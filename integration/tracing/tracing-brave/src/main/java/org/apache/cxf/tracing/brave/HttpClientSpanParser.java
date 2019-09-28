@@ -18,10 +18,9 @@
  */
 package org.apache.cxf.tracing.brave;
 
-import org.apache.cxf.common.util.StringUtils;
-
 import brave.http.HttpAdapter;
 import brave.http.HttpClientParser;
+import org.apache.cxf.common.util.StringUtils;
 
 public class HttpClientSpanParser extends HttpClientParser {
     @Override
@@ -32,8 +31,7 @@ public class HttpClientSpanParser extends HttpClientParser {
     private String buildSpanDescription(final String path, final String method) {
         if (StringUtils.isEmpty(method)) {
             return path;
-        } else {
-            return method + " " + path;
         }
+        return method + " " + path;
     }
 }

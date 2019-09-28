@@ -36,8 +36,13 @@ import org.apache.cxf.rs.security.jose.jaxrs.JwsWriterInterceptor;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Some encryption or signature tests, focus on how keys and certs are referenced and included.

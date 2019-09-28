@@ -55,7 +55,7 @@ public class BookNoSubResource {
     @Path("chapters/{chapterid}/")
     @GET
     public Chapter getChapter(@PathParam("id")int chapterid) {
-        return chapters.get(new Long(chapterid));
+        return chapters.get(Long.valueOf(chapterid));
     }
 
 }

@@ -24,7 +24,7 @@ import java.util.Collections;
 
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.rs.security.oauth2.common.Client;
-import org.apache.cxf.rs.security.oauth2.grants.code.DefaultEHCacheCodeDataProvider;
+import org.apache.cxf.rs.security.oauth2.grants.code.JCacheCodeDataProvider;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.xml.security.utils.ClassLoaderUtils;
@@ -32,7 +32,7 @@ import org.apache.xml.security.utils.ClassLoaderUtils;
 /**
  * Extend the DefaultEHCacheCodeDataProvider to allow refreshing of tokens
  */
-public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
+public class OAuthDataProviderImpl extends JCacheCodeDataProvider {
     public OAuthDataProviderImpl() throws Exception {
 
         Client client1 = new Client("CN=whateverhost.com,OU=Morpit,O=ApacheTest,L=Syracuse,C=US",
@@ -43,13 +43,13 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
         client1.getAllowedGrantTypes().add("custom_grant");
         registerCert(client1);
         this.setClient(client1);
-        
+
         Client client2 = new Client("bound",
                                    null,
                                    true,
                                    null,
                                    null);
-        client2.getProperties().put(OAuthConstants.TLS_CLIENT_AUTH_SUBJECT_DN, 
+        client2.getProperties().put(OAuthConstants.TLS_CLIENT_AUTH_SUBJECT_DN,
                                     "CN=whateverhost.com,OU=Morpit,O=ApacheTest,L=Syracuse,C=US");
         client2.getAllowedGrantTypes().add("custom_grant");
         this.setClient(client2);
@@ -67,12 +67,12 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
         Certificate cert = loadCert();
         String encodedCert = Base64Utility.encode(cert.getEncoded());
         client.setApplicationCertificates(Collections.singletonList(encodedCert));
-        
+
     }
 
     private Certificate loadCert() throws Exception {
         try (InputStream is = ClassLoaderUtils.getResourceAsStream("keys/Truststore.jks", this.getClass())) {
-            return CryptoUtils.loadCertificate(is, new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd'}, "morpit", null);
+            return CryptoUtils.loadCertificate(is, "password".toCharArray(), "morpit", null);
         }
     }
 }

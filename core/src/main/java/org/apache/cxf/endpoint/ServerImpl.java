@@ -30,6 +30,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.BindingFactory;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.logging.RegexLoggingFilter;
 import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
@@ -82,10 +83,18 @@ public class ServerImpl implements Server {
         }
 
         destination = destinationFactory.getDestination(ei, bus);
-        LOG.info("Setting the server's publish address to be " + ei.getAddress());
+        String wantFilter = ei.getAddress();
+        
+        if (wantFilter != null && wantFilter.startsWith("jms")) {
+            RegexLoggingFilter filter = new RegexLoggingFilter();
+            filter.setPattern("jms(.*?)password=+([^ ]+)");
+            filter.setGroup(2);
+            wantFilter = filter.filter(wantFilter).toString();
+        }
+        LOG.info("Setting the server's publish address to be " + wantFilter);
         serverRegistry = bus.getExtension(ServerRegistry.class);
 
-        mep = createManagedEndpoint();
+        mep = new ManagedEndpoint(bus, endpoint, this);
 
         slcMgr = bus.getExtension(ServerLifeCycleManager.class);
         if (slcMgr != null) {
@@ -100,10 +109,6 @@ public class ServerImpl implements Server {
                 LOG.log(Level.WARNING, "Registering ManagedEndpoint failed.", jmex);
             }
         }
-    }
-
-    private ManagedEndpoint createManagedEndpoint() {
-        return new ManagedEndpoint(bus, endpoint, this);
     }
 
     public Destination getDestination() {

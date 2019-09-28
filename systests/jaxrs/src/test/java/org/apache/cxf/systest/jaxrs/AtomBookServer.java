@@ -19,52 +19,12 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-import java.net.URISyntaxException;
+public class AtomBookServer extends AbstractSpringServer {
 
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.webapp.WebAppContext;
-
-public class AtomBookServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(AtomBookServer.class);
-    private org.eclipse.jetty.server.Server server;
 
-    protected void run() {
-        server = new org.eclipse.jetty.server.Server(Integer.parseInt(PORT));
-
-        WebAppContext webappcontext = new WebAppContext();
-        String contextPath = null;
-        try {
-            contextPath = getClass().getResource("/jaxrs_atom").toURI().getPath();
-        } catch (URISyntaxException e1) {
-            e1.printStackTrace();
-        }
-        webappcontext.setContextPath("/");
-
-        webappcontext.setWar(contextPath);
-
-        HandlerCollection handlers = new HandlerCollection();
-        handlers.setHandlers(new Handler[] {webappcontext, new DefaultHandler()});
-
-        server.setHandler(handlers);
-        try {
-            server.start();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public void tearDown() throws Exception {
-        super.tearDown();
-        if (server != null) {
-            server.stop();
-            server.destroy();
-            server = null;
-        }
+    public AtomBookServer() {
+        super("/jaxrs_atom", Integer.parseInt(PORT));
     }
 
     public static void main(String[] args) {

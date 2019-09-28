@@ -27,6 +27,8 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertTrue;
+
 /**
  * In this test case, a CXF JAX-RS client sends BasicAuth via (1-way) TLS to a CXF provider.
  * The provider converts it into Username Token and dispatches it to an STS for validation

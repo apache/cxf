@@ -70,15 +70,15 @@ public class CollectionType extends ArrayType {
         if (userTypeClass.isAssignableFrom(List.class)) {
             values = new ArrayList<>();
         } else if (userTypeClass.isAssignableFrom(LinkedList.class)) {
-            values = new LinkedList<Object>();
+            values = new LinkedList<>();
         } else if (userTypeClass.isAssignableFrom(Set.class)) {
             values = new HashSet<>();
         } else if (userTypeClass.isAssignableFrom(SortedSet.class)) {
-            values = new TreeSet<Object>();
-        } else if (userTypeClass.isAssignableFrom(Vector.class)) {
-            values = new Vector<Object>();
+            values = new TreeSet<>();
+        } else if (userTypeClass.isAssignableFrom(Vector.class)) { //NOPMD
+            values = new Vector<>(); //NOPMD
         } else if (userTypeClass.isAssignableFrom(Stack.class)) {
-            values = new Stack<Object>();
+            values = new Stack<>();
         } else if (userTypeClass.isInterface()) {
             values = new ArrayList<>();
         } else {

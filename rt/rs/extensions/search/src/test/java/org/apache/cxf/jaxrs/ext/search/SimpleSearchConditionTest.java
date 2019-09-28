@@ -74,23 +74,23 @@ public class SimpleSearchConditionTest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        cEq = new SimpleSearchCondition<SingleAttr>(ConditionType.EQUALS, attr);
-        cGt = new SimpleSearchCondition<SingleAttr>(ConditionType.GREATER_THAN, attr);
-        cGeq = new SimpleSearchCondition<SingleAttr>(ConditionType.GREATER_OR_EQUALS, attr);
-        cLt = new SimpleSearchCondition<SingleAttr>(ConditionType.LESS_THAN, attr);
-        cLeq = new SimpleSearchCondition<SingleAttr>(ConditionType.LESS_OR_EQUALS, attr);
+        cEq = new SimpleSearchCondition<>(ConditionType.EQUALS, attr);
+        cGt = new SimpleSearchCondition<>(ConditionType.GREATER_THAN, attr);
+        cGeq = new SimpleSearchCondition<>(ConditionType.GREATER_OR_EQUALS, attr);
+        cLt = new SimpleSearchCondition<>(ConditionType.LESS_THAN, attr);
+        cLeq = new SimpleSearchCondition<>(ConditionType.LESS_OR_EQUALS, attr);
 
-        dc1Eq = new SimpleSearchCondition<DoubleAttr>(ConditionType.EQUALS, attr1Val);
-        dc1Gt = new SimpleSearchCondition<DoubleAttr>(ConditionType.GREATER_THAN, attr1Val);
-        dc1Geq = new SimpleSearchCondition<DoubleAttr>(ConditionType.GREATER_OR_EQUALS, attr1Val);
-        dc1Lt = new SimpleSearchCondition<DoubleAttr>(ConditionType.LESS_THAN, attr1Val);
-        dc1Leq = new SimpleSearchCondition<DoubleAttr>(ConditionType.LESS_OR_EQUALS, attr1Val);
+        dc1Eq = new SimpleSearchCondition<>(ConditionType.EQUALS, attr1Val);
+        dc1Gt = new SimpleSearchCondition<>(ConditionType.GREATER_THAN, attr1Val);
+        dc1Geq = new SimpleSearchCondition<>(ConditionType.GREATER_OR_EQUALS, attr1Val);
+        dc1Lt = new SimpleSearchCondition<>(ConditionType.LESS_THAN, attr1Val);
+        dc1Leq = new SimpleSearchCondition<>(ConditionType.LESS_OR_EQUALS, attr1Val);
 
-        dc2Eq = new SimpleSearchCondition<DoubleAttr>(ConditionType.EQUALS, attr2Vals);
-        dc2Gt = new SimpleSearchCondition<DoubleAttr>(ConditionType.GREATER_THAN, attr2Vals);
-        dc2Geq = new SimpleSearchCondition<DoubleAttr>(ConditionType.GREATER_OR_EQUALS, attr2Vals);
-        dc2Lt = new SimpleSearchCondition<DoubleAttr>(ConditionType.LESS_THAN, attr2Vals);
-        dc2Leq = new SimpleSearchCondition<DoubleAttr>(ConditionType.LESS_OR_EQUALS, attr2Vals);
+        dc2Eq = new SimpleSearchCondition<>(ConditionType.EQUALS, attr2Vals);
+        dc2Gt = new SimpleSearchCondition<>(ConditionType.GREATER_THAN, attr2Vals);
+        dc2Geq = new SimpleSearchCondition<>(ConditionType.GREATER_OR_EQUALS, attr2Vals);
+        dc2Lt = new SimpleSearchCondition<>(ConditionType.LESS_THAN, attr2Vals);
+        dc2Leq = new SimpleSearchCondition<>(ConditionType.LESS_OR_EQUALS, attr2Vals);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -301,7 +301,7 @@ public class SimpleSearchConditionTest {
 
     @Test
     public void testIsMetWildcardEnds() {
-        SimpleSearchCondition<String> ssc = new SimpleSearchCondition<String>(ConditionType.EQUALS, "bar*");
+        SimpleSearchCondition<String> ssc = new SimpleSearchCondition<>(ConditionType.EQUALS, "bar*");
         assertTrue(ssc.isMet("bar"));
         assertTrue(ssc.isMet("barbaz"));
         assertFalse(ssc.isMet("foobar"));
@@ -309,7 +309,7 @@ public class SimpleSearchConditionTest {
 
     @Test
     public void testIsMetWildcardStarts() {
-        SimpleSearchCondition<String> ssc = new SimpleSearchCondition<String>(ConditionType.EQUALS, "*bar");
+        SimpleSearchCondition<String> ssc = new SimpleSearchCondition<>(ConditionType.EQUALS, "*bar");
         assertTrue(ssc.isMet("bar"));
         assertFalse(ssc.isMet("barbaz"));
         assertTrue(ssc.isMet("foobar"));
@@ -317,7 +317,7 @@ public class SimpleSearchConditionTest {
 
     @Test
     public void testIsMetWildcardStartsEnds() {
-        SimpleSearchCondition<String> ssc = new SimpleSearchCondition<String>(ConditionType.EQUALS, "*bar*");
+        SimpleSearchCondition<String> ssc = new SimpleSearchCondition<>(ConditionType.EQUALS, "*bar*");
         assertTrue(ssc.isMet("bar"));
         assertTrue(ssc.isMet("barbaz"));
         assertTrue(ssc.isMet("foobar"));
@@ -325,7 +325,7 @@ public class SimpleSearchConditionTest {
 
     @Test
     public void testIsMetWildcardMultiAsterisk() {
-        SimpleSearchCondition<String> ssc = new SimpleSearchCondition<String>(ConditionType.EQUALS, "*ba*r*");
+        SimpleSearchCondition<String> ssc = new SimpleSearchCondition<>(ConditionType.EQUALS, "*ba*r*");
         assertFalse(ssc.isMet("bar"));
         assertTrue(ssc.isMet("ba*r"));
         assertTrue(ssc.isMet("fooba*r"));

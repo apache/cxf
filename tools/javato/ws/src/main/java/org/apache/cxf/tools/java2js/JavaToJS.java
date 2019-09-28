@@ -106,10 +106,6 @@ public class JavaToJS extends AbstractCXFToolContainer {
                                JavaToJS.class.getResourceAsStream("java2js.xml"),
                                false,
                                pargs);
-        } catch (ToolException ex) {
-            System.err.println("Java2JS Error : " + ex.getMessage());
-            System.err.println();
-            ex.printStackTrace();
         } catch (Exception ex) {
             System.err.println("Java2JS Error : " + ex.getMessage());
             System.err.println();

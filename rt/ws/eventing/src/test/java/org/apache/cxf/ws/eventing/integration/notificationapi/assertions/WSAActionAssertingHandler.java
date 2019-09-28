@@ -61,7 +61,7 @@ public class WSAActionAssertingHandler implements SOAPHandler<SOAPMessageContext
         try {
             Element elm = DOMUtils.getFirstElement(context.getMessage().getSOAPHeader());
             while (elm != null) {
-                if (elm.getLocalName().equals("Action") && elm.getNamespaceURI().contains("addressing")) {
+                if ("Action".equals(elm.getLocalName()) && elm.getNamespaceURI().contains("addressing")) {
                     if (!elm.getTextContent().equals(action)) {
                         throw new RuntimeException("The event sink should have received "
                                 + "WSA-Action: " + action + " but received: "

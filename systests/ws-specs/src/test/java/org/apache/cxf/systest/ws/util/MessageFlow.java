@@ -33,9 +33,15 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.rm.RMConstants;
 
-import org.junit.Assert;
 
-public class MessageFlow extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class MessageFlow {
 
     private final String addressingNamespace;
     private final String rmNamespace;
@@ -256,7 +262,7 @@ public class MessageFlow extends Assert {
             boolean lastMessage;
             Element e = outbound ? getSequence(outboundMessages.get(i))
                 : getSequence(inboundMessages.get(i));
-            lastMessage = null == e ? false : getLastMessage(e);
+            lastMessage = null != e && getLastMessage(e);
             assertEquals("Outbound message " + i
                          + (expectedLastMessages[i] ? " does not contain expected last message element."
                              : " contains last message element."),
@@ -321,7 +327,7 @@ public class MessageFlow extends Assert {
 
     public void verifySequenceFault(QName code, boolean outbound, int index) throws Exception {
         Document d = outbound ? outboundMessages.get(index) : inboundMessages.get(index);
-        assert null != getRMHeaderElement(d, RMConstants.SEQUENCE_FAULT_NAME);
+        assertNotNull(getRMHeaderElement(d, RMConstants.SEQUENCE_FAULT_NAME));
     }
 
     public void verifyHeader(QName name, boolean outbound, int index) throws Exception {
@@ -524,7 +530,7 @@ public class MessageFlow extends Assert {
         try {
             buf.append(System.getProperty("line.separator"));
             for (int i = 0; i < streams.size(); i++) {
-                buf.append("[");
+                buf.append('[');
                 buf.append(i);
                 buf.append("] : ");
                 buf.append(new String(streams.get(i)));

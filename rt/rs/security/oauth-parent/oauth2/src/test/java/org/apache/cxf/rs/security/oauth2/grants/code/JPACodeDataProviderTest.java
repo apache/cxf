@@ -22,17 +22,22 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Collections;
 import java.util.List;
+
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
+
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JPACodeDataProviderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+public class JPACodeDataProviderTest {
     private EntityManagerFactory emFactory;
     private Connection connection;
     private JPACodeDataProvider provider;
@@ -58,7 +63,7 @@ public class JPACodeDataProviderTest extends Assert {
     }
 
     protected String getPersistenceUnitName() {
-        return "testUnitHibernate";
+        return "test-hibernate-cxf-rt-rs-security-oauth2";
     }
 
     protected void initializeProvider(JPACodeDataProvider dataProvider) {

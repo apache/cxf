@@ -22,6 +22,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
+import org.apache.cxf.attachment.AttachmentUtil;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class CachedOutputStreamTest extends CachedStreamTestBase {
 
@@ -62,7 +74,7 @@ public class CachedOutputStreamTest extends CachedStreamTestBase {
     @Override
     protected File getTmpFile(String result, Object cache) throws IOException {
         CachedOutputStream cos = (CachedOutputStream)cache;
-        cos.write(result.getBytes("utf-8"));
+        cos.write(result.getBytes(StandardCharsets.UTF_8));
         cos.flush();
         cos.getOut().close();
         return cos.getTempFile();
@@ -82,6 +94,38 @@ public class CachedOutputStreamTest extends CachedStreamTestBase {
     protected String readPartiallyFromStreamObject(Object cache, int len) throws IOException {
         return readPartiallyFromStream((InputStream)cache, len);
     }
-}
 
+    @Test
+    public void testUseSysPropsWithAttachmentDeserializer() throws Exception {
+        String old = System.getProperty(CachedConstants.THRESHOLD_SYS_PROP);
+        try {
+            System.clearProperty(CachedConstants.THRESHOLD_SYS_PROP);
+            reloadDefaultProperties();
+            CachedOutputStream cache = new CachedOutputStream();
+
+            Message message = new MessageImpl();
+            AttachmentUtil.setStreamedAttachmentProperties(message, cache);
+
+            File tmpfile = getTmpFile("Hello World!", cache);
+            assertNull("expects no tmp file", tmpfile);
+            cache.close();
+
+            System.setProperty(CachedConstants.THRESHOLD_SYS_PROP, "4");
+            reloadDefaultProperties();
+            cache = new CachedOutputStream();
+            AttachmentUtil.setStreamedAttachmentProperties(message, cache);
+
+            tmpfile = getTmpFile("Hello World!", cache);
+            assertNotNull("expects a tmp file", tmpfile);
+            assertTrue("expects a tmp file", tmpfile.exists());
+            cache.close();
+            assertFalse("expects no tmp file", tmpfile.exists());
+        } finally {
+            System.clearProperty(CachedConstants.THRESHOLD_SYS_PROP);
+            if (old != null) {
+                System.setProperty(CachedConstants.THRESHOLD_SYS_PROP, old);
+            }
+        }
+    }
+}
 

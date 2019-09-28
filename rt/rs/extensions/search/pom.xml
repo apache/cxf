@@ -23,16 +23,20 @@
     <packaging>bundle</packaging>
     <name>Apache CXF JAX-RS Extensions: Search</name>
     <description>Apache CXF JAX-RS Extensions: Search</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
-        <hibernate.em.version>4.1.0.Final</hibernate.em.version>
-        <hsqldb.version>1.8.0.10</hsqldb.version>
+        <cxf.module.name>org.apache.cxf.rs.search</cxf.module.name>
+        <cxf.osgi.import>
+            javax.persistence*;resolution:=optional,
+            org.apache.tika.*;resolution:=optional,
+            org.apache.lucene.*;resolution:=optional
+        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>
@@ -101,7 +105,15 @@
                 <exclusion>
                     <groupId>org.apache.poi</groupId>
                     <artifactId>poi-ooxml</artifactId>                
-                </exclusion>       
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-core</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -124,20 +136,19 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
-            <version>${hibernate.em.version}</version>
+            <version>${cxf.hibernate.em.version}</version>
             <scope>test</scope>
-            <!-- Conflicts with Apache Tika dependencies -->
             <exclusions>
                 <exclusion>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>                
+                    <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>hsqldb</groupId>
+            <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
-            <version>${hsqldb.version}</version>
+            <version>${cxf.hsqldb.version}</version>
             <scope>test</scope>
         </dependency>
         <!--
@@ -153,43 +164,4 @@
         <plugins>
         </plugins>
     </build>
-    <profiles>
-        <profile>
-            <id>java9</id>
-            <activation>
-                <jdk>9</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy</id>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>unpack</goal>
-                                </goals>
-                                <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.apache.geronimo.specs</groupId>
-                                            <artifactId>geronimo-jta_1.1_spec</artifactId>
-                                            <type>jar</type>
-                                            <overWrite>false</overWrite>
-                                            <outputDirectory>${project.basedir}/target/java9</outputDirectory>
-                                            <excludes>**/xa/*.class</excludes>
-                                        </artifactItem>
-                                    </artifactItems>
-                                    <overWriteReleases>false</overWriteReleases>
-                                    <overWriteSnapshots>true</overWriteSnapshots>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>

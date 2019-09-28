@@ -99,16 +99,15 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
     public boolean isMet(T pojo) {
         if (isPrimitive(pojo)) {
             return compare(pojo, cType, propertyValue);
-        } else {
-            Object lValue = getValue(propertyName, pojo);
-            Object rValue = getPrimitiveValue(propertyName, propertyValue);
-            return lValue == null ? false : compare(lValue, cType, rValue);
         }
+        Object lValue = getValue(propertyName, pojo);
+        Object rValue = getPrimitiveValue(propertyName, propertyValue);
+        return lValue != null && compare(lValue, cType, rValue);
     }
 
     private Object getValue(String getter, T pojo) {
         String thePropertyName;
-        int index = getter.indexOf(".");
+        int index = getter.indexOf('.');
         if (index != -1) {
             thePropertyName = getter.substring(0, index);
         } else {
@@ -192,6 +191,9 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
         if (rval.charAt(0) == '*') {
             starts = true;
             rval = rval.substring(1);
+            if (rval.isEmpty()) {
+                throw new SearchParseException("A single wildcard is not a valid search condition");
+            }
         }
         if (rval.charAt(rval.length() - 1) == '*') {
             ends = true;
@@ -206,14 +208,13 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
             } else {
                 return lval.contains(rval);
             }
-        } else {
-            return lval.equals(rval);
         }
+        return lval.equals(rval);
     }
 
     protected static Object getPrimitiveValue(String name, Object value) {
 
-        int index = name.indexOf(".");
+        int index = name.indexOf('.');
         if (index != -1) {
             String[] names = name.split("\\.");
             name = name.substring(index + 1);

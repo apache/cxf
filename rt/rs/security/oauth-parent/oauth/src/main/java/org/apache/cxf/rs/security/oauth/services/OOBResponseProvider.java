@@ -36,7 +36,6 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
 import net.oauth.OAuth;
-
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
 import org.apache.cxf.rs.security.oauth.utils.OAuthConstants;
@@ -47,7 +46,7 @@ import org.apache.cxf.rs.security.oauth.utils.OAuthConstants;
 public class OOBResponseProvider implements
     MessageBodyReader<OOBAuthorizationResponse>, MessageBodyWriter<OOBAuthorizationResponse> {
 
-    private FormEncodingProvider<Form> formProvider = new FormEncodingProvider<Form>();
+    private FormEncodingProvider<Form> formProvider = new FormEncodingProvider<>();
 
     public boolean isReadable(Class<?> type, Type genericType,
                               Annotation[] annotations, MediaType mt) {

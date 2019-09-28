@@ -37,6 +37,7 @@ import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.token.realm.CertConstraintsParser;
 import org.apache.cxf.ws.security.sts.provider.model.secext.BinarySecurityTokenType;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.BinarySecurity;
@@ -100,8 +101,8 @@ public class X509TokenValidator implements TokenValidator {
             && X509_V3_TYPE.equals(((BinarySecurityTokenType)token).getValueType())) {
             return true;
         } else if (token instanceof Element
-            && WSConstants.SIG_NS.equals(((Element)token).getNamespaceURI())
-            && WSConstants.X509_DATA_LN.equals(((Element)token).getLocalName())) {
+            && WSS4JConstants.SIG_NS.equals(((Element)token).getNamespaceURI())
+            && WSS4JConstants.X509_DATA_LN.equals(((Element)token).getLocalName())) {
             return true;
         }
         return false;
@@ -147,7 +148,7 @@ public class X509TokenValidator implements TokenValidator {
             //
             // Turn the received JAXB object into a DOM element
             //
-            Document doc = DOMUtils.createDocument();
+            Document doc = DOMUtils.getEmptyDocument();
             binarySecurity = new X509Security(doc);
             binarySecurity.setEncodingType(encodingType);
             binarySecurity.setValueType(binarySecurityType.getValueType());
@@ -157,7 +158,7 @@ public class X509TokenValidator implements TokenValidator {
             binarySecurity.getElement().appendChild(textNode);
         } else if (validateTarget.isDOMElement()) {
             try {
-                Document doc = DOMUtils.createDocument();
+                Document doc = DOMUtils.getEmptyDocument();
                 binarySecurity = new X509Security(doc);
                 binarySecurity.setEncodingType(BASE64_ENCODING);
                 X509Data x509Data = new X509Data((Element)validateTarget.getToken(), "");
@@ -165,9 +166,6 @@ public class X509TokenValidator implements TokenValidator {
                     X509Certificate cert = x509Data.itemCertificate(0).getX509Certificate();
                     ((X509Security)binarySecurity).setX509Certificate(cert);
                 }
-            } catch (WSSecurityException ex) {
-                LOG.log(Level.WARNING, "", ex);
-                return response;
             } catch (XMLSecurityException ex) {
                 LOG.log(Level.WARNING, "", ex);
                 return response;

@@ -206,7 +206,7 @@ class HttpServletResponseAdapter implements HttpServletResponse {
     }
 
     public void setHeader(String name, String value) {
-        List<String> list = new LinkedList<String>();
+        List<String> list = new LinkedList<>();
         list.add(value);
         exchange.getResponseHeaders().put(name, list);
     }

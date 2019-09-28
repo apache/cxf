@@ -44,8 +44,12 @@ import org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor;
 import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.interceptor.StaxInInterceptor;
+
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 
 public class SAAJInInterceptorTest extends TestBase {
@@ -139,7 +143,7 @@ public class SAAJInInterceptorTest extends TestBase {
         Iterator<?> detailEntries = faultDetail.getDetailEntries();
         DetailEntry detailEntry = (DetailEntry)detailEntries.next();
         assertEquals("errorcode", detailEntry.getLocalName());
-        assertEquals(3, Integer.valueOf(detailEntry.getTextContent()).intValue());
+        assertEquals(3, Integer.parseInt(detailEntry.getTextContent()));
         detailEntry = (DetailEntry)detailEntries.next();
         assertEquals("errorstring", detailEntry.getLocalName());
         assertEquals("This is a fault detail error string", detailEntry.getTextContent());

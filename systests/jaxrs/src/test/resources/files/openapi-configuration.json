@@ -1,0 +1,26 @@
+{
+    "resourcePackages": [
+        "org.apache.cxf.systest.jaxrs.description.openapi"
+    ],
+    "prettyPrint" : true,
+    "cacheTTL": 0,
+    "openAPI": {
+        "info": {
+            "version": "1.0.0",
+            "title": "Books API",
+            "description": "A sample Books API",
+            "contact": {
+                "email": "cxf-dev@apache.org"
+            },
+            "license": {
+                "name": "Apache 2.0",
+                "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+            }
+        },        
+        "components": {
+            "securitySchemes" : { 
+                "basicAuth": { "type": "http" } 
+            }
+        }
+    }
+}

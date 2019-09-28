@@ -30,6 +30,7 @@ import org.apache.cxf.configuration.blueprint.SimpleBPBeanDefinitionParser;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
+import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
 
@@ -83,7 +84,7 @@ public class ServerFactoryBeanDefinitionParser extends SimpleBPBeanDefinitionPar
         bean.setDestroyMethod("destroy");
 
         // We don't really want to delay the registration of our Server
-        bean.setActivation(MutableBeanMetadata.ACTIVATION_EAGER);
+        bean.setActivation(ComponentMetadata.ACTIVATION_EAGER);
         return bean;
     }
 

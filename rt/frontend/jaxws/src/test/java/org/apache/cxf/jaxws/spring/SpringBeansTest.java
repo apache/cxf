@@ -22,7 +22,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 
-
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
@@ -54,15 +53,24 @@ import org.apache.cxf.jaxws.service.Hello;
 import org.apache.cxf.jaxws.spring.NamespaceHandler.SpringServerFactoryBean;
 import org.apache.cxf.message.Message;
 import org.apache.hello_world_soap_http.Greeter;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Test;
-
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class SpringBeansTest extends Assert {
+import org.junit.After;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+
+public class SpringBeansTest {
 
     @After
     public void tearDown() throws Exception {
@@ -403,11 +411,10 @@ public class SpringBeansTest extends Assert {
 
     @Test
     public void testTwoEndpointsWithTwoBuses() throws Exception {
-        ClassPathXmlApplicationContext ctx = null;
         Bus cxf1 = null;
         Bus cxf2 = null;
-        try {
-            ctx = new ClassPathXmlApplicationContext("/org/apache/cxf/jaxws/spring/endpoints2.xml");
+        try (ClassPathXmlApplicationContext ctx
+            = new ClassPathXmlApplicationContext("/org/apache/cxf/jaxws/spring/endpoints2.xml")) {
             EndpointImpl ep1 = (EndpointImpl) ctx.getBean("ep1");
             assertNotNull(ep1);
             cxf1 = (Bus) ctx.getBean("cxf1");
@@ -428,9 +435,6 @@ public class SpringBeansTest extends Assert {
             }
             if (cxf2 != null) {
                 cxf2.shutdown(true);
-            }
-            if (ctx != null) {
-                ctx.close();
             }
         }
     }
@@ -476,4 +480,3 @@ public class SpringBeansTest extends Assert {
         assertNotNull(pc.getContext());
     }
 }
-

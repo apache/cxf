@@ -60,7 +60,7 @@ public class OASISCatalogManager {
 
     private EntityResolver resolver;
     private Object catalog;
-    private Set<String> loadedCatalogs = new CopyOnWriteArraySet<String>();
+    private Set<String> loadedCatalogs = new CopyOnWriteArraySet<>();
     private Bus bus;
 
     public OASISCatalogManager() {

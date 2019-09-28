@@ -32,8 +32,10 @@ import org.apache.cxf.aegis.AegisReader;
 import org.apache.cxf.aegis.services.SimpleBean;
 import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.test.TestUtilities;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -60,13 +62,13 @@ public class StandaloneReadTest {
         XMLStreamReader streamReader = testUtilities.getResourceAsXMLStreamReader("stringElement.xml");
         AegisReader<XMLStreamReader> reader = context.createXMLStreamReader();
         Object something = reader.read(streamReader);
-        assertTrue("ball-of-yarn".equals(something));
+        assertEquals("ball-of-yarn", something);
     }
 
     @Test
     public void testCollectionReadNoXsiType() throws Exception {
         context = new AegisContext();
-        Set<java.lang.reflect.Type> roots = new HashSet<java.lang.reflect.Type>();
+        Set<java.lang.reflect.Type> roots = new HashSet<>();
         java.lang.reflect.Type listStringType
             = ListStringInterface.class.getMethods()[0].getGenericReturnType();
         roots.add(listStringType);
@@ -91,7 +93,7 @@ public class StandaloneReadTest {
     @Test
     public void testCollectionReadXsiType() throws Exception {
         context = new AegisContext();
-        Set<java.lang.reflect.Type> roots = new HashSet<java.lang.reflect.Type>();
+        Set<java.lang.reflect.Type> roots = new HashSet<>();
         java.lang.reflect.Type listStringType
             = ListStringInterface.class.getMethods()[0].getGenericReturnType();
         roots.add(listStringType);
@@ -114,7 +116,7 @@ public class StandaloneReadTest {
     @Test
     public void testSimpleBeanRead() throws Exception {
         context = new AegisContext();
-        Set<java.lang.reflect.Type> rootClasses = new HashSet<java.lang.reflect.Type>();
+        Set<java.lang.reflect.Type> rootClasses = new HashSet<>();
         rootClasses.add(SimpleBean.class);
         context.setRootClasses(rootClasses);
         context.initialize();

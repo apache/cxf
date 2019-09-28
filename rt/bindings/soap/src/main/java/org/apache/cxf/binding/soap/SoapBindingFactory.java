@@ -22,6 +22,7 @@ package org.apache.cxf.binding.soap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -114,14 +115,14 @@ import static org.apache.cxf.helpers.CastUtils.cast;
 
 @NoJSR250Annotations(unlessNull = { "bus" })
 public class SoapBindingFactory extends AbstractWSDLBindingFactory {
-    public static final Collection<String> DEFAULT_NAMESPACES = Arrays.asList(
+    public static final Collection<String> DEFAULT_NAMESPACES = Collections.unmodifiableList(Arrays.asList(
         "http://schemas.xmlsoap.org/soap/",
         "http://schemas.xmlsoap.org/wsdl/soap/",
         "http://schemas.xmlsoap.org/wsdl/soap12/",
         "http://schemas.xmlsoap.org/wsdl/soap/http",
         "http://www.w3.org/2003/05/soap/bindings/HTTP/",
         "http://www.w3.org/2010/soapjms/"
-    );
+    ));
 
 
     public static final String SOAP_11_BINDING = "http://schemas.xmlsoap.org/wsdl/soap/";
@@ -334,9 +335,6 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
     }
 
     public Binding createBinding(BindingInfo binding) {
-        // TODO what about the mix style/use?
-
-
         // The default style should be doc-lit wrapped.
         String parameterStyle = SoapBindingConstants.PARAMETER_STYLE_WRAPPED;
         String bindingStyle = SoapBindingConstants.BINDING_STYLE_DOC;
@@ -810,7 +808,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
                 partName = mc.getPart();
 
                 if (attParts == null) {
-                    attParts = new LinkedList<MessagePartInfo>();
+                    attParts = new LinkedList<>();
                 }
 
                 if (StringUtils.isEmpty(partName)) {

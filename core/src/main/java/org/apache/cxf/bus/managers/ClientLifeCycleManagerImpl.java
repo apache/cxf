@@ -35,7 +35,7 @@ import org.apache.cxf.extension.BusExtension;
 public class ClientLifeCycleManagerImpl implements ClientLifeCycleManager, BusExtension {
 
     private CopyOnWriteArrayList<ClientLifeCycleListener> listeners
-        = new CopyOnWriteArrayList<ClientLifeCycleListener>();
+        = new CopyOnWriteArrayList<>();
 
     public ClientLifeCycleManagerImpl() {
 

@@ -30,6 +30,11 @@ if not defined CXF_HOME goto set_cxf_home
 :cont
 if not defined JAVA_HOME goto no_java_home
 
+rem Retrieve java version
+for /f tokens^=2-5^ delims^=.-_+^" %%j in ('"%JAVA_HOME%\bin\java" -fullversion 2^>^&1') do (
+    if %%j==1 (set JAVA_VERSION=%%k) else (set JAVA_VERSION=%%j)
+)
+
 if not exist "%CXF_HOME%\lib\cxf-manifest.jar" goto no_cxf_jar
 
 set CXF_JAR=%CXF_HOME%\lib\cxf-manifest.jar
@@ -38,7 +43,11 @@ if "%JAVA_MAX_MEM%" == "" (
     set JAVA_MAX_MEM=512M
 )
 
-"%JAVA_HOME%\bin\java" -Xmx%JAVA_MAX_MEM% -Djava.endorsed.dirs="%CXF_HOME%\lib\endorsed" -cp "%CXF_JAR%;%CLASSPATH%" -Djava.util.logging.config.file="%CXF_HOME%\etc\logging.properties" org.apache.cxf.tools.wsdlto.javascript.WSDLToJavaScript %*
+if %JAVA_VERSION% GTR 8 (
+    "%JAVA_HOME%\bin\java" -Xmx%JAVA_MAX_MEM% -cp "%CXF_JAR%;%CLASSPATH%" -Djava.util.logging.config.file="%CXF_HOME%\etc\logging.properties" org.apache.cxf.tools.wsdlto.javascript.WSDLToJavaScript %*
+) else (
+    "%JAVA_HOME%\bin\java" -Xmx%JAVA_MAX_MEM% -Djava.endorsed.dirs="%CXF_HOME%\lib\endorsed" -cp "%CXF_JAR%;%CLASSPATH%" -Djava.util.logging.config.file="%CXF_HOME%\etc\logging.properties" org.apache.cxf.tools.wsdlto.javascript.WSDLToJavaScript %*
+)
 
 @endlocal
 
@@ -49,7 +58,7 @@ echo ERROR: Unable to find cxf-manifest.jar in %cxf_home/lib
 goto end
 
 :no_java_home
-echo ERROR: Set JAVA_HOME to the path where the J2SE 6.0 (JDK6.0) is installed
+echo ERROR: Set JAVA_HOME to the path where the Java Development Kit (JDK) is installed
 goto end 
 
 :set_cxf_home

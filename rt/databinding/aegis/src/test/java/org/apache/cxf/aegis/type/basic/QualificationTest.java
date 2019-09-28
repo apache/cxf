@@ -32,10 +32,12 @@ import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.ws.commons.schema.constants.Constants;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class QualificationTest extends AbstractAegisTest {
 
+    @Before
     public void setUp() throws Exception {
         super.setUp();
 

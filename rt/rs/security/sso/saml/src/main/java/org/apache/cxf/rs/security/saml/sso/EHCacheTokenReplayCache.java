@@ -31,7 +31,6 @@ import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
 import net.sf.ehcache.config.DiskStoreConfiguration;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
@@ -137,10 +136,10 @@ public class EHCacheTokenReplayCache implements TokenReplayCache<String> {
         }
 
         int parsedTTL = (int)timeToLive;
-        if (timeToLive != (long)parsedTTL || parsedTTL < 0 || parsedTTL > MAX_TTL) {
+        if (timeToLive != parsedTTL || parsedTTL < 0 || parsedTTL > MAX_TTL) {
             // Default to configured value
             parsedTTL = (int)ttl;
-            if (ttl != (long)parsedTTL) {
+            if (ttl != parsedTTL) {
                 // Fall back to 60 minutes if the default TTL is set incorrectly
                 parsedTTL = 3600;
             }

@@ -39,13 +39,13 @@ import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SimplePrincipal;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
@@ -121,7 +121,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
 
         HttpServletRequest req = getMessageContext().getHttpServletRequest();
         for (OAuthPermission perm : permissions) {
-            boolean uriOK = checkRequestURI(req, perm.getUris());
+            boolean uriOK = checkRequestURI(req, perm.getUris(), m);
             boolean verbOK = checkHttpVerb(req, perm.getHttpVerbs());
             boolean scopeOk = checkScopeProperty(perm.getPermission());
             if (uriOK && verbOK && scopeOk) {
@@ -197,12 +197,16 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         return true;
     }
 
-    protected boolean checkRequestURI(HttpServletRequest request, List<String> uris) {
+        
+    protected boolean checkRequestURI(HttpServletRequest request, List<String> uris, Message m) {
 
         if (uris.isEmpty()) {
             return true;
         }
         String servletPath = request.getPathInfo();
+        if (servletPath == null) {
+            servletPath = (String)m.get(Message.PATH_INFO);
+        }
         boolean foundValidScope = false;
         for (String uri : uris) {
             if (OAuthUtils.checkRequestURI(servletPath, uri)) {
@@ -219,9 +223,8 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
     protected boolean checkScopeProperty(String scope) {
         if (!requiredScopes.isEmpty()) {
             return requiredScopes.contains(scope);
-        } else {
-            return true;
         }
+        return true;
     }
     public void setUseUserSubject(boolean useUserSubject) {
         this.useUserSubject = useUserSubject;
@@ -258,7 +261,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         //used to handle preflights but local preflights (to be handled by the service code)
         // will be blocked by this filter unless CORS filter has done the initial validation
         // and set a message "local_preflight" property to true
-        return MessageUtils.isTrue(m.get("local_preflight"));
+        return PropertyUtils.isTrue(m.get("local_preflight"));
     }
 
     protected String validateAudiences(List<String> audiences) {
@@ -292,9 +295,8 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
     protected String[] getAuthorizationParts(Message m) {
         if (!checkFormData) {
             return AuthorizationUtils.getAuthorizationParts(getMessageContext(), supportedSchemes);
-        } else {
-            return new String[]{OAuthConstants.BEARER_AUTHORIZATION_SCHEME, getTokenFromFormData(m)};
         }
+        return new String[]{OAuthConstants.BEARER_AUTHORIZATION_SCHEME, getTokenFromFormData(m)};
     }
 
     protected String getTokenFromFormData(Message message) {
@@ -303,7 +305,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         if (type != null && MediaType.APPLICATION_FORM_URLENCODED.startsWith(type)
             && method != null && (method.equals(HttpMethod.POST) || method.equals(HttpMethod.PUT))) {
             try {
-                FormEncodingProvider<Form> provider = new FormEncodingProvider<Form>(true);
+                FormEncodingProvider<Form> provider = new FormEncodingProvider<>(true);
                 Form form = FormUtils.readForm(provider, message);
                 MultivaluedMap<String, String> formData = form.asMap();
                 String token = formData.getFirst(OAuthConstants.ACCESS_TOKEN);

@@ -45,12 +45,14 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.easymock.EasyMock;
 
-import org.junit.Assert;
+import org.easymock.EasyMock;
 import org.junit.Test;
 
-public class XSLTJaxbProviderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class XSLTJaxbProviderTest {
 
     private static final String TEMPLATE_LOCATION = "classpath:/org/apache/cxf/jaxrs/provider/template.xsl";
     private static final String BOOK_XML = "<Book><id>123</id><name>TheBook</name></Book>";
@@ -58,14 +60,14 @@ public class XSLTJaxbProviderTest extends Assert {
 
     @Test
     public void testIsWriteable() throws Exception {
-        XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<Book>();
+        XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<>();
         provider.setOutTemplate(TEMPLATE_LOCATION);
         provider.isWriteable(Book.class, Book.class, null, MediaType.APPLICATION_XML_TYPE);
     }
 
     @Test
     public void testIsWriteableWithSetClasses() throws Exception {
-        XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<Book>();
+        XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<>();
         provider.setOutTemplate(TEMPLATE_LOCATION);
         List<String> names = new ArrayList<>();
         names.add(Book.class.getName());
@@ -75,7 +77,7 @@ public class XSLTJaxbProviderTest extends Assert {
 
     @Test
     public void testNotWriteableWithSetClasses() throws Exception {
-        XSLTJaxbProvider<SuperBook> provider = new XSLTJaxbProvider<SuperBook>();
+        XSLTJaxbProvider<SuperBook> provider = new XSLTJaxbProvider<>();
         provider.setOutTemplate(TEMPLATE_LOCATION);
         List<String> names = new ArrayList<>();
         names.add(Book.class.getName());
@@ -85,7 +87,7 @@ public class XSLTJaxbProviderTest extends Assert {
 
     @Test
     public void testIsWriteableWithSetClassesAndJaxbOnly() throws Exception {
-        XSLTJaxbProvider<SuperBook> provider = new XSLTJaxbProvider<SuperBook>();
+        XSLTJaxbProvider<SuperBook> provider = new XSLTJaxbProvider<>();
         provider.setSupportJaxbOnly(true);
         provider.setOutTemplate(TEMPLATE_LOCATION);
         List<String> names = new ArrayList<>();
@@ -96,7 +98,7 @@ public class XSLTJaxbProviderTest extends Assert {
 
     @Test
     public void testWrite() throws Exception {
-        XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<Book>();
+        XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<>();
         provider.setOutTemplate(TEMPLATE_LOCATION);
         provider.setMessageContext(new MessageContextImpl(createMessage()));
         Book b = new Book();
@@ -113,7 +115,7 @@ public class XSLTJaxbProviderTest extends Assert {
 
     @Test
     public void testWriteWithAnnotation() throws Exception {
-        XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<Book>();
+        XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<>();
         provider.setMessageContext(new MessageContextImpl(createMessage()));
         Book b = new Book();
         b.setId(123L);
@@ -154,7 +156,7 @@ public class XSLTJaxbProviderTest extends Assert {
 
     @Test
     public void testWriteWithoutTemplate() throws Exception {
-        XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<Book>();
+        XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<>();
         provider.setSupportJaxbOnly(true);
 
         Book b = new Book();
@@ -170,14 +172,14 @@ public class XSLTJaxbProviderTest extends Assert {
 
     @Test
     public void testIsReadable() throws Exception {
-        XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<Book>();
+        XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<>();
         provider.setInTemplate(TEMPLATE_LOCATION);
         provider.isReadable(Book.class, Book.class, null, MediaType.APPLICATION_XML_TYPE);
     }
 
     @Test
     public void testIsReadableWithSetClasses() throws Exception {
-        XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<Book>();
+        XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<>();
         provider.setInTemplate(TEMPLATE_LOCATION);
         List<String> names = new ArrayList<>();
         names.add(Book.class.getName());
@@ -187,7 +189,7 @@ public class XSLTJaxbProviderTest extends Assert {
 
     @Test
     public void testNotReadableWithSetClasses() throws Exception {
-        XSLTJaxbProvider<SuperBook> provider = new XSLTJaxbProvider<SuperBook>();
+        XSLTJaxbProvider<SuperBook> provider = new XSLTJaxbProvider<>();
         provider.setInTemplate(TEMPLATE_LOCATION);
         List<String> names = new ArrayList<>();
         names.add(Book.class.getName());
@@ -197,7 +199,7 @@ public class XSLTJaxbProviderTest extends Assert {
 
     @Test
     public void testIsReadableWithSetClassesAndJaxbOnly() throws Exception {
-        XSLTJaxbProvider<SuperBook> provider = new XSLTJaxbProvider<SuperBook>();
+        XSLTJaxbProvider<SuperBook> provider = new XSLTJaxbProvider<>();
         provider.setSupportJaxbOnly(true);
         provider.setInTemplate(TEMPLATE_LOCATION);
         List<String> names = new ArrayList<>();
@@ -208,7 +210,7 @@ public class XSLTJaxbProviderTest extends Assert {
 
     @Test
     public void testRead() throws Exception {
-        XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<Book>();
+        XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<>();
         provider.setInTemplate(TEMPLATE_LOCATION);
 
         Book b = new Book();
@@ -243,7 +245,7 @@ public class XSLTJaxbProviderTest extends Assert {
 
     @Test
     public void testReadWithoutTemplate() throws Exception {
-        XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<Book>();
+        XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<>();
         provider.setSupportJaxbOnly(true);
 
         Book b = new Book();
@@ -263,17 +265,12 @@ public class XSLTJaxbProviderTest extends Assert {
         Exchange e = new ExchangeImpl();
         m.setExchange(e);
         e.setInMessage(m);
-        Endpoint endpoint = EasyMock.createMock(Endpoint.class);
-        endpoint.getEndpointInfo();
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
-        endpoint.get(Application.class.getName());
-        EasyMock.expectLastCall().andReturn(null);
-        endpoint.size();
-        EasyMock.expectLastCall().andReturn(0).anyTimes();
-        endpoint.isEmpty();
-        EasyMock.expectLastCall().andReturn(true).anyTimes();
-        endpoint.get(ServerProviderFactory.class.getName());
-        EasyMock.expectLastCall().andReturn(factory).anyTimes();
+        Endpoint endpoint = EasyMock.mock(Endpoint.class);
+        EasyMock.expect(endpoint.getEndpointInfo()).andReturn(null).anyTimes();
+        EasyMock.expect(endpoint.get(Application.class.getName())).andReturn(null);
+        EasyMock.expect(endpoint.size()).andReturn(0).anyTimes();
+        EasyMock.expect(endpoint.isEmpty()).andReturn(true).anyTimes();
+        EasyMock.expect(endpoint.get(ServerProviderFactory.class.getName())).andReturn(factory).anyTimes();
         EasyMock.replay(endpoint);
         e.put(Endpoint.class, endpoint);
         return m;

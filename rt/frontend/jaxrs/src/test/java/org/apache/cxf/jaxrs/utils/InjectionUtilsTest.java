@@ -20,10 +20,13 @@ package org.apache.cxf.jaxrs.utils;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -31,10 +34,15 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import com.migesok.jaxb.adapter.javatime.LocalDateXmlAdapter;
 
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.model.ParameterType;
@@ -44,12 +52,16 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.easymock.EasyMock;
 
-import org.junit.Assert;
+import org.easymock.EasyMock;
 import org.junit.Test;
 
-public class InjectionUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class InjectionUtilsTest {
 
 
     @Test
@@ -58,7 +70,7 @@ public class InjectionUtilsTest extends Assert {
         String value = "1.1";
 
         // Act
-        Object id = InjectionUtils.handleParameter(value,
+        Id id = InjectionUtils.handleParameter(value,
                                                    true,
                                                    Id.class,
                                                    Id.class,
@@ -67,20 +79,20 @@ public class InjectionUtilsTest extends Assert {
                                                    createMessage());
 
         // Assert
-        assertTrue(id instanceof Id);
-        assertEquals(value, ((Id)id).getId());
+        assertEquals(value, id.getId());
     }
 
+    @Test
     public void testCollectionTypeFromArray() {
         assertNull(InjectionUtils.getCollectionType(String[].class));
     }
 
     @Test
     public void testCollectionType() {
-        assertEquals(ArrayList.class, InjectionUtils.getCollectionType(Collection.class));
-        assertEquals(ArrayList.class, InjectionUtils.getCollectionType(List.class));
-        assertEquals(HashSet.class, InjectionUtils.getCollectionType(Set.class));
-        assertEquals(TreeSet.class, InjectionUtils.getCollectionType(SortedSet.class));
+        assertEquals(ArrayList.class, InjectionUtils.getCollectionType(Collection.class)); //NOPMD
+        assertEquals(ArrayList.class, InjectionUtils.getCollectionType(List.class)); //NOPMD
+        assertEquals(HashSet.class, InjectionUtils.getCollectionType(Set.class)); //NOPMD
+        assertEquals(TreeSet.class, InjectionUtils.getCollectionType(SortedSet.class)); //NOPMD
     }
 
     @Test
@@ -172,8 +184,16 @@ public class InjectionUtilsTest extends Assert {
         assertEquals(String.class, str);
         ParameterizedType list = (ParameterizedType) InjectionUtils.getGenericResponseType(
             GenericInterface.class.getMethod("list"), TestService.class,
-            new ArrayList<>(), ArrayList.class, new ExchangeImpl());
+            new ArrayList<>(), ArrayList.class, new ExchangeImpl()); //NOPMD
         assertEquals(String.class, list.getActualTypeArguments()[0]);
+    }
+
+    @Test(expected = InternalServerErrorException.class)
+    public void testJsr310DateExceptionHandling() {
+        Field field = CustomerDetailsWithAdapter.class.getDeclaredFields()[0];
+        Annotation[] paramAnns = field.getDeclaredAnnotations();
+        InjectionUtils.createParameterObject(Collections.singletonList("wrongDate"), LocalDate.class,
+                LocalDate.class, paramAnns, null, false, ParameterType.QUERY, createMessage());
     }
 
     static class CustomerBean1 {
@@ -251,24 +271,19 @@ public class InjectionUtilsTest extends Assert {
         }
     }
 
-    private Message createMessage() {
+    private static Message createMessage() {
         ProviderFactory factory = ServerProviderFactory.getInstance();
         Message m = new MessageImpl();
         m.put("org.apache.cxf.http.case_insensitive_queries", false);
         Exchange e = new ExchangeImpl();
         m.setExchange(e);
         e.setInMessage(m);
-        Endpoint endpoint = EasyMock.createMock(Endpoint.class);
-        endpoint.getEndpointInfo();
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
-        endpoint.get(Application.class.getName());
-        EasyMock.expectLastCall().andReturn(null);
-        endpoint.size();
-        EasyMock.expectLastCall().andReturn(0).anyTimes();
-        endpoint.isEmpty();
-        EasyMock.expectLastCall().andReturn(true).anyTimes();
-        endpoint.get(ServerProviderFactory.class.getName());
-        EasyMock.expectLastCall().andReturn(factory).anyTimes();
+        Endpoint endpoint = EasyMock.mock(Endpoint.class);
+        EasyMock.expect(endpoint.getEndpointInfo()).andReturn(null).anyTimes();
+        EasyMock.expect(endpoint.get(Application.class.getName())).andReturn(null);
+        EasyMock.expect(endpoint.size()).andReturn(0).anyTimes();
+        EasyMock.expect(endpoint.isEmpty()).andReturn(true).anyTimes();
+        EasyMock.expect(endpoint.get(ServerProviderFactory.class.getName())).andReturn(factory).anyTimes();
         EasyMock.replay(endpoint);
         e.put(Endpoint.class, endpoint);
         return m;
@@ -350,6 +365,21 @@ public class InjectionUtilsTest extends Assert {
         @Override
         public List<String> list() {
             return new ArrayList<>();
+        }
+    }
+
+    public class CustomerDetailsWithAdapter {
+        @NotNull
+        @QueryParam("birthDate")
+        @XmlJavaTypeAdapter(LocalDateXmlAdapter.class)
+        private LocalDate birthDate;
+
+        public LocalDate getBirthDate() {
+            return birthDate;
+        }
+
+        public void setBirthDate(LocalDate birthDate) {
+            this.birthDate = birthDate;
         }
     }
 }

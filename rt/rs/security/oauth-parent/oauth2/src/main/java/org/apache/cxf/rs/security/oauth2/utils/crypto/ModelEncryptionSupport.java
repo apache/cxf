@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.crypto.SecretKey;
+import javax.security.auth.DestroyFailedException;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
@@ -99,7 +100,16 @@ public final class ModelEncryptionSupport {
     public static Client decryptClient(String encodedSequence, String encodedSecretKey,
                                        KeyProperties props) throws SecurityException {
         SecretKey key = CryptoUtils.decodeSecretKey(encodedSecretKey, props.getKeyAlgo());
-        return decryptClient(encodedSequence, key, props);
+        Client client = decryptClient(encodedSequence, key, props);
+
+        // Clean the secret key from memory when we're done
+        try {
+            key.destroy();
+        } catch (DestroyFailedException ex) {
+            // ignore
+        }
+
+        return client;
     }
 
     public static Client decryptClient(String encodedSequence, Key secretKey) throws SecurityException {
@@ -123,7 +133,16 @@ public final class ModelEncryptionSupport {
                                                  String encodedSecretKey,
                                                  KeyProperties props) throws SecurityException {
         SecretKey key = CryptoUtils.decodeSecretKey(encodedSecretKey, props.getKeyAlgo());
-        return decryptAccessToken(provider, encodedToken, key, props);
+        ServerAccessToken serverAccessToken = decryptAccessToken(provider, encodedToken, key, props);
+
+        // Clean the secret key from memory when we're done
+        try {
+            key.destroy();
+        } catch (DestroyFailedException ex) {
+            // ignore
+        }
+
+        return serverAccessToken;
     }
 
     public static ServerAccessToken decryptAccessToken(OAuthDataProvider provider,
@@ -151,7 +170,16 @@ public final class ModelEncryptionSupport {
                                                   String encodedSecretKey,
                                                   KeyProperties props) throws SecurityException {
         SecretKey key = CryptoUtils.decodeSecretKey(encodedSecretKey, props.getKeyAlgo());
-        return decryptRefreshToken(provider, encodedToken, key, props);
+        RefreshToken refreshToken = decryptRefreshToken(provider, encodedToken, key, props);
+
+        // Clean the secret key from memory when we're done
+        try {
+            key.destroy();
+        } catch (DestroyFailedException ex) {
+            // ignore
+        }
+
+        return refreshToken;
     }
 
     public static RefreshToken decryptRefreshToken(OAuthDataProvider provider,
@@ -179,7 +207,16 @@ public final class ModelEncryptionSupport {
                                                   String encodedSecretKey,
                                                   KeyProperties props) throws SecurityException {
         SecretKey key = CryptoUtils.decodeSecretKey(encodedSecretKey, props.getKeyAlgo());
-        return decryptCodeGrant(provider, encodedToken, key, props);
+        ServerAuthorizationCodeGrant authzCodeGrant = decryptCodeGrant(provider, encodedToken, key, props);
+
+        // Clean the secret key from memory when we're done
+        try {
+            key.destroy();
+        } catch (DestroyFailedException ex) {
+            // ignore
+        }
+
+        return authzCodeGrant;
     }
 
     public static ServerAuthorizationCodeGrant decryptCodeGrant(OAuthDataProvider provider,
@@ -230,8 +267,8 @@ public final class ModelEncryptionSupport {
         final ServerAccessToken newToken = new ServerAccessToken(provider.getClient(parts[4]),
                                                                  parts[1],
                                                                  newTokenKey == null ? parts[0] : newTokenKey,
-                                                                 Long.valueOf(parts[2]),
-                                                                 Long.valueOf(parts[3])) {
+                                                                 Long.parseLong(parts[2]),
+                                                                 Long.parseLong(parts[3])) {
         };
 
         newToken.setRefreshToken(getStringPart(parts[5]));
@@ -241,11 +278,11 @@ public final class ModelEncryptionSupport {
 
         // Permissions
         if (!parts[9].trim().isEmpty()) {
-            List<OAuthPermission> perms = new LinkedList<OAuthPermission>();
+            List<OAuthPermission> perms = new LinkedList<>();
             String[] allPermParts = parts[9].split("\\.");
             for (int i = 0; i + 4 < allPermParts.length; i = i + 5) {
                 OAuthPermission perm = new OAuthPermission(allPermParts[i], allPermParts[i + 1]);
-                perm.setDefaultPermission(Boolean.valueOf(allPermParts[i + 2]));
+                perm.setDefaultPermission(Boolean.parseBoolean(allPermParts[i + 2]));
                 perm.setHttpVerbs(parseSimpleList(allPermParts[i + 3]));
                 perm.setUris(parseSimpleList(allPermParts[i + 4]));
                 perms.add(perm);
@@ -299,21 +336,21 @@ public final class ModelEncryptionSupport {
         // 9: permissions
         state.append(SEP);
         if (token.getScopes().isEmpty()) {
-            state.append(" ");
+            state.append(' ');
         } else {
             for (OAuthPermission p : token.getScopes()) {
                 // 9.1
                 state.append(tokenizeString(p.getPermission()));
-                state.append(".");
+                state.append('.');
                 // 9.2
                 state.append(tokenizeString(p.getDescription()));
-                state.append(".");
+                state.append('.');
                 // 9.3
                 state.append(p.isDefaultPermission());
-                state.append(".");
+                state.append('.');
                 // 9.4
                 state.append(p.getHttpVerbs().toString());
-                state.append(".");
+                state.append('.');
                 // 9.5
                 state.append(p.getUris().toString());
             }
@@ -336,7 +373,7 @@ public final class ModelEncryptionSupport {
         String[] parts = getParts(sequence);
         Client c = new Client(parts[0],
                               parts[1],
-                              Boolean.valueOf(parts[2]),
+                              Boolean.parseBoolean(parts[2]),
                               getStringPart(parts[3]), getStringPart(parts[4]));
         c.setApplicationDescription(getStringPart(parts[5]));
         c.setApplicationLogoUri(getStringPart(parts[6]));
@@ -400,8 +437,8 @@ public final class ModelEncryptionSupport {
         String[] parts = getParts(sequence);
         ServerAuthorizationCodeGrant grant = new ServerAuthorizationCodeGrant(provider.getClient(parts[0]),
                                                                               parts[1],
-                                                                              Long.valueOf(parts[2]),
-                                                                              Long.valueOf(parts[3]));
+                                                                              Long.parseLong(parts[2]),
+                                                                              Long.parseLong(parts[3]));
         grant.setRedirectUri(getStringPart(parts[4]));
         grant.setAudience(getStringPart(parts[5]));
         grant.setClientCodeChallenge(getStringPart(parts[6]));
@@ -457,9 +494,8 @@ public final class ModelEncryptionSupport {
         String pureStringList = prepareSimpleString(listStr);
         if (pureStringList.isEmpty()) {
             return Collections.emptyList();
-        } else {
-            return Arrays.asList(pureStringList.split(","));
         }
+        return Arrays.asList(pureStringList.split(","));
     }
 
     public static Map<String, String> parseSimpleMap(String mapStr) {
@@ -493,17 +529,17 @@ public final class ModelEncryptionSupport {
         if (subject != null) {
             // 1
             state.append(tokenizeString(subject.getLogin()));
-            state.append(".");
+            state.append('.');
             // 2
             state.append(tokenizeString(subject.getId()));
-            state.append(".");
+            state.append('.');
             // 3
             state.append(subject.getRoles().toString());
-            state.append(".");
+            state.append('.');
             // 4
             state.append(subject.getProperties().toString());
         } else {
-            state.append(" ");
+            state.append(' ');
         }
     }
 

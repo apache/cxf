@@ -29,14 +29,17 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  *
  */
-public class ReadHeadersInterceptorTest extends Assert {
+public class ReadHeadersInterceptorTest {
     private static final byte[] TEST_SOAP =
         ("<soap:Envelope xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/'"
             + " xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'"

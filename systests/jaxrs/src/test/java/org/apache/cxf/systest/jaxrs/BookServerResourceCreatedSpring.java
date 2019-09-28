@@ -19,56 +19,15 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-import java.net.URISyntaxException;
+public class BookServerResourceCreatedSpring extends AbstractSpringServer {
 
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.webapp.WebAppContext;
-
-
-public class BookServerResourceCreatedSpring extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(BookServerResourceCreatedSpring.class);
 
-    private org.eclipse.jetty.server.Server server;
-
-    protected void run() {
-        server = new org.eclipse.jetty.server.Server(Integer.parseInt(PORT));
-
-        WebAppContext webappcontext = new WebAppContext();
-        String contextPath = null;
-        try {
-            contextPath = getClass().getResource("/jaxrs_spring").toURI().getPath();
-        } catch (URISyntaxException e1) {
-            e1.printStackTrace();
-        }
-        webappcontext.setContextPath("/webapp");
-
-        webappcontext.setWar(contextPath);
-
-        HandlerCollection handlers = new HandlerCollection();
-        handlers.setHandlers(new Handler[] {webappcontext, new DefaultHandler()});
-
-        server.setHandler(handlers);
-        try {
-            server.start();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public BookServerResourceCreatedSpring() {
+        super("/jaxrs_spring", "/webapp", Integer.parseInt(PORT));
     }
 
-    public void tearDown() throws Exception {
-        super.tearDown();
-        if (server != null) {
-            server.stop();
-            server.destroy();
-            server = null;
-        }
-    }
-
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         try {
             BookServerResourceCreatedSpring s = new BookServerResourceCreatedSpring();
             s.start();

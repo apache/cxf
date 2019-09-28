@@ -81,7 +81,12 @@ public final class ServiceUtils {
         if (validationType == null) {
             validationType = getSchemaValidationTypeFromModel(message);
         }
-
+        if (validationType == null) {
+            Object obj = message.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED);
+            if (obj != null) {
+                validationType = getSchemaValidationType(obj);
+            }
+        }
         if (validationType == null) {
             validationType = SchemaValidationType.NONE;
         }
@@ -90,41 +95,43 @@ public final class ServiceUtils {
     }
 
     private static SchemaValidationType getOverrideSchemaValidationType(Message message) {
-        Object obj = message.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED);
+        Object obj = message.get(Message.SCHEMA_VALIDATION_ENABLED);
+        if (obj == null && message.getExchange() != null) {
+            obj = message.getExchange().get(Message.SCHEMA_VALIDATION_ENABLED);
+        }
         if (obj != null) {
             // this method will transform the legacy enabled as well
             return getSchemaValidationType(obj);
-        } else {
-            return null;
         }
+        return null;
     }
 
     private static SchemaValidationType getSchemaValidationTypeFromModel(Message message) {
         Exchange exchange = message.getExchange();
+        SchemaValidationType validationType = null;
 
         if (exchange != null) {
+
             BindingOperationInfo boi = exchange.getBindingOperationInfo();
-            Endpoint endpoint = exchange.getEndpoint();
-
-            if (boi != null && endpoint != null) {
-                SchemaValidationType validationType = null;
+            if (boi != null) {
                 OperationInfo opInfo = boi.getOperationInfo();
-                EndpointInfo ep = endpoint.getEndpointInfo();
-
-                if (validationType == null && opInfo != null) {
+                if (opInfo != null) {
                     validationType = getSchemaValidationTypeFromModel(opInfo);
+                }
+            }
 
-                    if (validationType == null && ep != null) {
+            if (validationType == null) {
+                Endpoint endpoint = exchange.getEndpoint();
+                if (endpoint != null) {
+                    EndpointInfo ep = endpoint.getEndpointInfo();
+                    if (ep != null) {
                         validationType = getSchemaValidationTypeFromModel(ep);
                     }
                 }
-
-                return validationType;
             }
         }
 
-        // else
-        return null;
+        return validationType;
     }
 
     private static SchemaValidationType getSchemaValidationTypeFromModel(
@@ -132,9 +139,8 @@ public final class ServiceUtils {
         Object obj = properties.getProperty(Message.SCHEMA_VALIDATION_TYPE);
         if (obj != null) {
             return getSchemaValidationType(obj);
-        } else {
-            return null;
         }
+        return null;
     }
 
     public static SchemaValidationType getSchemaValidationType(Object obj) {
@@ -164,12 +170,12 @@ public final class ServiceUtils {
      */
     public static String makeServiceNameFromClassName(Class<?> clazz) {
         String name = clazz.getName();
-        int last = name.lastIndexOf(".");
+        int last = name.lastIndexOf('.');
         if (last != -1) {
             name = name.substring(last + 1);
         }
 
-        int inner = name.lastIndexOf("$");
+        int inner = name.lastIndexOf('$');
         if (inner != -1) {
             name = name.substring(inner + 1);
         }
@@ -216,7 +222,7 @@ public final class ServiceUtils {
      * @return the namespace
      */
     public static String makeNamespaceFromClassName(String className, String protocol) {
-        int index = className.lastIndexOf(".");
+        int index = className.lastIndexOf('.');
 
         if (index == -1) {
             return protocol + "://" + "DefaultNamespace";
@@ -227,24 +233,11 @@ public final class ServiceUtils {
         StringTokenizer st = new StringTokenizer(packageName, ".");
         String[] words = new String[st.countTokens()];
 
-        for (int i = 0; i < words.length; ++i) {
+        for (int i = words.length - 1; i >= 0; --i) {
             words[i] = st.nextToken();
         }
 
-        StringBuilder sb = new StringBuilder(80);
-
-        for (int i = words.length - 1; i >= 0; --i) {
-            String word = words[i];
-
-            // seperate with dot
-            if (i != words.length - 1) {
-                sb.append('.');
-            }
-
-            sb.append(word);
-        }
-
-        return protocol + "://" + sb.toString() + "/";
+        return protocol + "://" + String.join(".", words) + "/";
     }
 
     /**
@@ -264,11 +257,11 @@ public final class ServiceUtils {
             hostname = u.getHost();
             path = u.getPath();
         } catch (MalformedURLException e) {
-            if (namespace.indexOf(":") > -1) {
-                hostname = namespace.substring(namespace.indexOf(":") + 1);
+            if (namespace.indexOf(':') > -1) {
+                hostname = namespace.substring(namespace.indexOf(':') + 1);
 
-                if (hostname.indexOf("/") > -1) {
-                    hostname = hostname.substring(0, hostname.indexOf("/"));
+                if (hostname.indexOf('/') > -1) {
+                    hostname = hostname.substring(0, hostname.indexOf('/'));
                 }
             } else {
                 hostname = namespace;
@@ -339,19 +332,7 @@ public final class ServiceUtils {
         }
 
         // replace periods with underscores
-        if (word.indexOf('.') != -1) {
-            char[] buf = word.toCharArray();
-
-            for (int i = 0; i < word.length(); i++) {
-                if (buf[i] == '.') {
-                    buf[i] = '_';
-                }
-            }
-
-            word = new String(buf);
-        }
-
-        sb.append(word);
+        sb.append(word.replace('.', '_'));
     }
 
 }

@@ -61,7 +61,7 @@ public class CatalogXmlSchemaURIResolver implements URIResolver {
             throw new RuntimeException("Catalog resolution failed", e);
         }
 
-        InputSource in = null;
+        final InputSource in;
         if (resolvedSchemaLocation == null) {
             in = this.resolver.resolve(schemaLocation, baseUri);
         } else {
@@ -69,7 +69,7 @@ public class CatalogXmlSchemaURIResolver implements URIResolver {
             in = this.resolver.resolve(resolvedSchemaLocation, baseUri);
         }
 
-        // XXX: If we return null, a NPE is raised in SchemaBuilder.
+        // If we return null, a NPE is raised in SchemaBuilder.
         // If we return new InputSource(), a XmlSchemaException is raised
         // but without any nice error message. So let's just throw a nice error here.
         if (in == null) {

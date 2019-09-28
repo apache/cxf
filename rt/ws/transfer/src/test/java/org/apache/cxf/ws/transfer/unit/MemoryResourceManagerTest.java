@@ -20,14 +20,17 @@
 package org.apache.cxf.ws.transfer.unit;
 
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.manager.MemoryResourceManager;
 import org.apache.cxf.ws.transfer.manager.ResourceManager;
 import org.apache.cxf.ws.transfer.shared.faults.UnknownResource;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -77,7 +80,7 @@ public class MemoryResourceManagerTest {
     @Test(expected = UnknownResource.class)
     public void getUnknownReferenceParamsTest() {
         ReferenceParametersType refParams = new ReferenceParametersType();
-        Element uuid = DOMUtils.createDocument().createElementNS(
+        Element uuid = DOMUtils.getEmptyDocument().createElementNS(
                 MemoryResourceManager.REF_NAMESPACE, MemoryResourceManager.REF_LOCAL_NAME);
         uuid.setTextContent("123456");
         refParams.getAny().add(uuid);
@@ -92,7 +95,7 @@ public class MemoryResourceManagerTest {
     @Test(expected = UnknownResource.class)
     public void putUnknownReferenceParamsTest() {
         ReferenceParametersType refParams = new ReferenceParametersType();
-        Element uuid = DOMUtils.createDocument().createElementNS(
+        Element uuid = DOMUtils.getEmptyDocument().createElementNS(
                 MemoryResourceManager.REF_NAMESPACE, MemoryResourceManager.REF_LOCAL_NAME);
         uuid.setTextContent("123456");
         refParams.getAny().add(uuid);
@@ -107,7 +110,7 @@ public class MemoryResourceManagerTest {
     @Test(expected = UnknownResource.class)
     public void deleteUnknownReferenceParamsTest() {
         ReferenceParametersType refParams = new ReferenceParametersType();
-        Element uuid = DOMUtils.createDocument().createElementNS(
+        Element uuid = DOMUtils.getEmptyDocument().createElementNS(
                 MemoryResourceManager.REF_NAMESPACE, MemoryResourceManager.REF_LOCAL_NAME);
         uuid.setTextContent("123456");
         refParams.getAny().add(uuid);

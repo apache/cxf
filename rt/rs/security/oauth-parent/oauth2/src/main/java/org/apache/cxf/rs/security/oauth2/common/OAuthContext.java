@@ -40,7 +40,7 @@ public class OAuthContext {
     private String tokenAudience;
     private String tokenIssuer;
     private String[] tokenRequestParts;
-    private Map<String, String> tokenExtraProperties = new LinkedHashMap<String, String>();
+    private Map<String, String> tokenExtraProperties = new LinkedHashMap<>();
 
     public OAuthContext(UserSubject resourceOwnerSubject,
                         UserSubject clientSubject,

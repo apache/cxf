@@ -74,9 +74,8 @@ public class AbstractJweJsonWriterProvider {
             if (encProviders == null) {
                 LOG.warning("JWE JSON init properties resource is not identified");
                 throw new JweException(JweException.Error.NO_INIT_PROPERTIES);
-            } else {
-                return Collections.emptyList();
             }
+            return Collections.emptyList();
         }
         List<String> propLocs = null;
         if (propLocsProp instanceof String) {
@@ -100,7 +99,7 @@ public class AbstractJweJsonWriterProvider {
         
         Message m = JAXRSUtils.getCurrentMessage();
         // Load all the properties
-        List<Properties> propsList = new ArrayList<Properties>(propLocs.size());
+        List<Properties> propsList = new ArrayList<>(propLocs.size());
         for (int i = 0; i < propLocs.size(); i++) {
             propsList.add(JweUtils.loadJweProperties(m, propLocs.get(i)));
         }
@@ -110,9 +109,9 @@ public class AbstractJweJsonWriterProvider {
         // This set is to find out how many key encryption algorithms are used
         // If only one then save it in the shared protected headers as opposed to
         // per-recipient specific not protected ones
-        Set<KeyAlgorithm> keyAlgos = new HashSet<KeyAlgorithm>();
+        Set<KeyAlgorithm> keyAlgos = new HashSet<>();
         
-        List<KeyEncryptionProvider> keyProviders = new LinkedList<KeyEncryptionProvider>();
+        List<KeyEncryptionProvider> keyProviders = new LinkedList<>();
         for (int i = 0; i < propLocs.size(); i++) {
             Properties props = propsList.get(i);
             ContentAlgorithm currentCtAlgo = JweUtils.getContentEncryptionAlgorithm(m, props, ContentAlgorithm.A128GCM);
@@ -138,7 +137,7 @@ public class AbstractJweJsonWriterProvider {
         }
         sharedProtectedHeaders.setContentEncryptionAlgorithm(ctAlgo);
         
-        List<JweEncryptionProvider> theEncProviders = new LinkedList<JweEncryptionProvider>();
+        List<JweEncryptionProvider> theEncProviders = new LinkedList<>();
         if (keyProviders.size() == 1 && keyProviders.get(0).getAlgorithm() == KeyAlgorithm.DIRECT) {
             JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, propsList.get(0), KeyOperation.ENCRYPT);
             if (jwk != null) {
@@ -149,7 +148,7 @@ public class AbstractJweJsonWriterProvider {
         } else {
             ContentEncryptionProvider ctProvider = JweUtils.getContentEncryptionProvider(ctAlgo, true);
             for (int i = 0; i < keyProviders.size(); i++) {
-                JweEncryptionProvider encProvider = new JweEncryption(keyProviders.get(0), ctProvider);
+                JweEncryptionProvider encProvider = new JweEncryption(keyProviders.get(i), ctProvider);
                 theEncProviders.add(encProvider);
             }
         }

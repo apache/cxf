@@ -23,15 +23,18 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.binding.corba.wsdl.Fixed;
-
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.TypeCode;
 
-public class CorbaFixedHandlerTest extends Assert {
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class CorbaFixedHandlerTest {
 
     private ORB orb;
 
@@ -70,10 +73,10 @@ public class CorbaFixedHandlerTest extends Assert {
         java.math.BigDecimal value = new java.math.BigDecimal(123.45);
         obj.setValue(value);
 
-        assertTrue(value.equals(obj.getValue()));
+        assertEquals(value, obj.getValue());
 
         String valueData = obj.getValueData();
-        assertTrue(valueData.equals(value.toString()));
+        assertEquals(valueData, value.toString());
 
         assertTrue(fixedType.getDigits() == obj.getDigits());
         assertTrue(fixedType.getScale() == obj.getScale());

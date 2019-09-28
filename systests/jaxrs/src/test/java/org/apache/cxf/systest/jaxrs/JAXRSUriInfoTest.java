@@ -32,6 +32,8 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class JAXRSUriInfoTest extends AbstractClientServerTestBase {
     public static final int PORT = SpringServer.PORT;
     @BeforeClass
@@ -81,6 +83,29 @@ public class JAXRSUriInfoTest extends AbstractClientServerTestBase {
         assertEquals("http://localhost:" + PORT + "/app/v1/," + path + "," + pathParam, data);
     }
 
+    @Test
+    public void testBasePathAndPathAndPathParamXForwarded() throws Exception {
+        checkUriInfoXForwarded("http://localhost:" + PORT + "/app/v1", "\"\"", "/");
+        checkUriInfoXForwarded("http://localhost:" + PORT + "/app/v1/", "\"\"", "/");
+        checkUriInfoXForwarded("http://localhost:" + PORT + "/app/v1/test", "\"test\"", "test");
+        checkUriInfoXForwarded("http://localhost:" + PORT + "/app/v1/", "\"\"", "/");
+        checkUriInfoXForwarded("http://localhost:" + PORT + "/app/v1", "\"\"", "/");
+
+        checkUriInfoXForwarded("http://localhost:" + PORT + "/app/v1/bar", "\"bar\"", "bar");
+        checkUriInfoXForwarded("http://localhost:" + PORT + "/app/v1/bar", "\"bar\"", "bar");
+        checkUriInfoXForwarded("http://localhost:" + PORT + "/app/v1/bar/test", "\"bar/test\"", "bar/test");
+        checkUriInfoXForwarded("http://localhost:" + PORT + "/app/v1/bar", "\"bar\"", "bar");
+        checkUriInfoXForwarded("http://localhost:" + PORT + "/app/v1/bar", "\"bar\"", "bar");
+    }
+
+    private void checkUriInfoXForwarded(String address, String path, String pathParam) {
+        WebClient wc = WebClient.create(address);
+        wc.accept("text/plain");
+        wc.header("USE_XFORWARDED", true);
+        String data = wc.get(String.class);
+        assertEquals("https://external:8090/reverse/app/v1/," + path + "," + pathParam, data);
+    }
+
     @Ignore
     @Path("/")
     public static class Resource {
@@ -95,7 +120,7 @@ public class JAXRSUriInfoTest extends AbstractClientServerTestBase {
             StringBuilder sb = new StringBuilder();
             sb.append(uriInfo.getBaseUri());
             sb.append(",\"" + path + "\"");
-            sb.append("," + uriInfo.getPath());
+            sb.append(',').append(uriInfo.getPath());
             return sb.toString();
         }
 

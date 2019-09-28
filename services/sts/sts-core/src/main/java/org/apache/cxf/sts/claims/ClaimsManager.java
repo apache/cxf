@@ -29,6 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
@@ -50,7 +51,7 @@ public class ClaimsManager {
 
     private List<ClaimsParser> claimParsers;
     private List<ClaimsHandler> claimHandlers;
-    private List<URI> supportedClaimTypes = new ArrayList<>();
+    private List<String> supportedClaimTypes = new ArrayList<>();
     private boolean stopProcessingOnException = true;
     private IdentityMapper identityMapper;
 
@@ -71,7 +72,7 @@ public class ClaimsManager {
         this.stopProcessingOnException = stopProcessingOnException;
     }
 
-    public List<URI> getSupportedClaimTypes() {
+    public List<String> getSupportedClaimTypes() {
         return supportedClaimTypes;
     }
 
@@ -117,23 +118,22 @@ public class ClaimsManager {
             // Matching dialects - so we must merge them
             ClaimCollection mergedClaims = mergeClaims(primaryClaims, secondaryClaims);
             return retrieveClaimValues(mergedClaims, parameters);
-        } else {
-            // If the dialects don't match then just return all Claims
-            ProcessedClaimCollection claims = retrieveClaimValues(primaryClaims, parameters);
-            ProcessedClaimCollection claims2 = retrieveClaimValues(secondaryClaims, parameters);
-            ProcessedClaimCollection returnedClaims = new ProcessedClaimCollection();
-            if (claims != null) {
-                returnedClaims.addAll(claims);
-            }
-            if (claims2 != null) {
-                returnedClaims.addAll(claims2);
-            }
-            return returnedClaims;
         }
+        // If the dialects don't match then just return all Claims
+        ProcessedClaimCollection claims = retrieveClaimValues(primaryClaims, parameters);
+        ProcessedClaimCollection claims2 = retrieveClaimValues(secondaryClaims, parameters);
+        ProcessedClaimCollection returnedClaims = new ProcessedClaimCollection();
+        if (claims != null) {
+            returnedClaims.addAll(claims);
+        }
+        if (claims2 != null) {
+            returnedClaims.addAll(claims2);
+        }
+        return returnedClaims;
     }
 
     public ProcessedClaimCollection retrieveClaimValues(ClaimCollection claims, ClaimsParameters parameters) {
-        if (claims == null || claims.size() == 0) {
+        if (claims == null || claims.isEmpty()) {
             return null;
         }
 
@@ -150,33 +150,32 @@ public class ClaimsManager {
             validateClaimValues(claims, returnCollection);
             return returnCollection;
 
-        } else {
-            // Federate claims
-            ClaimsMapper claimsMapper = relationship.getClaimsMapper();
-            if (claimsMapper == null) {
-                LOG.log(Level.SEVERE, "ClaimsMapper required to federate claims but not configured.");
-                throw new STSException("ClaimsMapper required to federate claims but not configured",
-                                       STSException.BAD_REQUEST);
-            }
-
-            // Get the claims of the received token (only SAML supported)
-            // Consider refactoring to use a CallbackHandler and keep ClaimsManager token independent
-            SamlAssertionWrapper assertion =
-                (SamlAssertionWrapper)parameters.getAdditionalProperties().get(SamlAssertionWrapper.class.getName());
-            List<ProcessedClaim> claimList = null;
-            if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
-                claimList = this.parseClaimsInAssertion(assertion.getSaml2());
-            } else {
-                claimList = this.parseClaimsInAssertion(assertion.getSaml1());
-            }
-            ProcessedClaimCollection sourceClaims = new ProcessedClaimCollection();
-            sourceClaims.addAll(claimList);
-
-            ProcessedClaimCollection targetClaims = claimsMapper.mapClaims(relationship.getSourceRealm(),
-                    sourceClaims, relationship.getTargetRealm(), parameters);
-            validateClaimValues(claims, targetClaims);
-            return targetClaims;
         }
+        // Federate claims
+        ClaimsMapper claimsMapper = relationship.getClaimsMapper();
+        if (claimsMapper == null) {
+            LOG.log(Level.SEVERE, "ClaimsMapper required to federate claims but not configured.");
+            throw new STSException("ClaimsMapper required to federate claims but not configured",
+                                   STSException.BAD_REQUEST);
+        }
+
+        // Get the claims of the received token (only SAML supported)
+        // Consider refactoring to use a CallbackHandler and keep ClaimsManager token independent
+        SamlAssertionWrapper assertion =
+            (SamlAssertionWrapper)parameters.getAdditionalProperties().get(SamlAssertionWrapper.class.getName());
+        List<ProcessedClaim> claimList = null;
+        if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
+            claimList = this.parseClaimsInAssertion(assertion.getSaml2());
+        } else {
+            claimList = this.parseClaimsInAssertion(assertion.getSaml1());
+        }
+        ProcessedClaimCollection sourceClaims = new ProcessedClaimCollection();
+        sourceClaims.addAll(claimList);
+
+        ProcessedClaimCollection targetClaims = claimsMapper.mapClaims(relationship.getSourceRealm(),
+                sourceClaims, relationship.getTargetRealm(), parameters);
+        validateClaimValues(claims, targetClaims);
+        return targetClaims;
     }
 
     private ProcessedClaimCollection handleClaims(ClaimCollection claims, ClaimsParameters parameters) {
@@ -280,7 +279,7 @@ public class ClaimsManager {
     }
 
     private ClaimCollection filterHandlerClaims(ClaimCollection claims,
-                                                         List<URI> handlerClaimTypes) {
+                                                         List<String> handlerClaimTypes) {
         ClaimCollection supportedClaims = new ClaimCollection();
         supportedClaims.setDialect(claims.getDialect());
         for (Claim claim : claims) {
@@ -293,7 +292,7 @@ public class ClaimsManager {
 
     private boolean validateClaimValues(ClaimCollection requestedClaims, ProcessedClaimCollection claims) {
         for (Claim claim : requestedClaims) {
-            URI claimType = claim.getClaimType();
+            String claimType = claim.getClaimType();
             boolean found = false;
             if (!claim.isOptional()) {
                 for (ProcessedClaim c : claims) {

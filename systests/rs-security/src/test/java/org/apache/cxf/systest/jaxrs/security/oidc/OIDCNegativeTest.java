@@ -36,35 +36,73 @@ import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.common.UserInfo;
+import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils.AuthorizationCodeParameters;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.TestUtil;
+
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
- * Some negative tests for OpenID Connect
+ * Some negative tests for OpenID Connect. The tests are run multiple times with different OAuthDataProvider
+ * implementations:
+ * a) JCACHE_SERVER - JCache
+ * b) JWT_JCACHE_SERVER - JCache with useJwtFormatForAccessTokens enabled
+ * c) JPA_SERVER - JPA provider
+ * d) JWT_NON_PERSIST_JCACHE_SERVER-  JCache with useJwtFormatForAccessTokens + !persistJwtEncoding
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
 
-    static final String PORT = TestUtil.getPortNumber("jaxrs-negative-oidc");
+    private static final SpringBusTestServer JCACHE_SERVER = new SpringBusTestServer("oidc-negative-server-jcache");
+    private static final SpringBusTestServer JWT_JCACHE_SERVER =
+            new SpringBusTestServer("oidc-negative-server-jcache-jwt");
+    private static final SpringBusTestServer JPA_SERVER = new SpringBusTestServer("oidc-negative-server-jpa");
+    private static final SpringBusTestServer JWT_NON_PERSIST_JCACHE_SERVER =
+            new SpringBusTestServer("oidc-negative-server-jcache-jwt-non-persist");
+
+    final String port;
+
+    public OIDCNegativeTest(String port) {
+        this.port = port;
+    }
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-                "Server failed to launch",
-                // run the server in the same process
-                // set this to false to fork
-                launchServer(OIDCNegativeServer.class, true)
-        );
+        assertTrue("Server failed to launch", launchServer(JCACHE_SERVER));
+        assertTrue("Server failed to launch", launchServer(JWT_JCACHE_SERVER));
+        assertTrue("Server failed to launch", launchServer(JPA_SERVER));
+        assertTrue("Server failed to launch", launchServer(JWT_NON_PERSIST_JCACHE_SERVER));
+    }
+
+    @AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
+
+    @Parameters(name = "{0}")
+    public static String[] data() {
+        return new String[]{
+                JCACHE_SERVER.getPort(),
+                JWT_JCACHE_SERVER.getPort(),
+                JPA_SERVER.getPort(),
+                JWT_NON_PERSIST_JCACHE_SERVER.getPort()};
     }
 
     @org.junit.Test
     public void testImplicitFlowPromptNone() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -95,7 +133,7 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
     public void testImplicitFlowMaxAge() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -142,14 +180,14 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(idToken);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.AUTH_TIME_CLAIM));
+        assertNotNull(jwt.getClaims().getClaim(IdToken.AUTH_TIME_CLAIM));
     }
 
     @org.junit.Test
     public void testImplicitFlowNoNonce() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -173,16 +211,48 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
         }
 
         // Add a nonce and it should succeed
-        client.query("nonce", "1234565635");
+        String nonce = "1234565635";
+        client.query("nonce", nonce);
         response = client.get();
-        response.readEntity(OAuthAuthorizationData.class);
+
+        OAuthAuthorizationData authzData = response.readEntity(OAuthAuthorizationData.class);
+
+        // Now call "decision" to get the access token
+        client.path("decision");
+        client.type("application/x-www-form-urlencoded");
+
+        Form form = new Form();
+        form.param("session_authenticity_token", authzData.getAuthenticityToken());
+        form.param("client_id", authzData.getClientId());
+        form.param("redirect_uri", authzData.getRedirectUri());
+        form.param("scope", authzData.getProposedScope());
+        if (authzData.getResponseType() != null) {
+            form.param("response_type", authzData.getResponseType());
+        }
+        if (authzData.getNonce() != null) {
+            form.param("nonce", authzData.getNonce());
+        }
+        form.param("oauthDecision", "allow");
+
+        response = client.post(form);
+
+        String location = response.getHeaderString("Location");
+
+        // Check IdToken
+        String idToken = OAuth2TestUtils.getSubstring(location, "id_token");
+        assertNotNull(idToken);
+
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(idToken);
+        JwtToken jwt = jwtConsumer.getJwtToken();
+        // Check the nonce is in the idToken
+        assertEquals(jwt.getClaim("nonce"), nonce);
     }
 
     @org.junit.Test
     public void testImplicitFlowNoATHash() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -236,7 +306,7 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
     public void testJWTRequestNonmatchingResponseType() throws Exception {
         URL busFile = OIDCNegativeTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/unsignedjwtservices/";
+        String address = "https://localhost:" + port + "/unsignedjwtservices/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -247,7 +317,7 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
         claims.setIssuer("consumer-id");
         claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(
-            Collections.singletonList("https://localhost:" + PORT + "/unsignedjwtservices/"));
+            Collections.singletonList("https://localhost:" + port + "/unsignedjwtservices/"));
         claims.setProperty("response_type", "token");
 
         JwsHeaders headers = new JwsHeaders();
@@ -278,7 +348,7 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
     public void testJWTRequestNonmatchingClientId() throws Exception {
         URL busFile = OIDCNegativeTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/unsignedjwtservices/";
+        String address = "https://localhost:" + port + "/unsignedjwtservices/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -289,7 +359,7 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
         claims.setIssuer("consumer-id");
         claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(
-            Collections.singletonList("https://localhost:" + PORT + "/unsignedjwtservices/"));
+            Collections.singletonList("https://localhost:" + port + "/unsignedjwtservices/"));
         claims.setProperty("client_id", "consumer-id2");
 
         JwsHeaders headers = new JwsHeaders();
@@ -320,7 +390,7 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
     public void testUserInfoRefreshToken() throws Exception {
         URL busFile = UserInfoTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -367,7 +437,7 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
         // Now test the UserInfoService.
 
         // The old Access Token should fail
-        String userInfoAddress = "https://localhost:" + PORT + "/ui/plain/userinfo";
+        String userInfoAddress = "https://localhost:" + port + "/ui/plain/userinfo";
         WebClient userInfoClient = WebClient.create(userInfoAddress, OAuth2TestUtils.setupProviders(),
                                                     busFile.toString());
         userInfoClient.accept("application/json");
@@ -387,6 +457,5 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
         assertEquals("alice", userInfo.getSubject());
         assertEquals("consumer-id", userInfo.getAudience());
     }
-
 
 }

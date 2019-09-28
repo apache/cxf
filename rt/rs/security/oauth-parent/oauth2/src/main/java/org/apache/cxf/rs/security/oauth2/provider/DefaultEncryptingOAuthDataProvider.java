@@ -40,7 +40,7 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
     protected SecretKey key;
     private Set<String> tokens = Collections.synchronizedSet(new HashSet<>());
     private Set<String> refreshTokens = Collections.synchronizedSet(new HashSet<>());
-    private ConcurrentHashMap<String, String> clientsMap = new ConcurrentHashMap<String, String>();
+    private ConcurrentHashMap<String, String> clientsMap = new ConcurrentHashMap<>();
     public DefaultEncryptingOAuthDataProvider(String algo, int keySize) {
         this(new KeyProperties(algo, keySize));
     }

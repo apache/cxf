@@ -56,12 +56,14 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import javax.security.auth.DestroyFailedException;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.CompressionUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.helpers.JavaUtils;
 
 
 /**
@@ -125,7 +127,7 @@ public final class CryptoUtils {
             throw new SecurityException(ex);
         }
     }
-    
+
     public static RSAPublicKey getRSAPublicKey(KeyFactory factory,
                                                byte[] modulusBytes,
                                                byte[] publicExponentBytes) {
@@ -133,7 +135,7 @@ public final class CryptoUtils {
         BigInteger publicExponent = toBigInteger(publicExponentBytes);
         return getRSAPublicKey(factory, modulus, publicExponent);
     }
-    
+
     public static RSAPublicKey getRSAPublicKey(BigInteger modulusBytes,
                                                BigInteger publicExponentBytes) {
         try {
@@ -145,7 +147,7 @@ public final class CryptoUtils {
         }
     }
 
-    
+
     public static RSAPublicKey getRSAPublicKey(KeyFactory factory,
                                                BigInteger modulus,
                                                BigInteger publicExponent) {
@@ -156,7 +158,7 @@ public final class CryptoUtils {
             throw new SecurityException(ex);
         }
     }
-    
+
     public static RSAPrivateKey getRSAPrivateKey(String encodedModulus,
                                                  String encodedPrivateExponent) {
         try {
@@ -348,8 +350,8 @@ public final class CryptoUtils {
         }
     }
 
-    public static Signature getVerificationSignature(PublicKey key, 
-                                                        String signAlgo, 
+    public static Signature getVerificationSignature(PublicKey key,
+                                                        String signAlgo,
                                                         AlgorithmParameterSpec params) {
         try {
             Signature s = Signature.getInstance(signAlgo);
@@ -484,9 +486,18 @@ public final class CryptoUtils {
                                        String keyAlgo,
                                        Key wrapperKey,
                                        KeyProperties wrapperKeyProps)  throws SecurityException {
-        return wrapSecretKey(new SecretKeySpec(keyBytes, convertJCECipherToSecretKeyName(keyAlgo)),
+        SecretKeySpec secretKey = new SecretKeySpec(keyBytes, convertJCECipherToSecretKeyName(keyAlgo));
+        byte[] encryptedKey = wrapSecretKey(secretKey,
                              wrapperKey,
                              wrapperKeyProps);
+
+        // Here we're finished with the SecretKey we created, so we can destroy it
+        try {
+            secretKey.destroy();
+        } catch (DestroyFailedException e) {
+            // ignore
+        }
+        return encryptedKey;
     }
 
     public static byte[] wrapSecretKey(Key secretKey,
@@ -544,11 +555,11 @@ public final class CryptoUtils {
                 result = c.doFinal(bytes);
             } else {
                 if (blockSize == -1) {
-                    if (System.getProperty("java.version").startsWith("9")) {
+                    if (JavaUtils.isJava8Before161()) {
+                        blockSize = secretKey instanceof PublicKey ? 117 : 128;
+                    } else {
                         //the default block size is 256 when use private key under java9
                         blockSize = secretKey instanceof PublicKey ? 117 : 256;
-                    } else {
-                        blockSize = secretKey instanceof PublicKey ? 117 : 128;
                     }
                 }
                 boolean updateRequired = keyProps != null && keyProps.getAdditionalData() != null;

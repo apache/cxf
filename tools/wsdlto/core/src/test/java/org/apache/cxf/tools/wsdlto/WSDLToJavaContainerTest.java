@@ -25,10 +25,14 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class WSDLToJavaContainerTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class WSDLToJavaContainerTest {
 
     @Test
     public void testNoPlugin() throws Exception {

@@ -51,7 +51,7 @@ public class OperationResourceInfo {
     private List<Parameter> parameters;
     private boolean oneway;
     private boolean async;
-    private Set<String> nameBindings = new LinkedHashSet<String>();
+    private Set<String> nameBindings = new LinkedHashSet<>();
     private Class<?>[] actualInParamTypes;
     private Type[] actualInGenericParamTypes;
     private Annotation[][] actualInParamAnnotations;
@@ -146,11 +146,10 @@ public class OperationResourceInfo {
         Set<String> criNames = classResourceInfo.getNameBindings();
         if (criNames.isEmpty()) {
             return nameBindings;
-        } else {
-            Set<String> all = new LinkedHashSet<String>(criNames);
-            all.addAll(nameBindings);
-            return all;
         }
+        Set<String> all = new LinkedHashSet<>(criNames);
+        all.addAll(nameBindings);
+        return all;
     }
 
     private void checkOneway() {

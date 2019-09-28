@@ -92,9 +92,8 @@ public class FIStaxInInterceptor extends AbstractPhaseInterceptor<Message> {
     protected boolean isHttpVerbSupported(Message message) {
         if (isGET(message)) {
             return isRequestor(message)
-                && MessageUtils.isTrue(message.getContextualProperty(FI_GET_SUPPORTED));
-        } else {
-            return true;
+                && MessageUtils.getContextualBoolean(message, FI_GET_SUPPORTED, false);
         }
+        return true;
     }
 }

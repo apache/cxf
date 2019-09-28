@@ -42,16 +42,18 @@ import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertSame;
 
 /**
  *
  */
-public class PolicyInterceptorsTest extends Assert {
+public class PolicyInterceptorsTest {
     private static final QName ASSERTION_QNAME = new QName("http://apache.cxf", "test");
 
     private IMocksControl control;
@@ -71,11 +73,10 @@ public class PolicyInterceptorsTest extends Assert {
         bus = control.createMock(Bus.class);
     }
 
-    @SuppressWarnings("unchecked")
     private List<Interceptor<? extends Message>> createMockInterceptorList() {
         Interceptor<? extends Message> i = control.createMock(Interceptor.class);
         Interceptor<? extends Message> m = i;
-        List<Interceptor<? extends Message>> a = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> a = new ArrayList<>();
         a.add(m);
         return a;
     }
@@ -106,7 +107,6 @@ public class PolicyInterceptorsTest extends Assert {
         control.verify();
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testClientPolicyInInterceptor() {
         PolicyInInterceptor interceptor = new PolicyInInterceptor();
@@ -119,7 +119,7 @@ public class PolicyInterceptorsTest extends Assert {
         EasyMock.expect(pe.getEffectiveClientResponsePolicy(ei, boi, message)).andReturn(effectivePolicy);
         EasyMock.expect(effectivePolicy.getPolicy()).andReturn(new Policy()).times(2);
         Interceptor<? extends Message> i = control.createMock(Interceptor.class);
-        List<Interceptor<? extends Message>> lst = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> lst = new ArrayList<>();
         lst.add(i);
         EasyMock.expect(effectivePolicy.getInterceptors()).andReturn(lst);
         InterceptorChain ic = control.createMock(InterceptorChain.class);

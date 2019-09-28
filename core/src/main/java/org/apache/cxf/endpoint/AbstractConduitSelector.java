@@ -26,6 +26,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
 import org.apache.cxf.BusException;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
@@ -51,7 +52,7 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
 
 
     //collection of conduits that were created so we can close them all at the end
-    protected List<Conduit> conduits = new CopyOnWriteArrayList<Conduit>();
+    protected List<Conduit> conduits = new CopyOnWriteArrayList<>();
 
     //protected Conduit selectedConduit;
     protected Endpoint endpoint;
@@ -112,9 +113,7 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
                 } else {
                     getLogger().warning("ConduitInitiatorManager not found");
                 }
-            } catch (BusException ex) {
-                throw new Fault(ex);
-            } catch (IOException ex) {
+            } catch (BusException | IOException ex) {
                 throw new Fault(ex);
             }
         }
@@ -129,7 +128,7 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
 
     protected Conduit createConduit(Message message, Exchange exchange, ConduitInitiator conduitInitiator)
         throws IOException {
-        Conduit c = null;
+        Conduit c;
         synchronized (endpoint) {
             if (!conduits.isEmpty()) {
                 c = findCompatibleConduit(message);
@@ -197,7 +196,7 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
         // will need to keep low level conduits operating on InputStreams open
         // and will be responsible for closing the streams
 
-        if (MessageUtils.isTrue(exchange.get(KEEP_CONDUIT_ALIVE))) {
+        if (PropertyUtils.isTrue(exchange.get(KEEP_CONDUIT_ALIVE))) {
             return;
         }
         try {
@@ -272,12 +271,10 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
             //their hosts also match
             if (conduitAddress.equalsIgnoreCase(actualAddress)) {
                 return true;
-            } else {
-                return cbg.isFullComparison() ? false : matchAddressSubstrings(conduitAddress, actualAddress);
             }
-        } else {
-            return cbg.isFullComparison() ? false : matchAddressSubstrings(conduitAddress, actualAddress);
+            return !cbg.isFullComparison() && matchAddressSubstrings(conduitAddress, actualAddress);
         }
+        return !cbg.isFullComparison() && matchAddressSubstrings(conduitAddress, actualAddress);
     }
 
     //smart address substring comparison that tries to avoid building and comparing substrings unless strictly required
@@ -287,13 +284,10 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
             if (idx <= 0) {
                 return true;
             }
-            conduitAddress = conduitAddress.substring(0, idx);
-            actualAddress = actualAddress.substring(0, idx);
-            return conduitAddress.equalsIgnoreCase(actualAddress);
-        } else {
-            //no possible match as for sure the substrings before idx will be different
-            return false;
+            return conduitAddress.substring(0, idx).equalsIgnoreCase(actualAddress.substring(0, idx));
         }
+        //no possible match as for sure the substrings before idx will be different
+        return false;
     }
 
     private static final class ContextualBooleanGetter {

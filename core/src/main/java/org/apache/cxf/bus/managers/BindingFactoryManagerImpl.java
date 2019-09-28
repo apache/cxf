@@ -47,15 +47,15 @@ public final class BindingFactoryManagerImpl implements BindingFactoryManager {
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(BindingFactoryManagerImpl.class);
 
     Map<String, BindingFactory> bindingFactories;
-    Set<String> failed = new CopyOnWriteArraySet<String>();
-    Set<String> loaded = new CopyOnWriteArraySet<String>();
+    Set<String> failed = new CopyOnWriteArraySet<>();
+    Set<String> loaded = new CopyOnWriteArraySet<>();
     Bus bus;
 
     public BindingFactoryManagerImpl() {
-        bindingFactories = new ConcurrentHashMap<String, BindingFactory>(8, 0.75f, 4);
+        bindingFactories = new ConcurrentHashMap<>(8, 0.75f, 4);
     }
     public BindingFactoryManagerImpl(Bus b) {
-        bindingFactories = new ConcurrentHashMap<String, BindingFactory>(8, 0.75f, 4);
+        bindingFactories = new ConcurrentHashMap<>(8, 0.75f, 4);
         setBus(b);
     }
 
@@ -112,7 +112,7 @@ public final class BindingFactoryManagerImpl implements BindingFactoryManager {
                             }
                         } else {
                             try {
-                                Method m = bean.getClass().getMethod("getActivationNamespace", new Class[0]);
+                                Method m = bean.getClass().getMethod("getActivationNamespace");
                                 Collection<String> c = CastUtils.cast((Collection<?>)m.invoke(bean));
                                 for (String s : c) {
                                     registerBindingFactory(s, bean);

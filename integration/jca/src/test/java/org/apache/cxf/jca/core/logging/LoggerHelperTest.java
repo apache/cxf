@@ -24,13 +24,19 @@ import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-public class LoggerHelperTest extends Assert {
+
+public class LoggerHelperTest {
     public static final String TEST_LOGGER_NAME = "test.logger";
 
 
@@ -75,7 +81,7 @@ public class LoggerHelperTest extends Assert {
     public void testSetWriter() {
         // setup an dummy writer
         DummyWriter writer = new DummyWriter();
-        assertTrue("The DummyWriter init error", !writer.writed);
+        assertFalse("The DummyWriter init error", writer.writed);
         LoggerHelper.initializeLoggingOnWriter(writer);
         LoggerHelper.setLogLevel("INFO");
         LoggerHelper.getRootCXFLogger().severe("Test String");

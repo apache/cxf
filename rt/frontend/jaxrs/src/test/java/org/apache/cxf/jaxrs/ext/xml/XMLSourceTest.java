@@ -36,10 +36,16 @@ import org.w3c.dom.Node;
 
 import org.apache.ws.commons.schema.constants.Constants;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class XMLSourceTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class XMLSourceTest {
 
 
     @Test
@@ -166,7 +172,7 @@ public class XMLSourceTest extends Assert {
         InputStream is = new ByteArrayInputStream(data.getBytes());
         XMLSource xp = new XMLSource(is);
         xp.setBuffering();
-        Map<String, String> map = new LinkedHashMap<String, String>();
+        Map<String, String> map = new LinkedHashMap<>();
         map.put("x", "http://baz");
         Bar2 bar = xp.getNode("/x:foo/x:bar", map, Bar2.class);
         assertNotNull(bar);
@@ -178,7 +184,7 @@ public class XMLSourceTest extends Assert {
         InputStream is = new ByteArrayInputStream(data.getBytes());
         XMLSource xp = new XMLSource(is);
         xp.setBuffering();
-        Map<String, String> map = new LinkedHashMap<String, String>();
+        Map<String, String> map = new LinkedHashMap<>();
         map.put("x", "http://baz");
         Bar2 bar = xp.getNode("/x:foo/x:bar", map, Bar2.class);
         assertNotNull(bar);
@@ -192,7 +198,7 @@ public class XMLSourceTest extends Assert {
         InputStream is = new ByteArrayInputStream(data.getBytes());
         XMLSource xp = new XMLSource(is);
         xp.setBuffering();
-        Map<String, String> map = new LinkedHashMap<String, String>();
+        Map<String, String> map = new LinkedHashMap<>();
         map.put("x", "http://baz");
         Bar2 bar = xp.getNode("/x:foo/x:bar", map, Bar2.class);
         assertNotNull(bar);
@@ -204,7 +210,7 @@ public class XMLSourceTest extends Assert {
         InputStream is = new ByteArrayInputStream(data.getBytes());
         XMLSource xp = new XMLSource(is);
         xp.setBuffering();
-        Map<String, String> map = new LinkedHashMap<String, String>();
+        Map<String, String> map = new LinkedHashMap<>();
         map.put("x", "http://foo");
         map.put("y", "http://baz");
         Bar2 bar = xp.getNode("/x:foo/y:bar", map, Bar2.class);
@@ -217,7 +223,7 @@ public class XMLSourceTest extends Assert {
         InputStream is = new ByteArrayInputStream(data.getBytes());
         XMLSource xp = new XMLSource(is);
         xp.setBuffering();
-        Map<String, String> map = new LinkedHashMap<String, String>();
+        Map<String, String> map = new LinkedHashMap<>();
         map.put("x", "http://baz");
         Bar2 bar = xp.getNode("/x:foo/x:bar", map, Bar2.class);
         assertNotNull(bar);
@@ -240,7 +246,7 @@ public class XMLSourceTest extends Assert {
         InputStream is = new ByteArrayInputStream(data.getBytes());
         XMLSource xp = new XMLSource(is);
         xp.setBuffering();
-        Map<String, String> map = new LinkedHashMap<String, String>();
+        Map<String, String> map = new LinkedHashMap<>();
         map.put("x", "http://baz");
         Bar2[] bars = xp.getNodes("/x:foo/x:bar", map, Bar2.class);
         assertNotNull(bars);

@@ -50,7 +50,7 @@ public class URIParser {
             this.requestUri = uri;
         }
 
-        if (this.pathInfo.equals("")) {
+        if (this.pathInfo.isEmpty()) {
             this.pathInfo = null;
         } else if (!this.pathInfo.startsWith("/")) {
             this.pathInfo = "/" + this.pathInfo;

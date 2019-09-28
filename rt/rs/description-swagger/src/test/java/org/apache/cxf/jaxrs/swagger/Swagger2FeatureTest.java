@@ -19,13 +19,15 @@
 
 package org.apache.cxf.jaxrs.swagger;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  *
  */
-public class Swagger2FeatureTest extends Assert {
+public class Swagger2FeatureTest {
     @Test
     public void testSetBasePathByAddress() {
         Swagger2Feature f = new Swagger2Feature();

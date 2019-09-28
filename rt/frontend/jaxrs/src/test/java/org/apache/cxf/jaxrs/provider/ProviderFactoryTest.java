@@ -26,16 +26,22 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+import javax.annotation.Priority;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -46,6 +52,9 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.ParamConverter;
 import javax.ws.rs.ext.ParamConverterProvider;
+import javax.ws.rs.ext.ReaderInterceptor;
+import javax.ws.rs.ext.WriterInterceptor;
+import javax.ws.rs.ext.WriterInterceptorContext;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.validation.Schema;
@@ -68,13 +77,20 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.easymock.EasyMock;
 
-import org.junit.Assert;
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ProviderFactoryTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+public class ProviderFactoryTest {
 
 
     @Before
@@ -86,6 +102,71 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testMultipleFactories() {
         assertNotSame(ServerProviderFactory.getInstance(), ServerProviderFactory.getInstance());
+    }
+
+    @Test
+    public void testRegisterInFeature() {
+        ServerProviderFactory pf = ServerProviderFactory.getInstance();
+        final Object provider = new WebApplicationExceptionMapper();
+        pf.registerUserProvider((Feature) context -> {
+            context.register(provider);
+            return true;
+        });
+        ExceptionMapper<WebApplicationException> em =
+            pf.createExceptionMapper(WebApplicationException.class, new MessageImpl());
+        assertSame(provider, em);
+    }
+
+    @Test
+    public void testRegisterFeatureInFeature() {
+        ServerProviderFactory pf = ServerProviderFactory.getInstance();
+        final Object provider = new WebApplicationExceptionMapper();
+        pf.registerUserProvider((Feature) context -> {
+            context.register((Feature) context2-> {
+                context2.register(provider);
+                return true;
+            });
+            return true;
+        });
+        ExceptionMapper<WebApplicationException> em =
+            pf.createExceptionMapper(WebApplicationException.class, new MessageImpl());
+        assertSame(provider, em);
+    }
+
+    @Test
+    public void testRegisterMbrMbwProviderAsMbrOnly() {
+        ServerProviderFactory pf = ServerProviderFactory.getInstance();
+        JAXBElementProvider<Book> customProvider = new JAXBElementProvider<>();
+        pf.registerUserProvider((Feature) context -> {
+            context.register(customProvider, MessageBodyReader.class);
+            return true;
+        });
+        MessageBodyReader<Book> reader = pf.createMessageBodyReader(Book.class, null, null,
+                                                                    MediaType.TEXT_XML_TYPE, new MessageImpl());
+        assertSame(reader, customProvider);
+
+        MessageBodyWriter<Book> writer = pf.createMessageBodyWriter(Book.class, null, null,
+                                                                    MediaType.TEXT_XML_TYPE, new MessageImpl());
+        assertTrue(writer instanceof JAXBElementProvider);
+        assertNotSame(writer, customProvider);
+    }
+
+    @Test
+    public void testRegisterMbrMbwProviderAsMbwOnly() {
+        ServerProviderFactory pf = ServerProviderFactory.getInstance();
+        JAXBElementProvider<Book> customProvider = new JAXBElementProvider<>();
+        pf.registerUserProvider((Feature) context -> {
+            context.register(customProvider, MessageBodyWriter.class);
+            return true;
+        });
+        MessageBodyWriter<Book> writer = pf.createMessageBodyWriter(Book.class, null, null,
+                                                                    MediaType.TEXT_XML_TYPE, new MessageImpl());
+        assertSame(writer, customProvider);
+
+        MessageBodyReader<Book> reader = pf.createMessageBodyReader(Book.class, null, null,
+                                                                    MediaType.TEXT_XML_TYPE, new MessageImpl());
+        assertTrue(reader instanceof JAXBElementProvider);
+        assertNotSame(reader, customProvider);
     }
 
     @Test
@@ -232,6 +313,79 @@ public class ProviderFactoryTest extends Assert {
     }
 
     @Test
+    public void testCustomProviderSortingWIOnly() {
+        ProviderFactory pf = ServerProviderFactory.getInstance();
+
+        pf.setUserProviders(
+            Arrays.asList(
+                new DWriterInterceptor(), new CWriterInterceptor(),
+                new AWriterInterceptor(), new BWriterInterceptor()));
+
+        Comparator<ProviderInfo<WriterInterceptor>> comp =
+            new Comparator<ProviderInfo<WriterInterceptor>>() {
+
+                @Override
+                public int compare(
+                    ProviderInfo<WriterInterceptor> o1,
+                    ProviderInfo<WriterInterceptor> o2) {
+
+                    WriterInterceptor provider1 = o1.getProvider();
+                    WriterInterceptor provider2 = o2.getProvider();
+
+                    return provider1.getClass().getName().compareTo(
+                        provider2.getClass().getName());
+                }
+
+            };
+
+        pf.setProviderComparator(comp);
+
+        Collection<ProviderInfo<WriterInterceptor>> values =
+            pf.writerInterceptors.values();
+
+        assertEquals(4, values.size());
+
+        Iterator<ProviderInfo<WriterInterceptor>> iterator = values.iterator();
+
+        assertEquals(AWriterInterceptor.class, iterator.next().getProvider().getClass());
+        assertEquals(BWriterInterceptor.class, iterator.next().getProvider().getClass());
+        assertEquals(CWriterInterceptor.class, iterator.next().getProvider().getClass());
+        assertEquals(DWriterInterceptor.class, iterator.next().getProvider().getClass());
+    }
+
+    private static class AWriterInterceptor implements WriterInterceptor {
+        @Override
+        public void aroundWriteTo(WriterInterceptorContext context) throws
+            IOException, WebApplicationException {
+
+        }
+    }
+
+    private static class BWriterInterceptor implements WriterInterceptor {
+        @Override
+        public void aroundWriteTo(WriterInterceptorContext context) throws
+            IOException, WebApplicationException {
+
+        }
+    }
+
+    private static class CWriterInterceptor implements WriterInterceptor {
+        @Override
+        public void aroundWriteTo(WriterInterceptorContext context) throws
+            IOException, WebApplicationException {
+
+        }
+    }
+
+    private static class DWriterInterceptor implements WriterInterceptor {
+        @Override
+        public void aroundWriteTo(WriterInterceptorContext context) throws
+            IOException, WebApplicationException {
+
+        }
+    }
+
+    @Test
     public void testCustomProviderSortingWithBus() {
         WildcardReader wc1 = new WildcardReader();
         WildcardReader2 wc2 = new WildcardReader2();
@@ -261,7 +415,7 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testCustomJaxbProvider() {
         ProviderFactory pf = ServerProviderFactory.getInstance();
-        JAXBElementProvider<Book> provider = new JAXBElementProvider<Book>();
+        JAXBElementProvider<Book> provider = new JAXBElementProvider<>();
         pf.registerUserProvider(provider);
         MessageBodyReader<Book> customJaxbReader = pf.createMessageBodyReader(Book.class, null, null,
                                                               MediaType.TEXT_XML_TYPE, new MessageImpl());
@@ -321,8 +475,7 @@ public class ProviderFactoryTest extends Assert {
         Exchange e = new ExchangeImpl();
         m.setExchange(e);
         Endpoint endpoint = EasyMock.createMock(Endpoint.class);
-        endpoint.get(ServerProviderFactory.class.getName());
-        EasyMock.expectLastCall().andReturn(factory);
+        EasyMock.expect(endpoint.get(ServerProviderFactory.class.getName())).andReturn(factory);
         EasyMock.replay(endpoint);
         e.put(Endpoint.class, endpoint);
         assertSame(ProviderFactory.getInstance(m), factory);
@@ -478,7 +631,7 @@ public class ProviderFactoryTest extends Assert {
     public void testMessageBodyWriterNoTypes() throws Exception {
         ProviderFactory pf = ServerProviderFactory.getInstance();
         List<Object> providers = new ArrayList<>();
-        SuperBookReaderWriter2<SuperBook> superBookHandler = new SuperBookReaderWriter2<SuperBook>();
+        SuperBookReaderWriter2<SuperBook> superBookHandler = new SuperBookReaderWriter2<>();
         providers.add(superBookHandler);
         pf.setUserProviders(providers);
         assertSame(superBookHandler,
@@ -539,7 +692,7 @@ public class ProviderFactoryTest extends Assert {
         Message m = new MessageImpl();
         Exchange ex = new ExchangeImpl();
         m.setExchange(ex);
-        m.put(ServerProviderFactory.IGNORE_TYPE_VARIABLES, true);
+        m.put(ProviderFactory.IGNORE_TYPE_VARIABLES, true);
         MessageBodyReader<Book> reader =
             pf.createMessageBodyReader(Book.class, Book.class, null, MediaType.APPLICATION_JSON_TYPE,
                                        m);
@@ -663,10 +816,28 @@ public class ProviderFactoryTest extends Assert {
 
     private Message prepareMessage(String contentType, String acceptType) {
         Message message = new MessageImpl();
-        Map<String, List<String>> headers = new MetadataMap<String, String>();
+        Map<String, List<String>> headers = new MetadataMap<>();
         message.put(Message.PROTOCOL_HEADERS, headers);
         Exchange exchange = new ExchangeImpl();
         exchange.setInMessage(message);
+        if (acceptType != null) {
+            headers.put("Accept", Collections.singletonList(acceptType));
+            exchange.setOutMessage(new MessageImpl());
+        } else {
+            headers.put("Content-Type", Collections.singletonList(contentType));
+        }
+        message.put("Content-Type", contentType);
+        message.setExchange(exchange);
+        return message;
+    }
+
+    private Message prepareFaultMessage(String contentType, String acceptType) {
+        Message message = new MessageImpl();
+        Map<String, List<String>> headers = new MetadataMap<String, String>();
+        message.put(Message.PROTOCOL_HEADERS, headers);
+        Exchange exchange = new ExchangeImpl();
+        exchange.setInMessage(null);
+        exchange.setInFaultMessage(message);
         if (acceptType != null) {
             headers.put("Accept", Collections.singletonList(acceptType));
             exchange.setOutMessage(new MessageImpl());
@@ -685,6 +856,63 @@ public class ProviderFactoryTest extends Assert {
 
         verifyProvider(pf, org.apache.cxf.jaxrs.resources.Book.class, CustomWidgetProvider.class,
                        "application/widget");
+    }
+
+    @Test
+    public void testCreateMessageBodyReaderInterceptor() {
+        ServerProviderFactory spf = ServerProviderFactory.getInstance();
+        final Message message = prepareMessage(MediaType.APPLICATION_XML, MediaType.APPLICATION_XML);
+
+        List<ReaderInterceptor> interceptors =
+            spf.createMessageBodyReaderInterceptor(Book.class, Book.class,
+                                                   new Annotation[0], MediaType.APPLICATION_XML_TYPE,
+                                                   message, true, null);
+        assertSame(1, interceptors.size());
+    }
+
+    @Test
+    public void testCreateMessageBodyReaderInterceptorWithFaultMessage() throws Exception {
+        ServerProviderFactory spf = ServerProviderFactory.getInstance();
+        final Message message = prepareFaultMessage(MediaType.APPLICATION_XML, MediaType.APPLICATION_XML);
+
+        List<ReaderInterceptor> interceptors =
+            spf.createMessageBodyReaderInterceptor(Book.class, Book.class,
+                                                   new Annotation[0], MediaType.APPLICATION_XML_TYPE,
+                                                   message, true, null);
+        assertSame(1, interceptors.size());
+    }
+
+    @Test
+    public void testCreateMessageBodyReaderInterceptorWithReaderInterceptor() throws Exception {
+        ReaderInterceptor ri = readerInterceptorContext -> readerInterceptorContext.proceed();
+        ProviderInfo<ReaderInterceptor> pi = new ProviderInfo<>(ri, null, true);
+
+        ServerProviderFactory spf = ServerProviderFactory.getInstance();
+        spf.readerInterceptors.put(new ProviderFactory.NameKey("org.apache.cxf.filter.binding", 1, ri.getClass()), pi);
+
+        final Message message = prepareMessage(MediaType.APPLICATION_XML, MediaType.APPLICATION_XML);
+
+        List<ReaderInterceptor> interceptors =
+            spf.createMessageBodyReaderInterceptor(Book.class, Book.class,
+                                                   new Annotation[0], MediaType.APPLICATION_XML_TYPE,
+                                                   message, true, null);
+        assertSame(2, interceptors.size());
+    }
+
+    @Test
+    public void testCreateMessageBodyReaderInterceptorWithFaultMessageAndReaderInterceptor() throws Exception {
+        ReaderInterceptor ri = readerInterceptorContext -> readerInterceptorContext.proceed();
+        ProviderInfo<ReaderInterceptor> pi = new ProviderInfo<>(ri, null, true);
+
+        ServerProviderFactory spf = ServerProviderFactory.getInstance();
+        spf.readerInterceptors.put(new ProviderFactory.NameKey("org.apache.cxf.filter.binding", 1, ri.getClass()), pi);
+
+        final Message message = prepareFaultMessage(MediaType.APPLICATION_XML, MediaType.APPLICATION_XML);
+        List<ReaderInterceptor> interceptors =
+            spf.createMessageBodyReaderInterceptor(Book.class, Book.class,
+                                                   new Annotation[0], MediaType.APPLICATION_XML_TYPE,
+                                                   message, true, null);
+        assertSame(2, interceptors.size());
     }
 
     private int indexOf(List<? extends Object> providerInfos, Class<?> providerType) {
@@ -809,7 +1037,7 @@ public class ProviderFactoryTest extends Assert {
 
     @Test
     public void testSetSchemasFromClasspath() {
-        JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
+        JAXBElementProvider<?> provider = new JAXBElementProvider<>();
         ProviderFactory pf = ServerProviderFactory.getInstance();
         pf.registerUserProvider(provider);
 
@@ -820,13 +1048,174 @@ public class ProviderFactoryTest extends Assert {
         assertNotNull("schema can not be read from classpath", s);
     }
 
+    @Test
+    public void testSortByPriority() {
+        ProviderFactory pf = ServerProviderFactory.getInstance();
+        List<Object> providers = new ArrayList<>();
+        BookReaderWriter bookHandler = new BookReaderWriter();
+        providers.add(bookHandler);
+        HighPriorityBookReaderWriter highPriorityBookHandler = new HighPriorityBookReaderWriter();
+        providers.add(highPriorityBookHandler);
+        pf.setUserProviders(providers);
+        assertSame(highPriorityBookHandler,
+                   pf.createMessageBodyReader(Book.class, Book.class, new Annotation[]{},
+                                              MediaType.APPLICATION_XML_TYPE, new MessageImpl()));
+        assertSame(highPriorityBookHandler,
+                   pf.createMessageBodyWriter(Book.class, Book.class, new Annotation[]{},
+                                              MediaType.APPLICATION_XML_TYPE, new MessageImpl()));
+    }
+
+    @Test
+    public void testSortByPriorityReversed() {
+        // do the same thing again but add the providers in the reverse order to ensure add order
+        // isn't responsible for our success so far.
+        ProviderFactory pf = ServerProviderFactory.getInstance();
+        List<Object> providers = new ArrayList<>();
+        HighPriorityBookReaderWriter highPriorityBookHandler = new HighPriorityBookReaderWriter();
+        providers.add(highPriorityBookHandler);
+        BookReaderWriter bookHandler = new BookReaderWriter();
+        providers.add(bookHandler);
+        pf.setUserProviders(providers);
+        assertSame(highPriorityBookHandler,
+                   pf.createMessageBodyReader(Book.class, Book.class, new Annotation[]{},
+                                              MediaType.APPLICATION_XML_TYPE, new MessageImpl()));
+        assertSame(highPriorityBookHandler,
+                   pf.createMessageBodyWriter(Book.class, Book.class, new Annotation[]{},
+                                              MediaType.APPLICATION_XML_TYPE, new MessageImpl()));
+    }
+
+    @Test
+    public void testSortContextResolverByPriority() {
+        ProviderFactory pf = ServerProviderFactory.getInstance();
+        List<Object> providers = new ArrayList<>();
+        LowPriorityContextResolver lowResolver = new LowPriorityContextResolver();
+        providers.add(lowResolver);
+        HighPriorityContextResolver highResolver = new HighPriorityContextResolver();
+        providers.add(highResolver);
+        pf.setUserProviders(providers);
+        Message m = new MessageImpl();
+        assertEquals(highResolver.getContext(null),
+                   pf.createContextResolver(String.class, m, MediaType.TEXT_PLAIN_TYPE).getContext(null));
+    }
+
+    @Test
+    public void testSortContextResolverByPriorityReversed() {
+        ProviderFactory pf = ServerProviderFactory.getInstance();
+        List<Object> providers = new ArrayList<>();
+        HighPriorityContextResolver highResolver = new HighPriorityContextResolver();
+        providers.add(highResolver);
+        LowPriorityContextResolver lowResolver = new LowPriorityContextResolver();
+        providers.add(lowResolver);
+        pf.setUserProviders(providers);
+        Message m = new MessageImpl();
+        assertEquals(highResolver.getContext(null),
+                   pf.createContextResolver(String.class, m, MediaType.TEXT_PLAIN_TYPE).getContext(null));
+    }
+
+    @Test
+    public void testSortExceptionMapperByPriority() {
+        ServerProviderFactory pf = ServerProviderFactory.getInstance();
+        List<Object> providers = new ArrayList<>();
+        LowPriorityExceptionMapper lowMapper = new LowPriorityExceptionMapper();
+        providers.add(lowMapper);
+        HighPriorityExceptionMapper highMapper = new HighPriorityExceptionMapper();
+        providers.add(highMapper);
+        pf.setUserProviders(providers);
+        Message m = new MessageImpl();
+        assertEquals(Response.ok().build().getStatus(),
+                     pf.createExceptionMapper(RuntimeException.class, m).toResponse(null).getStatus());
+    }
+
+    @Test
+    public void testSortExceptionMapperByPriorityReversed() {
+        ServerProviderFactory pf = ServerProviderFactory.getInstance();
+        List<Object> providers = new ArrayList<>();
+        HighPriorityExceptionMapper highMapper = new HighPriorityExceptionMapper();
+        providers.add(highMapper);
+        LowPriorityExceptionMapper lowMapper = new LowPriorityExceptionMapper();
+        providers.add(lowMapper);
+        pf.setUserProviders(providers);
+        Message m = new MessageImpl();
+        assertEquals(Response.ok().build().getStatus(),
+                   pf.createExceptionMapper(RuntimeException.class, m).toResponse(null).getStatus());
+    }
+
+    @Priority(1001)
+    private static class HighPriorityExceptionMapper implements ExceptionMapper<Exception> {
+
+        @Override
+        public Response toResponse(Exception exception) {
+            return Response.ok().build();
+        }
+    }
+
+    @Priority(2001)
+    private static class LowPriorityExceptionMapper implements ExceptionMapper<Exception> {
+
+        @Override
+        public Response toResponse(Exception exception) {
+            return Response.noContent().build();
+        }
+    }
+
     private static class TestRuntimeExceptionMapper implements ExceptionMapper<RuntimeException> {
 
         public Response toResponse(RuntimeException exception) {
-            // TODO Auto-generated method stub
             return null;
         }
 
+    }
+
+    @Priority(100)
+    private static class LowPriorityContextResolver implements ContextResolver<String> {
+
+        @Override
+        public String getContext(Class<?> paramClass) {
+            return "low";
+        }
+    }
+
+    @Priority(1)
+    private static class HighPriorityContextResolver implements ContextResolver<String> {
+
+        @Override
+        public String getContext(Class<?> paramClass) {
+            return "high";
+        }
+    }
+
+    @Priority(Priorities.USER - 10)
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    private static class HighPriorityBookReaderWriter
+        implements MessageBodyReader<Book>, MessageBodyWriter<Book> {
+
+        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations,
+                                  MediaType mediaType) {
+            return true;
+        }
+
+        public Book readFrom(Class<Book> arg0, Type arg1, Annotation[] arg2,
+                             MediaType arg3, MultivaluedMap<String, String> arg4, InputStream arg5)
+            throws IOException, WebApplicationException {
+            return null;
+        }
+
+        public long getSize(Book t, Class<?> type, Type genericType, Annotation[] annotations,
+                            MediaType mediaType) {
+            return 0;
+        }
+
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations,
+                                   MediaType mediaType) {
+            return true;
+        }
+
+        public void writeTo(Book arg0, Class<?> arg1, Type arg2, Annotation[] arg3,
+                            MediaType arg4, MultivaluedMap<String, Object> arg5, OutputStream arg6)
+            throws IOException, WebApplicationException {
+
+        }
     }
 
     @Produces("application/xml")
@@ -842,13 +1231,11 @@ public class ProviderFactoryTest extends Assert {
         public Book readFrom(Class<Book> arg0, Type arg1, Annotation[] arg2,
                              MediaType arg3, MultivaluedMap<String, String> arg4, InputStream arg5)
             throws IOException, WebApplicationException {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public long getSize(Book t, Class<?> type, Type genericType, Annotation[] annotations,
                             MediaType mediaType) {
-            // TODO Auto-generated method stub
             return 0;
         }
 
@@ -860,7 +1247,6 @@ public class ProviderFactoryTest extends Assert {
         public void writeTo(Book arg0, Class<?> arg1, Type arg2, Annotation[] arg3,
                             MediaType arg4, MultivaluedMap<String, Object> arg5, OutputStream arg6)
             throws IOException, WebApplicationException {
-            // TODO Auto-generated method stub
 
         }
     }
@@ -878,13 +1264,11 @@ public class ProviderFactoryTest extends Assert {
         public SuperBook readFrom(Class<SuperBook> arg0, Type arg1, Annotation[] arg2, MediaType arg3,
                                   MultivaluedMap<String, String> arg4, InputStream arg5)
             throws IOException, WebApplicationException {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public long getSize(SuperBook t, Class<?> type, Type genericType,
                             Annotation[] annotations, MediaType mediaType) {
-            // TODO Auto-generated method stub
             return 0;
         }
 
@@ -896,7 +1280,6 @@ public class ProviderFactoryTest extends Assert {
         public void writeTo(SuperBook arg0, Class<?> arg1, Type arg2,
                             Annotation[] arg3, MediaType arg4, MultivaluedMap<String, Object> arg5,
                             OutputStream arg6) throws IOException, WebApplicationException {
-            // TODO Auto-generated method stub
 
         }
 
@@ -915,13 +1298,11 @@ public class ProviderFactoryTest extends Assert {
         public T readFrom(Class<T> arg0, Type arg1, Annotation[] arg2, MediaType arg3,
                           MultivaluedMap<String, String> arg4, InputStream arg5)
             throws IOException, WebApplicationException {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public long getSize(T t, Class<?> type, Type genericType,
                             Annotation[] annotations, MediaType mediaType) {
-            // TODO Auto-generated method stub
             return 0;
         }
 
@@ -935,7 +1316,6 @@ public class ProviderFactoryTest extends Assert {
                             MediaType mediaType, MultivaluedMap<String, Object> httpHeaders,
                             OutputStream entityStream)
             throws IOException, WebApplicationException {
-            // TODO Auto-generated method stub
         }
 
     }
@@ -952,7 +1332,6 @@ public class ProviderFactoryTest extends Assert {
         public Object readFrom(Class<Object> arg0, Type arg1, Annotation[] arg2, MediaType arg3,
                                   MultivaluedMap<String, String> arg4, InputStream arg5)
             throws IOException, WebApplicationException {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -969,7 +1348,6 @@ public class ProviderFactoryTest extends Assert {
         public Object readFrom(Class<Object> arg0, Type arg1, Annotation[] arg2, MediaType arg3,
                                   MultivaluedMap<String, String> arg4, InputStream arg5)
             throws IOException, WebApplicationException {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -989,7 +1367,6 @@ public class ProviderFactoryTest extends Assert {
         implements ExceptionMapper<T> {
 
         public Response toResponse(T arg0) {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -1008,19 +1385,16 @@ public class ProviderFactoryTest extends Assert {
         public Object readFrom(Class<Object> arg0, Type arg1, Annotation[] arg2, MediaType arg3,
                                MultivaluedMap<String, String> arg4, InputStream arg5) throws IOException,
             WebApplicationException {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public long getSize(Object arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4) {
-            // TODO Auto-generated method stub
             return 0;
         }
 
         @Override
         public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType arg3) {
-            // TODO Auto-generated method stub
             return false;
         }
 
@@ -1028,7 +1402,6 @@ public class ProviderFactoryTest extends Assert {
         public void writeTo(Object arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4,
                             MultivaluedMap<String, Object> arg5, OutputStream arg6) throws IOException,
             WebApplicationException {
-            // TODO Auto-generated method stub
 
         }
     }

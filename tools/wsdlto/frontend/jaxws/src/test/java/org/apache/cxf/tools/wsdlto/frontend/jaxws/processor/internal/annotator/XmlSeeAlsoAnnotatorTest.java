@@ -24,10 +24,13 @@ import java.util.Iterator;
 import org.apache.cxf.tools.common.model.JavaInterface;
 import org.apache.cxf.tools.util.ClassCollector;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.annotator.types.ObjectFactory;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class XmlSeeAlsoAnnotatorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+public class XmlSeeAlsoAnnotatorTest {
 
     @Test
     public void testAddXmlSeeAlsoAnnotation() throws Exception {

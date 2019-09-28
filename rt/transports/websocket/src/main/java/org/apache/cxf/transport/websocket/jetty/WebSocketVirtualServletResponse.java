@@ -49,7 +49,7 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
 
     public WebSocketVirtualServletResponse(WebSocketServletHolder websocket) {
         this.webSocketHolder = websocket;
-        this.responseHeaders = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
+        this.responseHeaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         this.outputStream = createOutputStream();
     }
 

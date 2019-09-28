@@ -17,7 +17,10 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cxf="http://cxf.apache.org/core" xsi:schemaLocation="         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:cxf="http://cxf.apache.org/core"
+    xsi:schemaLocation="http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean id="mapAggregator" class="org.apache.cxf.ws.addressing.MAPAggregator"/>
     <bean id="mapCodec" class="org.apache.cxf.ws.addressing.soap.MAPCodec"/>
     <bean id="logIn" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>

@@ -47,12 +47,13 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
     private String applicationWebUri;
     private String applicationDescription;
     private String applicationLogoUri;
-    private List<String> applicationCertificates = new LinkedList<String>();
+    private List<String> applicationCertificates = new LinkedList<>();
     private Map<String, String> extraApplicationProperties = new HashMap<>();
     private boolean implicitFlow;
 
     private List<OAuthPermission> permissions;
     private List<OAuthPermission> alreadyAuthorizedPermissions;
+    private String preauthorizedTokenKey;
     private boolean hidePreauthorizedScopesInForm;
     private boolean applicationRegisteredDynamically;
     private boolean supportSinglePageApplications;
@@ -242,7 +243,7 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
             : Collections.emptyList();
     }
     public List<OAuthPermission> getAllPermissions() {
-        List<OAuthPermission> allPerms = new LinkedList<OAuthPermission>();
+        List<OAuthPermission> allPerms = new LinkedList<>();
         if (alreadyAuthorizedPermissions != null) {
             allPerms.addAll(alreadyAuthorizedPermissions);
             if (permissions != null) {
@@ -275,5 +276,12 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
         this.supportSinglePageApplications = supportSinglePageApplications;
     }
 
+    public void setPreauthorizedTokenKey(String preauthorizedTokenKey) {
+        this.preauthorizedTokenKey = preauthorizedTokenKey;
+    }
+
+    public String getPreauthorizedTokenKey() {
+        return this.preauthorizedTokenKey;
+    }
     
 }

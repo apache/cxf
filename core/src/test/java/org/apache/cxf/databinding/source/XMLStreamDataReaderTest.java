@@ -30,13 +30,15 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.staxutils.StaxUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  */
-public class XMLStreamDataReaderTest extends Assert {
+public class XMLStreamDataReaderTest {
     private static final byte[] DUMMY_DATA = "<ns:dummy xmlns:ns='http://www.apache.org/cxf'/>".getBytes();
 
     @Test

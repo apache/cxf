@@ -74,6 +74,7 @@ public class ExtendedDocumentBuilder {
                 parserFactory = DocumentBuilderFactory.newInstance();
                 try {
                     parserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+                    parserFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
                 } catch (ParserConfigurationException e) {
                     //old version, not supported.
                 }

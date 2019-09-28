@@ -47,6 +47,7 @@ import javax.xml.stream.events.XMLEvent;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
@@ -88,13 +89,14 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
 
     }
 
+    @SuppressWarnings("resource") // Response shouldn't be closed here
     private void processResponse(ServerProviderFactory providerFactory, Message message) {
 
         if (isResponseAlreadyHandled(message)) {
             return;
         }
         MessageContentsList objs = MessageContentsList.getContentsList(message);
-        if (objs == null || objs.size() == 0) {
+        if (objs == null || objs.isEmpty()) {
             return;
         }
 
@@ -192,7 +194,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
 
         Object ignoreWritersProp = exchange.get(JAXRSUtils.IGNORE_MESSAGE_WRITERS);
         boolean ignoreWriters =
-            ignoreWritersProp == null ? false : Boolean.valueOf(ignoreWritersProp.toString());
+            ignoreWritersProp != null && Boolean.valueOf(ignoreWritersProp.toString());
         if (ignoreWriters) {
             writeResponseToStream(message.getContent(OutputStream.class), entity);
             return;
@@ -227,6 +229,9 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             }
             responseMediaType = checkFinalContentType(responseMediaType, writers, checkWriters);
         } catch (Throwable ex) {
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.FINE, ex.getMessage(), ex);
+            }
             handleWriteException(providerFactory, message, ex, firstTry);
             return;
         }
@@ -240,7 +245,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         boolean enabled = checkBufferingMode(message, writers, firstTry);
         try {
 
-            try {
+            try {       // NOPMD
                 JAXRSUtils.writeMessageBody(writers,
                         entity,
                         targetType,
@@ -311,9 +316,8 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     private int getActualStatus(int status, Object responseObj) {
         if (status == -1) {
             return responseObj == null ? 204 : 200;
-        } else {
-            return status;
         }
+        return status;
     }
 
     private boolean checkBufferingMode(Message m, List<WriterInterceptor> writers, boolean firstTry) {
@@ -323,14 +327,14 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         WriterInterceptor last = writers.get(writers.size() - 1);
         MessageBodyWriter<Object> w = ((WriterInterceptorMBW)last).getMBW();
         Object outBuf = m.getContextualProperty(OUT_BUFFERING);
-        boolean enabled = MessageUtils.isTrue(outBuf);
+        boolean enabled = PropertyUtils.isTrue(outBuf);
         boolean configurableProvider = w instanceof AbstractConfigurableProvider;
         if (!enabled && outBuf == null && configurableProvider) {
             enabled = ((AbstractConfigurableProvider)w).getEnableBuffering();
         }
         if (enabled) {
             boolean streamingOn = configurableProvider
-                ? ((AbstractConfigurableProvider)w).getEnableStreaming() : false;
+                && ((AbstractConfigurableProvider)w).getEnableStreaming();
             if (streamingOn) {
                 m.setContent(XMLStreamWriter.class, new CachingXmlEventWriter());
             } else {
@@ -393,9 +397,8 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         if (excResponse == null) {
             setResponseStatus(message, 500);
             throw new Fault(ex);
-        } else {
-            serializeMessage(pf, message, excResponse, null, false);
         }
+        serializeMessage(pf, message, excResponse, null, false);
 
     }
 
@@ -486,7 +489,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     // method is modifiable. Thus we do need to know if the initial copy has already
     // occurred: for now we will just use to ensure the correct status is set
     private boolean isResponseHeadersCopied(Message message) {
-        return MessageUtils.isTrue(message.get(AbstractHTTPDestination.RESPONSE_HEADERS_COPIED));
+        return PropertyUtils.isTrue(message.get(AbstractHTTPDestination.RESPONSE_HEADERS_COPIED));
     }
 
     public void handleFault(Message message) {

@@ -32,6 +32,10 @@ import org.apache.cxf.systest.jaxrs.Book;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class JAXRSJaasSecurityTest extends AbstractSpringSecurityTest {
     public static final int PORT = BookServerJaasSecurity.PORT;
 
@@ -125,8 +129,7 @@ public class JAXRSJaasSecurityTest extends AbstractSpringSecurityTest {
             "http://localhost:" + PORT + "/service/jaas2/bookstorestorage/thosebooks/123";
         WebClient wc = WebClient.create(endpointAddress);
         wc.accept("text/xml,text/html");
-        wc.header(HttpHeaders.AUTHORIZATION,
-                  "Basic " + base64Encode("foo" + ":" + "bar1"));
+        wc.header(HttpHeaders.AUTHORIZATION, basicAuthHeader("foo", "bar1"));
         Response r = wc.get();
         assertEquals(307, r.getStatus());
         Object locationHeader = r.getMetadata().getFirst(HttpHeaders.LOCATION);

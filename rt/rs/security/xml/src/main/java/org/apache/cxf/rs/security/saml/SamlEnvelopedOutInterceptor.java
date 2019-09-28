@@ -102,9 +102,8 @@ public class SamlEnvelopedOutInterceptor extends AbstractXmlSecOutInterceptor {
             CachedOutputStream bos = new CachedOutputStream();
             StaxUtils.writeTo(newDoc, bos);
             return StaxUtils.read(bos.getInputStream());
-        } else {
-            return newDoc;
         }
+        return newDoc;
     }
 
 

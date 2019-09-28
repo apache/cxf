@@ -52,7 +52,6 @@ public class SOAPHandlerFaultInInterceptor extends
     }
 
     public Set<URI> getRoles() {
-        // TODO
         return new HashSet<>();
     }
 
@@ -142,14 +141,10 @@ public class SOAPHandlerFaultInInterceptor extends
             xmlReader = StaxUtils.createXMLStreamReader(bodySource);
             xmlReader.nextTag();
             xmlReader.nextTag(); // move past body tag
-        } catch (SOAPException e) {
-            e.printStackTrace();
-        } catch (XMLStreamException e) {
+        } catch (SOAPException | XMLStreamException e) {
             e.printStackTrace();
         }
         return xmlReader;
     }
 
-    public void handleFault(SoapMessage message) {
-    }
 }

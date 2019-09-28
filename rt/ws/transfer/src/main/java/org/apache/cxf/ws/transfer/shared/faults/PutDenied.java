@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.transfer.shared.faults;
 
 import javax.xml.namespace.QName;
+
 import org.apache.cxf.ws.transfer.shared.TransferConstants;
 
 /**

@@ -40,7 +40,7 @@ public class ClassResourceInfoComparator implements Comparator<ClassResourceInfo
     }
 
     public int compare(ClassResourceInfo cr1, ClassResourceInfo cr2) {
-        int result = 0;
+        int result;
         if (rc != null) {
             result = rc.compare(cr1, cr2, message);
             if (result != 0) {

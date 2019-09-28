@@ -36,6 +36,7 @@ public class LogicalHandlerFaultInInterceptor
         addAfter(SOAPHandlerFaultInInterceptor.class.getName());
     }
 
+    @Override
     public void handleMessage(Message message) {
         if (binding.getHandlerChain().isEmpty()) {
             return;
@@ -63,7 +64,4 @@ public class LogicalHandlerFaultInInterceptor
         }
     }
 
-    public void handleFault(Message message) {
-        // TODO
-    }
 }

@@ -78,6 +78,11 @@ public class Java2WADLMojo extends AbstractMojo {
      * @parameter
      */
     private String docProvider;
+    
+    /**
+     * @parameter
+     */
+    private String customWadlGenerator;
 
 
     /**
@@ -99,7 +104,6 @@ public class Java2WADLMojo extends AbstractMojo {
 
     /**
      * @parameter
-     * @required
      */
     private List<String> classResourceNames;
 
@@ -231,7 +235,19 @@ public class Java2WADLMojo extends AbstractMojo {
         System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
         List<Class<?>> resourceClasses = loadResourceClasses();
         initClassResourceInfoList(resourceClasses);
-        WadlGenerator wadlGenerator = new WadlGenerator(getBus());
+        WadlGenerator wadlGenerator = null;
+        if (customWadlGenerator != null) {
+            try {
+                wadlGenerator = (WadlGenerator)getClassLoader().loadClass(customWadlGenerator).
+                    getConstructor(new Class[] {Bus.class}).
+                    newInstance(new Object[] {getBus()});
+            } catch (Throwable e) {
+                getLog().debug("Custom WADLGenerator can not be created, using the default one");
+            }
+        }
+        if (wadlGenerator == null) {
+            wadlGenerator = new WadlGenerator(getBus());
+        }
         DocumentationProvider documentationProvider = null;
         if (docProvider != null) {
             try {
@@ -291,27 +307,15 @@ public class Java2WADLMojo extends AbstractMojo {
                 + outputFileExtension).replace("/", File.separator);
         }
 
-        BufferedWriter writer = null;
         try {
             FileUtils.mkDir(new File(outputFile).getParentFile());
-            /*File wadlFile = new File(outputFile);
-            if (!wadlFile.exists()) {
-                wadlFile.createNewFile();
-            }*/
-            writer = new BufferedWriter(new FileWriter(outputFile));
-            writer.write(wadl);
-
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
+                writer.write(wadl);
+            }
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
-        } finally {
-            try {
-                if (writer != null) {
-                    writer.close();
-                }
-            } catch (IOException e) {
-                throw new MojoExecutionException(e.getMessage(), e);
-            }
-        }
+        } 
+        
         // Attach the generated wadl file to the artifacts that get deployed
         // with the enclosing project
         if (attachWadl && outputFile != null) {
@@ -330,10 +334,9 @@ public class Java2WADLMojo extends AbstractMojo {
     private String getBaseURI() {
         if (address != null) {
             return address;
-        } else {
-            // the consumer may use the original target URI to figure out absolute URI
-            return "/";
         }
+        // the consumer may use the original target URI to figure out absolute URI
+        return "/";
     }
 
 
@@ -356,17 +359,25 @@ public class Java2WADLMojo extends AbstractMojo {
         return resourceClassLoader;
     }
     private List<Class<?>> loadResourceClasses() throws MojoExecutionException {
-        List<Class<?>> resourceClasses = new ArrayList<Class<?>>(classResourceNames.size());
-        for (String className : classResourceNames) {
-            try {
-                resourceClasses.add(getClassLoader().loadClass(className));
-            } catch (Exception e) {
-                throw new MojoExecutionException(e.getMessage(), e);
+        if (classResourceNames == null
+            && basePackages == null) {
+            throw new MojoExecutionException(
+                "either classResourceNames or basePackages should be specified");
+        }
+        List<Class<?>> resourceClasses = new ArrayList<>(
+            classResourceNames == null ? 0 : classResourceNames.size());
+        if (classResourceNames != null) {
+            for (String className : classResourceNames) {
+                try {
+                    resourceClasses.add(getClassLoader().loadClass(className));
+                } catch (Exception e) {
+                    throw new MojoExecutionException(e.getMessage(), e);
+                }
             }
         }
         if (resourceClasses.isEmpty() && basePackages != null) {
             try {
-                List<Class<? extends Annotation>> anns = new ArrayList<Class<? extends Annotation>>();
+                List<Class<? extends Annotation>> anns = new ArrayList<>();
                 anns.add(Path.class);
                 final Map< Class< ? extends Annotation >, Collection< Class< ? > > > discoveredClasses =
                     ClasspathScanner.findClasses(ClasspathScanner.parsePackages(basePackages),

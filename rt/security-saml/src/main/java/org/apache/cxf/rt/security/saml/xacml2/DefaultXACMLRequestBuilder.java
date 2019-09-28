@@ -41,19 +41,18 @@ import org.opensaml.xacml.ctx.SubjectType;
 /**
  * This class constructs an XACML 2.0 Request given a Principal, list of roles and MessageContext,
  * following the SAML 2.0 profile of XACML 2.0. The principal name is inserted as the Subject ID,
- * and the list of roles associated with that principal are inserted as Subject roles. The action
- * to send defaults to "execute".
+ * and the list of roles associated with that principal are inserted as Subject roles. The current
+ * DateTime is also sent in an Environment, however this can be disabled via configuration.
  *
  * For a SOAP Service, the resource-id Attribute refers to the
  * "{serviceNamespace}serviceName#{operationNamespace}operationName" String (shortened to
  * "{serviceNamespace}serviceName#operationName" if the namespaces are identical). The
  * "{serviceNamespace}serviceName", "{operationNamespace}operationName" and resource URI are also
- * sent to simplify processing at the PDP side.
+ * sent to simplify processing at the PDP side. The action to send defaults to "execute".
  *
  * For a REST service the request URL is the resource. You can also configure the ability to
- * send the truncated request URI instead for a SOAP or REST service. The current DateTime is
- * also sent in an Environment, however this can be disabled via configuration.
- *
+ * send the truncated request URI instead for a SOAP or REST service. The action to send defaults
+ * to the HTTP verb.
  */
 public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
 

@@ -63,9 +63,8 @@ public class AbstractJwsJsonWriterProvider {
             if (sigProviders == null) {
                 LOG.warning("JWS JSON init properties resource is not identified");
                 throw new JwsException(JwsException.Error.NO_INIT_PROPERTIES);
-            } else {
-                return Collections.emptyList();
             }
+            return Collections.emptyList();
         }
         List<String> propLocs = null;
         if (propLocsProp instanceof String) {
@@ -83,7 +82,7 @@ public class AbstractJwsJsonWriterProvider {
             return sigProviders;
         }
         Message m = JAXRSUtils.getCurrentMessage();
-        List<JwsSignatureProvider> theSigProviders = new LinkedList<JwsSignatureProvider>();
+        List<JwsSignatureProvider> theSigProviders = new LinkedList<>();
         for (int i = 0; i < propLocs.size(); i++) {
             Properties props = JwsUtils.loadJwsProperties(m, propLocs.get(i));
             theSigProviders.add(JwsUtils.loadSignatureProvider(props, protectedHeaders.get(i)));

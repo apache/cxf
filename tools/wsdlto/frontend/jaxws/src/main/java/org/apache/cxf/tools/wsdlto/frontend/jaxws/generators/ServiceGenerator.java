@@ -77,7 +77,7 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
 
             Map<String, JavaServiceClass> serviceClasses = javaModel.getServiceClasses();
 
-            if (serviceClasses.size() == 0) {
+            if (serviceClasses.isEmpty()) {
                 ServiceInfo serviceInfo = env.get(ServiceInfo.class);
                 String wsdl = serviceInfo.getDescription().getBaseURI();
                 Message msg = new Message("CAN_NOT_GEN_SERVICE", LOG, wsdl);
@@ -146,7 +146,7 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
                     useGetResource = true;
                 }
 
-                setAttributes("cxfPortClassnames", portNames.toArray(new String[portNames.size()]));
+                setAttributes("cxfPortClassnames", portNames.toArray(new String[0]));
                 setAttributes("service", js);
                 setAttributes("wsdlLocation", location);
                 setAttributes("useGetResource", useGetResource);
@@ -158,7 +158,7 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
                 setCommonAttributes();
 
                 String target = (String)env.get("service.target");
-                setAttributes("service-target", target);
+                setAttributes("serviceTarget", target);
                 if ("jaxws22".equals(target)) {
                     setAttributes("jaxws22", true);
                 }

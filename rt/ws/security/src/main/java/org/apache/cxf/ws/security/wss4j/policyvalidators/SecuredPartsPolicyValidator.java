@@ -57,11 +57,10 @@ public class SecuredPartsPolicyValidator implements SecurityPolicyValidator {
             return assertionInfo.getAssertion() != null
                 && (SP12Constants.SIGNED_PARTS.equals(assertionInfo.getAssertion().getName())
                     || SP11Constants.SIGNED_PARTS.equals(assertionInfo.getAssertion().getName()));
-        } else {
-            return assertionInfo.getAssertion() != null
-                && (SP12Constants.ENCRYPTED_PARTS.equals(assertionInfo.getAssertion().getName())
-                    || SP11Constants.ENCRYPTED_PARTS.equals(assertionInfo.getAssertion().getName()));
         }
+        return assertionInfo.getAssertion() != null
+            && (SP12Constants.ENCRYPTED_PARTS.equals(assertionInfo.getAssertion().getName())
+                || SP11Constants.ENCRYPTED_PARTS.equals(assertionInfo.getAssertion().getName()));
     }
 
     /**
@@ -112,12 +111,16 @@ public class SecuredPartsPolicyValidator implements SecurityPolicyValidator {
             }
 
             for (Header h : p.getHeaders()) {
-                try {
-                    CryptoCoverageUtil.checkHeaderCoverage(header, dataRefs,
-                            h.getNamespace(), h.getName(), coverageType,
-                            CoverageScope.ELEMENT);
-                } catch (WSSecurityException e) {
+                if (header == null) {
                     ai.setNotAsserted(h.getNamespace() + ":" + h.getName() + " not + " + coverageType);
+                } else {
+                    try {
+                        CryptoCoverageUtil.checkHeaderCoverage(header, dataRefs,
+                                h.getNamespace(), h.getName(), coverageType,
+                                CoverageScope.ELEMENT);
+                    } catch (WSSecurityException e) {
+                        ai.setNotAsserted(h.getNamespace() + ":" + h.getName() + " not + " + coverageType);
+                    }
                 }
             }
 

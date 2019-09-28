@@ -21,7 +21,6 @@ package org.apache.cxf.ws.security.trust;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,10 +32,10 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.WSConstants;
 
 public class DefaultSTSTokenCacher implements STSTokenCacher {
 
@@ -140,7 +139,7 @@ public class DefaultSTSTokenCacher implements STSTokenCacher {
     private static boolean isOneTimeUse(SecurityToken issuedToken) {
         Element token = issuedToken.getToken();
         if (token != null && "Assertion".equals(token.getLocalName())
-            && WSConstants.SAML2_NS.equals(token.getNamespaceURI())) {
+            && WSS4JConstants.SAML2_NS.equals(token.getNamespaceURI())) {
             try {
                 SamlAssertionWrapper assertion = new SamlAssertionWrapper(token);
 
@@ -161,32 +160,32 @@ public class DefaultSTSTokenCacher implements STSTokenCacher {
         if (token != null) {
             // For SAML tokens get the ID/AssertionID
             if ("Assertion".equals(token.getLocalName())
-                && WSConstants.SAML2_NS.equals(token.getNamespaceURI())) {
+                && WSS4JConstants.SAML2_NS.equals(token.getNamespaceURI())) {
                 return token.getAttributeNS(null, "ID");
             } else if ("Assertion".equals(token.getLocalName())
-                && WSConstants.SAML_NS.equals(token.getNamespaceURI())) {
+                && WSS4JConstants.SAML_NS.equals(token.getNamespaceURI())) {
                 return token.getAttributeNS(null, "AssertionID");
             }
 
             // For UsernameTokens get the username
-            if (WSConstants.USERNAME_TOKEN_LN.equals(token.getLocalName())
-                && WSConstants.WSSE_NS.equals(token.getNamespaceURI())) {
+            if (WSS4JConstants.USERNAME_TOKEN_LN.equals(token.getLocalName())
+                && WSS4JConstants.WSSE_NS.equals(token.getNamespaceURI())) {
                 Element usernameElement =
-                    XMLUtils.getDirectChildElement(token, WSConstants.USERNAME_LN, WSConstants.WSSE_NS);
+                    XMLUtils.getDirectChildElement(token, WSS4JConstants.USERNAME_LN, WSS4JConstants.WSSE_NS);
                 if (usernameElement != null) {
                     return XMLUtils.getElementText(usernameElement);
                 }
             }
 
             // For BinarySecurityTokens take the hash of the value
-            if (WSConstants.BINARY_TOKEN_LN.equals(token.getLocalName())
-                && WSConstants.WSSE_NS.equals(token.getNamespaceURI())) {
+            if (WSS4JConstants.BINARY_TOKEN_LN.equals(token.getLocalName())
+                && WSS4JConstants.WSSE_NS.equals(token.getNamespaceURI())) {
                 String text = XMLUtils.getElementText(token);
                 if (text != null && !"".equals(text)) {
                     try {
                         MessageDigest digest = MessageDigest.getInstance("SHA-256");
                         byte[] bytes = digest.digest(text.getBytes());
-                        return Base64.getMimeEncoder().encodeToString(bytes);
+                        return org.apache.xml.security.utils.XMLUtils.encodeToString(bytes);
                     } catch (NoSuchAlgorithmException e) {
                         // SHA-256 must be supported so not going to happen...
                     }

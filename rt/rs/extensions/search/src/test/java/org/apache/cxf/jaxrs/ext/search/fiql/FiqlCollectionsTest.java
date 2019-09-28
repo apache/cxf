@@ -23,13 +23,14 @@ import java.util.Set;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchParseException;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class FiqlCollectionsTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+
+public class FiqlCollectionsTest {
     @Test
     public void testWithCollectionAfterFirstLevelOnCollection() throws SearchParseException {
-        FiqlParser<Place> placeParser = new FiqlParser<Place>(Place.class);
+        FiqlParser<Place> placeParser = new FiqlParser<>(Place.class);
         SearchCondition<Place> placeCondition = placeParser
                 .parse("specs.features.description==description");
         Place place = placeCondition.getCondition();
@@ -38,7 +39,7 @@ public class FiqlCollectionsTest extends Assert {
 
     @Test
     public void testWithCollectionAfterFirstLevelOnSingleObject() throws SearchParseException {
-        FiqlParser<Room> roomParser = new FiqlParser<Room>(Room.class);
+        FiqlParser<Room> roomParser = new FiqlParser<>(Room.class);
         SearchCondition<Room> roomCondition = roomParser
                 .parse("furniture.spec.features.description==description");
         Room room = roomCondition.getCondition();

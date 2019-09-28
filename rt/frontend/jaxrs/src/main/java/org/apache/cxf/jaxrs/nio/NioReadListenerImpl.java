@@ -23,27 +23,20 @@ import java.util.logging.Logger;
 
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
+import javax.ws.rs.container.AsyncResponse;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 public final class NioReadListenerImpl implements ReadListener {
     private static final Logger LOG = LogUtils.getL7dLogger(NioReadListenerImpl.class);
     private final NioReadEntity entity;
-    private final DelegatingNioInputStream in;
+    private final NioInputStream in;
 
     public NioReadListenerImpl(NioReadEntity entity, ServletInputStream in) {
         this.entity = entity;
-        this.in = new DelegatingNioInputStream(in);
-    }
-
-    @Override
-    public void onError(Throwable t) {
-        try {
-            entity.getError().error(t);
-        } catch (final Throwable ex) {
-            LOG.warning("NIO NioReadListener error: " + ExceptionUtils.getStackTrace(ex));
-        }
+        this.in = new NioInputStream(in);
     }
 
     @Override
@@ -55,6 +48,24 @@ public final class NioReadListenerImpl implements ReadListener {
 
     @Override
     public void onAllDataRead() throws IOException {
-        entity.getCompletion().complete(in);
+        entity.getCompletion().complete();
     }
+    
+    @Override
+    public void onError(Throwable t) {
+        if (entity.getError() == null) {
+            getAsyncResponse().resume(t);
+            return;
+        }
+        try {
+            entity.getError().error(t);
+        } catch (final Throwable ex) {
+            LOG.warning("NIO NioReadListener error: " + ExceptionUtils.getStackTrace(ex));
+        }
+    }
+
+    private AsyncResponse getAsyncResponse() {
+        return JAXRSUtils.getCurrentMessage().getExchange().get(AsyncResponse.class);
+    }
+
 }

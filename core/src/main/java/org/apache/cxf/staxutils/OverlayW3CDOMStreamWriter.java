@@ -41,7 +41,7 @@ import org.apache.cxf.common.util.StringUtils;
 public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
     protected boolean isOverlaid = true;
 
-    List<Boolean> isOverlaidStack = new LinkedList<Boolean>();
+    List<Boolean> isOverlaidStack = new LinkedList<>();
     Boolean textOverlay;
 
     public OverlayW3CDOMStreamWriter(Document document) {
@@ -94,7 +94,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
         isOverlaidStack.add(0, isOverlaid);
         if (isOverlaid) {
             Element nd = getCurrentNode();
-            Node nd2 = null;
+            Node nd2;
             if (nd == null) {
                 nd2 = getDocument().getDocumentElement();
             } else {
@@ -135,7 +135,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
         isOverlaidStack.add(0, isOverlaid);
         if (isOverlaid) {
             Element nd = getCurrentNode();
-            Node nd2 = null;
+            Node nd2;
             if (nd == null) {
                 nd2 = getDocument().getDocumentElement();
             } else {
@@ -170,13 +170,13 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
     }
 
     public void writeStartElement(String prefix, String local, String namespace) throws XMLStreamException {
-        if (prefix == null || prefix.equals("")) {
+        if (prefix == null || prefix.isEmpty()) {
             writeStartElement(namespace, local);
         } else {
             isOverlaidStack.add(0, isOverlaid);
             if (isOverlaid) {
                 Element nd = getCurrentNode();
-                Node nd2 = null;
+                Node nd2;
                 if (nd == null) {
                     nd2 = getDocument().getDocumentElement();
                 } else {

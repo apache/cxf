@@ -27,6 +27,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
@@ -62,7 +63,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
     }
 
 
-    public void handleMessage(Message message) throws Fault {
+    public void handleMessage(Message message) {
         final OutputStream os = message.getContent(OutputStream.class);
         final Writer iowriter = message.getContent(Writer.class);
         if (os == null && iowriter == null) {
@@ -120,7 +121,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             String uri = (String)message.get(Message.REQUEST_URI);
             if (uri != null && !address.startsWith(uri)) {
                 if (!address.endsWith("/") && !uri.startsWith("/")) {
-                    buffer.getAddress().append("/");
+                    buffer.getAddress().append('/');
                 }
                 buffer.getAddress().append(uri);
             }
@@ -231,21 +232,24 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
                 return;
             }
 
+            boolean truncated = false;
             if (cos.getTempFile() == null) {
                 //buffer.append("Outbound Message:\n");
                 if (cos.size() >= lim) {
                     buffer.getMessage().append("(message truncated to " + lim + " bytes)\n");
+                    truncated = true;
                 }
             } else {
                 buffer.getMessage().append("Outbound Message (saved to tmp file):\n");
                 buffer.getMessage().append("Filename: " + cos.getTempFile().getAbsolutePath() + "\n");
                 if (cos.size() >= lim) {
                     buffer.getMessage().append("(message truncated to " + lim + " bytes)\n");
+                    truncated = true;
                 }
             }
             try {
                 String encoding = (String)message.get(Message.ENCODING);
-                writePayload(buffer.getPayload(), cos, encoding, ct);
+                writePayload(buffer.getPayload(), cos, encoding, ct, truncated);
             } catch (Exception ex) {
                 //ignore
             }

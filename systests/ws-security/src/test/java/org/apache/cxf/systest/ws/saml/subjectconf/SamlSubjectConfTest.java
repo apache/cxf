@@ -28,6 +28,7 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
@@ -36,9 +37,13 @@ import org.apache.cxf.systest.ws.saml.client.SamlCallbackHandler;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * A set of tests for the validation rules associated with various Subject Confirmation
@@ -75,10 +80,10 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
+    public static Collection<TestParam> data() {
 
-        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
-                                                {new TestParam(STAX_PORT, false)},
+        return Arrays.asList(new TestParam[] {new TestParam(PORT, false),
+                                              new TestParam(STAX_PORT, false),
         });
     }
 
@@ -92,6 +97,7 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
     // HOK requires client auth + a internally signed token. The server is set up not to
     // require client auth to test this.
     //
+
     @org.junit.Test
     public void testHOKClientAuthentication() throws Exception {
 
@@ -99,8 +105,8 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlSubjectConfTest.class.getResource("client-auth.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlSubjectConfTest.class.getResource("DoubleItSamlSubjectConf.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -153,8 +159,8 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlSubjectConfTest.class.getResource("client-auth.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlSubjectConfTest.class.getResource("DoubleItSamlSubjectConf.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -177,6 +183,7 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         }
 
         ((java.io.Closeable)port).close();
+
         bus.shutdown(true);
     }
 
@@ -187,8 +194,8 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlSubjectConfTest.class.getResource("client-noauth.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlSubjectConfTest.class.getResource("DoubleItSamlSubjectConf.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -216,6 +223,18 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         }
 
         ((java.io.Closeable)port).close();
+
+        // Here we try against a service that has explicitly disabled the SAML Subject Confirmation Method requirements,
+        // and so the invocation should pass
+        portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort2");
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, test.getPort());
+
+        ((BindingProvider)port).getRequestContext().put(SecurityConstants.SAML_CALLBACK_HANDLER, callbackHandler);
+        int result = port.doubleIt(25);
+        assertTrue(result == 50);
+        ((java.io.Closeable)port).close();
+
         bus.shutdown(true);
     }
 
@@ -230,8 +249,8 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlSubjectConfTest.class.getResource("client-auth.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlSubjectConfTest.class.getResource("DoubleItSamlSubjectConf.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -261,8 +280,8 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlSubjectConfTest.class.getResource("client-noauth.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlSubjectConfTest.class.getResource("DoubleItSamlSubjectConf.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -300,8 +319,8 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlSubjectConfTest.class.getResource("client-auth.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlSubjectConfTest.class.getResource("DoubleItSamlSubjectConf.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -335,8 +354,8 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlSubjectConfTest.class.getResource("client-auth.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlSubjectConfTest.class.getResource("DoubleItSamlSubjectConf.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -371,8 +390,8 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlSubjectConfTest.class.getResource("client-auth.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlSubjectConfTest.class.getResource("DoubleItSamlSubjectConf.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -399,7 +418,6 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-
 
 
 }

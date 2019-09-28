@@ -33,6 +33,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.continuations.SuspendedInvocationException;
@@ -68,7 +69,7 @@ public class DestinationSequence extends AbstractSequence {
     private volatile long highNumberCompleted;
     private long nextInOrder;
     //be careful, must be used in sync block
-    private Map<Long, Continuation> continuations = new TreeMap<Long, Continuation>();
+    private Map<Long, Continuation> continuations = new TreeMap<>();
     // this map is used for robust and redelivery tracking. for redelivery it holds the beingDeliverd messages
     private Set<Long> deliveringMessageNumbers = new HashSet<>();
 
@@ -127,9 +128,9 @@ public class DestinationSequence extends AbstractSequence {
     public void acknowledge(Message message) throws SequenceFault {
         RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
         SequenceType st = rmps.getSequence();
-        long messageNumber = st.getMessageNumber().longValue();
+        long messageNumber = st.getMessageNumber();
         LOG.fine("Acknowledging message: " + messageNumber);
-        if (0 != lastMessageNumber && messageNumber > lastMessageNumber) {
+        if (0L != lastMessageNumber && messageNumber > lastMessageNumber) {
             RMConstants consts = getProtocol().getConstants();
             SequenceFaultFactory sff = new SequenceFaultFactory(consts);
             throw sff.createSequenceTerminatedFault(st.getIdentifier(), false);
@@ -149,13 +150,13 @@ public class DestinationSequence extends AbstractSequence {
                     break;
                 }
                 long diff = r.getLower() - messageNumber;
-                if (diff == 1) {
+                if (diff == 1L) {
                     r.setLower(messageNumber);
                     updated = true;
                     done = true;
-                } else if (diff > 0) {
+                } else if (diff > 0L) {
                     break;
-                } else if (messageNumber - r.getUpper().longValue() == 1) {
+                } else if (messageNumber - r.getUpper() == 1L) {
                     r.setUpper(messageNumber);
                     updated = true;
                     done = true;
@@ -183,7 +184,7 @@ public class DestinationSequence extends AbstractSequence {
 
         if (updated) {
             RMStore store = destination.getManager().getStore();
-            if (null != store && !MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY))) {
+            if (null != store && !MessageUtils.getContextualBoolean(message, Message.ROBUST_ONEWAY)) {
                 try {
                     RMMessage msg = new RMMessage();
                     CachedOutputStream cos = (CachedOutputStream)message
@@ -272,10 +273,10 @@ public class DestinationSequence extends AbstractSequence {
         boolean robustDelivering = false;
         boolean inOrder = mn - nextInOrder == 1;
         if (message != null) {
-            robust = MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY));
+            robust = MessageUtils.getContextualBoolean(message, Message.ROBUST_ONEWAY);
             if (robust) {
                 robustDelivering =
-                    MessageUtils.isTrue(message.get(RMMessageConstants.DELIVERING_ROBUST_ONEWAY));
+                    PropertyUtils.isTrue(message.get(RMMessageConstants.DELIVERING_ROBUST_ONEWAY));
             }
         }
         if (robust && !robustDelivering) {

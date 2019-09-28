@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -87,6 +88,10 @@ class TunedDocumentLoader extends DefaultDocumentLoader {
             nsasaxParserFactory.setFeature("http://xml.org/sax/features/namespaces", true);
             nsasaxParserFactory.setFeature("http://xml.org/sax/features/namespace-prefixes",
                                            true);
+            saxParserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+            nsasaxParserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+            saxParserFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            nsasaxParserFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
         } catch (Throwable e) {
             //ignore
         }
@@ -112,10 +117,9 @@ class TunedDocumentLoader extends DefaultDocumentLoader {
             W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
             StaxUtils.copy(saxSource, writer);
             return writer.getDocument();
-        } else {
-            return super.loadDocument(inputSource, entityResolver, errorHandler, validationMode,
-                                      namespaceAware);
         }
+        return super.loadDocument(inputSource, entityResolver, errorHandler, validationMode,
+                                  namespaceAware);
     }
 
     @Override

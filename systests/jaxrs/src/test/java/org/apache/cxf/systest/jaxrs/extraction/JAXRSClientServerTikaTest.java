@@ -43,10 +43,14 @@ import org.apache.cxf.jaxrs.provider.MultipartProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.lucene.search.ScoreDoc;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class JAXRSClientServerTikaTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(JAXRSClientServerTikaTest.class);
@@ -127,7 +131,7 @@ public class JAXRSClientServerTikaTest extends AbstractBusClientServerTestBase {
 
     @SuppressWarnings("unchecked")
     private Collection<ScoreDoc> search(final String expression) {
-        return (Collection<ScoreDoc>)createWebClient("/catalog")
+        return createWebClient("/catalog")
             .accept(MediaType.APPLICATION_JSON)
             .query("$filter", expression)
             .get(Collection.class);

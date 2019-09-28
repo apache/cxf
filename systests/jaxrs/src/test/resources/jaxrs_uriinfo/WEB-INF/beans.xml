@@ -20,10 +20,10 @@
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 xmlns:simple="http://cxf.apache.org/simple" xsi:schemaLocation="
                 http://www.springframework.org/schema/beans
-                http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+                http://www.springframework.org/schema/beans/spring-beans.xsd
                 http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd"
         -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xmlns:util="http://www.springframework.org/schema/util" xsi:schemaLocation=" http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans-4.2.xsd http://cxf.apache.org/jaxrs  http://cxf.apache.org/schemas/jaxrs.xsd http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util-4.2.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xmlns:util="http://www.springframework.org/schema/util" xsi:schemaLocation=" http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxrs  http://cxf.apache.org/schemas/jaxrs.xsd http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util-4.2.xsd">
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
     <jaxrs:server address="/">

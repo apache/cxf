@@ -21,6 +21,7 @@ package org.apache.cxf.transport.websocket;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -48,10 +49,10 @@ public class WebSocketTransportFactory extends AbstractTransportFactory implemen
     DestinationFactory {
 
     public static final List<String> DEFAULT_NAMESPACES
-        = Arrays.asList(
+        = Collections.unmodifiableList(Arrays.asList(
             "http://cxf.apache.org/transports/websocket",
             "http://cxf.apache.org/transports/websocket/configuration"
-        );
+        ));
 
     private static final Set<String> URI_PREFIXES = new HashSet<>();
     static {

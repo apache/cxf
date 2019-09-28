@@ -75,7 +75,7 @@ public abstract class AbstractSearchConditionVisitor <T, E> implements SearchCon
         boolean isCollection = InjectionUtils.isSupportedCollectionOrArray(valueCls);
         Class<?> actualCls = isCollection ? InjectionUtils.getActualType(type) : valueCls;
         CollectionCheckInfo collInfo = null;
-        int index = name.indexOf(".");
+        int index = name.indexOf('.');
         if (index != -1) {
             String[] names = name.split("\\.");
             name = name.substring(index + 1);

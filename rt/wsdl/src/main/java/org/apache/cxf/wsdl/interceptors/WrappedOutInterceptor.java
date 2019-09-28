@@ -95,7 +95,7 @@ public class WrappedOutInterceptor extends AbstractOutDatabindingInterceptor {
             super(phase);
         }
 
-        public void handleMessage(Message message) throws Fault {
+        public void handleMessage(Message message) {
             try {
                 XMLStreamWriter xtw = message.getContent(XMLStreamWriter.class);
                 if (xtw != null) {

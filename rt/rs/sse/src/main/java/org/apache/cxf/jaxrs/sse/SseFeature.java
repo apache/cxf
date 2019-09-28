@@ -22,20 +22,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.annotations.Provider;
+import org.apache.cxf.annotations.Provider.Scope;
+import org.apache.cxf.annotations.Provider.Type;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.AbstractPortableFeature;
+import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
-import org.apache.cxf.jaxrs.sse.atmosphere.SseAtmosphereEventSinkContextProvider;
 
-public class SseFeature extends AbstractFeature {
-    @Override
-    public void initialize(Server server, Bus bus) {
-        final List<Object> providers = new ArrayList<>();
+@Provider(value = Type.Feature, scope = Scope.Server)
+public class SseFeature extends DelegatingFeature<SseFeature.Portable> {
 
-        providers.add(new SseAtmosphereEventSinkContextProvider());
-        providers.add(new SseContextProvider());
+    public SseFeature() {
+        super(new Portable());
+    }
 
-        ((ServerProviderFactory) server.getEndpoint().get(
-            ServerProviderFactory.class.getName())).setUserProviders(providers);
+    @Provider(value = Type.Feature, scope = Scope.Server)
+    public static class Portable implements AbstractPortableFeature {
+
+        @Override
+        public void initialize(Server server, Bus bus) {
+            final List<Object> providers = new ArrayList<>();
+
+            providers.add(new SseContextProvider());
+            providers.add(new SseEventSinkContextProvider());
+
+            ((ServerProviderFactory) server.getEndpoint().get(
+                    ServerProviderFactory.class.getName())).setUserProviders(providers);
+        }
     }
 }

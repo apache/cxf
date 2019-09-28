@@ -59,9 +59,8 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 
             if (cause instanceof ClassNotFoundException) {
                 throw (ClassNotFoundException)cause;
-            } else {
-                throw (RuntimeException)cause;
             }
+            throw (RuntimeException)cause;
         }
     }
 
@@ -91,9 +90,8 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 
             if (cause instanceof IOException) {
                 throw (IOException)cause;
-            } else {
-                throw (RuntimeException)cause;
             }
+            throw (RuntimeException)cause;
         }
 
         if (urls == null) {

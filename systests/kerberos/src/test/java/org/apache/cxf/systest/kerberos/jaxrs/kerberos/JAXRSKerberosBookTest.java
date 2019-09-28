@@ -28,11 +28,12 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.security.KerberosAuthOutInterceptor;
 import org.apache.cxf.systest.kerberos.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.transport.http.auth.HttpAuthHeader;
 import org.apache.cxf.transport.http.auth.SpnegoAuthSupplier;
-import org.apache.directory.server.core.integ.AbstractLdapTestUnit;
 import org.apache.kerby.kerberos.kerb.server.SimpleKdcServer;
 import org.ietf.jgss.GSSName;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -40,7 +41,7 @@ import org.junit.Test;
 /**
  * A set of tests for Kerberos Tokens that use an Apache Kerby instance as the KDC.
  */
-public class JAXRSKerberosBookTest extends AbstractLdapTestUnit {
+public class JAXRSKerberosBookTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookKerberosServer.PORT;
 
     private static final String KERBEROS_CONFIG_FILE =
@@ -59,7 +60,7 @@ public class JAXRSKerberosBookTest extends AbstractLdapTestUnit {
         if (!"IBM Corporation".equals(System.getProperty("java.vendor"))) {
             runTests = true;
         }
-        
+
         String basedir = System.getProperty("basedir");
         if (basedir == null) {
             basedir = new File(".").getCanonicalPath();
@@ -93,14 +94,14 @@ public class JAXRSKerberosBookTest extends AbstractLdapTestUnit {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            AbstractBusClientServerTestBase.launchServer(BookKerberosServer.class, true)
+            AbstractClientServerTestBase.launchServer(BookKerberosServer.class, true)
         );
     }
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
-        AbstractBusClientServerTestBase.stopAllServers();
+        AbstractClientServerTestBase.stopAllServers();
         if (kerbyServer != null) {
             kerbyServer.stop();
         }

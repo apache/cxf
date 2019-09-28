@@ -29,7 +29,7 @@ public class LdapSchemaConfig {
     private String constAttrNamesCSV = "sn";
     private String constAttrValuesCSV = "X509 certificate";
     private String serviceCertRDNTemplate = "cn=%s,ou=services";
-    private String serviceCertUIDTemplate = "cn=%s";
+    private String serviceCertUIDTemplate = "uid=%s";
     private String trustedAuthorityFilter = "(&(objectClass=inetOrgPerson)(ou:dn:=CAs))";
     private String intermediateFilter = "(objectClass=*)";
     private String crlFilter = "(&(objectClass=inetOrgPerson)(ou:dn:=CAs))";

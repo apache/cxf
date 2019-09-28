@@ -29,7 +29,7 @@ import io.netty.handler.codec.http.HttpResponse;
 
 public class NettyHttpClientHandler extends ChannelDuplexHandler {
     private final BlockingQueue<NettyHttpClientRequest> sendedQueue =
-        new LinkedBlockingDeque<NettyHttpClientRequest>();
+        new LinkedBlockingDeque<>();
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {

@@ -137,7 +137,7 @@ public class LocalConduit extends AbstractConduit {
     }
 
     public void prepare(final Message message) throws IOException {
-        if (!MessageUtils.isTrue(message.getContextualProperty(DIRECT_DISPATCH))) {
+        if (!MessageUtils.getContextualBoolean(message, DIRECT_DISPATCH)) {
             dispatchViaPipe(message);
         } else {
             // prepare the stream here
@@ -151,7 +151,7 @@ public class LocalConduit extends AbstractConduit {
 
     @Override
     public void close(Message message) throws IOException {
-        if (MessageUtils.isTrue(message.getContextualProperty(DIRECT_DISPATCH))
+        if (MessageUtils.getContextualBoolean(message, DIRECT_DISPATCH)
             && !Boolean.TRUE.equals(message.get(Message.INBOUND_MESSAGE))) {
             dispatchDirect(message);
         }

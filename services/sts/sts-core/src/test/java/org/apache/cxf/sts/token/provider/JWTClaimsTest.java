@@ -40,16 +40,21 @@ import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
+import org.apache.cxf.sts.token.provider.jwt.DefaultJWTClaimsProvider;
 import org.apache.cxf.sts.token.provider.jwt.JWTTokenProvider;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * A unit test for creating JWT Tokens with various claims populated by a ClaimsHandler.
  */
-public class JWTClaimsTest extends org.junit.Assert {
+public class JWTClaimsTest {
 
     public static final URI CLAIM_STATIC_COMPANY =
         URI.create("http://apache.org/claims/test/company");
@@ -80,7 +85,7 @@ public class JWTClaimsTest extends org.junit.Assert {
 
         assertTrue(tokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
@@ -119,7 +124,7 @@ public class JWTClaimsTest extends org.junit.Assert {
         providerParameters.setRequestedSecondaryClaims(secondaryClaims);
 
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
@@ -162,7 +167,7 @@ public class JWTClaimsTest extends org.junit.Assert {
         providerParameters.setRequestedSecondaryClaims(secondaryClaims);
 
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
@@ -200,7 +205,7 @@ public class JWTClaimsTest extends org.junit.Assert {
         providerParameters.setRequestedPrimaryClaims(claims);
 
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
@@ -209,6 +214,80 @@ public class JWTClaimsTest extends org.junit.Assert {
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
         assertEquals(jwt.getClaim(CLAIM_STATIC_COMPANY.toString()), CLAIM_STATIC_COMPANY_VALUE);
+    }
+
+    @org.junit.Test
+    public void testJWTRoleUsingURI() throws Exception {
+        TokenProvider tokenProvider = new JWTTokenProvider();
+        TokenProviderParameters providerParameters =
+            createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE, null);
+
+        ClaimsManager claimsManager = new ClaimsManager();
+        ClaimsHandler claimsHandler = new CustomClaimsHandler();
+        claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
+        providerParameters.setClaimsManager(claimsManager);
+
+        ClaimCollection claims = new ClaimCollection();
+
+        URI role = URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");
+
+        Claim claim = new Claim();
+        claim.setClaimType(role);
+        claims.add(claim);
+
+        providerParameters.setRequestedPrimaryClaims(claims);
+
+        assertTrue(tokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
+        TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
+        assertNotNull(providerResponse);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+
+        String token = (String)providerResponse.getToken();
+        assertNotNull(token);
+
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
+        JwtToken jwt = jwtConsumer.getJwtToken();
+        assertEquals(jwt.getClaim(role.toString()), "DUMMY");
+    }
+
+    @org.junit.Test
+    public void testJWTRoleUsingCustomReturnType() throws Exception {
+        TokenProvider tokenProvider = new JWTTokenProvider();
+        TokenProviderParameters providerParameters =
+            createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE, null);
+
+        ClaimsManager claimsManager = new ClaimsManager();
+        ClaimsHandler claimsHandler = new CustomClaimsHandler();
+        claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
+        providerParameters.setClaimsManager(claimsManager);
+
+        ClaimCollection claims = new ClaimCollection();
+
+        URI role = URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");
+
+        Claim claim = new Claim();
+        claim.setClaimType(role);
+        claims.add(claim);
+
+        providerParameters.setRequestedPrimaryClaims(claims);
+
+        Map<String, String> claimTypeMap = new HashMap<>();
+        claimTypeMap.put(role.toString(), "roles");
+        DefaultJWTClaimsProvider claimsProvider = new DefaultJWTClaimsProvider();
+        claimsProvider.setClaimTypeMap(claimTypeMap);
+        ((JWTTokenProvider)tokenProvider).setJwtClaimsProvider(claimsProvider);
+
+        assertTrue(tokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
+        TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
+        assertNotNull(providerResponse);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+
+        String token = (String)providerResponse.getToken();
+        assertNotNull(token);
+
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
+        JwtToken jwt = jwtConsumer.getJwtToken();
+        assertEquals(jwt.getClaim("roles"), "DUMMY");
     }
 
     private TokenProviderParameters createProviderParameters(

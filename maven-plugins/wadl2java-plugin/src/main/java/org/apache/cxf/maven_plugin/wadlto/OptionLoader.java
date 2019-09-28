@@ -22,7 +22,7 @@ package org.apache.cxf.maven_plugin.wadlto;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -85,8 +85,8 @@ public final class OptionLoader {
      * @throws MojoExecutionException
      */
     public static List<WadlOption> loadWadlOptionsFromFile(File wadlBasedir,
-                                                           String includes[],
-                                                            String excludes[],
+                                                           String[] includes,
+                                                            String[] excludes,
                                                             Option defaultOptions,
                                                             File defaultOutputDir)
         throws MojoExecutionException {
@@ -111,31 +111,23 @@ public final class OptionLoader {
     }
 
     private static String joinWithComma(String[] arr) {
-        if (arr == null) {
+        if (arr == null || arr.length == 0) {
             return "";
         }
-        StringBuilder str = new StringBuilder();
-
-        for (String s : arr) {
-            if (str.length() > 0) {
-                str.append(',');
-            }
-            str.append(s);
-        }
-        return str.toString();
+        return String.join(",", arr);
     }
 
-    private static List<File> getWadlFiles(File dir, String includes[], String excludes[])
+    private static List<File> getWadlFiles(File dir, String[] includes, String[] excludes)
         throws MojoExecutionException {
 
         List<String> exList = new ArrayList<>();
         if (excludes != null) {
-            exList.addAll(Arrays.asList(excludes));
+            Collections.addAll(exList, excludes);
         }
-        exList.addAll(Arrays.asList(org.codehaus.plexus.util.FileUtils.getDefaultExcludes()));
+        Collections.addAll(exList, org.codehaus.plexus.util.FileUtils.getDefaultExcludes());
 
         String inc = joinWithComma(includes);
-        String ex = joinWithComma(exList.toArray(new String[exList.size()]));
+        String ex = joinWithComma(exList.toArray(new String[0]));
 
         try {
             List<?> newfiles = org.codehaus.plexus.util.FileUtils.getFiles(dir, inc, ex);
@@ -174,7 +166,7 @@ public final class OptionLoader {
 
         final String[] options = readOptionsFromFile(wadl.getParentFile(), wadlName);
         if (options.length > 0) {
-            wadlOption.getExtraargs().addAll(Arrays.asList(options));
+            Collections.addAll(wadlOption.getExtraargs(), options);
         }
 
         List<File> bindingFiles = FileUtils.getFiles(wadl.getParentFile(), wadlName + WADL_BINDINGS);
@@ -195,7 +187,7 @@ public final class OptionLoader {
     private static String[] readOptionsFromFile(File dir, String wsdlName) throws MojoExecutionException {
         String[] noOptions = new String[] {};
         List<File> files = FileUtils.getFiles(dir, wsdlName + WADL_OPTIONS);
-        if (files.size() <= 0) {
+        if (files.isEmpty()) {
             return noOptions;
         }
         File optionsFile = files.iterator().next();
@@ -204,7 +196,7 @@ public final class OptionLoader {
         }
         try {
             List<String> lines = FileUtils.readLines(optionsFile);
-            if (lines.size() <= 0) {
+            if (lines.isEmpty()) {
                 return noOptions;
             }
             return lines.iterator().next().split(" ");

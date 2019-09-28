@@ -21,16 +21,17 @@ package org.apache.cxf.jaxrs.ext.search.jpa;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JPALanguageVisitorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class JPALanguageVisitorTest {
 
     @Test
     public void testSimpleQuery() throws Exception {
 
-        SearchCondition<Book> filter = new FiqlParser<Book>(Book.class).parse("id=lt=10");
-        JPALanguageVisitor<Book> jpa = new JPALanguageVisitor<Book>(Book.class);
+        SearchCondition<Book> filter = new FiqlParser<>(Book.class).parse("id=lt=10");
+        JPALanguageVisitor<Book> jpa = new JPALanguageVisitor<>(Book.class);
         filter.accept(jpa);
         assertEquals("SELECT t FROM Book t WHERE t.id < '10'", jpa.getQuery());
 

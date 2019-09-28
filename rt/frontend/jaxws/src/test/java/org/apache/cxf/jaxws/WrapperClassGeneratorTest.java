@@ -36,10 +36,12 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
-import org.junit.After;
-import org.junit.Assert;
 
-public class WrapperClassGeneratorTest extends Assert {
+import org.junit.After;
+
+import static org.junit.Assert.assertTrue;
+
+public class WrapperClassGeneratorTest {
 
     @After
     public void tearDown() {
@@ -68,7 +70,7 @@ public class WrapperClassGeneratorTest extends Assert {
         List<Class<?>> partClasses = Arrays.asList(new Class<?>[] {List.class});
 
         String className = requestClass.getName();
-        className = className.substring(0, className.lastIndexOf(".") + 1);
+        className = className.substring(0, className.lastIndexOf('.') + 1);
 
         WrapperHelper wh = new JAXBDataBinding().createWrapperHelper(requestClass, null,
                                                              partNames, elTypeNames, partClasses);
@@ -87,7 +89,7 @@ public class WrapperClassGeneratorTest extends Assert {
         partClasses = Arrays.asList(new Class<?>[] {List.class});
 
         className = responseClass.getName();
-        className = className.substring(0, className.lastIndexOf(".") + 1);
+        className = className.substring(0, className.lastIndexOf('.') + 1);
 
         wh = new JAXBDataBinding().createWrapperHelper(responseClass, null,
                                                              partNames, elTypeNames, partClasses);

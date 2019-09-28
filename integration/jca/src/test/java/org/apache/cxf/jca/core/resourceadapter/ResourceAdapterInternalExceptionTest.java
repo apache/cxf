@@ -22,13 +22,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-public class ResourceAdapterInternalExceptionTest extends Assert {
+
+public class ResourceAdapterInternalExceptionTest {
     private static final Logger EXCEPTION_LOGGER =
         LogUtils.getLogger(ResourceAdapterInternalException.class);
     private Level logLevel;
@@ -46,8 +50,7 @@ public class ResourceAdapterInternalExceptionTest extends Assert {
 
     @Test
     public void testMessage() {
-        final String msg = "msg1";
-        msg.intern();
+        final String msg = "msg1".intern();
 
         Exception e = new ResourceAdapterInternalException(msg);
         assertTrue(e.toString().indexOf(msg) != -1);
@@ -57,8 +60,7 @@ public class ResourceAdapterInternalExceptionTest extends Assert {
 
     @Test
     public void testMessageWithNullTx() {
-        final String msg = "msg1";
-        msg.intern();
+        final String msg = "msg1".intern();
 
         javax.resource.spi.ResourceAdapterInternalException e = new ResourceAdapterInternalException(msg,
                                                                                                      null);

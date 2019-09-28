@@ -31,7 +31,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 
 public class SparkStreamingOutput implements StreamingOutput {
-    private BlockingQueue<String> responseQueue = new LinkedBlockingQueue<String>();
+    private BlockingQueue<String> responseQueue = new LinkedBlockingQueue<>();
 
     private JavaStreamingContext jssc;
     private volatile boolean sparkBatchCompleted;

@@ -71,7 +71,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXBContextInitializer.class);
     private Set<Class<?>> classes;
     private Collection<Object> typeReferences;
-    private Set<Class<?>> globalAdapters = new HashSet<Class<?>>();
+    private Set<Class<?>> globalAdapters = new HashSet<>();
     private Map<String, Object> unmarshallerProperties;
 
     JAXBContextInitializer(ServiceInfo serviceInfo,
@@ -392,7 +392,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         if (accessType != XmlAccessType.PROPERTY) {   // only look for fields if we are instructed to
             //fields are accessible even if not public, must look at the declared fields
             //then walk to parents declared fields, etc...
-            Field fields[] = ReflectionUtil.getDeclaredFields(cls);
+            Field[] fields = ReflectionUtil.getDeclaredFields(cls);
             for (Field f : fields) {
                 if (isFieldAccepted(f, accessType)) {
                     XmlJavaTypeAdapter xjta = Utils.getFieldXJTA(f);
@@ -410,7 +410,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         }
 
         if (accessType != XmlAccessType.FIELD) {   // only look for methods if we are instructed to
-            Method methods[] = ReflectionUtil.getDeclaredMethods(cls);
+            Method[] methods = ReflectionUtil.getDeclaredMethods(cls);
             for (Method m : methods) {
                 if (isMethodAccepted(m, accessType)) {
                     XmlJavaTypeAdapter xjta = Utils.getMethodXJTA(m);
@@ -449,9 +449,8 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         if (accessType == XmlAccessType.NONE
             || accessType == XmlAccessType.PROPERTY) {
             return checkJaxbAnnotation(field.getAnnotations());
-        } else {
-            return true;
         }
+        return true;
     }
 
     /**
@@ -547,7 +546,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         }
         if (refClass != null) {
             try {
-                return refClass.getConstructor(QName.class, Type.class, new Annotation[0].getClass())
+                return refClass.getConstructor(QName.class, Type.class, new Annotation[0].getClass()) //NOPMD
                     .newInstance(n, cls, new Annotation[0]);
             } catch (Throwable e) {
                 //ignore
@@ -582,7 +581,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         String name = cls.getName().replace(".", "/");
         mv.visitTypeInsn(Opcodes.NEW, name);
         mv.visitInsn(Opcodes.DUP);
-        StringBuilder paraString = new StringBuilder("(");
+        StringBuilder paraString = new StringBuilder(32).append("(");
 
         for (Class<?> paraClass : contructor.getParameterTypes()) {
             mv.visitInsn(Opcodes.ACONST_NULL);

@@ -49,7 +49,7 @@ public abstract class AbstractToolContainer implements ToolContainer {
     protected PrintStream out = System.out;
     protected PrintStream err = System.err;
 
-    private String arguments[];
+    private String[] arguments;
     private boolean isVerbose;
     private boolean isQuiet;
     private CommandDocument commandDoc;

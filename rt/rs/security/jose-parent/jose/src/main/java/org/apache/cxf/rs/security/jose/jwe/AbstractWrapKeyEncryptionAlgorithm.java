@@ -65,12 +65,11 @@ public abstract class AbstractWrapKeyEncryptionAlgorithm implements KeyEncryptio
         }
         if (!wrap) {
             return CryptoUtils.encryptBytes(cek, keyEncryptionKey, secretKeyProperties);
-        } else {
-            return CryptoUtils.wrapSecretKey(cek,
-                                             getContentEncryptionAlgoJava(headers),
-                                             keyEncryptionKey,
-                                             secretKeyProperties);
         }
+        return CryptoUtils.wrapSecretKey(cek,
+                                         getContentEncryptionAlgoJava(headers),
+                                         keyEncryptionKey,
+                                         secretKeyProperties);
     }
     protected String getKeyEncryptionAlgoJava(JweHeaders headers) {
         return AlgorithmUtils.toJavaName(headers.getKeyEncryptionAlgorithm().getJwaName());

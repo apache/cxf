@@ -39,12 +39,13 @@ import org.apache.cxf.xkms.model.xkms.StatusType;
 import org.apache.cxf.xkms.model.xkms.ValidateRequestType;
 import org.apache.cxf.xkms.model.xmldsig.KeyInfoType;
 import org.apache.cxf.xkms.model.xmldsig.X509DataType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.junit.PaxExam;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @RunWith(PaxExam.class)
 public class ValidatorTest extends BasicIntegrationTest {

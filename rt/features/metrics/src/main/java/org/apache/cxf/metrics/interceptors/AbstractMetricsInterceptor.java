@@ -44,8 +44,8 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 
 public abstract class AbstractMetricsInterceptor extends AbstractPhaseInterceptor<Message> {
     private static final String REST_METRICS_MAP = AbstractMetricsInterceptor.class.getName() + ".METRICS_MAP";
-    MetricsProvider providers[];
-    public AbstractMetricsInterceptor(String phase, MetricsProvider p[]) {
+    MetricsProvider[] providers;
+    public AbstractMetricsInterceptor(String phase, MetricsProvider[] p) {
         super(phase);
         providers = p;
     }

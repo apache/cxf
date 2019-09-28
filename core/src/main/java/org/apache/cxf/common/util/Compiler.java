@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -48,8 +49,8 @@ public class Compiler {
     private String encoding;
     private boolean forceFork = Boolean.getBoolean(Compiler.class.getName() + "-fork");
     private File classpathTmpFile;
-    private List<String> errors = new LinkedList<String>();
-    private List<String> warnings = new LinkedList<String>();
+    private List<String> errors = new LinkedList<>();
+    private List<String> warnings = new LinkedList<>();
 
     public Compiler() {
     }
@@ -84,6 +85,31 @@ public class Compiler {
         classPath = StringUtils.isEmpty(s) ? null : s;
     }
 
+    // https://issues.apache.org/jira/browse/CXF-8049
+    private String getSystemClassPath() {
+        String javaClasspath = SystemPropertyAction.getProperty("java.class.path");
+
+        if (!StringUtils.isEmpty(javaClasspath)) {
+            List<String> correctedEntries = new ArrayList<>();
+
+            String[] toks = javaClasspath.split(File.pathSeparator);
+            
+            for (String tok: toks) {
+                // if any classpath entry contains a whitespace char, 
+                // enclose the entry in double quotes
+                if (tok.matches(".*\\s+.*")) {
+                    correctedEntries.add("\"" + tok + "\"");
+                } else {
+                    correctedEntries.add(tok);
+                }
+            }
+
+            return String.join(File.pathSeparator, correctedEntries);
+        }
+
+        return javaClasspath;
+    }
+
     protected void addArgs(List<String> list) {
         if (!StringUtils.isEmpty(encoding)) {
             list.add("-encoding");
@@ -102,8 +128,8 @@ public class Compiler {
         }
 
         if (StringUtils.isEmpty(classPath)) {
-            String javaClasspath = SystemPropertyAction.getProperty("java.class.path");
-            boolean classpathSetted = javaClasspath != null ? true : false;
+            String javaClasspath = getSystemClassPath();
+            boolean classpathSetted = !StringUtils.isEmpty(javaClasspath);
             if (!classpathSetted) {
                 File f = new File(getClass().getClassLoader().getResource(".").getFile());
                 f = new File(f, "../lib");
@@ -126,14 +152,14 @@ public class Compiler {
         for (File file : files) {
             f.add(file.getAbsolutePath());
         }
-        return compileFiles(f.toArray(new String[files.length]));
+        return compileFiles(f.toArray(new String[0]));
     }
     public boolean compileFiles(List<File> files) {
         List<String> f = new ArrayList<>(files.size());
         for (File file : files) {
             f.add(file.getAbsolutePath());
         }
-        return compileFiles(f.toArray(new String[files.size()]));
+        return compileFiles(f.toArray(new String[0]));
     }
     public boolean compileFiles(String[] files) {
         String endorsed = SystemPropertyAction.getProperty("java.endorsed.dirs");
@@ -177,19 +203,14 @@ public class Compiler {
         //fix for CXF-2081, set maximum heap of this VM to javac.
         list.add("-J-Xmx" + maxMemory);
 
-        if (System.getProperty("java.version").startsWith("9")) {
-            list.add("--add-modules");
-            list.add("java.activation,java.xml.ws.annotation,java.corba,java.transaction,java.xml.bind,java.xml.ws");
-        }
-
         addArgs(list);
         int classpathIdx = list.indexOf("-classpath");
         String classpath = list.get(classpathIdx + 1);
         checkLongClasspath(classpath, list, classpathIdx);
         int idx = list.size();
-        list.addAll(Arrays.asList(files));
+        Collections.addAll(list, files);
 
-        return internalCompile(list.toArray(new String[list.size()]), idx);
+        return internalCompile(list.toArray(new String[0]), idx);
     }
 
     protected boolean useJava6Compiler(String[] files) {
@@ -252,34 +273,33 @@ public class Compiler {
 
     public boolean internalCompile(String[] args, int sourceFileIndex) {
         Process p = null;
-        String cmdArray[] = null;
+        String[] cmdArray = null;
         File tmpFile = null;
         try {
             if (isLongCommandLines(args) && sourceFileIndex >= 0) {
-                PrintWriter out = null;
                 tmpFile = FileUtils.createTempFile("cxf-compiler", null);
-                out = new PrintWriter(new FileWriter(tmpFile));
-                for (int i = sourceFileIndex; i < args.length; i++) {
-                    if (args[i].indexOf(" ") > -1) {
-                        args[i] = args[i].replace(File.separatorChar, '/');
-                        //
-                        // javac gives an error if you use forward slashes
-                        // with package-info.java. Refer to:
-                        // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6198196
-                        //
-                        if (args[i].indexOf("package-info.java") > -1
-                            && SystemPropertyAction.getProperty("os.name")
-                                .toLowerCase().indexOf("windows") > -1) {
-                            out.println("\"" + args[i].replaceAll("/", "\\\\\\\\") + "\"");
+                try (PrintWriter out = new PrintWriter(new FileWriter(tmpFile))) {
+                    for (int i = sourceFileIndex; i < args.length; i++) {
+                        if (args[i].indexOf(' ') > -1) {
+                            args[i] = args[i].replace(File.separatorChar, '/');
+                            //
+                            // javac gives an error if you use forward slashes
+                            // with package-info.java. Refer to:
+                            // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6198196
+                            //
+                            if (args[i].indexOf("package-info.java") > -1
+                                && SystemPropertyAction.getProperty("os.name")
+                                    .toLowerCase().indexOf("windows") > -1) {
+                                out.println('"' + args[i].replaceAll("/", "\\\\\\\\") + '"');
+                            } else {
+                                out.println('"' + args[i] + '"');
+                            }
                         } else {
-                            out.println("\"" + args[i] + "\"");
+                            out.println(args[i]);
                         }
-                    } else {
-                        out.println(args[i]);
                     }
+                    out.flush();
                 }
-                out.flush();
-                out.close();
                 cmdArray = new String[sourceFileIndex + 1];
                 System.arraycopy(args, 0, cmdArray, 0, sourceFileIndex);
                 cmdArray[sourceFileIndex] = "@" + tmpFile;
@@ -329,27 +349,26 @@ public class Compiler {
         return false;
     }
 
-    private boolean isLongCommandLines(String args[]) {
+    private boolean isLongCommandLines(String[] args) {
         StringBuilder strBuffer = new StringBuilder();
         for (int i = 0; i < args.length; i++) {
             strBuffer.append(args[i]);
         }
-        return strBuffer.toString().length() > 4096 ? true : false;
+        return strBuffer.length() > 4096;
     }
 
     private boolean isLongClasspath(String classpath) {
-        return classpath.length() > 2048 ? true : false;
+        return classpath.length() > 2048;
     }
 
     private void checkLongClasspath(String classpath, List<String> list, int classpathIdx) {
         if (isLongClasspath(classpath)) {
-            PrintWriter out = null;
             try {
                 classpathTmpFile = FileUtils.createTempFile("cxf-compiler-classpath", null);
-                out = new PrintWriter(new FileWriter(classpathTmpFile));
-                out.println(classpath);
-                out.flush();
-                out.close();
+                try (PrintWriter out = new PrintWriter(new FileWriter(classpathTmpFile))) {
+                    out.println(classpath);
+                    out.flush();
+                }
                 list.set(classpathIdx + 1, "@" + classpathTmpFile);
             } catch (IOException e) {
                 System.err.print("[ERROR] can't write long classpath to @argfile");
@@ -360,6 +379,5 @@ public class Compiler {
     public void setEncoding(String string) {
         encoding = string;
     }
-
 
 }

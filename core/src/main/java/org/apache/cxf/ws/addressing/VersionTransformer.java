@@ -31,14 +31,9 @@ import javax.xml.namespace.QName;
 //import javax.xml.ws.EndpointReference;
 //import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
-
-
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.jaxb.JAXBUtils;
-// importation convention: if the same class name is used for
-// 2005/08 and 2004/08, then the former version is imported
-// and the latter is fully qualified when used
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.addressing.v200408.AttributedQName;
 import org.apache.cxf.ws.addressing.v200408.AttributedURI;
@@ -184,7 +179,7 @@ public class VersionTransformer {
             exposed.setServiceName(serviceName);
         }
         String portLocalName = EndpointReferenceUtils.getPortName(internal);
-        if (portLocalName != null) {
+        if (portLocalName != null && serviceQName != null) {
             String namespace = serviceQName.getNamespaceURI() != null
                                ? serviceQName.getNamespaceURI()
                                : Names.WSDL_INSTANCE_NAMESPACE_NAME;
@@ -221,7 +216,7 @@ public class VersionTransformer {
             exposed.setServiceName(serviceName);
         }
         String portLocalName = EndpointReferenceUtils.getPortName(internal);
-        if (portLocalName != null) {
+        if (portLocalName != null && serviceQName != null) {
             String namespace = serviceQName.getNamespaceURI() != null
                 ? serviceQName.getNamespaceURI() : Names.WSDL_INSTANCE_NAMESPACE_NAME;
             QName portQName = new QName(namespace, portLocalName);
@@ -487,7 +482,7 @@ public class VersionTransformer {
     public static JAXBContext getExposedJAXBContext(String exposedURI) throws JAXBException {
 
         return NATIVE_VERSION.equals(exposedURI)
-            ? ContextUtils.getJAXBContext() : Names200408.WSA_NAMESPACE_NAME.equals(exposedURI) ? Names200408
+            ? ContextJAXBUtils.getJAXBContext() : Names200408.WSA_NAMESPACE_NAME.equals(exposedURI) ? Names200408
                 .getJAXBContext() : Names200403.WSA_NAMESPACE_NAME.equals(exposedURI) ? Names200403
                 .getJAXBContext() : null;
     }

@@ -31,15 +31,18 @@ import org.apache.cxf.jaxrs.resources.BookStore;
 import org.apache.cxf.jaxrs.resources.BookStoreNoAnnotations;
 import org.apache.cxf.jaxrs.resources.BookStoreSubresourcesOnly;
 import org.apache.cxf.jaxrs.resources.SuperBook;
-
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Test;
-
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import org.junit.After;
+import org.junit.Test;
 
-public class JAXRSServerFactoryBeanTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+
+
+
+public class JAXRSServerFactoryBeanTest {
 
     @After
     public void tearDown() throws Exception {

@@ -32,7 +32,7 @@ public final class Client {
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         // Create a websocket client and connect to the target service
         WebSocketTestClient client = new WebSocketTestClient(Server.HOST_URL + Server.CONTEXT_PATH);
@@ -81,7 +81,8 @@ public final class Client {
         // Sent GET request to monitor the customer activities
         client2.reset(1);
         System.out.println("Sent GET request to monitor activities");
-        client2.sendTextMessage("GET " + Server.CONTEXT_PATH + "/customerservice/monitor");
+        client2.sendTextMessage("GET " + Server.CONTEXT_PATH + "/customerservice/monitor\r\n"
+        		+ "Accept: text/xml; charset=ISO-8859-1\r\n");
         client2.await(5);
         responses = client2.getReceivedResponses();
         System.out.println(responses.get(0));

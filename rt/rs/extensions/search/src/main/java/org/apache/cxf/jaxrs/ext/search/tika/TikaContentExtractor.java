@@ -34,6 +34,7 @@ import org.apache.cxf.jaxrs.ext.search.SearchBean;
 import org.apache.tika.detect.DefaultDetector;
 import org.apache.tika.detect.Detector;
 import org.apache.tika.exception.TikaException;
+import org.apache.tika.metadata.HttpHeaders;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.mime.MediaType;
 import org.apache.tika.parser.AutoDetectParser;
@@ -178,7 +179,7 @@ public class TikaContentExtractor {
                 mediaType = detector.detect(in, metadata);
             }
             if (mediaType != null) {
-                metadata.set(Metadata.CONTENT_TYPE, mediaType.toString());
+                metadata.set(HttpHeaders.CONTENT_TYPE, mediaType.toString());
             }
 
             Parser parser = null;

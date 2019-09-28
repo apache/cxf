@@ -128,9 +128,6 @@ public abstract class AbstractBPBeanDefinitionParser {
 
     public QName parseQName(Element element, String t) {
         String t1 = t;
-        String ns = null;
-        String pre = null;
-        String local = null;
 
         if (t1.startsWith("{")) {
             int i = t1.indexOf('}');
@@ -138,10 +135,12 @@ public abstract class AbstractBPBeanDefinitionParser {
                 throw new RuntimeException("Namespace bracket '{' must having a closing bracket '}'.");
             }
 
-            ns = t1.substring(1, i);
             t1 = t1.substring(i + 1);
         }
 
+        final String local;
+        final String pre;
+        final String ns;
         int colIdx = t1.indexOf(':');
         if (colIdx == -1) {
             local = t1;
@@ -187,7 +186,7 @@ public abstract class AbstractBPBeanDefinitionParser {
                 }
             }
         }
-        return setBus;
+        return setBus; // 'setBus' is always false
     }
     protected void processBusAttribute(Element element, ParserContext ctx,
                                        MutableBeanMetadata bean, String val) {
@@ -406,7 +405,7 @@ public abstract class AbstractBPBeanDefinitionParser {
     protected synchronized JAXBContext getContext(Class<?> cls) {
         if (jaxbContext == null || jaxbClasses == null || !jaxbClasses.contains(cls)) {
             try {
-                Set<Class<?>> tmp = new HashSet<Class<?>>();
+                Set<Class<?>> tmp = new HashSet<>();
                 if (jaxbClasses != null) {
                     tmp.addAll(jaxbClasses);
                 }

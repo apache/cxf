@@ -133,7 +133,7 @@ public class TransportURIResolver extends ExtendedURIResolver {
                     c.prepare(message);
                     c.close(message);
                     InputStream ins = exch.get(InputStream.class);
-                    resourceOpened.addElement(ins);
+                    resourceOpened.add(ins);
                     InputSource src = new InputSource(ins);
                     String u = (String)message.get("transport.retransmit.url");
                     if (u == null) {

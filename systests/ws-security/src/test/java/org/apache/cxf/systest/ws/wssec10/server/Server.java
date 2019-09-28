@@ -21,7 +21,7 @@ package org.apache.cxf.systest.ws.wssec10.server;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.systest.ws.common.SecurityTestUtil;
+import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {
@@ -32,7 +32,7 @@ public class Server extends AbstractBusTestServerBase {
     private static String configFileName;
 
     static {
-        unrestrictedPoliciesInstalled = SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
+        unrestrictedPoliciesInstalled = TestUtilities.checkUnrestrictedPoliciesInstalled();
         if (unrestrictedPoliciesInstalled) {
             configFileName = "org/apache/cxf/systest/ws/wssec10/server.xml";
         } else {

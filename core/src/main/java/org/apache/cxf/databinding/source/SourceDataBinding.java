@@ -83,7 +83,7 @@ public class SourceDataBinding extends org.apache.cxf.databinding.AbstractDataBi
     }
 
     public Class<?>[] getSupportedReaderFormats() {
-        return new Class[] {XMLStreamReader.class, Node.class};
+        return new Class<?>[] {XMLStreamReader.class, Node.class};
     }
 
     @SuppressWarnings("unchecked")
@@ -92,13 +92,12 @@ public class SourceDataBinding extends org.apache.cxf.databinding.AbstractDataBi
             return (DataWriter<T>) new XMLStreamDataWriter();
         } else if (cls == Node.class) {
             return (DataWriter<T>) new NodeDataWriter();
-        } else {
-            throw new UnsupportedOperationException("The type " + cls.getName() + " is not supported.");
         }
+        throw new UnsupportedOperationException("The type " + cls.getName() + " is not supported.");
     }
 
     public Class<?>[] getSupportedWriterFormats() {
-        return new Class[] {XMLStreamWriter.class, Node.class};
+        return new Class<?>[] {XMLStreamWriter.class, Node.class};
     }
 
 }

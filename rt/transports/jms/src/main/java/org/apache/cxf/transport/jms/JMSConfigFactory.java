@@ -86,6 +86,8 @@ public final class JMSConfigFactory {
         jmsConfig.setUserName(endpoint.getUsername());
         jmsConfig.setPassword(endpoint.getPassword());
         jmsConfig.setConcurrentConsumers(endpoint.getConcurrentConsumers());
+        jmsConfig.setOneSessionPerConnection(endpoint.isOneSessionPerConnection());
+        jmsConfig.setMessageSelector(endpoint.getMessageSelector());
 
         TransactionManager tm = getTransactionManager(bus, endpoint);
         jmsConfig.setTransactionManager(tm);
@@ -130,6 +132,8 @@ public final class JMSConfigFactory {
         String targetService = endpoint.getTargetService();
         jmsConfig.setTargetService(targetService);
         jmsConfig.setMessageSelector(endpoint.getMessageSelector());
+        int retryInterval = endpoint.getRetryInterval();
+        jmsConfig.setRetryInterval(retryInterval);
         return jmsConfig;
     }
 

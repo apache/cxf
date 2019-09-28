@@ -34,11 +34,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class W3CDOMStreamReaderTest extends Assert {
+
+public class W3CDOMStreamReaderTest {
 
     private static final String RESULT =
         "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">"
@@ -50,7 +52,7 @@ public class W3CDOMStreamReaderTest extends Assert {
     public void testReader() throws Exception {
         ByteArrayInputStream is = new ByteArrayInputStream(
                 "<Test xmlns=\"http://example.org/types\"><argument>foobar</argument></Test>"
-                    .getBytes("utf-8"));
+                    .getBytes());
         DocumentBuilderFactory docBuilderFactory =
                 DocumentBuilderFactory.newInstance();
         docBuilderFactory.setNamespaceAware(true);
@@ -74,7 +76,7 @@ public class W3CDOMStreamReaderTest extends Assert {
     public void testTopLevelText() throws Exception {
         ByteArrayInputStream is = new ByteArrayInputStream(
                "<t:Test xmlns:t=\"http://example.org/types\">gorilla</t:Test>"
-               .getBytes("utf-8"));
+               .getBytes());
         Document doc = StaxUtils.read(is);
         Element e = doc.getDocumentElement();
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(e);

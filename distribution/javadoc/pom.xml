@@ -23,13 +23,16 @@
     <packaging>jar</packaging>
     <name>Apache CXF JavaDoc</name>
     <description>Apache CXF JavaDoc</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../../parent</relativePath>
     </parent>
+    <properties>
+        <cxf.module.name>org.apache.cxf.javadoc</cxf.module.name>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -48,8 +51,8 @@
         </dependency>
         
         <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.annotation</groupId>
@@ -116,15 +119,11 @@
             <artifactId>FastInfoset</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
+            <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-xjc</artifactId>
         </dependency>
         <dependency>
@@ -177,10 +176,6 @@
             <groupId>jdom</groupId>
             <artifactId>jdom</artifactId>
             <version>${cxf.jdom.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.xmlbeans</groupId>
-            <artifactId>xmlbeans</artifactId>
         </dependency>
         <dependency>
             <groupId>${cxf.servlet-api.group}</groupId>
@@ -312,29 +307,13 @@
             <artifactId>abdera-extensions-json</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.tuscany.sdo</groupId>
-            <artifactId>tuscany-sdo-impl</artifactId>
-            <version>1.1.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.codehaus.woodstox</groupId>
-                    <artifactId>wstx-asl</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tuscany.sdo</groupId>
-            <artifactId>tuscany-sdo-tools</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity</artifactId>
+            <artifactId>velocity-engine-core</artifactId>
         </dependency>
         <dependency>
             <groupId>antlr</groupId>

@@ -50,13 +50,14 @@ import org.apache.ws.commons.schema.XmlSchema;
  * Supply default implementations, as appropriate, for DataBinding.
  */
 public abstract class AbstractDataBinding implements DataBinding {
-    private static final Map<String, String> BUILTIN_SCHEMA_LOCS = new HashMap<>();
-    {
+    private static final Map<String, String> BUILTIN_SCHEMA_LOCS = new HashMap<>(2);
+    static {
         BUILTIN_SCHEMA_LOCS.put("http://www.w3.org/2005/08/addressing",
                                 "http://www.w3.org/2006/03/addressing/ws-addr.xsd");
         BUILTIN_SCHEMA_LOCS.put("http://ws-i.org/profiles/basic/1.1/xsd",
                                 "http://ws-i.org/profiles/basic/1.1/swaref.xsd");
     }
+
     protected boolean mtomEnabled;
     protected int mtomThreshold;
     private Bus bus;
@@ -153,7 +154,7 @@ public abstract class AbstractDataBinding implements DataBinding {
         while (n != null) {
             if (n instanceof Element) {
                 Element e = (Element)n;
-                if (e.getLocalName().equals("import")) {
+                if ("import".equals(e.getLocalName())) {
                     patchRequired = true;
                     break;
                 }
@@ -169,8 +170,7 @@ public abstract class AbstractDataBinding implements DataBinding {
             while (n != null) {
                 if (n instanceof Element) {
                     Element e = (Element)n;
-                    if (e.getLocalName().equals("import")) {
-                        e = (Element)n;
+                    if ("import".equals(e.getLocalName())) {
                         String loc = e.getAttribute("schemaLocation");
                         if (ids == null || ids.contains(loc)) {
                             e.removeAttribute("schemaLocation");
@@ -233,9 +233,7 @@ public abstract class AbstractDataBinding implements DataBinding {
     private Document copy(Document doc) {
         try {
             return StaxUtils.copy(doc);
-        } catch (XMLStreamException e) {
-            // ignore
-        } catch (ParserConfigurationException e) {
+        } catch (XMLStreamException | ParserConfigurationException e) {
             // ignore
         }
         return doc;

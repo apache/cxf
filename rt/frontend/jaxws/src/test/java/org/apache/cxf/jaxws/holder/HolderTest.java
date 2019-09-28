@@ -32,10 +32,14 @@ import org.apache.cxf.jaxws.MessageReplayObserver;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.local.LocalTransportFactory;
+
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class HolderTest extends AbstractJaxWsTest {
-    private final String address = "local://localhost:9000/HolderService";
+    private static final String ADDRESS = "local://localhost:9000/HolderService";
 
     @Override
     protected Bus createBus() throws BusException {
@@ -45,7 +49,7 @@ public class HolderTest extends AbstractJaxWsTest {
     @Test
     public void testClient() throws Exception {
         EndpointInfo ei = new EndpointInfo(null, "http://schemas.xmlsoap.org/soap/http");
-        ei.setAddress(address);
+        ei.setAddress(ADDRESS);
 
         Destination d = localTransport.getDestination(ei, bus);
         d.setMessageObserver(new MessageReplayObserver("/org/apache/cxf/jaxws/holder/echoResponse.xml"));
@@ -53,10 +57,10 @@ public class HolderTest extends AbstractJaxWsTest {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.getClientFactoryBean().setServiceClass(HolderService.class);
         factory.getClientFactoryBean().setBus(getBus());
-        factory.getClientFactoryBean().setAddress(address);
+        factory.getClientFactoryBean().setAddress(ADDRESS);
 
         HolderService h = (HolderService)factory.create();
-        Holder<String> holder = new Holder<String>();
+        Holder<String> holder = new Holder<>();
         assertEquals("one", h.echo("one", "two", holder));
         assertEquals("two", holder.value);
     }
@@ -66,20 +70,20 @@ public class HolderTest extends AbstractJaxWsTest {
         JaxWsServerFactoryBean svr = new JaxWsServerFactoryBean();
         svr.setBus(getBus());
         svr.setServiceBean(new HolderServiceImpl());
-        svr.setAddress(address);
+        svr.setAddress(ADDRESS);
         svr.create();
 
         addNamespace("h", "http://holder.jaxws.cxf.apache.org/");
         Node response;
 
-        response = invoke(address, LocalTransportFactory.TRANSPORT_ID, "echo.xml");
+        response = invoke(ADDRESS, LocalTransportFactory.TRANSPORT_ID, "echo.xml");
 
         assertNotNull(response);
         assertValid("//h:echoResponse/return[text()='one']", response);
         assertValid("//h:echoResponse/return1[text()='two']", response);
         assertNoFault(response);
 
-        response = invoke(address, LocalTransportFactory.TRANSPORT_ID, "echo2.xml");
+        response = invoke(ADDRESS, LocalTransportFactory.TRANSPORT_ID, "echo2.xml");
 
         assertNotNull(response);
         assertNoFault(response);
@@ -87,7 +91,7 @@ public class HolderTest extends AbstractJaxWsTest {
         assertValid("//h:echo2Response/return1[text()='two']", response);
 
         // test holder with in/out header
-        response = invoke(address, LocalTransportFactory.TRANSPORT_ID, "echo3.xml");
+        response = invoke(ADDRESS, LocalTransportFactory.TRANSPORT_ID, "echo3.xml");
 
         assertNotNull(response);
         assertNoFault(response);

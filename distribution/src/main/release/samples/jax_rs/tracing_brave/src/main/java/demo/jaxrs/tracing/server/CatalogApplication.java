@@ -32,12 +32,14 @@ import org.apache.cxf.tracing.brave.jaxrs.BraveFeature;
 
 @ApplicationPath("/")
 public class CatalogApplication extends Application {
+    private final CatalogTracing tracing = new CatalogTracing("catalog-server");
+    
     @Override
     public Set<Object> getSingletons() {
         return new HashSet<>(
             Arrays.asList(
                 new Catalog(),
-                new BraveFeature(),
+                new BraveFeature(tracing.getHttpTracing()),
                 new JsrJsonpProvider()
             )
         );

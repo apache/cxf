@@ -21,8 +21,6 @@ package org.apache.cxf.jaxrs.impl;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
-import org.apache.cxf.common.util.StringUtils;
-
 public class CookieHeaderProvider implements HeaderDelegate<Cookie> {
 
     private static final String VERSION = "$Version";
@@ -42,7 +40,7 @@ public class CookieHeaderProvider implements HeaderDelegate<Cookie> {
         String domain = null;
 
         // ignore the fact the possible version may be seperated by ','
-        String[] tokens = StringUtils.split(c, ";");
+        String[] tokens = c.split(";");
         for (String token : tokens) {
             String theToken = token.trim();
             if (theToken.startsWith(VERSION)) {

@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -60,12 +61,12 @@ public class HTTPTransportFactory
 
 
     public static final List<String> DEFAULT_NAMESPACES
-        = Arrays.asList(
+        = Collections.unmodifiableList(Arrays.asList(
             "http://cxf.apache.org/transports/http",
             "http://cxf.apache.org/transports/http/configuration",
             "http://schemas.xmlsoap.org/wsdl/http",
             "http://schemas.xmlsoap.org/wsdl/http/"
-        );
+        ));
 
     private static final Logger LOG = LogUtils.getL7dLogger(HTTPTransportFactory.class);
 

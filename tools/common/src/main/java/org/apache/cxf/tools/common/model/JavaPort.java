@@ -21,7 +21,9 @@ package org.apache.cxf.tools.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.jws.soap.SOAPBinding;
+
 import org.apache.cxf.common.util.StringUtils;
 
 public class JavaPort {
@@ -165,7 +167,7 @@ public class JavaPort {
         StringBuilder sb = new StringBuilder();
         if (!StringUtils.isEmpty(getPackageName())) {
             sb.append(getPackageName());
-            sb.append(".");
+            sb.append('.');
         }
         sb.append(getInterfaceClass());
         return sb.toString();

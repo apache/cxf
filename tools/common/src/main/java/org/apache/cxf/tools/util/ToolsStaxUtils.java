@@ -23,14 +23,16 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.staxutils.StaxUtils;
@@ -51,7 +53,7 @@ public final class ToolsStaxUtils {
             int count = 0;
             QName checkingPoint = null;
 
-            Stack<Tag> stack = new Stack<Tag>();
+            final Deque<Tag> stack = new ArrayDeque<>();
 
             while (reader.hasNext()) {
                 int event = reader.next();
@@ -60,7 +62,7 @@ public final class ToolsStaxUtils {
                     count++;
                 }
 
-                if (event == XMLStreamReader.START_ELEMENT) {
+                if (event == XMLStreamConstants.START_ELEMENT) {
                     newTag = new Tag();
                     newTag.setName(reader.getName());
 
@@ -74,11 +76,11 @@ public final class ToolsStaxUtils {
                     }
                     stack.push(newTag);
                 }
-                if (event == XMLStreamReader.CHARACTERS) {
+                if (event == XMLStreamConstants.CHARACTERS) {
                     newTag.setText(reader.getText());
                 }
 
-                if (event == XMLStreamReader.END_ELEMENT) {
+                if (event == XMLStreamConstants.END_ELEMENT) {
                     Tag startTag = stack.pop();
 
                     if (checkingPoint != null && checkingPoint.equals(reader.getName())) {
@@ -129,7 +131,7 @@ public final class ToolsStaxUtils {
         while (reader.hasNext()) {
             int event = reader.next();
 
-            if (event == XMLStreamReader.START_ELEMENT) {
+            if (event == XMLStreamConstants.START_ELEMENT) {
                 newTag = new Tag();
                 newTag.setName(reader.getName());
                 if (!ignoreAttr.isEmpty()) {
@@ -162,11 +164,11 @@ public final class ToolsStaxUtils {
                 currentTag.getTags().add(newTag);
                 currentTag = newTag;
             }
-            if (event == XMLStreamReader.CHARACTERS) {
+            if (event == XMLStreamConstants.CHARACTERS) {
                 newTag.setText(reader.getText());
             }
 
-            if (event == XMLStreamReader.END_ELEMENT) {
+            if (event == XMLStreamConstants.END_ELEMENT) {
                 currentTag = currentTag.getParent();
             }
         }

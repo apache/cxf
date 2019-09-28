@@ -30,12 +30,17 @@ import org.apache.cxf.javascript.JavascriptTestUtilities.JSRunnable;
 import org.apache.cxf.javascript.JavascriptTestUtilities.Notifier;
 import org.apache.cxf.javascript.fortest.AegisServiceImpl;
 import org.apache.cxf.testutil.common.TestUtil;
+import org.mozilla.javascript.Context;
+import org.springframework.context.support.GenericApplicationContext;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import org.mozilla.javascript.Context;
-import org.springframework.context.support.GenericApplicationContext;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 
 /*
  * We end up here with a part with isElement == true, a non-array element,
@@ -136,7 +141,7 @@ public class AegisTest extends JavascriptRhinoTest {
         assertEquals("aegis_fortest_javascript_cxf_apache_org_Mammal", marker);
         Object intValue =
             testUtilities.rhinoEvaluate("globalResponseObject._return._objects._anyType[1]");
-        assertEquals(new Float(42), new Float(intValue.toString()));
+        assertEquals(Float.valueOf(42), new Float(intValue.toString()));
         return null;
     }
 

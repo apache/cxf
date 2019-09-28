@@ -21,6 +21,7 @@ package org.apache.cxf.tools.fortest.cxf523;
 
 
 import java.util.Calendar;
+
 import javax.xml.namespace.QName;
 
 public class Operation0ResponseType {
@@ -91,7 +92,7 @@ public class Operation0ResponseType {
     }
 
     public String toString() {
-        StringBuilder buffer = new StringBuilder();
+        StringBuilder buffer = new StringBuilder(128);
         if (name != null) {
             buffer.append("name : " + name + "\n");
         }

@@ -33,12 +33,13 @@ import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.filter.Filter;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class HBaseVisitorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class HBaseVisitorTest {
     public static final byte[] BOOK_FAMILY = "book".getBytes();
     public static final byte[] NAME_QUALIFIER = "name".getBytes();
 
@@ -59,13 +60,12 @@ public class HBaseVisitorTest extends Assert {
     public void testScanWithFilterVisitor() throws Exception {
         Scan scan = new Scan();
 
-        SearchCondition<SearchBean> sc = new FiqlParser<SearchBean>(SearchBean.class).parse("name==CXF");
-        HBaseQueryVisitor<SearchBean> visitor = new HBaseQueryVisitor<SearchBean>("book");
+        SearchCondition<SearchBean> sc = new FiqlParser<>(SearchBean.class).parse("name==CXF");
+        HBaseQueryVisitor<SearchBean> visitor = new HBaseQueryVisitor<>("book");
         sc.accept(visitor);
         Filter filter = visitor.getQuery();
         scan.setFilter(filter);
-        ResultScanner rs = table.getScanner(scan);
-        try {
+        try (ResultScanner rs = table.getScanner(scan)) {
             int count = 0;
             for (Result r = rs.next(); r != null; r = rs.next()) {
                 assertEquals("row2", new String(r.getRow()));
@@ -73,8 +73,6 @@ public class HBaseVisitorTest extends Assert {
                 count++;
             }
             assertEquals(1, count);
-        } finally {
-            rs.close();
         }
     }
 

@@ -38,11 +38,15 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class RequestImplTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+
+public class RequestImplTest {
 
     private Message m;
     private MultivaluedMap<String, String> metadata;
@@ -50,7 +54,7 @@ public class RequestImplTest extends Assert {
     @Before
     public void setUp() {
         m = new MessageImpl();
-        metadata = new MetadataMap<String, String>();
+        metadata = new MetadataMap<>();
         m.put(Message.PROTOCOL_HEADERS, metadata);
         m.put(Message.HTTP_REQUEST_METHOD, "GET");
     }
@@ -143,6 +147,34 @@ public class RequestImplTest extends Assert {
         list.clear();
         list.add(var3);
         assertSame(var3, new RequestImpl(m).selectVariant(list));
+    }
+
+    @Test
+    public void testMultipleVariantsBestMatchMediaTypeQualityFactors() {
+        metadata.putSingle(HttpHeaders.ACCEPT, "a/b;q=0.6, c/d;q=0.5, e/f+json");
+        metadata.putSingle(HttpHeaders.ACCEPT_LANGUAGE, "en-us");
+        metadata.putSingle(HttpHeaders.ACCEPT_ENCODING, "gzip;q=1.0, compress");
+
+        List<Variant> list = new ArrayList<>();
+        Variant var1 = new Variant(MediaType.valueOf("a/b"), new Locale("en"), "gzip");
+        Variant var2 = new Variant(MediaType.valueOf("x/z"), new Locale("en"), "gzip");
+        Variant var3 = new Variant(MediaType.valueOf("e/f+json"), new Locale("en"), "gzip");
+        Variant var4 = new Variant(MediaType.valueOf("c/d"), new Locale("en"), "gzip");
+        list.add(var1);
+        list.add(var2);
+        list.add(var3);
+        list.add(var4);
+        assertSame(var3, new RequestImpl(m).selectVariant(list));
+
+        list.clear();
+        list.add(var1);
+        list.add(var4);
+        assertSame(var1, new RequestImpl(m).selectVariant(list));
+
+        list.clear();
+        list.add(var2);
+        list.add(var4);
+        assertSame(var4, new RequestImpl(m).selectVariant(list));
     }
 
     private void assertSameVariant(MediaType mt, Locale lang, String enc) {

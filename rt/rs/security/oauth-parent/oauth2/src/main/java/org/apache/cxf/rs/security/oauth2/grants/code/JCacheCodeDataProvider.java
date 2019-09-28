@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
 import javax.cache.Cache;
 
 import org.apache.cxf.Bus;
@@ -39,11 +40,11 @@ public class JCacheCodeDataProvider extends JCacheOAuthDataProvider
     private long codeLifetime = 10 * 60;
     private Cache<String, ServerAuthorizationCodeGrant> grantCache;
 
-    protected JCacheCodeDataProvider() throws Exception {
+    protected JCacheCodeDataProvider() {
         this(DEFAULT_CONFIG_URL, BusFactory.getThreadDefaultBus(true));
     }
 
-    protected JCacheCodeDataProvider(String configFileURL, Bus bus) throws Exception {
+    protected JCacheCodeDataProvider(String configFileURL, Bus bus) {
         this(configFileURL, bus, CLIENT_CACHE_KEY, CODE_GRANT_CACHE_KEY,
              ACCESS_TOKEN_CACHE_KEY, REFRESH_TOKEN_CACHE_KEY);
     }
@@ -53,10 +54,21 @@ public class JCacheCodeDataProvider extends JCacheOAuthDataProvider
                                      String clientCacheKey,
                                      String codeCacheKey,
                                      String accessTokenKey,
-                                     String refreshTokenKey) throws Exception {
-        super(configFileURL, bus, clientCacheKey, accessTokenKey, refreshTokenKey);
+                                     String refreshTokenKey) {
+        this(configFileURL, bus, clientCacheKey, codeCacheKey, accessTokenKey, refreshTokenKey, false);
+    }
+
+    protected JCacheCodeDataProvider(String configFileURL,
+                                     Bus bus,
+                                     String clientCacheKey,
+                                     String codeCacheKey,
+                                     String accessTokenKey,
+                                     String refreshTokenKey,
+                                     boolean storeJwtTokenKeyOnly) {
+        super(configFileURL, bus, clientCacheKey, accessTokenKey, refreshTokenKey, storeJwtTokenKeyOnly);
         grantCache = createCache(cacheManager, codeCacheKey, String.class, ServerAuthorizationCodeGrant.class);
     }
+
 
     @Override
     protected void doRemoveClient(Client c) {

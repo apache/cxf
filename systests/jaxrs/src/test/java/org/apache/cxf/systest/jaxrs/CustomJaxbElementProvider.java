@@ -43,9 +43,8 @@ public class CustomJaxbElementProvider extends JAXBElementProvider<Book> {
                 }
             }
             throw new RuntimeException();
-        } else {
-            return super.isWriteable(type, genericType, anns, mt);
         }
+        return super.isWriteable(type, genericType, anns, mt);
 
     }
     @Override

@@ -82,7 +82,7 @@ public class JAXRSServiceImpl extends AbstractAttributedInterceptorProvider impl
 
     public JAXRSServiceImpl(List<ClassResourceInfo> cri, boolean create) {
         this(cri, null);
-        createServiceModel = true;
+        createServiceModel = create;
     }
 
     public void setCreateServiceModel(boolean create) {
@@ -101,9 +101,8 @@ public class JAXRSServiceImpl extends AbstractAttributedInterceptorProvider impl
             Class<?> primaryClass = classResourceInfos.get(0).getServiceClass();
             String ns = PackageUtils.getNamespace(PackageUtils.getPackageName(primaryClass));
             return new QName(ns, primaryClass.getSimpleName());
-        } else {
-            return new QName(address, "WebClient");
         }
+        return new QName(address, "WebClient");
     }
 
     public List<ClassResourceInfo> getClassResourceInfos() {

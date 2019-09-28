@@ -23,10 +23,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class TextExtensionFragmentParserTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class TextExtensionFragmentParserTest {
 
     @Test
     public void testGetExtensions() throws IOException {
@@ -35,7 +39,7 @@ public class TextExtensionFragmentParserTest extends Assert {
         assertEquals("Unexpected number of Extension elements.", 3, extensions.size());
 
         Extension e = extensions.get(0);
-        assertTrue("Extension is deferred.", !e.isDeferred());
+        assertFalse("Extension is deferred.", e.isDeferred());
         assertEquals("Unexpected class name.",
                      "org.apache.cxf.foo.FooImpl", e.getClassname());
         assertEquals("Unexpected number of namespace elements.", 0, e.getNamespaces().size());

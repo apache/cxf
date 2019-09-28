@@ -66,7 +66,6 @@ public class TestAssertion implements PolicyAssertion {
     }
 
     public boolean isAsserted(AssertionInfoMap aim) {
-        // TODO Auto-generated method stub
         return false;
     }
 

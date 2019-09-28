@@ -38,10 +38,10 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.handlers.types.AddNumbersResponse;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -49,8 +49,9 @@ import static org.easymock.EasyMock.createNiceControl;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
+import static org.junit.Assert.assertEquals;
 
-public class LogicalHandlerInterceptorTest extends Assert {
+public class LogicalHandlerInterceptorTest {
 
     private IMocksControl control;
     private Binding binding;
@@ -73,7 +74,7 @@ public class LogicalHandlerInterceptorTest extends Assert {
 
     @Test
     public void testInterceptSuccess() {
-        List<LogicalHandler<?>> list = new ArrayList<LogicalHandler<?>>();
+        List<LogicalHandler<?>> list = new ArrayList<>();
         list.add(new LogicalHandler<LogicalMessageContext>() {
             public void close(MessageContext arg0) {
             }
@@ -109,6 +110,8 @@ public class LogicalHandlerInterceptorTest extends Assert {
     //direction is reversed during processing of a request message then the message
     //becomes a response message.
     //NOTE: commented out as this has been covered by other tests.
+    @Test
+    @org.junit.Ignore
     public void xtestReturnFalseClientSide() throws Exception {
         @SuppressWarnings("rawtypes")
         List<Handler> list = new ArrayList<>();

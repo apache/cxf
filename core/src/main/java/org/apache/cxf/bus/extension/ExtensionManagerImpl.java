@@ -51,8 +51,8 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
 
     private final ClassLoader loader;
     private ResourceManager resourceManager;
-    private Map<String, Extension> all = new ConcurrentHashMap<String, Extension>();
-    private List<Extension> ordered = new CopyOnWriteArrayList<Extension>();
+    private Map<String, Extension> all = new ConcurrentHashMap<>();
+    private List<Extension> ordered = new CopyOnWriteArrayList<>();
     private final Map<Class<?>, Object> activated;
     private final Bus bus;
 
@@ -68,7 +68,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
                                 Bus b) {
         this(new String[] {resource}, cl, initialExtensions, rm, b);
     }
-    public ExtensionManagerImpl(String resources[],
+    public ExtensionManagerImpl(String[] resources,
                                 ClassLoader cl,
                                 Map<Class<?>, Object> initialExtensions,
                                 ResourceManager rm,
@@ -93,7 +93,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         }
     }
 
-    final void load(String resources[]) {
+    final void load(String[] resources) {
         if (resources == null) {
             return;
         }
@@ -162,17 +162,11 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
 
         while (urls.hasMoreElements()) {
             final URL url = urls.nextElement();
-            InputStream is;
-            try {
-                is = AccessController.doPrivileged(new PrivilegedExceptionAction<InputStream>() {
+            try (InputStream is = AccessController.doPrivileged(new PrivilegedExceptionAction<InputStream>() {
                     public InputStream run() throws Exception {
                         return url.openStream();
                     }
-                });
-            } catch (PrivilegedActionException pae) {
-                throw (IOException)pae.getException();
-            }
-            try {
+                })) {
                 List<Extension> exts = new TextExtensionFragmentParser(loader).getExtensions(is);
                 for (Extension e : exts) {
                     if (loader != l) {
@@ -183,12 +177,8 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
                         ordered.add(e);
                     }
                 }
-            } finally {
-                try {
-                    is.close();
-                } catch (IOException ex) {
-                    //ignore
-                }
+            } catch (PrivilegedActionException pae) {
+                throw (IOException)pae.getException();
             }
         }
     }
@@ -277,7 +267,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
             Method[] methods = clazz.getMethods();
             for (int i = 0; i < methods.length; i++) {
                 Method method = methods[i];
-                Class<?> params[] = method.getParameterTypes();
+                Class<?>[] params = method.getParameterTypes();
                 if (method.getName().equals(methodName) && params.length == 1) {
                     Class<?> paramType = params[0];
                     if (paramType.isInstance(value)) {
@@ -294,7 +284,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         }
     }
     public List<String> getBeanNamesOfType(Class<?> type) {
-        List<String> ret = new LinkedList<String>();
+        List<String> ret = new LinkedList<>();
         for (Extension ex : ordered) {
             Class<?> cls = ex.getClassObject(loader);
             if (cls != null && type.isAssignableFrom(cls)) {
@@ -319,7 +309,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         return null;
     }
     public <T> Collection<? extends T> getBeansOfType(Class<T> type) {
-        List<T> ret = new LinkedList<T>();
+        List<T> ret = new LinkedList<>();
         Extension ext = all.get(type.getName());
         if (ext != null) {
             Class<?> cls = ext.getClassObject(loader);

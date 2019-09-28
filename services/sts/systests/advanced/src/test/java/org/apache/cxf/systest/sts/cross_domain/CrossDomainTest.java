@@ -24,13 +24,20 @@ import java.net.URL;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Some tests that illustrate how CXF clients can get tokens from different STS instances for
@@ -89,20 +96,20 @@ public class CrossDomainTest extends AbstractBusClientServerTestBase {
         stopAllServers();
     }
 
-    // In this test, a CXF client checks to see that the location defined on its STSClient is different
-    // from that configured in the Issuer of the IssuedToken policy supplied in the WSDL of the
-    // service provider. It obtains a SAML Token from the configured STS first, and then sends it in
-    // the security header to the second STS. The returned token is then sent to the service provider.
-    // This illustrates cross-domain SSO: https://issues.apache.org/jira/browse/CXF-3520
+    // In this test, the CXF client has two STSClients configured. The "default" STSClient config points to
+    // STS "b". This STS has an IssuedToken policy that requires a token from STS "a".
     @org.junit.Test
-    @org.junit.Ignore
     public void testCrossDomain() throws Exception {
+        if (!portFree) {
+            return;
+        }
+
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = CrossDomainTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = CrossDomainTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -130,11 +137,11 @@ public class CrossDomainTest extends AbstractBusClientServerTestBase {
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CrossDomainTest.class.getResource("cxf-client.xml");
+        URL busFile = CrossDomainTest.class.getResource("cxf-client-mex.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = CrossDomainTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -145,6 +152,44 @@ public class CrossDomainTest extends AbstractBusClientServerTestBase {
 
         // Transport port
         doubleIt(transportPort, 25);
+
+        ((java.io.Closeable)transportPort).close();
+        bus.shutdown(true);
+    }
+
+    // Here the service references STS "b". The WSDL of STS "b" has an IssuedToken. However our STS
+    // client config references STS "b". This could lead to an infinite loop - this test is to make
+    // sure that this doesn't happen.
+    @org.junit.Test
+    public void testIssuedTokenPointingToSameSTS() throws Exception {
+
+        if (!portFree) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = CrossDomainTest.class.getResource("cxf-client-b.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = CrossDomainTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItCrossDomainMEXPort");
+        DoubleItPortType transportPort =
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportPort, PORT);
+
+        // Transport port
+        try {
+            doubleIt(transportPort, 25);
+            fail("Failure expected on talking to an STS with an IssuedToken policy that points to the same STS");
+        } catch (SOAPFaultException ex) {
+            String expectedError =
+                "Calling an STS with an IssuedToken policy that points to the same STS is not allowed";
+            assertTrue(ex.getMessage().contains(expectedError));
+        }
 
         ((java.io.Closeable)transportPort).close();
         bus.shutdown(true);

@@ -90,9 +90,8 @@ public class TokenRequestCollectionOperation extends AbstractOperation
                             throw new STSException(
                                 "Error in requesting a token", STSException.REQUEST_FAILED
                             );
-                        } else {
-                            requestType = val;
                         }
+                        requestType = val;
                     }
                 }
             }

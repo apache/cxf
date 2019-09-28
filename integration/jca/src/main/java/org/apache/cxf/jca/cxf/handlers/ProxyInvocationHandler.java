@@ -45,7 +45,7 @@ public class ProxyInvocationHandler extends CXFInvocationHandlerBase  {
 
     public final Object invoke(final Object proxy,
                                final Method method,
-                               final Object args[]) throws Throwable {
+                               final Object[] args) throws Throwable {
 
         LOG.fine(this + " on " + method);
         Object o = getData().getManagedConnection().getManagedConnectionFactory();

@@ -22,115 +22,117 @@ package org.apache.cxf.tools.corba;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import javax.wsdl.Definition;
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.tools.corba.common.ToolTestBase;
 import org.apache.cxf.tools.corba.processors.wsdl.WSDLToProcessor;
 import org.apache.cxf.tools.corba.utils.TestUtils;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class WSDLToIDLTest extends ToolTestBase {
 
     private static String usage;
-    private static int noError;
-    private static int error = -1;
     ByteArrayOutputStream bout;
-    PrintStream newOut;
-    private File output;
+    private Path output;
 
-    public void setUp() {
+    @Before
+    public void setUp() throws Exception {
         super.setUp();
-        try {
-            TestUtils utils = new TestUtils(WSDLToIDL.TOOL_NAME, WSDLToIDL.class
-                .getResourceAsStream("/toolspecs/wsdl2idl.xml"));
-            usage = utils.getUsage();
-            bout = new ByteArrayOutputStream();
-            newOut = new PrintStream(bout);
-            System.setOut(newOut);
-            System.setErr(newOut);
-        } catch (Exception e) {
-            // complete
-        }
 
-        try {
-            output = new File(getClass().getResource(".").toURI());
-            output = new File(output, "generated-idl");
-            FileUtils.mkDir(output);
-        } catch (Exception e) {
-            // complete
-        }
+        TestUtils utils = new TestUtils(WSDLToIDL.TOOL_NAME, WSDLToIDL.class
+            .getResourceAsStream("/toolspecs/wsdl2idl.xml"));
+        usage = utils.getUsage();
+        bout = new ByteArrayOutputStream();
+        PrintStream newOut = new PrintStream(bout);
+        System.setOut(newOut);
+        System.setErr(newOut);
+
+        output = Files.createTempDirectory("wsdl2idl");
     }
 
-    private void deleteDir(File dir) throws IOException {
-        FileUtils.removeDir(dir);
-    }
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
 
-    public void tearDown() {
-        try {
-            deleteDir(output);
-        } catch (IOException ex) {
-            //ignore
-        }
+        Files.walkFileTree(output, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.delete(file);
+                return FileVisitResult.CONTINUE;
+            }
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir);
+                return FileVisitResult.CONTINUE;
+            }
+        });
         output = null;
     }
 
-    private int execute(String[] args) throws Exception {
+    private static String execute(String[] args) {
         try {
             WSDLToIDL.run(args);
         } catch (Exception ex) {
-            return -1;
+            return ex.getMessage();
         }
-        return 0;
+        return null;
     }
 
-    private void checkStrings(byte orig[], byte generated[]) throws Exception {
-        BufferedReader origReader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(orig)));
-        BufferedReader genReader =
-            new BufferedReader(new InputStreamReader(
-                       new ByteArrayInputStream(generated)));
+    private static void checkStrings(byte[] orig, byte[] generated) throws IOException {
+        try (BufferedReader origReader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(orig)));
+                BufferedReader genReader = new BufferedReader(
+                        new InputStreamReader(new ByteArrayInputStream(generated)))) {
 
-        String sorig = origReader.readLine();
-        String sgen = genReader.readLine();
+            String sorig = origReader.readLine();
+            String sgen = genReader.readLine();
 
-        while (sorig != null && sgen != null) {
-            if (!sorig.equals(sgen)) {
-                //assertEquals(sorig, sgen);
-                //sorig = origReader.readLine();
-                sgen = genReader.readLine();
-            } else {
-                assertEquals(sorig, sgen);
-                sorig = null;
-                sgen = null;
-                break;
+            while (sorig != null && sgen != null) {
+                if (!sorig.equals(sgen)) {
+                    // assertEquals(sorig, sgen);
+                    // sorig = origReader.readLine();
+                    sgen = genReader.readLine();
+                } else {
+                    assertEquals(sorig, sgen);
+                    sorig = origReader.readLine();
+                }
             }
         }
-        origReader.close();
-        genReader.close();
     }
 
+    @Test
     public void testBindingGenDefault() throws Exception {
         String[] cmdArgs = {"-corba", "-i", "BasePortType",
-                            "-d", output.getCanonicalPath(),
+                            "-d", output.toString(),
                             getClass().getResource("/wsdl/simpleList.wsdl").toString()};
-        int exc = execute(cmdArgs);
-        assertEquals("WSDLToIDL Failed", noError, exc);
+        String error = execute(cmdArgs);
+        assertNull("WSDLToIDL Failed", error);
 
-        File f = new File(output, "simpleList-corba.wsdl");
-        assertTrue("simpleList-corba.wsdl should be generated", f.exists());
+        Path f = output.resolve("simpleList-corba.wsdl");
+        assertTrue("simpleList-corba.wsdl should be generated", Files.exists(f));
 
         WSDLToProcessor proc = new WSDLToProcessor();
         try {
-            proc.parseWSDL(f.getAbsolutePath());
+            proc.parseWSDL(f.toString());
             Definition model = proc.getWSDLDefinition();
             assertNotNull("WSDL Definition Should not be Null", model);
             QName bindingName = new QName("http://schemas.apache.org/tests", "BaseCORBABinding");
@@ -140,21 +142,22 @@ public class WSDLToIDLTest extends ToolTestBase {
         }
     }
 
+    @Test
     public void testBindingGenSpecifiedFile() throws Exception {
 
         String[] cmdArgs = {"-corba", "-i", "BasePortType",
                             "-w", "simpleList-corba_gen.wsdl",
-                            "-d", output.getCanonicalPath(),
+                            "-d", output.toString(),
                             getClass().getResource("/wsdl/simpleList.wsdl").toString()};
-        int exc = execute(cmdArgs);
-        assertEquals("WSDLToIDL Failed", noError, exc);
+        String error = execute(cmdArgs);
+        assertNull("WSDLToIDL Failed", error);
 
-        File f = new File(output, "simpleList-corba_gen.wsdl");
-        assertTrue("simpleList-corba_gen.wsdl should be generated", f.exists());
+        Path f = output.resolve("simpleList-corba_gen.wsdl");
+        assertTrue("simpleList-corba_gen.wsdl should be generated", Files.exists(f));
 
         WSDLToProcessor proc = new WSDLToProcessor();
         try {
-            proc.parseWSDL(f.getAbsolutePath());
+            proc.parseWSDL(f.toString());
             Definition model = proc.getWSDLDefinition();
             assertNotNull("WSDL Definition Should not be Null", model);
             QName bindingName = new QName("http://schemas.apache.org/tests", "BaseCORBABinding");
@@ -165,29 +168,31 @@ public class WSDLToIDLTest extends ToolTestBase {
     }
 
 
+    @Test
     public void testIDLGenDefault() throws Exception {
         String[] cmdArgs = {"-idl", "-b", "BaseCORBABinding",
-                            "-d", output.getCanonicalPath(),
+                            "-d", output.toString(),
                             getClass().getResource("/wsdl/simple-binding.wsdl").toString()};
-        int exc = execute(cmdArgs);
-        assertEquals("WSDLToIDL Failed", noError, exc);
+        String error = execute(cmdArgs);
+        assertNull("WSDLToIDL Failed", error);
 
-        Path path = FileSystems.getDefault().getPath(output.getPath(), "simple-binding.idl");
+        Path path = output.resolve("simple-binding.idl");
         assertTrue("simple-binding.idl should be generated", Files.isReadable(path));
 
         String line = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
         assertTrue("Invalid Idl File Generated", line.length() > 0);
     }
 
+    @Test
     public void testIDLGenSpecifiedFile() throws Exception {
         String[] cmdArgs = {"-idl", "-b", "BaseCORBABinding",
                             "-o", "simple-binding_gen.idl",
-                            "-d", output.getCanonicalPath(),
+                            "-d", output.toString(),
                             getClass().getResource("/wsdl/simple-binding.wsdl").toString()};
-        int exc = execute(cmdArgs);
-        assertEquals("WSDLToIDL Failed in Idl Generation", noError, exc);
+        String error = execute(cmdArgs);
+        assertNull("WSDLToIDL Failed in Idl Generation", error);
 
-        Path path = FileSystems.getDefault().getPath(output.getPath(), "simple-binding_gen.idl");
+        Path path = output.resolve("simple-binding_gen.idl");
         assertTrue("simple-binding_gen.idl should be generated", Files.isReadable(path));
 
         String line = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
@@ -196,22 +201,23 @@ public class WSDLToIDLTest extends ToolTestBase {
 
     // tests generating corba and idl in default wsdl and idl files
     // pass the temp directory to create the wsdl files.
+    @Test
     public void testBindAndIDLGen() throws Exception {
         String[] cmdArgs = {"-i", "BasePortType",
                             "-b", "BaseOneCORBABinding",
-                            "-d", output.getCanonicalPath(),
+                            "-d", output.toString(),
                             getClass().getResource("/wsdl/simple-binding.wsdl").toString()};
-        int exc = execute(cmdArgs);
-        assertEquals("WSDLToIDL Failed", noError, exc);
+        String error = execute(cmdArgs);
+        assertNull("WSDLToIDL Failed", error);
 
-        Path path1 = FileSystems.getDefault().getPath(output.getPath(), "simple-binding-corba.wsdl");
+        Path path1 = output.resolve("simple-binding-corba.wsdl");
         assertTrue("simple-binding-corba.wsdl should be generated", Files.isReadable(path1));
-        Path path2 = FileSystems.getDefault().getPath(output.getPath(), "simple-binding.idl");
+        Path path2 = output.resolve("simple-binding.idl");
         assertTrue("simple-binding.idl should be generated", Files.isReadable(path2));
 
         WSDLToProcessor proc = new WSDLToProcessor();
         try {
-            proc.parseWSDL(path1.toAbsolutePath().toString());
+            proc.parseWSDL(path1.toString());
             Definition model = proc.getWSDLDefinition();
             assertNotNull("WSDL Definition Should not be Null", model);
             QName bindingName = new QName("http://schemas.apache.org/tests", "BaseOneCORBABinding");
@@ -224,89 +230,99 @@ public class WSDLToIDLTest extends ToolTestBase {
         assertTrue("Invalid Idl File Generated", line.length() > 0);
     }
 
+    @Test
     public void testNoArgs() throws Exception {
         String[] cmdArgs = {};
-        int exc = execute(cmdArgs);
-        assertEquals("WSDLToIDL Failed", error, exc);
-        StringBuilder strBuf = new StringBuilder();
+        String error = execute(cmdArgs);
+        assertNotNull("WSDLToIDL Failed", error);
+        StringBuilder strBuf = new StringBuilder(128);
         strBuf.append("Missing argument: wsdlurl\n\n");
         strBuf.append(usage);
         checkStrings(strBuf.toString().getBytes(), bout.toByteArray());
     }
 
+    @Test
     public void testMissingRequiredFlags() throws Exception {
         String[] cmdArgs = {"-i", " interfaceName"};
-        int exc = execute(cmdArgs);
-        assertEquals("WSDLToIDL Failed", error, exc);
-        StringBuilder expected = new StringBuilder();
+        String error = execute(cmdArgs);
+        assertNotNull("WSDLToIDL Failed", error);
+        StringBuilder expected = new StringBuilder(128);
         expected.append("Missing argument: wsdlurl\n\n");
         expected.append(usage);
         checkStrings(expected.toString().getBytes(), bout.toByteArray());
     }
 
+    @Test
     public void testBindingGenInvalidInterface() throws Exception {
 
         String[] cmdArgs = {"-corba", "-i", "TestInterface",
                              getClass().getResource("/wsdl/simpleList.wsdl").toString()};
-        int exc = execute(cmdArgs);
-        assertEquals("WSDLToIDL Failed", error, exc);
+        String error = execute(cmdArgs);
+        assertNotNull("WSDLToIDL Failed", error);
         String expected = "Error : PortType TestInterface doesn't exist in WSDL.";
         checkStrings(expected.getBytes(), bout.toByteArray());
     }
 
+    @Test
     public void testBindingGenDuplicate() throws Exception {
 
         String[] cmdArgs = {"-i", "BasePortType",
                             "-b", "BaseCORBABinding",
                             getClass().getResource("/wsdl/simple-binding.wsdl").toString()};
-        int exc = execute(cmdArgs);
-        assertEquals("WSDLToIDL Failed", error, exc);
+        String error = execute(cmdArgs);
+        assertNotNull("WSDLToIDL Failed", error);
         String expected = "Error : Binding BaseCORBABinding already exists in WSDL.";
         checkStrings(expected.getBytes(), bout.toByteArray());
     }
 
 
+    @Test
     public void testIdlGenMissingBinding() throws Exception {
-        String[] cmdArgs = {"-d", output.getAbsolutePath(),
+        String[] cmdArgs = {"-d", output.toString(),
                             "-idl",
                             getClass().getResource("/wsdl/simpleList.wsdl").toString()};
-        int exc = execute(cmdArgs);
-        assertEquals("WSDLToIDL Failed", error, exc);
+        String error = execute(cmdArgs);
+        assertNotNull("WSDLToIDL Failed", error);
         String expected = "Error : Binding Name required for generating IDL";
         checkStrings(expected.getBytes(), bout.toByteArray());
     }
 
+    @Test
     public void testIdlGenInvalidBinding() throws Exception {
-        String[] cmdArgs = {"-d", output.getAbsolutePath(),
+        String[] cmdArgs = {"-d", output.toString(),
                             "-idl", "-b", "TestBinding",
                              getClass().getResource("/wsdl/simpleList.wsdl").toString()};
-        int exc = execute(cmdArgs);
-        assertEquals("WSDLToCORBA Failed", error, exc);
+        String error = execute(cmdArgs);
+        assertNotNull("WSDLToCORBA Failed", error);
         String expected = "Error : Binding TestBinding doesn't exist in WSDL.";
         checkStrings(expected.getBytes(), bout.toByteArray());
     }
 
+    @Test
     public void testMissingBindingName() throws Exception {
-        String[] cmdArgs = {"-d", output.getAbsolutePath(),
+        String[] cmdArgs = {"-d", output.toString(),
                             "-i", "BasePortType",
                             getClass().getResource("/wsdl/simpleList.wsdl").toString()};
-        assertEquals("WSDLToIDL should succeed even without Binding name. "
+        assertNull("WSDLToIDL should succeed even without Binding name. "
                         + "Name used from creation of CORBA binding to generate IDL.",
-                        noError, execute(cmdArgs));
+                        execute(cmdArgs));
     }
 
+    @Test
     public void testDetailOutput() throws Exception {
         String[] args = new String[] {"-?"};
         WSDLToIDL.main(args);
         assertNotNull(getStdOut());
     }
 
+    @Test
     public void testVersionOutput() throws Exception {
         String[] args = new String[] {"-v"};
         WSDLToIDL.main(args);
         assertNotNull(getStdOut());
     }
 
+    @Test
     public void testHelpOutput() throws Exception {
         String[] args = new String[] {"-help"};
         WSDLToIDL.main(args);

@@ -35,7 +35,11 @@ import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.header_test.TestHeaderImpl;
 import org.apache.header_test.types.TestHeader5;
 import org.apache.header_test.types.TestHeader5ResponseBody;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class HeaderTest extends AbstractJaxWsTest {
 

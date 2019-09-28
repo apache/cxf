@@ -130,6 +130,10 @@ public final class Base64Utility {
                                      int l)
         throws Base64Exception {
 
+        if (id != null && id.length == 0 && l == 0) {
+            return new byte[0];
+        }
+
         // Keep it simple - must be >= 4. Unpadded
         // base64 data contain < 3 octets is invalid.
         //
@@ -188,8 +192,7 @@ public final class Base64Utility {
 
     public static byte[] decode(String id, boolean urlSafe) throws Base64Exception {
         if (urlSafe) {
-            //TODO: optimize further
-            id = id.replace("-", "+").replace('_', '/');
+            id = id.replace('-', '+').replace('_', '/');
             switch (id.length() % 4) {
             case 0:
                 break;
@@ -264,7 +267,9 @@ public final class Base64Utility {
                                      int o,
                                      int l,
                                      boolean urlSafe) {
-        if (l <= 0) {
+        if (id != null && id.length == 0 && l == 0) {
+            return new char[0];
+        } else if (l <= 0) {
             return null;
         }
 

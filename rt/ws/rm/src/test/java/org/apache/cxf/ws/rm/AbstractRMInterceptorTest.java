@@ -32,18 +32,23 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyAssertion;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 
 /**
  *
  */
-public class AbstractRMInterceptorTest extends Assert {
+public class AbstractRMInterceptorTest {
 
     private IMocksControl control;
 
@@ -151,10 +156,10 @@ public class AbstractRMInterceptorTest extends Assert {
         EasyMock.expectLastCall();
         control.replay();
         interceptor.assertReliability(message);
-        assertTrue(!ai.isAsserted());
+        assertFalse(ai.isAsserted());
         aim.put(RM10Constants.RMASSERTION_QNAME, ais);
         interceptor.assertReliability(message);
-        assertTrue(!ai.isAsserted());
+        assertFalse(ai.isAsserted());
         ais.add(ai);
         interceptor.assertReliability(message);
 

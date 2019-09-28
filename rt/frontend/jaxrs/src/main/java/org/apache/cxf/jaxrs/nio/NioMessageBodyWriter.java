@@ -24,12 +24,14 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 import javax.servlet.WriteListener;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -37,13 +39,21 @@ import org.apache.cxf.message.Message;
 
 @Provider
 public class NioMessageBodyWriter implements MessageBodyWriter<NioWriteEntity> {
-
+    boolean is31;
+    
     public NioMessageBodyWriter() {
+        try {
+            ClassLoaderUtils.loadClass("javax.servlet.WriteListener", HttpServletRequest.class);
+            is31 = true;
+        } catch (Throwable t) {
+            is31 = false;
+        }
+
     }
 
     @Override
     public boolean isWriteable(Class<?> cls, Type type, Annotation[] anns, MediaType mt) {
-        return NioWriteEntity.class.isAssignableFrom(cls) && getContinuationProvider() != null;
+        return is31 && NioWriteEntity.class.isAssignableFrom(cls) && getContinuationProvider() != null;
     }
 
     @Override

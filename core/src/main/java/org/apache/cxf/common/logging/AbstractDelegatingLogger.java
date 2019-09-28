@@ -57,13 +57,13 @@ public abstract class AbstractDelegatingLogger extends Logger {
     public void log(Level level, String msg, Object param1) {
         if (isLoggable(level)) {
             LogRecord lr = new LogRecord(level, msg);
-            Object params[] = {param1 };
+            Object[] params = {param1 };
             lr.setParameters(params);
             doLog(lr);
         }
     }
 
-    public void log(Level level, String msg, Object params[]) {
+    public void log(Level level, String msg, Object[] params) {
         if (isLoggable(level)) {
             LogRecord lr = new LogRecord(level, msg);
             lr.setParameters(params);
@@ -93,13 +93,13 @@ public abstract class AbstractDelegatingLogger extends Logger {
             LogRecord lr = new LogRecord(level, msg);
             lr.setSourceClassName(sourceClass);
             lr.setSourceMethodName(sourceMethod);
-            Object params[] = {param1 };
+            Object[] params = {param1 };
             lr.setParameters(params);
             doLog(lr);
         }
     }
 
-    public void logp(Level level, String sourceClass, String sourceMethod, String msg, Object params[]) {
+    public void logp(Level level, String sourceClass, String sourceMethod, String msg, Object[] params) {
         if (isLoggable(level)) {
             LogRecord lr = new LogRecord(level, msg);
             lr.setSourceClassName(sourceClass);
@@ -119,6 +119,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Deprecated
     public void logrb(Level level, String sourceClass, String sourceMethod, String bundleName, String msg) {
         if (isLoggable(level)) {
             LogRecord lr = new LogRecord(level, msg);
@@ -128,20 +129,22 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Deprecated
     public void logrb(Level level, String sourceClass, String sourceMethod,
                       String bundleName, String msg, Object param1) {
         if (isLoggable(level)) {
             LogRecord lr = new LogRecord(level, msg);
             lr.setSourceClassName(sourceClass);
             lr.setSourceMethodName(sourceMethod);
-            Object params[] = {param1 };
+            Object[] params = {param1 };
             lr.setParameters(params);
             doLog(lr, bundleName);
         }
     }
 
+    @Deprecated
     public void logrb(Level level, String sourceClass, String sourceMethod,
-                      String bundleName, String msg, Object params[]) {
+                      String bundleName, String msg, Object[] params) {
         if (isLoggable(level)) {
             LogRecord lr = new LogRecord(level, msg);
             lr.setSourceClassName(sourceClass);
@@ -151,6 +154,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Deprecated
     public void logrb(Level level, String sourceClass, String sourceMethod,
                       String bundleName, String msg, Throwable thrown) {
         if (isLoggable(level)) {
@@ -170,12 +174,12 @@ public abstract class AbstractDelegatingLogger extends Logger {
 
     public void entering(String sourceClass, String sourceMethod, Object param1) {
         if (isLoggable(Level.FINER)) {
-            Object params[] = {param1 };
+            Object[] params = {param1 };
             logp(Level.FINER, sourceClass, sourceMethod, "ENTRY {0}", params);
         }
     }
 
-    public void entering(String sourceClass, String sourceMethod, Object params[]) {
+    public void entering(String sourceClass, String sourceMethod, Object[] params) {
         if (isLoggable(Level.FINER)) {
             String msg = "ENTRY";
             if (params == null) {
@@ -186,7 +190,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
             for (int i = 0; i < params.length; i++) {
                 builder.append(" {");
                 builder.append(Integer.toString(i));
-                builder.append("}");
+                builder.append('}');
             }
             logp(Level.FINER, sourceClass, sourceMethod, builder.toString(), params);
         }
@@ -200,7 +204,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
 
     public void exiting(String sourceClass, String sourceMethod, Object result) {
         if (isLoggable(Level.FINER)) {
-            Object params[] = {result };
+            Object[] params = {result };
             logp(Level.FINER, sourceClass, sourceMethod, "RETURN {0}", params);
         }
     }
@@ -264,7 +268,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
-    public void setLevel(Level newLevel) throws SecurityException {
+    public void setLevel(Level newLevel) {
         throw new UnsupportedOperationException();
     }
 
@@ -279,7 +283,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         return false;
     }
 
-    public synchronized void addHandler(Handler handler) throws SecurityException {
+    public synchronized void addHandler(Handler handler) {
         if (supportsHandlers()) {
             super.addHandler(handler);
             return;
@@ -287,7 +291,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         throw new UnsupportedOperationException();
     }
 
-    public synchronized void removeHandler(Handler handler) throws SecurityException {
+    public synchronized void removeHandler(Handler handler) {
         if (supportsHandlers()) {
             super.removeHandler(handler);
             return;
@@ -366,7 +370,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
             }
         }
         try {
-            Object parameters[] = record.getParameters();
+            Object[] parameters = record.getParameters();
             if (parameters == null || parameters.length == 0) {
                 return format;
             }

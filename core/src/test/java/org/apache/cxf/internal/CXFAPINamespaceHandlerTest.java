@@ -19,13 +19,14 @@
 
 package org.apache.cxf.internal;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  *
  */
-public class CXFAPINamespaceHandlerTest extends Assert {
+public class CXFAPINamespaceHandlerTest {
     @Test
     public void testGetSchemaLocation() {
         CXFAPINamespaceHandler handler = new CXFAPINamespaceHandler();

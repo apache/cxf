@@ -69,8 +69,10 @@ public class CXFHttpAsyncResponseConsumer implements HttpAsyncResponseConsumer<B
 
     @Override
     public void consumeContent(final ContentDecoder dec, final IOControl ioc) throws IOException {
-        outstream.retrySetHttpResponse(response);
-        buf.consumeContent(dec, ioc);
+        // Only consume content when the work was accepted by the work queue
+        if (outstream.retrySetHttpResponse(response)) {
+            buf.consumeContent(dec, ioc);
+        }
     }
 
     @Override

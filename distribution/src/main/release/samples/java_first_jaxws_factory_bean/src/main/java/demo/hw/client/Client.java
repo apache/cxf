@@ -20,8 +20,7 @@
 package demo.hw.client;
 
 
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 
 import demo.hw.server.HelloWorld;
@@ -31,10 +30,9 @@ public final class Client {
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
-        factory.getInInterceptors().add(new LoggingInInterceptor());
-        factory.getOutInterceptors().add(new LoggingOutInterceptor());
+        factory.getFeatures().add(new LoggingFeature());
         factory.setAddress("http://localhost:9000/helloWorld");
         HelloWorld client = factory.create(HelloWorld.class);
         System.out.println(client.sayHi("World"));

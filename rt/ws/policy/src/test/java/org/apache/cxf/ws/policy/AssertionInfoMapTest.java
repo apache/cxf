@@ -33,16 +33,22 @@ import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.apache.neethi.builders.PolicyContainingPrimitiveAssertion;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  *
  */
-public class AssertionInfoMapTest extends Assert {
+public class AssertionInfoMapTest {
 
     private IMocksControl control;
 
@@ -98,7 +104,7 @@ public class AssertionInfoMapTest extends Assert {
         alt2.add(c);
 
         control.replay();
-        assertTrue(!aim.supportsAlternative(alt1, new ArrayList<>()));
+        assertFalse(aim.supportsAlternative(alt1, new ArrayList<>()));
         assertTrue(aim.supportsAlternative(alt2, new ArrayList<>()));
         control.verify();
     }

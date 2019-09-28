@@ -20,10 +20,8 @@
 package org.apache.cxf.systest.ws.addressing;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Deque;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -41,14 +39,10 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
  */
 public class MAPVerifier extends AbstractPhaseInterceptor<Message> {
     VerificationCache verificationCache;
-    List<String> expectedExposedAs = new ArrayList<>();
-    private Map<String, Object> mapProperties;
+    private final Deque<String> expectedExposedAs = new ConcurrentLinkedDeque<>();
 
     public MAPVerifier() {
         super(Phase.POST_LOGICAL);
-        mapProperties = new HashMap<>();
-        mapProperties.put(MAPTest.INBOUND_KEY, ADDRESSING_PROPERTIES_INBOUND);
-        mapProperties.put(MAPTest.OUTBOUND_KEY, ADDRESSING_PROPERTIES_OUTBOUND);
     }
 
     public void handleMessage(Message message) {
@@ -61,10 +55,7 @@ public class MAPVerifier extends AbstractPhaseInterceptor<Message> {
 
     private void verify(Message message) {
         boolean isOutbound = ContextUtils.isOutbound(message);
-        String mapProperty =
-            (String)mapProperties.get(isOutbound
-                                      ? MAPTest.OUTBOUND_KEY
-                                      : MAPTest.INBOUND_KEY);
+        String mapProperty = isOutbound ? ADDRESSING_PROPERTIES_OUTBOUND : ADDRESSING_PROPERTIES_INBOUND;
         AddressingProperties maps =
             (AddressingProperties)message.get(mapProperty);
         if (maps == null) {
@@ -89,16 +80,11 @@ public class MAPVerifier extends AbstractPhaseInterceptor<Message> {
                 exposeAs = null;
             }
         }
-        verificationCache.put(MAPTest.verifyMAPs(maps, this));
+        verificationCache.put(MAPTestBase.verifyMAPs(maps, this));
     }
 
     private String getExpectedExposeAs(boolean remove) {
-        int size = expectedExposedAs.size();
-        return size == 0
-                ? null
-                : remove
-                  ? expectedExposedAs.remove(size - 1)
-                  : expectedExposedAs.get(size - 1);
+        return remove ? expectedExposedAs.pollLast() : expectedExposedAs.peekLast();
     }
 
     public void setVerificationCache(VerificationCache cache) {

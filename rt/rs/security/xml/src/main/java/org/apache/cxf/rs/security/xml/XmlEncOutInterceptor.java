@@ -20,7 +20,6 @@ package org.apache.cxf.rs.security.xml;
 
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.util.Base64;
 import java.util.logging.Logger;
 
 import javax.crypto.BadPaddingException;
@@ -34,6 +33,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -222,7 +222,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
 
         Document doc = encryptedDataElement.getOwnerDocument();
 
-        String encodedKey = Base64.getMimeEncoder().encodeToString(encryptedKey);
+        String encodedKey = org.apache.xml.security.utils.XMLUtils.encodeToString(encryptedKey);
         Element encryptedKeyElement = createEncryptedKeyElement(doc, keyEncAlgo, digestAlgo);
         String encKeyId = IDGenerator.generateID("EK-");
         encryptedKeyElement.setAttributeNS(null, "Id", encKeyId);
@@ -266,7 +266,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
 
         Node keyIdentifierNode = null;
         if (keyIdType.equals(RSSecurityUtils.X509_CERT)) {
-            byte data[] = null;
+            byte[] data = null;
             try {
                 data = remoteCert.getEncoded();
             } catch (CertificateEncodingException e) {
@@ -274,7 +274,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
                     WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, e, "encodeError"
                 );
             }
-            Text text = encryptedDataDoc.createTextNode(Base64.getMimeEncoder().encodeToString(data));
+            Text text = encryptedDataDoc.createTextNode(org.apache.xml.security.utils.XMLUtils.encodeToString(data));
             Element cert = encryptedDataDoc.createElementNS(SIG_NS, SIG_PREFIX + ":X509Certificate");
             cert.appendChild(text);
             Element x509Data = encryptedDataDoc.createElementNS(SIG_NS, SIG_PREFIX + ":X509Data");

@@ -20,7 +20,8 @@ package org.apache.cxf.feature.transform;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.AbstractPortableFeature;
+import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 /**
@@ -31,30 +32,43 @@ import org.apache.cxf.interceptor.InterceptorProvider;
  * (can be fixed in further versions when XSLT engine supports XML stream).
  */
 @NoJSR250Annotations
-public class XSLTFeature extends AbstractFeature {
-    private String inXSLTPath;
-    private String outXSLTPath;
-
-    @Override
-    protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        if (inXSLTPath != null) {
-            XSLTInInterceptor in = new XSLTInInterceptor(inXSLTPath);
-            provider.getInInterceptors().add(in);
-        }
-
-        if (outXSLTPath != null) {
-            XSLTOutInterceptor out = new XSLTOutInterceptor(outXSLTPath);
-            provider.getOutInterceptors().add(out);
-            provider.getOutFaultInterceptors().add(out);
-        }
+public class XSLTFeature extends DelegatingFeature<XSLTFeature.Portable> {
+    public XSLTFeature() {
+        super(new Portable());
     }
 
     public void setInXSLTPath(String inXSLTPath) {
-        this.inXSLTPath = inXSLTPath;
+        delegate.setInXSLTPath(inXSLTPath);
     }
 
     public void setOutXSLTPath(String outXSLTPath) {
-        this.outXSLTPath = outXSLTPath;
+        delegate.setOutXSLTPath(outXSLTPath);
     }
 
+    public static class Portable implements AbstractPortableFeature {
+        private String inXSLTPath;
+        private String outXSLTPath;
+
+        @Override
+        public void doInitializeProvider(InterceptorProvider provider, Bus bus) {
+            if (inXSLTPath != null) {
+                XSLTInInterceptor in = new XSLTInInterceptor(inXSLTPath);
+                provider.getInInterceptors().add(in);
+            }
+
+            if (outXSLTPath != null) {
+                XSLTOutInterceptor out = new XSLTOutInterceptor(outXSLTPath);
+                provider.getOutInterceptors().add(out);
+                provider.getOutFaultInterceptors().add(out);
+            }
+        }
+
+        public void setInXSLTPath(String inXSLTPath) {
+            this.inXSLTPath = inXSLTPath;
+        }
+
+        public void setOutXSLTPath(String outXSLTPath) {
+            this.outXSLTPath = outXSLTPath;
+        }
+    }
 }

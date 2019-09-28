@@ -25,7 +25,12 @@ public class HelloWorldBean {
         this("Hello");
     }
     public HelloWorldBean(String greeting) {
+        this(greeting, "World");
+    }
+    
+    public HelloWorldBean(String greeting, String audience) {
         this.greeting = greeting;
+        this.audience = audience;
     }
 
     public String getGreeting() {
@@ -39,5 +44,41 @@ public class HelloWorldBean {
     }
     public void setAudience(String audience) {
         this.audience = audience;
+    }
+    @Override
+    public int hashCode() {
+        int result = 31 + ((audience == null) ? 0 : audience.hashCode());
+        result = 31 * result + ((greeting == null) ? 0 : greeting.hashCode());
+        return result;
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        
+        if (obj == null) {
+            return false;
+        }
+        
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        
+        final HelloWorldBean other = (HelloWorldBean) obj;
+        if (audience == null && other.audience != null) {
+            return false;
+        } else if (!audience.equals(other.audience)) {
+            return false;
+        }
+        
+        if (greeting == null && other.greeting != null) {
+            return false;
+        } else if (!greeting.equals(other.greeting)) {
+            return false;
+        }
+        
+        return true;
     }
 }

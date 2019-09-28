@@ -30,9 +30,9 @@ import org.apache.cxf.sts.request.BinarySecret;
 import org.apache.cxf.sts.request.Entropy;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.ws.security.sts.provider.STSException;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.derivedKey.P_SHA1;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 /**
@@ -51,25 +51,25 @@ public class SymmetricKeyHandler {
     public SymmetricKeyHandler(TokenProviderParameters tokenParameters) {
         KeyRequirements keyRequirements = tokenParameters.getKeyRequirements();
 
-        keySize = Long.valueOf(keyRequirements.getKeySize()).intValue();
+        keySize = (int)keyRequirements.getKeySize();
         STSPropertiesMBean stsProperties = tokenParameters.getStsProperties();
         SignatureProperties signatureProperties = stsProperties.getSignatureProperties();
 
         // Test EncryptWith
         String encryptWith = keyRequirements.getEncryptWith();
         if (encryptWith != null) {
-            if ((WSConstants.AES_128.equals(encryptWith) || WSConstants.AES_128_GCM.equals(encryptWith))
+            if ((WSS4JConstants.AES_128.equals(encryptWith) || WSS4JConstants.AES_128_GCM.equals(encryptWith))
                 && keySize < 128) {
                 keySize = 128;
-            } else if ((WSConstants.AES_192.equals(encryptWith)
-                || WSConstants.AES_192_GCM.equals(encryptWith))
+            } else if ((WSS4JConstants.AES_192.equals(encryptWith)
+                || WSS4JConstants.AES_192_GCM.equals(encryptWith))
                 && keySize < 192) {
                 keySize = 192;
-            } else if ((WSConstants.AES_256.equals(encryptWith)
-                || WSConstants.AES_256_GCM.equals(encryptWith))
+            } else if ((WSS4JConstants.AES_256.equals(encryptWith)
+                || WSS4JConstants.AES_256_GCM.equals(encryptWith))
                 && keySize < 256) {
                 keySize = 256;
-            } else if (WSConstants.TRIPLE_DES.equals(encryptWith) && keySize < 192) {
+            } else if (WSS4JConstants.TRIPLE_DES.equals(encryptWith) && keySize < 192) {
                 keySize = 192;
             }
         }
@@ -77,7 +77,7 @@ public class SymmetricKeyHandler {
         // Test KeySize
         if (keySize < signatureProperties.getMinimumKeySize()
             || keySize > signatureProperties.getMaximumKeySize()) {
-            keySize = Long.valueOf(signatureProperties.getKeySize()).intValue();
+            keySize = (int)signatureProperties.getKeySize();
             LOG.log(
                 Level.WARNING, "Received KeySize of " + keyRequirements.getKeySize()
                 + " not accepted so defaulting to " + signatureProperties.getKeySize()
@@ -109,8 +109,8 @@ public class SymmetricKeyHandler {
             } else if (STSConstants.SYMMETRIC_KEY_TYPE.equals(binarySecret.getBinarySecretType())
                 || binarySecret.getBinarySecretType() == null) {
                 byte[] secretValue = binarySecret.getBinarySecretValue();
-                if (((long)secretValue.length * 8L) < signatureProperties.getMinimumKeySize()
-                    || ((long)secretValue.length * 8L) > signatureProperties.getMaximumKeySize()) {
+                if ((secretValue.length * 8L) < signatureProperties.getMinimumKeySize()
+                    || (secretValue.length * 8L) > signatureProperties.getMaximumKeySize()) {
                     LOG.log(
                         Level.WARNING, "Received secret of length " + secretValue.length
                         + " bits is not accepted"
@@ -128,8 +128,8 @@ public class SymmetricKeyHandler {
             }
         } else if (clientEntropy.getDecryptedKey() != null) {
             byte[] secretValue = clientEntropy.getDecryptedKey();
-            if (((long)secretValue.length * 8L) < signatureProperties.getMinimumKeySize()
-                || ((long)secretValue.length * 8L) > signatureProperties.getMaximumKeySize()) {
+            if ((secretValue.length * 8L) < signatureProperties.getMinimumKeySize()
+                || (secretValue.length * 8L) > signatureProperties.getMaximumKeySize()) {
                 LOG.log(
                     Level.WARNING, "Received secret of length " + secretValue.length
                     + " bits is not accepted"

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -32,8 +33,8 @@ public abstract class AbstractPropertiesHolder implements Extensible {
     private AbstractPropertiesHolder delegate;
     private boolean delegateProperties;
 
-    private AtomicReference<Map<String, Object>> propertyMap = new AtomicReference<Map<String, Object>>();
-    private AtomicReference<Object[]> extensors = new AtomicReference<Object[]>();
+    private AtomicReference<Map<String, Object>> propertyMap = new AtomicReference<>();
+    private AtomicReference<Object[]> extensors = new AtomicReference<>();
     private Map<QName, Object> extensionAttributes;
     private String documentation;
 
@@ -138,7 +139,7 @@ public abstract class AbstractPropertiesHolder implements Extensible {
             return delegate.containsExtensor(el);
         }
 
-        Object exts[] = extensors.get();
+        Object[] exts = extensors.get();
         if (exts != null) {
             for (Object o : exts) {
                 if (o == el) {
@@ -153,15 +154,13 @@ public abstract class AbstractPropertiesHolder implements Extensible {
             delegate.addExtensor(el);
             return;
         }
-        Object exts[] = extensors.get();
-        Object exts2[];
+        Object[] exts = extensors.get();
+        Object[] exts2;
         if (exts == null) {
             exts2 = new Object[1];
         } else {
             exts2 = new Object[exts.length + 1];
-            for (int i = 0; i < exts.length; i++) {
-                exts2[i] = exts[i];
-            }
+            System.arraycopy(exts, 0, exts2, 0, exts.length);
         }
         exts2[exts2.length - 1] = el;
         if (!extensors.compareAndSet(exts, exts2)) {
@@ -174,7 +173,7 @@ public abstract class AbstractPropertiesHolder implements Extensible {
         if (delegate != null) {
             return delegate.getExtensor(cls);
         }
-        Object exts[] = extensors.get();
+        Object[] exts = extensors.get();
         if (exts == null) {
             return null;
         }
@@ -190,7 +189,7 @@ public abstract class AbstractPropertiesHolder implements Extensible {
             return delegate.getExtensors(cls);
         }
 
-        Object exts[] = extensors.get();
+        Object[] exts = extensors.get();
         if (exts == null) {
             return null;
         }
@@ -265,13 +264,8 @@ public abstract class AbstractPropertiesHolder implements Extensible {
     }
 
 
-
     protected static final boolean equals(Object o1, Object o2) {
-        if (o1 == null && o2 != null
-            || o1 != null && o2 == null) {
-            return false;
-        }
-        return o1 == null ? true : o1.equals(o2);
+        return Objects.equals(o1, o2);
     }
 
 }

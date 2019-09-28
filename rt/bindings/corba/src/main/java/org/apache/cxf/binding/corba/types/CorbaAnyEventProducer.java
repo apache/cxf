@@ -24,7 +24,7 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
 
@@ -94,9 +94,8 @@ public class CorbaAnyEventProducer extends AbstractStartEndEventProducer {
         // contained type and we CAN'T have the anys attributes used (It causes big problems)
         if (currentEventProducer == null) {
             return attributes;
-        } else {
-            return null;
         }
+        return null;
     }
 
     public List<Namespace> getNamespaces() {
@@ -145,7 +144,7 @@ public class CorbaAnyEventProducer extends AbstractStartEndEventProducer {
 
     class CorbaSimpleAnyContainedTypeEventProducer implements CorbaTypeEventProducer {
         int state;
-        int[] states = {XMLStreamReader.CHARACTERS};
+        int[] states = {XMLStreamConstants.CHARACTERS};
         String value;
 
         CorbaSimpleAnyContainedTypeEventProducer(String text) {

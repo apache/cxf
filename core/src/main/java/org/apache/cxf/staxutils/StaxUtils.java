@@ -29,13 +29,14 @@ import java.io.Writer;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
+import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -124,13 +125,13 @@ public final class StaxUtils {
 
     private static final Logger LOG = LogUtils.getL7dLogger(StaxUtils.class);
 
-    private static final BlockingQueue<XMLInputFactory> NS_AWARE_INPUT_FACTORY_POOL;
+    private static final Queue<XMLInputFactory> NS_AWARE_INPUT_FACTORY_POOL;
     private static final XMLInputFactory SAFE_INPUT_FACTORY;
-    private static final BlockingQueue<XMLOutputFactory> OUTPUT_FACTORY_POOL;
+    private static final Queue<XMLOutputFactory> OUTPUT_FACTORY_POOL;
     private static final XMLOutputFactory SAFE_OUTPUT_FACTORY;
 
     private static final String XML_NS = "http://www.w3.org/2000/xmlns/";
-    private static final String DEF_PREFIXES[] = new String[] {
+    private static final String[] DEF_PREFIXES = new String[] {
         "ns1".intern(), "ns2".intern(), "ns3".intern(),
         "ns4".intern(), "ns5".intern(), "ns6".intern(),
         "ns7".intern(), "ns8".intern(), "ns9".intern()
@@ -150,8 +151,8 @@ public final class StaxUtils {
     static {
         int i = getInteger("org.apache.cxf.staxutils.pool-size", 20);
 
-        NS_AWARE_INPUT_FACTORY_POOL = new ArrayBlockingQueue<XMLInputFactory>(i);
-        OUTPUT_FACTORY_POOL = new ArrayBlockingQueue<XMLOutputFactory>(i);
+        NS_AWARE_INPUT_FACTORY_POOL = new ArrayBlockingQueue<>(i);
+        OUTPUT_FACTORY_POOL = new ArrayBlockingQueue<>(i);
 
         //old names
         innerElementCountThreshold = getInteger(INNER_ELEMENT_COUNT_SYSTEM_PROP, innerElementCountThreshold);
@@ -236,18 +237,12 @@ public final class StaxUtils {
     }
 
     public static void setInnerElementLevelThreshold(int i) {
-        if (i == -1) {
-            i = 500;
-        }
-        innerElementLevelThreshold = i;
-        setProperty(SAFE_INPUT_FACTORY, "com.ctc.wstx.maxElementDepth", i);
+        innerElementLevelThreshold = i != -1 ? i : 500;
+        setProperty(SAFE_INPUT_FACTORY, "com.ctc.wstx.maxElementDepth", innerElementLevelThreshold);
     }
     public static void setInnerElementCountThreshold(int i) {
-        if (i == -1) {
-            i = 50000;
-        }
-        innerElementCountThreshold = i;
-        setProperty(SAFE_INPUT_FACTORY, "com.ctc.wstx.maxChildrenPerElement", i);
+        innerElementCountThreshold = i != -1 ? i : 50000;
+        setProperty(SAFE_INPUT_FACTORY, "com.ctc.wstx.maxChildrenPerElement", innerElementCountThreshold);
     }
 
     /**
@@ -335,7 +330,9 @@ public final class StaxUtils {
                 if (allowInsecureParser) {
                     LOG.log(Level.WARNING, "INSECURE_PARSER_DETECTED", factory.getClass().getName());
                 } else {
-                    throw new RuntimeException("Cannot create a secure XMLInputFactory");
+                    throw new RuntimeException("Cannot create a secure XMLInputFactory, "
+                        + "you should either add woodstox or set " + ALLOW_INSECURE_PARSER
+                        + " system property to true if an unsafe mode is acceptable.");
                 }
             }
         }
@@ -404,12 +401,9 @@ public final class StaxUtils {
     }
 
     public static XMLStreamWriter createXMLStreamWriter(OutputStream out, String encoding) {
-        if (encoding == null) {
-            encoding = StandardCharsets.UTF_8.name();
-        }
         XMLOutputFactory factory = getXMLOutputFactory();
         try {
-            return factory.createXMLStreamWriter(out, encoding);
+            return factory.createXMLStreamWriter(out, encoding != null ? encoding : StandardCharsets.UTF_8.name());
         } catch (XMLStreamException e) {
             throw new RuntimeException("Cant' create XMLStreamWriter", e);
         } finally {
@@ -462,7 +456,7 @@ public final class StaxUtils {
     }
 
     public static boolean toNextText(DepthXMLStreamReader reader) {
-        if (reader.getEventType() == XMLStreamReader.CHARACTERS) {
+        if (reader.getEventType() == XMLStreamConstants.CHARACTERS) {
             return true;
         }
 
@@ -470,7 +464,7 @@ public final class StaxUtils {
             int depth = reader.getDepth();
             int event = reader.getEventType();
             while (reader.getDepth() >= depth && reader.hasNext()) {
-                if (event == XMLStreamReader.CHARACTERS && reader.getDepth() == depth + 1) {
+                if (event == XMLStreamConstants.CHARACTERS && reader.getDepth() == depth + 1) {
                     return true;
                 }
                 event = reader.next();
@@ -484,8 +478,8 @@ public final class StaxUtils {
         try {
             // advance to first tag.
             int x = reader.getEventType();
-            while (x != XMLStreamReader.START_ELEMENT
-                && x != XMLStreamReader.END_ELEMENT
+            while (x != XMLStreamConstants.START_ELEMENT
+                && x != XMLStreamConstants.END_ELEMENT
                 && reader.hasNext()) {
                 x = reader.next();
             }
@@ -500,7 +494,7 @@ public final class StaxUtils {
             int depth = reader.getDepth();
             int event = reader.getEventType();
             while (reader.getDepth() >= depth && reader.hasNext()) {
-                if (event == XMLStreamReader.START_ELEMENT && reader.getName().equals(endTag)
+                if (event == XMLStreamConstants.START_ELEMENT && reader.getName().equals(endTag)
                     && reader.getDepth() == depth + 1) {
                     return true;
                 }
@@ -518,9 +512,9 @@ public final class StaxUtils {
             prefix = "";
         }
 
-        if (namespace.length() > 0) {
+        if (!namespace.isEmpty()) {
             writer.writeStartElement(prefix, name, namespace);
-            if (prefix.length() > 0) {
+            if (!prefix.isEmpty()) {
                 writer.writeNamespace(prefix, namespace);
                 writer.setPrefix(prefix, namespace);
             } else {
@@ -540,8 +534,8 @@ public final class StaxUtils {
      * returned if the end of the stream is reached.
      */
     public static boolean skipToStartOfElement(XMLStreamReader in) throws XMLStreamException {
-        for (int code = in.getEventType(); code != XMLStreamReader.END_DOCUMENT; code = in.next()) {
-            if (code == XMLStreamReader.START_ELEMENT) {
+        for (int code = in.getEventType(); code != XMLStreamConstants.END_DOCUMENT; code = in.next()) {
+            if (code == XMLStreamConstants.START_ELEMENT) {
                 return true;
             }
         }
@@ -549,19 +543,19 @@ public final class StaxUtils {
     }
 
     public static boolean toNextElement(DepthXMLStreamReader dr) {
-        if (dr.getEventType() == XMLStreamReader.START_ELEMENT) {
+        if (dr.getEventType() == XMLStreamConstants.START_ELEMENT) {
             return true;
         }
-        if (dr.getEventType() == XMLStreamReader.END_ELEMENT) {
+        if (dr.getEventType() == XMLStreamConstants.END_ELEMENT) {
             return false;
         }
         try {
             int depth = dr.getDepth();
 
             for (int event = dr.getEventType(); dr.getDepth() >= depth && dr.hasNext(); event = dr.next()) {
-                if (event == XMLStreamReader.START_ELEMENT && dr.getDepth() == depth + 1) {
+                if (event == XMLStreamConstants.START_ELEMENT && dr.getDepth() == depth + 1) {
                     return true;
-                } else if (event == XMLStreamReader.END_ELEMENT) {
+                } else if (event == XMLStreamConstants.END_ELEMENT) {
                     depth--;
                 }
             }
@@ -573,8 +567,8 @@ public final class StaxUtils {
     }
 
     public static boolean skipToStartOfElement(DepthXMLStreamReader in) throws XMLStreamException {
-        for (int code = in.getEventType(); code != XMLStreamReader.END_DOCUMENT; code = in.next()) {
-            if (code == XMLStreamReader.START_ELEMENT) {
+        for (int code = in.getEventType(); code != XMLStreamConstants.END_DOCUMENT; code = in.next()) {
+            if (code == XMLStreamConstants.START_ELEMENT) {
                 return true;
             }
         }
@@ -712,9 +706,7 @@ public final class StaxUtils {
 
     /**
      * Copies the reader to the writer. The start and end document methods must
-     * be handled on the writer manually. TODO: if the namespace on the reader
-     * has been declared previously to where we are in the stream, this probably
-     * won't work.
+     * be handled on the writer manually.
      *
      * @param reader
      * @param writer
@@ -734,7 +726,7 @@ public final class StaxUtils {
         // number of elements read in
         int read = 0;
         int elementCount = 0;
-        Stack<Integer> countStack = new Stack<Integer>();
+        final Deque<Integer> countStack = new ArrayDeque<>();
         int event = reader.getEventType();
 
         while (reader.hasNext()) {
@@ -828,7 +820,7 @@ public final class StaxUtils {
 
         // Write out the element name
         if (uri != null) {
-            if (prefix.length() == 0 && StringUtils.isEmpty(uri)) {
+            if (prefix.isEmpty() && StringUtils.isEmpty(uri)) {
                 writer.writeStartElement(local);
             } else {
                 writer.writeStartElement(prefix, local, uri);
@@ -847,7 +839,7 @@ public final class StaxUtils {
             if (nsURI == null) {
                 nsURI = "";
             }
-            if (nsPrefix.length() == 0) {
+            if (nsPrefix.isEmpty()) {
                 writer.writeDefaultNamespace(nsURI);
                 writer.setDefaultNamespace(nsURI);
             } else {
@@ -864,7 +856,7 @@ public final class StaxUtils {
         // We need this check because namespace writing works
         // different on Woodstox and the RI.
         if (writeElementNS) {
-            if (prefix.length() == 0) {
+            if (prefix.isEmpty()) {
                 writer.writeDefaultNamespace(uri);
                 writer.setDefaultNamespace(uri);
             } else {
@@ -877,9 +869,9 @@ public final class StaxUtils {
         for (int i = 0; i < reader.getAttributeCount(); i++) {
             String ns = reader.getAttributeNamespace(i);
             String nsPrefix = reader.getAttributePrefix(i);
-            if (ns == null || ns.length() == 0) {
+            if (ns == null || ns.isEmpty()) {
                 writer.writeAttribute(reader.getAttributeLocalName(i), reader.getAttributeValue(i));
-            } else if (nsPrefix == null || nsPrefix.length() == 0) {
+            } else if (nsPrefix == null || nsPrefix.isEmpty()) {
                 writer.writeAttribute(reader.getAttributeNamespace(i), reader.getAttributeLocalName(i),
                                       reader.getAttributeValue(i));
             } else {
@@ -978,7 +970,7 @@ public final class StaxUtils {
         String decUri = writer.getNamespaceContext().getNamespaceURI(prefix);
         boolean declareNamespace = decUri == null || !decUri.equals(ns);
 
-        if (ns == null || ns.length() == 0) {
+        if (ns == null || ns.isEmpty()) {
             writer.writeStartElement(localName);
             if (StringUtils.isEmpty(decUri)) {
                 declareNamespace = false;
@@ -1017,9 +1009,9 @@ public final class StaxUtils {
                 } else {
                     String attns = attr.getNamespaceURI();
                     String value = attr.getNodeValue();
-                    if (attns == null || attns.length() == 0) {
+                    if (attns == null || attns.isEmpty()) {
                         writer.writeAttribute(name, value);
-                    } else if (attrPrefix.length() == 0) {
+                    } else if (attrPrefix.isEmpty()) {
                         writer.writeAttribute(attns, name, value);
                     } else {
                         if (repairing && writer.getNamespaceContext().getNamespaceURI(attrPrefix) == null) {
@@ -1056,7 +1048,7 @@ public final class StaxUtils {
         if (attrs.getLength() == 0) {
             return Collections.<Node> emptyList();
         }
-        List<Node> sortedAttrs = new LinkedList<Node>();
+        List<Node> sortedAttrs = new ArrayList<>(attrs.getLength());
         for (int i = 0; i < attrs.getLength(); i++) {
             Node attr = attrs.item(i);
             String name = attr.getLocalName();
@@ -1217,7 +1209,7 @@ public final class StaxUtils {
     private static boolean isDeclared(Element e, String namespaceURI, String prefix) {
         while (e != null) {
             Attr att;
-            if (prefix != null && prefix.length() > 0) {
+            if (prefix != null && !prefix.isEmpty()) {
                 att = e.getAttributeNodeNS(XML_NS, prefix);
             } else {
                 att = e.getAttributeNode("xmlns");
@@ -1233,7 +1225,7 @@ public final class StaxUtils {
                 //A document that probably doesn't have any namespace qualifies elements
                 return true;
             } else {
-                e = null;
+                break;
             }
         }
         return false;
@@ -1272,7 +1264,7 @@ public final class StaxUtils {
                                        XMLStreamReader reader, boolean repairing, boolean recordLoc,
                                        boolean isThreshold)
         throws XMLStreamException {
-        Stack<Node> stack = new Stack<Node>();
+        final Deque<Node> stack = new ArrayDeque<>();
         int event = reader.getEventType();
         int elementCount = 0;
         while (reader.hasNext()) {
@@ -1282,7 +1274,7 @@ public final class StaxUtils {
                 Element e;
                 if (!StringUtils.isEmpty(reader.getPrefix())) {
                     e = doc.createElementNS(reader.getNamespaceURI(),
-                                            reader.getPrefix() + ":" + reader.getLocalName());
+                                            reader.getPrefix() + ':' + reader.getLocalName());
                 } else {
                     e = doc.createElementNS(reader.getNamespaceURI(), reader.getLocalName());
                 }
@@ -1299,8 +1291,8 @@ public final class StaxUtils {
                 for (int att = 0; att < reader.getAttributeCount(); att++) {
                     String name = reader.getAttributeLocalName(att);
                     String prefix = reader.getAttributePrefix(att);
-                    if (prefix != null && prefix.length() > 0) {
-                        name = prefix + ":" + name;
+                    if (prefix != null && !prefix.isEmpty()) {
+                        name = prefix + ':' + name;
                     }
 
                     Attr attr = doc.createAttributeNS(reader.getAttributeNamespace(att), name);
@@ -1330,7 +1322,7 @@ public final class StaxUtils {
                     return;
                 }
                 parent = stack.pop();
-                if (parent instanceof Document) {
+                if (parent instanceof Document || parent instanceof DocumentFragment) {
                     return;
                 }
                 break;
@@ -1372,7 +1364,7 @@ public final class StaxUtils {
     }
 
     public static class StreamToDOMContext {
-        private Stack<Node> stack = new Stack<Node>();
+        private final Deque<Node> stack = new ArrayDeque<>();
         private int elementCount;
         private boolean repairing;
         private boolean recordLoc;
@@ -1412,8 +1404,8 @@ public final class StaxUtils {
             return elementCount;
         }
 
-        public Node pushToStack(Node node) {
-            return stack.push(node);
+        public void pushToStack(Node node) {
+            stack.push(node);
         }
 
         public Node popFromStack() {
@@ -1489,7 +1481,7 @@ public final class StaxUtils {
                     return;
                 }
                 parent = context.popFromStack();
-                if (parent instanceof Document) {
+                if (parent instanceof Document || parent instanceof DocumentFragment) {
                     return;
                 }
                 break;
@@ -1571,7 +1563,7 @@ public final class StaxUtils {
                 return parent;
             }
             parent = context.popFromStack();
-            if (parent instanceof Document) {
+            if (parent instanceof Document || parent instanceof DocumentFragment) {
                 return parent;
             }
             break;
@@ -1718,13 +1710,9 @@ public final class StaxUtils {
      * @param encoding
      */
     public static XMLStreamReader createXMLStreamReader(InputStream in, String encoding) {
-        if (encoding == null) {
-            encoding = StandardCharsets.UTF_8.name();
-        }
-
         XMLInputFactory factory = getXMLInputFactory();
         try {
-            return factory.createXMLStreamReader(in, encoding);
+            return factory.createXMLStreamReader(in, encoding != null ? encoding : StandardCharsets.UTF_8.name());
         } catch (XMLStreamException e) {
             throw new RuntimeException("Couldn't parse stream.", e);
         } finally {
@@ -1849,7 +1837,7 @@ public final class StaxUtils {
         }
         value = value.trim();
 
-        int index = value.indexOf(":");
+        int index = value.indexOf(':');
 
         if (index == -1) {
             return new QName(value);
@@ -1859,7 +1847,7 @@ public final class StaxUtils {
         String localName = value.substring(index + 1);
         String ns = reader.getNamespaceURI(prefix);
 
-        if ((!StringUtils.isEmpty(prefix) && ns == null) || localName == null) {
+        if (!StringUtils.isEmpty(prefix) && ns == null) {
             throw new RuntimeException("Invalid QName in mapping: " + value);
         }
 
@@ -1984,22 +1972,22 @@ public final class StaxUtils {
         throws XMLStreamException {
 
         switch (event.getEventType()) {
-        case XMLEvent.START_ELEMENT:
+        case XMLStreamConstants.START_ELEMENT:
             writeStartElementEvent(event, writer);
             break;
-        case XMLEvent.END_ELEMENT:
+        case XMLStreamConstants.END_ELEMENT:
             writer.writeEndElement();
             break;
-        case XMLEvent.ATTRIBUTE:
+        case XMLStreamConstants.ATTRIBUTE:
             writeAttributeEvent(event, writer);
             break;
-        case XMLEvent.ENTITY_REFERENCE:
+        case XMLStreamConstants.ENTITY_REFERENCE:
             writer.writeEntityRef(((javax.xml.stream.events.EntityReference)event).getName());
             break;
-        case XMLEvent.DTD:
+        case XMLStreamConstants.DTD:
             writer.writeDTD(((DTD)event).getDocumentTypeDeclaration());
             break;
-        case XMLEvent.PROCESSING_INSTRUCTION:
+        case XMLStreamConstants.PROCESSING_INSTRUCTION:
             if (((javax.xml.stream.events.ProcessingInstruction)event).getData() != null) {
                 writer.writeProcessingInstruction(
                     ((javax.xml.stream.events.ProcessingInstruction)event).getTarget(),
@@ -2009,7 +1997,7 @@ public final class StaxUtils {
                     ((javax.xml.stream.events.ProcessingInstruction)event).getTarget());
             }
             break;
-        case XMLEvent.NAMESPACE:
+        case XMLStreamConstants.NAMESPACE:
             if (((Namespace)event).isDefaultNamespaceDeclaration()) {
                 writer.writeDefaultNamespace(((Namespace)event).getNamespaceURI());
                 writer.setDefaultNamespace(((Namespace)event).getNamespaceURI());
@@ -2020,17 +2008,17 @@ public final class StaxUtils {
                                  ((Namespace)event).getNamespaceURI());
             }
             break;
-        case XMLEvent.COMMENT:
+        case XMLStreamConstants.COMMENT:
             writer.writeComment(((javax.xml.stream.events.Comment)event).getText());
             break;
-        case XMLEvent.CHARACTERS:
-        case XMLEvent.SPACE:
+        case XMLStreamConstants.CHARACTERS:
+        case XMLStreamConstants.SPACE:
             writer.writeCharacters(event.asCharacters().getData());
             break;
-        case XMLEvent.CDATA:
+        case XMLStreamConstants.CDATA:
             writer.writeCData(event.asCharacters().getData());
             break;
-        case XMLEvent.START_DOCUMENT:
+        case XMLStreamConstants.START_DOCUMENT:
             if (((StartDocument)event).encodingSet()) {
                 writer.writeStartDocument(((StartDocument)event).getCharacterEncodingScheme(),
                                           ((StartDocument)event).getVersion());
@@ -2039,7 +2027,7 @@ public final class StaxUtils {
                 writer.writeStartDocument(((StartDocument)event).getVersion());
             }
             break;
-        case XMLEvent.END_DOCUMENT:
+        case XMLStreamConstants.END_DOCUMENT:
             writer.writeEndDocument();
             break;
         default:

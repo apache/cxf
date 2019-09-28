@@ -51,7 +51,7 @@ public class AttachmentOutInterceptor extends AbstractPhaseInterceptor<Message> 
         // Make it possible to step into this process in spite of Eclipse
         // by declaring the Object.
         boolean mtomEnabled = AttachmentUtil.isMtomEnabled(message);
-        boolean writeAtts = MessageUtils.isTrue(message.getContextualProperty(WRITE_ATTACHMENTS))
+        boolean writeAtts = MessageUtils.getContextualBoolean(message, WRITE_ATTACHMENTS, false)
             || (message.getAttachments() != null && !message.getAttachments().isEmpty());
 
         if (!mtomEnabled && !writeAtts) {

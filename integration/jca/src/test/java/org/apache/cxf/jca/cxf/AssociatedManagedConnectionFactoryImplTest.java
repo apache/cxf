@@ -18,21 +18,22 @@
  */
 package org.apache.cxf.jca.cxf;
 
-//import java.lang.reflect.Method;
 import java.util.Properties;
 
 import javax.resource.ResourceException;
-
-//import javax.resource.spi.ConnectionManager;
 import javax.resource.spi.ResourceAdapter;
 
-
 import org.apache.cxf.Bus;
-//import org.apache.cxf.jca.cxf.test.DummyBus;
+
 import org.easymock.EasyMock;
 import org.junit.Test;
 
-public class AssociatedManagedConnectionFactoryImplTest extends ManagedConnectionFactoryImplTest {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class AssociatedManagedConnectionFactoryImplTest {
 
 
     @Test
@@ -108,7 +109,7 @@ public class AssociatedManagedConnectionFactoryImplTest extends ManagedConnectio
 
 
         assertEquals("before associate, one props", 0, mci.getPluginProps().size());
-        assertTrue("before associate, key1 not set", !mci.getPluginProps().containsKey("key1"));
+        assertFalse("before associate, key1 not set", mci.getPluginProps().containsKey("key1"));
 
         mci.setResourceAdapter(rai);
         assertEquals("after associate, two props", 1, mci.getPluginProps().size());

@@ -261,9 +261,8 @@ public class XkmsCryptoProvider extends CryptoBase {
             return new X509Certificate[] {
                 cachedToken.getX509Certificate()
             };
-        } else {
-            return null;
         }
+        return null;
     }
 
     private X509Certificate[] buildX509GetResult(String key, X509Certificate cert) {
@@ -274,10 +273,9 @@ public class XkmsCryptoProvider extends CryptoBase {
             return new X509Certificate[] {
                 cert
             };
-        } else {
-            // Certificate was not found: return empty list
-            return new X509Certificate[0];
         }
+        // Certificate was not found: return empty list
+        return new X509Certificate[0];
     }
 
     /**

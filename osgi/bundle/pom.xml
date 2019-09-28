@@ -23,11 +23,11 @@
     <packaging>pom</packaging>
     <name>Apache CXF Bundle Parent</name>
     <description>Apache CXF Bundle Parent</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../../parent</relativePath>
     </parent>
     <properties>

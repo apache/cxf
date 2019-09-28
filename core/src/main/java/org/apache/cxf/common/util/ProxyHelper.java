@@ -22,8 +22,11 @@ package org.apache.cxf.common.util;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.logging.LogUtils;
 
 /**
  *
@@ -39,8 +42,13 @@ public class ProxyHelper {
         }
         HELPER = theHelper;
     }
-
-
+   
+    private static final Logger LOG = LogUtils.getL7dLogger(ProxyHelper.class);
+    
+    protected ProxyClassLoaderCache proxyClassLoaderCache = 
+        new ProxyClassLoaderCache();
+      
+    
     protected ProxyHelper() {
     }
 
@@ -59,37 +67,42 @@ public class ProxyHelper {
      */
     private ClassLoader getClassLoaderForInterfaces(final ClassLoader loader, final Class<?>[] interfaces) {
         if (canSeeAllInterfaces(loader, interfaces)) {
+            LOG.log(Level.FINE, "current classloader " + loader + " can see all interface");
             return loader;
         }
-        ProxyClassLoader combined;
-        final SecurityManager sm = System.getSecurityManager();
-        if (sm == null) {
-            combined = new ProxyClassLoader(loader, interfaces);
+        String sortedNameFromInterfaceArray = getSortedNameFromInterfaceArray(interfaces);
+        ClassLoader cachedLoader = proxyClassLoaderCache.getProxyClassLoader(loader, interfaces);
+        if (canSeeAllInterfaces(cachedLoader, interfaces)) {
+            LOG.log(Level.FINE, "find required loader from ProxyClassLoader cache with key" 
+                 + sortedNameFromInterfaceArray);
+            return cachedLoader;
         } else {
-            combined = AccessController.doPrivileged(new PrivilegedAction<ProxyClassLoader>() {
-                @Override
-                public ProxyClassLoader run() {
-                    return new ProxyClassLoader(loader, interfaces);
+            LOG.log(Level.FINE, "find a loader from ProxyClassLoader cache with interfaces " 
+                + sortedNameFromInterfaceArray
+                + " but can't see all interfaces");
+            for (Class<?> currentInterface : interfaces) {
+                String ifName = currentInterface.getName();
+                
+                if (!ifName.startsWith("org.apache.cxf") && !ifName.startsWith("java")) {
+                    // remove the stale ProxyClassLoader and recreate one
+                    proxyClassLoaderCache.removeStaleProxyClassLoader(currentInterface);
+                    cachedLoader = proxyClassLoaderCache.getProxyClassLoader(loader, interfaces);
+                    
                 }
-            });
+            }
         }
+               
+        return cachedLoader;
+    }
+    
+    private String getSortedNameFromInterfaceArray(Class<?>[] interfaces) {
+        SortedArraySet<String> arraySet = new SortedArraySet<String>();
         for (Class<?> currentInterface : interfaces) {
-            combined.addLoader(getClassLoader(currentInterface));
+            arraySet.add(currentInterface.getName() + ClassLoaderUtils.getClassLoaderName(currentInterface));
         }
-        return combined;
+        return arraySet.toString();
     }
 
-    private static ClassLoader getClassLoader(final Class<?> clazz) {
-        final SecurityManager sm = System.getSecurityManager();
-        if (sm != null) {
-            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
-                public ClassLoader run() {
-                    return clazz.getClassLoader();
-                }
-            });
-        }
-        return clazz.getClassLoader();
-    }
 
     private boolean canSeeAllInterfaces(ClassLoader loader, Class<?>[] interfaces) {
         for (Class<?> currentInterface : interfaces) {
@@ -113,9 +126,7 @@ public class ProxyHelper {
                         }
                     }
                 }
-            } catch (NoClassDefFoundError e) {
-                return false;
-            } catch (ClassNotFoundException e) {
+            } catch (NoClassDefFoundError | ClassNotFoundException e) {
                 return false;
             }
         }
@@ -125,4 +136,5 @@ public class ProxyHelper {
     public static Object getProxy(ClassLoader loader, Class<?>[] interfaces, InvocationHandler handler) {
         return HELPER.getProxyInternal(loader, interfaces, handler);
     }
+    
 }

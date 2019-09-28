@@ -58,9 +58,8 @@ public class PathSegmentImpl implements PathSegment {
         int index = path.indexOf(';');
         if (index == -1) {
             return null;
-        } else {
-            return path.substring(index);
         }
+        return path.substring(index);
     }
 
     public String toString() {

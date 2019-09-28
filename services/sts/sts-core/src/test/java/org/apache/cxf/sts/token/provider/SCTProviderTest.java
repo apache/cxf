@@ -40,10 +40,15 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests for creating SecurityContextTokens.
  */
-public class SCTProviderTest extends org.junit.Assert {
+public class SCTProviderTest {
 
     private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
 
@@ -59,7 +64,7 @@ public class SCTProviderTest extends org.junit.Assert {
 
         assertTrue(sctTokenProvider.canHandleToken(STSUtils.TOKEN_TYPE_SCT_05_12));
         TokenProviderResponse providerResponse = sctTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -80,7 +85,7 @@ public class SCTProviderTest extends org.junit.Assert {
 
         assertTrue(sctTokenProvider.canHandleToken(STSUtils.TOKEN_TYPE_SCT_05_02));
         TokenProviderResponse providerResponse = sctTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -102,15 +107,15 @@ public class SCTProviderTest extends org.junit.Assert {
 
         assertTrue(sctTokenProvider.canHandleToken(STSUtils.TOKEN_TYPE_SCT_05_12));
         TokenProviderResponse providerResponse = sctTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         assertTrue(providerResponse.getEntropy() != null && providerResponse.getEntropy().length > 0);
 
         ((SCTProvider)sctTokenProvider).setReturnEntropy(false);
         providerResponse = sctTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        assertTrue(providerResponse.getEntropy() == null);
+        assertNull(providerResponse.getEntropy());
     }
 
     /**
@@ -125,7 +130,7 @@ public class SCTProviderTest extends org.junit.Assert {
 
         assertTrue(sctTokenProvider.canHandleToken(STSUtils.TOKEN_TYPE_SCT_05_12));
         TokenProviderResponse providerResponse = sctTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -147,7 +152,7 @@ public class SCTProviderTest extends org.junit.Assert {
 
         assertTrue(sctTokenProvider.canHandleToken(STSUtils.TOKEN_TYPE_SCT_05_12));
         TokenProviderResponse providerResponse = sctTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         assertTrue(256L == providerResponse.getKeySize());
 
@@ -155,7 +160,7 @@ public class SCTProviderTest extends org.junit.Assert {
         KeyRequirements keyRequirements = providerParameters.getKeyRequirements();
         keyRequirements.setKeySize(192);
         providerResponse = sctTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(192L == providerResponse.getKeySize());
 
         // Test a bad KeySize - it will just use the default keysize

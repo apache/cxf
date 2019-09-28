@@ -25,11 +25,11 @@ import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 
 public class Server {
 
-    protected Server(String args[]) throws Exception {
+    protected Server(String[] args) throws Exception {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(StreamingService.class);
 
-        String receiverType = args.length == 1 && args[0].equals("-receiverType=queue")
+        String receiverType = args.length == 1 && "-receiverType=queue".equals(args[0])
             ? "queue" : "string";
         sf.setResourceProvider(StreamingService.class,
             new SingletonResourceProvider(new StreamingService(receiverType)));
@@ -38,7 +38,7 @@ public class Server {
         sf.create();
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         new Server(args);
         System.out.println("Server ready...");
         Thread.sleep(60 * 60 * 1000);

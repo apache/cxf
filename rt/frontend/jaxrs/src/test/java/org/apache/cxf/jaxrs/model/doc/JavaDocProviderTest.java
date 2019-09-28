@@ -23,10 +23,12 @@ import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.wadl.petstore.PetStore;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JavaDocProviderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class JavaDocProviderTest {
 
     @Test
     public void testJava6Docs() throws Exception {
@@ -73,7 +75,6 @@ public class JavaDocProviderTest extends Assert {
         assertTrue(getStatus2Tested);
         assertTrue(getStatus3Tested);
         assertTrue(noDocsTested);
-        assertTrue(true);
     }
 
     private void testOperWithNoJavaDocs(JavaDocProvider p, OperationResourceInfo ori) {

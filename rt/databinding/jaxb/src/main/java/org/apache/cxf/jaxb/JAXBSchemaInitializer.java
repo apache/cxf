@@ -98,9 +98,8 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         if (cls instanceof Class) {
             if (((Class<?>)cls).isArray()) {
                 return ((Class<?>)cls).getComponentType();
-            } else {
-                return (Class<?>)cls;
             }
+            return (Class<?>)cls;
         } else if (cls instanceof ParameterizedType) {
             for (Type t2 : ((ParameterizedType)cls).getActualTypeArguments()) {
                 return getArrayComponentType(t2);
@@ -117,9 +116,8 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         if (cls instanceof Class) {
             if (((Class<?>)cls).isArray()) {
                 return getBeanInfo(((Class<?>)cls).getComponentType());
-            } else {
-                return getBeanInfo((Class<?>)cls);
             }
+            return getBeanInfo((Class<?>)cls);
         } else if (cls instanceof ParameterizedType) {
             for (Type t2 : ((ParameterizedType)cls).getActualTypeArguments()) {
                 return getBeanInfo(t2);
@@ -192,7 +190,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
                     }
                 }
                 if (!found) {
-                    Annotation tmp[] = new Annotation[anns.length + 1];
+                    Annotation[] tmp = new Annotation[anns.length + 1];
                     System.arraycopy(anns, 0, tmp, 0, anns.length);
                     tmp[anns.length] = jta;
                     anns = tmp;
@@ -440,7 +438,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             XmlSchemaSequence seq = new XmlSchemaSequence();
             ct.setParticle(seq);
 
-            Method methods[] = cls.getMethods();
+            Method[] methods = cls.getMethods();
             for (Method m : methods) {
                 if (m.getName().startsWith("get")
                     || m.getName().startsWith("is")) {
@@ -638,7 +636,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         XmlSchemaComplexType generics = new XmlSchemaComplexType(schema, true);
         Type type = f.getGenericType();
         String rawType = ((ParameterizedType)type).getRawType().toString();
-        String typeName = StringUtils.uncapitalize(rawType.substring(rawType.lastIndexOf(".") + 1));
+        String typeName = StringUtils.uncapitalize(rawType.substring(rawType.lastIndexOf('.') + 1));
         generics.setName(typeName);
 
         Class<?> genericsClass = f.getType();
@@ -656,7 +654,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
 
     private void buildGenericElements(XmlSchema schema, XmlSchemaSequence seq, Method m, Type type) {
         String rawType = ((ParameterizedType)type).getRawType().toString();
-        String typeName = StringUtils.uncapitalize(rawType.substring(rawType.lastIndexOf(".") + 1));
+        String typeName = StringUtils.uncapitalize(rawType.substring(rawType.lastIndexOf('.') + 1));
 
         XmlSchemaComplexType generics = (XmlSchemaComplexType)schema.getTypeByName(typeName);
         if (generics == null) {

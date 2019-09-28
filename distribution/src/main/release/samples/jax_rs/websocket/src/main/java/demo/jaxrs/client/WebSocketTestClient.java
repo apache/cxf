@@ -29,15 +29,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.websocket.WebSocket;
-import com.ning.http.client.websocket.WebSocketByteListener;
-import com.ning.http.client.websocket.WebSocketTextListener;
-import com.ning.http.client.websocket.WebSocketUpgradeHandler;
-
 import org.apache.cxf.common.logging.LogUtils;
-
-
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.DefaultAsyncHttpClient;
+import org.asynchttpclient.ws.WebSocket;
+import org.asynchttpclient.ws.WebSocketByteListener;
+import org.asynchttpclient.ws.WebSocketTextListener;
+import org.asynchttpclient.ws.WebSocketUpgradeHandler;
 
 /**
  * Test client to do websocket calls.
@@ -60,7 +58,7 @@ class WebSocketTestClient {
         this.received = new ArrayList<>();
         this.fragments = new ArrayList<>();
         this.latch = new CountDownLatch(1);
-        this.client = new AsyncHttpClient();
+        this.client = new DefaultAsyncHttpClient();
         this.url = url;
     }
 
@@ -70,7 +68,7 @@ class WebSocketTestClient {
     }
 
     public void sendTextMessage(String message) {
-        websocket.sendTextMessage(message);
+        websocket.sendMessage(message);
     }
 
     public void sendMessage(byte[] message) {
@@ -99,7 +97,7 @@ class WebSocketTestClient {
         return responses;
     }
 
-    public void close() {
+    public void close() throws IOException {
         websocket.close();
         client.close();
     }

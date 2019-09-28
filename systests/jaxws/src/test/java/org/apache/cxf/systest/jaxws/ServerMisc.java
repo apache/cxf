@@ -69,8 +69,8 @@ public class ServerMisc extends AbstractBusTestServerBase {
         "http://localhost:" + PORT + "/XMLBindingCodeFirstService/";
 
 
-    List<org.apache.cxf.endpoint.Server> servers = new LinkedList<org.apache.cxf.endpoint.Server>();
-    List<Endpoint> endpoints = new LinkedList<Endpoint>();
+    List<org.apache.cxf.endpoint.Server> servers = new LinkedList<>();
+    List<Endpoint> endpoints = new LinkedList<>();
     public void tearDown() throws Exception {
         for (org.apache.cxf.endpoint.Server s : servers) {
             s.stop();

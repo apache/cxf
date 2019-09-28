@@ -75,7 +75,7 @@ public class EprMetaData {
             b.append(serviceQName);
             b.append(',');
             b.append(portName);
-            b.append("@");
+            b.append('@');
             b.append(candidateWsdlDef.getDocumentBaseURI());
             b.append('}');
             ret = b.toString();

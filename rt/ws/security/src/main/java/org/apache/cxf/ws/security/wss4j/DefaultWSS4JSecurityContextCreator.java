@@ -136,9 +136,8 @@ public class DefaultWSS4JSecurityContextCreator implements WSS4JSecurityContextC
                     roleClassifierType = "prefix";
                 }
                 return new RolePrefixSecurityContextImpl(subject, roleClassifier, roleClassifierType);
-            } else {
-                return new DefaultSecurityContext(p, subject);
             }
+            return new DefaultSecurityContext(p, subject);
         } else if (p != null) {
             boolean utWithCallbacks =
                 MessageUtils.getContextualBoolean(msg, SecurityConstants.VALIDATE_TOKEN, true);
@@ -171,9 +170,8 @@ public class DefaultWSS4JSecurityContextCreator implements WSS4JSecurityContextC
                 context.setIssuer(SAMLUtils.getIssuer(receivedAssertion));
                 context.setAssertionElement(SAMLUtils.getAssertionElement(receivedAssertion));
                 return context;
-            } else {
-                return createSecurityContext(p);
             }
+            return createSecurityContext(p);
         }
 
         return null;

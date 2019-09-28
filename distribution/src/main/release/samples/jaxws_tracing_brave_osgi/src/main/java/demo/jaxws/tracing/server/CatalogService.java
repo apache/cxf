@@ -24,6 +24,6 @@ import javax.jws.WebService;
 @WebService
 public interface CatalogService {
     void addBook(Book book);
-    Book getBook(final String id);
-    void deleteBook(final String id);
+    Book getBook(String id);
+    void deleteBook(String id);
 }

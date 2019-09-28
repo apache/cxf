@@ -19,12 +19,10 @@
 
 package org.apache.cxf.systest.aegis;
 
-import java.net.URISyntaxException;
-
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 
@@ -39,25 +37,14 @@ public class AegisServer extends AbstractBusTestServerBase {
         server = new org.eclipse.jetty.server.Server(Integer.parseInt(PORT));
 
         WebAppContext webappcontext = new WebAppContext();
-        String contextPath = null;
-        try {
-            contextPath = getClass().getResource("/webapp").toURI().getPath();
-        } catch (URISyntaxException e1) {
-            e1.printStackTrace();
-        }
         webappcontext.setContextPath("/");
+        webappcontext.setBaseResource(Resource.newClassPathResource("/webapp"));
 
-        webappcontext.setWar(contextPath);
-
-        HandlerCollection handlers = new HandlerCollection();
-        handlers.setHandlers(new Handler[] {webappcontext, new DefaultHandler()});
-
-        server.setHandler(handlers);
+        server.setHandler(new HandlerCollection(webappcontext, new DefaultHandler()));
         try {
             server.start();
-
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
     }
@@ -69,7 +56,7 @@ public class AegisServer extends AbstractBusTestServerBase {
         }
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         try {
             AegisServer s = new AegisServer();
             s.start();

@@ -18,10 +18,12 @@
  */
 package org.apache.cxf.rs.security.oauth.utils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class OAuthUtilsTest extends Assert {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class OAuthUtilsTest {
 
     @Test
     public void testCheckRequestURI() throws Exception {

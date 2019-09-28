@@ -34,7 +34,7 @@ import org.apache.type_substitution.Porsche;
 
 public class CarDealerImpl implements CarDealer {
     public List<Car> getSedans(String carType) {
-        if (carType.equalsIgnoreCase("Porsche")) {
+        if ("Porsche".equalsIgnoreCase(carType)) {
             List<Car> cars = new ArrayList<>();
             cars.add(newPorsche("Boxster", "1998", "white"));
             cars.add(newPorsche("BoxsterS", "1999", "red"));
@@ -50,8 +50,8 @@ public class CarDealerImpl implements CarDealer {
         }
 
         Porsche porsche = (Porsche)oldCar;
-        if (porsche.getMake().equals("Porsche") && porsche.getModel().equals("GT2000")
-            && porsche.getYear().equals("2000") && porsche.getColor().equals("white")) {
+        if ("Porsche".equals(porsche.getMake()) && "GT2000".equals(porsche.getModel())
+            && "2000".equals(porsche.getYear()) && "white".equals(porsche.getColor())) {
             return newPorsche("911GT3", "2007", "black");
         }
         throw new WebServiceException("Invalid Porsche Car");

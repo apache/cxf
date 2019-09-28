@@ -23,18 +23,20 @@
     <packaging>bundle</packaging>
     <name>Apache CXF Runtime Simple Frontend</name>
     <description>Apache CXF Runtime Simple Frontend</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.frontend.simple</cxf.module.name>
         <cxf.osgi.import>
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
             com.sun.tools*;resolution:=optional,
-            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
+            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
+            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}"
         </cxf.osgi.import>
         <!-- keep in sync with services exported in activator -->
         <cxf.export.service>
@@ -139,7 +141,7 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>com.sun.xml.bind</groupId>
+            <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-xjc</artifactId>
             <optional>true</optional>
             <scope>provided</scope>

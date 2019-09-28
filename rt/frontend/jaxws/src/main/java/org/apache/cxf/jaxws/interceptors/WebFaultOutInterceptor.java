@@ -35,6 +35,7 @@ import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.binding.soap.SoapFault;
+import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -99,20 +100,23 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                 sf = (SOAPFaultException)thr.getCause();
             }
             if (sf != null) {
-                if (f instanceof SoapFault) {
-                    for (Iterator<QName> it = CastUtils.cast(sf.getFault().getFaultSubcodes()); it.hasNext();) {
-                        ((SoapFault) f).addSubCode(it.next());
+                SoapVersion soapVersion = (SoapVersion)message.get(SoapVersion.class.getName());
+                if (soapVersion != null && soapVersion.getVersion() != 1.1) {
+                    if (f instanceof SoapFault) {
+                        for (Iterator<QName> it = CastUtils.cast(sf.getFault().getFaultSubcodes()); it.hasNext();) {
+                            ((SoapFault) f).addSubCode(it.next());
+                        }
                     }
-                }
-                if (sf.getFault().getFaultReasonLocales().hasNext()) {
-                    Locale lang = (Locale) sf.getFault()
-                           .getFaultReasonLocales().next();
-                    String convertedLang = lang.getLanguage();
-                    String country = lang.getCountry();
-                    if (country.length() > 0) {
-                        convertedLang = convertedLang + '-' + country;
+                    if (sf.getFault().getFaultReasonLocales().hasNext()) {
+                        Locale lang = (Locale) sf.getFault()
+                                .getFaultReasonLocales().next();
+                        String convertedLang = lang.getLanguage();
+                        String country = lang.getCountry();
+                        if (country.length() > 0) {
+                            convertedLang = convertedLang + '-' + country;
+                        }
+                        f.setLang(convertedLang);
                     }
-                    f.setLang(convertedLang);
                 }
                 message.setContent(Exception.class, f);
             }
@@ -141,9 +145,7 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
 
             } catch (InvocationTargetException e) {
                 throw new Fault(new org.apache.cxf.common.i18n.Message("INVOCATION_TARGET_EXC", BUNDLE), e);
-            } catch (IllegalAccessException e) {
-                throw new Fault(new org.apache.cxf.common.i18n.Message("COULD_NOT_INVOKE", BUNDLE), e);
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalAccessException | IllegalArgumentException e) {
                 throw new Fault(new org.apache.cxf.common.i18n.Message("COULD_NOT_INVOKE", BUNDLE), e);
             }
             Service service = message.getExchange().getService();
@@ -171,16 +173,16 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                 }
 
                 f.setMessage(ex.getMessage());
+            } catch (Fault f2) {
+                message.setContent(Exception.class, f2);
+                super.handleMessage(message);
             } catch (Exception nex) {
-                if (nex instanceof Fault) {
-                    message.setContent(Exception.class, nex);
-                    super.handleMessage(message);
-                } else {
-                    //if exception occurs while writing a fault, we'll just let things continue
-                    //and let the rest of the chain try handling it as is.
-                    LOG.log(Level.WARNING, "EXCEPTION_WHILE_WRITING_FAULT", nex);
-                }
+                //if exception occurs while writing a fault, we'll just let things continue
+                //and let the rest of the chain try handling it as is.
+                LOG.log(Level.WARNING, "EXCEPTION_WHILE_WRITING_FAULT", nex);
             }
+        } else if (cause instanceof SOAPFaultException && ((SOAPFaultException)cause).getFault().hasDetail()) {
+            return;
         } else {
             FaultMode mode = message.get(FaultMode.class);
             if (mode == FaultMode.CHECKED_APPLICATION_FAULT) {
@@ -199,7 +201,7 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                 if (cls != null) {
                     Object ret = cls.newInstance();
                     //copy props
-                    Method meth[] = cause.getClass().getMethods();
+                    Method[] meth = cause.getClass().getMethods();
                     for (Method m : meth) {
                         if (m.getParameterTypes().length == 0
                             && (m.getName().startsWith("get")
@@ -220,11 +222,7 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                     }
                     return ret;
                 }
-            } catch (ClassNotFoundException e1) {
-                //ignore
-            } catch (InstantiationException e) {
-                //ignore
-            } catch (IllegalAccessException e) {
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e1) {
                 //ignore
             }
         }

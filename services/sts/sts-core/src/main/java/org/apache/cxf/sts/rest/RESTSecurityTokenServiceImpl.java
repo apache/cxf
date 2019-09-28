@@ -23,6 +23,7 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ import javax.xml.bind.JAXBElement;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
@@ -57,8 +59,8 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.UseKeyType;
 import org.apache.cxf.ws.security.trust.STSUtils;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.content.X509Data;
 
@@ -74,21 +76,24 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
     private static final Logger LOG = LogUtils.getL7dLogger(RESTSecurityTokenServiceImpl.class);
 
     static {
-        DEFAULT_CLAIM_TYPE_MAP = new HashMap<>();
-        DEFAULT_CLAIM_TYPE_MAP.put("emailaddress", CLAIM_TYPE_NS + "/claims/emailaddress");
-        DEFAULT_CLAIM_TYPE_MAP.put("role", CLAIM_TYPE_NS + "/claims/role");
-        DEFAULT_CLAIM_TYPE_MAP.put("surname", CLAIM_TYPE_NS + "/claims/surname");
-        DEFAULT_CLAIM_TYPE_MAP.put("givenname", CLAIM_TYPE_NS + "/claims/givenname");
-        DEFAULT_CLAIM_TYPE_MAP.put("name", CLAIM_TYPE_NS + "/claims/name");
-        DEFAULT_CLAIM_TYPE_MAP.put("upn", CLAIM_TYPE_NS + "/claims/upn");
-        DEFAULT_CLAIM_TYPE_MAP.put("nameidentifier", CLAIM_TYPE_NS + "/claims/nameidentifier");
+        Map<String, String> tmpClaimTypeMap = new HashMap<>();
+        tmpClaimTypeMap.put("emailaddress", CLAIM_TYPE_NS + "/claims/emailaddress");
+        tmpClaimTypeMap.put("role", CLAIM_TYPE_NS + "/claims/role");
+        tmpClaimTypeMap.put("roles", CLAIM_TYPE_NS + "/claims/role");
+        tmpClaimTypeMap.put("surname", CLAIM_TYPE_NS + "/claims/surname");
+        tmpClaimTypeMap.put("givenname", CLAIM_TYPE_NS + "/claims/givenname");
+        tmpClaimTypeMap.put("name", CLAIM_TYPE_NS + "/claims/name");
+        tmpClaimTypeMap.put("upn", CLAIM_TYPE_NS + "/claims/upn");
+        tmpClaimTypeMap.put("nameidentifier", CLAIM_TYPE_NS + "/claims/nameidentifier");
+        DEFAULT_CLAIM_TYPE_MAP = Collections.unmodifiableMap(tmpClaimTypeMap);
 
-        DEFAULT_TOKEN_TYPE_MAP = new HashMap<>();
-        DEFAULT_TOKEN_TYPE_MAP.put("saml", WSConstants.WSS_SAML2_TOKEN_TYPE);
-        DEFAULT_TOKEN_TYPE_MAP.put("saml2.0", WSConstants.WSS_SAML2_TOKEN_TYPE);
-        DEFAULT_TOKEN_TYPE_MAP.put("saml1.1", WSConstants.WSS_SAML_TOKEN_TYPE);
-        DEFAULT_TOKEN_TYPE_MAP.put("jwt", JWTTokenProvider.JWT_TOKEN_TYPE);
-        DEFAULT_TOKEN_TYPE_MAP.put("sct", STSUtils.TOKEN_TYPE_SCT_05_12);
+        Map<String, String> tmpTokenTypeMap = new HashMap<>();
+        tmpTokenTypeMap.put("saml", WSS4JConstants.WSS_SAML2_TOKEN_TYPE);
+        tmpTokenTypeMap.put("saml2.0", WSS4JConstants.WSS_SAML2_TOKEN_TYPE);
+        tmpTokenTypeMap.put("saml1.1", WSS4JConstants.WSS_SAML_TOKEN_TYPE);
+        tmpTokenTypeMap.put("jwt", JWTTokenProvider.JWT_TOKEN_TYPE);
+        tmpTokenTypeMap.put("sct", STSUtils.TOKEN_TYPE_SCT_05_12);
+        DEFAULT_TOKEN_TYPE_MAP = Collections.unmodifiableMap(tmpTokenTypeMap);
 
         DEFAULT_KEY_TYPE_MAP.put("SymmetricKey", STSConstants.SYMMETRIC_KEY_KEYTYPE);
         DEFAULT_KEY_TYPE_MAP.put("PublicKey", STSConstants.PUBLIC_KEY_KEYTYPE);
@@ -156,16 +161,15 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
         if ("jwt".equals(tokenType)) {
             // Discard the wrapper here
             return Response.ok(((Element)requestedToken.getAny()).getTextContent()).build();
-        } else {
-            // Base-64 encode the token + return it
-            try {
-                String encodedToken =
-                    encodeToken(DOM2Writer.nodeToString((Element)requestedToken.getAny()));
-                return Response.ok(encodedToken).build();
-            } catch (Exception ex) {
-                LOG.warning(ex.getMessage());
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-            }
+        }
+        // Base-64 encode the token + return it
+        try {
+            String encodedToken =
+                encodeToken(DOM2Writer.nodeToString((Element)requestedToken.getAny()));
+            return Response.ok(encodedToken).build();
+        } catch (Exception ex) {
+            LOG.warning(ex.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -211,7 +215,7 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
         if (STSConstants.PUBLIC_KEY_KEYTYPE.equals(desiredKeyType)) {
             X509Certificate clientCert = getTLSClientCertificate();
             if (clientCert != null) {
-                Document doc = DOMUtils.createDocument();
+                Document doc = DOMUtils.getEmptyDocument();
                 Element keyInfoElement = doc.createElementNS("http://www.w3.org/2000/09/xmldsig#", "KeyInfo");
 
                 try {
@@ -379,7 +383,7 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
 
     private X509Certificate getTLSClientCertificate() {
         TLSSessionInfo tlsInfo =
-            (TLSSessionInfo)PhaseInterceptorChain.getCurrentMessage().get(TLSSessionInfo.class);
+            PhaseInterceptorChain.getCurrentMessage().get(TLSSessionInfo.class);
         if (tlsInfo != null && tlsInfo.getPeerCertificates() != null
                 && tlsInfo.getPeerCertificates().length > 0
                 && (tlsInfo.getPeerCertificates()[0] instanceof X509Certificate)

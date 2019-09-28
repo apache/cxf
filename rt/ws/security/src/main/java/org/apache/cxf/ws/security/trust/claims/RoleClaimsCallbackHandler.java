@@ -53,7 +53,7 @@ public class RoleClaimsCallbackHandler implements CallbackHandler {
      * Create a Claims Element for a "role"
      */
     private Element createClaims() {
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element claimsElement =
             doc.createElementNS("http://docs.oasis-open.org/ws-sx/ws-trust/200512", "Claims");
         claimsElement.setAttributeNS(null, "Dialect", "http://schemas.xmlsoap.org/ws/2005/05/identity");

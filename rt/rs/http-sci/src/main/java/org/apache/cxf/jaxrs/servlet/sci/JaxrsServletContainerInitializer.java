@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -102,12 +103,12 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
                     // with a JAX-RS Application class name
                     servletMapping = getServletMapping(ctx, servletName);
                 }
-                final Map<String, Object> appProperties = 
+                final Map<String, Object> appProperties =
                     app != null ? app.getProperties() : Collections.emptyMap();
                 app = new Application() {
                     @Override
                     public Set<Class<?>> getClasses() {
-                        Set<Class<?>> set = new HashSet<Class<?>>();
+                        Set<Class<?>> set = new HashSet<>();
                         set.addAll(providersAndResources.get(Path.class));
                         set.addAll(providersAndResources.get(Provider.class));
                         return set;
@@ -141,10 +142,9 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
         ServletRegistration sr = ctx.getServletRegistration(name);
         if (sr != null) {
             return sr.getMappings().iterator().next();
-        } else {
-            final String error = "Servlet with a name " + name + " is not available";
-            throw new ServletException(error);
         }
+        final String error = "Servlet with a name " + name + " is not available";
+        throw new ServletException(error);
     }
 
     private boolean isApplicationServletAvailable(final ServletContext ctx, final Class<?> appClass) {
@@ -164,7 +164,7 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
         final Set< Class< ? > > classes) {
 
         final Map< Class< ? extends Annotation >, Collection< Class< ? > > > grouped =
-            new HashMap< Class< ? extends Annotation >, Collection< Class< ? > > >();
+            new HashMap<>();
 
         grouped.put(Provider.class, new ArrayList< Class< ? > >());
         grouped.put(Path.class, new ArrayList< Class< ? > >());
@@ -172,9 +172,9 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
         if (classes != null) {
             for (final Class< ? > clazz: classes) {
                 if (!classShouldBeIgnored(clazz)) {
-                    for (final Class< ? extends Annotation > annotation: grouped.keySet()) {
-                        if (clazz.isAnnotationPresent(annotation)) {
-                            grouped.get(annotation).add(clazz);
+                    for (final Entry<Class<? extends Annotation>, Collection<Class<?>>> entry : grouped.entrySet()) {
+                        if (clazz.isAnnotationPresent(entry.getKey())) {
+                            entry.getValue().add(clazz);
                         }
                     }
                 }

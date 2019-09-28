@@ -133,13 +133,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
                 inboundXMLSec.processInMessage(originalXmlStreamReader, null, securityEventListener);
             inMsg.setContent(XMLStreamReader.class, newXmlStreamReader);
 
-        } catch (XMLStreamException e) {
-            throwFault(e.getMessage(), e);
-        } catch (XMLSecurityException e) {
-            throwFault(e.getMessage(), e);
-        } catch (IOException e) {
-            throwFault(e.getMessage(), e);
-        } catch (UnsupportedCallbackException e) {
+        } catch (XMLStreamException | XMLSecurityException | IOException | UnsupportedCallbackException e) {
             throwFault(e.getMessage(), e);
         }
     }
@@ -147,13 +141,9 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
     private boolean canDocumentBeRead(Message message) {
         if (isServerGet(message)) {
             return false;
-        } else {
-            Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
-            if (responseCode != null && responseCode != 200) {
-                return false;
-            }
         }
-        return true;
+        Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
+        return !(responseCode != null && responseCode != 200);
     }
     
     private boolean isServerGet(Message message) {
@@ -460,13 +450,12 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
 
         if (!canDocumentBeRead(message)) {
             return ctx.proceed();
-        } else {
-            prepareMessage(message);
-            Object object = ctx.proceed();
-            new StaxActionInInterceptor(requireSignature,
-                                        requireEncryption).handleMessage(message);
-            return object;
         }
+        prepareMessage(message);
+        Object object = ctx.proceed();
+        new StaxActionInInterceptor(requireSignature,
+                                    requireEncryption).handleMessage(message);
+        return object;
 
     }
 

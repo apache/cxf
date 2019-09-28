@@ -34,6 +34,7 @@ import org.apache.cxf.ws.eventing.base.SimpleEventingIntegrationTest;
 import org.apache.cxf.ws.eventing.manager.SubscriptionManagerEndpoint;
 import org.apache.cxf.ws.eventing.shared.faults.UnknownSubscription;
 import org.apache.cxf.ws.eventing.shared.utils.DurationAndDateUtil;
+
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -43,7 +43,7 @@ import org.apache.log4j.spi.LoggingEvent;
  */
 public class Log4jLogger extends AbstractDelegatingLogger {
     private static final Map<Level, org.apache.log4j.Level> TO_LOG4J =
-                                                new HashMap<Level, org.apache.log4j.Level>();
+                                                new HashMap<>();
     private static final org.apache.log4j.Level TRACE;
 
 
@@ -84,14 +84,14 @@ public class Log4jLogger extends AbstractDelegatingLogger {
         return null;
     }
 
-    public void setLevel(Level newLevel) throws SecurityException {
+    public void setLevel(Level newLevel) {
         log.setLevel(TO_LOG4J.get(newLevel));
     }
 
-    public synchronized void addHandler(Handler handler) throws SecurityException {
+    public synchronized void addHandler(Handler handler) {
         log.addAppender(new HandlerWrapper(handler));
     }
-    public synchronized void removeHandler(Handler handler) throws SecurityException {
+    public synchronized void removeHandler(Handler handler) {
         log.removeAppender("HandlerWrapper-" + handler.hashCode());
     }
     public synchronized Handler[] getHandlers() {
@@ -103,7 +103,7 @@ public class Log4jLogger extends AbstractDelegatingLogger {
                 ret.add(((HandlerWrapper)ap).getHandler());
             }
         }
-        return ret.toArray(new Handler[ret.size()]);
+        return ret.toArray(new Handler[0]);
     }
 
     protected void internalLogFormatted(String msg, LogRecord record) {
@@ -117,25 +117,25 @@ public class Log4jLogger extends AbstractDelegatingLogger {
     private Level fromL4J(org.apache.log4j.Level l) {
         Level l2 = null;
         switch (l.toInt()) {
-        case org.apache.log4j.Level.ALL_INT:
+        case org.apache.log4j.Priority.ALL_INT:
             l2 = Level.ALL;
             break;
-        case org.apache.log4j.Level.FATAL_INT:
+        case org.apache.log4j.Priority.FATAL_INT:
             l2 = Level.SEVERE;
             break;
-        case org.apache.log4j.Level.ERROR_INT:
+        case org.apache.log4j.Priority.ERROR_INT:
             l2 = Level.SEVERE;
             break;
-        case org.apache.log4j.Level.WARN_INT:
+        case org.apache.log4j.Priority.WARN_INT:
             l2 = Level.WARNING;
             break;
-        case org.apache.log4j.Level.INFO_INT:
+        case org.apache.log4j.Priority.INFO_INT:
             l2 = Level.INFO;
             break;
-        case org.apache.log4j.Level.DEBUG_INT:
+        case org.apache.log4j.Priority.DEBUG_INT:
             l2 = Level.FINE;
             break;
-        case org.apache.log4j.Level.OFF_INT:
+        case org.apache.log4j.Priority.OFF_INT:
             l2 = Level.OFF;
             break;
         default:
@@ -196,7 +196,7 @@ public class Log4jLogger extends AbstractDelegatingLogger {
         }
     }
     private static void getFullInfoForLogUtils(LogRecord lr, String cname) {
-        StackTraceElement el[] = Thread.currentThread().getStackTrace();
+        StackTraceElement[] el = Thread.currentThread().getStackTrace();
         for (int x = el.length - 2; x >= 0; x--) {
             if (LogUtils.class.getName().equals(el[x].getClassName())
                 || cname.equals(el[x].getClassName())) {

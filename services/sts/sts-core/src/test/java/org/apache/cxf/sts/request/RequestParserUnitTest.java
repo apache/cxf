@@ -31,6 +31,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
@@ -47,7 +48,10 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 
-public class RequestParserUnitTest extends org.junit.Assert {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class RequestParserUnitTest {
 
     private static final String SECURITY_HEADER =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?><wsse:Security "
@@ -207,7 +211,7 @@ public class RequestParserUnitTest extends org.junit.Assert {
 
         RequestRequirements requestRequirements = parser.parseRequest(request, msgContext, null, null);
 
-        assertNotNull(requestRequirements.getKeyRequirements().getReceivedKey().getX509Cert());
+        assertNotNull(requestRequirements.getKeyRequirements().getReceivedCredential().getX509Cert());
     }
 
     private Document parseStringToElement(String str) throws Exception {

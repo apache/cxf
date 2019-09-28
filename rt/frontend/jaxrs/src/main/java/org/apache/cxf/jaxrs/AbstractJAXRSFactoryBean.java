@@ -70,7 +70,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
 
     protected List<String> schemaLocations;
     protected JAXRSServiceFactoryBean serviceFactory;
-    protected List<Object> entityProviders = new LinkedList<Object>();
+    protected List<Object> entityProviders = new LinkedList<>();
     private Comparator<?> providerComparator;
 
     protected AbstractJAXRSFactoryBean(JAXRSServiceFactoryBean serviceFactory) {
@@ -309,7 +309,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
                 }
             }
         }
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             org.apache.cxf.common.i18n.Message msg =
                 new org.apache.cxf.common.i18n.Message("NO_RESOURCES_AVAILABLE",
                                                        BUNDLE);

@@ -94,7 +94,7 @@ public final class CustomizationParser {
 
             String[] jaxbArgs = jaxbCompilerArgs instanceof String
                     ? new String[]{(String)jaxbCompilerArgs} : (String[])jaxbCompilerArgs;
-            List<String> jaxbArgsList = new LinkedList<String>();
+            List<String> jaxbArgsList = new LinkedList<>();
             for (String jaxbArg : jaxbArgs) {
                 String[] allArgs = jaxbArg.split(" ");
                 for (String arg : allArgs) {
@@ -146,7 +146,7 @@ public final class CustomizationParser {
     }
 
     private String getBaseWadlPath() {
-        int lastSep = wadlPath.lastIndexOf("/");
+        int lastSep = wadlPath.lastIndexOf('/');
         return lastSep != -1 ? wadlPath.substring(0, lastSep + 1) : wadlPath;
     }
 
@@ -184,9 +184,8 @@ public final class CustomizationParser {
         if (files != null) {
             return files instanceof String ? new String[]{(String)files}
                                                    : (String[])files;
-        } else {
-            return new String[] {};
         }
+        return new String[] {};
     }
 
     public List<InputSource> getJaxbBindings() {

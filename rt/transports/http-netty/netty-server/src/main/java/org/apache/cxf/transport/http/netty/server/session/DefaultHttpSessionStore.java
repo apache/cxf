@@ -35,7 +35,7 @@ public class DefaultHttpSessionStore implements HttpSessionStore {
     private static final Logger LOG = LogUtils.getL7dLogger(DefaultHttpSessionStore.class);
 
     private static final Map<String, NettyHttpSession> SESSIONS
-        = new ConcurrentHashMap<String, NettyHttpSession>();
+        = new ConcurrentHashMap<>();
 
     @Override
     public NettyHttpSession createSession() {

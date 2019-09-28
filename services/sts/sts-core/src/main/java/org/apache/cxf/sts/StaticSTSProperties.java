@@ -166,15 +166,6 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     }
 
     /**
-     * Set the String corresponding to the signature Properties class
-     * @param signaturePropertiesFile the String corresponding to the signature properties file
-     */
-    @Deprecated
-    public void setSignaturePropertiesFile(String signaturePropertiesFile) {
-        setSignatureCryptoProperties(signaturePropertiesFile);
-    }
-
-    /**
      * Set the Object corresponding to the signature Properties class. It can be a String
      * corresponding to a filename, a Properties object, or a URL.
      * @param signatureCryptoProperties the object corresponding to the signature properties
@@ -223,15 +214,6 @@ public class StaticSTSProperties implements STSPropertiesMBean {
      */
     public void setEncryptionCrypto(Crypto encryptionCrypto) {
         this.encryptionCrypto = encryptionCrypto;
-    }
-
-    /**
-     * Set the String corresponding to the encryption Properties class
-     * @param signaturePropertiesFile the String corresponding to the encryption properties file
-     */
-    @Deprecated
-    public void setEncryptionPropertiesFile(String encryptionPropertiesFile) {
-        setEncryptionCryptoProperties(encryptionPropertiesFile);
     }
 
     /**

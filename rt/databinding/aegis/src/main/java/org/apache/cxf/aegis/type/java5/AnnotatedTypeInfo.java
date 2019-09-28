@@ -88,9 +88,8 @@ public class AnnotatedTypeInfo extends BeanTypeInfo {
         QName name = createQName(desc);
         if (!qualify) {
             return new QName(null, name.getLocalPart());
-        } else {
-            return name;
         }
+        return name;
     }
 
     protected QName createQName(PropertyDescriptor desc) {
@@ -157,9 +156,8 @@ public class AnnotatedTypeInfo extends BeanTypeInfo {
         PropertyDescriptor desc = getPropertyDescriptorFromMappedName(name);
         if (annotationReader.isElement(desc.getReadMethod())) {
             return annotationReader.isNillable(desc.getReadMethod());
-        } else {
-            return super.isNillable(name);
         }
+        return super.isNillable(name);
     }
 
     public int getMinOccurs(QName name) {

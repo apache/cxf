@@ -22,6 +22,7 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 import java.util.Collection;
 import java.util.Map;
 
+import javax.xml.XMLConstants;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -62,6 +63,12 @@ public class RequiredElementsPolicyValidator implements SecurityPolicyValidator 
 
             if (rp != null && rp.getXPaths() != null && !rp.getXPaths().isEmpty()) {
                 XPathFactory factory = XPathFactory.newInstance();
+                try {
+                    factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+                } catch (javax.xml.xpath.XPathFactoryConfigurationException ex) {
+                    // ignore
+                }
+
                 for (org.apache.wss4j.policy.model.XPath xPath : rp.getXPaths()) {
                     Map<String, String> namespaces = xPath.getPrefixNamespaceMap();
                     String expression = xPath.getXPath();
@@ -73,15 +80,19 @@ public class RequiredElementsPolicyValidator implements SecurityPolicyValidator 
                     NodeList list;
                     Element header = parameters.getSoapHeader();
                     header = (Element)DOMUtils.getDomElement(header);
-                    try {
-                        list = (NodeList)xpath.evaluate(expression,
-                                                                 header,
-                                                                 XPathConstants.NODESET);
-                        if (list.getLength() == 0) {
-                            ai.setNotAsserted("No header element matching XPath " + expression + " found.");
+                    if (header == null) {
+                        ai.setNotAsserted("No header element matching XPath " + expression + " found.");
+                    } else {
+                        try {
+                            list = (NodeList)xpath.evaluate(expression,
+                                                                     header,
+                                                                     XPathConstants.NODESET);
+                            if (list.getLength() == 0) {
+                                ai.setNotAsserted("No header element matching XPath " + expression + " found.");
+                            }
+                        } catch (XPathExpressionException e) {
+                            ai.setNotAsserted("Invalid XPath expression " + expression + " " + e.getMessage());
                         }
-                    } catch (XPathExpressionException e) {
-                        ai.setNotAsserted("Invalid XPath expression " + expression + " " + e.getMessage());
                     }
                 }
             }

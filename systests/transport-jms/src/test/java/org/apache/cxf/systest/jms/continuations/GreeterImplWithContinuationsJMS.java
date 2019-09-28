@@ -52,7 +52,7 @@ public class GreeterImplWithContinuationsJMS {
 
     public String greetMe(String name) {
 
-        Continuation continuation = getContinuation(name);
+        Continuation continuation = getContinuation();
         if (continuation == null) {
             throw new RuntimeException("Failed to get continuation");
         }
@@ -87,7 +87,7 @@ public class GreeterImplWithContinuationsJMS {
         return null;
     }
 
-    private Continuation getContinuation(String name) {
+    private Continuation getContinuation() {
 
         ContinuationProvider provider =
             (ContinuationProvider)context.getMessageContext().get(ContinuationProvider.class.getName());

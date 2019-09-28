@@ -37,13 +37,32 @@ import org.apache.cxf.workqueue.WorkQueueManager;
 public class WorkQueueImplMBeanWrapper implements ManagedComponent {
     private static final String TYPE_VALUE = "WorkQueues";
 
-    private AutomaticWorkQueueImpl aWorkQueue;
-    private WorkQueueManager manager;
+    private final AutomaticWorkQueueImpl aWorkQueue;
+    private final String objectName;
 
     public WorkQueueImplMBeanWrapper(AutomaticWorkQueueImpl wq,
                                      WorkQueueManager mgr) {
         aWorkQueue = wq;
-        manager = mgr;
+
+        //Use default domain name of server
+        StringBuilder sb = new StringBuilder(ManagementConstants.DEFAULT_DOMAIN_NAME).append(':');
+        if (!aWorkQueue.isShared()) {
+            String busId = Bus.DEFAULT_BUS_ID;
+            if (mgr instanceof WorkQueueManagerImpl) {
+                busId = ((WorkQueueManagerImpl) mgr).getBus().getId();
+            }
+            sb  .append(ManagementConstants.BUS_ID_PROP).append('=').append(busId).append(',')
+                .append(WorkQueueManagerImplMBeanWrapper.TYPE_VALUE).append('=')
+                .append(WorkQueueManagerImplMBeanWrapper.NAME_VALUE).append(',');
+        } else {
+            sb.append(ManagementConstants.BUS_ID_PROP).append("=Shared,");
+            //buffer.append(WorkQueueManagerImplMBeanWrapper.TYPE_VALUE).append("=Shared,");
+        }
+        sb  .append(ManagementConstants.TYPE_PROP).append('=').append(TYPE_VALUE).append(',')
+            .append(ManagementConstants.NAME_PROP).append('=').append(aWorkQueue.getName()).append(',')
+            // Added the instance id to make the ObjectName unique
+            .append(ManagementConstants.INSTANCE_ID_PROP).append('=').append(aWorkQueue.hashCode());
+        objectName = sb.toString();
     }
 
     @ManagedAttribute(description = "The WorkQueueMaxSize",
@@ -104,26 +123,7 @@ public class WorkQueueImplMBeanWrapper implements ManagedComponent {
     }
 
     public ObjectName getObjectName() throws JMException {
-        StringBuilder buffer = new StringBuilder();
-        buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME).append(':');
-        if (!aWorkQueue.isShared()) {
-            String busId = Bus.DEFAULT_BUS_ID;
-            if (manager instanceof WorkQueueManagerImpl) {
-                busId = ((WorkQueueManagerImpl)manager).getBus().getId();
-            }
-            buffer.append(ManagementConstants.BUS_ID_PROP).append('=').append(busId).append(',');
-            buffer.append(WorkQueueManagerImplMBeanWrapper.TYPE_VALUE).append('=');
-            buffer.append(WorkQueueManagerImplMBeanWrapper.NAME_VALUE).append(',');
-        } else {
-            buffer.append(ManagementConstants.BUS_ID_PROP).append("=Shared,");
-            //buffer.append(WorkQueueManagerImplMBeanWrapper.TYPE_VALUE + "=Shared,");
-        }
-        buffer.append(ManagementConstants.TYPE_PROP).append('=').append(TYPE_VALUE).append(',');
-        buffer.append(ManagementConstants.NAME_PROP).append('=').append(aWorkQueue.getName()).append(',');
-        // Added the instance id to make the ObjectName unique
-        buffer.append(ManagementConstants.INSTANCE_ID_PROP).append('=').append(aWorkQueue.hashCode());
-        //Use default domain name of server
-        return new ObjectName(buffer.toString());
+        return new ObjectName(objectName);
     }
 
 }

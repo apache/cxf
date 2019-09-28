@@ -79,7 +79,7 @@ public class SoapMessage extends MessageImpl {
     }
 
     public boolean hasHeaders() {
-        return containsKey(Header.HEADER_LIST) && getHeaders().size() > 0;
+        return containsKey(Header.HEADER_LIST) && !getHeaders().isEmpty();
     }
 
     public Map<String, String> getEnvelopeNs() {

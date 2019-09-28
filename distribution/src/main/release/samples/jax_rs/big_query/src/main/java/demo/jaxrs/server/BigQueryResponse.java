@@ -24,7 +24,7 @@ import java.util.List;
 public class BigQueryResponse {
     private String userName;
     private String searchWord;
-    private List<ShakespeareText> texts = new LinkedList<ShakespeareText>();
+    private List<ShakespeareText> texts = new LinkedList<>();
 
     public BigQueryResponse() {
 

@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.net.URL;
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
@@ -45,20 +46,34 @@ import org.apache.schema_validation.types.OccuringStruct;
 import org.apache.schema_validation.types.SomeRequest;
 import org.apache.schema_validation.types.SomeResponse;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class ValidationClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = ValidationServer.PORT;
+
+    private static Locale oldLocale;
 
     private final QName serviceName = new QName("http://apache.org/schema_validation",
                                                 "SchemaValidationService");
     private final QName portName = new QName("http://apache.org/schema_validation", "SoapPort");
 
-
     @BeforeClass
     public static void startservers() throws Exception {
+        oldLocale = Locale.getDefault();
+        Locale.setDefault(Locale.ENGLISH);
         assertTrue("server did not launch correctly", launchServer(ValidationServer.class, true));
+    }
+
+    @AfterClass
+    public static void resetLocale() {
+        Locale.setDefault(oldLocale);
     }
 
     @Test
@@ -149,8 +164,8 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
         // Populate the list in the wrong order.
         // Client side validation should throw an exception.
         List<Serializable> floatIntStringList = occuringStruct.getVarFloatAndVarIntAndVarString();
-        floatIntStringList.add(new Integer(42));
-        floatIntStringList.add(new Float(4.2f));
+        floatIntStringList.add(Integer.valueOf(42));
+        floatIntStringList.add(Float.valueOf(4.2f));
         floatIntStringList.add("Goofus and Gallant");
         try {
             /*boolean result =*/

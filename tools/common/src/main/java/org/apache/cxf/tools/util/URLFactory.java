@@ -78,7 +78,7 @@ public final class URLFactory {
                     handler = (URLStreamHandler)cls.newInstance();
                 }
             } catch (Exception ignored) {
-                ignored.getMessage();
+                // ignore
             }
         }
         return handler;

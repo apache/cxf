@@ -49,6 +49,7 @@ import org.w3c.dom.NodeList;
 
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -76,8 +77,7 @@ public class XMLSource {
             doc = StaxUtils.read(new StreamSource(stream));
             stream = null;
         } catch (XMLStreamException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new Fault(e); 
         }
     }
 
@@ -114,9 +114,8 @@ public class XMLSource {
             Node node = (Node)obj;
             if (cls.isPrimitive() || cls == String.class) {
                 return (T)readPrimitiveValue(node, cls);
-            } else {
-                return readNode(node, cls);
             }
+            return readNode(node, cls);
         }
         return cls.cast(evaluate(expression, namespaces, XPathConstants.STRING));
     }
@@ -218,7 +217,7 @@ public class XMLSource {
      * @return the xml:base value
      */
     public URI getBaseURI() {
-        Map<String, String> map = new LinkedHashMap<String, String>();
+        Map<String, String> map = new LinkedHashMap<>();
         map.put("xml", XML_NAMESPACE);
         return getLink("/*/@xml:base", map);
     }
@@ -335,7 +334,7 @@ public class XMLSource {
             return null;
         }
 
-        public Iterator<?> getPrefixes(String namespace) {
+        public Iterator<String> getPrefixes(String namespace) {
             String prefix = namespaces.get(namespace);
             if (prefix == null) {
                 return null;
@@ -348,9 +347,8 @@ public class XMLSource {
         if (String.class == cls) {
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 return StaxUtils.toString((Element)node);
-            } else {
-                return cls.cast(node.getNodeValue());
             }
+            return cls.cast(node.getNodeValue());
         }
 
         return InjectionUtils.convertStringToPrimitive(node.getNodeValue(), cls);
@@ -370,7 +368,7 @@ public class XMLSource {
 
         try {
 
-            JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
+            JAXBElementProvider<?> provider = new JAXBElementProvider<>();
             JAXBContext c = provider.getPackageContext(cls);
             if (c == null) {
                 c = provider.getClassContext(cls);
@@ -379,9 +377,8 @@ public class XMLSource {
             try {
                 if (cls.getAnnotation(XmlRootElement.class) != null) {
                     return cls.cast(u.unmarshal(s));
-                } else {
-                    return u.unmarshal(s, cls).getValue();
                 }
+                return u.unmarshal(s, cls).getValue();
             } finally {
                 JAXBUtils.closeUnmarshaller(u);
             }

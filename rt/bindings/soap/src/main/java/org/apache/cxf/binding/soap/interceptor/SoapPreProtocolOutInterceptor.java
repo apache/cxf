@@ -114,17 +114,16 @@ public class SoapPreProtocolOutInterceptor extends AbstractSoapInterceptor {
         String action = getSoapAction(message, boi);
 
         if (message.getVersion() instanceof Soap11) {
+            Map<String, List<String>> tempReqHeaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
             Map<String, List<String>> reqHeaders
-                = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
-            if (reqHeaders == null) {
-                reqHeaders = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+                    = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
+            if (reqHeaders != null) {
+                tempReqHeaders.putAll(reqHeaders);
             }
-
-            if (reqHeaders.size() == 0) {
-                message.put(Message.PROTOCOL_HEADERS, reqHeaders);
+            if (!tempReqHeaders.containsKey(SoapBindingConstants.SOAP_ACTION)) {
+                tempReqHeaders.put(SoapBindingConstants.SOAP_ACTION, Collections.singletonList(action));
             }
-
-            reqHeaders.put(SoapBindingConstants.SOAP_ACTION, Collections.singletonList(action));
+            message.put(Message.PROTOCOL_HEADERS, tempReqHeaders);
         } else if (message.getVersion() instanceof Soap12 && !"\"\"".equals(action)) {
             String ct = (String) message.get(Message.CONTENT_TYPE);
 

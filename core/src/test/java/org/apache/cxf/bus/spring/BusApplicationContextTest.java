@@ -18,13 +18,15 @@
  */
 
 package org.apache.cxf.bus.spring;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import org.springframework.beans.BeansException;
 
-public class BusApplicationContextTest extends Assert {
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+
+public class BusApplicationContextTest {
 
     @Test
     public void testGetResources() {

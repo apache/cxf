@@ -21,7 +21,6 @@ package org.apache.cxf.ws.security.policy.interceptors;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +29,7 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
@@ -77,6 +77,7 @@ import org.apache.wss4j.policy.model.SignedParts;
 import org.apache.wss4j.policy.model.Trust10;
 import org.apache.wss4j.policy.model.Trust13;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.apache.xml.security.utils.XMLUtils;
 
 class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
 
@@ -301,7 +302,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             String prefix,
             String namespace
         ) throws Exception {
-            doIssueOrRenew(requestEl, exchange, binaryExchange, writer, prefix, namespace, null);
+            doIssueOrRenew(requestEl, exchange, writer, prefix, namespace, null);
         }
 
         void doRenew(Element requestEl,
@@ -311,14 +312,13 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                      W3CDOMStreamWriter writer,
                      String prefix,
                      String namespace) throws Exception {
-            doIssueOrRenew(requestEl, exchange, binaryExchange, writer, prefix, namespace,
+            doIssueOrRenew(requestEl, exchange, writer, prefix, namespace,
                     renewToken.getId());
         }
 
 
         private void doIssueOrRenew(Element requestEl,
                                Exchange exchange,
-                               Element binaryExchange,
                                W3CDOMStreamWriter writer,
                                String prefix,
                                String namespace,
@@ -329,7 +329,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             }
             writer.writeStartElement(prefix, "RequestSecurityTokenResponse", namespace);
 
-            byte clientEntropy[] = null;
+            byte[] clientEntropy = null;
             int keySize = 256;
             long ttl = WSS4JUtils.getSecurityTokenLifetime(exchange.getOutMessage());
             String tokenType = null;
@@ -340,7 +340,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                     if ("Entropy".equals(localName)) {
                         Element bs = DOMUtils.getFirstElement(el);
                         if (bs != null) {
-                            clientEntropy = Base64.getMimeDecoder().decode(bs.getTextContent());
+                            clientEntropy = XMLUtils.decode(bs.getTextContent());
                         }
                     } else if ("KeySize".equals(localName)) {
                         keySize = Integer.parseInt(el.getTextContent());

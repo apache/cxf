@@ -51,12 +51,20 @@ import org.apache.ws.commons.schema.XmlSchemaSequence;
 import org.apache.ws.commons.schema.XmlSchemaSequenceMember;
 import org.apache.ws.commons.schema.constants.Constants;
 
+import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class BeanTest extends AbstractAegisTest {
     TypeMapping mapping;
     private AegisContext context;
 
+    @Before
     public void setUp() throws Exception {
         super.setUp();
 
@@ -488,10 +496,10 @@ public class BeanTest extends AbstractAegisTest {
         assertTrue(bigByteOk);
 
         SimpleBean bean = new SimpleBean();
-        bean.setBigByte(new Byte((byte)0xfe));
+        bean.setBigByte(Byte.valueOf((byte)0xfe));
         bean.setLittleByte((byte)0xfd);
         Element element = writeObjectToElement(type, bean, getContext());
-        Byte bb = new Byte((byte)0xfe);
+        Byte bb = Byte.valueOf((byte)0xfe);
         String bbs = bb.toString();
         assertValid("/b:root/bz:bigByte[text()='" + bbs + "']", element);
 

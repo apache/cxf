@@ -44,7 +44,7 @@ import org.apache.cxf.security.SecurityContext;
 public class WebServiceContextImpl implements WebServiceContext {
     private static final Logger LOG = LogUtils.getL7dLogger(WebServiceContextImpl.class);
 
-    private static ThreadLocal<MessageContext> context = new ThreadLocal<MessageContext>();
+    private static ThreadLocal<MessageContext> context = new ThreadLocal<>();
 
     private final MessageContext localCtx;
 
@@ -127,10 +127,9 @@ public class WebServiceContextImpl implements WebServiceContext {
                                                                 Element... referenceParameters) {
         if (W3CEndpointReference.class.isAssignableFrom(clazz)) {
             return clazz.cast(getEndpointReference(referenceParameters));
-        } else {
-            throw new WebServiceException(new Message("ENDPOINTREFERENCE_TYPE_NOT_SUPPORTED",
-                                                      LOG, clazz.getName()).toString());
         }
+        throw new WebServiceException(new Message("ENDPOINTREFERENCE_TYPE_NOT_SUPPORTED",
+                                                  LOG, clazz.getName()).toString());
     }
 
     /**

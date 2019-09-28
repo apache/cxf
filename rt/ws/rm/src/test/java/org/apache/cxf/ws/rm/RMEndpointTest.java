@@ -47,15 +47,21 @@ import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.policy.PolicyEngineImpl;
 import org.apache.cxf.ws.rm.v200702.Identifier;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class RMEndpointTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+public class RMEndpointTest {
 
     private IMocksControl control;
     private RMManager manager;
@@ -314,9 +320,9 @@ public class RMEndpointTest extends Assert {
         String ns = RM10Constants.NAMESPACE_URI;
         OperationInfo oi = intf.getOperation(new QName(ns, "CreateSequence"));
         assertNotNull("No operation info.", oi);
-        assertTrue("Operation is oneway.", !oi.isOneWay());
-        assertTrue("Operation is unwrapped.", !oi.isUnwrapped());
-        assertTrue("Operation is unwrappedCapable.", !oi.isUnwrappedCapable());
+        assertFalse("Operation is oneway.", oi.isOneWay());
+        assertFalse("Operation is unwrapped.", oi.isUnwrapped());
+        assertFalse("Operation is unwrappedCapable.", oi.isUnwrappedCapable());
         assertNull("Unexpected unwrapped operation.", oi.getUnwrappedOperation());
 
         oi = intf.getOperation(new QName(ns, "TerminateSequence"));
@@ -325,7 +331,7 @@ public class RMEndpointTest extends Assert {
 
         oi = intf.getOperation(new QName(ns, "TerminateSequenceAnonymous"));
         assertNotNull("No operation info.", oi);
-        assertTrue("Operation is oneway.", !oi.isOneWay());
+        assertFalse("Operation is oneway.", oi.isOneWay());
 
         oi = intf.getOperation(new QName(ns, "SequenceAcknowledgement"));
         assertNotNull("No operation info.", oi);

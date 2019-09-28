@@ -100,7 +100,7 @@ public class AttachmentSerializer {
         // Set transport mime type
         String requestMimeType = multipartType == null ? DEFAULT_MULTIPART_TYPE : multipartType;
 
-        StringBuilder ct = new StringBuilder();
+        StringBuilder ct = new StringBuilder(32);
         ct.append(requestMimeType);
 
         // having xop set to true implies multipart/related, but just in case...
@@ -114,14 +114,14 @@ public class AttachmentSerializer {
             if (xop) {
                 ct.append("; type=\"application/xop+xml\"");
             } else {
-                ct.append("; type=\"").append(bodyCt).append("\"");
+                ct.append("; type=\"").append(bodyCt).append('"');
             }
         }
 
         // boundary
         ct.append("; boundary=\"")
             .append(bodyBoundary)
-            .append("\"");
+            .append('"');
 
         String rootContentId = getHeaderValue("Content-ID", AttachmentUtil.BODY_ATTACHMENT_ID);
 
@@ -143,7 +143,7 @@ public class AttachmentSerializer {
             if (bodyCtParamsEscaped != null) {
                 ct.append(bodyCtParamsEscaped);
             }
-            ct.append("\"");
+            ct.append('"');
         }
 
 
@@ -157,6 +157,7 @@ public class AttachmentSerializer {
             encoding = StandardCharsets.UTF_8.name();
         }
         StringWriter writer = new StringWriter();
+        writer.write("\r\n");
         writer.write("--");
         writer.write(bodyBoundary);
 
@@ -170,7 +171,7 @@ public class AttachmentSerializer {
                 if (bodyCtParamsEscaped != null) {
                     mimeBodyCt.append(bodyCtParamsEscaped);
                 }
-                mimeBodyCt.append("\"");
+                mimeBodyCt.append('"');
             } else if (bodyCtParams != null) {
                 mimeBodyCt.append(bodyCtParams);
             }
@@ -260,7 +261,7 @@ public class AttachmentSerializer {
                 Map<String, List<String>> headers = null;
                 Iterator<String> it = a.getHeaderNames();
                 if (it.hasNext()) {
-                    headers = new LinkedHashMap<String, List<String>>();
+                    headers = new LinkedHashMap<>();
                     while (it.hasNext()) {
                         String key = it.next();
                         headers.put(key, Collections.singletonList(a.getHeader(key)));
@@ -277,7 +278,9 @@ public class AttachmentSerializer {
                              headers, writer);
                 out.write(writer.getBuffer().toString().getBytes(encoding));
                 if ("base64".equals(contentTransferEncoding)) {
-                    encodeBase64(handler.getInputStream(), out, IOUtils.DEFAULT_BUFFER_SIZE);
+                    try (InputStream inputStream = handler.getInputStream()) {
+                        encodeBase64(inputStream, out, IOUtils.DEFAULT_BUFFER_SIZE);
+                    }
                 } else {
                     handler.writeTo(out);
                 }
@@ -293,23 +296,40 @@ public class AttachmentSerializer {
 
     private int encodeBase64(InputStream input, OutputStream output, int bufferSize) throws IOException {
         int avail = input.available();
-        if (avail > 262144) {
-            avail = 262144;
+        if (avail > 262143) {
+            //must be divisible by 3
+            avail = 262143;
         }
         if (avail > bufferSize) {
             bufferSize = avail;
         }
         final byte[] buffer = new byte[bufferSize];
-        int n = 0;
-        n = input.read(buffer);
+        int n = input.read(buffer);
         int total = 0;
         while (-1 != n) {
             if (n == 0) {
                 throw new IOException("0 bytes read in violation of InputStream.read(byte[])");
             }
-            Base64Utility.encodeAndStream(buffer, 0, n, out);
-            total += n;
-            n = input.read(buffer);
+            //make sure n is divisible by 3
+            int left = n % 3;
+            n -= left;
+            if (n > 0) {
+                Base64Utility.encodeAndStream(buffer, 0, n, output);
+                total += n;
+            }
+            if (left != 0) {
+                for (int x = 0; x < left; ++x) {
+                    buffer[x] = buffer[n + x];
+                }
+                n = input.read(buffer, left, buffer.length - left);
+                if (n == -1) {
+                    // we've hit the end, but still have stuff left, write it out
+                    Base64Utility.encodeAndStream(buffer, 0, left, output);
+                    total += left;
+                }
+            } else {
+                n = input.read(buffer);
+            }
         }
         return total;
     }

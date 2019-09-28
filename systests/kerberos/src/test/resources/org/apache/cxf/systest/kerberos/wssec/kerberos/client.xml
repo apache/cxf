@@ -17,7 +17,14 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:cxf="http://cxf.apache.org/core" xmlns:p="http://cxf.apache.org/policy" xmlns:sec="http://cxf.apache.org/configuration/security" xsi:schemaLocation="           http://www.springframework.org/schema/beans           http://www.springframework.org/schema/beans/spring-beans-4.2.xsd           http://cxf.apache.org/jaxws                           http://cxf.apache.org/schemas/jaxws.xsd           http://cxf.apache.org/transports/http/configuration   http://cxf.apache.org/schemas/configuration/http-conf.xsd           http://cxf.apache.org/configuration/security          http://cxf.apache.org/schemas/configuration/security.xsd           http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd           http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:http="http://cxf.apache.org/transports/http/configuration"
+    xmlns:jaxws="http://cxf.apache.org/jaxws"
+    xmlns:cxf="http://cxf.apache.org/core"
+    xmlns:p="http://cxf.apache.org/policy"
+    xmlns:sec="http://cxf.apache.org/configuration/security"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
@@ -43,7 +50,6 @@
         <jaxws:properties>
             <entry key="ws-security.kerberos.client">
                 <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
-                    <constructor-arg ref="cxf"/>
                     <property name="contextName" value="alice"/>
                     <property name="serviceName" value="bob@service.ws.apache.org"/>
                     <property name="callbackHandler" ref="kerberosCallbackHandler"/>
@@ -58,13 +64,26 @@
             <entry key="security.callback-handler" value-ref="kerberosCallbackHandler"/>
         </jaxws:properties>
     </jaxws:client>
+    
+    <bean id="kerberosCallbackHandler2" 
+          class="org.apache.cxf.systest.kerberos.common.KerberosClientPasswordCallback">
+          <property name="username" value="carol"/>
+          <property name="password" value="carol"/>
+    </bean>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKerberosTransportPort3" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.kerberos.jaas.context" value="carol" />
+            <entry key="ws-security.kerberos.spn" value="dave@service.ws.apache.org" />
+            <entry key="security.callback-handler" value-ref="kerberosCallbackHandler2"/>
+        </jaxws:properties>
+    </jaxws:client>
+    
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKerberosSymmetricPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>
             <entry key="ws-security.kerberos.client">
                 <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
-                    <constructor-arg ref="cxf"/>
                     <property name="contextName" value="alice"/>
                     <property name="serviceName" value="bob@service.ws.apache.org"/>
                     <property name="callbackHandler" ref="kerberosCallbackHandler"/>
@@ -78,7 +97,6 @@
             <entry key="security.encryption.username" value="bob"/>
             <entry key="ws-security.kerberos.client">
                 <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
-                    <constructor-arg ref="cxf"/>
                     <property name="contextName" value="alice"/>
                     <property name="serviceName" value="bob@service.ws.apache.org"/>
                     <property name="callbackHandler" ref="kerberosCallbackHandler"/>
@@ -92,7 +110,6 @@
             <entry key="security.encryption.username" value="bob"/>
             <entry key="ws-security.kerberos.client">
                 <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
-                    <constructor-arg ref="cxf"/>
                     <property name="contextName" value="alice"/>
                     <property name="serviceName" value="bob@service.ws.apache.org"/>
                     <property name="callbackHandler" ref="kerberosCallbackHandler"/>
@@ -109,7 +126,6 @@
             <entry key="security.signature.username" value="alice"/>
             <entry key="ws-security.kerberos.client">
                 <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
-                    <constructor-arg ref="cxf"/>
                     <property name="contextName" value="alice"/>
                     <property name="serviceName" value="bob@service.ws.apache.org"/>
                     <property name="callbackHandler" ref="kerberosCallbackHandler"/>
@@ -121,7 +137,6 @@
         <jaxws:properties>
             <entry key="ws-security.kerberos.client">
                 <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
-                    <constructor-arg ref="cxf"/>
                     <property name="contextName" value="alice"/>
                     <property name="serviceName" value="bob@service.ws.apache.org"/>
                     <property name="callbackHandler" ref="kerberosCallbackHandler"/>
@@ -141,7 +156,6 @@
             <entry key="security.signature.username" value="alice"/>
             <entry key="ws-security.kerberos.client">
                 <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
-                    <constructor-arg ref="cxf"/>
                     <property name="contextName" value="alice"/>
                     <property name="serviceName" value="bob@service.ws.apache.org"/>
                     <property name="callbackHandler" ref="kerberosCallbackHandler"/>
@@ -155,7 +169,6 @@
             <entry key="security.encryption.username" value="bob"/>
             <entry key="ws-security.kerberos.client">
                 <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
-                    <constructor-arg ref="cxf"/>
                     <property name="contextName" value="alice"/>
                     <property name="serviceName" value="bob@service.ws.apache.org"/>
                     <property name="callbackHandler" ref="kerberosCallbackHandler"/>
@@ -169,7 +182,6 @@
             <entry key="security.encryption.username" value="bob"/>
             <entry key="ws-security.kerberos.client">
                 <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
-                    <constructor-arg ref="cxf"/>
                     <property name="contextName" value="alice"/>
                     <property name="serviceName" value="bob@service.ws.apache.org"/>
                     <property name="callbackHandler" ref="kerberosCallbackHandler"/>
@@ -186,7 +198,6 @@
             <entry key="security.signature.username" value="alice"/>
             <entry key="ws-security.kerberos.client">
                 <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
-                    <constructor-arg ref="cxf"/>
                     <property name="contextName" value="alice"/>
                     <property name="serviceName" value="bob@service.ws.apache.org"/>
                     <property name="callbackHandler" ref="kerberosCallbackHandler"/>
@@ -203,7 +214,6 @@
             <entry key="security.signature.username" value="alice"/>
             <entry key="ws-security.kerberos.client">
                 <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
-                    <constructor-arg ref="cxf"/>
                     <property name="contextName" value="alice"/>
                     <property name="serviceName" value="bob@service.ws.apache.org"/>
                     <property name="callbackHandler" ref="kerberosCallbackHandler"/>
@@ -217,7 +227,6 @@
             <entry key="security.encryption.username" value="bob"/>
             <entry key="ws-security.kerberos.client">
                 <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
-                    <constructor-arg ref="cxf"/>
                     <property name="contextName" value="alice"/>
                     <property name="serviceName" value="bob@service.ws.apache.org"/>
                     <property name="callbackHandler" ref="kerberosCallbackHandler"/>
@@ -231,7 +240,6 @@
             <entry key="security.encryption.username" value="bob"/>
             <entry key="ws-security.kerberos.client">
                 <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
-                    <constructor-arg ref="cxf"/>
                     <property name="contextName" value="alice"/>
                     <property name="serviceName" value="bob@service.ws.apache.org"/>
                     <property name="callbackHandler" ref="kerberosCallbackHandler"/>
@@ -245,7 +253,6 @@
             <entry key="security.encryption.username" value="bob"/>
             <entry key="ws-security.kerberos.client">
                 <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
-                    <constructor-arg ref="cxf"/>
                     <property name="contextName" value="alice"/>
                     <property name="serviceName" value="bob@service.ws.apache.org"/>
                     <property name="callbackHandler" ref="kerberosCallbackHandler"/>
@@ -253,4 +260,17 @@
             </entry>
         </jaxws:properties>
     </jaxws:client>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKerberosTransportActionPort" createdFromAPI="true">
+        <jaxws:outInterceptors>
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+                <constructor-arg>
+                    <map>
+                        <entry key="action" value="CustomToken"/>
+                        <entry key="passwordCallbackRef" value-ref="kerberosCallbackHandler"/>
+                    </map>
+                </constructor-arg>
+            </bean>
+        </jaxws:outInterceptors>
+    </jaxws:client>
+    
 </beans>

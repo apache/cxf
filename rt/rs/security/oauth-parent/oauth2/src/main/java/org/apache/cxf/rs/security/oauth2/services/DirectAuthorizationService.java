@@ -96,9 +96,8 @@ public class DirectAuthorizationService extends AbstractOAuthService {
         subject = getMessageContext().getContent(UserSubject.class);
         if (subject != null) {
             return subject;
-        } else {
-            return OAuthUtils.createSubject(securityContext);
         }
+        return OAuthUtils.createSubject(securityContext);
     }
 
     public SubjectCreator getSubjectCreator() {

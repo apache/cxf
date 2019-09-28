@@ -18,10 +18,11 @@
  */
 package org.apache.cxf.jaxrs.ext.search;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class SearchUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class SearchUtilsTest {
 
     @Test
     public void testSqlWildcardString() {

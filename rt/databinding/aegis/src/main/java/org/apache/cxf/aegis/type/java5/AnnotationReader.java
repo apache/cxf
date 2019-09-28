@@ -278,7 +278,7 @@ public class AnnotationReader {
                 try {
                     Annotation ann = element.getAnnotation(annotation.asSubclass(Annotation.class));
                     if (ann != null) {
-                        Method method = ann.getClass().getMethod(name);
+                        Method method = ann.annotationType().getMethod(name);
                         Object value = method.invoke(ann);
                         if ((ignoredValue == null && value != null) || (ignoredValue != null
                                 && !ignoredValue.equals(value))) {
@@ -301,7 +301,7 @@ public class AnnotationReader {
                 try {
                     for (Annotation ann : anns) {
                         if (annotation.isInstance(ann)) {
-                            Method method = ann.getClass().getMethod(name);
+                            Method method = ann.annotationType().getMethod(name);
                             return method.invoke(ann);
                         }
                     }
@@ -331,7 +331,7 @@ public class AnnotationReader {
                 try {
                     Annotation ann = getAnnotation(method, index, annotation);
                     if (ann != null) {
-                        Object value = ann.getClass().getMethod(name).invoke(ann);
+                        Object value = ann.annotationType().getMethod(name).invoke(ann);
                         if ((ignoredValue == null && value != null) || (ignoredValue != null
                                 && !ignoredValue.equals(value))) {
                             return value;

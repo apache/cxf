@@ -39,7 +39,6 @@ import javax.xml.ws.LogicalMessage;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -99,15 +98,15 @@ public class LogicalMessageImpl implements LogicalMessage {
 
                 if (source == null) {
                     try {
-                        Document doc = DOMUtils.newDocument();
-                        W3CDOMStreamWriter writer = new W3CDOMStreamWriter(doc.createDocumentFragment());
+                        DocumentFragment doc = DOMUtils.getEmptyDocument().createDocumentFragment();
+                        W3CDOMStreamWriter writer = new W3CDOMStreamWriter(doc);
                         reader = message.getContent(XMLStreamReader.class);
                         //content must be an element thing, skip over any whitespace
                         StaxUtils.toNextTag(reader);
                         StaxUtils.copy(reader, writer, true);
                         doc.appendChild(DOMUtils.getFirstElement(writer.getCurrentFragment()));
-                        source = new DOMSource(doc.getDocumentElement());
-                        reader = StaxUtils.createXMLStreamReader(doc.getDocumentElement());
+                        source = new DOMSource(DOMUtils.getFirstElement(doc));
+                        reader = StaxUtils.createXMLStreamReader(DOMUtils.getFirstElement(doc));
                     } catch (XMLStreamException e) {
                         throw new Fault(e);
                     }
@@ -232,6 +231,7 @@ public class LogicalMessageImpl implements LogicalMessage {
             Source s = getPayload();
             if (s instanceof DOMSource) {
                 DOMSource ds = (DOMSource)s;
+                ds.setNode(org.apache.cxf.helpers.DOMUtils.getDomElement(ds.getNode()));
                 Node parent = ds.getNode().getParentNode();
                 Node next = ds.getNode().getNextSibling();
                 if (parent instanceof DocumentFragment) {

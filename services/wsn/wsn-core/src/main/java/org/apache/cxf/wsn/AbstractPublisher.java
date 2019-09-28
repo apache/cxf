@@ -109,14 +109,13 @@ public abstract class AbstractPublisher extends AbstractEndpoint implements Publ
         topic = registerPublisherRequest.getTopic();
         // Check demand based
         demand = registerPublisherRequest.isDemand() != null
-            ? registerPublisherRequest.isDemand().booleanValue()
-                : false;
+            && registerPublisherRequest.isDemand().booleanValue();
         // Check all parameters
         if (publisherReference == null && demand) {
             PublisherRegistrationFailedFaultType fault = new PublisherRegistrationFailedFaultType();
             throw new PublisherRegistrationFailedFault("Invalid PublisherReference: null", fault);
         }
-        if (demand && (topic == null || topic.size() == 0)) {
+        if (demand && (topic == null || topic.isEmpty())) {
             InvalidTopicExpressionFaultType fault = new InvalidTopicExpressionFaultType();
             throw new InvalidTopicExpressionFault(
                     "Must specify at least one topic for demand-based publishing", fault);

@@ -31,6 +31,8 @@ import org.apache.cxf.aegis.services.BeanService;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class WrappedTest extends AbstractAegisTest {
 
     private ArrayService arrayService;
@@ -120,27 +122,6 @@ public class WrappedTest extends AbstractAegisTest {
                         + "/xsd:complexType[@name=\"SimpleBean\"]/xsd:sequence/xsd:element"
                         + "[@type=\"xsd:string\"]",
                     doc);
-    }
-
-    @org.junit.Ignore // uses Jaxen.
-    @Test
-    public void testSubmitJDOMArray() throws Exception {
-
-        org.jdom.xpath.XPath jxpathWalrus =
-            org.jdom.xpath.XPath.newInstance("/a:anyType/iam:walrus");
-        jxpathWalrus.addNamespace("a", "urn:Array");
-        jxpathWalrus.addNamespace("iam", "uri:iam");
-        jxpathWalrus.addNamespace("linux", "uri:linux");
-        jxpathWalrus.addNamespace("planets", "uri:planets");
-
-        invoke("Array", "/org/apache/cxf/aegis/integration/anyTypeArrayJDOM.xml");
-        assertEquals("before items", arrayService.getBeforeValue());
-        assertEquals(3, arrayService.getJdomArray().length);
-        org.jdom.Element e = (org.jdom.Element)
-            jxpathWalrus.selectSingleNode(arrayService.getJdomArray()[0]);
-        assertNotNull(e);
-        assertEquals("tusks", e.getText());
-        assertEquals("after items", arrayService.getAfterValue());
     }
 
     @Test

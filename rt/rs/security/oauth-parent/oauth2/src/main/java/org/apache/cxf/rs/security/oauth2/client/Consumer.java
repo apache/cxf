@@ -36,16 +36,6 @@ public class Consumer {
         this.clientSecret = secret;
     }
 
-    @Deprecated
-    public String getKey() {
-        return getClientId();
-    }
-
-    @Deprecated
-    public void setKey(String key) {
-        setClientId(key);
-    }
-
     public String getClientId() {
         return clientId;
     }
@@ -54,15 +44,6 @@ public class Consumer {
         this.clientId = id;
     }
 
-    @Deprecated
-    public String getSecret() {
-        return getClientSecret();
-    }
-
-    @Deprecated
-    public void setSecret(String secret) {
-        setClientSecret(secret);
-    }
     public String getClientSecret() {
         return clientSecret;
     }

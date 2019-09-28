@@ -50,7 +50,7 @@ public class CounterRepository {
     private Lock counterCreationLock = new ReentrantLock();
 
     public CounterRepository() {
-        counters = new ConcurrentHashMap<ObjectName, Counter>();
+        counters = new ConcurrentHashMap<>();
     }
 
     public void setBus(Bus b) {

@@ -28,11 +28,13 @@ import org.apache.cxf.tools.common.model.JAnnotation;
 import org.apache.cxf.tools.common.model.JAnnotationElement;
 import org.apache.cxf.tools.common.model.JavaMethod;
 import org.apache.cxf.tools.common.model.JavaParameter;
-import org.junit.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 
-public class WebParamAnnotatorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class WebParamAnnotatorTest {
 
     JavaMethod method;
     JavaParameter parameter;
@@ -66,10 +68,6 @@ public class WebParamAnnotatorTest extends Assert {
         assertEquals(2, elements.size());
         assertEquals("http://apache.org/cxf", elements.get(1).getValue());
         assertEquals("x", elements.get(0).getValue());
-        // XXX - order that attributes are appended to the string
-        //       differs with the ibmjdk...
-        //assertEquals("@WebParam(targetNamespace = \"http://apache.org/cxf\", name = \"x\")",
-        //             annotation.toString());
     }
 
     @Test
@@ -84,11 +82,6 @@ public class WebParamAnnotatorTest extends Assert {
                          annotation.toString());
         List<JAnnotationElement> elements = annotation.getElements();
         assertEquals(3, elements.size());
-        // XXX - order that attributes are appended to the string
-        //       differs with the ibmjdk...
-        //assertEquals(
-        //"@WebParam(targetNamespace = \"http://apache.org/cxf\", partName = \"y\", name = \"x\")",
-        //             annotation.toString());
     }
 
     @Test

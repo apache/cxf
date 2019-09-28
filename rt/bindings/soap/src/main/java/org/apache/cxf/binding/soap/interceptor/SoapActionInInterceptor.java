@@ -29,6 +29,7 @@ import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.jms.interceptor.SoapJMSInInterceptor;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -67,7 +68,7 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
                 List<String> sa = headers.get(SoapBindingConstants.SOAP_ACTION);
                 if (sa != null && !sa.isEmpty()) {
                     String action = sa.get(0);
-                    if (action.startsWith("\"")) {
+                    if (action.startsWith("\"") || action.startsWith("\'")) {
                         action = action.substring(1, action.length() - 1);
                     }
                     return action;
@@ -111,6 +112,12 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
                 return ct.substring(start, end);
             }
         }
+
+        // Return the Soap Action for the JMS Case
+        if (message.containsKey(SoapJMSInInterceptor.JMS_SOAP_ACTION_VALUE)) {
+            return (String)message.get(SoapJMSInInterceptor.JMS_SOAP_ACTION_VALUE);
+        }
+
         return null;
     }
 

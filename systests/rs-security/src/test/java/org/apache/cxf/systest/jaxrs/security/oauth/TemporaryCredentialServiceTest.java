@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import net.oauth.OAuth;
-
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.oauth.client.OAuthClientUtils;
 import org.apache.cxf.rs.security.oauth.client.OAuthClientUtils.Token;
@@ -32,6 +31,9 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class TemporaryCredentialServiceTest extends AbstractBusClientServerTestBase {
 

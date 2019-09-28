@@ -26,7 +26,7 @@ import org.apache.callback.CallbackPortType;
                       portName = "CallbackPort",
                       endpointInterface = "org.apache.callback.CallbackPortType",
                       targetNamespace = "http://apache.org/callback",
-                      wsdlLocation = "testutils/basic_callback_test.wsdl")
+                      wsdlLocation = "wsdl/basic_callback_test.wsdl")
 
 public class CallbackImpl implements CallbackPortType  {
 

@@ -18,12 +18,16 @@
  */
 package org.apache.cxf.systest.sts.transport;
 
+import java.io.InputStream;
 import java.net.URL;
+import java.security.KeyStore;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.TrustManagerFactory;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -37,8 +41,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
@@ -46,13 +54,20 @@ import org.apache.cxf.systest.sts.common.TokenTestUtils;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.systest.sts.deployment.StaxSTSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.trust.STSClient;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test the TransportBinding. The CXF client gets a token from the STS over TLS, and then
@@ -102,17 +117,17 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
+    public static Collection<TestParam> data() {
 
-        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false, STSPORT)},
-                                                {new TestParam(PORT, true, STSPORT)},
-                                                {new TestParam(STAX_PORT, false, STSPORT)},
-                                                {new TestParam(STAX_PORT, true, STSPORT)},
+        return Arrays.asList(new TestParam[] {new TestParam(PORT, false, STSPORT),
+                                              new TestParam(PORT, true, STSPORT),
+                                              new TestParam(STAX_PORT, false, STSPORT),
+                                              new TestParam(STAX_PORT, true, STSPORT),
 
-                                                {new TestParam(PORT, false, STAX_STSPORT)},
-                                                {new TestParam(PORT, true, STAX_STSPORT)},
-                                                {new TestParam(STAX_PORT, false, STAX_STSPORT)},
-                                                {new TestParam(STAX_PORT, true, STAX_STSPORT)},
+                                              new TestParam(PORT, false, STAX_STSPORT),
+                                              new TestParam(PORT, true, STAX_STSPORT),
+                                              new TestParam(STAX_PORT, false, STAX_STSPORT),
+                                              new TestParam(STAX_PORT, true, STAX_STSPORT),
         });
     }
 
@@ -129,8 +144,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -158,8 +173,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -180,6 +195,73 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
+    @org.junit.Test
+    public void testSAML2ViaCode() throws Exception {
+
+        URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2Port");
+        DoubleItPortType transportSaml2Port =
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportSaml2Port, test.getPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(transportSaml2Port);
+        }
+
+        // TLS configuration
+        TrustManagerFactory tmf =
+            TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        KeyManagerFactory kmf =
+            KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        final KeyStore ts = KeyStore.getInstance("JKS");
+        try (InputStream trustStore =
+            ClassLoaderUtils.getResourceAsStream("keys/clientstore.jks", TransportBindingTest.class)) {
+            ts.load(trustStore, "cspass".toCharArray());
+        }
+        tmf.init(ts);
+        kmf.init(ts, "ckpass".toCharArray());
+
+        TLSClientParameters tlsParams = new TLSClientParameters();
+        tlsParams.setTrustManagers(tmf.getTrustManagers());
+        tlsParams.setKeyManagers(kmf.getKeyManagers());
+        tlsParams.setDisableCNCheck(true);
+
+        Client client = ClientProxy.getClient(transportSaml2Port);
+        HTTPConduit http = (HTTPConduit) client.getConduit();
+        http.setTlsClientParameters(tlsParams);
+
+        // STSClient configuration
+        Bus clientBus = BusFactory.newInstance().createBus();
+        STSClient stsClient = new STSClient(clientBus);
+
+        // Use a local WSDL or else we run into problems retrieving the WSDL over HTTPS
+        // due to lack of TLS config when creating the client
+        URL stsWsdl = TransportBindingTest.class.getResource("../deployment/ws-trust-1.4-service.wsdl");
+        stsClient.setWsdlLocation(stsWsdl.toString());
+        stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
+        stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
+
+        Map<String, Object> props = new HashMap<>();
+        props.put("security.username", "alice");
+        props.put("security.callback-handler", "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
+        props.put("security.sts.token.username", "myclientkey");
+        props.put("security.sts.token.properties", "clientKeystore.properties");
+        props.put("security.sts.token.usecert", "false");
+        stsClient.setProperties(props);
+
+        ((BindingProvider)transportSaml2Port).getRequestContext().put("security.sts.client", stsClient);
+
+        // Update ports + HTTPS configuration for the STSClient
+        updateAddressPort(stsClient.getClient(), test.getStsPort());
+        ((HTTPConduit) stsClient.getClient().getConduit()).setTlsClientParameters(tlsParams);
+
+        doubleIt(transportSaml2Port, 25);
+
+        ((java.io.Closeable)transportSaml2Port).close();
+        clientBus.shutdown(true);
+    }
+
     /**
      * In this test-case, the client sends another cert to the STS for inclusion in the
      * SAML Assertion and connects via 2-way TLS as normal to the service provider. The
@@ -193,8 +275,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         URL busFile = TransportBindingTest.class.getResource("cxf-bad-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -227,8 +309,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -261,8 +343,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         URL busFile = TransportBindingTest.class.getResource("cxf-bad-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -300,8 +382,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -347,8 +429,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -384,7 +466,7 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.Test
-    public void testSAML2EndorsingX509() throws Exception {
+    public void testSAML2X509Endorsing() throws Exception {
 
         // Only works for DOM (clients)
         if (test.isStreaming()) {
@@ -395,12 +477,75 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2X509EndorsingPort");
+        DoubleItPortType transportSaml1Port =
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportSaml1Port, test.getPort());
+
+        TokenTestUtils.updateSTSPort((BindingProvider)transportSaml1Port, test.getStsPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(transportSaml1Port);
+        }
+
+        doubleIt(transportSaml1Port, 25);
+
+        ((java.io.Closeable)transportSaml1Port).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
+    public void testSAML2SymmetricEndorsing() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2SymmetricEndorsingPort");
+        DoubleItPortType transportSaml1Port =
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportSaml1Port, test.getPort());
+
+        TokenTestUtils.updateSTSPort((BindingProvider)transportSaml1Port, test.getStsPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(transportSaml1Port);
+        }
+
+        doubleIt(transportSaml1Port, 25);
+
+        ((java.io.Closeable)transportSaml1Port).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
+    public void testSAML2SymmetricEndorsingDerived() throws Exception {
+
+        // Only works for DOM (clients)
+        if (test.isStreaming()) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2SymmetricEndorsingDerivedPort");
         DoubleItPortType transportSaml1Port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportSaml1Port, test.getPort());
@@ -423,7 +568,7 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document requestDoc = db.newDocument();
         Element root = requestDoc.createElementNS("http://www.example.org/schema/DoubleIt", "ns2:DoubleIt");
-        root.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:ns2", "http://www.example.org/schema/DoubleIt");
+        root.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:ns2", "http://www.example.org/schema/DoubleIt");
         Element number = requestDoc.createElementNS(null, "numberToDouble");
         number.setTextContent("25");
         root.appendChild(number);

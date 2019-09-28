@@ -28,6 +28,7 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -63,7 +64,7 @@ public final class RSSecurityUtils {
         Object signatureProperties =
             SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_PROPERTIES, m);
 
-        return "POST".equals((String)requestMessage.get(Message.HTTP_REQUEST_METHOD))
+        return "POST".equals(requestMessage.get(Message.HTTP_REQUEST_METHOD))
             && encryptionProperties != null && signatureProperties != null;
     }
 
@@ -129,14 +130,15 @@ public final class RSSecurityUtils {
         return userName;
     }
 
-    public static String getPassword(Message message, String userName,
-                                     int type, Class<?> callingClass) throws WSSecurityException {
+    public static String getSignaturePassword(Message message, String userName,
+                                              Class<?> callingClass) throws WSSecurityException {
         CallbackHandler handler = getCallbackHandler(message, callingClass);
         if (handler == null) {
-            return null;
+            // See if we have a signature password we can use here instead
+            return (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_PASSWORD, message);
         }
 
-        WSPasswordCallback[] cb = {new WSPasswordCallback(userName, type)};
+        WSPasswordCallback[] cb = {new WSPasswordCallback(userName, WSPasswordCallback.SIGNATURE)};
         try {
             handler.handle(cb);
         } catch (Exception e) {

@@ -22,11 +22,9 @@ package org.apache.cxf.tools.wsdlto.javascript;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -45,9 +43,10 @@ import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.wsdlto.core.WSDLToProcessor;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 public class WSDLToJavaScriptProcessor extends WSDLToProcessor {
     private static final Logger LOG = LogUtils.getL7dLogger(WSDLToJavaScriptProcessor.class);
-    private static final Charset UTF8 = Charset.forName("utf-8");
 
     public void process() throws ToolException {
         super.process();
@@ -70,7 +69,6 @@ public class WSDLToJavaScriptProcessor extends WSDLToProcessor {
             }
         }
 
-        BufferedWriter writer = null;
         try {
             OutputStream outputStream = Files.newOutputStream(jsFile.toPath());
             if (null != context.get(ToolConstants.CFG_JAVASCRIPT_UTILS)) {
@@ -78,35 +76,26 @@ public class WSDLToJavaScriptProcessor extends WSDLToProcessor {
                                                                     outputStream);
             }
 
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, UTF8);
-            writer = new BufferedWriter(outputStreamWriter);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, UTF_8);
+            try (BufferedWriter writer = new BufferedWriter(outputStreamWriter)) {
 
-            XmlSchemaCollection collection = serviceInfo.getXmlSchemaCollection().getXmlSchemaCollection();
-            SchemaJavascriptBuilder jsBuilder =
-                new SchemaJavascriptBuilder(serviceInfo
-                .getXmlSchemaCollection(), prefixManager, nameManager);
-            String jsForSchemas = jsBuilder.generateCodeForSchemaCollection(collection);
-            writer.append(jsForSchemas);
+                XmlSchemaCollection collection = serviceInfo.getXmlSchemaCollection().getXmlSchemaCollection();
+                SchemaJavascriptBuilder jsBuilder =
+                    new SchemaJavascriptBuilder(serviceInfo
+                    .getXmlSchemaCollection(), prefixManager, nameManager);
+                String jsForSchemas = jsBuilder.generateCodeForSchemaCollection(collection);
+                writer.append(jsForSchemas);
 
-            ServiceJavascriptBuilder serviceBuilder = new ServiceJavascriptBuilder(serviceInfo,
-                                                                                   null,
-                                                                                   prefixManager,
-                                                                                   nameManager);
-            serviceBuilder.walk();
-            String serviceJavascript = serviceBuilder.getCode();
-            writer.append(serviceJavascript);
-        } catch (FileNotFoundException e) {
-            throw new ToolException(e);
+                ServiceJavascriptBuilder serviceBuilder = new ServiceJavascriptBuilder(serviceInfo,
+                                                                                       null,
+                                                                                       prefixManager,
+                                                                                       nameManager);
+                serviceBuilder.walk();
+                String serviceJavascript = serviceBuilder.getCode();
+                writer.append(serviceJavascript);
+            }
         } catch (IOException e) {
             throw new ToolException(e);
-        } finally {
-            try {
-                if (writer != null) {
-                    writer.close();
-                }
-            } catch (IOException e) {
-                throw new ToolException(e);
-            }
         }
     }
 

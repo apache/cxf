@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.security.policy.interceptors;
 
-import java.util.Base64;
 import java.util.Collection;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -43,6 +42,7 @@ import org.apache.wss4j.common.spnego.SpnegoTokenContext;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.Trust10;
 import org.apache.wss4j.policy.model.Trust13;
+import org.apache.xml.security.utils.XMLUtils;
 
 class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
     SpnegoContextTokenOutInterceptor() {
@@ -74,14 +74,12 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                 if (tok == null) {
                     tok = issueToken(message, aim);
                 }
-                if (tok != null) {
-                    for (AssertionInfo ai : ais) {
-                        ai.setAsserted(true);
-                    }
-                    message.getExchange().getEndpoint().put(SecurityConstants.TOKEN_ID, tok.getId());
-                    message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getId());
-                    TokenStoreUtils.getTokenStore(message).add(tok);
+                for (AssertionInfo ai : ais) {
+                    ai.setAsserted(true);
                 }
+                message.getExchange().getEndpoint().put(SecurityConstants.TOKEN_ID, tok.getId());
+                message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getId());
+                TokenStoreUtils.getTokenStore(message).add(tok);
             } else {
                 // server side should be checked on the way in
                 for (AssertionInfo ai : ais) {
@@ -135,7 +133,7 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                     client.setAddressingNamespace(maps.getNamespaceURI());
                 }
                 SecurityToken tok =
-                    client.requestSecurityToken(s, Base64.getMimeEncoder().encodeToString(spnegoToken.getToken()));
+                    client.requestSecurityToken(s, XMLUtils.encodeToString(spnegoToken.getToken()));
 
                 byte[] wrappedTok = spnegoToken.unwrapKey(tok.getSecret());
                 tok.setSecret(wrappedTok);

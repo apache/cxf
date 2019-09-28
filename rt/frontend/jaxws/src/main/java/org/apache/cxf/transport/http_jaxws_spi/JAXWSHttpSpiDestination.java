@@ -104,9 +104,8 @@ public class JAXWSHttpSpiDestination extends AbstractHTTPDestination {
             Throwable cause = ex.getCause();
             if (cause instanceof RuntimeException) {
                 throw (RuntimeException)cause;
-            } else {
-                throw ex;
             }
+            throw ex;
         } catch (RuntimeException ex) {
             throw ex;
         } finally {

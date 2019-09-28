@@ -25,7 +25,6 @@ import java.io.PrintWriter;
 import java.net.URI;
 
 import org.apache.cxf.Bus;
-
 import org.apache.cxf.annotations.Logging;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
@@ -45,7 +44,7 @@ public class OldLoggingFactoryBeanListener implements FactoryBeanListener {
     public OldLoggingFactoryBeanListener(Bus b) {
         FactoryBeanListenerManager m = b.getExtension(FactoryBeanListenerManager.class);
         for (FactoryBeanListener f : m.getListeners()) {
-            if (f.getClass().getSimpleName().equals("OldLoggingFactoryBeanListener")) {
+            if ("OldLoggingFactoryBeanListener".equals(f.getClass().getSimpleName())) {
                 m.removeListener(f);
             }
         }

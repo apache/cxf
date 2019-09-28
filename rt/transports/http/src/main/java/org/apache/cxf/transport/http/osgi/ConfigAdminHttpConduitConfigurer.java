@@ -100,8 +100,8 @@ class ConfigAdminHttpConduitConfigurer implements ManagedServiceFactory, HTTPCon
     }
 
     Map<String, PidInfo> props
-        = new ConcurrentHashMap<String, PidInfo>(4, 0.75f, 2);
-    CopyOnWriteArrayList<PidInfo> sorted = new CopyOnWriteArrayList<PidInfo>();
+        = new ConcurrentHashMap<>(4, 0.75f, 2);
+    CopyOnWriteArrayList<PidInfo> sorted = new CopyOnWriteArrayList<>();
 
     public String getName() {
         return FACTORY_PID;

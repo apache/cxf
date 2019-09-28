@@ -49,21 +49,20 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import org.apache.cxf.annotations.UseNio;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.MessageDigestInputStream;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
-import org.apache.cxf.jaxrs.nio.DelegatingNioOutputStream;
 import org.apache.cxf.jaxrs.nio.NioOutputStream;
 import org.apache.cxf.jaxrs.nio.NioWriteEntity;
+import org.apache.cxf.jaxrs.nio.NioWriteHandler;
 import org.apache.cxf.jaxrs.nio.NioWriteListenerImpl;
-import org.apache.cxf.jaxrs.nio.NioWriterHandler;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public class BinaryDataProvider<T> extends AbstractConfigurableProvider
@@ -215,7 +214,7 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
         NioWriteListenerImpl listener =
             new NioWriteListenerImpl(cont,
                                      new NioWriteEntity(getNioHandler(is), null),
-                                     new DelegatingNioOutputStream(os));
+                                     new NioOutputStream(os));
         Message m = JAXRSUtils.getCurrentMessage();
         m.put(WriteListener.class, listener);
         cont.suspend(0);
@@ -244,10 +243,9 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
     protected boolean isRangeSupported() {
         Message message = PhaseInterceptorChain.getCurrentMessage();
         if (message != null) {
-            return MessageUtils.isTrue(message.get(HTTP_RANGE_PROPERTY));
-        } else {
-            return false;
+            return PropertyUtils.isTrue(message.get(HTTP_RANGE_PROPERTY));
         }
+        return false;
     }
 
     public void setReportByteArraySize(boolean report) {
@@ -262,9 +260,9 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
         this.bufferSize = bufferSize;
     }
 
-    protected NioWriterHandler getNioHandler(final InputStream in) {
+    protected NioWriteHandler getNioHandler(final InputStream in) {
 
-        return new NioWriterHandler() {
+        return new NioWriteHandler() {
             final byte[] buffer = new byte[bufferSize];
             @Override
             public boolean write(NioOutputStream out) {

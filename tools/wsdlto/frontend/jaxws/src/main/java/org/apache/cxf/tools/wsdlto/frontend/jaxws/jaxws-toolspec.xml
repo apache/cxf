@@ -91,8 +91,8 @@ Examples:
             <option id="reserveClass" maxOccurs="unbounded">
                 <annotation>
                     Reserve a class name to keep the code generator from generating
-                    a class of the given name.   In name cases, a binding file or 
-                    use of -autoNameResolution flag may be necessary for the 
+                    a class of the given name.   In name cases, a binding file or
+                    use of -autoNameResolution flag may be necessary for the
                     code generator to completely generate usable code.
                 </annotation>
                 <switch>reserveClass</switch>
@@ -167,14 +167,14 @@ Examples:
             </option>
             <option id="autoNameResolution" maxOccurs="1">
                 <annotation>
-                    Specifies that the tool will attempt to resolve class naming conflicts 
+                    Specifies that the tool will attempt to resolve class naming conflicts
                     without requiring the use of binding customizations.
                 </annotation>
                 <switch>autoNameResolution</switch>
             </option>
             <option id="allowElementReferences" maxOccurs="1">
-                <annotaion>
-                </annotaion>
+                <annotation>
+                </annotation>
                 <associatedArgument placement="immediate">
                     <annotation>=true</annotation>
                     <valueenum>true|false</valueenum>
@@ -184,8 +184,8 @@ Examples:
             </option>
             <option id="defaultValues" maxOccurs="1">
                 <annotation>
-                    Specifies that default values are generated for the dummy implementation and client. 
-                    You can specify the name of the class to provide the default values. The default is 
+                    Specifies that default values are generated for the dummy implementation and client.
+                    You can specify the name of the class to provide the default values. The default is
                     RandomValueProvider.
                 </annotation>
                 <switch>defaultValues</switch>
@@ -245,10 +245,10 @@ Examples:
             </option>
             <option id="validate" maxOccurs="1">
                 <annotation>
-                    Specifies that the WSDL is validated before generating the code. Using 
+                    Specifies that the WSDL is validated before generating the code. Using
                     this option is highly recommended.  By default, only very basic validation
                     is done to make sure the WSDL meets the WSI-BasicProfile standards that
-                    CXF requires.  -validate=none can turn off those checks while -validate or 
+                    CXF requires.  -validate=none can turn off those checks while -validate or
                     -validate=all turns on additional schema validation and other checks.
                 </annotation>
                 <associatedArgument placement="immediate">
@@ -274,12 +274,12 @@ Examples:
             <option id="xjc" maxOccurs="unbounded">
                 <annotation>
                     Specifies a comma separated list of arguments that are passed directly to XJC when the
-                    JAXB data binding  is used. This option causes XJC to load additional plugins that 
-                    augment code generation. For example to load the toString(ts) plugin that will add a toString() 
-                    method to all generated types the following &lt;xjc arguments&gt; would 
+                    JAXB data binding  is used. This option causes XJC to load additional plugins that
+                    augment code generation. For example to load the toString(ts) plugin that will add a toString()
+                    method to all generated types the following &lt;xjc arguments&gt; would
                     be used:
                           -xjc-Xts
-                    A list of available XJC plugins can be obtained by using -xjc-X.                     
+                    A list of available XJC plugins can be obtained by using -xjc-X.
                 </annotation>
                 <associatedArgument placement="immediate">
                     <annotation>xjc-arguments</annotation>
@@ -310,7 +310,7 @@ Examples:
             </option>
             <option id="mimeMethods" maxOccurs="unbounded">
                 <annotation>
-                    Specifies a comma separated list of methods where the 
+                    Specifies a comma separated list of methods where the
                     mime:content information is used to generate the type.
                 </annotation>
                 <associatedArgument placement="immediate">
@@ -320,7 +320,7 @@ Examples:
             </option>
             <option id="noAddressBinding" maxOccurs="1">
                 <annotation>
-                    Specifies that the generator should not use the address jaxb binding file to map wsa:EndpointReferenceType 
+                    Specifies that the generator should not use the address jaxb binding file to map wsa:EndpointReferenceType
                     or wsa:EndpointReference to javax.xml.ws.wsaddressing.W3CEndpointReference.
                 </annotation>
                 <switch>noAddressBinding</switch>
@@ -329,7 +329,7 @@ Examples:
                 <annotation>
                     Specifies how to generate fault Exception's SUID, can use NONE|TIMESTAMP|FQCN|####", the default is NONE.
                     FQCN uses a hash of the fully qualified class name.   #### would be any valid Long to
-                    use as the SUID. 
+                    use as the SUID.
                 </annotation>
                 <switch>faultSerialVersionUID</switch>
                 <associatedArgument placement="afterSpace">
@@ -338,7 +338,7 @@ Examples:
             </option>
             <option id="encoding" maxOccurs="1">
                 <annotation>
-                    Specifies the charset encoding to use when generating java sources 
+                    Specifies the charset encoding to use when generating java sources
                 </annotation>
                 <switch>encoding</switch>
                 <associatedArgument placement="afterSpace">
@@ -363,11 +363,17 @@ Examples:
                     <annotation>seiSuper</annotation>
                 </associatedArgument>
             </option>
-            <option id="mark-generated" maxOccurs="1">
+            <option id="markGenerated" maxOccurs="1">
                 <annotation>
                     Adds @Generated annotation in all java files that are generated.
                 </annotation>
                 <switch>mark-generated</switch>
+            </option>
+            <option id="suppressGeneratedDate" maxOccurs="1">
+                <annotation>
+                    Prevents dumping current date as part of javadocs of the Java files generated.
+                </annotation>
+                <switch>suppress-generated-date</switch>
             </option>
         </optionGroup>
         <optionGroup id="common_options">
@@ -401,9 +407,9 @@ Examples:
             <option id="wsdlList" maxOccurs="1">
                 <annotation>
                         Indicates the wsdlurl is a plain text list of wsdlurls that are new line delimited.
-                        As an example the wsdlurl might point to 
-                        http://127.0.0.1:8080/context_path/ws?formatted=false&amp;wsdlList=true on a cxf 
-                        server. 
+                        As an example the wsdlurl might point to
+                        http://127.0.0.1:8080/context_path/ws?formatted=false&amp;wsdlList=true on a cxf
+                        server.
                     </annotation>
                 <switch>wsdlList</switch>
             </option>

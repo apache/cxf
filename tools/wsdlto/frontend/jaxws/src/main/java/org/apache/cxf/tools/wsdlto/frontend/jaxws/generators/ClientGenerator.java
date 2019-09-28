@@ -58,7 +58,7 @@ public class ClientGenerator extends AbstractJAXWSGenerator {
         Map<QName, JavaModel> map = CastUtils.cast((Map<?, ?>)penv.get(WSDLToJavaProcessor.MODEL_MAP));
         for (JavaModel javaModel : map.values()) {
 
-            if (javaModel.getServiceClasses().size() == 0) {
+            if (javaModel.getServiceClasses().isEmpty()) {
                 ServiceInfo serviceInfo = env.get(ServiceInfo.class);
                 String wsdl = serviceInfo.getDescription().getBaseURI();
                 Message msg = new Message("CAN_NOT_GEN_CLIENT", LOG, wsdl);

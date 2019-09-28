@@ -69,14 +69,17 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
 
     public WSS4JStaxOutInterceptor(WSSSecurityProperties securityProperties) {
         super(securityProperties);
+        WSSec.init();
         setPhase(Phase.PRE_STREAM);
         getBefore().add(StaxOutInterceptor.class.getName());
-
+        getAfter().add("org.apache.cxf.interceptor.LoggingOutInterceptor");
+        getAfter().add("org.apache.cxf.ext.logging.LoggingOutInterceptor");
         ending = createEndingInterceptor();
     }
 
     public WSS4JStaxOutInterceptor(Map<String, Object> props) {
         super(props);
+        WSSec.init();
         setPhase(Phase.PRE_STREAM);
         getBefore().add(StaxOutInterceptor.class.getName());
         getAfter().add("org.apache.cxf.interceptor.LoggingOutInterceptor");
@@ -86,6 +89,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
 
     public WSS4JStaxOutInterceptor() {
         super();
+        WSSec.init();
         setPhase(Phase.PRE_STREAM);
         getBefore().add(StaxOutInterceptor.class.getName());
         getAfter().add("org.apache.cxf.interceptor.LoggingOutInterceptor");
@@ -107,11 +111,6 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         this.mtomEnabled = allowMTOM;
     }
 
-    @Override
-    public Object getProperty(Object msgContext, String key) {
-        return super.getProperty(msgContext, key);
-    }
-
     protected void handleSecureMTOM(SoapMessage mc, WSSSecurityProperties secProps) {
         if (mtomEnabled) {
             return;
@@ -129,6 +128,16 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
 
     public void handleMessage(SoapMessage mc) throws Fault {
         OutputStream os = mc.getContent(OutputStream.class);
+        if (os == null) {
+            String error =
+                "The message outputstream is null - Multiple WSS4JStaxOutInterceptor instances are not supported";
+            WSSecurityException exception = new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                                          "empty",
+                                          new Object[] {error});
+            LOG.warning(error);
+            throw new Fault(exception);
+        }
+
         String encoding = getEncoding(mc);
 
         XMLStreamWriter newXMLStreamWriter;
@@ -139,7 +148,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
 
             final OutboundSecurityContext outboundSecurityContext = new OutboundSecurityContextImpl();
             configureProperties(mc, outboundSecurityContext, secProps);
-            if (secProps.getActions() == null || secProps.getActions().size() == 0) {
+            if (secProps.getActions() == null || secProps.getActions().isEmpty()) {
                 // If no actions configured then return
                 return;
             }
@@ -164,9 +173,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
 
             newXMLStreamWriter = outboundWSSec.processOutMessage(os, encoding, outboundSecurityContext);
             mc.setContent(XMLStreamWriter.class, newXMLStreamWriter);
-        } catch (WSSecurityException e) {
-            throw new Fault(e);
-        } catch (WSSPolicyException e) {
+        } catch (WSSecurityException | WSSPolicyException e) {
             throw new Fault(e);
         }
 
@@ -192,7 +199,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         msg.getExchange().put(SecurityEvent.class.getName() + ".out", outgoingSecurityEventList);
         msg.put(SecurityEvent.class.getName() + ".out", outgoingSecurityEventList);
 
-        final SecurityEventListener securityEventListener = new SecurityEventListener() {
+        return new SecurityEventListener() {
             @Override
             public void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
                 if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.SAML_TOKEN) {
@@ -205,8 +212,6 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
                 }
             }
         };
-
-        return securityEventListener;
     }
 
     protected void configureProperties(

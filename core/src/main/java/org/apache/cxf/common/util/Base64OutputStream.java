@@ -39,7 +39,7 @@ public class Base64OutputStream extends FilterOutputStream {
     }
 
     @Override
-    public void write(byte b[], int off, int len) throws IOException {
+    public void write(byte[] b, int off, int len) throws IOException {
         encodeAndWrite(b, off, len, false);
     }
 

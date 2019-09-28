@@ -33,9 +33,8 @@ public class CustomerParameterHandler implements ParamConverterProvider, ParamCo
     public <T> ParamConverter<T> getConverter(Class<T> cls, Type arg1, Annotation[] arg2) {
         if (Customer.class == cls) {
             return (ParamConverter<T>)this;
-        } else {
-            return null;
         }
+        return null;
     }
 
     public Customer fromString(String s) throws IllegalArgumentException {

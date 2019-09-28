@@ -25,10 +25,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.XMLConstants;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil;
@@ -76,10 +78,15 @@ public class SecuredElementsPolicyValidator implements SecurityPolicyValidator {
         // XPathFactory and XPath are not thread-safe so we must recreate them
         // each request.
         final XPathFactory factory = XPathFactory.newInstance();
+        try {
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+        } catch (javax.xml.xpath.XPathFactoryConfigurationException ex) {
+            // ignore
+        }
         final XPath xpath = factory.newXPath();
 
-        Element soapEnvelope =
-            parameters.getSoapHeader().getOwnerDocument().getDocumentElement();
+        Element soapEnvelope = parameters.getSoapHeader() != null
+            ? parameters.getSoapHeader().getOwnerDocument().getDocumentElement() : null;
         Collection<WSDataRef> dataRefs = parameters.getEncrypted();
         if (coverageType == CoverageType.SIGNED) {
             dataRefs = parameters.getSigned();
@@ -101,14 +108,20 @@ public class SecuredElementsPolicyValidator implements SecurityPolicyValidator {
                     }
                 }
 
-                xpath.setNamespaceContext(namespaceContext);
-                try {
-                    CryptoCoverageUtil.checkCoverage(soapEnvelope, dataRefs,
-                                                     xpath, expressions, coverageType, coverageScope);
-                } catch (WSSecurityException e) {
+                if (parameters.getSoapHeader() == null) {
                     ai.setNotAsserted("No " + coverageType
                                       + " element found matching one of the XPaths "
                                       + Arrays.toString(expressions.toArray()));
+                } else {
+                    xpath.setNamespaceContext(namespaceContext);
+                    try {
+                        CryptoCoverageUtil.checkCoverage(soapEnvelope, dataRefs,
+                                                         xpath, expressions, coverageType, coverageScope);
+                    } catch (WSSecurityException e) {
+                        ai.setNotAsserted("No " + coverageType
+                                          + " element found matching one of the XPaths "
+                                          + Arrays.toString(expressions.toArray()));
+                    }
                 }
             }
         }

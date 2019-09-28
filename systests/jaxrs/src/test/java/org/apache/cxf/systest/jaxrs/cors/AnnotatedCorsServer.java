@@ -36,9 +36,6 @@ import org.apache.cxf.rs.security.cors.CorsHeaderConstants;
 import org.apache.cxf.rs.security.cors.CrossOriginResourceSharing;
 import org.apache.cxf.rs.security.cors.LocalPreflight;
 
-/**
- * Service bean with no class-level annotation for cross-script control.
- */
 @CrossOriginResourceSharing(allowOrigins = {
         "http://area51.mil:31415"
         }, allowCredentials = true, maxAge = 1, allowHeaders = {
@@ -81,9 +78,8 @@ public class AnnotatedCorsServer {
             return Response.ok().header(CorsHeaderConstants.HEADER_AC_ALLOW_METHODS, "DELETE PUT")
                 .header(CorsHeaderConstants.HEADER_AC_ALLOW_CREDENTIALS, "false")
                 .header(CorsHeaderConstants.HEADER_AC_ALLOW_ORIGIN, "http://area51.mil:3333").build();
-        } else {
-            return Response.ok().build();
         }
+        return Response.ok().build();
     }
 
     @GET

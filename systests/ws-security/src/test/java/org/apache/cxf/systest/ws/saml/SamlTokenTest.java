@@ -31,6 +31,7 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
@@ -42,17 +43,21 @@ import org.apache.cxf.systest.ws.saml.client.SamlRoleCallbackHandler;
 import org.apache.cxf.systest.ws.ut.SecurityHeaderCacheInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.dom.WSConstants;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * A set of tests for SAML Tokens.
@@ -90,12 +95,12 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
+    public static Collection<TestParam> data() {
 
-        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
-                                                {new TestParam(PORT, true)},
-                                                {new TestParam(STAX_PORT, false)},
-                                                {new TestParam(STAX_PORT, true)},
+        return Arrays.asList(new TestParam[] {new TestParam(PORT, false),
+                                              new TestParam(PORT, true),
+                                              new TestParam(STAX_PORT, false),
+                                              new TestParam(STAX_PORT, true),
         });
     }
 
@@ -112,8 +117,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -182,8 +187,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -221,8 +226,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -270,8 +275,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -312,12 +317,65 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2SymmetricPort");
+        DoubleItPortType saml2Port =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml2Port, test.getPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(saml2Port);
+        }
+
+        try {
+            saml2Port.doubleIt(25);
+            fail("Expected failure on an invocation with no SAML Assertion");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            assertTrue(ex.getMessage().contains("No SAML CallbackHandler available"));
+        }
+
+        ((BindingProvider)saml2Port).getRequestContext().put(
+            SecurityConstants.SAML_CALLBACK_HANDLER, new SamlCallbackHandler(false)
+        );
+        try {
+            saml2Port.doubleIt(25);
+            fail("Expected failure on an invocation with a SAML1 Assertion");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            assertTrue(ex.getMessage().contains("Wrong SAML Version")
+                       || ex.getMessage().contains("enforces SamlVersion20Profile11 but we got 1.1"));
+        }
+
+        SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler();
+        samlCallbackHandler.setSignAssertion(true);
+        ((BindingProvider)saml2Port).getRequestContext().put(
+            SecurityConstants.SAML_CALLBACK_HANDLER, samlCallbackHandler
+        );
+        int result = saml2Port.doubleIt(25);
+        assertTrue(result == 50);
+
+        ((java.io.Closeable)saml2Port).close();
+        bus.shutdown(true);
+    }
+
+    // Re-enable once we pick up WSS4J 2.2.3 (https://issues.apache.org/jira/browse/WSS-640)
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testSaml2OverSymmetricSoap12() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml2SymmetricSoap12Port");
         DoubleItPortType saml2Port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(saml2Port, test.getPort());
@@ -366,8 +424,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -403,8 +461,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -469,8 +527,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -504,8 +562,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -539,12 +597,50 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSamlInitiatorPort");
+        DoubleItPortType saml2Port =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml2Port, test.getPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(saml2Port);
+        }
+
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
+        ((BindingProvider)saml2Port).getRequestContext().put(
+            SecurityConstants.SAML_CALLBACK_HANDLER, callbackHandler
+        );
+        int result = saml2Port.doubleIt(25);
+        assertTrue(result == 50);
+
+        ((java.io.Closeable)saml2Port).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
+    public void testAsymmetricSamlInitiatorProtectTokens() throws Exception {
+
+        // We don't support ProtectTokens + streaming clients
+        if (test.isStreaming()) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSamlInitiatorProtectTokensPort");
         DoubleItPortType saml2Port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(saml2Port, test.getPort());
@@ -572,8 +668,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -607,8 +703,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -645,8 +741,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -684,8 +780,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -722,8 +818,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -753,8 +849,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -788,8 +884,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -821,8 +917,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -859,8 +955,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -899,8 +995,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -947,8 +1043,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -1012,8 +1108,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -1067,8 +1163,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -1106,8 +1202,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -1152,6 +1248,16 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             SecurityConstants.SAML_CALLBACK_HANDLER, callbackHandler
         );
         saml2Port.doubleIt(25);
+
+        // It should pass because we explicitly allow the given audience restriction
+        portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort4");
+        saml2Port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml2Port, portNumber);
+
+        ((BindingProvider)saml2Port).getRequestContext().put(
+            SecurityConstants.SAML_CALLBACK_HANDLER, callbackHandler
+        );
+        saml2Port.doubleIt(25);
     }
 
     @org.junit.Test
@@ -1161,8 +1267,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -1181,7 +1287,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
 
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
         callbackHandler.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
-        callbackHandler.setDigestAlgorithm(WSConstants.SHA256);
+        callbackHandler.setDigestAlgorithm(WSS4JConstants.SHA256);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         ((BindingProvider)saml2Port).getRequestContext().put(
             SecurityConstants.SAML_CALLBACK_HANDLER, callbackHandler
@@ -1193,4 +1299,5 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)saml2Port).close();
         bus.shutdown(true);
     }
+
 }

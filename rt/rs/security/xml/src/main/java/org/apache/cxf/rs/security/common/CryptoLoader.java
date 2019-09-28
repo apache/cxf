@@ -43,9 +43,8 @@ public class CryptoLoader {
             org.apache.cxf.rt.security.utils.SecurityUtils.loadResource(cryptoResource);
         if (url != null) {
             return loadCryptoFromURL(url);
-        } else {
-            return null;
         }
+        return null;
     }
 
     public Crypto getCrypto(Message message,
@@ -106,8 +105,7 @@ public class CryptoLoader {
                 }
                 return o;
             }
-        } else {
-            return null;
         }
+        return null;
     }
 }

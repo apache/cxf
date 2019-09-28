@@ -52,7 +52,7 @@ public class ManualNumberFactoryImpl extends NumberFactoryImpl {
     protected void initDefaultServant() {
         servant = new ManualNumberImpl();
 
-        String wsdlLocation = "testutils/factory_pattern.wsdl";
+        String wsdlLocation = "wsdl/factory_pattern.wsdl";
         String bindingId = null;
         EndpointImpl ep =
             new EndpointImpl(bus, servant, bindingId, wsdlLocation);

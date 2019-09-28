@@ -39,8 +39,8 @@ import org.apache.cxf.message.MessageUtils;
 public abstract class AbstractPhaseInterceptor<T extends Message> implements PhaseInterceptor<T> {
     private final String id;
     private final String phase;
-    private final Set<String> before = new SortedArraySet<String>();
-    private final Set<String> after = new SortedArraySet<String>();
+    private final Set<String> before = new SortedArraySet<>();
+    private final Set<String> after = new SortedArraySet<>();
 
     /**
      * Instantiates the interceptor to live in a specified phase. The

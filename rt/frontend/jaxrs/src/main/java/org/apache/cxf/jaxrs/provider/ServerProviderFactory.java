@@ -21,11 +21,9 @@ package org.apache.cxf.jaxrs.provider;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,6 +38,8 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.container.PreMatching;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
@@ -58,6 +58,7 @@ import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.impl.ResourceInfoImpl;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
+import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.model.ApplicationInfo;
 import org.apache.cxf.jaxrs.model.BeanParamInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
@@ -72,28 +73,22 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 
 public final class ServerProviderFactory extends ProviderFactory {
-    private static final Set<Class<?>> SERVER_FILTER_INTERCEPTOR_CLASSES =
-        new HashSet<Class<?>>(Arrays.<Class<?>>asList(ContainerRequestFilter.class,
-                                                      ContainerResponseFilter.class,
-                                                      ReaderInterceptor.class,
-                                                      WriterInterceptor.class));
-
     private static final String WADL_PROVIDER_NAME = "org.apache.cxf.jaxrs.model.wadl.WadlGenerator";
     private static final String MAKE_DEFAULT_WAE_LEAST_SPECIFIC = "default.wae.mapper.least.specific";
     private List<ProviderInfo<ExceptionMapper<?>>> exceptionMappers =
-        new ArrayList<ProviderInfo<ExceptionMapper<?>>>(1);
+        new ArrayList<>(1);
 
     private List<ProviderInfo<ContainerRequestFilter>> preMatchContainerRequestFilters =
-        new ArrayList<ProviderInfo<ContainerRequestFilter>>(1);
+        new ArrayList<>(1);
     private Map<NameKey, ProviderInfo<ContainerRequestFilter>> postMatchContainerRequestFilters =
-        new NameKeyMap<ProviderInfo<ContainerRequestFilter>>(true);
+        new NameKeyMap<>(true);
     private Map<NameKey, ProviderInfo<ContainerResponseFilter>> containerResponseFilters =
-        new NameKeyMap<ProviderInfo<ContainerResponseFilter>>(false);
+        new NameKeyMap<>(false);
     private RequestPreprocessor requestPreprocessor;
     private ApplicationInfo application;
-    private Set<DynamicFeature> dynamicFeatures = new LinkedHashSet<DynamicFeature>();
+    private Set<DynamicFeature> dynamicFeatures = new LinkedHashSet<>();
 
-    private Map<Class<?>, BeanParamInfo> beanParams = new ConcurrentHashMap<Class<?>, BeanParamInfo>();
+    private Map<Class<?>, BeanParamInfo> beanParams = new ConcurrentHashMap<>();
     private ProviderInfo<ContainerRequestFilter> wadlGenerator;
 
     private ServerProviderFactory(Bus bus) {
@@ -105,9 +100,8 @@ public final class ServerProviderFactory extends ProviderFactory {
         Object provider = createProvider(WADL_PROVIDER_NAME, bus);
         if (provider == null) {
             return null;
-        } else {
-            return new ProviderInfo<ContainerRequestFilter>((ContainerRequestFilter)provider, bus, true);
         }
+        return new ProviderInfo<ContainerRequestFilter>((ContainerRequestFilter)provider, bus, true);
     }
 
     public static ServerProviderFactory getInstance() {
@@ -147,7 +141,7 @@ public final class ServerProviderFactory extends ProviderFactory {
         if (wadlGenerator == null) {
             return filters;
         }
-        if (filters.size() == 0) {
+        if (filters.isEmpty()) {
             return Collections.singletonList(wadlGenerator);
         } else if (!syncNeeded) {
             filters.add(0, wadlGenerator);
@@ -189,38 +183,45 @@ public final class ServerProviderFactory extends ProviderFactory {
     @SuppressWarnings("unchecked")
     public <T extends Throwable> ExceptionMapper<T> createExceptionMapper(Class<?> exceptionType,
                                                                           Message m) {
-        List<ProviderInfo<ExceptionMapper<?>>> candidates = new LinkedList<ProviderInfo<ExceptionMapper<?>>>();
-        for (ProviderInfo<ExceptionMapper<?>> em : exceptionMappers) {
-            if (handleMapper(em, exceptionType, m, ExceptionMapper.class, true)) {
-                candidates.add(em);
-            }
-        }
-        if (candidates.size() == 0) {
-            return null;
-        }
+        
         boolean makeDefaultWaeLeastSpecific =
             MessageUtils.getContextualBoolean(m, MAKE_DEFAULT_WAE_LEAST_SPECIFIC, false);
-        Collections.sort(candidates, new ExceptionProviderInfoComparator(exceptionType,
-                                                                         makeDefaultWaeLeastSpecific));
-        return (ExceptionMapper<T>) candidates.get(0).getProvider();
+        
+        return (ExceptionMapper<T>)exceptionMappers.stream()
+                .filter(em -> handleMapper(em, exceptionType, m, ExceptionMapper.class, Throwable.class, true))
+                .sorted(new ExceptionProviderInfoComparator(exceptionType,
+                                                            makeDefaultWaeLeastSpecific))
+                .map(ProviderInfo::getProvider)
+                .findFirst()
+                .orElse(null);
+        
     }
 
 
     @SuppressWarnings("unchecked")
     @Override
     protected void setProviders(boolean custom, boolean busGlobal, Object... providers) {
-        List<Object> allProviders = new LinkedList<Object>();
+        List<Object> allProviders = new LinkedList<>();
         for (Object p : providers) {
             if (p instanceof Feature) {
                 FeatureContext featureContext = createServerFeatureContext();
-                ((Feature)p).configure(featureContext);
+                Feature feature = (Feature)p; 
+                injectApplicationIntoFeature(feature);
+                feature.configure(featureContext);
                 Configuration cfg = featureContext.getConfiguration();
 
                 for (Object featureProvider : cfg.getInstances()) {
                     Map<Class<?>, Integer> contracts = cfg.getContracts(featureProvider.getClass());
                     if (contracts != null && !contracts.isEmpty()) {
-                        allProviders.add(new FilterProviderInfo<Object>(featureProvider,
+                        Class<?> providerCls = ClassHelper.getRealClass(getBus(), featureProvider);
+                        
+                        allProviders.add(new FilterProviderInfo<Object>(featureProvider.getClass(),
+                                                                        providerCls,
+                                                                        featureProvider,
                                                                         getBus(),
+                                                                        getFilterNameBindings(getBus(), 
+                                                                                              featureProvider),
+                                                                        false,
                                                                         contracts));
                     } else {
                         allProviders.add(featureProvider);
@@ -233,9 +234,9 @@ public final class ServerProviderFactory extends ProviderFactory {
 
 
         List<ProviderInfo<ContainerRequestFilter>> postMatchRequestFilters =
-            new LinkedList<ProviderInfo<ContainerRequestFilter>>();
+            new LinkedList<>();
         List<ProviderInfo<ContainerResponseFilter>> postMatchResponseFilters =
-            new LinkedList<ProviderInfo<ContainerResponseFilter>>();
+            new LinkedList<>();
 
         List<ProviderInfo<? extends Object>> theProviders =
             prepareProviders(custom, busGlobal, allProviders.toArray(), application);
@@ -258,8 +259,7 @@ public final class ServerProviderFactory extends ProviderFactory {
                 dynamicFeatures.add((DynamicFeature)feature);
             }
 
-
-            if (ExceptionMapper.class.isAssignableFrom(providerCls)) {
+            if (filterContractSupported(provider, providerCls, ExceptionMapper.class)) {    
                 addProviderToList(exceptionMappers, provider);
             }
 
@@ -275,6 +275,34 @@ public final class ServerProviderFactory extends ProviderFactory {
         injectContextProxies(exceptionMappers,
             postMatchContainerRequestFilters.values(), preMatchContainerRequestFilters,
             containerResponseFilters.values());
+    }
+
+    protected void injectApplicationIntoFeature(Feature feature) {
+        if (application != null) {
+            AbstractResourceInfo info = new AbstractResourceInfo(feature.getClass(),
+                                                                 ClassHelper.getRealClass(feature),
+                                                                 true,
+                                                                 true,
+                                                                 getBus()) {
+                @Override
+                public boolean isSingleton() {
+                    return false;
+                }
+            };
+            Method contextMethod = info.getContextMethods().get(Application.class);
+            if (contextMethod != null) {
+                InjectionUtils.injectThroughMethod(feature, contextMethod, application.getProvider());
+                return;
+            }
+            for (Field contextField : info.getContextFields()) {
+                if (Application.class == contextField.getType()) {
+                    InjectionUtils.injectContextField(info, contextField, feature, application.getProvider());
+                    break;
+                }
+            }
+            
+        }
+        
     }
 
     @Override
@@ -314,9 +342,8 @@ public final class ServerProviderFactory extends ProviderFactory {
         }
         if (WADL_PROVIDER_NAME.equals(filterCls.getName())) {
             return true;
-        } else {
-            return isWadlGenerator(filterCls.getSuperclass());
         }
+        return isWadlGenerator(filterCls.getSuperclass());
     }
 
     public RequestPreprocessor getRequestPreprocessor() {
@@ -382,9 +409,12 @@ public final class ServerProviderFactory extends ProviderFactory {
                 for (Object provider : cfg.getInstances()) {
                     Map<Class<?>, Integer> contracts = cfg.getContracts(provider.getClass());
                     if (contracts != null && !contracts.isEmpty()) {
-                        registerUserProvider(new FilterProviderInfo<Object>(provider,
+                        Class<?> providerCls = ClassHelper.getRealClass(getBus(), provider);
+                        registerUserProvider(new FilterProviderInfo<Object>(provider.getClass(),
+                            providerCls,
+                            provider,
                             getBus(),
-                            nameBinding,
+                            Collections.singleton(nameBinding),
                             true,
                             contracts));
                         ori.addNameBindings(Collections.singletonList(nameBinding));
@@ -401,8 +431,11 @@ public final class ServerProviderFactory extends ProviderFactory {
     }
 
     private FeatureContext createServerFeatureContext() {
-        FeatureContextImpl featureContext = new FeatureContextImpl();
-        ServerFeatureContextConfigurable configImpl = new ServerFeatureContextConfigurable(featureContext);
+        final FeatureContextImpl featureContext = new FeatureContextImpl();
+        final ServerConfigurableFactory factory = getBus().getExtension(ServerConfigurableFactory.class);
+        final Configurable<FeatureContext> configImpl = (factory == null) 
+            ? new ServerFeatureContextConfigurable(featureContext) 
+                : factory.create(featureContext);
         featureContext.setConfigurable(configImpl);
 
         if (application != null) {
@@ -420,7 +453,7 @@ public final class ServerProviderFactory extends ProviderFactory {
 
     private static class ServerFeatureContextConfigurable extends ConfigurableImpl<FeatureContext> {
         protected ServerFeatureContextConfigurable(FeatureContext mc) {
-            super(mc, RuntimeType.SERVER, SERVER_FILTER_INTERCEPTOR_CLASSES.toArray(new Class<?>[]{}));
+            super(mc, RuntimeType.SERVER);
         }
     }
 
@@ -474,7 +507,7 @@ public final class ServerProviderFactory extends ProviderFactory {
 
         @Override
         public boolean isEnabled(Feature f) {
-            return dynamicFeatures.contains(f);
+            return dynamicFeatures.contains((Object)f);
         }
 
         @Override
@@ -600,8 +633,11 @@ public final class ServerProviderFactory extends ProviderFactory {
                     return -1;
                 }
             }
-            return super.compare(p1, p2);
+            int result = super.compare(p1, p2);
+            if (result == 0) {
+                result = comparePriorityStatus(p1.getProvider().getClass(), p2.getProvider().getClass());
+            }
+            return result;
         }
     }
-
 }

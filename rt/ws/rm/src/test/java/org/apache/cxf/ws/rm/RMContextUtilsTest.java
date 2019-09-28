@@ -23,17 +23,22 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  */
-public class RMContextUtilsTest extends Assert {
+public class RMContextUtilsTest {
 
     private IMocksControl control;
 
@@ -66,18 +71,18 @@ public class RMContextUtilsTest extends Assert {
         EasyMock.expect(msg.getExchange()).andReturn(ex);
         EasyMock.expect(ex.getDestination()).andReturn(null);
         control.replay();
-        assertTrue(!RMContextUtils.isServerSide(msg));
+        assertFalse(RMContextUtils.isServerSide(msg));
     }
 
     @Test
     public void testIsRmPrtocolMessage() {
         control.replay();
         String action = null;
-        assertTrue(!RMContextUtils.isRMProtocolMessage(action));
+        assertFalse(RMContextUtils.isRMProtocolMessage(action));
         action = "";
-        assertTrue(!RMContextUtils.isRMProtocolMessage(action));
+        assertFalse(RMContextUtils.isRMProtocolMessage(action));
         action = "greetMe";
-        assertTrue(!RMContextUtils.isRMProtocolMessage(action));
+        assertFalse(RMContextUtils.isRMProtocolMessage(action));
         action = RM10Constants.CREATE_SEQUENCE_ACTION;
         assertTrue(RMContextUtils.isRMProtocolMessage(action));
     }

@@ -34,8 +34,8 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.apache.cxf.xkms.exception.XKMSConfigurationException;
 import org.apache.cxf.xkms.handlers.Applications;
@@ -81,10 +81,6 @@ public class FileCertificateRepo implements CertificateRepo {
         String name = crl.getIssuerX500Principal().getName();
         try {
             String path = convertIdForFileSystem(name) + ".cer";
-            Pattern p = Pattern.compile("[a-zA-Z_0-9-_]");
-            if (!p.matcher(path).find()) {
-                throw new URISyntaxException(path, "Input did not match [a-zA-Z_0-9-_].");
-            }
 
             File certFile = new File(storageDir + "/" + CRLS_PATH, path);
             certFile.getParentFile().mkdirs();
@@ -147,24 +143,16 @@ public class FileCertificateRepo implements CertificateRepo {
             path = cert.getSubjectDN().getName();
         }
         path = convertIdForFileSystem(path) + ".cer";
-        validateCertificatePath(path);
         return path;
-    }
-
-    private void validateCertificatePath(String path) throws URISyntaxException {
-        Pattern p = Pattern.compile("[a-zA-Z_0-9-_]");
-        if (!p.matcher(path).find()) {
-            throw new URISyntaxException(path, "Input did not match [a-zA-Z_0-9-_].");
-        }
     }
 
     private File[] getX509Files() {
         List<File> certificateFiles = new ArrayList<>();
         try {
-            certificateFiles.addAll(Arrays.asList(storageDir.listFiles()));
-            certificateFiles.addAll(Arrays.asList(new File(storageDir + "/" + TRUSTED_CAS_PATH).listFiles()));
-            certificateFiles.addAll(Arrays.asList(new File(storageDir + "/" + CAS_PATH).listFiles()));
-            certificateFiles.addAll(Arrays.asList(new File(storageDir + "/" + CRLS_PATH).listFiles()));
+            Collections.addAll(certificateFiles, storageDir.listFiles());
+            Collections.addAll(certificateFiles, new File(storageDir, TRUSTED_CAS_PATH).listFiles());
+            Collections.addAll(certificateFiles, new File(storageDir, CAS_PATH).listFiles());
+            Collections.addAll(certificateFiles, new File(storageDir, CRLS_PATH).listFiles());
         } catch (NullPointerException e) {
             //
         }
@@ -174,7 +162,7 @@ public class FileCertificateRepo implements CertificateRepo {
                                                  "File base persistence storage is not found: "
                                                      + storageDir.getPath());
         }
-        return certificateFiles.toArray(new File[certificateFiles.size()]);
+        return certificateFiles.toArray(new File[0]);
     }
 
     public X509Certificate readCertificate(File certFile) throws CertificateException, FileNotFoundException,
@@ -266,7 +254,6 @@ public class FileCertificateRepo implements CertificateRepo {
     public X509Certificate findByEndpoint(String endpoint) {
         try {
             String path = convertIdForFileSystem(endpoint) + ".cer";
-            validateCertificatePath(path);
             File certFile = new File(storageDir.getAbsolutePath() + "/" + path);
             if (!certFile.exists()) {
                 LOG.warn(String.format("Certificate not found for endpoint %s, path %s", endpoint,

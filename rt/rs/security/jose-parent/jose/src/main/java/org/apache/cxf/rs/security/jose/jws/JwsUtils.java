@@ -525,19 +525,18 @@ public final class JwsUtils {
         String storeType = props.getProperty(JoseConstants.RSSEC_KEY_STORE_TYPE);
         if ("jwk".equals(storeType)) {
             return JwkUtils.loadPublicJwkSet(m, props);
-        } else {
-            X509Certificate[] certs = null;
-            if (PropertyUtils.isTrue(props.get(JoseConstants.RSSEC_SIGNATURE_INCLUDE_CERT))) {
-                certs = KeyManagementUtils.loadX509CertificateOrChain(m, props);
-            }
-            PublicKey key = certs != null && certs.length > 0
-                ? certs[0].getPublicKey() : KeyManagementUtils.loadPublicKey(m, props);
-            JsonWebKey jwk = JwkUtils.fromPublicKey(key, props, JoseConstants.RSSEC_SIGNATURE_ALGORITHM);
-            jwk.setPublicKeyUse(PublicKeyUse.SIGN);
-            if (certs != null) {
-                jwk.setX509Chain(KeyManagementUtils.encodeX509CertificateChain(certs));
-            }
-            return new JsonWebKeys(jwk);
         }
+        X509Certificate[] certs = null;
+        if (PropertyUtils.isTrue(props.get(JoseConstants.RSSEC_SIGNATURE_INCLUDE_CERT))) {
+            certs = KeyManagementUtils.loadX509CertificateOrChain(m, props);
+        }
+        PublicKey key = certs != null && certs.length > 0
+            ? certs[0].getPublicKey() : KeyManagementUtils.loadPublicKey(m, props);
+        JsonWebKey jwk = JwkUtils.fromPublicKey(key, props, JoseConstants.RSSEC_SIGNATURE_ALGORITHM);
+        jwk.setPublicKeyUse(PublicKeyUse.SIGN);
+        if (certs != null) {
+            jwk.setX509Chain(KeyManagementUtils.encodeX509CertificateChain(certs));
+        }
+        return new JsonWebKeys(jwk);
     }
 }

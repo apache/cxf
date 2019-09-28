@@ -233,7 +233,6 @@ public final class XmlSchemaUtils {
             return null;
         }
 
-        //TODO: the anyAttribute case.
         XmlSchemaComplexContentExtension ext = (XmlSchemaComplexContentExtension)content;
         return ext.getAttributes();
     }
@@ -250,12 +249,11 @@ public final class XmlSchemaUtils {
             List<XmlSchemaAttributeOrGroupRef> extAttrs = getContentAttributes(type);
             results.addAll(extAttrs);
             return results;
-        } else {
-            // no base type, the simple case.
-            List<XmlSchemaAttributeOrGroupRef> attrs = type.getAttributes();
-            results.addAll(attrs);
-            return results;
         }
+        // no base type, the simple case.
+        List<XmlSchemaAttributeOrGroupRef> attrs = type.getAttributes();
+        results.addAll(attrs);
+        return results;
     }
 
 
@@ -325,9 +323,8 @@ public final class XmlSchemaUtils {
             return isAttributeNameQualified(attribute, attributeSchema)
                 || (localSchema != null
                     && !(attribute.getQName().getNamespaceURI().equals(localSchema.getTargetNamespace())));
-        } else {
-            return isAttributeNameQualified(attribute, attributeSchema);
         }
+        return isAttributeNameQualified(attribute, attributeSchema);
     }
 
     public static boolean isElementNameQualified(XmlSchemaElement element, XmlSchema schema) {
@@ -378,9 +375,8 @@ public final class XmlSchemaUtils {
             return isElementNameQualified(element, elementSchema)
                 || (localSchema != null
                     && !(qn.getNamespaceURI().equals(localSchema.getTargetNamespace())));
-        } else {
-            return isElementNameQualified(element, elementSchema);
         }
+        return isElementNameQualified(element, elementSchema);
     }
 
     public static boolean isParticleArray(XmlSchemaParticle particle) {

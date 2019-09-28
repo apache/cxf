@@ -96,7 +96,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
     private Map<String, Templates> inMediaTemplates;
     private Map<String, Templates> outMediaTemplates;
     private ConcurrentHashMap<String, Templates> annotationTemplates =
-        new ConcurrentHashMap<String, Templates>();
+        new ConcurrentHashMap<>();
 
     private List<String> inClassesToHandle;
     private List<String> outClassesToHandle;
@@ -129,9 +129,8 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
         // is in that list then it can only be handled by the template
         if (inClassCanBeHandled(type.getName()) || inClassesToHandle == null && !supportJaxbOnly) {
             return inTemplatesAvailable(type, anns, mt);
-        } else {
-            return supportJaxbOnly;
         }
+        return supportJaxbOnly;
     }
 
     @Override
@@ -148,9 +147,8 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
         // is in that list then it can only be handled by the template
         if (outClassCanBeHandled(type.getName()) || outClassesToHandle == null && !supportJaxbOnly) {
             return outTemplatesAvailable(type, anns, mt);
-        } else {
-            return supportJaxbOnly;
         }
+        return supportJaxbOnly;
     }
 
     protected boolean inTemplatesAvailable(Class<?> cls, Annotation[] anns, MediaType mt) {
@@ -339,6 +337,10 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
         // complete
     }
 
+    protected Result getStreamResult(OutputStream os, Annotation[] anns, MediaType mt) throws Exception {
+        return new StreamResult(os);
+    }
+    
     @Override
     protected void marshalToOutputStream(Marshaller ms, Object obj, OutputStream os,
                                          Annotation[] anns, MediaType mt)
@@ -349,6 +351,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             super.marshalToOutputStream(ms, obj, os, anns, mt);
             return;
         }
+        org.apache.cxf.common.jaxb.JAXBUtils.setMinimumEscapeHandler(ms);
         TransformerHandler th = null;
         try {
             th = factory.newTransformerHandler(t);
@@ -357,7 +360,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             th = factory.newTransformerHandler(ti.getTemplates());
             this.trySettingProperties(th, ti);
         }
-        Result result = new StreamResult(os);
+        Result result = getStreamResult(os, anns, mt);
         if (systemId != null) {
             result.setSystemId(systemId);
         }
@@ -443,10 +446,9 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
         if (templates == null) {
             if (supportJaxbOnly) {
                 return null;
-            } else {
-                LOG.severe("No template is available");
-                throw ExceptionUtils.toInternalServerErrorException(null, null);
             }
+            LOG.severe("No template is available");
+            throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
 
         TemplatesImpl templ = new TemplatesImpl(templates, uriResolver);
@@ -456,7 +458,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             MultivaluedMap<String, String> params = ui.getPathParameters();
             for (Map.Entry<String, List<String>> entry : params.entrySet()) {
                 String value = entry.getValue().get(0);
-                int ind = value.indexOf(";");
+                int ind = value.indexOf(';');
                 if (ind > 0) {
                     value = value.substring(0, ind);
                 }

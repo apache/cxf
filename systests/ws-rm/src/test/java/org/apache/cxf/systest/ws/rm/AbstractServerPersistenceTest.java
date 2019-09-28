@@ -51,6 +51,9 @@ import org.apache.cxf.ws.rm.persistence.jdbc.RMTxStore;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Tests the addition of WS-RM properties to application messages and the
  * exchange of WS-RM protocol messages.
@@ -77,7 +80,7 @@ public abstract class AbstractServerPersistenceTest extends AbstractBusClientSer
         String port;
         String pfx;
         Endpoint ep;
-        public Server(String args[]) {
+        public Server(String[] args) {
             port = args[0];
             pfx = args[1];
         }
@@ -102,7 +105,7 @@ public abstract class AbstractServerPersistenceTest extends AbstractBusClientSer
             ep.stop();
             ep = null;
         }
-        public static void main(String args[]) {
+        public static void main(String[] args) {
             new Server(args).start();
         }
     }
@@ -140,7 +143,7 @@ public abstract class AbstractServerPersistenceTest extends AbstractBusClientSer
 
         // avoid early client resends
         greeterBus.getExtension(RMManager.class).getConfiguration()
-            .setBaseRetransmissionInterval(new Long(60000));
+            .setBaseRetransmissionInterval(Long.valueOf(60000));
         GreeterService gs = new GreeterService();
         Greeter greeter = gs.getGreeterPort();
         updateAddressPort(greeter, getPort());
@@ -162,7 +165,7 @@ public abstract class AbstractServerPersistenceTest extends AbstractBusClientSer
 
         LOG.fine("Configured greeter client.");
 
-        Response<GreetMeResponse> responses[] = cast(new Response[4]);
+        Response<GreetMeResponse>[] responses = cast(new Response[4]);
 
         responses[0] = greeter.greetMeAsync("one");
         responses[1] = greeter.greetMeAsync("two");
@@ -194,7 +197,7 @@ public abstract class AbstractServerPersistenceTest extends AbstractBusClientSer
         bus.shutdown(true);
     }
 
-    void verifyMissingResponse(Response<GreetMeResponse> responses[]) throws Exception {
+    void verifyMissingResponse(Response<GreetMeResponse>[] responses) throws Exception {
         awaitMessages(5, 3, 25000);
 
         int nDone = 0;
@@ -227,7 +230,7 @@ public abstract class AbstractServerPersistenceTest extends AbstractBusClientSer
         // mf.verifyAcknowledgements(new boolean[] {false, true, true}, false);
     }
 
-    void verifyServerRecovery(Response<GreetMeResponse> responses[]) throws Exception {
+    void verifyServerRecovery(Response<GreetMeResponse>[] responses) throws Exception {
 
         // wait until all messages have received their responses
         int nDone = 0;
@@ -266,7 +269,7 @@ public abstract class AbstractServerPersistenceTest extends AbstractBusClientSer
     }
 
 
-    void verifyRetransmissionQueue() throws Exception {
+    protected void verifyRetransmissionQueue() throws Exception {
         awaitMessages(2, 2, 60000);
 
         int count = 0;

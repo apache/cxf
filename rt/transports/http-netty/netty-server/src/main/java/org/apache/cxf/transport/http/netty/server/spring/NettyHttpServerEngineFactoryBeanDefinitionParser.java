@@ -110,7 +110,7 @@ public class NettyHttpServerEngineFactoryBeanDefinitionParser
         List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(parent,
                                                                      name.getNamespaceURI(),
                                                                      name.getLocalPart());
-        ManagedList<Object> list = new ManagedList<Object>(elemList.size());
+        ManagedList<Object> list = new ManagedList<>(elemList.size());
         list.setSource(ctx.extractSource(parent));
 
         for (Element elem : elemList) {

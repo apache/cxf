@@ -21,8 +21,11 @@ package org.apache.cxf.systest.jaxrs.sse.tomcat;
 
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systest.jaxrs.sse.AbstractSseTest;
+
 import org.junit.BeforeClass;
 import org.junit.Ignore;
+
+import static org.junit.Assert.assertTrue;
 
 public class TomcatWarTest extends AbstractSseTest {
     @Ignore
@@ -46,4 +49,8 @@ public class TomcatWarTest extends AbstractSseTest {
         return EmbeddedTomcatServer.PORT;
     }
 
+    @Override
+    protected boolean supportsErrorPropagation() {
+        return true;
+    }
 }

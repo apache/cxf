@@ -91,7 +91,7 @@ public class JaxbAssertion<T> extends PrimitiveAssertion {
     }
 
     protected Assertion clone(boolean optional) {
-        JaxbAssertion<T> a = new JaxbAssertion<T>(getName(), optional, ignorable);
+        JaxbAssertion<T> a = new JaxbAssertion<>(getName(), optional, ignorable);
         a.setData(data);
         return a;
     }

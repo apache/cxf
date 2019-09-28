@@ -48,7 +48,7 @@ public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
     private String reasonPhrase;
     private boolean statusSet;
     private Object entity;
-    private MultivaluedMap<String, Object> metadata = new MetadataMap<String, Object>();
+    private MultivaluedMap<String, Object> metadata = new MetadataMap<>();
     private Annotation[] annotations;
 
     public ResponseBuilderImpl() {
@@ -68,7 +68,7 @@ public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
         }
         ResponseImpl r = new ResponseImpl(status, null, reasonPhrase);
         MetadataMap<String, Object> m =
-            new MetadataMap<String, Object>(metadata, false, true);
+            new MetadataMap<>(metadata, false, true);
         r.addMetadata(m);
         r.setEntity(entity, annotations);
         reset();
@@ -227,7 +227,7 @@ public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
 
 //  CHECKSTYLE:OFF
     @Override
-    public ResponseBuilder clone() {
+    public ResponseBuilder clone() { //NOPMD
         return new ResponseBuilderImpl(this);
     }
 //  CHECKSTYLE:ON
@@ -279,9 +279,8 @@ public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
     public ResponseBuilder allow(Set<String> methods) {
         if (methods == null) {
             return allow();
-        } else {
-            return allow(methods.toArray(new String[methods.size()]));
         }
+        return allow(methods.toArray(new String[0]));
     }
 
     @Override

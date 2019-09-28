@@ -45,11 +45,16 @@ import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.apache.hello_world_soap_http.Greeter;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class LifeCycleTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+public class LifeCycleTest {
     public static final String PORT1 = TestUtil.getPortNumber(LifeCycleTest.class, 1);
     public static final String PORT2 = TestUtil.getPortNumber(LifeCycleTest.class, 2);
     public static final String PORT3 = TestUtil.getPortNumber(LifeCycleTest.class, 3);
@@ -235,10 +240,10 @@ public class LifeCycleTest extends Assert {
             Integer count = notificationMap.get(address);
             if (count != null) {
                 notificationMap.put(address,
-                                    new Integer(count.intValue() + 1));
+                                    Integer.valueOf(count.intValue() + 1));
             } else {
                 notificationMap.put(address,
-                                    new Integer(1));
+                                    Integer.valueOf(1));
             }
         }
     }
@@ -248,7 +253,7 @@ public class LifeCycleTest extends Assert {
                 portName = "SoapPort",
                 endpointInterface = "org.apache.hello_world_soap_http.Greeter",
                 targetNamespace = "http://apache.org/hello_world_soap_http",
-                wsdlLocation = "testutils/hello_world.wsdl")
+                wsdlLocation = "wsdl/hello_world.wsdl")
     public class GreeterImpl extends org.apache.hello_world_soap_http.BaseGreeterImpl {
 
     }

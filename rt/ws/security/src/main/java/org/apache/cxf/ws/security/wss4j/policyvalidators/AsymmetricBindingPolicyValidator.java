@@ -33,7 +33,6 @@ import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.AbstractToken;
-import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
 import org.apache.wss4j.policy.model.AbstractTokenWrapper;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
 import org.apache.wss4j.policy.model.X509Token;
@@ -97,27 +96,27 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
     ) {
         boolean result = true;
         if (binding.getInitiatorToken() != null) {
-            result &= checkInitiatorTokens(binding.getInitiatorToken(), binding, ai, aim, hasDerivedKeys,
+            result &= checkInitiatorTokens(binding.getInitiatorToken(), ai, aim, hasDerivedKeys,
                                         signedResults, encryptedResults);
         }
         if (binding.getInitiatorSignatureToken() != null) {
-            result &= checkInitiatorTokens(binding.getInitiatorSignatureToken(), binding, ai, aim,
+            result &= checkInitiatorTokens(binding.getInitiatorSignatureToken(), ai, aim,
                                         hasDerivedKeys, signedResults, encryptedResults);
         }
         if (binding.getInitiatorEncryptionToken() != null) {
-            result &= checkInitiatorTokens(binding.getInitiatorEncryptionToken(), binding, ai, aim,
+            result &= checkInitiatorTokens(binding.getInitiatorEncryptionToken(), ai, aim,
                                         hasDerivedKeys, signedResults, encryptedResults);
         }
         if (binding.getRecipientToken() != null) {
-            result &= checkRecipientTokens(binding.getRecipientToken(), binding, ai, aim, hasDerivedKeys,
+            result &= checkRecipientTokens(binding.getRecipientToken(), ai, aim, hasDerivedKeys,
                                         signedResults, encryptedResults);
         }
         if (binding.getRecipientSignatureToken() != null) {
-            result &= checkRecipientTokens(binding.getRecipientSignatureToken(), binding, ai, aim,
+            result &= checkRecipientTokens(binding.getRecipientSignatureToken(), ai, aim,
                                         hasDerivedKeys, signedResults, encryptedResults);
         }
         if (binding.getRecipientEncryptionToken() != null) {
-            result &= checkRecipientTokens(binding.getRecipientEncryptionToken(), binding, ai, aim,
+            result &= checkRecipientTokens(binding.getRecipientEncryptionToken(), ai, aim,
                                         hasDerivedKeys, signedResults, encryptedResults);
         }
 
@@ -126,7 +125,6 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
 
     private boolean checkInitiatorTokens(
         AbstractTokenWrapper wrapper,
-        AsymmetricBinding binding,
         AssertionInfo ai,
         AssertionInfoMap aim,
         boolean hasDerivedKeys,
@@ -156,7 +154,7 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
             ai.setNotAsserted("Message fails the DerivedKeys requirement");
             return false;
         }
-        assertToken(wrapper, aim);
+        assertDerivedKeys(wrapper.getToken(), aim);
 
         return true;
     }
@@ -172,7 +170,6 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
 
     private boolean checkRecipientTokens(
         AbstractTokenWrapper wrapper,
-        AsymmetricBinding binding,
         AssertionInfo ai,
         AssertionInfoMap aim,
         boolean hasDerivedKeys,
@@ -184,19 +181,9 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
             ai.setNotAsserted("Message fails the DerivedKeys requirement");
             return false;
         }
-        assertToken(wrapper, aim);
+        assertDerivedKeys(wrapper.getToken(), aim);
 
         return true;
-    }
-
-    private void assertToken(AbstractTokenWrapper tokenWrapper, AssertionInfoMap aim) {
-        String namespace = tokenWrapper.getName().getNamespaceURI();
-
-        AbstractToken token = tokenWrapper.getToken();
-        DerivedKeys derivedKeys = token.getDerivedKeys();
-        if (derivedKeys != null) {
-            PolicyUtils.assertPolicy(aim, new QName(namespace, derivedKeys.name()));
-        }
     }
 
 }

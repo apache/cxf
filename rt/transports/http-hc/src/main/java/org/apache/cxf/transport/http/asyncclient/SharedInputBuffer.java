@@ -108,20 +108,18 @@ public class SharedInputBuffer extends ExpandableBuffer {
             if (bytesRead == -1 || decoder.isCompleted()) {
                 this.endOfStream = true;
             }
-            if (!this.buffer.hasRemaining() && this.ioctrl != null) {
+            if (!this.buffer.hasRemaining() && this.ioctrl != null && !this.endOfStream) {
                 this.ioctrl.suspendInput();
             }
             this.condition.signalAll();
 
             if (totalRead > 0) {
                 return totalRead;
-            } else {
-                if (this.endOfStream) {
-                    return -1;
-                } else {
-                    return 0;
-                }
             }
+            if (this.endOfStream) {
+                return -1;
+            }
+            return 0;
         } finally {
             this.lock.unlock();
         }

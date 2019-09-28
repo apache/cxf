@@ -54,6 +54,12 @@ import org.apache.cxf.tools.wsdlto.AbstractCodeGenTest;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class CodeGenTest extends AbstractCodeGenTest {
 
     @Test
@@ -69,10 +75,10 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         Class<?> clz = classLoader.loadClass("com.mypizzaco.pizza.PizzaPortType");
 
-        Method meths[] = clz.getMethods();
+        Method[] meths = clz.getMethods();
         for (Method m : meths) {
             if ("orderPizzaBroken".equals(m.getName())) {
-                Annotation annotations[][] = m.getParameterAnnotations();
+                Annotation[][] annotations = m.getParameterAnnotations();
                 assertEquals(2, annotations.length);
                 for (int i = 0; i < 2; i++) {
                     assertTrue(annotations[i][0] instanceof WebParam);
@@ -80,7 +86,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
                     if ("OrderPizza".equals(parm.name())) {
                         assertEquals("http://mypizzaco.com/pizza/types", parm.targetNamespace());
                         assertEquals("OrderPizza", parm.name());
-                        assertTrue(!parm.header());
+                        assertFalse(parm.header());
                     } else if ("CallerIDHeader".equals(parm.name())) {
                         assertEquals("http://mypizzaco.com/pizza/types", parm.targetNamespace());
                         assertEquals("callerID", parm.partName());
@@ -93,7 +99,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
             }
             if ("orderPizza".equals(m.getName())) {
-                Annotation annotations[][] = m.getParameterAnnotations();
+                Annotation[][] annotations = m.getParameterAnnotations();
                 assertEquals(2, annotations.length);
                 for (int i = 0; i < 2; i++) {
                     assertTrue(annotations[i][0] instanceof WebParam);
@@ -101,7 +107,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
                     if ("OrderPizza".equals(parm.name())) {
                         assertEquals("http://mypizzaco.com/pizza/types", parm.targetNamespace());
                         assertEquals("OrderPizza", parm.name());
-                        assertTrue(!parm.header());
+                        assertFalse(parm.header());
                     } else if ("CallerIDHeader".equals(parm.name())) {
                         assertEquals("http://mypizzaco.com/pizza/types", parm.targetNamespace());
                         assertEquals("callerID", parm.partName());
@@ -129,10 +135,10 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         Class<?> clz = classLoader.loadClass("com.mypizzaco.pizza.PizzaPortType");
 
-        Method meths[] = clz.getMethods();
+        Method[] meths = clz.getMethods();
         for (Method m : meths) {
             if ("orderPizzaBroken".equals(m.getName())) {
-                Annotation annotations[][] = m.getParameterAnnotations();
+                Annotation[][] annotations = m.getParameterAnnotations();
                 assertEquals(1, annotations.length);
                 for (int i = 0; i < 1; i++) {
                     assertTrue(annotations[i][0] instanceof WebParam);
@@ -140,7 +146,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
                     if ("OrderPizza".equals(parm.name())) {
                         assertEquals("http://mypizzaco.com/pizza/types", parm.targetNamespace());
                         assertEquals("OrderPizza", parm.name());
-                        assertTrue(!parm.header());
+                        assertFalse(parm.header());
                     } else if ("CallerIDHeader".equals(parm.name())) {
                         fail("If the exsh turned off, should not generate this parameter");
                     } else {
@@ -163,10 +169,10 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         Class<?> clz = classLoader.loadClass("com.mypizzaco.pizza.PizzaPortType");
 
-        Method meths[] = clz.getMethods();
+        Method[] meths = clz.getMethods();
         for (Method m : meths) {
             if ("orderPizzaBroken".equals(m.getName())) {
-                Annotation annotations[][] = m.getParameterAnnotations();
+                Annotation[][] annotations = m.getParameterAnnotations();
                 assertEquals(1, annotations.length);
                 for (int i = 0; i < 1; i++) {
                     assertTrue(annotations[i][0] instanceof WebParam);
@@ -174,7 +180,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
                     if ("OrderPizza".equals(parm.name())) {
                         assertEquals("http://mypizzaco.com/pizza/types", parm.targetNamespace());
                         assertEquals("OrderPizza", parm.name());
-                        assertTrue(!parm.header());
+                        assertFalse(parm.header());
                     } else if ("CallerIDHeader".equals(parm.name())) {
                         fail("If the exsh turned off, should not generate this parameter");
                     } else {
@@ -198,17 +204,17 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         Class<?> clz = classLoader.loadClass("org.apache.cxf.pizza_wrapped.Pizza");
 
-        Method meths[] = clz.getMethods();
+        Method[] meths = clz.getMethods();
         for (Method m : meths) {
             if ("orderPizza".equals(m.getName())) {
-                Annotation annotations[][] = m.getParameterAnnotations();
+                Annotation[][] annotations = m.getParameterAnnotations();
                 assertEquals(2, annotations.length);
                 for (int i = 0; i < 2; i++) {
                     assertTrue(annotations[i][0] instanceof WebParam);
                     WebParam parm = (WebParam)annotations[i][0];
                     if ("Toppings".equals(parm.name())) {
                         assertEquals("http://cxf.apache.org/pizza_wrapped/types", parm.targetNamespace());
-                        assertTrue(!parm.header());
+                        assertFalse(parm.header());
                     } else if ("CallerIDHeader".equals(parm.name())) {
                         assertEquals("http://cxf.apache.org/pizza_wrapped/types", parm.targetNamespace());
                         assertTrue(parm.header());
@@ -230,7 +236,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         assertNotNull(output);
 
         Class<?> clz = classLoader.loadClass("org.apache.cxf.bugs.oobh.LoginInterface");
-        Method meths[] = clz.getMethods();
+        Method[] meths = clz.getMethods();
         for (Method m : meths) {
             if ("login".equals(m.getName())) {
                 assertEquals(String.class, m.getReturnType());
@@ -635,7 +641,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         Class<?> clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.types.SayHi");
         Method method = clz.getMethod("dummy", new Class[] {});
-        assertTrue("method declared on SayHi", method.getDeclaringClass().equals(clz));
+        assertEquals("method declared on SayHi", method.getDeclaringClass(), clz);
     }
 
     @Test
@@ -870,7 +876,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         WebParam webParamAnno = AnnotationUtil.getWebParam(method, "SOAPHeaderInfo");
         assertEquals("INOUT", webParamAnno.mode().name());
-        assertEquals(true, webParamAnno.header());
+        assertTrue(webParamAnno.header());
         assertEquals("header_info", webParamAnno.partName());
 
     }
@@ -900,7 +906,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
 
         WebParam webParamAnno = AnnotationUtil.getWebParam(method, "greetMe");
-        assertEquals(true, webParamAnno.header());
+        assertTrue(webParamAnno.header());
 
         webParamAnno = AnnotationUtil.getWebParam(method, "sayHi");
         assertEquals("INOUT", webParamAnno.mode().name());
@@ -1125,6 +1131,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
             env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/invalid_mep.wsdl"));
             processor.setContext(env);
             processor.execute();
+            fail("Failure expected");
         } catch (Exception e) {
             String expectedMsg = "Invalid WSDL, Operation notify in PortType "
                 + "{http://services.medial.com.br/echo}EchoNotification not request-response or one-way";
@@ -1173,10 +1180,10 @@ public class CodeGenTest extends AbstractCodeGenTest {
         processor.execute();
         Class<?> cls = classLoader.loadClass("org.apache.header_test.rpc.TestRPCHeaderPort");
 
-        Method meths[] = cls.getMethods();
+        Method[] meths = cls.getMethods();
         for (Method m : meths) {
             if ("testHeader1".equals(m.getName())) {
-                Annotation annotations[][] = m.getParameterAnnotations();
+                Annotation[][] annotations = m.getParameterAnnotations();
                 assertEquals(2, annotations.length);
                 assertEquals(1, annotations[1].length);
                 assertTrue(annotations[1][0] instanceof WebParam);
@@ -1190,7 +1197,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         for (Method m : meths) {
             if ("testInOutHeader".equals(m.getName())) {
-                Annotation annotations[][] = m.getParameterAnnotations();
+                Annotation[][] annotations = m.getParameterAnnotations();
                 assertEquals(2, annotations.length);
                 assertEquals(1, annotations[1].length);
                 assertTrue(annotations[1][0] instanceof WebParam);
@@ -1261,6 +1268,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
             env.put(ToolConstants.CFG_VALIDATE_WSDL, ToolConstants.CFG_VALIDATE_WSDL);
             processor.setContext(env);
             processor.execute();
+            fail("Failure expected");
         } catch (Exception e) {
             boolean english = "en".equals(java.util.Locale.getDefault().getLanguage());
             if (english) {
@@ -1373,6 +1381,8 @@ public class CodeGenTest extends AbstractCodeGenTest {
         assertNotNull("GreetMe class from schema targetNamespace could not be found", tc);
     }
 
+    @Test
+    @org.junit.Ignore
     public void testW3CEPR() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/w3c-epr.wsdl"));
         processor.setContext(env);
@@ -1430,7 +1440,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         File seif = new File(output, "org/apache/cxf/helloworld/HelloWorldServiceImpl.java");
         assertTrue(seif.exists());
         Class<?> sei = classLoader.loadClass("org.apache.cxf.helloworld.HelloWorldServiceImpl");
-        Method m[] = sei.getDeclaredMethods();
+        Method[] m = sei.getDeclaredMethods();
         assertEquals(1, m.length);
         assertTrue(m[0].getParameterAnnotations()[1][0] instanceof WebParam);
         WebParam wp = (WebParam)m[0].getParameterAnnotations()[1][0];
@@ -1631,7 +1641,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         Method method = interfaceClass.getMethod("greetMe", new Class[] {
             Holder.class, Holder.class, Holder.class, Holder.class, Holder.class
         });
-        assertTrue("greetMe operation is NOT generated correctly as excepted", method != null);
+        assertNotNull("greetMe operation is NOT generated correctly as excepted", method);
         RequestWrapper reqWrapper = method.getAnnotation(RequestWrapper.class);
         assertNotNull("@RequestWrapper is expected", reqWrapper);
     }

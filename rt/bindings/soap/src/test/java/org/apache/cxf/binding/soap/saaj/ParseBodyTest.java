@@ -28,6 +28,7 @@ import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
@@ -40,10 +41,12 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class ParseBodyTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class ParseBodyTest {
     static final String[] DATA = {
         "<SOAP-ENV:Body xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">\n"
             + "    <foo>\n        <bar/>\n    </foo>\n</SOAP-ENV:Body>",
@@ -60,10 +63,10 @@ public class ParseBodyTest extends Assert {
         String data = DATA[n];
         //System.out.println("Original[" + n + "]: " + data);
 
-        xmlReader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(data.getBytes("utf-8")));
+        xmlReader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(data.getBytes()));
 
         //reader should be on the start element for the
-        assertEquals(XMLStreamReader.START_ELEMENT, xmlReader.next());
+        assertEquals(XMLStreamConstants.START_ELEMENT, xmlReader.next());
         assertEquals("Body", xmlReader.getLocalName());
 
         factory = MessageFactory.newInstance();

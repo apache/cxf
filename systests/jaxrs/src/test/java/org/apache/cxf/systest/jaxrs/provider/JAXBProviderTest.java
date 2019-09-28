@@ -37,6 +37,8 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class JAXBProviderTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(JAXBProviderTest.class);
 
@@ -79,11 +81,11 @@ public class JAXBProviderTest extends AbstractBusClientServerTestBase {
         List<String> values = new ArrayList<>();
         values.add(MediaType.APPLICATION_XML);
         client.getHeaders().put("content-type", values);
-        JAXBElement<String> test = new JAXBElement<String>(new QName("org.apache.cxf", "jaxbelement"),
+        JAXBElement<String> test = new JAXBElement<>(new QName("org.apache.cxf", "jaxbelement"),
                                                            String.class, "test");
         Response response = client.post(test);
         String result = response.readEntity(String.class);
-        Assert.assertTrue(result.contains("<jaxbelement xmlns=\"org.apache.cxf\">test</jaxbelement>"));
+        assertTrue(result.contains("<jaxbelement xmlns=\"org.apache.cxf\">test</jaxbelement>"));
         Assert.assertFalse(result.contains("WriteInCXFJaxbProvider"));
     }
 }

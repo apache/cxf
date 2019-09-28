@@ -39,16 +39,15 @@ public class HawkAccessTokenValidatorClient extends AbstractHawkAccessTokenValid
                                                      MultivaluedMap<String, String> extraProps)
         throws OAuthServiceException {
         if (isRemoteSignatureValidation()) {
-            MultivaluedMap<String, String> map = new MetadataMap<String, String>();
+            MultivaluedMap<String, String> map = new MetadataMap<>();
             if (extraProps != null) {
                 map.putAll(extraProps);
             }
             map.putSingle(HTTP_VERB, mc.getRequest().getMethod());
             map.putSingle(HTTP_URI, mc.getUriInfo().getRequestUri().toString());
             return validator.validateAccessToken(mc, authScheme, authSchemeData, map);
-        } else {
-            return super.validateAccessToken(mc, authScheme, authSchemeData, extraProps);
         }
+        return super.validateAccessToken(mc, authScheme, authSchemeData, extraProps);
 
     }
     protected AccessTokenValidation getAccessTokenValidation(MessageContext mc,

@@ -126,11 +126,10 @@ public class SchemaCollectionContextProxy implements JAXBContextProxy {
 
     public Object getBeanInfo(Class<?> cls) {
         Class<?> origCls = cls;
-        StringBuilder postfix = new StringBuilder();
-        postfix.append("");
+        String postfix = "";
         while (cls.isArray()) {
             cls = cls.getComponentType();
-            postfix.append("Array");
+            postfix = "Array";
         }
         XmlRootElement xre = cls.getAnnotation(XmlRootElement.class);
         String name = xre == null ? "##default" : xre.name();
@@ -150,7 +149,7 @@ public class SchemaCollectionContextProxy implements JAXBContextProxy {
                 namespace = defaultNamespace;
             }
         }
-        final QName qname = new QName(namespace, name + postfix.toString());
+        final QName qname = new QName(namespace, name + postfix);
         final XmlSchemaElement el = schemas.getElementByQName(qname);
         XmlSchemaType type = null;
         if (el != null) {
@@ -212,10 +211,7 @@ public class SchemaCollectionContextProxy implements JAXBContextProxy {
     }
     private XmlSchemaType mapToSchemaType(Class<?> cls, String namespace) {
         QName qn = getTypeQName(cls, namespace);
-        XmlSchemaType type = null;
-        if (qn != null) {
-            type = schemas.getTypeByQName(qn);
-        }
+        XmlSchemaType type = schemas.getTypeByQName(qn);
         if (type == null && cls.isArray()) {
             Class<?> compType = cls.getComponentType();
             int count = 1;
@@ -224,15 +220,13 @@ public class SchemaCollectionContextProxy implements JAXBContextProxy {
                 count++;
             }
             QName aqn = getTypeQName(compType, namespace);
-            if (aqn != null) {
-                while (count > 0) {
-                    aqn = new QName(aqn.getNamespaceURI(), aqn.getLocalPart() + "Array");
-                    count--;
-                }
-                type = schemas.getTypeByQName(aqn);
-                if (type == null) {
-                    type = schemas.getTypeByQName(new QName("http://jaxb.dev.java.net/array", aqn.getLocalPart()));
-                }
+            while (count > 0) {
+                aqn = new QName(aqn.getNamespaceURI(), aqn.getLocalPart() + "Array");
+                count--;
+            }
+            type = schemas.getTypeByQName(aqn);
+            if (type == null) {
+                type = schemas.getTypeByQName(new QName("http://jaxb.dev.java.net/array", aqn.getLocalPart()));
             }
         }
         /*

@@ -19,11 +19,11 @@
 package org.apache.cxf.jca.outbound;
 
 import java.net.URL;
+import java.util.Objects;
 
 import javax.resource.spi.ConnectionRequestInfo;
 import javax.xml.namespace.QName;
 
-import org.apache.commons.lang.ObjectUtils;
 
 /**
  *
@@ -124,27 +124,27 @@ public class CXFConnectionSpec implements ConnectionRequestInfo {
 
         CXFConnectionSpec that = (CXFConnectionSpec)other;
 
-        if (!ObjectUtils.equals(that.getWsdlURL(), wsdlURL)) {
+        if (!Objects.equals(that.getWsdlURL(), wsdlURL)) {
             return false;
         }
 
-        if (!ObjectUtils.equals(that.getBusConfigURL(), busConfigURL)) {
+        if (!Objects.equals(that.getBusConfigURL(), busConfigURL)) {
             return false;
         }
 
-        if (!ObjectUtils.equals(that.getServiceClass(), serviceClass)) {
+        if (!Objects.equals(that.getServiceClass(), serviceClass)) {
             return false;
         }
 
-        if (!ObjectUtils.equals(that.getServiceName(), serviceName)) {
+        if (!Objects.equals(that.getServiceName(), serviceName)) {
             return false;
         }
 
-        if (!ObjectUtils.equals(that.getEndpointName(), endpointName)) {
+        if (!Objects.equals(that.getEndpointName(), endpointName)) {
             return false;
         }
 
-        return ObjectUtils.equals(that.getAddress(), address);
+        return Objects.equals(that.getAddress(), address);
     }
 
     // Required by JCA Spec
@@ -180,13 +180,13 @@ public class CXFConnectionSpec implements ConnectionRequestInfo {
     }
 
     public String toString() {
-        StringBuilder buf = new StringBuilder();
-        buf.append("serviceName=" + serviceName);
-        buf.append(",endpointName=" + endpointName);
-        buf.append(",wsdlURL=" + wsdlURL);
-        buf.append(",busConfigURL=" + busConfigURL);
-        buf.append(",serviceClass=" + serviceClass);
-        buf.append(",address=" + address);
+        StringBuilder buf = new StringBuilder(128);
+        buf.append("serviceName=").append(serviceName);
+        buf.append(",endpointName=").append(endpointName);
+        buf.append(",wsdlURL=").append(wsdlURL);
+        buf.append(",busConfigURL=").append(busConfigURL);
+        buf.append(",serviceClass=").append(serviceClass);
+        buf.append(",address=").append(address);
         return buf.toString();
     }
 

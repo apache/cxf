@@ -18,10 +18,11 @@
  */
 package org.apache.cxf.management.persistence;
 
-import java.io.File;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,12 +41,12 @@ public class FilesystemExchangeDataDAO implements ExchangeDataDAO {
     }
 
     public void save(ExchangeData exchange) throws Exception {
-        File file = null;
+        Path file = null;
 
         if (this.directory == null) {
-            file = File.createTempFile("cxf-management-", "." + this.extension);
+            file = Files.createTempFile("cxf-management-", "." + this.extension);
         } else {
-            file = File.createTempFile("cxf-management-", "." + this.extension, new File(this.directory));
+            file = Files.createTempFile(Paths.get(this.directory), "cxf-management-", "." + this.extension);
         }
 
         StringWriter stringWriter = new StringWriter();
@@ -117,12 +118,12 @@ public class FilesystemExchangeDataDAO implements ExchangeDataDAO {
             }
         }
 
-        try (OutputStream fileOutputStream = Files.newOutputStream(file.toPath())) {
+        try (OutputStream fileOutputStream = Files.newOutputStream(file)) {
             fileOutputStream.write(stringWriter.getBuffer().toString().getBytes());
         }
 
         if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Exchange data saved in " + file.getAbsolutePath());
+            LOG.fine("Exchange data saved in " + file);
         }
 
     }

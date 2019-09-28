@@ -31,7 +31,7 @@ public class TestBeanABOImpl implements TestBeanABO {
     }
 
     public String nothing() {
-        return "" + bean + client;
+        return bean.toString() + client.toString();
     }
 
 }

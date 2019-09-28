@@ -23,7 +23,7 @@
        xmlns:jaxrs="http://cxf.apache.org/jaxrs"
        xsi:schemaLocation="http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
                            http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
-                           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd">
+                           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <import resource="classpath:META-INF/cxf/cxf.xml" />
 
@@ -42,8 +42,8 @@
 
     <!-- Swagger2Feature for the first Endpoint -->  
     <bean id="swagger2Feature" class="org.apache.cxf.jaxrs.swagger.Swagger2Feature">
+        <property name="title" value="Sample REST Application"/>
         <property name="usePathBasedConfig" value="true"/>
-        <property name="scan" value="false"/>
     </bean>
 
     <!-- First Endpoint -->
@@ -65,8 +65,8 @@
 
     <!-- Swagger2Feature for the second Endpoint -->  
     <bean id="swagger2Feature2" class="org.apache.cxf.jaxrs.swagger.Swagger2Feature">
+        <property name="title" value="Sample REST Application"/>
         <property name="usePathBasedConfig" value="true"/>
-        <property name="scan" value="false"/>
     </bean>
 
     <!-- First Endpoint -->

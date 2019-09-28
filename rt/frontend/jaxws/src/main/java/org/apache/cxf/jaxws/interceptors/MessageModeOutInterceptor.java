@@ -53,6 +53,7 @@ import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor.SAAJOutEndingInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJStreamWriter;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.ServiceUtils;
@@ -63,7 +64,6 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.BindingFaultInfo;
@@ -131,7 +131,6 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
                     }
 
                     public OutputStream getOutputStream() throws IOException {
-                        // TODO Auto-generated method stub
                         return null;
                     }
 
@@ -209,7 +208,7 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
                 for (BindingFaultInfo bfi : bop.getFaults()) {
                     if (bfi.getFaultInfo().getMessagePartByIndex(0).getConcreteName().equals(qn)) {
                         //Found a fault with the correct QName, we can validate it
-                        schema.newValidator().validate(new DOMSource(el));
+                        schema.newValidator().validate(new DOMSource(DOMUtils.getDomElement(el)));
                     }
                 }
                 el = DOMUtils.getNextElement(el);
@@ -253,8 +252,7 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
                     String cxfNamespace = cxfSoapMessage.getVersion().getNamespace();
                     SOAPHeader soapHeader = soapMessage.getSOAPHeader();
                     String namespace = soapHeader == null ? null : soapHeader.getNamespaceURI();
-                    if (namespace != null && cxfNamespace != null && !namespace.equals(cxfNamespace)
-                            && Soap12.SOAP_NAMESPACE.equals(namespace)) {
+                    if (Soap12.SOAP_NAMESPACE.equals(namespace) && !namespace.equals(cxfNamespace)) {
                         cxfSoapMessage.setVersion(Soap12.getInstance());
                         cxfSoapMessage.put(Message.CONTENT_TYPE, cxfSoapMessage.getVersion().getContentType());
                     }
@@ -273,7 +271,7 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
             try {
                 Object xmlDec = soapMessage.getProperty(SOAPMessage.WRITE_XML_DECLARATION);
                 if (xmlDec != null) {
-                    boolean b = MessageUtils.isTrue(xmlDec);
+                    boolean b = PropertyUtils.isTrue(xmlDec);
                     message.put(StaxOutInterceptor.FORCE_START_DOCUMENT, b);
                 }
             } catch (SOAPException e) {
@@ -307,10 +305,7 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
                     if (o instanceof Source) {
                         StaxUtils.copy((Source)o, new SAAJStreamWriter(part));
                     }
-                } catch (SOAPException e) {
-                    throw new SoapFault("Error creating SOAPMessage", e,
-                                        message.getVersion().getSender());
-                } catch (XMLStreamException e) {
+                } catch (SOAPException | XMLStreamException e) {
                     throw new SoapFault("Error creating SOAPMessage", e,
                                         message.getVersion().getSender());
                 }

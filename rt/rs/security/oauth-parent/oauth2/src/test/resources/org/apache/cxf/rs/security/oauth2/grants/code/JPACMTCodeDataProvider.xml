@@ -26,20 +26,20 @@ under the License.
        xsi:schemaLocation="http://www.springframework.org/schema/aop
                            http://www.springframework.org/schema/aop/spring-aop.xsd
                            http://www.springframework.org/schema/beans
-                           http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
                            http://www.springframework.org/schema/context
-                           http://www.springframework.org/schema/context/spring-context-4.2.xsd
+                           http://www.springframework.org/schema/context/spring-context.xsd
                            http://www.springframework.org/schema/tx
                            http://www.springframework.org/schema/tx/spring-tx.xsd
                            http://www.springframework.org/schema/util
-                           http://www.springframework.org/schema/util/spring-util-4.2.xsd">
+                           http://www.springframework.org/schema/util/spring-util.xsd">
 
 
     <bean id="oauthProvider"
           class="org.apache.cxf.rs.security.oauth2.grants.code.JPACMTCodeDataProvider"
           init-method="init" destroy-method="close">
+        <property name="entityManager" ref="entityManager"/>
     </bean>
-
 
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
         <property name="entityManagerFactory" ref="entityManagerFactory"/>
@@ -58,6 +58,10 @@ under the License.
         </tx:attributes>
     </tx:advice>
 
+    <bean name="entityManager" class="org.springframework.orm.jpa.support.SharedEntityManagerBean">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+
     <beans profile="hibernate">
         <bean id="entityManagerFactory"
               class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
@@ -70,7 +74,7 @@ under the License.
                     <!--<property name="generateDdl" value="true"/>-->
                 <!--</bean>-->
             <!--</property>-->
-            <property name="persistenceUnitName" value="testUnitHibernate"/>
+            <property name="persistenceUnitName" value="test-hibernate-cxf-rt-rs-security-oauth2"/>
             <property name="jpaPropertyMap">
                 <map>
                     <entry key="hibernate.jdbc.fetch_size" value="400"/>

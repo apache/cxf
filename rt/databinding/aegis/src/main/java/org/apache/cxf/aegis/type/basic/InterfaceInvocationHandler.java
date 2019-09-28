@@ -145,13 +145,11 @@ class InterfaceInvocationHandler implements InvocationHandler {
             if (!Character.isUpperCase(methodName.charAt(firstCharacter + 1))) {
                 return Character.toLowerCase(methodName.charAt(firstCharacter))
                        + methodName.substring(firstCharacter + 1);
-            } else {
-                return methodName.substring(3);
             }
-        } else {
-            return Character.toLowerCase(methodName.charAt(firstCharacter))
-                   + methodName.substring(firstCharacter + 1);
+            return methodName.substring(3);
         }
+        return Character.toLowerCase(methodName.charAt(firstCharacter))
+               + methodName.substring(firstCharacter + 1);
     }
 
     protected Integer proxyHashCode(Object proxy) {

@@ -27,6 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -34,6 +35,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -53,7 +55,6 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
@@ -82,6 +83,8 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                 convertExceptionToResponseIfPossible(ex.getCause(), message);
             } catch (RuntimeException ex) {
                 convertExceptionToResponseIfPossible(ex, message);
+            } catch (IOException ex) {
+                convertExceptionToResponseIfPossible(ex, message);
             }
         }
 
@@ -93,7 +96,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
     }
 
-    private void processRequest(Message message, Exchange exchange) {
+    private void processRequest(Message message, Exchange exchange) throws IOException {
 
         ServerProviderFactory providerFactory = ServerProviderFactory.getInstance(message);
 
@@ -163,13 +166,14 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                                                    BUNDLE,
                                                    message.get(Message.REQUEST_URI),
                                                    rawPath);
-            LOG.warning(errorMsg.toString());
+            Level logLevel = JAXRSUtils.getExceptionLogLevel(message, NotFoundException.class);
+            LOG.log(logLevel == null ? Level.FINE : logLevel, errorMsg.toString());
             Response resp = JAXRSUtils.createResponse(resources, message, errorMsg.toString(),
                     Response.Status.NOT_FOUND.getStatusCode(), false);
             throw ExceptionUtils.toNotFoundException(null, resp);
         }
 
-        MultivaluedMap<String, String> matchedValues = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> matchedValues = new MetadataMap<>();
 
         OperationResourceInfo ori = null;
 
@@ -182,9 +186,8 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                 Response response = JAXRSUtils.createResponse(resources, null, null, 200, true);
                 exchange.put(Response.class, response);
                 return;
-            } else {
-                throw ex;
             }
+            throw ex;
         }
 
 
@@ -208,13 +211,8 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
 
 
         //Process parameters
-        try {
-            List<Object> params = JAXRSUtils.processParameters(ori, matchedValues, message);
-            message.setContent(List.class, params);
-        } catch (IOException ex) {
-            convertExceptionToResponseIfPossible(ex, message);
-        }
-
+        List<Object> params = JAXRSUtils.processParameters(ori, matchedValues, message);
+        message.setContent(List.class, params);
     }
 
     private void convertExceptionToResponseIfPossible(Throwable ex, Message message) {
@@ -248,7 +246,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         exchange.put(RESOURCE_OPERATION_NAME, plainOperationName);
 
         if (ori.isOneway()
-            || MessageUtils.isTrue(HttpUtils.getProtocolHeader(message, Message.ONE_WAY_REQUEST, null))) {
+            || PropertyUtils.isTrue(HttpUtils.getProtocolHeader(message, Message.ONE_WAY_REQUEST, null))) {
             exchange.setOneWay(true);
         }
         ResourceProvider rp = cri.getResourceProvider();
@@ -256,11 +254,6 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             //cri.isSingleton is not guaranteed to indicate we have a 'pure' singleton
             exchange.put(Message.SERVICE_OBJECT, rp.getInstance(message));
         }
-    }
-
-    @Override
-    public void handleFault(Message message) {
-        super.handleFault(message);
     }
 
     private Message createOutMessage(Message inMessage, Response r) {

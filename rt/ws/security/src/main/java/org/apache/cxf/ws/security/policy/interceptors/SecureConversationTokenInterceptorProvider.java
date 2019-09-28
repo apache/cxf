@@ -57,10 +57,13 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
                             SP12Constants.SECURE_CONVERSATION_TOKEN,
                             SP12Constants.BOOTSTRAP_POLICY,
                             SP11Constants.BOOTSTRAP_POLICY));
-        this.getOutInterceptors().add(new SecureConversationOutInterceptor());
-        this.getOutFaultInterceptors().add(new SecureConversationOutInterceptor());
-        this.getInInterceptors().add(new SecureConversationInInterceptor());
-        this.getInFaultInterceptors().add(new SecureConversationInInterceptor());
+        SecureConversationOutInterceptor outInterceptor = new SecureConversationOutInterceptor();
+        this.getOutInterceptors().add(outInterceptor);
+        this.getOutFaultInterceptors().add(outInterceptor);
+
+        SecureConversationInInterceptor inInterceptor = new SecureConversationInInterceptor();
+        this.getInInterceptors().add(inInterceptor);
+        this.getInFaultInterceptors().add(inInterceptor);
     }
 
     static String setupClient(STSClient client,

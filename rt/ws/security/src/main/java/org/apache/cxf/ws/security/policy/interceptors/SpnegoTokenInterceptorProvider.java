@@ -46,10 +46,13 @@ public class SpnegoTokenInterceptorProvider extends AbstractPolicyInterceptorPro
 
     public SpnegoTokenInterceptorProvider() {
         super(Arrays.asList(SP11Constants.SPNEGO_CONTEXT_TOKEN, SP12Constants.SPNEGO_CONTEXT_TOKEN));
-        this.getOutInterceptors().add(new SpnegoContextTokenOutInterceptor());
-        this.getOutFaultInterceptors().add(new SpnegoContextTokenOutInterceptor());
-        this.getInInterceptors().add(new SpnegoContextTokenInInterceptor());
-        this.getInFaultInterceptors().add(new SpnegoContextTokenInInterceptor());
+        SpnegoContextTokenOutInterceptor outInterceptor = new SpnegoContextTokenOutInterceptor();
+        this.getOutInterceptors().add(outInterceptor);
+        this.getOutFaultInterceptors().add(outInterceptor);
+
+        SpnegoContextTokenInInterceptor inInterceptor = new SpnegoContextTokenInInterceptor();
+        this.getInInterceptors().add(inInterceptor);
+        this.getInFaultInterceptors().add(inInterceptor);
     }
 
     static String setupClient(STSClient client, SoapMessage message, AssertionInfoMap aim) {

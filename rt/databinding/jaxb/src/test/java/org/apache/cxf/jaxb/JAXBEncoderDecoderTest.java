@@ -66,14 +66,21 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
 import org.apache.hello_world_soap_http.types.StringStruct;
-import org.junit.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * JAXBEncoderDecoderTest
  */
-public class JAXBEncoderDecoderTest extends Assert {
+public class JAXBEncoderDecoderTest {
     public static final QName  SOAP_ENV =
             new QName("http://schemas.xmlsoap.org/soap/envelope/", "Envelope");
     public static final QName  SOAP_BODY =
@@ -83,7 +90,7 @@ public class JAXBEncoderDecoderTest extends Assert {
     JAXBContext context;
     Schema schema;
     Map<String, String> mapField;
-    String arrayField[];
+    String[] arrayField;
     List<String> listField;
 
     @Before
@@ -415,7 +422,7 @@ public class JAXBEncoderDecoderTest extends Assert {
         part.setTypeClass(Class.forName(wrapperAnnotation.className()));
 
 
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element elNode = doc.createElementNS(elName.getNamespaceURI(),
                                              elName.getLocalPart());
         Element rtEl = doc.createElementNS(elName.getNamespaceURI(), "requestType");
@@ -454,7 +461,7 @@ public class JAXBEncoderDecoderTest extends Assert {
         part.setElementQName(elName);
         part.setTypeClass(Class.forName("org.apache.hello_world_soap_http.types.StringStruct"));
 
-        doc = DOMUtils.createDocument();
+        doc = DOMUtils.getEmptyDocument();
         elNode = doc.createElementNS(elName.getNamespaceURI(),
                                              elName.getLocalPart());
         rtEl = doc.createElementNS(elName.getNamespaceURI(), "arg1");
@@ -483,7 +490,7 @@ public class JAXBEncoderDecoderTest extends Assert {
         QName elName = new QName(wrapperAnnotation.targetNamespace(),
                                  wrapperAnnotation.localName());
 
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element elNode = doc.createElementNS(elName.getNamespaceURI(),
                                              elName.getLocalPart());
         Element rtEl = doc.createElementNS(elName.getNamespaceURI(), "requestType");
@@ -501,7 +508,7 @@ public class JAXBEncoderDecoderTest extends Assert {
 
     @Test
     public void testMarshallExceptionWithOrder() throws Exception {
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element elNode = doc.createElementNS("http://cxf.apache.org",  "ExceptionRoot");
 
         OrderException exception = new OrderException("Mymessage");
@@ -583,7 +590,7 @@ public class JAXBEncoderDecoderTest extends Assert {
         int idx = 0;
         for (Type t : genericParameterTypes) {
             Class<?> cls = JAXBEncoderDecoder.getClassFromType(t);
-            assertTrue(cls.equals(paramTypes[idx]));
+            assertEquals(cls, paramTypes[idx]);
             idx++;
         }
 
@@ -594,7 +601,7 @@ public class JAXBEncoderDecoderTest extends Assert {
         idx = 0;
         for (Type t : genericParameterTypes) {
             Class<?> cls = JAXBEncoderDecoder.getClassFromType(t);
-            assertTrue(cls.equals(paramTypes[idx]));
+            assertEquals(cls, paramTypes[idx]);
             idx++;
         }
     }
@@ -635,4 +642,3 @@ public class JAXBEncoderDecoderTest extends Assert {
 
 
 }
-

@@ -40,6 +40,7 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.model.SoapHeaderInfo;
 import org.apache.cxf.common.i18n.BundleUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.DataWriter;
@@ -82,7 +83,7 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
 
     public void handleMessage(SoapMessage message) {
         // Yes this is ugly, but it avoids us from having to implement any kind of caching strategy
-        boolean wroteStart = MessageUtils.isTrue(message.get(WROTE_ENVELOPE_START));
+        boolean wroteStart = PropertyUtils.isTrue(message.get(WROTE_ENVELOPE_START));
         if (!wroteStart) {
             writeSoapEnvelopeStart(message);
 

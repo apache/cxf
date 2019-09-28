@@ -21,8 +21,10 @@ import java.util.Arrays;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
+import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
+import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -46,7 +48,23 @@ public class SampleRestApplication {
         endpoint.setBus(bus);
         endpoint.setServiceBeans(Arrays.<Object>asList(new HelloServiceImpl1(), new HelloServiceImpl2()));
         endpoint.setAddress("/");
-        endpoint.setFeatures(Arrays.asList(new Swagger2Feature()));
+        endpoint.setFeatures(Arrays.asList(createOpenApiFeature(), new LoggingFeature()));
         return endpoint.create();
+    }
+
+    @Bean
+    public OpenApiFeature createOpenApiFeature() {
+        final OpenApiFeature openApiFeature = new OpenApiFeature();
+        openApiFeature.setPrettyPrint(true);
+        openApiFeature.setTitle("Spring Boot CXF REST Application");
+        openApiFeature.setContactName("The Apache CXF team");
+        openApiFeature.setDescription("This sample project demonstrates how to use CXF JAX-RS services"
+                + " with Spring Boot. This demo has two JAX-RS class resources being"
+                + " deployed in a single JAX-RS endpoint.");
+        openApiFeature.setVersion("1.0.0");
+        openApiFeature.setSwaggerUiConfig(
+            new SwaggerUiConfig()
+                .url("/services/helloservice/openapi.json"));
+        return openApiFeature;
     }
 }

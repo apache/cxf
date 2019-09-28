@@ -48,13 +48,15 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 
 public class CachedOutputStream extends OutputStream {
+
     private static final File DEFAULT_TEMP_DIR;
     private static int defaultThreshold;
     private static long defaultMaxSize;
     private static String defaultCipherTransformation;
-    static {
+    private static boolean thresholdSysPropSet;
 
-        String s = SystemPropertyAction.getPropertyOrNull("org.apache.cxf.io.CachedOutputStream.OutputDirectory");
+    static {
+        String s = SystemPropertyAction.getPropertyOrNull(CachedConstants.OUTPUT_DIRECTORY_SYS_PROP);
         if (s != null) {
             File f = new File(s);
             if (f.exists() && f.isDirectory()) {
@@ -76,6 +78,8 @@ public class CachedOutputStream extends OutputStream {
 
     private long threshold = defaultThreshold;
     private long maxSize = defaultMaxSize;
+    private File outputDir = DEFAULT_TEMP_DIR;
+    private String cipherTransformation = defaultCipherTransformation;
 
     private long totalLength;
 
@@ -83,9 +87,7 @@ public class CachedOutputStream extends OutputStream {
 
     private boolean tempFileFailed;
     private File tempFile;
-    private File outputDir = DEFAULT_TEMP_DIR;
     private boolean allowDeleteOfFile = true;
-    private String cipherTransformation = defaultCipherTransformation;
     private CipherPair ciphers;
 
     private List<CachedOutputStreamCallback> callbacks;
@@ -106,17 +108,24 @@ public class CachedOutputStream extends OutputStream {
     private void readBusProperties() {
         Bus b = BusFactory.getThreadDefaultBus(false);
         if (b != null) {
-            String v = getBusProperty(b, "bus.io.CachedOutputStream.Threshold", null);
+            String v = getBusProperty(b, CachedConstants.THRESHOLD_BUS_PROP, null);
             if (v != null && threshold == defaultThreshold) {
                 threshold = Integer.parseInt(v);
             }
-            v = getBusProperty(b, "bus.io.CachedOutputStream.MaxSize", null);
+            v = getBusProperty(b, CachedConstants.MAX_SIZE_BUS_PROP, null);
             if (v != null) {
                 maxSize = Integer.parseInt(v);
             }
-            v = getBusProperty(b, "bus.io.CachedOutputStream.CipherTransformation", null);
+            v = getBusProperty(b, CachedConstants.CIPHER_TRANSFORMATION_BUS_PROP, null);
             if (v != null) {
                 cipherTransformation = v;
+            }
+            v = getBusProperty(b, CachedConstants.OUTPUT_DIRECTORY_BUS_PROP, null);
+            if (v != null) {
+                File f = new File(v);
+                if (f.exists() && f.isDirectory()) {
+                    outputDir = f;
+                }
             }
         }
     }
@@ -212,6 +221,9 @@ public class CachedOutputStream extends OutputStream {
         }
         doClose();
         currentStream.close();
+        if (ciphers != null) {
+            ciphers.clean();
+        }
         if (!maybeDeleteTempFile(currentStream)) {
             postClose();
         }
@@ -289,14 +301,12 @@ public class CachedOutputStream extends OutputStream {
         if (inmem) {
             if (currentStream instanceof ByteArrayOutputStream) {
                 return ((ByteArrayOutputStream)currentStream).toByteArray();
-            } else {
-                throw new IOException("Unknown format of currentStream");
             }
-        } else {
-            // read the file
-            try (InputStream fin = createInputStream(tempFile)) {
-                return IOUtils.readBytesFromStream(fin);
-            }
+            throw new IOException("Unknown format of currentStream");
+        }
+        // read the file
+        try (InputStream fin = createInputStream(tempFile)) {
+            return IOUtils.readBytesFromStream(fin);
         }
     }
 
@@ -333,7 +343,7 @@ public class CachedOutputStream extends OutputStream {
                 LoadingByteArrayOutputStream lout = (LoadingByteArrayOutputStream)currentStream;
                 out.append(IOUtils.newStringFromBytes(lout.getRawBytes(), charsetName, 0, (int)limit));
             } else if (currentStream instanceof ByteArrayOutputStream) {
-                byte bytes[] = ((ByteArrayOutputStream)currentStream).toByteArray();
+                byte[] bytes = ((ByteArrayOutputStream)currentStream).toByteArray();
                 out.append(IOUtils.newStringFromBytes(bytes, charsetName, 0, (int)limit));
             } else {
                 throw new IOException("Unknown format of currentStream");
@@ -342,7 +352,7 @@ public class CachedOutputStream extends OutputStream {
             // read the file
             try (InputStream fin = createInputStream(tempFile);
                 Reader reader = new InputStreamReader(fin, charsetName)) {
-                char bytes[] = new char[1024];
+                char[] bytes = new char[1024];
                 long x = reader.read(bytes);
                 while (x != -1) {
                     if ((count + x) > limit) {
@@ -381,7 +391,7 @@ public class CachedOutputStream extends OutputStream {
             // read the file
             try (InputStream fin = createInputStream(tempFile);
                 Reader reader = new InputStreamReader(fin, charsetName)) {
-                char bytes[] = new char[1024];
+                char[] bytes = new char[1024];
                 int x = reader.read(bytes);
                 while (x != -1) {
                     out.append(bytes, 0, x);
@@ -404,7 +414,7 @@ public class CachedOutputStream extends OutputStream {
     }
 
     public String toString() {
-        StringBuilder builder = new StringBuilder().append("[")
+        StringBuilder builder = new StringBuilder().append('[')
             .append(CachedOutputStream.class.getName())
             .append(" Content: ");
         try {
@@ -412,7 +422,7 @@ public class CachedOutputStream extends OutputStream {
         } catch (IOException e) {
             //ignore
         }
-        return builder.append("]").toString();
+        return builder.append(']').toString();
     }
 
     protected void onWrite() throws IOException {
@@ -498,26 +508,25 @@ public class CachedOutputStream extends OutputStream {
             } else {
                 return null;
             }
-        } else {
-            try {
-                InputStream fileInputStream = new TransferableFileInputStream(tempFile);
-                streamList.add(fileInputStream);
-                if (cipherTransformation != null) {
-                    fileInputStream = new CipherInputStream(fileInputStream, ciphers.getDecryptor()) {
-                        boolean closed;
-                        public void close() throws IOException {
-                            if (!closed) {
-                                super.close();
-                                closed = true;
-                            }
+        }
+        try {
+            InputStream fileInputStream = new TransferableFileInputStream(tempFile);
+            streamList.add(fileInputStream);
+            if (cipherTransformation != null) {
+                fileInputStream = new CipherInputStream(fileInputStream, ciphers.getDecryptor()) {
+                    boolean closed;
+                    public void close() throws IOException {
+                        if (!closed) {
+                            super.close();
+                            closed = true;
                         }
-                    };
-                }
-
-                return fileInputStream;
-            } catch (FileNotFoundException e) {
-                throw new IOException("Cached file was deleted, " + e.toString());
+                    }
+                };
             }
+
+            return fileInputStream;
+        } catch (FileNotFoundException e) {
+            throw new IOException("Cached file was deleted, " + e.toString());
         }
     }
 
@@ -569,27 +578,34 @@ public class CachedOutputStream extends OutputStream {
 
     public static void setDefaultMaxSize(long l) {
         if (l == -1) {
-            String s = System.getProperty("org.apache.cxf.io.CachedOutputStream.MaxSize",
-                    "-1");
+            String s = SystemPropertyAction.getProperty(CachedConstants.MAX_SIZE_SYS_PROP, "-1");
             l = Long.parseLong(s);
         }
         defaultMaxSize = l;
     }
+
     public static void setDefaultThreshold(int i) {
         if (i == -1) {
-            String s = SystemPropertyAction.getProperty("org.apache.cxf.io.CachedOutputStream.Threshold",
-                "-1");
-            i = Integer.parseInt(s);
+            i = SystemPropertyAction.getInteger(CachedConstants.THRESHOLD_SYS_PROP, -1);
             if (i <= 0) {
                 i = 128 * 1024;
+            } else {
+                thresholdSysPropSet = true;
             }
         }
         defaultThreshold = i;
-
     }
+
+    /**
+     * Returns true if the default threshold is explicitly set via CachedConstants.THRESHOLD_SYS_PROP
+     */
+    public static boolean isThresholdSysPropSet() {
+        return thresholdSysPropSet;
+    }
+
     public static void setDefaultCipherTransformation(String n) {
         if (n == null) {
-            n = SystemPropertyAction.getPropertyOrNull("org.apache.cxf.io.CachedOutputStream.CipherTransformation");
+            n = SystemPropertyAction.getPropertyOrNull(CachedConstants.CIPHER_TRANSFORMATION_SYS_PROP);
         }
         defaultCipherTransformation = n;
     }

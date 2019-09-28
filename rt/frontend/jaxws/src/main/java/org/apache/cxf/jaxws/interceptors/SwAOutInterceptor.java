@@ -24,6 +24,8 @@ import java.awt.MediaTracker;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
@@ -59,6 +61,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxb.JAXBDataBinding;
@@ -76,7 +79,7 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(SwAOutInterceptor.class);
 
     private static final Map<String, Method> SWA_REF_METHOD
-        = new ConcurrentHashMap<String, Method>(4, 0.75f, 2);
+        = new ConcurrentHashMap<>(4, 0.75f, 2);
     private static final Set<String> SWA_REF_NO_METHOD
         = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>(4, 0.75f, 2));
 
@@ -142,7 +145,7 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
 
         SoapBodyInfo sbi = bmi.getExtensor(SoapBodyInfo.class);
 
-        if (sbi == null || sbi.getAttachments() == null || sbi.getAttachments().size() == 0) {
+        if (sbi == null || sbi.getAttachments() == null || sbi.getAttachments().isEmpty()) {
             Service s = ex.getService();
             DataBinding db = s.getDataBinding();
             if (db instanceof JAXBDataBinding
@@ -162,7 +165,7 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
             String ct = (String) mpi.getProperty(Message.CONTENT_TYPE);
 
             String id = new StringBuilder().append(partName)
-                .append("=")
+                .append('=')
                 .append(UUID.randomUUID())
                 .append("@apache.org").toString();
 
@@ -180,29 +183,34 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
             if (o instanceof Source) {
                 dh = new DataHandler(createDataSource((Source)o, ct));
             } else if (o instanceof Image) {
-                // TODO: make this streamable. This is one of my pet
-                // peeves in JAXB RI as well, so if you fix this, submit the
-                // code to the JAXB RI as well (see RuntimeBuiltinLeafInfoImpl)! - DD
-                Iterator<ImageWriter> writers = ImageIO.getImageWritersByMIMEType(ct);
-                if (writers.hasNext()) {
-                    ImageWriter writer = writers.next();
-
-                    try (ByteArrayOutputStream bos = new ByteArrayOutputStream(2048)) {
-                        BufferedImage bimg = convertToBufferedImage((Image) o);
-                        ImageOutputStream out = ImageIO.createImageOutputStream(bos);
-                        writer.setOutput(out);
-                        writer.write(bimg);
-                        writer.dispose();
-                        out.flush();
-                        out.close();
-                        dh = new DataHandler(new ByteDataSource(bos.toByteArray(), ct));
-                    } catch (IOException e) {
-                        throw new Fault(e);
+                final Image img = (Image)o;
+                final String contentType = ct;
+                dh = new DataHandler(o, ct) {
+                    @Override
+                    public InputStream getInputStream() throws IOException {
+                        LoadingByteArrayOutputStream bout = new LoadingByteArrayOutputStream();
+                        writeTo(bout);
+                        return bout.createInputStream();
                     }
-                } else {
-                    throw new Fault(new org.apache.cxf.common.i18n.Message("ATTACHMENT_NOT_SUPPORTED",
-                                     LOG, ct));
-                }
+                    @Override
+                    public void writeTo(OutputStream out) throws IOException {
+                        ImageWriter writer = null;
+                        Iterator<ImageWriter> writers = ImageIO.getImageWritersByMIMEType(contentType);
+                        if (writers.hasNext()) {
+                            writer = writers.next();
+                        }
+                        if (writer != null) {
+                            BufferedImage bimg = convertToBufferedImage(img);
+                            ImageOutputStream iout = ImageIO.createImageOutputStream(out);
+                            writer.setOutput(iout);
+                            writer.write(bimg);
+                            writer.dispose();
+                            iout.flush();
+                            out.flush();
+                        }
+                    }
+                };
+                
             } else if (o instanceof DataHandler) {
                 dh = (DataHandler) o;
                 ct = dh.getContentType();

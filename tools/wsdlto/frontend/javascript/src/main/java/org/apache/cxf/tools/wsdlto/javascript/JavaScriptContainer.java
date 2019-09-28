@@ -132,7 +132,7 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
         if (serviceList.isEmpty()) {
             throw new ToolException("Did not find any services in WSDL");
         }
-        Map<String, InterfaceInfo> interfaces = new LinkedHashMap<String, InterfaceInfo>();
+        Map<String, InterfaceInfo> interfaces = new LinkedHashMap<>();
 
         ServiceInfo service0 = serviceList.get(0);
         SchemaCollection schemaCollection = service0.getXmlSchemaCollection();
@@ -183,7 +183,7 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
                 throw new ToolException(msg);
             }
             for (String jsprefix : pns) {
-                int pos = jsprefix.indexOf("=");
+                int pos = jsprefix.indexOf('=');
                 if (pos != -1) {
                     String ns = jsprefix.substring(0, pos);
                     jsprefix = jsprefix.substring(pos + 1);

@@ -17,7 +17,13 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:cxf="http://cxf.apache.org/core" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:test="http://apache.org/hello_world_soap_http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util" xsi:schemaLocation="         http://cxf.apache.org/core         http://cxf.apache.org/schemas/core.xsd         http://www.springframework.org/schema/beans         http://www.springframework.org/schema/beans/spring-beans-4.2.xsd         http://cxf.apache.org/jaxws                                              http://cxf.apache.org/schemas/jaxws.xsd         http://www.springframework.org/schema/util         http://www.springframework.org/schema/util/spring-util-4.2.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://cxf.apache.org/core"
+    xmlns:jaxws="http://cxf.apache.org/jaxws"
+    xmlns:test="http://apache.org/hello_world_soap_http"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
@@ -45,10 +51,10 @@
                 </value>
     </util:list>
     <bean id="utSTSProperties" class="org.apache.cxf.sts.StaticSTSProperties">
-        <property name="signaturePropertiesFile" value="stsKeystore.properties"/>
+        <property name="signatureCryptoProperties" value="stsKeystore.properties"/>
         <property name="signatureUsername" value="mystskey"/>
         <property name="callbackHandlerClass" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-        <property name="encryptionPropertiesFile" value="stsKeystore.properties"/>
+        <property name="encryptionCryptoProperties" value="stsKeystore.properties"/>
         <property name="issuer" value="DoubleItSTSIssuer"/>
         <property name="encryptionUsername" value="myservicekey"/>
     </bean>

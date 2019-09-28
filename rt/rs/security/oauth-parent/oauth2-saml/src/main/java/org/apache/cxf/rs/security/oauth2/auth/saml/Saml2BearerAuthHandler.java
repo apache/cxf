@@ -45,7 +45,7 @@ import org.apache.cxf.rs.security.saml.assertion.Subject;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 
 public class Saml2BearerAuthHandler extends AbstractSamlInHandler {
-    private FormEncodingProvider<Form> provider = new FormEncodingProvider<Form>(true);
+    private FormEncodingProvider<Form> provider = new FormEncodingProvider<>(true);
     private SamlOAuthValidator samlOAuthValidator = new SamlOAuthValidator();
 
     public Saml2BearerAuthHandler() {

@@ -23,12 +23,14 @@ import java.util.HashMap;
 
 import javax.xml.namespace.QName;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-public class ToolContextTest extends Assert {
+
+public class ToolContextTest {
 
     ToolContext context = new ToolContext();
 

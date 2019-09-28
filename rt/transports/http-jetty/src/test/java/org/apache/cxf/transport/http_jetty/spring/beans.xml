@@ -17,7 +17,13 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:h="http://cxf.apache.org/transports/http/configuration" xmlns:hj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xsi:schemaLocation="                 http://www.springframework.org/schema/beans                      http://www.springframework.org/schema/beans/spring-beans-4.2.xsd                 http://cxf.apache.org/configuration/security                      http://cxf.apache.org/schemas/configuration/security.xsd                 http://cxf.apache.org/transports/http/configuration                      http://cxf.apache.org/schemas/configuration/http-conf.xsd                 http://cxf.apache.org/transports/http-jetty/configuration                      http://cxf.apache.org/schemas/configuration/http-jetty.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:h="http://cxf.apache.org/transports/http/configuration"
+    xmlns:hj="http://cxf.apache.org/transports/http-jetty/configuration"
+    xmlns:sec="http://cxf.apache.org/configuration/security"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd">
     <h:destination name="{urn:test:ns}Foo.http-destination">
         <h:server ContentEncoding="foobar"/>
     </h:destination>
@@ -48,6 +54,7 @@
                 <beans:bean class="org.eclipse.jetty.server.handler.DefaultHandler"/>
             </hj:handlers>
             <hj:sessionSupport>true</hj:sessionSupport>
+            <hj:sessionTimeout>600</hj:sessionTimeout>
         </hj:engine>
         <hj:engine port="9002">
             <hj:tlsServerParameters>

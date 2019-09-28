@@ -30,7 +30,7 @@ public class ReferencingAuthenticator extends Authenticator {
     final Reference<Authenticator> auth;
     final Authenticator wrapped;
     public ReferencingAuthenticator(Authenticator cxfauth, Authenticator wrapped) {
-        this.auth = new WeakReference<Authenticator>(cxfauth);
+        this.auth = new WeakReference<>(cxfauth);
         this.wrapped = wrapped;
     }
 

@@ -26,7 +26,6 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
 
 import org.apache.cxf.service.model.ServiceInfo;
-
 import org.omg.CORBA.ORB;
 
 public class ParameterEventProducer implements CorbaTypeEventProducer {
@@ -57,9 +56,8 @@ public class ParameterEventProducer implements CorbaTypeEventProducer {
     }
 
     public boolean hasNext() {
-        return (currentEventProducer != null
-                ? currentEventProducer.hasNext() : false)
-            || (iterator != null ? iterator.hasNext() : false);
+        return (currentEventProducer != null && currentEventProducer.hasNext())
+            || (iterator != null && iterator.hasNext());
     }
 
     public int next() {

@@ -50,7 +50,7 @@ public class TestDateMapping {
     @Test
     public void testWriteSqlDateAsDate() throws Exception {
         context = new AegisContext();
-        Set<java.lang.reflect.Type> rootClasses = new HashSet<java.lang.reflect.Type>();
+        Set<java.lang.reflect.Type> rootClasses = new HashSet<>();
         rootClasses.add(BeanWithDate.class);
         context.setRootClasses(rootClasses);
         context.initialize();
@@ -70,7 +70,7 @@ public class TestDateMapping {
     @Test
     public void testWriteCustomTypeSchemaType() throws Exception {
         context = new AegisContext();
-        Set<java.lang.reflect.Type> rootClasses = new HashSet<java.lang.reflect.Type>();
+        Set<java.lang.reflect.Type> rootClasses = new HashSet<>();
         rootClasses.add(BeanWithDate.class);
         context.setRootClasses(rootClasses);
         context.initialize();

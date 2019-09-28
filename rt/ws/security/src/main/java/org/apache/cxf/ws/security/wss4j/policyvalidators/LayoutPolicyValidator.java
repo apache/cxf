@@ -28,7 +28,6 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
@@ -138,7 +137,7 @@ public class LayoutPolicyValidator extends AbstractSecurityPolicyValidator {
             for (WSDataRef r : sl) {
                 String xpath = r.getXpath();
                 if (xpath != null) {
-                    String[] nodes = StringUtils.split(xpath, "/");
+                    String[] nodes = xpath.split("/");
                     // envelope/Header/wsse:Security/header
                     if (nodes.length == 5) {
                         Element protectedElement = r.getProtectedElement();
@@ -189,7 +188,7 @@ public class LayoutPolicyValidator extends AbstractSecurityPolicyValidator {
                 CastUtils.cast((List<?>)signedResult.get(
                     WSSecurityEngineResult.TAG_DATA_REF_URIS
                 ));
-            if (sl != null && sl.size() >= 1) {
+            if (sl != null && !sl.isEmpty()) {
                 for (WSDataRef dataRef : sl) {
                     QName signedQName = dataRef.getName();
                     if (WSConstants.SIGNATURE.equals(signedQName)) {

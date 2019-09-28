@@ -25,7 +25,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -47,10 +49,14 @@ import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.BookInterface;
 import org.apache.cxf.jaxrs.resources.Chapter;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ResourceUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class ResourceUtilsTest {
 
     @Test
     public void testFindResourceConstructor() {
@@ -64,7 +70,7 @@ public class ResourceUtilsTest extends Assert {
     @Test
     public void testClassResourceInfoUserResource() throws Exception {
         UserResource ur = new UserResource();
-        ur.setName(HashMap.class.getName());
+        ur.setName(HashMap.class.getName()); //NOPMD
         ur.setPath("/hashmap");
         UserOperation op = new UserOperation();
         op.setPath("/key/{id}");
@@ -80,7 +86,7 @@ public class ResourceUtilsTest extends Assert {
         assertNotNull(cri);
         assertEquals("/hashmap", cri.getURITemplate().getValue());
         Method method =
-            HashMap.class.getMethod("get", new Class[]{Object.class});
+            HashMap.class.getMethod("get", new Class[]{Object.class}); //NOPMD
         OperationResourceInfo ori = cri.getMethodDispatcher().getOperationResourceInfo(method);
         assertNotNull(ori);
         assertEquals("/key/{id}", ori.getURITemplate().getValue());
@@ -160,6 +166,94 @@ public class ResourceUtilsTest extends Assert {
         OperationResourceInfo ori = cri.getMethodDispatcher().getOperationResourceInfo(m);
         assertNotNull(ori);
         assertEquals("GET", ori.getHttpMethod());
+    }
+
+    @Path("/synth-hello")
+    protected interface SyntheticHelloInterface<T> {
+        @GET
+        @Path("/{name}")
+        T getById(@PathParam("name") T name);
+    }
+
+    protected abstract static class AbstractSyntheticHello implements SyntheticHelloInterface<String> {
+        public abstract String getById(String name);
+    }
+
+    public static class SyntheticHelloInterfaceImpl
+            extends AbstractSyntheticHello
+            implements SyntheticHelloInterface<String> {
+        @Override
+        public String getById(String name) {
+            return "Hello " + name + "!";
+        }
+    }
+
+    @Test
+    public void testClassResourceInfoWithSyntheticMethod() throws Exception {
+        ClassResourceInfo cri =
+                ResourceUtils.createClassResourceInfo(
+                        SyntheticHelloInterfaceImpl.class,
+                        SyntheticHelloInterfaceImpl.class,
+                        true,
+                        true);
+
+        Method synthetic = SyntheticHelloInterfaceImpl.class.getMethod("getById", new Class[]{Object.class});
+        assertTrue(synthetic.isSynthetic());
+
+        assertNotNull(cri);
+        Method notSynthetic = SyntheticHelloInterfaceImpl.class.getMethod("getById", new Class[]{String.class});
+        assertFalse(notSynthetic.isSynthetic());
+
+        cri.hasSubResources();
+        assertEquals("there must be only one method, which is the getById(String)",
+                1,
+                cri.getMethodDispatcher().getOperationResourceInfos().size());
+    }
+
+    protected interface OverriddenInterface<T> {
+        @GET
+        @Path("/{key}")
+        T read(@PathParam("key") String key);
+    }
+
+    @Path("overridden-string")
+    protected interface OverriddenInterfaceString extends OverriddenInterface<String> {
+        @NotNull @Override
+        String read(String key);
+
+        @NotNull
+        Set<String> read(String key, String type);
+    }
+
+    public static class OverriddenInterfaceImpl implements OverriddenInterfaceString {
+        @Override
+        public String read(String key) {
+            return key;
+        }
+
+        @Override
+        public Set<String> read(String key, String type) {
+            return Collections.singleton(key);
+        }
+    }
+
+    @Test
+    public void testClassResourceInfoWithOverriddenMethods() throws Exception {
+        ClassResourceInfo cri =
+                ResourceUtils.createClassResourceInfo(
+                        OverriddenInterfaceImpl.class,
+                        OverriddenInterfaceImpl.class,
+                        true,
+                        true);
+
+        assertNotNull(cri);
+        Method notSynthetic = OverriddenInterfaceImpl.class.getMethod("read", new Class[]{String.class});
+        assertFalse(notSynthetic.isSynthetic());
+
+        cri.hasSubResources();
+        final Set<OperationResourceInfo> oris = cri.getMethodDispatcher().getOperationResourceInfos();
+        assertEquals("there must be one read method", 1, oris.size());
+        assertEquals(notSynthetic, oris.iterator().next().getMethodToInvoke());
     }
 
     @Test

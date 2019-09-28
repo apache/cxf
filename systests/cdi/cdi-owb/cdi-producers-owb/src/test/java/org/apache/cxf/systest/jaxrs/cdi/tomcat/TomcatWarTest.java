@@ -26,8 +26,12 @@ import javax.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systests.cdi.base.AbstractCdiSingleAppTest;
 import org.apache.cxf.systests.cdi.base.tomcat.AbstractTomcatServer;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TomcatWarTest extends AbstractCdiSingleAppTest {
     public static class EmbeddedTomcatServer extends AbstractTomcatServer {
@@ -54,14 +58,14 @@ public class TomcatWarTest extends AbstractCdiSingleAppTest {
                         .param("id", id));
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), r.getStatus());
     }
-    
+
     @Test
     public void testResponseHasBeenReceivedWhenQueringAllBookAsAtomFeed() {
         Response r = createWebClient(getBasePath() + "/books/feed", "application/atom+xml").get();
         assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
         assertEquals("application/atom+xml", r.getMediaType().toString());
     }
-    
+
     @Test
     public void testBookHasBeenValidatedWhenPostedAsAtomFeed() {
         Response r = createWebClient(getBasePath() + "/books/feed", "application/atom+xml").post(
@@ -70,7 +74,7 @@ public class TomcatWarTest extends AbstractCdiSingleAppTest {
 
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), r.getStatus());
     }
-    
+
     @Test
     public void testBookHasBeenCreatedWhenPostedAsAtomFeed() {
         Response r = createWebClient(getBasePath() + "/books/feed", "application/atom+xml").post(

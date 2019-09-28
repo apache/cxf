@@ -26,10 +26,14 @@ import java.lang.reflect.Proxy;
 import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.CompletionStage;
 import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -45,6 +49,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorChain.State;
 import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.impl.ResourceContextImpl;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -123,11 +128,17 @@ public class JAXRSInvoker extends AbstractInvoker {
     private Object handleAsyncResponse(Exchange exchange, AsyncResponseImpl ar) {
         Object asyncObj = ar.getResponseObject();
         if (asyncObj instanceof Throwable) {
-            return handleAsyncFault(exchange, ar, (Throwable)asyncObj);
-        } else {
-            setResponseContentTypeIfNeeded(exchange.getInMessage(), asyncObj);
-            return new MessageContentsList(asyncObj);
+            final Throwable throwable = (Throwable)asyncObj;
+            Throwable cause = throwable;
+
+            if (throwable instanceof CompletionException) {
+                cause = throwable.getCause();
+            }
+
+            return handleAsyncFault(exchange, ar, (cause != null) ? cause : throwable);
         }
+        setResponseContentTypeIfNeeded(exchange.getInMessage(), asyncObj);
+        return new MessageContentsList(asyncObj);
     }
 
     private Object handleAsyncFault(Exchange exchange, AsyncResponseImpl ar, Throwable t) {
@@ -155,8 +166,9 @@ public class JAXRSInvoker extends AbstractInvoker {
         final ClassResourceInfo cri = ori.getClassResourceInfo();
         final Message inMessage = exchange.getInMessage();
         final ServerProviderFactory providerFactory = ServerProviderFactory.getInstance(inMessage);
+        cri.injectContexts(resourceObject, ori, inMessage);
+
         if (cri.isRoot()) {
-            cri.injectContexts(resourceObject, ori, inMessage);
             ProviderInfo<Application> appProvider = providerFactory.getApplicationProvider();
             if (appProvider != null) {
                 InjectionUtils.injectContexts(appProvider.getProvider(),
@@ -187,6 +199,9 @@ public class JAXRSInvoker extends AbstractInvoker {
                 asyncResponse = (AsyncResponseImpl)inMessage.get(AsyncResponse.class);
             }
             result = invoke(exchange, resourceObject, methodToInvoke, params);
+            if (asyncResponse == null && !ori.isSubResourceLocator()) {
+                asyncResponse = checkFutureResponse(inMessage, checkResultObject(result));
+            }
             if (asyncResponse != null) {
                 if (!asyncResponse.suspendContinuationIfNeeded()) {
                     result = handleAsyncResponse(exchange, asyncResponse);
@@ -222,9 +237,18 @@ public class JAXRSInvoker extends AbstractInvoker {
                 List<MediaType> acceptContentType =
                     (List<MediaType>)exchange.get(Message.ACCEPT_CONTENT_TYPE);
 
-                result = checkResultObject(result, subResourcePath);
+                result = checkSubResultObject(result, subResourcePath);
 
-                subCri = cri.getSubResource(methodToInvoke.getReturnType(),
+                Class<?> subResponseType = null;
+                if (result.getClass() == Class.class) {
+                    ResourceContext rc = new ResourceContextImpl(inMessage, ori);
+                    result = rc.getResource((Class<?>)result);
+                    subResponseType = InjectionUtils.getActualType(methodToInvoke.getGenericReturnType());
+                } else {
+                    subResponseType = methodToInvoke.getReturnType();
+                }
+                
+                subCri = cri.getSubResource(subResponseType,
                     ClassHelper.getRealClass(exchange.getBus(), result), result);
                 if (subCri == null) {
                     org.apache.cxf.common.i18n.Message errorM =
@@ -281,6 +305,22 @@ public class JAXRSInvoker extends AbstractInvoker {
         return result;
     }
 
+    protected AsyncResponseImpl checkFutureResponse(Message inMessage, Object result) {
+        if (result instanceof CompletionStage) {
+            final CompletionStage<?> stage = (CompletionStage<?>)result;
+            final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
+            stage.whenComplete((v, t) -> {
+                if (t instanceof CancellationException) {
+                    asyncResponse.cancel();
+                } else {
+                    asyncResponse.resume(v != null ? v : t);
+                }
+            });
+            return asyncResponse;
+        }
+        return null;
+    }
+
     protected Method getMethodToInvoke(ClassResourceInfo cri, OperationResourceInfo ori, Object resourceObject) {
         Method resourceMethod = cri.getMethodDispatcher().getMethod(ori);
 
@@ -302,9 +342,8 @@ public class JAXRSInvoker extends AbstractInvoker {
         if (r != null) {
             JAXRSUtils.setMessageContentType(exchange.getInMessage(), r);
             return new MessageContentsList(r);
-        } else {
-            return null;
         }
+        return null;
     }
 
     private void setResponseContentTypeIfNeeded(Message inMessage, Object response) {
@@ -339,7 +378,7 @@ public class JAXRSInvoker extends AbstractInvoker {
 
     @SuppressWarnings("unchecked")
     protected MultivaluedMap<String, String> getTemplateValues(Message msg) {
-        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> values = new MetadataMap<>();
         MultivaluedMap<String, String> oldValues =
             (MultivaluedMap<String, String>)msg.get(URITemplate.TEMPLATE_PARAMETERS);
         if (oldValues != null) {
@@ -364,9 +403,8 @@ public class JAXRSInvoker extends AbstractInvoker {
             OperationResourceInfo ori = exchange.get(OperationResourceInfo.class);
             ClassResourceInfo cri = ori.getClassResourceInfo();
             return cri.getResourceProvider();
-        } else {
-            return (ResourceProvider)provider;
         }
+        return (ResourceProvider)provider;
     }
 
     public Object getServiceObject(Exchange exchange) {
@@ -390,10 +428,8 @@ public class JAXRSInvoker extends AbstractInvoker {
 
 
 
-    private static Object checkResultObject(Object result, String subResourcePath) {
+    private static Object checkResultObject(Object result) {
 
-
-        //the result becomes the object that will handle the request
         if (result != null) {
             if (result instanceof MessageContentsList) {
                 result = ((MessageContentsList)result).get(0);
@@ -403,6 +439,10 @@ public class JAXRSInvoker extends AbstractInvoker {
                 result = ((Object[])result)[0];
             }
         }
+        return result;
+    }
+    private static Object checkSubResultObject(Object result, String subResourcePath) {
+        result = checkResultObject(result);
         if (result == null) {
             org.apache.cxf.common.i18n.Message errorM =
                 new org.apache.cxf.common.i18n.Message("NULL_SUBRESOURCE",

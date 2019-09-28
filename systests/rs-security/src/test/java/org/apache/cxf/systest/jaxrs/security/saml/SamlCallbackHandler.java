@@ -35,7 +35,7 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.RSSecurityUtils;
 import org.apache.cxf.rt.security.SecurityConstants;
-import org.apache.cxf.rt.security.saml.claims.SAMLClaim;
+import org.apache.cxf.rt.security.claims.SAMLClaim;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.bean.ActionBean;
@@ -88,7 +88,10 @@ public class SamlCallbackHandler implements CallbackHandler {
                 }
                 callback.setIssuer("https://idp.example.org/SAML2");
 
-                String subjectName = (String)m.getContextualProperty("saml.subject.name");
+                String subjectName = null;
+                if (m != null) {
+                    subjectName = (String)m.getContextualProperty("saml.subject.name");
+                }
                 if (subjectName == null) {
                     subjectName = "uid=sts-client,o=mock-sts.com";
                 }
@@ -149,7 +152,10 @@ public class SamlCallbackHandler implements CallbackHandler {
                 AttributeStatementBean attrBean = new AttributeStatementBean();
                 attrBean.setSubject(subjectBean);
 
-                List<String> roles = CastUtils.cast((List<?>)m.getContextualProperty("saml.roles"));
+                List<String> roles = null;
+                if (m != null) {
+                    roles = CastUtils.cast((List<?>)m.getContextualProperty("saml.roles"));
+                }
                 if (roles == null) {
                     roles = Collections.singletonList("user");
                 }
@@ -161,7 +167,10 @@ public class SamlCallbackHandler implements CallbackHandler {
                 roleClaim.setAttributeValues(new ArrayList<>(roles));
                 claims.add(roleClaim);
 
-                List<String> authMethods = CastUtils.cast((List<?>)m.getContextualProperty("saml.auth"));
+                List<String> authMethods = null;
+                if (m != null) {
+                    authMethods = CastUtils.cast((List<?>)m.getContextualProperty("saml.auth"));
+                }
                 if (authMethods == null) {
                     authMethods = Collections.singletonList("password");
                 }

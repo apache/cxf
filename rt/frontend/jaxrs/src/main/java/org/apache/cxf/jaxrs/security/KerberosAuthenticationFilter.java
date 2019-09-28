@@ -40,12 +40,12 @@ import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.common.security.SimpleSecurityContext;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSException;
@@ -78,7 +78,7 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
             LOG.fine("No Authorization header is available");
             throw ExceptionUtils.toNotAuthorizedException(null, getFaultResponse());
         }
-        String[] authPair = StringUtils.split(authHeaders.get(0), " ");
+        String[] authPair = authHeaders.get(0).split(" ");
         if (authPair.length != 2 || !NEGOTIATE_SCHEME.equalsIgnoreCase(authPair[0])) {
             LOG.fine("Negotiate Authorization scheme is expected");
             throw ExceptionUtils.toNotAuthorizedException(null, getFaultResponse());
@@ -105,15 +105,13 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
             if (index > 0) {
                 simpleUserName = simpleUserName.substring(0, index);
             }
+            Message m = JAXRSUtils.getCurrentMessage();
+            m.put(SecurityContext.class, createSecurityContext(simpleUserName, complexUserName, gssContext));
+
             if (!gssContext.getCredDelegState()) {
                 gssContext.dispose();
                 gssContext = null;
             }
-            Message m = JAXRSUtils.getCurrentMessage();
-            m.put(SecurityContext.class,
-                new KerberosSecurityContext(new KerberosPrincipal(simpleUserName,
-                                                                  complexUserName),
-                                            gssContext));
 
         } catch (LoginException e) {
             LOG.fine("Unsuccessful JAAS login for the service principal: " + e.getMessage());
@@ -127,8 +125,13 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
         }
     }
 
+    protected SecurityContext createSecurityContext(String simpleUserName, String complexUserName,
+                                                    GSSContext gssContext) {
+        return new KerberosSecurityContext(new KerberosPrincipal(simpleUserName, complexUserName), gssContext);
+    }
+
     protected GSSContext createGSSContext() throws GSSException {
-        boolean useKerberosOid = MessageUtils.isTrue(
+        boolean useKerberosOid = PropertyUtils.isTrue(
             messageContext.getContextualProperty(PROPERTY_USE_KERBEROS_OID));
         Oid oid = new Oid(useKerberosOid ? KERBEROS_OID : SPNEGO_OID);
 

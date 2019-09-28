@@ -85,7 +85,7 @@ public class JweWriterInterceptor implements WriterInterceptor {
             try {
                 JweCompactBuilder.startJweContent(actualOs,
                                                    encryption.getHeaders(),
-                                                   encryption.getContentEncryptionKey(),
+                                                   encryption.getEncryptedContentEncryptionKey(),
                                                    encryption.getIv());
             } catch (IOException ex) {
                 LOG.warning("JWE encryption error");
@@ -138,11 +138,11 @@ public class JweWriterInterceptor implements WriterInterceptor {
 
     protected void protectHttpHeadersIfNeeded(WriterInterceptorContext ctx, JweHeaders jweHeaders) {
         if (protectHttpHeaders) {
-            JoseJaxrsUtils.protectHttpHeaders(ctx.getHeaders(), 
-                                              jweHeaders, 
+            JoseJaxrsUtils.protectHttpHeaders(ctx.getHeaders(),
+                                              jweHeaders,
                                               protectedHttpHeaders);
         }
-        
+
     }
 
     public void setProtectHttpHeaders(boolean protectHttpHeaders) {

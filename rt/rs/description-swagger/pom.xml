@@ -23,16 +23,18 @@
     <packaging>bundle</packaging>
     <name>Apache CXF JAX-RS Service Description Swagger</name>
     <description>Apache CXF JAX-RS Service Description Swagger</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.rs.swagger</cxf.module.name>
         <cxf.osgi.import>
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
+            javax.annotation;version="${cxf.osgi.javax.annotation.version}",
         </cxf.osgi.import>
     </properties>
     <dependencies>
@@ -50,6 +52,15 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-service-description-common-openapi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-service-description-swagger-ui</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -65,7 +76,6 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-json-basic</artifactId>
-            <version>${project.version}</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
@@ -81,8 +91,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <build>
-        <plugins>
-        </plugins>
-    </build>
 </project>

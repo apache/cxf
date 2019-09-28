@@ -45,7 +45,13 @@ import org.apache.cxf.tools.wsdlto.core.FrontEndProfile;
 import org.apache.cxf.tools.wsdlto.core.PluginLoader;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.JAXWSContainer;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.WSDLToJavaProcessor;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class JAXWSContainerTest extends ProcessorTestBase {
 
@@ -122,7 +128,7 @@ public class JAXWSContainerTest extends ProcessorTestBase {
             assertEquals(6, methods.size());
             Boolean methodSame = false;
             for (JavaMethod m1 : methods) {
-                if (m1.getName().equals("testDocLitFault")) {
+                if ("testDocLitFault".equals(m1.getName())) {
                     methodSame = true;
                     break;
                 }
@@ -181,7 +187,7 @@ public class JAXWSContainerTest extends ProcessorTestBase {
             Boolean methodSame = false;
             JavaMethod m1 = null;
             for (JavaMethod m2 : methods) {
-                if (m2.getName().equals("testDocLitFault")) {
+                if ("testDocLitFault".equals(m2.getName())) {
                     methodSame = true;
                     m1 = m2;
                     break;
@@ -222,11 +228,12 @@ public class JAXWSContainerTest extends ProcessorTestBase {
         }
     }
 
+    @Test
     public void testGetServceValidator() throws Exception {
         JAXWSContainer container = new JAXWSContainer(null);
         List<ServiceValidator> validators = container.getServiceValidators();
         assertNotNull(validators);
-        assertTrue(!validators.isEmpty());
+        assertFalse(validators.isEmpty());
     }
 
     protected String getLocation(String wsdlFile) throws URISyntaxException {

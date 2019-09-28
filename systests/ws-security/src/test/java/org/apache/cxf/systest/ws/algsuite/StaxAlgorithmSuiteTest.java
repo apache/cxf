@@ -25,13 +25,18 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
+import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-
 import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * This is a test for AlgorithmSuites. Essentially it checks that a service endpoint will
@@ -67,8 +72,8 @@ public class StaxAlgorithmSuiteTest extends AbstractBusClientServerTestBase {
         URL busFile = StaxAlgorithmSuiteTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = StaxAlgorithmSuiteTest.class.getResource("DoubleItAlgSuite.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -80,11 +85,11 @@ public class StaxAlgorithmSuiteTest extends AbstractBusClientServerTestBase {
 
         // This should succeed as the client + server policies match
         // DOM
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         // Streaming
         SecurityTestUtil.enableStreaming(port);
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         portQName = new QName(NAMESPACE, "DoubleItSymmetric128Port2");
         port = service.getPort(portQName, DoubleItPortType.class);
@@ -110,7 +115,7 @@ public class StaxAlgorithmSuiteTest extends AbstractBusClientServerTestBase {
 
 
         // This should fail as the client uses Basic256 + the server uses Basic128
-        if (SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
+        if (TestUtilities.checkUnrestrictedPoliciesInstalled()) {
             portQName = new QName(NAMESPACE, "DoubleItSymmetric128Port3");
             port = service.getPort(portQName, DoubleItPortType.class);
             updateAddressPort(port, PORT);

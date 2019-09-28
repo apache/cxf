@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.sts.common;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,13 +34,13 @@ import org.apache.cxf.sts.claims.ProcessedClaimCollection;
  */
 public class CustomUserClaimsHandler implements ClaimsHandler {
 
-    private static List<URI> knownURIs = new ArrayList<>();
+    private static List<String> knownURIs = new ArrayList<>();
 
     static {
-        knownURIs.add(ClaimTypes.FIRSTNAME);
+        knownURIs.add(ClaimTypes.FIRSTNAME.toString());
     }
 
-    public List<URI> getSupportedClaimTypes() {
+    public List<String> getSupportedClaimTypes() {
         return knownURIs;
     }
 
@@ -53,7 +52,7 @@ public class CustomUserClaimsHandler implements ClaimsHandler {
             for (Claim requestClaim : claims) {
                 ProcessedClaim claim = new ProcessedClaim();
                 claim.setClaimType(requestClaim.getClaimType());
-                if (ClaimTypes.FIRSTNAME.equals(requestClaim.getClaimType())) {
+                if (ClaimTypes.FIRSTNAME.toString().equals(requestClaim.getClaimType())) {
 
                     if (parameters.getPrincipal().getName().equalsIgnoreCase("alice")) {
                         claim.addValue("aliceClaim");

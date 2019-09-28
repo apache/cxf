@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.utils;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
@@ -27,7 +28,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.annotation.Priority;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
@@ -48,6 +48,10 @@ import org.apache.cxf.common.logging.LogUtils;
 
 public final class AnnotationUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(AnnotationUtils.class);
+    private static final Class<? extends Annotation> PRIORITY_API =
+            (Class<? extends Annotation>) loadClassOrNull("javax.annotation.Priority");
+    private static final Method PRIORITY_VALUE = getMethodOrNull(PRIORITY_API, "value");
+
     private static final Set<Class<?>> PARAM_ANNOTATION_CLASSES;
     private static final Set<Class<?>> METHOD_ANNOTATION_CLASSES;
     static {
@@ -59,9 +63,28 @@ public final class AnnotationUtils {
 
     }
 
+    private static Method getMethodOrNull(final Class<?> type, final String name) {
+        if (type == null) {
+            return null;
+        }
+        try {
+            return type.getMethod(name);
+        } catch (final NoSuchMethodException e) {
+            return null;
+        }
+    }
+
+    private static Class<? extends Annotation> loadClassOrNull(final String name) {
+        try {
+            return org.apache.cxf.common.classloader.ClassLoaderUtils.loadClass(
+                    name, AnnotationUtils.class, Annotation.class);
+        } catch (final ClassNotFoundException e) {
+            return null;
+        }
+    }
 
     private static Set<Class<?>> initParamAnnotationClasses() {
-        Set<Class<?>> classes = new HashSet<Class<?>>();
+        Set<Class<?>> classes = new HashSet<>();
         classes.add(PathParam.class);
         classes.add(QueryParam.class);
         classes.add(MatrixParam.class);
@@ -73,7 +96,7 @@ public final class AnnotationUtils {
     }
 
     private static Set<Class<?>> initMethodAnnotationClasses() {
-        Set<Class<?>> classes = new HashSet<Class<?>>();
+        Set<Class<?>> classes = new HashSet<>();
         classes.add(HttpMethod.class);
         classes.add(Path.class);
         classes.add(Produces.class);
@@ -82,14 +105,21 @@ public final class AnnotationUtils {
     }
 
     public static int getBindingPriority(Class<?> providerCls) {
-        Priority b = getClassAnnotation(providerCls, Priority.class);
-        return b == null ? Priorities.USER : b.value();
+        if (PRIORITY_API == null) {
+            return Priorities.USER;
+        }
+        Annotation b = getClassAnnotation(providerCls, PRIORITY_API);
+        try {
+            return b == null ? Priorities.USER : Integer.class.cast(PRIORITY_VALUE.invoke(b));
+        } catch (final IllegalAccessException | InvocationTargetException e) {
+            return Priorities.USER;
+        }
     }
     public static Set<String> getNameBindings(Annotation[] targetAnns) {
         if (targetAnns.length == 0) {
             return Collections.emptySet();
         }
-        Set<String> names = new LinkedHashSet<String>();
+        Set<String> names = new LinkedHashSet<>();
         for (Annotation a : targetAnns) {
             NameBinding nb = a.annotationType().getAnnotation(NameBinding.class);
             if (nb != null) {

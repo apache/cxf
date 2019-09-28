@@ -70,8 +70,8 @@ public class BenchClient {
         port = service.getBenchmark();
 
 
-        /*options.setProperty(org.apache.axis2.transport.http.HTTPConstants.SO_TIMEOUT,new Integer(480000));
-        options.setProperty(org.apache.axis2.transport.http.HTTPConstants.CONNECTION_TIMEOUT,new Integer(480000));*/
+        /*options.setProperty(org.apache.axis2.transport.http.HTTPConstants.SO_TIMEOUT,Integer.valueOf(480000));
+        options.setProperty(org.apache.axis2.transport.http.HTTPConstants.CONNECTION_TIMEOUT,Integer.valueOf(480000));*/
     }
 
     //URL or port of service
@@ -231,7 +231,7 @@ public class BenchClient {
         if (method == 'd') {
             darr = new Double[totalInv];
             for (int i = 0; i < darr.length; i++) {
-                darr[i] = new Double(i);
+                darr[i] = Double.valueOf(i);
             }
         }
 
@@ -239,7 +239,7 @@ public class BenchClient {
         if (method == 'i') {
             iarr = new Integer[totalInv];
             for (int i = 0; i < iarr.length ; i++) {
-                iarr[i] = new Integer(i);
+                iarr[i] = Integer.valueOf(i);
             }
         }
 

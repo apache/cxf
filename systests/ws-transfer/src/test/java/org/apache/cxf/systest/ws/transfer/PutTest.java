@@ -21,7 +21,9 @@ package org.apache.cxf.systest.ws.transfer;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.ws.soap.SOAPFaultException;
+
 import org.w3c.dom.Document;
+
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.ws.transfer.Create;
@@ -30,6 +32,7 @@ import org.apache.cxf.ws.transfer.Put;
 import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.resource.Resource;
 import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -27,6 +27,7 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
@@ -38,11 +39,11 @@ import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.apache.hello_world_soap_http.SOAPService;
 
-import org.junit.Assert;
-
 import org.junit.Test;
 
-public class BusShutdownTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+
+public class BusShutdownTest {
     public static final String PORT = TestUtil.getPortNumber(BusShutdownTest.class);
 
     @Test
@@ -72,7 +73,7 @@ public class BusShutdownTest extends Assert {
     private void makeTwoWayCallOnNewBus(URL wsdlUrl, String address) {
         SpringBusFactory bf = new SpringBusFactory();
         Bus bus = bf.createBus();
-        SpringBusFactory.setDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
         Endpoint ep = createService(address);
         doWork(wsdlUrl, address);
         // this should revert the JVM to its original state pending gc

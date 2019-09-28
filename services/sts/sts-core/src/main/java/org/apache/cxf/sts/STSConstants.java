@@ -73,6 +73,11 @@ public final class STSConstants {
     public static final String WSP_NS_04 = "http://schemas.xmlsoap.org/ws/2004/09/policy";
 
     /**
+     * WS-Policy 2006 namespace (deprecated)
+     */
+    public static final String WSP_NS_06 = "http://www.w3.org/2006/07/ws-policy";
+
+    /**
      * WS-Addressing 2005 namespace
      */
     public static final String WSA_NS_05 = "http://www.w3.org/2005/08/addressing";

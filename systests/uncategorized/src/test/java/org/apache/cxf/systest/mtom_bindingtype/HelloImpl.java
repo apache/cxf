@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.mtom_bindingtype;
 
 import java.awt.Image;
+
 import javax.xml.ws.BindingType;
 import javax.xml.ws.Holder;
 

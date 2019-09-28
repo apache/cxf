@@ -19,8 +19,11 @@
 
 package org.apache.cxf.message;
 
+import java.util.logging.Logger;
+
 import org.w3c.dom.Node;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
 
 
@@ -28,6 +31,8 @@ import org.apache.cxf.common.util.PropertyUtils;
  * Holder for utility methods relating to messages.
  */
 public final class MessageUtils {
+
+    private static final Logger LOG = LogUtils.getL7dLogger(MessageUtils.class);
 
     /**
      * Prevents instantiation.
@@ -78,9 +83,8 @@ public final class MessageUtils {
             FaultMode mode = message.get(FaultMode.class);
             if (null != mode) {
                 return mode;
-            } else {
-                return FaultMode.RUNTIME_FAULT;
             }
+            return FaultMode.RUNTIME_FAULT;
         }
         return null;
     }
@@ -125,16 +129,36 @@ public final class MessageUtils {
      * @param value
      * @return true if value is either the String "true" or Boolean.TRUE
      */
+    @Deprecated
     public static boolean isTrue(Object value) {
-        // TODO - consider deprecation as this really belongs in PropertyUtils
         return PropertyUtils.isTrue(value);
     }
 
+    public static boolean getContextualBoolean(Message m, String key) {
+        return getContextualBoolean(m, key, false);
+    }
     public static boolean getContextualBoolean(Message m, String key, boolean defaultValue) {
         if (m != null) {
             Object o = m.getContextualProperty(key);
             if (o != null) {
                 return PropertyUtils.isTrue(o);
+            }
+        }
+        return defaultValue;
+    }
+
+    public static int getContextualInteger(Message m, String key, int defaultValue) {
+        if (m != null) {
+            Object o = m.getContextualProperty(key);
+            if (o instanceof String) {
+                try {
+                    int i = Integer.parseInt((String)o);
+                    if (i > 0) {
+                        return i;
+                    }
+                } catch (NumberFormatException ex) {
+                    LOG.warning("Incorrect integer value of " + o + " specified for: " + key);
+                }
             }
         }
         return defaultValue;
@@ -158,7 +182,7 @@ public final class MessageUtils {
         return m != null && m.getContent(Node.class) != null;
         /*
         for (Class c : m.getContentFormats()) {
-            if (c.equals(Node.class) || c.getName().equals("javax.xml.soap.SOAPMessage")) {
+            if (c.equals(Node.class) || "javax.xml.soap.SOAPMessage".equals(c.getName())) {
                 return true;
             }
         }

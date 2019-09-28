@@ -46,7 +46,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -179,19 +178,18 @@ public abstract class AbstractBeanDefinitionParser
     }
 
     @Override
-    protected String resolveId(Element elem, AbstractBeanDefinition definition,
-                               ParserContext ctx) throws BeanDefinitionStoreException {
+    protected String resolveId(Element elem, AbstractBeanDefinition definition, ParserContext ctx) {
 
         // REVISIT: use getAttributeNS instead
 
         String id = getIdOrName(elem);
         String createdFromAPI = elem.getAttribute("createdFromAPI");
 
-        if (null == id || "".equals(id)) {
+        if (null == id || id.isEmpty()) {
             return super.resolveId(elem, definition, ctx);
         }
 
-        if (createdFromAPI != null && "true".equals(createdFromAPI.toLowerCase())) {
+        if (createdFromAPI != null && Boolean.parseBoolean(createdFromAPI)) {
             return id + getSuffix();
         }
         return id;
@@ -257,10 +255,8 @@ public abstract class AbstractBeanDefinitionParser
         LOG.fine("Adding " + WIRE_BUS_ATTRIBUTE + " attribute " + type + " to bean " + bean);
         bean.getRawBeanDefinition().setAttribute(WIRE_BUS_ATTRIBUTE, type);
         if (!StringUtils.isEmpty(busName)) {
-            if (busName.charAt(0) == '#') {
-                busName = busName.substring(1);
-            }
-            bean.getRawBeanDefinition().setAttribute(WIRE_BUS_NAME, busName);
+            bean.getRawBeanDefinition().setAttribute(WIRE_BUS_NAME,
+                    busName.charAt(0) == '#' ? busName.substring(1) : busName);
         }
 
         if (ctx != null
@@ -304,7 +300,7 @@ public abstract class AbstractBeanDefinitionParser
     private synchronized JAXBContext getContext(Class<?> cls) {
         if (context == null || classes == null || !classes.contains(cls)) {
             try {
-                Set<Class<?>> tmp = new HashSet<Class<?>>();
+                Set<Class<?>> tmp = new HashSet<>();
                 if (classes != null) {
                     tmp.addAll(classes);
                 }
@@ -480,20 +476,18 @@ public abstract class AbstractBeanDefinitionParser
     }
 
     protected QName parseQName(Element element, String t) {
-        String ns = null;
-        String pre = null;
-        String local = null;
-
         if (t.startsWith("{")) {
             int i = t.indexOf('}');
             if (i == -1) {
                 throw new RuntimeException("Namespace bracket '{' must having a closing bracket '}'.");
             }
 
-            ns = t.substring(1, i);
             t = t.substring(i + 1);
         }
 
+        final String local;
+        final String pre;
+        final String ns;
         int colIdx = t.indexOf(':');
         if (colIdx == -1) {
             local = t;

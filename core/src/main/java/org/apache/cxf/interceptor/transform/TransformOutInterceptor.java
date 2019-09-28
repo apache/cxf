@@ -88,7 +88,7 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
         }
 
         if (skipOnFault && null != message.getContent(Exception.class)
-            || MessageUtils.isTrue(message.getContextualProperty(TRANSFORM_SKIP))) {
+            || MessageUtils.getContextualBoolean(message, TRANSFORM_SKIP, false)) {
             return;
         }
 
@@ -98,11 +98,11 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
         XMLStreamWriter transformWriter = createTransformWriterIfNeeded(writer, out);
         if (transformWriter != null) {
             message.setContent(XMLStreamWriter.class, transformWriter);
+            message.put(AbstractOutDatabindingInterceptor.DISABLE_OUTPUTSTREAM_OPTIMIZATION,
+                        Boolean.TRUE);
             if (MessageUtils.isRequestor(message)) {
                 message.removeContent(OutputStream.class);
                 message.put(OUTPUT_STREAM_HOLDER, out);
-                message.put(AbstractOutDatabindingInterceptor.DISABLE_OUTPUTSTREAM_OPTIMIZATION,
-                            Boolean.TRUE);
                 message.getInterceptorChain().add(ENDING);
             }
         }

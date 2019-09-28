@@ -47,7 +47,7 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.Names;
-import org.apache.cxf.ws.addressing.soap.VersionTransformer;
+import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.cxf.ws.addressing.v200408.AttributedURI;
 
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND;
@@ -102,7 +102,7 @@ public class HeaderVerifier extends AbstractSoapInterceptor {
         try {
             // add piggybacked wsa:From header to partial response
             List<Header> header = message.getHeaders();
-            Document doc = DOMUtils.createDocument();
+            Document doc = DOMUtils.getEmptyDocument();
             SoapVersion ver = message.getVersion();
             Element hdr = doc.createElementNS(ver.getHeader().getNamespaceURI(),
                 ver.getHeader().getLocalPart());
@@ -135,14 +135,14 @@ public class HeaderVerifier extends AbstractSoapInterceptor {
                                  Names.WSA_NAMESPACE_NAME);
                 recordWSAHeaders(headers,
                                  wsaHeaders,
-                                 VersionTransformer.Names200408.WSA_NAMESPACE_NAME);
+                                 Names200408.WSA_NAMESPACE_NAME);
                 recordWSAHeaders(headers,
                                  wsaHeaders,
                                  MAPTestBase.CUSTOMER_NAME.getNamespaceURI());
             }
             boolean partialResponse = isIncomingPartialResponse(message)
                                       || outgoingPartialResponse;
-            verificationCache.put(MAPTest.verifyHeaders(wsaHeaders,
+            verificationCache.put(MAPTestBase.verifyHeaders(wsaHeaders,
                                                         partialResponse,
                                                         isRequestLeg(message),
                                                         false));
@@ -214,7 +214,7 @@ public class HeaderVerifier extends AbstractSoapInterceptor {
 
     private Marshaller getMarshaller() throws JAXBException {
         JAXBContext jaxbContext =
-            VersionTransformer.getExposedJAXBContext(currentNamespaceURI);
+            org.apache.cxf.ws.addressing.VersionTransformer.getExposedJAXBContext(currentNamespaceURI);
         Marshaller marshaller = jaxbContext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
         return marshaller;
@@ -231,12 +231,12 @@ public class HeaderVerifier extends AbstractSoapInterceptor {
                                                    AttributedURIType.class,
                                                    value),
                 header);
-        } else if (VersionTransformer.Names200408.WSA_NAMESPACE_NAME.equals(
+        } else if (Names200408.WSA_NAMESPACE_NAME.equals(
                                                       currentNamespaceURI)) {
             AttributedURI value =
-                VersionTransformer.Names200408.WSA_OBJECT_FACTORY.createAttributedURI();
+                Names200408.WSA_OBJECT_FACTORY.createAttributedURI();
             value.setValue(from);
-            QName qname = new QName(VersionTransformer.Names200408.WSA_NAMESPACE_NAME,
+            QName qname = new QName(Names200408.WSA_NAMESPACE_NAME,
                                     Names.WSA_FROM_NAME);
             marshaller.marshal(
                 new JAXBElement<AttributedURI>(qname,

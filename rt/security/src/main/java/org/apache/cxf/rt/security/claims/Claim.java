@@ -39,7 +39,7 @@ public class Claim implements Serializable, Cloneable {
 
     private static final Logger LOG = LogUtils.getL7dLogger(Claim.class);
 
-    private URI claimType;
+    private String claimType;
     private boolean optional;
     private List<Object> values = new ArrayList<>(1);
 
@@ -55,19 +55,21 @@ public class Claim implements Serializable, Cloneable {
         if (claim == null) {
             throw new IllegalArgumentException("Claim cannot be null");
         }
-        if (claim.getClaimType() != null) {
-            claimType = URI.create(claim.getClaimType().toString());
-        }
+        claimType = claim.getClaimType();
         optional = claim.isOptional();
         values.addAll(claim.getValues());
     }
 
-    public URI getClaimType() {
+    public String getClaimType() {
         return claimType;
     }
 
-    public void setClaimType(URI claimType) {
+    public void setClaimType(String claimType) {
         this.claimType = claimType;
+    }
+
+    public void setClaimType(URI claimType) {
+        this.claimType = claimType.toString();
     }
 
     public boolean isOptional() {
@@ -81,6 +83,11 @@ public class Claim implements Serializable, Cloneable {
     public void setValues(List<Object> values) {
         this.values.clear();
         this.values.addAll(values);
+    }
+
+    @Deprecated
+    public void setValue(Object s) {
+        addValue(s);
     }
 
     public void addValue(Object s) {
@@ -97,7 +104,7 @@ public class Claim implements Serializable, Cloneable {
             localname = "ClaimValue";
         }
         writer.writeStartElement(prefix, localname, namespace);
-        writer.writeAttribute(null, "Uri", claimType.toString());
+        writer.writeAttribute(null, "Uri", claimType);
         if (optional) {
             writer.writeAttribute(null, "Optional", "true");
         }
@@ -117,7 +124,7 @@ public class Claim implements Serializable, Cloneable {
     }
 
     @Override
-    public Claim clone() {
+    public Claim clone() { //NOPMD
         try {
             super.clone(); // Checkstyle requires this call
         } catch (CloneNotSupportedException e) {
@@ -173,14 +180,14 @@ public class Claim implements Serializable, Cloneable {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder(64);
         builder.append("Claim [values=");
         builder.append(values);
         builder.append(", claimType=");
         builder.append(claimType);
         builder.append(", optional=");
         builder.append(optional);
-        builder.append("]");
+        builder.append(']');
         return builder.toString();
     }
 }

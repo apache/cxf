@@ -24,11 +24,11 @@
 	xmlns:jms="http://cxf.apache.org/transports/jms" 
 	xmlns:jaxws="http://cxf.apache.org/jaxws" 
 	xmlns:cxf="http://cxf.apache.org/core" 
-	xsi:schemaLocation="
+    xsi:schemaLocation="
 		http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd  http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
 		http://cxf.apache.org/transports/jms  http://cxf.apache.org/schemas/configuration/jms.xsd
 		http://cxf.apache.org/transports/http/configuration  http://cxf.apache.org/schemas/configuration/http-conf.xsd
-		http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans-4.2.xsd">
+		http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd">
     <!--HTTP Connection Receive Timeout -->
     <!--Enable to avoid Connection Timeout during debugging-->
     <!--

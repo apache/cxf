@@ -21,10 +21,13 @@ package org.apache.cxf.ws.transfer.dialect.fragment.language;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.xml.namespace.NamespaceContext;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.dialect.fragment.ExpressionType;
@@ -79,9 +82,8 @@ public class FragmentDialectLanguageQName implements FragmentDialectLanguage {
                 if (prefix != null && !prefix.isEmpty()) {
                     Element resource = (Element) representation.getAny();
                     return resource.getAttribute("xmlns:" + prefix);
-                } else {
-                    return null;
                 }
+                return null;
             }
 
             @Override
@@ -123,12 +125,10 @@ public class FragmentDialectLanguageQName implements FragmentDialectLanguage {
             Matcher m = qNamePattern.matcher(expressionValue);
             if (m.matches()) {
                 return "/node()/" + expressionValue;
-            } else {
-                throw new InvalidExpression();
             }
-        } else {
             throw new InvalidExpression();
         }
+        throw new InvalidExpression();
     }
 
 }

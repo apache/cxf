@@ -34,6 +34,9 @@ import org.apache.wss4j.common.kerberos.KerberosContextAndServiceNameCallback;
  */
 public class KerberosServicePasswordCallback extends KeystorePasswordCallback {
 
+    private String username = "bob";
+    private String password = "bob";
+
     public KerberosServicePasswordCallback() {
     }
 
@@ -48,13 +51,27 @@ public class KerberosServicePasswordCallback extends KeystorePasswordCallback {
                 pc.setServiceName("bob@service.ws.apache.org");
             } else if (callbacks[i] instanceof NameCallback) {
                 NameCallback nameCallback = (NameCallback)callbacks[i];
-                nameCallback.setName("bob");
+                nameCallback.setName(username);
             } else if (callbacks[i] instanceof PasswordCallback) {
                 PasswordCallback passwordCallback = (PasswordCallback)callbacks[i];
-                passwordCallback.setPassword("bob".toCharArray());
+                passwordCallback.setPassword(password.toCharArray());
             }
         }
     }
 
+    public String getUsername() {
+        return username;
+    }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

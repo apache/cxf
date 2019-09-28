@@ -18,8 +18,12 @@
  */
 package org.apache.cxf.ws.security.trust;
 
+import javax.security.auth.callback.CallbackHandler;
+import javax.xml.bind.JAXBElement;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.helpers.DOMUtils;
@@ -37,9 +41,12 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.token.PKIPathSecurity;
 import org.apache.wss4j.common.token.X509Security;
+import org.apache.wss4j.common.util.AttachmentUtils;
+import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.impl.securityToken.KerberosServiceSecurityTokenImpl;
 import org.apache.wss4j.stax.impl.securityToken.SamlSecurityTokenImpl;
 import org.apache.wss4j.stax.impl.securityToken.UsernameSecurityTokenImpl;
@@ -54,7 +61,9 @@ import org.apache.wss4j.stax.validate.BinarySecurityTokenValidatorImpl;
 import org.apache.wss4j.stax.validate.SamlTokenValidatorImpl;
 import org.apache.wss4j.stax.validate.TokenContext;
 import org.apache.wss4j.stax.validate.UsernameTokenValidator;
+import org.apache.xml.security.binding.xop.Include;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityUtils;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
@@ -321,7 +330,7 @@ public class STSStaxTokenValidator
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
 
-        String passDigest = WSSUtils.doPasswordDigest(nonceVal, created, pwCb.getPassword());
+        String passDigest = UsernameTokenUtil.doPasswordDigest(nonceVal, created, pwCb.getPassword());
         if (!passwordType.getValue().equals(passDigest)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
@@ -361,7 +370,7 @@ public class STSStaxTokenValidator
     private Element convertToDOM(
         String username, String password, String passwordType, String id
     ) {
-        Document doc = DOMUtils.newDocument();
+        Document doc = DOMUtils.getEmptyDocument();
 
         UsernameToken usernameToken = new UsernameToken(true, doc, passwordType);
         usernameToken.setName(username);
@@ -420,7 +429,13 @@ public class STSStaxTokenValidator
                         new Object[]{binarySecurityTokenType.getEncodingType()});
             }
 
-            final byte[] securityTokenData = Base64.decodeBase64(binarySecurityTokenType.getValue());
+            byte[] securityTokenData = null;
+            try {
+                securityTokenData =
+                    getBinarySecurityTokenBytes(binarySecurityTokenType, tokenContext.getWssSecurityProperties());
+            } catch (XMLSecurityException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);
+            }
             final SoapMessage message =
                 (SoapMessage)tokenContext.getWssSecurityProperties().getMsgContext();
 
@@ -435,6 +450,7 @@ public class STSStaxTokenValidator
             final boolean stsValidated = valid;
 
             try {
+                final byte[] bytes = securityTokenData;
                 if (WSSConstants.NS_X509_V3_TYPE.equals(binarySecurityTokenType.getValueType())) {
                     Crypto crypto = getCrypto(tokenContext.getWssSecurityProperties());
                     X509V3SecurityTokenImpl x509V3SecurityToken = new X509V3SecurityTokenImpl(
@@ -455,7 +471,7 @@ public class STSStaxTokenValidator
                                 super.verify();
                             } catch (XMLSecurityException ex) {
                                 Element tokenElement =
-                                    convertToDOM(binarySecurityTokenType, securityTokenData);
+                                    convertToDOM(binarySecurityTokenType, bytes);
                                 validateTokenToSTS(tokenElement, message);
                             }
                         }
@@ -484,7 +500,7 @@ public class STSStaxTokenValidator
                                     super.verify();
                                 } catch (XMLSecurityException ex) {
                                     Element tokenElement =
-                                        convertToDOM(binarySecurityTokenType, securityTokenData);
+                                        convertToDOM(binarySecurityTokenType, bytes);
                                     validateTokenToSTS(tokenElement, message);
                                 }
                             }
@@ -511,7 +527,7 @@ public class STSStaxTokenValidator
                                     super.verify();
                                 } catch (XMLSecurityException ex) {
                                     Element tokenElement =
-                                        convertToDOM(binarySecurityTokenType, securityTokenData);
+                                        convertToDOM(binarySecurityTokenType, bytes);
                                     validateTokenToSTS(tokenElement, message);
                                 }
                             }
@@ -529,12 +545,38 @@ public class STSStaxTokenValidator
             }
         }
 
+        private byte[] getBinarySecurityTokenBytes(BinarySecurityTokenType binarySecurityTokenType,
+                                                   WSSSecurityProperties wssSecurityProperties
+        ) throws XMLSecurityException {
+
+            StringBuilder sb = new StringBuilder();
+
+            for (Object obj : binarySecurityTokenType.getContent()) {
+                if (obj instanceof String) {
+                    sb.append((String)obj);
+                } else if (obj instanceof JAXBElement<?>) {
+                    JAXBElement<?> element = (JAXBElement<?>)obj;
+                    if (XMLSecurityConstants.TAG_XOP_INCLUDE.equals(element.getName())) {
+                        Include include = (Include)element.getValue();
+                        if (include != null && include.getHref() != null && include.getHref().startsWith("cid:")) {
+                            CallbackHandler callbackHandler = wssSecurityProperties.getAttachmentCallbackHandler();
+                            return AttachmentUtils.getBytesFromAttachment(include.getHref(),
+                                                                          callbackHandler,
+                                                                          true);
+                        }
+                    }
+                }
+            }
+
+            return Base64.decodeBase64(sb.toString());
+        }
+
         // Convert to DOM to send the token to the STS
         private Element convertToDOM(
             BinarySecurityTokenType binarySecurityTokenType,
             byte[] securityTokenData
         ) throws WSSecurityException {
-            Document doc = DOMUtils.newDocument();
+            Document doc = DOMUtils.getEmptyDocument();
             BinarySecurity binarySecurity = null;
             if (WSSConstants.NS_X509_V3_TYPE.equals(binarySecurityTokenType.getValueType())) {
                 binarySecurity = new X509Security(doc);

@@ -17,7 +17,11 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cxf="http://cxf.apache.org/core" xmlns:jms="http://cxf.apache.org/transports/jms" xsi:schemaLocation=" http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/transports/jms http://cxf.apache.org/schemas/configuration/jms.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:cxf="http://cxf.apache.org/core"
+    xmlns:jms="http://cxf.apache.org/transports/jms"
+    xsi:schemaLocation="http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/transports/jms http://cxf.apache.org/schemas/configuration/jms.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean id="ConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
 	    <property name="brokerURL" value="vm://JMSClientServerSoap12Test"/>
     </bean>

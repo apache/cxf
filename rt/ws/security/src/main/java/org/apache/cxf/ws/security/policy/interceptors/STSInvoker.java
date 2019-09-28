@@ -22,7 +22,6 @@ package org.apache.cxf.ws.security.policy.interceptors;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.util.Base64;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -31,6 +30,7 @@ import javax.xml.transform.dom.DOMSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -45,6 +45,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSUtils;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.derivedKey.P_SHA1;
@@ -52,9 +53,9 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.DateUtil;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.xml.security.utils.XMLUtils;
 
 /**
  * An abstract Invoker used by the Spnego and SecureConversationInInterceptors.
@@ -133,9 +134,8 @@ abstract class STSInvoker implements Invoker {
             } catch (Exception ex) {
                 throw new Fault(ex);
             }
-        } else {
-            throw new Fault("Unknown SecureConversation element: " + requestEl.getLocalName(), LOG);
         }
+        throw new Fault("Unknown SecureConversation element: " + requestEl.getLocalName(), LOG);
     }
 
     abstract void doIssue(
@@ -184,7 +184,7 @@ abstract class STSInvoker implements Invoker {
 
     private SecurityToken findCancelOrRenewToken(Exchange exchange, Element el) throws WSSecurityException {
         Element childElement = DOMUtils.getFirstElement(el);
-        String uri = "";
+        final String uri;
         if ("SecurityContextToken".equals(childElement.getLocalName())) {
             SecurityContextToken sct = new SecurityContextToken(childElement);
             uri = sct.getIdentifier();
@@ -204,17 +204,17 @@ abstract class STSInvoker implements Invoker {
         byte[] clientEntropy,
         int keySize
     ) throws NoSuchAlgorithmException, WSSecurityException, XMLStreamException {
-        byte secret[] = null;
+        byte[] secret = null;
         writer.writeStartElement(prefix, "RequestedProofToken", namespace);
         if (clientEntropy == null) {
             secret = WSSecurityUtil.generateNonce(keySize / 8);
 
             writer.writeStartElement(prefix, "BinarySecret", namespace);
             writer.writeAttribute("Type", namespace + "/Nonce");
-            writer.writeCharacters(Base64.getMimeEncoder().encodeToString(secret));
+            writer.writeCharacters(XMLUtils.encodeToString(secret));
             writer.writeEndElement();
         } else {
-            byte entropy[] = WSSecurityUtil.generateNonce(keySize / 8);
+            byte[] entropy = WSSecurityUtil.generateNonce(keySize / 8);
             P_SHA1 psha1 = new P_SHA1();
             secret = psha1.createKey(clientEntropy, entropy, 0, keySize / 8);
 
@@ -226,7 +226,7 @@ abstract class STSInvoker implements Invoker {
             writer.writeStartElement(prefix, "Entropy", namespace);
             writer.writeStartElement(prefix, "BinarySecret", namespace);
             writer.writeAttribute("Type", namespace + "/Nonce");
-            writer.writeCharacters(Base64.getMimeEncoder().encodeToString(entropy));
+            writer.writeCharacters(XMLUtils.encodeToString(entropy));
             writer.writeEndElement();
 
         }
@@ -293,12 +293,12 @@ abstract class STSInvoker implements Invoker {
         String namespace
     ) throws Exception {
         writer.writeStartElement(prefix, "Lifetime", namespace);
-        writer.writeNamespace("wsu", WSConstants.WSU_NS);
-        writer.writeStartElement("wsu", "Created", WSConstants.WSU_NS);
+        writer.writeNamespace("wsu", WSS4JConstants.WSU_NS);
+        writer.writeStartElement("wsu", "Created", WSS4JConstants.WSU_NS);
         writer.writeCharacters(created.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         writer.writeEndElement();
 
-        writer.writeStartElement("wsu", "Expires", WSConstants.WSU_NS);
+        writer.writeStartElement("wsu", "Expires", WSS4JConstants.WSU_NS);
         writer.writeCharacters(expires.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         writer.writeEndElement();
         writer.writeEndElement();

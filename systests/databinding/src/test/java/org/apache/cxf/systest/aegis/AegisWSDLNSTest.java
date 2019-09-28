@@ -30,12 +30,12 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.TestUtil;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 /**
  *
@@ -99,7 +99,7 @@ public class AegisWSDLNSTest extends AbstractJUnit4SpringContextTests {
     @Test
     public void testUsingCorrectMethod() throws Exception {
         setupForTest(false);
-        Integer result = client.updateInteger(new Integer(20));
+        Integer result = client.updateInteger(Integer.valueOf(20));
         Assert.assertEquals(result.intValue(), 20);
     }
 

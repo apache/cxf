@@ -20,7 +20,6 @@
 package org.apache.cxf.transport.http_undertow;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -38,7 +37,6 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
-
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.servlet.ServletDestination;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
@@ -98,9 +96,8 @@ public class UndertowHTTPDestination extends ServletDestination {
                IOException {
         if (serverEngineFactory == null) {
             return;
-        } else { 
-            nurl = new URL(getAddress(endpointInfo));
         }
+        nurl = new URL(getAddress(endpointInfo));
         engine =
             serverEngineFactory.retrieveUndertowHTTPServerEngine(nurl.getPort());
         if (engine == null) {
@@ -232,11 +229,6 @@ public class UndertowHTTPDestination extends ServletDestination {
             super.setupContinuation(inMessage, req, resp);
         }
     }
-
-    protected OutputStream flushHeaders(Message outMessage, boolean getStream) throws IOException {
-        return super.flushHeaders(outMessage, getStream);
-    }
-
 
     protected String getAddress(EndpointInfo endpointInfo) {
         return endpointInfo.getAddress();

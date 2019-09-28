@@ -33,22 +33,26 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.rm.RMConstants;
 
-import org.junit.Assert;
 
-public class MessageFlow extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class MessageFlow {
 
     private final String addressingNamespace;
     private final String rmNamespace;
     private List<byte[]> inStreams;
     private List<byte[]> outStreams;
-    private List<Document> outboundMessages;
-    private List<Document> inboundMessages;
+    private final List<Document> outboundMessages = new ArrayList<>();
+    private final List<Document> inboundMessages = new ArrayList<>();
 
     public MessageFlow(List<byte[]> out, List<byte[]> in, String addrns, String rmns) throws Exception {
         addressingNamespace = addrns;
         rmNamespace = rmns;
-        inboundMessages = new ArrayList<>();
-        outboundMessages = new ArrayList<>();
         reset(out, in);
     }
 
@@ -71,18 +75,12 @@ public class MessageFlow extends Assert {
         }
         outStreams = out;
         inboundMessages.clear();
-        for (int i = 0; i < inStreams.size(); i++) {
-            byte[] bytes = inStreams.get(i);
-            ByteArrayInputStream is = new ByteArrayInputStream(bytes);
-            Document document = StaxUtils.read(is);
-            inboundMessages.add(document);
+        for (byte[] bytes : inStreams) {
+            inboundMessages.add(StaxUtils.read(new ByteArrayInputStream(bytes)));
         }
         outboundMessages.clear();
-        for (int i = 0; i < outStreams.size(); i++) {
-            byte[] bytes = outStreams.get(i);
-            ByteArrayInputStream is = new ByteArrayInputStream(bytes);
-            Document document = StaxUtils.read(is);
-            outboundMessages.add(document);
+        for (byte[] bytes : outStreams) {
+            outboundMessages.add(StaxUtils.read(new ByteArrayInputStream(bytes)));
         }
     }
 
@@ -98,12 +96,11 @@ public class MessageFlow extends Assert {
             Document doc = outbound ? outboundMessages.get(i) : inboundMessages.get(i);
             String action = getAction(doc);
             if (null == expectedActions[i]) {
-                assertNull((outbound ? "Outbound " : "Inbound") + " message " + i
-                           + " has unexpected action: " + action, action);
+                assertNull((outbound ? "Outbound " : "Inbound") + " message " + i + " has unexpected action: " + action,
+                        action);
             } else {
                 assertEquals((outbound ? "Outbound " : "Inbound") + " message " + i
-                             + " does not contain expected action header"
-                             + System.getProperty("line.separator"), expectedActions[i], action);
+                        + " does not contain expected action header", expectedActions[i], action);
             }
         }
     }
@@ -256,7 +253,7 @@ public class MessageFlow extends Assert {
             boolean lastMessage;
             Element e = outbound ? getSequence(outboundMessages.get(i))
                 : getSequence(inboundMessages.get(i));
-            lastMessage = null == e ? false : getLastMessage(e);
+            lastMessage = null != e && getLastMessage(e);
             assertEquals("Outbound message " + i
                          + (expectedLastMessages[i] ? " does not contain expected last message element."
                              : " contains last message element."),
@@ -321,7 +318,7 @@ public class MessageFlow extends Assert {
 
     public void verifySequenceFault(QName code, boolean outbound, int index) throws Exception {
         Document d = outbound ? outboundMessages.get(index) : inboundMessages.get(index);
-        assert null != getRMHeaderElement(d, RMConstants.SEQUENCE_FAULT_NAME);
+        assertNotNull(getRMHeaderElement(d, RMConstants.SEQUENCE_FAULT_NAME));
     }
 
     public void verifyHeader(QName name, boolean outbound, int index) throws Exception {
@@ -338,7 +335,7 @@ public class MessageFlow extends Assert {
             getHeaderElement(d, name.getNamespaceURI(), name.getLocalPart()));
     }
 
-    protected String getAction(Document document) throws Exception {
+    private String getAction(Document document) throws Exception {
         Element e = getHeaderElement(document, addressingNamespace, "Action");
         if (null != e) {
             return getText(e);
@@ -380,7 +377,7 @@ public class MessageFlow extends Assert {
         return getHeaderElement(document, rmNamespace, name);
     }
 
-    private Element getHeaderElement(Document document, String namespace, String localName)
+    private static Element getHeaderElement(Document document, String namespace, String localName)
         throws Exception {
         Element envelopeElement = document.getDocumentElement();
         Element headerElement = null;
@@ -519,19 +516,15 @@ public class MessageFlow extends Assert {
         return !(null != bodyElement && bodyElement.hasChildNodes());
     }
 
-    String dump(List<byte[]> streams) {
+    static String dump(List<byte[]> streams) {
         StringBuilder buf = new StringBuilder();
         try {
-            buf.append(System.getProperty("line.separator"));
             for (int i = 0; i < streams.size(); i++) {
-                buf.append("[");
-                buf.append(i);
-                buf.append("] : ");
-                buf.append(new String(streams.get(i)));
                 buf.append(System.getProperty("line.separator"));
+                buf.append('[').append(i).append("] : ").append(new String(streams.get(i)));
             }
         } catch (Exception ex) {
-            return "";
+            return ex.getMessage();
         }
 
         return buf.toString();
@@ -544,10 +537,6 @@ public class MessageFlow extends Assert {
             }
         }
         return null;
-    }
-
-    protected QName getNodeName(Node nd) {
-        return new QName(nd.getNamespaceURI(), nd.getLocalName());
     }
 
 }

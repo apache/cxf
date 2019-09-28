@@ -18,7 +18,9 @@
  */
 package org.apache.cxf.rs.security.oidc.idp;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -30,6 +32,13 @@ import org.apache.cxf.rs.security.oauth2.services.AuthorizationMetadataService;
 
 @Path("openid-configuration")
 public class OidcConfigurationService extends AuthorizationMetadataService {
+    // Response types supported with the combination of 
+    // AuthorizationCode, Implicit and Hybrid services
+    private static final List<String> DEFAULT_RESPONSE_TYPES = 
+        Arrays.asList("code", "code id_token", "id_token", "token id_token");
+    // Required:
+    private List<String> responseTypes;
+    
     // Recommended - but optional
     private boolean userInfoEndpointNotAvailable;
     private String userInfoEndpointAddress;
@@ -65,6 +74,12 @@ public class OidcConfigurationService extends AuthorizationMetadataService {
         if (isBackChannelLogoutSupported()) {
             cfg.put("backchannel_logout_supported", Boolean.TRUE);
         }
+        
+        //Subject types: pairwise is not supported yet
+        cfg.put("subject_types_supported", Collections.singletonList("public"));
+        
+        List<String> theResponseTypes = responseTypes == null ? DEFAULT_RESPONSE_TYPES : responseTypes;
+        cfg.put("response_types_supported", theResponseTypes);
     }
 
     public boolean isUserInfoEndpointNotAvailable() {
@@ -97,6 +112,14 @@ public class OidcConfigurationService extends AuthorizationMetadataService {
 
     public void setBackChannelLogoutSupported(boolean backChannelLogoutSupported) {
         this.backChannelLogoutSupported = backChannelLogoutSupported;
+    }
+
+    public List<String> getResponseTypes() {
+        return responseTypes;
+    }
+
+    public void setResponseTypes(List<String> responseTypes) {
+        this.responseTypes = responseTypes;
     }
 
 }

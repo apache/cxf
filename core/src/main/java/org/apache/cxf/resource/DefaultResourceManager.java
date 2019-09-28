@@ -34,7 +34,7 @@ public class DefaultResourceManager implements ResourceManager {
     private static final Logger LOG = LogUtils.getL7dLogger(DefaultResourceManager.class);
 
     protected final List<ResourceResolver> registeredResolvers
-        = new CopyOnWriteArrayList<ResourceResolver>();
+        = new CopyOnWriteArrayList<>();
     protected boolean firstCalled;
 
     public DefaultResourceManager() {
@@ -102,9 +102,6 @@ public class DefaultResourceManager implements ResourceManager {
         if (!firstCalled) {
             onFirstResolve();
         }
-        if (resolvers == null) {
-            resolvers = registeredResolvers;
-        }
 
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("resolving resource <" + name + ">" + (asStream ? " as stream "
@@ -113,11 +110,24 @@ public class DefaultResourceManager implements ResourceManager {
 
         T ret = null;
 
-        for (ResourceResolver rr : resolvers) {
+        for (ResourceResolver rr : resolvers != null ? resolvers : registeredResolvers) {
             if (asStream) {
                 ret = type.cast(rr.getAsStream(name));
             } else {
-                ret = rr.resolve(name, type);
+                try  {
+                    ret = rr.resolve(name, type);
+                } catch (RuntimeException ex) {
+                    //ResourceResolver.resolve method expected to 
+                    //return an instance of the resource or null if the
+                    //resource cannot be resolved. So we just catch 
+                    //Unchecked exceptions during resolving resource and log it.   
+                    //So other ResourceResolver get chance to be used
+                    if (LOG.isLoggable(Level.FINE)) {
+                        LOG.log(Level.FINE, 
+                             "run into exception when using" + rr.getClass().getName(), ex);
+                    }
+
+                }
             }
             if (ret != null) {
                 break;

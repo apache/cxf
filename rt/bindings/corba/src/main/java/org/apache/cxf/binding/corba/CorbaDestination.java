@@ -239,7 +239,7 @@ public class CorbaDestination implements MultiplexDestination {
             }
             setCorbaLocArgs(addressURI, orbArgs);
         } else if ("corbaname".equals(scheme)) {
-            int idx = location.indexOf("#");
+            int idx = location.indexOf('#');
             if (idx != -1) {
                 serviceId = location.substring(idx + 1);
             }
@@ -312,7 +312,6 @@ public class CorbaDestination implements MultiplexDestination {
 
             populateEpr(orb.object_to_string(obj));
             LOG.info("Object Reference: " + orb.object_to_string(obj));
-            // TODO: Provide other export mechanisms?
             poaManager.activate();
         } catch (Exception ex) {
             throw new CorbaBindingException("Unable to activate CORBA servant", ex);
@@ -417,7 +416,7 @@ public class CorbaDestination implements MultiplexDestination {
 
         orbConfig.addPOAPolicies(orb, name, parentPOA, poaManager, policies);
 
-        Policy[] policyList = policies.toArray(new Policy[policies.size()]);
+        Policy[] policyList = policies.toArray(new Policy[0]);
 
         try {
             return parentPOA.create_POA(name, poaManager, policyList);

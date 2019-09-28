@@ -163,7 +163,14 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
     private QName serviceName;
     private Invoker invoker;
     private Executor executor;
-    private List<String> ignoredClasses = new ArrayList<>();
+    private List<String> ignoredClasses = new ArrayList<>(Arrays.asList(
+            "java.lang.Object",
+            "java.lang.Throwable",
+            "org.omg.CORBA_2_3.portable.ObjectImpl",
+            "org.omg.CORBA.portable.ObjectImpl",
+            "javax.ejb.EJBObject",
+            "javax.rmi.CORBA.Stub"
+        ));
     private List<Method> ignoredMethods = new ArrayList<>();
     private MethodDispatcher methodDispatcher = new SimpleMethodDispatcher();
     private Boolean wrappedStyle;
@@ -183,14 +190,6 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
 
     public ReflectionServiceFactoryBean() {
         getServiceConfigurations().add(0, new DefaultServiceConfiguration());
-        ignoredClasses.addAll(Arrays.asList(new String[] {
-            "java.lang.Object",
-            "java.lang.Throwable",
-            "org.omg.CORBA_2_3.portable.ObjectImpl",
-            "org.omg.CORBA.portable.ObjectImpl",
-            "javax.ejb.EJBObject",
-            "javax.rmi.CORBA.Stub"
-        }));
     }
 
     protected DataBinding createDefaultDataBinding() {
@@ -1190,7 +1189,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
         MessageInfo message = isOut ? opInfo.getOutput() : opInfo.getInput();
 
         final List<MessagePartInfo> messageParts = message.getMessageParts();
-        if (messageParts.size() == 0) {
+        if (messageParts.isEmpty()) {
             return;
         }
 
@@ -1259,23 +1258,22 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
                 mpi.setElementQName(qname);
                 mpi.setConcreteName(qname);
                 continue;
+            }
+            if (null == mpi.getTypeQName() && mpi.getXmlSchema() == null) {
+                throw new ServiceConstructionException(new Message("UNMAPPABLE_PORT_TYPE", LOG,
+                                                                   method.getDeclaringClass().getName(),
+                                                                   method.getName(),
+                                                                   mpi.getName()));
+            }
+            if (mpi.getTypeQName() != null) {
+                el.setSchemaTypeName(mpi.getTypeQName());
             } else {
-                if (null == mpi.getTypeQName() && mpi.getXmlSchema() == null) {
-                    throw new ServiceConstructionException(new Message("UNMAPPABLE_PORT_TYPE", LOG,
-                                                                       method.getDeclaringClass().getName(),
-                                                                       method.getName(),
-                                                                       mpi.getName()));
-                }
-                if (mpi.getTypeQName() != null) {
-                    el.setSchemaTypeName(mpi.getTypeQName());
-                } else {
-                    el.setSchemaType((XmlSchemaType)mpi.getXmlSchema());
-                }
-                mpi.setXmlSchema(el);
-                mpi.setConcreteName(qname);
-                if (mpi.getTypeQName() != null) {
-                    addImport(schema, mpi.getTypeQName().getNamespaceURI());
-                }
+                el.setSchemaType((XmlSchemaType)mpi.getXmlSchema());
+            }
+            mpi.setXmlSchema(el);
+            mpi.setConcreteName(qname);
+            if (mpi.getTypeQName() != null) {
+                addImport(schema, mpi.getTypeQName().getNamespaceURI());
             }
 
             mpi.setElement(true);
@@ -1460,7 +1458,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
     }
 
     private Map<Class<?>, Boolean> getJaxbAnnoMap(MessagePartInfo mpi) {
-        Map<Class<?>, Boolean> map = new ConcurrentHashMap<Class<?>, Boolean>(4, 0.75f, 1);
+        Map<Class<?>, Boolean> map = new ConcurrentHashMap<>(4, 0.75f, 1);
         Annotation[] anns = getMethodParameterAnnotations(mpi);
 
         if (anns != null) {
@@ -1555,7 +1553,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
                 initializeParameter(part, paramClasses[j], genParTypes[j]);
                 part.setProperty(METHOD_PARAM_ANNOTATIONS, parAnnotations);
                 part.setProperty(PARAM_ANNOTATION, parAnnotations[j]);
-                if (getJaxbAnnoMap(part).size() > 0) {
+                if (!getJaxbAnnoMap(part).isEmpty()) {
                     op.setProperty(WRAPPERGEN_NEEDED, true);
                 }
                 if (!isWrapped(method) && !isRPC(method)) {
@@ -1665,7 +1663,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
 
     private void setParameterOrder(Method method, Class<?>[] paramClasses, OperationInfo op) {
         if (isRPC(method) || !isWrapped(method)) {
-            List<String> paramOrdering = new LinkedList<String>();
+            List<String> paramOrdering = new LinkedList<>();
             boolean hasOut = false;
             for (int j = 0; j < paramClasses.length; j++) {
                 if (Exchange.class.equals(paramClasses[j])) {
@@ -2011,8 +2009,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
     }
 
     protected boolean isMatchOperation(String methodNameInClass, String methodNameInWsdl) {
-        // TODO: This seems wrong and not sure who put it here. Will revisit -
-        // DBD
+        // checks to make sure the operation names match ignoring the case of the first character
         boolean ret = false;
         String initOfMethodInClass = methodNameInClass.substring(0, 1);
         String initOfMethodInWsdl = methodNameInWsdl.substring(0, 1);
@@ -2142,7 +2139,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
     }
 
     protected void createFaultForException(Class<?> exClass, FaultInfo fi) {
-        Field fields[] = exClass.getDeclaredFields();
+        Field[] fields = exClass.getDeclaredFields();
         for (Field field : fields) {
             MessagePartInfo mpi = fi
                 .addMessagePart(new QName(fi.getName().getNamespaceURI(), field.getName()));
@@ -2162,9 +2159,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
             try {
                 Method m = exClass.getMethod("getFaultInfo");
                 return m.getReturnType();
-            } catch (SecurityException e) {
-                throw new ServiceConstructionException(e);
-            } catch (NoSuchMethodException e) {
+            } catch (SecurityException | NoSuchMethodException e) {
                 throw new ServiceConstructionException(e);
             }
         }
@@ -2422,7 +2417,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
         checkServiceClassAnnotations(serviceClass);
     }
     protected void checkServiceClassAnnotations(Class<?> sc) {
-        Annotation anns[] = serviceClass.getAnnotations();
+        Annotation[] anns = serviceClass.getAnnotations();
         if (anns != null) {
             for (Annotation ann : anns) {
                 String pkg = ann.annotationType().getPackage().getName();

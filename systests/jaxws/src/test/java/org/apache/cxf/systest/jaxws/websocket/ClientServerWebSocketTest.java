@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.jaxws.websocket;
 
+import java.io.Closeable;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 import java.util.Map;
@@ -48,6 +49,12 @@ import org.apache.hello_world_soap_http.types.GreetMeLaterResponse;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
 
@@ -60,6 +67,7 @@ public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         // set up configuration to enable schema validation
+        //System.setProperty("org.apache.cxf.transport.websocket.atmosphere.disabled", "true");
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
         createStaticBus();
     }
@@ -219,7 +227,6 @@ public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    @org.junit.Ignore //TODO need to pass the principal of the original upgrade request to its subsequent service calls
     public void testBasicAuth() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
         assertNotNull(wsdl);
@@ -237,7 +244,10 @@ public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
             assertEquals("Hello BJ", s);
             bp.getRequestContext().remove(BindingProvider.USERNAME_PROPERTY);
             bp.getRequestContext().remove(BindingProvider.PASSWORD_PROPERTY);
+            ((Closeable)greeter).close();
 
+            greeter = service.getPort(portName, Greeter.class);
+            updateGreeterAddress(greeter, PORT);
             //try setting on the conduit directly
             Client client = ClientProxy.getClient(greeter);
             HTTPConduit httpConduit = (HTTPConduit)client.getConduit();
@@ -247,6 +257,7 @@ public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
             httpConduit.setAuthorization(policy);
 
             s = greeter.greetMe("secure");
+            ((Closeable)greeter).close();
             assertEquals("Hello BJ2", s);
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
@@ -373,9 +384,7 @@ public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
             try {
                 GreetMeLaterResponse reply = response.get();
                 replyBuffer = reply.getResponseType();
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-            } catch (ExecutionException ex) {
+            } catch (InterruptedException | ExecutionException ex) {
                 ex.printStackTrace();
             }
         }

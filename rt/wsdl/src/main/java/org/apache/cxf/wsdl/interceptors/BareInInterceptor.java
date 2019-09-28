@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -76,9 +77,6 @@ public class BareInInterceptor extends AbstractInDatabindingInterceptor {
         Endpoint ep = exchange.getEndpoint();
         BindingOperationInfo bop = exchange.getBindingOperationInfo();
         ServiceInfo si = ep.getEndpointInfo().getService();
-        // XXX - Should the BindingMessageInfo.class be put on
-        // the message?
-        //MessageInfo msgInfo = message.get(MessageInfo.class);
         BindingMessageInfo msgInfo = null;
 
         boolean client = isRequestor(message);
@@ -87,7 +85,7 @@ public class BareInInterceptor extends AbstractInDatabindingInterceptor {
         if (bop == null) {
             ops = new ArrayList<>();
             ops.addAll(si.getInterface().getOperations());
-            if (xmlReader.getEventType() == XMLStreamReader.END_ELEMENT && !client) {
+            if (xmlReader.getEventType() == XMLStreamConstants.END_ELEMENT && !client) {
                 //empty input
                 //TO DO : check duplicate operation with no input
                 for (OperationInfo op : ops) {
@@ -101,11 +99,6 @@ public class BareInInterceptor extends AbstractInDatabindingInterceptor {
 
             }
         } else {
-            // XXX - Is the call to
-            // AbstractInDatabindingInterceptor.getMessageInfo()
-            // necessary?  Should we put the BindingMessageInfo on
-            // the message instead of the MessageInfo?
-            // msgInfo = getMessageInfo(message, bop, exchange);
             getMessageInfo(message, bop);
             if (client) {
                 msgInfo = bop.getOutput();

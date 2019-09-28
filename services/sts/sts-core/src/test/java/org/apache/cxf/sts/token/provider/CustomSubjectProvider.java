@@ -23,10 +23,10 @@ import java.security.Principal;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.dom.WSConstants;
 
 /**
  * A test implementation of SubjectProvider.
@@ -55,22 +55,23 @@ public class CustomSubjectProvider implements SubjectProvider {
      * Get the SubjectConfirmation method given a tokenType and keyType
      */
     private String getSubjectConfirmationMethod(String tokenType, String keyType) {
-        if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
-            || WSConstants.SAML2_NS.equals(tokenType)) {
+        if (WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+            || WSS4JConstants.SAML2_NS.equals(tokenType)) {
             if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType)
                 || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
                 return SAML2Constants.CONF_HOLDER_KEY;
-            } else {
-                return SAML2Constants.CONF_BEARER;
             }
-        } else {
-            if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType)
-                || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
-                return SAML1Constants.CONF_HOLDER_KEY;
-            } else {
-                return SAML1Constants.CONF_BEARER;
-            }
+            return SAML2Constants.CONF_BEARER;
         }
+        return extracted(keyType);
+    }
+
+    private String extracted(String keyType) {
+        if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType)
+            || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
+            return SAML1Constants.CONF_HOLDER_KEY;
+        }
+        return SAML1Constants.CONF_BEARER;
     }
 
 

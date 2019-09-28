@@ -75,23 +75,23 @@ public final class JAnnotationElement {
             }
             if (value instanceof List) {
                 List<?> list = (List<?>) value;
-                sb.append("{");
+                sb.append('{');
                 for (int i = 0; i < list.size(); i++) {
                     appendValue(sb, list.get(i));
                     if (i < list.size() - 1) {
                         sb.append(", ");
                     }
                 }
-                sb.append("}");
+                sb.append('}');
             } else if (value instanceof String[]) {
-                sb.append("{");
+                sb.append('{');
                 for (int i = 0; i < Array.getLength(value); i++) {
                     appendValue(sb, Array.get(value, i));
                     if (i < Array.getLength(value) - 1) {
                         sb.append(", ");
                     }
                 }
-                sb.append("}");
+                sb.append('}');
             } else {
                 appendValue(sb, value);
             }
@@ -134,19 +134,19 @@ public final class JAnnotationElement {
 
         String clzName = e.getClass().getName();
         if (clzName.contains("$")) {
-            imports.add(obj.getClass().getName().substring(0, clzName.lastIndexOf("$")));
+            imports.add(obj.getClass().getName().substring(0, clzName.lastIndexOf('$')));
         } else {
             imports.add(obj.getClass().getName());
         }
-        sb.append(clzName.substring(clzName.lastIndexOf(".") + 1).replace("$", "."));
-        sb.append(".");
+        sb.append(clzName.substring(clzName.lastIndexOf('.') + 1).replace("$", "."));
+        sb.append('.');
         sb.append(e.name());
     }
 
     private void getStringValue(final StringBuilder sb, final Object obj) {
-        sb.append("\"");
+        sb.append('"');
         sb.append(obj);
-        sb.append("\"");
+        sb.append('"');
     }
 
     private boolean containsSameClassName(Class<?> clz) {

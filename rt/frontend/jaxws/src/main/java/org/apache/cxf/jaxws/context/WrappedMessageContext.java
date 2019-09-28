@@ -181,14 +181,20 @@ public class WrappedMessageContext implements MessageContext {
     }
 
     public void clear() {
-        //just clear the JAXWS things....
-        for (String key : jaxws2cxfMap.keySet()) {
-            remove(key);
+        if (message instanceof Message) {
+            //server side, just clear the JAXWS things....
+            //Otherwise lots of CXF things will not be found
+            for (String key : jaxws2cxfMap.keySet()) {
+                remove(key);
+            }
+        } else {
+            message.clear();
         }
     }
 
     public final boolean containsKey(Object key) {
-        return message.containsKey(mapKey((String)key));
+        return message.containsKey(mapKey((String)key))
+            || get(key) != null;
     }
 
     public final boolean containsValue(Object value) {
@@ -392,7 +398,7 @@ public class WrappedMessageContext implements MessageContext {
         return Collections.unmodifiableSet(set);
     }
     public final Set<Entry<String, Object>> entrySet() {
-        Set<Entry<String, Object>> set = new HashSet<Entry<String, Object>>();
+        Set<Entry<String, Object>> set = new HashSet<>();
         for (Map.Entry<String, Object> s : message.entrySet()) {
             set.add(s);
 
@@ -433,9 +439,8 @@ public class WrappedMessageContext implements MessageContext {
             if (tmp != null) {
                 if (MessageContext.HTTP_RESPONSE_HEADERS.equals(key)) {
                     return tmp.put(Message.PROTOCOL_HEADERS, value);
-                } else {
-                    return tmp.put(mappedKey, value);
                 }
+                return tmp.put(mappedKey, value);
             }
         } else if (BindingProvider.USERNAME_PROPERTY.equals(key)) {
             AuthorizationPolicy authPolicy =

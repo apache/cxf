@@ -29,10 +29,12 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.transport.local.LocalTransportFactory;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.common.ConfigurationConstants;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class RoundTripTest extends AbstractSecurityTest {
     private WSS4JInInterceptor wsIn;
@@ -55,18 +57,18 @@ public class RoundTripTest extends AbstractSecurityTest {
         service.getOutInterceptors().add(new LoggingOutInterceptor());
 
         wsIn = new WSS4JInInterceptor();
-        wsIn.setProperty(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
-        wsIn.setProperty(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
-        wsIn.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, TestPwdCallback.class.getName());
+        wsIn.setProperty(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        wsIn.setProperty(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
+        wsIn.setProperty(ConfigurationConstants.PW_CALLBACK_CLASS, TestPwdCallback.class.getName());
 
         service.getInInterceptors().add(wsIn);
 
         wsOut = new WSS4JOutInterceptor();
-        wsOut.setProperty(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
-        wsOut.setProperty(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
-        wsOut.setProperty(WSHandlerConstants.USER, "myalias");
+        wsOut.setProperty(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        wsOut.setProperty(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
+        wsOut.setProperty(ConfigurationConstants.USER, "myalias");
         wsOut.setProperty("password", "myAliasPassword");
-        wsOut.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, TestPwdCallback.class.getName());
+        wsOut.setProperty(ConfigurationConstants.PW_CALLBACK_CLASS, TestPwdCallback.class.getName());
         service.getOutInterceptors().add(wsOut);
 
         // Create the client
@@ -88,28 +90,28 @@ public class RoundTripTest extends AbstractSecurityTest {
 
     @Test
     public void testSignature() throws Exception {
-        wsIn.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        wsOut.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
+        wsIn.setProperty(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        wsOut.setProperty(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
 
         assertEquals("test", echo.echo("test"));
     }
 
     @Test
     public void testEncryptionPlusSig() throws Exception {
-        wsIn.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT + " "
-                                                    + WSHandlerConstants.SIGNATURE);
-        wsOut.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT + " "
-                                                     + WSHandlerConstants.SIGNATURE);
+        wsIn.setProperty(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT + " "
+                                                    + ConfigurationConstants.SIGNATURE);
+        wsOut.setProperty(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT + " "
+                                                     + ConfigurationConstants.SIGNATURE);
 
         assertEquals("test", echo.echo("test"));
     }
     @Test
     public void testUsernameToken() throws Exception {
-        String actions = WSHandlerConstants.ENCRYPT + " " + WSHandlerConstants.SIGNATURE + " "
-                         + WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.USERNAME_TOKEN;
+        String actions = ConfigurationConstants.ENCRYPT + " " + ConfigurationConstants.SIGNATURE + " "
+                         + ConfigurationConstants.TIMESTAMP + " " + ConfigurationConstants.USERNAME_TOKEN;
 
-        wsIn.setProperty(WSHandlerConstants.ACTION, actions);
-        wsOut.setProperty(WSHandlerConstants.ACTION, actions);
+        wsIn.setProperty(ConfigurationConstants.ACTION, actions);
+        wsOut.setProperty(ConfigurationConstants.ACTION, actions);
 
         assertEquals("test", echo.echo("test"));
     }

@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensionRegistry;
+import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
@@ -35,7 +36,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -92,16 +93,16 @@ public class JAXWSBindingParser {
                     jaxwsBinding.setEnableWrapperStyle(getNodeValue(child));
                 } else if (isPackageElement(child)) {
                     jaxwsBinding.setPackage(getPackageName(child));
-                    Node docChild = DOMUtils.getChild(child, Element.ELEMENT_NODE);
+                    Node docChild = DOMUtils.getChild(child, Node.ELEMENT_NODE);
                     if (docChild != null && this.isJAXWSClassDoc(docChild)) {
-                        jaxwsBinding.setPackageJavaDoc(StringEscapeUtils.escapeHtml(DOMUtils.getContent(docChild)));
+                        jaxwsBinding.setPackageJavaDoc(StringEscapeUtils.escapeHtml4(DOMUtils.getContent(docChild)));
                     }
                 } else if (isJAXWSMethodElement(child)) {
                     jaxwsBinding.setMethodName(getMethodName(child));
-                    Node docChild = DOMUtils.getChild(child, Element.ELEMENT_NODE);
+                    Node docChild = DOMUtils.getChild(child, Node.ELEMENT_NODE);
 
                     if (docChild != null && this.isJAXWSClassDoc(docChild)) {
-                        jaxwsBinding.setMethodJavaDoc(StringEscapeUtils.escapeHtml(DOMUtils.getContent(docChild)));
+                        jaxwsBinding.setMethodJavaDoc(StringEscapeUtils.escapeHtml4(DOMUtils.getContent(docChild)));
                     }
                 } else if (isJAXWSParameterElement(child)) {
                     Element childElement = (Element)child;
@@ -137,10 +138,10 @@ public class JAXWSBindingParser {
                     Element childElement = (Element)child;
                     String clzName = childElement.getAttribute("name");
                     String javadoc = "";
-                    Node docChild = DOMUtils.getChild(child, Element.ELEMENT_NODE);
+                    Node docChild = DOMUtils.getChild(child, Node.ELEMENT_NODE);
 
                     if (docChild != null && this.isJAXWSClassDoc(docChild)) {
-                        javadoc = StringEscapeUtils.escapeHtml(DOMUtils.getContent(docChild));
+                        javadoc = StringEscapeUtils.escapeHtml4(DOMUtils.getContent(docChild));
                     }
 
                     JAXWSClass jaxwsClass = new JAXWSClass(clzName, javadoc);
@@ -213,7 +214,14 @@ public class JAXWSBindingParser {
         NodeList nlst;
         try {
             ContextImpl contextImpl = new ContextImpl(target);
-            XPath xpath = XPathFactory.newInstance().newXPath();
+            XPathFactory xpathFactory = XPathFactory.newInstance();
+            try {
+                xpathFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+            } catch (javax.xml.xpath.XPathFactoryConfigurationException ex) {
+                // ignore
+            }
+
+            XPath xpath = xpathFactory.newXPath();
             xpath.setNamespaceContext(contextImpl);
             nlst = (NodeList)xpath.evaluate(expression, target, XPathConstants.NODESET);
         } catch (XPathExpressionException e) {
@@ -248,7 +256,7 @@ public class JAXWSBindingParser {
             throw new UnsupportedOperationException();
         }
 
-        public Iterator<?> getPrefixes(String namespaceURI) {
+        public Iterator<String> getPrefixes(String namespaceURI) {
             throw new UnsupportedOperationException();
         }
     }

@@ -45,15 +45,19 @@ import org.apache.cxf.ws.rm.manager.RetryPolicyType;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class RMInInterceptorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class RMInInterceptorTest {
 
     private IMocksControl control;
     private RMInInterceptor interceptor;
@@ -77,7 +81,7 @@ public class RMInInterceptorTest extends Assert {
     public void testOrdering() {
         control.replay();
         Phase p = new Phase(Phase.PRE_LOGICAL, 1);
-        SortedSet<Phase> phases = new TreeSet<Phase>();
+        SortedSet<Phase> phases = new TreeSet<>();
         phases.add(p);
         PhaseInterceptorChain chain =
             new PhaseInterceptorChain(phases);
@@ -305,8 +309,7 @@ public class RMInInterceptorTest extends Assert {
         try {
             interceptor.handle(message);
             fail("must reject the invalid rm message");
-        } catch (Exception e) {
-            assertTrue(e instanceof RMException);
+        } catch (RMException e) {
             // verify a partial error text match to exclude an unexpected exception
             // (see WSA_REQUIRED_EXC in Messages.properties)
             final String text = "WS-Addressing is required";
@@ -332,8 +335,7 @@ public class RMInInterceptorTest extends Assert {
         try {
             interceptor.handle(message);
             fail("must reject the invalid rm message");
-        } catch (Exception e) {
-            assertTrue(e instanceof RMException);
+        } catch (RMException e) {
             // verify a partial error text match to exclude an unexpected exception
             // (see WSRM_REQUIRED_EXC in Messages.properties)
             final String text = "WS-ReliableMessaging is required";

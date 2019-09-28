@@ -22,13 +22,13 @@ package org.apache.cxf.staxutils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
@@ -47,18 +47,24 @@ import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.IOUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class StaxUtilsTest extends Assert {
+public class StaxUtilsTest {
 
     @Test
     public void testFactoryCreation() {
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(getTestStream("./resources/amazon.xml"));
-        assertTrue(reader != null);
+        assertNotNull(reader);
     }
 
     private InputStream getTestStream(String resource) {
@@ -114,25 +120,16 @@ public class StaxUtilsTest extends Assert {
         baos.close();
 
         // re-read the input xml doc to a string
-        InputStreamReader inputStreamReader = new InputStreamReader(getTestStream(soapMessage));
-        StringWriter stringWriter = new StringWriter();
-        char[] buffer = new char[4096];
-        int n = 0;
-        n = inputStreamReader.read(buffer);
-        while (n > 0) {
-            stringWriter.write(buffer, 0, n);
-            n = inputStreamReader.read(buffer);
-        }
-        String input = stringWriter.toString();
-        stringWriter.close();
+        String input = IOUtils.toString(getTestStream(soapMessage));
+
         // seach for the first begin of "<soap:Envelope" to escape the apache licenses header
         int beginIndex = input.indexOf("<soap:Envelope");
         input = input.substring(beginIndex);
         beginIndex = output.indexOf("<soap:Envelope");
         output = output.substring(beginIndex);
 
-        output = output.replaceAll("\r\n", "\n");
-        input = input.replaceAll("\r\n", "\n");
+        output = output.replace("\r\n", "\n");
+        input = input.replace("\r\n", "\n");
 
         // compare the input and output string
         assertEquals(input, output);
@@ -396,7 +393,7 @@ public class StaxUtilsTest extends Assert {
 
     @Test
     public void testCopyWithEmptyNamespace() throws Exception {
-        StringBuilder in = new StringBuilder();
+        StringBuilder in = new StringBuilder(128);
         in.append("<foo xmlns=\"http://example.com/\">");
         in.append("<bar xmlns=\"\"/>");
         in.append("</foo>");
@@ -414,7 +411,7 @@ public class StaxUtilsTest extends Assert {
 
     @Test
     public void testQName() throws Exception {
-        StringBuilder in = new StringBuilder();
+        StringBuilder in = new StringBuilder(128);
         in.append("<f:foo xmlns:f=\"http://example.com/\">");
         in.append("<bar>f:Bar</bar>");
         in.append("<bar> f:Bar </bar>");
@@ -425,14 +422,14 @@ public class StaxUtilsTest extends Assert {
              new ByteArrayInputStream(in.toString().getBytes()));
 
         QName qname = new QName("http://example.com/", "Bar");
-        assertEquals(XMLStreamReader.START_ELEMENT, reader.next());
-        assertEquals(XMLStreamReader.START_ELEMENT, reader.next());
+        assertEquals(XMLStreamConstants.START_ELEMENT, reader.next());
+        assertEquals(XMLStreamConstants.START_ELEMENT, reader.next());
         // first bar
         assertEquals(qname, StaxUtils.readQName(reader));
-        assertEquals(XMLStreamReader.START_ELEMENT, reader.next());
+        assertEquals(XMLStreamConstants.START_ELEMENT, reader.next());
         // second bar
         assertEquals(qname, StaxUtils.readQName(reader));
-        assertEquals(XMLStreamReader.START_ELEMENT, reader.next());
+        assertEquals(XMLStreamConstants.START_ELEMENT, reader.next());
         // third bar
         try {
             StaxUtils.readQName(reader);

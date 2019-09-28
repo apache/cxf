@@ -26,17 +26,22 @@ import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.builders.PrimitiveAssertion;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  *
  */
-public class AssertionBuilderRegistryImplTest extends Assert {
+public class AssertionBuilderRegistryImplTest {
 
     private IMocksControl control;
 
@@ -75,7 +80,7 @@ public class AssertionBuilderRegistryImplTest extends Assert {
         control.replay();
         reg.setBus(bus);
 
-        assertTrue(!reg.isIgnoreUnknownAssertions());
+        assertFalse(reg.isIgnoreUnknownAssertions());
         try {
             reg.build(elems[0]);
             fail("Expected PolicyException not thrown.");

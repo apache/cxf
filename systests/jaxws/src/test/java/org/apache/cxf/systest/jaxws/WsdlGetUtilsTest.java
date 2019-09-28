@@ -41,6 +41,8 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+
 public class WsdlGetUtilsTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(WsdlGetUtilsTest.class);
 
@@ -64,7 +66,6 @@ public class WsdlGetUtilsTest extends AbstractBusClientServerTestBase {
         Server server = factory.create();
 
         try {
-            // FIXME - surely there is a better way to create a stubbed message and exchange
             Message message = new MessageImpl();
             Exchange exchange = new ExchangeImpl();
             exchange.put(Bus.class, getBus());

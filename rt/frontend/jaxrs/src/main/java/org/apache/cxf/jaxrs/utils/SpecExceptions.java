@@ -121,8 +121,7 @@ final class SpecExceptions {
     private static Response checkResponse(Response r, int status) {
         if (r == null) {
             return JAXRSUtils.toResponse(status);
-        } else {
-            return r;
         }
+        return r;
     }
 }

@@ -32,6 +32,7 @@ import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
 import org.apache.cxf.ws.rm.RM11Constants;
 import org.apache.cxf.ws.rm.RMConfiguration;
 import org.apache.cxf.ws.rm.RMConfiguration.DeliveryAssurance;
+import org.apache.cxf.ws.rm.RMConstants;
 import org.apache.cxf.ws.rm.RMUtils;
 import org.apache.cxf.ws.rmp.v200502.RMAssertion;
 import org.apache.neethi.builders.PrimitiveAssertion;
@@ -303,7 +304,7 @@ public final class RMPolicyUtilities {
         }
         RMConfiguration compatible = new RMConfiguration(cfg);
         String lname = rma.getName().getLocalPart();
-        if (RM11Constants.RMASSERTION_NAME.equals(lname)) {
+        if (RMConstants.RMASSERTION_NAME.equals(lname)) {
             compatible.setRMNamespace(RM11Constants.NAMESPACE_URI);
         } else if (RM12AssertionBuilder.SEQUENCESTR_NAME.equals(lname)) {
             compatible.setSequenceSTRRequired(true);
@@ -331,7 +332,7 @@ public final class RMPolicyUtilities {
     public static boolean isCompatible(PrimitiveAssertion rma, RMConfiguration cfg) {
         String lname = rma.getName().getLocalPart();
         boolean compatible = true;
-        if (RM11Constants.RMASSERTION_NAME.equals(lname)) {
+        if (RMConstants.RMASSERTION_NAME.equals(lname)) {
             compatible = RM11Constants.WSRMP_NAMESPACE_URI.equals(cfg.getRMNamespace());
         } else if (RM12AssertionBuilder.SEQUENCESTR_NAME.equals(lname)) {
             compatible = cfg.isSequenceSTRRequired();

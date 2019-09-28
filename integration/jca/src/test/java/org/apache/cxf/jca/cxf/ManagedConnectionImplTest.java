@@ -34,9 +34,14 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.connector.Connection;
 import org.apache.cxf.jca.cxf.handlers.ProxyInvocationHandler;
 import org.apache.hello_world_soap_http.Greeter;
+
 import org.easymock.EasyMock;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class ManagedConnectionImplTest extends ManagedConnectionTestBase {
 
@@ -56,15 +61,6 @@ public class ManagedConnectionImplTest extends ManagedConnectionTestBase {
         cri.setAddress("http://localhost:9000/soap");
         Object o = mci.getConnection(subj, cri);
         assertTrue(o instanceof Foo);
-    }
-
-
-    @Ignore("Need to check the classloader")
-    public void testThreadContextClassLoaderIsSet() throws Exception {
-        //set the threadContextClassLoader for Bus
-        //TODO njiang classloader things
-        //check the threadContextClassLoader
-        mci.getConnection(subj, cri);
     }
 
     @Test
@@ -87,6 +83,7 @@ public class ManagedConnectionImplTest extends ManagedConnectionTestBase {
         assertTrue("Checking implementation of passed interface", o instanceof Greeter);
     }
 
+    @Test
     @Ignore
     public void testGetConnectionWithNoPortReturnsConnection() throws Exception {
 
@@ -126,7 +123,7 @@ public class ManagedConnectionImplTest extends ManagedConnectionTestBase {
     @Test
     public void testGetConnectionWithDudSubjectB() throws ResourceException {
         String user = new String("user");
-        char password[] = {'a', 'b', 'c'};
+        char[] password = {'a', 'b', 'c'};
         PasswordCredential creds = new PasswordCredential(user, password);
         subj.getPrivateCredentials().add(creds);
         Object o = mci.getConnection(subj, cri);
@@ -138,7 +135,7 @@ public class ManagedConnectionImplTest extends ManagedConnectionTestBase {
     @Test
     public void testGetConnectionWithSubject() throws ResourceException {
         String user = new String("user");
-        char password[] = {'a', 'b', 'c'};
+        char[] password = {'a', 'b', 'c'};
         PasswordCredential creds = new PasswordCredential(user, password);
         creds.setManagedConnectionFactory(factory);
         subj.getPrivateCredentials().add(creds);
@@ -206,7 +203,7 @@ public class ManagedConnectionImplTest extends ManagedConnectionTestBase {
             mci.associateConnection(dodgyHandle);
             fail("Except exception on call with ClassCast Exception");
         } catch (ResourceAdapterInternalException raie) {
-            assertTrue(true);
+            // expected
         }
 
     }

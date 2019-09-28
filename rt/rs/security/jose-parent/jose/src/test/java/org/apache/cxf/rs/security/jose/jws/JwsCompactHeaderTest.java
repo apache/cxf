@@ -23,10 +23,12 @@ import java.util.List;
 
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JwsCompactHeaderTest extends Assert {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class JwsCompactHeaderTest {
 
     /**
      * JWS string, which lacks the "alg" header field.
@@ -200,4 +202,3 @@ public class JwsCompactHeaderTest extends Assert {
         assertFalse(consumer.validateCriticalHeaders());
     }
 }
-

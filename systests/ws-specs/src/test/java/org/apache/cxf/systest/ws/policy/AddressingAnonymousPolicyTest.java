@@ -37,9 +37,13 @@ import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests the use of the WS-Policy Framework to automatically engage WS-Addressing and
@@ -59,7 +63,7 @@ public class AddressingAnonymousPolicyTest extends AbstractBusClientServerTestBa
         public Server(String dir) {
             tmpDir = dir;
         }
-        public Server(String args[]) {
+        public Server(String[] args) {
             tmpDir = args[0];
         }
         protected void run()  {

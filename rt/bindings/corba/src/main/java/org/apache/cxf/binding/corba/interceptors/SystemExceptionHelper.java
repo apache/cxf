@@ -272,7 +272,7 @@ public final class SystemExceptionHelper
             TypeCode minortc = orb.get_primitive_tc(TCKind.tk_long);
             smBuf[0] = new StructMember("minor", minortc, null);
 
-            String csLabels[] = {"COMPLETED_YES", "COMPLETED_NO", "COMPLETED_MAYBE"};
+            String[] csLabels = {"COMPLETED_YES", "COMPLETED_NO", "COMPLETED_MAYBE"};
             TypeCode completedtc = orb
                 .create_enum_tc("IDL:omg.org/CORBA/CompletionStatus:1.0",
                               "CompletionStatus", csLabels);

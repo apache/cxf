@@ -33,6 +33,7 @@ import javax.xml.ws.Dispatch;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Response;
 import javax.xml.ws.Service;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
@@ -46,6 +47,10 @@ import org.apache.hello_world_soap_http.SOAPService;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientServerTestBase {
 
@@ -178,8 +183,8 @@ public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientS
                 throw e;
             }
             Throwable t = e.getCause();
-            if (t instanceof SoapFault) {
-                SoapFault sf = (SoapFault)e.getCause();
+            if (t instanceof SOAPFaultException) {
+                SoapFault sf = (SoapFault)t.getCause();
                 if (sf.getCause() == null) {
                     throw e;
                 }
@@ -236,8 +241,8 @@ public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientS
                 throw e;
             }
             Throwable t = e.getCause();
-            if (t instanceof SoapFault) {
-                SoapFault sf = (SoapFault)e.getCause();
+            if (t instanceof SOAPFaultException) {
+                SoapFault sf = (SoapFault)t.getCause();
                 if (sf.getCause() == null) {
                     throw e;
                 }

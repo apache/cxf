@@ -28,6 +28,7 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
@@ -36,9 +37,14 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.example.contract.doubleit.DoubleItSwaPortType;
 import org.example.schema.doubleit.DoubleIt3;
+
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * This is a test for various Required/Signed/Encrypted Parts/Elements.
@@ -74,12 +80,12 @@ public class PartsTest extends AbstractBusClientServerTestBase {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
+    public static Collection<TestParam> data() {
 
-        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
-                                                {new TestParam(PORT, true)},
-                                                {new TestParam(STAX_PORT, false)},
-                                                {new TestParam(STAX_PORT, true)},
+        return Arrays.asList(new TestParam[] {new TestParam(PORT, false),
+                                              new TestParam(PORT, true),
+                                              new TestParam(STAX_PORT, false),
+                                              new TestParam(STAX_PORT, true),
         });
     }
 
@@ -96,8 +102,8 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -131,8 +137,8 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -146,7 +152,7 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         // This should fail, as the service requires a (bad) header
         portQName = new QName(NAMESPACE, "DoubleItRequiredPartsPort2");
@@ -176,8 +182,8 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -191,7 +197,7 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         // This should fail, as the service requires a (bad) header
         portQName = new QName(NAMESPACE, "DoubleItRequiredElementsPort2");
@@ -222,8 +228,8 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -237,7 +243,7 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         // This should fail, as the service requires that the Body must be signed
         portQName = new QName(NAMESPACE, "DoubleItSignedPartsPort2");
@@ -286,8 +292,8 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -301,7 +307,7 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         // This should fail, as the service requires that the To header must be signed
         portQName = new QName(NAMESPACE, "DoubleItSignedElementsPort2");
@@ -332,8 +338,8 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -347,7 +353,7 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         // This should fail, as the service requires that the Body must be encrypted
         portQName = new QName(NAMESPACE, "DoubleItEncryptedPartsPort2");
@@ -396,8 +402,8 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -411,7 +417,7 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         // This should fail, as the service requires that the header must be encrypted
         portQName = new QName(NAMESPACE, "DoubleItEncryptedElementsPort2");
@@ -446,8 +452,8 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -461,7 +467,7 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         // This should fail, as the service requires that the header must be encrypted
         portQName = new QName(NAMESPACE, "DoubleItEncryptedElementsPort2");
@@ -492,8 +498,8 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -507,7 +513,7 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         // This should fail, as the service requires that the header must be encrypted
         portQName = new QName(NAMESPACE, "DoubleItContentEncryptedElementsPort2");
@@ -538,8 +544,8 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -587,8 +593,8 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);

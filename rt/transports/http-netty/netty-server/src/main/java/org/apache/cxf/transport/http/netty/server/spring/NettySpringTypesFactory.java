@@ -53,7 +53,7 @@ public final class NettySpringTypesFactory {
     private static Map<String, ThreadingParameters> toThreadingParameters(
         List<ThreadingParametersIdentifiedType> list) {
 
-        Map<String, ThreadingParameters> map = new TreeMap<String, ThreadingParameters>();
+        Map<String, ThreadingParameters> map = new TreeMap<>();
         for (ThreadingParametersIdentifiedType t : list) {
             ThreadingParameters parameter = toThreadingParameters(t.getThreadingParameters());
             map.put(t.getId(), parameter);
@@ -69,7 +69,7 @@ public final class NettySpringTypesFactory {
 
     private static Map<String, TLSServerParameters> toTLSServerParamenters(
         List <TLSServerParametersIdentifiedType> list) {
-        Map<String, TLSServerParameters> map = new TreeMap<String, TLSServerParameters>();
+        Map<String, TLSServerParameters> map = new TreeMap<>();
         for (TLSServerParametersIdentifiedType t : list) {
             try {
                 TLSServerParameters parameter = new TLSServerParametersConfig(t.getTlsServerParameters());

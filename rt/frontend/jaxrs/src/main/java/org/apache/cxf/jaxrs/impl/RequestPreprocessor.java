@@ -56,6 +56,8 @@ public class RequestPreprocessor {
         PATHS_TO_SKIP = new HashSet<>();
         PATHS_TO_SKIP.add("swagger.json");
         PATHS_TO_SKIP.add("swagger.yaml");
+        PATHS_TO_SKIP.add("openapi.json");
+        PATHS_TO_SKIP.add("openapi.yaml");
     }
 
     private Map<Object, Object> languageMappings;

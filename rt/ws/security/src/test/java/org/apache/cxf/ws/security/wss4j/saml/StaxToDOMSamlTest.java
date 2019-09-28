@@ -46,12 +46,14 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * In these test-cases, the client is using StaX and the service is using DOM.
@@ -64,7 +66,7 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SAML_TOKEN_UNSIGNED);
         final Map<QName, Object> customMap = new HashMap<>();
         CustomSamlValidator validator = new CustomSamlValidator();
         customMap.put(WSConstants.SAML_TOKEN, validator);
@@ -84,7 +86,7 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.SAML_TOKEN_UNSIGNED);
         properties.setActions(actions);
         properties.setSamlCallbackHandler(new SAML1CallbackHandler());
@@ -101,7 +103,7 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SAML_TOKEN_UNSIGNED);
         final Map<QName, Object> customMap = new HashMap<>();
         CustomSamlValidator validator = new CustomSamlValidator();
         customMap.put(WSConstants.SAML_TOKEN, validator);
@@ -137,10 +139,10 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
 
         Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.SAML_TOKEN_UNSIGNED + " " + WSHandlerConstants.SIGNATURE
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.SAML_TOKEN_UNSIGNED + " " + ConfigurationConstants.SIGNATURE
         );
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         final Map<QName, Object> customMap = new HashMap<>();
         CustomSamlValidator validator = new CustomSamlValidator();
         customMap.put(WSConstants.SAML_TOKEN, validator);
@@ -158,7 +160,7 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.SAML_TOKEN_SIGNED);
         properties.setActions(actions);
         properties.setSamlCallbackHandler(new SAML1CallbackHandler());
@@ -181,10 +183,10 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
 
         Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.SAML_TOKEN_UNSIGNED + " " + WSHandlerConstants.SIGNATURE
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.SAML_TOKEN_UNSIGNED + " " + ConfigurationConstants.SIGNATURE
         );
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         final Map<QName, Object> customMap = new HashMap<>();
         CustomSamlValidator validator = new CustomSamlValidator();
         customMap.put(WSConstants.SAML_TOKEN, validator);
@@ -219,7 +221,7 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SAML_TOKEN_UNSIGNED);
         final Map<QName, Object> customMap = new HashMap<>();
         CustomSamlValidator validator = new CustomSamlValidator();
         validator.setRequireSAML1Assertion(false);
@@ -240,7 +242,7 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.SAML_TOKEN_UNSIGNED);
         properties.setActions(actions);
         properties.setSamlCallbackHandler(new SAML2CallbackHandler());
@@ -257,7 +259,7 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SAML_TOKEN_UNSIGNED);
         final Map<QName, Object> customMap = new HashMap<>();
         CustomSamlValidator validator = new CustomSamlValidator();
         validator.setRequireSAML1Assertion(false);
@@ -294,10 +296,10 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
 
         Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.SAML_TOKEN_UNSIGNED + " " + WSHandlerConstants.SIGNATURE
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.SAML_TOKEN_UNSIGNED + " " + ConfigurationConstants.SIGNATURE
         );
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         final Map<QName, Object> customMap = new HashMap<>();
         CustomSamlValidator validator = new CustomSamlValidator();
         validator.setRequireSAML1Assertion(false);
@@ -316,7 +318,7 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.SAML_TOKEN_SIGNED);
         properties.setActions(actions);
         properties.setSamlCallbackHandler(new SAML2CallbackHandler());
@@ -339,10 +341,10 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
 
         Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.SAML_TOKEN_UNSIGNED + " " + WSHandlerConstants.SIGNATURE
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.SAML_TOKEN_UNSIGNED + " " + ConfigurationConstants.SIGNATURE
         );
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         final Map<QName, Object> customMap = new HashMap<>();
         CustomSamlValidator validator = new CustomSamlValidator();
         validator.setRequireSAML1Assertion(false);
@@ -379,10 +381,10 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
 
         Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.SAML_TOKEN_SIGNED + " " + WSHandlerConstants.SIGNATURE
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.SAML_TOKEN_SIGNED + " " + ConfigurationConstants.SIGNATURE
         );
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         final Map<QName, Object> customMap = new HashMap<>();
         CustomSamlValidator validator = new CustomSamlValidator();
         customMap.put(WSConstants.SAML_TOKEN, validator);
@@ -400,7 +402,7 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.SAML_TOKEN_SIGNED);
         properties.setActions(actions);
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
@@ -439,10 +441,10 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
 
         Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.SAML_TOKEN_SIGNED + " " + WSHandlerConstants.SIGNATURE
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.SAML_TOKEN_SIGNED + " " + ConfigurationConstants.SIGNATURE
         );
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         final Map<QName, Object> customMap = new HashMap<>();
         CustomSamlValidator validator = new CustomSamlValidator();
         customMap.put(WSConstants.SAML_TOKEN, validator);
@@ -469,7 +471,6 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         outConfig.put(ConfigurationConstants.SIGNATURE_USER, "alice");
         outConfig.put(ConfigurationConstants.SIG_PROP_FILE, "alice.properties");
         outConfig.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
-        outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new PasswordCallbackHandler());
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(outConfig);
 
         client.getOutInterceptors().add(ohandler);
@@ -492,10 +493,10 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
 
         Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.SAML_TOKEN_SIGNED + " " + WSHandlerConstants.SIGNATURE
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.SAML_TOKEN_SIGNED + " " + ConfigurationConstants.SIGNATURE
         );
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         final Map<QName, Object> customMap = new HashMap<>();
         CustomSamlValidator validator = new CustomSamlValidator();
         customMap.put(WSConstants.SAML_TOKEN, validator);
@@ -513,7 +514,7 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.SAML_TOKEN_SIGNED);
         properties.setActions(actions);
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
@@ -560,10 +561,10 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
 
         Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.SAML_TOKEN_SIGNED + " " + WSHandlerConstants.SIGNATURE
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.SAML_TOKEN_SIGNED + " " + ConfigurationConstants.SIGNATURE
         );
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         final Map<QName, Object> customMap = new HashMap<>();
         CustomSamlValidator validator = new CustomSamlValidator();
         customMap.put(WSConstants.SAML_TOKEN, validator);
@@ -590,7 +591,6 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         outConfig.put(ConfigurationConstants.SIGNATURE_USER, "alice");
         outConfig.put(ConfigurationConstants.SIG_PROP_FILE, "alice.properties");
         outConfig.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
-        outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new PasswordCallbackHandler());
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(outConfig);
 
         client.getOutInterceptors().add(ohandler);

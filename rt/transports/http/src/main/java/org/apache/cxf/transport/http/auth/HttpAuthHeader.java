@@ -84,12 +84,12 @@ public final class HttpAuthHeader {
                 if (!first) {
                     builder.append(", ");
                 }
-                if (entry.getKey().equals("nc")
-                    || entry.getKey().equals("qop")
-                    || entry.getKey().equals("algorithm")) {
-                    builder.append(entry.getKey() + "=" + param + "");
+                if ("nc".equals(entry.getKey())
+                    || "qop".equals(entry.getKey())
+                    || "algorithm".equals(entry.getKey())) {
+                    builder.append(entry.getKey()).append('=').append(param);
                 } else {
-                    builder.append(entry.getKey() + "=\"" + param + "\"");
+                    builder.append(entry.getKey()).append("=\"").append(param).append('"');
                 }
                 first = false;
             }
@@ -116,13 +116,13 @@ public final class HttpAuthHeader {
                 if ("nc".equals(key)) {
                     //nc is a 8 length HEX number so need get it as number
                     value = String.valueOf(tok.nval);
-                    if (value.indexOf(".") > 0) {
-                        value = value.substring(0, value.indexOf("."));
+                    if (value.indexOf('.') > 0) {
+                        value = value.substring(0, value.indexOf('.'));
                     }
                     StringBuilder pad = new StringBuilder();
                     pad.append("");
                     for (int i = 0; i < 8 - value.length(); i++) {
-                        pad.append("0");
+                        pad.append('0');
                     }
                     value = pad.toString() + value;
                 } else {
@@ -157,7 +157,7 @@ public final class HttpAuthHeader {
     }
 
     public boolean authTypeIsNegotiate() {
-        return AUTH_TYPE_DIGEST.equals(this.authType);
+        return AUTH_TYPE_NEGOTIATE.equals(this.authType);
     }
 
     public String getAuthType() {

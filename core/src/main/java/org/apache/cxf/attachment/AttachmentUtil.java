@@ -34,6 +34,7 @@ import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -53,6 +54,7 @@ import javax.activation.MailcapCommandMap;
 import javax.activation.URLDataSource;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
@@ -133,13 +135,12 @@ public final class AttachmentUtil {
             String[] mimeTypes = super.getMimeTypes();
             String[] defMimeTypes = DEFAULT_COMMAND_MAP.getMimeTypes();
             Set<String> mimeTypeSet = new HashSet<>();
-            mimeTypeSet.addAll(Arrays.asList(mimeTypes));
-            mimeTypeSet.addAll(Arrays.asList(defMimeTypes));
+            Collections.addAll(mimeTypeSet, mimeTypes);
+            Collections.addAll(mimeTypeSet, defMimeTypes);
             String[] mimeArray = new String[0];
             return mimeTypeSet.toArray(mimeArray);
         }
     }
-
 
 
     private AttachmentUtil() {
@@ -156,8 +157,7 @@ public final class AttachmentUtil {
     }
 
     public static boolean isMtomEnabled(Message message) {
-        Object prop = message.getContextualProperty(Message.MTOM_ENABLED);
-        return MessageUtils.isTrue(prop);
+        return MessageUtils.getContextualBoolean(message, Message.MTOM_ENABLED, false);
     }
 
     public static void setStreamedAttachmentProperties(Message message, CachedOutputStream bos)
@@ -178,7 +178,8 @@ public final class AttachmentUtil {
             } else {
                 bos.setThreshold(Long.parseLong((String)threshold));
             }
-        } else {
+        } else if (!CachedOutputStream.isThresholdSysPropSet()) {
+            // Use the default AttachmentDeserializer Threshold only if there is no system property defined
             bos.setThreshold(AttachmentDeserializer.THRESHOLD);
         }
 
@@ -219,8 +220,8 @@ public final class AttachmentUtil {
         //we don't need the cryptographically secure random uuid that
         //UUID.randomUUID() will produce.  Thus, use a faster
         //pseudo-random thing
-        long leastSigBits = 0;
-        long mostSigBits = 0;
+        long leastSigBits;
+        long mostSigBits;
         synchronized (BOUND_RANDOM) {
             mostSigBits = BOUND_RANDOM.nextLong();
             leastSigBits = BOUND_RANDOM.nextLong();
@@ -357,14 +358,7 @@ public final class AttachmentUtil {
     }
     static String getHeaderValue(List<String> v, String delim) {
         if (v != null && !v.isEmpty()) {
-            StringBuilder b = new StringBuilder();
-            for (String s : v) {
-                if (b.length() > 0) {
-                    b.append(delim);
-                }
-                b.append(s);
-            }
-            return b.toString();
+            return String.join(delim, v);
         }
         return null;
     }
@@ -389,7 +383,7 @@ public final class AttachmentUtil {
 
         for (Map.Entry<String, List<String>> e : headers.entrySet()) {
             String name = e.getKey();
-            if (name.equalsIgnoreCase("Content-Transfer-Encoding")) {
+            if ("Content-Transfer-Encoding".equalsIgnoreCase(name)) {
                 encoding = getHeader(headers, name);
                 if ("binary".equalsIgnoreCase(encoding)) {
                     att.setXOP(true);
@@ -400,13 +394,13 @@ public final class AttachmentUtil {
         if (encoding == null) {
             encoding = "binary";
         }
-        InputStream ins =  decode(stream, encoding);
+        InputStream ins = decode(stream, encoding);
         if (ins != stream) {
             headers.remove("Content-Transfer-Encoding");
         }
         DataSource source = new AttachmentDataSource(ct, ins);
         if (!StringUtils.isEmpty(fileName)) {
-            ((AttachmentDataSource)source).setName(fileName);
+            ((AttachmentDataSource)source).setName(FileUtils.stripPath(fileName));
         }
         att.setDataHandler(new DataHandler(source));
         return att;
@@ -416,7 +410,6 @@ public final class AttachmentUtil {
         if (StringUtils.isEmpty(cd)) {
             return null;
         }
-        //TODO: save ContentDisposition directly
         ContentDisposition c = new ContentDisposition(cd);
         String s = c.getParameter("filename");
         if (s == null) {

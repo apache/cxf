@@ -24,9 +24,7 @@
 	xmlns:x1="http://cxf.apache.org/hello_world_jms/types" 
 	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
 	xmlns:tns="http://cxf.apache.org/hello_world_jms" 
-	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xsi:schemaLocation="http://www.w3.org/2010/soapjms/ http://svn.apache.org/repos/asf/cxf/tags/cxf-2.7.7/rt/transports/jms/src/main/resources/schemas/wsdl/spec/jms-spec-wsdl.xsd ">
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <types>
         <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://cxf.apache.org/hello_world_jms/types" targetNamespace="http://cxf.apache.org/hello_world_jms/types" elementFormDefault="qualified">
             <complexType name="ErrorCode">

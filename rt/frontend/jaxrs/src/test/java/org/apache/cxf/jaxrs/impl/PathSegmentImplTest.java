@@ -22,10 +22,11 @@ package org.apache.cxf.jaxrs.impl;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class PathSegmentImplTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class PathSegmentImplTest {
 
     @Test
     public void testPlainPathSegment() {

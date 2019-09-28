@@ -27,6 +27,8 @@ import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.webapp.WebXmlConfiguration;
 
+import static org.junit.Assert.fail;
+
 public abstract class AbstractJettyServer extends AbstractBusTestServerBase {
     private org.eclipse.jetty.server.Server server;
     private final Resource[] resources;

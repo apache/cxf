@@ -23,13 +23,17 @@ package org.apache.cxf.helpers;
 import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.message.Message;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ServiceUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class ServiceUtilsTest {
     private IMocksControl control;
     private Message msg;
 
@@ -163,11 +167,9 @@ public class ServiceUtilsTest extends Assert {
 
     private void setupSchemaValidationValue(Object value, boolean isRequestor) {
         control.reset();
-        msg.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED);
-        EasyMock.expectLastCall().andReturn(value);
+        EasyMock.expect(msg.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED)).andReturn(value);
 
-        msg.get(Message.REQUESTOR_ROLE);
-        EasyMock.expectLastCall().andReturn(isRequestor);
+        EasyMock.expect(msg.get(Message.REQUESTOR_ROLE)).andReturn(isRequestor);
 
         control.replay();
     }

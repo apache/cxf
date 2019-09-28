@@ -19,20 +19,24 @@
 package org.apache.cxf.interceptor.security;
 
 import java.security.Principal;
-import java.security.acl.Group;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.security.auth.Subject;
 
+import org.apache.cxf.common.security.GroupPrincipal;
 import org.apache.cxf.common.security.SimpleGroup;
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.security.LoginSecurityContext;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class DefaultSecurityContextTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+public class DefaultSecurityContextTest {
 
     @Test
     public void testUserNotInRole() {
@@ -82,7 +86,7 @@ public class DefaultSecurityContextTest extends Assert {
         Subject s = new Subject();
         Principal p = new SimplePrincipal("Barry");
         s.getPrincipals().add(p);
-        Group group = new SimpleGroup("Roles", p);
+        GroupPrincipal group = new SimpleGroup("Roles", p);
         group.addMember(new SimpleGroup("friend"));
         s.getPrincipals().add(group);
         assertTrue(new DefaultSecurityContext(p, s).isUserInRole("friend"));
@@ -93,8 +97,8 @@ public class DefaultSecurityContextTest extends Assert {
         Subject s = new Subject();
         Principal p = new SimplePrincipal("Barry");
         s.getPrincipals().add(p);
-        Group group = new SimpleGroup("Roles", p);
-        Group subgroup = new SimpleGroup("subgroup");
+        GroupPrincipal group = new SimpleGroup("Roles", p);
+        GroupPrincipal subgroup = new SimpleGroup("subgroup");
         subgroup.addMember(new SimpleGroup("friend"));
         group.addMember(subgroup);
         s.getPrincipals().add(group);

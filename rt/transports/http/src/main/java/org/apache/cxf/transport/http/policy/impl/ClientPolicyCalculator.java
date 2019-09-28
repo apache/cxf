@@ -67,6 +67,7 @@ public class ClientPolicyCalculator implements PolicyCalculator<HTTPClientPolicy
                   && (p1.isSetProxyServerPort() ? p1.getProxyServerPort() == p2.getProxyServerPort() : !p2
                       .isSetProxyServerPort())
                   && p1.getProxyServerType().value().equals(p2.getProxyServerType().value())
+                  && (p1.getConnectionRequestTimeout() == p2.getConnectionRequestTimeout())
                   && (p1.getReceiveTimeout() == p2.getReceiveTimeout())
                   && StringUtils.equals(p1.getReferer(), p2.getReferer());
 
@@ -140,6 +141,11 @@ public class ClientPolicyCalculator implements PolicyCalculator<HTTPClientPolicy
             p.setConnectionTimeout(p1.getConnectionTimeout());
         } else if (p2.isSetConnectionTimeout()) {
             p.setConnectionTimeout(p2.getConnectionTimeout());
+        }
+        if (p1.isSetConnectionRequestTimeout()) {
+            p.setConnectionRequestTimeout(p1.getConnectionRequestTimeout());
+        } else if (p2.isSetConnectionRequestTimeout()) {
+            p.setConnectionRequestTimeout(p2.getConnectionRequestTimeout());
         }
         if (p1.isSetReceiveTimeout()) {
             p.setReceiveTimeout(p1.getReceiveTimeout());
@@ -258,7 +264,7 @@ public class ClientPolicyCalculator implements PolicyCalculator<HTTPClientPolicy
     }
     
     public static String toString(HTTPClientPolicy p) {
-        StringBuilder buf = new StringBuilder();
+        StringBuilder buf = new StringBuilder(64);
         buf.append(p);
         buf.append("[DecoupledEndpoint=\"");
         buf.append(p.getDecoupledEndpoint());

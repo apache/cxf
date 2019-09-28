@@ -58,6 +58,10 @@ import org.apache.cxf.ws.rm.RMManager;
 import org.junit.After;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Tests the operation of InOrder delivery assurance for one-way messages to the server.
  */
@@ -103,7 +107,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
 
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getConfiguration().setBaseRetransmissionInterval(new Long(1000));
+        manager.getConfiguration().setBaseRetransmissionInterval(Long.valueOf(1000));
         String[] callArgs = new String[] {"one", "two", "three", "four", "five", "six",
                                           "seven", "eight", "nine"};
         for (int i = 0; i < callArgs.length; i++) {
@@ -149,7 +153,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
 
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
+        manager.getConfiguration().setBaseRetransmissionInterval(Long.valueOf(2000));
         String[] callArgs = new String[] {"one", "two", "three", "four"};
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
@@ -183,7 +187,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
 
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
+        manager.getConfiguration().setBaseRetransmissionInterval(Long.valueOf(2000));
         String[] callArgs = new String[] {"one", "two", "three", "four"};
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
@@ -222,7 +226,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
 
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
+        manager.getConfiguration().setBaseRetransmissionInterval(Long.valueOf(2000));
         String[] callArgs = new String[] {"one", "two", "three", "four"};
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
@@ -238,7 +242,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
             assertTrue("Message out of order", argNum < callArgs.length);
         }
     }
-    
+
     @Test
     public void testOnewayAtLeastOnceInOrderDelay() throws Exception {
         int numMessages = 4;
@@ -292,7 +296,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
 
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
+        manager.getConfiguration().setBaseRetransmissionInterval(Long.valueOf(2000));
         String[] callArgs = new String[] {"one", "two", "three", "four"};
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
@@ -325,7 +329,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
 
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
+        manager.getConfiguration().setBaseRetransmissionInterval(Long.valueOf(2000));
         String[] callArgs = new String[] {"one", "two", "three", "four"};
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
@@ -499,17 +503,16 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
                     CALL_ARGS.add(s);
                 }
                 return null;
-            } else {
-                synchronized (CALL_ARGS) {
-                    CALL_ARGS.add(s);
-                }
-                String resp =
-                    "<greetMeResponse "
-                        + "xmlns=\"http://cxf.apache.org/greeter_control/types\">"
-                        + "<responseType>" + s.toUpperCase() + "</responseType>"
-                    + "</greetMeResponse>";
-                return new StreamSource(new StringReader(resp));
             }
+            synchronized (CALL_ARGS) {
+                CALL_ARGS.add(s);
+            }
+            String resp =
+                "<greetMeResponse "
+                    + "xmlns=\"http://cxf.apache.org/greeter_control/types\">"
+                    + "<responseType>" + s.toUpperCase() + "</responseType>"
+                + "</greetMeResponse>";
+            return new StreamSource(new StringReader(resp));
         }
     }
 }

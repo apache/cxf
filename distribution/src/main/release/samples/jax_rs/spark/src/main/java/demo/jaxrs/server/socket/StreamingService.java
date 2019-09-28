@@ -59,8 +59,7 @@ public class StreamingService {
     }
     private Executor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
                                                        new ArrayBlockingQueue<Runnable>(10));
-    private Map<String, BlockingQueue<String>> sparkResponses =
-        new ConcurrentHashMap<String, BlockingQueue<String>>();
+    private Map<String, BlockingQueue<String>> sparkResponses = new ConcurrentHashMap<>();
     private PrintStream sparkOutputStream;
 
     public StreamingService(BufferedReader sparkInputStream, PrintStream sparkOutputStream) {

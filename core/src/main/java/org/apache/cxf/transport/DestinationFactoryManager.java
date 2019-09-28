@@ -19,6 +19,8 @@
 
 package org.apache.cxf.transport;
 
+import java.util.Set;
+
 import org.apache.cxf.BusException;
 
 /**
@@ -42,6 +44,12 @@ public interface DestinationFactoryManager {
      * <code>DestinationFactory</code>.
      */
     void deregisterDestinationFactory(String name);
+    
+    /**
+     * Returns all registered (as of the moment of the call) destination factories.
+     * @return all registered (as of the moment of the call) destination factories.
+     */
+    Set<String> getRegisteredDestinationFactoryNames();
 
     /**
      * Returns the <code>DestinationFactory</code> registered with the specified name,
@@ -53,5 +61,13 @@ public interface DestinationFactoryManager {
      */
     DestinationFactory getDestinationFactory(String name) throws BusException;
 
+    /**
+     * Returns the <code>DestinationFactory</code> registered with the specified URI,
+     * loading the appropriate plugin if necessary.
+     *
+     * @param uri the uri to look up <code>DestinationFactory</code>
+     * @return the registered <code>DestinationFactory</code>
+     * @throws BusException
+     */
     DestinationFactory getDestinationFactoryForUri(String uri);
 }

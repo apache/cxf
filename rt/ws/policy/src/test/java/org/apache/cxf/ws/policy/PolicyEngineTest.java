@@ -51,17 +51,23 @@ import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 import org.apache.neethi.PolicyReference;
 import org.apache.neethi.PolicyRegistry;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  */
-public class PolicyEngineTest extends Assert {
+public class PolicyEngineTest {
 
     private IMocksControl control;
     private PolicyEngineImpl engine;
@@ -93,7 +99,7 @@ public class PolicyEngineTest extends Assert {
         assertNull(engine.getBus());
         assertNotNull(engine.getPolicyProviders());
         assertNull(engine.getAlternativeSelector());
-        assertTrue(!engine.isEnabled());
+        assertFalse(engine.isEnabled());
         Bus bus = new ExtensionManagerBus();
 
         engine.setBus(bus);
@@ -383,10 +389,10 @@ public class PolicyEngineTest extends Assert {
         engine = new PolicyEngineImpl(enabled);
 
         Bus bus = control.createMock(Bus.class);
-        List<Interceptor<? extends Message>> out = new ArrayList<Interceptor<? extends Message>>();
-        List<Interceptor<? extends Message>> in = new ArrayList<Interceptor<? extends Message>>();
-        List<Interceptor<? extends Message>> inFault = new ArrayList<Interceptor<? extends Message>>();
-        List<Interceptor<? extends Message>> outFault = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> out = new ArrayList<>();
+        List<Interceptor<? extends Message>> in = new ArrayList<>();
+        List<Interceptor<? extends Message>> inFault = new ArrayList<>();
+        List<Interceptor<? extends Message>> outFault = new ArrayList<>();
         if (enabled) {
             EasyMock.expect(bus.getOutInterceptors()).andReturn(out).times(1);
             EasyMock.expect(bus.getInInterceptors()).andReturn(in).times(1);

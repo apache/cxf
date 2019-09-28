@@ -60,6 +60,6 @@ public class CD {
     }
 
     public int hashCode() {
-        return name.hashCode() + new Long(id).hashCode();
+        return name.hashCode() + Long.valueOf(id).hashCode();
     }
 }

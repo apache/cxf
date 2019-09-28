@@ -36,7 +36,6 @@ import org.apache.cxf.rs.security.common.RSSecurityUtils;
 import org.apache.cxf.rs.security.saml.assertion.Subject;
 import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
@@ -87,7 +86,7 @@ public final class SAMLUtils {
     }
 
     private static org.opensaml.saml.saml1.core.Subject getSaml1Subject(SamlAssertionWrapper assertionW) {
-        for (Statement stmt : ((org.opensaml.saml.saml1.core.Assertion)assertionW.getSaml1()).getStatements()) {
+        for (Statement stmt : assertionW.getSaml1().getStatements()) {
             org.opensaml.saml.saml1.core.Subject samlSubject = null;
             if (stmt instanceof AttributeStatement) {
                 AttributeStatement attrStmt = (AttributeStatement) stmt;
@@ -151,8 +150,7 @@ public final class SAMLUtils {
                 }
 
                 String password =
-                    RSSecurityUtils.getPassword(message, user, WSPasswordCallback.SIGNATURE,
-                            SAMLUtils.class);
+                    RSSecurityUtils.getSignaturePassword(message, user, SAMLUtils.class);
 
                 assertion.signAssertion(user, password, crypto, false,
                                         samlCallback.getCanonicalizationAlgorithm(),

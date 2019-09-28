@@ -26,7 +26,6 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Service;
 
-import org.apache.commons.logging.Log;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -34,10 +33,11 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 
-public abstract class AbstractColocTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+
+public abstract class AbstractColocTest {
     public static final String PORT = TestUtil.getPortNumber(AbstractColocTest.class);
 
     /**
@@ -62,7 +62,7 @@ public abstract class AbstractColocTest extends Assert {
             if (cxfConfig == null) {
                 throw new Exception("Make sure " + getCxfConfig() + " is in the CLASSPATH");
             }
-            assertTrue(cxfConfig.toExternalForm() != null);
+            assertNotNull(cxfConfig.toExternalForm());
         }
 
         //Bus is shared by client, router and server.
@@ -80,8 +80,6 @@ public abstract class AbstractColocTest extends Assert {
      */
     @After
     public void tearDown() throws Exception {
-
-        getLogger().debug("tearDown ...");
 
         if (endpoint != null) {
             endpoint.stop();
@@ -116,11 +114,6 @@ public abstract class AbstractColocTest extends Assert {
      * @return the greeter impl object
      */
     protected abstract Object getServiceImpl();
-
-    /**
-     * @return logger object
-     */
-    protected abstract Log getLogger();
 
     /**
      * @return transport URI for the WS Endpoint

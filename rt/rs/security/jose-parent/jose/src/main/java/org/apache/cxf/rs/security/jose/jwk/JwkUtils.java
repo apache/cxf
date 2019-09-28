@@ -56,7 +56,6 @@ import org.apache.cxf.rs.security.jose.common.JoseException;
 import org.apache.cxf.rs.security.jose.common.JoseHeaders;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.common.KeyManagementUtils;
-import org.apache.cxf.rs.security.jose.common.PrivateKeyPasswordProvider;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
@@ -74,6 +73,7 @@ import org.apache.cxf.rs.security.jose.jwe.PbesHmacAesWrapKeyEncryptionAlgorithm
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
+import org.apache.cxf.rt.security.rs.PrivateKeyPasswordProvider;
 
 public final class JwkUtils {
     private static final Map<KeyType, List<String>> JWK_REQUIRED_FIELDS_MAP;
@@ -244,10 +244,18 @@ public final class JwkUtils {
     }
     public static JsonWebKeys loadJwkSet(Message m, Properties props, PrivateKeyPasswordProvider cb) {
         String key = (String)props.get(JoseConstants.RSSEC_KEY_STORE_FILE);
-        JsonWebKeys jwkSet = key != null ? (JsonWebKeys)m.getExchange().get(key) : null;
+        JsonWebKeys jwkSet = null;
+        if (key != null && m != null) {
+            Object jwkSetProp = m.getExchange().get(key);
+            if (jwkSetProp != null && !(jwkSetProp instanceof JsonWebKeys)) {
+                throw new JwkException("Unexpected key store class: " + jwkSetProp.getClass().getName());
+            } else {
+                jwkSet = (JsonWebKeys)jwkSetProp;
+            }
+        }
         if (jwkSet == null) {
-            jwkSet = loadJwkSet(props, m.getExchange().getBus(), cb);
-            if (key != null) {
+            jwkSet = loadJwkSet(props, m != null ? m.getExchange().getBus() : null, cb);
+            if (key != null && m != null) {
                 m.getExchange().put(key, jwkSet);
             }
         }
@@ -263,13 +271,12 @@ public final class JwkUtils {
         String keyContent = null;
         String keyStoreLoc = props.getProperty(JoseConstants.RSSEC_KEY_STORE_FILE);
         if (keyStoreLoc != null) {
-            try {
-                InputStream is = JoseUtils.getResourceStream(keyStoreLoc, bus);
-                if (is == null) {
+            try (InputStream isResource = JoseUtils.getResourceStream(keyStoreLoc, bus)) {
+                if (isResource == null) {
                     throw new JwkException("Error in loading keystore location: " + keyStoreLoc);
                 }
-                keyContent = IOUtils.readStringFromStream(is);
-            } catch (Exception ex) {
+                keyContent = IOUtils.readStringFromStream(isResource);
+            } catch (IOException ex) {
                 throw new JwkException(ex);
             }
         } else {
@@ -284,10 +291,9 @@ public final class JwkUtils {
         JwkReaderWriter reader = new JwkReaderWriter();
         if (props.getProperty(JoseConstants.RSSEC_KEY_STORE_JWKKEY) == null) {
             return reader.jsonToJwkSet(keyContent);
-        } else {
-            JsonWebKey jwk = reader.jsonToJwk(keyContent);
-            return new JsonWebKeys(jwk);
         }
+        JsonWebKey jwk = reader.jsonToJwk(keyContent);
+        return new JsonWebKeys(jwk);
     }
 
     public static JsonWebKey loadJsonWebKey(Message m, Properties props, KeyOperation keyOper) {
@@ -415,24 +421,23 @@ public final class JwkUtils {
         String encodedPrimeP = (String)jwk.getProperty(JsonWebKey.RSA_FIRST_PRIME_FACTOR);
         if (encodedPrimeP == null) {
             return CryptoUtils.getRSAPrivateKey(encodedModulus, encodedPrivateExponent);
-        } else {
-            String encodedPublicExponent = (String)jwk.getProperty(JsonWebKey.RSA_PUBLIC_EXP);
-            if (encodedPublicExponent == null) {
-                throw new JoseException("JWK without the public exponent can not be converted to RSAPrivateKey");
-            }
-            String encodedPrimeQ = (String)jwk.getProperty(JsonWebKey.RSA_SECOND_PRIME_FACTOR);
-            String encodedPrimeExpP = (String)jwk.getProperty(JsonWebKey.RSA_FIRST_PRIME_CRT);
-            String encodedPrimeExpQ = (String)jwk.getProperty(JsonWebKey.RSA_SECOND_PRIME_CRT);
-            String encodedCrtCoefficient = (String)jwk.getProperty(JsonWebKey.RSA_FIRST_CRT_COEFFICIENT);
-            return CryptoUtils.getRSAPrivateKey(encodedModulus,
-                                                encodedPublicExponent,
-                                                encodedPrivateExponent,
-                                                encodedPrimeP,
-                                                encodedPrimeQ,
-                                                encodedPrimeExpP,
-                                                encodedPrimeExpQ,
-                                                encodedCrtCoefficient);
         }
+        String encodedPublicExponent = (String)jwk.getProperty(JsonWebKey.RSA_PUBLIC_EXP);
+        if (encodedPublicExponent == null) {
+            throw new JoseException("JWK without the public exponent can not be converted to RSAPrivateKey");
+        }
+        String encodedPrimeQ = (String)jwk.getProperty(JsonWebKey.RSA_SECOND_PRIME_FACTOR);
+        String encodedPrimeExpP = (String)jwk.getProperty(JsonWebKey.RSA_FIRST_PRIME_CRT);
+        String encodedPrimeExpQ = (String)jwk.getProperty(JsonWebKey.RSA_SECOND_PRIME_CRT);
+        String encodedCrtCoefficient = (String)jwk.getProperty(JsonWebKey.RSA_FIRST_CRT_COEFFICIENT);
+        return CryptoUtils.getRSAPrivateKey(encodedModulus,
+                                            encodedPublicExponent,
+                                            encodedPrivateExponent,
+                                            encodedPrimeP,
+                                            encodedPrimeQ,
+                                            encodedPrimeExpP,
+                                            encodedPrimeExpQ,
+                                            encodedCrtCoefficient);
     }
     public static JsonWebKey fromRSAPrivateKey(RSAPrivateKey pk, String algo) {
         return fromRSAPrivateKey(pk, algo, null);

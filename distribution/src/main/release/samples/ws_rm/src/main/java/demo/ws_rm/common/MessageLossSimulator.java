@@ -50,7 +50,7 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
         addBefore(MessageSenderInterceptor.class.getName());
     }
 
-
+    // CHECKSTYLE:OFF: ReturnCount 
     public void handleMessage(Message message) throws Fault {
         AddressingProperties maps =
             RMContextUtils.retrieveMAPs(message, false, true);
@@ -96,6 +96,7 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
 
         });
     }
+    // CHECKSTYLE:ON: ReturnCount 
 
     private class WrappedOutputStream extends AbstractWrappedOutputStream {
 

@@ -27,7 +27,7 @@ public class BookContinuationServlet3Server extends AbstractSpringServer {
         super("/jaxrs_async", Integer.valueOf(PORT));
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         try {
             BookContinuationServlet3Server s = new BookContinuationServlet3Server();
             s.start();

@@ -113,17 +113,16 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
             } catch (XmlSchemaException ex) {
                 throw new ServiceConstructionException(new Message("SERVICE_CREATION_MSG", LOG), ex);
             }
-            if (services.size() == 0) {
+            if (services.isEmpty()) {
                 throw new ServiceConstructionException(new Message("NO_SERVICE_EXC", LOG));
-            } else {
-                //@@TODO  - this isn't good, need to return all the services
-                serviceName = services.get(0).getName();
-                //get all the service info's that match that first one.
-                Iterator<ServiceInfo> it = services.iterator();
-                while (it.hasNext()) {
-                    if (!it.next().getName().equals(serviceName)) {
-                        it.remove();
-                    }
+            }
+            //@@TODO  - this isn't good, need to return all the services
+            serviceName = services.get(0).getName();
+            //get all the service info's that match that first one.
+            Iterator<ServiceInfo> it = services.iterator();
+            while (it.hasNext()) {
+                if (!it.next().getName().equals(serviceName)) {
+                    it.remove();
                 }
             }
         } else {
@@ -162,7 +161,7 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
                 services = new WSDLServiceBuilder(getBus()).buildServices(definition,
                                                                           wsdlService,
                                                                           endpointName);
-                if (services.size() == 0) {
+                if (services.isEmpty()) {
                     throw new ServiceConstructionException(
                         new Message("NO_SUCH_ENDPOINT_EXC", LOG, endpointName));
                 }

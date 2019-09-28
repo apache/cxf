@@ -31,6 +31,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
@@ -134,7 +135,8 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
                     List<?> handlers =
                         ctx.getDelegate().parseListElement(elem, bean.getBeanDefinition());
                     bean.addPropertyValue("handlers", handlers);
-                } else if ("sessionSupport".equals(name) || "reuseAddress".equals(name)) {
+                } else if ("sessionTimeout".equals(name) 
+                    || "sessionSupport".equals(name) || "reuseAddress".equals(name)) {
                     String text = elem.getTextContent();
                     bean.addPropertyValue(name, text);
                 }

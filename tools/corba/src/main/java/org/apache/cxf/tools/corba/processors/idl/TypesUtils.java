@@ -90,9 +90,9 @@ public final class TypesUtils {
         do {
             id++;
             StringBuilder name = new StringBuilder();
-            name.append("_");
-            name.append("Anon" + id.toString());
-            name.append("_");
+            name.append('_');
+            name.append("Anon").append(id.toString());
+            name.append('_');
             name.append(scope.tail());
             scopedName = new Scope(scope.getParent(), name.toString());
             QName scopedQName = new QName(schema.getTargetNamespace(), scopedName.toString());

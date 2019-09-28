@@ -37,6 +37,8 @@ import org.apache.cxf.phase.Phase;
  */
 public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
 
+    public static final String JMS_SOAP_ACTION_VALUE = "jms.soap.action.value";
+
     public SoapJMSInInterceptor() {
         super(Phase.RECEIVE);
         addAfter(AttachmentInInterceptor.class.getName());
@@ -109,7 +111,7 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
         if (sa != null && !sa.isEmpty()) {
             soapAction = sa.get(0);
             if (soapAction != null && soapAction.startsWith("\"")) {
-                soapAction = soapAction.substring(1, soapAction.lastIndexOf("\""));
+                soapAction = soapAction.substring(1, soapAction.lastIndexOf('"'));
             }
         }
         if (ct != null && !ct.isEmpty()) {
@@ -117,11 +119,11 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
         }
         if (contentType != null && contentType.indexOf("action=") != -1) {
             contentTypeAction = contentType.substring(contentType.indexOf("action=") + 7);
-            if (contentTypeAction.indexOf(";") != -1) {
-                contentTypeAction = contentTypeAction.substring(0, contentTypeAction.indexOf(";"));
+            if (contentTypeAction.indexOf(';') != -1) {
+                contentTypeAction = contentTypeAction.substring(0, contentTypeAction.indexOf(';'));
             }
             if (contentTypeAction.startsWith("\"")) {
-                contentTypeAction = contentTypeAction.substring(1, contentTypeAction.lastIndexOf("\""));
+                contentTypeAction = contentTypeAction.substring(1, contentTypeAction.lastIndexOf('"'));
             }
         }
         if (contentTypeAction != null) {
@@ -139,6 +141,9 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
                 throw f;
             }
         }
+        if (soapAction != null) {
+            message.put(JMS_SOAP_ACTION_VALUE, soapAction);
+        }
     }
 
     /**
@@ -151,12 +156,12 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
         if (ru != null && !ru.isEmpty()) {
             String requestURI = ru.get(0);
             List<String> mr = headers.get(SoapJMSConstants.MALFORMED_REQUESTURI);
-            if (mr != null && !mr.isEmpty() && mr.get(0).equals("true")) {
+            if (mr != null && !mr.isEmpty() && "true".equals(mr.get(0))) {
                 jmsFault = JMSFaultFactory.createMalformedRequestURIFault(requestURI);
             }
 
             List<String> trn = headers.get(SoapJMSConstants.TARGET_SERVICE_IN_REQUESTURI);
-            if (trn != null && !trn.isEmpty() && trn.get(0).equals("true")) {
+            if (trn != null && !trn.isEmpty() && "true".equals(trn.get(0))) {
                 jmsFault = JMSFaultFactory.createTargetServiceNotAllowedInRequestURIFault();
             }
         } else {

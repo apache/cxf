@@ -19,7 +19,6 @@
 
 package org.apache.cxf.sts.claims;
 
-import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +34,7 @@ public class StaticEndpointClaimsHandler implements ClaimsHandler {
     private static final Logger LOG = LogUtils.getL7dLogger(StaticEndpointClaimsHandler.class);
 
     private Map<String, Map<String, String>> endpointClaimsMap;
-    private List<URI> supportedClaims;
+    private List<String> supportedClaims;
 
     public void setEndpointClaims(Map<String, Map<String, String>> userClaims) {
         this.endpointClaimsMap = userClaims;
@@ -45,11 +44,11 @@ public class StaticEndpointClaimsHandler implements ClaimsHandler {
         return endpointClaimsMap;
     }
 
-    public void setSupportedClaims(List<URI> supportedClaims) {
+    public void setSupportedClaims(List<String> supportedClaims) {
         this.supportedClaims = supportedClaims;
     }
 
-    public List<URI> getSupportedClaimTypes() {
+    public List<String> getSupportedClaimTypes() {
         return Collections.unmodifiableList(this.supportedClaims);
     }
 

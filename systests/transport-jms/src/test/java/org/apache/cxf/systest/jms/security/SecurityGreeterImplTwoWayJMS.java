@@ -20,6 +20,8 @@ package org.apache.cxf.systest.jms.security;
 
 import javax.jws.WebService;
 
+import org.apache.cxf.systest.jms.TwoWayJMSImplBase;
+
 @WebService(serviceName = "HelloWorldService",
             portName = "HelloWorldPort",
             endpointInterface = "org.apache.cxf.hello_world_jms.HelloWorldPortType",

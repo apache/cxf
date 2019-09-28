@@ -25,7 +25,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -45,7 +44,7 @@ public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInte
     public AbstractAuthorizingInInterceptor(boolean uniqueId) {
         super(null, Phase.PRE_INVOKE, uniqueId);
     }
-    public void handleMessage(Message message) throws Fault {
+    public void handleMessage(Message message) {
         Method method = getTargetMethod(message);
         SecurityContext sc = message.get(SecurityContext.class);
         if (sc != null && sc.getUserPrincipal() != null) {
@@ -80,7 +79,7 @@ public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInte
 
             List<String> denyRoles = getDenyRoles(method);
 
-            return denyRoles.isEmpty() ? true : isUserInRole(sc, denyRoles, true);
+            return denyRoles.isEmpty() || isUserInRole(sc, denyRoles, true);
         }
 
         if (isUserInRole(sc, expectedRoles, false)) {

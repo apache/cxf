@@ -40,6 +40,11 @@ import org.apache.cxf.ws.rm.manager.SourcePolicyType;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Tests the decoupling the soap fault handling if the fault occurs after
  * the message is queued and retransmission is scheduled.
@@ -102,7 +107,7 @@ public class RetransmissionQueueTest extends AbstractBusClientServerTestBase {
         bus.getInFaultInterceptors().add(in);
         LoggingOutInterceptor out = new LoggingOutInterceptor();
         bus.getOutInterceptors().add(out);
-        bus.getExtension(RMManager.class).getConfiguration().setBaseRetransmissionInterval(new Long(4000));
+        bus.getExtension(RMManager.class).getConfiguration().setBaseRetransmissionInterval(Long.valueOf(4000));
 
         // an interceptor to simulate a transmission error
         MessageLossSimulator loser = new MessageLossSimulator();
@@ -137,7 +142,7 @@ public class RetransmissionQueueTest extends AbstractBusClientServerTestBase {
         empty = manager.getRetransmissionQueue().isEmpty();
         assertTrue("RetransmissionQueue not cleared", empty);
     }
-    
+
     @Test
     public void testOnewayFaultHandlingWithoutRetry() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -148,7 +153,7 @@ public class RetransmissionQueueTest extends AbstractBusClientServerTestBase {
         bus.getInFaultInterceptors().add(in);
         LoggingOutInterceptor out = new LoggingOutInterceptor();
         bus.getOutInterceptors().add(out);
-        bus.getExtension(RMManager.class).getConfiguration().setBaseRetransmissionInterval(new Long(4000));
+        bus.getExtension(RMManager.class).getConfiguration().setBaseRetransmissionInterval(Long.valueOf(4000));
         SourcePolicyType sourcePolicy = new SourcePolicyType();
         RetryPolicyType retryP = new RetryPolicyType();
         retryP.setMaxRetries(0);

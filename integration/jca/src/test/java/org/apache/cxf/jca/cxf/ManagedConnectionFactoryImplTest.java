@@ -36,13 +36,20 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.connector.CXFConnectionFactory;
 import org.apache.hello_world_soap_http.Greeter;
+
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class ManagedConnectionFactoryImplTest extends Assert {
+
+public class ManagedConnectionFactoryImplTest {
 
     protected ManagedConnectionFactoryImpl mci;
 
@@ -97,7 +104,7 @@ public class ManagedConnectionFactoryImplTest extends Assert {
 
     @Test
     public void testSetEJBServicePropertiesPollInterval() throws Exception {
-        final Integer value = new Integer(10);
+        final Integer value = Integer.valueOf(10);
         Properties p = new Properties();
         ManagedConnectionFactoryImpl mcf = new ManagedConnectionFactoryImpl(p);
 
@@ -143,8 +150,7 @@ public class ManagedConnectionFactoryImplTest extends Assert {
         assertTrue("not Object's hashCode method", hashCodeMethod != Object.class
             .getDeclaredMethod("hashCode", (Class[])null));
         assertEquals("equal with its self", mci, mci);
-        assertTrue("not equal with another", !mci.equals(new ManagedConnectionFactoryImpl()));
-        assertTrue("not equal with another thing", !mci.equals(this));
+        assertNotEquals("not equal with another", mci, new ManagedConnectionFactoryImpl());
     }
 
     @Test

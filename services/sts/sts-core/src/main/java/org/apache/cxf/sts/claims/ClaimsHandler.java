@@ -19,7 +19,6 @@
 
 package org.apache.cxf.sts.claims;
 
-import java.net.URI;
 import java.util.List;
 
 import org.apache.cxf.rt.security.claims.ClaimCollection;
@@ -29,7 +28,7 @@ import org.apache.cxf.rt.security.claims.ClaimCollection;
  */
 public interface ClaimsHandler {
 
-    List<URI> getSupportedClaimTypes();
+    List<String> getSupportedClaimTypes();
 
     ProcessedClaimCollection retrieveClaimValues(ClaimCollection claims, ClaimsParameters parameters);
 

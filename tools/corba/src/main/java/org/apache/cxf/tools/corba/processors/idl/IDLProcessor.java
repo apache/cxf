@@ -77,9 +77,8 @@ public class IDLProcessor implements Processor {
     public AST getIDLTree() {
         if (parser != null) {
             return parser.getAST();
-        } else {
-            return null;
         }
+        return null;
     }
 
     private DefaultIncludeResolver getDefaultIncludeResolver(File currentDir) {

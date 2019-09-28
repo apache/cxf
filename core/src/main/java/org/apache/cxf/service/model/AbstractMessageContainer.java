@@ -32,7 +32,7 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
     protected QName mName;
     private OperationInfo operation;
     private Map<QName, MessagePartInfo> messageParts
-        = new LinkedHashMap<QName, MessagePartInfo>(4);
+        = new LinkedHashMap<>(4);
     private List<MessagePartInfo> outOfBandParts;
     private String documentation;
 
@@ -182,13 +182,8 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
         if (n == -1) {
             return null;
         }
-        for (MessagePartInfo mpi : getMessageParts()) {
-            if (n == 0) {
-                return mpi;
-            }
-            n--;
-        }
-        return null;
+        List<MessagePartInfo> mpis = getMessageParts();
+        return n < mpis.size() ? mpis.get(n) : null;
     }
 
 

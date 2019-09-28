@@ -56,6 +56,10 @@ import org.apache.cxf.ws.rm.persistence.jdbc.RMTxStore;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Tests the addition of WS-RM properties to application messages and the
  * exchange of WS-RM protocol messages.
@@ -76,7 +80,7 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
         String port;
         String pfx;
 
-        public Server(String args[]) {
+        public Server(String[] args) {
             port = args[0];
             pfx = args[1];
         }
@@ -96,7 +100,7 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
             bus.getOutFaultInterceptors().add(logOut);
 
             bus.getExtension(RMManager.class).getConfiguration()
-                .setBaseRetransmissionInterval(new Long(60000));
+                .setBaseRetransmissionInterval(Long.valueOf(60000));
 
             GreeterImpl implementor = new GreeterImpl();
             String address = "http://localhost:" + port + "/SoapContext/GreeterPort";
@@ -112,7 +116,7 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
             ep = null;
         }
 
-        public static void main(String args[]) {
+        public static void main(String[] args) {
             new Server(args).start();
         }
 
@@ -140,7 +144,7 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
         verifyRecovery();
     }
 
-    void startClient() throws Exception {
+    protected void startClient() throws Exception {
         LOG.fine("Creating greeter client");
         System.setProperty("db.name", getPrefix() + "-client");
         SpringBusFactory bf = new SpringBusFactory();
@@ -159,9 +163,9 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
         bus.getInInterceptors().add(in);
     }
 
-    void populateStore() throws Exception {
+    protected void populateStore() throws Exception {
 
-        bus.getExtension(RMManager.class).getConfiguration().setBaseRetransmissionInterval(new Long(60000));
+        bus.getExtension(RMManager.class).getConfiguration().setBaseRetransmissionInterval(Long.valueOf(60000));
         bus.getOutInterceptors().add(new MessageLossSimulator());
 
         greeter.greetMeOneWay("one");
@@ -194,7 +198,7 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
         mf.verifyAcknowledgements(new boolean[] {false, true, true}, false);
     }
 
-    void verifyStorePopulation() {
+    protected void verifyStorePopulation() {
 
         RMManager manager = bus.getExtension(RMManager.class);
         assertNotNull(manager);
@@ -221,14 +225,14 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
         assertEquals(0, msgs.size());
     }
 
-    void stopClient() {
+    protected void stopClient() {
         // ClientProxy.getClient(greeter).destroy();
         bus.shutdown(true);
     }
 
-    void populateStoreAfterRestart() throws Exception {
+    protected void populateStoreAfterRestart() throws Exception {
 
-        bus.getExtension(RMManager.class).getConfiguration().setBaseRetransmissionInterval(new Long(60000));
+        bus.getExtension(RMManager.class).getConfiguration().setBaseRetransmissionInterval(Long.valueOf(60000));
 
         greeter.greetMeOneWay("five");
 
@@ -270,7 +274,7 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
         }
     }
 
-    void recover() throws Exception {
+    protected void recover() throws Exception {
 
         // do nothing - resends should happen in the background
 
@@ -279,7 +283,7 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
 
     }
 
-    void verifyRecovery() throws Exception {
+    protected void verifyRecovery() throws Exception {
 
         RMManager manager = bus.getExtension(RMManager.class);
         assertNotNull(manager);

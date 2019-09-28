@@ -19,13 +19,14 @@
 
 package org.apache.cxf.transport.http_undertow.blueprint;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  *
  */
-public class HTTPUndertowTransportNamespaceHandlerTest extends Assert {
+public class HTTPUndertowTransportNamespaceHandlerTest {
     @Test
     public void testGetSchemaLocation() {
         HTTPUndertowTransportNamespaceHandler handler = new HTTPUndertowTransportNamespaceHandler();

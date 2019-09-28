@@ -109,7 +109,7 @@ public class SoapFault extends Fault {
 
     private void setRootSubCode(QName subCode) {
         if (subCodes == null) {
-            subCodes = new LinkedList<QName>();
+            subCodes = new LinkedList<>();
         } else {
             subCodes.clear();
         }
@@ -191,7 +191,7 @@ public class SoapFault extends Fault {
      */
     public void addSubCode(QName subCode) {
         if (subCodes == null) {
-            subCodes = new LinkedList<QName>();
+            subCodes = new LinkedList<>();
         }
         subCodes.add(subCode);
     }

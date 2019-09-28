@@ -23,6 +23,7 @@ import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.ws.rs.ext.ParamConverter;
 import javax.ws.rs.ext.ParamConverterProvider;
@@ -35,7 +36,7 @@ import org.apache.lucene.document.DateTools.Resolution;
  */
 public class DefaultParamConverterProvider implements ParamConverterProvider {
     private final Map< Class< ? >, ParamConverter< ? > > converters =
-            new HashMap< Class< ? >, ParamConverter< ? > >();
+            new HashMap<>();
 
     /**
      * Date type converter.
@@ -125,9 +126,9 @@ public class DefaultParamConverterProvider implements ParamConverterProvider {
     public <T> ParamConverter<T> getConverter(final Class<T> rawType, final Type genericType,
             final Annotation[] annotations) {
 
-        for (final Class< ? > type: converters.keySet()) {
-            if (type.isAssignableFrom(rawType)) {
-                return (ParamConverter<T>)converters.get(type);
+        for (final Entry<Class<?>, ParamConverter<?>> entry: converters.entrySet()) {
+            if (entry.getKey().isAssignableFrom(rawType)) {
+                return (ParamConverter<T>)entry.getValue();
             }
         }
 

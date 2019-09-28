@@ -51,7 +51,7 @@ public class Attachment implements Transferable {
 
     private DataHandler handler;
     private MultivaluedMap<String, String> headers =
-        new MetadataMap<String, String>(false, true);
+        new MetadataMap<>(false, true);
     private Object object;
     private Providers providers;
 
@@ -71,7 +71,7 @@ public class Attachment implements Transferable {
 
     public Attachment(String id, DataHandler dh, MultivaluedMap<String, String> headers) {
         handler = dh;
-        this.headers = new MetadataMap<String, String>(headers, false, true);
+        this.headers = new MetadataMap<>(headers, false, true);
         this.headers.putSingle("Content-ID", id);
     }
 
@@ -93,7 +93,7 @@ public class Attachment implements Transferable {
     public Attachment(String mediaType, Object object) {
         this(UUID.randomUUID().toString(), mediaType, object);
     }
-    
+
     public Attachment(String id, String mediaType, Object object) {
         this.object = object;
         if (id != null) {
@@ -111,7 +111,7 @@ public class Attachment implements Transferable {
         headers.putSingle("Content-Type", "application/octet-stream");
     }
 
-    Attachment(MultivaluedMap<String, String> headers, DataHandler handler, Object object) {
+    public Attachment(MultivaluedMap<String, String> headers, DataHandler handler, Object object) {
         this.headers = headers;
         this.handler = handler;
         this.object = object;
@@ -128,7 +128,7 @@ public class Attachment implements Transferable {
     }
 
     public MediaType getContentType() {
-        String value = handler != null && handler.getContentType() != null ? handler.getContentType() 
+        String value = handler != null && handler.getContentType() != null ? handler.getContentType()
             : headers.getFirst("Content-Type");
         return value == null ? MediaType.TEXT_PLAIN_TYPE : JAXRSUtils.toMediaType(value);
     }
@@ -162,7 +162,7 @@ public class Attachment implements Transferable {
 
     public String getHeader(String name) {
         List<String> header = headers.get(name);
-        if (header == null || header.size() == 0) {
+        if (header == null || header.isEmpty()) {
             return null;
         }
         StringBuilder sb = new StringBuilder();

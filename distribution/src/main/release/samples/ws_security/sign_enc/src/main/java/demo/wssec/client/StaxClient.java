@@ -50,7 +50,7 @@ public final class StaxClient {
     private StaxClient() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         try {
 
             SpringBusFactory bf = new SpringBusFactory();

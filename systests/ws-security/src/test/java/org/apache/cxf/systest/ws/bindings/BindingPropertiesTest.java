@@ -27,14 +27,20 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * This is a test for various properties associated with a security binding.
@@ -70,12 +76,12 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
+    public static Collection<TestParam> data() {
 
-        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
-                                                {new TestParam(PORT, true)},
-                                                {new TestParam(STAX_PORT, false)},
-                                                {new TestParam(STAX_PORT, true)},
+        return Arrays.asList(new TestParam[] {new TestParam(PORT, false),
+                                              new TestParam(PORT, true),
+                                              new TestParam(STAX_PORT, false),
+                                              new TestParam(STAX_PORT, true),
         });
     }
 
@@ -93,8 +99,8 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
         URL busFile = BindingPropertiesTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = BindingPropertiesTest.class.getResource("DoubleItBindings.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -108,7 +114,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         // This should fail, as OnlySignEntireHeadersAndBody is specified
         portQName = new QName(NAMESPACE, "DoubleItOnlySignPort");
@@ -138,8 +144,8 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
         URL busFile = BindingPropertiesTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = BindingPropertiesTest.class.getResource("DoubleItBindings.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -153,7 +159,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         // This should fail, as the client is not encrypting the signature is specified
         portQName = new QName(NAMESPACE, "DoubleItEncryptSignaturePort2");
@@ -184,8 +190,8 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
         URL busFile = BindingPropertiesTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = BindingPropertiesTest.class.getResource("DoubleItBindings.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -199,7 +205,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         // This should fail, as the client is not sending a Timestamp
         portQName = new QName(NAMESPACE, "DoubleItIncludeTimestampPort2");
@@ -230,8 +236,8 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
         URL busFile = BindingPropertiesTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = BindingPropertiesTest.class.getResource("DoubleItBindings.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -245,7 +251,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         // This should fail, as the client is not following the correct steps for this property
         portQName = new QName(NAMESPACE, "DoubleItEncryptBeforeSigningPort2");
@@ -276,8 +282,8 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
         URL busFile = BindingPropertiesTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = BindingPropertiesTest.class.getResource("DoubleItBindings.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -291,7 +297,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         // This should fail, as the client is not following the correct steps for this property
         portQName = new QName(NAMESPACE, "DoubleItSignBeforeEncryptingPort2");
@@ -323,8 +329,8 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
         URL busFile = BindingPropertiesTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = BindingPropertiesTest.class.getResource("DoubleItBindings.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -340,7 +346,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
 
         // TODO Timestamp First/Last validation not working - see WSS-444
         if (!STAX_PORT.equals(test.getPort())) {
-            port.doubleIt(25);
+            assertEquals(50, port.doubleIt(25));
         }
 
         // This should fail, as the client is sending the timestamp last
@@ -374,8 +380,8 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
         URL busFile = BindingPropertiesTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = BindingPropertiesTest.class.getResource("DoubleItBindings.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -391,7 +397,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
 
         // TODO Timestamp First/Last validation not working - see WSS-444
         if (!STAX_PORT.equals(test.getPort())) {
-            port.doubleIt(25);
+            assertEquals(50, port.doubleIt(25));
         }
 
         // This should fail, as the client is sending the timestamp first
@@ -425,8 +431,8 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
         URL busFile = BindingPropertiesTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = BindingPropertiesTest.class.getResource("DoubleItBindings.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -442,7 +448,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
 
         // TODO Strict validation not working - see WSS-444
         if (!STAX_PORT.equals(test.getPort())) {
-            port.doubleIt(25);
+            assertEquals(50, port.doubleIt(25));
         }
 
         // This should fail, as the client is sending the timestamp last
@@ -476,8 +482,8 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
         URL busFile = BindingPropertiesTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = BindingPropertiesTest.class.getResource("DoubleItBindings.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -493,7 +499,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
 
         // TODO DOM server not working
         if (!PORT.equals(test.getPort())) {
-            port.doubleIt(25);
+            assertEquals(50, port.doubleIt(25));
         }
 
         // This should fail, as the property is not enabled
@@ -528,8 +534,8 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
         URL busFile = BindingPropertiesTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = BindingPropertiesTest.class.getResource("DoubleItBindings.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -543,7 +549,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         // This should fail, as SignatureConfirmation is not enabled
         portQName = new QName(NAMESPACE, "DoubleItSignatureConfirmationPort2");
@@ -572,8 +578,8 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
         URL busFile = BindingPropertiesTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = BindingPropertiesTest.class.getResource("DoubleItBindings.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -586,7 +592,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);

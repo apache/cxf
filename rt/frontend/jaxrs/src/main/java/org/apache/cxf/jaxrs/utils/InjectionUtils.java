@@ -49,6 +49,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
@@ -71,7 +72,7 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.common.util.PrimitiveUtils;
-import org.apache.cxf.common.util.ProxyClassLoader;
+import org.apache.cxf.common.util.ProxyClassLoaderCache;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
@@ -102,6 +103,9 @@ import org.apache.cxf.message.MessageUtils;
 public final class InjectionUtils {
     public static final Set<String> STANDARD_CONTEXT_CLASSES = new HashSet<>();
     public static final Set<String> VALUE_CONTEXTS = new HashSet<>();
+
+    private static final boolean USE_JAXB;
+
     static {
         // JAX-RS 1.0-1.1
         STANDARD_CONTEXT_CLASSES.add(Application.class.getName());
@@ -121,9 +125,20 @@ public final class InjectionUtils {
         // JAX-RS 2.1
         STANDARD_CONTEXT_CLASSES.add("javax.ws.rs.sse.Sse");
         STANDARD_CONTEXT_CLASSES.add("javax.ws.rs.sse.SseEventSink");
-        
+
         VALUE_CONTEXTS.add(Application.class.getName());
         VALUE_CONTEXTS.add("javax.ws.rs.sse.Sse");
+
+        boolean useJaxb;
+        try {
+            ClassLoaderUtils.loadClass(
+                    "javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter",
+                    InjectionUtils.class);
+            useJaxb = true;
+        } catch (final ClassNotFoundException cnfe) {
+            useJaxb = false;
+        }
+        USE_JAXB = useJaxb;
     }
 
     private static final Logger LOG = LogUtils.getL7dLogger(InjectionUtils.class);
@@ -136,6 +151,9 @@ public final class InjectionUtils {
     private static final String ENUM_CONVERSION_CASE_SENSITIVE = "enum.conversion.case.sensitive";
 
     private static final String IGNORE_MATRIX_PARAMETERS = "ignore.matrix.parameters";
+
+    private static ProxyClassLoaderCache proxyClassLoaderCache =
+        new ProxyClassLoaderCache();
 
     private InjectionUtils() {
 
@@ -161,9 +179,8 @@ public final class InjectionUtils {
             ParameterizedType type = (ParameterizedType) scope;
             if (type.getRawType() == declaration) {
                 return type;
-            } else {
-                scope = type.getRawType();
             }
+            scope = type.getRawType();
         }
         if (scope instanceof Class) {
             Class<?> classScope = (Class<?>)scope;
@@ -367,6 +384,7 @@ public final class InjectionUtils {
         } catch (IllegalAccessException ex) {
             reportServerError("METHOD_ACCESS_FAILURE", method.getName());
         } catch (InvocationTargetException ex) {
+            LOG.log(Level.SEVERE, ex.getCause().getMessage(), ex);
             Response r = JAXRSUtils.convertFaultToResponse(ex.getCause(), inMessage);
             if (r != null) {
                 inMessage.getExchange().put(Response.class, r);
@@ -410,8 +428,7 @@ public final class InjectionUtils {
         if (pType == ParameterType.PATH) {
             if (PathSegment.class.isAssignableFrom(pClass)) {
                 return pClass.cast(new PathSegmentImpl(value, decoded));
-            } else if (!MessageUtils.isTrue(
-                        message.getContextualProperty(IGNORE_MATRIX_PARAMETERS))) {
+            } else if (!MessageUtils.getContextualBoolean(message, IGNORE_MATRIX_PARAMETERS)) {
                 value = new PathSegmentImpl(value, false).getPath();
             }
         }
@@ -438,6 +455,10 @@ public final class InjectionUtils {
             //pass empty string to boxed number type will result in 404
             return null;
         }
+        if (Boolean.class == pClass) {
+            // allow == checks for Boolean object
+            pClass = (Class<T>) Boolean.TYPE;
+        }
         if (pClass.isPrimitive()) {
             try {
                 // cannot us pClass.cast as the pClass is something like
@@ -451,7 +472,9 @@ public final class InjectionUtils {
 
         boolean adapterHasToBeUsed = false;
         Class<?> cls = pClass;
-        Class<?> valueType = JAXBUtils.getValueTypeFromAdapter(pClass, pClass, paramAnns);
+        Class<?> valueType = !USE_JAXB
+                ? cls
+                : JAXBUtils.getValueTypeFromAdapter(pClass, pClass, paramAnns);
         if (valueType != cls) {
             cls = valueType;
             adapterHasToBeUsed = true;
@@ -497,7 +520,12 @@ public final class InjectionUtils {
             reportServerError("WRONG_PARAMETER_TYPE", pClass.getName());
         }
 
-        return pClass.cast(result);
+        try {
+            return pClass.cast(result);
+        } catch (ClassCastException ex) {
+            reportServerError("WRONG_PARAMETER_TYPE", pClass.getName());
+            return null;
+        }
     }
 
     private static RuntimeException createParamConversionException(ParameterType pType, Exception ex) {
@@ -550,7 +578,7 @@ public final class InjectionUtils {
         Exception factoryMethodEx = null;
         for (String mName : methodNames) {
             try {
-                result = evaluateFactoryMethod(value, cls, pType, mName);
+                result = evaluateFactoryMethod(value, cls, mName);
                 if (result != null) {
                     factoryMethodEx = null;
                     break;
@@ -570,14 +598,12 @@ public final class InjectionUtils {
                                                                BUNDLE,
                                                                cls.getName()).toString());
             throw new WebApplicationException(t, HttpUtils.getParameterFailureStatus(pType));
-        } else {
-            return result;
         }
+        return result;
     }
 
     private static <T> T evaluateFactoryMethod(String value,
                                                Class<T> pClass,
-                                               ParameterType pType,
                                                String methodName)
         throws InvocationTargetException {
         try {
@@ -620,7 +646,7 @@ public final class InjectionUtils {
         }
 
         Map<String, MultivaluedMap<String, String>> parsedValues =
-            new HashMap<String, MultivaluedMap<String, String>>();
+            new HashMap<>();
         for (Map.Entry<String, List<String>> entry : values.entrySet()) {
             String memberKey = entry.getKey();
             String beanKey = null;
@@ -635,7 +661,7 @@ public final class InjectionUtils {
 
             MultivaluedMap<String, String> value = parsedValues.get(beanKey);
             if (value == null) {
-                value = new MetadataMap<String, String>();
+                value = new MetadataMap<>();
                 parsedValues.put(beanKey, value);
             }
             value.put(memberKey, entry.getValue());
@@ -701,9 +727,9 @@ public final class InjectionUtils {
                             paramValue = InjectionUtils.mergeCollectionsOrArrays(paramValue, appendValue,
                                                             genericType);
                         } else if (isSupportedMap(genericType)) {
-                            Object appendValue = InjectionUtils.injectIntoMap(
-                                type, genericType, paramAnns, processedValues, true, pType, message);
-                            paramValue = InjectionUtils.mergeMap(paramValue, appendValue, genericType);
+                            Object appendValue = injectIntoMap(
+                                genericType, paramAnns, processedValues, true, pType, message);
+                            paramValue = mergeMap(paramValue, appendValue);
 
                         } else if (isbean) {
                             paramValue = InjectionUtils.handleBean(type, paramAnns, processedValues,
@@ -730,7 +756,7 @@ public final class InjectionUtils {
     }
 
     @SuppressWarnings("unchecked")
-    private static Object mergeMap(Object first, Object second, Type genericType) {
+    private static Object mergeMap(Object first, Object second) {
         if (first == null) {
             return second;
         } else if (first instanceof Map) {
@@ -741,7 +767,7 @@ public final class InjectionUtils {
     }
 
     // CHECKSTYLE:OFF
-    private static Object injectIntoMap(Class<?> rawType, Type genericType,
+    private static Object injectIntoMap(Type genericType,
                                         Annotation[] paramAnns,
                                         MultivaluedMap<String, String> processedValues,
                                         boolean decoded,
@@ -752,7 +778,7 @@ public final class InjectionUtils {
         Type secondType = InjectionUtils.getType(paramType.getActualTypeArguments(), 1);
 
         if (secondType instanceof ParameterizedType) {
-            MultivaluedMap<Object, Object> theValues = new MetadataMap<Object, Object>();
+            MultivaluedMap<Object, Object> theValues = new MetadataMap<>();
             ParameterizedType valueParamType = (ParameterizedType) secondType;
             Class<?> valueType = (Class<?>) InjectionUtils.getType(valueParamType
                                .getActualTypeArguments(), 0);
@@ -766,22 +792,21 @@ public final class InjectionUtils {
                 }
             }
             return theValues;
-        } else {
-            Map<Object, Object> theValues = new HashMap<>();
-            Class<?> valueType =
-                (Class<?>) InjectionUtils.getType(paramType.getActualTypeArguments(), 1);
-            for (Map.Entry<String, List<String>> processedValuesEntry : processedValues.entrySet()) {
-                List<String> valuesList = processedValuesEntry.getValue();
-                for (String value : valuesList) {
-                    Object o = InjectionUtils.handleParameter(value,
-                                       decoded, valueType, valueType, paramAnns, pathParam, message);
-                    theValues.put(
-                        convertStringToPrimitive(processedValuesEntry.getKey(), keyType),
-                        o);
-                }
-            }
-            return theValues;
         }
+        Map<Object, Object> theValues = new HashMap<>();
+        Class<?> valueType =
+            (Class<?>) InjectionUtils.getType(paramType.getActualTypeArguments(), 1);
+        for (Map.Entry<String, List<String>> processedValuesEntry : processedValues.entrySet()) {
+            List<String> valuesList = processedValuesEntry.getValue();
+            for (String value : valuesList) {
+                Object o = InjectionUtils.handleParameter(value,
+                                   decoded, valueType, valueType, paramAnns, pathParam, message);
+                theValues.put(
+                    convertStringToPrimitive(processedValuesEntry.getKey(), keyType),
+                    o);
+            }
+        }
+        return theValues;
 
     }
 
@@ -816,7 +841,7 @@ public final class InjectionUtils {
                                         MultivaluedMap<String, String> values,
                                         boolean isbean) {
         List<MultivaluedMap<String, String>> valuesList =
-            new ArrayList<MultivaluedMap<String, String>>();
+            new ArrayList<>();
 
         if (isbean && InjectionUtils.isSupportedCollectionOrArray(type)) {
             Class<?> realType = InjectionUtils.getActualType(genericType);
@@ -861,7 +886,7 @@ public final class InjectionUtils {
                     MultivaluedMap<String, String> splitValues =
                         (idx < valuesList.size()) ? valuesList.get(idx) : null;
                     if (splitValues == null) {
-                        splitValues = new MetadataMap<String, String>();
+                        splitValues = new MetadataMap<>();
                         valuesList.add(splitValues);
                     }
                     splitValues.add(memberKey, value);
@@ -901,11 +926,11 @@ public final class InjectionUtils {
     static Class<?> getCollectionType(Class<?> rawType) {
         Class<?> type = null;
         if (SortedSet.class.isAssignableFrom(rawType)) {
-            type = TreeSet.class;
+            type = TreeSet.class; //NOPMD
         } else if (Set.class.isAssignableFrom(rawType)) {
-            type = HashSet.class;
+            type = HashSet.class; //NOPMD
         } else if (Collection.class.isAssignableFrom(rawType)) {
-            type = ArrayList.class;
+            type = ArrayList.class; //NOPMD
         }
         return type;
 
@@ -927,12 +952,12 @@ public final class InjectionUtils {
             realGenericType = realType;
         } else {
             Type[] types = getActualTypes(genericType);
-            if (types.length == 0 || !(types[0] instanceof ParameterizedType)) {
+            if (types == null || types.length == 0 || !(types[0] instanceof ParameterizedType)) {
                 realType = getActualType(genericType);
                 realGenericType = realType;
             } else {
                 realType = getRawType(types[0]);
-                realGenericType = types[0] == realType ? realType : types[0];
+                realGenericType = types[0];
             }
         }
         Object theValues = null;
@@ -982,7 +1007,7 @@ public final class InjectionUtils {
         }
         List<String> newValues = new ArrayList<>();
         for (String v : values) {
-            String[] segments = StringUtils.split(v, "/");
+            String[] segments = v.split("/");
             for (String s : segments) {
                 if (s.length() != 0) {
                     newValues.add(s);
@@ -1006,7 +1031,7 @@ public final class InjectionUtils {
                                                Message message) {
     //CHECKSTYLE:ON
 
-        if (paramValues == null) {
+        if (paramValues == null || paramValues.size() == 1 && paramValues.get(0) == null) {
             if (defaultValue != null) {
                 paramValues = Collections.singletonList(defaultValue);
             } else {
@@ -1024,7 +1049,7 @@ public final class InjectionUtils {
 
         Object value = null;
         if (InjectionUtils.isSupportedCollectionOrArray(paramType)) {
-            MultivaluedMap<String, String> paramValuesMap = new MetadataMap<String, String>();
+            MultivaluedMap<String, String> paramValuesMap = new MetadataMap<>();
             paramValuesMap.put("", paramValues);
             value = InjectionUtils.injectIntoCollectionOrArray(paramType, genericType, paramAnns,
                                                 paramValuesMap, false, decoded, pathParam, message);
@@ -1056,7 +1081,7 @@ public final class InjectionUtils {
         } else if (SecurityContext.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalSecurityContext();
         } else if (ContextResolver.class.isAssignableFrom(type)) {
-            proxy = new ThreadLocalContextResolver<Object>();
+            proxy = new ThreadLocalContextResolver<>();
         } else if (Request.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalRequest();
         }  else if (Providers.class.isAssignableFrom(type)) {
@@ -1069,15 +1094,42 @@ public final class InjectionUtils {
             proxy = createThreadLocalServletApiContext(type.getName());
         }
         if (proxy == null) {
-            ProxyClassLoader loader = new ProxyClassLoader(Proxy.class.getClassLoader());
-            loader.addLoader(type.getClassLoader());
-            loader.addLoader(ThreadLocalProxy.class.getClassLoader());
+            ClassLoader loader
+                = proxyClassLoaderCache.getProxyClassLoader(Proxy.class.getClassLoader(),
+                                                            new Class<?>[]{Proxy.class, ThreadLocalProxy.class, type});
+            if (!canSeeAllClasses(loader, new Class<?>[]{Proxy.class, ThreadLocalProxy.class, type})) {
+                LOG.log(Level.FINE, "find a loader from ProxyClassLoader cache,"
+                    + " but can't see all interfaces");
+
+                LOG.log(Level.FINE, "create a new one with parent  " + Proxy.class.getClassLoader());
+                proxyClassLoaderCache.removeStaleProxyClassLoader(type);
+                proxyClassLoaderCache.getProxyClassLoader(Proxy.class.getClassLoader(),
+                                                          new Class<?>[]{Proxy.class, ThreadLocalProxy.class, type});
+
+
+            }
             return (ThreadLocalProxy<T>)Proxy.newProxyInstance(loader,
                                    new Class[] {type, ThreadLocalProxy.class },
                                    new ThreadLocalInvocationHandler<T>());
         }
 
         return (ThreadLocalProxy<T>)proxy;
+    }
+
+    private static boolean canSeeAllClasses(ClassLoader loader, Class<?>[] interfaces) {
+        for (Class<?> currentInterface : interfaces) {
+            String ifName = currentInterface.getName();
+            try {
+                Class<?> ifClass = Class.forName(ifName, true, loader);
+                if (ifClass != currentInterface) {
+                    return false;
+                }
+
+            } catch (NoClassDefFoundError | ClassNotFoundException e) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static boolean isServletApiContext(String name) {
@@ -1254,7 +1306,7 @@ public final class InjectionUtils {
     }
 
     public static MultivaluedMap<String, Object> extractValuesFromBean(Object bean, String baseName) {
-        MultivaluedMap<String, Object> values = new MetadataMap<String, Object>();
+        MultivaluedMap<String, Object> values = new MetadataMap<>();
         fillInValuesFromBean(bean, baseName, values);
         return values;
     }
@@ -1329,7 +1381,7 @@ public final class InjectionUtils {
     public static Map<Parameter, Class<?>> getParametersFromBeanClass(Class<?> beanClass,
                                                                       ParameterType type,
                                                                       boolean checkIgnorable) {
-        Map<Parameter, Class<?>> params = new LinkedHashMap<Parameter, Class<?>>();
+        Map<Parameter, Class<?>> params = new LinkedHashMap<>();
         for (Method m : beanClass.getMethods()) {
             String methodName = m.getName();
             boolean startsFromGet = methodName.startsWith("get");
@@ -1379,9 +1431,8 @@ public final class InjectionUtils {
         }
         if (param == ParameterType.PATH || param == ParameterType.MATRIX) {
             return HttpUtils.pathDecode(value);
-        } else {
-            return HttpUtils.urlDecode(value);
         }
+        return HttpUtils.urlDecode(value);
     }
 
     public static void invokeLifeCycleMethod(Object instance, Method method) {
@@ -1454,9 +1505,8 @@ public final class InjectionUtils {
         if (targetObject != null) {
             Class<?> targetClass = targetObject.getClass();
             return ClassHelper.getRealClassFromClass(targetClass);
-        } else {
-            return null;
         }
+        return null;
     }
 
     public static Type getGenericResponseType(Method invoked,
@@ -1512,7 +1562,7 @@ public final class InjectionUtils {
                 }
             }
         }
-            
+
         if (type == null || type == Object.class) {
             type = paramCls;
         }

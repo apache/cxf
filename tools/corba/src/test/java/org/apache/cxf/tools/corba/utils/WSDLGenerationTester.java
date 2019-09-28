@@ -94,8 +94,8 @@ public class WSDLGenerationTester {
         int actualAttrCount = actual.getAttributeCount();
         for (int i = 0; i < origAttrCount; i++) {
             QName origAttrName = orig.getAttributeName(i);
-            if ((origAttrName.getLocalPart().equals("location"))
-                || (origAttrName.getLocalPart().equals("schemaLocation"))) {
+            if ("location".equals(origAttrName.getLocalPart())
+                || "schemaLocation".equals(origAttrName.getLocalPart())) {
                 //skip this atribute
                 origAttrCount--;
             } else {
@@ -116,8 +116,8 @@ public class WSDLGenerationTester {
         }
         for (int i = 0; i < actualAttrCount; i++) {
             QName actualAttrName = actual.getAttributeName(i);
-            if ((actualAttrName.getLocalPart().equals("location"))
-                || (actualAttrName.getLocalPart().equals("schemaLocation"))) {
+            if ("location".equals(actualAttrName.getLocalPart())
+                || "schemaLocation".equals(actualAttrName.getLocalPart())) {
                 //skip this atribute
                 actualAttrCount--;
             }

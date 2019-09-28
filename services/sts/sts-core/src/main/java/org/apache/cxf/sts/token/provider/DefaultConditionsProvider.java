@@ -78,6 +78,7 @@ public class DefaultConditionsProvider implements ConditionsProvider {
      * doesn't specify a lifetime element
      * @return the lifetime in seconds
      */
+    @Override
     public long getLifetime() {
         return lifetime;
     }
@@ -134,25 +135,17 @@ public class DefaultConditionsProvider implements ConditionsProvider {
     /**
      * Get a ConditionsBean object.
      */
+    @Override
     public ConditionsBean getConditions(TokenProviderParameters providerParameters) {
         ConditionsBean conditions = new ConditionsBean();
 
         Lifetime tokenLifetime = providerParameters.getTokenRequirements().getLifetime();
         if (lifetime > 0) {
             if (acceptClientLifetime && tokenLifetime != null
-                && tokenLifetime.getCreated() != null && tokenLifetime.getExpires() != null) {
-                Instant creationTime = null;
-                Instant expirationTime = null;
-                try {
-                    creationTime = ZonedDateTime.parse(tokenLifetime.getCreated()).toInstant();
-                    expirationTime = ZonedDateTime.parse(tokenLifetime.getExpires()).toInstant();
-                } catch (DateTimeParseException ex) {
-                    LOG.fine("Error in parsing Timestamp Created or Expiration Strings");
-                    throw new STSException(
-                        "Error in parsing Timestamp Created or Expiration Strings",
-                        STSException.INVALID_TIME
-                    );
-                }
+                    && (tokenLifetime.getCreated() != null || tokenLifetime.getExpires() != null)) {
+                Instant creationTime = parsedInstantOrDefault(tokenLifetime.getCreated(), Instant.now());
+                Instant expirationTime = parsedInstantOrDefault(tokenLifetime.getExpires(),
+                        creationTime.plusSeconds(lifetime));
 
                 // Check to see if the created time is in the future
                 Instant validCreation = Instant.now();
@@ -176,9 +169,8 @@ public class DefaultConditionsProvider implements ConditionsProvider {
                     if (isFailLifetimeExceedance()) {
                         throw new STSException("Requested lifetime exceeds maximum lifetime",
                                                STSException.INVALID_TIME);
-                    } else {
-                        expirationTime = creationTime.plusSeconds(getMaxLifetime());
                     }
+                    expirationTime = creationTime.plusSeconds(getMaxLifetime());
                 }
 
                 conditions.setNotAfter(expirationTime);
@@ -197,6 +189,21 @@ public class DefaultConditionsProvider implements ConditionsProvider {
         }
 
         return conditions;
+    }
+
+    private Instant parsedInstantOrDefault(String dateTime, Instant defaultInstant) {
+        if (dateTime == null || dateTime.isEmpty()) {
+            return defaultInstant;
+        }
+        try {
+            return ZonedDateTime.parse(dateTime).toInstant();
+        } catch (DateTimeParseException ex) {
+            LOG.fine("Error in parsing Timestamp Created or Expiration Strings");
+            throw new STSException(
+                "Error in parsing Timestamp Created or Expiration Strings",
+                STSException.INVALID_TIME
+            );
+        }
     }
 
     /**

@@ -26,7 +26,7 @@ public class DocumentResourceImpl implements DocumentResource<String, Document<S
 
     @Override
     public Set<Document<String>> getDocuments(String id) {
-        Document<String> d = new Document<String>(id);
+        Document<String> d = new Document<>(id);
         return Collections.singleton(d);
     }
     

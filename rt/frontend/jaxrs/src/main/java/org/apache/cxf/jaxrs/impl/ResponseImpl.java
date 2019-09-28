@@ -54,6 +54,7 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.io.ReaderInputStream;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -150,45 +151,43 @@ public final class ResponseImpl extends Response {
     }
 
     public MultivaluedMap<String, String> getStringHeaders() {
-        MetadataMap<String, String> headers = new MetadataMap<String, String>(metadata.size());
+        MetadataMap<String, String> headers = new MetadataMap<>(metadata.size());
         for (Map.Entry<String, List<Object>> entry : metadata.entrySet()) {
             String headerName = entry.getKey();
-            headers.put(headerName, toListOfStrings(headerName, entry.getValue()));
+            headers.put(headerName, toListOfStrings(entry.getValue()));
         }
         return headers;
     }
 
     public String getHeaderString(String header) {
         List<Object> methodValues = metadata.get(header);
-        return HttpUtils.getHeaderString(toListOfStrings(header, methodValues));
+        return HttpUtils.getHeaderString(toListOfStrings(methodValues));
     }
 
     // This conversion is needed as some values may not be Strings
-    private List<String> toListOfStrings(String headerName, List<Object> values) {
+    private List<String> toListOfStrings(List<Object> values) {
         if (values == null) {
             return null;
-        } else {
-            List<String> stringValues = new ArrayList<>(values.size());
-            HeaderDelegate<Object> hd = HttpUtils.getHeaderDelegate(values.get(0));
-            for (Object value : values) {
-                String actualValue = hd == null ? value.toString() : hd.toString(value);
-                stringValues.add(actualValue);
-            }
-            return stringValues;
         }
+        List<String> stringValues = new ArrayList<>(values.size());
+        HeaderDelegate<Object> hd = HttpUtils.getHeaderDelegate(values.get(0));
+        for (Object value : values) {
+            String actualValue = hd == null ? value.toString() : hd.toString(value);
+            stringValues.add(actualValue);
+        }
+        return stringValues;
     }
 
     public Set<String> getAllowedMethods() {
         List<Object> methodValues = metadata.get(HttpHeaders.ALLOW);
         if (methodValues == null) {
             return Collections.emptySet();
-        } else {
-            Set<String> methods = new HashSet<>();
-            for (Object o : methodValues) {
-                methods.add(o.toString());
-            }
-            return methods;
         }
+        Set<String> methods = new HashSet<>();
+        for (Object o : methodValues) {
+            methods.add(o.toString());
+        }
+        return methods;
     }
 
 
@@ -197,14 +196,13 @@ public final class ResponseImpl extends Response {
         List<Object> cookieValues = metadata.get(HttpHeaders.SET_COOKIE);
         if (cookieValues == null) {
             return Collections.emptyMap();
-        } else {
-            Map<String, NewCookie> cookies = new HashMap<>();
-            for (Object o : cookieValues) {
-                NewCookie newCookie = NewCookie.valueOf(o.toString());
-                cookies.put(newCookie.getName(), newCookie);
-            }
-            return cookies;
         }
+        Map<String, NewCookie> cookies = new HashMap<>();
+        for (Object o : cookieValues) {
+            NewCookie newCookie = NewCookie.valueOf(o.toString());
+            cookies.put(newCookie.getName(), newCookie);
+        }
+        return cookies;
     }
 
     public Date getDate() {
@@ -240,7 +238,10 @@ public final class ResponseImpl extends Response {
 
     public URI getLocation() {
         Object header = metadata.getFirst(HttpHeaders.LOCATION);
-        return header == null || header instanceof URI ? (URI)header
+        if (header == null && outMessage != null) {
+            header = outMessage.get(Message.REQUEST_URI);
+        }
+        return header == null || header instanceof URI ? (URI) header
             : URI.create(header.toString());
     }
 
@@ -286,18 +287,17 @@ public final class ResponseImpl extends Response {
         List<Object> linkValues = metadata.get(HttpHeaders.LINK);
         if (linkValues == null) {
             return Collections.emptySet();
-        } else {
-            Set<Link> links = new LinkedHashSet<Link>();
-            for (Object o : linkValues) {
-                Link link = o instanceof Link ? (Link)o : Link.valueOf(o.toString());
-                if (!link.getUri().isAbsolute()) {
-                    URI requestURI = URI.create((String)outMessage.get(Message.REQUEST_URI));
-                    link = Link.fromLink(link).baseUri(requestURI).build();
-                }
-                links.add(link);
-            }
-            return links;
         }
+        Set<Link> links = new LinkedHashSet<>();
+        for (Object o : linkValues) {
+            Link link = o instanceof Link ? (Link)o : Link.valueOf(o.toString());
+            if (!link.getUri().isAbsolute()) {
+                URI requestURI = URI.create((String)outMessage.get(Message.REQUEST_URI));
+                link = Link.fromLink(link).baseUri(requestURI).build();
+            }
+            links.add(link);
+        }
+        return links;
     }
 
     public <T> T readEntity(Class<T> cls) throws ProcessingException, IllegalStateException {
@@ -346,6 +346,12 @@ public final class ResponseImpl extends Response {
             entityStreamAvailable = entityStream != null;
         } else if (entity instanceof InputStream) {
             entityStream = InputStream.class.cast(entity);
+        } else {
+            Message inMessage = getResponseMessage();
+            Reader reader = inMessage.getContent(Reader.class);
+            if (reader != null) {
+                entityStream = InputStream.class.cast(new ReaderInputStream(reader));
+            }
         }
 
         // we need to check for readers even if no IS is set - the readers may still do it
@@ -405,9 +411,8 @@ public final class ResponseImpl extends Response {
             } catch (Exception ex) {
                 throw new ProcessingException(ex);
             }
-        } else {
-            return null;
         }
+        return null;
     }
 
     private boolean entityStreamAvailable() {
@@ -415,9 +420,8 @@ public final class ResponseImpl extends Response {
             Message inMessage = getResponseMessage();
             return inMessage != null && (inMessage.getContent(XMLStreamReader.class) != null
                 || inMessage.getContent(Reader.class) != null);
-        } else {
-            return entity instanceof InputStream;
         }
+        return entity instanceof InputStream;
     }
 
     private Message getResponseMessage() {
@@ -435,7 +439,7 @@ public final class ResponseImpl extends Response {
 
     protected void autoClose(Class<?> cls, boolean exception) {
         if (!entityBufferred && !JAXRSUtils.isStreamingOutType(cls)
-            && (exception || MessageUtils.isTrue(outMessage.getContextualProperty("response.stream.auto.close")))) {
+            && (exception || MessageUtils.getContextualBoolean(outMessage, "response.stream.auto.close"))) {
             close();
         }
     }
@@ -486,10 +490,9 @@ public final class ResponseImpl extends Response {
             public String getReasonPhrase() {
                 if (reasonPhrase != null) {
                     return reasonPhrase;
-                } else {
-                    Response.Status statusEnum = Response.Status.fromStatusCode(statusCode);
-                    return statusEnum != null ? statusEnum.getReasonPhrase() : "";
                 }
+                Response.Status statusEnum = Response.Status.fromStatusCode(statusCode);
+                return statusEnum != null ? statusEnum.getReasonPhrase() : "";
             }
 
             public int getStatusCode() {

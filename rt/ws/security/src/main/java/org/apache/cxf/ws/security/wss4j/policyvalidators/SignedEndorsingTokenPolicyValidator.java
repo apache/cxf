@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.cxf.ws.policy.AssertionInfo;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.AbstractToken;
@@ -68,6 +69,7 @@ public class SignedEndorsingTokenPolicyValidator extends AbstractSupportingToken
             List<AbstractToken> tokens = binding.getTokens();
             for (AbstractToken token : tokens) {
                 if (!isTokenRequired(token, parameters.getMessage())) {
+                    assertDerivedKeys(token, parameters.getAssertionInfoMap());
                     assertSecurePartsIfTokenNotRequired(binding, parameters.getAssertionInfoMap());
                     continue;
                 }
@@ -80,7 +82,7 @@ public class SignedEndorsingTokenPolicyValidator extends AbstractSupportingToken
                         processingFailed = true;
                     }
                 } else if (token instanceof SamlToken) {
-                    if (!processSAMLTokens(parameters)) {
+                    if (!processSAMLTokens(parameters, derived)) {
                         processingFailed = true;
                     }
                 } else if (token instanceof X509Token) {
@@ -100,7 +102,12 @@ public class SignedEndorsingTokenPolicyValidator extends AbstractSupportingToken
                     if (!processSCTokens(parameters, derived)) {
                         processingFailed = true;
                     }
-                } else if (!(token instanceof IssuedToken)) {
+                } else if (token instanceof IssuedToken) {
+                    IssuedToken issuedToken = (IssuedToken)token;
+                    if (isSamlTokenRequiredForIssuedToken(issuedToken) && !processSAMLTokens(parameters, derived)) {
+                        processingFailed = true;
+                    }
+                } else {
                     processingFailed = true;
                 }
 
@@ -109,6 +116,10 @@ public class SignedEndorsingTokenPolicyValidator extends AbstractSupportingToken
                         "The received token does not match the signed endorsing supporting token requirement"
                     );
                     continue;
+                }
+
+                if (derived && parameters.getResults().getActionResults().containsKey(WSConstants.DKT)) {
+                    assertDerivedKeys(token, parameters.getAssertionInfoMap());
                 }
             }
         }

@@ -55,7 +55,7 @@ public final class DumpJavaDoc {
                         }
                     }
                 }
-                Tag retTags[] = method.tags("return");
+                Tag[] retTags = method.tags("return");
                 if (retTags != null && retTags.length == 1) {
                     Tag retTag = method.tags("return")[0];
                     javaDocMap.put(method.qualifiedName() + "." + "returnCommentTag",
@@ -74,7 +74,7 @@ public final class DumpJavaDoc {
         String tagName = null;
         for (int i = 0; i < options.length; i++) {
             String[] opt = options[i];
-            if (opt[0].equals("-dumpJavaDocFile")) {
+            if ("-dumpJavaDocFile".equals(opt[0])) {
                 tagName = opt[1];
             }
         }
@@ -88,21 +88,20 @@ public final class DumpJavaDoc {
         return 0;
     }
 
-    public static boolean validOptions(String options[][], DocErrorReporter reporter) {
+    public static boolean validOptions(String[][] options, DocErrorReporter reporter) {
         boolean foundTagOption = false;
         for (int i = 0; i < options.length; i++) {
             String[] opt = options[i];
-            if (opt[0].equals("-dumpJavaDocFile")) {
+            if ("-dumpJavaDocFile".equals(opt[0])) {
                 if (foundTagOption) {
                     reporter.printError("Only one -dumpJavaDocFile option allowed.");
                     return false;
-                } else {
-                    foundTagOption = true;
                 }
+                foundTagOption = true;
             }
         }
         if (!foundTagOption) {
-            reporter.printError("Usage: -dumpJavaDocFile theFileToDumpJavaDocForLatarUse...");
+            reporter.printError("Usage: -dumpJavaDocFile theFileToDumpJavaDocForLaterUse...");
         }
         return foundTagOption;
     }

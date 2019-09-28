@@ -33,6 +33,9 @@ import org.apache.cxf.tools.java2wsdl.generator.wsdl11.WSDL11Generator;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class JaxwsServiceBuilderRPCTest extends ProcessorTestBase {
     JaxwsServiceBuilder builder = new JaxwsServiceBuilder();
     WSDL11Generator generator = new WSDL11Generator();

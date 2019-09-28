@@ -19,14 +19,18 @@
 package org.apache.cxf.ws.transfer.dialect.fragment.language;
 
 import java.util.Iterator;
+
+import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
 import javax.xml.xpath.XPathFactory;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.dialect.fragment.ExpressionType;
@@ -38,6 +42,14 @@ import org.apache.cxf.ws.transfer.dialect.fragment.faults.InvalidExpression;
 public class FragmentDialectLanguageXPath10 implements FragmentDialectLanguage {
 
     private static XPathFactory xpathFactory = XPathFactory.newInstance();
+
+    static {
+        try {
+            xpathFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+        } catch (javax.xml.xpath.XPathFactoryConfigurationException ex) {
+            // ignore
+        }
+    }
 
     @Override
     public Object getResourceFragment(final Representation representation, ExpressionType expression) {
@@ -51,9 +63,8 @@ public class FragmentDialectLanguageXPath10 implements FragmentDialectLanguage {
                 if (prefix != null && !prefix.isEmpty()) {
                     Element resource = (Element) representation.getAny();
                     return resource.getAttribute("xmlns:" + prefix);
-                } else {
-                    return null;
                 }
+                return null;
             }
 
             @Override
@@ -76,18 +87,16 @@ public class FragmentDialectLanguageXPath10 implements FragmentDialectLanguage {
             if (checkResultConstraints(result)) {
                 if (result.getLength() == 0) {
                     return null;
-                } else {
-                    return result;
                 }
-            } else {
-                return result.item(0);
+                return result;
             }
+            return result.item(0);
         } catch (XPathException ex) {
             // See https://www.java.net/node/681793
         }
 
         try {
-            return (String) xPath.evaluate(
+            return xPath.evaluate(
                 expressionStr, representation.getAny(), XPathConstants.STRING);
         } catch (XPathException ex) {
             throw new InvalidExpression();
@@ -102,9 +111,8 @@ public class FragmentDialectLanguageXPath10 implements FragmentDialectLanguage {
     private String getXPathFromExpression(ExpressionType expression) {
         if (expression.getContent().size() == 1) {
             return (String) expression.getContent().get(0);
-        } else {
-            throw new InvalidExpression();
         }
+        throw new InvalidExpression();
     }
 
     /**

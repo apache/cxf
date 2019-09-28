@@ -33,7 +33,7 @@ import org.apache.cxf.ws.addressing.WSAddressingFeature;
 
 public class Server extends AbstractBusTestServerBase {
     static final String PORT = allocatePort(Server.class);
-    List<EndpointImpl> eps = new LinkedList<EndpointImpl>();
+    List<EndpointImpl> eps = new LinkedList<>();
 
     @WebService(serviceName = "AddNumbersService",
                 portName = "AddNumbersPort",

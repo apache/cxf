@@ -185,7 +185,7 @@ public class ParameterProcessor extends AbstractProcessor {
         if (StringUtils.isEmpty(value)) {
             return false;
         }
-        return Boolean.valueOf(value).booleanValue();
+        return Boolean.parseBoolean(value);
     }
 
     private int countOutOfBandHeader(MessageInfo message) {
@@ -239,7 +239,7 @@ public class ParameterProcessor extends AbstractProcessor {
         MessagePartInfo part = inputMessage.getFirstMessagePart();
 
         List<QName> wrappedElements = ProcessorUtil.getWrappedElementQNames(context, part.getElementQName());
-        if ((wrappedElements == null || wrappedElements.size() == 0)
+        if ((wrappedElements == null || wrappedElements.isEmpty())
             && countOutOfBandHeader(inputMessage) == 0) {
             return;
         }
@@ -399,7 +399,7 @@ public class ParameterProcessor extends AbstractProcessor {
             outputWrapElement = ProcessorUtil.getWrappedElementQNames(context, outputPart.getElementQName());
         }
 
-        if (inputWrapElement == null || outputWrapElement.size() == 0) {
+        if (inputWrapElement == null || outputWrapElement.isEmpty()) {
             addVoidReturn(method);
             return;
         }
@@ -563,7 +563,7 @@ public class ParameterProcessor extends AbstractProcessor {
         fullJavaName = this.dataBinding.getWrappedElementType(part.getElementQName(), element);
         simpleJavaName = fullJavaName;
 
-        int index = fullJavaName.lastIndexOf(".");
+        int index = fullJavaName.lastIndexOf('.');
 
         if (index > -1) {
             simpleJavaName = fullJavaName.substring(index);
@@ -675,7 +675,7 @@ public class ParameterProcessor extends AbstractProcessor {
             outputPartsMap = outputMessage.getMessagePartsMap();
             outputParts = outputPartsMap.values();
         } else {
-            outputPartsMap = new LinkedHashMap<QName, MessagePartInfo>();
+            outputPartsMap = new LinkedHashMap<>();
             outputParts = new ArrayList<>();
         }
 

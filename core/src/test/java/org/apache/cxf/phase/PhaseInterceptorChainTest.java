@@ -34,15 +34,19 @@ import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.logging.FaultListener;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class PhaseInterceptorChainTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
+
+public class PhaseInterceptorChainTest {
 
     private IMocksControl control;
 
@@ -59,7 +63,7 @@ public class PhaseInterceptorChainTest extends Assert {
         Phase phase1 = new Phase("phase1", 1);
         Phase phase2 = new Phase("phase2", 2);
         Phase phase3 = new Phase("phase3", 3);
-        SortedSet<Phase> phases = new TreeSet<Phase>();
+        SortedSet<Phase> phases = new TreeSet<>();
         phases.add(phase1);
         phases.add(phase2);
         phases.add(phase3);
@@ -126,7 +130,7 @@ public class PhaseInterceptorChainTest extends Assert {
         chain.add(p);
         Iterator<Interceptor<? extends Message>> it = chain.iterator();
         assertSame(p, it.next());
-        assertTrue(!it.hasNext());
+        assertFalse(it.hasNext());
     }
 
     @Test
@@ -138,12 +142,12 @@ public class PhaseInterceptorChainTest extends Assert {
         chain.add(p, false);
         Iterator<Interceptor<? extends Message>> it = chain.iterator();
         assertSame(p, it.next());
-        assertTrue(!it.hasNext());
+        assertFalse(it.hasNext());
         chain.add(p, true);
         it = chain.iterator();
         assertSame(p, it.next());
         assertSame(p, it.next());
-        assertTrue(!it.hasNext());
+        assertFalse(it.hasNext());
     }
 
     @Test
@@ -156,12 +160,12 @@ public class PhaseInterceptorChainTest extends Assert {
         chain.add(p2, false);
         Iterator<Interceptor<? extends Message>> it = chain.iterator();
         assertSame(p1, it.next());
-        assertTrue(!it.hasNext());
+        assertFalse(it.hasNext());
         chain.add(p2, true);
         it = chain.iterator();
         assertSame(p1, it.next());
         assertSame(p2, it.next());
-        assertTrue(!it.hasNext());
+        assertFalse(it.hasNext());
     }
 
     @Test
@@ -177,7 +181,7 @@ public class PhaseInterceptorChainTest extends Assert {
 
         assertSame("Unexpected interceptor at this position.", p1, it.next());
         assertSame("Unexpected interceptor at this position.", p2, it.next());
-        assertTrue(!it.hasNext());
+        assertFalse(it.hasNext());
     }
 
     @Test
@@ -198,7 +202,7 @@ public class PhaseInterceptorChainTest extends Assert {
         assertSame("Unexpected interceptor at this position.", p3, it.next());
         assertSame("Unexpected interceptor at this position.", p2, it.next());
         assertSame("Unexpected interceptor at this position.", p1, it.next());
-        assertTrue(!it.hasNext());
+        assertFalse(it.hasNext());
     }
 
     @Test
@@ -401,15 +405,14 @@ public class PhaseInterceptorChainTest extends Assert {
                                                    Set<String> b,
                                                    Set<String> a) throws Exception {
 
-        @SuppressWarnings("unchecked")
         AbstractPhaseInterceptor<Message> p = control
             .createMock(AbstractPhaseInterceptor.class);
 
         if (a == null) {
-            a = new SortedArraySet<String>();
+            a = new SortedArraySet<>();
         }
         if (b == null) {
-            b = new SortedArraySet<String>();
+            b = new SortedArraySet<>();
         }
         Field f = AbstractPhaseInterceptor.class.getDeclaredField("before");
         ReflectionUtil.setAccessible(f);
@@ -452,8 +455,7 @@ public class PhaseInterceptorChainTest extends Assert {
                                    boolean returnFromCustomLogger) {
         if (useCustomLogger) {
             FaultListener customLogger = control.createMock(FaultListener.class);
-            message.getContextualProperty(FaultListener.class.getName());
-            EasyMock.expectLastCall().andReturn(customLogger);
+            EasyMock.expect(message.getContextualProperty(FaultListener.class.getName())).andReturn(customLogger);
             if (expectFault) {
                 customLogger.faultOccurred(EasyMock.isA(Exception.class),
                                  EasyMock.isA(String.class),
@@ -462,15 +464,12 @@ public class PhaseInterceptorChainTest extends Assert {
                 if (returnFromCustomLogger) {
                     //default logging should also be invoked
                     //not too beautiful way to verify that defaultLogging was invoked.
-                    message.get(FaultMode.class);
-                    EasyMock.expectLastCall().andReturn(FaultMode.RUNTIME_FAULT);
+                    EasyMock.expect(message.get(FaultMode.class)).andReturn(FaultMode.RUNTIME_FAULT);
                 }
             }
         } else {
-            message.getContextualProperty(FaultListener.class.getName());
-            EasyMock.expectLastCall().andReturn(null);
+            EasyMock.expect(message.getContextualProperty(FaultListener.class.getName())).andReturn(null);
         }
-
     }
 
 

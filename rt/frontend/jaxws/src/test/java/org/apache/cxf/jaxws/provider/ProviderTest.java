@@ -23,7 +23,10 @@ import org.w3c.dom.Node;
 import org.apache.cxf.jaxws.AbstractJaxWsTest;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.transport.local.LocalTransportFactory;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 public class ProviderTest extends AbstractJaxWsTest {
     @Test

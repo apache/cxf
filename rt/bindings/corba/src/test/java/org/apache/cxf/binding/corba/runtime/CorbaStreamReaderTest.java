@@ -21,12 +21,14 @@ package org.apache.cxf.binding.corba.runtime;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.corba.types.CorbaTypeEventProducer;
+
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class CorbaStreamReaderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class CorbaStreamReaderTest {
 
     private CorbaStreamReader reader;
     private CorbaTypeEventProducer mock;

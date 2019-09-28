@@ -23,9 +23,14 @@ import java.time.ZonedDateTime;
 
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+
 import org.junit.BeforeClass;
 
-public class HazelCastTokenStoreTest extends org.junit.Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class HazelCastTokenStoreTest {
 
     private static TokenStore store;
 
@@ -87,6 +92,6 @@ public class HazelCastTokenStoreTest extends org.junit.Assert {
         assertNull(store.getToken("test3"));
         store.remove(token1.getId());
         store.remove(token2.getId());
-        assertTrue(store.getTokenIdentifiers().size() == 0);
+        assertTrue(store.getTokenIdentifiers().isEmpty());
     }
 }

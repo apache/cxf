@@ -21,16 +21,18 @@ package org.apache.cxf.tools.common.dom;
 
 import org.w3c.dom.Document;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ExtendedDocumentBuilderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class ExtendedDocumentBuilderTest {
     @Test
     public void testMassMethod() throws Exception {
         ExtendedDocumentBuilder builder = new ExtendedDocumentBuilder();
         builder.setValidating(false);
         String tsSource = "/org/apache/cxf/tools/common/toolspec/parser/resources/testtool.xml";
-        assertTrue(builder.parse(getClass().getResourceAsStream(tsSource)) != null);
+        assertNotNull(builder.parse(getClass().getResourceAsStream(tsSource)));
     }
 
     @Test

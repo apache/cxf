@@ -28,6 +28,7 @@ import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
 import org.apache.cxf.tools.wsdlto.core.FrontEndProfile;
 import org.apache.cxf.tools.wsdlto.core.PluginLoader;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.JAXWSContainer;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -62,9 +63,6 @@ public abstract class AbstractCodeGenTest extends ProcessorTestBase {
     @Before
     public void setUp() throws Exception {
         processor = new JAXWSContainer(null);
-        if (System.getProperty("java.version").startsWith("9")) {
-            System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
-        }
     }
 
     @After

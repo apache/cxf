@@ -20,8 +20,8 @@
 package org.apache.cxf.tools.corba.common.idltypes;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 
 public abstract class IdlDefnImplBase implements IdlDefn {
@@ -88,7 +88,7 @@ public abstract class IdlDefnImplBase implements IdlDefn {
     }
 
     public boolean isCircular() {
-        return getCircularScope(null, new Vector<Object>()) != null;
+        return getCircularScope(null, new ArrayList<Object>()) != null;
     }
 
     public IdlScopeBase getCircularScope(IdlScopeBase startScope, List<Object> doneDefn) {

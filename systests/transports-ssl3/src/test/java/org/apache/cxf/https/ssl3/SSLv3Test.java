@@ -33,13 +33,20 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * A set of tests SSL v3 protocol support. It should be disallowed by default on both the
@@ -73,8 +80,8 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         URL busFile = SSLv3Test.class.getResource("sslv3-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         System.setProperty("https.protocols", "SSLv3");
 
@@ -90,7 +97,7 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
             trustedCertStore.load(keystore, null);
         }
 
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         tmf.init(trustedCertStore);
         TrustManager[] trustManagers = tmf.getTrustManagers();
 
@@ -121,8 +128,8 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         URL busFile = SSLv3Test.class.getResource("sslv3-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         System.setProperty("https.protocols", "SSLv3");
 
@@ -137,7 +144,7 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
             trustedCertStore.load(keystore, null);
         }
 
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         tmf.init(trustedCertStore);
         TrustManager[] trustManagers = tmf.getTrustManagers();
 
@@ -160,8 +167,8 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         URL busFile = SSLv3Test.class.getResource("sslv3-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -188,8 +195,8 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         URL busFile = SSLv3Test.class.getResource("sslv3-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -224,8 +231,8 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         URL busFile = SSLv3Test.class.getResource("sslv3-client-allow.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -252,8 +259,8 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         URL busFile = SSLv3Test.class.getResource("sslv3-client-allow.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -283,8 +290,8 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         URL busFile = SSLv3Test.class.getResource("sslv3-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -311,8 +318,8 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         URL busFile = SSLv3Test.class.getResource("sslv3-client-allow.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);

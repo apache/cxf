@@ -63,9 +63,8 @@ public final class DnUtils {
             // normalize the prefix if present
             if (split.length == 2) {
                 return split[1].trim();
-            } else {
-                return attr.trim();
             }
+            return attr.trim();
         }
         return attr;
     }

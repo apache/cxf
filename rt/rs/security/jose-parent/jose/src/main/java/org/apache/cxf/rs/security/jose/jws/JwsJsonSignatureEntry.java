@@ -80,9 +80,8 @@ public class JwsJsonSignatureEntry implements JsonObject {
     public String getDecodedJwsPayload() {
         if (protectedHeader == null || !JwsUtils.isPayloadUnencoded(protectedHeader)) {
             return JoseUtils.decodeToString(jwsPayload);
-        } else {
-            return jwsPayload;
         }
+        return jwsPayload;
     }
     public byte[] getDecodedJwsPayloadBytes() {
         return StringUtils.toBytesUTF8(getDecodedJwsPayload());
@@ -108,9 +107,8 @@ public class JwsJsonSignatureEntry implements JsonObject {
     public String getUnsignedSequence() {
         if (getEncodedProtectedHeader() != null) {
             return getEncodedProtectedHeader() + "." + getJwsPayload();
-        } else {
-            return "." + getJwsPayload();
         }
+        return "." + getJwsPayload();
     }
     public String getKeyId() {
         return getUnionHeader().getKeyId();
@@ -141,23 +139,23 @@ public class JwsJsonSignatureEntry implements JsonObject {
         return toJson(false);
     }
     public String toJson(boolean flattenedMode) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(32);
         if (!flattenedMode) {
-            sb.append("{");
+            sb.append('{');
         }
         if (protectedHeader != null) {
-            sb.append("\"protected\":\"" + Base64UrlUtility.encode(writer.toJson(protectedHeader)) + "\"");
+            sb.append("\"protected\":\"").append(Base64UrlUtility.encode(writer.toJson(protectedHeader))).append('"');
         }
         if (unprotectedHeader != null) {
             if (protectedHeader != null) {
-                sb.append(",");
+                sb.append(',');
             }
-            sb.append("\"header\":" + writer.toJson(unprotectedHeader));
+            sb.append("\"header\":").append(writer.toJson(unprotectedHeader));
         }
-        sb.append(",");
-        sb.append("\"signature\":\"" + encodedSignature + "\"");
+        sb.append(',');
+        sb.append("\"signature\":\"").append(encodedSignature).append('"');
         if (!flattenedMode) {
-            sb.append("}");
+            sb.append('}');
         }
         return sb.toString();
     }

@@ -119,7 +119,7 @@ public class JaxbAssertionBuilder<T> implements AssertionBuilder<Element> {
     }
 
     public QName[] getKnownElements() {
-        return supportedTypes.toArray(new QName[supportedTypes.size()]);
+        return supportedTypes.toArray(new QName[0]);
     }
 
     protected JaxbAssertion<T> buildAssertion() {

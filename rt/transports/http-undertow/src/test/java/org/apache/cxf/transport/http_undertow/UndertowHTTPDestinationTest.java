@@ -71,17 +71,24 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
-import org.easymock.EasyMock;
-
-
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Test;
 
 import io.undertow.util.HeaderMap;
 import io.undertow.util.HttpString;
 
-public class UndertowHTTPDestinationTest extends Assert {
+import org.easymock.EasyMock;
+import org.junit.After;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+
+public class UndertowHTTPDestinationTest {
     protected static final String AUTH_HEADER = "Authorization";
     protected static final String USER = "copernicus";
     protected static final String PASSWD = "epicycles";
@@ -773,10 +780,10 @@ public class UndertowHTTPDestinationTest extends Assert {
                     bus, threadDefaultBus);
         assertNotNull("unexpected null message", inMessage);
         assertSame("unexpected HTTP request",
-                   inMessage.get(UndertowHTTPDestination.HTTP_REQUEST),
+                   inMessage.get(AbstractHTTPDestination.HTTP_REQUEST),
                    request);
         assertSame("unexpected HTTP response",
-                   inMessage.get(UndertowHTTPDestination.HTTP_RESPONSE),
+                   inMessage.get(AbstractHTTPDestination.HTTP_RESPONSE),
                    response);
         assertEquals("unexpected method",
                      inMessage.get(Message.HTTP_REQUEST_METHOD),
@@ -862,10 +869,10 @@ public class UndertowHTTPDestinationTest extends Assert {
 
         if (oneway) {
             assertNull("unexpected HTTP response",
-                       outMsg.get(UndertowHTTPDestination.HTTP_RESPONSE));
+                       outMsg.get(AbstractHTTPDestination.HTTP_RESPONSE));
         } else {
             assertNotNull("expected HTTP response",
-                           outMsg.get(UndertowHTTPDestination.HTTP_RESPONSE));
+                           outMsg.get(AbstractHTTPDestination.HTTP_RESPONSE));
             responseOS.close();
         }
     }

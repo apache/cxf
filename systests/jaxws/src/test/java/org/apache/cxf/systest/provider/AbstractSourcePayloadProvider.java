@@ -101,10 +101,9 @@ public abstract class AbstractSourcePayloadProvider implements SourceProvider {
             if (doneStax) {
                 XMLReader reader = XMLReaderFactory.createXMLReader();
                 return new SAXSource(reader, new InputSource(greetMeInputStream));
-            } else {
-                doneStax = true;
-                return new StaxSource(StaxUtils.createXMLStreamReader(greetMeInputStream));
             }
+            doneStax = true;
+            return new StaxSource(StaxUtils.createXMLStreamReader(greetMeInputStream));
         } else if (StreamSource.class.equals(class1)) {
             StreamSource source = new StreamSource();
             source.setInputStream(greetMeInputStream);

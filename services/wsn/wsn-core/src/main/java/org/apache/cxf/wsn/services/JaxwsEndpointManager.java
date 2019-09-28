@@ -56,11 +56,7 @@ public class JaxwsEndpointManager implements EndpointManager {
             if (WSNHelper.getInstance().setClassLoader()) {
                 Thread.currentThread().setContextClassLoader(JaxwsEndpointManager.class.getClassLoader());
             }
-            String bindingId = SOAPBinding.SOAP11HTTP_BINDING;
-            if (isCXF()) {
-                bindingId = SOAPBinding.SOAP12HTTP_BINDING;
-            }
-            Endpoint endpoint = Endpoint.create(bindingId, service);
+            Endpoint endpoint = createEndpoint(service);
             if (wsdlLocation != null) {
                 try {
                     if (endpoint.getProperties() == null) {
@@ -92,6 +88,14 @@ public class JaxwsEndpointManager implements EndpointManager {
         } finally {
             Thread.currentThread().setContextClassLoader(cl);
         }
+    }
+
+    protected Endpoint createEndpoint(Object service) {
+        String bindingId = SOAPBinding.SOAP11HTTP_BINDING;
+        if (isCXF()) {
+            bindingId = SOAPBinding.SOAP12HTTP_BINDING;
+        }
+        return Endpoint.create(bindingId, service);
     }
 
     private boolean isCXF() {

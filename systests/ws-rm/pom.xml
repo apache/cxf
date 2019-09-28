@@ -21,7 +21,7 @@
     <parent>
         <artifactId>cxf-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -29,7 +29,12 @@
     <artifactId>cxf-systests-ws-rm</artifactId>
     <name>Apache CXF WS-RM Specifications System Tests</name>
     <description>Apache CXF WS-RM Specifications System Tests</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
+    
+    <properties>
+        <cxf.module.name>org.apache.cxf.systests.ws.rm</cxf.module.name>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -78,12 +83,12 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-ws-rm</artifactId>
+            <artifactId>cxf-rt-ws-policy</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-ws-policy</artifactId>
+            <artifactId>cxf-rt-ws-rm</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -97,7 +102,7 @@
             <artifactId>cxf-rt-features-logging</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-testutils</artifactId>

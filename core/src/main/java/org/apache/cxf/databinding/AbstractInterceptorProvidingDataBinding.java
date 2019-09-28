@@ -33,13 +33,13 @@ public abstract class AbstractInterceptorProvidingDataBinding
     extends AbstractDataBinding implements InterceptorProvider {
 
     protected ModCountCopyOnWriteArrayList<Interceptor<? extends Message>> inInterceptors
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+        = new ModCountCopyOnWriteArrayList<>();
     protected ModCountCopyOnWriteArrayList<Interceptor<? extends Message>> outInterceptors
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+        = new ModCountCopyOnWriteArrayList<>();
     protected ModCountCopyOnWriteArrayList<Interceptor<? extends Message>> outFaultInterceptors
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+        = new ModCountCopyOnWriteArrayList<>();
     protected ModCountCopyOnWriteArrayList<Interceptor<? extends Message>> inFaultInterceptors
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+        = new ModCountCopyOnWriteArrayList<>();
 
     public AbstractInterceptorProvidingDataBinding() {
     }

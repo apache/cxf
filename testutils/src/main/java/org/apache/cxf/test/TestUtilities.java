@@ -26,10 +26,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.wsdl.Definition;
 import javax.wsdl.WSDLException;
 import javax.wsdl.factory.WSDLFactory;
@@ -60,13 +62,14 @@ import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * This class provides unit test support for tests that look at generated WSDL
  * contents, as well as some test methods for invoking services.
  */
 public class TestUtilities {
 
-    private static final Charset UTF8 = Charset.forName("utf-8");
     private static String preKeepAlive;
     private static String basedirPath;
     protected Bus bus;
@@ -272,7 +275,7 @@ public class TestUtilities {
     }
 
     public Reader getResourceAsReader(String resource) {
-        return new InputStreamReader(getResourceAsStream(resource), UTF8);
+        return new InputStreamReader(getResourceAsStream(resource), UTF_8);
     }
 
     public XMLStreamReader getResourceAsXMLStreamReader(String resource) throws XMLStreamException {
@@ -419,5 +422,25 @@ public class TestUtilities {
      */
     public void setBus(Bus bus) {
         this.bus = bus;
+    }
+
+    public static boolean checkUnrestrictedPoliciesInstalled() {
+        boolean unrestrictedPoliciesInstalled = false;
+        try {
+            byte[] data = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07};
+
+            SecretKey key192 = new SecretKeySpec(
+                new byte[] {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,     //NOPMD
+                            0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+                            0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17},
+                            "AES");
+            Cipher c = Cipher.getInstance("AES");
+            c.init(Cipher.ENCRYPT_MODE, key192);
+            c.doFinal(data);
+            unrestrictedPoliciesInstalled = true;
+        } catch (Exception e) {
+            return unrestrictedPoliciesInstalled;
+        }
+        return unrestrictedPoliciesInstalled;
     }
 }

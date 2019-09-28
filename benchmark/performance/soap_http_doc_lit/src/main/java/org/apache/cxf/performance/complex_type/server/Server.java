@@ -35,7 +35,7 @@ public class Server implements Runnable {
         System.out.println("Server published " + address);
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         String host = "localhost";
         String protocol = "http";
         String cfg = null;

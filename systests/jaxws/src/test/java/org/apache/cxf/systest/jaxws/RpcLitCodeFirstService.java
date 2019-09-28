@@ -19,7 +19,6 @@
 package org.apache.cxf.systest.jaxws;
 
 import java.util.List;
-import java.util.Vector;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -47,7 +46,7 @@ public interface RpcLitCodeFirstService {
             @WebParam(name = "input") String[] inputs);
 
     @WebMethod
-    Vector<String> listOutput();
+    List<String> listOutput();
 
     @WebMethod
     String listInput(List<String> inputs);

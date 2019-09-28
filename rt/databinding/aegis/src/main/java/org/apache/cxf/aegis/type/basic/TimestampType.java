@@ -44,8 +44,10 @@ public class TimestampType extends AegisType {
         }
 
         try {
-            Calendar c = (Calendar)format.parseObject(value.trim());
-            return new Timestamp(c.getTimeInMillis());
+            synchronized (format) {
+                Calendar c = (Calendar)format.parseObject(value.trim());
+                return new Timestamp(c.getTimeInMillis());
+            }
         } catch (ParseException e) {
             throw new DatabindingException("Could not parse xs:dateTime: " + e.getMessage(), e);
         }
@@ -55,6 +57,8 @@ public class TimestampType extends AegisType {
     public void writeObject(Object object, MessageWriter writer, Context context) {
         Calendar c = Calendar.getInstance();
         c.setTime((Timestamp)object);
-        writer.writeValue(format.format(c));
+        synchronized (format) {
+            writer.writeValue(format.format(c));
+        }
     }
 }

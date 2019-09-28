@@ -32,6 +32,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
@@ -62,7 +63,18 @@ public abstract class AbstractSoapInterceptor extends AbstractPhaseInterceptor<S
         String codeNs = faultCode.getNamespaceURI();
         String prefix = null;
         if (codeNs.length() > 0) {
-            prefix = StaxUtils.getUniquePrefix(writer, codeNs, true);
+            prefix = faultCode.getPrefix();
+            if (!StringUtils.isEmpty(prefix)) {
+                String boundNS = writer.getNamespaceContext().getNamespaceURI(prefix);
+                if (StringUtils.isEmpty(boundNS)) {
+                    writer.writeNamespace(prefix, codeNs);
+                } else if (!codeNs.equals(boundNS)) {
+                    prefix = null;
+                }
+            }
+            if (StringUtils.isEmpty(prefix)) {
+                prefix = StaxUtils.getUniquePrefix(writer, codeNs, true);
+            }
         }
         return prefix;
     }
@@ -88,7 +100,7 @@ public abstract class AbstractSoapInterceptor extends AbstractPhaseInterceptor<S
             Element detail = fault.getDetail();
             String soapNamespace = message.getVersion().getNamespace();
             if (detail == null) {
-                Document doc = DOMUtils.newDocument();
+                Document doc = DOMUtils.getEmptyDocument();
                 Element stackTrace = doc.createElementNS(
                     Fault.STACKTRACE_NAMESPACE, Fault.STACKTRACE);
                 stackTrace.setTextContent(sb.toString());
@@ -115,15 +127,13 @@ public abstract class AbstractSoapInterceptor extends AbstractPhaseInterceptor<S
             if (config && fault.getCause() != null
                 && fault.getCause().getMessage() != null && !fault.getMessage().equals(fault.getCause().getMessage())) {
                 return fault.getMessage() + " Caused by: " + fault.getCause().getMessage();
-            } else {
-                return fault.getMessage();
             }
+            return fault.getMessage();
         } else if (config && fault.getCause() != null) {
             if (fault.getCause().getMessage() != null) {
                 return fault.getCause().getMessage();
-            } else {
-                return fault.getCause().toString();
             }
+            return fault.getCause().toString();
         } else {
             return "Fault occurred while processing.";
         }

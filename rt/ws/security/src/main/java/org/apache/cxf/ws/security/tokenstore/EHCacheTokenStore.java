@@ -30,7 +30,6 @@ import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.Status;
 import net.sf.ehcache.config.CacheConfiguration;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
@@ -141,7 +140,7 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
 
     private int getTTL() {
         int parsedTTL = (int)ttl;
-        if (ttl != (long)parsedTTL) {
+        if (ttl != parsedTTL) {
              // Fall back to 60 minutes if the default TTL is set incorrectly
             parsedTTL = 3600;
         }

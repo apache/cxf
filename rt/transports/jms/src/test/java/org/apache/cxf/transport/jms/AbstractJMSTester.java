@@ -18,21 +18,20 @@
  */
 package org.apache.cxf.transport.jms;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
-import java.io.StringReader;
 import java.io.Writer;
 import java.net.URL;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.jms.ConnectionFactory;
+import javax.jms.DeliveryMode;
 import javax.xml.namespace.QName;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
-import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.activemq.store.memory.MemoryPersistenceAdapter;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -40,31 +39,35 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
-import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
+
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 
-public abstract class AbstractJMSTester extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+public abstract class AbstractJMSTester {
     protected static final String WSDL = "/jms_test.wsdl";
     protected static final String SERVICE_NS = "http://cxf.apache.org/hello_world_jms";
     protected static final int MAX_RECEIVE_TIME = 10;
-    protected static final String MESSAGE_CONTENT = "HelloWorld";
     protected static Bus bus;
+    protected static ActiveMQConnectionFactory cf1;
     protected static ConnectionFactory cf;
     protected static BrokerService broker;
+    private static final String MESSAGE_CONTENT = "HelloWorld";
 
     protected enum ExchangePattern { oneway, requestReply };
 
-    protected EndpointReferenceType target;
-    protected Message inMessage;
-    protected Message destMessage;
+    private final AtomicReference<Message> inMessage = new AtomicReference<>();
+    private final AtomicReference<Message> destMessage = new AtomicReference<>();
 
     @BeforeClass
     public static void startSerices() throws Exception {
@@ -78,8 +81,8 @@ public abstract class AbstractJMSTester extends Assert {
         broker.addConnector(brokerUri);
         broker.start();
         bus = BusFactory.getDefaultBus();
-        ActiveMQConnectionFactory cf1 = new ActiveMQConnectionFactory(brokerUri);
-        cf = new PooledConnectionFactory(cf1);
+        cf1 = new ActiveMQConnectionFactory(brokerUri);
+        cf = cf1;
     }
 
     @AfterClass
@@ -88,12 +91,12 @@ public abstract class AbstractJMSTester extends Assert {
         broker.stop();
     }
 
-    protected EndpointInfo setupServiceInfo(String serviceName, String portName) {
+    protected static EndpointInfo setupServiceInfo(String serviceName, String portName) {
         return setupServiceInfo(SERVICE_NS, WSDL, serviceName, portName);
     }
 
-    protected EndpointInfo setupServiceInfo(String ns, String wsdl, String serviceName, String portName) {
-        URL wsdlUrl = getClass().getResource(wsdl);
+    protected static EndpointInfo setupServiceInfo(String ns, String wsdl, String serviceName, String portName) {
+        URL wsdlUrl = AbstractJMSTester.class.getResource(wsdl);
         if (wsdlUrl == null) {
             throw new IllegalArgumentException("Wsdl file not found on class path " + wsdl);
         }
@@ -109,64 +112,72 @@ public abstract class AbstractJMSTester extends Assert {
     protected MessageObserver createMessageObserver() {
         return new MessageObserver() {
             public void onMessage(Message m) {
-                Exchange exchange = new ExchangeImpl();
-                exchange.setInMessage(m);
-                m.setExchange(exchange);
-                destMessage = m;
+//                Exchange exchange = new ExchangeImpl();
+//                exchange.setInMessage(m);
+//                m.setExchange(exchange);
+                destMessage.set(m);
+                synchronized (destMessage) {
+                    destMessage.notifyAll();
+                }
             }
         };
     }
 
-    protected void sendMessageAsync(Conduit conduit, Message message) throws IOException {
+    protected static void sendMessageAsync(Conduit conduit, Message message) throws IOException {
         sendoutMessage(conduit, message, false, false);
     }
 
-    protected void sendMessageSync(Conduit conduit, Message message) throws IOException {
+    protected static void sendMessageSync(Conduit conduit, Message message) throws IOException {
         sendoutMessage(conduit, message, false, true);
     }
 
-    protected void sendMessage(Conduit conduit, Message message, boolean synchronous) throws IOException {
+    protected static void sendMessage(Conduit conduit, Message message, boolean synchronous) throws IOException {
         sendoutMessage(conduit, message, false, synchronous);
     }
 
-    protected void sendOneWayMessage(Conduit conduit, Message message) throws IOException {
+    protected static void sendOneWayMessage(Conduit conduit, Message message) throws IOException {
         sendoutMessage(conduit, message, true, true);
     }
 
-    private void sendoutMessage(Conduit conduit,
+    private static void sendoutMessage(Conduit conduit,
                                   Message message,
                                   boolean isOneWay,
                                   boolean synchronous) throws IOException {
-
-        Exchange exchange = new ExchangeImpl();
+        final Exchange exchange = new ExchangeImpl();
         exchange.setOneWay(isOneWay);
         exchange.setSynchronous(synchronous);
         message.setExchange(exchange);
         exchange.setOutMessage(message);
         conduit.prepare(message);
-        OutputStream os = message.getContent(OutputStream.class);
-        Writer writer = message.getContent(Writer.class);
-        assertTrue("The OutputStream and Writer should not both be null ", os != null || writer != null);
-        if (os != null) {
-            os.write(MESSAGE_CONTENT.getBytes()); // TODO encoding
-            os.close();
-        } else {
-            writer.write(MESSAGE_CONTENT);
-            writer.close();
+        try (OutputStream os = message.getContent(OutputStream.class)) {
+            if (os != null) {
+                os.write(MESSAGE_CONTENT.getBytes()); // TODO encoding
+                return;
+            }
         }
+        try (Writer writer = message.getContent(Writer.class)) {
+            if (writer != null) {
+                writer.write(MESSAGE_CONTENT);
+                return;
+            }
+        }
+        fail("The OutputStream and Writer should not both be null");
     }
 
-    protected JMSConduit setupJMSConduit(EndpointInfo ei) throws IOException {
+    protected static JMSConduit setupJMSConduit(EndpointInfo ei) throws IOException {
         JMSConfiguration jmsConfig = JMSConfigFactory.createFromEndpointInfo(bus, ei, null);
         jmsConfig.setConnectionFactory(cf);
-        return new JMSConduit(target, jmsConfig, bus);
+        return new JMSConduit(null, jmsConfig, bus);
     }
 
     protected JMSConduit setupJMSConduitWithObserver(EndpointInfo ei) throws IOException {
         JMSConduit jmsConduit = setupJMSConduit(ei);
         MessageObserver observer = new MessageObserver() {
             public void onMessage(Message m) {
-                inMessage = m;
+                inMessage.set(m);
+                synchronized (inMessage) {
+                    inMessage.notifyAll();
+                }
             }
         };
         jmsConduit.setMessageObserver(observer);
@@ -179,58 +190,85 @@ public abstract class AbstractJMSTester extends Assert {
         return new JMSDestination(bus, ei, jmsConfig);
     }
 
-    protected String getContent(Message message) {
-        ByteArrayInputStream bis = (ByteArrayInputStream)message.getContent(InputStream.class);
+    protected static Message createMessage() {
+        return createMessage(null);
+    }
+
+    protected static Message createMessage(String correlationId) {
+        Message outMessage = new MessageImpl();
+        JMSMessageHeadersType header = new JMSMessageHeadersType();
+        header.setJMSDeliveryMode(DeliveryMode.PERSISTENT);
+        header.setJMSPriority(1);
+        header.setTimeToLive(1000L);
+        outMessage.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, header);
+        outMessage.put(Message.ENCODING, "US-ASCII");
+        return outMessage;
+    }
+
+    protected static void verifyReceivedMessage(Message message) {
         String response = "<not found>";
+        InputStream bis = message.getContent(InputStream.class);
         if (bis != null) {
-            byte bytes[] = new byte[bis.available()];
             try {
+                byte[] bytes = new byte[bis.available()];
                 bis.read(bytes);
+                response = IOUtils.newStringFromBytes(bytes);
             } catch (IOException ex) {
-                assertFalse("Read the Destination recieved Message error ", false);
-                ex.printStackTrace();
+                fail("Read the Destination recieved Message error: " + ex.getMessage());
             }
-            response = IOUtils.newStringFromBytes(bytes);
         } else {
-            StringReader reader = (StringReader)message.getContent(Reader.class);
-            char buffer[] = new char[5000];
+            Reader reader = message.getContent(Reader.class);
+            char[] buffer = new char[5000];
             try {
                 int i = reader.read(buffer);
                 response = new String(buffer, 0, i);
             } catch (IOException e) {
-                assertFalse("Read the Destination recieved Message error ", false);
-                e.printStackTrace();
+                fail("Read the Destination recieved Message error: " + e.getMessage());
             }
         }
-        return response;
+        assertEquals("The response content should be equal", MESSAGE_CONTENT, response);
     }
 
-    protected void waitForReceiveInMessage() {
-        int waitTime = 0;
-        while (inMessage == null && waitTime < MAX_RECEIVE_TIME * 10) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                // do nothing here
-            }
-            waitTime++;
-        }
-        assertTrue("Can't receive the Conduit Message in " + MAX_RECEIVE_TIME + " seconds",
-                   inMessage != null);
+    protected static void verifyHeaders(Message msgIn, Message msgOut) {
+        JMSMessageHeadersType outHeader = (JMSMessageHeadersType)msgOut
+            .get(JMSConstants.JMS_CLIENT_REQUEST_HEADERS);
+
+        JMSMessageHeadersType inHeader = (JMSMessageHeadersType)msgIn
+            .get(JMSConstants.JMS_SERVER_REQUEST_HEADERS);
+
+        verifyJmsHeaderEquality(outHeader, inHeader);
+
     }
 
-    protected void waitForReceiveDestMessage() {
-        int waitTime = 0;
-        while (destMessage == null && waitTime < MAX_RECEIVE_TIME * 10) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                // do nothing here
+    protected static void verifyJmsHeaderEquality(JMSMessageHeadersType outHeader, JMSMessageHeadersType inHeader) {
+        assertEquals("The inMessage and outMessage JMS Header's JMSPriority should be equals", outHeader
+            .getJMSPriority(), inHeader.getJMSPriority());
+        assertEquals("The inMessage and outMessage JMS Header's JMSDeliveryMode should be equals", outHeader
+                     .getJMSDeliveryMode(), inHeader.getJMSDeliveryMode());
+        assertEquals("The inMessage and outMessage JMS Header's JMSType should be equals", outHeader
+            .getJMSType(), inHeader.getJMSType());
+    }
+
+
+    protected Message waitForReceiveInMessage() throws InterruptedException {
+        if (null == inMessage.get()) {
+            synchronized (inMessage) {
+                inMessage.wait(MAX_RECEIVE_TIME * 1000L);
             }
-            waitTime++;
+            assertNotNull("Can't receive the Conduit Message in " + MAX_RECEIVE_TIME + " seconds", inMessage.get());
         }
-        assertNotNull("Can't receive the Destination message in " + MAX_RECEIVE_TIME
-                   + " seconds", destMessage);
+        return inMessage.getAndSet(null);
+    }
+
+    protected Message waitForReceiveDestMessage() throws InterruptedException {
+        if (null == destMessage.get()) {
+            synchronized (destMessage) {
+                destMessage.wait(MAX_RECEIVE_TIME * 1000L);
+            }
+            assertNotNull("Can't receive the Destination message in " + MAX_RECEIVE_TIME + " seconds",
+                    destMessage.get());
+        }
+        return destMessage.getAndSet(null);
     }
 
 }

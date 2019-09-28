@@ -73,9 +73,8 @@ public class BookStoreWithInterface extends BookStoreStorage implements BookInte
         String ct = (String)JAXRSUtils.getCurrentMessage().get(Message.CONTENT_TYPE);
         if ("application/xml;a=b".equals(ct)) {
             return b;
-        } else {
-            throw new RuntimeException();
         }
+        throw new RuntimeException();
     }
 
     private Book doGetBook(Long id) throws BookNotFoundFault {
@@ -83,11 +82,10 @@ public class BookStoreWithInterface extends BookStoreStorage implements BookInte
         Book book = books.get(id);
         if (book != null) {
             return book;
-        } else {
-            BookNotFoundDetails details = new BookNotFoundDetails();
-            details.setId(id);
-            throw new BookNotFoundFault(details);
         }
+        BookNotFoundDetails details = new BookNotFoundDetails();
+        details.setId(id);
+        throw new BookNotFoundFault(details);
     }
 
     public Book getThatBook() throws BookNotFoundFault {

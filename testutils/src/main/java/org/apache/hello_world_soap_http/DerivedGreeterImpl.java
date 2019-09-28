@@ -56,10 +56,9 @@ public class DerivedGreeterImpl implements Greeter {
     public int getInvocationCount(String method) {
         if (invocationCount.containsKey(method)) {
             return invocationCount.get(method).intValue();
-        } else {
-            System.out.println("No invocation count for method: " + method);
-            return 0;
         }
+        System.out.println("No invocation count for method: " + method);
+        return 0;
     }
 
     /**
@@ -187,7 +186,6 @@ public class DerivedGreeterImpl implements Greeter {
     }
 
     public String testNillable(String nillElem, int intElem) {
-        // TODO Auto-generated method stub
         return null;
     }
 

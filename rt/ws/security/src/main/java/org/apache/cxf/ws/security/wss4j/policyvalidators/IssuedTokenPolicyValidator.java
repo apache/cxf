@@ -35,6 +35,7 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.token.BinarySecurity;
@@ -207,10 +208,10 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
         while (child != null) {
             if ("TokenType".equals(child.getLocalName())) {
                 String content = child.getTextContent();
-                if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(content)
+                if (WSS4JConstants.WSS_SAML_TOKEN_TYPE.equals(content)
                     && assertionWrapper.getSamlVersion() != SAMLVersion.VERSION_11) {
                     return false;
-                } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(content)
+                } else if (WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(content)
                     && assertionWrapper.getSamlVersion() != SAMLVersion.VERSION_20) {
                     return false;
                 }
@@ -275,9 +276,9 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
             }
         }
         if (assertionWrapper.getSaml1() != null) {
-            token.setTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+            token.setTokenType(WSS4JConstants.WSS_SAML_TOKEN_TYPE);
         } else if (assertionWrapper.getSaml2() != null) {
-            token.setTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+            token.setTokenType(WSS4JConstants.WSS_SAML2_TOKEN_TYPE);
         }
         token.setToken(assertionWrapper.getElement());
 

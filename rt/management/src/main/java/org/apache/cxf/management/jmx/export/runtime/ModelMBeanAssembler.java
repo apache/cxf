@@ -148,13 +148,12 @@ public class ModelMBeanAssembler {
 
     }
 
-    Method findMethodByName(Method methods[], String methodName) {
+    Method findMethodByName(Method[] methods, String methodName) {
         for (int i = 0; i < methods.length; i++) {
             if (methods[i].getName().compareTo(methodName) == 0) {
                 return methods[i];
-            } else {
-                continue;
             }
+            continue;
 
         }
         return null;

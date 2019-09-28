@@ -30,7 +30,7 @@ public class Saml2BearerGrant extends AbstractSaml2BearerGrant {
     }
 
     public Saml2BearerGrant(String assertion, boolean encoded) {
-        this(assertion, false, null);
+        this(assertion, encoded, null);
     }
 
     public Saml2BearerGrant(String assertion, String scope) {

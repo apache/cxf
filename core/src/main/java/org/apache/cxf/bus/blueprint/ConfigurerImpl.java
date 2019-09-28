@@ -46,7 +46,7 @@ public class ConfigurerImpl implements Configurer {
     BlueprintContainer container;
 
     private final Map<String, List<MatcherHolder>> wildCardBeanDefinitions
-        = new TreeMap<String, List<MatcherHolder>>();
+        = new TreeMap<>();
 
     static class MatcherHolder implements Comparable<MatcherHolder> {
         Matcher matcher;
@@ -57,13 +57,12 @@ public class ConfigurerImpl implements Configurer {
         }
         @Override
         public int compareTo(MatcherHolder mh) {
-            Integer literalCharsLen1 = this.wildCardId.replaceAll("\\*", "").length();
-            Integer literalCharsLen2 = mh.wildCardId.replaceAll("\\*", "").length();
+            Integer literalCharsLen1 = this.wildCardId.replace("*", "").length();
+            Integer literalCharsLen2 = mh.wildCardId.replace("*", "").length();
             // The expression with more literal characters should end up on the top of the list
             return literalCharsLen1.compareTo(literalCharsLen2) * -1;
         }
     }
-
 
     public ConfigurerImpl(BlueprintContainer con) {
         container = con;
@@ -80,18 +79,15 @@ public class ConfigurerImpl implements Configurer {
                 ComponentMetadata cmd = container.getComponentMetadata(s);
                 Class<?> cls = BlueprintBeanLocator.getClassForMetaData(container, cmd);
                 if (cls != null) {
-                    String orig = s;
-                    if (s.charAt(0) == '*') {
-                        //old wildcard
-                        s = "." + s.replaceAll("\\.", "\\.");
-                    }
-                    Matcher matcher = Pattern.compile(s).matcher("");
+                    final String cid = s.charAt(0) != '*' ? s
+                            : "." + s.replaceAll("\\.", "\\."); //old wildcard
+                    Matcher matcher = Pattern.compile(cid).matcher("");
                     List<MatcherHolder> m = wildCardBeanDefinitions.get(cls.getName());
                     if (m == null) {
                         m = new ArrayList<>();
                         wildCardBeanDefinitions.put(cls.getName(), m);
                     }
-                    MatcherHolder holder = new MatcherHolder(orig, matcher);
+                    MatcherHolder holder = new MatcherHolder(s, matcher);
                     m.add(holder);
                 }
             }

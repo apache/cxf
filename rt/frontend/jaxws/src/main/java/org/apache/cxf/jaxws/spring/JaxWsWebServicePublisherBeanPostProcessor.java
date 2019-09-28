@@ -39,7 +39,6 @@ import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -194,9 +193,7 @@ public class JaxWsWebServicePublisherBeanPostProcessor
     public void setServletConfig(ServletConfig servletConfig) {
         try {
             shadowCxfServlet = (Servlet)servletClass.newInstance();
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
         try {

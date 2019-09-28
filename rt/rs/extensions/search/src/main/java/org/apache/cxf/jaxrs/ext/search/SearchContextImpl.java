@@ -102,13 +102,11 @@ public class SearchContextImpl implements SearchContext {
             } catch (SearchParseException ex) {
                 if (PropertyUtils.isTrue(message.getContextualProperty(BLOCK_SEARCH_EXCEPTION))) {
                     return null;
-                } else {
-                    throw ex;
                 }
+                throw ex;
             }
-        } else {
-            return null;
         }
+        return null;
 
     }
 
@@ -116,7 +114,7 @@ public class SearchContextImpl implements SearchContext {
 
         String queryStr = (String)message.get(Message.QUERY_STRING);
         if (queryStr != null) {
-            if (MessageUtils.isTrue(message.getContextualProperty(USE_ALL_QUERY_COMPONENT))) {
+            if (MessageUtils.getContextualBoolean(message, USE_ALL_QUERY_COMPONENT)) {
                 return queryStr;
             }
             boolean encoded = PropertyUtils.isTrue(getKeepEncodedProperty());
@@ -130,10 +128,9 @@ public class SearchContextImpl implements SearchContext {
             if (queryStr.contains(SHORT_SEARCH_QUERY) || queryStr.contains(SEARCH_QUERY)) {
                 if (params.containsKey(SHORT_SEARCH_QUERY)) {
                     return params.getFirst(SHORT_SEARCH_QUERY);
-                } else {
-                    return params.getFirst(SEARCH_QUERY);
                 }
-            } else if (MessageUtils.isTrue(message.getContextualProperty(USE_PLAIN_QUERY_PARAMETERS))) {
+                return params.getFirst(SEARCH_QUERY);
+            } else if (MessageUtils.getContextualBoolean(message, USE_PLAIN_QUERY_PARAMETERS)) {
                 return convertPlainQueriesToFiqlExp(params);
             }
         }
@@ -189,7 +186,7 @@ public class SearchContextImpl implements SearchContext {
 
         Map<String, String> props = null;
         if (parserProperties == null) {
-            props = new LinkedHashMap<String, String>(4);
+            props = new LinkedHashMap<>(4);
             props.put(SearchUtils.DATE_FORMAT_PROPERTY,
                       (String)message.getContextualProperty(SearchUtils.DATE_FORMAT_PROPERTY));
             props.put(SearchUtils.TIMEZONE_SUPPORT_PROPERTY,

@@ -58,11 +58,7 @@ public class JsSimpleDomParser extends ScriptableObject {
     public static void register(ScriptableObject scope) {
         try {
             ScriptableObject.defineClass(scope, JsSimpleDomParser.class);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
     }
@@ -80,9 +76,7 @@ public class JsSimpleDomParser extends ScriptableObject {
         Document document;
         try {
             document = documentBuilder.parse(inputSource);
-        } catch (SAXException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
+        } catch (SAXException | IOException e) {
             throw new RuntimeException(e);
         }
 

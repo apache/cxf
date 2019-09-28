@@ -46,10 +46,14 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests for cancelling a SecurityContextToken via the SCTCanceller.
  */
-public class SCTCancellerTest extends org.junit.Assert {
+public class SCTCancellerTest {
 
     private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
 
@@ -72,12 +76,12 @@ public class SCTCancellerTest extends org.junit.Assert {
         assertTrue(sctCanceller.canHandleToken(cancelTarget));
 
         TokenCancellerResponse cancellerResponse = sctCanceller.cancelToken(cancellerParameters);
-        assertTrue(cancellerResponse != null);
+        assertNotNull(cancellerResponse);
         assertTrue(cancellerResponse.getToken().getState() == STATE.CANCELLED);
 
         // Try to cancel the token again - this should fail
         cancellerResponse = sctCanceller.cancelToken(cancellerParameters);
-        assertTrue(cancellerResponse != null);
+        assertNotNull(cancellerResponse);
         assertFalse(cancellerResponse.getToken().getState() == STATE.CANCELLED);
     }
 
@@ -92,7 +96,7 @@ public class SCTCancellerTest extends org.junit.Assert {
         TokenRequirements tokenRequirements = cancellerParameters.getTokenRequirements();
 
         // Create a CancelTarget consisting of a SecurityContextToken
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         SecurityContextToken sct = new SecurityContextToken(doc);
         ReceivedToken cancelTarget = new ReceivedToken(sct.getElement());
         tokenRequirements.setCancelTarget(cancelTarget);
@@ -101,7 +105,7 @@ public class SCTCancellerTest extends org.junit.Assert {
         assertTrue(sctCanceller.canHandleToken(cancelTarget));
 
         TokenCancellerResponse cancellerResponse = sctCanceller.cancelToken(cancellerParameters);
-        assertTrue(cancellerResponse != null);
+        assertNotNull(cancellerResponse);
         assertFalse(cancellerResponse.getToken().getState() == STATE.CANCELLED);
     }
 

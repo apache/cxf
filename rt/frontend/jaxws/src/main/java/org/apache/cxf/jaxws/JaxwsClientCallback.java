@@ -82,7 +82,7 @@ class JaxwsClientCallback<T> extends ClientCallback {
     @Override
     public void handleException(Map<String, Object> ctx, final Throwable ex) {
         context = ctx;
-        exception = ex;
+        exception = mapThrowable(ex);
         if (handler != null) {
             handler.handleResponse(new Response<T>() {
 
@@ -119,5 +119,9 @@ class JaxwsClientCallback<T> extends ClientCallback {
         synchronized (this) {
             notifyAll();
         }
+    }
+    
+    protected Throwable mapThrowable(Throwable t) {
+        return t;
     }
 }

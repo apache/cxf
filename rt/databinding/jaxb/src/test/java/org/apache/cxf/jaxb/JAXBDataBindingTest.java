@@ -68,15 +68,20 @@ import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeOneWay;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JAXBDataBindingTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class JAXBDataBindingTest {
 
     private static final Logger LOG = LogUtils.getLogger(JAXBDataBindingTest.class);
     private static final String WSDL_PATH = "/wsdl/jaxb/hello_world.wsdl";
@@ -193,7 +198,7 @@ public class JAXBDataBindingTest extends Assert {
         Map<String, Object> contextProperties = new HashMap<>();
         contextProperties.put("com.sun.xml.bind.defaultNamespaceRemap", "uri:ultima:thule");
         db.setContextProperties(contextProperties);
-        Set<Class<?>> classes = new HashSet<Class<?>>();
+        Set<Class<?>> classes = new HashSet<>();
         classes.add(UnqualifiedBean.class);
         db.setContext(db.createJAXBContext(classes));
         DataWriter<XMLStreamWriter> writer = db.createWriter(XMLStreamWriter.class);
@@ -215,7 +220,7 @@ public class JAXBDataBindingTest extends Assert {
         db.setNamespaceMap(nsMap);
         Map<String, Object> contextProperties = new HashMap<>();
         db.setContextProperties(contextProperties);
-        Set<Class<?>> classes = new HashSet<Class<?>>();
+        Set<Class<?>> classes = new HashSet<>();
         classes.add(QualifiedBean.class);
 
         //have to fastboot to avoid conflicts of generated accessors
@@ -284,14 +289,15 @@ public class JAXBDataBindingTest extends Assert {
             doNamespaceMappingTest(true, false);
             fail("Internal needs ASM");
         } catch (AssertionError er) {
-            er.getMessage().contains("Failed to map namespace");
+            assertTrue(er.getMessage().contains("Failed to map namespace")
+                || er.getMessage().contains("Internal needs ASM"));
         }
     }
 
 
     @Test
     public void testResursiveType() throws Exception {
-        Set<Class<?>> classes = new HashSet<Class<?>>();
+        Set<Class<?>> classes = new HashSet<>();
         Collection<Object> typeReferences = new ArrayList<>();
         Map<String, Object> props = new HashMap<>();
         JAXBContextInitializer init = new JAXBContextInitializer(null, classes, typeReferences, props);
@@ -330,6 +336,17 @@ public class JAXBDataBindingTest extends Assert {
 
         assertEquals(dutch, read.getMotherTongue());
 
+    }
+
+    @Test
+    public void testClassInDefaultPackage() throws Exception {
+        Class<?> sampleClassInDefaultPackage = Class.forName("SampleClassInDefaultPackage");
+        Set<Class<?>> classes = new HashSet<>();
+        Collection<Object> typeReferences = new ArrayList<>();
+        Map<String, Object> props = new HashMap<>();
+        JAXBContextInitializer init = new JAXBContextInitializer(null, classes, typeReferences, props);
+        init.addClass(sampleClassInDefaultPackage);
+        assertEquals(1, classes.size());
     }
 
     @XmlRootElement

@@ -53,7 +53,7 @@ public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel>
         LogUtils.getL7dLogger(NettyHttpServletPipelineFactory.class);
 
     //Holds the child channel
-    private final ChannelGroup allChannels = new DefaultChannelGroup(ImmediateEventExecutor.INSTANCE);;
+    private final ChannelGroup allChannels = new DefaultChannelGroup(ImmediateEventExecutor.INSTANCE);
 
     private final HttpSessionWatchdog watchdog;
 
@@ -170,9 +170,8 @@ public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel>
         if (tlsServerParameters != null) {
             SSLEngine sslEngine = SSLUtils.createServerSSLEngine(tlsServerParameters);
             return new SslHandler(sslEngine);
-        } else {
-            return null;
         }
+        return null;
     }
 
     private class HttpSessionWatchdog implements Runnable {

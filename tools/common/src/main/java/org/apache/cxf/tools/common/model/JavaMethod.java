@@ -86,18 +86,18 @@ public class JavaMethod implements JavaAnnotatable {
     public String getSignature() {
         StringBuilder sb = new StringBuilder();
         sb.append(javaReturn.getName());
-        sb.append("#");
+        sb.append('#');
         sb.append(javaInterface.getPackageName());
-        sb.append(".");
+        sb.append('.');
         sb.append(javaInterface.getName());
-        sb.append("#");
+        sb.append('#');
         sb.append(name);
-        sb.append("[");
+        sb.append('[');
         for (JavaParameter param : parameters) {
             sb.append(param.getName());
-            sb.append(",");
+            sb.append(',');
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 
@@ -174,11 +174,10 @@ public class JavaMethod implements JavaAnnotatable {
                 //removeParameter(paramInList);
                 replaceParameter(paramInList, param);
                 return;
-            } else {
-                Message message = new Message("PARAMETER_ALREADY_EXIST", LOG, param.getName(),
-                                              getName(), paramInList.getType(), param.getType());
-                throw new ToolException(message);
             }
+            Message message = new Message("PARAMETER_ALREADY_EXIST", LOG, param.getName(),
+                                          getName(), paramInList.getType(), param.getType());
+            throw new ToolException(message);
         }
 
         if (param.getType() == null && param.getClassName() == null) {
@@ -326,13 +325,13 @@ public class JavaMethod implements JavaAnnotatable {
             sb.setLength(0);
             if (parameter.isHolder()) {
                 sb.append(parameter.getHolderName());
-                sb.append("<");
+                sb.append('<');
                 sb.append(getClassName(parameter));
-                sb.append(">");
+                sb.append('>');
             } else {
                 sb.append(getClassName(parameter));
             }
-            sb.append(" ");
+            sb.append(' ');
             sb.append(parameter.getName());
             if (i != (parameters.size() - 1)) {
                 sb.append(',');
@@ -343,7 +342,7 @@ public class JavaMethod implements JavaAnnotatable {
     }
 
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(256);
         sb.append("\n========================\n");
         sb.append("\nMethod:");
         sb.append(getName());

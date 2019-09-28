@@ -78,7 +78,5 @@ public class HTTPSPStateManager implements SPStateManager {
     @POST
     @Path("close")
     public void close() throws IOException {
-        // TODO Auto-generated method stub
-
     }
 }

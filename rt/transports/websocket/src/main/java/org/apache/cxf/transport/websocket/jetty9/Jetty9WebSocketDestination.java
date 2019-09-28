@@ -49,6 +49,7 @@ import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
 import org.apache.cxf.transport.websocket.InvalidPathException;
 import org.apache.cxf.transport.websocket.WebSocketConstants;
 import org.apache.cxf.transport.websocket.WebSocketDestinationService;
+import org.apache.cxf.transport.websocket.WebSocketUtils;
 import org.apache.cxf.transport.websocket.jetty.WebSocketServletHolder;
 import org.apache.cxf.transport.websocket.jetty.WebSocketVirtualServletRequest;
 import org.apache.cxf.transport.websocket.jetty.WebSocketVirtualServletResponse;
@@ -56,7 +57,6 @@ import org.apache.cxf.workqueue.WorkQueueManager;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import org.eclipse.jetty.websocket.server.WebSocketHandler;
@@ -98,9 +98,9 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
                        final ServletContext context,
                        final HttpServletRequest request,
                        final HttpServletResponse response) throws IOException {
-        
+
         WebSocketServletFactory wsf = getWebSocketFactory(config, context);
-       
+
         if (wsf.isUpgradeRequest(request, response)
             && wsf.acceptWebSocket(request, response)) {
             ((Request)request).setHandled(true);
@@ -120,13 +120,13 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
     protected String getAddress(EndpointInfo endpointInfo) {
         return getNonWSAddress(endpointInfo);
     }
-    
+
     Server getServer(ServletConfig config, ServletContext context) {
-        WebAppContext.Context c = (WebAppContext.Context)context;
+        ContextHandler.Context c = (ContextHandler.Context)context;
         ContextHandler h = c.getContextHandler();
         return h.getServer();
     }
-    
+
     private WebSocketServletFactory getWebSocketFactory(ServletConfig config, ServletContext context) {
         if (webSocketFactory == null) {
             Server server = getServer(config, context);
@@ -146,7 +146,6 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
                 webSockethandler.setServer(server);
                 webSockethandler.start();
             } catch (Exception e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             webSocketFactory = webSockethandler.getWebSocketFactory();
@@ -183,10 +182,14 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
                 try {
                     WebSocketServletHolder holder = new Jetty9WebSocketHolder(session);
                     response = createServletResponse(holder);
-                    request = createServletRequest(data, offset, length, holder);
+                    request = createServletRequest(data, offset, length, holder, session);
                     String reqid = request.getHeader(REQUEST_ID_KEY);
                     if (reqid != null) {
-                        response.setHeader(RESPONSE_ID_KEY, reqid);
+                        if (WebSocketUtils.isContainingCRLF(reqid)) {
+                            LOG.warning("Invalid characters (CR/LF) in header " + REQUEST_ID_KEY);
+                        } else {
+                            response.setHeader(RESPONSE_ID_KEY, reqid);
+                        }
                     }
                     invoke(null, null, request, response);
                 } catch (InvalidPathException ex) {
@@ -220,9 +223,10 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
         }
     }
     private WebSocketVirtualServletRequest createServletRequest(byte[] data, int offset, int length,
-                                                                WebSocketServletHolder holder)
+                                                                WebSocketServletHolder holder,
+                                                                Session session)
         throws IOException {
-        return new WebSocketVirtualServletRequest(holder, new ByteArrayInputStream(data, offset, length));
+        return new WebSocketVirtualServletRequest(holder, new ByteArrayInputStream(data, offset, length), session);
     }
 
     private WebSocketVirtualServletResponse createServletResponse(WebSocketServletHolder holder) throws IOException {

@@ -66,8 +66,7 @@ public class StaxSource extends SAXSource implements XMLReader {
                 // Attributes are handled in START_ELEMENT
                 case XMLStreamConstants.ATTRIBUTE:
                     break;
-                case XMLStreamConstants.CDATA:
-                {
+                case XMLStreamConstants.CDATA: {
                     if (lexicalHandler != null) {
                         lexicalHandler.startCDATA();
                     }
@@ -80,16 +79,14 @@ public class StaxSource extends SAXSource implements XMLReader {
                     }
                     break;
                 }
-                case XMLStreamConstants.CHARACTERS:
-                {
+                case XMLStreamConstants.CHARACTERS: {
                     int length = streamReader.getTextLength();
                     int start = streamReader.getTextStart();
                     char[] chars = streamReader.getTextCharacters();
                     contentHandler.characters(chars, start, length);
                     break;
                 }
-                case XMLStreamConstants.SPACE:
-                {
+                case XMLStreamConstants.SPACE: {
                     int length = streamReader.getTextLength();
                     int start = streamReader.getTextStart();
                     char[] chars = streamReader.getTextCharacters();
@@ -113,17 +110,12 @@ public class StaxSource extends SAXSource implements XMLReader {
                     String uri = streamReader.getNamespaceURI();
                     String localName = streamReader.getLocalName();
                     String prefix = streamReader.getPrefix();
-                    String qname = prefix != null && prefix.length() > 0
-                        ? prefix + ":" + localName : localName;
+                    String qname = prefix != null && !prefix.isEmpty()
+                        ? prefix + ':' + localName : localName;
                     contentHandler.endElement(uri, localName, qname);
                     // namespaces
                     for (int i = 0; i < streamReader.getNamespaceCount(); i++) {
-                        String nsPrefix = streamReader.getNamespacePrefix(i);
-                        String nsUri = streamReader.getNamespaceURI(i);
-                        if (nsUri == null) {
-                            nsUri = "";
-                        }
-                        contentHandler.endPrefixMapping(nsPrefix);
+                        contentHandler.endPrefixMapping(streamReader.getNamespacePrefix(i));
                     }
                     break;
                 }
@@ -141,8 +133,8 @@ public class StaxSource extends SAXSource implements XMLReader {
                     String uri = streamReader.getNamespaceURI();
                     String localName = streamReader.getLocalName();
                     String prefix = streamReader.getPrefix();
-                    String qname = prefix != null && prefix.length() > 0
-                        ? prefix + ":" + localName : localName;
+                    String qname = prefix != null && !prefix.isEmpty()
+                        ? prefix + ':' + localName : localName;
                     // namespaces
                     for (int i = 0; i < streamReader.getNamespaceCount(); i++) {
                         String nsPrefix = streamReader.getNamespacePrefix(i);
@@ -179,11 +171,10 @@ public class StaxSource extends SAXSource implements XMLReader {
 
     protected String getQualifiedName() {
         String prefix = streamReader.getPrefix();
-        if (prefix != null && prefix.length() > 0) {
-            return prefix + ":" + streamReader.getLocalName();
-        } else {
-            return streamReader.getLocalName();
+        if (prefix != null && !prefix.isEmpty()) {
+            return prefix + ':' + streamReader.getLocalName();
         }
+        return streamReader.getLocalName();
     }
 
     protected Attributes getAttributes() {

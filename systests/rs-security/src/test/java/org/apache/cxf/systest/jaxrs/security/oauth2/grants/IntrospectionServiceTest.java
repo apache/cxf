@@ -19,37 +19,90 @@
 package org.apache.cxf.systest.jaxrs.security.oauth2.grants;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.TokenIntrospection;
+import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
+
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Some unit tests for the token introspection service in CXF.
+ * Some unit tests for the token introspection service in CXF. The tests are run multiple times with different
+ * OAuthDataProvider implementations:
+ * a) JCACHE_PORT - JCache
+ * b) JWT_JCACHE_PORT - JCache with useJwtFormatForAccessTokens enabled
+ * c) JPA_PORT - JPA provider
+ * d) JWT_NON_PERSIST_JCACHE_PORT-  JCache with useJwtFormatForAccessTokens + !persistJwtEncoding
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
 
-    public static final String PORT = BookServerOAuth2Introspection.PORT;
-    public static final String PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-introspection2");
+    public static final String JCACHE_PORT = TestUtil.getPortNumber("jaxrs-oauth2-introspection-jcache");
+    public static final String JCACHE_PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-introspection2-jcache");
+    public static final String JWT_JCACHE_PORT = TestUtil.getPortNumber("jaxrs-oauth2-introspection-jcache-jwt");
+    public static final String JWT_JCACHE_PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-introspection2-jcache-jwt");
+    public static final String JPA_PORT = TestUtil.getPortNumber("jaxrs-oauth2-introspection-jpa");
+    public static final String JPA_PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-introspection2-jpa");
+    public static final String JWT_NON_PERSIST_JCACHE_PORT =
+        TestUtil.getPortNumber("jaxrs-oauth2-introspection-jcache-jwt-non-persist");
+    public static final String JWT_NON_PERSIST_JCACHE_PORT2 =
+        TestUtil.getPortNumber("jaxrs-oauth2-introspection2-jcache-jwt-non-persist");
+
+    final String port;
+
+    public IntrospectionServiceTest(String port) {
+        this.port = port;
+    }
 
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(BookServerOAuth2Introspection.class, true));
+                   launchServer(BookServerOAuth2IntrospectionJCache.class, true));
+        assertTrue("server did not launch correctly",
+                   launchServer(BookServerOAuth2IntrospectionJCacheJWT.class, true));
+        assertTrue("server did not launch correctly",
+                   launchServer(BookServerOAuth2IntrospectionJPA.class, true));
+        assertTrue("server did not launch correctly",
+                   launchServer(BookServerOAuth2IntrospectionJCacheJWTNonPersist.class, true));
+    }
+
+    @AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
+
+    @Parameters(name = "{0}")
+    public static Collection<String> data() {
+
+        return Arrays.asList(JCACHE_PORT, JWT_JCACHE_PORT, JPA_PORT, JWT_NON_PERSIST_JCACHE_PORT);
     }
 
     @org.junit.Test
     public void testTokenIntrospection() throws Exception {
         URL busFile = IntrospectionServiceTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -80,19 +133,22 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
         Response response = client.post(form);
 
         TokenIntrospection tokenIntrospection = response.readEntity(TokenIntrospection.class);
-        assertEquals(tokenIntrospection.isActive(), true);
+        assertTrue(tokenIntrospection.isActive());
         assertEquals(tokenIntrospection.getUsername(), "alice");
         assertEquals(tokenIntrospection.getClientId(), "consumer-id");
         assertEquals(tokenIntrospection.getScope(), accessToken.getApprovedScope());
         Long validity = tokenIntrospection.getExp() - tokenIntrospection.getIat();
         assertTrue(validity == accessToken.getExpiresIn());
+        Long nbf = tokenIntrospection.getNbf();
+        long now = System.currentTimeMillis() / 1000L;
+        assertTrue(nbf < now);
     }
 
     @org.junit.Test
     public void testTokenIntrospectionWithAudience() throws Exception {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -110,7 +166,15 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(client).getRequestContext().put(
             org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
 
-        String audience = "https://localhost:" + PORT2 + "/secured/bookstore/books";
+        String audPort = JCACHE_PORT2;
+        if (JWT_JCACHE_PORT.equals(port)) {
+            audPort = JWT_JCACHE_PORT2;
+        } else if (JPA_PORT.equals(port)) {
+            audPort = JPA_PORT2;
+        } else if (JWT_NON_PERSIST_JCACHE_PORT.equals(port)) {
+            audPort = JWT_NON_PERSIST_JCACHE_PORT2;
+        }
+        String audience = "https://localhost:" + audPort + "/secured/bookstore/books";
         ClientAccessToken accessToken =
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code, "consumer-id-aud", audience);
         assertNotNull(accessToken.getTokenKey());
@@ -125,7 +189,7 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
         Response response = client.post(form);
 
         TokenIntrospection tokenIntrospection = response.readEntity(TokenIntrospection.class);
-        assertEquals(tokenIntrospection.isActive(), true);
+        assertTrue(tokenIntrospection.isActive());
         assertEquals(tokenIntrospection.getUsername(), "alice");
         assertEquals(tokenIntrospection.getClientId(), "consumer-id-aud");
         assertEquals(tokenIntrospection.getScope(), accessToken.getApprovedScope());
@@ -138,7 +202,7 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
     public void testInvalidToken() throws Exception {
         URL busFile = IntrospectionServiceTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -169,14 +233,14 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
         Response response = client.post(form);
 
         TokenIntrospection tokenIntrospection = response.readEntity(TokenIntrospection.class);
-        assertEquals(tokenIntrospection.isActive(), false);
+        assertFalse(tokenIntrospection.isActive());
     }
 
     @org.junit.Test
     public void testRefreshedToken() throws Exception {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -224,7 +288,7 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
         response = client.post(form);
 
         TokenIntrospection tokenIntrospection = response.readEntity(TokenIntrospection.class);
-        assertEquals(tokenIntrospection.isActive(), true);
+        assertTrue(tokenIntrospection.isActive());
 
         // Original token should not be ok
         form = new Form();
@@ -232,14 +296,14 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
         response = client.post(form);
 
         tokenIntrospection = response.readEntity(TokenIntrospection.class);
-        assertEquals(tokenIntrospection.isActive(), false);
+        assertFalse(tokenIntrospection.isActive());
     }
 
     @org.junit.Test
     public void testTokenIntrospectionWithScope() throws Exception {
         URL busFile = IntrospectionServiceTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -271,7 +335,7 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
         Response response = client.post(form);
 
         TokenIntrospection tokenIntrospection = response.readEntity(TokenIntrospection.class);
-        assertEquals(tokenIntrospection.isActive(), true);
+        assertTrue(tokenIntrospection.isActive());
         assertEquals(tokenIntrospection.getUsername(), "alice");
         assertEquals(tokenIntrospection.getClientId(), "consumer-id");
         assertEquals(tokenIntrospection.getScope(), accessToken.getApprovedScope());
@@ -279,4 +343,84 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
         assertTrue(validity == accessToken.getExpiresIn());
     }
 
+    //
+    // Server implementations
+    //
+
+    public static class BookServerOAuth2IntrospectionJCache extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            BookServerOAuth2IntrospectionJCache.class.getResource("introspection-server-jcache.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new BookServerOAuth2IntrospectionJCache();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class BookServerOAuth2IntrospectionJCacheJWT extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            BookServerOAuth2IntrospectionJCacheJWT.class.getResource("introspection-server-jcache-jwt.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new BookServerOAuth2IntrospectionJCacheJWT();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class BookServerOAuth2IntrospectionJPA extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            BookServerOAuth2IntrospectionJPA.class.getResource("introspection-server-jpa.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new BookServerOAuth2IntrospectionJPA();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class BookServerOAuth2IntrospectionJCacheJWTNonPersist extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            BookServerOAuth2IntrospectionJCacheJWTNonPersist.class.getResource(
+                "introspection-server-jcache-jwt-non-persist.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new BookServerOAuth2IntrospectionJCacheJWTNonPersist();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
 }

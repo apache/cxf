@@ -71,7 +71,7 @@ class NoNamespaceAegisElementProvider<T> extends AegisElementProvider<T> {
         context.setReadXsiTypes(readXsiType);
         TypeCreationOptions tco = new TypeCreationOptions();
         tco.setQualifyElements(false);
-        Set<java.lang.reflect.Type> rootClasses = new HashSet<java.lang.reflect.Type>();
+        Set<java.lang.reflect.Type> rootClasses = new HashSet<>();
         rootClasses.add(genericType);
         context.setTypeCreationOptions(tco);
         context.setRootClasses(rootClasses);

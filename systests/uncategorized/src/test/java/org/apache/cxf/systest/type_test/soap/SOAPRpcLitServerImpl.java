@@ -34,7 +34,7 @@ public class SOAPRpcLitServerImpl extends AbstractBusTestServerBase {
         Endpoint.publish(address, implementor);
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         try {
             SOAPRpcLitServerImpl s = new SOAPRpcLitServerImpl();
             s.start();
@@ -50,7 +50,7 @@ public class SOAPRpcLitServerImpl extends AbstractBusTestServerBase {
                 portName = "SOAPPort",
                 endpointInterface = "org.apache.type_test.rpc.TypeTestPortType",
                 targetNamespace = "http://apache.org/type_test/rpc",
-                wsdlLocation = "testutils/type_test/type_test_rpclit_soap.wsdl")
+                wsdlLocation = "wsdl/type_test/type_test_rpclit_soap.wsdl")
     class SOAPTypeTestImpl extends TypeTestImpl implements TypeTestPortType {
     }
 }

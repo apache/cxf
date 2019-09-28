@@ -32,11 +32,16 @@ import org.opensaml.xacml.ctx.AttributeType;
 import org.opensaml.xacml.ctx.RequestType;
 import org.opensaml.xacml.ctx.ResourceType;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 
 /**
  * Some unit tests to create a XACML Request via the XACMLRequestBuilder interface.
  */
-public class XACMLRequestBuilderTest extends org.junit.Assert {
+public class XACMLRequestBuilderTest {
 
     static {
         org.apache.wss4j.common.saml.OpenSAMLUtil.initSamlEngine();

@@ -211,9 +211,7 @@ public class SubscriptionManagerImpl implements SubscriptionManager {
             if (!EPRInspectionTool.containsUsableEPR(notifyTo.getValue())) {
                 throw new NoDeliveryMechanismEstablished();
             }
-        } catch (NullPointerException npe) {
-            throw new NoDeliveryMechanismEstablished();
-        } catch (IndexOutOfBoundsException ioobe) {
+        } catch (NullPointerException | IndexOutOfBoundsException npe) {
             throw new NoDeliveryMechanismEstablished();
         }
         ticket.setDelivery(request);
@@ -226,7 +224,7 @@ public class SubscriptionManagerImpl implements SubscriptionManager {
         // generate a ID for this subscription
         UUID uuid = UUID.randomUUID();
         JAXBElement<String> idqn
-            = new JAXBElement<String>(new QName(subscriptionIdNamespace, subscriptionIdElementName),
+            = new JAXBElement<>(new QName(subscriptionIdNamespace, subscriptionIdElementName),
                     String.class,
                     uuid.toString());
         subscriptionManagerReference.setReferenceParameters(new ReferenceParametersType());

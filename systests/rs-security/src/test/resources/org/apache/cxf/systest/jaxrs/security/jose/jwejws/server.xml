@@ -17,7 +17,14 @@ KIND, either express or implied. See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:cxf="http://cxf.apache.org/core" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xsi:schemaLocation="         http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd         http://www.springframework.org/schema/beans                 http://www.springframework.org/schema/beans/spring-beans-4.2.xsd         http://cxf.apache.org/transports/http/configuration         http://cxf.apache.org/schemas/configuration/http-conf.xsd         http://cxf.apache.org/transports/http-jetty/configuration   http://cxf.apache.org/schemas/configuration/http-jetty.xsd         http://cxf.apache.org/configuration/security                http://cxf.apache.org/schemas/configuration/security.xsd         ">
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:http="http://cxf.apache.org/transports/http/configuration"
+    xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
+    xmlns:sec="http://cxf.apache.org/configuration/security"
+    xmlns:cxf="http://cxf.apache.org/core"
+    xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+    xsi:schemaLocation="http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
@@ -97,6 +104,23 @@ under the License.
             <entry key="rs.security.encryption.out.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs.properties"/>
             <entry key="rs.security.signature.out.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
             <entry key="rs.security.signature.key.password.provider" value-ref="keyPasswordProvider"/>
+            <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    
+    <bean id="encrSignJwsInFilter" class="org.apache.cxf.systest.jaxrs.security.jose.jwejws.EncrSignJwsContainerRequestFilter"/>
+    <bean id="encrSignJweInFilter" class="org.apache.cxf.systest.jaxrs.security.jose.jwejws.EncrSignJweContainerRequestFilter"/>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwejwsrsaencrsign">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="encrSignJweInFilter"/>
+            <ref bean="encrSignJwsInFilter"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.encryption.in.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
+            <entry key="rs.security.signature.in.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs.properties"/>
             <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
         </jaxrs:properties>
     </jaxrs:server>

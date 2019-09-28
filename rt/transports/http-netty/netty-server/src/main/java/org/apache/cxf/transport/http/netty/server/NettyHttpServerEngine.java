@@ -24,9 +24,9 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
+
 import javax.annotation.PostConstruct;
 
 import org.apache.cxf.common.i18n.Message;
@@ -34,6 +34,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.transport.HttpUriMapper;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
@@ -68,7 +69,7 @@ public class NettyHttpServerEngine implements ServerEngine {
 
     private NettyHttpServletPipelineFactory servletPipeline;
 
-    private Map<String, NettyHttpContextHandler> handlerMap = new ConcurrentHashMap<String, NettyHttpContextHandler>();
+    private Map<String, NettyHttpContextHandler> handlerMap = new ConcurrentHashMap<>();
 
     /**
      * This field holds the TLS ServerParameters that are programatically
@@ -79,7 +80,7 @@ public class NettyHttpServerEngine implements ServerEngine {
 
     private ThreadingParameters threadingParameters = new ThreadingParameters();
 
-    private List<String> registedPaths = new CopyOnWriteArrayList<String>();
+    private List<String> registedPaths = new CopyOnWriteArrayList<>();
 
     // TODO need to setup configuration about them
     private int readIdleTime = 60;
@@ -117,6 +118,11 @@ public class NettyHttpServerEngine implements ServerEngine {
      */
     public void setTlsServerParameters(TLSServerParameters params) {
         tlsServerParameters = params;
+        if (tlsServerParameters != null) {
+            protocol = "https";
+        } else {
+            protocol = "http";
+        }
     }
 
     /**
@@ -226,9 +232,8 @@ public class NettyHttpServerEngine implements ServerEngine {
         NettyHttpContextHandler contextHandler = handlerMap.get(contextName);
         if (contextHandler != null) {
             return contextHandler.getNettyHttpHandler(url.getPath());
-        } else {
-            return null;
         }
+        return null;
     }
 
     public void shutdown() {

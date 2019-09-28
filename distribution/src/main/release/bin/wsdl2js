@@ -33,6 +33,15 @@ case "`uname`" in
            ;;
 esac
 
+#
+# Load common functions
+#
+DIR="$( cd "$( dirname $0 )" >/dev/null 2>&1 && pwd )"
+. "${DIR}/inc"
+
+# Determine the JVM version >= 9
+checkJvmVersion
+
 me=`basename $0`
 cxf_home=$CXF_HOME
 if [ ! -f  $cxf_home/lib/cxf-manifest.jar ]; then
@@ -72,7 +81,11 @@ if [ "x${JAVA_MAX_MEM}" = "x" ]; then
     export JAVA_MAX_MEM
 fi
 
-$JAVA_HOME/bin/java -Xmx${JAVA_MAX_MEM} -Djava.endorsed.dirs="${cxf_home}/lib/endorsed" -cp "${cxf_classpath}" -Djava.util.logging.config.file=$log_config org.apache.cxf.tools.wsdlto.javascript.WSDLToJavaScript "$@"
+if [ "${VERSION}" -gt "8" ]; then
+    $JAVA_HOME/bin/java -Xmx${JAVA_MAX_MEM} -cp "${cxf_classpath}" -Djava.util.logging.config.file=$log_config org.apache.cxf.tools.wsdlto.javascript.WSDLToJavaScript "$@"
+else
+    $JAVA_HOME/bin/java -Xmx${JAVA_MAX_MEM} -Djava.endorsed.dirs="${cxf_home}/lib/endorsed" -cp "${cxf_classpath}" -Djava.util.logging.config.file=$log_config org.apache.cxf.tools.wsdlto.javascript.WSDLToJavaScript "$@"
+fi
 
 
 

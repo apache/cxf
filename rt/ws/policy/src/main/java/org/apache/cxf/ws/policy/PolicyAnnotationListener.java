@@ -22,7 +22,7 @@ package org.apache.cxf.ws.policy;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.logging.Level;
@@ -130,7 +130,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
                 list.add(p);
             }
             if (ps != null) {
-                list.addAll(Arrays.asList(ps.value()));
+                Collections.addAll(list, ps.value());
             }
             ListIterator<Policy> it = list.listIterator();
             while (it.hasNext()) {
@@ -250,7 +250,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
                 list.add(p);
             }
             if (ps != null) {
-                list.addAll(Arrays.asList(ps.value()));
+                Collections.addAll(list, ps.value());
             }
             addPolicies(factory, endpoint, cls, list, Policy.Placement.SERVICE);
         }
@@ -312,7 +312,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
                 list.add(p);
             }
             if (ps != null) {
-                list.addAll(Arrays.asList(ps.value()));
+                Collections.addAll(list, ps.value());
             }
             ListIterator<Policy> it = list.listIterator();
             while (it.hasNext()) {
@@ -404,7 +404,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
             uri = "#" + uri;
         }
 
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element el = doc.createElementNS(ns, "wsp:" + Constants.ELEM_POLICY_REF);
         Attr att = doc.createAttributeNS(null, "URI");
         att.setValue(uri);
@@ -419,7 +419,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
     private String getPolicyRefURI(Element element) {
         return element.getAttributeNS(null, "URI");
     }
-    private boolean isExistsPolicy(Object exts[], String uri) {
+    private boolean isExistsPolicy(Object[] exts, String uri) {
         exts = exts == null ? new Object[0] : exts;
         for (Object o : exts) {
             if (o instanceof UnknownExtensibilityElement) {
@@ -433,7 +433,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
         return false;
     }
 
-    private boolean isExistsPolicyReference(Object exts[], String uri) {
+    private boolean isExistsPolicyReference(Object[] exts, String uri) {
         exts = exts == null ? new Object[0] : exts;
         for (Object o : exts) {
             if (o instanceof UnknownExtensibilityElement) {
@@ -450,9 +450,8 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
     private Element loadPolicy(String uri, String defName) {
         if (!uri.startsWith("#")) {
             return loadRemotePolicy(uri, defName);
-        } else {
-            return loadLocalPolicy(uri);
         }
+        return loadLocalPolicy(uri);
     }
 
     private Element loadRemotePolicy(String uri, String defName) {
@@ -492,8 +491,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
             .getBeanOfType(uri.substring(1), PolicyBean.class);
         if (null != pb) {
             return pb.getElement();
-        } else {
-            return null;
         }
+        return null;
     }
 }

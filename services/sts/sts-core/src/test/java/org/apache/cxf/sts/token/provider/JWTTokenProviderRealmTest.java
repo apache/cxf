@@ -39,10 +39,14 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests for creating JWT Tokens via the JWTTokenProvider in different realms
  */
-public class JWTTokenProviderRealmTest extends org.junit.Assert {
+public class JWTTokenProviderRealmTest {
 
     @org.junit.Test
     public void testRealms() throws Exception {
@@ -63,7 +67,7 @@ public class JWTTokenProviderRealmTest extends org.junit.Assert {
         // Realm "A"
         assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE, "A"));
         TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
@@ -77,7 +81,7 @@ public class JWTTokenProviderRealmTest extends org.junit.Assert {
         providerParameters.setRealm("B");
         assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE, "B"));
         providerResponse = jwtTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         token = (String)providerResponse.getToken();
@@ -91,7 +95,7 @@ public class JWTTokenProviderRealmTest extends org.junit.Assert {
         providerParameters.setRealm(null);
         assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE, null));
         providerResponse = jwtTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         token = (String)providerResponse.getToken();

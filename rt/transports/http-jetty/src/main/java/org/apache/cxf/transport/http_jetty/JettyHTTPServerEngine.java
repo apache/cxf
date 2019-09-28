@@ -105,6 +105,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
     private String protocol = "http";
 
     private Boolean isSessionSupport = false;
+    private int sessionTimeout = -1;
     private Boolean isReuseAddress = true;
     private Boolean continuationsEnabled = true;
     private int maxIdleTime = 200000;
@@ -137,7 +138,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
      */
     private boolean configFinalized;
 
-    private List<String> registedPaths = new CopyOnWriteArrayList<String>();
+    private List<String> registedPaths = new CopyOnWriteArrayList<>();
 
     /**
      * This constructor is called by the JettyHTTPServerEngineFactory.
@@ -489,28 +490,8 @@ public class JettyHTTPServerEngine implements ServerEngine {
         context.setContextPath(contextName);
         // bind the jetty http handler with the context handler
         if (isSessionSupport) {
-            // If we have sessions, we need two handlers.
-            SessionHandler sh = null;
-            if (Server.getVersion().startsWith("9.2") 
-                || Server.getVersion().startsWith("9.3")) {
-                if (sessionHandler == null) {
-                    sessionHandler = new SessionHandler();
-                }
-                sh = new SessionHandler();
-                try {
-                    Method get = ReflectionUtil.getDeclaredMethod(SessionHandler.class, "getSessionManager");
-                    Method set = ReflectionUtil.getDeclaredMethod(SessionHandler.class, 
-                                                                  "setSessionManager", 
-                                                                  get.getReturnType());
-                    ReflectionUtil.setAccessible(set)
-                        .invoke(sh, ReflectionUtil.setAccessible(get).invoke(sessionHandler));
-                } catch (Throwable t) {
-                    //ignore, just use the new session manager
-                }
-            } else {
-                //9.4+ stores the session id handling and cache and everything on the server, just need the handler
-                sh = new SessionHandler();
-            }
+            SessionHandler sh = configureSession();
+
             if (securityHandler != null) {
                 //use the securityHander which already wrap the jetty http handler
                 sh.setHandler(securityHandler);
@@ -532,7 +513,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
         ServletContext sc = context.getServletContext();
         handler.setServletContext(sc);
 
-        final String smap = HttpUriMapper.getResourceBase(url.getPath());
+        final String smap = getHandlerName(url, context);
         handler.setName(smap);
 
         if (contexts.isStarted()) {
@@ -545,6 +526,58 @@ public class JettyHTTPServerEngine implements ServerEngine {
 
         registedPaths.add(url.getPath());
         ++servantCount;
+    }
+
+    private SessionHandler configureSession() {
+        // If we have sessions, we need two handlers.
+        SessionHandler sh = null;
+        try {
+            if (Server.getVersion().startsWith("9.2") || Server.getVersion().startsWith("9.3")) {
+                if (sessionHandler == null) {
+                    sessionHandler = new SessionHandler();
+                }
+                sh = new SessionHandler();
+                Method get = ReflectionUtil.getDeclaredMethod(SessionHandler.class, "getSessionManager");
+                Method set = ReflectionUtil.getDeclaredMethod(SessionHandler.class, "setSessionManager",
+                                                              get.getReturnType());
+                if (this.getSessionTimeout() >= 0) {
+                    Method setMaxInactiveInterval = ReflectionUtil
+                        .getDeclaredMethod(get.getReturnType(), "setMaxInactiveInterval", int.class);
+                    ReflectionUtil.setAccessible(setMaxInactiveInterval)
+                        .invoke(ReflectionUtil.setAccessible(get).invoke(sessionHandler), 20);
+                }
+                ReflectionUtil.setAccessible(set)
+                    .invoke(sh, ReflectionUtil.setAccessible(get).invoke(sessionHandler));
+
+            } else {
+                // 9.4+ stores the session id handling and cache and everything on the server, just need
+                // the handler
+
+                sh = new SessionHandler();
+                if (this.getSessionTimeout() >= 0) {
+                    Method setMaxInactiveInterval = ReflectionUtil
+                        .getDeclaredMethod(SessionHandler.class, "setMaxInactiveInterval", int.class);
+                    ReflectionUtil.setAccessible(setMaxInactiveInterval).invoke(sh, 20);
+                }
+
+            }
+        } catch (Throwable t) {
+
+        }
+        return sh;
+    }
+
+    private String getHandlerName(URL url, ContextHandler context) {
+        String contextPath = context.getContextPath();
+        String path = url.getPath();
+        if (path.startsWith(contextPath)) {
+            if ("/".equals(contextPath)) {
+                return path;
+            }
+            return path.substring(contextPath.length());
+        } else {
+            return HttpUriMapper.getResourceBase(url.getPath());
+        }
     }
 
     private void initializeContexts() {
@@ -585,6 +618,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private Connector createConnector(String hosto, int porto) {
         // now we just use the SelectChannelConnector as the default connector
         SslContextFactory sslcf = null;
@@ -692,11 +726,11 @@ public class JettyHTTPServerEngine implements ServerEngine {
             ? SSLContext.getInstance(proto)
                 : SSLContext.getInstance(proto, tlsServerParameters.getJsseProvider());
 
-        KeyManager keyManagers[] = tlsServerParameters.getKeyManagers();
-        org.apache.cxf.transport.https.SSLUtils.configureKeyManagersWithCertAlias(
+        KeyManager[] keyManagers = tlsServerParameters.getKeyManagers();
+        KeyManager[] configuredKeyManagers = org.apache.cxf.transport.https.SSLUtils.configureKeyManagersWithCertAlias(
             tlsServerParameters, keyManagers);
 
-        context.init(tlsServerParameters.getKeyManagers(),
+        context.init(configuredKeyManagers,
                      tlsServerParameters.getTrustManagers(),
                      tlsServerParameters.getSecureRandom());
 
@@ -725,6 +759,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
         return context;
     }
 
+    @SuppressWarnings("deprecation")
     protected void setClientAuthentication(SslContextFactory con,
                                            ClientAuthentication clientAuth) {
         con.setWantClientAuth(true);
@@ -747,6 +782,8 @@ public class JettyHTTPServerEngine implements ServerEngine {
         setClientAuthentication(con,
                                 tlsServerParameters.getClientAuthentication());
         con.setCertAlias(tlsServerParameters.getCertAlias());
+        // TODO Once we switch to use SslContextFactory.Server instead, we can get rid of this line
+        con.setEndpointIdentificationAlgorithm(null);
     }
 
 
@@ -809,7 +846,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
     }
 
     private ThreadPool getThreadPool() {
-        ThreadPool pool = (ThreadPool)server.getThreadPool();
+        ThreadPool pool = server.getThreadPool();
         if (pool == null) {
             pool = new QueuedThreadPool();
             try {
@@ -969,10 +1006,12 @@ public class JettyHTTPServerEngine implements ServerEngine {
 
     private void checkConnectorPort() throws IOException {
         try {
-            int cp = ((ServerConnector)connector).getPort();
-            if (null != connector && port != cp) {
-                throw new IOException("Error: Connector port " + cp + " does not match"
-                            + " with the server engine port " + port);
+            if (null != connector) {
+                int cp = ((ServerConnector)connector).getPort();
+                if (port != cp) {
+                    throw new IOException("Error: Connector port " + cp + " does not match"
+                                + " with the server engine port " + port);
+                }
             }
         } catch (IOException ioe) {
             throw ioe;
@@ -1001,7 +1040,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
                     }
                 }
             } finally {
-                if (contexts != null) {
+                if (contexts != null && contexts.getHandlers() != null) {
                     for (Handler h : contexts.getHandlers()) {
                         h.stop();
                     }
@@ -1072,6 +1111,14 @@ public class JettyHTTPServerEngine implements ServerEngine {
 
     public Boolean getSendServerVersion() {
         return sendServerVersion;
+    }
+
+    public int getSessionTimeout() {
+        return sessionTimeout;
+    }
+
+    public void setSessionTimeout(int sessionTimeout) {
+        this.sessionTimeout = sessionTimeout;
     }
 
 }

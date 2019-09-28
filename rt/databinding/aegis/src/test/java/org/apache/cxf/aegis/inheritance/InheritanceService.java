@@ -21,6 +21,8 @@
  */
 package org.apache.cxf.aegis.inheritance;
 
+import org.junit.Assert;
+
 public class InheritanceService {
     public AbstractUser getEmployee() {
         Employee e = new Employee();
@@ -31,6 +33,6 @@ public class InheritanceService {
     }
 
     public void receiveUser(AbstractUser user) {
-        InheritancePOJOTest.assertTrue(user instanceof Employee);
+        Assert.assertTrue(user instanceof Employee);
     }
 }

@@ -56,7 +56,7 @@ public class JwtRequestCodeGrant extends AuthorizationCodeGrant {
     }
     public MultivaluedMap<String, String> toMap() {
         String request = getRequest();
-        MultivaluedMap<String, String> newMap = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> newMap = new MetadataMap<>();
         newMap.putSingle("request", request);
         return newMap;
 

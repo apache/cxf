@@ -25,6 +25,10 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -94,7 +98,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         new HashSet<Class<?>>(Arrays.asList(InputStream.class,
                                             OutputStream.class,
                                             StreamingOutput.class));
-    protected Set<Class<?>> collectionContextClasses = new HashSet<Class<?>>();
+    protected Set<Class<?>> collectionContextClasses = new HashSet<>();
 
     protected Map<String, String> jaxbElementClassMap = Collections.emptyMap();
     protected boolean unmarshalAsJaxbElement;
@@ -138,6 +142,22 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     private Marshaller.Listener marshallerListener;
     private DocumentDepthProperties depthProperties;
     private String namespaceMapperPropertyName;
+
+    private static JAXBContext newJAXBContextInstance(Class<?>[] classes, Map<String, Object> cProperties) 
+        throws JAXBException {
+
+        try {
+            return AccessController.doPrivileged((PrivilegedExceptionAction<JAXBContext>)() -> {
+                return JAXBContext.newInstance(classes, cProperties);
+            });
+        } catch (PrivilegedActionException e) {
+            Throwable t = e.getCause();
+            if (t instanceof JAXBException) {
+                throw (JAXBException) t;
+            }
+            throw new RuntimeException(t);
+        }
+    }
 
     public void setXmlRootAsJaxbElement(boolean xmlRootAsJaxbElement) {
         this.xmlRootAsJaxbElement = xmlRootAsJaxbElement;
@@ -188,12 +208,12 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
             JAXBContext context = null;
             Set<Class<?>> allTypes = null;
             if (cris != null) {
-                allTypes = new HashSet<Class<?>>(ResourceUtils.getAllRequestResponseTypes(cris, true)
+                allTypes = new HashSet<>(ResourceUtils.getAllRequestResponseTypes(cris, true)
                     .getAllTypes().keySet());
-                context = ResourceUtils.createJaxbContext(allTypes, extraClass, cProperties);
+                context = org.apache.cxf.jaxrs.utils.JAXBUtils.createJaxbContext(allTypes, extraClass, cProperties);
             } else if (extraClass != null) {
-                allTypes = new HashSet<Class<?>>(Arrays.asList(extraClass));
-                context = ResourceUtils.createJaxbContext(allTypes, null, cProperties);
+                allTypes = new HashSet<>(Arrays.asList(extraClass));
+                context = org.apache.cxf.jaxrs.utils.JAXBUtils.createJaxbContext(allTypes, null, cProperties);
             }
 
             if (context != null) {
@@ -207,7 +227,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
             }
         }
         if (cris != null) {
-            List<String> schemaLocs = new LinkedList<String>();
+            List<String> schemaLocs = new LinkedList<>();
             SchemaValidation sv = null;
             for (ClassResourceInfo cri : cris) {
                 sv = cri.getServiceClass().getAnnotation(SchemaValidation.class);
@@ -223,7 +243,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
             }
             if (!schemaLocs.isEmpty()) {
                 this.setSchemaLocations(schemaLocs);
-                if (cris.size() == 0 && schema != null) {
+                if (cris.isEmpty() && schema != null && sv != null) {
                     SchemaValidation.SchemaValidationType type = sv.type();
                     if (type == SchemaValidation.SchemaValidationType.OUT) {
                         validateInputIfPossible = false;
@@ -308,9 +328,8 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         }
         if (jaxbElementClassNames.contains(cls.getName())) {
             return cls;
-        } else {
-            return getJaxbElementClass(cls.getSuperclass());
         }
+        return getJaxbElementClass(cls.getSuperclass());
 
     }
 
@@ -337,7 +356,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         return marshalAsJaxbElement && (!xmlTypeAsJaxbElementOnly || isXmlType(type))
             || isSupported(type, genericType, anns);
     }
-    public void writeTo(T t, Type genericType, Annotation annotations[],
+    public void writeTo(T t, Type genericType, Annotation[] annotations,
                  MediaType mediaType,
                  MultivaluedMap<String, Object> httpHeaders,
                  OutputStream entityStream) throws IOException, WebApplicationException {
@@ -352,8 +371,8 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
                 collectionContextClasses.add(CollectionWrapper.class);
                 collectionContextClasses.add(type);
             }
-            return JAXBContext.newInstance(
-                collectionContextClasses.toArray(new Class[collectionContextClasses.size()]), cProperties);
+            return newJAXBContextInstance(
+                collectionContextClasses.toArray(new Class[0]), cProperties);
         }
     }
 
@@ -505,7 +524,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         synchronized (classContexts) {
             JAXBContext context = classContexts.get(type);
             if (context == null) {
-                Class<?>[] classes = null;
+                Class<?>[] classes;
                 if (extraClass != null) {
                     classes = new Class[extraClass.length + 1];
                     classes[0] = type;
@@ -514,7 +533,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
                     classes = new Class[] {type};
                 }
 
-                context = JAXBContext.newInstance(classes, cProperties);
+                context = newJAXBContextInstance(classes, cProperties);
                 classContexts.put(type, context);
             }
             return context;
@@ -523,7 +542,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     public JAXBContext getPackageContext(Class<?> type) {
         return getPackageContext(type, type);
     }
-    protected JAXBContext getPackageContext(Class<?> type, Type genericType) {
+    protected JAXBContext getPackageContext(final Class<?> type, Type genericType) {
         if (type == null || type == JAXBElement.class) {
             return null;
         }
@@ -532,7 +551,11 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
             JAXBContext context = packageContexts.get(packageName);
             if (context == null) {
                 try {
-                    if (type.getClassLoader() != null && objectFactoryOrIndexAvailable(type)) {
+                    final ClassLoader loader = AccessController.doPrivileged((PrivilegedAction<ClassLoader>) 
+                        () -> {
+                            return type.getClassLoader();
+                        });
+                    if (loader != null && objectFactoryOrIndexAvailable(type)) {
 
                         String contextName = packageName;
                         if (extraClass != null) {
@@ -540,13 +563,13 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
                             for (Class<?> extra : extraClass) {
                                 String extraPackage = PackageUtils.getPackageName(extra);
                                 if (!extraPackage.equals(packageName)) {
-                                    sb.append(":").append(extraPackage);
+                                    sb.append(':').append(extraPackage);
                                 }
                             }
                             contextName = sb.toString();
                         }
 
-                        context = JAXBContext.newInstance(contextName, type.getClassLoader(), cProperties);
+                        context = JAXBContext.newInstance(contextName, loader, cProperties);
                         packageContexts.put(packageName, context);
                     }
                 } catch (JAXBException ex) {
@@ -677,10 +700,9 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
 
         if (schema != null) {
             return schema;
-        } else {
-            SchemaHandler handler = schemaHandlers.get(cls.getName());
-            return handler != null ? handler.getSchema() : null;
         }
+        SchemaHandler handler = schemaHandlers.get(cls.getName());
+        return handler != null ? handler.getSchema() : null;
     }
 
 
@@ -707,9 +729,8 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
             ? Response.Status.BAD_REQUEST : Response.Status.INTERNAL_SERVER_ERROR;
         Response r = JAXRSUtils.toResponseBuilder(status)
             .type(MediaType.TEXT_PLAIN).entity(message).build();
-        WebApplicationException ex = read ? ExceptionUtils.toBadRequestException(t, r)
+        throw read ? ExceptionUtils.toBadRequestException(t, r)
             : ExceptionUtils.toInternalServerErrorException(t, r);
-        throw ex;
     }
 
     protected void handleJAXBException(JAXBException e, boolean read) {
@@ -816,9 +837,8 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
             } catch (XMLStreamException ex) {
                 throw ExceptionUtils.toInternalServerErrorException(ex, null);
             }
-        } else {
-            return reader;
         }
+        return reader;
     }
 
     protected DocumentDepthProperties getDepthProperties() {
@@ -920,20 +940,18 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
                                        theList.get(i), adapter, false);
                 }
                 return values;
-            } else {
-                if (!adapterChecked && adapter != null) {
-                    List<Object> newList = new ArrayList<>(theList.size());
-                    for (Object o : theList) {
-                        newList.add(org.apache.cxf.jaxrs.utils.JAXBUtils.useAdapter(o, adapter, false));
-                    }
-                    theList = newList;
-                }
-                if (collectionType == Set.class) {
-                    return new HashSet<>(theList);
-                } else {
-                    return theList;
-                }
             }
+            if (!adapterChecked && adapter != null) {
+                List<Object> newList = new ArrayList<>(theList.size());
+                for (Object o : theList) {
+                    newList.add(org.apache.cxf.jaxrs.utils.JAXBUtils.useAdapter(o, adapter, false));
+                }
+                theList = newList;
+            }
+            if (collectionType == Set.class) {
+                return new HashSet<>(theList);
+            }
+            return theList;
         }
 
     }

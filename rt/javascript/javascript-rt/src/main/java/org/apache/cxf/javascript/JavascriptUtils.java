@@ -19,13 +19,15 @@
 
 package org.apache.cxf.javascript;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -72,60 +74,46 @@ public class JavascriptUtils {
     private static final XmlSchemaChoice EMPTY_CHOICE = new XmlSchemaChoice();
     private static final XmlSchemaAll EMPTY_ALL = new XmlSchemaAll();
 
-
     private static final Logger LOG = LogUtils.getL7dLogger(JavascriptUtils.class);
 
     private static final String NL = "\n";
+    private static final Map<String, String> DEFAULT_VALUE_FOR_SIMPLE_TYPE = new HashMap<>();
+    static {
+        DEFAULT_VALUE_FOR_SIMPLE_TYPE.put("int", "0");
+        DEFAULT_VALUE_FOR_SIMPLE_TYPE.put("unsignedInt", "0");
+        DEFAULT_VALUE_FOR_SIMPLE_TYPE.put("long", "0");
+        DEFAULT_VALUE_FOR_SIMPLE_TYPE.put("unsignedLong", "0");
+        DEFAULT_VALUE_FOR_SIMPLE_TYPE.put("float", "0.0");
+        DEFAULT_VALUE_FOR_SIMPLE_TYPE.put("double", "0.0");
+    }
+    private static final Set<String> NON_STRINGS_SIMPLE_TYPES = new HashSet<>(
+            Arrays.asList("int", "long", "unsignedInt", "unsignedLong", "float", "double"));
+    private static final Set<String> INT_TYPES = new HashSet<>(
+            Arrays.asList("int", "long", "unsignedInt", "unsignedLong"));
+    private static final Set<String> FLOAT_TYPES = new HashSet<>(Arrays.asList("float", "double"));
+
     private static int anyTypePrefixCounter;
-    private StringBuilder code;
-    private Stack<String> prefixStack;
+
+    private final StringBuilder code;
+    private final Deque<String> prefixStack = new ArrayDeque<>();
     private String xmlStringAccumulatorVariable;
-    private Map<String, String> defaultValueForSimpleType;
-    private Set<String> nonStringSimpleTypes;
-    private Set<String> intTypes;
-    private Set<String> floatTypes;
 
     public JavascriptUtils(StringBuilder code) {
         this.code = code;
-        defaultValueForSimpleType = new HashMap<>();
-        defaultValueForSimpleType.put("int", "0");
-        defaultValueForSimpleType.put("unsignedInt", "0");
-        defaultValueForSimpleType.put("long", "0");
-        defaultValueForSimpleType.put("unsignedLong", "0");
-        defaultValueForSimpleType.put("float", "0.0");
-        defaultValueForSimpleType.put("double", "0.0");
-        nonStringSimpleTypes = new HashSet<>();
-        nonStringSimpleTypes.add("int");
-        nonStringSimpleTypes.add("long");
-        nonStringSimpleTypes.add("unsignedInt");
-        nonStringSimpleTypes.add("unsignedLong");
-        nonStringSimpleTypes.add("float");
-        nonStringSimpleTypes.add("double");
 
-        intTypes = new HashSet<>();
-        intTypes.add("int");
-        intTypes.add("long");
-        intTypes.add("unsignedInt");
-        intTypes.add("unsignedLong");
-        floatTypes = new HashSet<>();
-        floatTypes.add("float");
-        floatTypes.add("double");
-
-        prefixStack = new Stack<String>();
         prefixStack.push("    ");
     }
 
     public String getDefaultValueForSimpleType(XmlSchemaType type) {
-        String val = defaultValueForSimpleType.get(type.getName());
+        String val = DEFAULT_VALUE_FOR_SIMPLE_TYPE.get(type.getName());
         if (val == null) { // ints and such return the appropriate 0.
             return "''";
-        } else {
-            return val;
         }
+        return val;
     }
 
     public boolean isStringSimpleType(QName typeName) {
-        return !(WSDLConstants.NS_SCHEMA_XSD.equals(typeName.getNamespaceURI()) && nonStringSimpleTypes
+        return !(WSDLConstants.NS_SCHEMA_XSD.equals(typeName.getNamespaceURI()) && NON_STRINGS_SIMPLE_TYPES
             .contains(typeName.getLocalPart()));
     }
 
@@ -136,9 +124,7 @@ public class JavascriptUtils {
     public void startXmlStringAccumulator(String variableName) {
         xmlStringAccumulatorVariable = variableName;
         code.append(prefix());
-        code.append("var ");
-        code.append(variableName);
-        code.append(" = '';" + NL);
+        code.append("var ").append(variableName).append(" = '';").append(NL);
     }
 
     public static String protectSingleQuotes(String value) {
@@ -156,16 +142,16 @@ public class JavascriptUtils {
      */
     public void appendString(String value) {
         code.append(prefix());
-        code.append(xmlStringAccumulatorVariable + " = " + xmlStringAccumulatorVariable + " + '");
+        code.append(xmlStringAccumulatorVariable).append(" = ").append(xmlStringAccumulatorVariable).append(" + '");
         code.append(escapeStringQuotes(value));
-        code.append("';" + NL);
+        code.append("';").append(NL);
     }
 
     public void appendExpression(String value) {
         code.append(prefix());
-        code.append(xmlStringAccumulatorVariable + " = " + xmlStringAccumulatorVariable + " + ");
+        code.append(xmlStringAccumulatorVariable).append(" = ").append(xmlStringAccumulatorVariable).append(" + ");
         code.append(value);
-        code.append(";" + NL);
+        code.append(';').append(NL);
     }
 
     private String prefix() {
@@ -174,56 +160,56 @@ public class JavascriptUtils {
 
     public void appendLine(String line) {
         code.append(prefix());
-        code.append(line);
-        code.append(NL);
+        code.append(line).append(NL);
     }
 
     public void startIf(String test) {
         code.append(prefix());
-        code.append("if (" + test + ") {" + NL);
+        code.append("if (").append(test).append(") {").append(NL);
         prefixStack.push(prefix() + " ");
     }
 
     public void startBlock() {
         code.append(prefix());
-        code.append("{" + NL);
+        code.append('{').append(NL);
         prefixStack.push(prefix() + " ");
     }
 
     public void appendElse() {
         prefixStack.pop();
         code.append(prefix());
-        code.append("} else {" + NL);
+        code.append("} else {").append(NL);
         prefixStack.push(prefix() + " ");
     }
 
     public void endBlock() {
         prefixStack.pop();
         code.append(prefix());
-        code.append("}" + NL);
+        code.append('}').append(NL);
     }
 
     public void startFor(String start, String test, String increment) {
         code.append(prefix());
-        code.append("for (" + start + ";" + test + ";" + increment + ") {" + NL);
+        code.append("for (").append(start).append(';').append(test).append(';').append(increment).append(") {")
+                .append(NL);
         prefixStack.push(prefix() + " ");
     }
 
     public void startForIn(String var, String collection) {
         code.append(prefix());
-        code.append("for (var " + var + " in " + collection + ") {" + NL);
+        code.append("for (var ").append(var).append(" in ").append(collection).append(") {").append(NL);
         prefixStack.push(prefix() + " ");
     }
 
     public void startWhile(String test) {
         code.append(prefix());
-        code.append("while (" + test + ") {" + NL);
+        code.append("while (").append(test).append(") {").append(NL);
         prefixStack.push(prefix() + " ");
     }
 
     public void startDo() {
         code.append(prefix());
-        code.append("do  {" + NL);
+        code.append("do  {").append(NL);
         prefixStack.push(prefix() + " ");
     }
 
@@ -234,9 +220,9 @@ public class JavascriptUtils {
             return value;
         }
         String name = type.getName();
-        if (intTypes.contains(name)) {
+        if (INT_TYPES.contains(name)) {
             return "parseInt(" + value + ")";
-        } else if (floatTypes.contains(name)) {
+        } else if (FLOAT_TYPES.contains(name)) {
             return "parseFloat(" + value + ")";
         } else if ("boolean".equals(name)) {
             return "(" + value + " == 'true')";
@@ -680,14 +666,13 @@ public class JavascriptUtils {
                 }
             }
             return results;
-        } else {
-            // no base type, the simple case.
-            XmlSchemaSequence sequence = getSequence(type);
-            for (XmlSchemaSequenceMember item : sequence.getItems()) {
-                results.add((XmlSchemaObject)item);
-            }
-            return results;
         }
+        // no base type, the simple case.
+        XmlSchemaSequence sequence = getSequence(type);
+        for (XmlSchemaSequenceMember item : sequence.getItems()) {
+            results.add((XmlSchemaObject)item);
+        }
+        return results;
     }
 
     public static XmlSchemaSequence getContentSequence(XmlSchemaComplexType type) {
@@ -737,8 +722,7 @@ public class JavascriptUtils {
     static String cleanedUpSchemaSource(XmlSchemaObject subject) {
         if (subject == null || subject.getSourceURI() == null) {
             return "";
-        } else {
-            return subject.getSourceURI() + ":" + subject.getLineNumber();
         }
+        return subject.getSourceURI() + ':' + subject.getLineNumber();
     }
 }

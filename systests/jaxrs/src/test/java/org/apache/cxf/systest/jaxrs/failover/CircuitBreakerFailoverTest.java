@@ -31,7 +31,10 @@ import org.apache.cxf.clustering.RandomStrategy;
 import org.apache.cxf.clustering.SequentialStrategy;
 import org.apache.cxf.clustering.circuitbreaker.CircuitBreakerFailoverFeature;
 import org.apache.cxf.systest.jaxrs.BookStore;
+
 import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * Tests failover within a static cluster.

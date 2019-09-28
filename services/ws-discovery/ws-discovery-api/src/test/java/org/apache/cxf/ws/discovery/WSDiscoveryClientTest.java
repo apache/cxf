@@ -80,7 +80,7 @@ public final class WSDiscoveryClientTest {
     @Test
     public void testMultiResponses() throws Exception {
         // Disable the test on Redhat Enterprise Linux which doesn't enable the UDP broadcast by default
-        if (System.getProperties().getProperty("os.name").equals("Linux")
+        if ("Linux".equals(System.getProperties().getProperty("os.name"))
             && System.getProperties().getProperty("os.version").indexOf("el") > 0) {
             System.out.println("Skipping MultiResponse test for REL");
             return;
@@ -129,7 +129,7 @@ public final class WSDiscoveryClientTest {
                         String msg = IOUtils.readStringFromStream(ins);
                         msg = msg.replace("urn:uuid:883d0d53-92aa-4066-9b6f-9eadb1832366",
                                           incoming);
-                        byte out[] = msg.getBytes(StandardCharsets.UTF_8);
+                        byte[] out = msg.getBytes(StandardCharsets.UTF_8);
                         DatagramPacket outp = new DatagramPacket(out, 0, out.length, sa);
                         s.send(outp);
                     }
@@ -194,7 +194,7 @@ public final class WSDiscoveryClientTest {
                     System.out.println(pmt.getXAddrs());
                 }
             }
-            if (pmts.getProbeMatch().size() == 0) {
+            if (pmts.getProbeMatch().isEmpty()) {
                 System.exit(0);
             }
             pmts = c.probe(pt);

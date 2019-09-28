@@ -27,6 +27,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.rm.RM11Constants;
+import org.apache.cxf.ws.rm.RMConstants;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Policy;
@@ -84,7 +85,7 @@ public class RM12AssertionBuilder implements AssertionBuilder<Element> {
         if (RM11Constants.WSRMP_NAMESPACE_URI.equals(elem.getNamespaceURI())) {
             boolean optional = XMLPrimitiveAssertionBuilder.isOptional(elem);
             String lname = elem.getLocalName();
-            if (RM11Constants.RMASSERTION_NAME.equals(lname)) {
+            if (RMConstants.RMASSERTION_NAME.equals(lname)) {
 
                 // top-level RMAssertion, with nested policy
                 XMLPrimitiveAssertionBuilder nesting = new XMLPrimitiveAssertionBuilder() {

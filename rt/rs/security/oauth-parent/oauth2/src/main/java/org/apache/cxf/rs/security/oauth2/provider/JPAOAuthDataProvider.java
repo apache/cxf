@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -174,7 +175,13 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
         return execute(new EntityManagerOperation<ServerAccessToken>() {
             @Override
             public ServerAccessToken execute(EntityManager em) {
-                return em.find(BearerAccessToken.class, accessToken);
+                TypedQuery<BearerAccessToken> query = em.createQuery("SELECT t FROM BearerAccessToken t"
+                                      + " WHERE t.tokenKey = :tokenKey", BearerAccessToken.class)
+                                      .setParameter("tokenKey", accessToken);
+                if (query.getResultList().isEmpty()) {
+                    return null;
+                }
+                return query.getSingleResult();
             }
         });
     }
@@ -251,7 +258,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
         executeInTransaction(new EntityManagerOperation<Void>() {
             @Override
             public Void execute(EntityManager em) {
-                List<OAuthPermission> perms = new LinkedList<OAuthPermission>();
+                List<OAuthPermission> perms = new LinkedList<>();
                 for (OAuthPermission perm : serverToken.getScopes()) {
                     OAuthPermission permSaved = em.find(OAuthPermission.class, perm.getPermission());
                     if (permSaved != null) {
@@ -311,64 +318,44 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     protected TypedQuery<Client> getClientsQuery(UserSubject resourceOwnerSubject, EntityManager entityManager) {
         if (resourceOwnerSubject == null) {
             return entityManager.createQuery(CLIENT_QUERY, Client.class);
-        } else {
-            return entityManager.createQuery(CLIENT_QUERY + " WHERE ros.login = :login", Client.class).
-                    setParameter("login", resourceOwnerSubject.getLogin());
         }
+        return entityManager.createQuery(CLIENT_QUERY + " WHERE ros.login = :login", Client.class).
+                setParameter("login", resourceOwnerSubject.getLogin());
     }
 
     protected TypedQuery<BearerAccessToken> getTokensQuery(Client c, UserSubject resourceOwnerSubject,
                                                            EntityManager entityManager) {
-        if (c == null && resourceOwnerSubject == null) {
-            return entityManager.createQuery("SELECT t FROM BearerAccessToken t", BearerAccessToken.class);
-        } else if (c == null) {
-            return entityManager.createQuery(
-                    "SELECT t FROM BearerAccessToken t"
-                            + " JOIN t.subject s"
-                            + " WHERE s.login = :login", BearerAccessToken.class)
-                    .setParameter("login", resourceOwnerSubject.getLogin());
-        } else if (resourceOwnerSubject == null) {
-            return entityManager.createQuery(
-                    "SELECT t FROM BearerAccessToken t"
-                            + " JOIN t.client c"
-                            + " WHERE c.clientId = :clientId", BearerAccessToken.class)
-                    .setParameter("clientId", c.getClientId());
-        } else {
-            return entityManager.createQuery(
-                    "SELECT t FROM BearerAccessToken t"
-                            + " JOIN t.subject s"
-                            + " JOIN t.client c"
-                            + " WHERE s.login = :login AND c.clientId = :clientId", BearerAccessToken.class)
-                    .setParameter("login", resourceOwnerSubject.getLogin())
-                    .setParameter("clientId", c.getClientId());
-        }
+        return getQuery("BearerAccessToken", c, resourceOwnerSubject, entityManager, BearerAccessToken.class);
     }
 
     protected TypedQuery<RefreshToken> getRefreshTokensQuery(Client c, UserSubject resourceOwnerSubject,
                                                              EntityManager entityManager) {
-        if (c == null && resourceOwnerSubject == null) {
-            return entityManager.createQuery("SELECT t FROM RefreshToken t", RefreshToken.class);
-        } else if (c == null) {
-            return entityManager.createQuery(
-                    "SELECT t FROM RefreshToken t"
-                            + " JOIN t.subject s"
-                            + " WHERE s.login = :login", RefreshToken.class)
-                    .setParameter("login", resourceOwnerSubject.getLogin());
-        } else if (resourceOwnerSubject == null) {
-            return entityManager.createQuery(
-                    "SELECT t FROM RefreshToken t"
-                            + " JOIN t.client c"
-                            + " WHERE c.clientId = :clientId", RefreshToken.class)
-                    .setParameter("clientId", c.getClientId());
-        } else {
-            return entityManager.createQuery(
-                    "SELECT t FROM RefreshToken t"
-                            + " JOIN t.subject s"
-                            + " JOIN t.client c"
-                            + " WHERE s.login = :login AND c.clientId = :clientId", RefreshToken.class)
-                    .setParameter("login", resourceOwnerSubject.getLogin())
-                    .setParameter("clientId", c.getClientId());
+        return getQuery("RefreshToken", c, resourceOwnerSubject, entityManager, RefreshToken.class);
+    }
+
+    private static <T> TypedQuery<T> getQuery(String table, Client c, UserSubject resourceOwnerSubject,
+            EntityManager entityManager, Class<T> resultClass) {
+        StringBuilder query = new StringBuilder("SELECT t FROM ").append(table).append(" t");
+        Map<String, Object> parameterMap = new HashMap<>();
+        if (c != null || resourceOwnerSubject != null) {
+            query.append(" WHERE");
+            if (c != null) {
+                query.append(" t.client.clientId = :clientId");
+                parameterMap.put("clientId", c.getClientId());
+            }
+            if (resourceOwnerSubject != null) {
+                if (!parameterMap.isEmpty()) {
+                    query.append(" AND");
+                }
+                query.append(" t.subject.login = :login");
+                parameterMap.put("login", resourceOwnerSubject.getLogin());
+            }
         }
+        TypedQuery<T> typedQuery = entityManager.createQuery(query.toString(), resultClass);
+        for (Map.Entry<String, Object> entry : parameterMap.entrySet()) {
+            typedQuery.setParameter(entry.getKey(), entry.getValue());
+        }
+        return typedQuery;
     }
 
     /**

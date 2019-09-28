@@ -47,14 +47,16 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.servlet.ServletDestination;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class WadlGeneratorJsonTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class WadlGeneratorJsonTest {
 
     private IMocksControl control;
 

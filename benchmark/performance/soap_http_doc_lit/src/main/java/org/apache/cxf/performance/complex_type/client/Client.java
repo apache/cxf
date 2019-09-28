@@ -85,18 +85,18 @@ public final class Client extends TestCaseBase<DocPortType> {
 
     public void processArgs() {
         super.processArgs();
-        if (getOperationName().equals("echoStringDoc")) {
+        if ("echoStringDoc".equals(getOperationName())) {
             opid = 0;
-        } else if (getOperationName().equals("echoBase64Doc")) {
+        } else if ("echoBase64Doc".equals(getOperationName())) {
             opid = 1;
-        } else if (getOperationName().equals("echoComplexTypeDoc")) {
+        } else if ("echoComplexTypeDoc".equals(getOperationName())) {
             opid = 2;
         } else {
             System.out.println("Invalid operation: " + getOperationName());
         }
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         //workaround issue of xmlsec logging too much
         Logger.getLogger("org.apache.xml.security.signature.Reference").setLevel(Level.WARNING);
 
@@ -111,7 +111,7 @@ public final class Client extends TestCaseBase<DocPortType> {
             }
         }
         if (servIdx != -1) {
-            String tmp[] = new String[args.length - servIdx];
+            String[] tmp = new String[args.length - servIdx];
             System.arraycopy(args, servIdx, tmp, 0, args.length - servIdx);
             Server.main(tmp);
 
@@ -121,11 +121,11 @@ public final class Client extends TestCaseBase<DocPortType> {
         }
         List<String> threadList = new ArrayList<>();
         if (threadIdx != -1) {
-            String threads[] = args[threadIdx].split(",");
+            String[] threads = args[threadIdx].split(",");
             for (String s : threads) {
-                if (s.indexOf("-") != -1) {
-                    String s1 = s.substring(0, s.indexOf("-"));
-                    String s2 = s.substring(s.indexOf("-") + 1);
+                if (s.indexOf('-') != -1) {
+                    String s1 = s.substring(0, s.indexOf('-'));
+                    String s2 = s.substring(s.indexOf('-') + 1);
                     int i1 = Integer.parseInt(s1);
                     int i2 = Integer.parseInt(s2);
                     for (int x = i1; x <= i2; x++) {
@@ -247,7 +247,7 @@ public final class Client extends TestCaseBase<DocPortType> {
                 break;
             case 2:
                 int id = ++statId;
-                Holder<Integer> i = new Holder<Integer>();
+                Holder<Integer> i = new Holder<>();
                 port.echoComplexTypeDoc(complexTypeSeq, id, i);
                 if (id != i.value) {
                     System.out.println(id + " != " + i.value);

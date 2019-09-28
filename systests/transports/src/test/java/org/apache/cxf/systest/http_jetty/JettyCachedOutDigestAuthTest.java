@@ -22,6 +22,7 @@ package org.apache.cxf.systest.http_jetty;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests thread pool config.

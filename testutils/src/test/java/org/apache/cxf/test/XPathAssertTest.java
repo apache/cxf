@@ -24,14 +24,13 @@ import java.util.Map;
 
 import org.w3c.dom.Document;
 
-import junit.framework.AssertionFailedError;
-
 import org.apache.cxf.staxutils.StaxUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class XPathAssertTest extends Assert {
+import static org.junit.Assert.fail;
+
+public class XPathAssertTest {
 
     @Test
     public void testAssert() throws Exception {
@@ -40,18 +39,25 @@ public class XPathAssertTest extends Assert {
         XPathAssert.assertValid("//a", document, null);
         XPathAssert.assertInvalid("//aasd", document, null);
 
+        boolean f = false;
         try {
             XPathAssert.assertInvalid("//a", document, null);
-            fail("Expression is valid!");
-        } catch (AssertionFailedError e) {
+            f = true;
+        } catch (AssertionError e) {
             // this is correct
+        }
+        if (f) {
+            fail("Expression is valid!");
         }
 
         try {
             XPathAssert.assertValid("//aa", document, null);
-            fail("Expression is invalid!");
-        } catch (AssertionFailedError e) {
+            f = true;
+        } catch (AssertionError e) {
             // this is correct
+        }
+        if (f) {
+            fail("Expression is valid!");
         }
 
         XPathAssert.assertXPathEquals("//b", "foo", document, null);

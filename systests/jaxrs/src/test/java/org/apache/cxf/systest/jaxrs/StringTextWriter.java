@@ -47,9 +47,8 @@ public class StringTextWriter extends StringTextProvider {
         String path = ui.getAbsolutePath().toString();
         if (path.endsWith("/webapp/resources/bookstore/nonexistent")) {
             return super.isWriteable(type, genericType, annotations, mt);
-        } else {
-            return false;
         }
+        return false;
     }
 
     public void writeTo(String obj, Class<?> type, Type genType, Annotation[] anns,

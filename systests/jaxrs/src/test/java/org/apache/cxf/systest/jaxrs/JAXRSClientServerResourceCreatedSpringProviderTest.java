@@ -54,6 +54,10 @@ import org.apache.cxf.transport.http.HTTPConduit;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class JAXRSClientServerResourceCreatedSpringProviderTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerResourceCreatedSpringProviders.PORT;
 
@@ -315,16 +319,13 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     public void testPostPetStatus2() throws Exception {
 
 
-        Socket s = new Socket("localhost", Integer.parseInt(PORT));
-        IOUtils.copyAndCloseInput(getClass().getResource("resources/formRequest.txt").openStream(),
-                                  s.getOutputStream());
+        try (Socket s = new Socket("localhost", Integer.parseInt(PORT))) {
+            IOUtils.copyAndCloseInput(getClass().getResource("resources/formRequest.txt").openStream(),
+                                      s.getOutputStream());
 
-        s.getOutputStream().flush();
-        try {
+            s.getOutputStream().flush();
             assertTrue("Wrong status returned", getStringFromInputStream(s.getInputStream())
                        .contains("open"));
-        } finally {
-            s.close();
         }
     }
 
@@ -335,7 +336,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
 
     @Test
     public void testPostPetStatusType() throws Exception {
-        JAXBElementProvider<Object> p = new JAXBElementProvider<Object>();
+        JAXBElementProvider<Object> p = new JAXBElementProvider<>();
         p.setUnmarshallAsJaxbElement(true);
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/webapp/pets/petstore/jaxb/statusType/",
                                         Collections.singletonList(p));

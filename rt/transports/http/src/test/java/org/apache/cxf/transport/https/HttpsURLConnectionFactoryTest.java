@@ -19,11 +19,13 @@
 package org.apache.cxf.transport.https;
 
 import java.lang.reflect.Field;
+
 import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.configuration.jsse.SSLUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
+
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;

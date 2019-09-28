@@ -24,10 +24,12 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.service.model.EndpointInfo;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class HTTPTransportFactoryTest extends Assert {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class HTTPTransportFactoryTest {
     @Test
     public void testGetDestination() {
         Bus bus = BusFactory.getDefaultBus();

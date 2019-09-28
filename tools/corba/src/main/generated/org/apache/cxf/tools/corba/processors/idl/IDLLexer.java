@@ -46,7 +46,7 @@ public IDLLexer(LexerSharedInputState state) {
 	super(state);
 	caseSensitiveLiterals = true;
 	setCaseSensitive(true);
-	literals = new Hashtable<ANTLRHashString, Integer>();
+	literals = new Hashtable<>();
 	literals.put(new ANTLRHashString("switch", this), Integer.valueOf(56));
 	literals.put(new ANTLRHashString("typeprefix", this), Integer.valueOf(78));
 	literals.put(new ANTLRHashString("case", this), Integer.valueOf(57));
@@ -359,9 +359,7 @@ tryAgain:
 			if ( cse instanceof CharStreamIOException ) {
 				throw new TokenStreamIOException(((CharStreamIOException)cse).io);
 			}
-			else {
-				throw new TokenStreamException(cse.getMessage());
-			}
+            throw new TokenStreamException(cse.getMessage());
 		}
 	}
 }
@@ -839,7 +837,8 @@ tryAgain:
 						match('*');
 					}
 					else {
-						if ( _cnt332>=1 ) { break _loop332; } else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
+						if ( _cnt332>=1 ) { break _loop332; }
+                        throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
 					}
 
 					_cnt332++;
@@ -978,19 +977,19 @@ tryAgain:
 		case '?':
 		{
 			match('?');
-			text.setLength(_begin); text.append("?");
+			text.setLength(_begin); text.append('?');
 			break;
 		}
 		case '\'':
 		{
 			match('\'');
-			text.setLength(_begin); text.append("'");
+			text.setLength(_begin); text.append('\'');
 			break;
 		}
 		case '"':
 		{
 			match('"');
-			text.setLength(_begin); text.append("\"");
+			text.setLength(_begin); text.append('"');
 			break;
 		}
 		case '0':  case '1':  case '2':  case '3':
@@ -1278,7 +1277,8 @@ tryAgain:
 				mHEXDIGIT(false);
 			}
 			else {
-				if ( _cnt361>=1 ) { break _loop361; } else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
+				if ( _cnt361>=1 ) { break _loop361; }
+                throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
 			}
 
 			_cnt361++;
@@ -1381,7 +1381,8 @@ tryAgain:
 						mDIGIT(false);
 					}
 					else {
-						if ( _cnt373>=1 ) { break _loop373; } else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
+						if ( _cnt373>=1 ) { break _loop373; }
+                        throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
 					}
 
 					_cnt373++;
@@ -1474,7 +1475,8 @@ tryAgain:
 					mDIGIT(false);
 				}
 				else {
-					if ( _cnt378>=1 ) { break _loop378; } else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
+					if ( _cnt378>=1 ) { break _loop378; }
+					throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
 				}
 
 				_cnt378++;
@@ -1538,7 +1540,8 @@ tryAgain:
 					mDIGIT(false);
 				}
 				else {
-					if ( _cnt383>=1 ) { break _loop383; } else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
+					if ( _cnt383>=1 ) { break _loop383; } 
+					throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
 				}
 
 				_cnt383++;
@@ -1602,7 +1605,8 @@ tryAgain:
 				mDIGIT(false);
 			}
 			else {
-				if ( _cnt387>=1 ) { break _loop387; } else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
+				if ( _cnt387>=1 ) { break _loop387; } 
+				throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
 			}
 
 			_cnt387++;
@@ -1662,7 +1666,8 @@ tryAgain:
 					mDIGIT(false);
 				}
 				else {
-					if ( _cnt392>=1 ) { break _loop392; } else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
+					if ( _cnt392>=1 ) { break _loop392; } 
+					throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
 				}
 
 				_cnt392++;
@@ -1883,13 +1888,13 @@ tryAgain:
 	}
 
 
-	private static final long[] mk_tokenSet_0() {
+	private static long[] mk_tokenSet_0() {
 		long[] data = new long[1025];
 		data[1]=576460743847706622L;
 		return data;
 	}
 	public static final BitSet _tokenSet_0 = new BitSet(mk_tokenSet_0());
-	private static final long[] mk_tokenSet_1() {
+	private static long[] mk_tokenSet_1() {
 		long[] data = new long[2048];
 		data[0]=-1025L;
 		for (int i = 1; i<=1022; i++) { data[i]=-1L; }
@@ -1897,7 +1902,7 @@ tryAgain:
 		return data;
 	}
 	public static final BitSet _tokenSet_1 = new BitSet(mk_tokenSet_1());
-	private static final long[] mk_tokenSet_2() {
+	private static long[] mk_tokenSet_2() {
 		long[] data = new long[2048];
 		data[0]=-140737488355329L;
 		for (int i = 1; i<=1022; i++) { data[i]=-1L; }
@@ -1905,7 +1910,7 @@ tryAgain:
 		return data;
 	}
 	public static final BitSet _tokenSet_2 = new BitSet(mk_tokenSet_2());
-	private static final long[] mk_tokenSet_3() {
+	private static long[] mk_tokenSet_3() {
 		long[] data = new long[2048];
 		data[0]=-145135534867457L;
 		for (int i = 1; i<=1022; i++) { data[i]=-1L; }
@@ -1913,7 +1918,7 @@ tryAgain:
 		return data;
 	}
 	public static final BitSet _tokenSet_3 = new BitSet(mk_tokenSet_3());
-	private static final long[] mk_tokenSet_4() {
+	private static long[] mk_tokenSet_4() {
 		long[] data = new long[2048];
 		data[0]=-4398046512129L;
 		for (int i = 1; i<=1022; i++) { data[i]=-1L; }
@@ -1921,7 +1926,7 @@ tryAgain:
 		return data;
 	}
 	public static final BitSet _tokenSet_4 = new BitSet(mk_tokenSet_4());
-	private static final long[] mk_tokenSet_5() {
+	private static long[] mk_tokenSet_5() {
 		long[] data = new long[2048];
 		data[0]=-549755813889L;
 		data[1]=-268435457L;
@@ -1930,14 +1935,14 @@ tryAgain:
 		return data;
 	}
 	public static final BitSet _tokenSet_5 = new BitSet(mk_tokenSet_5());
-	private static final long[] mk_tokenSet_6() {
+	private static long[] mk_tokenSet_6() {
 		long[] data = new long[1025];
 		data[0]=287948901175001088L;
 		data[1]=541165879422L;
 		return data;
 	}
 	public static final BitSet _tokenSet_6 = new BitSet(mk_tokenSet_6());
-	private static final long[] mk_tokenSet_7() {
+	private static long[] mk_tokenSet_7() {
 		long[] data = new long[2048];
 		data[0]=-17179869185L;
 		data[1]=-268435457L;

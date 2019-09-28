@@ -29,7 +29,6 @@ import javax.validation.executable.ValidateOnExecution;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -58,7 +57,7 @@ public abstract class AbstractValidationInterceptor extends AbstractPhaseInterce
     }
 
     @Override
-    public void handleMessage(Message message) throws Fault {
+    public void handleMessage(Message message) {
         final Object theServiceObject = getServiceObject(message);
         if (theServiceObject == null) {
             return;

@@ -69,7 +69,7 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
 
     protected boolean supportsDataReader(Message message, Class<?> input) {
         Service service = ServiceModelUtil.getService(message.getExchange());
-        Class<?> cls[] = service.getDataBinding().getSupportedReaderFormats();
+        Class<?>[] cls = service.getDataBinding().getSupportedReaderFormats();
         for (Class<?> c : cls) {
             if (c.equals(input)) {
                 return true;
@@ -157,15 +157,14 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
         MessagePartInfo lastChoice = null;
         BindingOperationInfo lastBoi = null;
         BindingMessageInfo lastMsgInfo = null;
-        BindingMessageInfo msgInfo = null;
-        BindingOperationInfo boi = null;
         for (Iterator<OperationInfo> itr = operations.iterator(); itr.hasNext();) {
             OperationInfo op = itr.next();
 
-            boi = ep.getEndpointInfo().getBinding().getOperation(op);
+            final BindingOperationInfo boi = ep.getEndpointInfo().getBinding().getOperation(op);
             if (boi == null) {
                 continue;
             }
+            final BindingMessageInfo msgInfo;
             if (client) {
                 msgInfo = boi.getOutput();
             } else {
@@ -178,13 +177,13 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
             }
 
             Collection<MessagePartInfo> bodyParts = msgInfo.getMessageParts();
-            if (bodyParts.size() == 0 || bodyParts.size() <= index) {
+            if (bodyParts.isEmpty() || bodyParts.size() <= index) {
                 itr.remove();
                 continue;
             }
 
             MessagePartInfo p = msgInfo.getMessageParts().get(index);
-            if (name.getNamespaceURI() == null || name.getNamespaceURI().length() == 0) {
+            if (name.getNamespaceURI() == null || name.getNamespaceURI().isEmpty()) {
                 // message part has same namespace with the message
                 name = new QName(p.getMessageInfo().getName().getNamespaceURI(), name.getLocalPart());
             }
@@ -272,7 +271,6 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
             local = local.substring(0, local.length() - 8);
         }
 
-        // TODO: Allow overridden methods.
         BindingOperationInfo bop = ServiceModelUtil.getOperation(exchange, local);
 
         if (bop != null) {

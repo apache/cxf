@@ -53,7 +53,7 @@ public class JweOutputStream extends FilterOutputStream {
     }
 
     @Override
-    public void write(byte b[], int off, int len) throws IOException {
+    public void write(byte[] b, int off, int len) throws IOException {
         if (lastRawDataChunk != null) {
             int remaining = blockSize - lastRawDataChunk.length;
             int lenToCopy = remaining < len ? remaining : len;
@@ -62,10 +62,9 @@ public class JweOutputStream extends FilterOutputStream {
             len -= lenToCopy;
             if (lastRawDataChunk.length < blockSize) {
                 return;
-            } else {
-                encryptAndWrite(lastRawDataChunk, 0, lastRawDataChunk.length);
-                lastRawDataChunk = null;
             }
+            encryptAndWrite(lastRawDataChunk, 0, lastRawDataChunk.length);
+            lastRawDataChunk = null;
         }
         int offset = 0;
         int chunkSize = blockSize > len ? blockSize : blockSize * (len / blockSize);
@@ -80,10 +79,12 @@ public class JweOutputStream extends FilterOutputStream {
 
     private void encryptAndWrite(byte[] chunk, int off, int len) throws IOException {
         byte[] encrypted = encryptingCipher.update(chunk, off, len);
-        if (authTagProducer != null) {
-            authTagProducer.update(encrypted, 0, encrypted.length);
+        if (encrypted != null) {
+            if (authTagProducer != null) {
+                authTagProducer.update(encrypted, 0, encrypted.length);
+            }
+            encodeAndWrite(encrypted, 0, encrypted.length, false);
         }
-        encodeAndWrite(encrypted, 0, encrypted.length, false);
     }
     private void encodeAndWrite(byte[] encryptedChunk, int off, int len, boolean finalWrite) throws IOException {
         byte[] theChunk = lastEncryptedDataChunk;

@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URI;
-import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Map;
 
@@ -47,11 +46,12 @@ import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.Conduit;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 public class JavascriptGetInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final Interceptor<? extends Message> INSTANCE = new JavascriptGetInterceptor();
 
     private static final String JS_UTILS_PATH = "/org/apache/cxf/javascript/cxf-utils.js";
-    private static final Charset UTF8 = Charset.forName("utf-8");
     private static final String NO_UTILS_QUERY_KEY = "nojsutils";
     private static final String CODE_QUERY_KEY = "js";
 
@@ -114,7 +114,7 @@ public class JavascriptGetInterceptor extends AbstractPhaseInterceptor<Message> 
     }
 
     private void writeResponse(URI uri, Map<String, String> map, OutputStream os, Endpoint serverEndpoint) {
-        OutputStreamWriter writer = new OutputStreamWriter(os, UTF8);
+        OutputStreamWriter writer = new OutputStreamWriter(os, UTF_8);
         if (!map.containsKey(NO_UTILS_QUERY_KEY)) {
             writeUtilsToResponseStream(JavascriptGetInterceptor.class, os);
         }

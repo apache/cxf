@@ -25,10 +25,15 @@ import java.util.Set;
 
 import javax.xml.namespace.NamespaceContext;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class DelegatingNamespaceContextTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class DelegatingNamespaceContextTest {
 
     @Test
     public void testSomeAddsAndGets() throws Exception {

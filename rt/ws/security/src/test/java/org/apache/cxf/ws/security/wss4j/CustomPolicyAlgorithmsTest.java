@@ -23,7 +23,11 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.neethi.Policy;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class CustomPolicyAlgorithmsTest extends AbstractPolicySecurityTest {
 
@@ -40,9 +44,9 @@ public class CustomPolicyAlgorithmsTest extends AbstractPolicySecurityTest {
         AsymmetricBinding binding = (AsymmetricBinding) assertInfo.getAssertion();
 
         // set Signature Algorithm to RSA SHA-256
-        binding.getAlgorithmSuite().setAsymmetricSignature(rsaSha2SigMethod);
+        binding.getAlgorithmSuite().getAlgorithmSuiteType().setAsymmetricSignature(rsaSha2SigMethod);
 
-        String sigMethod = binding.getAlgorithmSuite().getAsymmetricSignature();
+        String sigMethod = binding.getAlgorithmSuite().getAlgorithmSuiteType().getAsymmetricSignature();
 
         assertNotNull(sigMethod);
         assertEquals(rsaSha2SigMethod, sigMethod);

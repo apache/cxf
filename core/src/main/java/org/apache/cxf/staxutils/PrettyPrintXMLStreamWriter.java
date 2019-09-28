@@ -19,7 +19,8 @@
 
 package org.apache.cxf.staxutils;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
@@ -34,7 +35,7 @@ public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
 
     int curIndent;
     int indentAmount = DEFAULT_INDENT_LEVEL;
-    Stack<CurrentElement> elems = new Stack<CurrentElement>();
+    final Deque<CurrentElement> elems = new ArrayDeque<>();
 
     public PrettyPrintXMLStreamWriter(XMLStreamWriter writer,
                                       int indentAmount) {
@@ -84,7 +85,7 @@ public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
         return baseWriter.getPrefix(uri);
     }
 
-    public java.lang.Object getProperty(java.lang.String name) throws IllegalArgumentException {
+    public Object getProperty(java.lang.String name) {
         return baseWriter.getProperty(name);
     }
 
@@ -170,7 +171,7 @@ public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
             writeSpaces();
         }
         baseWriter.writeEndElement();
-        if (elems.empty()) {
+        if (elems.isEmpty()) {
             baseWriter.writeCharacters("\n");
         }
     }
@@ -220,10 +221,9 @@ public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
                            java.lang.String localName,
                            java.lang.String namespaceURI) throws XMLStreamException {
         QName currElemName = new QName(namespaceURI, localName);
-        if (elems.empty()) {
+        if (elems.isEmpty()) {
             indentWithSpaces();
         } else {
-            baseWriter.writeCharacters("");
             baseWriter.writeCharacters("\n");
             indentWithSpaces();
             CurrentElement elem = elems.peek();

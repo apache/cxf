@@ -51,6 +51,7 @@ import org.apache.cxf.workqueue.AutomaticWorkQueue;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.future.CloseFuture;
 import org.apache.mina.core.session.AttributeKey;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
@@ -83,7 +84,7 @@ public class UDPDestination extends AbstractDestination {
                     return;
                 }
                 try {
-                    byte bytes[] = new byte[64 * 1024];
+                    byte[] bytes = new byte[64 * 1024];
                     final DatagramPacket p = new DatagramPacket(bytes, bytes.length);
                     mcast.receive(p);
 
@@ -98,22 +99,14 @@ public class UDPDestination extends AbstractDestination {
                         }
                     };
 
-                    UDPConnectionInfo info = new UDPConnectionInfo(null,
-                                                                   out,
-                                                                   new ByteArrayInputStream(bytes, 0, p.getLength()));
-
                     final MessageImpl m = new MessageImpl();
                     final Exchange exchange = new ExchangeImpl();
                     exchange.setDestination(UDPDestination.this);
                     m.setDestination(UDPDestination.this);
                     exchange.setInMessage(m);
-                    m.setContent(InputStream.class, info.in);
-                    m.put(UDPConnectionInfo.class, info);
-                    queue.execute(new Runnable() {
-                        public void run() {
-                            getMessageObserver().onMessage(m);
-                        }
-                    });
+                    m.setContent(InputStream.class, new ByteArrayInputStream(bytes, 0, p.getLength()));
+                    m.put(OutputStream.class, out);
+                    queue.execute(() -> getMessageObserver().onMessage(m));
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -124,14 +117,13 @@ public class UDPDestination extends AbstractDestination {
 
     /** {@inheritDoc}*/
     @Override
-    protected Conduit getInbuiltBackChannel(Message inMessage) {
+    protected Conduit getInbuiltBackChannel(final Message inMessage) {
         if (inMessage.getExchange().isOneWay()) {
             return null;
         }
-        final UDPConnectionInfo info = inMessage.get(UDPConnectionInfo.class);
         return new AbstractBackChannelConduit() {
             public void prepare(Message message) throws IOException {
-                message.setContent(OutputStream.class, info.out);
+                message.setContent(OutputStream.class, inMessage.get(OutputStream.class));
             }
         };
     }
@@ -190,8 +182,9 @@ public class UDPDestination extends AbstractDestination {
                 dcfg.setReuseAddress(true);
                 acceptor.bind();
             }
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception ex) {
-            ex.printStackTrace();
             throw new RuntimeException(ex);
         }
     }
@@ -235,21 +228,7 @@ public class UDPDestination extends AbstractDestination {
         }
     }
 
-    static class UDPConnectionInfo {
-        final IoSession session;
-        final OutputStream out;
-        final InputStream in;
-
-        UDPConnectionInfo(IoSession io, OutputStream o, InputStream i) {
-            session = io;
-            out = o;
-            in = i;
-        }
-    }
-
-
     class UDPIOHandler extends StreamIoHandler {
-
 
         @Override
         public void sessionOpened(IoSession session) {
@@ -259,7 +238,17 @@ public class UDPDestination extends AbstractDestination {
 
             // Create streams
             InputStream in = new IoSessionInputStream();
-            OutputStream out = new IoSessionOutputStream(session);
+            OutputStream out = new IoSessionOutputStream(session) {
+                @Override
+                public void close() throws IOException {
+                    try {
+                        flush();
+                    } finally {
+                        CloseFuture future = session.closeNow();
+                        future.awaitUninterruptibly();
+                    }
+                }  
+            };
             session.setAttribute(KEY_IN, in);
             session.setAttribute(KEY_OUT, out);
             processStreamIo(session, in, out);
@@ -273,12 +262,8 @@ public class UDPDestination extends AbstractDestination {
             exchange.setInMessage(m);
             m.setContent(InputStream.class, in);
             out = new UDPDestinationOutputStream(out);
-            m.put(UDPConnectionInfo.class, new UDPConnectionInfo(session, out, in));
-            queue.execute(new Runnable() {
-                public void run() {
-                    getMessageObserver().onMessage(m);
-                }
-            });
+            m.put(OutputStream.class, out);
+            queue.execute(() -> getMessageObserver().onMessage(m));
         }
 
         public void sessionClosed(IoSession session) throws Exception {
@@ -329,19 +314,19 @@ public class UDPDestination extends AbstractDestination {
         }
     }
 
-    public class UDPDestinationOutputStream extends OutputStream {
+    static class UDPDestinationOutputStream extends OutputStream {
         final OutputStream out;
         IoBuffer buffer = IoBuffer.allocate(64 * 1024 - 42); //max size
         boolean closed;
 
-        public UDPDestinationOutputStream(OutputStream out) {
+        UDPDestinationOutputStream(OutputStream out) {
             this.out = out;
         }
 
         public void write(int b) throws IOException {
             buffer.put(new byte[] {(byte)b}, 0, 1);
         }
-        public void write(byte b[], int off, int len) throws IOException {
+        public void write(byte[] b, int off, int len) throws IOException {
             while (len > buffer.remaining()) {
                 int nlen = buffer.remaining();
                 buffer.put(b, off, nlen);

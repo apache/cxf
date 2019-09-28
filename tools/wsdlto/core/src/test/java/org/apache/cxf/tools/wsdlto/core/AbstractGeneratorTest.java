@@ -25,7 +25,11 @@ import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.util.FileWriterUtil;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class AbstractGeneratorTest extends ProcessorTestBase {
 
@@ -72,4 +76,3 @@ public class AbstractGeneratorTest extends ProcessorTestBase {
         assertNotNull(gen.parseOutputName(packageName, className));
     }
 }
-

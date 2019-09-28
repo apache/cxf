@@ -19,7 +19,6 @@
 
 package org.apache.cxf.systest.factory_pattern;
 
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 
@@ -48,6 +47,9 @@ import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ManualHttpMulitplexClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = TestUtil.getPortNumber(ManualHttpMulitplexClientServerTest.class);
@@ -115,21 +117,21 @@ public class ManualHttpMulitplexClientServerTest extends AbstractBusClientServer
         setupContextWithEprAddress(epr, num);
 
         IsEvenResponse numResp = num.isEven();
-        assertTrue("2 is even", Boolean.TRUE.equals(numResp.isEven()));
+        assertTrue("2 is even", numResp.isEven());
 
         // try again with the address from another epr
         w3cEpr = nfact.create("3");
         epr = ProviderImpl.convertToInternal(w3cEpr);
         setupContextWithEprAddress(epr, num);
         numResp = num.isEven();
-        assertTrue("3 is not even", Boolean.FALSE.equals(numResp.isEven()));
+        assertFalse("3 is not even", numResp.isEven());
 
         // try again with the address from another epr
         w3cEpr = nfact.create("6");
         epr = ProviderImpl.convertToInternal(w3cEpr);
         setupContextWithEprAddress(epr, num);
         numResp = num.isEven();
-        assertTrue("6 is even", Boolean.TRUE.equals(numResp.isEven()));
+        assertTrue("6 is even", numResp.isEven());
     }
 
     @Test
@@ -153,7 +155,7 @@ public class ManualHttpMulitplexClientServerTest extends AbstractBusClientServer
         w3cEpr = factory.create("23");
         EndpointReferenceType numberTwentyThreeRef = ProviderImpl.convertToInternal(w3cEpr);
         num = serviceImpl.getPort(numberTwentyThreeRef, Number.class);
-        assertTrue("23 is not even", !num.isEven().isEven());
+        assertFalse("23 is not even", num.isEven().isEven());
     }
 
     private void setupContextWithEprAddress(EndpointReferenceType epr, Number num) {

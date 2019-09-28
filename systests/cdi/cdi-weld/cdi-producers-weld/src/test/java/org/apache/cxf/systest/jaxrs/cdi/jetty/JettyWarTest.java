@@ -18,22 +18,19 @@
  */
 package org.apache.cxf.systest.jaxrs.cdi.jetty;
 
-import java.util.UUID;
-
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.Response;
-
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
-import org.apache.cxf.systests.cdi.base.AbstractCdiSingleAppTest;
+import org.apache.cxf.systest.jaxrs.cdi.AbstractBookStoreCdiTest;
 import org.apache.cxf.systests.cdi.base.jetty.AbstractJettyServer;
 import org.jboss.weld.environment.Container;
 import org.jboss.weld.environment.jetty.JettyContainer;
 import org.jboss.weld.environment.servlet.Listener;
+
 import org.junit.BeforeClass;
 import org.junit.Ignore;
-import org.junit.Test;
 
-public class JettyWarTest extends AbstractCdiSingleAppTest {
+import static org.junit.Assert.assertTrue;
+
+public class JettyWarTest extends AbstractBookStoreCdiTest {
     @Ignore
     public static class EmbeddedJettyServer extends AbstractJettyServer {
         public static final int PORT = allocatePortAsInt(EmbeddedJettyServer.class);
@@ -50,44 +47,7 @@ public class JettyWarTest extends AbstractCdiSingleAppTest {
         assertTrue("server did not launch correctly", launchServer(EmbeddedJettyServer.class, true));
         createStaticBus();
     }
-    
-    @Test
-    public void testAddOneBookWithValidation() {
-        final String id = UUID.randomUUID().toString();
 
-        Response r = createWebClient(getBasePath() + "/books").post(
-                new Form()
-                        .param("id", id));
-        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), r.getStatus());
-    }
-
-    @Test
-    public void testResponseHasBeenReceivedWhenQueringAllBookAsAtomFeed() {
-        Response r = createWebClient(getBasePath() + "/books/feed", "application/atom+xml").get();
-        assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
-        assertEquals("application/atom+xml", r.getMediaType().toString());
-    }
-
-    @Test
-    public void testBookHasBeenValidatedWhenPostedAsAtomFeed() {
-        Response r = createWebClient(getBasePath() + "/books/feed", "application/atom+xml").post(
-                new Form()
-                        .param("name", "Book 1234"));
-
-        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), r.getStatus());
-    }
-    
-    @Test
-    public void testBookHasBeenCreatedWhenPostedAsAtomFeed() {
-        Response r = createWebClient(getBasePath() + "/books/feed", "application/atom+xml").post(
-                new Form()
-                        .param("id", "1234")
-                        .param("name", "Book 1234"));
-
-        assertEquals(Response.Status.CREATED.getStatusCode(), r.getStatus());
-    }
-
-    @Override
     protected int getPort() {
         return EmbeddedJettyServer.PORT;
     }

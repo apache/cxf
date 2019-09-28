@@ -23,7 +23,6 @@ import java.util.Properties;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
-import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.xkms.crypto.CryptoProviderException;
 import org.apache.cxf.xkms.crypto.CryptoProviderFactory;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -45,15 +44,15 @@ public class XkmsCryptoProviderFactory implements CryptoProviderFactory {
 
     @Override
     public Crypto create(Message message) {
-        Object crypto =
-            SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_CRYPTO, message);
+        Object crypto = SecurityUtils
+            .getSecurityPropertyValue(org.apache.cxf.rt.security.SecurityConstants.SIGNATURE_CRYPTO, message);
         if (crypto instanceof Crypto) {
             new XkmsCryptoProvider(xkmsConsumer, (Crypto)crypto);
         }
 
         Properties keystoreProps = CryptoProviderUtils
             .loadKeystoreProperties(message,
-                                    SecurityConstants.SIGNATURE_PROPERTIES);
+                                    org.apache.cxf.rt.security.SecurityConstants.SIGNATURE_PROPERTIES);
         try {
             Crypto defaultCrypto = CryptoFactory.getInstance(keystoreProps);
             return new XkmsCryptoProvider(xkmsConsumer, defaultCrypto);

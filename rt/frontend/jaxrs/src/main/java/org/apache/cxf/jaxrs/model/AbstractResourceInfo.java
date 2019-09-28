@@ -36,6 +36,7 @@ import javax.ws.rs.core.Context;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProxy;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
@@ -85,7 +86,7 @@ public abstract class AbstractResourceInfo {
         findContextFields(cls, provider);
         findContextSetterMethods(cls, provider);
         if (constructorProxies != null) {
-            Map<Class<?>, Map<Class<?>, ThreadLocalProxy<?>>> proxies = getConstructorProxyMap(true);
+            Map<Class<?>, Map<Class<?>, ThreadLocalProxy<?>>> proxies = getConstructorProxyMap();
             proxies.put(serviceClass, constructorProxies);
             constructorProxiesAvailable = true;
         }
@@ -119,7 +120,7 @@ public abstract class AbstractResourceInfo {
         if (cls == Object.class || cls == null) {
             return;
         }
-        for (Field f : cls.getDeclaredFields()) {
+        for (Field f : ReflectionUtil.getDeclaredFields(cls)) {
             for (Annotation a : f.getAnnotations()) {
                 if (a.annotationType() == Context.class
                     && (f.getType().isInterface() || f.getType() == Application.class)) {
@@ -149,9 +150,8 @@ public abstract class AbstractResourceInfo {
                 }
             }
             return (ThreadLocalProxy<?>)proxy;
-        } else {
-            return InjectionUtils.createThreadLocalProxy(f.getType());
         }
+        return InjectionUtils.createThreadLocalProxy(f.getType());
     }
 
     private static ThreadLocalProxy<?> getMethodThreadLocalProxy(Method m, Object provider) {
@@ -171,9 +171,8 @@ public abstract class AbstractResourceInfo {
                 }
             }
             return (ThreadLocalProxy<?>)proxy;
-        } else {
-            return InjectionUtils.createThreadLocalProxy(m.getParameterTypes()[0]);
         }
+        return InjectionUtils.createThreadLocalProxy(m.getParameterTypes()[0]);
     }
 
     @SuppressWarnings("unchecked")
@@ -183,7 +182,7 @@ public abstract class AbstractResourceInfo {
             property = bus.getProperty(prop);
             if (property == null && create) {
                 Map<Class<?>, Map<T, ThreadLocalProxy<?>>> map
-                    = new ConcurrentHashMap<Class<?>, Map<T, ThreadLocalProxy<?>>>(2);
+                    = new ConcurrentHashMap<>(2);
                 bus.setProperty(prop, map);
                 property = map;
             }
@@ -193,18 +192,17 @@ public abstract class AbstractResourceInfo {
 
     public Map<Class<?>, ThreadLocalProxy<?>> getConstructorProxies() {
         if (constructorProxiesAvailable) {
-            return getConstructorProxyMap(false).get(serviceClass);
-        } else {
-            return null;
+            return getConstructorProxyMap().get(serviceClass);
         }
+        return null;
     }
 
     @SuppressWarnings("unchecked")
-    private Map<Class<?>, Map<Class<?>, ThreadLocalProxy<?>>> getConstructorProxyMap(boolean create) {
+    private Map<Class<?>, Map<Class<?>, ThreadLocalProxy<?>>> getConstructorProxyMap() {
         Object property = bus.getProperty(CONSTRUCTOR_PROXY_MAP);
         if (property == null) {
             Map<Class<?>, Map<Class<?>, ThreadLocalProxy<?>>> map
-                = new ConcurrentHashMap<Class<?>, Map<Class<?>, ThreadLocalProxy<?>>>(2);
+                = new ConcurrentHashMap<>(2);
             bus.setProperty(CONSTRUCTOR_PROXY_MAP, map);
             property = map;
         }
@@ -317,7 +315,7 @@ public abstract class AbstractResourceInfo {
     public void clearThreadLocalProxies() {
         clearProxies(getFieldProxyMap(false));
         clearProxies(getSetterProxyMap(false));
-        clearProxies(getConstructorProxyMap(false));
+        clearProxies(getConstructorProxyMap());
     }
 
     private <T> void clearProxies(Map<Class<?>, Map<T, ThreadLocalProxy<?>>> tlps) {
@@ -353,7 +351,7 @@ public abstract class AbstractResourceInfo {
                                  V proxy) {
         Map<T, V> proxies = proxyMap.get(serviceClass);
         if (proxies == null) {
-            proxies = new ConcurrentHashMap<T, V>();
+            proxies = new ConcurrentHashMap<>();
             proxyMap.put(serviceClass, proxies);
         }
         if (!proxies.containsKey(f)) {

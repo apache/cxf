@@ -52,6 +52,10 @@ import org.apache.cxf.ws.policy.selector.FirstAlternativeSelector;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class MtomPolicyTest extends AbstractBusClientServerTestBase {
     public static final String PORT = TestUtil.getPortNumber(MtomPolicyTest.class);
     public static final String PORT2 = TestUtil.getPortNumber(MtomPolicyTest.class, 2);

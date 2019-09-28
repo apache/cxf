@@ -26,6 +26,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -61,6 +62,7 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     private boolean failLifetimeExceedance = true;
     private boolean acceptClientLifetime;
     private long futureTimeToLive = 60L;
+    private Map<String, String> claimTypeMap;
 
     /**
      * Get a JwtClaims object.
@@ -159,7 +161,7 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
                     if (claim.getValues().size() == 1) {
                         claimValues = claim.getValues().get(0);
                     }
-                    claims.setProperty(claim.getClaimType().toString(), claimValues);
+                    claims.setProperty(translateClaim(claim.getClaimType().toString()), claimValues);
                 }
             }
         }
@@ -212,9 +214,8 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
                 if (isFailLifetimeExceedance()) {
                     throw new STSException("Requested lifetime exceeds maximum lifetime",
                                            STSException.INVALID_TIME);
-                } else {
-                    expirationTime = creationTime.plusSeconds(getMaxLifetime());
                 }
+                expirationTime = creationTime.plusSeconds(getMaxLifetime());
             }
 
             long creationTimeInSeconds = creationTime.getEpochSecond();
@@ -274,6 +275,13 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
                 claims.setClaim("ActAs", receivedToken.getPrincipal().getName());
             }
         }
+    }
+
+    private String translateClaim(String claimType) {
+        if (claimTypeMap == null || !claimTypeMap.containsKey(claimType)) {
+            return claimType;
+        }
+        return claimTypeMap.get(claimType);
     }
 
     public boolean isUseX500CN() {
@@ -363,6 +371,18 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
      */
     public void setFailLifetimeExceedance(boolean failLifetimeExceedance) {
         this.failLifetimeExceedance = failLifetimeExceedance;
+    }
+
+    public Map<String, String> getClaimTypeMap() {
+        return claimTypeMap;
+    }
+
+    /**
+     * Specify a way to map ClaimType URIs to custom ClaimTypes
+     * @param claimTypeMap
+     */
+    public void setClaimTypeMap(Map<String, String> claimTypeMap) {
+        this.claimTypeMap = claimTypeMap;
     }
 
 }

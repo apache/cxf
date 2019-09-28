@@ -115,35 +115,32 @@ public class PushBack401 extends AbstractPhaseInterceptor<Message> {
             // No Auth Header, respond with 401 Realm=Cronus
             replyUnauthorized(message, "Cronus");
             return;
-        } else {
-            for (String a : auth) {
-                if (a.startsWith("Basic ")) {
-                    String[] userpass =
-                        extractUserPass(a.substring("Basic ".length()));
-                    if (userpass != null) {
-                        try {
-                            String realm =
-                                checkUserPass(userpass[0], userpass[1]);
-                            if (realm != null) {
-                                replyUnauthorized(message, realm);
-                                return;
-                            } else {
-                                // Password is good and no realm
-                                // We just return for successful fall thru.
-                                return;
-                            }
-                        } catch (Exception e) {
-                            // Bad Password
-                            replyUnauthorized(message, null);
+        }
+        for (String a : auth) {
+            if (a.startsWith("Basic ")) {
+                String[] userpass =
+                    extractUserPass(a.substring("Basic ".length()));
+                if (userpass != null) {
+                    try {
+                        String realm =
+                            checkUserPass(userpass[0], userpass[1]);
+                        if (realm != null) {
+                            replyUnauthorized(message, realm);
                             return;
                         }
+                        // Password is good and no realm
+                        // We just return for successful fall thru.
+                        return;
+                    } catch (Exception e) {
+                        // Bad Password
+                        replyUnauthorized(message, null);
+                        return;
                     }
                 }
             }
-            // No Authorization: Basic
-            replyUnauthorized(message, null);
-            return;
         }
+        // No Authorization: Basic
+        replyUnauthorized(message, null);
     }
 
     /**

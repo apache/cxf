@@ -68,7 +68,7 @@ public class PooledFactory implements Factory {
         if (max < 1) {
             max = 16;
         }
-        pool = new ArrayBlockingQueue<Object>(max, true);
+        pool = new ArrayBlockingQueue<>(max, true);
         this.max = max;
         this.count = 0;
         this.createMore = createMore;
@@ -79,7 +79,7 @@ public class PooledFactory implements Factory {
      * @param objs The collection of objects to pre-populate the pool
      */
     public PooledFactory(Collection<Object> objs) {
-        pool = new ArrayBlockingQueue<Object>(objs.size(), true);
+        pool = new ArrayBlockingQueue<>(objs.size(), true);
         pool.addAll(objs);
     }
 

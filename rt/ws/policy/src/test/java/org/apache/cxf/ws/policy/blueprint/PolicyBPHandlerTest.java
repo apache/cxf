@@ -19,13 +19,14 @@
 
 package org.apache.cxf.ws.policy.blueprint;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  *
  */
-public class PolicyBPHandlerTest extends Assert {
+public class PolicyBPHandlerTest {
     @Test
     public void testGetSchemaLocation() {
         PolicyBPHandler handler = new PolicyBPHandler();

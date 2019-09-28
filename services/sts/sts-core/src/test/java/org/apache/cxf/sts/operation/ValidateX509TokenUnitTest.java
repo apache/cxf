@@ -43,16 +43,19 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.StatusType;
 import org.apache.cxf.ws.security.sts.provider.model.ValidateTargetType;
 import org.apache.cxf.ws.security.sts.provider.model.secext.BinarySecurityTokenType;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
-import org.apache.wss4j.dom.WSConstants;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Some unit tests for the validate operation to validate X.509 tokens.
  */
-public class ValidateX509TokenUnitTest extends org.junit.Assert {
+public class ValidateX509TokenUnitTest {
 
     public static final QName REQUESTED_SECURITY_TOKEN =
         QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(null).getName();
@@ -249,7 +252,7 @@ public class ValidateX509TokenUnitTest extends org.junit.Assert {
         BinarySecurityTokenType binarySecurityToken = new BinarySecurityTokenType();
         binarySecurityToken.setValue(Base64.getMimeEncoder().encodeToString(cert.getEncoded()));
         binarySecurityToken.setValueType(X509TokenValidator.X509_V3_TYPE);
-        binarySecurityToken.setEncodingType(WSConstants.SOAPMESSAGE_NS + "#Base64Binary");
+        binarySecurityToken.setEncodingType(WSS4JConstants.SOAPMESSAGE_NS + "#Base64Binary");
         return new JAXBElement<BinarySecurityTokenType>(
                 QNameConstants.BINARY_SECURITY_TOKEN, BinarySecurityTokenType.class, binarySecurityToken
             );

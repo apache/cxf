@@ -30,13 +30,17 @@ import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  */
-public class RMManagerConfigurationTest extends Assert {
+public class RMManagerConfigurationTest {
 
     private Bus bus;
 
@@ -105,62 +109,50 @@ public class RMManagerConfigurationTest extends Assert {
 
 
         public void createDestinationSequence(DestinationSequence seq) {
-            // TODO Auto-generated method stub
-
+    
         }
 
         public void createSourceSequence(SourceSequence seq) {
-            // TODO Auto-generated method stub
-
+    
         }
 
         public Collection<DestinationSequence> getDestinationSequences(String endpointIdentifier) {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public Collection<RMMessage> getMessages(Identifier sid, boolean outbound) {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public Collection<SourceSequence> getSourceSequences(String endpointIdentifier) {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public void persistIncoming(DestinationSequence seq, RMMessage msg) {
-            // TODO Auto-generated method stub
-
+    
         }
 
         public void persistOutgoing(SourceSequence seq, RMMessage msg) {
-            // TODO Auto-generated method stub
-
+    
         }
 
         public void removeDestinationSequence(Identifier seq) {
-            // TODO Auto-generated method stub
-
+    
         }
 
         public void removeMessages(Identifier sid, Collection<Long> messageNrs, boolean outbound) {
-            // TODO Auto-generated method stub
-
+    
         }
 
         public void removeSourceSequence(Identifier seq) {
-            // TODO Auto-generated method stub
-
+    
         }
 
         public SourceSequence getSourceSequence(Identifier seq) {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public DestinationSequence getDestinationSequence(Identifier seq) {
-            // TODO Auto-generated method stub
             return null;
         }
 

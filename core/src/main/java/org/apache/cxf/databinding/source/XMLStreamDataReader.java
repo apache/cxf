@@ -185,7 +185,7 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
             final InputStream ins = message.getContent(InputStream.class);
             message.removeContent(InputStream.class);
 
-            input = new FragmentStreamReader(input, true) {
+            return new FragmentStreamReader(input, true) {
                 boolean closed;
                 public boolean hasNext() throws XMLStreamException {
                     boolean b = super.hasNext();
@@ -217,7 +217,7 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
 
     private Element validate(XMLStreamReader input) throws XMLStreamException, IOException {
         DOMSource ds = read(input);
-        Element rootElement = null;
+        final Element rootElement;
         if (ds.getNode() instanceof Document) {
             rootElement = ((Document)ds.getNode()).getDocumentElement();
         } else {
@@ -289,14 +289,13 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
                 DOMSource o = new DOMSource(domreader.getCurrentElement());
                 domreader.consumeFrame();
                 return o;
-            } else {
-                Document document = StaxUtils.read(reader);
-                if (reader.hasNext()) {
-                    //need to actually consume the END_ELEMENT
-                    reader.next();
-                }
-                return new DOMSource(document);
             }
+            Document document = StaxUtils.read(reader);
+            if (reader.hasNext()) {
+                //need to actually consume the END_ELEMENT
+                reader.next();
+            }
+            return new DOMSource(document);
         } catch (XMLStreamException e) {
             throw new Fault("COULD_NOT_READ_XML_STREAM_CAUSED_BY", LOG, e,
                             e.getClass().getCanonicalName(), e.getMessage());

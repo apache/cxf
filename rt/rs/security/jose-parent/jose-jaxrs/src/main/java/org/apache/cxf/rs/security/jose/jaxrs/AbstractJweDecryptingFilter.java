@@ -19,13 +19,11 @@
 package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweCompactConsumer;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
@@ -38,9 +36,10 @@ public class AbstractJweDecryptingFilter {
     private boolean validateHttpHeaders;
     private JweDecryptionProvider decryption;
     private String defaultMediaType;
-    protected JweDecryptionOutput decrypt(InputStream is) throws IOException {
-        JweCompactConsumer jwe = new JweCompactConsumer(new String(IOUtils.readBytesFromStream(is),
-                                                                   StandardCharsets.UTF_8));
+    private boolean checkEmptyStream;
+    
+    protected JweDecryptionOutput decrypt(final byte[] content) throws IOException {
+        JweCompactConsumer jwe = new JweCompactConsumer(new String(content, StandardCharsets.UTF_8));
         JweDecryptionProvider theDecryptor = getInitializedDecryptionProvider(jwe.getJweHeaders());
         JweDecryptionOutput out = new JweDecryptionOutput(jwe.getJweHeaders(), jwe.getDecryptedContent(theDecryptor));
         JoseUtils.traceHeaders(out.getHeaders());
@@ -83,4 +82,13 @@ public class AbstractJweDecryptingFilter {
     public void setProtectedHttpHeaders(Set<String> protectedHttpHeaders) {
         this.protectedHttpHeaders = protectedHttpHeaders;
     }
+
+    public boolean isCheckEmptyStream() {
+        return checkEmptyStream;
+    }
+
+    public void setCheckEmptyStream(boolean checkEmptyStream) {
+        this.checkEmptyStream = checkEmptyStream;
+    }
+    
 }

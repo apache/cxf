@@ -19,13 +19,15 @@
 package org.apache.cxf.common.security;
 
 import java.security.Principal;
-import java.security.acl.Group;
 import java.util.Enumeration;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class SimpleGroupTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class SimpleGroupTest {
 
     @Test
     public void testName() {
@@ -42,7 +44,7 @@ public class SimpleGroupTest extends Assert {
     @Test
     public void testAddRemoveMembers() {
 
-        Group group = new SimpleGroup("group");
+        GroupPrincipal group = new SimpleGroup("group");
         assertFalse(group.members().hasMoreElements());
 
         group.addMember(new SimpleGroup("group", "friend"));

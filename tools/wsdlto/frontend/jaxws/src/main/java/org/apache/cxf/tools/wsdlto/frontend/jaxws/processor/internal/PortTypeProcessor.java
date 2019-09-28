@@ -67,9 +67,9 @@ public class PortTypeProcessor extends AbstractProcessor {
                 intf.setPackageName(jaxwsBinding.getPackage());
             }
 
-            if (infBinding != null && !infBinding.getPackageJavaDoc().equals("")) {
+            if (infBinding != null && !infBinding.getPackageJavaDoc().isEmpty()) {
                 intf.setPackageJavaDoc(infBinding.getPackageJavaDoc());
-            } else if (jaxwsBinding != null && !jaxwsBinding.getPackageJavaDoc().equals("")) {
+            } else if (jaxwsBinding != null && !jaxwsBinding.getPackageJavaDoc().isEmpty()) {
                 intf.setPackageJavaDoc(jaxwsBinding.getPackageJavaDoc());
             }
 
@@ -110,7 +110,7 @@ public class PortTypeProcessor extends AbstractProcessor {
             interfaceInfo.setProperty("JavaInterface", intf);
 
             if (context.containsKey(ToolConstants.CFG_SEI_SUPER)) {
-                String supers[] = context.getArray(ToolConstants.CFG_SEI_SUPER);
+                String[] supers = context.getArray(ToolConstants.CFG_SEI_SUPER);
                 for (String s : supers) {
                     intf.addSuperInterface(s);
                 }
@@ -163,9 +163,8 @@ public class PortTypeProcessor extends AbstractProcessor {
     private boolean isOverloading(QName operationName) {
         if (operationMap.contains(operationName)) {
             return true;
-        } else {
-            operationMap.add(operationName);
         }
+        operationMap.add(operationName);
         return false;
     }
 

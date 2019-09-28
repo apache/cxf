@@ -22,10 +22,8 @@ package org.apache.cxf.testutil.common;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.junit.Assert;
 
-
-public abstract class AbstractTestServerBase extends Assert {
+public abstract class AbstractTestServerBase {
     boolean inProcess;
 
     /**

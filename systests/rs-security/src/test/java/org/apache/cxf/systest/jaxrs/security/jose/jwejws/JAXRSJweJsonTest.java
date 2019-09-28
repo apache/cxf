@@ -39,6 +39,9 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class JAXRSJweJsonTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerJweJson.PORT;
 
@@ -81,7 +84,7 @@ public class JAXRSJweJsonTest extends AbstractBusClientServerTestBase {
         bean.setBus(springBus);
         bean.setServiceClass(BookStore.class);
         bean.setAddress(address);
-        List<Object> providers = new LinkedList<Object>();
+        List<Object> providers = new LinkedList<>();
         JweJsonWriterInterceptor writer = new JweJsonWriterInterceptor();
         providers.add(writer);
         providers.add(new JweJsonClientResponseFilter());
@@ -90,7 +93,7 @@ public class JAXRSJweJsonTest extends AbstractBusClientServerTestBase {
                                      propLoc);
         return bean.create(BookStore.class);
     }
-    
+
     @Test
     public void testJweJsontTwoRecipientsKeyWrapAndAesGcm() throws Exception {
         String address = "https://localhost:" + PORT + "/jwejsonTwoRecipients";
@@ -108,7 +111,7 @@ public class JAXRSJweJsonTest extends AbstractBusClientServerTestBase {
         bean.setServiceClass(BookStore.class);
         bean.setAddress(address);
         bean.setProvider(new JweJsonWriterInterceptor());
-        
+
         List<String> properties = new ArrayList<>();
         properties.add("org/apache/cxf/systest/jaxrs/security/jwejson1.properties");
         properties.add("org/apache/cxf/systest/jaxrs/security/jwejson2.properties");

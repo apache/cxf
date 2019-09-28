@@ -23,10 +23,16 @@ import java.util.Map;
 
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.jms.uri.JMSEndpoint.DeliveryModeType;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class JMSEndpointTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class JMSEndpointTest {
 
     private static final String TEST_VALUE = "testValue";
 
@@ -45,7 +51,7 @@ public class JMSEndpointTest extends Assert {
         assertEquals(JMSEndpoint.QUEUE, endpoint.getJmsVariant());
         assertEquals(endpoint.getDestinationName(), "Foo.Bar");
         assertEquals(endpoint.getJmsVariant(), JMSEndpoint.QUEUE);
-        assertEquals(false, endpoint.isUseConduitIdSelector());
+        assertFalse(endpoint.isUseConduitIdSelector());
         assertEquals(endpoint.getParameters().size(), 2);
         assertEquals(endpoint.getParameter("foo"), "bar");
         assertEquals(endpoint.getParameter("foo2"), "bar2");

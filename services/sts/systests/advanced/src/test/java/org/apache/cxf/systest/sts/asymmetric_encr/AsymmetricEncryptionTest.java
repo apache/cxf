@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
@@ -33,10 +34,13 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
+
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * In this test, a CXF client gets a token from the STS over the Asymmetric Binding. The STS is configured
@@ -71,10 +75,10 @@ public class AsymmetricEncryptionTest extends AbstractBusClientServerTestBase {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
+    public static Collection<TestParam> data() {
 
-        return Arrays.asList(new TestParam[][] {{new TestParam("", false, STSPORT)},
-                                                {new TestParam("", false, STAX_STSPORT)},
+        return Arrays.asList(new TestParam[] {new TestParam("", false, STSPORT),
+                                              new TestParam("", false, STAX_STSPORT),
         });
     }
 
@@ -90,11 +94,11 @@ public class AsymmetricEncryptionTest extends AbstractBusClientServerTestBase {
         URL busFile = SecurityContextTokenUnitTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         SecurityToken token = requestSecurityToken(bus, test.getStsPort());
-        assertTrue(token != null);
+        assertNotNull(token);
 
         bus.shutdown(true);
     }

@@ -73,16 +73,15 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
             // to do anything, otherwise if not yet handled, then do this 'hack'
             if (origHandler != null && origHandler.handleEvent(event)) {
                 return true;
-            } else {
-                // hack for CXF-3453
-                String msg = event.getMessage();
-                return msg != null
-                    && msg.contains(":Id")
-                    && (msg.startsWith("cvc-type.3.1.1")
-                        || msg.startsWith("cvc-type.3.2.2")
-                        || msg.startsWith("cvc-complex-type.3.1.1")
-                        || msg.startsWith("cvc-complex-type.3.2.2"));
             }
+            // hack for CXF-3453
+            String msg = event.getMessage();
+            return msg != null
+                && msg.contains(":Id")
+                && (msg.startsWith("cvc-type.3.1.1")
+                    || msg.startsWith("cvc-type.3.2.2")
+                    || msg.startsWith("cvc-complex-type.3.1.1")
+                    || msg.startsWith("cvc-complex-type.3.2.2"));
         }
     }
 
@@ -134,14 +133,11 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
                 um.setAdapter(adapter);
             }
             return um;
+        } catch (javax.xml.bind.UnmarshalException ex) {
+            throw new Fault(new Message("UNMARSHAL_ERROR", LOG, ex.getLinkedException()
+                .getMessage()), ex);
         } catch (JAXBException ex) {
-            if (ex instanceof javax.xml.bind.UnmarshalException) {
-                javax.xml.bind.UnmarshalException unmarshalEx = (javax.xml.bind.UnmarshalException)ex;
-                throw new Fault(new Message("UNMARSHAL_ERROR", LOG, unmarshalEx.getLinkedException()
-                    .getMessage()), ex);
-            } else {
-                throw new Fault(new Message("UNMARSHAL_ERROR", LOG, ex.getMessage()), ex);
-            }
+            throw new Fault(new Message("UNMARSHAL_ERROR", LOG, ex.getMessage()), ex);
         }
     }
 
@@ -205,9 +201,8 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
                 if (e.getLinkedException() != null) {
                     throw new Fault(new Message("UNMARSHAL_ERROR", LOG,
                             e.getLinkedException().getMessage()), e);
-                } else {
-                    throw new Fault(new Message("UNMARSHAL_ERROR", LOG, e.getMessage()), e);
                 }
+                throw new Fault(new Message("UNMARSHAL_ERROR", LOG, e.getMessage()), e);
             }
         }
     }

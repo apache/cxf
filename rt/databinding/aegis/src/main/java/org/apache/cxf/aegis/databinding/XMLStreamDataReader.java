@@ -49,10 +49,9 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
             if (type == null) {
                 type = databinding.getType(part);
                 return reader.read(input, type);
-            } else {
-                ArrayType arrayType = (ArrayType) type;
-                return reader.readFlatArray(input, arrayType, part.getConcreteName());
             }
+            ArrayType arrayType = (ArrayType) type;
+            return reader.readFlatArray(input, arrayType, part.getConcreteName());
 
         } catch (Exception e) {
             throw new Fault(e);

@@ -174,7 +174,7 @@ public class StringVisitor extends VisitorBase {
             // corba:anonstring
             Anonstring anonstring = new Anonstring();
             anonstring.setQName(new QName(typeMap.getTargetNamespace(), anonstringName));
-            anonstring.setBound(Long.valueOf(boundNode.toString()));
+            anonstring.setBound(Long.parseLong(boundNode.toString()));
             anonstring.setType(simpleType.getQName());
 
             anon = anonstring;

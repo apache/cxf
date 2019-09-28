@@ -53,9 +53,8 @@ public class JAXBAttachmentMarshaller extends AttachmentMarshaller {
         if (att != null) {
             atts.add(att);
             return "cid:" + att.getId();
-        } else {
-            return null;
         }
+        return null;
 
     }
 
@@ -65,9 +64,8 @@ public class JAXBAttachmentMarshaller extends AttachmentMarshaller {
         if (att != null) {
             atts.add(att);
             return "cid:" + att.getId();
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override

@@ -61,7 +61,7 @@ public class CustomOutInterceptor extends AbstractPhaseInterceptor<Message> {
             message.put(Message.PROTOCOL_HEADERS, headers);
         } else {
 
-            MultivaluedMap<String, Object> headers = new MetadataMap<String, Object>();
+            MultivaluedMap<String, Object> headers = new MetadataMap<>();
             headers.putSingle("BookId", "123");
             headers.putSingle("MAP-NAME", MultivaluedMap.class.getName());
             message.put(Message.PROTOCOL_HEADERS, headers);

@@ -23,6 +23,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
+
 import javax.jws.soap.SOAPBinding;
 
 import org.w3c.dom.Element;
@@ -44,7 +45,7 @@ public class JavaInterface implements JavaAnnotatable {
 
     private final List<JavaMethod> methods = new ArrayList<>();
     private final List<JAnnotation> annotations = new ArrayList<>();
-    private final Set<String> imports = new TreeSet<String>();
+    private final Set<String> imports = new TreeSet<>();
     private final List<String> supers = new ArrayList<>();
 
     private String webserviceName;
@@ -75,7 +76,7 @@ public class JavaInterface implements JavaAnnotatable {
                     }
                     if (pfx != null) {
                         if (d2.length() > 0) {
-                            d2.append("\n");
+                            d2.append('\n');
                         }
                         d2.append(spaces).append("* ");
                         if (s2.startsWith(pfx)) {
@@ -252,8 +253,8 @@ public class JavaInterface implements JavaAnnotatable {
     }
 
     public void addImport(String i) {
-        if (i != null && i.lastIndexOf(".") != -1 && getPackageName() != null
-            && getPackageName().equals(i.substring(0, i.lastIndexOf(".")))) {
+        if (i != null && i.lastIndexOf('.') != -1 && getPackageName() != null
+            && getPackageName().equals(i.substring(0, i.lastIndexOf('.')))) {
             return;
         }
         // replace "$" with "." to correctly deal with member classes
@@ -290,7 +291,7 @@ public class JavaInterface implements JavaAnnotatable {
     }
 
     public void setFullClassName(String fullName) {
-        int index = fullName.lastIndexOf(".");
+        int index = fullName.lastIndexOf('.');
         setPackageName(fullName.substring(0, index));
         setName(fullName.substring(index + 1, fullName.length()));
     }
@@ -298,7 +299,7 @@ public class JavaInterface implements JavaAnnotatable {
     public String getFullClassName() {
         StringBuilder sb = new StringBuilder();
         sb.append(getPackageName());
-        sb.append(".");
+        sb.append('.');
         sb.append(getName());
         return sb.toString();
     }
@@ -307,7 +308,7 @@ public class JavaInterface implements JavaAnnotatable {
         StringBuilder sb = new StringBuilder();
         for (JAnnotation anno : annotations) {
             sb.append(anno);
-            sb.append("\n");
+            sb.append('\n');
         }
         sb.append(getFullClassName());
         return sb.toString();

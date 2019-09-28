@@ -41,13 +41,12 @@ public enum HmacAlgorithm {
     }
 
     public static HmacAlgorithm toHmacAlgorithm(String value) {
-        if (OAuthConstants.HMAC_ALGO_SHA_1.equals(value)) {
-            return HmacSHA1;
+        for (HmacAlgorithm ha : HmacAlgorithm.values()) {
+            if (ha.oauthName.equals(value)) {
+                return ha;
+            }
         }
-        if (OAuthConstants.HMAC_ALGO_SHA_256.equals(value)) {
-            return HmacSHA256;
-        }
-        return null;
+        throw new IllegalArgumentException(value);
     }
 
 }

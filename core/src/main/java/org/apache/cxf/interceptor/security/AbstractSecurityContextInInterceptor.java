@@ -19,14 +19,12 @@
 package org.apache.cxf.interceptor.security;
 
 import java.security.Principal;
-import java.security.acl.Group;
 import java.util.logging.Logger;
 
 import javax.security.auth.Subject;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SecurityToken;
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -41,7 +39,7 @@ public abstract class AbstractSecurityContextInInterceptor extends AbstractPhase
         super(Phase.PRE_INVOKE);
     }
 
-    public void handleMessage(Message message) throws Fault {
+    public void handleMessage(Message message) {
         SecurityToken token = message.get(SecurityToken.class);
         if (token == null) {
             reportSecurityException("Security Token is not available on the current message");
@@ -59,7 +57,7 @@ public abstract class AbstractSecurityContextInInterceptor extends AbstractPhase
             reportSecurityException("Failed Authentication : Subject has not been created, "
                                     + ex.getMessage());
         }
-        if (subject == null || subject.getPrincipals().size() == 0) {
+        if (subject == null || subject.getPrincipals().isEmpty()) {
             reportSecurityException("Failed Authentication : Invalid Subject");
         }
 
@@ -70,11 +68,11 @@ public abstract class AbstractSecurityContextInInterceptor extends AbstractPhase
 
     protected Principal getPrincipal(Principal originalPrincipal, Subject subject) {
         Principal[] ps = subject.getPrincipals().toArray(new Principal[subject.getPrincipals().size()]);
-        if (ps != null && ps.length > 0 && !(ps[0] instanceof Group)) {
+        if (ps != null && ps.length > 0 
+            && !DefaultSecurityContext.isGroupPrincipal(ps[0])) {
             return ps[0];
-        } else {
-            return originalPrincipal;
         }
+        return originalPrincipal;
     }
 
     protected SecurityContext createSecurityContext(Principal p, Subject subject) {

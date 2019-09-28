@@ -19,10 +19,11 @@
 
 package org.apache.cxf.tools.common.model;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JavaClassTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class JavaClassTest {
     @Test
     public void testGetterSetter() throws Exception {
         JavaField field = new JavaField("arg0",

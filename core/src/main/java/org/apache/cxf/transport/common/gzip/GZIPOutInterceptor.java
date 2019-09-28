@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -112,7 +113,8 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
      */
     private int threshold = 1024;
     private boolean force;
-
+    private Set<String> supportedPayloadContentTypes;
+    
     public GZIPOutInterceptor() {
         super(Phase.PREPARE_SEND);
         addAfter(MessageSenderInterceptor.class.getName());
@@ -131,8 +133,8 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
         return threshold;
     }
 
-    public void handleMessage(Message message) throws Fault {
-        UseGzip use = gzipPermitted(message, force);
+    public void handleMessage(Message message) {
+        UseGzip use = gzipPermitted(message);
         if (use != UseGzip.NO) {
             // remember the original output stream, we will write compressed
             // data to this later
@@ -167,8 +169,12 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
      * @throws Fault if the Accept-Encoding header does not allow any encoding
      *                 that we can support (identity, gzip or x-gzip).
      */
-    public static UseGzip gzipPermitted(Message message, boolean force) throws Fault {
+    public UseGzip gzipPermitted(Message message) {
         UseGzip permitted = UseGzip.NO;
+        if (supportedPayloadContentTypes != null && message.containsKey(Message.CONTENT_TYPE)
+            && !supportedPayloadContentTypes.contains(message.get(Message.CONTENT_TYPE))) {
+            return permitted;
+        }
         if (MessageUtils.isRequestor(message)) {
             LOG.fine("Requestor role, so gzip enabled");
             Object o = message.getContextualProperty(USE_GZIP_KEY);
@@ -320,7 +326,7 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
         Map<String, List<String>> protocolHeaders = CastUtils.cast((Map<?, ?>)message
             .get(Message.PROTOCOL_HEADERS));
         if (protocolHeaders == null) {
-            protocolHeaders = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+            protocolHeaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
             message.put(Message.PROTOCOL_HEADERS, protocolHeaders);
         }
         List<String> header = CastUtils.cast((List<?>)protocolHeaders.get(name));
@@ -328,7 +334,7 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
             header = new ArrayList<>();
             protocolHeaders.put(name, header);
         }
-        if (header.size() == 0) {
+        if (header.isEmpty()) {
             header.add(value);
         } else {
             header.set(0, header.get(0) + "," + value);
@@ -336,6 +342,12 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
     }
     public void setForce(boolean force) {
         this.force = force;
+    }
+    public Set<String> getSupportedPayloadContentTypes() {
+        return supportedPayloadContentTypes;
+    }
+    public void setSupportedPayloadContentTypes(Set<String> supportedPayloadContentTypes) {
+        this.supportedPayloadContentTypes = supportedPayloadContentTypes;
     }
 
 }

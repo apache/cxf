@@ -20,10 +20,14 @@ package org.apache.cxf.transport.http.policy;
 
 import org.apache.cxf.transport.http.policy.impl.ServerPolicyCalculator;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class ServerPolicyCalculatorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class ServerPolicyCalculatorTest {
     @Test
     public void testCompatibleServerPolicies() {
         ServerPolicyCalculator spc = new ServerPolicyCalculator();
@@ -39,7 +43,7 @@ public class ServerPolicyCalculatorTest extends Assert {
         p1.setSuppressClientSendErrors(false);
         assertTrue("Policies are compatible.", spc.compatible(p1, p2));
         p1.setSuppressClientSendErrors(true);
-        assertTrue("Policies are compatible.", !spc.compatible(p1, p2));
+        assertFalse("Policies are compatible.", spc.compatible(p1, p2));
         p2.setSuppressClientSendErrors(true);
         assertTrue("Policies are compatible.", spc.compatible(p1, p2));
     }
@@ -73,10 +77,10 @@ public class ServerPolicyCalculatorTest extends Assert {
         HTTPServerPolicy p2 = new HTTPServerPolicy();
         assertTrue(spc.equals(p1, p2));
         p1.setContentEncoding("encoding");
-        assertTrue(!spc.equals(p1, p2));
+        assertFalse(spc.equals(p1, p2));
         p2.setContentEncoding("encoding");
         assertTrue(spc.equals(p1, p2));
         p1.setSuppressClientSendErrors(true);
-        assertTrue(!spc.equals(p1, p2));
+        assertFalse(spc.equals(p1, p2));
     }
 }

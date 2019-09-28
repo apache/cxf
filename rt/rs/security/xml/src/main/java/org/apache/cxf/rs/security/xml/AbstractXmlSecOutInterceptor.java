@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
@@ -89,11 +90,10 @@ public abstract class AbstractXmlSecOutInterceptor extends AbstractPhaseIntercep
 
     private Object getRequestBody(Message message) {
         MessageContentsList objs = MessageContentsList.getContentsList(message);
-        if (objs == null || objs.size() == 0) {
+        if (objs == null || objs.isEmpty()) {
             return null;
-        } else {
-            return objs.get(0);
         }
+        return objs.get(0);
     }
 
     @SuppressWarnings("unchecked")

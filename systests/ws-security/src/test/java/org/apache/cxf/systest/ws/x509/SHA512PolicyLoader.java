@@ -24,6 +24,7 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.ws.policy.AssertionBuilderRegistry;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
@@ -33,7 +34,7 @@ import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.builders.xml.XMLPrimitiveAssertionBuilder;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
@@ -78,7 +79,7 @@ public class SHA512PolicyLoader implements AlgorithmSuiteLoader {
                 new AlgorithmSuiteType(
                     "Basic128RsaSha512",
                     "http://www.w3.org/2001/04/xmlenc#sha512",
-                    WSConstants.AES_128,
+                    WSS4JConstants.AES_128,
                     SPConstants.KW_AES128,
                     SPConstants.KW_RSA_OAEP,
                     SPConstants.P_SHA1_L128,
@@ -90,7 +91,7 @@ public class SHA512PolicyLoader implements AlgorithmSuiteLoader {
 
         SHA512AlgorithmSuite(SPConstants.SPVersion version, Policy nestedPolicy) {
             super(version, nestedPolicy);
-            setAsymmetricSignature("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512");
+            getAlgorithmSuiteType().setAsymmetricSignature("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512");
         }
 
         @Override

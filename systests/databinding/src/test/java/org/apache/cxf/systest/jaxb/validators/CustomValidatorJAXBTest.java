@@ -20,11 +20,12 @@
 package org.apache.cxf.systest.jaxb.validators;
 
 import org.apache.cxf.testutil.common.TestUtil;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
+
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 /**
  *
  */
@@ -34,7 +35,7 @@ public class CustomValidatorJAXBTest extends AbstractJUnit4SpringContextTests {
 
     @Test
     public void cleanTest() {
-        HelloWorld client = (HelloWorld)applicationContext
+        HelloWorld client = applicationContext
                 .getBean("testClient", HelloWorld.class);
 
         PassedObject hi = client.sayHi(new PassedObject("John", "Doe"));
@@ -45,7 +46,7 @@ public class CustomValidatorJAXBTest extends AbstractJUnit4SpringContextTests {
 
     @Test
     public void sendNullTest() {
-        HelloWorld client = (HelloWorld)applicationContext
+        HelloWorld client = applicationContext
                 .getBean("testClient", HelloWorld.class);
 
         PassedObject hi = client.sayHi(new PassedObject());
@@ -56,7 +57,7 @@ public class CustomValidatorJAXBTest extends AbstractJUnit4SpringContextTests {
 
     @Test
     public void returnNullTest() {
-        HelloWorld client = (HelloWorld)applicationContext
+        HelloWorld client = applicationContext
                 .getBean("testClient", HelloWorld.class);
 
         PassedObject hi = client.returnNull(new PassedObject("John", "Doe"));

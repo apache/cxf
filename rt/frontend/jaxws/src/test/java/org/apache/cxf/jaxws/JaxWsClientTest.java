@@ -22,8 +22,12 @@ package org.apache.cxf.jaxws;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.net.URL;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.namespace.QName;
@@ -31,10 +35,17 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Dispatch;
 import javax.xml.ws.WebServiceException;
+import javax.xml.ws.handler.Handler;
+import javax.xml.ws.handler.LogicalHandler;
+import javax.xml.ws.handler.LogicalMessageContext;
+import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.soap.SOAPHandler;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
@@ -51,24 +62,35 @@ import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import org.apache.hello_world_soap_http.BadRecordLitFault;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.GreeterImpl;
+
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class JaxWsClientTest extends AbstractJaxWsTest {
 
-    private final QName serviceName = new QName("http://apache.org/hello_world_soap_http",
+    private static final QName SERVICE_NAME = new QName("http://apache.org/hello_world_soap_http",
                     "SOAPService");
-    private final QName portName = new QName("http://apache.org/hello_world_soap_http",
+    private static final QName PORT_NAME = new QName("http://apache.org/hello_world_soap_http",
                     "SoapPort");
-    private final String address = "http://localhost:9000/SoapContext/SoapPort";
+    private static final String ADDRESS = "http://localhost:9000/SoapContext/SoapPort";
+
     private Destination d;
+    private Map<String, List<String>> headers = new HashMap<>();
 
     @Before
     public void setUp() throws Exception {
         super.setUpBus();
 
         EndpointInfo ei = new EndpointInfo(null, "http://schemas.xmlsoap.org/soap/http");
-        ei.setAddress(address);
+        ei.setAddress(ADDRESS);
 
         d = localTransport.getDestination(ei, bus);
     }
@@ -92,8 +114,8 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
     public void testRequestContext() throws Exception {
         URL url = getClass().getResource("/wsdl/hello_world.wsdl");
         javax.xml.ws.Service s = javax.xml.ws.Service
-            .create(url, serviceName);
-        Greeter greeter = s.getPort(portName, Greeter.class);
+            .create(url, SERVICE_NAME);
+        Greeter greeter = s.getPort(PORT_NAME, Greeter.class);
         InvocationHandler handler = Proxy.getInvocationHandler(greeter);
         BindingProvider bp = null;
 
@@ -104,7 +126,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
             String reqAddr =
                 (String)requestContext.get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY);
             assertEquals("the address get from requestContext is not equal",
-                         address, reqAddr);
+                         ADDRESS, reqAddr);
         } else {
             fail("can't get the requset context");
         }
@@ -114,13 +136,13 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
     public void testRequestContextPutAndRemoveEcho() throws Exception {
         URL url = getClass().getResource("/wsdl/hello_world.wsdl");
         javax.xml.ws.Service s = javax.xml.ws.Service
-            .create(url, serviceName);
-        final Greeter handler = s.getPort(portName, Greeter.class);
+            .create(url, SERVICE_NAME);
+        final Greeter handler = s.getPort(PORT_NAME, Greeter.class);
 
         Map<String, Object> requestContext = ((BindingProvider)handler).getRequestContext();
         requestContext.put(JaxWsClientProxy.THREAD_LOCAL_REQUEST_CONTEXT, Boolean.TRUE);
 
-        // future calls to getRequestContext() will use a thread local request context. 
+        // future calls to getRequestContext() will use a thread local request context.
         // That allows the request context to be threadsafe.
         requestContext = ((BindingProvider)handler).getRequestContext();
 
@@ -151,16 +173,16 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
     public void testRequestContextPutAndRemoveEchoDispatch() throws Exception {
         URL url = getClass().getResource("/wsdl/hello_world.wsdl");
         javax.xml.ws.Service s = javax.xml.ws.Service
-            .create(url, serviceName);
+            .create(url, SERVICE_NAME);
 
-        final Dispatch<DOMSource> disp = s.createDispatch(portName, DOMSource.class,
+        final Dispatch<DOMSource> disp = s.createDispatch(PORT_NAME, DOMSource.class,
                                                     javax.xml.ws.Service.Mode.PAYLOAD);
 
 
         Map<String, Object> requestContext = disp.getRequestContext();
         requestContext.put(JaxWsClientProxy.THREAD_LOCAL_REQUEST_CONTEXT, Boolean.TRUE);
 
-        // future calls to getRequestContext() will use a thread local request context. 
+        // future calls to getRequestContext() will use a thread local request context.
         // That allows the request context to be threadsafe.
         requestContext = disp.getRequestContext();
 
@@ -187,12 +209,12 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         assertEquals("main thread does not see removal",
                      "ho", requestContext.get(key));
     }
-    
+
     @Test
     public void testThreadLocalRequestContextIsIsolated() throws InterruptedException {
         URL url = getClass().getResource("/wsdl/hello_world.wsdl");
-        javax.xml.ws.Service s = javax.xml.ws.Service.create(url, serviceName);
-        final Greeter handler = s.getPort(portName, Greeter.class);
+        javax.xml.ws.Service s = javax.xml.ws.Service.create(url, SERVICE_NAME);
+        final Greeter handler = s.getPort(PORT_NAME, Greeter.class);
         final AtomicBoolean isPropertyAPresent = new AtomicBoolean(false);
         // Makes request context thread local
         ClientProxy.getClient(handler).setThreadLocalRequestContext(true);
@@ -243,7 +265,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         assertEquals(0, part.getIndex());
 
         d.setMessageObserver(new MessageReplayObserver("sayHiResponse.xml"));
-        Object ret[] = client.invoke(bop, new Object[] {"hi"}, null);
+        Object[] ret = client.invoke(bop, new Object[] {"hi"}, null);
         assertNotNull(ret);
         assertEquals("Wrong number of return objects", 1, ret.length);
 
@@ -265,7 +287,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
             client.invoke(bop, new Object[] {"BadRecordLitFault"}, null);
             fail("Should have returned a fault!");
         } catch (Fault fault) {
-            assertEquals(true, fault.getMessage().indexOf("Foo") >= 0);
+            assertTrue(fault.getMessage().indexOf("Foo") >= 0);
         }
         client.close();
 
@@ -281,7 +303,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
 
         public void handleMessage(Message message) throws Fault {
             boolean result = message.getInterceptorChain().doIntercept(message);
-            assertEquals("doIntercept not return false", result, false);
+            assertFalse("doIntercept not return false", result);
             assertNotNull(message.getContent(Exception.class));
             throw new Fault(message.getContent(Exception.class));
         }
@@ -318,6 +340,91 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         assertEquals("jack", ((BindingProvider)greeter3).getRequestContext().get("test"));
     }
 
+    @Test
+    public void testLogicalHandler() {
+        URL url = getClass().getResource("/wsdl/hello_world.wsdl");
+        javax.xml.ws.Service s = javax.xml.ws.Service
+            .create(url, SERVICE_NAME);
+        Greeter greeter = s.getPort(PORT_NAME, Greeter.class);
+        d.setMessageObserver(new MessageReplayObserver("sayHiResponse.xml"));
+
+        @SuppressWarnings("rawtypes") // JAX-WS api doesn't specify this as List<Handler<? extends MessageContext>>
+        List<Handler> chain = ((BindingProvider)greeter).getBinding().getHandlerChain();
+        chain.add(new LogicalHandler<LogicalMessageContext>() {
+            public void close(MessageContext arg0) {
+            }
+
+            public boolean handleFault(LogicalMessageContext arg0) {
+                return true;
+            }
+
+            public boolean handleMessage(LogicalMessageContext context) {
+
+                Boolean outbound = (Boolean) context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+                if (outbound) {
+                    headers = CastUtils.cast((Map<?, ?>) context.get(MessageContext.HTTP_REQUEST_HEADERS));
+                    if (headers == null) {
+                        headers = new HashMap<>();
+                        context.put(MessageContext.HTTP_REQUEST_HEADERS, headers);
+                    }
+                    headers.put("My-Custom-Header", Collections.singletonList("value"));
+                }
+                return true;
+            }
+        });
+        ((BindingProvider)greeter).getBinding().setHandlerChain(chain);
+
+        String response = greeter.sayHi();
+        assertNotNull(response);
+        assertTrue("custom header should be present", headers.containsKey("My-Custom-Header"));
+        assertTrue("existing SOAPAction header should not be removed", headers.containsKey("SOAPAction"));
+    }
+
+    @Test
+    public void testSoapHandler() {
+        URL url = getClass().getResource("/wsdl/hello_world.wsdl");
+        javax.xml.ws.Service s = javax.xml.ws.Service
+            .create(url, SERVICE_NAME);
+        Greeter greeter = s.getPort(PORT_NAME, Greeter.class);
+        d.setMessageObserver(new MessageReplayObserver("sayHiResponse.xml"));
+
+        @SuppressWarnings("rawtypes")
+        List<Handler> chain = ((BindingProvider)greeter).getBinding().getHandlerChain();
+        chain.add(new SOAPHandler<SOAPMessageContext>() {
+
+                public boolean handleMessage(SOAPMessageContext context) {
+
+                    Boolean outbound = (Boolean) context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+                    if (outbound) {
+                        headers = CastUtils.cast((Map<?, ?>) context.get(MessageContext.HTTP_REQUEST_HEADERS));
+                        if (headers == null) {
+                            headers = new HashMap<>();
+                            context.put(MessageContext.HTTP_REQUEST_HEADERS, headers);
+                        }
+                        headers.put("My-Custom-Header", Collections.singletonList("value"));
+                    }
+                    return true;
+                }
+
+                public boolean handleFault(SOAPMessageContext smc) {
+                    return true;
+                }
+
+                public Set<QName> getHeaders() {
+                    return null;
+                }
+
+                public void close(MessageContext messageContext) {
+                }
+        });
+        ((BindingProvider)greeter).getBinding().setHandlerChain(chain);
+
+        String response = greeter.sayHi();
+        assertNotNull(response);
+        assertTrue("custom header should be present", headers.containsKey("My-Custom-Header"));
+        assertTrue("existing SOAPAction header should not be removed", headers.containsKey("SOAPAction"));
+
+    }
 
     public static class FaultThrower extends AbstractPhaseInterceptor<Message> {
 

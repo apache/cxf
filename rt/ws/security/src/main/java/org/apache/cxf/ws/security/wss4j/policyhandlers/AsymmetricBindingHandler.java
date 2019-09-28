@@ -28,12 +28,15 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
@@ -48,10 +51,12 @@ import org.apache.cxf.ws.security.wss4j.AttachmentCallbackHandler;
 import org.apache.cxf.ws.security.wss4j.StaxSerializer;
 import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
@@ -222,12 +227,24 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     encToken = abinding.getInitiatorToken();
                 }
             }
-            doEncryption(encToken, enc, false);
+
             if (encToken != null) {
+                WSSecBase encr = null;
+                if (encToken.getToken() != null && !enc.isEmpty()) {
+                    if (encToken.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
+                        encr = doEncryptionDerived(encToken, enc);
+                    } else {
+                        String symEncAlgorithm = abinding.getAlgorithmSuite().getAlgorithmSuiteType().getEncryption();
+                        KeyGenerator keyGen = KeyUtils.getKeyGenerator(symEncAlgorithm);
+                        SecretKey symmetricKey = keyGen.generateKey();
+                        encr = doEncryption(encToken, enc, false, symmetricKey);
+                    }
+
+                    encr.clean();
+                }
                 assertTokenWrapper(encToken);
                 assertToken(encToken.getToken());
             }
-
         } catch (Exception e) {
             String reason = e.getMessage();
             LOG.log(Level.WARNING, "Sign before encryption failed due to : " + reason);
@@ -331,9 +348,21 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         }
 
         WSSecBase encrBase = null;
+        SecretKey symmetricKey = null;
         if (encryptionToken != null && !encrParts.isEmpty()) {
-            encrBase = doEncryption(wrapper, encrParts, true);
-            handleEncryptedSignedHeaders(encrParts, sigParts);
+            if (encryptionToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
+                encrBase = doEncryptionDerived(wrapper, encrParts);
+            } else {
+                String symEncAlgorithm = abinding.getAlgorithmSuite().getAlgorithmSuiteType().getEncryption();
+                try {
+                    KeyGenerator keyGen = KeyUtils.getKeyGenerator(symEncAlgorithm);
+                    symmetricKey = keyGen.generateKey();
+                    encrBase = doEncryption(wrapper, encrParts, true, symmetricKey);
+                } catch (WSSecurityException ex) {
+                    LOG.log(Level.FINE, ex.getMessage(), ex);
+                    throw new Fault(ex);
+                }
+            }
         }
 
         if (!isRequestor()) {
@@ -357,10 +386,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     }
                 }
             }
-        } catch (WSSecurityException ex) {
-            LOG.log(Level.FINE, ex.getMessage(), ex);
-            throw new Fault(ex);
-        } catch (SOAPException ex) {
+        } catch (WSSecurityException | SOAPException ex) {
             LOG.log(Level.FINE, ex.getMessage(), ex);
             throw new Fault(ex);
         }
@@ -370,12 +396,15 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         }
 
         if (encrBase != null) {
-            encryptTokensInSecurityHeader(encryptionToken, encrBase);
+            encryptTokensInSecurityHeader(encryptionToken, encrBase, symmetricKey);
+            encrBase.clean();
         }
     }
 
 
-    private void encryptTokensInSecurityHeader(AbstractToken encryptionToken, WSSecBase encrBase) {
+    private void encryptTokensInSecurityHeader(AbstractToken encryptionToken,
+                                               WSSecBase encrBase,
+                                               SecretKey symmetricKey) {
         List<WSEncryptionPart> secondEncrParts = new ArrayList<>();
 
         // Check for signature protection
@@ -422,14 +451,14 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             try {
                 // Encrypt, get hold of the ref list and add it
                 Element secondRefList = saaj.getSOAPPart()
-                    .createElementNS(WSConstants.ENC_NS,
-                                     WSConstants.ENC_PREFIX + ":ReferenceList");
+                    .createElementNS(WSS4JConstants.ENC_NS,
+                                     WSS4JConstants.ENC_PREFIX + ":ReferenceList");
                 if (lastEncryptedKeyElement != null) {
                     insertAfter(secondRefList, lastEncryptedKeyElement);
                 } else {
                     this.insertBeforeBottomUp(secondRefList);
                 }
-                ((WSSecEncrypt)encrBase).encryptForRef(secondRefList, secondEncrParts);
+                ((WSSecEncrypt)encrBase).encryptForRef(secondRefList, secondEncrParts, symmetricKey);
 
             } catch (WSSecurityException ex) {
                 LOG.log(Level.FINE, ex.getMessage(), ex);
@@ -440,125 +469,121 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
 
     private WSSecBase doEncryption(AbstractTokenWrapper recToken,
                                     List<WSEncryptionPart> encrParts,
-                                    boolean externalRef) {
-        //Do encryption
-        if (recToken != null && recToken.getToken() != null && !encrParts.isEmpty()) {
-            AbstractToken encrToken = recToken.getToken();
-            assertPolicy(recToken);
-            assertPolicy(encrToken);
-            AlgorithmSuite algorithmSuite = abinding.getAlgorithmSuite();
-            if (encrToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
-                return doEncryptionDerived(recToken, encrToken, encrParts, algorithmSuite);
+                                    boolean externalRef,
+                                    SecretKey symmetricKey) {
+        AbstractToken encrToken = recToken.getToken();
+        assertPolicy(recToken);
+        assertPolicy(encrToken);
+        try {
+            WSSecEncrypt encr = new WSSecEncrypt(secHeader);
+            encr.setEncryptionSerializer(new StaxSerializer());
+            encr.setIdAllocator(wssConfig.getIdAllocator());
+            encr.setCallbackLookup(callbackLookup);
+            encr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
+            encr.setStoreBytesInAttachment(storeBytesInAttachment);
+            encr.setExpandXopInclude(isExpandXopInclude());
+            encr.setWsDocInfo(wsDocInfo);
+
+            Crypto crypto = getEncryptionCrypto();
+
+            SecurityToken securityToken = getSecurityToken();
+            if (!isRequestor() && securityToken != null
+                && recToken.getToken() instanceof SamlToken) {
+                String tokenType = securityToken.getTokenType();
+                if (WSS4JConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+                    || WSS4JConstants.SAML_NS.equals(tokenType)) {
+                    encr.setCustomEKTokenValueType(WSS4JConstants.WSS_SAML_KI_VALUE_TYPE);
+                    encr.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+                    encr.setCustomEKTokenId(securityToken.getId());
+                } else if (WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+                    || WSS4JConstants.SAML2_NS.equals(tokenType)) {
+                    encr.setCustomEKTokenValueType(WSS4JConstants.WSS_SAML2_KI_VALUE_TYPE);
+                    encr.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+                    encr.setCustomEKTokenId(securityToken.getId());
+                } else {
+                    setKeyIdentifierType(encr, encrToken);
+                }
             } else {
-                try {
-                    WSSecEncrypt encr = new WSSecEncrypt(secHeader);
-                    encr.setEncryptionSerializer(new StaxSerializer());
-                    encr.setIdAllocator(wssConfig.getIdAllocator());
-                    encr.setCallbackLookup(callbackLookup);
-                    encr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
-                    encr.setStoreBytesInAttachment(storeBytesInAttachment);
-                    encr.setExpandXopInclude(isExpandXopInclude());
-                    encr.setWsDocInfo(wsDocInfo);
+                setKeyIdentifierType(encr, encrToken);
+            }
+            //
+            // Using a stored cert is only suitable for the Issued Token case, where
+            // we're extracting the cert from a SAML Assertion on the provider side
+            //
+            if (!isRequestor() && securityToken != null
+                && securityToken.getX509Certificate() != null) {
+                encr.setUseThisCert(securityToken.getX509Certificate());
+            } else if (!isRequestor() && securityToken != null
+                && securityToken.getKey() instanceof PublicKey) {
+                encr.setUseThisPublicKey((PublicKey)securityToken.getKey());
+                encr.setKeyIdentifierType(WSConstants.KEY_VALUE);
+            } else {
+                setEncryptionUser(encr, encrToken, false, crypto);
+            }
+            if (!encr.isCertSet() && encr.getUseThisPublicKey() == null && crypto == null) {
+                unassertPolicy(recToken, "Missing security configuration. "
+                    + "Make sure jaxws:client element is configured "
+                    + "with a " + SecurityConstants.ENCRYPT_PROPERTIES + " value.");
+            }
+            AlgorithmSuite algorithmSuite = abinding.getAlgorithmSuite();
+            AlgorithmSuiteType algType = algorithmSuite.getAlgorithmSuiteType();
+            encr.setSymmetricEncAlgorithm(algType.getEncryption());
+            encr.setKeyEncAlgo(algType.getAsymmetricKeyWrap());
+            encr.setMGFAlgorithm(algType.getMGFAlgo());
+            encr.setDigestAlgorithm(algType.getEncryptionDigest());
+            encr.prepare(crypto, symmetricKey);
 
-                    Crypto crypto = getEncryptionCrypto();
-
-                    SecurityToken securityToken = getSecurityToken();
-                    if (!isRequestor() && securityToken != null
-                        && recToken.getToken() instanceof SamlToken) {
-                        String tokenType = securityToken.getTokenType();
-                        if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
-                            || WSConstants.SAML_NS.equals(tokenType)) {
-                            encr.setCustomEKTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-                            encr.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
-                            encr.setCustomEKTokenId(securityToken.getId());
-                        } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
-                            || WSConstants.SAML2_NS.equals(tokenType)) {
-                            encr.setCustomEKTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
-                            encr.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
-                            encr.setCustomEKTokenId(securityToken.getId());
-                        } else {
-                            setKeyIdentifierType(encr, encrToken);
-                        }
-                    } else {
-                        setKeyIdentifierType(encr, encrToken);
+            Element encryptedKeyElement = encr.getEncryptedKeyElement();
+            List<Element> attachments = encr.getAttachmentEncryptedDataElements();
+            //Encrypt, get hold of the ref list and add it
+            if (externalRef) {
+                Element refList = encr.encryptForRef(null, encrParts, symmetricKey);
+                if (refList != null) {
+                    insertBeforeBottomUp(refList);
+                }
+                if (attachments != null) {
+                    for (Element attachment : attachments) {
+                        this.insertBeforeBottomUp(attachment);
                     }
-                    //
-                    // Using a stored cert is only suitable for the Issued Token case, where
-                    // we're extracting the cert from a SAML Assertion on the provider side
-                    //
-                    if (!isRequestor() && securityToken != null
-                        && securityToken.getX509Certificate() != null) {
-                        encr.setUseThisCert(securityToken.getX509Certificate());
-                    } else if (!isRequestor() && securityToken != null
-                        && securityToken.getKey() instanceof PublicKey) {
-                        encr.setUseThisPublicKey((PublicKey)securityToken.getKey());
-                    } else {
-                        setEncryptionUser(encr, encrToken, false, crypto);
-                    }
-                    if (!encr.isCertSet() && encr.getUseThisPublicKey() == null && crypto == null) {
-                        unassertPolicy(recToken, "Missing security configuration. "
-                                + "Make sure jaxws:client element is configured "
-                                + "with a " + SecurityConstants.ENCRYPT_PROPERTIES + " value.");
-                    }
-                    AlgorithmSuiteType algType = algorithmSuite.getAlgorithmSuiteType();
-                    encr.setSymmetricEncAlgorithm(algType.getEncryption());
-                    encr.setKeyEncAlgo(algType.getAsymmetricKeyWrap());
-                    encr.setMGFAlgorithm(algType.getMGFAlgo());
-                    encr.setDigestAlgorithm(algType.getEncryptionDigest());
-                    encr.prepare(crypto);
+                }
+                if (refList != null || (attachments != null && !attachments.isEmpty())) {
+                    this.addEncryptedKeyElement(encryptedKeyElement);
+                }
+            } else {
+                Element refList = encr.encryptForRef(null, encrParts, symmetricKey);
+                if (refList != null || (attachments != null && !attachments.isEmpty())) {
+                    this.addEncryptedKeyElement(encryptedKeyElement);
+                }
 
-                    Element encryptedKeyElement = encr.getEncryptedKeyElement();
-                    List<Element> attachments = encr.getAttachmentEncryptedDataElements();
-                    //Encrypt, get hold of the ref list and add it
-                    if (externalRef) {
-                        Element refList = encr.encryptForRef(null, encrParts);
-                        if (refList != null) {
-                            insertBeforeBottomUp(refList);
-                        }
-                        if (attachments != null) {
-                            for (Element attachment : attachments) {
-                                this.insertBeforeBottomUp(attachment);
-                            }
-                        }
-                        if (refList != null || (attachments != null && !attachments.isEmpty())) {
-                            this.addEncryptedKeyElement(encryptedKeyElement);
-                        }
-                    } else {
-                        Element refList = encr.encryptForRef(null, encrParts);
-                        if (refList != null || (attachments != null && !attachments.isEmpty())) {
-                            this.addEncryptedKeyElement(encryptedKeyElement);
-                        }
-
-                        // Add internal refs
-                        if (refList != null) {
-                            encryptedKeyElement.appendChild(refList);
-                        }
-                        if (attachments != null) {
-                            for (Element attachment : attachments) {
-                                this.addEncryptedKeyElement(attachment);
-                            }
-                        }
+                // Add internal refs
+                if (refList != null) {
+                    encryptedKeyElement.appendChild(refList);
+                }
+                if (attachments != null) {
+                    for (Element attachment : attachments) {
+                        this.addEncryptedKeyElement(attachment);
                     }
-
-                    // Put BST before EncryptedKey element
-                    if (encr.getBSTTokenId() != null) {
-                        encr.prependBSTElementToHeader();
-                    }
-
-                    return encr;
-                } catch (WSSecurityException e) {
-                    LOG.log(Level.FINE, e.getMessage(), e);
-                    unassertPolicy(recToken, e);
                 }
             }
+
+            // Put BST before EncryptedKey element
+            if (encr.getBSTTokenId() != null) {
+                encr.prependBSTElementToHeader();
+            }
+
+            return encr;
+        } catch (WSSecurityException e) {
+            LOG.log(Level.FINE, e.getMessage(), e);
+            unassertPolicy(recToken, e);
         }
         return null;
     }
 
     private WSSecBase doEncryptionDerived(AbstractTokenWrapper recToken,
-                                     AbstractToken encrToken,
-                                     List<WSEncryptionPart> encrParts,
-                                     AlgorithmSuite algorithmSuite) {
+                                     List<WSEncryptionPart> encrParts) {
+        AbstractToken encrToken = recToken.getToken();
+        assertPolicy(recToken);
+        assertPolicy(encrToken);
         try {
             WSSecDKEncrypt dkEncr = new WSSecDKEncrypt(secHeader);
             dkEncr.setEncryptionSerializer(new StaxSerializer());
@@ -573,17 +598,19 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             }
 
             if (encrKey == null) {
-                setupEncryptedKey(recToken, encrToken);
+                setupEncryptedKey(encrToken);
             }
 
-            dkEncr.setExternalKey(this.encryptedKeyValue, this.encryptedKeyId);
+            dkEncr.setTokenIdentifier(this.encryptedKeyId);
             dkEncr.getParts().addAll(encrParts);
-            dkEncr.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
-                + WSConstants.ENC_KEY_VALUE_TYPE);
+            dkEncr.setCustomValueType(WSS4JConstants.SOAPMESSAGE_NS11 + "#"
+                + WSS4JConstants.ENC_KEY_VALUE_TYPE);
+
+            AlgorithmSuite algorithmSuite = abinding.getAlgorithmSuite();
             AlgorithmSuiteType algType = algorithmSuite.getAlgorithmSuiteType();
             dkEncr.setSymmetricEncAlgorithm(algType.getEncryption());
             dkEncr.setDerivedKeyLength(algType.getEncryptionDerivedKeyLength() / 8);
-            dkEncr.prepare();
+            dkEncr.prepare(this.encryptedKeyValue);
 
             addDerivedKeyElement(dkEncr.getdktElement());
             Element refList = dkEncr.encryptForExternalRef(null, encrParts);
@@ -640,12 +667,13 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             if (!attached && isTokenRequired(sigToken.getIncludeTokenType())) {
                 WSSecSignature sig = getSignatureBuilder(sigToken, attached, false);
                 sig.appendBSTElementToHeader();
+                sig.clean();
             }
             return;
         }
         if (sigToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
             // Set up the encrypted key to use
-            setupEncryptedKey(wrapper, sigToken);
+            setupEncryptedKey(sigToken);
 
             WSSecDKSign dkSign = new WSSecDKSign(secHeader);
             dkSign.setIdAllocator(wssConfig.getIdAllocator());
@@ -658,16 +686,16 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 dkSign.setWscVersion(ConversationConstants.VERSION_05_02);
             }
 
-            dkSign.setExternalKey(this.encryptedKeyValue, this.encryptedKeyId);
+            dkSign.setTokenIdentifier(this.encryptedKeyId);
 
             // Set the algo info
-            dkSign.setSignatureAlgorithm(abinding.getAlgorithmSuite().getSymmetricSignature());
+            dkSign.setSignatureAlgorithm(abinding.getAlgorithmSuite().getAlgorithmSuiteType().getSymmetricSignature());
             dkSign.setSigCanonicalization(abinding.getAlgorithmSuite().getC14n().getValue());
             AlgorithmSuiteType algType = abinding.getAlgorithmSuite().getAlgorithmSuiteType();
             dkSign.setDigestAlgorithm(algType.getDigest());
             dkSign.setDerivedKeyLength(algType.getSignatureDerivedKeyLength() / 8);
-            dkSign.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
-                    + WSConstants.ENC_KEY_VALUE_TYPE);
+            dkSign.setCustomValueType(WSS4JConstants.SOAPMESSAGE_NS11 + "#"
+                    + WSS4JConstants.ENC_KEY_VALUE_TYPE);
 
             boolean includePrefixes =
                 MessageUtils.getContextualBoolean(
@@ -676,14 +704,14 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             dkSign.setAddInclusivePrefixes(includePrefixes);
 
             try {
-                dkSign.prepare();
+                dkSign.prepare(this.encryptedKeyValue);
 
                 if (abinding.isProtectTokens()) {
                     assertPolicy(
                         new QName(abinding.getName().getNamespaceURI(), SPConstants.PROTECT_TOKENS));
                     if (bstElement != null) {
                         WSEncryptionPart bstPart =
-                            new WSEncryptionPart(bstElement.getAttributeNS(WSConstants.WSU_NS, "Id"));
+                            new WSEncryptionPart(bstElement.getAttributeNS(WSS4JConstants.WSU_NS, "Id"));
                         bstPart.setElement(bstElement);
                         sigParts.add(bstPart);
                     } else {
@@ -712,6 +740,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
 
                     mainSigId = dkSign.getSignatureId();
                 }
+                dkSign.clean();
             } catch (Exception ex) {
                 LOG.log(Level.FINE, ex.getMessage(), ex);
                 throw new Fault(ex);
@@ -719,17 +748,22 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         } else {
             WSSecSignature sig = getSignatureBuilder(sigToken, attached, false);
 
-            // This action must occur before sig.prependBSTElementToHeader
             if (abinding.isProtectTokens()) {
                 assertPolicy(
                     new QName(abinding.getName().getNamespaceURI(), SPConstants.PROTECT_TOKENS));
-                if (sig.getBSTTokenId() != null) {
+                if (sig.getCustomTokenId() != null
+                    && (sigToken instanceof SamlToken || sigToken instanceof IssuedToken)) {
+                    WSEncryptionPart samlPart =
+                        new WSEncryptionPart(sig.getCustomTokenId());
+                    sigParts.add(samlPart);
+                } else if (sig.getBSTTokenId() != null) {
+                    // This action must occur before sig.prependBSTElementToHeader
                     WSEncryptionPart bstPart =
                         new WSEncryptionPart(sig.getBSTTokenId());
                     bstPart.setElement(sig.getBinarySecurityTokenElement());
                     sigParts.add(bstPart);
+                    sig.prependBSTElementToHeader();
                 }
-                sig.prependBSTElementToHeader();
             }
 
             List<Reference> referenceList = sig.addReferencesToSign(sigParts);
@@ -753,10 +787,12 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
 
                 mainSigId = sig.getId();
             }
+
+            sig.clean();
         }
     }
 
-    private void setupEncryptedKey(AbstractTokenWrapper wrapper, AbstractToken token) throws WSSecurityException {
+    private void setupEncryptedKey(AbstractToken token) throws WSSecurityException {
         if (!isRequestor() && token.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
             //If we already have them, simply return
             if (encryptedKeyId != null && encryptedKeyValue != null) {
@@ -780,20 +816,24 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 //message by a listener created for an async client
                 //Therefore we will create a new EncryptedKey
                 if (encryptedKeyId == null && encryptedKeyValue == null) {
-                    createEncryptedKey(wrapper, token);
+                    createEncryptedKey(token);
                 }
             } else {
                 unassertPolicy(token, "No security results found");
             }
         } else {
-            createEncryptedKey(wrapper, token);
+            createEncryptedKey(token);
         }
     }
 
-    private void createEncryptedKey(AbstractTokenWrapper wrapper, AbstractToken token)
+    private void createEncryptedKey(AbstractToken token)
         throws WSSecurityException {
         //Set up the encrypted key to use
-        encrKey = this.getEncryptedKeyBuilder(token);
+        AlgorithmSuiteType algType = binding.getAlgorithmSuite().getAlgorithmSuiteType();
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(algType.getEncryption());
+        SecretKey symmetricKey = keyGen.generateKey();
+
+        encrKey = this.getEncryptedKeyBuilder(token, symmetricKey);
         Element bstElem = encrKey.getBinarySecurityTokenElement();
         if (bstElem != null) {
             // If a BST is available then use it
@@ -802,7 +842,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
 
         // Add the EncryptedKey
         this.addEncryptedKeyElement(encrKey.getEncryptedKeyElement());
-        encryptedKeyValue = encrKey.getEphemeralKey();
+        encryptedKeyValue = symmetricKey.getEncoded();
         encryptedKeyId = encrKey.getId();
     }
 
@@ -816,11 +856,12 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
 
             for (WSSecurityEngineResult wser : wsSecEngineResults) {
                 Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
-                String id = (String)wser.get(WSSecurityEngineResult.TAG_ID);
                 if (actInt.intValue() == WSConstants.ST_SIGNED
                     || actInt.intValue() == WSConstants.ST_UNSIGNED) {
                     Instant created = Instant.now();
                     Instant expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
+
+                    String id = (String)wser.get(WSSecurityEngineResult.TAG_ID);
                     SecurityToken tempTok = new SecurityToken(id, created, expires);
                     tempTok.setSecret((byte[])wser.get(WSSecurityEngineResult.TAG_SECRET));
                     tempTok.setX509Certificate(
@@ -830,9 +871,9 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     SamlAssertionWrapper samlAssertion =
                         (SamlAssertionWrapper)wser.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                     if (samlAssertion.getSamlVersion() == SAMLVersion.VERSION_20) {
-                        tempTok.setTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+                        tempTok.setTokenType(WSS4JConstants.WSS_SAML2_TOKEN_TYPE);
                     } else {
-                        tempTok.setTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+                        tempTok.setTokenType(WSS4JConstants.WSS_SAML_TOKEN_TYPE);
                     }
 
                     message.put(SecurityConstants.TOKEN, tempTok);

@@ -18,18 +18,21 @@
   ~  under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>cxf-systests-cdi</artifactId>
         <groupId>org.apache.cxf.systests</groupId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>cxf-systests-cdi-base</artifactId>
     <name>Apache CXF CDI Integration System Tests - Base</name>
+    
+    <properties>
+        <cxf.module.name>org.apache.cxf.systests.cdi.base</cxf.module.name>
+    </properties>
+    
     <dependencies>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
@@ -64,10 +67,6 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-logging-juli</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>

@@ -42,12 +42,12 @@ public class SoapRefRegistry {
     /**
      * The unmarshaled object instances by id.
      */
-    private final SortedMap<String, Object> instances = new TreeMap<String, Object>();
+    private final SortedMap<String, Object> instances = new TreeMap<>();
 
     /**
      * The unresolved SOAP references by referenced id.
      */
-    private final SortedMap<String, List<SoapRef>> unresolvedRefs = new TreeMap<String, List<SoapRef>>();
+    private final SortedMap<String, List<SoapRef>> unresolvedRefs = new TreeMap<>();
 
     /**
      * Get the SoapRefRegistry stored in the context, and if necessary create a new one.

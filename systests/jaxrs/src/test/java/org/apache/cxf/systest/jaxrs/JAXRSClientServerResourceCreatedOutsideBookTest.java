@@ -30,8 +30,13 @@ import java.net.URLConnection;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class JAXRSClientServerResourceCreatedOutsideBookTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerResourceCreatedOutside.PORT;

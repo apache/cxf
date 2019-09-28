@@ -26,8 +26,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 @XmlType(name = "widget", namespace = "http://cxf.org.apache/model")
 @XmlRootElement(name = "widget", namespace = "http://cxf.org.apache/model")
@@ -142,8 +142,18 @@ public abstract class Widget {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        int result = 17;
+        result *= Long.hashCode(id);
+        if (name != null) {
+            result = 31 * result + name.hashCode();
+        }
+        if (serialNumber != null) {
+            result = 31 * result + serialNumber.hashCode();
+        }
+        result *= Boolean.hashCode(broken);
+        return result;
     }
+
     /*
      * (non-Javadoc)
      *

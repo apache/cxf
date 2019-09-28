@@ -21,8 +21,10 @@ package org.apache.cxf.transport.common.gzip;
 import java.util.List;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.AbstractPortableFeature;
+import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.message.Message;
@@ -48,69 +50,98 @@ import org.apache.cxf.message.Message;
  * that your client can accept compressed responses.
  */
 @NoJSR250Annotations
-public class GZIPFeature extends AbstractFeature {
-    private static final GZIPInInterceptor IN = new GZIPInInterceptor();
-    private static final GZIPOutInterceptor OUT = new GZIPOutInterceptor();
+@Provider(value = Provider.Type.Feature)
+public class GZIPFeature extends DelegatingFeature<GZIPFeature.Portable> {
 
-    /**
-     * The compression threshold to pass to the outgoing interceptor.
-     */
-    int threshold = -1;
-
-    /**
-     * Force GZIP instead of negotiate
-     */
-    boolean force;
-
-
-    @Override
-    protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        provider.getInInterceptors().add(IN);
-        if (threshold == -1 && !force) {
-            provider.getOutInterceptors().add(OUT);
-            provider.getOutFaultInterceptors().add(OUT);
-        } else {
-            GZIPOutInterceptor out = new GZIPOutInterceptor();
-            out.setThreshold(threshold);
-            out.setForce(force);
-            remove(provider.getOutInterceptors());
-            remove(provider.getOutFaultInterceptors());
-            provider.getOutInterceptors().add(out);
-            provider.getOutFaultInterceptors().add(out);
-        }
+    public GZIPFeature() {
+        super(new Portable());
     }
 
-    private void remove(List<Interceptor<? extends Message>> outInterceptors) {
-        int x = outInterceptors.size();
-        while (x > 0) {
-            --x;
-            if (outInterceptors.get(x) instanceof GZIPOutInterceptor) {
-                outInterceptors.remove(x);
-            }
-        }
+    public void remove(List<Interceptor<? extends Message>> outInterceptors) {
+        delegate.remove(outInterceptors);
     }
 
     public void setThreshold(int threshold) {
-        this.threshold = threshold;
+        delegate.setThreshold(threshold);
     }
 
     public int getThreshold() {
-        return threshold;
+        return delegate.getThreshold();
     }
 
-
-    /**
-     * Set if GZIP is always used without negotiation
-     * @param b
-     */
     public void setForce(boolean b) {
-        force = b;
+        delegate.setForce(b);
     }
 
-    /**
-     * Retrieve the value set with {@link #setForce(boolean)}.
-     */
     public boolean getForce() {
-        return force;
+        return delegate.getForce();
+    }
+
+    @Provider(value = Provider.Type.Feature)
+    public static class Portable implements AbstractPortableFeature {
+        private static final GZIPInInterceptor IN = new GZIPInInterceptor();
+        private static final GZIPOutInterceptor OUT = new GZIPOutInterceptor();
+
+        /**
+         * The compression threshold to pass to the outgoing interceptor.
+         */
+        int threshold = -1;
+
+        /**
+         * Force GZIP instead of negotiate
+         */
+        boolean force;
+
+
+        @Override
+        public void doInitializeProvider(InterceptorProvider provider, Bus bus) {
+            provider.getInInterceptors().add(IN);
+            if (threshold == -1 && !force) {
+                provider.getOutInterceptors().add(OUT);
+                provider.getOutFaultInterceptors().add(OUT);
+            } else {
+                GZIPOutInterceptor out = new GZIPOutInterceptor();
+                out.setThreshold(threshold);
+                out.setForce(force);
+                remove(provider.getOutInterceptors());
+                remove(provider.getOutFaultInterceptors());
+                provider.getOutInterceptors().add(out);
+                provider.getOutFaultInterceptors().add(out);
+            }
+        }
+
+        private void remove(List<Interceptor<? extends Message>> outInterceptors) {
+            int x = outInterceptors.size();
+            while (x > 0) {
+                --x;
+                if (outInterceptors.get(x) instanceof GZIPOutInterceptor) {
+                    outInterceptors.remove(x);
+                }
+            }
+        }
+
+        public void setThreshold(int threshold) {
+            this.threshold = threshold;
+        }
+
+        public int getThreshold() {
+            return threshold;
+        }
+
+
+        /**
+         * Set if GZIP is always used without negotiation
+         * @param b
+         */
+        public void setForce(boolean b) {
+            force = b;
+        }
+
+        /**
+         * Retrieve the value set with {@link #setForce(boolean)}.
+         */
+        public boolean getForce() {
+            return force;
+        }
     }
 }

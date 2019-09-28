@@ -29,7 +29,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.BindingFactoryManager;
-import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.bus.managers.BindingFactoryManagerImpl;
 import org.apache.cxf.bus.managers.ConduitInitiatorManagerImpl;
 import org.apache.cxf.bus.managers.DestinationFactoryManagerImpl;
@@ -65,34 +64,30 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
     protected final Set<Class<?>> missingExtensions;
     protected String id;
     private BusState state;
-    private final Collection<Feature> features = new CopyOnWriteArrayList<Feature>();
-    private final Map<String, Object> properties = new ConcurrentHashMap<String, Object>(16, 0.75f, 4);
+    private final Collection<Feature> features = new CopyOnWriteArrayList<>();
+    private final Map<String, Object> properties = new ConcurrentHashMap<>(16, 0.75f, 4);
 
 
     private final ExtensionManagerImpl extensionManager;
 
     public ExtensionManagerBus(Map<Class<?>, Object> extensions, Map<String, Object> props,
           ClassLoader extensionClassLoader) {
-        if (extensions == null) {
-            extensions = new ConcurrentHashMap<Class<?>, Object>(16, 0.75f, 4);
-        } else {
-            extensions = new ConcurrentHashMap<Class<?>, Object>(extensions);
-        }
-        this.extensions = extensions;
-        this.missingExtensions = new CopyOnWriteArraySet<Class<?>>();
+        this.extensions = extensions == null ? new ConcurrentHashMap<>(16, 0.75f, 4)
+                : new ConcurrentHashMap<>(extensions);
+        this.missingExtensions = new CopyOnWriteArraySet<>();
 
 
         state = BusState.INITIAL;
 
-        CXFBusFactory.possiblySetDefaultBus(this);
+        BusFactory.possiblySetDefaultBus(this);
         if (null != props) {
             properties.putAll(props);
         }
 
-        Configurer configurer = (Configurer)extensions.get(Configurer.class);
+        Configurer configurer = (Configurer)this.extensions.get(Configurer.class);
         if (null == configurer) {
             configurer = new NullConfigurer();
-            extensions.put(Configurer.class, configurer);
+            this.extensions.put(Configurer.class, configurer);
         }
 
         id = getBusId(properties);
@@ -125,11 +120,11 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
             }
         });
 
-        extensions.put(ResourceManager.class, resourceManager);
+        this.extensions.put(ResourceManager.class, resourceManager);
 
         extensionManager = new ExtensionManagerImpl(new String[0],
                                                     extensionClassLoader,
-                                                    extensions,
+                                                    this.extensions,
                                                     resourceManager,
                                                     this);
 
@@ -149,11 +144,11 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
         extensionManager.load(new String[] {ExtensionManagerImpl.BUS_EXTENSION_RESOURCE});
         extensionManager.activateAllByType(ResourceResolver.class);
 
-        extensions.put(ExtensionManager.class, extensionManager);
+        this.extensions.put(ExtensionManager.class, extensionManager);
     }
 
     public ExtensionManagerBus(Map<Class<?>, Object> e, Map<String, Object> properties) {
-       this(e, properties, Thread.currentThread().getContextClassLoader());
+        this(e, properties, Thread.currentThread().getContextClassLoader());
     }
     public ExtensionManagerBus(Map<Class<?>, Object> e) {
         this(e, null, Thread.currentThread().getContextClassLoader());
@@ -189,7 +184,7 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
                 } else {
                     //force loading
                     Collection<?> objs = loc.getBeansOfType(extensionType);
-                    if (objs != null && objs.size() != 0) {
+                    if (objs != null && !objs.isEmpty()) {
                         extensions.put(extensionType, objs.iterator().next());
                     }
                     obj = extensions.get(extensionType);
@@ -198,10 +193,9 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
         }
         if (null != obj) {
             return extensionType.cast(obj);
-        } else {
-            //record that it couldn't be found to avoid expensive searches again in the future
-            missingExtensions.add(extensionType);
         }
+        //record that it couldn't be found to avoid expensive searches again in the future
+        missingExtensions.add(extensionType);
         return null;
     }
 
@@ -273,10 +267,8 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
 
     protected void initializeFeatures() {
         loadAdditionalFeatures();
-        if (features != null) {
-            for (Feature f : features) {
-                f.initialize(this);
-            }
+        for (Feature f : features) {
+            f.initialize(this);
         }
     }
 
@@ -359,19 +351,19 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
 
     private static String getBusId(Map<String, Object> properties) {
 
-        String busId = null;
+        String busId;
 
         // first check properties
         if (null != properties) {
             busId = (String)properties.get(BUS_ID_PROPERTY_NAME);
-            if (null != busId && !"".equals(busId)) {
+            if (null != busId && !busId.isEmpty()) {
                 return busId;
             }
         }
 
         // next check system properties
         busId = SystemPropertyAction.getPropertyOrNull(BUS_ID_PROPERTY_NAME);
-        if (null != busId && !"".equals(busId)) {
+        if (null != busId && !busId.isEmpty()) {
             return busId;
         }
 

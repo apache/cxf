@@ -33,9 +33,8 @@ public final class PropertyUtils {
     public static boolean isTrue(Map<String, Object> props, String key) {
         if (props == null || key == null) {
             return false;
-        } else {
-            return isTrue(props.get(key));
         }
+        return isTrue(props.get(key));
     }
 
     /**
@@ -50,9 +49,8 @@ public final class PropertyUtils {
     public static boolean isFalse(Map<String, Object> props, String key) {
         if (props == null || key == null) {
             return false;
-        } else {
-            return isFalse(props.get(key));
         }
+        return isFalse(props.get(key));
     }
 
     /**

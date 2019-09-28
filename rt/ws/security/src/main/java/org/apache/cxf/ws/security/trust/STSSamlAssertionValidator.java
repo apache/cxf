@@ -41,18 +41,6 @@ public class STSSamlAssertionValidator extends SamlAssertionValidator {
     private boolean trustVerificationSucceeded;
 
     /**
-     * Validate the credential argument. It must contain a non-null AssertionWrapper.
-     * A Crypto and a CallbackHandler implementation is also required to be set.
-     *
-     * @param credential the Credential to be validated
-     * @param data the RequestData associated with the request
-     * @throws WSSecurityException on a failed validation
-     */
-    public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
-        return super.validate(credential, data);
-    }
-
-    /**
      * Try to verify trust on the assertion. If it fails, then set a boolean and return.
      * @param assertion The signed Assertion
      * @param data The RequestData context

@@ -21,15 +21,15 @@
     <parent>
         <groupId>org.apache.cxf.systests</groupId>
         <artifactId>cxf-systests-cdi</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-systests-cdi-weld</artifactId>
-	<packaging>pom</packaging>
+    <packaging>pom</packaging>
     <name>Apache CXF CDI Integration System Tests - Weld</name>
     <description>Apache CXF CDI Integration System Tests - Weld</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
 	
 	<modules>
         <module>cdi-multiple-apps-weld</module>
@@ -55,10 +55,6 @@
             <groupId>org.jboss.weld</groupId>
             <artifactId>weld-core</artifactId>
             <version>${cxf.jboss.weld.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.el</groupId>
-            <artifactId>javax.el-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.glassfish</groupId>
@@ -105,7 +101,7 @@
             <artifactId>httpclient</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.ning</groupId>
+            <groupId>org.asynchttpclient</groupId>
             <artifactId>async-http-client</artifactId>
         </dependency>
         <dependency>

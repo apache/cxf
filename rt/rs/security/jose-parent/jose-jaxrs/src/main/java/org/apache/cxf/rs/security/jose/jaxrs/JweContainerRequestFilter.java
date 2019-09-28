@@ -27,6 +27,8 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 
+import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 
@@ -35,10 +37,15 @@ import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 public class JweContainerRequestFilter extends AbstractJweDecryptingFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext context) throws IOException {
-        if (HttpMethod.GET.equals(context.getMethod())) {
+        if (isMethodWithNoContent(context.getMethod())
+            || isCheckEmptyStream() && !context.hasEntity()) {
             return;
         }
-        JweDecryptionOutput out = decrypt(context.getEntityStream());
+        final byte[] encryptedContent = IOUtils.readBytesFromStream(context.getEntityStream());
+        if (encryptedContent.length == 0) {
+            return;
+        }
+        JweDecryptionOutput out = decrypt(encryptedContent);
         byte[] bytes = out.getContent();
         context.setEntityStream(new ByteArrayInputStream(bytes));
         context.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
@@ -49,5 +56,9 @@ public class JweContainerRequestFilter extends AbstractJweDecryptingFilter imple
         if (super.isValidateHttpHeaders()) {
             super.validateHttpHeadersIfNeeded(context.getHeaders(), out.getHeaders());
         }
+    }
+    
+    protected boolean isMethodWithNoContent(String method) {
+        return HttpMethod.DELETE.equals(method) || HttpUtils.isMethodWithNoRequestContent(method);
     }
 }

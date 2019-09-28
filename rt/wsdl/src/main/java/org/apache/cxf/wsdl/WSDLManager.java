@@ -25,7 +25,9 @@ import javax.wsdl.Definition;
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensionRegistry;
 import javax.wsdl.factory.WSDLFactory;
+
 import org.w3c.dom.Element;
+
 import org.apache.cxf.service.model.ServiceSchemaInfo;
 
 

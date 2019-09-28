@@ -39,7 +39,7 @@ import org.apache.cxf.common.util.StringUtils;
 public class StreamWriterContentHandler implements ContentHandler, LexicalHandler {
 
     XMLStreamWriter writer;
-    Map<String, String> mapping = new LinkedHashMap<String, String>();
+    Map<String, String> mapping = new LinkedHashMap<>();
     boolean inCDATA;
 
     public StreamWriterContentHandler(XMLStreamWriter w) {
@@ -72,7 +72,7 @@ public class StreamWriterContentHandler implements ContentHandler, LexicalHandle
      * @param length
      * @throws SAXException
      */
-    public void characters(char ch[], int start, int length) throws SAXException {
+    public void characters(char[] ch, int start, int length) throws SAXException {
         try {
             if (inCDATA) {
                 writer.writeCData(new String(ch, start, length));
@@ -92,7 +92,7 @@ public class StreamWriterContentHandler implements ContentHandler, LexicalHandle
      * @param length
      * @throws SAXException
      */
-    public void ignorableWhitespace(char ch[], int start, int length) throws SAXException {
+    public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
         try {
             writer.writeCharacters(ch, start, length);
         } catch (XMLStreamException e) {

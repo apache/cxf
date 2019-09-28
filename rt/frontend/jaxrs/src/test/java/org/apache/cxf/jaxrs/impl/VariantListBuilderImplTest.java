@@ -25,10 +25,12 @@ import java.util.Locale;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Variant;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class VariantListBuilderImplTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class VariantListBuilderImplTest {
 
     @Test
     public void testBuildAll() {
@@ -37,6 +39,24 @@ public class VariantListBuilderImplTest extends Assert {
         MediaType mt2 = new MediaType("text", "xml");
         List<Variant> variants = vb.mediaTypes(mt1, mt2)
             .languages(new Locale("en"), new Locale("fr")).encodings("zip", "identity").add().build();
+        assertEquals("8 variants need to be created", 8, variants.size());
+        assertTrue(verifyVariant(variants, new Variant(mt1, new Locale("en"), "zip")));
+        assertTrue(verifyVariant(variants, new Variant(mt1, new Locale("en"), "identity")));
+        assertTrue(verifyVariant(variants, new Variant(mt1, new Locale("fr"), "zip")));
+        assertTrue(verifyVariant(variants, new Variant(mt1, new Locale("fr"), "identity")));
+        assertTrue(verifyVariant(variants, new Variant(mt2, new Locale("en"), "zip")));
+        assertTrue(verifyVariant(variants, new Variant(mt2, new Locale("en"), "identity")));
+        assertTrue(verifyVariant(variants, new Variant(mt2, new Locale("fr"), "zip")));
+        assertTrue(verifyVariant(variants, new Variant(mt2, new Locale("fr"), "identity")));
+    }
+    
+    @Test
+    public void testBuildAllWithoutAdd() {
+        VariantListBuilderImpl vb = new VariantListBuilderImpl();
+        MediaType mt1 = new MediaType("*", "*");
+        MediaType mt2 = new MediaType("text", "xml");
+        List<Variant> variants = vb.mediaTypes(mt1, mt2)
+            .languages(new Locale("en"), new Locale("fr")).encodings("zip", "identity").build();
         assertEquals("8 variants need to be created", 8, variants.size());
         assertTrue(verifyVariant(variants, new Variant(mt1, new Locale("en"), "zip")));
         assertTrue(verifyVariant(variants, new Variant(mt1, new Locale("en"), "identity")));

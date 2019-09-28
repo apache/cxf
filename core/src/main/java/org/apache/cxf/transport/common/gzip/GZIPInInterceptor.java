@@ -59,7 +59,7 @@ public class GZIPInInterceptor extends AbstractPhaseInterceptor<Message> {
         addBefore(AttachmentInInterceptor.class.getName());
     }
 
-    public void handleMessage(Message message) throws Fault {
+    public void handleMessage(Message message) {
         if (isGET(message)) {
             return;
         }
@@ -88,7 +88,7 @@ public class GZIPInInterceptor extends AbstractPhaseInterceptor<Message> {
 
                     // remove content encoding header as we've now dealt with it
                     for (String key : protocolHeaders.keySet()) {
-                        if (key.equalsIgnoreCase("Content-Encoding")) {
+                        if ("Content-Encoding".equalsIgnoreCase(key)) {
                             protocolHeaders.remove(key);
                             break;
                         }

@@ -51,9 +51,11 @@ import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.rs.security.jose.jwk.JwkException;
 import org.apache.cxf.rs.security.jose.jwk.KeyOperation;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
+import org.apache.cxf.rt.security.rs.PrivateKeyPasswordProvider;
 
 /**
  * Encryption helpers
@@ -76,10 +78,7 @@ public final class KeyManagementUtils {
                 byte[] digest =
                     MessageDigestUtils.createDigest(certs[0].getEncoded(), digestAlgo);
                 return Base64UrlUtility.encode(digest);
-            } catch (NoSuchAlgorithmException ex) {
-                LOG.log(Level.FINE, "Error creating digest", ex);
-                throw new JoseException(ex);
-            } catch (CertificateEncodingException ex) {
+            } catch (NoSuchAlgorithmException | CertificateEncodingException ex) {
                 LOG.log(Level.FINE, "Error creating digest", ex);
                 throw new JoseException(ex);
             }
@@ -101,9 +100,8 @@ public final class KeyManagementUtils {
             Certificate[] certs = keyStore.getCertificateChain(alias);
             if (certs != null) {
                 return Arrays.copyOf(certs, certs.length, X509Certificate[].class);
-            } else {
-                return new X509Certificate[]{(X509Certificate)CryptoUtils.loadCertificate(keyStore, alias)};
             }
+            return new X509Certificate[]{(X509Certificate)CryptoUtils.loadCertificate(keyStore, alias)};
         } catch (Exception ex) {
             LOG.warning("X509 Certificates can not be created");
             throw new JoseException(ex);
@@ -285,7 +283,12 @@ public final class KeyManagementUtils {
                 throw new JoseException("No keystore file has been configured");
             }
             if (m != null) {
-                keyStore = (KeyStore)m.getExchange().get(props.get(JoseConstants.RSSEC_KEY_STORE_FILE));
+                Object keyStoreProp = m.getExchange().get(props.get(JoseConstants.RSSEC_KEY_STORE_FILE));
+                if (keyStoreProp != null && !(keyStoreProp instanceof KeyStore)) {
+                    throw new JwkException("Unexpected key store class: " + keyStoreProp.getClass().getName());
+                } else {
+                    keyStore = (KeyStore)keyStoreProp;
+                }
             }
         }
 
@@ -312,8 +315,7 @@ public final class KeyManagementUtils {
         if (keyStorePswd == null) {
             throw new JoseException("No keystore password was defined");
         }
-        try {
-            InputStream is = JoseUtils.getResourceStream(keyStoreLoc, bus);
+        try (InputStream is = JoseUtils.getResourceStream(keyStoreLoc, bus)) {
             return CryptoUtils.loadKeyStore(is, keyStorePswd.toCharArray(), keyStoreType);
         } catch (Exception ex) {
             LOG.warning("Key store can not be loaded");
@@ -347,9 +349,8 @@ public final class KeyManagementUtils {
                 }
             }
             return certs;
-        } else {
-            return null;
         }
+        return null;
     }
     //TODO: enhance the certificate validation code
     public static void validateCertificateChain(Properties storeProperties, List<X509Certificate> inCerts) {
@@ -361,7 +362,7 @@ public final class KeyManagementUtils {
         // Initial chain validation, to be enhanced as needed
         try {
             X509CertSelector certSelect = new X509CertSelector();
-            certSelect.setCertificate((X509Certificate) inCerts.get(0));
+            certSelect.setCertificate(inCerts.get(0));
             PKIXBuilderParameters pbParams = new PKIXBuilderParameters(ks, certSelect);
             pbParams.addCertStore(CertStore.getInstance("Collection",
                                                         new CollectionCertStoreParameters(inCerts)));
@@ -435,7 +436,7 @@ public final class KeyManagementUtils {
         if (props == null) {
             if (required) {
                 LOG.warning("Properties resource is not identified");
-                throw new JoseException();
+                throw new JoseException("Properties resource is not identified");
             }
             props = new Properties();
         }
@@ -489,23 +490,14 @@ public final class KeyManagementUtils {
                     }
                 }
             }
-        } catch (KeyStoreException e) {
-            LOG.log(Level.WARNING, "X509Certificate can not be loaded: ", e);
-            throw new JoseException(e);
-        } catch (CertificateEncodingException e) {
-            LOG.log(Level.WARNING, "X509Certificate can not be loaded: ", e);
-            throw new JoseException(e);
-        } catch (NoSuchAlgorithmException e) {
-            LOG.log(Level.WARNING, "X509Certificate can not be loaded: ", e);
-            throw new JoseException(e);
-        } catch (Base64Exception e) {
+        } catch (KeyStoreException | CertificateEncodingException | NoSuchAlgorithmException | Base64Exception e) {
             LOG.log(Level.WARNING, "X509Certificate can not be loaded: ", e);
             throw new JoseException(e);
         }
 
         return null;
     }
-    
+
     public static void setSha1DigestHeader(JoseHeaders headers, Message m, Properties props) {
         String digest = loadDigestAndEncodeX509Certificate(m, props, MessageDigestUtils.ALGO_SHA_1);
         if (digest != null) {

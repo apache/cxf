@@ -40,9 +40,9 @@ import org.apache.cxf.transport.servlet.ServletConfigAware;
 public class DestinationRegistryImpl implements DestinationRegistry, ServletConfigAware {
     private static final String SLASH = "/";
     private ConcurrentMap<String, AbstractHTTPDestination> destinations
-        = new ConcurrentHashMap<String, AbstractHTTPDestination>();
+        = new ConcurrentHashMap<>();
     private Map<String, AbstractHTTPDestination> decodedDestinations =
-        new ConcurrentHashMap<String, AbstractHTTPDestination>();
+        new ConcurrentHashMap<>();
 
     public DestinationRegistryImpl() {
     }
@@ -123,7 +123,7 @@ public class DestinationRegistryImpl implements DestinationRegistry, ServletConf
 
 
     public AbstractDestination[] getSortedDestinations() {
-        List<AbstractHTTPDestination> dest2 = new LinkedList<AbstractHTTPDestination>(
+        List<AbstractHTTPDestination> dest2 = new LinkedList<>(
                 getDestinations());
         Collections.sort(dest2, new Comparator<AbstractHTTPDestination>() {
             public int compare(AbstractHTTPDestination o1, AbstractHTTPDestination o2) {
@@ -143,7 +143,7 @@ public class DestinationRegistryImpl implements DestinationRegistry, ServletConf
             }
         });
 
-        return dest2.toArray(new AbstractDestination[dest2.size()]);
+        return dest2.toArray(new AbstractDestination[0]);
     }
 
     public Set<String> getDestinationsPaths() {

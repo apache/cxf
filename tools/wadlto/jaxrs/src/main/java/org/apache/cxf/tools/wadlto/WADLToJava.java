@@ -40,13 +40,13 @@ public class WADLToJava {
     public WADLToJava() {
         args = new String[0];
     }
-    public WADLToJava(String pargs[]) {
+    public WADLToJava(String[] pargs) {
         args = pargs;
     }
 
 
     private boolean isExitOnFinish() {
-        String exit = System.getProperty("exitOnFinish");
+        String exit = System.getProperty("exitOnFinish", "true");
         if (StringUtils.isEmpty(exit)) {
             return false;
         }
@@ -117,9 +117,6 @@ public class WADLToJava {
             if (w2j.isExitOnFinish()) {
                 System.exit(1);
             }
-        }
-        if (w2j.isExitOnFinish()) {
-            System.exit(0);
         }
     }
 

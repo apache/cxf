@@ -116,9 +116,8 @@ public class UniqueBodyPartsValidator extends AbstractDefinitionValidator {
         if (opName == null) {
             uniqueBodyPartsMap.put(partQN, operationName);
             return null;
-        } else {
-            return opName;
         }
+        return opName;
     }
 
 }

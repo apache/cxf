@@ -51,7 +51,22 @@ class ServletExporter implements ManagedService {
     @Override
     public void updated(Dictionary properties) throws ConfigurationException {
         if (alias != null) {
-            httpService.unregister(alias);
+            try {
+                LOG.log(Level.INFO, "Unregistering previous instance of \"" + alias + "\" servlet");
+                httpService.unregister(alias);
+            } catch (IllegalArgumentException e) {
+                // NOTE: pax-web specific...
+                if (e.getMessage() != null && e.getMessage().contains("was never registered")) {
+                    LOG.log(Level.INFO, "CXF OSGi servlet was not unregistered: " + e.getMessage());
+                } else {
+                    LOG.log(Level.SEVERE, e.getMessage(), e);
+                }
+            }
+            if (properties == null) {
+                // we're simply stopping. if we couldn't unregister, that means we had to little time to register
+                // otherwise, we'll try to register the servlet
+                return;
+            }
             alias = null;
         }
         if (properties == null) {
@@ -86,6 +101,8 @@ class ServletExporter implements ManagedService {
                    getProp(properties, CXF_SERVLET_PREFIX + "service-list-page-authenticate-realm", "karaf"));
         sprops.put("use-x-forwarded-headers",
                    getProp(properties, CXF_SERVLET_PREFIX + "use-x-forwarded-headers", "false"));
+        sprops.put("async-supported", 
+                   getProp(properties, CXF_SERVLET_PREFIX + "async-supported", "true"));
 
         // Accept extra properties by default, can be disabled if it is really needed
         if (Boolean.valueOf(getProp(properties, CXF_SERVLET_PREFIX + "support.extra.properties", "true").toString())) {
@@ -105,6 +122,7 @@ class ServletExporter implements ManagedService {
         alias = (String)getProp(properties, CXF_SERVLET_PREFIX + "context", "/cxf");
         HttpContext context = httpService.createDefaultHttpContext();
         try {
+            LOG.log(Level.INFO, "Registering new instance of \"" + alias + "\" servlet");
             httpService.registerServlet(alias, servlet, sprops, context);
         } catch (Exception e) {
             LOG.log(Level.WARNING, "Error registering CXF OSGi servlet " + e.getMessage(), e);

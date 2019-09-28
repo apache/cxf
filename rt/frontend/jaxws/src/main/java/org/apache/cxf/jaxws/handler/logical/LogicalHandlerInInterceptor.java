@@ -46,6 +46,7 @@ public class LogicalHandlerInInterceptor
         addAfter(SOAPHandlerInterceptor.class.getName());
     }
 
+    @Override
     public void handleMessage(Message message) {
         if (binding.getHandlerChain().isEmpty()) {
             return;
@@ -101,10 +102,6 @@ public class LogicalHandlerInInterceptor
 
             chain.doIntercept(responseMsg);
         }
-    }
-
-    public void handleFault(Message message) {
-        // TODO
     }
 
     protected QName getOpQName(Exchange ex, Object data) {

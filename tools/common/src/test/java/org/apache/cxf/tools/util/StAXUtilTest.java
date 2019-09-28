@@ -23,7 +23,10 @@ import java.io.File;
 
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.Tag;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class StAXUtilTest extends ProcessorTestBase {
 

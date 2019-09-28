@@ -35,22 +35,18 @@ import org.apache.cxf.source.doc_lit_bare.PutLastTradedPricePortType;
 public class PutLastTradePriceImpl implements PutLastTradedPricePortType {
 
     public DOMSource nillableParameter(DOMSource theRequest) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public void sayHi(Holder<DOMSource> body) {
-        // TODO Auto-generated method stub
 
     }
 
     public void putLastTradedPrice(DOMSource body) {
-        // TODO Auto-generated method stub
 
     }
 
     public DOMSource bareNoParam() {
-        // TODO Auto-generated method stub
         return null;
     }
 

@@ -42,7 +42,6 @@ import javax.ws.rs.core.UriBuilder;
 import net.oauth.OAuth;
 import net.oauth.OAuthMessage;
 import net.oauth.OAuthProblemException;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
@@ -121,11 +120,11 @@ public class AuthorizationRequestHandler {
                 List<OAuthPermission> originalScopes = token.getScopes();
                 for (OAuthPermission perm : originalScopes) {
                     String param = oAuthMessage.getParameter(perm.getPermission() + "_status");
-                    if (param != null && OAuthConstants.AUTHORIZATION_DECISION_ALLOW.equals(param)) {
+                    if (OAuthConstants.AUTHORIZATION_DECISION_ALLOW.equals(param)) {
                         approvedScopesSet.add(perm);
                     }
                 }
-                List<OAuthPermission> approvedScopes = new LinkedList<OAuthPermission>(approvedScopesSet);
+                List<OAuthPermission> approvedScopes = new LinkedList<>(approvedScopesSet);
                 if (approvedScopes.isEmpty()) {
                     approvedScopes = originalScopes;
                 } else if (approvedScopes.size() < originalScopes.size()) {
@@ -151,10 +150,9 @@ public class AuthorizationRequestHandler {
             if (OAuthConstants.OAUTH_CALLBACK_OOB.equals(callbackValue)) {
                 OOBAuthorizationResponse bean = convertQueryParamsToOOB(queryParams);
                 return Response.ok().entity(bean).build();
-            } else {
-                URI callbackURI = buildCallbackURI(callbackValue, queryParams);
-                return Response.seeOther(callbackURI).build();
             }
+            URI callbackURI = buildCallbackURI(callbackValue, queryParams);
+            return Response.seeOther(callbackURI).build();
 
         } catch (OAuthProblemException e) {
             LOG.log(Level.WARNING, "An OAuth related problem: {0}", new Object[]{e.fillInStackTrace()});

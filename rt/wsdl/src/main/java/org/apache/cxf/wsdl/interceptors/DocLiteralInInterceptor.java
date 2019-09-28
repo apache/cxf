@@ -69,7 +69,6 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
         }
 
         DepthXMLStreamReader xmlReader = getXMLStreamReader(message);
-        DataReader<XMLStreamReader> dr = getDataReader(message);
         MessageContentsList parameters = new MessageContentsList();
 
         Exchange exchange = message.getExchange();
@@ -90,6 +89,7 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
         if (bop != null && bop.getBinding() != null) {
             forceDocLitBare = Boolean.TRUE.equals(bop.getBinding().getService().getProperty("soap.force.doclit.bare"));
         }
+        DataReader<XMLStreamReader> dr = getDataReader(message);
 
         try {
             if (!forceDocLitBare && bop != null && bop.isUnwrappedCapable()) {
@@ -169,7 +169,7 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
 
                     MessagePartInfo p;
                     if (!client && msgInfo != null && msgInfo.getMessageParts() != null
-                        && msgInfo.getMessageParts().size() == 0) {
+                        && msgInfo.getMessageParts().isEmpty()) {
                         //no input messagePartInfo
                         return;
                     }
@@ -354,8 +354,7 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
         Object keepParametersWrapperFlag = message.get(KEEP_PARAMETERS_WRAPPER);
         if (keepParametersWrapperFlag == null) {
             return msgInfo.getFirstMessagePart().getTypeClass() != null;
-        } else {
-            return Boolean.parseBoolean(keepParametersWrapperFlag.toString());
         }
+        return Boolean.parseBoolean(keepParametersWrapperFlag.toString());
     }
 }

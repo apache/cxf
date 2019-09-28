@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
@@ -51,10 +50,8 @@ public final class XSLTUtils {
     }
 
     public static InputStream transform(Templates xsltTemplate, InputStream in) {
-        CachedOutputStream out = new CachedOutputStream();
-        try {
-            XMLStreamReader reader = StaxUtils.createXMLStreamReader(in);
-            Source beforeSource = new StaxSource(reader);
+        try (InputStream inputStream = in; CachedOutputStream out = new CachedOutputStream()) {
+            Source beforeSource = new StaxSource(StaxUtils.createXMLStreamReader(inputStream));
 
             Transformer trans = xsltTemplate.newTransformer();
             trans.transform(beforeSource, new StreamResult(out));
@@ -64,25 +61,12 @@ public final class XSLTUtils {
             throw new Fault("GET_CACHED_INPUT_STREAM", LOG, e, e.getMessage());
         } catch (TransformerException e) {
             throw new Fault("XML_TRANSFORM", LOG, e, e.getMessage());
-        } finally {
-            try {
-                in.close();
-            } catch (Exception e) {
-                // ignore
-            }
-            try {
-                out.close();
-            } catch (Exception e) {
-                // ignore
-            }
         }
     }
 
     public static Reader transform(Templates xsltTemplate, Reader inReader) {
-        CachedWriter outWriter = new CachedWriter();
-        try {
-            XMLStreamReader reader = StaxUtils.createXMLStreamReader(inReader);
-            Source beforeSource = new StaxSource(reader);
+        try (Reader reader = inReader; CachedWriter outWriter = new CachedWriter()) {
+            Source beforeSource = new StaxSource(StaxUtils.createXMLStreamReader(reader));
 
             Transformer trans = xsltTemplate.newTransformer();
             trans.transform(beforeSource, new StreamResult(outWriter));
@@ -92,17 +76,6 @@ public final class XSLTUtils {
             throw new Fault("GET_CACHED_INPUT_STREAM", LOG, e, e.getMessage());
         } catch (TransformerException e) {
             throw new Fault("XML_TRANSFORM", LOG, e, e.getMessage());
-        } finally {
-            try {
-                inReader.close();
-            } catch (Exception e) {
-                // ignore
-            }
-            try {
-                outWriter.close();
-            } catch (Exception e) {
-                // ignore
-            }
         }
     }
 

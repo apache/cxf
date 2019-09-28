@@ -21,6 +21,7 @@ package org.apache.cxf.transport.http;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
@@ -31,6 +32,7 @@ import java.security.PrivilegedAction;
 
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -50,40 +52,75 @@ public class CXFAuthenticator extends Authenticator {
         if (instance == null) {
             instance = new CXFAuthenticator();
             Authenticator wrapped = null;
-            for (final Field f : ReflectionUtil.getDeclaredFields(Authenticator.class)) {
-                if (f.getType().equals(Authenticator.class)) {
-                    ReflectionUtil.setAccessible(f);
-                    try {
-                        wrapped = (Authenticator)f.get(null);
-                        if (wrapped != null
-                            && wrapped.getClass().getName().equals(ReferencingAuthenticator.class.getName())) {
-                            Method m = wrapped.getClass().getMethod("check");
-                            m.setAccessible(true);
-                            m.invoke(wrapped);
+            if (JavaUtils.isJava9Compatible()) {
+                try {
+                    Method m = ReflectionUtil.getMethod(Authenticator.class, "getDefault");
+                    wrapped = (Authenticator)m.invoke(null);
+                } catch (Exception e) {
+                    // ignore
+                }
+                
+
+            } else {
+                for (final Field f : ReflectionUtil.getDeclaredFields(Authenticator.class)) {
+                    if (f.getType().equals(Authenticator.class)) {
+                        ReflectionUtil.setAccessible(f);
+                        try {
+                            wrapped = (Authenticator)f.get(null);
+                            if (wrapped != null && wrapped.getClass().getName()
+                                .equals(ReferencingAuthenticator.class.getName())) {
+                                Method m = wrapped.getClass().getMethod("check");
+                                m.setAccessible(true);
+                                m.invoke(wrapped);
+                            }
+                            wrapped = (Authenticator)f.get(null);
+                        } catch (Exception e) {
+                            // ignore
                         }
-                        wrapped = (Authenticator)f.get(null);
-                    } catch (Exception e) {
-                        //ignore
                     }
                 }
             }
 
             try {
-                ClassLoader loader = AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                Class<?> cls = null;
+                InputStream ins = ReferencingAuthenticator.class
+                    .getResourceAsStream("ReferencingAuthenticator.class");
+                byte[] b = IOUtils.readBytesFromStream(ins);
+                if (JavaUtils.isJava9Compatible()) {
+                    Class<?> methodHandles = Class.forName("java.lang.invoke.MethodHandles");
+                    Method m = ReflectionUtil.getMethod(methodHandles, "lookup");
+                    Object lookup = m.invoke(null);
+                    m = ReflectionUtil.getMethod(lookup.getClass(), "findClass", String.class);
+                    try {
+                        cls = (Class<?>)m.invoke(lookup, "org.apache.cxf.transport.http.ReferencingAuthenticator");
+                    } catch (InvocationTargetException e) {
+                        //use defineClass as fallback
+                        m = ReflectionUtil.getMethod(lookup.getClass(), "defineClass", byte[].class);
+                        cls = (Class<?>)m.invoke(lookup, b);
+                    }
+                } else {
+                    ClassLoader loader = AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
                         public ClassLoader run() {
                             return new URLClassLoader(new URL[0], ClassLoader.getSystemClassLoader());
                         }
                     }, null);
-                Method m = ReflectionUtil.getDeclaredMethod(ClassLoader.class, "defineClass", String.class,
-                                                               byte[].class, Integer.TYPE, Integer.TYPE);
+                    Method m = ReflectionUtil.getDeclaredMethod(ClassLoader.class, "defineClass",
+                                                                String.class, byte[].class, Integer.TYPE,
+                                                                Integer.TYPE);
 
-                InputStream ins = ReferencingAuthenticator.class
-                        .getResourceAsStream("ReferencingAuthenticator.class");
-                byte b[] = IOUtils.readBytesFromStream(ins);
+                    
 
-                ReflectionUtil.setAccessible(m).invoke(loader, ReferencingAuthenticator.class.getName(),
-                                                       b, 0, b.length);
-                Class<?> cls = loader.loadClass(ReferencingAuthenticator.class.getName());
+                    ReflectionUtil.setAccessible(m).invoke(loader, ReferencingAuthenticator.class.getName(),
+                                                           b, 0, b.length);
+                    cls = loader.loadClass(ReferencingAuthenticator.class.getName());
+                    try {
+                        //clear the acc field that can hold onto the webapp classloader
+                        Field f = ReflectionUtil.getDeclaredField(loader.getClass(), "acc");
+                        ReflectionUtil.setAccessible(f).set(loader, null);
+                    } catch (Throwable t) {
+                        //ignore
+                    }
+                }
                 final Authenticator auth = (Authenticator)cls.getConstructor(Authenticator.class, Authenticator.class)
                     .newInstance(instance, wrapped);
 
@@ -98,13 +135,7 @@ public class CXFAuthenticator extends Authenticator {
                     });
 
                 }
-                try {
-                    //clear the acc field that can hold onto the webapp classloader
-                    Field f = ReflectionUtil.getDeclaredField(loader.getClass(), "acc");
-                    ReflectionUtil.setAccessible(f).set(loader, null);
-                } catch (Throwable t) {
-                    //ignore
-                }
+                
             } catch (Throwable t) {
                 //ignore
             }

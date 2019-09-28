@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -34,8 +35,12 @@ import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
 import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
+
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class SoapOutInterceptorTest extends TestBase {
     private ReadHeadersInterceptor rhi;
@@ -102,19 +107,19 @@ public class SoapOutInterceptorTest extends TestBase {
     }
 
     private void assertInputStream(XMLStreamReader xmlReader, SoapVersion version) throws Exception {
-        assertEquals(XMLStreamReader.START_ELEMENT, xmlReader.nextTag());
+        assertEquals(XMLStreamConstants.START_ELEMENT, xmlReader.nextTag());
         assertEquals(version.getEnvelope(), xmlReader.getName());
 
-        assertEquals(XMLStreamReader.START_ELEMENT, xmlReader.nextTag());
+        assertEquals(XMLStreamConstants.START_ELEMENT, xmlReader.nextTag());
         assertEquals(version.getHeader(), xmlReader.getName());
 
-        assertEquals(XMLStreamReader.START_ELEMENT, xmlReader.nextTag());
+        assertEquals(XMLStreamConstants.START_ELEMENT, xmlReader.nextTag());
         assertEquals("reservation", xmlReader.getLocalName());
         assertEquals(version.getAttrValueMustUnderstand(true),
                      xmlReader.getAttributeValue(version.getNamespace(),
                                                  version.getAttrNameMustUnderstand()));
 
-        assertEquals(XMLStreamReader.START_ELEMENT, xmlReader.nextTag());
+        assertEquals(XMLStreamConstants.START_ELEMENT, xmlReader.nextTag());
         assertEquals("reference", xmlReader.getLocalName());
         // I don't think we're writing the body yet...
         //

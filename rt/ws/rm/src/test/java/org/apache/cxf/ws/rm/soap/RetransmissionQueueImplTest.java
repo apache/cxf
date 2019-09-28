@@ -40,18 +40,24 @@ import org.apache.cxf.ws.rm.manager.SourcePolicyType;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceType;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test resend logic.
  */
-public class RetransmissionQueueImplTest extends Assert {
+public class RetransmissionQueueImplTest {
     private static final Long ONE = Long.valueOf(1);
     private static final Long TWO = Long.valueOf(2);
     private static final Long TEN = Long.valueOf(10);
@@ -115,10 +121,10 @@ public class RetransmissionQueueImplTest extends Assert {
         assertSame(message, candidate.getMessage());
         assertEquals(0, candidate.getRetries());
         Date refDate = new Date(now + 5000);
-        assertTrue(!candidate.getNext().before(refDate));
+        assertFalse(candidate.getNext().before(refDate));
         refDate = new Date(now + 7000);
-        assertTrue(!candidate.getNext().after(refDate));
-        assertTrue(!candidate.isPending());
+        assertFalse(candidate.getNext().after(refDate));
+        assertFalse(candidate.isPending());
     }
 
     @Test
@@ -131,10 +137,10 @@ public class RetransmissionQueueImplTest extends Assert {
         candidate.attempted();
         assertEquals(1, candidate.getRetries());
         Date refDate = new Date(now + 15000);
-        assertTrue(!candidate.getNext().before(refDate));
+        assertFalse(candidate.getNext().before(refDate));
         refDate = new Date(now + 17000);
-        assertTrue(!candidate.getNext().after(refDate));
-        assertTrue(!candidate.isPending());
+        assertFalse(candidate.getNext().after(refDate));
+        assertFalse(candidate.isPending());
     }
 
     @Test
@@ -226,7 +232,7 @@ public class RetransmissionQueueImplTest extends Assert {
                                           messageNumbers,
                                           new boolean[] {true, false});
         List<RetransmissionQueueImpl.ResendCandidate> sequenceList =
-            new ArrayList<RetransmissionQueueImpl.ResendCandidate>();
+            new ArrayList<>();
         queue.getUnacknowledged().put("sequence1", sequenceList);
         SoapMessage message1 = setUpMessage("sequence1", messageNumbers[0]);
         setupMessagePolicies(message1);
@@ -256,7 +262,7 @@ public class RetransmissionQueueImplTest extends Assert {
                                            messageNumbers,
                                            new boolean[] {false, false});
         List<RetransmissionQueueImpl.ResendCandidate> sequenceList =
-            new ArrayList<RetransmissionQueueImpl.ResendCandidate>();
+            new ArrayList<>();
         queue.getUnacknowledged().put("sequence1", sequenceList);
         SoapMessage message1 = setUpMessage("sequence1", messageNumbers[0]);
         setupMessagePolicies(message1);
@@ -283,7 +289,7 @@ public class RetransmissionQueueImplTest extends Assert {
                                           messageNumbers,
                                           new boolean[] {true, true});
         List<RetransmissionQueueImpl.ResendCandidate> sequenceList =
-            new ArrayList<RetransmissionQueueImpl.ResendCandidate>();
+            new ArrayList<>();
         queue.getUnacknowledged().put("sequence1", sequenceList);
         SoapMessage message1 = setUpMessage("sequence1", messageNumbers[0]);
         setupMessagePolicies(message1);
@@ -320,7 +326,7 @@ public class RetransmissionQueueImplTest extends Assert {
                                           messageNumbers,
                                           null);
         List<RetransmissionQueueImpl.ResendCandidate> sequenceList =
-            new ArrayList<RetransmissionQueueImpl.ResendCandidate>();
+            new ArrayList<>();
 
         queue.getUnacknowledged().put("sequence1", sequenceList);
         SoapMessage message1 = setUpMessage("sequence1", messageNumbers[0], false);
@@ -335,7 +341,7 @@ public class RetransmissionQueueImplTest extends Assert {
         assertEquals("unexpected unacked count",
                      2,
                      queue.countUnacknowledged(sequence));
-        assertTrue("queue is empty", !queue.isEmpty());
+        assertFalse("queue is empty", queue.isEmpty());
     }
 
     @Test
@@ -374,7 +380,7 @@ public class RetransmissionQueueImplTest extends Assert {
     private void setupMessagePolicies(Message message) {
         RMConfiguration cfg = new RMConfiguration();
         EasyMock.expect(manager.getEffectiveConfiguration(message)).andReturn(cfg);
-        cfg.setBaseRetransmissionInterval(new Long(5000));
+        cfg.setBaseRetransmissionInterval(Long.valueOf(5000));
         cfg.setExponentialBackoff(true);
     }
 

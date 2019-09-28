@@ -36,6 +36,7 @@ import org.apache.cxf.xkms.model.xkms.ResultMinorEnum;
 import org.apache.cxf.xkms.model.xkms.ResultType;
 import org.apache.cxf.xkms.model.xkms.RevokeRequestType;
 import org.apache.cxf.xkms.model.xkms.RevokeResultType;
+
 import org.junit.Assert;
 import org.junit.Test;
 

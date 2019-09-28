@@ -46,13 +46,18 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.apache.neethi.Constants;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.common.ConfigurationConstants;
+import org.apache.wss4j.common.WSS4JConstants;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase {
     static final String PORT = JavaFirstPolicyServer.PORT;
@@ -96,7 +101,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
             svc.doInputMessagePolicy();
             fail("Expected authentication failure");
         } catch (Exception e) {
-            assertTrue(true);
+            // expected
         }
 
         wssOut.setProperties(getNoPasswordProperties("alice"));
@@ -105,7 +110,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
             svc.doInputMessagePolicy();
             fail("Expected authentication failure");
         } catch (Exception e) {
-            assertTrue(true);
+            // expected
         }
 
         ctx.close();
@@ -132,7 +137,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
             svc.doSslAndUsernamePasswordPolicy();
             fail("Expected authentication failure");
         } catch (Exception e) {
-            assertTrue(true);
+            // expected
         }
 
         wssOut.setProperties(getNoPasswordProperties("alice"));
@@ -141,7 +146,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
             svc.doSslAndUsernamePasswordPolicy();
             fail("Expected authentication failure");
         } catch (Exception e) {
-            assertTrue(true);
+            // expected
         }
 
         ctx.close();
@@ -162,7 +167,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
             simpleService.doStuff();
             fail("Expected exception as no credentials");
         } catch (SOAPFaultException e) {
-            assertTrue(true);
+            // expected
         }
 
         WSS4JOutInterceptor wssOut = addToClient(simpleService);
@@ -172,7 +177,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
             simpleService.doStuff();
             fail("Expected exception as no password and no client cert");
         } catch (SOAPFaultException e) {
-            assertTrue(true);
+            // expected
         }
 
         wssOut.setProperties(getPasswordProperties("alice", "password"));
@@ -196,7 +201,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
             simpleService.doStuff();
             fail("Expected exception as no credentials");
         } catch (SOAPFaultException e) {
-            assertTrue(true);
+            // expected
         }
 
         WSS4JOutInterceptor wssOut = addToClient(simpleService);
@@ -228,7 +233,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
             simpleService.doStuff();
             fail("Expected exception as no credentials");
         } catch (SOAPFaultException e) {
-            assertTrue(true);
+            // expected
         }
 
         WSS4JOutInterceptor wssOut = addToClient(simpleService);
@@ -238,7 +243,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
             simpleService.doStuff();
             fail("Expected exception as no password and no client cert");
         } catch (SOAPFaultException e) {
-            assertTrue(true);
+            // expected
         }
 
         wssOut.setProperties(getPasswordProperties("alice", "password"));
@@ -246,7 +251,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
             simpleService.doStuff();
             fail("Expected exception as no client cert and password not allowed");
         } catch (SOAPFaultException e) {
-            assertTrue(true);
+            // expected
         }
 
         wssOut.setProperties(getNoPasswordProperties("alice"));
@@ -254,7 +259,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
             simpleService.ping();
             fail("Expected exception as no password");
         } catch (SOAPFaultException e) {
-            assertTrue(true);
+            // expected
         }
 
         wssOut.setProperties(getPasswordProperties("alice", "password"));
@@ -279,7 +284,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
             simpleService.doStuff();
             fail("Expected exception as no credentials");
         } catch (SOAPFaultException e) {
-            assertTrue(true);
+            // expected
         }
 
         WSS4JOutInterceptor wssOut = addToClient(simpleService);
@@ -292,7 +297,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
             simpleService.doStuff();
             fail("Expected exception as password not allowed");
         } catch (SOAPFaultException e) {
-            assertTrue(true);
+            // expected
         }
 
         wssOut.setProperties(getNoPasswordProperties("alice"));
@@ -300,7 +305,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
             simpleService.ping();
             fail("Expected exception as no password");
         } catch (SOAPFaultException e) {
-            assertTrue(true);
+            // expected
         }
 
         wssOut.setProperties(getPasswordProperties("alice", "password"));
@@ -327,7 +332,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
             simpleService.doStuff();
             fail("Expected exception as no credentials");
         } catch (SOAPFaultException e) {
-            assertTrue(true);
+            // expected
         }
 
         WSS4JOutInterceptor wssOut = addToClient(simpleService);
@@ -337,7 +342,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
             simpleService.doStuff();
             fail("Expected exception as no password and no client cert");
         } catch (SOAPFaultException e) {
-            assertTrue(true);
+            // expected
         }
 
         // this is successful because the alternative policy allows a password to be specified.
@@ -365,7 +370,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
             simpleService.doStuff();
             fail("Expected exception as no credentials");
         } catch (SOAPFaultException e) {
-            assertTrue(true);
+            // expected
         }
 
         WSS4JOutInterceptor wssOut = addToClient(simpleService);
@@ -393,18 +398,18 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         callback.setAliasPassword(username, password);
 
         Map<String, Object> outProps = new HashMap<>();
-        outProps.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
-        outProps.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
-        outProps.put(WSHandlerConstants.PW_CALLBACK_REF, callback);
-        outProps.put(WSHandlerConstants.USER, username);
+        outProps.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
+        outProps.put(ConfigurationConstants.PASSWORD_TYPE, WSS4JConstants.PW_TEXT);
+        outProps.put(ConfigurationConstants.PW_CALLBACK_REF, callback);
+        outProps.put(ConfigurationConstants.USER, username);
         return outProps;
     }
 
     private Map<String, Object> getNoPasswordProperties(String username) {
         Map<String, Object> outProps = new HashMap<>();
-        outProps.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
-        outProps.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_NONE);
-        outProps.put(WSHandlerConstants.USER, username);
+        outProps.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
+        outProps.put(ConfigurationConstants.PASSWORD_TYPE, WSS4JConstants.PW_NONE);
+        outProps.put(ConfigurationConstants.USER, username);
         return outProps;
     }
 
@@ -529,9 +534,8 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
                                                                  "PolicyReference");
         if (policyReference != null) {
             return policyReference.getAttributeNS(null, "URI");
-        } else {
-            return null;
         }
+        return null;
     }
 
     private String getOperationPolicyReferenceId(Element operationElement, String policyNamespace) {
@@ -539,9 +543,8 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
                                                                  "PolicyReference");
         if (policyReference != null) {
             return policyReference.getAttributeNS(null, "URI");
-        } else {
-            return null;
         }
+        return null;
     }
 }
 

@@ -40,7 +40,7 @@ public final class Client {
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         if (args.length < 2) {
             System.out.println("please specify wsdl and configuration file");
@@ -64,7 +64,7 @@ public final class Client {
             busURL = new URL(args[1]);
         }
 
-        Bus bus = bf.createBus(busFile.toString());
+        Bus bus = bf.createBus(busURL);
         BusFactory.setDefaultBus(bus);
 
         System.out.println(wsdlURL);

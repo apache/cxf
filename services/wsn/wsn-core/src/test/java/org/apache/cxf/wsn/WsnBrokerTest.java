@@ -47,17 +47,18 @@ import org.apache.cxf.wsn.services.JaxwsCreatePullPoint;
 import org.apache.cxf.wsn.services.JaxwsNotificationBroker;
 import org.apache.cxf.wsn.types.CustomType;
 import org.apache.cxf.wsn.util.WSNHelper;
-
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 import org.oasis_open.docs.wsn.b_2.NotificationMessageHolderType;
 import org.oasis_open.docs.wsn.b_2.TopicExpressionType;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public abstract class WsnBrokerTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public abstract class WsnBrokerTest {
     private boolean useExternal;
 
 
@@ -78,11 +79,12 @@ public abstract class WsnBrokerTest extends Assert {
     public void setUp() throws Exception {
         loader = Thread.currentThread().getContextClassLoader();
         String impl = getProviderImpl();
+        System.setProperty("javax.xml.ws.spi.Provider", impl);
         Thread.currentThread()
             .setContextClassLoader(new FakeClassLoader(impl));
         WSNHelper.getInstance().setClassLoader(false);
 
-        System.setProperty("javax.xml.ws.spi.Provider", impl);
+
 
         port2 = getFreePort();
         if (!useExternal) {
@@ -152,15 +154,16 @@ public abstract class WsnBrokerTest extends Assert {
         TestConsumer callback = new TestConsumer();
         Consumer consumer = new Consumer(callback, "http://localhost:" + port2 + "/test/consumer");
 
-        //create subscription with InitialTerminationTime 20 sec, so that the
-        //subscription would be expired after 20 sec
-        Subscription subscription = notificationBroker.subscribe(consumer, "myTopic", null, false, "PT20S");
-        Thread.sleep(30000);
+        //create subscription with InitialTerminationTime 2 sec, so that the
+        //subscription would be expired after 2 sec
+        Subscription subscription = notificationBroker.subscribe(consumer, "myTopic", null, false, "PT02S");
+        Thread.sleep(5000);
         synchronized (callback.notifications) {
+            System.out.println("send notify");
             notificationBroker.notify("myTopic",
                                       new JAXBElement<String>(new QName("urn:test:org", "foo"),
                                           String.class, "bar"));
-            callback.notifications.wait(10000);
+            callback.notifications.wait(2000);
         }
         assertEquals(0, callback.notifications.size()); //the subscription is expired so can't get the notification
         subscription.renew("PT60S"); //renew another 60 sec to resend the notification
@@ -384,9 +387,8 @@ public abstract class WsnBrokerTest extends Assert {
         public InputStream getResourceAsStream(String name) {
             if ("META-INF/services/javax.xml.ws.spi.Provider".equals(name)) {
                 return provider != null ? new ByteArrayInputStream(provider.getBytes()) : null;
-            } else {
-                return super.getResourceAsStream(name);
             }
+            return super.getResourceAsStream(name);
         }
         @Override
         public Enumeration<URL> getResources(String name) throws IOException {

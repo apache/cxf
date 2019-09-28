@@ -31,11 +31,11 @@ import org.apache.cxf.databinding.AbstractWrapperHelper;
  *
  */
 public class JAXBWrapperHelper extends AbstractWrapperHelper {
-    protected final Method jaxbObjectMethods[];
+    protected final Method[] jaxbObjectMethods;
     protected final Object objectFactory;
 
     protected JAXBWrapperHelper(Class<?> wt, Method[] sets, Method[] gets,
-                                Method jaxbs[], Field[] f, Object of) {
+                                Method[] jaxbs, Field[] f, Object of) {
         super(wt, sets, gets, f);
         jaxbObjectMethods = jaxbs;
         objectFactory = of;
@@ -57,9 +57,8 @@ public class JAXBWrapperHelper extends AbstractWrapperHelper {
         if ("javax.xml.bind.JAXBElement".equals(method.getReturnType().getCanonicalName())) {
             JAXBElement<?> je = (JAXBElement<?>)method.invoke(in);
             return je == null ? je : je.getValue();
-        } else {
-            return method.invoke(in);
         }
+        return method.invoke(in);
     }
 
     @Override

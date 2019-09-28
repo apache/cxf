@@ -28,6 +28,7 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToOne;
@@ -51,13 +52,13 @@ public class Client implements Serializable {
     private String applicationWebUri;
     private String applicationLogoUri;
     private String applicationLogoutUri;
-    private List<String> applicationCertificates = new LinkedList<String>();
-    private List<String> redirectUris = new LinkedList<String>();
+    private List<String> applicationCertificates = new LinkedList<>();
+    private List<String> redirectUris = new LinkedList<>();
 
     private boolean isConfidential;
-    private List<String> allowedGrantTypes = new LinkedList<String>();
-    private List<String> registeredScopes = new LinkedList<String>();
-    private List<String> registeredAudiences = new LinkedList<String>();
+    private List<String> allowedGrantTypes = new LinkedList<>();
+    private List<String> registeredScopes = new LinkedList<>();
+    private List<String> registeredAudiences = new LinkedList<>();
 
     private Map<String, String> properties = new HashMap<>();
     private UserSubject subject;
@@ -66,7 +67,7 @@ public class Client implements Serializable {
     private String homeRealm;
     private boolean registeredDynamically;
     private String tokenEndpointAuthMethod;
-    
+
     public Client() {
 
     }
@@ -346,6 +347,7 @@ public class Client implements Serializable {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @OrderColumn
+    @Lob
     public List<String> getApplicationCertificates() {
         return applicationCertificates;
     }

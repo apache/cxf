@@ -176,9 +176,8 @@ public class MultipartStore {
     public String testNullPart(@Multipart(value = "someid", required = false) String value) {
         if (value != null) {
             return value;
-        } else {
-            return "nobody home";
         }
+        return "nobody home";
     }
     @POST
     @Path("/books/testnullparts")
@@ -188,9 +187,8 @@ public class MultipartStore {
                                 @Multipart(value = "someid2", required = false) String value2) {
         if (value2 != null) {
             return value + value2;
-        } else {
-            return "nobody home2";
         }
+        return "nobody home2";
     }
 
     @POST
@@ -217,7 +215,7 @@ public class MultipartStore {
     public Map<String, Object> addBookJaxbJsonImage(@Multipart("root.message@cxf.apache.org") Book jaxb,
                                                     @Multipart("1") Book json,
                                                     @Multipart("2") byte[] image) throws Exception {
-        Map<String, Object> objects = new LinkedHashMap<String, Object>();
+        Map<String, Object> objects = new LinkedHashMap<>();
         objects.put("application/xml", jaxb);
         objects.put("application/json", json);
         objects.put("application/octet-stream", new ByteArrayInputStream(image));
@@ -232,7 +230,7 @@ public class MultipartStore {
     public Map<String, Object> addBookJaxbJsonImage2(@Multipart("theroot") Book jaxb,
                                                      @Multipart("thejson") Book json,
                                                      @Multipart("theimage") byte[] image) throws Exception {
-        Map<String, Object> objects = new LinkedHashMap<String, Object>();
+        Map<String, Object> objects = new LinkedHashMap<>();
         objects.put("application/xml", jaxb);
         objects.put("application/json", json);
         objects.put("application/octet-stream", new ByteArrayInputStream(image));
@@ -247,7 +245,7 @@ public class MultipartStore {
     public Map<String, Object> addBookJsonImageStream(
         @Multipart(value = "thejson", type = "application/json") Book json,
         @Multipart("theimage") InputStream image) throws Exception {
-        Map<String, Object> objects = new LinkedHashMap<String, Object>();
+        Map<String, Object> objects = new LinkedHashMap<>();
         objects.put("application/json", json);
         objects.put("application/octet-stream", image);
         return objects;
@@ -260,7 +258,7 @@ public class MultipartStore {
     public Map<String, Book> getBookJaxbJson() throws Exception {
         Book jaxb = new Book("jaxb", 1L);
         Book json = new Book("json", 2L);
-        Map<String, Book> objects = new LinkedHashMap<String, Book>();
+        Map<String, Book> objects = new LinkedHashMap<>();
         objects.put(MediaType.APPLICATION_XML, jaxb);
         objects.put(MediaType.APPLICATION_JSON, json);
         return objects;
@@ -272,7 +270,7 @@ public class MultipartStore {
     @Produces("multipart/mixed")
     public Map<String, Book> getBookJson() throws Exception {
         Book json = new Book("json", 1L);
-        Map<String, Book> objects = new LinkedHashMap<String, Book>();
+        Map<String, Book> objects = new LinkedHashMap<>();
         objects.put(MediaType.APPLICATION_JSON, json);
         return objects;
 
@@ -284,7 +282,7 @@ public class MultipartStore {
     public Map<String, Object> getBookJaxbJsonObject() throws Exception {
         Book jaxb = new Book("jaxb", 1L);
         Book json = new Book("json", 2L);
-        Map<String, Object> objects = new LinkedHashMap<String, Object>();
+        Map<String, Object> objects = new LinkedHashMap<>();
         objects.put(MediaType.APPLICATION_XML, jaxb);
         objects.put(MediaType.APPLICATION_JSON, json);
         return objects;
@@ -692,7 +690,7 @@ public class MultipartStore {
     public Response addBookFromMessageContext() throws Exception {
         Map<String, Attachment> handlers = AttachmentUtils.getAttachmentsMap(context);
         for (Map.Entry<String, Attachment> entry : handlers.entrySet()) {
-            if (entry.getKey().equals("book2")) {
+            if ("book2".equals(entry.getKey())) {
                 return readBookFromInputStream(entry.getValue().getDataHandler().getInputStream());
             }
         }
@@ -705,7 +703,7 @@ public class MultipartStore {
     public Response addBookFromAttachments() throws Exception {
         Collection<Attachment> handlers = AttachmentUtils.getChildAttachments(context);
         for (Attachment a : handlers) {
-            if (a.getContentId().equals("book2")) {
+            if ("book2".equals(a.getContentId())) {
                 return readBookFromInputStream(a.getDataHandler().getInputStream());
             }
         }

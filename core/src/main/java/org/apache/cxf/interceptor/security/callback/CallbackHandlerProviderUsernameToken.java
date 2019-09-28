@@ -40,9 +40,8 @@ public class CallbackHandlerProviderUsernameToken implements CallbackHandlerProv
                                                          ut.getPassword(),
                                                          ut.getNonce(),
                                                          ut.getCreatedTime());
-        } else {
-            return new NamePasswordCallbackHandler(ut.getName(), ut.getPassword());
         }
+        return new NamePasswordCallbackHandler(ut.getName(), ut.getPassword());
     }
 
 }

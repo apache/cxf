@@ -19,12 +19,10 @@
 package org.apache.cxf.cdi;
 
 import java.lang.reflect.Type;
-import java.util.Collections;
 import java.util.Set;
 
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.Vetoed;
-import javax.enterprise.inject.spi.InjectionPoint;
 import javax.ws.rs.core.Application;
 
 @Vetoed
@@ -37,19 +35,8 @@ class DefaultApplicationBean extends AbstractCXFBean<DefaultApplication> {
     }
 
     @Override
-    public Set<InjectionPoint> getInjectionPoints() {
-        return Collections.emptySet();
-    }
-
-    @Override
     public DefaultApplication create(CreationalContext<DefaultApplication> creationalContext) {
         return application;
-    }
-
-    @Override
-    public void destroy(DefaultApplication defaultApplication,
-                        CreationalContext<DefaultApplication> creationalContext) {
-        creationalContext.release();
     }
 
     @Override

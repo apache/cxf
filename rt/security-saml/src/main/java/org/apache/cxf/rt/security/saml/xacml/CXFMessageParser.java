@@ -21,6 +21,7 @@ package org.apache.cxf.rt.security.saml.xacml;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rt.security.saml.claims.SAMLSecurityContext;
 import org.apache.cxf.security.SecurityContext;

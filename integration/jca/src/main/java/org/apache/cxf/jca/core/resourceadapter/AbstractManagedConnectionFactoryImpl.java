@@ -85,12 +85,11 @@ public abstract class AbstractManagedConnectionFactoryImpl extends ResourceBean
             if (!conn.isBound()) {
                 LOG.fine("Match against unbounded, con= " + conn + ", info=" + crInfo);
                 return conn;
-            } else {
-                if (isMatch(conn, crInfo, subject)) {
-                    LOG.fine("Match against bounded, con= " + conn + ", info=" + crInfo);
+            }
+            if (isMatch(conn, crInfo, subject)) {
+                LOG.fine("Match against bounded, con= " + conn + ", info=" + crInfo);
 
-                    return conn;
-                }
+                return conn;
             }
         }
 

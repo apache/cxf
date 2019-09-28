@@ -71,17 +71,20 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.staxutils.PartialXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
+
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 
 import static org.easymock.EasyMock.createNiceControl;
 import static org.easymock.EasyMock.expect;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-public class SOAPHandlerInterceptorTest extends Assert {
+public class SOAPHandlerInterceptorTest {
 
     @Before
     public void setUp() {
@@ -274,8 +277,8 @@ public class SOAPHandlerInterceptorTest extends Assert {
             Header localHdr = iter.next();
             if (localHdr.getObject() instanceof Element) {
                 Element elem = (Element) localHdr.getObject();
-                if (elem.getNamespaceURI().equals("http://apache.org/hello_world_rpclit/types")
-                        && elem.getLocalName().equals("header1")) {
+                if ("http://apache.org/hello_world_rpclit/types".equals(elem.getNamespaceURI())
+                        && "header1".equals(elem.getLocalName())) {
                     requiredHeader = (Element) localHdr.getObject();
                     break;
                 }

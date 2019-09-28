@@ -36,6 +36,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.ietf.jgss.GSSCredential;
+
 import org.junit.Assert;
 
 @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",

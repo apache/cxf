@@ -38,6 +38,11 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
     public static final String PORT = SessionServer.PORT;
     @BeforeClass
@@ -108,6 +113,18 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
             }
             assertNotNull("no response received from service", greeting);
             assertEquals("Hello Hello", greeting);
+            assertTrue(cookie.contains("a=a"));
+            assertTrue(cookie.contains("b=b"));
+
+            Thread.sleep(30 * 1000); //let session expire
+            greeting = greeter.greetMe("SessionExpire");
+            cookie = "";
+            if (greeting.indexOf(';') != -1) {
+                cookie = greeting.substring(greeting.indexOf(';'));
+                greeting = greeting.substring(0, greeting.indexOf(';'));
+            }
+            assertNotNull("no response received from service", greeting);
+            assertEquals("Hello SessionExpire", greeting);
             assertTrue(cookie.contains("a=a"));
             assertTrue(cookie.contains("b=b"));
         } catch (UndeclaredThrowableException ex) {

@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -33,16 +34,20 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  *
  */
-public class HeadersTest extends Assert {
+public class HeadersTest {
 
     @Test
     public void setHeadersTest() throws Exception {
@@ -95,7 +100,7 @@ public class HeadersTest extends Assert {
 
     @Test
     public void sensitiveHeadersTest() {
-        Map<String, List<String>> headerMap = new HashMap<>();
+        Map<String, List<Object>> headerMap = new HashMap<>();
         headerMap.put("Authorization", Arrays.asList("FAIL"));
         headerMap.put("Proxy-Authorization", Arrays.asList("FAIL"));
         headerMap.put("Content-Type", Arrays.asList("application/xml"));
@@ -112,7 +117,7 @@ public class HeadersTest extends Assert {
 
     @Test
     public void logProtocolHeadersTest() {
-        Map<String, List<String>> headerMap = new HashMap<>();
+        Map<String, List<Object>> headerMap = new HashMap<>();
         headerMap.put("Normal-Header", Arrays.asList("normal"));
         headerMap.put("Multivalue-Header", Arrays.asList("first", "second"));
         headerMap.put("Authorization", Arrays.asList("myPassword"));
@@ -206,5 +211,20 @@ public class HeadersTest extends Assert {
                      headers.determineContentType());
 
         control.verify();
+    }
+    
+    @Test
+    public void httpLanguage() {
+        Locale locale = new Locale("en", "US");
+        assertEquals("en-US", Headers.toHttpLanguage(locale));
+
+        locale = new Locale("de");
+        assertEquals("de", Headers.toHttpLanguage(locale));
+
+        locale = new Locale("aa", "ZZ");
+        assertEquals("aa-ZZ", Headers.toHttpLanguage(locale));
+
+        locale = new Locale("es", "");
+        assertEquals("es", Headers.toHttpLanguage(locale));
     }
 }

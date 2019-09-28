@@ -26,6 +26,7 @@ import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import javax.wsdl.Definition;
 import javax.wsdl.Import;
 import javax.wsdl.Types;
@@ -74,7 +75,7 @@ public final class SchemaUtil {
         // added
         getSchemaList(def);
 
-        Map<Definition, Definition> done = new IdentityHashMap<Definition, Definition>();
+        Map<Definition, Definition> done = new IdentityHashMap<>();
         done.put(def, def);
         for (Definition def2 : defList) {
             if (!done.containsKey(def2)) {
@@ -97,7 +98,7 @@ public final class SchemaUtil {
                     schemaElem = schema.getElement();
                 } else if (obj instanceof UnknownExtensibilityElement) {
                     org.w3c.dom.Element elem = ((UnknownExtensibilityElement)obj).getElement();
-                    if (elem.getLocalName().equals("schema")) {
+                    if ("schema".equals(elem.getLocalName())) {
                         schemaElem = elem;
                     }
                 }

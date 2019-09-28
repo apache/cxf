@@ -39,7 +39,7 @@ public class BindingInfo extends AbstractDescriptionElement implements NamedItem
     final String bindingId;
 
     Map<QName, BindingOperationInfo> operations
-        = new ConcurrentHashMap<QName, BindingOperationInfo>(4, 0.75f, 2);
+        = new ConcurrentHashMap<>(4, 0.75f, 2);
 
     public BindingInfo(ServiceInfo service, String bindingId) {
         this.service = service;
@@ -72,17 +72,14 @@ public class BindingInfo extends AbstractDescriptionElement implements NamedItem
         return name;
     }
 
-    private boolean nameEquals(String a, String b, String def) {
+    private static boolean nameEquals(String a, String b, String def) {
         if (a == null) {
             // in case of input/output itself is empty
             return true;
-        } else {
-            if (b == null) {
-                b = def;
-            }
-            return "".equals(a) ? "".equals(b) : a.equals(b);
         }
+        return a.isEmpty() ? b.isEmpty() : a.equals(b != null ? b : def);
     }
+
     public BindingOperationInfo buildOperation(QName opName, String inName, String outName) {
         for (OperationInfo op : getInterface().getOperations()) {
             if (opName.equals(op.getName())

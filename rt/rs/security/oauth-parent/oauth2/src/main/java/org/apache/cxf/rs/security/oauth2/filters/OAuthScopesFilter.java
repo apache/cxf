@@ -48,13 +48,8 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthContextUtils;
 public class OAuthScopesFilter implements ContainerRequestFilter {
 
     private static final Logger LOG = LogUtils.getL7dLogger(OAuthScopesFilter.class);
-    private static final Set<String> SKIP_METHODS;
-    static {
-        SKIP_METHODS = new HashSet<>();
-        SKIP_METHODS.addAll(Arrays.asList(
-            new String[] {"wait", "notify", "notifyAll",
-                          "equals", "toString", "hashCode"}));
-    }
+    private static final Set<String> SKIP_METHODS = new HashSet<>(
+            Arrays.asList("wait", "notify", "notifyAll", "equals", "toString", "hashCode"));
 
     @Context
     private MessageContext mc;
@@ -125,7 +120,7 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
         }
         boolean matchAll = scopesMatchAllMap.get(m.getName());
         OAuthContext context = OAuthContextUtils.getContext(mc);
-        List<String> requestScopes = new LinkedList<String>();
+        List<String> requestScopes = new LinkedList<>();
         for (OAuthPermission perm : context.getPermissions()) {
             if (matchAll) {
                 requestScopes.add(perm.getPermission());

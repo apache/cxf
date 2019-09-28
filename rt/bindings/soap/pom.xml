@@ -23,17 +23,21 @@
     <packaging>bundle</packaging>
     <name>Apache CXF Runtime SOAP Binding</name>
     <description>Apache CXF Runtime SOAP Binding</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.binding.soap</cxf.module.name>
         <cxf.osgi.import>
+            javax.xml.soap;version="${cxf.osgi.saaj.version}",
+            javax.activation;version="${cxf.osgi.javax.activation.version}",
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
-            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
+            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
+            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}"
         </cxf.osgi.import>
         <cxf.bundle.activator>org.apache.cxf.binding.soap.blueprint.Activator</cxf.bundle.activator>
         <!-- keep in sync with services exported in activator -->
@@ -77,7 +81,7 @@
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>com.sun.xml.bind</groupId>
+                    <groupId>org.glassfish.jaxb</groupId>
                     <artifactId>jaxb-xjc</artifactId>
                 </exclusion>
             </exclusions>
@@ -88,8 +92,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-javamail_1.4_spec</artifactId>
+            <groupId>org.apache.geronimo.javamail</groupId>
+            <artifactId>geronimo-javamail_1.4_mail</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

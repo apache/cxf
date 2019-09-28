@@ -29,7 +29,9 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
@@ -42,9 +44,14 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * This is a test for invoking on an STS using SOAP 1.2 via the TransportBinding. The CXF client gets a
@@ -104,17 +111,17 @@ public class Soap12Test extends AbstractBusClientServerTestBase {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
+    public static Collection<TestParam> data() {
 
-        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false, STSPORT)},
-                                                {new TestParam(PORT, true, STSPORT)},
-                                                {new TestParam(STAX_PORT, false, STSPORT)},
-                                                {new TestParam(STAX_PORT, true, STSPORT)},
+        return Arrays.asList(new TestParam[] {new TestParam(PORT, false, STSPORT),
+                                              new TestParam(PORT, true, STSPORT),
+                                              new TestParam(STAX_PORT, false, STSPORT),
+                                              new TestParam(STAX_PORT, true, STSPORT),
 
-                                                {new TestParam(PORT, false, STAX_STSPORT)},
-                                                {new TestParam(PORT, true, STAX_STSPORT)},
-                                                {new TestParam(STAX_PORT, false, STAX_STSPORT)},
-                                                {new TestParam(STAX_PORT, true, STAX_STSPORT)},
+                                              new TestParam(PORT, false, STAX_STSPORT),
+                                              new TestParam(PORT, true, STAX_STSPORT),
+                                              new TestParam(STAX_PORT, false, STAX_STSPORT),
+                                              new TestParam(STAX_PORT, true, STAX_STSPORT),
         });
     }
 
@@ -131,8 +138,8 @@ public class Soap12Test extends AbstractBusClientServerTestBase {
         URL busFile = Soap12Test.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = Soap12Test.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -163,8 +170,8 @@ public class Soap12Test extends AbstractBusClientServerTestBase {
         URL busFile = Soap12Test.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         try {
             String badAddress =

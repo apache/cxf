@@ -26,17 +26,20 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.http.HTTPConduitFactory;
 
+import io.netty.channel.EventLoopGroup;
+
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import io.netty.channel.EventLoopGroup;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 
 
-public class NettyHttpConduitFactoryTest extends Assert {
+
+public class NettyHttpConduitFactoryTest {
     Bus bus;
 
     @BeforeClass

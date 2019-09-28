@@ -39,7 +39,6 @@ import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.endpoint.ServerRegistry;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.Feature;
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
@@ -48,12 +47,19 @@ import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.workqueue.WorkQueueManager;
+
 import org.easymock.EasyMock;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
 
-public class SpringBusFactoryTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+public class SpringBusFactoryTest {
 
     @After
     public void tearDown() {
@@ -161,11 +167,11 @@ public class SpringBusFactoryTest extends Assert {
         SortedSet<Phase> cxfPhases = cxfPM.getInPhases();
         SortedSet<Phase> defaultPhases = defaultPM.getInPhases();
         assertEquals(defaultPhases.size(), cxfPhases.size());
-        assertTrue(cxfPhases.equals(defaultPhases));
+        assertEquals(cxfPhases, defaultPhases);
         cxfPhases = cxfPM.getOutPhases();
         defaultPhases = defaultPM.getOutPhases();
         assertEquals(defaultPhases.size(), cxfPhases.size());
-        assertTrue(cxfPhases.equals(defaultPhases));
+        assertEquals(cxfPhases, defaultPhases);
     }
 
     @Test
@@ -173,7 +179,7 @@ public class SpringBusFactoryTest extends Assert {
         Bus bus = new SpringBusFactory().createBus("org/apache/cxf/bus/spring/testjsr250.xml");
         TestExtension te = bus.getExtension(TestExtension.class);
         assertTrue("@PostConstruct annotated method has not been called.", te.postConstructMethodCalled);
-        assertTrue("@PreDestroy annoated method has been called already.", !te.preDestroyMethodCalled);
+        assertFalse("@PreDestroy annoated method has been called already.", te.preDestroyMethodCalled);
         bus.shutdown(true);
         assertTrue("@PreDestroy annotated method has not been called.", te.preDestroyMethodCalled);
 
@@ -206,10 +212,10 @@ public class SpringBusFactoryTest extends Assert {
         public void handleFault(Message message) {
         }
 
-        public void handleMessage(Message message) throws Fault {
+        public void handleMessage(Message message) {
         }
 
-        public void postHandleMessage(Message message) throws Fault {
+        public void postHandleMessage(Message message) {
         }
 
     }

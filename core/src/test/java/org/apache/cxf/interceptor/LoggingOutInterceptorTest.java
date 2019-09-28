@@ -35,16 +35,20 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 @SuppressWarnings("deprecation")
-public class LoggingOutInterceptorTest extends Assert {
+public class LoggingOutInterceptorTest {
 
     protected IMocksControl control;
 
@@ -73,6 +77,55 @@ public class LoggingOutInterceptorTest extends Assert {
         Message message = new MessageImpl();
         message.setExchange(new ExchangeImpl());
         message.put(Message.CONTENT_TYPE, "application/xml");
+        Logger logger = LogUtils.getL7dLogger(this.getClass());
+        LoggingOutInterceptor.LoggingCallback l = p.new LoggingCallback(logger, message, cos);
+        l.onClose(cos);
+        String str = baos.toString();
+        //format has changed
+        assertFalse(str.matches(s));
+        assertTrue(str.contains("<today>"));
+    }
+
+    @Test
+    public void testPrettyLoggingWithoutEncoding() throws Exception {
+        control.replay();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintWriter pw = new PrintWriter(baos);
+        
+        LoggingOutInterceptor p = new LoggingOutInterceptor(pw);
+        p.setPrettyLogging(true);
+        CachedOutputStream cos = new CachedOutputStream();
+        String s = "<today><is><the><twenty> <second> <of> <january> <two> <thousand> <and> <nine></nine> "
+            + "</and></thousand></two></january></of></second></twenty></the></is></today>";
+        cos.write(s.getBytes());
+        Message message = new MessageImpl();
+        message.setExchange(new ExchangeImpl());
+        message.put(Message.CONTENT_TYPE, "application/xml");
+        Logger logger = LogUtils.getL7dLogger(this.getClass());
+        LoggingOutInterceptor.LoggingCallback l = p.new LoggingCallback(logger, message, cos);
+        l.onClose(cos);
+        String str = baos.toString();
+        //format has changed
+        assertFalse(str.matches(s));
+        assertTrue(str.contains("<today>"));
+    }
+
+    @Test
+    public void testPrettyLoggingWithEncoding() throws Exception {
+        control.replay();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintWriter pw = new PrintWriter(baos);
+        
+        LoggingOutInterceptor p = new LoggingOutInterceptor(pw);
+        p.setPrettyLogging(true);
+        CachedOutputStream cos = new CachedOutputStream();
+        String s = "<today><is><the><twenty> <second> <of> <january> <two> <thousand> <and> <nine></nine> "
+            + "</and></thousand></two></january></of></second></twenty></the></is></today>";
+        cos.write(s.getBytes());
+        Message message = new MessageImpl();
+        message.setExchange(new ExchangeImpl());
+        message.put(Message.CONTENT_TYPE, "application/xml");
+        message.put(Message.ENCODING, "UTF-8");
         Logger logger = LogUtils.getL7dLogger(this.getClass());
         LoggingOutInterceptor.LoggingCallback l = p.new LoggingCallback(logger, message, cos);
         l.onClose(cos);

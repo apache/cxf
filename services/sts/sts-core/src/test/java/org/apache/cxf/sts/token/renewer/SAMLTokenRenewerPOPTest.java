@@ -30,6 +30,7 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.sts.STSConstants;
@@ -38,7 +39,7 @@ import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.Lifetime;
-import org.apache.cxf.sts.request.ReceivedKey;
+import org.apache.cxf.sts.request.ReceivedCredential;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.request.Renewing;
@@ -53,6 +54,7 @@ import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -63,13 +65,18 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
+
 import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Some unit tests for renewing a SAML token via the SAMLTokenRenewer with proof of possession enabled
  * (message level, not TLS).
  */
-public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
+public class SAMLTokenRenewerPOPTest {
 
     private static TokenStore tokenStore;
 
@@ -88,7 +95,7 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
             createSAMLAssertion(
-                WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50000, true, false
+                WSS4JConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50000, true, false
             );
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
@@ -105,8 +112,8 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
 
         TokenValidatorResponse validatorResponse =
                 samlTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
 
         // Renew the Assertion
@@ -151,8 +158,8 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
         // Now successfully renew the token
         TokenRenewerResponse renewerResponse =
                 samlTokenRenewer.renewToken(renewerParameters);
-        assertTrue(renewerResponse != null);
-        assertTrue(renewerResponse.getToken() != null);
+        assertNotNull(renewerResponse);
+        assertNotNull(renewerResponse.getToken());
     }
 
     /**
@@ -165,7 +172,7 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
             createSAMLAssertion(
-                WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50000, true, false
+                WSS4JConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50000, true, false
             );
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
@@ -182,8 +189,8 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
 
         TokenValidatorResponse validatorResponse =
                 samlTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
 
         // Renew the Assertion
@@ -285,7 +292,7 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
 
         if (ttlMs != 0) {
             Lifetime lifetime = new Lifetime();
-            
+
             Instant creationTime = Instant.now();
             Instant expirationTime = creationTime.plusNanos(ttlMs * 1000000L);
 
@@ -296,7 +303,7 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
         }
 
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         return (Element)providerResponse.getToken();
@@ -314,11 +321,11 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
 
         KeyRequirements keyRequirements = new KeyRequirements();
         keyRequirements.setKeyType(keyType);
-        ReceivedKey receivedKey = new ReceivedKey();
+        ReceivedCredential receivedCredential = new ReceivedCredential();
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("myclientkey");
-        receivedKey.setX509Cert(crypto.getX509Certificates(cryptoType)[0]);
-        keyRequirements.setReceivedKey(receivedKey);
+        receivedCredential.setX509Cert(crypto.getX509Certificates(cryptoType)[0]);
+        keyRequirements.setReceivedCredential(receivedCredential);
         parameters.setKeyRequirements(keyRequirements);
 
         parameters.setPrincipal(new CustomTokenPrincipal("alice"));

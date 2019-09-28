@@ -45,7 +45,7 @@ import javax.xml.ws.spi.Invoker;
 import javax.xml.ws.spi.ServiceDelegate;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
-import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
@@ -112,9 +112,8 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
             Bus bus = BusFactory.getThreadDefaultBus();
             ep = createEndpointImpl(bus, bindingId, implementor);
             return ep;
-        } else {
-            throw new WebServiceException(new Message("INVALID_IMPLEMENTOR_EXC", LOG).toString());
         }
+        throw new WebServiceException(new Message("INVALID_IMPLEMENTOR_EXC", LOG).toString());
     }
     //new in 2.2
     public Endpoint createEndpoint(String bindingId,
@@ -125,9 +124,8 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
             Bus bus = BusFactory.getThreadDefaultBus();
             ep = createEndpointImpl(bus, bindingId, implementor, features);
             return ep;
-        } else {
-            throw new WebServiceException(new Message("INVALID_IMPLEMENTOR_EXC", LOG).toString());
         }
+        throw new WebServiceException(new Message("INVALID_IMPLEMENTOR_EXC", LOG).toString());
     }
 
     @Override
@@ -165,9 +163,8 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
             EndpointImpl ep = new EndpointImpl(bus, null, factory);
             ep.setImplementorClass(implementorClass);
             return ep;
-        } else {
-            throw new WebServiceException(new Message("INVALID_IMPLEMENTOR_EXC", LOG).toString());
         }
+        throw new WebServiceException(new Message("INVALID_IMPLEMENTOR_EXC", LOG).toString());
     }
 
 
@@ -193,10 +190,10 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
 
             Unmarshaller um = null;
             try {
-                Document doc = DOMUtils.newDocument();
-                DOMResult result = new DOMResult(doc);
+                DocumentFragment frag = DOMUtils.getEmptyDocument().createDocumentFragment();
+                DOMResult result = new DOMResult(frag);
                 external.writeTo(result);
-                W3CDOMStreamReader reader = new W3CDOMStreamReader(doc.getDocumentElement());
+                W3CDOMStreamReader reader = new W3CDOMStreamReader(frag);
 
                 // CXF internal 2005/08 EndpointReferenceType should be
                 // compatible with W3CEndpointReference
@@ -206,14 +203,10 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                 um = context.createUnmarshaller();
                 return um.unmarshal(reader, EndpointReferenceType.class).getValue();
             } catch (JAXBException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new IllegalArgumentException("Could not unmarshal EndpointReference", e);
             } finally {
                 JAXBUtils.closeUnmarshaller(um);
             }
-            return null;
-        } else {
-            //TODO: 200408
         }
         return null;
     }
@@ -287,8 +280,8 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                     boolean includeLocationOnly = false;
                     org.apache.cxf.message.Message message = PhaseInterceptorChain.getCurrentMessage();
                     if (message != null) {
-                        includeLocationOnly = MessageUtils.isTrue(
-                            message.getContextualProperty("org.apache.cxf.wsa.metadata.wsdlLocationOnly"));
+                        includeLocationOnly = MessageUtils
+                            .getContextualBoolean(message, "org.apache.cxf.wsa.metadata.wsdlLocationOnly", false);
                     }
                     String attrubuteValue = serviceName != null && !includeLocationOnly
                             ? serviceName.getNamespaceURI() + " " + wsdlDocumentLocation
@@ -305,7 +298,7 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                                              JAXWSAConstants.WSAM_INTERFACE_NAME,
                                              JAXWSAConstants.NS_WSAM);
                     String portTypePrefix = interfaceName.getPrefix();
-                    if (portTypePrefix == null || portTypePrefix.equals("")) {
+                    if (portTypePrefix == null || portTypePrefix.isEmpty()) {
                         portTypePrefix = "ns1";
                     }
                     writer.writeNamespace(portTypePrefix, interfaceName.getNamespaceURI());
@@ -382,9 +375,8 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                 Exception e = pae.getException();
                 if (e instanceof JAXBException) {
                     throw (JAXBException)e;
-                } else {
-                    throw new SecurityException(e);
                 }
+                throw new SecurityException(e);
             }
         } catch (Exception e) {
             throw new WebServiceException(new Message("ERROR_UNMARSHAL_ENDPOINTREFERENCE", LOG).toString(),
@@ -424,9 +416,8 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                 throw new WebServiceException(new Message("ERROR_UNMARSHAL_ENDPOINTREFERENCE", LOG)
                                                   .toString(),
                                               e);
-            } else {
-                throw new SecurityException(e);
             }
+            throw new SecurityException(e);
         }
     }
 

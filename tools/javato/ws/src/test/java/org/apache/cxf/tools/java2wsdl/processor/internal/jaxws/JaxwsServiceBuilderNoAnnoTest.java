@@ -28,8 +28,11 @@ import org.apache.cxf.jaxws.JaxwsServiceBuilder;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.java2wsdl.generator.wsdl11.WSDL11Generator;
+
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class JaxwsServiceBuilderNoAnnoTest extends ProcessorTestBase {
     JaxwsServiceBuilder builder = new JaxwsServiceBuilder();

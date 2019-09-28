@@ -39,7 +39,7 @@ public class ServiceContractResolverRegistryImpl implements ServiceContractResol
 
     private Bus bus;
     private List<ServiceContractResolver> resolvers
-        = new CopyOnWriteArrayList<ServiceContractResolver>();
+        = new CopyOnWriteArrayList<>();
 
     public ServiceContractResolverRegistryImpl() {
 

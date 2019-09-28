@@ -22,15 +22,16 @@ import java.lang.reflect.Method;
 
 import javax.xml.bind.annotation.XmlAccessType;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class UtilsTest extends Assert {
+import static org.junit.Assert.fail;
+
+public class UtilsTest {
 
     @Test
     public void testGetMethod() {
         for (Method method : Utils.getGetters(MyException.class, XmlAccessType.PUBLIC_MEMBER)) {
-            if (method.getName().equals("toString")) {
+            if ("toString".equals(method.getName())) {
                 fail("toString should not be included in get methods list");
             }
         }

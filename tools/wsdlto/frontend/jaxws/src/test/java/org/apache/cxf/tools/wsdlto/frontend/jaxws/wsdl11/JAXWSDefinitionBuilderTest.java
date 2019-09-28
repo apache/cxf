@@ -22,6 +22,7 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.wsdl11;
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.wsdl.Definition;
 import javax.wsdl.Operation;
 import javax.wsdl.PortType;
@@ -32,11 +33,14 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBinding;
-import org.junit.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 
-public class JAXWSDefinitionBuilderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class JAXWSDefinitionBuilderTest {
     private ToolContext env;
 
     @Before
@@ -62,7 +66,7 @@ public class JAXWSDefinitionBuilderTest extends Assert {
             ExtensibilityElement extElement = (ExtensibilityElement)ite.next();
             JAXWSBinding binding = (JAXWSBinding)extElement;
             assertEquals("Customized package name does not been parsered", "com.foo", binding.getPackage());
-            assertEquals("Customized enableAsync does not parsered", true, binding.isEnableAsyncMapping());
+            assertTrue("Customized enableAsync does not parsered", binding.isEnableAsyncMapping());
         }
 
         PortType portType = customizedDef.getPortType(new QName("http://apache.org/hello_world_soap_http",
@@ -71,7 +75,7 @@ public class JAXWSDefinitionBuilderTest extends Assert {
         List<?> portTypeList = portType.getExtensibilityElements();
         JAXWSBinding binding = (JAXWSBinding)portTypeList.get(0);
 
-        assertEquals("Customized enable EnableWrapperStyle name does not been parsered", true, binding
+        assertTrue("Customized enable EnableWrapperStyle name does not been parsered", binding
             .isEnableWrapperStyle());
 
         List<?> opList = portType.getOperations();
@@ -110,7 +114,7 @@ public class JAXWSDefinitionBuilderTest extends Assert {
             ExtensibilityElement extElement = (ExtensibilityElement)ite.next();
             JAXWSBinding binding = (JAXWSBinding)extElement;
             assertEquals("Customized package name does not been parsered", "com.foo", binding.getPackage());
-            assertEquals("Customized enableAsync does not parsered", true, binding.isEnableAsyncMapping());
+            assertTrue("Customized enableAsync does not parsered", binding.isEnableAsyncMapping());
         }
 
         PortType portType = customizedDef.getPortType(new QName("http://apache.org/hello_world_soap_http",
@@ -119,7 +123,7 @@ public class JAXWSDefinitionBuilderTest extends Assert {
         List<?> portTypeList = portType.getExtensibilityElements();
         JAXWSBinding binding = (JAXWSBinding)portTypeList.get(0);
 
-        assertEquals("Customized enable EnableWrapperStyle name does not been parsered", true, binding
+        assertTrue("Customized enable EnableWrapperStyle name does not been parsered", binding
             .isEnableWrapperStyle());
 
         List<?> opList = portType.getOperations();
@@ -157,8 +161,6 @@ public class JAXWSDefinitionBuilderTest extends Assert {
 
         // this call will fail before CXF-556
         builder.customize();
-
-        assertTrue(true);
     }
 
     @Test

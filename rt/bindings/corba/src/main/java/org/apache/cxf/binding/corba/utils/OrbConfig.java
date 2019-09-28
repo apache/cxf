@@ -134,7 +134,7 @@ public class OrbConfig {
     public void exportObjectReferenceToNamingService(ORB orb,
                                                      org.omg.CORBA.Object ref,
                                                      String location) {
-        int idx = location.indexOf("#");
+        int idx = location.indexOf('#');
         String name = location.substring(idx + 1);
 
         //Register in NameService
@@ -162,9 +162,7 @@ public class OrbConfig {
             Method addBindingMethod =
                 bootMgrClass.getMethod("add_binding", byte[].class, org.omg.CORBA.Object.class);
             addBindingMethod.invoke(bootMgr, key.getBytes(), object);
-        } catch (ClassNotFoundException ex) {
-            //Not supported by the orb. skip it.
-        } catch (java.lang.reflect.InvocationTargetException ex) {
+        } catch (ClassNotFoundException | java.lang.reflect.InvocationTargetException ex) {
             //Not supported by the orb. skip it.
         } catch (java.lang.Exception ex) {
             throw new CorbaBindingException(ex.getMessage(), ex);

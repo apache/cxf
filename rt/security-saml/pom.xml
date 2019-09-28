@@ -23,14 +23,15 @@
     <packaging>bundle</packaging>
     <name>Apache CXF Runtime SAML Security functionality</name>
     <description>Apache CXF Runtime SAML Security functionality</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.security.saml</cxf.module.name>
         <cxf.osgi.import>
             org.opensaml*;version="${cxf.opensaml.osgi.version.range}",
         </cxf.osgi.import>

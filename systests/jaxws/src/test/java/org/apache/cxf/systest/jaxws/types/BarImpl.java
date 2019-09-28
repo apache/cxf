@@ -36,7 +36,6 @@ public class BarImpl implements Bar {
 
     /** {@inheritDoc}*/
     public String getName() {
-        // TODO Auto-generated method stub
         return name;
     }
 

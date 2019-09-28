@@ -102,15 +102,13 @@ public class ProxyFactory {
             if (policy.isSetProxyServer()
                 && !StringUtils.isEmpty(policy.getProxyServer())) {
                 return getProxy(policy, currentUrl.getHost());
-            } else {
-                // There is a policy but no Proxy configuration,
-                // fallback on the system proxy configuration
-                return getSystemProxy(currentUrl.getHost());
             }
-        } else {
-            // Use system proxy configuration
+            // There is a policy but no Proxy configuration,
+            // fallback on the system proxy configuration
             return getSystemProxy(currentUrl.getHost());
         }
+        // Use system proxy configuration
+        return getSystemProxy(currentUrl.getHost());
     }
 
     /**

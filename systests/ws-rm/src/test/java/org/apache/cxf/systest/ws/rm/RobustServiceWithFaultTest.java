@@ -40,6 +40,10 @@ import org.apache.cxf.ws.rm.RMManager;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Tests the addition of WS-RM properties to application messages and the
  * exchange of WS-RM protocol messages.
@@ -63,7 +67,7 @@ public class RobustServiceWithFaultTest extends AbstractBusClientServerTestBase 
             Bus bus = bf.createBus("/org/apache/cxf/systest/ws/rm/atmostonce.xml");
             BusFactory.setDefaultBus(bus);
             setBus(bus);
-            bus.getExtension(RMManager.class).getConfiguration().setAcknowledgementInterval(new Long(0));
+            bus.getExtension(RMManager.class).getConfiguration().setAcknowledgementInterval(Long.valueOf(0));
 
             serverGreeter = new GreeterCounterImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
@@ -97,7 +101,7 @@ public class RobustServiceWithFaultTest extends AbstractBusClientServerTestBase 
         bus = bf.createBus("/org/apache/cxf/systest/ws/rm/seqlength1.xml");
         // set the client retry interval much shorter than the slow processing delay
         RMManager manager = bus.getExtension(RMManager.class);
-        manager.getConfiguration().setBaseRetransmissionInterval(new Long(5000));
+        manager.getConfiguration().setBaseRetransmissionInterval(Long.valueOf(5000));
 
         BusFactory.setDefaultBus(bus);
         GreeterService gs = new GreeterService();

@@ -61,14 +61,18 @@ import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ServiceWSDLBuilderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class ServiceWSDLBuilderTest {
 
     private static final Logger LOG = LogUtils.getLogger(ServiceWSDLBuilderTest.class);
     private static final String WSDL_PATH = "hello_world.wsdl";
@@ -164,7 +168,7 @@ public class ServiceWSDLBuilderTest extends Assert {
         assertEquals(1, newDef.getPortTypes().size());
         PortType portType = (PortType)newDef.getPortTypes().values().iterator().next();
         assertNotNull(portType);
-        assertTrue(portType.getQName().equals(new QName(newDef.getTargetNamespace(), "Greeter")));
+        assertEquals(portType.getQName(), new QName(newDef.getTargetNamespace(), "Greeter"));
 
     }
 
@@ -307,7 +311,7 @@ public class ServiceWSDLBuilderTest extends Assert {
     public void testBindingWithDifferentNamespaceImport() throws Exception {
         setupWSDL("wsdl2/person.wsdl");
         assertEquals(newDef.getBindings().size(), 1);
-        assertTrue(newDef.getNamespace("ns3").equals("http://cxf.apache.org/samples/wsdl-first"));
+        assertEquals("http://cxf.apache.org/samples/wsdl-first", newDef.getNamespace("ns3"));
     }
 
     @Test

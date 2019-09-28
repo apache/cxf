@@ -38,7 +38,7 @@ public class Server extends AbstractBusTestServerBase {
     public static final String ADDRESS3 = "http://localhost:" + PORT3 + "/work/rest";
 
 
-    List<org.apache.cxf.endpoint.Server> servers = new ArrayList<org.apache.cxf.endpoint.Server>();
+    List<org.apache.cxf.endpoint.Server> servers = new ArrayList<>();
 
     protected void run()  {
         createEndpoint(ADDRESS2);

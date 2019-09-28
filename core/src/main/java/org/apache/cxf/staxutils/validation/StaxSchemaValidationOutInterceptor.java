@@ -41,7 +41,7 @@ public class StaxSchemaValidationOutInterceptor extends AbstractPhaseInterceptor
     }
 
 
-    public void handleMessage(Message message) throws Fault {
+    public void handleMessage(Message message) {
         XMLStreamWriter writer = message.getContent(XMLStreamWriter.class);
         try {
             setSchemaInMessage(message, writer);

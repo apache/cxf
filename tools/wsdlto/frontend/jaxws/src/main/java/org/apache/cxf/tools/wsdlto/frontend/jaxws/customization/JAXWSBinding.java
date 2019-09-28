@@ -89,7 +89,7 @@ public class JAXWSBinding implements ExtensibilityElement, Serializable {
     }
 
     public boolean isEnableMime() {
-        return enableMime == null ? false : enableMime;
+        return enableMime != null && enableMime;
     }
     public boolean isSetEnableMime() {
         return enableMime != null;
@@ -99,7 +99,7 @@ public class JAXWSBinding implements ExtensibilityElement, Serializable {
     }
 
     public boolean isEnableAsyncMapping() {
-        return enableAsyncMapping == null ? false : enableAsyncMapping;
+        return enableAsyncMapping != null && enableAsyncMapping;
     }
     public boolean isSetEnableAsyncMapping() {
         return enableAsyncMapping != null;
@@ -109,7 +109,7 @@ public class JAXWSBinding implements ExtensibilityElement, Serializable {
     }
 
     public boolean isEnableWrapperStyle() {
-        return enableWrapperStyle == null ? true : enableWrapperStyle;
+        return enableWrapperStyle == null || enableWrapperStyle;
     }
     public boolean isSetEnableWrapperStyle() {
         return enableWrapperStyle != null;

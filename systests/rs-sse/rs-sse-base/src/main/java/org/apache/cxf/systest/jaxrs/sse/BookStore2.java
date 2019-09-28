@@ -20,6 +20,7 @@ package org.apache.cxf.systest.jaxrs.sse;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -33,7 +34,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.sse.OutboundSseEvent;
 import javax.ws.rs.sse.OutboundSseEvent.Builder;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseBroadcaster;
@@ -43,7 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Path("/api/bookstore")
-public class BookStore2 {
+public class BookStore2 extends BookStoreClientCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(BookStore2.class);
 
     private final CountDownLatch latch = new CountDownLatch(2);
@@ -93,6 +93,23 @@ public class BookStore2 {
     }
 
     @GET
+    @Path("nodelay/sse/{id}")
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    public void forBookNoDelay(@Context SseEventSink sink, @PathParam("id") final String id) {
+        final Builder builder = sse.newEventBuilder();
+        
+        CompletableFuture
+            .runAsync(() -> {
+                sink.send(createStatsEvent(builder.name("book"), 1));
+                sink.send(createStatsEvent(builder.name("book"), 2));
+                sink.send(createStatsEvent(builder.name("book"), 3));
+                sink.send(createStatsEvent(builder.name("book"), 4));
+                sink.send(createStatsEvent(builder.name("book"), 5));
+            })
+            .whenComplete((r, ex) -> sink.close());
+    }
+
+    @GET
     @Path("broadcast/sse")
     @Produces(MediaType.SERVER_SENT_EVENTS)
     public void broadcast(@Context SseEventSink sink) {
@@ -101,6 +118,13 @@ public class BookStore2 {
         } finally {
             latch.countDown();
         }
+    }
+    
+    @GET
+    @Path("nodata")
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    public void nodata(@Context SseEventSink sink) {
+        sink.close();
     }
 
     @POST
@@ -113,23 +137,20 @@ public class BookStore2 {
             }
 
             final Builder builder = sse.newEventBuilder();
-            broadcaster.broadcast(createStatsEvent(builder.name("book"), 1000));
-            broadcaster.broadcast(createStatsEvent(builder.name("book"), 2000));
-
+            broadcaster.broadcast(createStatsEvent(builder.name("book"), 1000))
+                .thenAcceptBoth(broadcaster.broadcast(createStatsEvent(builder.name("book"), 2000)), (a, b) -> { })
+                .whenComplete((r, ex) -> { 
+                    if (broadcaster != null) {
+                        broadcaster.close();
+                    }
+                });
         } catch (final InterruptedException ex) {
             LOG.error("Wait has been interrupted", ex);
         }
-
-        if (broadcaster != null) {
-            broadcaster.close();
-        }
     }
-
-    private static OutboundSseEvent createStatsEvent(final OutboundSseEvent.Builder builder, final int eventId) {
-        return builder
-            .id(Integer.toString(eventId))
-            .data(Book.class, new Book("New Book #" + eventId, eventId))
-            .mediaType(MediaType.APPLICATION_JSON_TYPE)
-            .build();
+    
+    @Override
+    protected Sse getSse() {
+        return sse;
     }
 }

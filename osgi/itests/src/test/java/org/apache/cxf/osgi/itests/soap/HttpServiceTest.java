@@ -21,12 +21,12 @@ package org.apache.cxf.osgi.itests.soap;
 import java.io.InputStream;
 
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.osgi.itests.AbstractServerActivator;
 import org.apache.cxf.osgi.itests.CXFOSGiTestSupport;
+import org.osgi.framework.Constants;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
@@ -34,8 +34,8 @@ import org.ops4j.pax.exam.karaf.options.LogLevelOption.LogLevel;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.ops4j.pax.tinybundles.core.TinyBundles;
-import org.osgi.framework.Constants;
 
+import static org.junit.Assert.assertEquals;
 import static org.ops4j.pax.exam.CoreOptions.provision;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
@@ -48,14 +48,14 @@ public class HttpServiceTest extends CXFOSGiTestSupport {
     public void testHttpEndpoint() throws Exception {
         Greeter greeter = greeterHttpProxy("8181");
         String res = greeter.greetMe("Chris");
-        Assert.assertEquals("Hi Chris", res);
+        assertEquals("Hi Chris", res);
     }
 
     @Test
     public void testHttpEndpointJetty() throws Exception {
         Greeter greeter = greeterHttpProxy(HttpTestActivator.PORT);
         String res = greeter.greetMe("Chris");
-        Assert.assertEquals("Hi Chris", res);
+        assertEquals("Hi Chris", res);
     }
 
     private Greeter greeterHttpProxy(String port) {
@@ -69,15 +69,16 @@ public class HttpServiceTest extends CXFOSGiTestSupport {
     public Option[] config() {
         return new Option[] {
             cxfBaseConfig(),
-            features(cxfUrl, "cxf-jaxws", "cxf-http-jetty", "http"),
+            features(cxfUrl, "cxf-jaxws", "cxf-http-jetty"),
             testUtils(),
             logLevel(LogLevel.INFO),
             provision(serviceBundle())
         };
     }
 
-    private InputStream serviceBundle() {
+    private static InputStream serviceBundle() {
         return TinyBundles.bundle()
+                  .add(AbstractServerActivator.class)
                   .add(HttpTestActivator.class)
                   .add(Greeter.class)
                   .add(GreeterImpl.class)

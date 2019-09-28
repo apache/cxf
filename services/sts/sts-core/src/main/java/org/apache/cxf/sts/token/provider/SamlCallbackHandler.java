@@ -28,6 +28,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.TokenRequirements;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
 import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean;
@@ -35,7 +36,6 @@ import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.bean.Version;
-import org.apache.wss4j.dom.WSConstants;
 
 /**
  * This CallbackHandler implementation is populated with SAML Beans by the SAMLTokenProvider, and is tasked
@@ -113,8 +113,8 @@ public class SamlCallbackHandler implements CallbackHandler {
                 TokenRequirements tokenRequirements = tokenParameters.getTokenRequirements();
                 String tokenType = tokenRequirements.getTokenType();
                 boolean saml1 = false;
-                if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
-                    || WSConstants.SAML_NS.equals(tokenType)) {
+                if (WSS4JConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+                    || WSS4JConstants.SAML_NS.equals(tokenType)) {
                     samlCallback.setSamlVersion(Version.SAML_11);
                     saml1 = true;
                     setSubjectOnBeans();

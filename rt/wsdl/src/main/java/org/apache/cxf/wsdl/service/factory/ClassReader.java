@@ -64,7 +64,7 @@ class ClassReader extends ByteArrayInputStream {
 
     private Map<String, Method> attrMethods;
 
-    protected ClassReader(byte buf[], Map<String, Method> attrMethods) {
+    protected ClassReader(byte[] buf, Map<String, Method> attrMethods) {
         super(buf);
 
         this.attrMethods = attrMethods;
@@ -300,7 +300,6 @@ class ClassReader extends ByteArrayInputStream {
         }
     }
 
-    @SuppressWarnings("fallthrough")
     protected final void readCpool() throws IOException {
         int count = readShort(); // cpool count
         cpoolIndex = new int[count];
@@ -395,11 +394,7 @@ class ClassReader extends ByteArrayInputStream {
                 } catch (InvocationTargetException e) {
                     try {
                         throw e.getTargetException();
-                    } catch (Error ex) {
-                        throw ex;
-                    } catch (RuntimeException ex) {
-                        throw ex;
-                    } catch (IOException ex) {
+                    } catch (Error | RuntimeException | IOException ex) {
                         throw ex;
                     } catch (Throwable ex) {
                         pos = curPos;

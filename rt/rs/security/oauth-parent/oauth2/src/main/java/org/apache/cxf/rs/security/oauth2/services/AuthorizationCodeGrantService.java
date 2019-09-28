@@ -111,7 +111,7 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
             bean.setAuthorizationCode(grantCode);
             bean.setUserId(userSubject.getLogin());
             bean.setExpiresIn(grant.getExpiresIn());
-            return deliverOOBResponse((OOBAuthorizationResponse)bean);
+            return deliverOOBResponse(bean);
         } else if (isFormResponse(state)) {
             FormAuthorizationResponse bean = new FormAuthorizationResponse();
             bean.setAuthorizationCode(grantCode);
@@ -177,9 +177,8 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
     protected Response deliverOOBResponse(OOBAuthorizationResponse response) {
         if (oobDeliverer != null) {
             return oobDeliverer.deliver(response);
-        } else {
-            return createHtmlResponse(response);
         }
+        return createHtmlResponse(response);
     }
 
     protected Response createErrorResponse(String state,
@@ -187,11 +186,10 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
                                            String error) {
         if (redirectUri == null) {
             return Response.status(401).entity(error).build();
-        } else {
-            UriBuilder ub = getRedirectUriBuilder(state, redirectUri);
-            ub.queryParam(OAuthConstants.ERROR_KEY, error);
-            return Response.seeOther(ub.build()).build();
         }
+        UriBuilder ub = getRedirectUriBuilder(state, redirectUri);
+        ub.queryParam(OAuthConstants.ERROR_KEY, error);
+        return Response.seeOther(ub.build()).build();
     }
 
     protected UriBuilder getRedirectUriBuilder(String state, String redirectUri) {

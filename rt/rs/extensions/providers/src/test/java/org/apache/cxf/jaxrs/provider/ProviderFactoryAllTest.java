@@ -29,11 +29,13 @@ import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.TagVO;
 import org.apache.cxf.message.MessageImpl;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ProviderFactoryAllTest extends Assert {
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+public class ProviderFactoryAllTest {
 
     @Before
     public void setUp() {
@@ -62,7 +64,7 @@ public class ProviderFactoryAllTest extends Assert {
     @Test
     public void testCustomJsonProvider() {
         ProviderFactory pf = ServerProviderFactory.getInstance();
-        JSONProvider<Book> provider = new JSONProvider<Book>();
+        JSONProvider<Book> provider = new JSONProvider<>();
         pf.registerUserProvider(provider);
         MessageBodyReader<?> customJsonReader = pf.createMessageBodyReader(Book.class, null, null,
                                                MediaType.APPLICATION_JSON_TYPE, new MessageImpl());

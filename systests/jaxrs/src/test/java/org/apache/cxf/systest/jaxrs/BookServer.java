@@ -101,7 +101,7 @@ public class BookServer extends AbstractBusTestServerBase {
         List<Object> providers = new ArrayList<>();
 
         //default lifecycle is per-request, change it to singleton
-        BinaryDataProvider<Object> p = new BinaryDataProvider<Object>();
+        BinaryDataProvider<Object> p = new BinaryDataProvider<>();
         p.setProduceMediaTypes(Collections.singletonList("application/bar"));
         p.setEnableBuffering(true);
         p.setReportByteArraySize(true);
@@ -112,7 +112,7 @@ public class BookServer extends AbstractBusTestServerBase {
         providers.add(new BookStore.StringListBodyReaderWriter());
         providers.add(new StreamingResponseProvider<Object>());
         providers.add(new ContentTypeModifyingMBW());
-        JAXBElementProvider<?> jaxbProvider = new JAXBElementProvider<Object>();
+        JAXBElementProvider<?> jaxbProvider = new JAXBElementProvider<>();
         Map<String, String> jaxbElementClassMap = new HashMap<>();
         jaxbElementClassMap.put(BookNoXmlRootElement.class.getName(), "BookNoXmlRootElement");
         jaxbProvider.setJaxbElementClassMap(jaxbElementClassMap);
@@ -127,15 +127,15 @@ public class BookServer extends AbstractBusTestServerBase {
         providers.add(new BlockedExceptionMapper());
         providers.add(new ParamConverterImpl());
         sf.setProviders(providers);
-        List<Interceptor<? extends Message>> inInts = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> inInts = new ArrayList<>();
         inInts.add(new CustomInFaultyInterceptor());
         inInts.add(new LoggingInInterceptor());
         sf.setInInterceptors(inInts);
-        List<Interceptor<? extends Message>> outInts = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> outInts = new ArrayList<>();
         outInts.add(new CustomOutInterceptor());
         outInts.add(new LoggingOutInterceptor());
         sf.setOutInterceptors(outInts);
-        List<Interceptor<? extends Message>> outFaultInts = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> outFaultInts = new ArrayList<>();
         outFaultInts.add(new CustomOutFaultInterceptor());
         sf.setOutFaultInterceptors(outFaultInts);
         sf.setResourceProvider(BookStore.class,
@@ -242,9 +242,8 @@ public class BookServer extends AbstractBusTestServerBase {
             String status = r.getHeaderString("Status");
             if ("notReturned".equals(status)) {
                 return new BookNotReturnedException(status);
-            } else {
-                return null;
             }
+            return null;
         }
 
     }
@@ -255,9 +254,8 @@ public class BookServer extends AbstractBusTestServerBase {
             String status = r.getHeaderString("Status");
             if ("notFound".equals(status)) {
                 return new BookNotFoundFault(status);
-            } else {
-                return null;
             }
+            return null;
         }
 
     }
@@ -266,8 +264,6 @@ public class BookServer extends AbstractBusTestServerBase {
         @Override
         public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext)
             throws IOException {
-            // TODO Auto-generated method stub
-
         }
 
     }
@@ -300,7 +296,7 @@ public class BookServer extends AbstractBusTestServerBase {
         private static class ByteConverter implements ParamConverter<Byte> {
             @Override
             public Byte fromString(String t) {
-                return new Byte(t);
+                return Byte.valueOf(t);
             }
 
             @Override

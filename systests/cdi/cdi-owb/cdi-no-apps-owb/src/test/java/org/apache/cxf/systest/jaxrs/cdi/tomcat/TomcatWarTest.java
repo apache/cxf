@@ -21,7 +21,10 @@ package org.apache.cxf.systest.jaxrs.cdi.tomcat;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systests.cdi.base.AbstractCdiSingleAppTest;
 import org.apache.cxf.systests.cdi.base.tomcat.AbstractTomcatServer;
+
 import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertTrue;
 
 public class TomcatWarTest extends AbstractCdiSingleAppTest {
     public static class EmbeddedTomcatServer extends AbstractTomcatServer {

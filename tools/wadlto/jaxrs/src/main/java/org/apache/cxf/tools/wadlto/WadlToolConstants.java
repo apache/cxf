@@ -47,6 +47,7 @@ public final class WadlToolConstants {
 
     public static final String CFG_CATALOG = ToolConstants.CFG_CATALOG;
     public static final String CFG_BINDING = ToolConstants.CFG_BINDING;
+    public static final String CFG_AUTHENTICATION = "authentication";
 
     public static final String CFG_NO_TYPES = ToolConstants.CFG_NO_TYPES;
     public static final String CFG_NO_VOID_FOR_EMPTY_RESPONSES = "noVoidForEmptyResponses";
@@ -55,10 +56,12 @@ public final class WadlToolConstants {
     public static final String CFG_WADL_NAMESPACE = "wadlNamespace";
     public static final String CFG_GENERATE_ENUMS = "generateEnums";
     public static final String CFG_INHERIT_PARAMS = "inheritResourceParams";
+    public static final String CFG_JAXB_CLASS_NAME_SUFFIX = "jaxbClassNameSuffix";
     public static final String CFG_CREATE_JAVA_DOCS = "javaDocs";
     public static final String CFG_GENERATE_RESPONSE_IF_HEADERS_SET = "generateResponseIfHeadersSet";
     public static final String CFG_GENERATE_RESPONSE_FOR_METHODS = "generateResponseForMethods";
     public static final String CFG_VALIDATE_WADL = "validate";
+    public static final String CFG_ONEWAY = "oneway";
 
     // JAX-RS 2.0 @Suspended AsyncResponse
     public static final String CFG_SUSPENDED_ASYNC = "async";

@@ -31,14 +31,15 @@ import javax.json.JsonValue;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.fail;
 
-public class JsrJsonpProviderTest extends Assert {
+public class JsrJsonpProviderTest {
     private JsrJsonpProvider provider;
 
     @Before

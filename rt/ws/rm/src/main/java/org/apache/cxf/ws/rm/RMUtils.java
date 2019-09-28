@@ -165,7 +165,7 @@ public final class RMUtils {
 
     private static void writeEndpointProperty(StringBuilder buffer, Endpoint ep) {
         String serviceName = ObjectName.quote(ep.getService().getName().toString());
-        buffer.append(",");
+        buffer.append(',');
         buffer.append(ManagementConstants.SERVICE_NAME_PROP).append('=').append(serviceName).append(',');
         String endpointName = ObjectName.quote(ep.getEndpointInfo().getName().toString());
         buffer.append(ManagementConstants.PORT_NAME_PROP).append('=').append(endpointName).append(',');
@@ -183,9 +183,8 @@ public final class RMUtils {
     public static boolean equalStrings(String aval, String bval) {
         if (null != aval) {
             return aval.equals(bval);
-        } else {
-            return null == bval;
         }
+        return null == bval;
     }
 
     /**
@@ -198,8 +197,7 @@ public final class RMUtils {
     public static boolean equalLongs(Long aval, Long bval) {
         if (null != aval) {
             return aval.equals(bval);
-        } else {
-            return null == bval;
         }
+        return null == bval;
     }
 }

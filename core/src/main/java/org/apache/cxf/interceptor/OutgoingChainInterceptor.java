@@ -69,7 +69,11 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
         }
         Message out = ex.getOutMessage();
         if (out != null) {
-            getBackChannelConduit(message);
+            try {
+                getBackChannelConduit(message);
+            } catch (IOException ioe) {
+                throw new Fault(ioe);
+            }
             if (binding != null) {
                 out.put(MessageInfo.class, binding.getOperationInfo().getOutput());
                 out.put(BindingMessageInfo.class, binding.getOutput());
@@ -100,7 +104,7 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
         }
     }
 
-    protected static Conduit getBackChannelConduit(Message message) {
+    protected static Conduit getBackChannelConduit(Message message) throws IOException {
         Conduit conduit = null;
         Exchange ex = message.getExchange();
         if (ex.getConduit(message) == null
@@ -110,8 +114,7 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
                 ex.put(ConduitSelector.class,
                        new PreexistingConduitSelector(conduit, ex.getEndpoint()));
             } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new Fault(e);
             }
         }
         return conduit;

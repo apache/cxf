@@ -34,7 +34,7 @@ public class NonceVerifierImpl implements NonceVerifier {
         }
 
         long serverClock = System.currentTimeMillis();
-        long clientTimestamp = Long.valueOf(clientTimestampString);
+        long clientTimestamp = Long.parseLong(clientTimestampString);
         NonceHistory nonceHistory = nonceStore.getNonceHistory(tokenKey);
         Nonce nonce = new Nonce(clientNonceString, clientTimestamp);
         if (nonceHistory == null) {

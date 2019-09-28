@@ -21,9 +21,12 @@ package org.apache.cxf.systests.cdi.base.tomcat;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import org.apache.catalina.startup.Tomcat;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+
+import static org.junit.Assert.fail;
 
 public abstract class AbstractTomcatServer extends AbstractBusTestServerBase {
 
@@ -62,7 +65,7 @@ public abstract class AbstractTomcatServer extends AbstractBusTestServerBase {
     }
 
     private static File createTemporaryDirectory() throws IOException {
-        final File base = File.createTempFile("tmp-", "");
+        final File base = Files.createTempFile("tmp-", "").toFile();
 
         if (!base.delete()) {
             throw new IOException("Cannot (re)create base folder: " + base.getAbsolutePath());

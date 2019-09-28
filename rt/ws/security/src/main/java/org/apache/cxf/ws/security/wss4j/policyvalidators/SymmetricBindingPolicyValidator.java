@@ -22,8 +22,6 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 import java.util.Collection;
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
@@ -31,9 +29,6 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
-import org.apache.wss4j.policy.model.AbstractToken;
-import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
-import org.apache.wss4j.policy.model.AbstractTokenWrapper;
 import org.apache.wss4j.policy.model.SymmetricBinding;
 
 /**
@@ -101,7 +96,7 @@ public class SymmetricBindingPolicyValidator extends AbstractBindingPolicyValida
                 ai.setNotAsserted("Message fails the DerivedKeys requirement");
                 return false;
             }
-            assertToken(binding.getEncryptionToken(), aim);
+            assertDerivedKeys(binding.getEncryptionToken().getToken(), aim);
         }
 
         if (binding.getSignatureToken() != null) {
@@ -112,7 +107,7 @@ public class SymmetricBindingPolicyValidator extends AbstractBindingPolicyValida
                 ai.setNotAsserted("Message fails the DerivedKeys requirement");
                 return false;
             }
-            assertToken(binding.getSignatureToken(), aim);
+            assertDerivedKeys(binding.getSignatureToken().getToken(), aim);
         }
 
         if (binding.getProtectionToken() != null) {
@@ -123,19 +118,10 @@ public class SymmetricBindingPolicyValidator extends AbstractBindingPolicyValida
                 ai.setNotAsserted("Message fails the DerivedKeys requirement");
                 return false;
             }
-            assertToken(binding.getProtectionToken(), aim);
+            assertDerivedKeys(binding.getProtectionToken().getToken(), aim);
         }
 
         return true;
     }
 
-    private void assertToken(AbstractTokenWrapper tokenWrapper, AssertionInfoMap aim) {
-        String namespace = tokenWrapper.getName().getNamespaceURI();
-
-        AbstractToken token = tokenWrapper.getToken();
-        DerivedKeys derivedKeys = token.getDerivedKeys();
-        if (derivedKeys != null) {
-            PolicyUtils.assertPolicy(aim, new QName(namespace, derivedKeys.name()));
-        }
-    }
 }

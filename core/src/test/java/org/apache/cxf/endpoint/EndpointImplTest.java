@@ -25,13 +25,15 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.ServiceImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  *
  */
-public class EndpointImplTest extends Assert {
+public class EndpointImplTest {
 
     @Test
     public void testEqualsAndHashCode() throws Exception {
@@ -50,17 +52,16 @@ public class EndpointImplTest extends Assert {
         int hashcode1 = ep1.hashCode();
         int hashcode2 = ep2.hashCode();
 
-        assertTrue("hashcodes must be equal", hashcode == hashcode1);
-        assertTrue("hashcodes must not be equal", hashcode != hashcode2);
+        assertEquals("hashcodes must be equal", hashcode, hashcode1);
+        assertNotEquals("hashcodes must not be equal", hashcode, hashcode2);
 
-        assertTrue("reflexivity violated", ep.equals(ep));
-        assertFalse("two objects must not be equal", ep.equals(ep1));
-        assertFalse("two objects must not be equal", ep.equals(ep2));
+        // assertEquals("reflexivity violated", ep, ep);
+        assertNotEquals("two objects must not be equal", ep, ep1);
+        assertNotEquals("two objects must not be equal", ep, ep2);
 
         ep.put("custom", Boolean.TRUE);
 
-        assertTrue("hashcode must remain equal", hashcode == ep.hashCode());
+        assertEquals("hashcode must remain equal", hashcode, ep.hashCode());
     }
 
-    //TODO add other tests
 }

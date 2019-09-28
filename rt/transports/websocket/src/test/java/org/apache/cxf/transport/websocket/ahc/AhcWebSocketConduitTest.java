@@ -21,13 +21,16 @@ package org.apache.cxf.transport.websocket.ahc;
 
 import org.apache.cxf.transport.websocket.WebSocketConstants;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  */
-public class AhcWebSocketConduitTest extends Assert {
+public class AhcWebSocketConduitTest {
     private static final String TEST_RESPONSE1 =
         "200\r\nresponseId: 59610eed-d9de-4692-96d4-bb95a36c41ea\r\nContent-Type: text/plain\r\n\r\nHola!";
     private static final String TEST_RESPONSE2 =

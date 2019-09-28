@@ -40,10 +40,10 @@ public class ServerRegistryImpl implements ServerRegistry, BusLifeCycleListener 
     BusLifeCycleManager lifeCycleManager;
 
     public ServerRegistryImpl() {
-        serversList = new CopyOnWriteArrayList<Server>();
+        serversList = new CopyOnWriteArrayList<>();
     }
     public ServerRegistryImpl(Bus b) {
-        serversList = new CopyOnWriteArrayList<Server>();
+        serversList = new CopyOnWriteArrayList<>();
         setBus(b);
     }
 
@@ -76,8 +76,6 @@ public class ServerRegistryImpl implements ServerRegistry, BusLifeCycleListener 
     }
 
     public void initComplete() {
-        // TODO Auto-generated method stub
-
     }
 
     @PreDestroy

@@ -20,7 +20,6 @@ package org.apache.cxf.aegis.type.encoded;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -54,7 +53,7 @@ public class ArrayTypeInfo {
     public ArrayTypeInfo(QName typeName, int ranks, Integer... dimensions) {
         this.typeName = typeName;
         this.ranks = ranks;
-        this.dimensions.addAll(Arrays.asList(dimensions));
+        Collections.addAll(this.dimensions, dimensions);
     }
 
     public ArrayTypeInfo(MessageReader reader, TypeMapping tm) {
@@ -112,7 +111,7 @@ public class ArrayTypeInfo {
         if (tokens.size() < 3) {
             throw new DatabindingException("Invalid ArrayType value " + arrayTypeValue);
         }
-        if (tokens.get(1).equals(":")) {
+        if (":".equals(tokens.get(1))) {
             typeName =
                 new QName(namespaceContext.getNamespaceURI(tokens.get(0)), tokens.get(2), tokens.get(0));
             tokens = tokens.subList(3, tokens.size());
@@ -121,7 +120,7 @@ public class ArrayTypeInfo {
             tokens = tokens.subList(1, tokens.size());
         }
 
-        if (!tokens.get(0).equals("[")) {
+        if (!"[".equals(tokens.get(0))) {
             throw new DatabindingException("Invalid ArrayType value " + arrayTypeValue);
         }
 
@@ -230,27 +229,27 @@ public class ArrayTypeInfo {
 
         // typeName: foo:bar
         if (typeName.getPrefix() != null && typeName.getPrefix().length() > 0) {
-            string.append(typeName.getPrefix()).append(":");
+            string.append(typeName.getPrefix()).append(':');
         }
         string.append(typeName.getLocalPart());
 
         // ranks: [,,,,]
         if (ranks > 0) {
-            string.append("[");
+            string.append('[');
             for (int i = 1; i < ranks; i++) {
-                string.append(",");
+                string.append(',');
             }
-            string.append("]");
+            string.append(']');
         }
 
         // dimensions: [2,3,4]
-        string.append("[");
+        string.append('[');
         string.append(dimensions.get(0));
         for (int dimension : dimensions.subList(1, dimensions.size())) {
-            string.append(",").append(dimension);
+            string.append(',').append(dimension);
 
         }
-        string.append("]");
+        string.append(']');
 
         return string.toString();
     }

@@ -23,7 +23,7 @@ import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
 public class FormIdTokenResponse extends AbstractFormImplicitResponse {
     public String getIdToken() {
-        return (String)getParameters().get(OidcUtils.ID_TOKEN);
+        return getParameters().get(OidcUtils.ID_TOKEN);
     }
 
     public void setIdToken(String idToken) {

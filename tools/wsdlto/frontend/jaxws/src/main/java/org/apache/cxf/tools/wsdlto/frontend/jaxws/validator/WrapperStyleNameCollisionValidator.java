@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.i18n.Message;
@@ -80,7 +81,7 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
         return false;
     }
     private boolean checkBare(ToolContext context, String opName) {
-        String o[] = context.getArray(ToolConstants.CFG_BAREMETHODS);
+        String[] o = context.getArray(ToolConstants.CFG_BAREMETHODS);
         return checkArray(o, opName);
     }
     private boolean isValidOperation(OperationInfo operation) {
@@ -154,9 +155,8 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
                             || names.get(mappedName).equals(element.getSchemaTypeName()))) {
                         handleErrors(names.get(mappedName), element);
                         return false;
-                    } else {
-                        names.put(mappedName, element.getSchemaTypeName());
                     }
+                    names.put(mappedName, element.getSchemaTypeName());
                 }
             }
 
@@ -174,9 +174,8 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
                                 || (mn != null && mn.equals(element.getSchemaTypeName())))) {
                             handleErrors(names.get(mappedName), element);
                             return false;
-                        } else {
-                            names.put(mappedName, element.getSchemaTypeName());
                         }
+                        names.put(mappedName, element.getSchemaTypeName());
                     }
                 }
             }

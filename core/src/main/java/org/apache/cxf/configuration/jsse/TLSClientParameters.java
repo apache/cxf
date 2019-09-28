@@ -19,8 +19,10 @@
 package org.apache.cxf.configuration.jsse;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 
 /**
@@ -35,6 +37,7 @@ public class TLSClientParameters extends TLSParameterBase {
     private boolean useHttpsURLConnectionDefaultSslSocketFactory;
     private boolean useHttpsURLConnectionDefaultHostnameVerifier;
     private HostnameVerifier hostnameVerifier;
+    private SSLContext sslContext;
 
     /**
      * Set custom HostnameVerifier
@@ -147,6 +150,9 @@ public class TLSClientParameters extends TLSParameterBase {
         if (sslSocketFactory != null) {
             hash = hash * 41 + System.identityHashCode(sslSocketFactory);
         }
+        if (sslContext != null) {
+            hash = hash * 41 + System.identityHashCode(sslContext);
+        }
         hash = hash(hash, useHttpsURLConnectionDefaultSslSocketFactory);
         hash = hash(hash, useHttpsURLConnectionDefaultHostnameVerifier);
         hash = hash(hash, sslCacheTimeout);
@@ -171,7 +177,7 @@ public class TLSClientParameters extends TLSParameterBase {
     }
     private int hash(int i, Object o) {
         if (o != null) {
-            i = i * 37 + o.hashCode();
+            return i * 37 + o.hashCode();
         }
         return i;
     }
@@ -193,16 +199,17 @@ public class TLSClientParameters extends TLSParameterBase {
             TLSClientParameters that = (TLSClientParameters)o;
             boolean eq = disableCNCheck == that.disableCNCheck;
             eq &= sslSocketFactory == that.sslSocketFactory;
+            eq &= sslContext == that.sslContext;
             eq &= useHttpsURLConnectionDefaultSslSocketFactory == that.useHttpsURLConnectionDefaultSslSocketFactory;
             eq &= useHttpsURLConnectionDefaultHostnameVerifier == that.useHttpsURLConnectionDefaultHostnameVerifier;
             eq &= sslCacheTimeout == that.sslCacheTimeout;
             eq &= secureRandom == that.secureRandom;
-            eq &= equals(certAlias, that.certAlias);
-            eq &= equals(protocol, that.protocol);
-            eq &= equals(provider, that.provider);
+            eq &= Objects.equals(certAlias, that.certAlias);
+            eq &= Objects.equals(protocol, that.protocol);
+            eq &= Objects.equals(provider, that.provider);
             eq &= equals(ciphersuites, that.ciphersuites);
-            eq &= equals(keyManagers, that.keyManagers);
-            eq &= equals(trustManagers, that.trustManagers);
+            eq &= Objects.deepEquals(keyManagers, that.keyManagers);
+            eq &= Objects.deepEquals(trustManagers, that.trustManagers);
             if (cipherSuiteFilters != null) {
                 if (that.cipherSuiteFilters != null) {
                     eq &= equals(cipherSuiteFilters.getExclude(), that.cipherSuiteFilters.getExclude());
@@ -215,9 +222,9 @@ public class TLSClientParameters extends TLSParameterBase {
             }
             if (certConstraints != null) {
                 if (that.certConstraints != null) {
-                    eq &= equals(certConstraints.getIssuerDNConstraints(),
+                    eq &= Objects.equals(certConstraints.getIssuerDNConstraints(),
                                  that.certConstraints.getIssuerDNConstraints());
-                    eq &= equals(certConstraints.getSubjectDNConstraints(),
+                    eq &= Objects.equals(certConstraints.getSubjectDNConstraints(),
                                  that.certConstraints.getSubjectDNConstraints());
                 } else {
                     eq = false;
@@ -231,33 +238,20 @@ public class TLSClientParameters extends TLSParameterBase {
     }
 
     private static boolean equals(final List<?> obj1, final List<?> obj2) {
-        if (obj1.size() == obj2.size()) {
-            for (int x = 0; x < obj1.size(); x++) {
-                if (!equals(obj1.get(x), obj2.get(x))) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
+        return obj1.equals(obj2);
     }
-    private static boolean equals(final Object obj1, final Object obj2) {
-        return obj1 == null ? obj2 == null : obj1.equals(obj2);
+
+    /**
+     * Get the SSLContext parameter to use (if it has been set)
+     */
+    public SSLContext getSslContext() {
+        return sslContext;
     }
-    private static boolean equals(final Object[] a1, final Object[] a2) {
-        if (a1 == null) {
-            return a2 == null;
-        } else {
-            if (a2 != null && a1.length == a2.length) {
-                for (int i = 0; i < a1.length; i++) {
-                    if (!equals(a1[i], a2[i])) {
-                        return false;
-                    }
-                }
-                return true;
-            } else {
-                return false;
-            }
-        }
+
+    /**
+     * Set an SSLContext parameter to use to create https connections
+     */
+    public void setSslContext(SSLContext sslContext) {
+        this.sslContext = sslContext;
     }
 }

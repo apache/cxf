@@ -25,11 +25,11 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import org.apache.cxf.helpers.DOMUtils;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.crypto.Merlin;
@@ -43,7 +43,6 @@ import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.Loader;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.joda.time.DateTime;
 import org.opensaml.saml.common.SignableSAMLObject;
@@ -56,24 +55,24 @@ import org.opensaml.xmlsec.signature.KeyInfo;
 import org.opensaml.xmlsec.signature.Signature;
 import org.opensaml.xmlsec.signature.support.SignatureConstants;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 /**
  * Some unit tests for the SAMLProtocolResponseValidator and the SAMLSSOResponseValidator
  */
-public class CombinedValidatorTest extends org.junit.Assert {
-
-    private static final DocumentBuilderFactory DOC_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
+public class CombinedValidatorTest {
 
     static {
         WSSConfig.init();
         OpenSAMLUtil.initSamlEngine();
-        DOC_BUILDER_FACTORY.setNamespaceAware(true);
     }
 
     @org.junit.Test
     public void testSuccessfulValidation() throws Exception {
 
-        DocumentBuilder docBuilder = DOC_BUILDER_FACTORY.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
+        Document doc = DOMUtils.createDocument();
 
         Response response = createResponse(doc);
 
@@ -115,9 +114,7 @@ public class CombinedValidatorTest extends org.junit.Assert {
 
     @org.junit.Test
     public void testWrappingAttack3() throws Exception {
-        DocumentBuilder docBuilder = DOC_BUILDER_FACTORY.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-
+        Document doc = DOMUtils.createDocument();
         Response response = createResponse(doc);
 
         Element responseElement = OpenSAMLUtil.toDom(response, doc);
@@ -133,7 +130,7 @@ public class CombinedValidatorTest extends org.junit.Assert {
         Element clonedAssertion = (Element)assertionElement.cloneNode(true);
         clonedAssertion.setAttributeNS(null, "ID", "_12345623562");
         Element sigElement =
-            (Element)clonedAssertion.getElementsByTagNameNS(WSConstants.SIG_NS, "Signature").item(0);
+            (Element)clonedAssertion.getElementsByTagNameNS(WSS4JConstants.SIG_NS, "Signature").item(0);
         clonedAssertion.removeChild(sigElement);
 
         Element subjElement =
@@ -187,9 +184,7 @@ public class CombinedValidatorTest extends org.junit.Assert {
     @org.junit.Test
     public void testSuccessfulSignedValidation() throws Exception {
 
-        DocumentBuilder docBuilder = DOC_BUILDER_FACTORY.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-
+        Document doc = DOMUtils.createDocument();
         Response response = createResponse(doc);
 
         Crypto issuerCrypto = new Merlin();
@@ -233,8 +228,7 @@ public class CombinedValidatorTest extends org.junit.Assert {
     @org.junit.Test
     public void testEnforceResponseSigned() throws Exception {
 
-        DocumentBuilder docBuilder = DOC_BUILDER_FACTORY.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
+        Document doc = DOMUtils.createDocument();
 
         Response response = createResponse(doc);
 
@@ -352,7 +346,7 @@ public class CombinedValidatorTest extends org.junit.Assert {
         String sigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1;
         String pubKeyAlgo = issuerCerts[0].getPublicKey().getAlgorithm();
 
-        if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
+        if ("DSA".equalsIgnoreCase(pubKeyAlgo)) {
             sigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_DSA;
         }
 
@@ -377,7 +371,7 @@ public class CombinedValidatorTest extends org.junit.Assert {
         }
 
         // add the signature to the assertion
-        SignableSAMLObject signableObject = (SignableSAMLObject) response;
+        SignableSAMLObject signableObject = response;
         signableObject.setSignature(signature);
         signableObject.releaseDOM();
         signableObject.releaseChildrenDOM(true);

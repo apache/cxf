@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,6 +31,7 @@ import java.util.logging.Logger;
 import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Document;
+
 import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -41,6 +43,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.ThreadLocalSecurityProvider;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
@@ -65,7 +68,6 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
 
     private WSS4JOutInterceptorInternal ending;
     private SAAJOutInterceptor saajOut = new SAAJOutInterceptor();
-    private boolean mtomEnabled;
 
     public WSS4JOutInterceptor() {
         super();
@@ -78,16 +80,6 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
     public WSS4JOutInterceptor(Map<String, Object> props) {
         this();
         setProperties(props);
-    }
-
-    @Deprecated
-    public boolean isAllowMTOM() {
-        return mtomEnabled;
-    }
-
-    @Deprecated
-    public void setAllowMTOM(boolean allowMTOM) {
-        this.mtomEnabled = allowMTOM;
     }
 
     @Override
@@ -109,6 +101,13 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
             saajOut.handleMessage(mc);
         }
 
+        // If a custom Id has been set, then change the Id for the internal interceptor as well, as otherwise
+        // we can't add two WSS4JOutInterceptor instances to the interceptor chain.
+        if (!WSS4JOutInterceptor.class.getName().equals(getId())) {
+            Random random = new Random();
+            int randomInt = random.nextInt();
+            ending.setId(WSS4JOutInterceptorInternal.class.getName() + "_" + randomInt);
+        }
         mc.getInterceptorChain().add(ending);
     }
     public void handleFault(SoapMessage message) {
@@ -121,6 +120,8 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
 
     final class WSS4JOutInterceptorInternal
         implements PhaseInterceptor<SoapMessage> {
+        private String id = WSS4JOutInterceptorInternal.class.getName();
+
         WSS4JOutInterceptorInternal() {
             super();
         }
@@ -178,7 +179,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                     CastUtils.cast((List<?>)getProperty(mc, WSHandlerConstants.HANDLER_ACTIONS));
                 if (actions == null) {
                     // If null then just fall back to the "action" String
-                    String action = getString(WSHandlerConstants.ACTION, mc);
+                    String action = getString(ConfigurationConstants.ACTION, mc);
                     if (action == null) {
                         throw new SoapFault(new Message("NO_ACTION", LOG), version
                                 .getReceiver());
@@ -195,10 +196,10 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                 reqData.setAttachmentCallbackHandler(new AttachmentCallbackHandler(mc));
 
                 // Enable XOP Include unless the user has explicitly configured it
-                if (getString(WSHandlerConstants.EXPAND_XOP_INCLUDE, mc) == null) {
+                if (getString(ConfigurationConstants.EXPAND_XOP_INCLUDE, mc) == null) {
                     reqData.setExpandXopInclude(AttachmentUtil.isMtomEnabled(mc));
                 }
-                if (getString(WSHandlerConstants.STORE_BYTES_IN_ATTACHMENT, mc) == null) {
+                if (getString(ConfigurationConstants.STORE_BYTES_IN_ATTACHMENT, mc) == null) {
                     reqData.setStoreBytesInAttachment(AttachmentUtil.isMtomEnabled(mc));
                 }
 
@@ -206,10 +207,10 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                  * For every action we need a username, so get this now. The
                  * username defined in the deployment descriptor takes precedence.
                  */
-                reqData.setUsername((String) getOption(WSHandlerConstants.USER));
-                if (reqData.getUsername() == null || reqData.getUsername().equals("")) {
+                reqData.setUsername((String) getOption(ConfigurationConstants.USER));
+                if (reqData.getUsername() == null || reqData.getUsername().isEmpty()) {
                     String username = (String) getProperty(reqData.getMsgContext(),
-                            WSHandlerConstants.USER);
+                            ConfigurationConstants.USER);
                     if (username != null) {
                         reqData.setUsername(username);
                     }
@@ -228,8 +229,8 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                         break;
                     }
                 }
-                if (userNameRequired && (reqData.getUsername() == null || reqData.getUsername().equals(""))
-                        && (String)getOption(WSHandlerConstants.SIGNATURE_USER) == null) {
+                if (userNameRequired && (reqData.getUsername() == null || reqData.getUsername().isEmpty())
+                        && (String)getOption(ConfigurationConstants.SIGNATURE_USER) == null) {
                     throw new SoapFault(new Message("NO_USERNAME", LOG), version
                             .getReceiver());
                 }
@@ -283,7 +284,11 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
         }
 
         public String getId() {
-            return WSS4JOutInterceptorInternal.class.getName();
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
         }
 
         public String getPhase() {

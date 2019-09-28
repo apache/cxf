@@ -22,7 +22,14 @@ package org.apache.cxf.bus.extension;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class ExtensionTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class ExtensionTest {
 
     @Test
     public void testMutators() {
@@ -37,7 +44,7 @@ public class ExtensionTest extends Assert {
         e.setInterfaceName(interfaceName);
         assertEquals("Unexpected interface name.", interfaceName, e.getInterfaceName());
 
-        assertTrue("Extension is deferred.", !e.isDeferred());
+        assertFalse("Extension is deferred.", e.isDeferred());
         e.setDeferred(true);
         assertTrue("Extension is not deferred.", e.isDeferred());
 
@@ -45,12 +52,13 @@ public class ExtensionTest extends Assert {
     }
 
     @Test
-    public void testLoad() throws ExtensionException {
+    public void testLoad() throws Exception {
         Extension e = new Extension();
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         e.setClassname("no.such.Extension");
         try {
             e.load(cl, null);
+            fail("Failure expected");
         } catch (ExtensionException ex) {
             assertTrue("ExtensionException does not wrap ClassNotFoundException",
                        ex.getCause() instanceof ClassNotFoundException);
@@ -59,6 +67,7 @@ public class ExtensionTest extends Assert {
         e.setClassname("java.lang.System");
         try {
             e.load(cl, null);
+            fail("Failure expected");
         } catch (ExtensionException ex) {
             assertTrue("ExtensionException does not wrap NoSuchMethodException " + ex.getCause(),
                        ex.getCause() instanceof NoSuchMethodException);
@@ -66,6 +75,7 @@ public class ExtensionTest extends Assert {
         e.setClassname(MyServiceConstructorThrowsException.class.getName());
         try {
             e.load(cl, null);
+            fail("Failure expected");
         } catch (ExtensionException ex) {
             assertTrue("ExtensionException does not wrap IllegalArgumentException",
                        ex.getCause() instanceof IllegalArgumentException);
@@ -82,6 +92,7 @@ public class ExtensionTest extends Assert {
         e.setInterfaceName("no.such.Extension");
         try {
             e.loadInterface(cl);
+            fail("Failure expected");
         } catch (ExtensionException ex) {
             assertTrue("ExtensionException does not wrap ClassNotFoundException",
                        ex.getCause() instanceof ClassNotFoundException);

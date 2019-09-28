@@ -67,7 +67,7 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
             return;
         }
 
-        List<Interceptor<? extends Message>> interceptors = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> interceptors = new ArrayList<>();
         Collection<Assertion> assertions = new ArrayList<>();
 
         // 1. Check overridden policy
@@ -75,7 +75,7 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
         if (p != null) {
             EndpointPolicyImpl endpi = new EndpointPolicyImpl(p);
             EffectivePolicyImpl effectivePolicy = new EffectivePolicyImpl();
-            effectivePolicy.initialise(endpi, (PolicyEngineImpl)pe, true, msg);
+            effectivePolicy.initialise(endpi, pe, true, msg);
             msg.put(EffectivePolicy.class, effectivePolicy);
             PolicyUtils.logPolicy(LOG, Level.FINEST, "Using effective policy: ",
                                   effectivePolicy.getPolicy());

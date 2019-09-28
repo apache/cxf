@@ -34,6 +34,8 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class WSDLAddressRewriteTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(WSDLAddressRewriteTest.class);
 

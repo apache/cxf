@@ -25,7 +25,7 @@ import org.apache.cxf.phase.Phase;
 
 public class MetricsMessageInPostInvokeInterceptor extends AbstractMetricsInterceptor {
 
-    public MetricsMessageInPostInvokeInterceptor(MetricsProvider p[]) {
+    public MetricsMessageInPostInvokeInterceptor(MetricsProvider[] p) {
         super(Phase.POST_INVOKE, p);
     }
 

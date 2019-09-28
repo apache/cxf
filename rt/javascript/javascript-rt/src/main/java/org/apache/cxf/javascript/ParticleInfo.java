@@ -300,7 +300,7 @@ public final class ParticleInfo implements ItemInfo {
         }
         if (!leaveAlone) {
             StringBuilder builder = new StringBuilder();
-            builder.append("'");
+            builder.append('\'');
             for (char c : schemaDefaultValue.toCharArray()) {
                 if (c == '\'') {
                     builder.append("\\'");
@@ -473,9 +473,8 @@ public final class ParticleInfo implements ItemInfo {
     public String getDefaultValue() {
         if (isOptional()) {
             return "null";
-        } else {
-            return defaultValue;
         }
+        return defaultValue;
     }
 
     /**

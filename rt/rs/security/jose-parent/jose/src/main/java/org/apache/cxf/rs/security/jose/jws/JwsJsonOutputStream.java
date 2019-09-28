@@ -53,7 +53,7 @@ public class JwsJsonOutputStream extends FilterOutputStream {
     }
 
     @Override
-    public void write(final byte b[], final int off, final int len) throws IOException {
+    public void write(final byte[] b, final int off, final int len) throws IOException {
         //TODO: Review if it is at least theoretically possible that a given b[] region
         // can be modified in a subsequent write which might affect the signature calculation
         executor.execute(new Runnable() {

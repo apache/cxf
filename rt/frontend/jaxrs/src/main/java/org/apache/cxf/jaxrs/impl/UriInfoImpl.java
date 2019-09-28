@@ -64,9 +64,9 @@ public class UriInfoImpl implements UriInfo {
         if (m != null) {
             this.stack = m.get(OperationResourceInfoStack.class);
             this.caseInsensitiveQueries =
-                MessageUtils.isTrue(m.getContextualProperty(CASE_INSENSITIVE_QUERIES));
+                MessageUtils.getContextualBoolean(m, CASE_INSENSITIVE_QUERIES);
             this.queryValueIsCollection =
-                MessageUtils.isTrue(m.getContextualProperty(PARSE_QUERY_VALUE_AS_COLLECTION));
+                MessageUtils.getContextualBoolean(m, PARSE_QUERY_VALUE_AS_COLLECTION);
         }
     }
 
@@ -96,9 +96,8 @@ public class UriInfoImpl implements UriInfo {
         String value = doGetPath(decode, true);
         if (value.length() > 1 && value.startsWith("/")) {
             return value.substring(1);
-        } else {
-            return value;
         }
+        return value;
     }
 
     public List<PathSegment> getPathSegments() {
@@ -140,7 +139,7 @@ public class UriInfoImpl implements UriInfo {
     }
 
     public MultivaluedMap<String, String> getPathParameters(boolean decode) {
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
+        MetadataMap<String, String> values = new MetadataMap<>();
         if (templateParams == null) {
             return values;
         }
@@ -156,7 +155,7 @@ public class UriInfoImpl implements UriInfo {
 
     public List<Object> getMatchedResources() {
         if (stack != null) {
-            List<Object> resources = new LinkedList<Object>();
+            List<Object> resources = new ArrayList<>(stack.size());
             for (MethodInvocationInfo invocation : stack) {
                 resources.add(0, invocation.getRealClass());
             }
@@ -173,7 +172,7 @@ public class UriInfoImpl implements UriInfo {
     public List<String> getMatchedURIs(boolean decode) {
         if (stack != null) {
             List<String> objects = new ArrayList<>();
-            List<String> uris = new LinkedList<String>();
+            List<String> uris = new LinkedList<>();
             StringBuilder sumPath = new StringBuilder("");
             for (MethodInvocationInfo invocation : stack) {
                 List<String> templateObjects = invocation.getTemplateValues();
@@ -190,13 +189,15 @@ public class UriInfoImpl implements UriInfo {
                     }
                     uris.add(0, createMatchedPath(paths[0].getValue(), rootObjects, decode));
                 }
-                for (URITemplate t : paths) {
-                    if (t != null) {
-                        sumPath.append("/").append(t.getValue());
+                if (paths[1] != null && paths[1].getValue().length() > 1) {
+                    for (URITemplate t : paths) {
+                        if (t != null) {
+                            sumPath.append('/').append(t.getValue());
+                        }
                     }
+                    objects.addAll(templateObjects);
+                    uris.add(0, createMatchedPath(sumPath.toString(), objects, decode));
                 }
-                objects.addAll(templateObjects);
-                uris.add(0, createMatchedPath(sumPath.toString(), objects, decode));
             }
             return uris;
         }
@@ -206,7 +207,11 @@ public class UriInfoImpl implements UriInfo {
 
     private static String createMatchedPath(String uri, List<? extends Object> vars, boolean decode) {
         String uriPath = UriBuilder.fromPath(uri).buildFromEncoded(vars.toArray()).getRawPath();
-        return decode ? HttpUtils.pathDecode(uriPath) : uriPath;
+        uriPath = decode ? HttpUtils.pathDecode(uriPath) : uriPath;
+        if (uriPath.startsWith("/")) {
+            uriPath = uriPath.substring(1);
+        }
+        return uriPath;
     }
     private String doGetPath(boolean decode, boolean addSlash) {
         String path = HttpUtils.getPathToMatch(message, addSlash);

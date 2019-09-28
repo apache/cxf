@@ -28,7 +28,12 @@ import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Some tests for the OIDC filters
@@ -83,7 +88,7 @@ public class OIDCFiltersTest extends AbstractBusClientServerTestBase {
         client.query("code", code);
         client.query("state", state);
 
-        Response serviceResponse = client.post(new Book("book", 123L));
+        Response serviceResponse = client.type("application/xml").post(new Book("book", 123L));
         assertEquals(serviceResponse.getStatus(), 200);
 
         Book returnedBook = serviceResponse.readEntity(Book.class);

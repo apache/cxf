@@ -49,6 +49,7 @@ import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.policy.SPConstants;
@@ -80,7 +81,7 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
     public void handleMessage(SoapMessage message) throws Fault {
 
         boolean enableStax =
-            MessageUtils.isTrue(message.getContextualProperty(SecurityConstants.ENABLE_STREAMING_SECURITY));
+            MessageUtils.getContextualBoolean(message, SecurityConstants.ENABLE_STREAMING_SECURITY, false);
         if (enableStax) {
             return;
         }
@@ -153,19 +154,19 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
     protected Header findSecurityHeader(SoapMessage message, boolean create) {
         for (Header h : message.getHeaders()) {
             QName n = h.getName();
-            if (n.getLocalPart().equals("Security")
-                && (n.getNamespaceURI().equals(WSConstants.WSSE_NS)
-                    || n.getNamespaceURI().equals(WSConstants.WSSE11_NS))) {
+            if ("Security".equals(n.getLocalPart())
+                && (n.getNamespaceURI().equals(WSS4JConstants.WSSE_NS)
+                    || n.getNamespaceURI().equals(WSS4JConstants.WSSE11_NS))) {
                 return h;
             }
         }
         if (!create) {
             return null;
         }
-        Document doc = DOMUtils.createDocument();
-        Element el = doc.createElementNS(WSConstants.WSSE_NS, "wsse:Security");
-        el.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsse", WSConstants.WSSE_NS);
-        SoapHeader sh = new SoapHeader(new QName(WSConstants.WSSE_NS, "Security"), el);
+        Document doc = DOMUtils.getEmptyDocument();
+        Element el = doc.createElementNS(WSS4JConstants.WSSE_NS, "wsse:Security");
+        el.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsse", WSS4JConstants.WSSE_NS);
+        SoapHeader sh = new SoapHeader(new QName(WSS4JConstants.WSSE_NS, "Security"), el);
         sh.setMustUnderstand(true);
         message.getHeaders().add(sh);
         return sh;

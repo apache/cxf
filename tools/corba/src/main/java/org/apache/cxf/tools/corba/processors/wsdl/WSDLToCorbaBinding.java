@@ -184,22 +184,21 @@ public class WSDLToCorbaBinding {
             org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(
                 "No PortTypes defined in wsdl", LOG);
             throw new Exception(msg.toString());
-        } else {
-            PortType portType = null;
-            intfs = new ArrayList<>();
-            if (portTypes.size() == 1) {
-                portType = portTypes.values().iterator().next();
-                interfaceNames.add(portType.getQName().getLocalPart());
-                intfs.add(portType);
-            } else if (portTypes.size() > 1) {
-                if (def.getAllBindings().size() > 0) {
-                    throwMultipleMultipleTypeException(CastUtils.cast(def.getAllBindings().keySet(),
-                                                                      QName.class));
-                }
-                for (PortType port : portTypes.values()) {
-                    interfaceNames.add(port.getQName().getLocalPart());
-                    intfs.add(port);
-                }
+        }
+        PortType portType = null;
+        intfs = new ArrayList<>();
+        if (portTypes.size() == 1) {
+            portType = portTypes.values().iterator().next();
+            interfaceNames.add(portType.getQName().getLocalPart());
+            intfs.add(portType);
+        } else if (portTypes.size() > 1) {
+            if (def.getAllBindings().size() > 0) {
+                throwMultipleMultipleTypeException(CastUtils.cast(def.getAllBindings().keySet(),
+                                                                  QName.class));
+            }
+            for (PortType port : portTypes.values()) {
+                interfaceNames.add(port.getQName().getLocalPart());
+                intfs.add(port);
             }
         }
         return intfs;
@@ -339,18 +338,14 @@ public class WSDLToCorbaBinding {
 
             String addr = null;
             if (getAddressFile() != null) {
-                BufferedReader bufferedReader = null;
+                File addrFile = new File(getAddressFile());
                 try {
-                    File addrFile = new File(getAddressFile());
                     FileReader fileReader = new FileReader(addrFile);
-                    bufferedReader = new BufferedReader(fileReader);
-                    addr = bufferedReader.readLine();
+                    try (BufferedReader bufferedReader = new BufferedReader(fileReader)) {
+                        addr = bufferedReader.readLine();
+                    }
                 } catch (Exception ex) {
                     throw new ToolException(ex.getMessage(), ex);
-                } finally {
-                    if (bufferedReader != null) {
-                        bufferedReader.close();
-                    }
                 }
             } else {
                 addr = getAddress();
@@ -632,22 +627,21 @@ public class WSDLToCorbaBinding {
             org.apache.cxf.common.i18n.Message msg =
                 new org.apache.cxf.common.i18n.Message(msgStr, LOG);
             throw new Exception(msg.toString());
-        } else {
-            // Set the repository ID for Exception
-            // add to CorbaTypeMapping
-            String repoId = WSDLToCorbaHelper.REPO_STRING
-                + corbaex.getName().replace('.', '/')
-                + WSDLToCorbaHelper.IDL_VERSION;
-            corbaex.setRepositoryID(repoId);
-            CorbaType corbaTypeImpl = corbaex;
-            if (!helper.isDuplicate(corbaTypeImpl)) {
-                CorbaType dup = helper.isDuplicateException(corbaTypeImpl);
-                if (dup != null) {
-                    typeMappingType.getStructOrExceptionOrUnion().remove(dup);
-                    typeMappingType.getStructOrExceptionOrUnion().add(corbaTypeImpl);
-                } else {
-                    typeMappingType.getStructOrExceptionOrUnion().add(corbaTypeImpl);
-                }
+        }
+        // Set the repository ID for Exception
+        // add to CorbaTypeMapping
+        String repoId = WSDLToCorbaHelper.REPO_STRING
+            + corbaex.getName().replace('.', '/')
+            + WSDLToCorbaHelper.IDL_VERSION;
+        corbaex.setRepositoryID(repoId);
+        CorbaType corbaTypeImpl = corbaex;
+        if (!helper.isDuplicate(corbaTypeImpl)) {
+            CorbaType dup = helper.isDuplicateException(corbaTypeImpl);
+            if (dup != null) {
+                typeMappingType.getStructOrExceptionOrUnion().remove(dup);
+                typeMappingType.getStructOrExceptionOrUnion().add(corbaTypeImpl);
+            } else {
+                typeMappingType.getStructOrExceptionOrUnion().add(corbaTypeImpl);
             }
         }
         return corbaex;
@@ -755,9 +749,8 @@ public class WSDLToCorbaBinding {
 
         if (idx != -1) {
             return name.substring(0, idx);
-        } else {
-            return name;
         }
+        return name;
     }
 
     public QName convertToQName(String name) {
@@ -765,8 +758,8 @@ public class WSDLToCorbaBinding {
         String nametype = null;
         String pfx = "";
 
-        int i = name.lastIndexOf("}");
-        int i2 = name.indexOf("}");
+        int i = name.lastIndexOf('}');
+        int i2 = name.indexOf('}');
 
         if (i >= 1) {
             if (i == i2) {
@@ -859,7 +852,7 @@ public class WSDLToCorbaBinding {
         }
     }
 
-    public void main(String args[]) {
+    public void main(String[] args) {
         if (args.length != 6) {
             System.err.println("usage: WSDLToCORBABinding "
                                + "-w <wsdl file> -i <interfaceName> -o <output wsdl file>");

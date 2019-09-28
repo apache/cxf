@@ -16,12 +16,13 @@ eureka:
   client:
     registerWithEureka: true
     serviceUrl:
-      defaultZone: http://127.0.0.1:8761/eureka/
+      defaultZone: ${EUREKA_SERVER_URI:http://127.0.0.1}:${EUREKA_SERVER_PORT:8761}/eureka/
   instance:
+    prefer-ip-address: true
     statusPageUrlPath: /services/helloservice/info
     healthCheckUrlPath: /system/health
     metadataMap:
-      instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}} 
+      instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
       servletPath: ${cxf.path}
 
 endpoints:

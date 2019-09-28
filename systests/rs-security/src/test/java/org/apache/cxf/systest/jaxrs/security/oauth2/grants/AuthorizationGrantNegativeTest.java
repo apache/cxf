@@ -21,6 +21,8 @@ package org.apache.cxf.systest.jaxrs.security.oauth2.grants;
 
 import java.net.URL;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Properties;
 
@@ -28,6 +30,9 @@ import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
@@ -36,27 +41,77 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
+import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.SamlCallbackHandler;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
+
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
- * Some (negative) tests for various authorization grants.
+ * Some (negative) tests for various authorization grants. The tests are run multiple times with different
+ * OAuthDataProvider implementations:
+ * a) JCACHE_PORT - JCache
+ * b) JWT_JCACHE_PORT - JCache with useJwtFormatForAccessTokens enabled
+ * c) JPA_PORT - JPA provider
+ * d) JWT_NON_PERSIST_JCACHE_PORT-  JCache with useJwtFormatForAccessTokens + !persistJwtEncoding
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = BookServerOAuth2GrantsNegative.PORT;
-    public static final String PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-grants2-negative");
+    public static final String JCACHE_PORT = TestUtil.getPortNumber("jaxrs-oauth2-grants-negative-jcache");
+    public static final String JCACHE_PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-grants2-negative-jcache");
+    public static final String JWT_JCACHE_PORT = TestUtil.getPortNumber("jaxrs-oauth2-grants-negative-jcache-jwt");
+    public static final String JWT_JCACHE_PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-grants2-negative-jcache-jwt");
+    public static final String JPA_PORT = TestUtil.getPortNumber("jaxrs-oauth2-grants-negative-jpa");
+    public static final String JPA_PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-grants2-negative-jpa");
+    public static final String JWT_NON_PERSIST_JCACHE_PORT =
+        TestUtil.getPortNumber("jaxrs-oauth2-grants-negative-jcache-jwt-non-persist");
+    public static final String JWT_NON_PERSIST_JCACHE_PORT2 =
+        TestUtil.getPortNumber("jaxrs-oauth2-grants2-negative-jcache-jwt-non-persist");
+
+    final String port;
+
+    public AuthorizationGrantNegativeTest(String port) {
+        this.port = port;
+    }
 
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(BookServerOAuth2GrantsNegative.class, true));
+                   launchServer(BookServerOAuth2GrantsNegativeJCache.class, true));
+        assertTrue("server did not launch correctly",
+                   launchServer(BookServerOAuth2GrantsNegativeJCacheJWT.class, true));
+        assertTrue("server did not launch correctly",
+                   launchServer(BookServerOAuth2GrantsNegativeJPA.class, true));
+        assertTrue("server did not launch correctly",
+                   launchServer(BookServerOAuth2GrantsNegativeJCacheJWTNonPersist.class, true));
+    }
+
+    @AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
+
+    @Parameters(name = "{0}")
+    public static Collection<String> data() {
+
+        return Arrays.asList(JCACHE_PORT, JWT_JCACHE_PORT, JPA_PORT, JWT_NON_PERSIST_JCACHE_PORT);
     }
 
     //
@@ -67,7 +122,7 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     public void testAuthorizationCodeBadClient() throws Exception {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -95,7 +150,7 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     public void testAuthorizationCodeBadRedirectionURI() throws Exception {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -115,11 +170,51 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
         assertEquals(400, response.getStatus());
     }
 
+    // The redirect URI if in the authz request, must be in the token request and must match
+    @org.junit.Test
+    public void testNonMatchingRedirectURI() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + port + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code
+        String code = OAuth2TestUtils.getAuthorizationCode(client);
+        assertNotNull(code);
+
+        // Now get the access token
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                  "consumer-id", "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        client.type("application/x-www-form-urlencoded").accept("application/json");
+        client.path("token");
+
+        Form form = new Form();
+        form.param("grant_type", "authorization_code");
+        form.param("code", code);
+        form.param("client_id", "consumer-id");
+        form.param("redirect_uri", "http://www.bad.blah.apache.org");
+        Response response = client.post(form);
+        try {
+            response.readEntity(ClientAccessToken.class);
+            fail("Failure expected on not sending the correct redirect URI");
+        } catch (ResponseProcessingException ex) {
+            //expected
+        }
+    }
+
     @org.junit.Test
     public void testResponseType() throws Exception {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -147,7 +242,7 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     public void testAuthorizationCodeBadScope() throws Exception {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -159,13 +254,13 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
         client.type("application/json").accept("application/json");
         client.query("client_id", "consumer-id");
         client.query("response_type", "code");
-        client.query("redirect_uri", "http://www.blah.bad.apache.org");
+        client.query("redirect_uri", "http://www.blah.apache.org");
         client.query("scope", "unknown-scope");
         client.path("authorize/");
 
         // No redirect URI
         Response response = client.get();
-        assertEquals(400, response.getStatus());
+        assertEquals(303, response.getStatus());
     }
 
     // Send the authorization code twice to get an access token
@@ -173,7 +268,7 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     public void testRepeatAuthorizationCode() throws Exception {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -218,7 +313,7 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     public void testRepeatRefreshCall() throws Exception {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -269,7 +364,7 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     public void testRefreshWithBadToken() throws Exception {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -325,7 +420,7 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     public void testAccessTokenBadCode() throws Exception {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -375,7 +470,7 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     public void testUnknownGrantType() throws Exception {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "consumer-id", "this-is-a-secret",
                                             busFile.toString());
@@ -413,7 +508,7 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     public void testPasswordCredentialsGrantUnknownUsers() throws Exception {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "consumer-id", "this-is-a-secret",
                                             busFile.toString());
@@ -468,7 +563,7 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     public void testAuthorizationCodeGrantWithUnknownAudience() throws Exception {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -497,6 +592,169 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
         }
     }
 
+    // Here we are sending a different client Id in both the authz + token requests
+    @org.junit.Test
+    public void testNonMatchingClientId() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + port + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code
+        String code = OAuth2TestUtils.getAuthorizationCode(client);
+        assertNotNull(code);
+
+        // Now get the access token using a different client id
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                  "consumer-id-aud", "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        client.type("application/x-www-form-urlencoded").accept("application/json");
+        client.path("token");
+
+        Form form = new Form();
+        form.param("grant_type", "authorization_code");
+        form.param("code", code);
+        form.param("client_id", "consumer-id-aud");
+
+        // Now try to get a token
+        Response response = client.post(form);
+        try {
+            response.readEntity(ClientAccessToken.class);
+            fail("Failure expected on trying to get a token");
+        } catch (ResponseProcessingException ex) {
+            //expected
+        }
+    }
+
+    // Here we are sending a different client Id in both the authz + token requests
+    @org.junit.Test
+    public void testNonMatchingClientIdBasicAuth() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + port + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code
+        String code = OAuth2TestUtils.getAuthorizationCode(client);
+        assertNotNull(code);
+
+        // Now get the access token using a different client id
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                  "consumer-id-aud", "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        client.type("application/x-www-form-urlencoded").accept("application/json");
+        client.path("token");
+
+        Form form = new Form();
+        form.param("grant_type", "authorization_code");
+        form.param("code", code);
+
+        // Now try to get a token
+        Response response = client.post(form);
+        try {
+            response.readEntity(ClientAccessToken.class);
+            fail("Failure expected on trying to get a token");
+        } catch (ResponseProcessingException ex) {
+            //expected
+        }
+    }
+
+    // Here we are sending a different client Id in both the authz + token requests, where in the
+    // token request we authenticate using a different clientId
+    @org.junit.Test
+    public void testNonMatchingClientDifferentClientIds() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + port + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code
+        String code = OAuth2TestUtils.getAuthorizationCode(client);
+        assertNotNull(code);
+
+        // Now get the access token using a different client id
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                  "consumer-id-aud", "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        client.type("application/x-www-form-urlencoded").accept("application/json");
+        client.path("token");
+
+        Form form = new Form();
+        form.param("grant_type", "authorization_code");
+        form.param("code", code);
+        form.param("client_id", "consumer-id");
+
+        // Now try to get a token
+        Response response = client.post(form);
+        try {
+            response.readEntity(ClientAccessToken.class);
+            fail("Failure expected on trying to get a token");
+        } catch (ResponseProcessingException ex) {
+            //expected
+        }
+    }
+
+    // We shouldn't be able to get a refresh token using the implicit grant
+    @org.junit.Test
+    public void testRefreshImplicitGrant() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + port + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Access Token
+        client.type("application/json").accept("application/json");
+        client.query("client_id", "consumer-id");
+        client.query("redirect_uri", "http://www.blah.apache.org");
+        client.query("response_type", "token");
+        client.path("authorize-implicit/");
+        Response response = client.get();
+
+        OAuthAuthorizationData authzData = response.readEntity(OAuthAuthorizationData.class);
+
+        // Now call "decision" to get the access token
+        client.path("decision");
+        client.type("application/x-www-form-urlencoded");
+
+        Form form = new Form();
+        form.param("session_authenticity_token", authzData.getAuthenticityToken());
+        form.param("client_id", authzData.getClientId());
+        form.param("redirect_uri", authzData.getRedirectUri());
+        form.param("oauthDecision", "allow");
+
+        response = client.post(form);
+
+        String location = response.getHeaderString("Location");
+        String accessToken = OAuth2TestUtils.getSubstring(location, "access_token");
+        assertNotNull(accessToken);
+        assertFalse(location.contains("refresh"));
+    }
+
     //
     // SAML Authorization grants
     //
@@ -505,7 +763,7 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     public void testSAML11() throws Exception {
         URL busFile = AuthorizationGrantNegativeTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
 
@@ -534,7 +792,7 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     public void testSAMLAudRestr() throws Exception {
         URL busFile = AuthorizationGrantNegativeTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
 
@@ -563,7 +821,7 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     public void testSAMLUnsigned() throws Exception {
         URL busFile = AuthorizationGrantNegativeTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
 
@@ -592,7 +850,7 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     public void testSAMLHolderOfKey() throws Exception {
         URL busFile = AuthorizationGrantNegativeTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
 
@@ -637,7 +895,7 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     public void testSAMLUnauthenticatedSignature() throws Exception {
         URL busFile = AuthorizationGrantNegativeTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
 
@@ -688,13 +946,13 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     public void testJWTUnsigned() throws Exception {
         URL busFile = AuthorizationGrantNegativeTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
 
         // Create the JWT Token
         String token = OAuth2TestUtils.createToken("DoubleItSTSIssuer", "consumer-id",
-                                   "https://localhost:" + PORT + "/services/token", true, false);
+                                   "https://localhost:" + port + "/services/token", true, false);
 
         // Get Access Token
         client.type("application/x-www-form-urlencoded").accept("application/json");
@@ -718,13 +976,13 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     public void testJWTNoIssuer() throws Exception {
         URL busFile = AuthorizationGrantNegativeTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
 
         // Create the JWT Token
         String token = OAuth2TestUtils.createToken(null, "consumer-id",
-                                   "https://localhost:" + PORT + "/services/token", true, true);
+                                   "https://localhost:" + port + "/services/token", true, true);
 
         // Get Access Token
         client.type("application/x-www-form-urlencoded").accept("application/json");
@@ -748,13 +1006,13 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     public void testJWTNoExpiry() throws Exception {
         URL busFile = AuthorizationGrantNegativeTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
 
         // Create the JWT Token
         String token = OAuth2TestUtils.createToken("DoubleItSTSIssuer", "consumer-id",
-                                   "https://localhost:" + PORT + "/services/token", false, true);
+                                   "https://localhost:" + port + "/services/token", false, true);
 
         // Get Access Token
         client.type("application/x-www-form-urlencoded").accept("application/json");
@@ -778,13 +1036,13 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     public void testJWTBadAudienceRestriction() throws Exception {
         URL busFile = AuthorizationGrantNegativeTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
 
         // Create the JWT Token
         String token = OAuth2TestUtils.createToken("DoubleItSTSIssuer", "consumer-id",
-                                   "https://localhost:" + PORT + "/services/badtoken", true, true);
+                                   "https://localhost:" + port + "/services/badtoken", true, true);
 
         // Get Access Token
         client.type("application/x-www-form-urlencoded").accept("application/json");
@@ -808,7 +1066,7 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     public void testJWTUnauthenticatedSignature() throws Exception {
         URL busFile = AuthorizationGrantNegativeTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
 
@@ -820,7 +1078,7 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
         Instant now = Instant.now();
         claims.setIssuedAt(now.getEpochSecond());
         claims.setExpiryTime(now.plusSeconds(60L).getEpochSecond());
-        String audience = "https://localhost:" + PORT + "/services/token";
+        String audience = "https://localhost:" + port + "/services/token";
         claims.setAudiences(Collections.singletonList(audience));
 
         // Sign the JWT Token
@@ -859,4 +1117,84 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
         }
     }
 
+    //
+    // Server implementations
+    //
+
+    public static class BookServerOAuth2GrantsNegativeJCache extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            BookServerOAuth2GrantsNegativeJCache.class.getResource("grants-negative-server-jcache.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new BookServerOAuth2GrantsNegativeJCache();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class BookServerOAuth2GrantsNegativeJCacheJWT extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            BookServerOAuth2GrantsNegativeJCacheJWT.class.getResource("grants-negative-server-jcache-jwt.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new BookServerOAuth2GrantsNegativeJCacheJWT();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class BookServerOAuth2GrantsNegativeJPA extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            BookServerOAuth2GrantsNegativeJPA.class.getResource("grants-negative-server-jpa.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new BookServerOAuth2GrantsNegativeJPA();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class BookServerOAuth2GrantsNegativeJCacheJWTNonPersist extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            BookServerOAuth2GrantsNegativeJCacheJWTNonPersist.class.getResource(
+                "grants-negative-server-jcache-jwt-non-persist.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new BookServerOAuth2GrantsNegativeJCacheJWTNonPersist();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
 }

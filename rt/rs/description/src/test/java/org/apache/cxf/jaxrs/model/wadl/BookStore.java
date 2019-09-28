@@ -116,7 +116,7 @@ public class BookStore extends AbstractStore<Book> implements BookDescription {
     //CHECKSTYLE:OFF
     @POST
     @Path("books/{bookid}")
-    public Book addBook(@Description("book id")
+    public Book addBook(@Description("book id") //NOPMD
                         @PathParam("id") int id,
                         @PathParam("bookid") int bookId,
                         @MatrixParam("mid") @DefaultValue("mid > 5") String matrixId,

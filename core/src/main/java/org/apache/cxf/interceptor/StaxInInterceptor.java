@@ -82,7 +82,7 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
                 if (reader == null) {
                     reader = new InputStreamReader(is, (String)message.get(Message.ENCODING));
                 }
-                char s[] = new char[1024];
+                char[] s = new char[1024];
                 int i = reader.read(s);
                 while (htmlMessage.length() < 64536 && i > 0) {
                     htmlMessage.append(s, 0, i);
@@ -93,7 +93,7 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
                         LOG, "(none)"));
             }
             throw new Fault(new org.apache.cxf.common.i18n.Message("INVALID_HTML_RESPONSETYPE",
-                    LOG, (htmlMessage == null || htmlMessage.length() == 0) ? "(none)" : htmlMessage));
+                    LOG, (htmlMessage.length() == 0) ? "(none)" : htmlMessage));
         }
         if (contentType == null) {
             //if contentType is null, this is likely a an empty post/put/delete/similar, lets see if it's
@@ -146,7 +146,10 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
 
-    public static XMLInputFactory getXMLInputFactory(Message m) throws Fault {
+    /**
+     * @throws Fault
+     */
+    public static XMLInputFactory getXMLInputFactory(Message m) {
         Object o = m.getContextualProperty(XMLInputFactory.class.getName());
         if (o instanceof XMLInputFactory) {
             return (XMLInputFactory)o;
@@ -171,9 +174,7 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
                 try {
                     xif = (XMLInputFactory)(cls.newInstance());
                     factories.put(o, xif);
-                } catch (InstantiationException e) {
-                    throw new Fault(e);
-                } catch (IllegalAccessException e) {
+                } catch (InstantiationException | IllegalAccessException e) {
                     throw new Fault(e);
                 }
             }

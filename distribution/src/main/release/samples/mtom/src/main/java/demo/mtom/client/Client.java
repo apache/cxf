@@ -48,7 +48,7 @@ public final class Client {
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         if (args.length == 0) {
             System.out.println("Please specify the WSDL file.");
             System.exit(1);
@@ -75,8 +75,8 @@ public final class Client {
         System.out.println("Filesize of me.bmp image is: " + fileSize);
 
         System.out.println("\nStarting MTOM Test using basic byte array:");
-        Holder<String> name = new Holder<String>("Sam");
-        Holder<byte[]> param = new Holder<byte[]>();
+        Holder<String> name = new Holder<>("Sam");
+        Holder<byte[]> param = new Holder<>();
         param.value = new byte[(int) fileSize];
         InputStream in = fileURL.openStream();
         int len = in.read(param.value);
@@ -99,7 +99,7 @@ public final class Client {
 
         System.out.println("\nStarting MTOM test with DataHandler:");
         name.value = "Bob";
-        Holder<DataHandler> handler = new Holder<DataHandler>();
+        Holder<DataHandler> handler = new Holder<>();
 
         handler.value = new DataHandler(fileURL);
 

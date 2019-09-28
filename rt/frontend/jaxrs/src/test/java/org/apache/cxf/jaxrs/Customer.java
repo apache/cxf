@@ -212,6 +212,11 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
 
     }
 
+    public void testGenericObjectParamDefaultValue(@QueryParam("p1") String query1,
+                                                   @QueryParam("p2") @DefaultValue("thequery") String query2) {
+
+    }
+
     public void testXmlAdapter(@QueryParam("a")
                                @XmlJavaTypeAdapter(CustomerBeanAdapter.class)
                                CustomerBean cb) {
@@ -229,6 +234,13 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
                                 CustomerBeanInterface cb) {
 
     }
+
+    public String testXmlAdapter4(@QueryParam("a")
+                                   @XmlJavaTypeAdapter(CustomerStringAdapter.class)
+                                   String value) {
+        return value;
+    }
+
 
     public void testPathBean(@PathParam("") CustomerBean cb) {
 
@@ -373,6 +385,7 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     }
 
     @Produces("text/xml")
+    //CHECKSTYLE:OFF
     public void testQueryAsList(
         @DefaultValue("default") @QueryParam("query") List<String> queryString,
         @QueryParam("query2") List<String> queryString2,
@@ -380,9 +393,12 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
         @QueryParam("query3") Integer[] queryString3Array,
         @QueryParam("query4") List<String> queryString4,
         @QueryParam("query5") List<String> queryString5,
-        @QueryParam("query3") List<MyType<Integer>> queryString6) {
+        @QueryParam("query3") List<MyType<Integer>> queryString6,
+        @QueryParam("query3") List<Long> queryString7,
+        @QueryParam("query3") List<Double> queryString8) {
         // complete
     }
+    //CHECKSTYLE:ON
     public static class MyType<T> {
         private T t;
         public MyType(T t) {
@@ -400,14 +416,18 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     }
 
     @Produces("text/xml")
+    //CHECKSTYLE:OFF: checkstyle:parameternumber
     public void testMultipleQuery(@QueryParam("query")  String queryString,
                                   @QueryParam("query2") String queryString2,
                                   @QueryParam("query3") Long queryString3,
                                   @QueryParam("query4") boolean queryBoolean4,
                                   @QueryParam("query5") char queryChar5,
-                                  @QueryParam("query6") String queryString6) {
+                                  @QueryParam("query6") String queryString6,
+                                  @QueryParam("query7") Boolean queryString7,
+                                  @QueryParam("query8") String queryString8) {
         // complete
     }
+    //CHECKSTYLE:ON: checkstyle:parameternumber
 
     @Produces("text/xml")
     public void testMatrixParam(@MatrixParam("p1") String mp1,
@@ -440,7 +460,7 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     }
 
 //  CHECKSTYLE:OFF
-    public void testWrongType(@QueryParam("p1") HashMap<?, ?> map) {
+    public void testWrongType(@QueryParam("p1") HashMap<?, ?> map) { //NOPMD
         // complete
     }
 //  CHECKSTYLE:ON
@@ -514,8 +534,23 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
 
         @Override
         public String marshal(CustomerBean v) throws Exception {
-            // TODO Auto-generated method stub
             return null;
+        }
+
+    }
+    public static class CustomerStringAdapter extends XmlAdapter<Integer, String> {
+
+        @Override
+        public String unmarshal(Integer v) throws Exception {
+            return "Val: " + v.toString();
+        }
+
+        @Override
+        public Integer marshal(String v) throws Exception {
+            if (v.startsWith("Val: ")) {
+                v = v.substring(5);
+            }
+            return Integer.parseInt(v);
         }
 
     }
@@ -546,7 +581,6 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
 
         @Override
         public ABean marshal(CustomerBean v) throws Exception {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -574,4 +608,4 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
             return entity;
         }
     }
-};
+}

@@ -73,9 +73,8 @@ public class NettyHttpClientPipelineFactory extends ChannelInitializer<Channel> 
         if (tlsClientParameters != null) {
             SSLEngine sslEngine = SSLUtils.createClientSSLEngine(tlsClientParameters);
             return new SslHandler(sslEngine);
-        } else {
-            return null;
         }
+        return null;
     }
 
 

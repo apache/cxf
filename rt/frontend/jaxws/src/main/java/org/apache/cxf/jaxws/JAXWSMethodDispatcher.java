@@ -90,7 +90,7 @@ public class JAXWSMethodDispatcher extends SimpleMethodDispatcher {
                                                  method.getParameterTypes());
                 if (Modifier.isVolatile(m2.getModifiers())) {
                     //bridge method, need to map the generics
-                    Class<?> params[] = method.getParameterTypes();
+                    Class<?>[] params = method.getParameterTypes();
                     for (Type t : method.getGenericParameterTypes()) {
                         if (t instanceof TypeVariable) {
                             TypeVariable<?> tv = (TypeVariable<?>)t;

@@ -36,6 +36,9 @@ import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 public class AbstractWSATestBase extends AbstractBusClientServerTestBase {
 
     static class PayloadLogEventSender implements LogEventSender {

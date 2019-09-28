@@ -32,11 +32,13 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.BusFactory;
 
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class WSDLDefinitionBuilderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class WSDLDefinitionBuilderTest {
     @BeforeClass
     public static void ensureNewBus() {
         BusFactory.setDefaultBus(null);

@@ -49,6 +49,10 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Unit tests for CORS. This isn't precisely simple as it's turned out.
  *
@@ -95,14 +99,14 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
             StringBuilder ob = new StringBuilder();
             for (String requestOrigin : requestOrigins) {
                 ob.append(requestOrigin);
-                ob.append(" "); // extra trailing space won't hurt.
+                ob.append(' '); // extra trailing space won't hurt.
             }
             httpget.addHeader("Origin", ob.toString());
         }
         HttpResponse response = httpclient.execute(httpget);
         assertEquals(200, response.getStatusLine().getStatusCode());
         HttpEntity entity = response.getEntity();
-        String e = IOUtils.toString(entity.getContent(), "utf-8");
+        String e = IOUtils.toString(entity.getContent());
 
         assertEquals("HelloThere", e); // ensure that we didn't bust the operation itself.
         assertOriginResponse(allOrigins, requestOrigins, permitted, response);
@@ -474,7 +478,25 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         HttpResponse response = httpclient.execute(httpget);
         assertEquals(200, response.getStatusLine().getStatusCode());
         HttpEntity entity = response.getEntity();
-        String e = IOUtils.toString(entity.getContent(), "utf-8");
+        String e = IOUtils.toString(entity.getContent());
+
+        assertEquals("HelloThere", e); // ensure that we didn't bust the operation itself.
+        assertOriginResponse(false, new String[] {"http://area51.mil:31415" }, true, response);
+        if (httpclient instanceof Closeable) {
+            ((Closeable)httpclient).close();
+        }
+    }
+
+    @Test
+    public void testAnnotatedClassCorrectOrigin2() throws Exception {
+        HttpClient httpclient = HttpClientBuilder.create().build();
+        HttpGet httpget = new HttpGet("http://localhost:" + PORT + "/antest2/simpleGet/HelloThere");
+        httpget.addHeader("Origin", "http://area51.mil:31415");
+
+        HttpResponse response = httpclient.execute(httpget);
+        assertEquals(200, response.getStatusLine().getStatusCode());
+        HttpEntity entity = response.getEntity();
+        String e = IOUtils.toString(entity.getContent());
 
         assertEquals("HelloThere", e); // ensure that we didn't bust the operation itself.
         assertOriginResponse(false, new String[] {"http://area51.mil:31415" }, true, response);
@@ -492,7 +514,7 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         HttpResponse response = httpclient.execute(httpget);
         assertEquals(200, response.getStatusLine().getStatusCode());
         HttpEntity entity = response.getEntity();
-        String e = IOUtils.toString(entity.getContent(), "utf-8");
+        String e = IOUtils.toString(entity.getContent());
 
         assertEquals("HelloThere", e);
         assertOriginResponse(false, null, false, response);

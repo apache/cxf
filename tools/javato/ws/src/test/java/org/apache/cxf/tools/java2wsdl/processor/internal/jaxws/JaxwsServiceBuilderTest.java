@@ -38,10 +38,14 @@ import org.apache.cxf.tools.java2wsdl.generator.wsdl11.WSDL11Generator;
 import org.apache.cxf.tools.util.AnnotationUtil;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.hello_world_rpclit.javato.GreeterRPCLit;
+
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class JaxwsServiceBuilderTest extends ProcessorTestBase {
     JaxwsServiceBuilder builder;
@@ -200,8 +204,6 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
         assertWsdlEquals(new File(expectedFile), file);
     }
 
-
-    // TODO assertFileEquals
     @Test
     public void testDocWrapparBare() throws Exception {
         builder.setServiceClass(org.apache.hello_world_doc_wrapped_bare.Greeter.class);
@@ -213,9 +215,11 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
         assertNotNull(output);
         generator.generate(file);
         assertTrue(output.exists());
+
+        URI expectedFile = this.getClass().getResource("expected/doc_wrapped_bare.wsdl").toURI();
+        assertWsdlEquals(new File(expectedFile), file);
     }
 
-    // TODO assertFileEquals
     @Test
     public void testRPCWithoutParentBindingAnnotation() throws Exception {
         builder.setServiceClass(org.apache.cxf.tools.fortest.withannotation.rpc.Hello.class);
@@ -226,11 +230,12 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
         assertNotNull(output);
         generator.generate(file);
         assertTrue(output.exists());
+        
+        URI expectedFile = this.getClass().getResource("expected/rpc_lit_service_no_anno.wsdl").toURI();
+        assertWsdlEquals(new File(expectedFile), file);
     }
 
-    // TODO: SOAPBinding can not on method with RPC style
     @Test
-    @Ignore("RuntimeException: org.apache.cxf.interceptor.Fault: Method [sayHi] pro")
     public void testSOAPBindingRPCOnMethod() throws Exception {
         builder.setServiceClass(org.apache.cxf.tools.fortest.withannotation.rpc.HelloWrongAnnotation.class);
         ServiceInfo service = builder.createService();
@@ -240,6 +245,9 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
         assertNotNull(output);
         generator.generate(file);
         assertTrue(output.exists());
+        
+        URI expectedFile = this.getClass().getResource("expected/rpc_on_method.wsdl").toURI();
+        assertWsdlEquals(new File(expectedFile), file);
     }
 
     @Test
@@ -273,7 +281,6 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
         assertWsdlEquals(new File(expectedFile), output);
     }
 
-    // TODO: assertFileEquals
     @Test
     public void testCXF188() throws Exception {
         Class<?> clz = AnnotationUtil.loadClass("org.apache.cxf.tools.fortest.cxf188.Demo", getClass()
@@ -282,10 +289,13 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
         ServiceInfo service = builder.createService();
 
         generator.setServiceModel(service);
-        File file = getOutputFile("cxf188.wsdl");
+        File output = getOutputFile("cxf188.wsdl");
         assertNotNull(output);
-        generator.generate(file);
-        assertTrue(output.exists());
+        generator.generate(output);
+        assertTrue(output.exists()); 
+
+        URI expectedFile = this.getClass().getResource("expected/cxf188.wsdl").toURI();
+        assertWsdlEquals(new File(expectedFile), output);
     }
 
     @Test

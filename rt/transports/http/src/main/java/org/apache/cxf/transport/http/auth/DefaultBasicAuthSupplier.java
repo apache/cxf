@@ -56,9 +56,8 @@ public final class DefaultBasicAuthSupplier implements HttpAuthSupplier {
             return getBasicAuthHeader(authPolicy.getUserName(),
                                       authPolicy.getPassword(),
                                       encodeBasicAuthWithIso8859);
-        } else {
-            return null;
         }
+        return null;
     }
 
 }

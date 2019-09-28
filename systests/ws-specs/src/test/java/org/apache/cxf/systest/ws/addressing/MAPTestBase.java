@@ -47,18 +47,21 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
-import org.apache.cxf.ws.addressing.soap.VersionTransformer;
+import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.hello_world_soap_http.BadRecordLitFault;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.NoSuchCodeLitFault;
 import org.apache.hello_world_soap_http.SOAPService;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 /**
  * Tests the addition of WS-Addressing Message Addressing Properties.
@@ -82,7 +85,7 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
         new QName("http://apache.org/hello_world_soap_http", "SOAPServiceAddressing");
 
     private static Map<Object, Map<String, String>> messageIDs =
-        new HashMap<Object, Map<String, String>>();
+        new HashMap<>();
     protected Greeter greeter;
     private String verified;
 
@@ -139,7 +142,7 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
         ReferenceParametersType params =
             ContextUtils.WSA_OBJECT_FACTORY.createReferenceParametersType();
         JAXBElement<String> param =
-             new JAXBElement<String>(CUSTOMER_NAME, String.class, CUSTOMER_KEY);
+             new JAXBElement<>(CUSTOMER_NAME, String.class, CUSTOMER_KEY);
         params.getAny().add(param);
         target.setReferenceParameters(params);
         greeter = createGreeter(target);
@@ -277,8 +280,8 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
         try {
             // expect two MAPs instances versioned with 200408, i.e. for both
             // the partial and full responses
-            mapVerifier.expectedExposedAs.add(VersionTransformer.Names200408.WSA_NAMESPACE_NAME);
-            mapVerifier.expectedExposedAs.add(VersionTransformer.Names200408.WSA_NAMESPACE_NAME);
+            mapVerifier.addToExpectedExposedAs(Names200408.WSA_NAMESPACE_NAME);
+            mapVerifier.addToExpectedExposedAs(Names200408.WSA_NAMESPACE_NAME);
             String greeting = greeter.greetMe("versioning1");
             assertEquals("unexpected response received from service",
                          "Hello versioning1",

@@ -29,15 +29,53 @@ import javax.ws.rs.core.Response;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractCdiSingleAppTest extends AbstractBusClientServerTestBase {
     @Test
+    public void testAvailableInjections() {
+        assertEquals("configuration=Configuration/"
+            + "contextResolver=ContextResolver/"
+            + "cxfApplication=Application/"
+            + "cxfConfiguration=Configuration/"
+            + "cxfContextResolver=ContextResolver/"
+            + "cxfHttpHeaders=HttpHeaders/"
+            + "cxfHttpServletRequest=HttpServletRequest/"
+            + "cxfProviders=Providers/"
+            + "cxfRequest=Request/"
+            + "cxfResourceContext=ResourceContext/"
+            + "cxfResourceInfo=ResourceInfo/"
+            + "cxfSecurityContext=SecurityContext/"
+            + "cxfServletContext=ServletContext/"
+            + "cxfUriInfo=UriInfo/"
+            + "cxfhttpServletResponse=HttpServletRequest/"
+            + "httpHeaders=HttpHeaders/"
+            + "httpServletRequest=HttpServletRequest/"
+            + "httpServletResponse=HttpServletResponse/"
+            + "providers=Providers/request=Request/"
+            + "resourceContext=ResourceContext/"
+            + "resourceInfo=ResourceInfo/"
+            + "securityContext=SecurityContext/"
+            + "servletContext=ServletContext/"
+            + "uriInfo=UriInfo",
+            createWebClient(getBasePath() + "/injections", MediaType.TEXT_PLAIN).get(String.class).trim());
+    }
+
+    @Test
     public void testInjectedVersionIsProperlyReturned() {
         Response r = createWebClient(getBasePath() + "/version", MediaType.TEXT_PLAIN).get();
+        String pathInfo = r.getHeaderString(Message.PATH_INFO);
+        String httpMethod = r.getHeaderString(Message.HTTP_REQUEST_METHOD);
         assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
         assertEquals("1.0", r.readEntity(String.class));
+        assertTrue(pathInfo.endsWith("/bookstore/version"));
+        assertEquals("GET", httpMethod);
     }
 
     @Test
@@ -52,6 +90,24 @@ public abstract class AbstractCdiSingleAppTest extends AbstractBusClientServerTe
     @Test
     public void testResponseHasBeenReceivedWhenQueringAllBooks() {
         Response r = createWebClient(getBasePath() + "/books").get();
+        assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
+    }
+
+    @Test
+    public void testResponseHasBeenReceivedWhenQueringBooksById() {
+        final String id = UUID.randomUUID().toString();
+
+        Response r = createWebClient(getBasePath() + "/books").post(
+                new Form()
+                        .param("id", id)
+                        .param("name", "Book " + id));
+        r.close();
+        r = createWebClient(getBasePath() + "/byIds")
+                .query("ids", "1234")
+                .query("ids", UUID.randomUUID().toString())
+                .query("ids", id)
+                .get();
+        r.close();
         assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
     }
 

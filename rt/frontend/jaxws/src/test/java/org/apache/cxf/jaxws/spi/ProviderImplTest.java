@@ -34,8 +34,10 @@ import org.apache.cxf.BusFactory;
 
 import org.junit.After;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class ProviderImplTest extends org.junit.Assert {
+public class ProviderImplTest {
 
     @org.junit.Test
     public void testCreateW3CEpr() throws Exception {

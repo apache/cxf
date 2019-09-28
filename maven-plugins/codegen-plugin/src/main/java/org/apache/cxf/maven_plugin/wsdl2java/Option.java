@@ -89,12 +89,12 @@ public class Option {
      * A set of dependent files used to detect that the generator must process WSDL, even
      * if generator marker files are up to date.
      */
-    String dependencies[];
+    String[] dependencies;
 
     /**
      * Redundant directories to be deleted after code generation
      */
-    File redundantDirs[];
+    File[] redundantDirs;
 
     /**
      * Specifies JAXWS or JAXB binding files. Use spaces to separate multiple entries.
@@ -113,12 +113,12 @@ public class Option {
     Boolean wsdlList;
 
     /**
-     * Specifies the frontend. Default is JAXWS. Currently supports only JAXWS frontend.
+     * Specifies the frontend. Default is JAXWS. Currently supports "JAXWS" and "CXF" frontends.
      */
     String frontEnd;
 
     /**
-     * Specifies the databinding. Default is JAXB. Currently supports only JAXB databinding.
+     * Specifies the databinding. Default is JAXB.
      */
     String dataBinding;
 
@@ -168,6 +168,12 @@ public class Option {
      * Uses @Generated annotation in all generated java classes if the flag is set to true.
      */
     Boolean markGenerated;
+
+    /**
+     * Prevents dumping current date as part of @Generated annotation as well as part of
+     * the javadocs of the Java files generated.
+     */
+    Boolean suppressGeneratedDate;
 
     /**
      * The WSDL service name to use for the generated code
@@ -246,7 +252,7 @@ public class Option {
     public void setNamespaceExcludes(List<String> namespaceExcludes) {
         this.namespaceExcludes = namespaceExcludes;
     }
-    public void setDependencies(String dependencies[]) {
+    public void setDependencies(String[] dependencies) {
         this.dependencies = dependencies;
     }
 
@@ -267,7 +273,7 @@ public class Option {
         return uris;
     }
 
-    public void setDeleteDirs(File files[]) {
+    public void setDeleteDirs(File[] files) {
         redundantDirs = files;
     }
 
@@ -313,7 +319,7 @@ public class Option {
     }
 
     public boolean isWsdlList() {
-        return wsdlList == null ? false : wsdlList;
+        return wsdlList != null && wsdlList;
     }
 
     public void setWsdlList(boolean wsdlList) {
@@ -353,7 +359,7 @@ public class Option {
     }
 
     public boolean isExtendedSoapHeaders() {
-        return extendedSoapHeaders == null ? false : extendedSoapHeaders;
+        return extendedSoapHeaders != null && extendedSoapHeaders;
     }
 
     public void setExtendedSoapHeaders(boolean extendedSoapHeaders) {
@@ -372,7 +378,7 @@ public class Option {
     }
 
     public boolean isNoTypes() {
-        return noTypes == null ? false : noTypes;
+        return noTypes != null && noTypes;
     }
 
     public void setNoTypes(boolean noTypes) {
@@ -411,6 +417,14 @@ public class Option {
         this.markGenerated = markGenerated;
     }
 
+    public Boolean isSuppressGeneratedDate() {
+        return suppressGeneratedDate;
+    }
+
+    public void setSuppressGeneratedDate(Boolean suppressGeneratedDate) {
+        this.suppressGeneratedDate = suppressGeneratedDate;
+    }
+
     public Boolean getDefaultExcludesNamespace() {
         return defaultExcludesNamespace;
     }
@@ -436,7 +450,7 @@ public class Option {
     }
 
     public boolean isAutoNameResolution() {
-        return autoNameResolution == null ? false : autoNameResolution;
+        return autoNameResolution != null && autoNameResolution;
     }
 
     public void setAutoNameResolution(boolean autoNameResolution) {
@@ -444,7 +458,7 @@ public class Option {
     }
 
     public boolean isNoAddressBinding() {
-        return noAddressBinding == null ? false : noAddressBinding;
+        return noAddressBinding != null && noAddressBinding;
     }
 
     public void setNoAddressBinding(boolean noAddressBinding) {
@@ -452,7 +466,7 @@ public class Option {
     }
 
     public boolean isAllowElementRefs() {
-        return allowElementRefs == null ? false : allowElementRefs;
+        return allowElementRefs != null && allowElementRefs;
     }
 
     public void setAllowElementRefs(boolean allowElementRefs) {
@@ -481,6 +495,7 @@ public class Option {
         destination.setNoTypes(isNoTypes());
         destination.setFaultSerialVersionUID(getFaultSerialVersionUID());
         destination.setMarkGenerated(isMarkGenerated());
+        destination.setSuppressGeneratedDate(isSuppressGeneratedDate());
         destination.setAllowElementRefs(isAllowElementRefs());
         if (isSetWsdlLocation()) {
             destination.setWsdlLocation(getWsdlLocation());
@@ -509,6 +524,7 @@ public class Option {
         faultSerialVersionUID = setIfNull(faultSerialVersionUID,
             defaultOptions.faultSerialVersionUID);
         markGenerated = setIfNull(markGenerated, defaultOptions.markGenerated);
+        suppressGeneratedDate = setIfNull(suppressGeneratedDate, defaultOptions.suppressGeneratedDate);
         autoNameResolution = setIfNull(autoNameResolution, defaultOptions.autoNameResolution);
         noAddressBinding = setIfNull(noAddressBinding, defaultOptions.noAddressBinding);
         allowElementRefs = setIfNull(allowElementRefs, defaultOptions.allowElementRefs);
@@ -545,7 +561,7 @@ public class Option {
             return l1;
         }
         int len = l1.length + l2.length;
-        T ret[] = (T[])java.lang.reflect.Array.newInstance(cls, len);
+        T[] ret = (T[])java.lang.reflect.Array.newInstance(cls, len);
         System.arraycopy(l1, 0, ret, 0, l1.length);
         System.arraycopy(l2, 0, ret, l1.length, l2.length);
         return ret;

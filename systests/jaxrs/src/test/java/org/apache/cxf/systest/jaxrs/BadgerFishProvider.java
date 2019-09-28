@@ -57,8 +57,7 @@ public final class BadgerFishProvider
     implements MessageBodyReader<Object>, MessageBodyWriter<Object>  {
 
 
-    private static Map<Class<?>, JAXBContext> jaxbContexts
-        = new WeakHashMap<Class<?>, JAXBContext>();
+    private static Map<Class<?>, JAXBContext> jaxbContexts = new WeakHashMap<>();
     @Context
     private HttpHeaders requestHeaders;
 
@@ -85,9 +84,7 @@ public final class BadgerFishProvider
             Object obj = unmarshaller.unmarshal(xsw);
             xsw.close();
             return obj;
-        } catch (JAXBException e) {
-            e.printStackTrace();
-        } catch (XMLStreamException e) {
+        } catch (JAXBException | XMLStreamException e) {
             e.printStackTrace();
         }
 
@@ -109,9 +106,7 @@ public final class BadgerFishProvider
             marshaller.marshal(obj, xsw);
             xsw.close();
 
-        } catch (JAXBException e) {
-            e.printStackTrace();
-        } catch (XMLStreamException e) {
+        } catch (JAXBException | XMLStreamException e) {
             e.printStackTrace();
         }
     }

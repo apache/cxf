@@ -74,15 +74,12 @@ public abstract class AbstractSpnegoAuthSupplier {
         try {
             String spn = getCompleteServicePrincipalName(currentURI);
 
-            boolean useKerberosOid = MessageUtils.isTrue(
-                message.getContextualProperty(PROPERTY_USE_KERBEROS_OID));
+            boolean useKerberosOid = MessageUtils.getContextualBoolean(message, PROPERTY_USE_KERBEROS_OID);
             Oid oid = new Oid(useKerberosOid ? KERBEROS_OID : SPNEGO_OID);
 
             byte[] token = getToken(authPolicy, spn, oid, message);
             return HttpAuthHeader.AUTH_TYPE_NEGOTIATE + " " + Base64Utility.encode(token);
-        } catch (LoginException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        } catch (GSSException e) {
+        } catch (LoginException | GSSException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -139,8 +136,10 @@ public abstract class AbstractSpnegoAuthSupplier {
             return context.initSecContext(token, 0, token.length);
         }
 
+        decorateSubject(subject);
+
         try {
-            return (byte[])Subject.doAs(subject, new CreateServiceTicketAction(context, token));
+            return Subject.doAs(subject, new CreateServiceTicketAction(context, token));
         } catch (PrivilegedActionException e) {
             if (e.getCause() instanceof GSSException) {
                 throw (GSSException) e.getCause();
@@ -150,9 +149,13 @@ public abstract class AbstractSpnegoAuthSupplier {
         }
     }
 
+    // Allow subclasses to decorate the Subject if required.
+    protected void decorateSubject(Subject subject) {
+
+    }
+
     protected boolean isCredDelegationRequired(Message message) {
-        Object prop = message.getContextualProperty(PROPERTY_REQUIRE_CRED_DELEGATION);
-        return prop == null ? credDelegation : MessageUtils.isTrue(prop);
+        return MessageUtils.getContextualBoolean(message, PROPERTY_REQUIRE_CRED_DELEGATION, credDelegation);
     }
 
     protected String getCompleteServicePrincipalName(URI currentURI) {
@@ -213,9 +216,8 @@ public abstract class AbstractSpnegoAuthSupplier {
     public CallbackHandler getUsernamePasswordHandler(final String username, final String password) {
         if (StringUtils.isEmpty(username)) {
             return null;
-        } else {
-            return new NamePasswordCallbackHandler(username, password);
         }
+        return new NamePasswordCallbackHandler(username, password);
     }
 
     public void setCredDelegation(boolean delegation) {

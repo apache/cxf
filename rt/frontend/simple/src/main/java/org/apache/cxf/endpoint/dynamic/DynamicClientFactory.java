@@ -48,6 +48,7 @@ import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.util.StreamReaderDelegate;
@@ -73,6 +74,7 @@ import com.sun.tools.xjc.reader.internalizer.InternalizationLogic;
 
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.catalog.OASISCatalogManagerHelper;
@@ -97,6 +99,7 @@ import org.apache.cxf.endpoint.EndpointImplFactory;
 import org.apache.cxf.endpoint.SimpleEndpointImplFactory;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.FileUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.service.Service;
@@ -174,7 +177,7 @@ public class DynamicClientFactory {
      * @see CXFBusFactory#getDefaultBus()
      */
     public static DynamicClientFactory newInstance() {
-        Bus bus = CXFBusFactory.getThreadDefaultBus();
+        Bus bus = BusFactory.getThreadDefaultBus();
         return new DynamicClientFactory(bus);
     }
 
@@ -334,6 +337,7 @@ public class DynamicClientFactory {
 
         addSchemas(compiler.getOptions(), compiler, svc.getServiceInfos(), schemas);
         addBindingFiles(bindingFiles, compiler);
+        applySchemaCompilerOptions(compiler);
         S2JJAXBModel intermediateModel = compiler.bind();
 
         listener.throwException();
@@ -382,7 +386,7 @@ public class DynamicClientFactory {
             throw new RuntimeException(ex);
         }
 
-        List<File> srcFiles = FileUtils.getFilesRecurse(src, ".+\\.java$");
+        List<File> srcFiles = FileUtils.getFilesRecurseUsingSuffix(src, ".java");
         if (!srcFiles.isEmpty() && !compileJavaSrc(classPath.toString(), srcFiles, classes.toString())) {
             LOG.log(Level.SEVERE, new Message("COULD_NOT_COMPILE_SRC", LOG, wsdlUrl).toString());
         }
@@ -439,12 +443,13 @@ public class DynamicClientFactory {
     }
 
     protected SchemaCompiler createSchemaCompiler() {
-        SchemaCompiler compiler =
-            JAXBUtils.createSchemaCompilerWithDefaultAllocator(new HashSet<>());
+        return JAXBUtils.createSchemaCompilerWithDefaultAllocator(new HashSet<>());    
+    }
+
+    protected void applySchemaCompilerOptions(SchemaCompiler compiler) {
         if (schemaCompilerOptions != null && schemaCompilerOptions.length > 0) {
             compiler.getOptions().parseArguments(schemaCompilerOptions);
         }
-        return compiler;
     }
 
     private void addBindingFiles(List<String> bindingFiles, SchemaCompiler compiler) {
@@ -625,7 +630,7 @@ public class DynamicClientFactory {
 
         javaCompiler.setClassPath(classPath);
         javaCompiler.setOutputDir(dest);
-        if (System.getProperty("java.version").startsWith("9")) {
+        if (JavaUtils.isJava9Compatible()) {
             javaCompiler.setTarget("9");
         } else {
             javaCompiler.setTarget("1.8");
@@ -727,9 +732,8 @@ public class DynamicClientFactory {
 
             if (resolver.isResolved()) {
                 return resolver.getURI().toURL();
-            } else {
-                throw new ServiceConstructionException(new Message("COULD_NOT_RESOLVE_URL", LOG, s));
             }
+            throw new ServiceConstructionException(new Message("COULD_NOT_RESOLVE_URL", LOG, s));
         } catch (IOException e) {
             throw new ServiceConstructionException(new Message("COULD_NOT_RESOLVE_URL", LOG, s), e);
         }
@@ -757,7 +761,7 @@ public class DynamicClientFactory {
             if (errors.length() == 0) {
                 errors.append("Error compiling schema from WSDL at {").append(url).append("}: \n");
             } else {
-                errors.append("\n");
+                errors.append('\n');
             }
             if (arg0.getLineNumber() > 0) {
                 errors.append(arg0.getLocalizedMessage() + "\n"
@@ -767,7 +771,7 @@ public class DynamicClientFactory {
                     + "\n");
             } else {
                 errors.append(arg0.getMessage());
-                errors.append("\n");
+                errors.append('\n');
             }
         }
 
@@ -800,9 +804,8 @@ public class DynamicClientFactory {
                 File file = new File(baseURI, systemId);
                 if (file.exists()) {
                     return new InputSource(Files.newInputStream(file.toPath()));
-                } else {
-                    return new InputSource(systemId);
                 }
+                return new InputSource(systemId);
             }
             return null;
         }
@@ -940,7 +943,7 @@ public class DynamicClientFactory {
         List<Element> incElemList = DOMUtils.findAllElementsByTagNameNS(element,
                                                                         "http://www.w3.org/2001/XMLSchema",
                                                                      "include");
-        if (impElemList.size() == 0 && incElemList.size() == 0) {
+        if (impElemList.isEmpty() && incElemList.isEmpty()) {
             return element;
         }
         element = (Element)cloneNode(element.getOwnerDocument(), element, true);
@@ -1033,7 +1036,7 @@ public class DynamicClientFactory {
 
         public int next() throws XMLStreamException {
             int i = super.next();
-            if (i == XMLStreamReader.START_ELEMENT) {
+            if (i == XMLStreamConstants.START_ELEMENT) {
                 QName qn = super.getName();
                 isInclude = qn.equals(WSDLConstants.QNAME_SCHEMA_INCLUDE);
                 isImport = qn.equals(WSDLConstants.QNAME_SCHEMA_IMPORT);
@@ -1051,7 +1054,7 @@ public class DynamicClientFactory {
 
         public int nextTag() throws XMLStreamException {
             int i = super.nextTag();
-            if (i == XMLStreamReader.START_ELEMENT) {
+            if (i == XMLStreamConstants.START_ELEMENT) {
                 QName qn = super.getName();
                 isInclude = qn.equals(WSDLConstants.QNAME_SCHEMA_INCLUDE);
                 isImport = qn.equals(WSDLConstants.QNAME_SCHEMA_IMPORT);

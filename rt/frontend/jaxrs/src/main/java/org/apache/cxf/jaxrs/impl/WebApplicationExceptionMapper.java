@@ -22,6 +22,7 @@ package org.apache.cxf.jaxrs.impl;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -55,7 +56,7 @@ public class WebApplicationExceptionMapper
         if (r == null) {
             r = Response.serverError().build();
         }
-        boolean doAddMessage = r.getEntity() != null ? false : addMessageToResponse;
+        boolean doAddMessage = r.getEntity() == null && addMessageToResponse;
 
 
         Message msg = PhaseInterceptorChain.getCurrentMessage();
@@ -68,7 +69,7 @@ public class WebApplicationExceptionMapper
             ? buildErrorMessage(r, ex) : null;
         if (flogger == null
             || !flogger.faultOccurred(ex, errorMessage, msg)) {
-            Level level = printStackTrace ? Level.WARNING : Level.FINE;
+            Level level = printStackTrace ? getStackTraceLogLevel(msg, r) : Level.FINE;
             LOG.log(level, ExceptionUtils.getStackTrace(ex));
         }
 
@@ -77,6 +78,14 @@ public class WebApplicationExceptionMapper
             r = buildResponse(r, errorMessage);
         }
         return r;
+    }
+
+    protected Level getStackTraceLogLevel(Message msg, Response r) {
+        if (r.getStatus() == 404) {
+            Level logLevel = JAXRSUtils.getExceptionLogLevel(msg, NotFoundException.class);
+            return logLevel == null ? Level.FINE : logLevel;
+        }
+        return Level.WARNING;
     }
 
     protected String buildErrorMessage(Response r, WebApplicationException ex) {

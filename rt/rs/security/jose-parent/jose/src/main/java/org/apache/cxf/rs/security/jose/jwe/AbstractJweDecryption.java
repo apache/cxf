@@ -18,9 +18,12 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
-import java.security.Key;
 import java.security.spec.AlgorithmParameterSpec;
+import java.util.Arrays;
 import java.util.logging.Logger;
+
+import javax.crypto.SecretKey;
+import javax.security.auth.DestroyFailedException;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
@@ -42,19 +45,17 @@ public abstract class AbstractJweDecryption implements JweDecryptionProvider {
         this.contentDecryptionAlgo = contentDecryptionAlgo;
     }
 
-    protected byte[] getContentEncryptionKey(JweDecryptionInput jweDecryptionInput) {
-        return keyDecryptionAlgo.getDecryptedContentEncryptionKey(jweDecryptionInput);
-    }
-
     public JweDecryptionOutput decrypt(String content) {
         JweCompactConsumer consumer = new JweCompactConsumer(content);
-        byte[] cek = getContentEncryptionKey(consumer.getJweDecryptionInput());
+        byte[] cek = keyDecryptionAlgo.getDecryptedContentEncryptionKey(consumer.getJweDecryptionInput());
         return doDecrypt(consumer.getJweDecryptionInput(), cek);
     }
+
     public byte[] decrypt(JweDecryptionInput jweDecryptionInput) {
-        byte[] cek = getContentEncryptionKey(jweDecryptionInput);
+        byte[] cek = keyDecryptionAlgo.getDecryptedContentEncryptionKey(jweDecryptionInput);
         return doDecrypt(jweDecryptionInput, cek).getContent();
     }
+
     protected JweDecryptionOutput doDecrypt(JweDecryptionInput jweDecryptionInput, byte[] cek) {
         KeyProperties keyProperties = new KeyProperties(getContentEncryptionAlgorithm(jweDecryptionInput));
         keyProperties.setAdditionalData(getContentEncryptionCipherAAD(jweDecryptionInput));
@@ -65,9 +66,21 @@ public abstract class AbstractJweDecryption implements JweDecryptionProvider {
         keyProperties.setCompressionSupported(compressionSupported);
         byte[] actualCek = getActualCek(cek,
                                jweDecryptionInput.getJweHeaders().getContentEncryptionAlgorithm().getJwaName());
-        Key secretKey = CryptoUtils.createSecretKeySpec(actualCek, keyProperties.getKeyAlgo());
+        SecretKey secretKey = CryptoUtils.createSecretKeySpec(actualCek, keyProperties.getKeyAlgo());
         byte[] bytes =
             CryptoUtils.decryptBytes(getEncryptedContentWithAuthTag(jweDecryptionInput), secretKey, keyProperties);
+
+        // Here we're finished with the SecretKey we created, so we can destroy it
+        try {
+            secretKey.destroy();
+        } catch (DestroyFailedException e) {
+            // ignore
+        }
+        Arrays.fill(cek, (byte) 0);
+        if (actualCek != cek) {
+            Arrays.fill(actualCek, (byte) 0);
+        }
+
         return new JweDecryptionOutput(jweDecryptionInput.getJweHeaders(), bytes);
     }
     protected byte[] getEncryptedContentEncryptionKey(JweCompactConsumer consumer) {

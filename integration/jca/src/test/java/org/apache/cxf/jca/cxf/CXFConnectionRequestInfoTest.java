@@ -22,11 +22,13 @@ import java.net.URL;
 
 import javax.xml.namespace.QName;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
-public class CXFConnectionRequestInfoTest extends Assert {
+public class CXFConnectionRequestInfoTest {
 
 
     @Test
@@ -41,7 +43,7 @@ public class CXFConnectionRequestInfoTest extends Assert {
                                                                           new QName("service"),
                                                                           new QName("fooPort"));
 
-        assertTrue("Checking equals ", cr1.equals(cr2));
+        assertEquals("Checking equals ", cr1, cr2);
 
         assertTrue("Checking hashcodes ", cr1.hashCode() == cr2.hashCode());
 
@@ -49,7 +51,7 @@ public class CXFConnectionRequestInfoTest extends Assert {
 
         cr2 = new CXFConnectionRequestInfo(Foo.class, null, new QName("service"), null);
 
-        assertTrue("Checking equals with null parameters ", cr1.equals(cr2));
+        assertEquals("Checking equals with null parameters ", cr1, cr2);
 
         assertTrue("Checking hashcodes  with null parameters ", cr1.hashCode() == cr2.hashCode());
 
@@ -58,34 +60,34 @@ public class CXFConnectionRequestInfoTest extends Assert {
         cr2 = new CXFConnectionRequestInfo(String.class, new URL("file:/tmp/foo"), new QName("service"),
                                               new QName("fooPort"));
 
-        assertTrue("Checking that objects are not equals ", !cr1.equals(cr2));
+        assertNotEquals("Checking that objects are not equals ", cr1, cr2);
 
         cr1 = new CXFConnectionRequestInfo(Foo.class, new URL("file:/tmp/foox"), new QName("service"),
                                               new QName("fooPort"));
         cr2 = new CXFConnectionRequestInfo(Foo.class, new URL("file:/tmp/foo"), new QName("service"),
                                               new QName("fooPort"));
 
-        assertTrue("Checking that objects are not equal ", !cr1.equals(cr2));
+        assertNotEquals("Checking that objects are not equal ", cr1, cr2);
 
         cr1 = new CXFConnectionRequestInfo(Foo.class, new URL("file:/tmp/foo"), new QName("service"),
                                               new QName("fooPort"));
         cr2 = new CXFConnectionRequestInfo(Foo.class, new URL("file:/tmp/foo"), new QName("servicex"),
                                               new QName("fooPort"));
 
-        assertTrue("Checking that objects are not equal ", !cr1.equals(cr2));
+        assertNotEquals("Checking that objects are not equal ", cr1, cr2);
 
         cr1 = new CXFConnectionRequestInfo(Foo.class, new URL("file:/tmp/foo"), new QName("service"),
                                               new QName("fooPort"));
         cr2 = new CXFConnectionRequestInfo(Foo.class, new URL("file:/tmp/foo"), new QName("service"),
                                               new QName("fooPortx"));
 
-        assertTrue("Checking that objects are not equal ", !cr1.equals(cr2));
+        assertNotEquals("Checking that objects are not equal ", cr1, cr2);
 
         cr1 = new CXFConnectionRequestInfo(Foo.class, new URL("file:/tmp/foo"), new QName("service"),
                                               new QName("fooPort"));
         cr2 = new CXFConnectionRequestInfo(Foo.class, null, new QName("service"), new QName("fooPort"));
 
-        assertTrue("Checking that objects are not equal ", !cr1.equals(cr2));
+        assertNotEquals("Checking that objects are not equal ", cr1, cr2);
 
     }
 

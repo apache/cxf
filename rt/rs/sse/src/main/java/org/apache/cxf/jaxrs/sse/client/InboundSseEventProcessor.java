@@ -22,27 +22,33 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.sse.InboundSseEvent;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.client.ClientProviderFactory;
 import org.apache.cxf.jaxrs.impl.ResponseImpl;
+import org.apache.cxf.jaxrs.sse.client.InboundSseEventImpl.Builder;
 import org.apache.cxf.message.Message;
 
 public class InboundSseEventProcessor {
     public static final String SERVER_SENT_EVENTS = "text/event-stream";
     public static final MediaType SERVER_SENT_EVENTS_TYPE = MediaType.valueOf(SERVER_SENT_EVENTS);
 
+    private static final Logger LOG = LogUtils.getL7dLogger(InboundSseEventProcessor.class);
     private static final String COMMENT = ": ";
-    private static final String EVENT = "    ";
+    private static final String EVENT = "event: ";
     private static final String ID = "id: ";
     private static final String RETRY = "retry: ";
     private static final String DATA = "data: ";
@@ -50,15 +56,20 @@ public class InboundSseEventProcessor {
     private final Endpoint endpoint;
     private final InboundSseEventListener listener;
     private final ExecutorService executor;
-    private volatile boolean closed = false;
+    
+    private volatile boolean closed;
     
     protected InboundSseEventProcessor(Endpoint endpoint, InboundSseEventListener listener) {
         this.endpoint = endpoint;
         this.listener = listener;
-        this.executor = Executors.newSingleThreadExecutor();
+        this.executor = Executors.newSingleThreadScheduledExecutor();
     }
     
     void run(final Response response) {
+        if (closed) {
+            throw new IllegalStateException("The SSE Event Processor is already closed");
+        }
+        
         final InputStream is = response.readEntity(InputStream.class);
         final ClientProviderFactory factory = ClientProviderFactory.getInstance(endpoint);
         
@@ -72,69 +83,77 @@ public class InboundSseEventProcessor {
     
     private Callable<?> process(Response response, InputStream is, ClientProviderFactory factory, Message message) {
         return () -> {
-            try (final BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
-                String line = null;
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+                String line = reader.readLine();
                 InboundSseEventImpl.Builder builder = null;
 
-                while ((line = reader.readLine()) != null && !Thread.interrupted() && !closed) {
-                    if (!StringUtils.isEmpty(line) && line.startsWith(EVENT)) {
-                        if (builder == null) {
-                            builder = new InboundSseEventImpl.Builder(line.substring(EVENT.length()));
-                        } else {
-                            final InboundSseEvent event = builder.build(factory, message);
-                            builder = new InboundSseEventImpl.Builder(line.substring(EVENT.length()));
-                            
-                            if (listener != null) {
-                                listener.onNext(event);
-                            }
-                        }
-                    } else if (builder != null) {
-                        if (line.startsWith(ID)) {
-                            builder.id(line.substring(ID.length()));
+                while (line != null && !Thread.interrupted() && !closed) {
+                    if (StringUtils.isEmpty(line) && builder != null) { /* empty new line */
+                        final InboundSseEvent event = builder.build(factory, message);
+                        builder = null; /* reset the builder for next event */
+                        listener.onNext(event);
+                    } else {
+                        if (line.startsWith(EVENT)) {
+                            builder = getOrCreate(builder).name(line.substring(EVENT.length()));
+                        } else if (line.startsWith(ID)) {
+                            builder = getOrCreate(builder).id(line.substring(ID.length()));
                         } else if (line.startsWith(COMMENT)) {
-                            builder.id(line.substring(COMMENT.length()));
+                            builder = getOrCreate(builder).comment(line.substring(COMMENT.length()));
                         } else if (line.startsWith(RETRY)) {
-                            builder.reconnectDelay(line.substring(RETRY.length()));
+                            builder = getOrCreate(builder).reconnectDelay(line.substring(RETRY.length()));
                         } else if (line.startsWith(DATA)) {
-                            builder.data(line.substring(DATA.length()));
+                            builder = getOrCreate(builder).data(line.substring(DATA.length()));
                         }
                     }
+                    line = reader.readLine();
                 }
                 
-                if (listener != null) {
-                    if (builder != null) {
-                        listener.onNext(builder.build(factory, message));
-                    }
+                if (builder != null) {
+                    listener.onNext(builder.build(factory, message));
+                }
 
-                    // complete the stream
-                    listener.onComplete();
-                }
+                // complete the stream
+                listener.onComplete();
             } catch (final Exception ex) {
-                if (listener != null) {
-                    listener.onError(ex);
-                }
+                listener.onError(ex);
             }
 
             if (response != null) {
+                LOG.fine("Closing the response");
                 response.close();
             }
 
-            closed = true;
             return null;
         };
     }
     
+    boolean isClosed() {
+        return closed;
+    }
+    
     boolean close(long timeout, TimeUnit unit) {
-        if (closed) {
-            return true;
-        }
-        
         try {
             closed = true;
-            executor.shutdown();
+            
+            if (executor.isShutdown()) {
+                return true;
+            }
+            
+            AccessController.doPrivileged((PrivilegedAction<Void>)
+                () -> { 
+                    executor.shutdown();
+                    return null;
+                });
             return executor.awaitTermination(timeout, unit);
         } catch (final InterruptedException ex) {
             return false;
         }
+    }
+    
+    /**
+     * Create builder on-demand, without explicit event demarcation
+     */
+    private static Builder getOrCreate(final Builder builder) {
+        return (builder == null) ? new InboundSseEventImpl.Builder() : builder;
     }
 }

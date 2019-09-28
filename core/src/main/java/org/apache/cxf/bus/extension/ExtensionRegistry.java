@@ -33,7 +33,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public final class ExtensionRegistry {
     private static ConcurrentMap<String, Extension> extensions
-        = new ConcurrentHashMap<String, Extension>(16, 0.75f, 4);
+        = new ConcurrentHashMap<>(16, 0.75f, 4);
 
     private ExtensionRegistry() {
         //singleton

@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.transport.http_undertow.blueprint;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.UUID;
@@ -27,14 +26,12 @@ import org.w3c.dom.Element;
 
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
-import org.apache.aries.blueprint.reflect.MapEntryImpl;
-import org.apache.aries.blueprint.reflect.MapMetadataImpl;
+import org.apache.aries.blueprint.mutable.MutableMapMetadata;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.blueprint.AbstractBPBeanDefinitionParser;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
-import org.osgi.service.blueprint.reflect.MapEntry;
 import org.osgi.service.blueprint.reflect.Metadata;
 import org.osgi.service.blueprint.reflect.ValueMetadata;
 
@@ -93,7 +90,10 @@ public class UndertowServerEngineFactoryParser extends AbstractBPBeanDefinitionP
 
     protected Metadata parseEngineHandlers(List<Element> engines, ComponentMetadata enclosingComponent,
                                            ParserContext context) {
-        List<MapEntry> entries = new ArrayList<>();
+        MutableMapMetadata map = context.createMetadata(MutableMapMetadata.class);
+        map.setKeyType("java.lang.String");
+        map.setValueType("java.util.List");
+
         for (Element engine : engines) {
             String port = engine.getAttribute("port");
             ValueMetadata keyValue = createValue(context, port);
@@ -102,10 +102,10 @@ public class UndertowServerEngineFactoryParser extends AbstractBPBeanDefinitionP
                                        "handlers");
             if (handlers != null) {
                 Metadata valValue = parseListData(context, enclosingComponent, handlers);
-                entries.add(new MapEntryImpl(keyValue, valValue));
+                map.addEntry(keyValue, valValue);
             }
         }
-        return new MapMetadataImpl("java.lang.String", "java.util.List", entries);
+        return map;
     }
 
 

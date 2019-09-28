@@ -51,7 +51,6 @@ import org.apache.cxf.tools.util.FileWriterUtil;
 import org.apache.cxf.tools.util.OutputStreamCreator;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBinding;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBindingDeserializer;
-import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBindingSerializer;
 import org.apache.cxf.wsdl.WSDLConstants;
 
 public class XSDToWSDLProcessor implements Processor {
@@ -165,8 +164,6 @@ public class XSDToWSDLProcessor implements Processor {
     }
 
     private void registerJAXWSBinding(Class<?> clz) {
-        registry.registerSerializer(clz, ToolConstants.JAXWS_BINDINGS, new JAXWSBindingSerializer());
-
         registry.registerDeserializer(clz, ToolConstants.JAXWS_BINDINGS, new JAXWSBindingDeserializer());
         registry.mapExtensionTypes(clz, ToolConstants.JAXWS_BINDINGS, JAXWSBinding.class);
     }
@@ -180,9 +177,9 @@ public class XSDToWSDLProcessor implements Processor {
             newName = (String)env.get(ToolConstants.CFG_OUTPUTFILE);
         } else {
             String oldName = (String)env.get(ToolConstants.CFG_XSDURL);
-            int position = oldName.lastIndexOf("/");
+            int position = oldName.lastIndexOf('/');
             if (position < 0) {
-                position = oldName.lastIndexOf("\\");
+                position = oldName.lastIndexOf('\\');
             }
             if (position >= 0) {
                 oldName = oldName.substring(position + 1, oldName.length());

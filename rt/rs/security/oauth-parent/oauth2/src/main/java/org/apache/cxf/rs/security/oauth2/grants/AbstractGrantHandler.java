@@ -71,19 +71,6 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
         return Collections.unmodifiableList(supportedGrants);
     }
 
-    @Deprecated
-    protected void checkIfGrantSupported(Client client) {
-        checkIfGrantSupported(client, getSingleGrantType());
-    }
-
-    private void checkIfGrantSupported(Client client, String requestedGrant) {
-        if (!OAuthUtils.isGrantSupportedForClient(client,
-                                                  canSupportPublicClients,
-                                                  requestedGrant)) {
-            throw new OAuthServiceException(OAuthConstants.UNAUTHORIZED_CLIENT);
-        }
-    }
-
     protected String getSingleGrantType() {
         if (supportedGrants.size() > 1) {
             String errorMessage = "Request grant type must be specified";
@@ -123,7 +110,7 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
                                                     UserSubject subject,
                                                     String requestedGrant,
                                                     List<String> requestedScopes) {
-        return doCreateAccessToken(client, subject, requestedGrant, requestedScopes, null);
+        return doCreateAccessToken(client, subject, requestedGrant, requestedScopes, Collections.emptyList());
     }
 
     protected ServerAccessToken doCreateAccessToken(Client client,
@@ -149,7 +136,7 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
     }
 
     protected List<String> getApprovedScopes(Client client, UserSubject subject, List<String> requestedScopes) {
-        // This method can be overridden if the down-scoping is required 
+        // This method can be overridden if the down-scoping is required
         return Collections.emptyList();
     }
 
@@ -197,8 +184,7 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
                 throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
             }
             return audiences;
-        } else {
-            return client.getRegisteredAudiences();
         }
+        return client.getRegisteredAudiences();
     }
 }

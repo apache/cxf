@@ -19,14 +19,12 @@
 package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
@@ -42,9 +40,9 @@ public class AbstractJweJsonDecryptingFilter {
     private JweDecryptionProvider decryption;
     private String defaultMediaType;
     private Map<String, Object> recipientProperties;
-    protected JweDecryptionOutput decrypt(InputStream is) throws IOException {
-        JweJsonConsumer c = new JweJsonConsumer(new String(IOUtils.readBytesFromStream(is),
-                                                                   StandardCharsets.UTF_8));
+    private boolean checkEmptyStream;
+    protected JweDecryptionOutput decrypt(final byte[] content) throws IOException {
+        JweJsonConsumer c = new JweJsonConsumer(new String(content, StandardCharsets.UTF_8));
         JweDecryptionProvider theProvider = getInitializedDecryptionProvider(c.getProtectedHeader());
         JweJsonEncryptionEntry entry = c.getJweDecryptionEntry(theProvider, recipientProperties);
         if (entry == null) {
@@ -95,5 +93,13 @@ public class AbstractJweJsonDecryptingFilter {
     }
     public void setProtectedHttpHeaders(Set<String> protectedHttpHeaders) {
         this.protectedHttpHeaders = protectedHttpHeaders;
+    }
+
+    public boolean isCheckEmptyStream() {
+        return checkEmptyStream;
+    }
+
+    public void setCheckEmptyStream(boolean checkEmptyStream) {
+        this.checkEmptyStream = checkEmptyStream;
     }
 }

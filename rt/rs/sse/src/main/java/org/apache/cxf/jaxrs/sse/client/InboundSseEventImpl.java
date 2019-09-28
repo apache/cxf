@@ -37,7 +37,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.client.ClientProviderFactory;
 import org.apache.cxf.message.Message;
 
-public class InboundSseEventImpl implements InboundSseEvent {
+public final class InboundSseEventImpl implements InboundSseEvent {
     private final String id;
     private final String name;
     private final String comment;
@@ -50,29 +50,33 @@ public class InboundSseEventImpl implements InboundSseEvent {
     static class Builder {
         private static final Logger LOG = LogUtils.getL7dLogger(Builder.class);
 
-        private final String name;
+        private String name; /* the default event type would be "message" */
         private String id;
         private String comment;
         private OptionalLong reconnectDelay = OptionalLong.empty();
         private String data;
 
-        Builder(String name) {
-            this.name = name;
+        Builder() {
         }
 
-        Builder id(String id) {
-            this.id = id;
+        Builder id(String i) {
+            this.id = i;
+            return this;
+        }
+        
+        Builder name(String n) {
+            this.name = n;
             return this;
         }
 
-        Builder comment(String comment) {
-            this.comment = comment;
+        Builder comment(String cmt) {
+            this.comment = cmt;
             return this;
         }
 
-        Builder reconnectDelay(String reconnectDelay) {
+        Builder reconnectDelay(String rd) {
             try {
-                this.reconnectDelay = OptionalLong.of(Long.parseLong(reconnectDelay));
+                this.reconnectDelay = OptionalLong.of(Long.parseLong(rd));
             } catch (final NumberFormatException ex) {
                 LOG.warning("Unable to parse reconnectDelay, long number expected: " + ex.getMessage());
             }
@@ -80,19 +84,21 @@ public class InboundSseEventImpl implements InboundSseEvent {
             return this;
         }
         
-        Builder data(String data) {
-            this.data = data;
+        Builder data(String d) {
+            this.data = d;
             return this;
         }
 
         InboundSseEvent build(ClientProviderFactory factory, Message message) {
-            return new InboundSseEventImpl(id, name, comment, reconnectDelay.orElse(0), 
+            return new InboundSseEventImpl(id, name, comment, reconnectDelay.orElse(RECONNECT_NOT_SET), 
                 reconnectDelay.isPresent(), data, factory, message);
         }
     }
     
-    InboundSseEventImpl(String id, String name, String comment, long reconnectDelay, boolean reconnectDelaySet, 
+    //CHECKSTYLE:OFF
+    InboundSseEventImpl(String id, String name, String comment, long reconnectDelay, boolean reconnectDelaySet,   
             String data, ClientProviderFactory factory, Message message) {
+        //CHECKSTYLE:ON
         this.id = id;
         this.name = name;
         this.comment = comment;
@@ -140,13 +146,13 @@ public class InboundSseEventImpl implements InboundSseEvent {
 
     @Override
     public <T> T readData(Class<T> type) {
-        return read(type, type, MediaType.WILDCARD_TYPE);
+        return read(type, type, MediaType.TEXT_PLAIN_TYPE);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T readData(GenericType<T> type) {
-        return read((Class<T>)type.getRawType(), type.getType(), MediaType.WILDCARD_TYPE);
+        return read((Class<T>)type.getRawType(), type.getType(), MediaType.TEXT_PLAIN_TYPE);
     }
 
     @Override
@@ -175,7 +181,7 @@ public class InboundSseEventImpl implements InboundSseEvent {
             throw new RuntimeException("No suitable message body reader for class: " + messageType.getName());
         }
 
-        try (final ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8))) {
+        try (ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8))) {
             return reader.readFrom(messageType, type, annotations, mediaType, headers, is);
         } catch (final IOException ex) {
             throw new RuntimeException("Unable to read data of type " + messageType.getName(), ex);

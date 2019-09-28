@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
@@ -34,10 +35,14 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSUtils;
+import org.opensaml.saml.common.xml.SAMLConstants;
+
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
-import org.opensaml.saml.common.xml.SAMLConstants;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * In this test case, a CXF client requests a number of SAML Tokens from an STS using batch processing.
@@ -73,10 +78,10 @@ public class SAMLBatchUnitTest extends AbstractBusClientServerTestBase {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
+    public static Collection<TestParam> data() {
 
-        return Arrays.asList(new TestParam[][] {{new TestParam("", false, STSPORT)},
-                                                {new TestParam("", false, STAX_STSPORT)},
+        return Arrays.asList(new TestParam[] {new TestParam("", false, STSPORT),
+                                              new TestParam("", false, STAX_STSPORT),
         });
     }
 
@@ -92,8 +97,8 @@ public class SAMLBatchUnitTest extends AbstractBusClientServerTestBase {
         URL busFile = SAMLBatchUnitTest.class.getResource("cxf-client-unit.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String wsdlLocation =
             "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
@@ -120,10 +125,10 @@ public class SAMLBatchUnitTest extends AbstractBusClientServerTestBase {
             requestSecurityTokens(bus, wsdlLocation, requestList, action, requestType, port);
         assertTrue(tokens != null && tokens.size() == 2);
 
-        assertTrue(tokens.get(0).getToken().getLocalName().equals("Assertion"));
-        assertTrue(tokens.get(0).getToken().getNamespaceURI().equals(SAMLConstants.SAML1_NS));
-        assertTrue(tokens.get(1).getToken().getLocalName().equals("Assertion"));
-        assertTrue(tokens.get(1).getToken().getNamespaceURI().equals(SAMLConstants.SAML20_NS));
+        assertEquals("Assertion", tokens.get(0).getToken().getLocalName());
+        assertEquals(tokens.get(0).getToken().getNamespaceURI(), SAMLConstants.SAML1_NS);
+        assertEquals("Assertion", tokens.get(1).getToken().getLocalName());
+        assertEquals(tokens.get(1).getToken().getNamespaceURI(), SAMLConstants.SAML20_NS);
 
         // Now validate the tokens
         requestList.get(0).setValidateTarget(tokens.get(0).getToken());

@@ -27,6 +27,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 import javax.security.auth.kerberos.KerberosPrincipal;
@@ -39,12 +41,13 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.KeyRequirements;
-import org.apache.cxf.sts.request.ReceivedKey;
+import org.apache.cxf.sts.request.ReceivedCredential;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.ws.security.sts.provider.STSException;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -54,7 +57,7 @@ import org.apache.wss4j.common.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
 
 /**
@@ -202,22 +205,19 @@ public class DefaultSubjectProvider implements SubjectProvider {
      * Get the SubjectConfirmation method given a tokenType and keyType
      */
     protected String getSubjectConfirmationMethod(String tokenType, String keyType) {
-        if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
-            || WSConstants.SAML_NS.equals(tokenType)) {
+        if (WSS4JConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+            || WSS4JConstants.SAML_NS.equals(tokenType)) {
             if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType)
                 || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
                 return SAML1Constants.CONF_HOLDER_KEY;
-            } else {
-                return SAML1Constants.CONF_BEARER;
             }
-        } else {
-            if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType)
-                || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
-                return SAML2Constants.CONF_HOLDER_KEY;
-            } else {
-                return SAML2Constants.CONF_BEARER;
-            }
+            return SAML1Constants.CONF_BEARER;
         }
+        if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType)
+            || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
+            return SAML2Constants.CONF_HOLDER_KEY;
+        }
+        return SAML2Constants.CONF_BEARER;
     }
 
     /**
@@ -272,23 +272,23 @@ public class DefaultSubjectProvider implements SubjectProvider {
                 throw new STSException(ex.getMessage(), ex);
             }
         } else if (STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
-            ReceivedKey receivedKey = keyRequirements.getReceivedKey();
+            ReceivedCredential receivedCredential = keyRequirements.getReceivedCredential();
 
             // Validate UseKey trust
             if (stsProperties.isValidateUseKey() && stsProperties.getSignatureCrypto() != null) {
-                if (receivedKey.getX509Cert() != null) {
+                if (receivedCredential.getX509Cert() != null) {
                     try {
                         Collection<Pattern> constraints = Collections.emptyList();
                         stsProperties.getSignatureCrypto().verifyTrust(
-                            new X509Certificate[]{receivedKey.getX509Cert()}, false, constraints, null);
+                            new X509Certificate[]{receivedCredential.getX509Cert()}, false, constraints, null);
                     } catch (WSSecurityException e) {
                         LOG.log(Level.FINE, "Error in trust validation of UseKey: ", e);
                         throw new STSException("Error in trust validation of UseKey", STSException.REQUEST_FAILED);
                     }
                 }
-                if (receivedKey.getPublicKey() != null) {
+                if (receivedCredential.getPublicKey() != null) {
                     try {
-                        stsProperties.getSignatureCrypto().verifyTrust(receivedKey.getPublicKey());
+                        stsProperties.getSignatureCrypto().verifyTrust(receivedCredential.getPublicKey());
                     } catch (WSSecurityException e) {
                         LOG.log(Level.FINE, "Error in trust validation of UseKey: ", e);
                         throw new STSException("Error in trust validation of UseKey", STSException.REQUEST_FAILED);
@@ -296,7 +296,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
                 }
             }
 
-            return createPublicKeyKeyInfo(receivedKey.getX509Cert(), receivedKey.getPublicKey());
+            return createPublicKeyKeyInfo(receivedCredential.getX509Cert(), receivedCredential.getPublicKey());
         }
 
         return null;
@@ -334,20 +334,27 @@ public class DefaultSubjectProvider implements SubjectProvider {
         // Create an EncryptedKey
         WSSecEncryptedKey encrKey = new WSSecEncryptedKey(doc);
         encrKey.setKeyIdentifierType(encryptionProperties.getKeyIdentifierType());
-        encrKey.setEphemeralKey(secret);
-        encrKey.setSymmetricEncAlgorithm(encryptionProperties.getEncryptionAlgorithm());
         encrKey.setUseThisCert(certificate);
         encrKey.setKeyEncAlgo(encryptionProperties.getKeyWrapAlgorithm());
-        encrKey.prepare(encryptionCrypto);
+
+        SecretKey symmetricKey = null;
+        if (secret != null) {
+            symmetricKey = KeyUtils.prepareSecretKey(encryptionProperties.getEncryptionAlgorithm(), secret);
+        } else {
+            KeyGenerator keyGen = KeyUtils.getKeyGenerator(encryptionProperties.getEncryptionAlgorithm());
+            symmetricKey = keyGen.generateKey();
+        }
+
+        encrKey.prepare(encryptionCrypto, symmetricKey);
         Element encryptedKeyElement = encrKey.getEncryptedKeyElement();
 
         // Append the EncryptedKey to a KeyInfo element
         Element keyInfoElement =
             doc.createElementNS(
-                WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN
+                WSS4JConstants.SIG_NS, WSS4JConstants.SIG_PREFIX + ":" + WSS4JConstants.KEYINFO_LN
             );
         keyInfoElement.setAttributeNS(
-            WSConstants.XMLNS_NS, "xmlns:" + WSConstants.SIG_PREFIX, WSConstants.SIG_NS
+            WSS4JConstants.XMLNS_NS, "xmlns:" + WSS4JConstants.SIG_PREFIX, WSS4JConstants.SIG_NS
         );
         keyInfoElement.appendChild(encryptedKeyElement);
 

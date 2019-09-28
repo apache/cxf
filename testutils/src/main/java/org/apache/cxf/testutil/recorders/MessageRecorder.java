@@ -21,9 +21,9 @@ package org.apache.cxf.testutil.recorders;
 
 import java.util.List;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
 
-public class MessageRecorder extends Assert {
+public class MessageRecorder {
 
     private OutMessageRecorder outRecorder;
     private InMessageRecorder inRecorder;
@@ -38,17 +38,13 @@ public class MessageRecorder extends Assert {
         int nOut = 0;
         int nIn = 0;
         while (waited <= timeout) {
-            synchronized (outRecorder) {
-                nOut = outRecorder.getOutboundMessages().size();
-            }
-            synchronized (inRecorder) {
-                nIn = inRecorder.getInboundMessages().size();
-            }
+            nOut = outRecorder.getOutboundMessages().size();
+            nIn = inRecorder.getInboundMessages().size();
             if (nIn >= nExpectedIn && nOut >= nExpectedOut) {
                 return;
             }
             try {
-                Thread.sleep(100);
+                Thread.sleep(100L);
             } catch (InterruptedException ex) {
                 // ignore
             }
@@ -61,8 +57,8 @@ public class MessageRecorder extends Assert {
             System.out.println("\nMessages actually received:\n");
             List<byte[]> inbound = inRecorder.getInboundMessages();
             for (byte[] b : inbound) {
-                System.out.println(new String(b) + "\n");
-                System.out.println("----------------\n");
+                System.out.println(new String(b));
+                System.out.println("----------------");
             }
         }
         if (nExpectedOut != nOut) {
@@ -72,16 +68,12 @@ public class MessageRecorder extends Assert {
             System.out.println("\nMessages actually sent:\n");
             List<byte[]> outbound = outRecorder.getOutboundMessages();
             for (byte[] b : outbound) {
-                System.out.println(new String(b) + "\n");
-                System.out.println("----------------\n");
+                System.out.println(new String(b));
+                System.out.println("----------------");
             }
         }
 
-        if (nExpectedIn > nIn) {
-            assertEquals("Did not receive expected number of inbound messages", nExpectedIn, nIn);
-        }
-        if (nExpectedOut > nOut) {
-            assertEquals("Did not send expected number of outbound messages", nExpectedOut, nOut);
-        }
+        assertEquals("Did not receive expected number of inbound messages", nExpectedIn, nIn);
+        assertEquals("Did not send expected number of outbound messages", nExpectedOut, nOut);
     }
 }

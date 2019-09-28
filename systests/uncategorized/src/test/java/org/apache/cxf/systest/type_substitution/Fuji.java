@@ -20,10 +20,10 @@
 package org.apache.cxf.systest.type_substitution;
 
 public class Fuji extends Apple {
-    private final String type = "Fuji";
+    private static final String TYPE = "Fuji";
 
     public Fuji() {
-        setType("Fuji");
+        setType(TYPE);
     }
 
     public Fuji(String color, String flavor, String type) {

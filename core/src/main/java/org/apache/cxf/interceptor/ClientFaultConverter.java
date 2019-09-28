@@ -39,6 +39,7 @@ import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
@@ -148,7 +149,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
         Service s = msg.getExchange().getService();
         DataBinding dataBinding = s.getDataBinding();
 
-        Object e = null;
+        Object e;
         if (isDOMSupported(dataBinding)) {
             DataReader<Node> reader = this.getNodeDataReader(msg);
             reader.setProperty(DataReader.FAULT, fault);
@@ -173,13 +174,13 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
                     return;
                 }
                 if (e == null) {
-                    Constructor<?> constructor = exClass.getConstructor(new Class[]{String.class});
-                    e = constructor.newInstance(new Object[]{fault.getMessage()});
+                    Constructor<?> constructor = exClass.getConstructor(String.class);
+                    e = constructor.newInstance(fault.getMessage());
                 } else {
 
                     try {
                         Constructor<?> constructor = getConstructor(exClass, e);
-                        e = constructor.newInstance(new Object[]{fault.getMessage(), e});
+                        e = constructor.newInstance(fault.getMessage(), e);
                     } catch (NoSuchMethodException e1) {
                         //Use reflection to convert fault bean to exception
                         e = convertFaultBean(exClass, e, fault);
@@ -206,7 +207,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
 
     private Constructor<?> getConstructor(Class<?> faultClass, Object e) throws NoSuchMethodException {
         Class<?> beanClass = e.getClass();
-        Constructor<?> cons[] = faultClass.getConstructors();
+        Constructor<?>[] cons = faultClass.getConstructors();
         for (Constructor<?> c : cons) {
             if (c.getParameterTypes().length == 2
                 && String.class.equals(c.getParameterTypes()[0])
@@ -215,14 +216,13 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
             }
         }
         try {
-            return faultClass.getConstructor(new Class[]{String.class, beanClass});
+            return faultClass.getConstructor(String.class, beanClass);
         } catch (NoSuchMethodException ex) {
             Class<?> cls = getPrimitiveClass(beanClass);
             if (cls != null) {
-                return faultClass.getConstructor(new Class[]{String.class, cls});
-            } else {
-                throw ex;
+                return faultClass.getConstructor(String.class, cls);
             }
+            throw ex;
         }
 
     }
@@ -279,14 +279,14 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
     private Throwable getCause(Iterator<String> linesIterator, String firstLine) {
         // The actual exception class of the cause might be unavailable at the
         // client -> use a standard throwable to represent the cause.
-        firstLine = firstLine.substring(firstLine.indexOf(":") + 1).trim();
+        firstLine = firstLine.substring(firstLine.indexOf(':') + 1).trim();
         Throwable res = null;
-        if (firstLine.indexOf(":") != -1) {
-            String cn = firstLine.substring(0, firstLine.indexOf(":")).trim();
+        if (firstLine.indexOf(':') != -1) {
+            String cn = firstLine.substring(0, firstLine.indexOf(':')).trim();
             if (cn.startsWith("java.lang")) {
                 try {
                     res = (Throwable)Class.forName(cn).getConstructor(String.class)
-                            .newInstance(firstLine.substring(firstLine.indexOf(":") + 2));
+                            .newInstance(firstLine.substring(firstLine.indexOf(':') + 2));
                 } catch (Throwable t) {
                     //ignore, use the default
                 }
@@ -334,8 +334,8 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
     }
 
     private Exception convertFaultBean(Class<?> exClass, Object faultBean, Fault fault) throws Exception {
-        Constructor<?> constructor = exClass.getConstructor(new Class[]{String.class});
-        Exception e = (Exception)constructor.newInstance(new Object[]{fault.getMessage()});
+        Constructor<?> constructor = exClass.getConstructor(String.class);
+        Exception e = (Exception)constructor.newInstance(fault.getMessage());
 
         //Copy fault bean fields to exception
         for (Class<?> obj = exClass; !obj.equals(Object.class);  obj = obj.getSuperclass()) {
@@ -352,7 +352,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
             }
         }
         //also use/try public getter/setter methods
-        Method meth[] = faultBean.getClass().getMethods();
+        Method[] meth = faultBean.getClass().getMethods();
         for (Method m : meth) {
             if (m.getParameterTypes().length == 0
                 && (m.getName().startsWith("get")

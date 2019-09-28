@@ -64,12 +64,10 @@ public class BookStore extends BookSuperClass implements BookInterface {
 
     @Override
     public String getDescription() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public String getAuthor() {
-        // TODO Auto-generated method stub
         return null;
     }
 }

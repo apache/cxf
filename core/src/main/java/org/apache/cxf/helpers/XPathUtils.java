@@ -23,6 +23,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Map;
 
+import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
@@ -39,6 +40,14 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 public class XPathUtils {
 
     private static XPathFactory xpathFactory = XPathFactory.newInstance();
+
+    static {
+        try {
+            xpathFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+        } catch (javax.xml.xpath.XPathFactoryConfigurationException ex) {
+            // ignore
+        }
+    }
 
     private XPath xpath;
 

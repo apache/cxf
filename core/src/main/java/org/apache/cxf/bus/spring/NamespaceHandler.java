@@ -47,8 +47,7 @@ public class NamespaceHandler extends NamespaceHandlerSupport {
                     bean.addPropertyValue("name", val);
                     element.removeAttribute("name");
                     if (!element.hasAttribute("id")) {
-                        val = "cxf.workqueue." + val;
-                        element.setAttribute("id", val);
+                        element.setAttribute("id", "cxf.workqueue." + val);
                     }
 
                 }

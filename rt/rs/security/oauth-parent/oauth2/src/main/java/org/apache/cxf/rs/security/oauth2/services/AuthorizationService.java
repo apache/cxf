@@ -42,7 +42,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 public class AuthorizationService {
 
     private Map<String, RedirectionBasedGrantService> servicesMap =
-        new HashMap<String, RedirectionBasedGrantService>();
+        new HashMap<>();
 
     @Context
     public void setMessageContext(MessageContext context) {
@@ -50,15 +50,27 @@ public class AuthorizationService {
             service.setMessageContext(context);
         }
     }
+
     @GET
     @Produces({"application/xhtml+xml", "text/html", "application/xml", "application/json" })
     public Response authorize(@QueryParam(OAuthConstants.RESPONSE_TYPE) String responseType) {
         RedirectionBasedGrantService service = getService(responseType);
         if (service != null) {
             return service.authorize();
-        } else {
-            return reportInvalidResponseType();
         }
+        return reportInvalidResponseType();
+    }
+
+    @POST
+    @Consumes("application/x-www-form-urlencoded")
+    @Produces({"application/xhtml+xml", "text/html", "application/xml", "application/json" })
+    public Response authorizePost(MultivaluedMap<String, String> params) {
+        String responseType = params.getFirst(OAuthConstants.RESPONSE_TYPE);
+        RedirectionBasedGrantService service = getService(responseType);
+        if (service != null) {
+            return service.authorize();
+        }
+        return reportInvalidResponseType();
     }
 
     @GET
@@ -67,9 +79,8 @@ public class AuthorizationService {
         RedirectionBasedGrantService service = getService(responseType);
         if (service != null) {
             return service.authorizeDecision();
-        } else {
-            return reportInvalidResponseType();
         }
+        return reportInvalidResponseType();
     }
 
     /**
@@ -84,9 +95,8 @@ public class AuthorizationService {
         RedirectionBasedGrantService service = getService(responseType);
         if (service != null) {
             return service.authorizeDecisionForm(params);
-        } else {
-            return reportInvalidResponseType();
         }
+        return reportInvalidResponseType();
     }
 
     private RedirectionBasedGrantService getService(String responseType) {

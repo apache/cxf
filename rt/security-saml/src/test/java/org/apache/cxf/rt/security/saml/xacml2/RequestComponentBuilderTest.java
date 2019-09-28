@@ -29,6 +29,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.rt.security.saml.xacml.XACMLConstants;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.joda.time.DateTime;
@@ -40,11 +41,13 @@ import org.opensaml.xacml.ctx.RequestType;
 import org.opensaml.xacml.ctx.ResourceType;
 import org.opensaml.xacml.ctx.SubjectType;
 
+import static org.junit.Assert.assertNotNull;
+
 
 /**
  * Some unit tests to create a XACML Request using the RequestComponentBuilder.
  */
-public class RequestComponentBuilderTest extends org.junit.Assert {
+public class RequestComponentBuilderTest {
 
     private DocumentBuilder docBuilder;
     static {

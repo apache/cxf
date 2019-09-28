@@ -21,8 +21,11 @@ package org.apache.cxf.systest.jaxrs.sse.jetty;
 
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systest.jaxrs.sse.AbstractSseTest;
+
 import org.junit.BeforeClass;
 import org.junit.Ignore;
+
+import static org.junit.Assert.assertTrue;
 
 public class JettyWarTest extends AbstractSseTest {
     @Ignore
@@ -44,10 +47,5 @@ public class JettyWarTest extends AbstractSseTest {
     @Override
     protected int getPort() {
         return EmbeddedJettyServer.PORT;
-    }
-    
-    @Override
-    protected boolean isStrict() {
-        return false;
     }
 }

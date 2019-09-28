@@ -38,6 +38,7 @@ import org.apache.cxf.systest.jms.AbstractVmJMSTest;
 import org.apache.cxf.transport.common.gzip.GZIPFeature;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -106,7 +107,7 @@ public class SoapJmsSpecTest extends AbstractVmJMSTest {
         JMSMessageHeadersType responseHeader = (JMSMessageHeadersType)responseContext
             .get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
         Assert.assertEquals("1.0", responseHeader.getSOAPJMSBindingVersion());
-        Assert.assertEquals(null, responseHeader.getSOAPJMSSOAPAction());
+        Assert.assertEquals("\"test\"", responseHeader.getSOAPJMSSOAPAction());
         Assert.assertEquals(DeliveryMode.PERSISTENT, responseHeader.getJMSDeliveryMode());
         Assert.assertEquals(7, responseHeader.getJMSPriority());
     }

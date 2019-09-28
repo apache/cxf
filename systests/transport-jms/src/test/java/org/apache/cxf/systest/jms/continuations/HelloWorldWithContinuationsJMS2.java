@@ -42,8 +42,7 @@ import org.apache.cxf.continuations.ContinuationProvider;
             wsdlLocation = "org/apache/cxf/systest/jms/continuations/test.wsdl")
 public class HelloWorldWithContinuationsJMS2 implements HelloContinuation {
 
-    private Map<String, Continuation> suspended =
-        new HashMap<String, Continuation>();
+    private Map<String, Continuation> suspended = new HashMap<>();
     private Executor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
                                         new ArrayBlockingQueue<Runnable>(10));
 

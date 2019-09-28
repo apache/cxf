@@ -75,18 +75,23 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenRespons
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.dom.WSConstants;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Some unit tests for the issue operation to issue SAML tokens with Claims information.
  */
-public class JexlIssueSamlClaimsTest extends org.junit.Assert {
+public class JexlIssueSamlClaimsTest {
 
     public static final QName REQUESTED_SECURITY_TOKEN = QNameConstants.WS_TRUST_FACTORY
         .createRequestedSecurityToken(null).getName();
@@ -104,7 +109,7 @@ public class JexlIssueSamlClaimsTest extends org.junit.Assert {
         RequestSecurityTokenResponseCollectionType response =
             issueOperation.issue(request, principal, messageContext);
         List<RequestSecurityTokenResponseType> securityTokenResponse = response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
+        assertFalse(securityTokenResponse.isEmpty());
         return securityTokenResponse;
     }
 
@@ -206,22 +211,22 @@ public class JexlIssueSamlClaimsTest extends org.junit.Assert {
     private RequestSecurityTokenType createRequest(Map<String, RealmProperties> realms, Crypto crypto)
         throws WSSecurityException {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = new JAXBElement<String>(QNameConstants.TOKEN_TYPE, String.class,
-                                                                WSConstants.WSS_SAML2_TOKEN_TYPE);
+        JAXBElement<String> tokenType = new JAXBElement<>(QNameConstants.TOKEN_TYPE, String.class,
+                                                                WSS4JConstants.WSS_SAML2_TOKEN_TYPE);
         request.getAny().add(tokenType);
 
         // Add a ClaimsType
         ClaimsType claimsType = new ClaimsType();
         claimsType.setDialect(STSConstants.IDT_NS_05_05);
 
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element claimType = createClaimsType(doc, ClaimTypes.LASTNAME);
         claimsType.getAny().add(claimType);
 
         claimType = createClaimsType(doc, ROLE_CLAIM);
         claimsType.getAny().add(claimType);
 
-        JAXBElement<ClaimsType> claimsTypeJaxb = new JAXBElement<ClaimsType>(QNameConstants.CLAIMS, ClaimsType.class,
+        JAXBElement<ClaimsType> claimsTypeJaxb = new JAXBElement<>(QNameConstants.CLAIMS, ClaimsType.class,
                                                                              claimsType);
         request.getAny().add(claimsTypeJaxb);
 
@@ -229,7 +234,8 @@ public class JexlIssueSamlClaimsTest extends org.junit.Assert {
 
         // create a SAML Token via the SAMLTokenProvider which contains claims
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler,
+        Element samlToken = createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE,
+                                                crypto, "mystskey", callbackHandler,
                                                 realms);
         Document docToken = samlToken.getOwnerDocument();
         samlToken = (Element)docToken.appendChild(samlToken);
@@ -247,7 +253,7 @@ public class JexlIssueSamlClaimsTest extends org.junit.Assert {
         // add SAML token as On-Behalf-Of element
         OnBehalfOfType onbehalfof = new OnBehalfOfType();
         onbehalfof.setAny(samlToken);
-        JAXBElement<OnBehalfOfType> onbehalfofType = new JAXBElement<OnBehalfOfType>(QNameConstants.ON_BEHALF_OF,
+        JAXBElement<OnBehalfOfType> onbehalfofType = new JAXBElement<>(QNameConstants.ON_BEHALF_OF,
                                                                                      OnBehalfOfType.class, onbehalfof);
         request.getAny().add(onbehalfofType);
         return request;
@@ -294,7 +300,7 @@ public class JexlIssueSamlClaimsTest extends org.junit.Assert {
     private Element createClaimsType(Document doc, URI claimTypeURI) {
         Element claimType = doc.createElementNS(STSConstants.IDT_NS_05_05, "ClaimType");
         claimType.setAttributeNS(null, "Uri", claimTypeURI.toString());
-        claimType.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", STSConstants.IDT_NS_05_05);
+        claimType.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns", STSConstants.IDT_NS_05_05);
 
         return claimType;
     }
@@ -355,7 +361,7 @@ public class JexlIssueSamlClaimsTest extends org.junit.Assert {
         providerParameters.setRequestedSecondaryClaims(requestedClaims);
 
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         return (Element)providerResponse.getToken();

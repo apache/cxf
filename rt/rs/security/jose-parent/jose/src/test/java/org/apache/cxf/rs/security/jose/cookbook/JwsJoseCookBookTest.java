@@ -345,7 +345,7 @@ public class JwsJoseCookBookTest {
         + "0\""
         + "}"
         + "]"
-        + "}").replace(" ", "");;
+        + "}").replace(" ", "");
     @Test
     public void testEncodedPayload() throws Exception {
         assertEquals(Base64UrlUtility.encode(PAYLOAD), ENCODED_PAYLOAD);
@@ -506,6 +506,7 @@ public class JwsJoseCookBookTest {
         jsonConsumer = new JwsJsonConsumer(jsonProducer.getJwsJsonSignedDocument());
         assertTrue(jsonConsumer.verifySignatureWith(key, SignatureAlgorithm.HS256));
     }
+    @SuppressWarnings("deprecation")
     @Test
     public void testDetachedHMACSignature() throws Exception {
         JwsCompactProducer compactProducer = new JwsCompactProducer(PAYLOAD, true);
@@ -540,6 +541,33 @@ public class JwsJoseCookBookTest {
         jsonProducer.signWith(JwsUtils.getSignatureProvider(key, SignatureAlgorithm.HS256), protectedHeader);
         assertEquals(jsonProducer.getJwsJsonSignedDocument(true), HMAC_DETACHED_JSON_FLATTENED_SERIALIZATION);
         jsonConsumer = new JwsJsonConsumer(jsonProducer.getJwsJsonSignedDocument(true), ENCODED_PAYLOAD);
+        assertTrue(jsonConsumer.verifySignatureWith(key, SignatureAlgorithm.HS256));
+    }
+    @Test
+    public void testDetachedHMACSignature2() throws Exception {
+        JsonWebKeys jwks = readKeySet("cookbookSecretSet.txt");
+        List<JsonWebKey> keys = jwks.getKeys();
+        JsonWebKey key = keys.get(0);
+        
+        JwsJsonProducer jsonProducer = new JwsJsonProducer(PAYLOAD, false, true);
+        assertEquals(jsonProducer.getPlainPayload(), PAYLOAD);
+        assertEquals(jsonProducer.getUnsignedEncodedPayload(), ENCODED_PAYLOAD);
+        JwsHeaders protectedHeader = new JwsHeaders();
+        protectedHeader.setSignatureAlgorithm(SignatureAlgorithm.HS256);
+        protectedHeader.setKeyId(HMAC_KID_VALUE);
+        
+        String jwsJsonCompleteSequence = 
+            jsonProducer.signWith(JwsUtils.getSignatureProvider(key, SignatureAlgorithm.HS256), protectedHeader);
+        assertEquals(jwsJsonCompleteSequence, HMAC_DETACHED_JSON_GENERAL_SERIALIZATION);
+        JwsJsonConsumer jsonConsumer =
+                new JwsJsonConsumer(jsonProducer.getJwsJsonSignedDocument(), ENCODED_PAYLOAD);
+        assertTrue(jsonConsumer.verifySignatureWith(key, SignatureAlgorithm.HS256));
+
+        jsonProducer = new JwsJsonProducer(PAYLOAD, true, true);
+        String jwsJsonFlattenedSequence = 
+            jsonProducer.signWith(JwsUtils.getSignatureProvider(key, SignatureAlgorithm.HS256), protectedHeader);
+        assertEquals(jwsJsonFlattenedSequence, HMAC_DETACHED_JSON_FLATTENED_SERIALIZATION);
+        jsonConsumer = new JwsJsonConsumer(jwsJsonFlattenedSequence, ENCODED_PAYLOAD);
         assertTrue(jsonConsumer.verifySignatureWith(key, SignatureAlgorithm.HS256));
     }
     @Test

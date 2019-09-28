@@ -23,15 +23,18 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.binding.corba.wsdl.Enum;
 import org.apache.cxf.binding.corba.wsdl.Enumerator;
-
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.TypeCode;
 
-public class CorbaEnumHandlerTest extends Assert {
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class CorbaEnumHandlerTest {
 
     private ORB orb;
 
@@ -72,7 +75,7 @@ public class CorbaEnumHandlerTest extends Assert {
         QName enumName = new QName("EnumType");
         QName enumIdlType =
             new QName(CorbaConstants.NU_WSDL_CORBA, "EnumType", CorbaConstants.NP_WSDL_CORBA);
-        String members[] = new String[3];
+        String[] members = new String[3];
         members[0] = enumerator0.getValue();
         members[1] = enumerator1.getValue();
         members[2] = enumerator2.getValue();
@@ -82,7 +85,7 @@ public class CorbaEnumHandlerTest extends Assert {
         assertNotNull(obj);
 
         obj.setValue(members[1]);
-        assertTrue(obj.getValue().equals(enumerator1.getValue()));
+        assertEquals(obj.getValue(), enumerator1.getValue());
 
         assertTrue(obj.getIndex() == 1);
     }

@@ -28,13 +28,16 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  *
  */
-public class LocalDestinationTest extends Assert {
+public class LocalDestinationTest {
 
     /**
      * Tests if the status code is available after closing the destination so that it can be logged.

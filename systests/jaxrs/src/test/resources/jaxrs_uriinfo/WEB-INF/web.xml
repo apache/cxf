@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 <!--
         Licensed to the Apache Software Foundation (ASF) under one
         or more contributor license agreements. See the NOTICE file
@@ -19,7 +18,17 @@
         under the License.
 -->
 <!-- START SNIPPET: webxml -->
-<web-app>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    version="3.0">
+  <filter> 
+    <filter-name>xforwarded</filter-name>
+    <filter-class>org.apache.cxf.systest.jaxrs.XForwardedServletFilter</filter-class> 
+  </filter> 
+  <filter-mapping> 
+    <filter-name>xforwarded</filter-name>
+    <url-pattern>/v1/*</url-pattern> 
+  </filter-mapping> 
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>WEB-INF/beans.xml</param-value>
@@ -33,8 +42,12 @@
         <servlet-name>CXFServlet</servlet-name>
         <display-name>CXF Servlet</display-name>
         <servlet-class>
-                        org.apache.cxf.transport.servlet.CXFServlet
-                </servlet-class>
+             org.apache.cxf.transport.servlet.CXFServlet
+        </servlet-class>
+        <init-param>
+            <param-name>use-x-forwarded-headers</param-name>
+            <param-value>true</param-value>
+        </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>

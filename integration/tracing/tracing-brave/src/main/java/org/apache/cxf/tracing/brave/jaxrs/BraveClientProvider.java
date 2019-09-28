@@ -26,12 +26,11 @@ import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.ext.Provider;
 
+import brave.Tracing;
+import brave.http.HttpTracing;
 import org.apache.cxf.tracing.brave.AbstractBraveClientProvider;
 import org.apache.cxf.tracing.brave.HttpClientSpanParser;
 import org.apache.cxf.tracing.brave.TraceScope;
-
-import brave.Tracing;
-import brave.http.HttpTracing;
 
 @Provider
 public class BraveClientProvider extends AbstractBraveClientProvider

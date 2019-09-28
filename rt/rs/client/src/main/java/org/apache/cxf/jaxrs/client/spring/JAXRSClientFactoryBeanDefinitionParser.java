@@ -132,22 +132,21 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
                     if (classes.get(Path.class).size() > 1) {
                         throw new NoUniqueBeanDefinitionException(Path.class, classes.get(Path.class).size(),
                             "More than one service class (@Path) has been discovered");
-                    } else {
-                        AutowireCapableBeanFactory beanFactory = ctx.getAutowireCapableBeanFactory();
-                        for (final Class< ? > providerClass: classes.get(Provider.class)) {
-                            Object bean = null;
-                            try {
-                                bean = beanFactory.createBean(providerClass,
-                                                       AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
-                            } catch (Exception ex) {
-                                bean = beanFactory.createBean(providerClass);
-                            }
-                            setProvider(bean);
+                    }
+                    AutowireCapableBeanFactory beanFactory = ctx.getAutowireCapableBeanFactory();
+                    for (final Class< ? > providerClass: classes.get(Provider.class)) {
+                        Object bean = null;
+                        try {
+                            bean = beanFactory.createBean(providerClass,
+                                                   AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
+                        } catch (Exception ex) {
+                            bean = beanFactory.createBean(providerClass);
                         }
+                        setProvider(bean);
+                    }
 
-                        for (final Class< ? > serviceClass: classes.get(Path.class)) {
-                            setServiceClass(serviceClass);
-                        }
+                    for (final Class< ? > serviceClass: classes.get(Path.class)) {
+                        setServiceClass(serviceClass);
                     }
                 }
             } catch (IOException ex) {
@@ -171,7 +170,7 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
         return rootClasses.iterator().next();
     }
     static List<Object> getProviders(ApplicationContext context, Collection<Class<?>> providerClasses) {
-        List<Object> providers = new LinkedList<Object>();
+        List<Object> providers = new LinkedList<>();
         AutowireCapableBeanFactory beanFactory = context.getAutowireCapableBeanFactory();
         for (final Class< ? > providerClass: providerClasses) {
             Object bean = null;

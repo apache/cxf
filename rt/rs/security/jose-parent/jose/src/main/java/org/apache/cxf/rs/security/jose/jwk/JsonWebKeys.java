@@ -46,18 +46,16 @@ public class JsonWebKeys extends JsonMapObject {
             Object first = list.get(0);
             if (first instanceof JsonWebKey) {
                 return CastUtils.cast(list);
-            } else {
-                List<JsonWebKey> keys = new LinkedList<JsonWebKey>();
-                List<Map<String, Object>> listOfMaps =
-                    CastUtils.cast((List<?>)super.getProperty(KEYS_PROPERTY));
-                for (Map<String, Object> map : listOfMaps) {
-                    keys.add(new JsonWebKey(map));
-                }
-                return keys;
             }
-        } else {
-            return null;
+            List<JsonWebKey> keys = new LinkedList<>();
+            List<Map<String, Object>> listOfMaps =
+                CastUtils.cast((List<?>)super.getProperty(KEYS_PROPERTY));
+            for (Map<String, Object> map : listOfMaps) {
+                keys.add(new JsonWebKey(map));
+            }
+            return keys;
         }
+        return null;
     }
     public final void setKey(JsonWebKey key) {
         setKeys(Collections.singletonList(key));
@@ -71,7 +69,7 @@ public class JsonWebKeys extends JsonMapObject {
         if (keys == null) {
             return Collections.emptyMap();
         }
-        Map<String, JsonWebKey> map = new LinkedHashMap<String, JsonWebKey>();
+        Map<String, JsonWebKey> map = new LinkedHashMap<>();
         for (JsonWebKey key : keys) {
             String kid = key.getKeyId();
             if (kid != null) {
@@ -88,13 +86,13 @@ public class JsonWebKeys extends JsonMapObject {
         if (keys == null) {
             return Collections.emptyMap();
         }
-        Map<KeyType, List<JsonWebKey>> map = new LinkedHashMap<KeyType, List<JsonWebKey>>();
+        Map<KeyType, List<JsonWebKey>> map = new LinkedHashMap<>();
         for (JsonWebKey key : keys) {
             KeyType type = key.getKeyType();
             if (type != null) {
                 List<JsonWebKey> list = map.get(type);
                 if (list == null) {
-                    list = new LinkedList<JsonWebKey>();
+                    list = new LinkedList<>();
                     map.put(type, list);
                 }
                 list.add(key);
@@ -108,14 +106,14 @@ public class JsonWebKeys extends JsonMapObject {
         if (keys == null) {
             return Collections.emptyMap();
         }
-        Map<KeyOperation, List<JsonWebKey>> map = new LinkedHashMap<KeyOperation, List<JsonWebKey>>();
+        Map<KeyOperation, List<JsonWebKey>> map = new LinkedHashMap<>();
         for (JsonWebKey key : keys) {
             List<KeyOperation> ops = key.getKeyOperation();
             if (ops != null) {
                 for (KeyOperation op : ops) {
                     List<JsonWebKey> list = map.get(op);
                     if (list == null) {
-                        list = new LinkedList<JsonWebKey>();
+                        list = new LinkedList<>();
                         map.put(op, list);
                     }
                     list.add(key);

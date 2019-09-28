@@ -18,11 +18,11 @@
  */
 package org.apache.cxf.systest.jaxws;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 
 import javax.annotation.Resource;
 import javax.jws.WebService;
@@ -44,7 +44,7 @@ import org.apache.cxf.systest.jaxws.types.BarImpl;
 @GZIP(threshold = 10)
 @FastInfoset(force = true)
 public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirstService {
-    public static final String DATA[] = new String[] {"string1", "string2", "string3"};
+    public static final String[] DATA = new String[] {"string1", "string2", "string3"};
 
     @Resource
     WebServiceContext context;
@@ -64,11 +64,11 @@ public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirst
         return DATA;
     }
 
-    public Vector<String> listOutput() {
+    public List<String> listOutput() {
         if (context == null) {
             throw new RuntimeException("No CONTEXT!!!");
         }
-        return new Vector<String>(Arrays.asList(DATA));
+        return new ArrayList<String>(Arrays.asList(DATA));
     }
 
     public String arrayInput(String[] inputs) {
@@ -218,7 +218,6 @@ public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirst
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -245,8 +244,8 @@ public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirst
     }
 
     public CXF2411Result<CXF2411SubClass> doCXF2411() {
-        CXF2411Result<CXF2411SubClass> ret = new CXF2411Result<CXF2411SubClass>();
-        CXF2411SubClass content[] = new CXF2411SubClass[1];
+        CXF2411Result<CXF2411SubClass> ret = new CXF2411Result<>();
+        CXF2411SubClass[] content = new CXF2411SubClass[1];
         content[0] = new CXF2411SubClass();
         ret.setContent(content);
         return ret;

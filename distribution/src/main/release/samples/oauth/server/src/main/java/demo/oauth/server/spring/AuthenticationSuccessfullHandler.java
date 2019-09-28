@@ -52,18 +52,18 @@ public class AuthenticationSuccessfullHandler extends SavedRequestAwareAuthentic
             return super.determineTargetUrl(request, response);
         }
 
-        StringBuilder url = new StringBuilder(confirmationUrl).append("?").append(OAuth.OAUTH_TOKEN).append("=")
-                .append(oauthToken).append("&").append(OAuthConstants.AUTHENTICITY_TOKEN)
-                .append("=")
+        StringBuilder url = new StringBuilder(confirmationUrl).append('?').append(OAuth.OAUTH_TOKEN).append("=")
+                .append(oauthToken).append('&').append(OAuthConstants.AUTHENTICITY_TOKEN)
+                .append('=')
                 .append(authToken);
 
         if (!StringUtils.isEmpty(decision)) {
-            url.append("&").append(OAuthConstants.AUTHORIZATION_DECISION_KEY).append("=")
+            url.append('&').append(OAuthConstants.AUTHORIZATION_DECISION_KEY).append("=")
                     .append(decision);
         }
 
         if (!StringUtils.isEmpty(xScope)) {
-            url.append("&").append(OAuthConstants.X_OAUTH_SCOPE).append("=").append(xScope);
+            url.append('&').append(OAuthConstants.X_OAUTH_SCOPE).append("=").append(xScope);
         }
 
         return url.toString();

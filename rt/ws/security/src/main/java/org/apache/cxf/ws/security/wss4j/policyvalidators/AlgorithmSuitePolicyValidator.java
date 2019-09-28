@@ -32,6 +32,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
@@ -82,7 +83,7 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
                 PolicyUtils.assertPolicy(parameters.getAssertionInfoMap(),
                                          new QName(algorithmSuite.getName().getNamespaceURI(),
                                                    algorithmSuite.getC14n().name()));
-            } else if (!valid && ai.isAsserted()) {
+            } else if (ai.isAsserted()) {
                 ai.setNotAsserted("Error in validating AlgorithmSuite policy");
             }
         }
@@ -116,8 +117,8 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
     ) {
         String signatureMethod =
             (String)result.get(WSSecurityEngineResult.TAG_SIGNATURE_METHOD);
-        if (!algorithmPolicy.getAsymmetricSignature().equals(signatureMethod)
-            && !algorithmPolicy.getSymmetricSignature().equals(signatureMethod)) {
+        if (!algorithmPolicy.getAlgorithmSuiteType().getAsymmetricSignature().equals(signatureMethod)
+            && !algorithmPolicy.getAlgorithmSuiteType().getSymmetricSignature().equals(signatureMethod)) {
             ai.setNotAsserted(
                 "The signature method does not match the requirement"
             );
@@ -167,11 +168,11 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
             }
             for (String transformAlgorithm : transformAlgorithms) {
                 if (!(algorithmPolicy.getC14n().getValue().equals(transformAlgorithm)
-                    || WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(transformAlgorithm)
+                    || WSS4JConstants.C14N_EXCL_OMIT_COMMENTS.equals(transformAlgorithm)
                     || STRTransform.TRANSFORM_URI.equals(transformAlgorithm)
                     || Transforms.TRANSFORM_ENVELOPED_SIGNATURE.equals(transformAlgorithm)
-                    || WSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(transformAlgorithm)
-                    || WSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(transformAlgorithm))) {
+                    || WSS4JConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(transformAlgorithm)
+                    || WSS4JConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(transformAlgorithm))) {
                     ai.setNotAsserted("The transform algorithms do not match the requirement");
                     return false;
                 }

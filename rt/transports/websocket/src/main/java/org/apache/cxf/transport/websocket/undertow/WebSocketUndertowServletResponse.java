@@ -53,7 +53,7 @@ public class WebSocketUndertowServletResponse implements HttpServletResponse {
 
     public WebSocketUndertowServletResponse(WebSocketChannel channel) {
         this.channel = channel;
-        this.responseHeaders = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
+        this.responseHeaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         this.outputStream = createOutputStream();
     }
 

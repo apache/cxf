@@ -117,8 +117,8 @@ public class RMManager {
     private SequenceIdentifierGenerator idGenerator;
     private RetransmissionQueue retransmissionQueue;
     private RedeliveryQueue redeliveryQueue;
-    private Map<Endpoint, RMEndpoint> reliableEndpoints = new ConcurrentHashMap<Endpoint, RMEndpoint>();
-    private AtomicReference<Timer> timer = new AtomicReference<Timer>();
+    private Map<Endpoint, RMEndpoint> reliableEndpoints = new ConcurrentHashMap<>();
+    private AtomicReference<Timer> timer = new AtomicReference<>();
     private RMConfiguration configuration;
     private SourcePolicyType sourcePolicy;
     private DestinationPolicyType destinationPolicy;
@@ -142,7 +142,7 @@ public class RMManager {
         }
         String id = RMUtils.getEndpointIdentifier(client.getEndpoint(), getBus());
         Collection<SourceSequence> sss = store.getSourceSequences(id/*, protocol*/);
-        if (null == sss || 0 == sss.size()) {
+        if (null == sss || sss.isEmpty()) {
             return;
         }
         LOG.log(Level.FINE, "Number of source sequences: {0}", sss.size());
@@ -559,7 +559,7 @@ public class RMManager {
 
         Collection<SourceSequence> sss = store.getSourceSequences(id);
         Collection<DestinationSequence> dss = store.getDestinationSequences(id);
-        if ((null == sss || 0 == sss.size()) && (null == dss || 0 == dss.size())) {
+        if ((null == sss || sss.isEmpty()) && (null == dss || dss.isEmpty())) {
             return;
         }
         LOG.log(Level.FINE, "Number of source sequences: {0}", sss.size());
@@ -586,7 +586,7 @@ public class RMManager {
     private void recoverSourceSequence(Endpoint endpoint, Conduit conduit, Source s,
                                        SourceSequence ss) {
         Collection<RMMessage> ms = store.getMessages(ss.getIdentifier(), true);
-        if (null == ms || 0 == ms.size()) {
+        if (null == ms || ms.isEmpty()) {
             store.removeSourceSequence(ss.getIdentifier());
             return;
         }
@@ -653,7 +653,7 @@ public class RMManager {
         d.addSequence(ds, false);
 
         Collection<RMMessage> ms = store.getMessages(ds.getIdentifier(), false);
-        if (null == ms || 0 == ms.size()) {
+        if (null == ms || ms.isEmpty()) {
             return;
         }
         LOG.log(Level.FINE, "Number of messages in sequence: {0}", ms.size());

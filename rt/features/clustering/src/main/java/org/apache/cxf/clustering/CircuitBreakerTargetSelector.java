@@ -116,8 +116,8 @@ public class CircuitBreakerTargetSelector extends FailoverTargetSelector {
             return c;
         }
         Exchange exchange = message.getExchange();
-        InvocationKey key = new InvocationKey(exchange);
-        InvocationContext invocation = inProgress.get(key);
+        String key = String.valueOf(System.identityHashCode(exchange));
+        InvocationContext invocation = getInvocationContext(key);
         if (invocation != null && !invocation.getContext().containsKey(IS_SELECTED)) {
             final String address = (String) message.get(Message.ENDPOINT_ADDRESS);
 
@@ -190,11 +190,6 @@ public class CircuitBreakerTargetSelector extends FailoverTargetSelector {
         }
 
         return failoverTarget;
-    }
-
-    @Override
-    public void prepare(Message message) {
-        super.prepare(message);
     }
 
     @Override

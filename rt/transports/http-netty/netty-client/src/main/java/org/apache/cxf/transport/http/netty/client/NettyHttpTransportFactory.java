@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,15 +40,13 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 public class NettyHttpTransportFactory extends AbstractTransportFactory implements ConduitInitiator {
 
-    public static final List<String> DEFAULT_NAMESPACES = Arrays
-        .asList("http://cxf.apache.org/transports/http/netty/client");
+    public static final List<String> DEFAULT_NAMESPACES = Collections.unmodifiableList(Arrays
+        .asList("http://cxf.apache.org/transports/http/netty/client"));
 
     /**
      * This constant holds the prefixes served by this factory.
      */
     private static final Set<String> URI_PREFIXES = new HashSet<>();
-
-
 
     static {
         URI_PREFIXES.add("netty://");

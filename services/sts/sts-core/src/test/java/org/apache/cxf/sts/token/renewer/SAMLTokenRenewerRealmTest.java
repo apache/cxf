@@ -55,18 +55,23 @@ import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.util.DateUtil;
-import org.apache.wss4j.dom.WSConstants;
+
 import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Some unit tests for renewing a SAML token in different realms.
  */
-public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
+public class SAMLTokenRenewerRealmTest {
 
     private static TokenStore tokenStore;
 
@@ -86,7 +91,7 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
 
         TokenProviderParameters providerParameters =
             createProviderParameters(
-                WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, crypto, "mystskey",
+                WSS4JConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, crypto, "mystskey",
                 callbackHandler
             );
 
@@ -109,10 +114,10 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
         // Validate the token
         TokenValidatorResponse validatorResponse =
             samlTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.EXPIRED);
-        assertTrue(validatorResponse.getTokenRealm().equals("A"));
+        assertEquals("A", validatorResponse.getTokenRealm());
 
         // Renew the Assertion
         TokenRenewerParameters renewerParameters = new TokenRenewerParameters();
@@ -134,8 +139,8 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
         assertTrue(samlTokenRenewer.canHandleToken(validatorResponse.getToken(), realm));
 
         TokenRenewerResponse renewerResponse = samlTokenRenewer.renewToken(renewerParameters);
-        assertTrue(renewerResponse != null);
-        assertTrue(renewerResponse.getToken() != null);
+        assertNotNull(renewerResponse);
+        assertNotNull(renewerResponse.getToken());
 
         // Now validate it again
         ReceivedToken validateTarget = new ReceivedToken(renewerResponse.getToken());
@@ -143,8 +148,8 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
         validatorParameters.setToken(validateTarget);
 
         validatorResponse = samlTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
     }
 
@@ -159,7 +164,7 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
 
         TokenProviderParameters providerParameters =
             createProviderParameters(
-                WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, crypto, "mystskey",
+                WSS4JConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, crypto, "mystskey",
                 callbackHandler
             );
 
@@ -182,10 +187,10 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
         // Validate the token
         TokenValidatorResponse validatorResponse =
             samlTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.EXPIRED);
-        assertTrue(validatorResponse.getTokenRealm().equals("B"));
+        assertEquals("B", validatorResponse.getTokenRealm());
 
         // Renew the Assertion
         TokenRenewerParameters renewerParameters = new TokenRenewerParameters();
@@ -207,8 +212,8 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
         assertTrue(samlTokenRenewer.canHandleToken(validatorResponse.getToken(), realm));
 
         TokenRenewerResponse renewerResponse = samlTokenRenewer.renewToken(renewerParameters);
-        assertTrue(renewerResponse != null);
-        assertTrue(renewerResponse.getToken() != null);
+        assertNotNull(renewerResponse);
+        assertNotNull(renewerResponse.getToken());
 
         // Now validate it again
         ReceivedToken validateTarget = new ReceivedToken(renewerResponse.getToken());
@@ -216,8 +221,8 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
         validatorParameters.setToken(validateTarget);
 
         validatorResponse = samlTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
     }
 
@@ -274,13 +279,13 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
 
         if (ttlMs != 0) {
             Lifetime lifetime = new Lifetime();
-            
+
             Instant creationTime = Instant.now();
             Instant expirationTime = creationTime.plusNanos(ttlMs * 1000000L);
 
             lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
             lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
-            
+
             providerParameters.getTokenRequirements().setLifetime(lifetime);
         }
 
@@ -289,7 +294,7 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
         ((SAMLTokenProvider)samlTokenProvider).setRealmMap(samlRealms);
 
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         return (Element)providerResponse.getToken();

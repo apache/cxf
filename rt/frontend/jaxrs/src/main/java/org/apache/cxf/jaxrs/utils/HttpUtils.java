@@ -26,11 +26,14 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -91,6 +94,11 @@ public final class HttpUtils {
     // there are more of such characters, ex, '*' but '*' is not affected by UrlEncode
     private static final String PATH_RESERVED_CHARACTERS = "=@/:!$&\'(),;~";
     private static final String QUERY_RESERVED_CHARACTERS = "?/,";
+    
+    private static final Set<String> KNOWN_HTTP_VERBS_WITH_NO_REQUEST_CONTENT =
+        new HashSet<>(Arrays.asList(new String[]{"GET", "HEAD", "OPTIONS", "TRACE"}));
+    private static final Set<String> KNOWN_HTTP_VERBS_WITH_NO_RESPONSE_CONTENT =
+        new HashSet<>(Arrays.asList(new String[]{"HEAD", "OPTIONS"}));
 
     private HttpUtils() {
     }
@@ -109,24 +117,29 @@ public final class HttpUtils {
 
     private static String componentEncode(String reservedChars, String value) {
 
-        StringBuilder buffer = new StringBuilder();
-        StringBuilder bufferToEncode = new StringBuilder();
-
-        for (int i = 0; i < value.length(); i++) {
+        StringBuilder buffer = null;
+        int length = value.length();
+        int startingIndex = 0;
+        for (int i = 0; i < length; i++) {
             char currentChar = value.charAt(i);
             if (reservedChars.indexOf(currentChar) != -1) {
-                if (bufferToEncode.length() > 0) {
-                    buffer.append(urlEncode(bufferToEncode.toString()));
-                    bufferToEncode.setLength(0);
+                if (buffer == null) {
+                    buffer = new StringBuilder(length + 8);
+                }
+                // If it is going to be an empty string nothing to encode.
+                if (i != startingIndex) {
+                    buffer.append(urlEncode(value.substring(startingIndex, i)));
                 }
                 buffer.append(currentChar);
-            } else {
-                bufferToEncode.append(currentChar);
+                startingIndex = i + 1;
             }
         }
 
-        if (bufferToEncode.length() > 0) {
-            buffer.append(urlEncode(bufferToEncode.toString()));
+        if (buffer == null) {
+            return urlEncode(value);
+        }
+        if (startingIndex < length) {
+            buffer.append(urlEncode(value.substring(startingIndex, length)));
         }
 
         return buffer.toString();
@@ -178,15 +191,21 @@ public final class HttpUtils {
             return encoded;
         }
         Matcher m = ENCODE_PATTERN.matcher(encoded);
-        StringBuilder sb = new StringBuilder();
+
+        if (!m.find()) {
+            return query ? HttpUtils.queryEncode(encoded) : HttpUtils.pathEncode(encoded);
+        }
+
+        int length = encoded.length();
+        StringBuilder sb = new StringBuilder(length + 8);
         int i = 0;
-        while (m.find()) {
+        do {
             String before = encoded.substring(i, m.start());
             sb.append(query ? HttpUtils.queryEncode(before) : HttpUtils.pathEncode(before));
             sb.append(m.group());
             i = m.end();
-        }
-        String tail = encoded.substring(i, encoded.length());
+        } while (m.find());
+        String tail = encoded.substring(i, length);
         sb.append(query ? HttpUtils.queryEncode(tail) : HttpUtils.pathEncode(tail));
         return sb.toString();
     }
@@ -300,9 +319,8 @@ public final class HttpUtils {
 
         if (locale == null) {
             return new Locale(language);
-        } else {
-            return new Locale(language, locale);
         }
+        return new Locale(language, locale);
 
     }
 
@@ -321,20 +339,19 @@ public final class HttpUtils {
     public static String getHeaderString(List<String> values) {
         if (values == null) {
             return null;
-        } else {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < values.size(); i++) {
-                String value = values.get(i);
-                if (StringUtils.isEmpty(value)) {
-                    continue;
-                }
-                sb.append(value);
-                if (i + 1 < values.size()) {
-                    sb.append(",");
-                }
-            }
-            return sb.toString();
         }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < values.size(); i++) {
+            String value = values.get(i);
+            if (StringUtils.isEmpty(value)) {
+                continue;
+            }
+            sb.append(value);
+            if (i + 1 < values.size()) {
+                sb.append(',');
+            }
+        }
+        return sb.toString();
     }
 
     public static boolean isDateRelatedHeader(String headerName) {
@@ -460,7 +477,7 @@ public final class HttpUtils {
             }
             return (path == null || path.length() == 0) ? "/" : path;
         } catch (URISyntaxException ex) {
-            return endpointAddress == null ? "/" : endpointAddress;
+            return endpointAddress;
         }
     }
 
@@ -510,7 +527,7 @@ public final class HttpUtils {
             ind = 0;
         }
         if (ind == 0) {
-            path = path.substring(ind + address.length());
+            path = path.substring(address.length());
         }
         if (addSlash && !path.startsWith("/")) {
             path = "/" + path;
@@ -627,7 +644,7 @@ public final class HttpUtils {
 
         // No, then just keep climbing up until we find a common base.
         URI relative = URI.create("");
-        while (!(uriRel.getPath().startsWith(commonBase.getPath())) && !(commonBase.getPath().equals("/"))) {
+        while (!(uriRel.getPath().startsWith(commonBase.getPath())) && !"/".equals(commonBase.getPath())) {
             commonBase = commonBase.resolve("../");
             relative = relative.resolve("../");
         }
@@ -675,5 +692,13 @@ public final class HttpUtils {
         }
 
         return clazz.cast(value);
+    }
+
+    public static boolean isMethodWithNoRequestContent(String method) {
+        return KNOWN_HTTP_VERBS_WITH_NO_REQUEST_CONTENT.contains(method);
+    }
+    
+    public static boolean isMethodWithNoResponseContent(String method) {
+        return KNOWN_HTTP_VERBS_WITH_NO_RESPONSE_CONTENT.contains(method);
     }
 }

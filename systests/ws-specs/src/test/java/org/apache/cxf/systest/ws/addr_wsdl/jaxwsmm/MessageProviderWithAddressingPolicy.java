@@ -40,8 +40,6 @@ import org.apache.cxf.common.logging.LogUtils;
     serviceName = "AsyncMessagingService",
     portName = "AsyncMessagingImplPort")
 @ServiceMode(value = Service.Mode.MESSAGE)
-//FIXME: When using "PAYLOAD" mode, it works; but when using "MESSAGE" mode, it breaks
-//@ServiceMode(value = Service.Mode.PAYLOAD)
 public class MessageProviderWithAddressingPolicy implements Provider<Source> {
 
     private static final Logger LOG = LogUtils.getLogger(WSDLAddrPolicyAttachmentJaxwsMMProviderTest.class);

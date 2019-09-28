@@ -37,7 +37,11 @@ import org.apache.cxf.aegis.namespaces.impl.NameServiceImpl;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.service.Service;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 /**
  * Test of the ability of the user to control prefixes by specifying them in a

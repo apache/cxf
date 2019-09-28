@@ -21,7 +21,11 @@ package org.apache.cxf.jca.cxf.handlers;
 
 import org.apache.cxf.jca.cxf.CXFInvocationHandler;
 import org.apache.cxf.jca.cxf.CXFManagedConnectionFactory;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
 
 public abstract class AbstractInvocationHandlerTest
     extends HandlerTestBase {
@@ -40,7 +44,7 @@ public abstract class AbstractInvocationHandlerTest
 
         handler.invoke(target, testMethod, args);
 
-        assertTrue("target object must not be called", !target.methodInvoked);
+        assertFalse("target object must not be called", target.methodInvoked);
     }
 
     @Test

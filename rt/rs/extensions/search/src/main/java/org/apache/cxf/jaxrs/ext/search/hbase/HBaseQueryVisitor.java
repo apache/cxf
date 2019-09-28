@@ -19,11 +19,12 @@
 package org.apache.cxf.jaxrs.ext.search.hbase;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
@@ -31,7 +32,7 @@ import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.visitor.AbstractSearchConditionVisitor;
 import org.apache.hadoop.hbase.filter.BinaryComparator;
 import org.apache.hadoop.hbase.filter.ByteArrayComparable;
-import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
+import org.apache.hadoop.hbase.filter.CompareFilter;
 import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.hbase.filter.RegexStringComparator;
@@ -39,7 +40,7 @@ import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 
 public class HBaseQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Filter> {
 
-    private Stack<List<Filter>> queryStack = new Stack<List<Filter>>();
+    private final Deque<List<Filter>> queryStack = new ArrayDeque<>();
     private String family;
     private Map<String, String> familyMap;
     public HBaseQueryVisitor(String family) {
@@ -84,32 +85,33 @@ public class HBaseQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Filt
         return queries.isEmpty() ? null : queries.get(0);
     }
 
+    @SuppressWarnings("deprecation")
     private Filter buildSimpleQuery(ConditionType ct, String name, Object value) {
         name = super.getRealPropertyName(name);
         validatePropertyValue(name, value);
         Class<?> clazz = getPrimitiveFieldClass(name, value.getClass());
-        CompareOp compareOp = null;
+        CompareFilter.CompareOp compareOp = null;
         boolean regexCompRequired = false;
         switch (ct) {
         case EQUALS:
-            compareOp = CompareOp.EQUAL;
+            compareOp = CompareFilter.CompareOp.EQUAL;
             regexCompRequired = String.class == clazz && value.toString().endsWith("*");
             break;
         case NOT_EQUALS:
-            compareOp = CompareOp.NOT_EQUAL;
+            compareOp = CompareFilter.CompareOp.NOT_EQUAL;
             regexCompRequired = String.class == clazz && value.toString().endsWith("*");
             break;
         case GREATER_THAN:
-            compareOp = CompareOp.GREATER;
+            compareOp = CompareFilter.CompareOp.GREATER;
             break;
         case GREATER_OR_EQUALS:
-            compareOp = CompareOp.GREATER_OR_EQUAL;
+            compareOp = CompareFilter.CompareOp.GREATER_OR_EQUAL;
             break;
         case LESS_THAN:
-            compareOp = CompareOp.LESS;
+            compareOp = CompareFilter.CompareOp.LESS;
             break;
         case LESS_OR_EQUALS:
-            compareOp = CompareOp.LESS_OR_EQUAL;
+            compareOp = CompareFilter.CompareOp.LESS_OR_EQUAL;
             break;
         default:
             break;

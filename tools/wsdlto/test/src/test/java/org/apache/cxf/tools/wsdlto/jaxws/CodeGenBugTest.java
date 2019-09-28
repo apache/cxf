@@ -41,7 +41,9 @@ import javax.xml.ws.WebServiceClient;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.tools.common.CommandInterfaceUtils;
 import org.apache.cxf.tools.common.ToolConstants;
+import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.util.AnnotationUtil;
 import org.apache.cxf.tools.wsdlto.AbstractCodeGenTest;
@@ -53,6 +55,13 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class CodeGenBugTest extends AbstractCodeGenTest {
 
@@ -133,11 +142,11 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
 
         WebService webServiceAnn = AnnotationUtil.getPrivClassAnnotation(clz, WebService.class);
         assertTrue("Impl class should note generate name property value in webService annotation",
-                   webServiceAnn.name().equals(""));
+                   webServiceAnn.name().isEmpty());
         assertFalse("Impl class should generate portName property value in webService annotation",
-                    webServiceAnn.portName().equals(""));
+                    webServiceAnn.portName().isEmpty());
         assertFalse("Impl class should generate serviceName property value in webService annotation",
-                    webServiceAnn.serviceName().equals(""));
+                    webServiceAnn.serviceName().isEmpty());
 
     }
 
@@ -242,6 +251,35 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
                                       "http://apache.org/Invoice", "-compile", "-classdir",
                                       output.getCanonicalPath() + "/classes",
                                       getLocation("/wsdl2java_wsdl/hello_world_exclude.wsdl")};
+        CommandInterfaceUtils.commandCommonMain();
+        WSDLToJava w2j = new WSDLToJava(args);
+        w2j.run(new ToolContext());
+
+        assertNotNull(output);
+        File com = new File(output, "com");
+        assertFalse("Generated file has been excluded", com.exists());
+        File iona = new File(com, "iona");
+        assertFalse("Generated file has been excluded", iona.exists());
+
+        File implFile = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/Greeter.java");
+        String str = FileUtils.getStringFromFile(implFile);
+        assertTrue(str.indexOf("com.iona.BareDocumentResponse") > 0);
+
+        File org = new File(output, "org");
+        File apache = new File(org, "apache");
+        File invoice = new File(apache, "Invoice");
+        assertFalse("Generated file has been excluded", invoice.exists());
+
+    }
+
+    @Test
+    public void testExcludeNSWithPackageNameViaMain() throws Exception {
+
+        String[] args = new String[] {"-d", output.getCanonicalPath(), "-nexclude",
+                                      "http://apache.org/test/types=com.iona", "-nexclude",
+                                      "http://apache.org/Invoice", "-compile", "-classdir",
+                                      output.getCanonicalPath() + "/classes",
+                                      getLocation("/wsdl2java_wsdl/hello_world_exclude.wsdl")};
         WSDLToJava.main(args);
 
         assertNotNull(output);
@@ -267,7 +305,9 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         String[] args = new String[] {"-d", output.getCanonicalPath(), "-nexclude",
                                       "http://apache.org/test/types",
                                       getLocation("/wsdl2java_wsdl/hello_world_exclude.wsdl")};
-        WSDLToJava.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        WSDLToJava w2j = new WSDLToJava(args);
+        w2j.run(new ToolContext());
 
         assertNotNull(output);
         File com = new File(output, "test");
@@ -281,7 +321,9 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
                                       output.getCanonicalPath() + "/classes", "-p", "org.cxf", "-p",
                                       "http://apache.org/hello_world_soap_http/types=org.apache.types",
                                       "-server", "-impl", getLocation("/wsdl2java_wsdl/hello_world.wsdl")};
-        WSDLToJava.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        WSDLToJava w2j = new WSDLToJava(args);
+        w2j.run(new ToolContext());
 
         Class<?> clz = classLoader.loadClass("org.cxf.Greeter");
         assertTrue("Generate " + clz.getName() + "error", clz.isInterface());
@@ -292,7 +334,9 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         String[] args = new String[] {"-dns", "false", "-d", output.getCanonicalPath(), "-noAddressBinding",
                                       getLocation("/wsdl2java_wsdl/basic_callback.wsdl")};
 
-        WSDLToJava.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        WSDLToJava w2j = new WSDLToJava(args);
+        w2j.run(new ToolContext());
 
         assertNotNull(output);
         File org = new File(output, "org");
@@ -315,7 +359,9 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         String[] args = new String[] {"-d", output.getCanonicalPath(), "-noAddressBinding",
                                       getLocation("/wsdl2java_wsdl/basic_callback.wsdl")};
 
-        WSDLToJava.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        WSDLToJava w2j = new WSDLToJava(args);
+        w2j.run(new ToolContext());
 
         assertNotNull(output);
         File org = new File(output, "org");
@@ -341,10 +387,12 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
                                           output.getCanonicalPath(), "-b",
                                           getLocation("/wsdl2java_wsdl/bug305924/binding2.xml"),
                                           getLocation("/wsdl2java_wsdl/bug305924/hello_world.wsdl")};
-            WSDLToJava.main(args);
+            CommandInterfaceUtils.commandCommonMain();
+            WSDLToJava w2j = new WSDLToJava(args);
+            w2j.run(new ToolContext());
         } catch (Exception e) {
-            fail("Error during wsdl2java: \n" + e.getMessage());
         }
+
         try {
             Class<?> clz = classLoader
                 .loadClass("org.apache.cxf.w2j.hello_world_soap_http.types.CreateProcess$MyProcess");
@@ -362,7 +410,9 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
                                           output.getCanonicalPath(), "-b",
                                           getLocation("/wsdl2java_wsdl/bug305924/binding1.xml"),
                                           getLocation("/wsdl2java_wsdl/bug305924/hello_world.wsdl")};
-            WSDLToJava.main(args);
+            CommandInterfaceUtils.commandCommonMain();
+            WSDLToJava w2j = new WSDLToJava(args);
+            w2j.run(new ToolContext());
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }
@@ -447,7 +497,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
 
     // CXF-492
     @Test
-    public void testDefatultNsMap() throws Exception {
+    public void testDefaultNsMap() throws Exception {
         env.put(ToolConstants.CFG_ALL, ToolConstants.CFG_ALL);
         env.put(ToolConstants.CFG_NO_ADDRESS_BINDING, ToolConstants.CFG_NO_ADDRESS_BINDING);
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/cxf492/locator.wsdl"));
@@ -466,7 +516,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
     }
 
     @Test
-    public void testDefatultNsMapExclude() throws Exception {
+    public void testDefaultNsMapExclude() throws Exception {
         env.put(ToolConstants.CFG_ALL, ToolConstants.CFG_ALL);
         env.put(ToolConstants.CFG_NEXCLUDE,
                 "http://www.w3.org/2005/08/addressing=org.apache.cxf.ws.addressing");
@@ -485,26 +535,24 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         assertFalse(orginal.exists());
     }
 
-    // @Ignore'd due to continually failing on Jenkins
     @Test
-    @org.junit.Ignore
     public void testHelloWorldExternalBindingFile() throws Exception {
         Server server = new Server(0);
-
-        ResourceHandler reshandler = new ResourceHandler();
-        reshandler.setResourceBase(getLocation("/wsdl2java_wsdl/"));
-        // this is the only handler we're supposed to need, so we don't need to
-        // 'add' it.
-        server.setHandler(reshandler);
-        server.start();
-        int port = ((NetworkConnector)server.getConnectors()[0]).getLocalPort();
-        env.put(ToolConstants.CFG_WSDLURL, "http://localhost:"
-            + port + "/hello_world.wsdl");
-        env.put(ToolConstants.CFG_BINDING, "http://localhost:"
-            + port + "/remote-hello_world_binding.xsd");
-        processor.setContext(env);
-        processor.execute();
         try {
+            ResourceHandler reshandler = new ResourceHandler();
+            reshandler.setResourceBase(getLocation("/wsdl2java_wsdl/"));
+            // this is the only handler we're supposed to need, so we don't need to
+            // 'add' it.
+            server.setHandler(reshandler);
+            server.start();
+            Thread.sleep(250); //give network connector a little time to spin up
+            int port = ((NetworkConnector)server.getConnectors()[0]).getLocalPort();
+            env.put(ToolConstants.CFG_WSDLURL, "http://localhost:"
+                + port + "/hello_world.wsdl");
+            env.put(ToolConstants.CFG_BINDING, "http://localhost:"
+                + port + "/remote-hello_world_binding.xsd");
+            processor.setContext(env);
+            processor.execute();
             reshandler.stop();
         } finally {
             server.stop();
@@ -518,7 +566,9 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         String[] args = new String[] {"-d", output.getCanonicalPath(), "-p", "org.cxf", "-noAddressBinding",
                                       getLocation("/wsdl2java_wsdl/basic_callback.wsdl")};
 
-        WSDLToJava.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        WSDLToJava w2j = new WSDLToJava(args);
+        w2j.run(new ToolContext());
 
         assertNotNull(output);
         File org = new File(output, "org");
@@ -548,7 +598,9 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
                                       getLocation("/wsdl2java_wsdl/hello-mime-binding.xml"),
                                       getLocation("/wsdl2java_wsdl/hello-mime.wsdl")};
 
-        WSDLToJava.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        WSDLToJava w2j = new WSDLToJava(args);
+        w2j.run(new ToolContext());
 
         String str1 = "SOAPBinding.ParameterStyle.BARE";
         String str2 = "javax.xml.ws.Holder";
@@ -760,19 +812,14 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
 
     @Test
     public void testParameterOrderDifferentNS() throws Exception {
-        try {
-            env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/bug978/bug.wsdl"));
-            processor.setContext(env);
-            processor.execute();
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/bug978/bug.wsdl"));
+        processor.setContext(env);
+        processor.execute();
 
-            String results = FileUtils.getStringFromFile(new File(output.getCanonicalPath(),
-                                                                  "org/tempuri/GreeterRPCLit.java"));
-            assertTrue(results.indexOf("@WebParam(partName  =  \"inInt\",  name  =  \"inInt\")") != -1);
-            assertTrue(results.indexOf("Style.RPC") != -1);
-
-        } catch (Exception e) {
-            fail("The cxf978.wsdl is a valid wsdl, should pass the test, caused by: " + e.getMessage());
-        }
+        String results = FileUtils.getStringFromFile(new File(output,
+                                                              "org/tempuri/GreeterRPCLit.java"));
+        assertTrue(results.indexOf("@WebParam(partName  =  \"inInt\",  name  =  \"inInt\")") != -1);
+        assertTrue(results.indexOf("Style.RPC") != -1);
     }
 
     @Test
@@ -884,7 +931,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
 
         boolean existSayHiAsyn = false;
         for (Method m : methods) {
-            if (m.getName().equals("sayHiAsyn")) {
+            if ("sayHiAsyn".equals(m.getName())) {
                 existSayHiAsyn = true;
             }
         }
@@ -1064,7 +1111,9 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
                                       getLocation("/wsdl2java_wsdl/cxf1662/test.wsdl")};
 
         try {
-            WSDLToJava.main(args);
+            CommandInterfaceUtils.commandCommonMain();
+            WSDLToJava w2j = new WSDLToJava(args);
+            w2j.run(new ToolContext());
         } catch (ToolException tex) {
             assertTrue(tex.getMessage().contains(" -p option cannot be used when "
                                                      + "wsdl contains mutiple schemas"));
@@ -1073,7 +1122,9 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         String[] args2 = new String[] {"-d", output.getCanonicalPath(), "-p", "org.cxf",
                                        getLocation("/wsdl2java_wsdl/cxf1662/test2.wsdl")};
         try {
-            WSDLToJava.main(args2);
+            CommandInterfaceUtils.commandCommonMain();
+            WSDLToJava w2j = new WSDLToJava(args2);
+            w2j.run(new ToolContext());
         } catch (ToolException tex) {
             assertNull(tex);
         }
@@ -1088,7 +1139,10 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
     public void testMultiXjcArgs() throws Exception {
         String[] args = new String[] {"-d", output.getCanonicalPath(), "-xjc-Xlocator", "-xjc-Xsync-methods",
                                       getLocation("/wsdl2java_wsdl/hello_world.wsdl")};
-        WSDLToJava.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        WSDLToJava w2j = new WSDLToJava(args);
+        w2j.run(new ToolContext());
+
         File file = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/types/SayHi.java");
 
         assertTrue(file.exists());
@@ -1102,7 +1156,9 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         String[] args = new String[] {"-d", output.getCanonicalPath(), "-impl", "-server", "-client",
                                       "-autoNameResolution",
                                       getLocation("/wsdl2java_wsdl/cxf1939/hello_world.wsdl")};
-        WSDLToJava.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        WSDLToJava w2j = new WSDLToJava(args);
+        w2j.run(new ToolContext());
 
         assertNotNull(output);
         assertTrue(new File(output, "org/apache/cxf/w2j/hello_world_soap_http/Soap_PortImpl.java").exists());
@@ -1118,7 +1174,9 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         String[] args = new String[] {"-d", output.getCanonicalPath(), "-impl", "-server", "-client", "-b",
                                       getLocation("/wsdl2java_wsdl/cxf3105/ws-binding.xml"),
                                       getLocation("/wsdl2java_wsdl/cxf3105/cxf3105.wsdl")};
-        WSDLToJava.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        WSDLToJava w2j = new WSDLToJava(args);
+        w2j.run(new ToolContext());
 
         assertNotNull(output);
         File f = new File(output, "org/apache/cxf/testcase/cxf3105/Login.java");
@@ -1132,7 +1190,9 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
     public void testOverloadWithAction() throws Exception {
         String[] args = new String[] {"-d", output.getCanonicalPath(),
                                       getLocation("/wsdl2java_wsdl/hello_world_overload.wsdl")};
-        WSDLToJava.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        WSDLToJava w2j = new WSDLToJava(args);
+        w2j.run(new ToolContext());
 
         assertNotNull(output);
         File f = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/SayHi.java");
@@ -1195,7 +1255,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
             fail("shouldn't get exception");
         }
     }
-    
+
     @Test
     public void testCXF5280() throws Exception {
         env.put(ToolConstants.CFG_ALL, "all");

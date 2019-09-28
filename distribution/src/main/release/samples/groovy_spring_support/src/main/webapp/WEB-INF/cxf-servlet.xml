@@ -18,17 +18,26 @@
         under the License.
 -->
 <!-- START SNIPPET: beans -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:simple="http://cxf.apache.org/simple" xmlns:lang="http://www.springframework.org/schema/lang" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang.xsd http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:simple="http://cxf.apache.org/simple"
+    xmlns:lang="http://www.springframework.org/schema/lang"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang.xsd http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd">
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
-    <lang:groovy id="helloworld" script-source="classpath:HelloWorld.groovy" scope="prototype">
-</lang:groovy>
-    <lang:groovy id="helloworldImpl" script-source="classpath:HelloWorldImpl.groovy" scope="prototype">
-</lang:groovy>
+    
+    <lang:groovy id="helloworld" script-source="classpath:HelloWorld.groovy" scope="prototype" />
+    
+    <lang:groovy id="helloworldImpl" script-source="classpath:HelloWorldImpl.groovy" scope="prototype" />
+    
     <simple:server serviceClass="demo.spring.HelloWorld" address="/HelloWorld">
         <simple:serviceBean>
             <ref bean="helloworldImpl"/>
         </simple:serviceBean>
+        <simple:features>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature" />
+        </simple:features>
     </simple:server>
+    
 </beans>
 <!-- END SNIPPET: beans -->

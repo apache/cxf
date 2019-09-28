@@ -81,14 +81,14 @@ public final class DateTypeCustomGenerator extends AbstractGenerator<File> {
             generator.setAttributes("datetype", dateType.getName());
 
             if (allowImports()) {
-                if (schemaFiles.size() == 0) {
+                if (schemaFiles.isEmpty()) {
                     return null;
                 }
                 generator.setAttributes("schemaFiles", schemaFiles);
             } else {
                 generator.setAttributes("wsdlName", wsdlName);
                 List<String> ns = getSchemaNamespaces();
-                if (ns.size() == 0) {
+                if (ns.isEmpty()) {
                     return null;
                 }
                 generator.setAttributes("targetNamespaces", ns);

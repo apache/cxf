@@ -23,11 +23,16 @@ import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 
 import org.apache.cxf.jaxrs.provider.atom.AtomFeedProvider;
+import org.apache.cxf.systests.cdi.base.BookStoreRequestFilter;
+import org.apache.cxf.systests.cdi.base.BookStoreResponseFilter;
 
 public class SampleFeature implements Feature {
     @Override
     public boolean configure(FeatureContext context) {
         context.register(AtomFeedProvider.class);
+        context.register(BookStoreRequestFilter.class);
+        context.register(BookStoreResponseFilter.class);
+        context.register(SampleNestedFeature.class);
         return false;
     }
 }

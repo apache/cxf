@@ -20,7 +20,9 @@
 package org.apache.cxf.ws.transfer.integration;
 
 import javax.xml.ws.BindingProvider;
+
 import org.w3c.dom.Element;
+
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.addressing.AddressingProperties;
@@ -37,6 +39,7 @@ import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.manager.MemoryResourceManager;
 import org.apache.cxf.ws.transfer.manager.ResourceManager;
 import org.apache.cxf.ws.transfer.resource.Resource;
+
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;

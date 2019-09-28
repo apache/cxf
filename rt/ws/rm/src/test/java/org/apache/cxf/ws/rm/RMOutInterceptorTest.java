@@ -32,14 +32,17 @@ import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.cxf.ws.rm.v200702.Identifier;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class RMOutInterceptorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class RMOutInterceptorTest {
 
     private IMocksControl control;
 
@@ -130,14 +133,14 @@ public class RMOutInterceptorTest extends Assert {
         EasyMock.expect(manager.getSequence((Identifier)EasyMock.isNull(), EasyMock.same(message),
                                         EasyMock.same(maps))).andReturn(sseq).anyTimes();
         EasyMock.expect(sseq.nextMessageNumber((Identifier)EasyMock.isNull(),
-            (Long)EasyMock.eq(0L), EasyMock.eq(false))).andReturn(new Long(10)).anyTimes();
+            (Long)EasyMock.eq(0L), EasyMock.eq(false))).andReturn(Long.valueOf(10)).anyTimes();
         EasyMock.expect(sseq.isLastMessage()).andReturn(false).anyTimes();
         interceptor.addAcknowledgements(EasyMock.same(destination), EasyMock.same(rmpsOut),
             (Identifier)EasyMock.isNull(), EasyMock.isA(AttributedURIType.class));
         EasyMock.expectLastCall();
         Identifier sid = control.createMock(Identifier.class);
         EasyMock.expect(sseq.getIdentifier()).andReturn(sid).anyTimes();
-        EasyMock.expect(sseq.getCurrentMessageNr()).andReturn(new Long(10)).anyTimes();
+        EasyMock.expect(sseq.getCurrentMessageNr()).andReturn(Long.valueOf(10)).anyTimes();
 
 
         control.replay();
@@ -160,7 +163,7 @@ public class RMOutInterceptorTest extends Assert {
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
         EasyMock.expect(exchange.getOutFaultMessage()).andReturn(null).anyTimes();
         control.replay();
-        assertTrue(!rmi.isRuntimeFault(message));
+        assertFalse(rmi.isRuntimeFault(message));
         control.verify();
     }
 

@@ -19,9 +19,9 @@
 package org.apache.cxf.sts.claims;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -169,14 +169,8 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
         this.groupNameScopedFilter = groupNameScopedFilter;
     }
 
-    public List<URI> getSupportedClaimTypes() {
-        List<URI> list = new ArrayList<>();
-        try {
-            list.add(new URI(this.groupURI));
-        } catch (URISyntaxException e) {
-            LOG.warning("Invalid groupURI '" + this.groupURI + "'");
-        }
-        return list;
+    public List<String> getSupportedClaimTypes() {
+        return Collections.singletonList(groupURI);
     }
 
     public ProcessedClaimCollection retrieveClaimValues(
@@ -243,7 +237,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
             LdapUtils.getAttributeOfEntries(ldap, this.groupBaseDn, this.getGroupObjectClass(),
                                             filters, "cn");
 
-        if (groups == null || groups.size() == 0) {
+        if (groups == null || groups.isEmpty()) {
             if (LOG.isLoggable(Level.INFO)) {
                 LOG.info("No groups found for user '" + user + "'");
             }
@@ -255,7 +249,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
         }
 
         String scope = null;
-        if (getAppliesToScopeMapping() != null && getAppliesToScopeMapping().size() > 0
+        if (getAppliesToScopeMapping() != null && !getAppliesToScopeMapping().isEmpty()
             && parameters.getAppliesToAddress() != null) {
             scope = getAppliesToScopeMapping().get(parameters.getAppliesToAddress());
             if (LOG.isLoggable(Level.FINE)) {
@@ -311,7 +305,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
         }
 
         LOG.info("Filtered groups: " + filteredGroups);
-        if (filteredGroups.size() == 0) {
+        if (filteredGroups.isEmpty()) {
             LOG.info("No matching groups found for user '" + principal + "'");
             return new ProcessedClaimCollection();
         }

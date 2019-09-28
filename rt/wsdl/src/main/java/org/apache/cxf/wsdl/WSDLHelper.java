@@ -19,7 +19,6 @@
 
 package org.apache.cxf.wsdl;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -33,8 +32,6 @@ import javax.wsdl.Operation;
 import javax.wsdl.Output;
 import javax.wsdl.Part;
 import javax.wsdl.PortType;
-import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.helpers.CastUtils;
@@ -123,10 +120,4 @@ public class WSDLHelper {
         return null;
     }
 
-    public Definition getDefinition(File wsdlFile) throws Exception {
-        WSDLFactory wsdlFactory = WSDLFactory.newInstance();
-        WSDLReader reader = wsdlFactory.newWSDLReader();
-        reader.setFeature("javax.wsdl.verbose", false);
-        return reader.readWSDL(wsdlFile.toURI().toURL().toString());
-    }
 }

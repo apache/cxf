@@ -112,7 +112,7 @@ public final class JAXBUtils {
      * @return file
      */
     public static File getPackageMappingSchemaBindingFile(String namespace, String pkgName) {
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element rootElement = doc.createElementNS(ToolConstants.SCHEMA_URI, "schema");
         rootElement.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns", ToolConstants.SCHEMA_URI);
         rootElement.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:jaxb", ToolConstants.NS_JAXB_BINDINGS);
@@ -128,21 +128,13 @@ public final class JAXBUtils {
         schemaBindings.appendChild(pkgElement);
         rootElement.appendChild(annoElement);
         File tmpFile = null;
-        OutputStream out = null;
         try {
             tmpFile = FileUtils.createTempFile("customzied", ".xsd");
-            out = Files.newOutputStream(tmpFile.toPath());
-            StaxUtils.writeTo(rootElement, out);
+            try (OutputStream out = Files.newOutputStream(tmpFile.toPath())) {
+                StaxUtils.writeTo(rootElement, out);
+            }
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
         }
         return tmpFile;
     }

@@ -81,7 +81,6 @@ public class SecurityHeaderCacheInterceptor implements PhaseInterceptor<SoapMess
                 }
 
             } catch (SOAPException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }

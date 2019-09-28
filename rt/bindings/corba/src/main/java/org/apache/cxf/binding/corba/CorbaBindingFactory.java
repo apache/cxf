@@ -111,7 +111,7 @@ public class CorbaBindingFactory extends AbstractWSDLBindingFactory
     }
 
     public Set<String> getUriPrefixes() {
-        Set<String> uriPrefixes = new java.util.HashSet<String>();
+        Set<String> uriPrefixes = new java.util.HashSet<>();
         uriPrefixes.add("IOR");
         uriPrefixes.add("ior");
         uriPrefixes.add("file");

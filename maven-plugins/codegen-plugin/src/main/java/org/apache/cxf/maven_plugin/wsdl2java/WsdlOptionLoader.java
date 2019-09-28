@@ -21,7 +21,6 @@ package org.apache.cxf.maven_plugin.wsdl2java;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -58,9 +57,8 @@ public final class WsdlOptionLoader {
         WsdlOption option = new WsdlOption();
         if (WsdlUtilities.fillWsdlOptionFromArtifact(option, artifact, outputDir)) {
             return option;
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**
@@ -76,8 +74,8 @@ public final class WsdlOptionLoader {
      * @throws MojoExecutionException
      */
     public static List<GenericWsdlOption> loadWsdlOptionsFromFiles(File wsdlBasedir,
-                                                                   String includes[],
-                                                                   String excludes[],
+                                                                   String[] includes,
+                                                                   String[] excludes,
                                                                    File defaultOutputDir)
         throws MojoExecutionException {
 
@@ -104,7 +102,7 @@ public final class WsdlOptionLoader {
     private static String[] readOptionsFromFile(File dir, String wsdlName) throws MojoExecutionException {
         String[] noOptions = new String[] {};
         List<File> files = FileUtils.getFiles(dir, wsdlName + WSDL_OPTIONS);
-        if (files.size() <= 0) {
+        if (files.isEmpty()) {
             return noOptions;
         }
         File optionsFile = files.iterator().next();
@@ -113,7 +111,7 @@ public final class WsdlOptionLoader {
         }
         try {
             List<String> lines = FileUtils.readLines(optionsFile);
-            if (lines.size() <= 0) {
+            if (lines.isEmpty()) {
                 return noOptions;
             }
             return lines.iterator().next().split(" ");
@@ -145,7 +143,7 @@ public final class WsdlOptionLoader {
 
         final String[] options = readOptionsFromFile(wsdl.getParentFile(), wsdlName);
         if (options.length > 0) {
-            wsdlOption.getExtraargs().addAll(Arrays.asList(options));
+            Collections.addAll(wsdlOption.getExtraargs(), options);
         }
 
         List<File> bindingFiles = FileUtils.getFiles(wsdl.getParentFile(), wsdlName + WSDL_BINDINGS);

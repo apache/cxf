@@ -35,6 +35,7 @@ import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.client.RxInvoker;
 import javax.ws.rs.client.SyncInvoker;
 import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.HttpHeaders;
@@ -45,6 +46,7 @@ import javax.ws.rs.ext.RuntimeDelegate;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.jaxrs.client.AbstractClient;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 
@@ -53,10 +55,13 @@ public class InvocationBuilderImpl implements Invocation.Builder {
 
     private WebClient webClient;
     private SyncInvoker sync;
+    private Configuration config;
 
-    public InvocationBuilderImpl(WebClient webClient) {
+    public InvocationBuilderImpl(WebClient webClient,
+                                 Configuration config) {
         this.webClient = webClient;
         this.sync = webClient.sync();
+        this.config = config;
     }
 
     public WebClient getWebClient() {
@@ -248,10 +253,13 @@ public class InvocationBuilderImpl implements Invocation.Builder {
 
     @Override
     public Builder headers(MultivaluedMap<String, Object> headers) {
-        RuntimeDelegate rd = HttpUtils.getOtherRuntimeDelegate();
-        for (Map.Entry<String, List<Object>> entry : headers.entrySet()) {
-            for (Object value : entry.getValue()) {
-                doSetHeader(rd, entry.getKey(), value);
+        webClient.removeAllHeaders();
+        if (headers != null) {
+            RuntimeDelegate rd = HttpUtils.getOtherRuntimeDelegate();
+            for (Map.Entry<String, List<Object>> entry : headers.entrySet()) {
+                for (Object value : entry.getValue()) {
+                    doSetHeader(rd, entry.getKey(), value);
+                }
             }
         }
         return this;
@@ -376,13 +384,17 @@ public class InvocationBuilderImpl implements Invocation.Builder {
 
     @Override
     public CompletionStageRxInvoker rx() {
-        return webClient.rx((ExecutorService)null);
+        return webClient.rx(getConfiguredExecutorService());
     }
 
     @SuppressWarnings("rawtypes")
     @Override
     public <T extends RxInvoker> T rx(Class<T> rxCls) {
-        return webClient.rx(rxCls, (ExecutorService)null);
+        return webClient.rx(rxCls, getConfiguredExecutorService());
+    }
+
+    private ExecutorService getConfiguredExecutorService() {
+        return (ExecutorService)config.getProperty(AbstractClient.EXECUTOR_SERVICE_PROPERTY);
     }
 
 }

@@ -19,6 +19,8 @@
 
 package org.apache.cxf.jaxrs.provider;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -28,16 +30,22 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 
 public class ProviderCache {
     private static final int MAX_PROVIDER_CACHE_SIZE =
-        Integer.getInteger("org.apache.cxf.jaxrs.max_provider_cache_size", 100);
+        AccessController.doPrivileged(new PrivilegedAction<Integer>() {
+            @Override
+            public Integer run() {
+                return SystemPropertyAction.getInteger("org.apache.cxf.jaxrs.max_provider_cache_size", 100);
+            } }).intValue();
+
     private final Map<String, List<ProviderInfo<MessageBodyReader<?>>>>
-        readerProviderCache = new ConcurrentHashMap<String, List<ProviderInfo<MessageBodyReader<?>>>>();
+        readerProviderCache = new ConcurrentHashMap<>();
 
     private final Map<String, List<ProviderInfo<MessageBodyWriter<?>>>>
-        writerProviderCache = new ConcurrentHashMap<String, List<ProviderInfo<MessageBodyWriter<?>>>>();
+        writerProviderCache = new ConcurrentHashMap<>();
 
     private boolean checkAllCandidates;
     public ProviderCache(boolean checkAllCandidates) {

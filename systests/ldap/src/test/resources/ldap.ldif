@@ -1,0 +1,114 @@
+dn: dc=example,dc=com
+dc: example
+objectClass: top
+objectClass: domain
+
+dn: ou=users,dc=example,dc=com
+objectClass: organizationalUnit
+objectClass: top
+ou: users
+
+dn: ou=other-users,dc=example,dc=com
+objectClass: organizationalUnit
+objectClass: top
+ou: other-users
+
+dn: ou=services,dc=example,dc=com
+objectClass: organizationalUnit
+objectClass: top
+ou: services
+
+dn: ou=groups,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
+
+dn: cn=employee,ou=groups,dc=example,dc=com
+objectClass: groupOfNames
+objectClass: top
+cn: employee
+member: cn=alice,ou=users,dc=example,dc=com
+member: cn=bob,ou=other-users,dc=example,dc=com
+description: This is an employee
+
+dn: cn=boss,ou=groups,dc=example,dc=com
+objectClass: groupOfNames
+objectClass: top
+cn: boss
+member: cn=alice,ou=users,dc=example,dc=com
+description: The boss
+
+dn: cn=manager,ou=groups,dc=example,dc=com
+objectClass: groupOfNames
+objectClass: top
+cn: manager
+businessCategory: widgets
+member: cn=bob,ou=other-users,dc=example,dc=com
+description: The boss
+
+# Web server identity/service principal.
+dn: cn=bob,ou=other-users,dc=example,dc=com
+objectclass: top
+objectclass: person
+objectclass: inetOrgPerson
+objectclass: organizationalPerson
+cn: bob
+sn: green
+uid: bob
+mail: bob@users.apache.org
+givenname: bob2
+userpassword: security
+
+# User / client principal.
+dn: cn=alice,ou=users,dc=example,dc=com
+objectclass: top
+objectclass: person
+objectclass: inetOrgPerson
+objectclass: organizationalPerson
+cn: alice
+sn: smith
+uid: alice
+mail: alice@users.apache.org
+givenname: alice2
+userpassword: security
+
+# Other principal.
+dn: cn=dave,ou=users,dc=example,dc=com
+objectclass: top
+objectclass: person
+objectclass: inetOrgPerson
+objectclass: organizationalPerson
+cn: dave
+sn: smith
+uid: dave
+mail: dave@users.apache.org
+givenname: dave2
+userpassword: security
+userCertificate:: MIIDFjCCAn+gAwIBAgIJAI3hLAppEXfSMA0GCSqGSIb3DQEBBQU
+ AMGYxCzAJBgNVBAYTAkRFMQ8wDQYDVQQIEwZCYXllcm4xDzANBgNVBAcTBk11bmljaDENMAsGA1
+ UEChMESG9tZTEVMBMGA1UECxMMQXBhY2hlIFdTUzRKMQ8wDQYDVQQDEwZXZXJuZXIwHhcNMDkwN
+ DI0MTAzMjQ2WhcNMTkwNDIyMTAzMjQ2WjBmMQswCQYDVQQGEwJERTEPMA0GA1UECBMGQmF5ZXJu
+ MQ8wDQYDVQQHEwZNdW5pY2gxDTALBgNVBAoTBEhvbWUxFTATBgNVBAsTDEFwYWNoZSBXU1M0SjE
+ PMA0GA1UEAxMGV2VybmVyMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDWyYLtAg1XlEGC5d
+ Cc4SP1Rg4SbEVLWvXBIZrAIG1MqDpjDFM7WlOdMudqmVFn6+z+PMPfuQdTET7+udhDty4ukhycu
+ Akiv80lie+6tbfWddR9i3gZt0YMTq2PvXOpKiBAjD7umjbzbGnSbXAWKAYLQO5Nzcjc9eYVWxNu
+ rUqJvwIDAQABo4HLMIHIMB0GA1UdDgQWBBRWF+/2a4tZ/iMZaN54wOFNZ33QZjCBmAYDVR0jBIG
+ QMIGNgBRWF+/2a4tZ/iMZaN54wOFNZ33QZqFqpGgwZjELMAkGA1UEBhMCREUxDzANBgNVBAgTBk
+ JheWVybjEPMA0GA1UEBxMGTXVuaWNoMQ0wCwYDVQQKEwRIb21lMRUwEwYDVQQLEwxBcGFjaGUgV
+ 1NTNEoxDzANBgNVBAMTBldlcm5lcoIJAI3hLAppEXfSMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcN
+ AQEFBQADgYEAYTuCjZSScbxzaWtItIL0Szh410aAisfB12MDWTGvxOL6YdqXtlwpA/miTK67KaE
+ Bnsb7PwnUGClKvGIoFYAtvgAyKclzsl4dl4pA8P2a4ofSKsdVKLyIIS7Vqgj0fmlc6lYJlhXIxU
+ Hz4tR1T97/ZU1uAr5KwXiEA7SYQzZkHZg=
+
+dn: uid=admin,dc=example,dc=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: system administrator
+sn: administrator
+displayName: Directory Superuser
+uid: admin
+userPassword:: e1NTSEF9c2UyV0ZiWHowL2RjSkVuTWgvOWNOZnIzUXU4YUg1R1gvM2E1OFE9P
+ Q==
+

@@ -36,18 +36,21 @@ import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.ws.security.sts.provider.model.secext.BinarySecurityTokenType;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
-import org.apache.wss4j.dom.WSConstants;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Some unit tests for validating an X.509 Token via the X509TokenValidator.
  */
-public class X509TokenValidatorTest extends org.junit.Assert {
+public class X509TokenValidatorTest {
 
     /**
      * Test a valid certificate
@@ -84,14 +87,14 @@ public class X509TokenValidatorTest extends org.junit.Assert {
         // This will fail as the encoding type is not set
         TokenValidatorResponse validatorResponse = null;
         validatorResponse = x509TokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
 
-        binarySecurityToken.setEncodingType(WSConstants.SOAPMESSAGE_NS + "#Base64Binary");
+        binarySecurityToken.setEncodingType(WSS4JConstants.SOAPMESSAGE_NS + "#Base64Binary");
 
         validatorResponse = x509TokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
 
         Principal principal = validatorResponse.getPrincipal();
@@ -122,7 +125,7 @@ public class X509TokenValidatorTest extends org.junit.Assert {
 
         binarySecurityToken.setValue(Base64.getMimeEncoder().encodeToString(certs[0].getEncoded()));
         binarySecurityToken.setValueType(X509TokenValidator.X509_V3_TYPE);
-        binarySecurityToken.setEncodingType(WSConstants.SOAPMESSAGE_NS + "#Base64Binary");
+        binarySecurityToken.setEncodingType(WSS4JConstants.SOAPMESSAGE_NS + "#Base64Binary");
 
         ReceivedToken validateTarget = new ReceivedToken(tokenType);
         tokenRequirements.setValidateTarget(validateTarget);
@@ -131,8 +134,8 @@ public class X509TokenValidatorTest extends org.junit.Assert {
         assertTrue(x509TokenValidator.canHandleToken(validateTarget));
 
         TokenValidatorResponse validatorResponse = x509TokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
     }
 

@@ -47,7 +47,7 @@ public abstract class AbstractSpringConfiguredAutoRewriteSoapAddressTest extends
 
     protected List<String> findAllServiceUrlsFromWsdl(String hostname, String port) throws Exception {
         Document wsdlDocument = retrieveWsdlDocument(hostname, port);
-        List<String> serviceUrls = new LinkedList<String>();
+        List<String> serviceUrls = new LinkedList<>();
         List<Element> serviceList = DOMUtils.findAllElementsByTagNameNS(wsdlDocument.getDocumentElement(),
                                                           "http://schemas.xmlsoap.org/wsdl/",
                                                           "service");

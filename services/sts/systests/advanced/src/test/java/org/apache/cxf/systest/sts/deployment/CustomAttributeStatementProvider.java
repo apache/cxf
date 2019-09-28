@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.systest.sts.deployment;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -29,10 +28,10 @@ import org.apache.cxf.sts.claims.ProcessedClaim;
 import org.apache.cxf.sts.claims.ProcessedClaimCollection;
 import org.apache.cxf.sts.token.provider.AttributeStatementProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
 import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.dom.WSConstants;
 
 public class CustomAttributeStatementProvider implements AttributeStatementProvider {
 
@@ -79,17 +78,17 @@ public class CustomAttributeStatementProvider implements AttributeStatementProvi
             ProcessedClaim claim = claimIterator.next();
             AttributeBean attributeBean = new AttributeBean();
 
-            URI claimType = claim.getClaimType();
-            if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
-                || WSConstants.SAML2_NS.equals(tokenType)) {
-                attributeBean.setQualifiedName(claimType.toString());
+            String claimType = claim.getClaimType();
+            if (WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+                || WSS4JConstants.SAML2_NS.equals(tokenType)) {
+                attributeBean.setQualifiedName(claimType);
                 attributeBean.setNameFormat(nameFormat);
             } else {
-                String uri = claimType.toString();
-                int lastSlash = uri.lastIndexOf("/");
+                String uri = claimType;
+                int lastSlash = uri.lastIndexOf('/');
                 if (lastSlash == (uri.length() - 1)) {
                     uri = uri.substring(0, lastSlash);
-                    lastSlash = uri.lastIndexOf("/");
+                    lastSlash = uri.lastIndexOf('/');
                 }
 
                 String namespace = uri.substring(0, lastSlash);

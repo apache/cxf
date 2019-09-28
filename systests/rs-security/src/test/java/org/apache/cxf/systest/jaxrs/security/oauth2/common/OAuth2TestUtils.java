@@ -19,7 +19,7 @@
 package org.apache.cxf.systest.jaxrs.security.oauth2.common;
 
 import java.time.Instant;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -45,6 +45,7 @@ import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
+
 import org.junit.Assert;
 
 /**
@@ -99,11 +100,21 @@ public final class OAuth2TestUtils {
         if (parameters.getRequest() != null) {
             client.query("request", parameters.getRequest());
         }
+        if (parameters.getCodeChallenge() != null) {
+            client.query("code_challenge", parameters.getCodeChallenge());
+        }
+        if (parameters.getCodeChallengeMethod() != null) {
+            client.query("code_challenge_method", parameters.getCodeChallengeMethod());
+        }
 
         client.path(parameters.getPath());
         Response response = client.get();
 
         OAuthAuthorizationData authzData = response.readEntity(OAuthAuthorizationData.class);
+        return getLocation(client, authzData, parameters.getState());
+    }
+
+    public static String getLocation(WebClient client, OAuthAuthorizationData authzData, String state) {
 
         // Now call "decision" to get the authorization code grant
         client.path("decision");
@@ -122,13 +133,16 @@ public final class OAuth2TestUtils {
         if (authzData.getState() != null) {
             form.param("state", authzData.getState());
         }
+        if (authzData.getClientCodeChallenge() != null) {
+            form.param("code_challenge", authzData.getClientCodeChallenge());
+        }
         form.param("response_type", authzData.getResponseType());
         form.param("oauthDecision", "allow");
 
-        response = client.post(form);
+        Response response = client.post(form);
         String location = response.getHeaderString("Location");
-        if (parameters.getState() != null) {
-            Assert.assertTrue(location.contains("state=" + parameters.getState()));
+        if (state != null) {
+            Assert.assertTrue(location.contains("state=" + state));
         }
 
         return location;
@@ -142,6 +156,14 @@ public final class OAuth2TestUtils {
                                                                         String code,
                                                                         String consumerId,
                                                                         String audience) {
+        return getAccessTokenWithAuthorizationCode(client, code, consumerId, audience, null);
+    }
+
+    public static ClientAccessToken getAccessTokenWithAuthorizationCode(WebClient client,
+                                                                        String code,
+                                                                        String consumerId,
+                                                                        String audience,
+                                                                        String codeVerifier) {
         client.type("application/x-www-form-urlencoded").accept("application/json");
         client.path("token");
 
@@ -152,22 +174,21 @@ public final class OAuth2TestUtils {
         if (audience != null) {
             form.param("audience", audience);
         }
+        if (codeVerifier != null) {
+            form.param("code_verifier", codeVerifier);
+        }
+        form.param("redirect_uri", "http://www.blah.apache.org");
         Response response = client.post(form);
 
         return response.readEntity(ClientAccessToken.class);
     }
 
     public static List<Object> setupProviders() {
-        List<Object> providers = new ArrayList<>();
-        JSONProvider<OAuthAuthorizationData> jsonP = new JSONProvider<OAuthAuthorizationData>();
+        JSONProvider<OAuthAuthorizationData> jsonP = new JSONProvider<>();
         jsonP.setNamespaceMap(Collections.singletonMap("http://org.apache.cxf.rs.security.oauth",
                                                        "ns2"));
-        providers.add(jsonP);
-        providers.add(new OAuthJSONProvider());
-        providers.add(new JsonWebKeysProvider());
-        providers.add(new JsonMapObjectProvider());
 
-        return providers;
+        return Arrays.asList(jsonP, new OAuthJSONProvider(), new JsonWebKeysProvider(), new JsonMapObjectProvider());
     }
 
     public static String createToken(String audRestr) throws WSSecurityException {
@@ -263,6 +284,8 @@ public final class OAuth2TestUtils {
         private String responseType;
         private String path;
         private String request;
+        private String codeChallenge;
+        private String codeChallengeMethod;
 
         public String getScope() {
             return scope;
@@ -305,6 +328,18 @@ public final class OAuth2TestUtils {
         }
         public void setRequest(String request) {
             this.request = request;
+        }
+        public String getCodeChallenge() {
+            return codeChallenge;
+        }
+        public void setCodeChallenge(String codeChallenge) {
+            this.codeChallenge = codeChallenge;
+        }
+        public String getCodeChallengeMethod() {
+            return codeChallengeMethod;
+        }
+        public void setCodeChallengeMethod(String codeChallengeMethod) {
+            this.codeChallengeMethod = codeChallengeMethod;
         }
     }
 }

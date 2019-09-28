@@ -44,13 +44,13 @@ import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
 import org.apache.cxf.ws.rm.persistence.jdbc.RMTxStore;
 import org.apache.cxf.ws.rmp.v200502.RMAssertion;
 
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
 
 /**
- * 
+ *
  */
 public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(WSRM12ServerCycleTest.class);
@@ -64,7 +64,7 @@ public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
         String port;
         String pfx;
         Endpoint ep;
-        public Server(String args[]) {
+        public Server(String[] args) {
             port = args[0];
             pfx = args[1];
         }
@@ -89,7 +89,7 @@ public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
             ep.stop();
             ep = null;
         }
-        public static void main(String args[]) {
+        public static void main(String[] args) {
             new Server(args).start();
         }
     }
@@ -102,17 +102,17 @@ public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
                    launchServer(Server.class, null, new String[] {PORT, "cxf7392"}, true));
 
     }
-    
-    private String getPrefix() { 
+
+    private String getPrefix() {
         return "cxf7392";
     }
-    
+
     public static RMFeature wsrm() {
         return wsrm(DEFAULT_BASE_RETRANSMISSION_INTERVAL, DEFAULT_ACKNOWLEDGEMENT_INTERVAL);
     }
 
     public static RMFeature wsrm(long brtxInterval, long ackInterval) {
-        RMAssertion.BaseRetransmissionInterval baseRetransmissionInterval 
+        RMAssertion.BaseRetransmissionInterval baseRetransmissionInterval
             = new RMAssertion.BaseRetransmissionInterval();
         baseRetransmissionInterval.setMilliseconds(Long.valueOf(brtxInterval));
         RMAssertion.AcknowledgementInterval acknowledgementInterval = new RMAssertion.AcknowledgementInterval();
@@ -155,7 +155,7 @@ public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
             System.clearProperty("javax.xml.transform.TransformerFactory");
         }
     }
-        
+
 
     public void runTest(String cfg, boolean faultOnRestart) throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -166,7 +166,7 @@ public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
         ConnectionHelper.setKeepAliveConnection(control, false, true);
         updateAddressPort(control, PORT);
 
-        Assert.assertTrue("Failed to start greeter", control.startGreeter(cfg));
+        assertTrue("Failed to start greeter", control.startGreeter(cfg));
 
         System.setProperty("db.name", getPrefix() + "-recovery");
         Bus greeterBus = new SpringBusFactory().createBus();
@@ -175,7 +175,7 @@ public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
 
         // avoid early client resends
         greeterBus.getExtension(RMManager.class).getConfiguration()
-            .setBaseRetransmissionInterval(new Long(60000));
+            .setBaseRetransmissionInterval(Long.valueOf(60000));
         GreeterService gs = new GreeterService();
         Greeter greeter = gs.getGreeterPort(new LoggingFeature(), new AddressingFeature(), wsrm());
         updateAddressPort(greeter, PORT);
@@ -186,11 +186,11 @@ public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
 
 
         control.stopGreeter(cfg);
-        
+
         //make sure greeter is down
         Thread.sleep(1000);
         control.startGreeter(cfg);
-        
+
         //CXF-7392
         if (faultOnRestart) {
             try {
@@ -203,7 +203,7 @@ public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
             // this should work as the sequence should be recovered on the server side
             greeter.greetMe("four");
         }
-        
+
 
         ((Closeable)greeter).close();
         greeterBus.shutdown(true);

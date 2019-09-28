@@ -99,10 +99,9 @@ public class BeanTypeInfo {
             if (!initialized) {
                 initializeSync();
             }
+        } catch (DatabindingException e) {
+            throw e;
         } catch (Exception e) {
-            if (e instanceof DatabindingException) {
-                throw (DatabindingException)e;
-            }
             throw new DatabindingException("Couldn't create TypeInfo.", e);
         }
     }
@@ -171,10 +170,9 @@ public class BeanTypeInfo {
             PropertyDescriptor desc;
             try {
                 desc = getPropertyDescriptorFromMappedName(name);
+            } catch (DatabindingException e) {
+                throw e;
             } catch (Exception e) {
-                if (e instanceof DatabindingException) {
-                    throw (DatabindingException)e;
-                }
                 throw new DatabindingException("Couldn't get properties.", e);
             }
 
@@ -237,9 +235,8 @@ public class BeanTypeInfo {
     protected QName createMappedName(PropertyDescriptor desc, boolean qualified) {
         if (qualified) {
             return new QName(getDefaultNamespace(), desc.getName());
-        } else {
-            return new QName(null, desc.getName());
         }
+        return new QName(null, desc.getName());
     }
 
     public void mapAttribute(String property, QName mappedName) {
@@ -310,7 +307,7 @@ public class BeanTypeInfo {
 
         getInterfacePropertyDescriptors(clazz, pds, new HashSet<Class<?>>());
 
-        return pds.toArray(new PropertyDescriptor[pds.size()]);
+        return pds.toArray(new PropertyDescriptor[0]);
     }
 
     private void getInterfacePropertyDescriptors(Class<?> clazz, List<PropertyDescriptor> pds,

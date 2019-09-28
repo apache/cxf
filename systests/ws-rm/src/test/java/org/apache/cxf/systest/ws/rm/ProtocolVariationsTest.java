@@ -62,6 +62,10 @@ import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Tests control of WS-RM protocol variations on the client, and of the server responses matching whichever
  * variation is used by the client.

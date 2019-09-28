@@ -19,13 +19,13 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import java.security.Provider;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.util.StreamReaderDelegate;
@@ -37,10 +37,12 @@ import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.rt.security.saml.utils.SAMLUtils;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
@@ -58,10 +60,9 @@ import org.apache.wss4j.stax.setup.InboundWSSec;
 import org.apache.wss4j.stax.setup.WSSec;
 import org.apache.wss4j.stax.validate.Validator;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.securityEvent.AbstractSecuredElementSecurityEvent;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
-import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
 public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
 
@@ -71,24 +72,27 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
 
     public WSS4JStaxInInterceptor(WSSSecurityProperties securityProperties) {
         super(securityProperties);
+        WSSec.init();
         setPhase(Phase.POST_STREAM);
         getAfter().add(StaxInInterceptor.class.getName());
     }
 
     public WSS4JStaxInInterceptor(Map<String, Object> props) {
         super(props);
+        WSSec.init();
         setPhase(Phase.POST_STREAM);
         getAfter().add(StaxInInterceptor.class.getName());
     }
 
     public WSS4JStaxInInterceptor() {
         super();
+        WSSec.init();
         setPhase(Phase.POST_STREAM);
         getAfter().add(StaxInInterceptor.class.getName());
     }
 
     public final boolean isGET(SoapMessage message) {
-        String method = (String)message.get(SoapMessage.HTTP_REQUEST_METHOD);
+        String method = (String)message.get(org.apache.cxf.message.Message.HTTP_REQUEST_METHOD);
         return "GET".equals(method) && message.getContent(XMLStreamReader.class) == null;
     }
 
@@ -188,10 +192,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         final SecurityEventListener securityEventListener = new SecurityEventListener() {
             @Override
             public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
-                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.TIMESTAMP
-                    || securityEvent.getSecurityEventType() == WSSecurityEventConstants.SignatureValue
-                    || securityEvent instanceof TokenSecurityEvent
-                    || securityEvent instanceof AbstractSecuredElementSecurityEvent) {
+                if (securityEvent.getSecurityEventType() != WSSecurityEventConstants.AlgorithmSuite) {
                     // Store events required for the security context setup, or the crypto coverage checker
                     incomingSecurityEventList.add(securityEvent);
                 }
@@ -232,7 +233,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         securityProperties.setSamlOneTimeUseReplayCache(samlCache);
 
         boolean enableRevocation =
-            MessageUtils.isTrue(SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENABLE_REVOCATION, msg));
+            PropertyUtils.isTrue(SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENABLE_REVOCATION, msg));
         securityProperties.setEnableRevocation(enableRevocation);
 
         // Crypto loading only applies for Map
@@ -275,27 +276,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         }
 
         // Add Audience Restrictions for SAML
-        configureAudienceRestriction(msg, securityProperties);
-    }
-
-    private void configureAudienceRestriction(SoapMessage msg, WSSSecurityProperties securityProperties) {
-        // Add Audience Restrictions for SAML
-        boolean enableAudienceRestriction = true;
-        String audRestrStr =
-            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.AUDIENCE_RESTRICTION_VALIDATION, msg);
-        if (audRestrStr != null) {
-            enableAudienceRestriction = Boolean.parseBoolean(audRestrStr);
-        }
-        if (enableAudienceRestriction) {
-            List<String> audiences = new ArrayList<>();
-            if (msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL) != null) {
-                audiences.add((String)msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL));
-            }
-            if (msg.getContextualProperty("javax.xml.ws.wsdl.service") != null) {
-                audiences.add(msg.getContextualProperty("javax.xml.ws.wsdl.service").toString());
-            }
-            securityProperties.setAudienceRestrictions(audiences);
-        }
+        securityProperties.setAudienceRestrictions(SAMLUtils.getAudienceRestrictions(msg, true));
     }
 
     /**
@@ -366,7 +347,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         }
         validator = loadValidator(SecurityConstants.SIGNATURE_TOKEN_VALIDATOR, message);
         if (validator != null) {
-            properties.addValidator(WSSConstants.TAG_dsig_Signature, validator);
+            properties.addValidator(XMLSecurityConstants.TAG_dsig_Signature, validator);
         }
         validator = loadValidator(SecurityConstants.TIMESTAMP_TOKEN_VALIDATOR, message);
         if (validator != null) {
@@ -433,9 +414,9 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             XMLStreamReader xmlReader = message.getContent(XMLStreamReader.class);
             try {
                 int i = xmlReader.getEventType();
-                while (i == XMLStreamReader.NAMESPACE
-                    || i == XMLStreamReader.ATTRIBUTE
-                    || i == XMLStreamReader.CHARACTERS) {
+                while (i == XMLStreamConstants.NAMESPACE
+                    || i == XMLStreamConstants.ATTRIBUTE
+                    || i == XMLStreamConstants.CHARACTERS) {
                     i = xmlReader.next();
                 }
             } catch (XMLStreamException e) {

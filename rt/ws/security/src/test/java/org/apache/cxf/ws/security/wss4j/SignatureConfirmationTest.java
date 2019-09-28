@@ -22,23 +22,23 @@ import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.soap.SOAPMessage;
-import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Document;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.helpers.DOMUtils.NullResolver;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * This a test of the Signature Confirmation functionality that is contained in the
@@ -62,10 +62,10 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
 
         SoapMessage msg = getSoapMessageForDom(doc);
 
-        msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        msg.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
-        msg.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
-        msg.put(WSHandlerConstants.USER, "myalias");
+        msg.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        msg.put(ConfigurationConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
+        msg.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        msg.put(ConfigurationConstants.USER, "myalias");
         msg.put("password", "myAliasPassword");
         //
         // This is necessary to convince the WSS4JOutInterceptor that we're
@@ -81,26 +81,15 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         assertValid("//wsse:Security", doc);
         assertValid("//wsse:Security/ds:Signature", doc);
 
-        byte[] docbytes = getMessageBytes(doc);
         //
         // Save the signature for future confirmation
         //
         Set<Integer> sigv = CastUtils.cast((Set<?>)msg.get(WSHandlerConstants.SEND_SIGV));
         assertNotNull(sigv);
-        assertTrue(sigv.size() != 0);
+        assertFalse(sigv.isEmpty());
 
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
-
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
-        dbf.setValidating(false);
-        dbf.setIgnoringComments(false);
-        dbf.setIgnoringElementContentWhitespace(true);
-        dbf.setNamespaceAware(true);
-
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        db.setEntityResolver(new NullResolver());
-        doc = StaxUtils.read(db, reader, false);
+        byte[] docbytes = getMessageBytes(doc);
+        doc = StaxUtils.read(new ByteArrayInputStream(docbytes));
 
         WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
 
@@ -109,9 +98,9 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         ex.setInMessage(inmsg);
         inmsg.setContent(SOAPMessage.class, saajMsg);
 
-        inHandler.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inHandler.setProperty(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
-        inHandler.setProperty(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
+        inHandler.setProperty(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        inHandler.setProperty(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inHandler.setProperty(ConfigurationConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
 
         inHandler.handleMessage(inmsg);
 
@@ -121,7 +110,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         List<WSHandlerResult> sigReceived =
             CastUtils.cast((List<?>)inmsg.get(WSHandlerConstants.RECV_RESULTS));
         assertNotNull(sigReceived);
-        assertTrue(sigReceived.size() != 0);
+        assertFalse(sigReceived.isEmpty());
 
         testSignatureConfirmationResponse(sigv, sigReceived);
     }
@@ -138,7 +127,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
 
         SoapMessage msg = getSoapMessageForDom(doc);
 
-        msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.TIMESTAMP);
+        msg.put(ConfigurationConstants.ACTION, ConfigurationConstants.TIMESTAMP);
         msg.put(WSHandlerConstants.RECV_RESULTS, sigReceived);
 
         handler.handleMessage(msg);
@@ -150,20 +139,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         // assertValid("//wsse:Security/wsse11:SignatureConfirmation", doc);
 
         byte[] docbytes = getMessageBytes(doc);
-        // System.out.println(new String(docbytes));
-
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
-
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
-        dbf.setValidating(false);
-        dbf.setIgnoringComments(false);
-        dbf.setIgnoringElementContentWhitespace(true);
-        dbf.setNamespaceAware(true);
-
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        db.setEntityResolver(new NullResolver());
-        doc = StaxUtils.read(db, reader, false);
+        doc = StaxUtils.read(new ByteArrayInputStream(docbytes));
 
         WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
 
@@ -172,7 +148,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         ex.setInMessage(inmsg);
         inmsg.setContent(SOAPMessage.class, saajMsg);
 
-        inHandler.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.TIMESTAMP);
+        inHandler.setProperty(ConfigurationConstants.ACTION, ConfigurationConstants.TIMESTAMP);
         inmsg.put(WSHandlerConstants.SEND_SIGV, sigSaved);
 
         inHandler.handleMessage(inmsg);

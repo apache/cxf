@@ -48,7 +48,7 @@ public class BookContinuationStore implements BookAsyncInterface {
 
     private Map<String, String> books = new HashMap<>();
     private Executor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
-                                        new ArrayBlockingQueue<Runnable>(10));
+                                        new ArrayBlockingQueue<>(10));
 
     public BookContinuationStore() {
         init();

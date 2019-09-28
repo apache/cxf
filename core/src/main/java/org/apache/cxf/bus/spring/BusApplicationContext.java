@@ -233,7 +233,7 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
             LOG.fine("Creating application context with resources: " + resources);
         }
 
-        if (0 == resources.size()) {
+        if (resources.isEmpty()) {
             return null;
         }
         Resource[] res = new Resource[resources.size()];

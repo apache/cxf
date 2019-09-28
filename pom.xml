@@ -21,17 +21,17 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf</artifactId>
-    <version>3.2.0-SNAPSHOT</version>
+    <version>3.4.0-SNAPSHOT</version>
     <name>Apache CXF</name>
     <description>Apache CXF is an open-source services framework that aids in 
     the development of services using front-end programming APIs, like JAX-WS 
     and JAX-RS.</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <packaging>pom</packaging>
     <scm>
-        <connection>scm:git:http://git-wip-us.apache.org/repos/asf/cxf.git</connection>
-        <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/cxf.git</developerConnection>
-        <url>https://git-wip-us.apache.org/repos/asf?p=cxf.git;a=summary</url>
+        <connection>scm:git:https://gitbox.apache.org/repos/asf/cxf.git</connection>
+        <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/cxf.git</developerConnection>
+        <url>https://gitbox.apache.org/repos/asf?p=cxf.git;a=summary</url>
         <tag>HEAD</tag>
     </scm>
     <issueManagement>
@@ -40,11 +40,12 @@
     </issueManagement>
     <properties>
         <cxf.compiler.fork>false</cxf.compiler.fork>
-        <cxf.build-utils.version>3.2.2-SNAPSHOT</cxf.build-utils.version>
-        <cxf.xjc-utils.version>3.1.0</cxf.xjc-utils.version>
+        <cxf.build-utils.version>3.4.3</cxf.build-utils.version>
+        <cxf.xjc-utils.version>3.3.0</cxf.xjc-utils.version>
         <cxf.jdk.version>1.8</cxf.jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <site.deploy.url>scp://people.apache.org/www/cxf.apache.org/maven-site</site.deploy.url>
+        <maven-owasp-plugin-version>4.0.2</maven-owasp-plugin-version>
     </properties>
     <distributionManagement>
         <repository>
@@ -95,46 +96,46 @@
             <subscribe>users-subscribe@cxf.apache.org</subscribe>
             <unsubscribe>users-unsubscribe@cxf.apache.org</unsubscribe>
             <post>users@cxf.apache.org</post>
-            <archive>http://mail-archives.apache.org/mod_mbox/cxf-users</archive>
+            <archive>https://mail-archives.apache.org/mod_mbox/cxf-users</archive>
         </mailingList>
         <mailingList>
             <name>Apache CXF Developer List</name>
             <subscribe>dev-subscribe@cxf.apache.org</subscribe>
             <unsubscribe>dev-unsubscribe@cxf.apache.org</unsubscribe>
             <post>dev@cxf.apache.org</post>
-            <archive>http://mail-archives.apache.org/mod_mbox/cxf-dev</archive>
+            <archive>https://mail-archives.apache.org/mod_mbox/cxf-dev</archive>
         </mailingList>
         <mailingList>
             <name>Apache CXF Commits List</name>
             <subscribe>commits-subscribe@cxf.apache.org</subscribe>
             <unsubscribe>commits-unsubscribe@cxf.apache.org</unsubscribe>
             <post>commits@cxf.apache.org</post>
-            <archive>http://mail-archives.apache.org/mod_mbox/cxf-commits</archive>
+            <archive>https://mail-archives.apache.org/mod_mbox/cxf-commits</archive>
         </mailingList>
         <mailingList>
             <name>Apache CXF Issues List</name>
             <subscribe>issues-subscribe@cxf.apache.org</subscribe>
             <unsubscribe>issues-unsubscribe@cxf.apache.org</unsubscribe>
             <post>issues@cxf.apache.org</post>
-            <archive>http://mail-archives.apache.org/mod_mbox/cxf-issues</archive>
+            <archive>https://mail-archives.apache.org/mod_mbox/cxf-issues</archive>
         </mailingList>
         <mailingList>
             <name>Apache CXF Build Notifications List</name>
             <subscribe>notifications-subscribe@cxf.apache.org</subscribe>
             <unsubscribe>notifications-unsubscribe@cxf.apache.org</unsubscribe>
             <post>notifications@cxf.apache.org</post>
-            <archive>http://mail-archives.apache.org/mod_mbox/cxf-notifications</archive>
+            <archive>https://mail-archives.apache.org/mod_mbox/cxf-notifications</archive>
         </mailingList>
     </mailingLists>
     <developers>
         <developer>
             <name>The Apache CXF Team</name>
             <email>dev@cxf.apache.org</email>
-            <url>http://cxf.apache.org</url>
+            <url>https://cxf.apache.org</url>
             <organization>Apache Software Foundation</organization>
-            <organizationUrl>http://apache.org/</organizationUrl>
+            <organizationUrl>https://apache.org/</organizationUrl>
             <properties>
-                <picUrl>http://cxf.apache.org/images/cxf.png</picUrl>
+                <picUrl>https://cxf.apache.org/images/cxf.png</picUrl>
             </properties>
         </developer>
     </developers>
@@ -152,14 +153,14 @@
     </ciManagement>
     <licenses>
         <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
     <organization>
         <name>The Apache Software Foundation</name>
-        <url>http://www.apache.org/</url>
+        <url>https://www.apache.org/</url>
     </organization>
     <modules>
         <module>parent</module>
@@ -214,7 +215,7 @@
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-compiler-plugin</artifactId>
-                            <version>3.6.1</version>
+                            <version>3.8.1</version>
                             <configuration>
                                 <source>${cxf.jdk.version}</source>
                                 <target>${cxf.jdk.version}</target>
@@ -362,6 +363,11 @@
                                 </goals>
                             </execution>
                         </executions>
+                        <configuration>
+                            <gpgArguments>
+                                <arg>--digest-algo=SHA512</arg>
+                            </gpgArguments>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
@@ -401,6 +407,17 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>dependencycheck</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.owasp</groupId>
+                        <artifactId>dependency-check-maven</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
     <build>
         <defaultGoal>install</defaultGoal>
@@ -414,27 +431,22 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>1.12</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>xmlbeans-maven-plugin</artifactId>
-                    <version>2.3.3</version>
+                    <version>3.0.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>2.5.4</version>
+                    <version>4.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.1.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.2.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -456,7 +468,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.10.4</version>
+                    <version>3.1.0</version>
                     <configuration>
                         <attach>true</attach>
                         <source>${cxf.jdk.version}</source>
@@ -473,10 +485,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <!-- The current 2.19, 2.19.1 and 2.20 versions are broken.
-                         Wait for https://issues.apache.org/jira/browse/SUREFIRE-1302 to be fixed.
-                         See also http://maven.40175.n5.nabble.com/surefire-forked-vm-failed-td5858900.html -->
-                    <version>2.18.1</version>
+                    <version>2.22.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -486,14 +495,29 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.6.1</version>
+                    <version>3.8.1</version>
                     <configuration>
                         <source>${cxf.jdk.version}</source>
                         <target>${cxf.jdk.version}</target>
                         <maxmem>256M</maxmem>
                         <fork>${cxf.compiler.fork}</fork>
                         <encoding>UTF-8</encoding>
+                        
+                        <!--compilerId>javac-with-errorprone</compilerId>
+                        <forceJavacCompilerUse>true</forceJavacCompilerUse-->
                     </configuration>
+                    <!--dependencies>
+                        <dependency>
+                            <groupId>org.codehaus.plexus</groupId>
+                            <artifactId>plexus-compiler-javac-errorprone</artifactId>
+                            <version>2.8.4</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>com.google.errorprone</groupId>
+                            <artifactId>error_prone_core</artifactId>
+                            <version>2.3.1</version>
+                        </dependency>
+                    </dependencies-->
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -513,25 +537,20 @@
                         </dependency>
                         <dependency>
                             <groupId>org.apache.ant</groupId>
-                            <artifactId>ant-trax</artifactId>
-                            <version>1.8.0</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.apache.ant</groupId>
-                            <artifactId>ant-nodeps</artifactId>
-                            <version>1.8.1</version>
+                            <artifactId>ant</artifactId>
+                            <version>1.10.6</version>
                         </dependency>
                     </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.0.2</version>
+                    <version>3.1.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.0.2</version>
+                    <version>3.1.0</version>
                     <configuration>
                         <encoding>UTF-8</encoding>
                     </configuration>
@@ -539,12 +558,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.1.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>3.1.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -554,7 +573,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-report-plugin</artifactId>
-                    <version>2.20</version>
+                    <version>2.22.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -564,7 +583,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-plugin-plugin</artifactId>
-                    <version>3.5</version>
+                    <version>3.6.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -581,7 +600,7 @@
                 <plugin>
                     <groupId>org.apache.rat</groupId>
                     <artifactId>apache-rat-plugin</artifactId>
-                    <version>0.12</version>
+                    <version>0.13</version>
                     <configuration>
                         <numUnapprovedLicenses>350</numUnapprovedLicenses>
                         <excludeSubProjects>false</excludeSubProjects>
@@ -603,7 +622,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.6</version>
+                    <version>3.7.1</version>
                     <configuration>
                         <chmod>true</chmod>
                         <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
@@ -653,7 +672,34 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>1.4.1</version>
+                    <version>3.0.0-M2</version>
+                    <configuration>
+                        <rules>
+                            <requireMavenVersion>
+                                <version>3.1</version>
+                            </requireMavenVersion>
+                            <bannedDependencies>
+                                <excludes>
+                                    <exclude>javax.ws.rs:javax.ws.rs-api</exclude>
+                                    <exclude>javax.xml.bind:jaxb-api</exclude>
+                                    <exclude>com.sun.xml.bind:jaxb-core</exclude>
+                                </excludes>
+                            </bannedDependencies>
+                        </rules>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.owasp</groupId>
+                    <artifactId>dependency-check-maven</artifactId>
+                    <version>${maven-owasp-plugin-version}</version>
+                    <executions>
+                        <execution>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -663,17 +709,10 @@
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>enforce-versions</id>
+                        <id>enforce-maven</id>
                         <goals>
                             <goal>enforce</goal>
                         </goals>
-                        <configuration>
-                            <rules>
-                                <requireMavenVersion>
-                                    <version>3.1</version>
-                                </requireMavenVersion>
-                            </rules>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -691,7 +730,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.9</version>
+                <version>3.0.0</version>
                 <configuration>
                     <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
                 </configuration>
@@ -706,6 +745,11 @@
                         </reports>
                     </reportSet>
                 </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>${maven-owasp-plugin-version}</version>
             </plugin>
         </plugins>
     </reporting>

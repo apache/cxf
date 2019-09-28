@@ -35,7 +35,7 @@ import org.apache.cxf.mime.types.XopStringType;
 public class TestMtomImpl implements TestMtom {
 
     public void testXop(Holder<String> name, Holder<DataHandler> attachinfo) {
-        if (name.value.equals("have name") && attachinfo.value.getName() != null) {
+        if ("have name".equals(name.value) && attachinfo.value.getName() != null) {
             name.value = "return detail + " + attachinfo.value.getName();
         } else {
             name.value = "return detail + " + name.value;

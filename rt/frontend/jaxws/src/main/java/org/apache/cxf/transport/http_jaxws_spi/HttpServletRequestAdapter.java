@@ -343,7 +343,7 @@ class HttpServletRequestAdapter implements HttpServletRequest {
             if (la != null) {
                 sb.append(la.getHostName());
                 if (la.getPort() > 0) {
-                    sb.append(":");
+                    sb.append(':');
                     sb.append(la.getPort());
                 }
             } else {

@@ -60,7 +60,7 @@ public final class WrapperClassGenerator extends ASMHelper {
     public static final String DEFAULT_PACKAGE_NAME = "defaultnamespace";
 
     private static final Logger LOG = LogUtils.getL7dLogger(WrapperClassGenerator.class);
-    private Set<Class<?>> wrapperBeans = new LinkedHashSet<Class<?>>();
+    private Set<Class<?>> wrapperBeans = new LinkedHashSet<>();
     private InterfaceInfo interfaceInfo;
     private boolean qualified;
     private JaxWsServiceFactoryBean factory;
@@ -92,7 +92,7 @@ public final class WrapperClassGenerator extends ASMHelper {
     }
 
     private List<Annotation> getJaxbAnnos(MessagePartInfo mpi) {
-        List<Annotation> list = new java.util.concurrent.CopyOnWriteArrayList<Annotation>();
+        List<Annotation> list = new java.util.concurrent.CopyOnWriteArrayList<>();
         Annotation[] anns = getMethodParameterAnnotations(mpi);
         if (anns != null) {
             for (Annotation anno : anns) {
@@ -150,8 +150,8 @@ public final class WrapperClassGenerator extends ASMHelper {
 
         ClassWriter cw = createClassWriter();
         if (cw == null) {
-            LOG.warning(op.getName() + "requires a wrapper bean but problems with"
-                + " ASM has prevented creating one.  Operation may not work correctly.");
+            LOG.warning(op.getName() + " requires a wrapper bean but problems with"
+                + " ASM has prevented creating one. Operation may not work correctly.");
             return;
         }
         QName wrapperElement = messageInfo.getName();
@@ -315,7 +315,6 @@ public final class WrapperClassGenerator extends ASMHelper {
                 ParameterizedType ptype = (ParameterizedType)genericType;
 
                 java.lang.reflect.Type[] types = ptype.getActualTypeArguments();
-                // TODO: more complex Parameterized type
                 if (types.length > 0) {
                     if (types[0] instanceof Class) {
                         fieldDescriptor = getClassCode(genericType);

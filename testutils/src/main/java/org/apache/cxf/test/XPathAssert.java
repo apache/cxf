@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
@@ -31,8 +32,6 @@ import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import junit.framework.AssertionFailedError;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -60,8 +59,8 @@ public final class XPathAssert {
         NodeList nodes = (NodeList)createXPath(namespaces).evaluate(xpath, node, XPathConstants.NODESET);
 
         if (nodes.getLength() == 0) {
-            throw new AssertionFailedError("Failed to select any nodes for expression:\n" + xpath
-                                           + " from document:\n" + writeNodeToString(node));
+            Assert.fail("Failed to select any nodes for expression:\n" + xpath
+                         + " from document:\n" + writeNodeToString(node));
         }
 
         return nodes;
@@ -80,14 +79,14 @@ public final class XPathAssert {
         Boolean b = (Boolean)createXPath(namespaces).evaluate(xpath, node, XPathConstants.BOOLEAN);
 
         if (b == null) {
-            throw new AssertionFailedError("Failed to select any nodes for expression:\n" + xpath
-                                           + " from document:\n" + writeNodeToString(node));
+            Assert.fail("Failed to select any nodes for expression:\n" + xpath
+                        + " from document:\n" + writeNodeToString(node));
         }
 
         if (!b.booleanValue()) {
-            throw new AssertionFailedError("Boolean XPath assertion evaluated to false:\n"
-                                           + xpath
-                                           + " from document:\n" + writeNodeToString(node));
+            Assert.fail("Boolean XPath assertion evaluated to false:\n"
+                        + xpath
+                        + " from document:\n" + writeNodeToString(node));
         }
     }
 
@@ -111,7 +110,7 @@ public final class XPathAssert {
         if (nodes.getLength() > 0) {
             String value = writeNodeToString(node);
 
-            throw new AssertionFailedError("Found multiple nodes for expression:\n" + xpath + "\n" + value);
+            Assert.fail("Found multiple nodes for expression:\n" + xpath + "\n" + value);
         }
 
         return nodes;
@@ -137,15 +136,14 @@ public final class XPathAssert {
             String value2 = DOMUtils.getContent(result);
             Assert.assertEquals(value, value2);
             return;
-        } else {
-            o = createXPath(namespaces).compile(xpath)
-                .evaluate(node, XPathConstants.STRING);
-            if (o instanceof String) {
-                Assert.assertEquals(value, (String)o);
-                return;
-            }
         }
-        throw new AssertionFailedError("No nodes were found for expression: "
+        o = createXPath(namespaces).compile(xpath)
+            .evaluate(node, XPathConstants.STRING);
+        if (o instanceof String) {
+            Assert.assertEquals(value, o);
+            return;
+        }
+        Assert.fail("No nodes were found for expression: "
             + xpath
             + " in document "
             + writeNodeToString(node));
@@ -172,16 +170,15 @@ public final class XPathAssert {
             QName q2 = DOMUtils.createQName(value2, result);
             Assert.assertEquals(value, q2);
             return;
-        } else {
-            o = createXPath(namespaces).compile(xpath)
-                .evaluate(node, XPathConstants.STRING);
-            if (o instanceof String) {
-                QName q2 = DOMUtils.createQName(o.toString(), node);
-                Assert.assertEquals(value, q2);
-                return;
-            }
         }
-        throw new AssertionFailedError("No nodes were found for expression: "
+        o = createXPath(namespaces).compile(xpath)
+            .evaluate(node, XPathConstants.STRING);
+        if (o instanceof String) {
+            QName q2 = DOMUtils.createQName(o.toString(), node);
+            Assert.assertEquals(value, q2);
+            return;
+        }
+        Assert.fail("No nodes were found for expression: "
             + xpath
             + " in document "
             + writeNodeToString(node));
@@ -210,7 +207,13 @@ public final class XPathAssert {
      * addNamespace().
      */
     public static XPath createXPath(Map<String, String> namespaces) throws Exception {
-        XPath xpath = XPathFactory.newInstance().newXPath();
+        XPathFactory xpathFactory = XPathFactory.newInstance();
+        try {
+            xpathFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+        } catch (javax.xml.xpath.XPathFactoryConfigurationException ex) {
+            // ignore
+        }
+        XPath xpath = xpathFactory.newXPath();
 
         if (namespaces != null) {
             xpath.setNamespaceContext(new MapNamespaceContext(namespaces));

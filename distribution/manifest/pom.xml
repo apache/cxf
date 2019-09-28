@@ -23,16 +23,17 @@
     <packaging>jar</packaging>
     <name>Apache CXF Manifest Jar</name>
     <description>Apache CXF Manifest Jar</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../../parent</relativePath>
     </parent>
     <properties>
         <maven.test.skip>true</maven.test.skip>
         <cxf.version>${project.version}</cxf.version>
+        <cxf.module.name>org.apache.cxf.manifest</cxf.module.name>
     </properties>
     <dependencies>
         <dependency>
@@ -335,6 +336,26 @@
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-extensions-json</artifactId>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.ws</groupId>
+            <artifactId>jaxws-api</artifactId>
+            <version>2.3.0</version>
+            <exclusions>
+                <exclusion>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
+            <version>1.1.3</version>
         </dependency>
     </dependencies>
     <build>

@@ -1,0 +1,26 @@
+<application xmlns="http://wadl.dev.java.net/2009/02" xmlns:xs="http://www.w3.org/2001/XMLSchema" >
+	<grammars />
+	<resources>
+		<resource id="Test1" path="/1">
+			<method name="PUT" >
+				<request>
+					<param name="standalone" style="query" type="xs:boolean" />
+					<representation mediaType="multipart/mixed">
+						<param name="action" style="query" type="xs:anyType" />
+						<param name="sources" style="query" type="xs:anyType" required="false" />
+					</representation>
+				</request>
+			</method>
+		</resource>
+		<resource id="Test2" path="/2">
+			<method name="PUT" >
+				<request>
+					<param name="snapshot" style="query" type="xs:boolean" required="true" />
+					<representation mediaType="application/json">
+						<param name="flow" style="plain" type="xs:anyType" required="true" />
+					</representation>
+				</request>
+			</method>
+		</resource>
+	</resources>
+</application>

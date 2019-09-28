@@ -33,8 +33,14 @@ import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.misc.WSDLToService;
+
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 
 public class WSDLToServiceProcessorTest extends ProcessorTestBase {
@@ -77,7 +83,7 @@ public class WSDLToServiceProcessorTest extends ProcessorTestBase {
                 if (obj instanceof SOAPAddress) {
                     SOAPAddress soapAddress = (SOAPAddress)obj;
                     if (soapAddress.getLocationURI() != null
-                        && soapAddress.getLocationURI().equals("http://localhost:9000/newservice/newport")) {
+                        && "http://localhost:9000/newservice/newport".equals(soapAddress.getLocationURI())) {
                         found = true;
                         break;
                     }
@@ -167,7 +173,7 @@ public class WSDLToServiceProcessorTest extends ProcessorTestBase {
                 if (obj instanceof SOAPAddress) {
                     SOAPAddress soapAddress = (SOAPAddress)obj;
                     if (soapAddress.getLocationURI() != null
-                        && soapAddress.getLocationURI().equals("http://localhost:9000/serviceins/portins")) {
+                        && "http://localhost:9000/serviceins/portins".equals(soapAddress.getLocationURI())) {
                         found = true;
                         break;
                     }

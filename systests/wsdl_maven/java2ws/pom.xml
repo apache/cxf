@@ -26,9 +26,14 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
+    
+    <properties>
+        <cxf.module.name>org.apache.cxf.systests.plugin.java2ws</cxf.module.name>
+    </properties>
+    
     <build>
         <plugins>
             <plugin>
@@ -59,6 +64,24 @@
                             <verbose>true</verbose>
                             <classifier>test</classifier>
                             <attachWsdl>true</attachWsdl>
+                        </configuration>
+                        <goals>
+                            <goal>java2ws</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>process-classes2</id>
+                        <phase>process-classes</phase>
+                        <configuration>
+                            <fork>${cxf.codegenplugin.forkmode}</fork>
+                            <additionalJvmArgs>${cxf.codegen.jvmArgs}</additionalJvmArgs>
+                            <className>org.apache.cxf.systests.java2ws.HelloWorldArgs</className>
+                            <genWsdl>true</genWsdl>
+                            <verbose>true</verbose>
+                            <classifier>test</classifier>
+                            <attachWsdl>true</attachWsdl>
+                            <genWrapperbean>true</genWrapperbean>
+                            <argline>-s ./target/generated-sources</argline>
                         </configuration>
                         <goals>
                             <goal>java2ws</goal>

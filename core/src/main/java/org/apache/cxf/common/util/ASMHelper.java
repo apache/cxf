@@ -42,9 +42,9 @@ public class ASMHelper {
     protected static final Map<Class<?>, Integer> PRIMITIVE_ZERO_MAP = new HashMap<>();
 
     protected static final Map<ClassLoader, WeakReference<TypeHelperClassLoader>> LOADER_MAP
-        = new WeakIdentityHashMap<ClassLoader, WeakReference<TypeHelperClassLoader>>();
+        = new WeakIdentityHashMap<>();
     protected static final Map<Class<?>, WeakReference<TypeHelperClassLoader>> CLASS_MAP
-        = new WeakIdentityHashMap<Class<?>, WeakReference<TypeHelperClassLoader>>();
+        = new WeakIdentityHashMap<>();
 
     protected static boolean badASM;
     private static Class<?> cwClass;
@@ -93,6 +93,7 @@ public class ASMHelper {
         if (cwClass == null) {
             //try the "real" asm first, then the others
             tryClass("org.objectweb.asm.ClassWriter");
+            tryClass("org.apache.xbean.asm7.ClassWriter");
             tryClass("org.apache.xbean.asm5.ClassWriter");
             tryClass("org.apache.xbean.asm6.ClassWriter");
             tryClass("org.apache.xbean.asm4.ClassWriter");
@@ -189,14 +190,14 @@ public class ASMHelper {
         for (Class<?> cl : m.getParameterTypes()) {
             buf.append(getClassCode(cl));
         }
-        buf.append(")");
+        buf.append(')');
         buf.append(getClassCode(m.getReturnType()));
 
         return buf.toString();
     }
 
     public static String periodToSlashes(String s) {
-        char ch[] = s.toCharArray();
+        char[] ch = s.toCharArray();
         for (int x = 0; x < ch.length; x++) {
             if (ch[x] == '.') {
                 ch[x] = '/';
@@ -229,9 +230,8 @@ public class ASMHelper {
             java.lang.reflect.Type[] bounds = tv.getBounds();
             if (bounds != null && bounds.length == 1) {
                 return getClassCode(bounds[0]);
-            } else {
-                throw new IllegalArgumentException("Unable to determine type for: " + tv);
             }
+            throw new IllegalArgumentException("Unable to determine type for: " + tv);
         } else if (type instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType)type;
             StringBuilder a = new StringBuilder(getClassCode(pt.getRawType()));
@@ -251,11 +251,11 @@ public class ASMHelper {
             java.lang.reflect.Type[] lowBounds = wt.getLowerBounds();
             java.lang.reflect.Type[] upBounds = wt.getUpperBounds();
             for (java.lang.reflect.Type t : upBounds) {
-                a.append("+");
+                a.append('+');
                 a.append(getClassCode(t));
             }
             for (java.lang.reflect.Type t : lowBounds) {
-                a.append("-");
+                a.append('-');
                 a.append(getClassCode(t));
             }
             return a.toString();
@@ -365,7 +365,7 @@ public class ASMHelper {
     }
 
     public static class TypeHelperClassLoader extends ClassLoader {
-        ConcurrentHashMap<String, Class<?>> defined = new ConcurrentHashMap<String, Class<?>>();
+        ConcurrentHashMap<String, Class<?>> defined = new ConcurrentHashMap<>();
 
         TypeHelperClassLoader(ClassLoader parent) {
             super(parent);
@@ -382,7 +382,7 @@ public class ASMHelper {
             return super.findClass(name);
         }
 
-        public Class<?> defineClass(String name, byte bytes[]) {
+        public Class<?> defineClass(String name, byte[] bytes) {
             Class<?> ret = defined.get(name.replace('/', '.'));
             if (ret != null) {
                 return ret;

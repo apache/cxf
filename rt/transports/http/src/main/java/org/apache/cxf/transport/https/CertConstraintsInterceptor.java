@@ -76,13 +76,12 @@ public final class CertConstraintsInterceptor extends AbstractPhaseInterceptor<M
                     throw new UntrustedURLConnectionIOException(
                         "No client certificates were found"
                     );
-                } else {
-                    X509Certificate[] x509Certs = (X509Certificate[])certs;
-                    if (!certConstraints.matches(x509Certs[0])) {
-                        throw new UntrustedURLConnectionIOException(
-                            "The client certificate does not match the defined cert constraints"
-                        );
-                    }
+                }
+                X509Certificate[] x509Certs = (X509Certificate[])certs;
+                if (!certConstraints.matches(x509Certs[0])) {
+                    throw new UntrustedURLConnectionIOException(
+                        "The client certificate does not match the defined cert constraints"
+                    );
                 }
             } catch (UntrustedURLConnectionIOException ex) {
                 throw new Fault(ex);

@@ -67,7 +67,7 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
 
         }
     }
-    public void handleMessage(Message message) throws Fault {
+    public void handleMessage(Message message) {
 
         if (message.getExchange().isOneWay()
             && !isRequestor(message)
@@ -80,10 +80,10 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
             final InterceptorChain chain = message.getInterceptorChain();
 
             boolean robust =
-                MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY));
+                MessageUtils.getContextualBoolean(message, Message.ROBUST_ONEWAY, false);
 
             boolean useOriginalThread =
-                MessageUtils.isTrue(message.getContextualProperty(USE_ORIGINAL_THREAD));
+                MessageUtils.getContextualBoolean(message, USE_ORIGINAL_THREAD, false);
 
             if (!useOriginalThread && !robust) {
                 //need to suck in all the data from the input stream as
@@ -140,16 +140,15 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
                         //wait a few milliseconds for the background thread to start processing
                         //Mostly just to make an attempt at keeping the ordering of the
                         //messages coming in from a client.  Not guaranteed though.
-                        lock.wait(20);
+                        lock.wait(20L);
                     }
                 } catch (RejectedExecutionException e) {
                     LOG.warning(
                         "Executor queue is full, run the oneway invocation task in caller thread."
                         + "  Users can specify a larger executor queue to avoid this.");
                     // only block the thread if the prop is unset or set to false, otherwise let it go
-                    if (!MessageUtils.isTrue(
-                        message.getContextualProperty(
-                            "org.apache.cxf.oneway.rejected_execution_exception"))) {
+                    if (!MessageUtils.getContextualBoolean(message,
+                            "org.apache.cxf.oneway.rejected_execution_exception", false)) {
                         //the executor queue is full, so run the task in the caller thread
                         chain.unpause();
                     }

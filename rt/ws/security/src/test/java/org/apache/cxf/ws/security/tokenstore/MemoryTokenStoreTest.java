@@ -23,9 +23,15 @@ import java.time.Instant;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.ws.security.SecurityConstants;
+
 import org.junit.BeforeClass;
 
-public class MemoryTokenStoreTest extends org.junit.Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class MemoryTokenStoreTest {
 
     private static TokenStore store;
 
@@ -68,7 +74,7 @@ public class MemoryTokenStoreTest extends org.junit.Assert {
         assertNull(store.getToken("test3"));
         store.remove(token1.getId());
         store.remove(token2.getId());
-        assertTrue(store.getTokenIdentifiers().size() == 0);
+        assertTrue(store.getTokenIdentifiers().isEmpty());
     }
 
     @org.junit.Test

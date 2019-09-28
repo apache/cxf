@@ -30,6 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
@@ -52,8 +53,7 @@ import org.apache.cxf.resource.ResourceResolver;
 public class ResourceInjector extends AbstractAnnotationVisitor {
 
     private static final Logger LOG = LogUtils.getL7dLogger(ResourceInjector.class);
-    private static final List<Class<? extends Annotation>> ANNOTATIONS =
-        new ArrayList<Class<? extends Annotation>>();
+    private static final List<Class<? extends Annotation>> ANNOTATIONS = new ArrayList<>();
 
     static {
         ANNOTATIONS.add(Resource.class);
@@ -79,7 +79,11 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
             return null;
         }
         try {
-            return ReflectionUtil.getDeclaredField(cls, name);
+            Field f = ReflectionUtil.getDeclaredField(cls, name);
+            if (f == null) {
+                f = getField(cls.getSuperclass(), name);
+            }
+            return f;
         } catch (Exception ex) {
             return getField(cls.getSuperclass(), name);
         }
@@ -164,7 +168,7 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
             return;
         }
 
-        Object resource = null;
+        Object resource;
         // first find a setter that matches this resource
         Method setter = findSetterForResource(res);
         if (setter != null) {
@@ -306,10 +310,10 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
         assert res != null;
         assert method.getName().startsWith("set") : method;
 
-        if (res.name() == null || "".equals(res.name())) {
+        if (res.name() == null || res.name().isEmpty()) {
             String name = method.getName().substring(3);
             name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
-            return method.getDeclaringClass().getCanonicalName() + "/" + name;
+            return method.getDeclaringClass().getCanonicalName() + '/' + name;
         }
         return res.name();
     }
@@ -386,7 +390,7 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
 
     private Collection<Method> getAnnotatedMethods(Class<? extends Annotation> acls) {
 
-        Collection<Method> methods = new LinkedList<Method>();
+        Collection<Method> methods = new LinkedList<>();
         addAnnotatedMethods(acls, getTarget().getClass().getMethods(), methods);
         addAnnotatedMethods(acls, ReflectionUtil.getDeclaredMethods(getTarget().getClass()), methods);
         if (getTargetClass() != getTarget().getClass()) {

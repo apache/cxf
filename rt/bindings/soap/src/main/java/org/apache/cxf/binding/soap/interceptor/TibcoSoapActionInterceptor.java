@@ -47,7 +47,7 @@ public class TibcoSoapActionInterceptor extends AbstractPhaseInterceptor<SoapMes
             //need to flip to a case sensitive map.  The default
             //is a case insensitive map, but in this case, we need
             //to use a case sensitive map to make sure both versions go out
-            headers = new TreeMap<String, Object>(headers);
+            headers = new TreeMap<>(headers);
             soapMessage.put(Message.PROTOCOL_HEADERS, headers);
             headers.put(SOAPACTION_TIBCO, headers.get(SoapBindingConstants.SOAP_ACTION));
         }

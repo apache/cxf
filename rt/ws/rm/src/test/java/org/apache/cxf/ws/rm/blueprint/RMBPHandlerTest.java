@@ -19,13 +19,14 @@
 
 package org.apache.cxf.ws.rm.blueprint;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  *
  */
-public class RMBPHandlerTest extends Assert {
+public class RMBPHandlerTest {
     @Test
     public void testGetSchemaLocation() {
         RMBPHandler handler = new RMBPHandler();

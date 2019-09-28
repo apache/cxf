@@ -58,7 +58,6 @@ public class CodeGrantEncryptingDataProvider extends EncryptingDataProvider
 
     @Override
     public List<ServerAuthorizationCodeGrant> getCodeGrants(Client c, UserSubject sub) throws OAuthServiceException {
-        // TODO Auto-generated method stub
         return null;
     }
 }

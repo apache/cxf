@@ -165,7 +165,6 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
 
         @Override
         public void write(int b) throws IOException {
-            // TODO Auto-generated method stub
 
         }
 

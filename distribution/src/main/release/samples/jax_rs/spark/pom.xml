@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
     <properties>
@@ -35,43 +35,42 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>3.2.0-SNAPSHOT</version>
+            <version>3.4.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>3.2.0-SNAPSHOT</version>
+            <version>3.4.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-extension-search</artifactId>
-            <version>3.2.0-SNAPSHOT</version>
+            <version>3.4.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-streaming_2.10</artifactId>
-            <version>2.0.0-preview</version>
+            <artifactId>spark-streaming_2.11</artifactId>
+            <version>2.0.0</version>
             <exclusions>
             <exclusion>
               <groupId>io.netty</groupId>
               <artifactId>netty</artifactId>
             </exclusion>
+            <exclusion>
+              <groupId>com.fasterxml.jackson.module</groupId>
+              <artifactId>jackson-module-scala_2.11</artifactId>
+            </exclusion>
             </exclusions>  
         </dependency>
         <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-core</artifactId>
-            <version>2.0-SNAPSHOT</version>
+          <groupId>com.fasterxml.jackson.module</groupId>
+          <artifactId>jackson-module-scala_2.11</artifactId>
+          <version>2.9.9</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
-            <artifactId>tika-parser-pdf-module</artifactId>
-            <version>2.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-parser-office-module</artifactId>
-            <version>2.0-SNAPSHOT</version>
+            <artifactId>tika-parsers</artifactId>
+            <version>${cxf.tika.version}</version>
         </dependency>
     </dependencies>
 
@@ -93,10 +92,5 @@
             </plugin>
         </plugins>
     </build>
-    <repositories>
-      <repository>
-         <id>snapshots</id>
-         <url>https://repository.apache.org/content/repositories/snapshots/</url>
-      </repository> 
-    </repositories> 
+    
 </project>

@@ -22,10 +22,14 @@ import java.util.Arrays;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.helpers.JavaUtils;
+import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.wss4j.policy.SP12Constants;
 
 import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
 
@@ -378,7 +382,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
 
     @Test
     public void testSignedEncryptedPartsWithCompleteCoverage() throws Exception {
-        if (!checkUnrestrictedPoliciesInstalled()) {
+        if (!TestUtilities.checkUnrestrictedPoliciesInstalled()) {
             return;
         }
         this.runInInterceptorAndValidate(
@@ -414,11 +418,6 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
 
     @Test
     public void testEncryptedSignedPartsWithCompleteCoverage() throws Exception {
-        if (System.getProperty("java.version").startsWith("9")) {
-            //CXF-7270
-            return;
-        }
-
         this.runInInterceptorAndValidate(
                 "encrypted_body_content_signed.xml",
                 "encrypted_parts_policy_header_and_body_signed.xml",
@@ -435,7 +434,9 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 null,
                 Arrays.asList(CoverageType.ENCRYPTED, CoverageType.SIGNED));
 
-        this.runAndValidate(
+        if (!JavaUtils.isJava9Compatible()) {
+            // CXF-7270
+            this.runAndValidate(
                 "wsse-request-clean.xml",
                 "encrypted_parts_policy_header_and_body_signed.xml",
                 null,
@@ -445,6 +446,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 null,
                 Arrays.asList(CoverageType.ENCRYPTED,
                         CoverageType.SIGNED));
+        }
     }
 
     @Test

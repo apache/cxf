@@ -77,7 +77,7 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
         String e1HttpMethod = e1.getHttpMethod();
         String e2HttpMethod = e2.getHttpMethod();
 
-        int result = 0;
+        int result;
         if (!getMethod && HttpMethod.HEAD.equals(httpMethod)) {
             result = compareWithHead(e1HttpMethod, e2HttpMethod);
             if (result != 0) {
@@ -117,6 +117,9 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
             } else if (!e1IsDefault && e2IsDefault) {
                 result = -1;
             }
+        } 
+        if (result == 0) {
+            result = JAXRSUtils.compareMethodParameters(e1.getInParameterTypes(), e2.getInParameterTypes());
         }
         if (result == 0) {
             String m1Name =

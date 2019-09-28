@@ -35,8 +35,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import junit.framework.AssertionFailedError;
-
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapFault;
@@ -53,10 +51,13 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.staxutils.StaxUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class SoapFaultSerializerTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+public class SoapFaultSerializerTest {
     private void assertValid(String xpathExpression, Document doc) {
         Map<String, String> namespaces = new HashMap<>();
         namespaces.put("s", "http://schemas.xmlsoap.org/soap/envelope/");
@@ -68,8 +69,8 @@ public class SoapFaultSerializerTest extends Assert {
         namespaces.put("xml", "http://www.w3.org/XML/1998/namespace");
         XPathUtils xpu = new XPathUtils(namespaces);
         if (!xpu.isExist(xpathExpression, doc, XPathConstants.NODE)) {
-            throw new AssertionFailedError("Failed to select any nodes for expression:\n" + xpathExpression
-                                           + " from document:\n" + StaxUtils.toString(doc));
+            fail("Failed to select any nodes for expression:\n" + xpathExpression
+                 + " from document:\n" + StaxUtils.toString(doc));
         }
     }
 
@@ -144,7 +145,7 @@ public class SoapFaultSerializerTest extends Assert {
         assertValid("//soap12env:Fault/soap12env:Code/soap12env:Value[text()='ns1:Sender']",
                     faultDoc);
         assertValid("//soap12env:Fault/soap12env:Code/soap12env:Subcode/"
-                    + "soap12env:Value[text()='ns2:invalidsoap']",
+                    + "soap12env:Value[text()='cxffaultcode:invalidsoap']",
                     faultDoc);
         assertValid("//soap12env:Fault/soap12env:Reason/soap12env:Text[@xml:lang='en']",
                     faultDoc);
@@ -171,7 +172,7 @@ public class SoapFaultSerializerTest extends Assert {
         String faultString = "Hadrian caused this Fault!";
         SoapFault fault = new SoapFault(faultString, Soap12.getInstance().getSender());
 
-        fault.addSubCode(new QName("http://cxf.apache.org/soap/fault", "invalidsoap", "cxffaultcode"));
+        fault.addSubCode(new QName("http://cxf.apache.org/soap/fault", "invalidsoap"));
         fault.addSubCode(new QName("http://cxf.apache.org/soap/fault2", "invalidsoap2", "cxffaultcode2"));
 
         SoapMessage m = new SoapMessage(new MessageImpl());
@@ -200,7 +201,7 @@ public class SoapFaultSerializerTest extends Assert {
                     + "soap12env:Value[text()='ns2:invalidsoap']",
                     faultDoc);
         assertValid("//soap12env:Fault/soap12env:Code/soap12env:Subcode/soap12env:Subcode/"
-                    + "soap12env:Value[text()='ns2:invalidsoap2']",
+                    + "soap12env:Value[text()='cxffaultcode2:invalidsoap2']",
                     faultDoc);
         assertValid("//soap12env:Fault/soap12env:Reason/soap12env:Text[@xml:lang='en']",
                     faultDoc);

@@ -88,7 +88,7 @@ public class EventMapper implements STSEventListener {
                 (HttpServletRequest)params.getMessageContext().get(AbstractHTTPDestination.HTTP_REQUEST);
             map.put(KEYS.REMOTE_HOST.name(), req.getRemoteHost());
             map.put(KEYS.REMOTE_PORT.name(), String.valueOf(req.getRemotePort()));
-            map.put(KEYS.URL.name(), (String)params.getMessageContext().get("org.apache.cxf.request.url"));
+            map.put(KEYS.URL.name(), params.getMessageContext().get("org.apache.cxf.request.url"));
         } catch (Exception ex) {
             map.put(KEYS.REMOTE_HOST.name(), "N.A.");
             map.put(KEYS.REMOTE_PORT.name(), "N.A.");
@@ -136,7 +136,7 @@ public class EventMapper implements STSEventListener {
             (HttpServletRequest)params.getMessageContext().get(AbstractHTTPDestination.HTTP_REQUEST);
         map.put(KEYS.REMOTE_HOST.name(), req.getRemoteHost());
         map.put(KEYS.REMOTE_PORT.name(), String.valueOf(req.getRemotePort()));
-        map.put(KEYS.URL.name(), (String)params.getMessageContext().get("org.apache.cxf.request.url"));
+        map.put(KEYS.URL.name(), params.getMessageContext().get("org.apache.cxf.request.url"));
         map.put(KEYS.TOKENTYPE.name(), params.getTokenRequirements().getTokenType());
         if (params.getTokenRequirements().getActAs() != null) {
             map.put(KEYS.VALIDATE_PRINCIPAL.name(), params.getTokenRequirements().getValidateTarget().getPrincipal()
@@ -157,7 +157,7 @@ public class EventMapper implements STSEventListener {
             (HttpServletRequest)params.getMessageContext().get(AbstractHTTPDestination.HTTP_REQUEST);
         map.put(KEYS.REMOTE_HOST.name(), req.getRemoteHost());
         map.put(KEYS.REMOTE_PORT.name(), String.valueOf(req.getRemotePort()));
-        map.put(KEYS.URL.name(), (String)params.getMessageContext().get("org.apache.cxf.request.url"));
+        map.put(KEYS.URL.name(), params.getMessageContext().get("org.apache.cxf.request.url"));
         map.put(KEYS.TOKENTYPE.name(), params.getTokenRequirements().getTokenType());
         if (params.getTokenRequirements().getActAs() != null) {
             map.put(KEYS.CANCEL_PRINCIPAL.name(), params.getTokenRequirements().getCancelTarget().getPrincipal()
@@ -177,7 +177,7 @@ public class EventMapper implements STSEventListener {
             (HttpServletRequest)params.getMessageContext().get(AbstractHTTPDestination.HTTP_REQUEST);
         map.put(KEYS.REMOTE_HOST.name(), req.getRemoteHost());
         map.put(KEYS.REMOTE_PORT.name(), String.valueOf(req.getRemotePort()));
-        map.put(KEYS.URL.name(), (String)params.getMessageContext().get("org.apache.cxf.request.url"));
+        map.put(KEYS.URL.name(), params.getMessageContext().get("org.apache.cxf.request.url"));
         map.put(KEYS.TOKENTYPE.name(), params.getTokenRequirements().getTokenType());
         if (params.getTokenRequirements().getRenewTarget() != null) {
             map.put(KEYS.RENEW_PRINCIPAL.name(), params.getTokenRequirements().getRenewTarget().getPrincipal()

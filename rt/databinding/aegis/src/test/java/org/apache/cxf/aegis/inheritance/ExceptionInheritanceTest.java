@@ -35,12 +35,18 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.service.invoker.BeanInvoker;
+
+import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class ExceptionInheritanceTest extends AbstractAegisTest {
     private WS1 client;
     private Map<String, Object> props;
 
+    @Before
     public void setUp() throws Exception {
         super.setUp();
 

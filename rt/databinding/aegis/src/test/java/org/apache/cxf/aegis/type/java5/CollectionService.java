@@ -75,11 +75,11 @@ public class CollectionService implements CollectionServiceInterface {
     }
 
     //CHECKSTYLE:OFF
-    public String takeUnsortedSet(HashSet<String> strings) {
+    public String takeUnsortedSet(HashSet<String> strings) { //NOPMD
         return Integer.toString(strings.size());
     }
 
-    public String takeArrayList(ArrayList<String> strings) {
+    public String takeArrayList(ArrayList<String> strings) { //NOPMD
         return strings.get(0);
     }
     //CHECKSTYLE:ON
@@ -93,7 +93,7 @@ public class CollectionService implements CollectionServiceInterface {
     }
 
     public Collection<double[]> returnCollectionOfPrimitiveArrays() {
-        List<double[]> data = new ArrayList<double[]>();
+        List<double[]> data = new ArrayList<>();
         double[] dataArray = new double[] {3.14, 2.0, -666.6 };
         data.add(dataArray);
         dataArray = new double[] {-666.6, 3.14, 2.0, 0 };
@@ -113,7 +113,7 @@ public class CollectionService implements CollectionServiceInterface {
             d2.appendChild(e);
             e.setAttribute("not-an", "ungulate");
             Document[] da = new Document[] {d1, d2};
-            List<Document[]> l = new ArrayList<Document[]>();
+            List<Document[]> l = new ArrayList<>();
             l.add(da);
             da = new Document[] {d2, d1};
             l.add(da);

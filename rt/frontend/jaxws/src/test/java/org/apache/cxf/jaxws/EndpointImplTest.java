@@ -19,7 +19,6 @@
 
 package org.apache.cxf.jaxws;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -32,6 +31,7 @@ import javax.xml.ws.WebServiceContext;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxws.service.Hello;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
 import org.apache.cxf.message.Message;
@@ -44,6 +44,13 @@ import org.apache.hello_world_soap_http.HelloImpl;
 import org.apache.hello_world_soap_http.HelloWrongAnnotation;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class EndpointImplTest extends AbstractJaxWsTest {
 
@@ -282,7 +289,7 @@ public class EndpointImplTest extends AbstractJaxWsTest {
                 InputStream in = message.getContent(InputStream.class);
                 assertNotNull(in);
 
-                copy(in, out, 2045);
+                IOUtils.copy(in, out, 2045);
 
                 out.close();
                 in.close();
@@ -292,19 +299,4 @@ public class EndpointImplTest extends AbstractJaxWsTest {
         }
     }
 
-    private static void copy(final InputStream input, final OutputStream output, final int bufferSize)
-        throws IOException {
-        try {
-            final byte[] buffer = new byte[bufferSize];
-
-            int n = input.read(buffer);
-            while (-1 != n) {
-                output.write(buffer, 0, n);
-                n = input.read(buffer);
-            }
-        } finally {
-            input.close();
-            output.close();
-        }
-    }
 }

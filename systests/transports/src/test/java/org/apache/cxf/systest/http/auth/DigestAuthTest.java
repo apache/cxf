@@ -33,9 +33,13 @@ import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.HTTPException;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 
 public class DigestAuthTest extends AbstractBusClientServerTestBase {
@@ -45,8 +49,6 @@ public class DigestAuthTest extends AbstractBusClientServerTestBase {
         new QName("http://apache.org/hello_world", "SOAPService");
     private final QName mortimerQ =
         new QName("http://apache.org/hello_world", "Mortimer");
-    public DigestAuthTest() {
-    }
 
     @BeforeClass
     public static void startServer() throws Exception {
@@ -101,9 +103,9 @@ public class DigestAuthTest extends AbstractBusClientServerTestBase {
             Assert.fail("Unexpected reply (" + answer + "). Should throw exception");
         } catch (Exception e) {
             Throwable cause = e.getCause();
-            Assert.assertEquals(HTTPException.class, cause.getClass());
+            assertEquals(HTTPException.class, cause.getClass());
             HTTPException he = (HTTPException)cause;
-            Assert.assertEquals(401, he.getResponseCode());
+            assertEquals(401, he.getResponseCode());
         }
     }
 

@@ -43,15 +43,18 @@ import org.apache.cxf.ws.security.sts.provider.model.ValidateTargetType;
 import org.apache.cxf.ws.security.sts.provider.model.secext.AttributedString;
 import org.apache.cxf.ws.security.sts.provider.model.secext.PasswordString;
 import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
-import org.apache.wss4j.dom.WSConstants;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Some unit tests for the validate operation to validate UsernameTokens.
  */
-public class ValidateUsernameTokenUnitTest extends org.junit.Assert {
+public class ValidateUsernameTokenUnitTest {
 
     public static final QName REQUESTED_SECURITY_TOKEN =
         QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(null).getName();
@@ -227,7 +230,7 @@ public class ValidateUsernameTokenUnitTest extends org.junit.Assert {
         // Add a password
         PasswordString passwordString = new PasswordString();
         passwordString.setValue(password);
-        passwordString.setType(WSConstants.PASSWORD_TEXT);
+        passwordString.setType(WSS4JConstants.PASSWORD_TEXT);
         JAXBElement<PasswordString> passwordType =
             new JAXBElement<PasswordString>(
                 QNameConstants.PASSWORD, PasswordString.class, passwordString

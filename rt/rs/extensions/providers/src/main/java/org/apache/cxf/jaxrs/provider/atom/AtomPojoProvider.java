@@ -77,7 +77,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
     private static final Abdera ATOM_ENGINE = new Abdera();
     private static final String DEFAULT_ENTRY_CONTENT_METHOD = "getContent";
 
-    private JAXBElementProvider<Object> jaxbProvider = new JAXBElementProvider<Object>();
+    private JAXBElementProvider<Object> jaxbProvider = new JAXBElementProvider<>();
     private Map<String, String> collectionGetters = Collections.emptyMap();
     private Map<String, String> collectionSetters = Collections.emptyMap();
 
@@ -257,9 +257,8 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         String method = map.get(pojoClass.getName());
         if (method != null) {
             return method;
-        } else {
-            return getCollectionMethod(map, pojoClass.getSuperclass());
         }
+        return getCollectionMethod(map, pojoClass.getSuperclass());
     }
 
     @SuppressWarnings("unchecked")
@@ -314,9 +313,8 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         T handler = handlers.get(pojoClass.getName());
         if (handler != null) {
             return handler;
-        } else {
-            return getAtomElementHandlerSuperClass(handlers, pojoClass.getSuperclass());
         }
+        return getAtomElementHandlerSuperClass(handlers, pojoClass.getSuperclass());
     }
 
     //CHECKSTYLE:OFF
@@ -433,7 +431,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         }
 
         if (entry.getContentElement() == null
-            && entry.getExtensions().size() == 0) {
+            && entry.getExtensions().isEmpty()) {
             createEntryContent(factory, entry, o, cls);
         }
         return entry;
@@ -603,13 +601,12 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
 
         if (isFeed) {
             return readFromFeedOrEntry(cls, mt, headers, is);
-        } else {
-            AtomEntryProvider p = new AtomEntryProvider();
-            p.setAutodetectCharset(autodetectCharset);
-            Entry entry = p.readFrom(Entry.class, Entry.class,
-                                     new Annotation[]{}, mt, headers, is);
-            return readFromEntry(entry, cls);
         }
+        AtomEntryProvider p = new AtomEntryProvider();
+        p.setAutodetectCharset(autodetectCharset);
+        Entry entry = p.readFrom(Entry.class, Entry.class,
+                                 new Annotation[]{}, mt, headers, is);
+        return readFromEntry(entry, cls);
     }
 
     @SuppressWarnings("unchecked")

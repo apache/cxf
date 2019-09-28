@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.rs.security.oauth2.filters;
 
-import java.time.Instant;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,6 +40,7 @@ import org.apache.cxf.rs.security.oauth2.provider.AccessTokenValidator;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.JwtTokenUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 public class JwtAccessTokenValidator extends JoseJwtConsumer implements AccessTokenValidator {
 
@@ -76,8 +76,7 @@ public class JwtAccessTokenValidator extends JoseJwtConsumer implements AccessTo
         if (claims.getIssuedAt() != null) {
             atv.setTokenIssuedAt(claims.getIssuedAt());
         } else {
-            Instant now = Instant.now();
-            atv.setTokenIssuedAt(now.toEpochMilli());
+            atv.setTokenIssuedAt(OAuthUtils.getIssuedAt());
         }
         if (claims.getExpiryTime() != null) {
             atv.setTokenLifetime(claims.getExpiryTime() - atv.getTokenIssuedAt());
@@ -89,11 +88,14 @@ public class JwtAccessTokenValidator extends JoseJwtConsumer implements AccessTo
         if (claims.getIssuer() != null) {
             atv.setTokenIssuer(claims.getIssuer());
         }
+        if (claims.getNotBefore() != null) {
+            atv.setTokenNotBefore(claims.getNotBefore());
+        }
         Object scope = claims.getClaim(OAuthConstants.SCOPE);
         if (scope != null) {
             String[] scopes = scope instanceof String
                 ? scope.toString().split(" ") : CastUtils.cast((List<?>)scope).toArray(new String[]{});
-            List<OAuthPermission> perms = new LinkedList<OAuthPermission>();
+            List<OAuthPermission> perms = new LinkedList<>();
             for (String s : scopes) {
                 if (!StringUtils.isEmpty(s)) {
                     perms.add(new OAuthPermission(s.trim()));
@@ -125,7 +127,7 @@ public class JwtAccessTokenValidator extends JoseJwtConsumer implements AccessTo
                 atv.getExtraProps().put(JoseConstants.HEADER_X509_THUMBPRINT_SHA256, certCnf.toString());
             }
         }
-        
+
         return atv;
     }
 

@@ -25,7 +25,7 @@ import org.apache.cxf.rt.security.claims.ClaimCollection;
 public class CustomSecurityContextProvider extends SecurityContextProviderImpl {
     @Override
     protected String getSubjectPrincipalName(Subject subject, ClaimCollection claims) {
-        int index = subject.getName().indexOf("@");
+        int index = subject.getName().indexOf('@');
         return index == -1
             ? super.getSubjectPrincipalName(subject, claims)
             : subject.getName().substring(0, index);

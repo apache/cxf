@@ -37,7 +37,7 @@ public class DefaultTokenWrapper implements TokenWrapper {
      */
     public void wrapToken(Object token, RequestedSecurityTokenType requestedTokenType) {
         if (token instanceof String) {
-            Document doc = DOMUtils.newDocument();
+            Document doc = DOMUtils.getEmptyDocument();
             Element tokenWrapper = doc.createElementNS(null, "TokenWrapper");
             tokenWrapper.setTextContent((String)token);
             requestedTokenType.setAny(tokenWrapper);

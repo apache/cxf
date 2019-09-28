@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs.client;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutorService;
 
@@ -142,22 +143,34 @@ public class CompletionStageRxInvokerImpl implements CompletionStageRxInvoker {
 
     @Override
     public <T> CompletionStage<T> method(String name, Entity<?> entity, Class<T> responseType) {
-        return wc.doInvokeAsyncStage(name, entity, responseType, responseType, ex);
+        if (ex == null) {
+            return CompletableFuture.supplyAsync(() -> wc.sync().method(name, entity, responseType));
+        }
+        return CompletableFuture.supplyAsync(() -> wc.sync().method(name, entity, responseType), ex);
     }
 
     @Override
     public <T> CompletionStage<T> method(String name, Entity<?> entity, GenericType<T> responseType) {
-        return wc.doInvokeAsyncStage(name, entity, responseType.getRawType(), responseType.getType(), ex);
+        if (ex == null) {
+            return CompletableFuture.supplyAsync(() -> wc.sync().method(name, entity, responseType));
+        }
+        return CompletableFuture.supplyAsync(() -> wc.sync().method(name, entity, responseType), ex);
     }
 
     @Override
     public <T> CompletionStage<T> method(String name, Class<T> responseType) {
-        return wc.doInvokeAsyncStage(name, null, responseType, responseType, ex);
+        if (ex == null) {
+            return CompletableFuture.supplyAsync(() -> wc.sync().method(name, responseType));
+        }
+        return CompletableFuture.supplyAsync(() -> wc.sync().method(name, responseType), ex);
     }
 
     @Override
     public <T> CompletionStage<T> method(String name, GenericType<T> responseType) {
-        return wc.doInvokeAsyncStage(name, null, responseType.getRawType(), responseType.getType(), ex);
+        if (ex == null) {
+            return CompletableFuture.supplyAsync(() -> wc.sync().method(name, responseType));
+        }
+        return CompletableFuture.supplyAsync(() -> wc.sync().method(name, responseType), ex);
     }
 
 }

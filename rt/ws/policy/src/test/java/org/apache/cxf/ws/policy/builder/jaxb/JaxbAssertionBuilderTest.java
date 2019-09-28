@@ -31,13 +31,17 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.test.assertions.foo.FooType;
 import org.apache.neethi.Assertion;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 
 /**
  *
  */
-public class JaxbAssertionBuilderTest extends Assert {
+public class JaxbAssertionBuilderTest {
 
     @Test
     public void testConstructors() throws Exception {
@@ -56,7 +60,7 @@ public class JaxbAssertionBuilderTest extends Assert {
     @Test
     public void testGetKnownElements() throws Exception {
         QName qn = new QName("http://cxf.apache.org/test/assertions/foo", "FooType");
-        JaxbAssertionBuilder<FooType> ab = new JaxbAssertionBuilder<FooType>(FooType.class, qn);
+        JaxbAssertionBuilder<FooType> ab = new JaxbAssertionBuilder<>(FooType.class, qn);
         assertNotNull(ab);
         assertEquals(1, ab.getKnownElements().length);
         assertSame(qn, ab.getKnownElements()[0]);
@@ -65,7 +69,7 @@ public class JaxbAssertionBuilderTest extends Assert {
     @Test
     public void testBuild() throws Exception {
         QName qn = new QName("http://cxf.apache.org/test/assertions/foo", "FooType");
-        JaxbAssertionBuilder<FooType> ab = new JaxbAssertionBuilder<FooType>(FooType.class, qn);
+        JaxbAssertionBuilder<FooType> ab = new JaxbAssertionBuilder<>(FooType.class, qn);
         assertNotNull(ab);
         InputStream is = JaxbAssertionBuilderTest.class.getResourceAsStream("foo.xml");
         Document doc = StaxUtils.read(is);

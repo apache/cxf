@@ -25,7 +25,10 @@ import java.net.URISyntaxException;
 
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.misc.XSDToWSDL;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class XSDToWSDLProcessorTest
     extends ProcessorTestBase {

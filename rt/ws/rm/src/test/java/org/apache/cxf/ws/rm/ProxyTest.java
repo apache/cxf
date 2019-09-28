@@ -52,18 +52,22 @@ import org.apache.cxf.ws.addressing.WSAddressingFeature.WSAddressingFeatureAppli
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.OfferType;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 
 /**
  *
  */
-public class ProxyTest extends Assert {
+public class ProxyTest {
 
     private IMocksControl control;
     private RMEndpoint rme;

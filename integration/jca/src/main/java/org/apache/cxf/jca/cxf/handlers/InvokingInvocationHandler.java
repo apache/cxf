@@ -60,7 +60,7 @@ public class InvokingInvocationHandler extends CXFInvocationHandlerBase {
         getData().getManagedConnection().close(handle);
     }
 
-    private Object invokeTargetMethod(Object proxy, Method method, Object args[]) throws Throwable {
+    private Object invokeTargetMethod(Object proxy, Method method, Object[] args) throws Throwable {
 
         Object ret = null;
 

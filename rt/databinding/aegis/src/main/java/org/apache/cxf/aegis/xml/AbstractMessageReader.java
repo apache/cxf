@@ -48,7 +48,7 @@ public abstract class AbstractMessageReader implements MessageReader {
         boolean nil = false;
         if (nilReader != null) {
             String value = nilReader.getValue();
-            if (value != null && (value.trim().equals("true") || value.trim().equals("1"))) {
+            if (value != null && ("true".equals(value.trim()) || "1".equals(value.trim()))) {
                 return true;
             }
         }

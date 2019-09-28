@@ -43,9 +43,8 @@ public class CachingMessageBodyReader<T> extends AbstractCachingMessageProvider<
     public boolean isReadable(Class<?> type, Type gType, Annotation[] anns, MediaType mt) {
         if (delegatingReaders != null) {
             return getDelegatingReader(type, gType, anns, mt) != null;
-        } else {
-            return isProviderKeyNotSet();
         }
+        return isProviderKeyNotSet();
     }
 
     private MessageBodyReader<T> getDelegatingReader(Class<?> type, Type gType, Annotation[] anns, MediaType mt) {

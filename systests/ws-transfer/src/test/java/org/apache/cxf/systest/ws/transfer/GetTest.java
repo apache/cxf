@@ -20,9 +20,11 @@
 package org.apache.cxf.systest.ws.transfer;
 
 import javax.xml.stream.XMLStreamException;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -32,6 +34,7 @@ import org.apache.cxf.ws.transfer.GetResponse;
 import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.resource.Resource;
 import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;

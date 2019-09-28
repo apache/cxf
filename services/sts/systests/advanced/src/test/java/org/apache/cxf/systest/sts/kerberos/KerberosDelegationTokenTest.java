@@ -26,6 +26,7 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
@@ -35,7 +36,11 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.auth.SpnegoAuthSupplier;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.ietf.jgss.GSSName;
+
 import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * This tests credential delegation. The client enables credential delegation + sends a Kerberos
@@ -92,8 +97,8 @@ public class KerberosDelegationTokenTest extends AbstractBusClientServerTestBase
         URL busFile = KerberosDelegationTokenTest.class.getResource("cxf-intermediary-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = KerberosDelegationTokenTest.class.getResource("DoubleItIntermediary.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -130,7 +135,7 @@ public class KerberosDelegationTokenTest extends AbstractBusClientServerTestBase
         WebClient.getConfig(client).getHttpConduit().setAuthSupplier(authSupplier);
 
         int resp = client.post(numToDouble, Integer.class);
-        org.junit.Assert.assertEquals(2 * numToDouble, resp);
+        assertEquals(2 * numToDouble, resp);
     }
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {

@@ -66,13 +66,19 @@ import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.ws.commons.schema.XmlSchemaElement;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
-import org.junit.Assert;
 import org.junit.Test;
 
-public class WSDLServiceBuilderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class WSDLServiceBuilderTest {
     // TODO: reuse the wsdl in testutils and add the parameter order into one of the wsdl
     private static final Logger LOG = LogUtils.getLogger(WSDLServiceBuilderTest.class);
     private static final String WSDL_PATH = "hello_world.wsdl";
@@ -101,7 +107,7 @@ public class WSDLServiceBuilderTest extends Assert {
 
     private DestinationFactoryManager destinationFactoryManager;
 
-    public void setUpBasic() throws Exception {
+    protected void setUpBasic() throws Exception {
         setUpWSDL(WSDL_PATH, 0);
     }
 
@@ -127,9 +133,8 @@ public class WSDLServiceBuilderTest extends Assert {
                 service = serv;
                 if (seq == serviceSeq) {
                     break;
-                } else {
-                    seq++;
                 }
+                seq++;
             }
         }
     }
@@ -370,7 +375,7 @@ public class WSDLServiceBuilderTest extends Assert {
         assertEquals(elementName.getLocalPart(), "sayHiResponse");
         assertEquals(elementName.getNamespaceURI(), "http://apache.org/hello_world_soap_http/types");
 
-        assertTrue(sayHi.getFaults().size() == 0);
+        assertTrue(sayHi.getFaults().isEmpty());
 
         name = new QName(serviceInfo.getName().getNamespaceURI(), "pingMe");
         BindingOperationInfo pingMe = bindingInfo.getOperation(name);

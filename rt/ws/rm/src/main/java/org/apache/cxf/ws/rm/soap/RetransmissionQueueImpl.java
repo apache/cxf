@@ -110,9 +110,9 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
     private static final Logger LOG = LogUtils.getL7dLogger(RetransmissionQueueImpl.class);
 
     private Map<String, List<ResendCandidate>> candidates =
-        new HashMap<String, List<ResendCandidate>>();
+        new HashMap<>();
     private Map<String, List<ResendCandidate>> suspendedCandidates =
-        new HashMap<String, List<ResendCandidate>>();
+        new HashMap<>();
     private Resender resender;
     private RMManager manager;
 
@@ -151,7 +151,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
      * @return true if there are no unacknowledged messages in the queue
      */
     public boolean isEmpty() {
-        return 0 == getUnacknowledged().size();
+        return getUnacknowledged().isEmpty();
     }
 
     /**
@@ -323,7 +323,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
      * @param message the message context
      * @return a ResendCandidate
      */
-    protected ResendCandidate createResendCandidate(SoapMessage message) {
+    protected ResendCandidate createResendCandidate(Message message) {
         return new ResendCandidate(message);
     }
 
@@ -347,7 +347,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                 sequenceCandidates = new ArrayList<>();
                 candidates.put(key, sequenceCandidates);
             }
-            candidate = new ResendCandidate(message);
+            candidate = createResendCandidate(message);
             if (isSequenceSuspended(key)) {
                 candidate.suspend();
             }
@@ -743,7 +743,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
 
     private void doResend(SoapMessage message) {
         InputStream is = null;
-        try {
+        try {   //NOPMD
 
             // initialize copied interceptor chain for message
             PhaseInterceptorChain retransmitChain = manager.getRetransmitChain(message);
@@ -828,7 +828,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                 if (incept.getClass().getName().startsWith("org.apache.cxf.jaxws.interceptors")) {
                     retransmitChain.remove(incept);
                 } else if (incept instanceof PhaseInterceptor
-                    && (((PhaseInterceptor<?>)incept).getPhase() == Phase.MARSHAL)) {
+                    && Phase.MARSHAL.equals(((PhaseInterceptor<?>)incept).getPhase())) {
 
                     // remove any interceptors from the marshal phase
                     retransmitChain.remove(incept);

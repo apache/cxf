@@ -23,7 +23,11 @@ package org.apache.cxf.systest.basicDOCBare;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.jws.WebMethod;
+import javax.jws.WebService;
+import javax.jws.soap.SOAPBinding;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 
@@ -44,6 +48,10 @@ public class Server extends AbstractBusTestServerBase {
         props.put(Endpoint.WSDL_PORT, new QName("http://apache.org/hello_world_doc_lit_bare", "SoapPort"));
         ep.setProperties(props);
         ep.publish(address);
+        implementor = new BareSoapServiceImpl();
+        address = "http://localhost:" + PORT + "/SOAPDocLitBareService/SoapPort1";
+        ep = Endpoint.create(implementor);
+        ep.publish(address);
     }
 
     public void tearDown() {
@@ -60,6 +68,23 @@ public class Server extends AbstractBusTestServerBase {
             System.exit(-1);
         } finally {
             System.out.println("done!");
+        }
+    }
+    
+    @WebService(targetNamespace = "http://apache.org/hello_world_doc_lit_bare", name = "BareSoapService")
+    @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
+    public interface BareSoapService {
+
+        @WebMethod
+        void doSomething();
+    }
+
+
+    public static class BareSoapServiceImpl implements BareSoapService {
+        private AtomicInteger invocations = new AtomicInteger(0);
+
+        public void doSomething() {
+            invocations.incrementAndGet();
         }
     }
 }

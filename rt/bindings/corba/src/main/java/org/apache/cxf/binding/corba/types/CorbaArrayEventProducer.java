@@ -19,7 +19,6 @@
 package org.apache.cxf.binding.corba.types;
 
 import org.apache.cxf.service.model.ServiceInfo;
-
 import org.omg.CORBA.ORB;
 
 public class CorbaArrayEventProducer extends AbstractStartEndEventProducer {

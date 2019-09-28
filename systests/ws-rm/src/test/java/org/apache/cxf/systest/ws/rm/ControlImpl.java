@@ -120,15 +120,14 @@ public class ControlImpl  extends org.apache.cxf.greeter_control.ControlImpl {
                                         XPathConstants.STRING);
                 //System.out.println("greetMeOneWay arg: " + s);
                 return null;
-            } else {
-                //System.out.println("greetMe arg: " + s);
-                String resp =
-                    "<greetMeResponse "
-                        + "xmlns=\"http://cxf.apache.org/greeter_control/types\">"
-                        + "<responseType>" + s.toUpperCase() + "</responseType>"
-                    + "</greetMeResponse>";
-                return new StreamSource(new StringReader(resp));
             }
+            //System.out.println("greetMe arg: " + s);
+            String resp =
+                "<greetMeResponse "
+                    + "xmlns=\"http://cxf.apache.org/greeter_control/types\">"
+                    + "<responseType>" + s.toUpperCase() + "</responseType>"
+                + "</greetMeResponse>";
+            return new StreamSource(new StringReader(resp));
         }
     }
 }

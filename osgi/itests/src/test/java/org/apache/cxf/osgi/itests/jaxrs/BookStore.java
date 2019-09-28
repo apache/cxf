@@ -89,10 +89,9 @@ public class BookStore {
         Book b = books.get(id);
         if (b == null) {
             return Response.status(Status.NOT_FOUND).build();
-        } else {
-            b.setName(book.getName());
-            return Response.ok().build();
         }
+        b.setName(book.getName());
+        return Response.ok().build();
     }
 
     @POST
@@ -116,7 +115,7 @@ public class BookStore {
             StringBuilder violationMessages = new StringBuilder();
             for (ConstraintViolation<?> constraintViolation : cve.getConstraintViolations()) {
                 violationMessages.append(constraintViolation.getPropertyPath())
-                        .append(": ").append(constraintViolation.getMessage()).append("\n");
+                        .append(": ").append(constraintViolation.getMessage()).append('\n');
             }
             return Response.status(Response.Status.BAD_REQUEST)
                     .type("text/plain").entity(violationMessages.toString()).build();
@@ -132,12 +131,11 @@ public class BookStore {
         Book b = books.get(book.getId());
         if (b != null) {
             return Response.status(Status.CONFLICT).build();
-        } else {
-            books.put(book.getId(), book);
-            URI createdURI = UriBuilder.fromUri(ui.getAbsolutePath())
-                .path(Long.toString(book.getId())).build();
-            return Response.created(createdURI).build();
         }
+        books.put(book.getId(), book);
+        URI createdURI = UriBuilder.fromUri(ui.getAbsolutePath())
+            .path(Long.toString(book.getId())).build();
+        return Response.created(createdURI).build();
     }
 
     @DELETE
@@ -147,9 +145,8 @@ public class BookStore {
         Book b = books.remove(id);
         if (b == null) {
             return Response.status(Status.NOT_FOUND).build();
-        } else {
-            return Response.ok().build();
         }
+        return Response.ok().build();
     }
 
     private void init() {

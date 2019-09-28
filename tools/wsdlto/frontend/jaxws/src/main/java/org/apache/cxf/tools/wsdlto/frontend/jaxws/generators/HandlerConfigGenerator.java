@@ -50,21 +50,11 @@ public class HandlerConfigGenerator extends AbstractJAXWSGenerator {
         return handlerChainAnnotation;
     }
 
-    public boolean passthrough() {
-       //TODO: enable the handler chain
-        /* if (this.intf.getHandlerChains() == null) {
-            return true;
-        }*/
-        return false;
-    }
-
     public void setJavaInterface(JavaInterface javaInterface) {
         this.intf = javaInterface;
     }
 
     public void generate(ToolContext penv) throws ToolException {
-
-
         this.env = penv;
 
         if (passthrough()) {

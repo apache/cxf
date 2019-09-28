@@ -33,6 +33,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,9 +54,9 @@ public final class PublicSuffixMatcherLoader {
     }
 
     private static PublicSuffixMatcher load(final InputStream in) throws IOException {
-        final PublicSuffixList list = new PublicSuffixListParser().parse(
+        final List<PublicSuffixList> lists = new PublicSuffixListParser().parseByType(
                 new InputStreamReader(in, StandardCharsets.UTF_8));
-        return new PublicSuffixMatcher(list.getRules(), list.getExceptions());
+        return new PublicSuffixMatcher(lists);
     }
 
     public static PublicSuffixMatcher load(final URL url) throws IOException {
@@ -85,7 +86,7 @@ public final class PublicSuffixMatcherLoader {
                     if (url != null) {
                         try {
                             defaultInstance = load(url);
-                        } catch (IOException ex) {
+                        } catch (final IOException ex) {
                             // Should never happen
                             if (LOG.isLoggable(Level.WARNING)) {
                                 LOG.log(Level.WARNING,

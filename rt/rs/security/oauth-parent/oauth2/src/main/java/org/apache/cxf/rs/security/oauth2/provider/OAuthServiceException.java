@@ -60,4 +60,8 @@ public class OAuthServiceException extends RuntimeException {
         return error;
     }
 
+    @Override
+    public String getMessage() {
+        return error == null ? super.getMessage() : error.toString();
+    }
 }

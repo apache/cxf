@@ -52,6 +52,10 @@ import org.apache.cxf.testutil.common.TestUtil;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
     static String serverPort = TestUtil.getPortNumber(Server.class);
 
@@ -67,8 +71,8 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         org.apache.cxf.swa_nomime.SwAServiceInterface port = service.getSwAServiceHttpPort();
         setAddress(port, "http://localhost:" + serverPort + "/swa-nomime");
 
-        Holder<String> textHolder = new Holder<String>("Hi");
-        Holder<byte[]> data = new Holder<byte[]>("foobar".getBytes());
+        Holder<String> textHolder = new Holder<>("Hi");
+        Holder<byte[]> data = new Holder<>("foobar".getBytes());
 
         port.echoData(textHolder, data);
         String string = IOUtils.newStringFromBytes(data.value);
@@ -81,11 +85,11 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         URL url4 = this.getClass().getResource("resources/attach.jpeg1");
         URL url5 = this.getClass().getResource("resources/attach.jpeg2");
 
-        Holder<String> attach1 = new Holder<String>(IOUtils.toString(url1.openStream()));
-        Holder<String> attach2 = new Holder<String>(IOUtils.toString(url2.openStream()));
-        Holder<String> attach3 = new Holder<String>(IOUtils.toString(url3.openStream()));
-        Holder<byte[]> attach4 = new Holder<byte[]>(IOUtils.readBytesFromStream(url4.openStream()));
-        Holder<byte[]> attach5 = new Holder<byte[]>(IOUtils.readBytesFromStream(url5.openStream()));
+        Holder<String> attach1 = new Holder<>(IOUtils.toString(url1.openStream()));
+        Holder<String> attach2 = new Holder<>(IOUtils.toString(url2.openStream()));
+        Holder<String> attach3 = new Holder<>(IOUtils.toString(url3.openStream()));
+        Holder<byte[]> attach4 = new Holder<>(IOUtils.readBytesFromStream(url4.openStream()));
+        Holder<byte[]> attach5 = new Holder<>(IOUtils.readBytesFromStream(url5.openStream()));
         org.apache.cxf.swa_nomime.types.VoidRequest request
             = new org.apache.cxf.swa_nomime.types.VoidRequest();
         org.apache.cxf.swa_nomime.types.OutputResponseAll response
@@ -105,8 +109,8 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         SwAServiceInterface port = service.getSwAServiceHttpPort();
         setAddress(port, "http://localhost:" + serverPort + "/swa");
 
-        Holder<String> textHolder = new Holder<String>();
-        Holder<DataHandler> data = new Holder<DataHandler>();
+        Holder<String> textHolder = new Holder<>();
+        Holder<DataHandler> data = new Holder<>();
 
         ByteArrayDataSource source = new ByteArrayDataSource("foobar".getBytes(), "application/octet-stream");
         DataHandler handler = new DataHandler(source);
@@ -118,7 +122,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         port.echoData(textHolder, data);
         InputStream bis = null;
         bis = data.value.getDataSource().getInputStream();
-        byte b[] = new byte[10];
+        byte[] b = new byte[10];
         bis.read(b, 0, 10);
         String string = IOUtils.newStringFromBytes(b);
         assertEquals("testfoobar", string);
@@ -132,9 +136,9 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         SwAServiceInterface port = service.getSwAServiceHttpPort();
         setAddress(port, "http://localhost:" + serverPort + "/swa");
 
-        Holder<String> textHolder = new Holder<String>();
-        Holder<String> headerHolder = new Holder<String>();
-        Holder<DataHandler> data = new Holder<DataHandler>();
+        Holder<String> textHolder = new Holder<>();
+        Holder<String> headerHolder = new Holder<>();
+        Holder<DataHandler> data = new Holder<>();
 
         ByteArrayDataSource source = new ByteArrayDataSource("foobar".getBytes(), "application/octet-stream");
         DataHandler handler = new DataHandler(source);
@@ -147,7 +151,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         port.echoDataWithHeader(textHolder, data, headerHolder);
         InputStream bis = null;
         bis = data.value.getDataSource().getInputStream();
-        byte b[] = new byte[10];
+        byte[] b = new byte[10];
         bis.read(b, 0, 10);
         String string = IOUtils.newStringFromBytes(b);
         assertEquals("testfoobar", string);
@@ -162,7 +166,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         SwAServiceInterface port = service.getSwAServiceHttpPort();
         setAddress(port, "http://localhost:" + serverPort + "/swa");
 
-        Holder<DataStruct> structHolder = new Holder<DataStruct>();
+        Holder<DataStruct> structHolder = new Holder<>();
 
         ByteArrayDataSource source = new ByteArrayDataSource("foobar".getBytes(), "application/octet-stream");
         DataHandler handler = new DataHandler(source);
@@ -175,7 +179,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
 
         handler = structHolder.value.getDataRef();
         InputStream bis = handler.getDataSource().getInputStream();
-        byte b[] = new byte[10];
+        byte[] b = new byte[10];
         bis.read(b, 0, 10);
         String string = IOUtils.newStringFromBytes(b);
         assertEquals("testfoobar", string);
@@ -193,21 +197,21 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         URL url2 = this.getClass().getResource("resources/attach.html");
         URL url3 = this.getClass().getResource("resources/attach.xml");
         URL url4 = this.getClass().getResource("resources/attach.jpeg1");
-        URL url5 = this.getClass().getResource("resources/attach.jpeg2");
+        URL url5 = this.getClass().getResource("resources/attach.gif");
 
         DataHandler dh1 = new DataHandler(url1);
         DataHandler dh2 = new DataHandler(url2);
         DataHandler dh3 = new DataHandler(url3);
         //DataHandler dh4 = new DataHandler(url4);
         //DataHandler dh5 = new DataHandler(url5);
-        Holder<DataHandler> attach1 = new Holder<DataHandler>();
+        Holder<DataHandler> attach1 = new Holder<>();
         attach1.value = dh1;
-        Holder<DataHandler> attach2 = new Holder<DataHandler>();
+        Holder<DataHandler> attach2 = new Holder<>();
         attach2.value = dh2;
-        Holder<Source> attach3 = new Holder<Source>();
+        Holder<Source> attach3 = new Holder<>();
         attach3.value = new StreamSource(dh3.getInputStream());
-        Holder<Image> attach4 = new Holder<Image>();
-        Holder<Image> attach5 = new Holder<Image>();
+        Holder<Image> attach4 = new Holder<>();
+        Holder<Image> attach5 = new Holder<>();
         attach4.value = ImageIO.read(url4);
         attach5.value = ImageIO.read(url5);
         VoidRequest request = new VoidRequest();

@@ -23,14 +23,14 @@
       xmlns:jaxrsclient="http://cxf.apache.org/jaxrs-client"
       xsi:schemaLocation="
          http://www.springframework.org/schema/beans 
-         http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+         http://www.springframework.org/schema/beans/spring-beans.xsd
          http://cxf.apache.org/jaxrs
          http://cxf.apache.org/schemas/jaxrs.xsd
          http://cxf.apache.org/jaxrs-client
          http://cxf.apache.org/schemas/jaxrs-client.xsd">
 
      <!-- CXF Logging Feature -->
-     <bean id="loggingFeature" class="org.apache.cxf.feature.LoggingFeature"/>
+     <bean id="loggingFeature" class="org.apache.cxf.ext.logging.LoggingFeature"/>
 
      <!-- 
         1. Big Query Client Application: 
@@ -189,7 +189,7 @@
      This client is optional if the application is happy working with OIDC IDToken only -->
      
      <jaxrsclient:client id="userInfoServiceClient" threadSafe="true" 
-        address="https://www.googleapis.com/plus/v1/people/me/openIdConnect"
+        address="https://openidconnect.googleapis.com/v1/userinfo"
         serviceClass="org.apache.cxf.jaxrs.client.WebClient">
         <jaxrsclient:headers>
             <entry key="Accept" value="application/json"/>

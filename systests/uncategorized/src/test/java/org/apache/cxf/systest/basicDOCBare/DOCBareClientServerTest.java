@@ -18,7 +18,6 @@
  */
 
 
-
 package org.apache.cxf.systest.basicDOCBare;
 
 import java.lang.annotation.Annotation;
@@ -30,6 +29,9 @@ import javax.jws.WebParam;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Holder;
 
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.frontend.ClientProxyFactoryBean;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world_doc_lit_bare.PutLastTradedPricePortType;
 import org.apache.hello_world_doc_lit_bare.SOAPService;
@@ -38,6 +40,13 @@ import org.apache.hello_world_doc_lit_bare.types.TradePriceData;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class DOCBareClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = Server.PORT;
@@ -75,7 +84,7 @@ public class DOCBareClientServerTest extends AbstractBusClientServerTestBase {
         priceData.setTickerPrice(1.0f);
         priceData.setTickerSymbol("CELTIX");
 
-        Holder<TradePriceData> holder = new Holder<TradePriceData>(priceData);
+        Holder<TradePriceData> holder = new Holder<>(priceData);
 
         for (int i = 0; i < 5; i++) {
             putLastTradedPrice.sayHi(holder);
@@ -90,7 +99,7 @@ public class DOCBareClientServerTest extends AbstractBusClientServerTestBase {
     public void testAnnotation() throws Exception {
         Class<PutLastTradedPricePortType> claz = PutLastTradedPricePortType.class;
         TradePriceData priceData = new TradePriceData();
-        Holder<TradePriceData> holder = new Holder<TradePriceData>(priceData);
+        Holder<TradePriceData> holder = new Holder<>(priceData);
         Method method = claz.getMethod("sayHi", holder.getClass());
         assertNotNull("Can not find SayHi method in generated class ", method);
         Annotation ann = method.getAnnotation(WebMethod.class);
@@ -123,5 +132,27 @@ public class DOCBareClientServerTest extends AbstractBusClientServerTestBase {
     }
 
 
+    @Test
+    public void testBare() throws Exception {
+        ClientProxyFactoryBean factory = new ClientProxyFactoryBean();
+        factory.setServiceClass(Server.BareSoapService.class);
+        factory.setAddress("http://localhost:" + Server.PORT + "/SOAPDocLitBareService/SoapPort1");
+        factory.setBus(BusFactory.newInstance().createBus());
+        Server.BareSoapService client = (Server.BareSoapService) factory.create();
+
+        try {
+            client.doSomething();
+            fail("This should fail, ClientProxyFactoryBean doesn't support @SOAPBinding annotation");
+        } catch (IllegalStateException t) {
+            //expected
+        }
+
+        factory = new JaxWsProxyFactoryBean();
+        factory.setServiceClass(Server.BareSoapService.class);
+        factory.setAddress("http://localhost:" + Server.PORT + "/SOAPDocLitBareService/SoapPort1");
+        factory.setBus(BusFactory.newInstance().createBus());
+        client = (Server.BareSoapService) factory.create();
+        client.doSomething();
+    }
 }
 

@@ -34,7 +34,7 @@ public class Server extends AbstractBusTestServerBase {
     static final String PORT = allocatePort(Server.class);
     static final String BOGUS_REAL_PORT = allocatePort(Server.class, 2);
 
-    List<Endpoint> eps = new LinkedList<Endpoint>();
+    List<Endpoint> eps = new LinkedList<>();
 
     protected void run() {
         Object implementor;

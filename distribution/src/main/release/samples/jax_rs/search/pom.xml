@@ -25,12 +25,12 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <cxf.lucene.version>4.9.0</cxf.lucene.version>
+        <cxf.lucene.version>8.2.0</cxf.lucene.version>
     </properties>
     <profiles>
         <profile>
@@ -84,33 +84,33 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>3.2.0-SNAPSHOT</version>
+            <version>3.4.0-SNAPSHOT</version>
         </dependency>
         <!-- This dependency is needed if you're using the Jetty container -->
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>3.2.0-SNAPSHOT</version>
+            <version>3.4.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>3.2.0-SNAPSHOT</version>
+            <version>3.4.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-extension-search</artifactId>
-            <version>3.2.0-SNAPSHOT</version>
+            <version>3.4.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-extension-providers</artifactId>
-            <version>3.2.0-SNAPSHOT</version>
+            <version>3.4.0-SNAPSHOT</version>
         </dependency>                 
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-security-cors</artifactId>
-            <version>3.2.0-SNAPSHOT</version>
+            <version>3.4.0-SNAPSHOT</version>
         </dependency> 
         <dependency>
             <groupId>org.apache.lucene</groupId>
@@ -132,26 +132,16 @@
         </dependency>                    
         <dependency>
             <groupId>org.apache.tika</groupId>
-            <artifactId>tika-core</artifactId>
-            <version>2.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-parser-pdf-module</artifactId>
-            <version>2.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-parser-office-module</artifactId>
-            <version>2.0-SNAPSHOT</version>
+            <artifactId>tika-parsers</artifactId>
+            <version>${cxf.tika.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>                        
         <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
@@ -164,20 +154,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
-            <version>4.5.3</version>
+            <version>${cxf.httpcomponents.client.version}</version>
         </dependency>    
     </dependencies>
-    <repositories>
-        <repository>
-            <id>apache-snapshots</id>
-            <url>http://repository.apache.org/snapshots</url>
-            <name>Apache Snapshots Repo</name>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-    </repositories>
 </project>

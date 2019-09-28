@@ -21,10 +21,12 @@ package org.apache.cxf.jaxrs.provider;
 
 import java.util.Collections;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class RequestDispatcherProviderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class RequestDispatcherProviderTest {
 
     @Test
     public void testIsWriteableEnum() {

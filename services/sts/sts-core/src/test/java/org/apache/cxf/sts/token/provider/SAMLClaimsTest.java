@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.sts.token.provider;
 
-import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.rt.security.claims.Claim;
@@ -43,6 +44,7 @@ import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -50,20 +52,25 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.dom.WSConstants;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.saml.saml2.core.Attribute;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * A unit test for creating a SAML Tokens with various Attributes populated by a ClaimsHandler.
  */
-public class SAMLClaimsTest extends org.junit.Assert {
+public class SAMLClaimsTest {
 
-    public static final URI CLAIM_STATIC_COMPANY =
-        URI.create("http://apache.org/claims/test/company");
+    public static final String CLAIM_STATIC_COMPANY =
+        "http://apache.org/claims/test/company";
 
-    public static final URI CLAIM_APPLICATION =
-        URI.create("http://apache.org/claims/test/applicationId");
+    public static final String CLAIM_APPLICATION =
+        "http://apache.org/claims/test/applicationId";
 
     private static final String CLAIM_STATIC_COMPANY_VALUE = "myc@mpany";
 
@@ -78,7 +85,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
     public void testSaml2Claims() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         TokenProviderParameters providerParameters =
-            createProviderParameters(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
+            createProviderParameters(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
 
         ClaimsManager claimsManager = new ClaimsManager();
         ClaimsHandler claimsHandler = new CustomClaimsHandler();
@@ -88,9 +95,9 @@ public class SAMLClaimsTest extends org.junit.Assert {
         ClaimCollection claims = createClaims();
         providerParameters.setRequestedPrimaryClaims(claims);
 
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -113,7 +120,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
     public void testSaml2MultipleClaims() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         TokenProviderParameters providerParameters =
-            createProviderParameters(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
+            createProviderParameters(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
 
         ClaimsManager claimsManager = new ClaimsManager();
         ClaimsHandler claimsHandler = new CustomClaimsHandler();
@@ -129,9 +136,9 @@ public class SAMLClaimsTest extends org.junit.Assert {
         secondaryClaims.add(claim);
         providerParameters.setRequestedSecondaryClaims(secondaryClaims);
 
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -156,7 +163,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
     public void testSaml2MultipleClaimsSameDialect() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         TokenProviderParameters providerParameters =
-            createProviderParameters(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
+            createProviderParameters(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
 
         ClaimsManager claimsManager = new ClaimsManager();
         ClaimsHandler claimsHandler = new CustomClaimsHandler();
@@ -174,9 +181,9 @@ public class SAMLClaimsTest extends org.junit.Assert {
         secondaryClaims.setDialect(ClaimTypes.URI_BASE);
         providerParameters.setRequestedSecondaryClaims(secondaryClaims);
 
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -198,12 +205,12 @@ public class SAMLClaimsTest extends org.junit.Assert {
     public void testSaml2StaticClaims() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         TokenProviderParameters providerParameters =
-            createProviderParameters(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
+            createProviderParameters(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
 
         ClaimsManager claimsManager = new ClaimsManager();
         StaticClaimsHandler claimsHandler = new StaticClaimsHandler();
         Map<String, String> staticClaimsMap = new HashMap<>();
-        staticClaimsMap.put(CLAIM_STATIC_COMPANY.toString(), CLAIM_STATIC_COMPANY_VALUE);
+        staticClaimsMap.put(CLAIM_STATIC_COMPANY, CLAIM_STATIC_COMPANY_VALUE);
         claimsHandler.setGlobalClaims(staticClaimsMap);
         claimsManager.setClaimHandlers(Collections.singletonList((ClaimsHandler)claimsHandler));
         providerParameters.setClaimsManager(claimsManager);
@@ -214,9 +221,9 @@ public class SAMLClaimsTest extends org.junit.Assert {
         claims.add(claim);
         providerParameters.setRequestedPrimaryClaims(claims);
 
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -229,7 +236,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
         SamlAssertionWrapper assertion = new SamlAssertionWrapper(token);
         List<Attribute> attributes = assertion.getSaml2().getAttributeStatements().get(0).getAttributes();
         assertEquals(attributes.size(), 1);
-        assertEquals(attributes.get(0).getName(), CLAIM_STATIC_COMPANY.toString());
+        assertEquals(attributes.get(0).getName(), CLAIM_STATIC_COMPANY);
         XMLObject valueObj = attributes.get(0).getAttributeValues().get(0);
         assertEquals(valueObj.getDOM().getTextContent(), CLAIM_STATIC_COMPANY_VALUE);
     }
@@ -241,20 +248,20 @@ public class SAMLClaimsTest extends org.junit.Assert {
     public void testSaml2StaticEndpointClaims() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         TokenProviderParameters providerParameters =
-            createProviderParameters(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
+            createProviderParameters(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
 
         ClaimsManager claimsManager = new ClaimsManager();
         StaticEndpointClaimsHandler claimsHandler = new StaticEndpointClaimsHandler();
 
         // Create claims map for specific application
         Map<String, String> endpointClaimsMap = new HashMap<>();
-        endpointClaimsMap.put(CLAIM_APPLICATION.toString(), CLAIM_APPLICATION_VALUE);
+        endpointClaimsMap.put(CLAIM_APPLICATION, CLAIM_APPLICATION_VALUE);
 
         Map<String, Map<String, String>> staticClaims = new HashMap<>();
         staticClaims.put(APPLICATION_APPLIES_TO, endpointClaimsMap);
         claimsHandler.setEndpointClaims(staticClaims);
 
-        List<URI> supportedClaims = new ArrayList<>();
+        List<String> supportedClaims = new ArrayList<>();
         supportedClaims.add(CLAIM_APPLICATION);
         claimsHandler.setSupportedClaims(supportedClaims);
 
@@ -267,9 +274,9 @@ public class SAMLClaimsTest extends org.junit.Assert {
         claims.add(claim);
         providerParameters.setRequestedPrimaryClaims(claims);
 
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -282,7 +289,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
         SamlAssertionWrapper assertion = new SamlAssertionWrapper(token);
         List<Attribute> attributes = assertion.getSaml2().getAttributeStatements().get(0).getAttributes();
         assertEquals(attributes.size(), 1);
-        assertEquals(attributes.get(0).getName(), CLAIM_APPLICATION.toString());
+        assertEquals(attributes.get(0).getName(), CLAIM_APPLICATION);
         XMLObject valueObj = attributes.get(0).getAttributeValues().get(0);
         assertEquals(valueObj.getDOM().getTextContent(), CLAIM_APPLICATION_VALUE);
     }
@@ -295,7 +302,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
     public void testSaml2StaticEndpointClaimsUnknownAppliesTo() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         TokenProviderParameters providerParameters =
-            createProviderParameters(WSConstants.WSS_SAML2_TOKEN_TYPE,
+            createProviderParameters(WSS4JConstants.WSS_SAML2_TOKEN_TYPE,
                     STSConstants.BEARER_KEY_KEYTYPE, APPLICATION_APPLIES_TO + "UNKNOWN");
 
         ClaimsManager claimsManager = new ClaimsManager();
@@ -303,13 +310,13 @@ public class SAMLClaimsTest extends org.junit.Assert {
 
         // Create claims map for specific application
         Map<String, String> endpointClaimsMap = new HashMap<>();
-        endpointClaimsMap.put(CLAIM_APPLICATION.toString(), CLAIM_APPLICATION_VALUE);
+        endpointClaimsMap.put(CLAIM_APPLICATION, CLAIM_APPLICATION_VALUE);
 
         Map<String, Map<String, String>> staticClaims = new HashMap<>();
         staticClaims.put(APPLICATION_APPLIES_TO, endpointClaimsMap);
         claimsHandler.setEndpointClaims(staticClaims);
 
-        List<URI> supportedClaims = new ArrayList<>();
+        List<String> supportedClaims = new ArrayList<>();
         supportedClaims.add(CLAIM_APPLICATION);
         claimsHandler.setSupportedClaims(supportedClaims);
 
@@ -322,7 +329,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
         claims.add(claim);
         providerParameters.setRequestedPrimaryClaims(claims);
 
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
 
         try {
             samlTokenProvider.createToken(providerParameters);
@@ -339,7 +346,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
     public void testSaml2ClaimsInteger() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         TokenProviderParameters providerParameters =
-            createProviderParameters(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
+            createProviderParameters(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
 
         ClaimsManager claimsManager = new ClaimsManager();
         ClaimsHandler claimsHandler = new CustomClaimsHandler();
@@ -352,9 +359,9 @@ public class SAMLClaimsTest extends org.junit.Assert {
         claims.add(claim);
         providerParameters.setRequestedPrimaryClaims(claims);
 
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -366,6 +373,92 @@ public class SAMLClaimsTest extends org.junit.Assert {
         assertTrue(tokenString.contains(ClaimTypes.MOBILEPHONE.toString()));
     }
 
+    /**
+     * Here we have two ClaimsHandlers that can both add claims for the same claim type. By default we will
+     * combine the Claims into one Attribute.
+     */
+    @org.junit.Test
+    public void testSaml2CombinedClaimsMultipleClaimsHandlers() throws Exception {
+        TokenProvider samlTokenProvider = new SAMLTokenProvider();
+        TokenProviderParameters providerParameters =
+            createProviderParameters(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
+
+        ClaimsManager claimsManager = new ClaimsManager();
+        ClaimsHandler claimsHandler = new CustomClaimsHandler();
+        ClaimsHandler claimsHandler2 = new CustomClaimsHandler();
+        ((CustomClaimsHandler) claimsHandler2).setRole("CustomRole");
+        claimsManager.setClaimHandlers(new ArrayList<ClaimsHandler>(Arrays.asList(claimsHandler, claimsHandler2)));
+        providerParameters.setClaimsManager(claimsManager);
+
+        ClaimCollection claims = new ClaimCollection();
+
+        Claim claim = new Claim();
+        claim.setClaimType(CustomClaimsHandler.ROLE_CLAIM);
+        claims.add(claim);
+
+        providerParameters.setRequestedPrimaryClaims(claims);
+
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
+        TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertNotNull(providerResponse);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+
+        Element token = (Element)providerResponse.getToken();
+        String tokenString = DOM2Writer.nodeToString(token);
+        assertTrue(tokenString.contains(providerResponse.getTokenId()));
+        assertTrue(tokenString.contains("AttributeStatement"));
+
+        String requiredClaim = CustomClaimsHandler.ROLE_CLAIM.toString();
+        assertTrue(tokenString.contains(requiredClaim));
+        assertTrue(tokenString.contains("DUMMY"));
+        assertTrue(tokenString.contains("CustomRole"));
+        // Check only one Role Claim
+        assertEquals(tokenString.indexOf(requiredClaim), tokenString.lastIndexOf(requiredClaim));
+    }
+
+    /**
+     * Here we have two ClaimsHandlers that can both add claims for the same claim type. We configure the
+     * SAMLTokenProvider not to combine the claims unlike the test above.
+     */
+    @org.junit.Test
+    public void testSaml2SeparateClaimsMultipleClaimsHandlers() throws Exception {
+        TokenProvider samlTokenProvider = new SAMLTokenProvider();
+        ((SAMLTokenProvider) samlTokenProvider).setCombineClaimAttributes(false);
+        TokenProviderParameters providerParameters =
+            createProviderParameters(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
+
+        ClaimsManager claimsManager = new ClaimsManager();
+        ClaimsHandler claimsHandler = new CustomClaimsHandler();
+        ClaimsHandler claimsHandler2 = new CustomClaimsHandler();
+        ((CustomClaimsHandler) claimsHandler2).setRole("CustomRole");
+        claimsManager.setClaimHandlers(new ArrayList<ClaimsHandler>(Arrays.asList(claimsHandler, claimsHandler2)));
+        providerParameters.setClaimsManager(claimsManager);
+
+        ClaimCollection claims = new ClaimCollection();
+
+        Claim claim = new Claim();
+        claim.setClaimType(CustomClaimsHandler.ROLE_CLAIM);
+        claims.add(claim);
+
+        providerParameters.setRequestedPrimaryClaims(claims);
+
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
+        TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertNotNull(providerResponse);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+
+        Element token = (Element)providerResponse.getToken();
+        String tokenString = DOM2Writer.nodeToString(token);
+        assertTrue(tokenString.contains(providerResponse.getTokenId()));
+        assertTrue(tokenString.contains("AttributeStatement"));
+
+        String requiredClaim = CustomClaimsHandler.ROLE_CLAIM.toString();
+        assertTrue(tokenString.contains(requiredClaim));
+        assertTrue(tokenString.contains("DUMMY"));
+        assertTrue(tokenString.contains("CustomRole"));
+        // Check we have two Role Claims
+        assertNotEquals(tokenString.indexOf(requiredClaim), tokenString.lastIndexOf(requiredClaim));
+    }
 
     private TokenProviderParameters createProviderParameters(
         String tokenType, String keyType, String appliesTo
@@ -404,8 +497,6 @@ public class SAMLClaimsTest extends org.junit.Assert {
         parameters.setStsProperties(stsProperties);
 
         parameters.setEncryptionProperties(new EncryptionProperties());
-
-
 
         return parameters;
     }

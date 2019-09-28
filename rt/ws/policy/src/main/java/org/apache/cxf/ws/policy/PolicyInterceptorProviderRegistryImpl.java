@@ -74,7 +74,7 @@ public class PolicyInterceptorProviderRegistryImpl
         for (QName qn : provider.getAssertionTypes()) {
             Set<PolicyInterceptorProvider> providers = super.get(qn);
             if (providers == null) {
-                providers = new CopyOnWriteArraySet<PolicyInterceptorProvider>();
+                providers = new CopyOnWriteArraySet<>();
             }
             providers.add(provider);
             super.register(qn, providers);
@@ -111,7 +111,7 @@ public class PolicyInterceptorProviderRegistryImpl
     getInterceptorsForAlternative(Collection<? extends Assertion> alternative,
                                   boolean out, boolean fault) {
 
-        List<Interceptor<? extends Message>> interceptors = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> interceptors = new ArrayList<>();
         for (Assertion a : alternative) {
             if (a.isOptional()) {
                 continue;
@@ -141,7 +141,7 @@ public class PolicyInterceptorProviderRegistryImpl
     protected List<Interceptor<? extends Message>> getInterceptorsForAssertion(QName qn, boolean out,
                                                                                boolean fault) {
         loadDynamic();
-        List<Interceptor<? extends Message>> interceptors = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> interceptors = new ArrayList<>();
         Set<PolicyInterceptorProvider> pps = get(qn);
         for (PolicyInterceptorProvider pp : pps) {
             interceptors.addAll(out

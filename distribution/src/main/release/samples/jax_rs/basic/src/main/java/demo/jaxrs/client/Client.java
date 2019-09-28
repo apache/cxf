@@ -40,7 +40,7 @@ public final class Client {
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         // Sent HTTP GET request to query all customer info
         /*
          * URL url = new URL("http://localhost:9000/customers");

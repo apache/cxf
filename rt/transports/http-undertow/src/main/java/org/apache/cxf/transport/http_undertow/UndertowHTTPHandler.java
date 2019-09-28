@@ -21,6 +21,7 @@ package org.apache.cxf.transport.http_undertow;
 
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.Bus;
 
@@ -40,6 +41,7 @@ public class UndertowHTTPHandler implements HttpHandler {
 
     private static final String SSL_CIPHER_SUITE_ATTRIBUTE = "javax.servlet.request.cipher_suite";
     private static final String SSL_PEER_CERT_CHAIN_ATTRIBUTE = "javax.servlet.request.X509Certificate";
+    private static final String METHOD_TRACE = "TRACE";
 
     protected UndertowHTTPDestination undertowHTTPDestination;
     protected ServletContext servletContext;
@@ -69,7 +71,7 @@ public class UndertowHTTPHandler implements HttpHandler {
     public ServletContext getServletContext() {
         return this.servletContext;
     }
-    
+
     public void setName(String name) {
         urlName = name;
     }
@@ -91,13 +93,16 @@ public class UndertowHTTPHandler implements HttpHandler {
                 undertowExchange.dispatch(this);
                 return;
             }
-            
-            
+
+
             HttpServletResponseImpl response = new HttpServletResponseImpl(undertowExchange,
                                                                            (ServletContextImpl)servletContext);
             HttpServletRequestImpl request = new HttpServletRequestImpl(undertowExchange,
                                                                         (ServletContextImpl)servletContext);
-
+            if (request.getMethod().equals(METHOD_TRACE)) {
+                response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+                return;
+            }
             ServletRequestContext servletRequestContext = new ServletRequestContext(((ServletContextImpl)servletContext)
                 .getDeployment(), request, response, null);
 
@@ -125,7 +130,7 @@ public class UndertowHTTPHandler implements HttpHandler {
                     + "</head><body>Internal Error 500" + t.getMessage()
                     + "</body></html>";
                 undertowExchange.getResponseHeaders().put(Headers.CONTENT_LENGTH,
-                                                          "" + errorPage.length());
+                                                          Integer.toString(errorPage.length()));
                 undertowExchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/html");
                 Sender sender = undertowExchange.getResponseSender();
                 sender.send(errorPage);

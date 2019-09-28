@@ -19,6 +19,7 @@
 package org.apache.cxf.tools.fortest;
 
 import java.awt.Image;
+
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlMimeType;
 

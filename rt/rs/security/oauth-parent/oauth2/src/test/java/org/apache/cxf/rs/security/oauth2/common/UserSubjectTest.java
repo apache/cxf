@@ -20,10 +20,12 @@ package org.apache.cxf.rs.security.oauth2.common;
 
 import java.util.Collections;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class UserSubjectTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class UserSubjectTest {
 
     @Test
     public void testId() {

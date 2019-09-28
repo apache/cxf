@@ -50,7 +50,7 @@ public class DelegatingXMLStreamWriter implements XMLStreamWriter {
         return delegate.getPrefix(uri);
     }
 
-    public Object getProperty(String name) throws IllegalArgumentException {
+    public Object getProperty(String name) {
         return delegate.getProperty(name);
     }
 

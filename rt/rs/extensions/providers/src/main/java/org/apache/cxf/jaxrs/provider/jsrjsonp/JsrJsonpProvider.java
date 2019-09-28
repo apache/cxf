@@ -69,14 +69,8 @@ public class JsrJsonpProvider implements MessageBodyReader<JsonStructure>, Messa
             throw new IOException("Initialized OutputStream should be provided");
         }
 
-        JsonWriter writer = null;
-        try {
-            writer = Json.createWriter(entityStream);
+        try (JsonWriter writer = Json.createWriter(entityStream)) {
             writer.write(t);
-        } finally {
-            if (writer != null) {
-                writer.close();
-            }
         }
     }
 
@@ -96,16 +90,10 @@ public class JsrJsonpProvider implements MessageBodyReader<JsonStructure>, Messa
             throw new IOException("Initialized InputStream should be provided");
         }
 
-        JsonReader reader = null;
-        try {
-            reader = Json.createReader(entityStream);
+        try (JsonReader reader = Json.createReader(entityStream)) {
             return reader.read();
         } catch (JsonException ex) {
             throw ExceptionUtils.toBadRequestException(ex, null);
-        } finally {
-            if (reader != null) {
-                reader.close();
-            }
         }
     }
 }

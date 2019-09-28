@@ -96,7 +96,7 @@ public final class Client implements Runnable {
         doStop = true;
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         if (args.length == 0) {
             args = new String[] {SOAPService.WSDL_LOCATION.toExternalForm()};
         }

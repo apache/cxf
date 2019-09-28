@@ -31,8 +31,7 @@ public class JaxbElementTestImpl implements JaxbElementTest {
     public String newOperation(String in) {
         if (in == null) {
             return "in=null";
-        } else {
-            return "in=" + in;
         }
+        return "in=" + in;
     }
 }

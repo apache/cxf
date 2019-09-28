@@ -67,7 +67,7 @@ public final class JAXBContextCache {
         private CachedContextAndSchemas(JAXBContext context, Set<Class<?>> classes, CachedContextAndSchemasInternal i) {
             this.context = context;
             this.classes = classes;
-            ccas = new WeakReference<CachedContextAndSchemasInternal>(i);
+            ccas = new WeakReference<>(i);
         }
         public JAXBContext getContext() {
             return context;
@@ -97,8 +97,8 @@ public final class JAXBContextCache {
         private Collection<DOMSource> schemas;
 
         CachedContextAndSchemasInternal(JAXBContext context, Set<Class<?>> classes) {
-            this.context = new WeakReference<JAXBContext>(context);
-            this.classes = new WeakReference<Set<Class<?>>>(classes);
+            this.context = new WeakReference<>(context);
+            this.classes = new WeakReference<>(classes);
         }
 
         public JAXBContext getContext() {
@@ -118,10 +118,10 @@ public final class JAXBContextCache {
     }
 
     private static final Map<Set<Class<?>>, Map<String, CachedContextAndSchemasInternal>> JAXBCONTEXT_CACHE
-        = new CacheMap<Set<Class<?>>, Map<String, CachedContextAndSchemasInternal>>();
+        = new CacheMap<>();
 
     private static final Map<Package, CachedClass> OBJECT_FACTORY_CACHE
-        = new CacheMap<Package, CachedClass>();
+        = new CacheMap<>();
 
     private static final boolean HAS_MOXY;
 
@@ -157,7 +157,7 @@ public final class JAXBContextCache {
     }
 
     public static CachedContextAndSchemas getCachedContextAndSchemas(Class<?> ... cls) throws JAXBException {
-        Set<Class<?>> classes = new HashSet<Class<?>>();
+        Set<Class<?>> classes = new HashSet<>();
         for (Class<?> c : cls) {
             classes.add(c);
         }
@@ -169,7 +169,7 @@ public final class JAXBContextCache {
                                                                      Map<String, Object> props,
                                                                      ClassLoader loader)
         throws JAXBException {
-        Set<Class<?>> classes = new HashSet<Class<?>>();
+        Set<Class<?>> classes = new HashSet<>();
         addPackage(classes, pkg, loader);
         return getCachedContextAndSchemas(classes, null, props, null, true);
     }
@@ -233,7 +233,6 @@ public final class JAXBContextCache {
                         if (cls != null) {
                             JAXBCONTEXT_CACHE.remove(cls);
                         }
-                        cachedContextAndSchemasInternal = null;
                     } else {
                         return new CachedContextAndSchemas(context, cachedContextAndSchemasInternal.getClasses(),
                             cachedContextAndSchemasInternal);
@@ -251,8 +250,7 @@ public final class JAXBContextCache {
                 try {
                     context = AccessController.doPrivileged(new PrivilegedExceptionAction<JAXBContext>() {
                         public JAXBContext run() throws Exception {
-                            return JAXBContext.newInstance(classes
-                                                          .toArray(new Class[classes.size()]), null);
+                            return JAXBContext.newInstance(classes.toArray(new Class<?>[0]), null);
                         }
                     });
                 } catch (PrivilegedActionException e) {
@@ -268,7 +266,7 @@ public final class JAXBContextCache {
             if (typeRefs == null || typeRefs.isEmpty()) {
                 if (cachedContextAndSchemasInternalMap == null) {
                     cachedContextAndSchemasInternalMap
-                        = new CacheMap<String, CachedContextAndSchemasInternal>();
+                        = new CacheMap<>();
                 }
                 cachedContextAndSchemasInternalMap.put((defaultNs != null) ? defaultNs : "",
                     cachedContextAndSchemasInternal);
@@ -319,7 +317,7 @@ public final class JAXBContextCache {
                         && m.getParameterTypes().length == 9) {
                         try {
                             return (JAXBContext)m.invoke(null,
-                                     classes.toArray(new Class[classes.size()]),
+                                     classes.toArray(new Class<?>[0]),
                                      typeRefs,
                                      map.get(pfx + "subclassReplacements"),
                                      map.get(pfx + "defaultNamespaceRemap"),
@@ -344,7 +342,7 @@ public final class JAXBContextCache {
         try {
             ctx = AccessController.doPrivileged(new PrivilegedExceptionAction<JAXBContext>() {
                 public JAXBContext run() throws Exception {
-                    return JAXBContext.newInstance(classes.toArray(new Class[classes.size()]), map);
+                    return JAXBContext.newInstance(classes.toArray(new Class<?>[0]), map);
                 }
             });
         } catch (PrivilegedActionException e2) {
@@ -355,7 +353,7 @@ public final class JAXBContextCache {
                     && ex.getMessage().contains("com.sun.xml.bind.defaultNamespaceRemap")) {
                     map.put("com.sun.xml.internal.bind.defaultNamespaceRemap",
                             map.remove("com.sun.xml.bind.defaultNamespaceRemap"));
-                    ctx = JAXBContext.newInstance(classes.toArray(new Class[classes.size()]), map);
+                    ctx = JAXBContext.newInstance(classes.toArray(new Class<?>[0]), map);
                 } else {
                     throw ex;
                 }
@@ -402,17 +400,17 @@ public final class JAXBContextCache {
         } catch (Exception ex) {
             //ignore
         }
-        try (InputStream ins = loader.getResourceAsStream("/" + pkg.replace('.', '/') + "/jaxb.index");
+        try (InputStream ins = loader.getResourceAsStream('/' + pkg.replace('.', '/') + "/jaxb.index");
             BufferedReader reader = new BufferedReader(new InputStreamReader(ins, StandardCharsets.UTF_8))) {
             if (!StringUtils.isEmpty(pkg)) {
-                pkg += ".";
+                pkg += '.';
             }
 
             String line = reader.readLine();
             while (line != null) {
                 line = line.trim();
-                if (line.indexOf("#") != -1) {
-                    line = line.substring(0, line.indexOf("#"));
+                if (line.indexOf('#') != -1) {
+                    line = line.substring(0, line.indexOf('#'));
                 }
                 if (!StringUtils.isEmpty(line)) {
                     try {

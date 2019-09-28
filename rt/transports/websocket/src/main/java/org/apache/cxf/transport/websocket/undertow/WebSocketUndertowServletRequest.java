@@ -62,6 +62,8 @@ import io.undertow.websockets.core.BufferedBinaryMessage;
 import io.undertow.websockets.core.BufferedTextMessage;
 import io.undertow.websockets.core.WebSocketChannel;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  *
  */
@@ -89,7 +91,7 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
         if (!path.startsWith(origin)) {
             throw new InvalidPathException();
         }*/
-        this.attributes = new TreeMap<String, Object>(String.CASE_INSENSITIVE_ORDER);
+        this.attributes = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         Object v = channel.getAttribute("org.apache.cxf.transport.endpoint.address");
         if (v != null) {
             attributes.put("org.apache.cxf.transport.endpoint.address", v);
@@ -117,7 +119,6 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
 
     @Override
     public String getCharacterEncoding() {
-        // TODO Auto-generated method stub
         LOG.log(Level.FINE, "getCharacterEncoding()");
         return null;
     }
@@ -176,7 +177,7 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
         try {
             return new URL(channel.getUrl()).getHost();
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOG.log(Level.FINE, "getLocalAddr error", e);
             return null;
         }
     }
@@ -187,7 +188,7 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
         try {
             return new URL(channel.getUrl()).getHost();
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOG.log(Level.FINE, "getLocalName error", e);
             return null;
         }
     }
@@ -198,7 +199,7 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
         try {
             return new URL(channel.getUrl()).getPort();
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOG.log(Level.FINE, "getLocalPort error", e);
             return 0;
         }
     }
@@ -217,7 +218,6 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
 
     @Override
     public String getParameter(String name) {
-        // TODO Auto-generated method stub
         if (LOG.isLoggable(Level.FINE)) {
             LOG.log(Level.FINE, "getParameter({0})", name);
         }
@@ -226,21 +226,18 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
 
     @Override
     public Map<String, String[]> getParameterMap() {
-        // TODO Auto-generated method stub
         LOG.log(Level.FINE, "getParameterMap()");
         return null;
     }
 
     @Override
     public Enumeration<String> getParameterNames() {
-        // TODO Auto-generated method stub
         LOG.log(Level.FINE, "getParameterNames()");
         return null;
     }
 
     @Override
     public String[] getParameterValues(String name) {
-        // TODO Auto-generated method stub
         if (LOG.isLoggable(Level.FINE)) {
             LOG.log(Level.FINE, "getParameterValues({0})", name);
         }
@@ -253,7 +250,7 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
         try {
             return new URL(channel.getUrl()).getProtocol();
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOG.log(Level.FINE, "getProtocol error", e);
             return null;
         }
     }
@@ -261,12 +258,11 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
     @Override
     public BufferedReader getReader() throws IOException {
         LOG.log(Level.FINE, "getReader");
-        return new BufferedReader(new InputStreamReader(in, "utf-8"));
+        return new BufferedReader(new InputStreamReader(in, UTF_8));
     }
 
     @Override
     public String getRealPath(String path) {
-        // TODO Auto-generated method stub
         LOG.log(Level.FINE, "getRealPath");
         return null;
     }
@@ -277,7 +273,7 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
         try {
             return new URL(channel.getPeerAddress().toString()).getHost();
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOG.log(Level.FINE, "getRemoteAddr error", e);
             return null;
         }
     }
@@ -288,7 +284,7 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
         try {
             return new URL(channel.getPeerAddress().toString()).getHost();
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOG.log(Level.FINE, "getRemoteHost error", e);
             return null;
         }
     }
@@ -299,14 +295,13 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
         try {
             return new URL(channel.getPeerAddress().toString()).getPort();
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOG.log(Level.FINE, "getRemotePort error", e);
             return 0;
         }
     }
 
     @Override
     public RequestDispatcher getRequestDispatcher(String path) {
-        // TODO Auto-generated method stub
         LOG.log(Level.FINE, "getRequestDispatcher");
         return null;
     }
@@ -317,7 +312,7 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
         try {
             return new URL(channel.getUrl()).getProtocol();
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOG.log(Level.FINE, "getScheme error", e);
             return null;
         }
     }
@@ -383,14 +378,12 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
 
     @Override
     public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse) {
-        // TODO Auto-generated method stub
         LOG.log(Level.FINE, "startAsync");
         return null;
     }
 
     @Override
     public boolean authenticate(HttpServletResponse servletResponse) throws IOException, ServletException {
-        // TODO Auto-generated method stub
         LOG.log(Level.FINE, "authenticate");
         return false;
     }
@@ -439,9 +432,8 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
         // our protocol assumes no multiple headers
         if (requestHeaders.get(name) != null) {
             return Collections.enumeration(Arrays.asList(requestHeaders.get(name)));
-        } else {
-            return Collections.enumeration(Arrays.asList());
         }
+        return Collections.enumeration(Arrays.asList());
     }
 
     @Override

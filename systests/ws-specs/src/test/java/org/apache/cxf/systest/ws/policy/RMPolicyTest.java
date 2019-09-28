@@ -48,6 +48,9 @@ import org.apache.cxf.ws.rm.RM10Constants;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests the use of the WS-Policy Framework to automatically engage WS-RM
@@ -78,7 +81,7 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
         public Server(String dir) {
             tmpDir = dir;
         }
-        public Server(String args[]) {
+        public Server(String[] args) {
             tmpDir = args[0];
         }
         protected void run()  {

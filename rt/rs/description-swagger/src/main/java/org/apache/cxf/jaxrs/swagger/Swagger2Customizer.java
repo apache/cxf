@@ -49,6 +49,8 @@ public class Swagger2Customizer {
 
     protected boolean replaceTags;
 
+    protected boolean applyDefaultVersion = true;
+
     protected DocumentationProvider javadocProvider;
 
     protected List<ClassResourceInfo> cris;
@@ -60,12 +62,15 @@ public class Swagger2Customizer {
         if (dynamicBasePath) {
             MessageContext ctx = createMessageContext();
             String currentBasePath = StringUtils.substringBeforeLast(ctx.getHttpServletRequest().getRequestURI(), "/");
-            if (!currentBasePath.equals(beanConfig.getBasePath())) {
-                data.setBasePath(currentBasePath);
+            data.setBasePath(currentBasePath);
+            if (data.getHost() == null) {
                 data.setHost(beanConfig.getHost());
+            }
+            if (data.getInfo() == null) {
                 data.setInfo(beanConfig.getInfo());
             }
-            if (beanConfig.getSwagger() != null 
+
+            if (beanConfig.getSwagger() != null
                 && beanConfig.getSwagger().getSecurityDefinitions() != null
                 && data.getSecurityDefinitions() == null) {
                 data.setSecurityDefinitions(beanConfig.getSwagger().getSecurityDefinitions());
@@ -137,6 +142,7 @@ public class Swagger2Customizer {
                 }
             });
         }
+        applyDefaultVersion(data);
         return data;
     }
 
@@ -148,10 +154,10 @@ public class Swagger2Customizer {
     protected String getNormalizedPath(String classResourcePath, String operationResourcePath) {
         StringBuilder normalizedPath = new StringBuilder();
 
-        String[] segments = StringUtils.split(classResourcePath + operationResourcePath, "/");
+        String[] segments = (classResourcePath + operationResourcePath).split("/");
         for (String segment : segments) {
             if (!StringUtils.isEmpty(segment)) {
-                normalizedPath.append("/").append(segment);
+                normalizedPath.append('/').append(segment);
             }
         }
         // Adapt to Swagger's path expression
@@ -160,6 +166,16 @@ public class Swagger2Customizer {
             normalizedPath.append('}');
         }
         return StringUtils.EMPTY.equals(normalizedPath.toString()) ? "/" : normalizedPath.toString();
+    }
+
+    protected void applyDefaultVersion(Swagger data) {
+        if (applyDefaultVersion && data.getInfo() != null && data.getInfo().getVersion() == null
+                && beanConfig != null && beanConfig.getResourcePackage() != null) {
+            Package resourcePackage = Package.getPackage(beanConfig.getResourcePackage());
+            if (resourcePackage != null) {
+                data.getInfo().setVersion(resourcePackage.getImplementationVersion());
+            }
+        }
     }
 
     /**
@@ -208,6 +224,9 @@ public class Swagger2Customizer {
 
     public void setBeanConfig(BeanConfig beanConfig) {
         this.beanConfig = beanConfig;
+    }
 
+    public void setApplyDefaultVersion(boolean applyDefaultVersion) {
+        this.applyDefaultVersion = applyDefaultVersion;
     }
 }

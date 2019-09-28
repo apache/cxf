@@ -21,10 +21,11 @@ package org.apache.cxf.common.util;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ASMHelperTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class ASMHelperTest {
     @Test
     public void testEnumParamType() throws Exception {
         Method method = EnumTest.class.getMethod("test", new Class[] {

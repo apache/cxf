@@ -74,7 +74,7 @@ public class NettyHttpServerEngineFactoryHolder {
             factory = new NettyHttpServerEngineFactory();
 
             Map<String, ThreadingParameters> threadingParametersMap
-                = new TreeMap<String, ThreadingParameters>();
+                = new TreeMap<>();
 
             if (config.getIdentifiedThreadingParameters() != null) {
                 for (ThreadingParametersIdentifiedType threads : config.getIdentifiedThreadingParameters()) {
@@ -88,7 +88,7 @@ public class NettyHttpServerEngineFactoryHolder {
             }
 
             //SSL
-            Map<String, TLSServerParameters> sslMap = new TreeMap<String, TLSServerParameters>();
+            Map<String, TLSServerParameters> sslMap = new TreeMap<>();
             if (config.getIdentifiedTLSServerParameters() != null) {
 
                 for (TLSServerParametersIdentifiedType t : config.getIdentifiedTLSServerParameters()) {
@@ -188,7 +188,7 @@ public class NettyHttpServerEngineFactoryHolder {
     protected synchronized JAXBContext getContext(Class<?> cls) {
         if (jaxbContext == null || jaxbClasses == null || !jaxbClasses.contains(cls)) {
             try {
-                Set<Class<?>> tmp = new HashSet<Class<?>>();
+                Set<Class<?>> tmp = new HashSet<>();
                 if (jaxbClasses != null) {
                     tmp.addAll(jaxbClasses);
                 }

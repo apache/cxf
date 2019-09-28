@@ -404,7 +404,6 @@ public final class CorbaAnyHelper {
     }
 
     private static void addExtractOverride(ASMHelper helper, ClassWriter cw) {
-        // TODO Auto-generated method stub
         MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "extract_Streamable",
                             "()Lorg/omg/CORBA/portable/Streamable;", null, null);
         mv.visitCode();

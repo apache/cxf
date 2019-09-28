@@ -85,7 +85,7 @@ public final class WSDLASTVisitor implements ASTVisitor {
 
         definition = manager.createWSDLDefinition(tns);
 
-        inheritScopeMap = new TreeMap<Scope, List<Scope>>();
+        inheritScopeMap = new TreeMap<>();
 
         targetNamespace = tns;
         schemas = new XmlSchemaCollection();
@@ -262,7 +262,7 @@ public final class WSDLASTVisitor implements ASTVisitor {
                 }
             }
         }
-        return result.toArray(new Binding[result.size()]);
+        return result.toArray(new Binding[0]);
     }
 
     public boolean writeDefinition(Writer writer) throws Exception {

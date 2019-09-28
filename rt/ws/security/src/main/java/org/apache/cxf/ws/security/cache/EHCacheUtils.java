@@ -22,7 +22,6 @@ package org.apache.cxf.ws.security.cache;
 import java.net.URL;
 
 import net.sf.ehcache.CacheManager;
-
 import org.apache.cxf.Bus;
 import org.apache.wss4j.common.cache.EHCacheManagerHolder;
 
@@ -54,8 +53,7 @@ public final class EHCacheUtils {
     private static String getGlobalCacheManagerName(Bus bus) {
         if (bus != null) {
             return (String) bus.getProperty(GLOBAL_EHCACHE_MANAGER_NAME);
-        } else {
-            return null;
         }
+        return null;
     }
 }

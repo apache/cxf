@@ -92,7 +92,7 @@ public class MEXEndpoint implements MetadataExchange {
                 org.apache.cxf.ws.mex.model._2004_09.MetadataReference ref
                     = new org.apache.cxf.ws.mex.model._2004_09.MetadataReference();
 
-                Element el = DOMUtils.createDocument().createElementNS(getAddressingNamespace(),
+                Element el = DOMUtils.getEmptyDocument().createElementNS(getAddressingNamespace(),
                                                                "wsa:Address");
                 el.setTextContent(s.getValue());
                 ref.getAny().add(el);

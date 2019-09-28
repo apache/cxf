@@ -21,6 +21,7 @@ package org.apache.cxf.tools.wadlto.jaxrs;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
@@ -113,8 +114,8 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
     private void processWadl() {
         File outDir = new File((String)context.get(WadlToolConstants.CFG_OUTPUTDIR));
         String wadlURL = getAbsoluteWadlURL();
-
-        String wadl = readWadl(wadlURL);
+        String authentication = (String)context.get(WadlToolConstants.CFG_AUTHENTICATION);
+        String wadl = readWadl(wadlURL, authentication);
 
         SourceGenerator sg = new SourceGenerator();
         sg.setBus(getBus());
@@ -127,11 +128,13 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         sg.setPackageName((String)context.get(WadlToolConstants.CFG_PACKAGENAME));
         sg.setResourceName((String)context.get(WadlToolConstants.CFG_RESOURCENAME));
         sg.setEncoding((String)context.get(WadlToolConstants.CFG_ENCODING));
+        sg.setAuthentication(authentication);
 
         String wadlNs = (String)context.get(WadlToolConstants.CFG_WADL_NAMESPACE);
         if (wadlNs != null) {
             sg.setWadlNamespace(wadlNs);
         }
+        sg.setJaxbClassNameSuffix((String)context.get(WadlToolConstants.CFG_JAXB_CLASS_NAME_SUFFIX));
 
         sg.setSupportMultipleXmlReps(context.optionSet(WadlToolConstants.CFG_MULTIPLE_XML_REPS));
         sg.setSupportBeanValidation(context.optionSet(WadlToolConstants.CFG_BEAN_VALIDATION));
@@ -157,6 +160,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
 
         sg.setSuspendedAsyncMethods(getSuspendedAsyncMethods());
         sg.setResponseMethods(getResponseMethods());
+        sg.setOnewayMethods(getOnewayMethods());
 
         sg.setGenerateEnums(context.optionSet(WadlToolConstants.CFG_GENERATE_ENUMS));
         sg.setValidateWadl(context.optionSet(WadlToolConstants.CFG_VALIDATE_WADL));
@@ -184,7 +188,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
             ClassCollector collector = createClassCollector();
             List<String> generatedServiceClasses = sg.getGeneratedServiceClasses();
             for (String className : generatedServiceClasses) {
-                int index = className.lastIndexOf(".");
+                int index = className.lastIndexOf('.');
                 collector.addServiceClassName(className.substring(0, index),
                                               className.substring(index + 1),
                                               className);
@@ -192,7 +196,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
 
             List<String> generatedTypeClasses = sg.getGeneratedTypeClasses();
             for (String className : generatedTypeClasses) {
-                int index = className.lastIndexOf(".");
+                int index = className.lastIndexOf('.');
                 collector.addTypesClassName(className.substring(0, index),
                                               className.substring(index + 1),
                                               className);
@@ -204,10 +208,16 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
 
     }
 
-    protected String readWadl(String wadlURI) {
+    protected String readWadl(String wadlURI, String authentication) {
         try {
             URL url = new URL(wadlURI);
-            Reader reader = new InputStreamReader(url.openStream(), StandardCharsets.UTF_8);
+            InputStream is = null;
+            if (wadlURI.startsWith("https") && authentication != null) {
+                is = SecureConnectionHelper.getStreamFromSecureConnection(url, authentication);
+            } else {
+                is = url.openStream();
+            }
+            Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8);
             return IOUtils.toString(reader);
         } catch (IOException e) {
             throw new ToolException(e);
@@ -229,6 +239,10 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         return parseMethodList(WadlToolConstants.CFG_GENERATE_RESPONSE_FOR_METHODS);
     }
 
+    public Set<String> getOnewayMethods() {
+        return parseMethodList(WadlToolConstants.CFG_ONEWAY);
+    }
+
     private Set<String> parseMethodList(String paramName) {
         Object value = context.get(paramName);
         if (value != null) {
@@ -244,17 +258,15 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
                 methods.add("*");
             }
             return methods;
-        } else {
-            return Collections.emptySet();
         }
+        return Collections.emptySet();
     }
     private boolean isInheritResourceParamsFirst() {
         Object value = context.get(WadlToolConstants.CFG_INHERIT_PARAMS);
         if (StringUtils.isEmpty((String)value)) {
             return true;
-        } else {
-            return "first".equals(value.toString().trim());
         }
+        return "first".equals(value.toString().trim());
     }
 
     //TODO: this belongs to JAXB Databinding, should we just reuse
@@ -267,7 +279,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
                                                    : (String[])value;
         }
         for (int i = 0; i < schemaPackageNamespaces.length; i++) {
-            int pos = schemaPackageNamespaces[i].indexOf("=");
+            int pos = schemaPackageNamespaces[i].indexOf('=');
             String packagename = schemaPackageNamespaces[i];
             if (pos != -1) {
                 String ns = schemaPackageNamespaces[i].substring(0, pos);
@@ -300,7 +312,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         }
         Map<String, String> typeMap = new HashMap<>();
         for (int i = 0; i < typeToClasses.length; i++) {
-            int pos = typeToClasses[i].indexOf("=");
+            int pos = typeToClasses[i].indexOf('=');
             if (pos != -1) {
                 String type = typeToClasses[i].substring(0, pos);
                 if (type.contains("%3D")) {

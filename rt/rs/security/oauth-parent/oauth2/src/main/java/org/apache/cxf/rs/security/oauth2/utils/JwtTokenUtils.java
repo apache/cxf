@@ -79,7 +79,7 @@ public final class JwtTokenUtils {
         if (scope != null) {
             String[] scopes = scope instanceof String
                 ? scope.toString().split(" ") : CastUtils.cast((List<?>)scope).toArray(new String[]{});
-            List<OAuthPermission> perms = new LinkedList<OAuthPermission>();
+            List<OAuthPermission> perms = new LinkedList<>();
             for (String s : scopes) {
                 if (!StringUtils.isEmpty(s)) {
                     perms.add(new OAuthPermission(s.trim()));

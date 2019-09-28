@@ -61,7 +61,7 @@ public class SamlHeaderOutInterceptor extends AbstractSamlOutInterceptor {
             Map<String, List<String>> headers = getHeaders(message);
 
             StringBuilder builder = new StringBuilder();
-            builder.append("SAML").append(" ").append(encodedToken);
+            builder.append("SAML").append(' ').append(encodedToken);
             headers.put("Authorization",
                 CastUtils.cast(Collections.singletonList(builder.toString()), String.class));
 

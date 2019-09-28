@@ -82,7 +82,7 @@ public abstract class AbstractGenerator implements FrontEndGenerator {
         }
 
         fw = new FileWriterUtil(getOutputDir(),
-                                (OutputStreamCreator)env.get(OutputStreamCreator.class));
+                                env.get(OutputStreamCreator.class));
         try {
             if (".java".equals(ext)) {
                 writer = fw.getWriter(packageName, filename + ext,
@@ -116,7 +116,9 @@ public abstract class AbstractGenerator implements FrontEndGenerator {
         setAttributes("version", Version.getCurrentVersion());
         setAttributes("fullversion", Version.getCompleteVersionString());
         setAttributes("name", Version.getName());
-        setAttributes("mark-generated", env.optionSet(ToolConstants.CFG_MARK_GENERATED));
+        setAttributes(ToolConstants.CFG_MARK_GENERATED, env.optionSet(ToolConstants.CFG_MARK_GENERATED));
+        setAttributes(ToolConstants.CFG_SUPPRESS_GENERATED_DATE,
+                      env.optionSet(ToolConstants.CFG_SUPPRESS_GENERATED_DATE));
         if (env.optionSet(ToolConstants.CFG_FRONTEND)) {
             setAttributes("frontend", env.get(ToolConstants.CFG_FRONTEND));
         }

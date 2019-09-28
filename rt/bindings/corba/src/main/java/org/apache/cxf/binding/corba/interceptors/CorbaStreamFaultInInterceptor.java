@@ -73,8 +73,6 @@ public class CorbaStreamFaultInInterceptor extends AbstractPhaseInterceptor<Mess
 
             SystemException sysEx = message.getSystemException();
             if (sysEx != null) {
-                // TODO: Do we need anything else to handle system exceptions here...i.e. do
-                // we want to add a wrapper around this so that we can add some more information?
                 message.setContent(Exception.class, sysEx);
                 return;
             }
@@ -134,9 +132,8 @@ public class CorbaStreamFaultInInterceptor extends AbstractPhaseInterceptor<Mess
     private void createFaultDetail(Document faultData, FaultInfo faultInfo, Fault faultEx) {
         MessagePartInfo partInfo = faultInfo.getMessageParts().get(0);
         QName partInfoName = partInfo.getElementQName();
-        Document faultDoc = DOMUtils.createDocument();
+        Document faultDoc = DOMUtils.getEmptyDocument();
         Element faultElement = faultDoc.createElement("detail");
-        faultDoc.appendChild(faultElement);
         Element partElement =
             faultDoc.createElementNS(partInfoName.getNamespaceURI(), partInfoName.getLocalPart());
 

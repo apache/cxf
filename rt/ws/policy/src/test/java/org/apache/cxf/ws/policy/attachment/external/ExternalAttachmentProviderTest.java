@@ -40,19 +40,26 @@ import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 
 
 /**
  *
  */
-public class ExternalAttachmentProviderTest extends Assert {
+public class ExternalAttachmentProviderTest {
 
     private static final QName TEST_ASSERTION_TYPE = new QName("http://a.b.c", "x");
 

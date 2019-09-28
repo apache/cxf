@@ -45,6 +45,7 @@ import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.message.Message;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -107,7 +108,7 @@ public class WebFaultOutInterceptorTestCase {
         interceptor.handleMessage(message);
 
         Assert.assertTrue("SoapFault.subCodes are expected to be empty.",
-                soapFault.getSubCodes() == null || soapFault.getSubCodes().size() == 0);
+                soapFault.getSubCodes() == null || soapFault.getSubCodes().isEmpty());
         Assert.assertEquals(CODE, soapFault.getFaultCode());
     }
 
@@ -120,7 +121,7 @@ public class WebFaultOutInterceptorTestCase {
         interceptor.handleMessage(message);
 
         Assert.assertTrue("SoapFault.subCodes are expected to be empty.",
-                soapFault.getSubCodes() == null || soapFault.getSubCodes().size() == 0);
+                soapFault.getSubCodes() == null || soapFault.getSubCodes().isEmpty());
         Assert.assertEquals(CODE, soapFault.getFaultCode());
     }
 

@@ -37,10 +37,6 @@ import org.apache.cxf.binding.corba.wsdl.MemberType;
 import org.apache.cxf.binding.corba.wsdl.Sequence;
 import org.apache.cxf.binding.corba.wsdl.Struct;
 import org.apache.cxf.helpers.IOUtils;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.StructMember;
 import org.omg.CORBA.TCKind;
@@ -48,8 +44,16 @@ import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.portable.InputStream;
 import org.omg.CORBA.portable.OutputStream;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class CorbaObjectWriterTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+
+public class CorbaObjectWriterTest {
 
     private static ORB orb;
 
@@ -117,7 +121,7 @@ public class CorbaObjectWriterTest extends Assert {
         OutputStream oStream = orb.create_output_stream();
 
         CorbaObjectWriter writer = new CorbaObjectWriter(oStream);
-        Short shortValue = new Short((short)-123);
+        Short shortValue = Short.valueOf((short)-123);
         writer.writeShort(shortValue);
 
         InputStream iStream = oStream.create_input_stream();
@@ -130,7 +134,7 @@ public class CorbaObjectWriterTest extends Assert {
         OutputStream oStream = orb.create_output_stream();
 
         CorbaObjectWriter writer = new CorbaObjectWriter(oStream);
-        Integer ushortValue = new Integer(123);
+        Integer ushortValue = Integer.valueOf(123);
         writer.writeUShort(ushortValue);
 
         InputStream iStream = oStream.create_input_stream();
@@ -143,7 +147,7 @@ public class CorbaObjectWriterTest extends Assert {
         OutputStream oStream = orb.create_output_stream();
 
         CorbaObjectWriter writer = new CorbaObjectWriter(oStream);
-        Integer longValue = new Integer(-1234567);
+        Integer longValue = Integer.valueOf(-1234567);
         writer.writeLong(longValue);
 
         InputStream iStream = oStream.create_input_stream();
@@ -169,7 +173,7 @@ public class CorbaObjectWriterTest extends Assert {
         OutputStream oStream = orb.create_output_stream();
 
         CorbaObjectWriter writer = new CorbaObjectWriter(oStream);
-        Long longlongValue = new Long("-12345678900");
+        Long longlongValue = Long.valueOf("-12345678900");
         writer.writeLongLong(longlongValue);
 
         InputStream iStream = oStream.create_input_stream();
@@ -195,7 +199,7 @@ public class CorbaObjectWriterTest extends Assert {
         OutputStream oStream = orb.create_output_stream();
 
         CorbaObjectWriter writer = new CorbaObjectWriter(oStream);
-        Float floatValue = new Float((float)123456.78);
+        Float floatValue = Float.valueOf((float)123456.78);
         writer.writeFloat(floatValue);
 
         InputStream iStream = oStream.create_input_stream();
@@ -208,7 +212,7 @@ public class CorbaObjectWriterTest extends Assert {
         OutputStream oStream = orb.create_output_stream();
 
         CorbaObjectWriter writer = new CorbaObjectWriter(oStream);
-        Double doubleValue = new Double(987654.321);
+        Double doubleValue = Double.valueOf(987654.321);
         writer.writeDouble(doubleValue);
 
         InputStream iStream = oStream.create_input_stream();
@@ -226,7 +230,7 @@ public class CorbaObjectWriterTest extends Assert {
 
         InputStream iStream = oStream.create_input_stream();
         String s = iStream.read_string();
-        assertTrue(s.equals(stringValue));
+        assertEquals(s, stringValue);
     }
 
     @Test
@@ -239,12 +243,12 @@ public class CorbaObjectWriterTest extends Assert {
 
         InputStream iStream = oStream.create_input_stream();
         String s = iStream.read_wstring();
-        assertTrue(s.equals(wstringValue));
+        assertEquals(s, wstringValue);
     }
 
     @Test
     public void testWriteArray() {
-        int data[] = {1, 1, 2, 3, 5, 8, 13, 21};
+        int[] data = {1, 1, 2, 3, 5, 8, 13, 21};
 
         // create an array of longs
         QName longIdlType = new QName(CorbaConstants.NU_WSDL_CORBA, "long", CorbaConstants.NP_WSDL_CORBA);
@@ -278,7 +282,7 @@ public class CorbaObjectWriterTest extends Assert {
 
     @Test
     public void testWriteSequence() {
-        String data[] = {"one", "one", "two", "three", "five", "eight", "thirteen", "twenty-one"};
+        String[] data = {"one", "one", "two", "three", "five", "eight", "thirteen", "twenty-one"};
 
         // create an sequence of strings
         QName stringIdlType = new QName(CorbaConstants.NU_WSDL_CORBA, "string", CorbaConstants.NP_WSDL_CORBA);
@@ -308,7 +312,7 @@ public class CorbaObjectWriterTest extends Assert {
         int length = iStream.read_long();
         for (int i = 0; i < length; ++i) {
             String val = iStream.read_string();
-            assertTrue(val.equals(data[i]));
+            assertEquals(val, data[i]);
         }
     }
 
@@ -376,7 +380,7 @@ public class CorbaObjectWriterTest extends Assert {
         int readMember1 = iStream.read_long();
         assertTrue(readMember1 == member1);
         String readMember2 = iStream.read_string();
-        assertTrue(readMember2.equals(member2));
+        assertEquals(readMember2, member2);
         boolean readMember3 = iStream.read_boolean();
         assertTrue(readMember3 == member3);
     }
@@ -435,11 +439,11 @@ public class CorbaObjectWriterTest extends Assert {
         InputStream iStream = oStream.create_input_stream();
 
         String readId = iStream.read_string();
-        assertTrue(readId.equals(reposID));
+        assertEquals(readId, reposID);
         short readCode = iStream.read_short();
         assertTrue(readCode == code);
         String readMessage = iStream.read_string();
-        assertTrue(readMessage.equals(message));
+        assertEquals(readMessage, message);
     }
 
     @Test

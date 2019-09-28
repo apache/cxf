@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.utils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Constructor;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -67,14 +68,12 @@ public final class ExceptionUtils {
         }
         Message inMessage = currentMessage.getExchange().getInMessage();
         Response response = null;
-        if (ex.getClass() == WebApplicationException.class) {
+        if (ex instanceof WebApplicationException) {
             WebApplicationException webEx = (WebApplicationException)ex;
             if (webEx.getResponse().hasEntity()
-                && webEx.getCause() == null) {
-                Object prop = inMessage.getContextualProperty(SUPPORT_WAE_SPEC_OPTIMIZATION);
-                if (prop == null || MessageUtils.isTrue(prop)) {
-                    response = webEx.getResponse();
-                }
+                && webEx.getCause() == null
+                && MessageUtils.getContextualBoolean(inMessage, SUPPORT_WAE_SPEC_OPTIMIZATION, true)) {
+                response = webEx.getResponse();
             }
         }
 
@@ -169,6 +168,17 @@ public final class ExceptionUtils {
             return SpecExceptions.toHttpException(cause, response);
         } catch (NoClassDefFoundError ex) {
             return toWebApplicationException(ex, response);
+        }
+    }
+    
+    public static WebApplicationException toWebApplicationException(Response response) {
+        try {
+            final Class<?> exceptionClass = ExceptionUtils.getWebApplicationExceptionClass(response, 
+                WebApplicationException.class);
+            final Constructor<?> ctr = exceptionClass.getConstructor(Response.class);
+            return (WebApplicationException)ctr.newInstance(response);
+        } catch (Throwable ex) {
+            return new WebApplicationException(response);
         }
     }
 }

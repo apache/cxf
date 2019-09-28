@@ -93,13 +93,12 @@ public class ClientProxy implements InvocationHandler, Closeable {
         if (client == null) {
             throw new IllegalStateException("The client has been closed.");
         }
-        Object rawRet[] = client.invoke(oi, params);
+        Object[] rawRet = client.invoke(oi, params);
 
         if (rawRet != null && rawRet.length > 0) {
             return rawRet[0];
-        } else {
-            return null;
         }
+        return null;
     }
     public Map<String, Object> getRequestContext() {
         if (client == null) {

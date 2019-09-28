@@ -62,7 +62,7 @@ public class CreateSubscriptionServlet extends HttpServlet {
             if (req.getParameter("expires-set") == null) {
                 expires = req.getParameter("expires");
             } else {
-                if (!req.getParameter("expires-set").equals("false")) {
+                if (!"false".equals(req.getParameter("expires-set"))) {
                     expires = req.getParameter("expires");
                 }
             }

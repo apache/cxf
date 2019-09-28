@@ -27,6 +27,7 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
@@ -35,9 +36,13 @@ import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.systest.sts.deployment.StaxSTSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test the Symmetric binding. The CXF client gets a token from the STS by authenticating via an
@@ -88,17 +93,17 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
+    public static Collection<TestParam> data() {
 
-        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false, STSPORT2)},
-                                                {new TestParam(PORT, true, STSPORT2)},
-                                                {new TestParam(STAX_PORT, false, STSPORT2)},
-                                                {new TestParam(STAX_PORT, true, STSPORT2)},
+        return Arrays.asList(new TestParam[] {new TestParam(PORT, false, STSPORT2),
+                                              new TestParam(PORT, true, STSPORT2),
+                                              new TestParam(STAX_PORT, false, STSPORT2),
+                                              new TestParam(STAX_PORT, true, STSPORT2),
 
-                                                {new TestParam(PORT, false, STAX_STSPORT2)},
-                                                {new TestParam(PORT, true, STAX_STSPORT2)},
-                                                {new TestParam(STAX_PORT, false, STAX_STSPORT2)},
-                                                {new TestParam(STAX_PORT, true, STAX_STSPORT2)},
+                                              new TestParam(PORT, false, STAX_STSPORT2),
+                                              new TestParam(PORT, true, STAX_STSPORT2),
+                                              new TestParam(STAX_PORT, false, STAX_STSPORT2),
+                                              new TestParam(STAX_PORT, true, STAX_STSPORT2),
         });
     }
 
@@ -115,8 +120,8 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL busFile = X509SymmetricBindingTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -144,8 +149,8 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL busFile = X509SymmetricBindingTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -174,8 +179,8 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL busFile = X509SymmetricBindingTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -206,8 +211,8 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL busFile = X509SymmetricBindingTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -242,8 +247,8 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL busFile = X509SymmetricBindingTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);

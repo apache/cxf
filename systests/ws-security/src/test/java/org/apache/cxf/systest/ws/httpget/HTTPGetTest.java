@@ -23,21 +23,25 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
+import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * A set of tests for CXF-4629.
@@ -48,7 +52,6 @@ public class HTTPGetTest extends AbstractBusClientServerTestBase {
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
-    private boolean unrestrictedPoliciesInstalled = checkUnrestrictedPoliciesInstalled();
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -68,7 +71,7 @@ public class HTTPGetTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testSOAPClientSecurityPolicy() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
+        if (!TestUtilities.checkUnrestrictedPoliciesInstalled()) {
             return;
         }
 
@@ -76,8 +79,8 @@ public class HTTPGetTest extends AbstractBusClientServerTestBase {
         URL busFile = HTTPGetTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = HTTPGetTest.class.getResource("DoubleItHTTPGet.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -93,7 +96,7 @@ public class HTTPGetTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testHTTPGetClientSecurityPolicy() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
+        if (!TestUtilities.checkUnrestrictedPoliciesInstalled()) {
             return;
         }
 
@@ -101,8 +104,8 @@ public class HTTPGetTest extends AbstractBusClientServerTestBase {
         URL busFile = HTTPGetTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "http://localhost:" + PORT + "/DoubleItX509KeyIdentifier/DoubleIt";
         WebClient client = WebClient.create(address);
@@ -120,7 +123,7 @@ public class HTTPGetTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testSignedBodyTimestamp() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
+        if (!TestUtilities.checkUnrestrictedPoliciesInstalled()) {
             return;
         }
 
@@ -128,8 +131,8 @@ public class HTTPGetTest extends AbstractBusClientServerTestBase {
         URL busFile = HTTPGetTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = HTTPGetTest.class.getResource("DoubleItHTTPGet.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -159,7 +162,7 @@ public class HTTPGetTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testHTTPGetSignedBody() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
+        if (!TestUtilities.checkUnrestrictedPoliciesInstalled()) {
             return;
         }
 
@@ -167,8 +170,8 @@ public class HTTPGetTest extends AbstractBusClientServerTestBase {
         URL busFile = HTTPGetTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "http://localhost:" + PORT + "/DoubleItSignBody/DoubleIt";
         WebClient client = WebClient.create(address);
@@ -189,26 +192,6 @@ public class HTTPGetTest extends AbstractBusClientServerTestBase {
         }
 
         bus.shutdown(true);
-    }
-
-
-    private boolean checkUnrestrictedPoliciesInstalled() {
-        try {
-            byte[] data = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07};
-
-            SecretKey key192 = new SecretKeySpec(
-                new byte[] {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-                            0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-                            0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17},
-                            "AES");
-            Cipher c = Cipher.getInstance("AES");
-            c.init(Cipher.ENCRYPT_MODE, key192);
-            c.doFinal(data);
-            return true;
-        } catch (Exception e) {
-            //
-        }
-        return false;
     }
 
 }

@@ -46,7 +46,7 @@ public class EndpointResolverRegistryImpl implements EndpointResolverRegistry {
 
     private Bus bus;
     private List<EndpointResolver> resolvers
-        = new CopyOnWriteArrayList<EndpointResolver>();
+        = new CopyOnWriteArrayList<>();
 
     public EndpointResolverRegistryImpl() {
 

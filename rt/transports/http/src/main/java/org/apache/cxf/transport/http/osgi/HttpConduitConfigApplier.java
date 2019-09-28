@@ -37,6 +37,7 @@ import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
 import org.apache.cxf.configuration.security.SecureRandomParameters;
 import org.apache.cxf.configuration.security.TrustManagersType;
 import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transport.http.auth.HttpAuthSupplier;
 import org.apache.cxf.transports.http.configuration.ConnectionType;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.transports.http.configuration.ProxyServerType;
@@ -57,6 +58,7 @@ class HttpConduitConfigApplier {
         if (address != null && address.startsWith(SECURE_HTTP_PREFIX)) {
             applyTlsClientParameters(d, c);
         }
+        applyAuthSupplier(d, c);
     }
 
     private void applyTlsClientParameters(Dictionary<String, String> d, HTTPConduit c) {
@@ -347,6 +349,25 @@ class HttpConduitConfigApplier {
                     p.setProxyServerType(ProxyServerType.fromValue(v));
                 } else if ("NonProxyHosts".equals(k)) {
                     p.setNonProxyHosts(v);
+                }
+            }
+        }
+    }
+
+    private void applyAuthSupplier(Dictionary<String, String> d, HTTPConduit c) {
+        Enumeration<String> keys = d.keys();
+        while (keys.hasMoreElements()) {
+            String k = keys.nextElement();
+            if (k.startsWith("authSupplier")) {
+                String v = d.get(k);
+                Object obj;
+                try {
+                    obj = Class.forName(v).newInstance();
+                } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+                if (obj instanceof HttpAuthSupplier) {
+                    c.setAuthSupplier((HttpAuthSupplier)obj);
                 }
             }
         }

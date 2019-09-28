@@ -27,7 +27,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -63,6 +62,12 @@ import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerAsyncClient.PORT;
@@ -289,7 +294,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     @Test
     public void testAsyncProxyPrimitiveResponse() throws Exception {
         String address = "http://localhost:" + PORT;
-        final Holder<Boolean> holder = new Holder<Boolean>();
+        final Holder<Boolean> holder = new Holder<>();
         final InvocationCallback<Boolean> callback = new InvocationCallback<Boolean>() {
             public void completed(Boolean response) {
                 holder.value = response;
@@ -307,7 +312,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     @Test
     public void testAsyncProxyBookResponse() throws Exception {
         String address = "http://localhost:" + PORT;
-        final Holder<Book> holder = new Holder<Book>();
+        final Holder<Book> holder = new Holder<>();
         final InvocationCallback<Book> callback = new InvocationCallback<Book>() {
             public void completed(Book response) {
                 holder.value = response;
@@ -327,7 +332,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     @Test
     public void testAsyncProxyMultipleCallbacks() throws Exception {
         String address = "http://localhost:" + PORT;
-        final Holder<Book> bookHolder = new Holder<Book>();
+        final Holder<Book> bookHolder = new Holder<>();
         final InvocationCallback<Book> bookCallback = new InvocationCallback<Book>() {
             public void completed(Book response) {
                 bookHolder.value = response;
@@ -335,7 +340,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             public void failed(Throwable error) {
             }
         };
-        final Holder<Boolean> booleanHolder = new Holder<Boolean>();
+        final Holder<Boolean> booleanHolder = new Holder<>();
         final InvocationCallback<Boolean> booleanCallback = new InvocationCallback<Boolean>() {
             public void completed(Boolean response) {
                 booleanHolder.value = response;
@@ -343,7 +348,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             public void failed(Throwable error) {
             }
         };
-        List<InvocationCallback<?>> callbacks = new ArrayList<InvocationCallback<?>>();
+        List<InvocationCallback<?>> callbacks = new ArrayList<>();
         callbacks.add(bookCallback);
         callbacks.add(booleanCallback);
 
@@ -374,7 +379,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     public void testGetBookAsync404Callback() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/404";
         WebClient wc = createWebClient(address);
-        final Holder<Object> holder = new Holder<Object>();
+        final Holder<Object> holder = new Holder<>();
         InvocationCallback<Object> callback = createCallback(holder);
         try {
             wc.async().get(callback).get();
@@ -386,47 +391,8 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         wc.close();
     }
 
-
-    @Test
-    public void testGetBookAsyncStage() throws Exception {
-        String address = "http://localhost:" + PORT + "/bookstore/books";
-        WebClient wc = createWebClient(address);
-        CompletionStage<Book> stage = wc.path("123").rx().get(Book.class);
-        Book book = stage.toCompletableFuture().join();
-        assertEquals(123L, book.getId());
-    }
-    @Test
-    public void testGetBookAsyncStageThenAcceptAsync() throws Exception {
-        String address = "http://localhost:" + PORT + "/bookstore/books";
-        WebClient wc = createWebClient(address);
-        CompletionStage<Book> stage = wc.path("123").rx().get(Book.class);
-        Holder<Book> holder = new Holder<Book>();
-        stage.thenApply(v -> {
-            v.setId(v.getId() * 2);
-            return v;
-        }).thenAcceptAsync(v -> {
-            holder.value = v;
-        });
-        Thread.sleep(3000);
-        assertEquals(246L, holder.value.getId());
-    }
-
-    @Test
-    public void testGetBookAsyncStage404() throws Exception {
-        String address = "http://localhost:" + PORT + "/bookstore/bookheaders/404";
-        WebClient wc = createWebClient(address);
-        CompletionStage<Book> stage = wc.path("123").rx().get(Book.class);
-        try {
-            stage.toCompletableFuture().get();
-            fail("Exception expected");
-        } catch (ExecutionException ex) {
-            assertTrue(ex.getCause() instanceof NotFoundException);
-        }
-
-    }
     private WebClient createWebClient(String address) {
-        List<Object> providers = new ArrayList<>();
-        return WebClient.create(address, providers);
+        return WebClient.create(address);
     }
 
     private InvocationCallback<Object> createCallback(final Holder<Object> holder) {
@@ -444,7 +410,6 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
 
         @Override
         public long getSize(Book arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4) {
-            // TODO Auto-generated method stub
             return 0;
         }
 
@@ -485,7 +450,6 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         @Override
         public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext)
             throws IOException {
-            // TODO Auto-generated method stub
 
         }
 

@@ -33,9 +33,9 @@ import javax.xml.stream.XMLStreamWriter;
 import com.sun.xml.fastinfoset.stax.StAXDocumentSerializer;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
@@ -112,7 +112,7 @@ public class FIStaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
         }
 
         if (force
-            || MessageUtils.isTrue(o)) {
+            || PropertyUtils.isTrue(o)) {
             StAXDocumentSerializer serializer = getOutput(out);
             message.setContent(XMLStreamWriter.class, serializer);
 

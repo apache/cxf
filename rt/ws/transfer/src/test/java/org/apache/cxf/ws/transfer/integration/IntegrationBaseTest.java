@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.ws.BindingProvider;
 
 import org.w3c.dom.Document;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Server;
@@ -51,6 +52,7 @@ import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory;
 import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactoryImpl;
 import org.apache.cxf.ws.transfer.resourcefactory.resolver.SimpleResourceResolver;
 import org.apache.cxf.ws.transfer.shared.TransferConstants;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

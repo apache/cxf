@@ -333,22 +333,20 @@ public class JaxWsImplementorInfo {
         WebServiceProvider ann = cls.getAnnotation(WebServiceProvider.class);
         if (null != ann) {
             return ann;
-        } else {
-            if (ifAnnotationLoadedByOtherClassLoader(cls, WebServiceProvider.class)) {
-                LOG.log(Level.WARNING,
-                    "WEBSERVICE_ANNOTATIONS_IS_LOADED_BY_OTHER_CLASSLOADER",
-                    WebServiceProvider.class.getName());
-            }
+        }
+        if (ifAnnotationLoadedByOtherClassLoader(cls, WebServiceProvider.class)) {
+            LOG.log(Level.WARNING,
+                "WEBSERVICE_ANNOTATIONS_IS_LOADED_BY_OTHER_CLASSLOADER",
+                WebServiceProvider.class.getName());
         }
         for (Class<?> inf : cls.getInterfaces()) {
             if (null != inf.getAnnotation(WebServiceProvider.class)) {
                 return inf.getAnnotation(WebServiceProvider.class);
-            } else {
-                if (ifAnnotationLoadedByOtherClassLoader(cls, WebServiceProvider.class)) {
-                    LOG.log(Level.WARNING,
-                            "WEBSERVICE_ANNOTATIONS_IS_LOADED_BY_OTHER_CLASSLOADER",
-                            WebServiceProvider.class.getName());
-                }
+            }
+            if (ifAnnotationLoadedByOtherClassLoader(cls, WebServiceProvider.class)) {
+                LOG.log(Level.WARNING,
+                        "WEBSERVICE_ANNOTATIONS_IS_LOADED_BY_OTHER_CLASSLOADER",
+                        WebServiceProvider.class.getName());
             }
         }
         return getWebServiceProviderAnnotation(cls.getSuperclass());
@@ -376,16 +374,15 @@ public class JaxWsImplementorInfo {
 
     private static Class<?> doGetProviderParameterType(Class<?> c) {
         while (c != null) {
-            Type intfTypes[] = c.getGenericInterfaces();
+            Type[] intfTypes = c.getGenericInterfaces();
             for (Type t : intfTypes) {
                 Class<?> clazz = JAXBEncoderDecoder.getClassFromType(t);
                 if (Provider.class.isAssignableFrom(clazz)) {
                     if (Provider.class == clazz) {
-                        Type paramTypes[] = ((ParameterizedType)t).getActualTypeArguments();
+                        Type[] paramTypes = ((ParameterizedType)t).getActualTypeArguments();
                         return JAXBEncoderDecoder.getClassFromType(paramTypes[0]);
-                    } else {
-                        return doGetProviderParameterType(clazz);
                     }
+                    return doGetProviderParameterType(clazz);
                 }
             }
             c = c.getSuperclass();

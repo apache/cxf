@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxws.handler;
 
 import java.util.List;
+
 import javax.jws.HandlerChain;
 import javax.jws.WebService;
 import javax.xml.namespace.QName;
@@ -28,12 +29,14 @@ import javax.xml.ws.handler.LogicalHandler;
 import javax.xml.ws.handler.LogicalMessageContext;
 import javax.xml.ws.handler.MessageContext;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class AnnotationHandlerChainBuilderTest extends Assert {
+
+public class AnnotationHandlerChainBuilderTest {
 
     @Before
     public void setUp() {

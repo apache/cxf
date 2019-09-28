@@ -19,13 +19,14 @@
 
 package org.apache.cxf.clustering.blueprint;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  *
  */
-public class ClusteringBPNamespaceHandlerTest extends Assert {
+public class ClusteringBPNamespaceHandlerTest {
     @Test
     public void testGetSchemaLocation() {
         ClusteringBPNamespaceHandler handler = new ClusteringBPNamespaceHandler();

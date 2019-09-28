@@ -139,7 +139,7 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
     }
 
     public List<List<Assertion>> checkEffectivePolicy(Policy policy) {
-        List<List<Assertion>> validated = new ArrayList<List<Assertion>>(4);
+        List<List<Assertion>> validated = new ArrayList<>(4);
         List<QName> errors = new ArrayList<>();
         Iterator<List<Assertion>> alternatives = policy.getAlternatives();
         while (alternatives.hasNext()) {
@@ -152,7 +152,7 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
             return validated;
         }
 
-        Set<String> msgs = new LinkedHashSet<String>();
+        Set<String> msgs = new LinkedHashSet<>();
 
         for (QName name : errors) {
             Collection<AssertionInfo> ais = getAssertionInfo(name);
@@ -173,7 +173,7 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
         }
         StringBuilder error = new StringBuilder();
         for (String msg : msgs) {
-            error.append("\n").append(msg);
+            error.append('\n').append(msg);
         }
 
         throw new PolicyException(new Message("NO_ALTERNATIVE_EXC", BUNDLE, error.toString()));

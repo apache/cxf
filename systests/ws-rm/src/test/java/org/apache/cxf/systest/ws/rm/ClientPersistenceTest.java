@@ -24,7 +24,6 @@ import org.apache.cxf.ws.rm.persistence.jdbc.RMTxStore;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 /**
  * Tests the addition of WS-RM properties to application messages and the
@@ -45,11 +44,6 @@ public class ClientPersistenceTest extends AbstractClientPersistenceTest {
         CachedOutputStream.setDefaultThreshold(-1);
         RMTxStore.deleteDatabaseFiles("cpt-server", false);
         RMTxStore.deleteDatabaseFiles("cpt-client", false);
-    }
-
-    @Test
-    public void testRecovery() throws Exception {
-        super.testRecovery();
     }
 
     @Override

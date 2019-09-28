@@ -28,6 +28,7 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
@@ -55,10 +56,13 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests for the validate operation to validate JWT Tokens.
  */
-public class ValidateJWTUnitTest extends org.junit.Assert {
+public class ValidateJWTUnitTest {
 
     public static final QName REQUESTED_SECURITY_TOKEN =
         QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(null).getName();
@@ -96,8 +100,6 @@ public class ValidateJWTUnitTest extends org.junit.Assert {
         // Get a JWTToken via the JWTTokenProvider
         TokenProviderResponse providerResponse = createJWT();
         Element wrapper = createTokenWrapper((String)providerResponse.getToken());
-        Document doc = wrapper.getOwnerDocument();
-        wrapper = (Element)doc.appendChild(wrapper);
         ValidateTargetType validateTarget = new ValidateTargetType();
         validateTarget.setAny(wrapper);
 
@@ -123,7 +125,7 @@ public class ValidateJWTUnitTest extends org.junit.Assert {
     }
 
     private Element createTokenWrapper(String token) {
-        Document doc = DOMUtils.newDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element tokenWrapper = doc.createElementNS(null, "TokenWrapper");
         tokenWrapper.setTextContent(token);
         return tokenWrapper;
@@ -182,7 +184,7 @@ public class ValidateJWTUnitTest extends org.junit.Assert {
 
         assertTrue(tokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         return providerResponse;

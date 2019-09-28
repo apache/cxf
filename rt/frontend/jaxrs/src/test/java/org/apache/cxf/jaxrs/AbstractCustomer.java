@@ -72,4 +72,4 @@ public class AbstractCustomer {
         return request;
     }
 
-};
+}

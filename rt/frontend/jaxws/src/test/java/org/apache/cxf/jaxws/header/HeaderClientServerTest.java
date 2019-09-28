@@ -56,6 +56,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class HeaderClientServerTest extends AbstractJaxWsTest {
     private final QName serviceName = new QName("http://apache.org/header_test",
@@ -121,8 +124,8 @@ public class HeaderClientServerTest extends AbstractJaxWsTest {
         try {
             TestHeader2 in = new TestHeader2();
             String val = new String(TestHeader2Response.class.getSimpleName());
-            Holder<TestHeader2Response> out = new Holder<TestHeader2Response>();
-            Holder<TestHeader2Response> outHeader = new Holder<TestHeader2Response>();
+            Holder<TestHeader2Response> out = new Holder<>();
+            Holder<TestHeader2Response> outHeader = new Holder<>();
             for (int idx = 0; idx < 2; idx++) {
                 val += idx;
                 in.setRequestType(val);
@@ -149,7 +152,7 @@ public class HeaderClientServerTest extends AbstractJaxWsTest {
         try {
             TestHeader3 in = new TestHeader3();
             String val = new String(TestHeader3.class.getSimpleName());
-            Holder<TestHeader3> inoutHeader = new Holder<TestHeader3>();
+            Holder<TestHeader3> inoutHeader = new Holder<>();
             for (int idx = 0; idx < 2; idx++) {
                 val += idx;
                 in.setRequestType(val);
@@ -182,8 +185,8 @@ public class HeaderClientServerTest extends AbstractJaxWsTest {
         assertNotNull(service);
         TestHeader proxy = service.getPort(portName, TestHeader.class);
         try {
-            Holder<TestHeader5ResponseBody> out = new Holder<TestHeader5ResponseBody>();
-            Holder<TestHeader5> outHeader = new Holder<TestHeader5>();
+            Holder<TestHeader5ResponseBody> out = new Holder<>();
+            Holder<TestHeader5> outHeader = new Holder<>();
             TestHeader5 in = new TestHeader5();
             String val = new String(TestHeader5.class.getSimpleName());
             for (int idx = 0; idx < 2; idx++) {
@@ -209,7 +212,7 @@ public class HeaderClientServerTest extends AbstractJaxWsTest {
 
         TestHeader6 in = new TestHeader6();
         String val = new String(TestHeader6.class.getSimpleName());
-        Holder<TestHeader3> inoutHeader = new Holder<TestHeader3>();
+        Holder<TestHeader3> inoutHeader = new Holder<>();
         for (int idx = 0; idx < 1; idx++) {
             val += idx;
             in.setRequestType(val);
@@ -291,7 +294,7 @@ public class HeaderClientServerTest extends AbstractJaxWsTest {
         TestRPCHeader proxy = service.getSoapRPCHeaderPort();
         try {
             HeaderMessage header = new HeaderMessage();
-            Holder<HeaderMessage> holder = new Holder<HeaderMessage>(header);
+            Holder<HeaderMessage> holder = new Holder<>(header);
 
             for (int idx = 0; idx < 2; idx++) {
                 holder.value.setHeaderVal("header" + idx);
@@ -315,7 +318,7 @@ public class HeaderClientServerTest extends AbstractJaxWsTest {
         SOAPHeaderService service = new SOAPHeaderService(wsdl, serviceName);
         assertNotNull(service);
         TestHeader proxy = service.getPort(portName, TestHeader.class);
-        Holder<SimpleAll> simpleAll = new Holder<SimpleAll>();
+        Holder<SimpleAll> simpleAll = new Holder<>();
         SimpleAll sa = new SimpleAll();
         sa.setVarAttrString("varAttrString");
         sa.setVarInt(100);

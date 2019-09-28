@@ -31,6 +31,10 @@ import org.apache.cxf.frontend.ServerFactoryBean;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class FlatArrayTest extends AbstractAegisTest {
 
     private static final int[] INT_ARRAY = new int[] {4, 6, 12};
@@ -66,7 +70,7 @@ public class FlatArrayTest extends AbstractAegisTest {
                                             + "/xsd:sequence/xsd:element" + "[@name='array']", arrayWsdlDoc);
         Element typeElement = (Element)typeList.item(0);
         String nillableValue = typeElement.getAttribute("nillable");
-        assertTrue(nillableValue == null || "".equals(nillableValue) || "false".equals("nillableValue"));
+        assertTrue(nillableValue == null || "".equals(nillableValue) || "false".equals(nillableValue));
         String typeString = typeElement.getAttribute("type");
         assertEquals("xsd:string", typeString); // no ArrayOf
 

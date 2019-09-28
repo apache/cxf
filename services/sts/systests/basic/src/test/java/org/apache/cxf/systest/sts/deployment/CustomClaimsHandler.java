@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.systest.sts.deployment;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,12 +33,12 @@ import org.apache.cxf.sts.claims.ProcessedClaimCollection;
  */
 public class CustomClaimsHandler implements ClaimsHandler {
 
-    public static final URI ROLE =
-            URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");
-    public static final URI GIVEN_NAME =
-        URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname");
-    public static final URI LANGUAGE =
-        URI.create("http://schemas.mycompany.com/claims/language");
+    public static final String ROLE =
+            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
+    public static final String GIVEN_NAME =
+        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname";
+    public static final String LANGUAGE =
+        "http://schemas.mycompany.com/claims/language";
 
     public ProcessedClaimCollection retrieveClaimValues(
             ClaimCollection claims, ClaimsParameters parameters) {
@@ -69,8 +68,8 @@ public class CustomClaimsHandler implements ClaimsHandler {
         return null;
     }
 
-    public List<URI> getSupportedClaimTypes() {
-        List<URI> list = new ArrayList<>();
+    public List<String> getSupportedClaimTypes() {
+        List<String> list = new ArrayList<>();
         list.add(ROLE);
         list.add(GIVEN_NAME);
         list.add(LANGUAGE);

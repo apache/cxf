@@ -27,7 +27,7 @@ import org.xmlsoap.schemas.soap.envelope.Fault;
 
 @WebService(endpointInterface = "org.apache.cxf.soapfault.SoapFaultPortType",
             serviceName = "SoapFaultService")
-@HandlerChain(file = "./handlers.xml", name = "TestHandlerChain")
+@HandlerChain(file = "handlers.xml")
 public class SOAPFaultImpl implements SoapFaultPortType {
     public void soapFault(Fault fault) {
         //System.out.println("Received soap fault message");

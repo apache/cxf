@@ -41,12 +41,10 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-//import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.phase.PhaseManager;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
-//import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.transport.MessageObserver;
 
 public class ColocOutInterceptor extends AbstractPhaseInterceptor<Message> {
@@ -159,7 +157,7 @@ public class ColocOutInterceptor extends AbstractPhaseInterceptor<Message> {
             //Handle Response
             ex.setInMessage(inMsg);
             PhaseManager pm = bus.getExtension(PhaseManager.class);
-            SortedSet<Phase> phases = new TreeSet<Phase>(pm.getInPhases());
+            SortedSet<Phase> phases = new TreeSet<>(pm.getInPhases());
             ColocUtil.setPhases(phases, Phase.USER_LOGICAL, Phase.PRE_INVOKE);
 
             InterceptorChain chain = ColocUtil.getInInterceptorChain(ex, phases);

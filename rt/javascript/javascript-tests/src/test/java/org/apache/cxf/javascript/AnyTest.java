@@ -28,12 +28,17 @@ import org.apache.cxf.javascript.JavascriptTestUtilities.JSRunnable;
 import org.apache.cxf.javascript.JavascriptTestUtilities.Notifier;
 import org.apache.cxf.javascript.fortest.AnyImpl;
 import org.apache.cxf.testutil.common.TestUtil;
-
-import org.junit.Before;
-import org.junit.Test;
 import org.mozilla.javascript.Context;
 import org.springframework.context.support.GenericApplicationContext;
 import uri.cxf_apache_org.jstest.types.any.alts.Alternative1;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /*
  * We end up here with a part with isElement == true, a non-array element,

@@ -28,6 +28,7 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
@@ -46,10 +47,10 @@ import org.apache.cxf.ws.security.wss4j.policyhandlers.AsymmetricBindingHandler;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.SymmetricBindingHandler;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.TransportBindingHandler;
 import org.apache.neethi.Policy;
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.ThreadLocalSecurityProvider;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.engine.WSSConfig;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.policy.model.AbstractBinding;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
@@ -75,7 +76,7 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
 
     public void handleMessage(SoapMessage mc) throws Fault {
         boolean enableStax =
-            MessageUtils.isTrue(mc.getContextualProperty(SecurityConstants.ENABLE_STREAMING_SECURITY));
+            MessageUtils.getContextualBoolean(mc, SecurityConstants.ENABLE_STREAMING_SECURITY);
         if (!enableStax) {
             if (mc.getContent(SOAPMessage.class) == null) {
                 saajOut.handleMessage(mc);
@@ -152,7 +153,7 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                     SAAJUtils.getHeader(saaj).appendChild(el);
                 } catch (SOAPException e) {
                     //ignore
-                } 
+                }
 
                 WSSConfig config = (WSSConfig)message.getContextualProperty(WSSConfig.class.getName());
                 if (config == null) {
@@ -163,13 +164,13 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                 String asymSignatureAlgorithm =
                     (String)message.getContextualProperty(SecurityConstants.ASYMMETRIC_SIGNATURE_ALGORITHM);
                 if (asymSignatureAlgorithm != null && binding.getAlgorithmSuite() != null) {
-                    binding.getAlgorithmSuite().setAsymmetricSignature(asymSignatureAlgorithm);
+                    binding.getAlgorithmSuite().getAlgorithmSuiteType().setAsymmetricSignature(asymSignatureAlgorithm);
                 }
 
                 String symSignatureAlgorithm =
                     (String)message.getContextualProperty(SecurityConstants.SYMMETRIC_SIGNATURE_ALGORITHM);
                 if (symSignatureAlgorithm != null && binding.getAlgorithmSuite() != null) {
-                    binding.getAlgorithmSuite().setSymmetricSignature(symSignatureAlgorithm);
+                    binding.getAlgorithmSuite().getAlgorithmSuiteType().setSymmetricSignature(symSignatureAlgorithm);
                 }
 
                 try {
@@ -225,7 +226,7 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
         private void translateProperties(SoapMessage msg) {
             String bspCompliant = (String)msg.getContextualProperty(SecurityConstants.IS_BSP_COMPLIANT);
             if (bspCompliant != null) {
-                msg.put(WSHandlerConstants.IS_BSP_COMPLIANT, bspCompliant);
+                msg.put(ConfigurationConstants.IS_BSP_COMPLIANT, bspCompliant);
             }
         }
     }

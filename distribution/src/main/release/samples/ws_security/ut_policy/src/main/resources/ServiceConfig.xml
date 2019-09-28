@@ -20,7 +20,14 @@
 <!-- 
   ** This file configures the web service provider.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:cxf="http://cxf.apache.org/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:jaxws="http://cxf.apache.org/jaxws" xsi:schemaLocation="             http://cxf.apache.org/core             http://cxf.apache.org/schemas/core.xsd              http://cxf.apache.org/configuration/security                       http://cxf.apache.org/schemas/configuration/security.xsd             http://cxf.apache.org/jaxws             http://cxf.apache.org/schemas/jaxws.xsd             http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd             http://cxf.apache.org/transports/http-jetty/configuration             http://cxf.apache.org/schemas/configuration/http-jetty.xsd             http://www.springframework.org/schema/beans             http://www.springframework.org/schema/beans/spring-beans-4.2.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://cxf.apache.org/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:sec="http://cxf.apache.org/configuration/security"
+    xmlns:http="http://cxf.apache.org/transports/http/configuration"
+    xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
+    xmlns:jaxws="http://cxf.apache.org/jaxws"
+    xsi:schemaLocation="http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <cxf:bus>
         <cxf:features>
             <cxf:logging/>
@@ -49,7 +56,7 @@
                     <sec:keyStore file="src/main/config/serviceKeystore.jks" password="sspass" type="JKS"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:keyStore file="src/main/config/serviceKeystore.jks" password="sspass" type="JKS"/>
+                    <sec:keyStore file="src/main/config/stsstore.jks" password="stsspass" type="JKS"/>
                 </sec:trustManagers>
                 <sec:clientAuthentication want="true" required="true"/>
             </httpj:tlsServerParameters>

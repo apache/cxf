@@ -23,7 +23,7 @@ import io.netty.channel.Channel;
 
 public final class ChannelThreadLocal {
     public static final ThreadLocal<Channel> CHANNEL_THREAD_LOCAL
-        = new ThreadLocal<Channel>();
+        = new ThreadLocal<>();
 
     private ChannelThreadLocal() {
         // Utils class

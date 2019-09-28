@@ -25,13 +25,11 @@ import javax.jms.ConnectionFactory;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
-import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 public class JmsTestActivator implements BundleActivator {
-    public static final String PORT = TestUtil.getPortNumber(JmsTestActivator.class);
     private Server server;
 
     @Override

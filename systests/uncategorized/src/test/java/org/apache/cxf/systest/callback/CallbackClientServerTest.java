@@ -29,8 +29,12 @@ import javax.xml.ws.wsaddressing.W3CEndpointReference;
 import org.apache.callback.SOAPService;
 import org.apache.callback.ServerPortType;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class CallbackClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = Server.PORT;

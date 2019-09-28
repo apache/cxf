@@ -18,27 +18,34 @@
  */
 package org.apache.cxf.systest.jaxrs.security.oauth2.tls;
 
+import java.util.Random;
+
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.rs.security.oauth2.common.Client;
-import org.apache.cxf.rs.security.oauth2.grants.code.DefaultEHCacheCodeDataProvider;
+import org.apache.cxf.rs.security.oauth2.grants.code.JCacheCodeDataProvider;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 /**
  * Extend the DefaultEHCacheCodeDataProvider to allow refreshing of tokens
  */
-public class OAuthDataProviderImplJwt extends DefaultEHCacheCodeDataProvider {
+public class OAuthDataProviderImplJwt extends JCacheCodeDataProvider {
     public OAuthDataProviderImplJwt() throws Exception {
-
+        super(DEFAULT_CONFIG_URL, BusFactory.getThreadDefaultBus(true),
+              CLIENT_CACHE_KEY + "_" + Math.abs(new Random().nextInt()),
+              CODE_GRANT_CACHE_KEY + "_" + Math.abs(new Random().nextInt()),
+              ACCESS_TOKEN_CACHE_KEY + "_" + Math.abs(new Random().nextInt()),
+              REFRESH_TOKEN_CACHE_KEY + "_" + Math.abs(new Random().nextInt()),
+              true);
         Client client = new Client("boundJwt",
                                    null,
                                    true,
                                    null,
                                    null);
-        client.getProperties().put(OAuthConstants.TLS_CLIENT_AUTH_SUBJECT_DN, 
+        client.getProperties().put(OAuthConstants.TLS_CLIENT_AUTH_SUBJECT_DN,
                                     "CN=whateverhost.com,OU=Morpit,O=ApacheTest,L=Syracuse,C=US");
         client.getAllowedGrantTypes().add("custom_grant");
         this.setClient(client);
         this.setUseJwtFormatForAccessTokens(true);
-        this.setStoreJwtTokenKeyOnly(true);
     }
 
 }

@@ -20,12 +20,12 @@
 package org.apache.cxf.systest.coloc;
 
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 import javax.xml.ws.Holder;
 
-
-import org.apache.commons.logging.Log;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.headers.coloc.types.FaultDetailT;
 import org.apache.headers.coloc.types.HeaderInfo;
@@ -43,10 +43,10 @@ import org.apache.headers.rpc_lit.PingMeFault;
 import static org.junit.Assert.assertEquals;
 
 public class BaseHeaderTesterRpcLitImpl implements HeaderTester {
-    private Log logger;
+    private static final Logger LOG = LogUtils.getL7dLogger(BaseHeaderTesterRpcLitImpl.class);
 
     public InHeaderResponseT inHeader(InHeaderT in, HeaderInfo header) {
-        getLogger().debug("Server: inHeader called");
+        LOG.fine("Server: inHeader called");
         assertEquals(HeaderTesterUtil.IN_REQUEST_TYPE, in.getRequestType());
         assertEquals(HeaderTesterUtil.IN_MESSAGE, header.getMessage());
         assertEquals(HeaderTesterUtil.IN_ORIGINATOR, header.getOriginator());
@@ -57,7 +57,7 @@ public class BaseHeaderTesterRpcLitImpl implements HeaderTester {
     }
 
     public InoutHeaderResponseT inoutHeader(InoutHeaderT in, Holder<HeaderInfo> header) {
-        getLogger().debug("Server: inoutHeader called");
+        LOG.fine("Server: inoutHeader called");
         assertEquals(HeaderTesterUtil.INOUT_REQUEST_TYPE_IN, in.getRequestType());
         assertEquals(HeaderTesterUtil.INOUT_MESSAGE_IN, header.value.getMessage());
         assertEquals(HeaderTesterUtil.INOUT_ORIGINATOR_IN, header.value.getOriginator());
@@ -73,7 +73,7 @@ public class BaseHeaderTesterRpcLitImpl implements HeaderTester {
     }
 
     public void outHeader(OutHeaderT in, Holder<OutHeaderResponseT> out, Holder<HeaderInfo> header) {
-        getLogger().debug("Server: outHeader called");
+        LOG.fine("Server: outHeader called");
         assertEquals(HeaderTesterUtil.OUT_REQUEST_TYPE, in.getRequestType());
 
         HeaderInfo outHeader = new HeaderInfo();
@@ -88,7 +88,7 @@ public class BaseHeaderTesterRpcLitImpl implements HeaderTester {
 
     public PingMeResponseT pingMe(PingMeT in) throws PingMeFault {
         String msgType = in.getFaultType();
-        getLogger().debug("Server: in pingMe:" + msgType);
+        LOG.fine("Server: in pingMe:" + msgType);
         if ("USER".equals(msgType)) {
 
             FaultDetailT detail = new FaultDetailT();
@@ -106,11 +106,4 @@ public class BaseHeaderTesterRpcLitImpl implements HeaderTester {
         return new PingMeResponseT();
     }
 
-    public void init(Log log) {
-        logger = log;
-    }
-
-    protected Log getLogger() {
-        return logger;
-    }
 }

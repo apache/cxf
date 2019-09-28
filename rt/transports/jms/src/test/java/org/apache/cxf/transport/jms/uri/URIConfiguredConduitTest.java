@@ -35,9 +35,12 @@ import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
 import org.apache.cxf.transport.jms.util.TestReceiver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.junit.Assert;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Checks if a CXF client works correlates requests and responses correctly if the server sets the message id
@@ -45,7 +48,8 @@ import org.junit.Test;
  */
 public class URIConfiguredConduitTest {
     private static final String SERVICE_QUEUE = "test";
-    private static final String BROKER_URI = "vm://URIConfiguredConduitTest?broker.persistent=false";
+    private static final String BROKER_URI 
+        = "vm://URIConfiguredConduitTest?broker.persistent=false&broker.useJmx=false";
     private static ConnectionFactory cf;
 
     private enum SyncType {
@@ -58,9 +62,7 @@ public class URIConfiguredConduitTest {
         cf = new ActiveMQConnectionFactory(BROKER_URI);
     }
 
-    // @Ignoring due to continually failing on Jenkins
     @Test
-    @org.junit.Ignore
     public void testSendReceive() throws Exception {
         sendAndReceive(SyncType.sync,
                        "jms:jndi:dynamicQueues/"
@@ -102,20 +104,16 @@ public class URIConfiguredConduitTest {
 
         waitForAsyncReply(exchange);
         receiver.close();
-        if (exchange.getInMessage() == null) {
-            throw new RuntimeException("No reply received within 2 seconds");
-        }
+        assertNotNull("No reply received within 2 seconds", exchange.getInMessage());
         JMSMessageHeadersType inHeaders = (JMSMessageHeadersType)exchange.getInMessage()
             .get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
-        Assert.assertEquals(receiver.getRequestMessageId(), inHeaders.getJMSCorrelationID());
+        assertEquals(receiver.getRequestMessageId(), inHeaders.getJMSCorrelationID());
         conduit.close();
     }
 
-    private void waitForAsyncReply(Exchange exchange) throws InterruptedException {
-        int count = 0;
-        while (exchange.getInMessage() == null && count <= 20) {
-            Thread.sleep(100);
-            count++;
+    private static void waitForAsyncReply(Exchange exchange) throws InterruptedException {
+        for (int count = 0; exchange.getInMessage() == null && count <= 20; count++) {
+            Thread.sleep(100L);
         }
     }
 

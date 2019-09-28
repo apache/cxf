@@ -233,7 +233,7 @@ public class WSDiscoveryClient implements Closeable {
             dispatch.getRequestContext().put("thread.local.request.context", Boolean.TRUE);
             version.addVersionTransformer(dispatch);
         }
-        addAddressing(dispatch, false, action);
+        addAddressing(dispatch, addSeq, action);
         return dispatch;
     }
     private void addAddressing(BindingProvider p, boolean addSeq, String action) {
@@ -278,8 +278,8 @@ public class WSDiscoveryClient implements Closeable {
         service = null;
     }
     protected void finalize() throws Throwable {
-        super.finalize();
         close();
+        super.finalize();
     }
 
     /**
@@ -376,9 +376,7 @@ public class WSDiscoveryClient implements Closeable {
                                 resetDispatch(h.getXAddrs().get(0));
                             }
                         }
-                    } catch (InterruptedException e) {
-                        // ?
-                    } catch (ExecutionException e) {
+                    } catch (InterruptedException | ExecutionException e) {
                         // ?
                     }
                 }
@@ -402,7 +400,7 @@ public class WSDiscoveryClient implements Closeable {
         rt.setEndpointReference(ref);
         if (adHoc) {
             disp.getRequestContext().put("udp.multi.response.timeout", timeout);
-            final Holder<ResolveMatchesType> response = new Holder<ResolveMatchesType>();
+            final Holder<ResolveMatchesType> response = new Holder<>();
             AsyncHandler<Object> handler = new AsyncHandler<Object>() {
                 public void handleResponse(Response<Object> res) {
                     try {
@@ -422,9 +420,7 @@ public class WSDiscoveryClient implements Closeable {
                                 resetDispatch(h.getXAddrs().get(0));
                             }
                         }
-                    } catch (InterruptedException e) {
-                        // ?
-                    } catch (ExecutionException e) {
+                    } catch (InterruptedException | ExecutionException e) {
                         // ?
                     }
                 }

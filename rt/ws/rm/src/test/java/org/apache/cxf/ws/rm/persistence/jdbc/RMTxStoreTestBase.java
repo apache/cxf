@@ -41,17 +41,23 @@ import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStoreException;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  *
  */
-public abstract class RMTxStoreTestBase extends Assert {
+public abstract class RMTxStoreTestBase {
     protected static RMTxStore store;
 
     protected static final String CLIENT_ENDPOINT_ID =
@@ -61,9 +67,9 @@ public abstract class RMTxStoreTestBase extends Assert {
     private static final String NON_ANON_ACKS_TO =
         "http://localhost:9999/decoupled_endpoint";
 
-    private static final Long ZERO = new Long(0);
-    private static final Long ONE = new Long(1);
-    private static final Long TEN = new Long(10);
+    private static final Long ZERO = Long.valueOf(0);
+    private static final Long ONE = Long.valueOf(1);
+    private static final Long TEN = Long.valueOf(10);
 
     private static SequenceAcknowledgement ack1;
     private static SequenceAcknowledgement ack2;
@@ -87,7 +93,7 @@ public abstract class RMTxStoreTestBase extends Assert {
         range.setUpper(ONE);
         ack2.getAcknowledgementRange().add(range);
         range = new SequenceAcknowledgement.AcknowledgementRange();
-        range.setLower(new Long(3));
+        range.setLower(Long.valueOf(3));
         range.setUpper(TEN);
         ack2.getAcknowledgementRange().add(range);
     }
@@ -902,7 +908,7 @@ public abstract class RMTxStoreTestBase extends Assert {
                 assertEquals(ONE, r.getLower());
                 assertEquals(ONE, r.getUpper());
                 r = recovered.getAcknowledgment().getAcknowledgementRange().get(1);
-                assertEquals(new Long(3), r.getLower());
+                assertEquals(Long.valueOf(3), r.getLower());
                 assertEquals(TEN, r.getUpper());
                 assertEquals(ProtocolVariation.RM11WSA200508, recovered.getProtocol());
             }

@@ -28,8 +28,15 @@ import javax.security.auth.Subject;
 
 import org.apache.cxf.jca.cxf.CXFInvocationHandler;
 import org.apache.cxf.jca.cxf.CXFInvocationHandlerData;
+
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class InvocationHandlerFactoryTest extends HandlerTestBase {
 
@@ -62,7 +69,7 @@ public class InvocationHandlerFactoryTest extends HandlerTestBase {
 
         assertNotNull("handler must not be null", handler);
         int count = 0;
-        Set<Class<?>> allHandlerTypes = new HashSet<Class<?>>();
+        Set<Class<?>> allHandlerTypes = new HashSet<>();
 
         while (handler != null) {
 

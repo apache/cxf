@@ -15,13 +15,15 @@ Please review the README in the samples directory before continuing.
 
 *** Requirements ***
 
-The samples in this directory use STRONG encryption.  The default encryption algorithms
-included in a JRE is not adequate for these samples.   The Java Cryptography Extension
-(JCE) Unlimited Strength Jurisdiction Policy Files available on Oracle's JDK download
-page[3] *must* be installed for the examples to work.   If you get errors about invalid
-key lengths, the Unlimited Strength files are not installed.
+The samples in this directory use STRONG encryption. If you are using a version
+of Java prior to 1.8.0_161 then you may need to install the Java Cryptography
+Extension (JCE) Unlimited Strength Jurisdiction Policy Files [1] for the
+examples to work. Note that from the 1.8.0_161 release, Java has the unlimited
+strength policies installed by default. If you get errors about invalid key
+lengths with an older JDK version, then the Unlimited Strength files are not
+installed.
 
-[3] http://www.oracle.com/technetwork/java/javase/downloads/index.html
+[1] http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 
 Building and running the demo using Maven

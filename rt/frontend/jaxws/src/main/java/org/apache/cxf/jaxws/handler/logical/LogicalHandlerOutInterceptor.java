@@ -35,12 +35,12 @@ import org.w3c.dom.Node;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.jaxws.handler.AbstractJAXWSHandlerInterceptor;
 import org.apache.cxf.jaxws.handler.HandlerChainInvoker;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
@@ -160,7 +160,7 @@ public class LogicalHandlerOutInterceptor
                                 .getContent(XMLStreamReader.class));
 
                             message.getExchange().setInMessage(responseMsg);
-                            responseMsg.put(PhaseInterceptorChain.STARTING_AT_INTERCEPTOR_ID,
+                            responseMsg.put(InterceptorChain.STARTING_AT_INTERCEPTOR_ID,
                                             LogicalHandlerInInterceptor.class.getName());
                             observer.onMessage(responseMsg);
                         }

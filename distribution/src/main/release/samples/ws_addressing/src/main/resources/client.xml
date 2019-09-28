@@ -17,7 +17,12 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cxf="http://cxf.apache.org/core" xmlns:wsa="http://cxf.apache.org/ws/addressing" xmlns:http="http://cxf.apache.org/transports/http/configuration" xsi:schemaLocation="        http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd        http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:cxf="http://cxf.apache.org/core"
+    xmlns:wsa="http://cxf.apache.org/ws/addressing"
+    xmlns:http="http://cxf.apache.org/transports/http/configuration"
+    xsi:schemaLocation="http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <http:conduit name="{http://apache.org/hello_world_soap_http}SoapPort.http-conduit">
         <http:client DecoupledEndpoint="http://localhost:9990/decoupled_endpoint"/>
     </http:conduit>

@@ -24,7 +24,7 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-
+import static org.junit.Assert.assertTrue;
 
 /**
  * JAXRSClientServerWebSocketTest without atmosphere
@@ -42,7 +42,7 @@ public class JAXRSClientServerWebSocketNoAtmosphereTest extends JAXRSClientServe
 
     @AfterClass
     public static void cleanup() {
-        System.clearProperty("org.apache.cxf.transport.websocket.atmosphere.disabled");
+        //System.clearProperty("org.apache.cxf.transport.websocket.atmosphere.disabled");
     }
 
     protected String getPort() {

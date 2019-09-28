@@ -76,7 +76,7 @@ public class StaxDataBinding extends AbstractInterceptorProvidingDataBinding {
             addBefore(StaxInEndingInterceptor.class.getName());
         }
 
-        public void handleMessage(Message message) throws Fault {
+        public void handleMessage(Message message) {
             message.getInterceptorChain().remove(StaxInEndingInterceptor.INSTANCE);
         }
     }
@@ -104,26 +104,24 @@ public class StaxDataBinding extends AbstractInterceptorProvidingDataBinding {
     public <T> DataReader<T> createReader(Class<T> cls) {
         if (cls == XMLStreamReader.class) {
             return (DataReader<T>) xsrReader;
-        } else {
-            throw new UnsupportedOperationException("The type " + cls.getName() + " is not supported.");
         }
+        throw new UnsupportedOperationException("The type " + cls.getName() + " is not supported.");
     }
 
     public Class<?>[] getSupportedReaderFormats() {
-        return new Class[] {XMLStreamReader.class};
+        return new Class<?>[] {XMLStreamReader.class};
     }
 
     @SuppressWarnings("unchecked")
     public <T> DataWriter<T> createWriter(Class<T> cls) {
         if (cls == XMLStreamWriter.class) {
             return (DataWriter<T>) xswWriter;
-        } else {
-            throw new UnsupportedOperationException("The type " + cls.getName() + " is not supported.");
         }
+        throw new UnsupportedOperationException("The type " + cls.getName() + " is not supported.");
     }
 
     public Class<?>[] getSupportedWriterFormats() {
-        return new Class[] {XMLStreamWriter.class, Node.class};
+        return new Class<?>[] {XMLStreamWriter.class, Node.class};
     }
 
     public static class XMLStreamDataReader implements DataReader<XMLStreamReader> {

@@ -24,18 +24,23 @@
     <packaging>bundle</packaging>
     <name>Apache CXF WS-Discovery API</name>
     <description>Apache CXF WS-Discovery API</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.ws.discovery</cxf.module.name>
         <cxf.osgi.export>
             =org.apache.cxf.ws.discovery.internal,
             org.apache.cxf.ws.discovery.*,
         </cxf.osgi.export>
+        <cxf.osgi.import>
+            javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
+            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}"
+        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>
@@ -88,6 +93,11 @@
                         <artifactId>cxf-xjc-bug986</artifactId>
                         <version>${cxf.xjc-utils.version}</version>
                     </dependency>
+                    <dependency>
+                        <groupId>org.apache.cxf.xjcplugins</groupId>
+                        <artifactId>cxf-xjc-dv</artifactId>
+                        <version>${cxf.xjc-utils.version}</version>
+                    </dependency>
                 </dependencies>
                 <executions>
                     <execution>
@@ -102,6 +112,7 @@
                                 <wsdlOption>
                                     <xjcargs>
                                         <xjcarg>-Xbug986</xjcarg>
+                                        <xjcarg>-Xdv</xjcarg>
                                     </xjcargs>
                                     <wsdl>${basedir}/src/main/resources/org/apache/cxf/ws/discovery/wsdl/wsdd-discovery-1.1-wsdl-os.wsdl</wsdl>
                                     <extraargs>

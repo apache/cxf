@@ -35,17 +35,13 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 
-/**
- *
- */
 public class OutMessageRecorder extends AbstractPhaseInterceptor<Message> {
 
     private static final Logger LOG = LogUtils.getLogger(OutMessageRecorder.class);
-    private List<byte[]> outbound;
+    private final List<byte[]> outbound = new CopyOnWriteArrayList<>();
 
     public OutMessageRecorder() {
         super(Phase.PREPARE_SEND);
-        outbound = new CopyOnWriteArrayList<byte[]>();
         addAfter(MessageSenderInterceptor.class.getName());
     }
 
@@ -84,10 +80,7 @@ public class OutMessageRecorder extends AbstractPhaseInterceptor<Message> {
         public void onClose(CachedOutputStream cos) {
             // bytes were already copied after flush
             try {
-                byte bytes[] = cos.getBytes();
-                synchronized (outbound) {
-                    outbound.add(bytes);
-                }
+                outbound.add(cos.getBytes());
             } catch (Exception e) {
                 LOG.fine("Can't record message from output stream class: "
                          + cos.getOut().getClass().getName());

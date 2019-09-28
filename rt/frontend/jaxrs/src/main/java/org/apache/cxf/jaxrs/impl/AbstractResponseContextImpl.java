@@ -124,7 +124,7 @@ public abstract class AbstractResponseContextImpl {
     }
 
     public void setEntity(Object entity, Annotation[] anns, MediaType mt) {
-        ((ResponseImpl)r).setEntity(entity, anns);
+        r.setEntity(entity, anns);
         if (mt != null) {
             r.getMetadata().putSingle(HttpHeaders.CONTENT_TYPE, mt);
             m.put(Message.CONTENT_TYPE, mt.toString());
@@ -132,18 +132,18 @@ public abstract class AbstractResponseContextImpl {
     }
 
     public void setEntity(Object entity) {
-        ((ResponseImpl)r).setEntity(entity, getResponseEntityAnnotations());
+        r.setEntity(entity, getResponseEntityAnnotations());
     }
 
     protected Annotation[] getResponseEntityAnnotations() {
-        return ((ResponseImpl)r).getEntityAnnotations();
+        return r.getEntityAnnotations();
     }
 
 
     public void setStatus(int status) {
         m.getExchange().put(Message.RESPONSE_CODE, status);
         m.put(Message.RESPONSE_CODE, status);
-        ((ResponseImpl)r).setStatus(status);
+        r.setStatus(status);
     }
 
     public void setStatusInfo(StatusType status) {

@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.rs.security.oauth2.services;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -33,6 +35,7 @@ import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 @Path("oauth-authorization-server")
 public class AuthorizationMetadataService {
     private String issuer;
+    private boolean stripPathFromIssuerUri = true;
     // Required
     private String authorizationEndpointAddress;
     // Optional if only an implicit flow is used
@@ -51,7 +54,7 @@ public class AuthorizationMetadataService {
     @GET
     @Produces("application/json")
     public String getConfiguration(@Context UriInfo ui) {
-        Map<String, Object> cfg = new LinkedHashMap<String, Object>();
+        Map<String, Object> cfg = new LinkedHashMap<>();
         String baseUri = getBaseUri(ui);
         prepareConfigurationData(cfg, baseUri);
 
@@ -62,7 +65,7 @@ public class AuthorizationMetadataService {
 
     protected void prepareConfigurationData(Map<String, Object> cfg, String baseUri) {
         // Issuer
-        cfg.put("issuer", issuer == null ? baseUri : issuer);
+        cfg.put("issuer", buildIssuerUri(baseUri));
         // Authorization Endpoint
         String theAuthorizationEndpointAddress =
             calculateEndpointAddress(authorizationEndpointAddress, baseUri, "/idp/authorize");
@@ -95,11 +98,19 @@ public class AuthorizationMetadataService {
 
     protected static String calculateEndpointAddress(String endpointAddress, String baseUri, String defRelAddress) {
         endpointAddress = endpointAddress != null ? endpointAddress : defRelAddress;
-        if (endpointAddress.startsWith("https")) {
+        if (isAbsoluteUri(endpointAddress)) {
             return endpointAddress;
         } else {
-            return UriBuilder.fromUri(baseUri).path(endpointAddress).build().toString();
+            URI uri = UriBuilder.fromUri(baseUri).path(endpointAddress).build();
+            return removeDefaultPort(uri).toString();
         }
+    }
+
+    private static boolean isAbsoluteUri(String endpointAddress) {
+        if (endpointAddress == null) {
+            return false;
+        }
+        return endpointAddress.startsWith("http://") || endpointAddress.startsWith("https://");
     }
 
     private String getBaseUri(UriInfo ui) {
@@ -170,4 +181,41 @@ public class AuthorizationMetadataService {
         this.dynamicRegistrationEndpointAddress = dynamicRegistrationEndpointAddress;
     }
 
+    private String buildIssuerUri(String baseUri) {
+        URI uri;
+        if (isAbsoluteUri(issuer)) {
+            uri = UriBuilder.fromUri(issuer).build();
+        } else {
+            uri = issuer == null || !issuer.startsWith("/") ? URI.create(baseUri)
+                    : UriBuilder.fromUri(baseUri).path(issuer).build();
+        }
+        uri = removeDefaultPort(uri);
+        if (stripPathFromIssuerUri) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(uri.getScheme()).append("://").append(uri.getHost());
+            if (uri.getPort() != -1) {
+                sb.append(':').append(uri.getPort());
+            }
+            return sb.toString();
+        } else {
+            return uri.toString();
+        }
+    }
+
+    private static URI removeDefaultPort(URI uri) {
+        if ((uri.getPort() == 80 && "http".equals(uri.getScheme()))
+                || (uri.getPort() == 443 && "https".equals(uri.getScheme()))) {
+            try {
+                return new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), -1,
+                        uri.getPath(), uri.getQuery(), uri.getFragment());
+            } catch (URISyntaxException e) {
+                throw new IllegalArgumentException("Invalid URI " + uri + " : " + e.toString(), e);
+            }
+        }
+        return uri;
+    }
+
+    public void setStripPathFromIssuerUri(boolean stripPathFromIssuerUri) {
+        this.stripPathFromIssuerUri = stripPathFromIssuerUri;
+    }
 }

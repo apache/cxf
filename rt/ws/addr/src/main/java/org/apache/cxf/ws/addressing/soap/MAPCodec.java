@@ -90,7 +90,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
      * is used in all chains.
      */
     protected final Map<String, Exchange> uncorrelatedExchanges
-        = new ConcurrentHashMap<String, Exchange>();
+        = new ConcurrentHashMap<>();
 
     private VersionTransformer transformer;
     private HeaderFactory headerFactory;
@@ -226,7 +226,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
                 discardMAPs(header, maps);
 
                 JAXBContext jaxbContext =
-                    VersionTransformer.getExposedJAXBContext(
+                    org.apache.cxf.ws.addressing.VersionTransformer.getExposedJAXBContext(
                                                      maps.getNamespaceURI());
                 QName duplicate = maps.getDuplicate();
                 encodeAsExposed(maps,
@@ -359,7 +359,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
         return maps.getReplyTo() != null
             && maps.getReplyTo().getAddress() != null
             && maps.getReplyTo().getAddress().getValue() != null
-            && !(VersionTransformer.Names200408.WSA_NAMESPACE_NAME.equals(maps.getNamespaceURI())
+            && !(Names200408.WSA_NAMESPACE_NAME.equals(maps.getNamespaceURI())
                 && maps.getReplyTo().getAddress().getValue()
                 .equals(ContextUtils.getNoneEndpointReference().getAddress().getValue()));
     }
@@ -466,7 +466,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
                     "{0} : {1}",
                     new Object[] {name.getLocalPart(), getLogText(value)});
 
-            boolean mu = maps.getMustUnderstand().contains(name);
+            boolean mu = maps.isRequired() || maps.getMustUnderstand().contains(name);
 
             transformer.encodeAsExposed(message,
                                         maps.getNamespaceURI(),
@@ -505,10 +505,10 @@ public class MAPCodec extends AbstractSoapInterceptor {
                         // Need to check the uri before getting unmarshaller else
                         // would get wrong unmarshaller and fail to process required
                         // headers.
-                        if (VersionTransformer.isSupported(headerURI)) {
+                        if (org.apache.cxf.ws.addressing.VersionTransformer.isSupported(headerURI)) {
                             if (unmarshaller == null) {
                                 JAXBContext jaxbContext =
-                                    VersionTransformer.getExposedJAXBContext(headerURI);
+                                    org.apache.cxf.ws.addressing.VersionTransformer.getExposedJAXBContext(headerURI);
                                 unmarshaller =
                                     jaxbContext.createUnmarshaller();
                                 unmarshaller.setEventHandler(null);
@@ -715,8 +715,9 @@ public class MAPCodec extends AbstractSoapInterceptor {
                                  Class<T> clz,
                                  JAXBContext ctx,
                                  boolean mustUnderstand) throws JAXBException {
+        JAXBDataBinding jaxbDataBinding = new JAXBDataBinding(ctx);
         SoapHeader h = new SoapHeader(qname, new JAXBElement<T>(qname, clz, value),
-                                      new JAXBDataBinding(ctx));
+                                      jaxbDataBinding);
         h.setMustUnderstand(mustUnderstand);
         message.getHeaders().add(h);
     }
@@ -770,7 +771,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
                 List<String> soapActionHeaders = mimeHeaders.get("SOAPAction");
                 // only propogate to SOAPAction header if currently non-empty
                 if (!(soapActionHeaders == null
-                      || soapActionHeaders.size() == 0
+                      || soapActionHeaders.isEmpty()
                       || "".equals(soapActionHeaders.get(0)))) {
                     LOG.log(Level.FINE,
                             "encoding wsa:Action in SOAPAction header {0}",
@@ -874,7 +875,8 @@ public class MAPCodec extends AbstractSoapInterceptor {
             } else if (maps.getRelatesTo() == null
                 && maps.getAction() != null
                 && (Names.WSA_DEFAULT_FAULT_ACTION.equals(maps.getAction().getValue())
-                    || Names.WSA_DEFAULT_SOAP_FAULT_ACTION.equals(maps.getAction().getValue()))) {
+                    || Names.WSA_DEFAULT_SOAP_FAULT_ACTION.equals(maps.getAction().getValue())
+                    || "http://docs.oasis-open.org/wsrf/fault".equals(maps.getAction().getValue()))) {
                 //there is an Action header that points to a fault and no relatesTo.  Use the out map for the ID
                 Message m = message.getExchange().getOutMessage();
                 maps = ContextUtils.retrieveMAPs(m, false, true, false);
@@ -912,7 +914,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
         if (headerFactory == null) {
             headerFactory = new HeaderFactory() {
                 public Element getHeader(SoapVersion soapversion) {
-                    Document doc = DOMUtils.createDocument();
+                    Document doc = DOMUtils.getEmptyDocument();
                     return doc.createElementNS(soapversion.getHeader().getNamespaceURI(),
                             soapversion.getHeader().getLocalPart());
                 }

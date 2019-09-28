@@ -40,6 +40,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.Bus;
@@ -154,7 +155,7 @@ public final class CustomizationParser {
         }
 
         XMLStreamReader reader = null;
-        try {
+        try {   //NOPMD
             reader = StaxUtils.createXMLStreamReader(uri, ins);
             doc = StaxUtils.read(reader, true);
         } catch (Exception e) {
@@ -201,7 +202,7 @@ public final class CustomizationParser {
                 DOMUtils.findAllElementsByTagNameNS(jaxwsBinding,
                                                     ToolConstants.HANDLER_CHAINS_URI,
                                                     ToolConstants.HANDLER_CHAINS);
-            if (elemList.size() == 0) {
+            if (elemList.isEmpty()) {
                 continue;
             }
             // take the first one, anyway its 1 handler-config per customization
@@ -451,11 +452,11 @@ public final class CustomizationParser {
     private boolean isGlobaleBindings(Element binding) {
 
         boolean globleNode = binding.getNamespaceURI().equals(ToolConstants.NS_JAXWS_BINDINGS)
-                             && binding.getLocalName().equals("package")
-                             || binding.getLocalName().equals("enableAsyncMapping")
-                             || binding.getLocalName().equals("enableAdditionalSOAPHeaderMapping")
-                             || binding.getLocalName().equals("enableWrapperStyle")
-                             || binding.getLocalName().equals("enableMIMEContent");
+                             && "package".equals(binding.getLocalName())
+                             || "enableAsyncMapping".equals(binding.getLocalName())
+                             || "enableAdditionalSOAPHeaderMapping".equals(binding.getLocalName())
+                             || "enableWrapperStyle".equals(binding.getLocalName())
+                             || "enableMIMEContent".equals(binding.getLocalName());
         Node parentNode = binding.getParentNode();
         if (parentNode instanceof Element) {
             Element ele = (Element)parentNode;
@@ -478,7 +479,7 @@ public final class CustomizationParser {
                 a.add((Element)item);
             }
         }
-        return a.toArray(new Element[a.size()]);
+        return a.toArray(new Element[0]);
     }
 
     private void addBinding(String bindingFile) throws XMLStreamException {

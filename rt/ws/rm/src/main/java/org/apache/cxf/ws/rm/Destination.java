@@ -27,13 +27,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.rm.persistence.RMStore;
@@ -49,7 +49,7 @@ public class Destination extends AbstractEndpoint {
 
     Destination(RMEndpoint reliableEndpoint) {
         super(reliableEndpoint);
-        map = new ConcurrentHashMap<String, DestinationSequence>();
+        map = new ConcurrentHashMap<>();
     }
 
     public DestinationSequence getSequence(Identifier id) {
@@ -125,7 +125,7 @@ public class Destination extends AbstractEndpoint {
 
         if (null != seq) {
             if (seq.applyDeliveryAssurance(sequenceType.getMessageNumber(), message)) {
-                if (MessageUtils.isTrue(message.get(RMMessageConstants.DELIVERING_ROBUST_ONEWAY))) {
+                if (PropertyUtils.isTrue(message.get(RMMessageConstants.DELIVERING_ROBUST_ONEWAY))) {
                     return;
                 }
 

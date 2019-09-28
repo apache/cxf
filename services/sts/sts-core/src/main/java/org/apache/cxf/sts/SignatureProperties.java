@@ -21,6 +21,7 @@ package org.apache.cxf.sts;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.dom.WSConstants;
 
 /**
@@ -40,7 +41,7 @@ public class SignatureProperties {
 
     public SignatureProperties() {
         // Default signature algorithms
-        acceptedSignatureAlgorithms.add(WSConstants.RSA_SHA1);
+        acceptedSignatureAlgorithms.add(WSS4JConstants.RSA_SHA1);
         acceptedSignatureAlgorithms.add(signatureAlgorithm);
         acceptedSignatureAlgorithms.add("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512");
 

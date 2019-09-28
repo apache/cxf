@@ -268,20 +268,17 @@ public final class LogUtils {
                         } catch (InvocationTargetException ite) {
                             if (ite.getTargetException() instanceof MissingResourceException) {
                                 return (Logger) cns.newInstance(loggerName, null);
-                            } else {
-                                throw ite;
                             }
+                            throw ite;
                         }
-                    } else {
-                        try {
-                            return (Logger) cns.newInstance(loggerName, bundleName);
-                        } catch (InvocationTargetException ite) {
-                            if (ite.getTargetException() instanceof MissingResourceException) {
-                                throw (MissingResourceException)ite.getTargetException();
-                            } else {
-                                throw ite;
-                            }
+                    }
+                    try {
+                        return (Logger) cns.newInstance(loggerName, bundleName);
+                    } catch (InvocationTargetException ite) {
+                        if (ite.getTargetException() instanceof MissingResourceException) {
+                            throw (MissingResourceException)ite.getTargetException();
                         }
+                        throw ite;
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -465,7 +462,7 @@ public final class LogUtils {
 
         //try to get the right class name/method name - just trace
         //back the stack till we get out of this class
-        StackTraceElement stack[] = (new Throwable()).getStackTrace();
+        StackTraceElement[] stack = (new Throwable()).getStackTrace();
         String cname = LogUtils.class.getName();
         for (int x = 0; x < stack.length; x++) {
             StackTraceElement frame = stack[x];

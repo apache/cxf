@@ -37,7 +37,6 @@ import net.oauth.OAuthMessage;
 import net.oauth.OAuthProblemException;
 import net.oauth.OAuthValidator;
 import net.oauth.server.OAuthServlet;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -69,10 +68,8 @@ public class AbstractAuthFilter {
             OAuth.OAUTH_NONCE
         };
 
-    private static final Set<String> ALLOWED_OAUTH_PARAMETERS;
+    private static final Set<String> ALLOWED_OAUTH_PARAMETERS = new HashSet<>(Arrays.asList(REQUIRED_PARAMETERS));
     static {
-        ALLOWED_OAUTH_PARAMETERS = new HashSet<>();
-        ALLOWED_OAUTH_PARAMETERS.addAll(Arrays.asList(REQUIRED_PARAMETERS));
         ALLOWED_OAUTH_PARAMETERS.add(OAuth.OAUTH_VERSION);
         ALLOWED_OAUTH_PARAMETERS.add(OAuthConstants.OAUTH_CONSUMER_SECRET);
     }
@@ -165,10 +162,9 @@ public class AbstractAuthFilter {
             if (consumerSecret != null && !consumerSecret.equals(client.getSecretKey())) {
                 LOG.warning("Client secret is invalid");
                 throw new OAuthProblemException(OAuth.Problems.CONSUMER_KEY_UNKNOWN);
-            } else {
-                OAuthUtils.validateMessage(oAuthMessage, client, null,
-                                           dataProvider, validator);
             }
+            OAuthUtils.validateMessage(oAuthMessage, client, null,
+                                       dataProvider, validator);
             accessToken = client.getPreAuthorizedToken();
             if (accessToken == null || !accessToken.isPreAuthorized()) {
                 LOG.warning("Preauthorized access token is unavailable");
@@ -198,7 +194,7 @@ public class AbstractAuthFilter {
 
     protected AuthorizationPolicy getAuthorizationPolicy(String authorizationHeader) {
         Message m = PhaseInterceptorChain.getCurrentMessage();
-        return m != null ? (AuthorizationPolicy)m.get(AuthorizationPolicy.class) : null;
+        return m != null ? m.get(AuthorizationPolicy.class) : null;
     }
 
     protected boolean checkHttpVerb(HttpServletRequest req, List<String> verbs) {

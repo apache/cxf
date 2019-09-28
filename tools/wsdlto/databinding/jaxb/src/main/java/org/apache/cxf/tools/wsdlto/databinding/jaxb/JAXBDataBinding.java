@@ -41,6 +41,7 @@ import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.util.StreamReaderDelegate;
@@ -179,7 +180,7 @@ public class JAXBDataBinding implements DataBindingProfile {
 
         public int next() throws XMLStreamException {
             int i = super.next();
-            if (i == XMLStreamReader.START_ELEMENT) {
+            if (i == XMLStreamConstants.START_ELEMENT) {
                 QName qn = super.getName();
                 isInclude = qn.equals(WSDLConstants.QNAME_SCHEMA_INCLUDE);
                 isImport = qn.equals(WSDLConstants.QNAME_SCHEMA_IMPORT);
@@ -197,7 +198,7 @@ public class JAXBDataBinding implements DataBindingProfile {
 
         public int nextTag() throws XMLStreamException {
             int i = super.nextTag();
-            if (i == XMLStreamReader.START_ELEMENT) {
+            if (i == XMLStreamConstants.START_ELEMENT) {
                 QName qn = super.getName();
                 isInclude = qn.equals(WSDLConstants.QNAME_SCHEMA_INCLUDE);
                 isImport = qn.equals(WSDLConstants.QNAME_SCHEMA_IMPORT);
@@ -406,11 +407,11 @@ public class JAXBDataBinding implements DataBindingProfile {
                 // keep parseArguments happy, supply dummy required command-line
                 // opts
                 opts.addGrammar(new InputSource("null"));
-                opts.parseArguments(args.toArray(new String[args.size()]));
+                opts.parseArguments(args.toArray(new String[0]));
             } catch (BadCommandLineException e) {
                 StringBuilder msg = new StringBuilder("XJC reported 'BadCommandLineException' for -xjc argument:");
                 for (String arg : args) {
-                    msg.append(arg + " ");
+                    msg.append(arg).append(' ');
                 }
                 LOG.log(Level.FINE, msg.toString(), e);
                 if (opts != null) {
@@ -418,9 +419,8 @@ public class JAXBDataBinding implements DataBindingProfile {
                     msg.append(System.getProperty("line.separator"));
                     if (args.contains("-X")) {
                         throw new ToolException(pluginUsage, e);
-                    } else {
-                        msg.append(pluginUsage);
                     }
+                    msg.append(pluginUsage);
                 }
 
                 throw new ToolException(msg.toString(), e);
@@ -431,30 +431,16 @@ public class JAXBDataBinding implements DataBindingProfile {
             // Add the @Generated annotation in the Java files generated. This is done by passing
             // '-mark-generated' attribute to jaxb xjc.
             try {
-                opts.parseArgument(new String[] {"-mark-generated" }, 0);
+                opts.parseArgument(new String[] {"-" + ToolConstants.CFG_MARK_GENERATED_OPTION}, 0);
             } catch (BadCommandLineException e) {
                 LOG.log(Level.SEVERE, e.getMessage());
                 throw new ToolException(e);
             }
         }
+
         addSchemas(opts, schemaCompiler, schemas);
         addBindingFiles(opts, jaxbBindings, schemas);
-
-
-        for (String ns : context.getNamespacePackageMap().keySet()) {
-            File file = JAXBUtils.getPackageMappingSchemaBindingFile(ns, context.mapPackageName(ns));
-            try {
-                InputSource ins = new InputSource(file.toURI().toString());
-                schemaCompiler.parseSchema(ins);
-            } finally {
-                FileUtils.delete(file);
-            }
-        }
-
-        if (context.getPackageName() != null) {
-            schemaCompiler.setDefaultPackageName(context.getPackageName());
-        }
-
+        parseSchemas(schemaCompiler);
 
         rawJaxbModelGenCode = schemaCompiler.bind();
 
@@ -478,6 +464,22 @@ public class JAXBDataBinding implements DataBindingProfile {
         }
 
         initialized = true;
+    }
+
+    private void parseSchemas(SchemaCompiler schemaCompiler) {
+        for (String ns : context.getNamespacePackageMap().keySet()) {
+            File file = JAXBUtils.getPackageMappingSchemaBindingFile(ns, context.mapPackageName(ns));
+            try {
+                InputSource ins = new InputSource(file.toURI().toString());
+                schemaCompiler.parseSchema(ins);
+            } finally {
+                FileUtils.delete(file);
+            }
+        }
+
+        if (context.getPackageName() != null) {
+            schemaCompiler.setDefaultPackageName(context.getPackageName());
+        }
     }
 
     private boolean isJAXB22() {
@@ -551,7 +553,14 @@ public class JAXBDataBinding implements DataBindingProfile {
                 String s = r.getAttributeValue(null, "schemaLocation");
                 if (StringUtils.isEmpty(s)) {
                     Document d = StaxUtils.read(r);
-                    XPath p = XPathFactory.newInstance().newXPath();
+
+                    XPathFactory xpathFactory = XPathFactory.newInstance();
+                    try {
+                        xpathFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+                    } catch (javax.xml.xpath.XPathFactoryConfigurationException ex) {
+                        // ignore
+                    }
+                    XPath p = xpathFactory.newXPath();
                     p.setNamespaceContext(new W3CNamespaceContext(d.getDocumentElement()));
                     XPathExpression xpe = p.compile(d.getDocumentElement().getAttribute("node"));
                     for (XmlSchema schema : schemas.getXmlSchemas()) {
@@ -679,7 +688,7 @@ public class JAXBDataBinding implements DataBindingProfile {
             }
             if (key.startsWith("file:") || key.startsWith("jar:")) {
                 InputStream in = null;
-                try {
+                try {   //NOPMD
                     if (key.startsWith("file:")) {
                         in = Files.newInputStream(new File(new URI(key)).toPath());
                     } else {
@@ -747,12 +756,12 @@ public class JAXBDataBinding implements DataBindingProfile {
         return new StreamReaderDelegate(reader) {
             public int next() throws XMLStreamException {
                 int i = super.next();
-                return i == XMLStreamReader.CDATA ? XMLStreamReader.CHARACTERS : i;
+                return i == XMLStreamConstants.CDATA ? XMLStreamConstants.CHARACTERS : i;
             }
         };
     }
     private String getPluginUsageString(Options opts) {
-        StringBuilder buf = new StringBuilder();
+        StringBuilder buf = new StringBuilder(128);
         buf.append("\nAvailable plugin options:\n");
         for (Plugin pl : opts.getAllPlugins()) {
             buf.append(pl.getUsage());
@@ -789,7 +798,7 @@ public class JAXBDataBinding implements DataBindingProfile {
         ClassCollector classCollector = context.get(ClassCollector.class);
         Collection<String> files = classCollector.getGeneratedFileInfo();
         for (String file : files) {
-            int dotIndex = file.lastIndexOf(".");
+            int dotIndex = file.lastIndexOf('.');
             String sub = dotIndex <= 0 ? "" : file.substring(0, dotIndex - 1);
             if (sub.equals(packageName)) {
                 return true;
@@ -888,7 +897,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                                                                      ToolConstants.SCHEMA_URI,
                                                                      "include");
         boolean hasJAXB = DOMUtils.hasElementInNS(element, ToolConstants.NS_JAXB_BINDINGS);
-        if (impElemList.size() == 0 && incElemList.size() == 0 && !hasJAXB) {
+        if (impElemList.isEmpty() && incElemList.isEmpty() && !hasJAXB) {
             return element;
         }
         element = (Element)cloneNode(element.getOwnerDocument(), element, true);
@@ -984,14 +993,17 @@ public class JAXBDataBinding implements DataBindingProfile {
                                            String systemId,
                                            String baseURI) {
                 String s = JAXBDataBinding.mapSchemaLocation(systemId, baseURI, catalog);
-                //System.out.println(namespaceURI + " " + systemId + " " + baseURI + " " + s);
+                LOG.fine("validating: " + namespaceURI + " " + systemId + " " + baseURI + " " + s);
                 if (s == null) {
                     XmlSchema sc = schemaCollection.getSchemaByTargetNamespace(namespaceURI);
-                    StringWriter writer = new StringWriter();
-                    sc.write(writer);
-                    InputSource src = new InputSource(new StringReader(writer.toString()));
-                    src.setSystemId(sc.getSourceURI());
-                    return new LSInputSAXWrapper(src);
+                    if (sc != null) {
+                        StringWriter writer = new StringWriter();
+                        sc.write(writer);
+                        InputSource src = new InputSource(new StringReader(writer.toString()));
+                        src.setSystemId(sc.getSourceURI());
+                        return new LSInputSAXWrapper(src);
+                    }
+                    throw new ToolException("Schema not found for namespace: " + namespaceURI);
                 }
                 return new LSInputSAXWrapper(new InputSource(s));
             }

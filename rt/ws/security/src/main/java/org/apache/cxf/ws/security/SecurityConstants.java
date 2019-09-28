@@ -145,14 +145,21 @@ public final class SecurityConstants extends org.apache.cxf.rt.security.Security
      * Signatures using WSConstants.C14N_EXCL_OMIT_COMMENTS. Default is "true".
      */
     public static final String ADD_INCLUSIVE_PREFIXES = "ws-security.add.inclusive.prefixes";
-    
+
     /**
-     * Whether to disable the enforcement of the WS-SecurityPolicy 'RequireClientCertificate' policy. 
-     * Default is "false". Some servers may not do client certificate verification at the start of the SSL 
-     * handshake, and therefore the client certs may not be available to the WS-Security layer for policy 
+     * Whether to disable the enforcement of the WS-SecurityPolicy 'RequireClientCertificate' policy.
+     * Default is "false". Some servers may not do client certificate verification at the start of the SSL
+     * handshake, and therefore the client certs may not be available to the WS-Security layer for policy
      * verification at that time.
      */
     public static final String DISABLE_REQ_CLIENT_CERT_CHECK = "ws-security.disable.require.client.cert.check";
+
+    /**
+     * Whether to search for and expand xop:Include Elements for encryption and signature (on the outbound
+     * side) or for signature verification (on the inbound side). This ensures that the actual bytes are signed,
+     * and not just the reference. The default is "true" if MTOM is enabled, false otherwise.
+     */
+    public static final String EXPAND_XOP_INCLUDE = "ws-security.expand.xop.include";
 
     //
     // Non-boolean WS-Security Configuration parameters
@@ -425,7 +432,7 @@ public final class SecurityConstants extends org.apache.cxf.rt.security.Security
             KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM, KERBEROS_REQUEST_CREDENTIAL_DELEGATION,
             POLICY_VALIDATOR_MAP, STORE_BYTES_IN_ATTACHMENT, USE_ATTACHMENT_ENCRYPTION_CONTENT_ONLY_TRANSFORM,
             SYMMETRIC_SIGNATURE_ALGORITHM, SECURITY_CONTEXT_CREATOR, SECURITY_TOKEN_LIFETIME,
-            DISABLE_REQ_CLIENT_CERT_CHECK
+            DISABLE_REQ_CLIENT_CERT_CHECK, EXPAND_XOP_INCLUDE
         }));
         for (String commonProperty : COMMON_PROPERTIES) {
             s.add(commonProperty);

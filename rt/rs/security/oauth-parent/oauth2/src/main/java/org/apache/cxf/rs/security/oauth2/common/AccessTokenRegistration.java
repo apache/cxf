@@ -28,16 +28,16 @@ import java.util.Map;
  */
 public class AccessTokenRegistration {
     private Client client;
-    private List<String> requestedScope = new LinkedList<String>();
-    private List<String> approvedScope = new LinkedList<String>();
+    private List<String> requestedScope = new LinkedList<>();
+    private List<String> approvedScope = new LinkedList<>();
     private String grantType;
     private UserSubject subject;
-    private List<String> audiences = new LinkedList<String>();
+    private List<String> audiences = new LinkedList<>();
     private String nonce;
     private String clientCodeVerifier;
     private String responseType;
     private String grantCode;
-    private Map<String, String> extraProperties = new LinkedHashMap<String, String>();
+    private Map<String, String> extraProperties = new LinkedHashMap<>();
 
     /**
      * Sets the {@link Client} instance

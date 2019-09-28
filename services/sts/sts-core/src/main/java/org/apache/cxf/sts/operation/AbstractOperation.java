@@ -29,11 +29,14 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
@@ -73,8 +76,10 @@ import org.apache.cxf.ws.security.sts.provider.model.secext.ReferenceType;
 import org.apache.cxf.ws.security.sts.provider.model.secext.SecurityTokenReferenceType;
 import org.apache.cxf.ws.security.sts.provider.model.utility.AttributedDateTime;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DateUtil;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
@@ -105,6 +110,7 @@ public abstract class AbstractOperation {
     protected List<TokenDelegationHandler> delegationHandlers = new ArrayList<>();
     protected TokenWrapper tokenWrapper = new DefaultTokenWrapper();
     protected boolean allowCustomContent;
+    protected boolean includeLifetimeElement = true;
 
     public boolean isAllowCustomContent() {
         return allowCustomContent;
@@ -182,6 +188,14 @@ public abstract class AbstractOperation {
         this.claimsManager = claimsManager;
     }
 
+    public void setIncludeLifetimeElement(boolean value) {
+        this.includeLifetimeElement = value;
+    }
+
+    public boolean isIncludeLifetimeElement() {
+        return includeLifetimeElement;
+    }
+
     /**
      * Check the arguments from the STSProvider and parse the request.
      */
@@ -202,6 +216,13 @@ public abstract class AbstractOperation {
         requestParser.setAllowCustomContent(allowCustomContent);
         return requestParser.parseRequest(request, messageContext, stsProperties,
                                           claimsManager.getClaimParsers());
+    }
+
+    protected void cleanRequest(RequestRequirements requestRequirements) {
+        if (requestRequirements.getKeyRequirements() != null
+            && requestRequirements.getKeyRequirements().getEntropy() != null) {
+            requestRequirements.getKeyRequirements().getEntropy().clean();
+        }
     }
 
     /**
@@ -268,16 +289,16 @@ public abstract class AbstractOperation {
         TokenReference tokenReference = new TokenReference();
         tokenReference.setIdentifier(tokenId);
 
-        if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
-            || WSConstants.SAML_NS.equals(tokenType)) {
-            tokenReference.setWsse11TokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+        if (WSS4JConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+            || WSS4JConstants.SAML_NS.equals(tokenType)) {
+            tokenReference.setWsse11TokenType(WSS4JConstants.WSS_SAML_TOKEN_TYPE);
             tokenReference.setUseKeyIdentifier(true);
-            tokenReference.setWsseValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-        } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
-            || WSConstants.SAML2_NS.equals(tokenType)) {
-            tokenReference.setWsse11TokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+            tokenReference.setWsseValueType(WSS4JConstants.WSS_SAML_KI_VALUE_TYPE);
+        } else if (WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+            || WSS4JConstants.SAML2_NS.equals(tokenType)) {
+            tokenReference.setWsse11TokenType(WSS4JConstants.WSS_SAML2_TOKEN_TYPE);
             tokenReference.setUseKeyIdentifier(true);
-            tokenReference.setWsseValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+            tokenReference.setWsseValueType(WSS4JConstants.WSS_SAML2_KI_VALUE_TYPE);
         } else {
             tokenReference.setUseDirectReference(true);
             tokenReference.setWsseValueType(tokenType);
@@ -300,7 +321,7 @@ public abstract class AbstractOperation {
         if (tokenCreated == null) {
             creationTime = now;
         }
-        
+
         Instant expirationTime = tokenExpires;
         if (tokenExpires == null) {
             long lifeTimeOfToken = 300L;
@@ -352,15 +373,22 @@ public abstract class AbstractOperation {
             }
         }
 
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
 
         WSSecEncryptedKey builder = new WSSecEncryptedKey(doc);
         builder.setUserInfo(name);
         builder.setKeyIdentifierType(encryptionProperties.getKeyIdentifierType());
-        builder.setEphemeralKey(secret);
         builder.setKeyEncAlgo(keyWrapAlgorithm);
 
-        builder.prepare(stsProperties.getEncryptionCrypto());
+        SecretKey symmetricKey = null;
+        if (secret != null) {
+            symmetricKey = KeyUtils.prepareSecretKey(encryptionProperties.getEncryptionAlgorithm(), secret);
+        } else {
+            KeyGenerator keyGen = KeyUtils.getKeyGenerator(encryptionProperties.getEncryptionAlgorithm());
+            symmetricKey = keyGen.generateKey();
+        }
+
+        builder.prepare(stsProperties.getEncryptionCrypto(), symmetricKey);
 
         return builder.getEncryptedKeyElement();
     }

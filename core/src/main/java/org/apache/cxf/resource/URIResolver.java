@@ -57,8 +57,7 @@ import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 public class URIResolver {
     private static final Logger LOG = LogUtils.getLogger(URIResolver.class);
 
-    private Map<String, LoadingByteArrayOutputStream> cache
-        = new HashMap<>();
+    private Map<String, LoadingByteArrayOutputStream> cache = new HashMap<>();
     private File file;
     private URI uri;
     private URL url;
@@ -83,7 +82,8 @@ public class URIResolver {
         } else if (baseUriStr != null
             && (baseUriStr.startsWith("jar:")
                 || baseUriStr.startsWith("zip:")
-                || baseUriStr.startsWith("wsjar:"))) {
+                || baseUriStr.startsWith("wsjar:"))
+            && !isAbsolute(uriStr)) {
             tryArchive(baseUriStr, uriStr);
         } else if (uriStr.startsWith("jar:")
             || uriStr.startsWith("zip:")
@@ -112,7 +112,8 @@ public class URIResolver {
         } else if (baseUriStr != null
             && (baseUriStr.startsWith("jar:")
                 || baseUriStr.startsWith("zip:")
-                || baseUriStr.startsWith("wsjar:"))) {
+                || baseUriStr.startsWith("wsjar:"))
+            && !isAbsolute(uriStr)) {
             tryArchive(baseUriStr, uriStr);
         } else if (uriStr.startsWith("jar:")
             || uriStr.startsWith("zip:")
@@ -123,18 +124,20 @@ public class URIResolver {
         }
     }
 
-
+    private boolean isAbsolute(String uriStr) {
+        try {
+            return new URI(uriStr).isAbsolute();
+        } catch (URISyntaxException e) {
+            return false;
+        }
+    }
 
     private void tryFileSystem(String baseUriStr, String uriStr) throws IOException, MalformedURLException {
+        // It is possible that spaces have been encoded.  We should decode them first.
+        String fileStr = uriStr.replace("%20", " ");
+
         try {
-            URI relative;
-
-            String orig = uriStr;
-
-            // It is possible that spaces have been encoded.  We should decode them first.
-            uriStr = uriStr.replaceAll("%20", " ");
-
-            final File uriFileTemp = new File(uriStr);
+            final File uriFileTemp = new File(fileStr);
 
             File uriFile = new File(AccessController.doPrivileged(new PrivilegedAction<String>() {
                 @Override
@@ -144,7 +147,7 @@ public class URIResolver {
             }));
             if (!SecurityActions.fileExists(uriFile, CXFPermissions.RESOLVE_URI)) {
                 try {
-                    URI urif = new URI(URLDecoder.decode(orig, "ASCII"));
+                    URI urif = new URI(URLDecoder.decode(uriStr, "ASCII"));
                     if ("file".equals(urif.getScheme()) && urif.isAbsolute()) {
                         File f2 = new File(urif);
                         if (f2.exists()) {
@@ -155,8 +158,9 @@ public class URIResolver {
                     //ignore
                 }
             }
+            final URI relative;
             if (!SecurityActions.fileExists(uriFile, CXFPermissions.RESOLVE_URI)) {
-                relative = new URI(uriStr.replaceAll(" ", "%20"));
+                relative = new URI(uriStr.replace(" ", "%20"));
             } else {
                 relative = uriFile.getAbsoluteFile().toURI();
             }
@@ -166,28 +170,14 @@ public class URIResolver {
                 url = relative.toURL();
 
                 try {
-                    HttpURLConnection huc = (HttpURLConnection)url.openConnection();
-
-                    String host = SystemPropertyAction.getPropertyOrNull("http.proxyHost");
-                    if (host != null) {
-                        //comment out unused port to pass pmd check
-                        /*String ports = SystemPropertyAction.getProperty("http.proxyPort");
-                        int port = 80;
-                        if (ports != null) {
-                            port = Integer.parseInt(ports);
-                        }*/
-
-                        String username = SystemPropertyAction.getPropertyOrNull("http.proxy.user");
-                        String password = SystemPropertyAction.getPropertyOrNull("http.proxy.password");
-
-                        if (username != null && password != null) {
-                            String encoded = Base64Utility.encode((username + ":" + password).getBytes());
-                            huc.setRequestProperty("Proxy-Authorization", "Basic " + encoded);
-                        }
+                    HttpURLConnection huc = createInputStream();
+                    int status = huc.getResponseCode();
+                    if (status != HttpURLConnection.HTTP_OK && followRedirect(status)) {
+                        // only redirect once.
+                        uri = new URI(huc.getHeaderField("Location"));
+                        url = uri.toURL();
+                        createInputStream();
                     }
-                    huc.setConnectTimeout(30000);
-                    huc.setReadTimeout(60000);
-                    is = huc.getInputStream();
                 } catch (ClassCastException ex) {
                     is = url.openStream();
                 }
@@ -226,15 +216,15 @@ public class URIResolver {
                                  ? base.toString().substring(5) : base.toString());
                 }
             } else {
-                tryClasspath(uriStr.startsWith("file:")
-                             ? uriStr.substring(5) : uriStr);
+                tryClasspath(fileStr.startsWith("file:")
+                             ? fileStr.substring(5) : fileStr);
             }
         } catch (URISyntaxException e) {
             // do nothing
         }
 
         if (is == null && baseUriStr != null && baseUriStr.startsWith("classpath:")) {
-            tryClasspath(baseUriStr + uriStr);
+            tryClasspath(baseUriStr + fileStr);
         }
         if (is == null && uri != null && "file".equals(uri.getScheme())) {
             try {
@@ -252,12 +242,45 @@ public class URIResolver {
             try {
                 is = Files.newInputStream(file.toPath());
             } catch (FileNotFoundException e) {
-                throw new RuntimeException("File was deleted! " + uriStr, e);
+                throw new RuntimeException("File was deleted! " + fileStr, e);
             }
             url = file.toURI().toURL();
         } else if (is == null) {
-            tryClasspath(uriStr);
+            tryClasspath(fileStr);
         }
+    }
+
+    private static boolean followRedirect(int status) {
+        return (status == HttpURLConnection.HTTP_MOVED_TEMP
+                || status == HttpURLConnection.HTTP_MOVED_PERM
+                || status == HttpURLConnection.HTTP_SEE_OTHER)
+              && Boolean.parseBoolean(SystemPropertyAction.getPropertyOrNull("http.autoredirect"));
+    }
+
+    private HttpURLConnection createInputStream() throws IOException {
+        HttpURLConnection huc = (HttpURLConnection)url.openConnection();
+
+        String host = SystemPropertyAction.getPropertyOrNull("http.proxyHost");
+        if (host != null) {
+            //comment out unused port to pass pmd check
+            /*String ports = SystemPropertyAction.getProperty("http.proxyPort");
+            int port = 80;
+            if (ports != null) {
+                port = Integer.parseInt(ports);
+            }*/
+
+            String username = SystemPropertyAction.getPropertyOrNull("http.proxy.user");
+            String password = SystemPropertyAction.getPropertyOrNull("http.proxy.password");
+
+            if (username != null && password != null) {
+                String encoded = Base64Utility.encode((username + ":" + password).getBytes());
+                huc.setRequestProperty("Proxy-Authorization", "Basic " + encoded);
+            }
+        }
+        huc.setConnectTimeout(30000);
+        huc.setReadTimeout(60000);
+        is = huc.getInputStream();
+        return huc;
     }
 
     /**
@@ -396,9 +419,7 @@ public class URIResolver {
                 cache.put(uriStr, bout);
             }
             is = bout.createInputStream();
-        } catch (MalformedURLException e) {
-            // do nothing
-        } catch (URISyntaxException e) {
+        } catch (MalformedURLException | URISyntaxException e) {
             // do nothing
         }
     }

@@ -27,7 +27,9 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.w3c.dom.Document;
+
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
@@ -36,7 +38,11 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.wss4j.common.token.BinarySecurity;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * This is a test to add a custom BinarySecurityToken to the security header of a service request,
@@ -71,8 +77,8 @@ public class BinarySecurityTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = BinarySecurityTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = BinarySecurityTokenTest.class.getResource("DoubleItTokens.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -95,7 +101,7 @@ public class BinarySecurityTokenTest extends AbstractBusClientServerTestBase {
 
         ((BindingProvider)port).getRequestContext().put(SecurityConstants.TOKEN, securityToken);
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);

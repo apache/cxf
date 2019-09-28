@@ -22,6 +22,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
@@ -35,6 +36,7 @@ import org.apache.cxf.ws.transfer.dialect.fragment.ValueType;
 import org.apache.cxf.ws.transfer.manager.MemoryResourceManager;
 import org.apache.cxf.ws.transfer.manager.ResourceManager;
 import org.apache.cxf.ws.transfer.resource.Resource;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -55,7 +57,7 @@ public class FragmentPutInsertBeforeTest extends IntegrationBaseTest {
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
         expression.setMode(FragmentDialectConstants.FRAGMENT_MODE_INSERT_BEFORE);
         expression.getContent().add("/a/b");
-        Element addedElement = DOMUtils.createDocument().createElement("d");
+        Element addedElement = DOMUtils.getEmptyDocument().createElement("d");
         ValueType value = new ValueType();
         value.getContent().add(addedElement);
         fragment.setExpression(expression);
@@ -90,7 +92,7 @@ public class FragmentPutInsertBeforeTest extends IntegrationBaseTest {
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
         expression.setMode(FragmentDialectConstants.FRAGMENT_MODE_INSERT_BEFORE);
         expression.getContent().add("/a/b[1]");
-        Element addedElement = DOMUtils.createDocument().createElement("c");
+        Element addedElement = DOMUtils.getEmptyDocument().createElement("c");
         ValueType value = new ValueType();
         value.getContent().add(addedElement);
         fragment.setExpression(expression);
@@ -124,7 +126,7 @@ public class FragmentPutInsertBeforeTest extends IntegrationBaseTest {
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
         expression.setMode(FragmentDialectConstants.FRAGMENT_MODE_INSERT_BEFORE);
         expression.getContent().add("/");
-        Element addedElement = DOMUtils.createDocument().createElement("a");
+        Element addedElement = DOMUtils.getEmptyDocument().createElement("a");
         ValueType value = new ValueType();
         value.getContent().add(addedElement);
         fragment.setExpression(expression);
@@ -153,7 +155,7 @@ public class FragmentPutInsertBeforeTest extends IntegrationBaseTest {
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
         expression.setMode(FragmentDialectConstants.FRAGMENT_MODE_INSERT_BEFORE);
         expression.getContent().add("/");
-        Element addedElement = DOMUtils.createDocument().createElement("b");
+        Element addedElement = DOMUtils.getEmptyDocument().createElement("b");
         ValueType value = new ValueType();
         value.getContent().add(addedElement);
         fragment.setExpression(expression);
@@ -180,7 +182,7 @@ public class FragmentPutInsertBeforeTest extends IntegrationBaseTest {
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
         expression.setMode(FragmentDialectConstants.FRAGMENT_MODE_INSERT_BEFORE);
         expression.getContent().add("/a/@f");
-        Element addedElement = DOMUtils.createDocument().createElement("b");
+        Element addedElement = DOMUtils.getEmptyDocument().createElement("b");
         ValueType value = new ValueType();
         value.getContent().add(addedElement);
         fragment.setExpression(expression);

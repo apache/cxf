@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs.failover;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +34,6 @@ import org.apache.cxf.clustering.RandomStrategy;
 import org.apache.cxf.clustering.RetryStrategy;
 import org.apache.cxf.clustering.SequentialStrategy;
 import org.apache.cxf.endpoint.ConduitSelector;
-import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.systest.jaxrs.Book;
@@ -44,6 +43,11 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests failover within a static cluster.
@@ -57,7 +61,7 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
                    launchServer(Server.class, true));
         boolean activeReplica1Started = false;
         boolean activeReplica2Started = false;
-        for (int i = 0; i < 60; i++) {
+        for (int i = 0; i < 10; i++) {
             if (!activeReplica1Started) {
                 activeReplica1Started = checkReplica(Server.ADDRESS2);
             }
@@ -67,13 +71,13 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
             if (activeReplica1Started && activeReplica2Started) {
                 break;
             }
-            Thread.sleep(1000);
+            Thread.sleep(100L);
         }
     }
+
     private static boolean checkReplica(String address) {
         try {
-            Response r = WebClient.create(address).query("_wadl").get();
-            return r.getStatus() == 200;
+            return WebClient.create(address).query("_wadl").get().getStatus() == 200;
         } catch (Exception ex) {
             return false;
         }
@@ -140,7 +144,7 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
             getFeature(false, Server.ADDRESS3, null);
         strategyTest(Server.ADDRESS1, feature, Server.ADDRESS3, Server.ADDRESS2, false, false, false);
     }
-
+    @Test
     public void testSequentialStrategyWithDiffBaseAddresses2() throws Exception {
         FailoverFeature feature =
             getFeature(false, Server.ADDRESS3, null);
@@ -166,13 +170,11 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
         String address = "http://localhost:" + NON_PORT + "/non-existent";
         String address2 = "http://localhost:" + NON_PORT + "/non-existent2";
 
-        FailoverFeature feature = new FailoverFeature();
-        List<String> alternateAddresses = new ArrayList<>();
-        alternateAddresses.add(address);
-        alternateAddresses.add(address2);
         CustomRetryStrategy strategy = new CustomRetryStrategy();
         strategy.setMaxNumberOfRetries(5);
-        strategy.setAlternateAddresses(alternateAddresses);
+        strategy.setAlternateAddresses(Arrays.asList(address, address2));
+
+        FailoverFeature feature = new FailoverFeature();
         feature.setStrategy(strategy);
 
         BookStore store = getBookStore(address, feature);
@@ -200,18 +202,14 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
     protected WebClient getWebClient(String address,
                                      FailoverFeature feature) throws Exception {
         JAXRSClientFactoryBean bean = createBean(address, feature);
-
         return bean.createWebClient();
     }
 
-    protected JAXRSClientFactoryBean createBean(String address,
+    private static JAXRSClientFactoryBean createBean(String address,
                                                 FailoverFeature feature) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
-        List<Feature> features = new ArrayList<>();
-        features.add(feature);
-        bean.setFeatures(features);
-
+        bean.setFeatures(Arrays.asList(feature));
         return bean;
     }
 
@@ -244,14 +242,15 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
                     bookStore.getBook("9999");
                     fail("Exception expected");
                 } else {
-                    Book book = bookStore.echoBookElementJson(new Book("CXF", 123));
+                    final long bookId = 123L;
+                    Book book = bookStore.echoBookElementJson(new Book("CXF", bookId));
                     assertNotNull("expected non-null response", book);
-                    assertEquals("unexpected id", 123L, book.getId());
+                    assertEquals("unexpected id", bookId, book.getId());
                 }
             } catch (Exception error) {
                 if (!expectServerException) {
                     //String currEndpoint = getCurrentEndpointAddress(bookStore);
-                    //assertTrue(currEndpoint.equals(inactiveReplica));
+                    //assertEquals(currEndpoint, inactiveReplica);
                     throw error;
                 }
                 ex = error;
@@ -312,7 +311,7 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
             if (expectRandom) {
                 assertTrue(currEndpoint.equals(activeReplica1) || currEndpoint.equals(activeReplica2));
             } else {
-                assertTrue(currEndpoint.equals(activeReplica1));
+                assertEquals(currEndpoint, activeReplica1);
             }
             if (expectServerException) {
                 assertNotNull(ex);
@@ -340,9 +339,9 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
         assertEquals(406, r.getStatus());
         String currEndpoint = getCurrentEndpointAddress(bookStore);
         if (notAvailableOnly) {
-            assertTrue(currEndpoint.equals(currentReplica));
+            assertEquals(currEndpoint, currentReplica);
         } else {
-            assertTrue(currEndpoint.equals(newReplica));
+            assertEquals(currEndpoint, newReplica);
         }
     }
 

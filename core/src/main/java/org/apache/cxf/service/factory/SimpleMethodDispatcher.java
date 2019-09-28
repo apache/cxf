@@ -31,11 +31,11 @@ public class SimpleMethodDispatcher
     implements org.apache.cxf.service.invoker.MethodDispatcher  {
 
     private Map<Method, Map<BindingInfo, BindingOperationInfo>> infoMap =
-        new ConcurrentHashMap<Method, Map<BindingInfo, BindingOperationInfo>>(16, 0.75f, 2);
+        new ConcurrentHashMap<>(16, 0.75f, 2);
     private Map<OperationInfo, Method> opToMethod =
-        new ConcurrentHashMap<OperationInfo, Method>(16, 0.75f, 2);
+        new ConcurrentHashMap<>(16, 0.75f, 2);
     private Map<Method, OperationInfo> methodToOp =
-        new ConcurrentHashMap<Method, OperationInfo>(16, 0.75f, 2);
+        new ConcurrentHashMap<>(16, 0.75f, 2);
 
     public SimpleMethodDispatcher() {
         //complete
@@ -47,7 +47,7 @@ public class SimpleMethodDispatcher
             methodToOp.put(m, o);
 
             Map<BindingInfo, BindingOperationInfo> biToBop
-                = new ConcurrentHashMap<BindingInfo, BindingOperationInfo>(4, 0.75f, 2);
+                = new ConcurrentHashMap<>(4, 0.75f, 2);
             infoMap.put(m, biToBop);
         }
 
@@ -74,10 +74,10 @@ public class SimpleMethodDispatcher
             BindingInfo b = endpoint.getEndpointInfo().getBinding();
             for (BindingOperationInfo bop2 : b.getOperations()) {
                 if (bop2.getOperationInfo().equals(o)) {
-                    bop2 = getRealOperation(o, bop2);
+                    BindingOperationInfo realBop = getRealOperation(o, bop2);
 
-                    bops.put(b, bop2);
-                    return bop2;
+                    bops.put(b, realBop);
+                    return realBop;
                 }
             }
         }
@@ -88,7 +88,7 @@ public class SimpleMethodDispatcher
         BindingOperationInfo unwrappedOp = bop.getUnwrappedOperation();
         if (unwrappedOp != null
             && unwrappedOp.getOperationInfo().equals(o.getUnwrappedOperation())) {
-            bop = unwrappedOp;
+            return unwrappedOp;
         }
         return bop;
     }

@@ -48,8 +48,7 @@ public class ClaimRequirement extends JsonMapObject {
         Object prop = getProperty(VALUES_PROPERTY);
         if (prop instanceof List) {
             return CastUtils.cast((List<?>)prop);
-        } else {
-            return null;
         }
+        return null;
     }
 }

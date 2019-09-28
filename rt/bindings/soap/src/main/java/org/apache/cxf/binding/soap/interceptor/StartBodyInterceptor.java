@@ -21,6 +21,7 @@ package org.apache.cxf.binding.soap.interceptor;
 
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -57,8 +58,8 @@ public class StartBodyInterceptor extends AbstractSoapInterceptor {
         //important to keep for ws-security signature digests and stuff
         try {
             int i = xmlReader.next();
-            while (i == XMLStreamReader.NAMESPACE
-                || i == XMLStreamReader.ATTRIBUTE) {
+            while (i == XMLStreamConstants.NAMESPACE
+                || i == XMLStreamConstants.ATTRIBUTE) {
                 i = xmlReader.next();
             }
         } catch (XMLStreamException e) {

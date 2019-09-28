@@ -63,11 +63,9 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
         StringBuilder b = new StringBuilder(brokerUrl1.length());
         for (int x = 0; x < brokerUrl1.length(); x++) {
             char c = brokerUrl1.charAt(x);
-            switch (c) {
-            case '?':
+            if (c == '?') {
                 b.append("%3F");
-                break;
-            default:
+            } else {
                 b.append(c);
             }
         }
@@ -124,7 +122,7 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
                 String add = ((SOAPAddress)e).getLocationURI();
                 int idx = add.indexOf("jndiURL=");
                 if (idx != -1) {
-                    int idx2 = add.indexOf("&", idx);
+                    int idx2 = add.indexOf('&', idx);
                     add = add.substring(0, idx)
                         + "jndiURL=" + encodedUrl
                         + (idx2 == -1 ? "" : add.substring(idx2));

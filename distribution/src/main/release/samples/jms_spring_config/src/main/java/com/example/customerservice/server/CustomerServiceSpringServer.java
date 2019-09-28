@@ -27,7 +27,7 @@ public final class CustomerServiceSpringServer {
     private CustomerServiceSpringServer() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         ClassPathXmlApplicationContext ctx
             = new ClassPathXmlApplicationContext("server-applicationContext.xml");
         Thread.sleep(5 * 60 * 1000);

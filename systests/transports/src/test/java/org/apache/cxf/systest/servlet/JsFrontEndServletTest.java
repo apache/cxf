@@ -28,6 +28,9 @@ import org.apache.cxf.staxutils.StaxUtils;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class JsFrontEndServletTest extends AbstractServletTest {
 
     protected String getConfiguration() {

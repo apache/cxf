@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
@@ -82,7 +81,7 @@ import org.apache.cxf.message.Message;
  * Http-centric web client
  *
  */
-public class WebClient extends AbstractClient implements AsyncClient {
+public class WebClient extends AbstractClient {
     private static final String REQUEST_CLASS = "request.class";
     private static final String REQUEST_TYPE = "request.type";
     private static final String REQUEST_ANNS = "request.annotations";
@@ -91,11 +90,19 @@ public class WebClient extends AbstractClient implements AsyncClient {
     private static final String WEB_CLIENT_OPERATION_REPORTING = "enable.webclient.operation.reporting";
     private BodyWriter bodyWriter = new BodyWriter();
     protected WebClient(String baseAddress) {
-        this(convertStringToURI(baseAddress));
+        this(convertStringToURI(baseAddress), Collections.emptyMap());
+    }
+    
+    protected WebClient(String baseAddress, Map<String, Object> properties) {
+        this(convertStringToURI(baseAddress), properties);
     }
 
     protected WebClient(URI baseURI) {
-        this(new LocalClientState(baseURI));
+        this(baseURI, Collections.emptyMap());
+    }
+
+    protected WebClient(URI baseURI, Map<String, Object> properties) {
+        this(new LocalClientState(baseURI, properties));
     }
 
     protected WebClient(ClientState state) {
@@ -111,8 +118,17 @@ public class WebClient extends AbstractClient implements AsyncClient {
      * @param baseAddress baseAddress
      */
     public static WebClient create(String baseAddress) {
+        return create(baseAddress, Collections.emptyMap());
+    }
+
+    /**
+     * Creates WebClient
+     * @param baseAddress baseAddress
+     */
+    public static WebClient create(String baseAddress, Map<String, Object> properties) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(baseAddress);
+        bean.setProperties(properties);
         return bean.createWebClient();
     }
 
@@ -148,10 +164,23 @@ public class WebClient extends AbstractClient implements AsyncClient {
      * @param threadSafe if true ThreadLocalClientState is used
      */
     public static WebClient create(String baseAddress, List<?> providers, boolean threadSafe) {
+        return create(baseAddress, providers, Collections.emptyMap(), threadSafe);
+    }
+    
+    /**
+     * Creates WebClient
+     * @param baseAddress baseURI
+     * @param providers list of providers
+     * @param threadSafe if true ThreadLocalClientState is used
+     * @param properties additional properties
+     */
+    public static WebClient create(String baseAddress, List<?> providers, 
+            Map<String, Object> properties, boolean threadSafe) {
         JAXRSClientFactoryBean bean = getBean(baseAddress, null);
         bean.setProviders(providers);
+        bean.setProperties(properties);
         if (threadSafe) {
-            bean.setInitialState(new ThreadLocalClientState(baseAddress));
+            bean.setInitialState(new ThreadLocalClientState(baseAddress, properties));
         }
         return bean.createWebClient();
     }
@@ -844,6 +873,11 @@ public class WebClient extends AbstractClient implements AsyncClient {
     }
 
     @Override
+    public WebClient authorization(Object auth) {
+        return (WebClient)super.authorization(auth);
+    }
+
+    @Override
     public WebClient header(String name, Object... values) {
         return (WebClient)super.header(name, values);
     }
@@ -900,8 +934,9 @@ public class WebClient extends AbstractClient implements AsyncClient {
         } finally {
             resetResponseStateImmediatelyIfNeeded();
         }
-        
-        if (r.getStatus() >= 300 && responseClass != Response.class) {
+
+        int status = r.getStatus();
+        if (status != 304 && status >= 300 && responseClass != Response.class) {
             throw convertToWebApplicationException(r);
         }
         return r;
@@ -925,23 +960,12 @@ public class WebClient extends AbstractClient implements AsyncClient {
                                           Class<?> respClass,
                                           Type outType,
                                           InvocationCallback<T> callback) {
-        JaxrsClientCallback<T> cb = new JaxrsClientCallback<T>(callback, respClass, outType);
+        JaxrsClientCallback<T> cb = new JaxrsClientCallback<>(callback, respClass, outType);
         prepareAsyncClient(httpMethod, body, requestClass, inType, respClass, outType, cb);
         return cb.createFuture();
     }
 
-    protected <T> CompletionStage<T> doInvokeAsyncStage(String httpMethod,
-                                          Object body,
-                                          Class<?> respClass,
-                                          Type outType,
-                                          ExecutorService ex) {
-        JaxrsClientStageCallback<T> cb = new JaxrsClientStageCallback<T>(respClass, outType, ex);
-        prepareAsyncClient(httpMethod, body, null, null, respClass, outType, cb);
-        return cb.getCompletionStage();
-    }
-
-    @Override
-    public void prepareAsyncClient(String httpMethod,
+    protected void prepareAsyncClient(String httpMethod,
                                    Object body,
                                    Class<?> requestClass,
                                    Type inType,
@@ -971,6 +995,7 @@ public class WebClient extends AbstractClient implements AsyncClient {
                                   inAnns, respClass, outType, null, null);
 
         m.getExchange().setSynchronous(false);
+        setAsyncMessageObserverIfNeeded(m.getExchange());
         m.getExchange().put(JaxrsClientCallback.class, cb);
 
         doRunInterceptorChain(m);
@@ -979,10 +1004,8 @@ public class WebClient extends AbstractClient implements AsyncClient {
 
     private MultivaluedMap<String, String> prepareHeaders(Class<?> responseClass, Object body) {
         MultivaluedMap<String, String> headers = getHeaders();
-        if (headers.getFirst(HttpHeaders.CONTENT_TYPE) == null && body != null) {
-            String contentType = body instanceof Form ? MediaType.APPLICATION_FORM_URLENCODED
-                                     : MediaType.APPLICATION_XML;
-            headers.putSingle(HttpHeaders.CONTENT_TYPE, contentType);
+        if (headers.getFirst(HttpHeaders.CONTENT_TYPE) == null && body instanceof Form) {
+            headers.putSingle(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED);
         }
 
         if (responseClass != null && responseClass != Response.class
@@ -1039,7 +1062,7 @@ public class WebClient extends AbstractClient implements AsyncClient {
                                    inAnns, respClass, outType, exchange, invContext);
     }
     //CHECKSTYLE:OFF
-    protected Response doChainedInvocation(String httpMethod,
+    protected Response doChainedInvocation(String httpMethod, //NOPMD
                                            MultivaluedMap<String, String> headers,
                                            Object body,
                                            Class<?> requestClass,
@@ -1073,7 +1096,7 @@ public class WebClient extends AbstractClient implements AsyncClient {
     }
 
     //CHECKSTYLE:OFF
-    private Message finalizeMessage(String httpMethod,
+    private Message finalizeMessage(String httpMethod, //NOPMD
                                    MultivaluedMap<String, String> headers,
                                    Object body,
                                    Class<?> requestClass,
@@ -1128,11 +1151,10 @@ public class WebClient extends AbstractClient implements AsyncClient {
             if (results != null && results.length == 1) {
                 return (Response)results[0];
             }
+        } catch (WebApplicationException | ProcessingException ex) {
+            throw ex;
         } catch (Exception ex) {
-            throw ex instanceof WebApplicationException
-                ? (WebApplicationException)ex
-                : ex instanceof ProcessingException
-                ? (ProcessingException)ex : new ProcessingException(ex);
+            throw new ProcessingException(ex);
         }
 
         try {
@@ -1157,7 +1179,7 @@ public class WebClient extends AbstractClient implements AsyncClient {
                     entity = currentResponse.getEntity();
                 }
             }
-            rb = JAXRSUtils.fromResponse(currentResponse);
+            rb = JAXRSUtils.fromResponse(currentResponse, false);
 
             rb.entity(entity instanceof Response
                       ? ((Response)entity).getEntity() : entity);
@@ -1166,9 +1188,10 @@ public class WebClient extends AbstractClient implements AsyncClient {
             getState().setResponse(r);
             ((ResponseImpl)r).setOutMessage(outMessage);
             return r;
+        } catch (ProcessingException ex) {
+            throw ex;
         } catch (Throwable ex) {
-            throw (ex instanceof ProcessingException) ? (ProcessingException)ex
-                                                  : new ProcessingException(ex);
+            throw new ProcessingException(ex);
         } finally {
             ClientProviderFactory.getInstance(outMessage).clearThreadLocalProxies();
         }
@@ -1244,9 +1267,8 @@ public class WebClient extends AbstractClient implements AsyncClient {
         AbstractClient newClient = toAbstractClient(client);
         if (newClient == null) {
             return null;
-        } else  {
-            return newClient.getState();
         }
+        return newClient.getState();
     }
 
     static URI convertStringToURI(String baseAddress) {
@@ -1257,9 +1279,8 @@ public class WebClient extends AbstractClient implements AsyncClient {
             // as the relative address will not work as the base address
             if (baseAddress.startsWith(HTTP_SCHEME)) {
                 return new UriBuilderImpl().uriAsTemplate(baseAddress).build();
-            } else {
-                throw ex;
             }
+            throw ex;
         }
     }
 
@@ -1275,8 +1296,9 @@ public class WebClient extends AbstractClient implements AsyncClient {
 
     // Link to JAX-RS 2.1 CompletionStageRxInvoker
     public CompletionStageRxInvoker rx() {
-        return rx((ExecutorService)null);
+        return rx(lookUpExecutorService());
     }
+
     public CompletionStageRxInvoker rx(ExecutorService ex) {
         return new CompletionStageRxInvokerImpl(this, ex);
     }
@@ -1312,4 +1334,16 @@ public class WebClient extends AbstractClient implements AsyncClient {
         }
     }
 
+    private ExecutorService lookUpExecutorService() {
+        try {
+            javax.naming.InitialContext ic = new javax.naming.InitialContext();
+            Object execService = ic.lookup("java:comp/DefaultManagedExecutorService");
+            if (execService != null) {
+                return (ExecutorService)execService;
+            }
+        } catch (Throwable ex) {
+            // ignore
+        }
+        return null;
+    }
 }

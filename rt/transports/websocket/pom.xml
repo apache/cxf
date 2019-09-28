@@ -23,11 +23,11 @@
     <packaging>bundle</packaging>
     <name>Apache CXF Runtime WebSocket Transport</name>
     <description>Apache CXF Runtime WebSocket Transport</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
@@ -36,6 +36,7 @@
                     org.eclipse.jetty.websocket;version="${cxf.jetty.osgi.version}";resolution:=optional,
         
 -->
+        <cxf.module.name>org.apache.cxf.transport.websocket</cxf.module.name>
         <cxf.osgi.import>
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
             org.eclipse.jetty*;version="${cxf.jetty.osgi.version}";resolution:=optional,
@@ -198,21 +199,9 @@
             <artifactId>${cxf.servlet-api.artifact}</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.ning</groupId>
+            <groupId>org.asynchttpclient</groupId>
             <artifactId>async-http-client</artifactId>
             <version>${cxf.ahc.version}</version>
-            <optional>true</optional>
-            <exclusions>
-                <exclusion>
-                    <groupId>io.netty</groupId>
-                    <artifactId>netty</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty</artifactId>
-            <version>${cxf.netty3.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>

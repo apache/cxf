@@ -47,9 +47,8 @@ public class DefaultSubjectRoleParser implements SubjectRoleParser {
                 RolePrefixSecurityContextImpl securityContext =
                     new RolePrefixSecurityContextImpl(subject, roleClassifier, roleClassifierType);
                 return securityContext.getUserRoles();
-            } else {
-                return new DefaultSecurityContext(principal, subject).getUserRoles();
             }
+            return new DefaultSecurityContext(principal, subject).getUserRoles();
         }
 
         return Collections.emptySet();

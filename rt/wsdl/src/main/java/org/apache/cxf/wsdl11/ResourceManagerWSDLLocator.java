@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 import javax.wsdl.xml.WSDLLocator;
+
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.Bus;

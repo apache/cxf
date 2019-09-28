@@ -42,6 +42,7 @@ public class JsonMapObjectReaderWriter {
     private static final char OBJECT_END = '}';
     private static final char ARRAY_START = '[';
     private static final char ARRAY_END = ']';
+    private static final char ESCAPE = '\\';
     private static final String NULL_VALUE = "null";
     private boolean format;
 
@@ -197,7 +198,7 @@ public class JsonMapObjectReaderWriter {
                 values.put(name, internalFromJsonAsList(name, newJson));
                 i = closingIndex + 1;
             } else {
-                int commaIndex = getCommaIndex(json, sepIndex + j, sepIndex + j);
+                int commaIndex = getCommaIndex(json, sepIndex + j);
                 Object value = readPrimitiveValue(name, json, sepIndex + j, commaIndex);
                 values.put(name, value);
                 i = commaIndex + 1;
@@ -206,7 +207,7 @@ public class JsonMapObjectReaderWriter {
         }
     }
     protected List<Object> internalFromJsonAsList(String name, String json) {
-        List<Object> values = new LinkedList<Object>();
+        List<Object> values = new LinkedList<>();
         for (int i = 0; i < json.length(); i++) {
             if (Character.isWhitespace(json.charAt(i))) {
                 continue;
@@ -218,7 +219,7 @@ public class JsonMapObjectReaderWriter {
                 values.add(nextMap.map);
                 i = closingIndex + 1;
             } else {
-                int commaIndex = getCommaIndex(json, i, i);
+                int commaIndex = getCommaIndex(json, i);
                 Object value = readPrimitiveValue(name, json, i, commaIndex);
                 values.add(value);
                 i = commaIndex;
@@ -243,36 +244,49 @@ public class JsonMapObjectReaderWriter {
                 value = Double.valueOf(valueStr);
             }
         }
+
+        if (value instanceof String) {
+            // Escape an encoded forward slash
+            value = ((String) value).replace("\\/", "/");
+        }
         return value;
     }
 
-    protected static int getCommaIndex(String json, int start, int from) {
-        int commaIndex = json.indexOf(COMMA, from);
+    protected static int getCommaIndex(String json, int from) {
+        int commaIndex = getNextSepCharIndex(json, COMMA, from);
         if (commaIndex == -1) {
             commaIndex = json.length();
-        } else if (json.charAt(commaIndex - 1) != DQUOTE && json.charAt(start) == DQUOTE) {
-            int lastNonWhiteCharIndex = commaIndex - 1; 
-            for (; lastNonWhiteCharIndex > from; lastNonWhiteCharIndex--) {
-                if (!Character.isWhitespace(json.charAt(lastNonWhiteCharIndex))) {
-                    break;
-                }
-            }
-            if (json.charAt(lastNonWhiteCharIndex) != DQUOTE) {
-                commaIndex = getCommaIndex(json, start, commaIndex + 1);
-            }
         }
         return commaIndex;
     }
-    protected int getClosingIndex(String json, char openChar, char closeChar, int from) {
-        int nextOpenIndex = json.indexOf(openChar, from + 1);
-        int closingIndex = json.indexOf(closeChar, from + 1);
+    protected static int getClosingIndex(String json, char openChar, char closeChar, int from) {
+        int nextOpenIndex = getNextSepCharIndex(json, openChar, from + 1);
+        int closingIndex = getNextSepCharIndex(json, closeChar, from + 1);
         while (nextOpenIndex != -1 && nextOpenIndex < closingIndex) {
-            nextOpenIndex = json.indexOf(openChar, nextOpenIndex + 1);
-            closingIndex = json.indexOf(closeChar, closingIndex + 1);
+            nextOpenIndex = getNextSepCharIndex(json, openChar, nextOpenIndex + 1);
+            closingIndex = getNextSepCharIndex(json, closeChar, closingIndex + 1);
         }
         return closingIndex;
     }
-    
+
+    protected static int getNextSepCharIndex(String json, char curlyBracketChar, int from) {
+        int nextCurlyBracketIndex = -1;
+        boolean inString = false;
+        for (int i = from; i < json.length(); i++) {
+            char currentChar = json.charAt(i);
+            if (currentChar == curlyBracketChar && !inString) {
+                nextCurlyBracketIndex = i;
+                break;
+            } else if (currentChar == DQUOTE) {
+                if (i > from && json.charAt(i - 1) == ESCAPE) {
+                    continue;
+                }
+                inString = !inString;
+            }
+        }
+        return nextCurlyBracketIndex;
+    }
+
     public void setFormat(boolean format) {
         this.format = format;
     }
@@ -281,7 +295,7 @@ public class JsonMapObjectReaderWriter {
         void put(String key, Object value);
     }
     private static class MapSettable implements Settable {
-        private Map<String, Object> map = new LinkedHashMap<String, Object>();
+        private Map<String, Object> map = new LinkedHashMap<>();
         public void put(String key, Object value) {
             map.put(key, value);
         }

@@ -42,7 +42,7 @@ public class Extension {
     protected String interfaceName;
     protected boolean deferred;
     protected Collection<String> namespaces = new ArrayList<>();
-    protected Object args[];
+    protected Object[] args;
     protected volatile Object obj;
     protected boolean optional;
     protected boolean notFound;
@@ -102,7 +102,7 @@ public class Extension {
     }
 
     public String toString() {
-        StringBuilder buf = new StringBuilder();
+        StringBuilder buf = new StringBuilder(128);
         buf.append("class: ");
         buf.append(className);
         buf.append(", interface: ");
@@ -118,7 +118,7 @@ public class Extension {
             buf.append(ns);
             n++;
         }
-        buf.append(")");
+        buf.append(')');
         return buf.toString();
     }
 
@@ -153,7 +153,7 @@ public class Extension {
         return namespaces;
     }
 
-    public void setArgs(Object a[]) {
+    public void setArgs(Object[] a) {
         args = a;
     }
 
@@ -217,18 +217,10 @@ public class Extension {
                     obj = con.newInstance(b);
                     return obj;
                 } else if (b != null && args != null) {
-                    Constructor<?> con;
-                    boolean noBus = false;
                     try {
-                        con = cls.getConstructor(Bus.class, Object[].class);
-                    } catch (Exception ex) {
-                        con = cls.getConstructor(Object[].class);
-                        noBus = true;
-                    }
-                    if (noBus) {
-                        obj = con.newInstance(args);
-                    } else {
-                        obj = con.newInstance(b, args);
+                        obj = cls.getConstructor(Bus.class, Object[].class).newInstance(b, args);
+                    } catch (NoSuchMethodException ex) { // no bus
+                        obj = cls.getConstructor(Object[].class).newInstance(args);
                     }
                     return obj;
                 } else if (args != null) {
@@ -251,17 +243,15 @@ public class Extension {
             notFound = true;
             if (!optional) {
                 throw ex;
-            } else {
-                LOG.log(Level.FINE, "Could not load optional extension " + getName(), (Throwable)ex);
             }
+            LOG.log(Level.FINE, "Could not load optional extension " + getName(), ex);
         } catch (InvocationTargetException ex) {
             notFound = true;
             if (!optional) {
                 throw new ExtensionException(new Message("PROBLEM_CREATING_EXTENSION_CLASS", LOG, cls.getName()),
                                              ex.getCause());
-            } else {
-                LOG.log(Level.FINE, "Could not load optional extension " + getName(), (Throwable)ex);
             }
+            LOG.log(Level.FINE, "Could not load optional extension " + getName(), ex);
         } catch (NoSuchMethodException ex) {
             notFound = true;
             List<Object> a = new ArrayList<>();
@@ -274,16 +264,14 @@ public class Extension {
             if (!optional) {
                 throw new ExtensionException(new Message("PROBLEM_FINDING_CONSTRUCTOR", LOG,
                                                          cls.getName(), a), ex);
-            } else {
-                LOG.log(Level.FINE, "Could not load optional extension " + getName(), (Throwable)ex);
             }
+            LOG.log(Level.FINE, "Could not load optional extension " + getName(), ex);
         } catch (Throwable e) {
             notFound = true;
             if (!optional) {
                 throw new ExtensionException(new Message("PROBLEM_CREATING_EXTENSION_CLASS", LOG, cls.getName()), e);
-            } else {
-                LOG.log(Level.FINE, "Could not load optional extension " + getName(), (Throwable)e);
             }
+            LOG.log(Level.FINE, "Could not load optional extension " + getName(), e);
         }
         return obj;
     }

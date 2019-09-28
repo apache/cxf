@@ -50,6 +50,7 @@ public class HttpRequestProperties {
         this.hostName = hostName;
         this.port = port;
         this.httpMethod = httpMethod;
+        this.requestQuery = requestQuery;
     }
 
     private static int getPortFromURI(URI uri) {

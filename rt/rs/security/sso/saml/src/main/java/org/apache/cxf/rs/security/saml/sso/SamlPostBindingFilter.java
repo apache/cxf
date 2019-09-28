@@ -23,12 +23,14 @@ import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
+import javax.security.auth.DestroyFailedException;
 import javax.security.auth.callback.CallbackHandler;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
@@ -61,32 +63,31 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
         Message m = JAXRSUtils.getCurrentMessage();
         if (checkSecurityContext(m)) {
             return;
-        } else {
-            try {
-                SamlRequestInfo info = createSamlRequestInfo(m);
-                info.setIdpServiceAddress(getIdpServiceAddress());
-                // This depends on RequestDispatcherProvider linking
-                // SamlRequestInfo with the jsp page which will fill
-                // in the XHTML form using SamlRequestInfo
-                // in principle we could've built the XHTML form right here
-                // but it will be cleaner to get that done in JSP
+        }
+        try {
+            SamlRequestInfo info = createSamlRequestInfo(m);
+            info.setIdpServiceAddress(getIdpServiceAddress());
+            // This depends on RequestDispatcherProvider linking
+            // SamlRequestInfo with the jsp page which will fill
+            // in the XHTML form using SamlRequestInfo
+            // in principle we could've built the XHTML form right here
+            // but it will be cleaner to get that done in JSP
 
-                String contextCookie = createCookie(SSOConstants.RELAY_STATE,
-                                                    info.getRelayState(),
-                                                    info.getWebAppContext(),
-                                                    info.getWebAppDomain());
-                new MessageContextImpl(m).getHttpServletResponse().addHeader(
-                    HttpHeaders.SET_COOKIE, contextCookie);
+            String contextCookie = createCookie(SSOConstants.RELAY_STATE,
+                                                info.getRelayState(),
+                                                info.getWebAppContext(),
+                                                info.getWebAppDomain());
+            new MessageContextImpl(m).getHttpServletResponse().addHeader(
+                HttpHeaders.SET_COOKIE, contextCookie);
 
-                context.abortWith(Response.ok(info)
-                               .type("text/html")
-                               .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store")
-                               .header("Pragma", "no-cache")
-                               .build());
+            context.abortWith(Response.ok(info)
+                           .type("text/html")
+                           .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store")
+                           .header("Pragma", "no-cache")
+                           .build());
 
-            } catch (Exception ex) {
-                throw ExceptionUtils.toInternalServerErrorException(ex, null);
-            }
+        } catch (Exception ex) {
+            throw ExceptionUtils.toInternalServerErrorException(ex, null);
         }
     }
 
@@ -108,17 +109,17 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
     protected void signAuthnRequest(AuthnRequest authnRequest) throws Exception {
         Crypto crypto = getSignatureCrypto();
         if (crypto == null) {
-            LOG.fine("No crypto instance of properties file configured for signature");
+            LOG.warning("No crypto instance of properties file configured for signature");
             throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
         String signatureUser = getSignatureUsername();
         if (signatureUser == null) {
-            LOG.fine("No user configured for signature");
+            LOG.warning("No user configured for signature");
             throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
         CallbackHandler callbackHandler = getCallbackHandler();
         if (callbackHandler == null) {
-            LOG.fine("No CallbackHandler configured to supply a password for signature");
+            LOG.warning("No CallbackHandler configured to supply a password for signature");
             throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
 
@@ -131,10 +132,10 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
             );
         }
 
-        String sigAlgo = SSOConstants.RSA_SHA1;
+        String sigAlgo = getSignatureAlgorithm();
         String pubKeyAlgo = issuerCerts[0].getPublicKey().getAlgorithm();
         LOG.fine("automatic sig algo detection: " + pubKeyAlgo);
-        if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
+        if ("DSA".equalsIgnoreCase(pubKeyAlgo)) {
             sigAlgo = SSOConstants.DSA_SHA1;
         }
         LOG.fine("Using Signature algorithm " + sigAlgo);
@@ -167,10 +168,17 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
                     "Error generating KeyInfo from signing credential", ex);
         }
 
-        SignableSAMLObject signableObject = (SignableSAMLObject) authnRequest;
+        SignableSAMLObject signableObject = authnRequest;
         signableObject.setSignature(signature);
         signableObject.releaseDOM();
         signableObject.releaseChildrenDOM(true);
+
+        // Clean the private key from memory when we're done
+        try {
+            privateKey.destroy();
+        } catch (DestroyFailedException ex) {
+            // ignore
+        }
 
     }
 

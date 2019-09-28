@@ -36,7 +36,6 @@ import org.apache.hello_world_soap_http_source.source.PingMeFault;
 public class GreeterImpl implements Greeter {
 
     public void greetMeOneWay(DOMSource in) {
-        // TODO Auto-generated method stub
 
     }
 
@@ -87,7 +86,6 @@ public class GreeterImpl implements Greeter {
     }
 
     public void pingMe() throws PingMeFault {
-        // TODO Auto-generated method stub
 
     }
 

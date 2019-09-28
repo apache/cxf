@@ -28,12 +28,14 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.policy.PolicyCalculator;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Test;
 
-public class PolicyDataEngineImplTest extends Assert {
+import static org.junit.Assert.assertTrue;
+
+public class PolicyDataEngineImplTest {
     private static final QName TEST_POLICY_NAME = new QName("http://test", "TestPolicy");
 
     class TestPolicy {
@@ -61,7 +63,7 @@ public class PolicyDataEngineImplTest extends Assert {
 
     public AssertionInfo getTestPolicyAssertionInfo(TestPolicy policy) {
         JaxbAssertion<TestPolicy> assertion =
-            new JaxbAssertion<TestPolicy>(TEST_POLICY_NAME, false);
+            new JaxbAssertion<>(TEST_POLICY_NAME, false);
         assertion.setData(policy);
         return new AssertionInfo(assertion);
     }

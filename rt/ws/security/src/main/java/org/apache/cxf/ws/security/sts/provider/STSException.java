@@ -51,7 +51,7 @@ public class STSException extends RuntimeException {
      * A map of Fault Code to Fault Strings
      */
     private static final java.util.Map<QName, String> FAULT_CODE_MAP =
-            new java.util.HashMap<QName, String>();
+            new java.util.HashMap<>();
 
     static {
         FAULT_CODE_MAP.put(INVALID_REQUEST, "The request was invalid or malformed");

@@ -107,15 +107,6 @@ public class RealmProperties {
     }
 
     /**
-     * Set the String corresponding to the signature Properties class
-     * @param signaturePropertiesFile the String corresponding to the signature properties file
-     */
-    @Deprecated
-    public void setSignaturePropertiesFile(String signaturePropertiesFile) {
-        setSignatureCryptoProperties(signaturePropertiesFile);
-    }
-
-    /**
      * Set the Object corresponding to the signature Properties class. It can be a String
      * corresponding to a filename, a Properties object, or a URL.
      * @param signatureCryptoProperties the object corresponding to the signature properties

@@ -36,7 +36,11 @@ class AllowAllHostnameVerifier implements javax.net.ssl.HostnameVerifier {
             Certificate[] certs = session.getPeerCertificates();
             return certs != null && certs[0] instanceof X509Certificate;
         } catch (SSLException e) {
-            return false;
+            throw new RuntimeException("HostnameVerifier, socket reset for TTL");
         }
+    }
+
+    public boolean verify(final String host, final String certHostname) {
+        return certHostname != null && !certHostname.isEmpty();
     }
 }

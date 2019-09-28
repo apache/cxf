@@ -28,7 +28,9 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactConsumer;
@@ -41,10 +43,15 @@ import org.apache.cxf.security.SecurityContext;
 public class JwsContainerRequestFilter extends AbstractJwsReaderProvider implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext context) throws IOException {
-        if (HttpMethod.GET.equals(context.getMethod())) {
+        if (isMethodWithNoContent(context.getMethod())
+            || isCheckEmptyStream() && !context.hasEntity()) {
             return;
         }
-        JwsCompactConsumer p = new JwsCompactConsumer(IOUtils.readStringFromStream(context.getEntityStream()));
+        final String content = IOUtils.readStringFromStream(context.getEntityStream());
+        if (StringUtils.isEmpty(content)) {
+            return;
+        }
+        JwsCompactConsumer p = new JwsCompactConsumer(content);
         JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier(p.getJwsHeaders());
         if (!p.verifySignatureWith(theSigVerifier)) {
             context.abortWith(JAXRSUtils.toResponse(400));
@@ -91,5 +98,9 @@ public class JwsContainerRequestFilter extends AbstractJwsReaderProvider impleme
             };
         }
         return null;
+    }
+    
+    protected boolean isMethodWithNoContent(String method) {
+        return HttpMethod.DELETE.equals(method) || HttpUtils.isMethodWithNoRequestContent(method);
     }
 }

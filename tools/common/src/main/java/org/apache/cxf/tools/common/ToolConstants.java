@@ -100,8 +100,11 @@ public final class ToolConstants {
     public static final String CFG_FAULT_SERIAL_VERSION_UID = "faultSerialVersionUID";
     public static final String CFG_EXCEPTION_SUPER = "exceptionSuper";
     public static final String CFG_SEI_SUPER = "seiSuper";
-    public static final String CFG_MARK_GENERATED = "mark-generated";
-
+    public static final String CFG_MARK_GENERATED = "markGenerated";
+    public static final String CFG_SUPPRESS_GENERATED_DATE = "suppressGeneratedDate";
+    
+    public static final String CFG_MARK_GENERATED_OPTION = "mark-generated";
+    public static final String CFG_SUPPRESS_GENERATED_DATE_OPTION = "suppress-generated-date";
 
     //Internal Flag to generate
     public static final String CFG_IMPL_CLASS = "implClass";

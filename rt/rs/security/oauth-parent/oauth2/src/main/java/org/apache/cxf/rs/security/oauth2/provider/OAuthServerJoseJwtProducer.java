@@ -19,7 +19,6 @@
 package org.apache.cxf.rs.security.oauth2.provider;
 
 import java.security.cert.X509Certificate;
-import java.security.interfaces.RSAPublicKey;
 
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
@@ -44,7 +43,7 @@ public class OAuthServerJoseJwtProducer extends OAuthJoseJwtProducer {
         if (encryptWithClientCertificates && c != null && !c.getApplicationCertificates().isEmpty()) {
             X509Certificate cert =
                 (X509Certificate)CryptoUtils.decodeCertificate(c.getApplicationCertificates().get(0));
-            theEncryptionProvider = JweUtils.createJweEncryptionProvider((RSAPublicKey)cert.getPublicKey(),
+            theEncryptionProvider = JweUtils.createJweEncryptionProvider(cert.getPublicKey(),
                                                                          KeyAlgorithm.RSA_OAEP,
                                                                          ContentAlgorithm.A128GCM,
                                                                          null);

@@ -28,10 +28,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 
-
-
-
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -39,8 +35,13 @@ import org.apache.hello_world_soap_http.any.Greeter;
 import org.apache.hello_world_soap_http.any.SOAPService;
 import org.apache.hello_world_soap_http.any_types.GreeterImpl;
 import org.apache.hello_world_soap_http.any_types.SayHi.Port;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public final class AnyClientServerTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(MyServer.class);
@@ -88,12 +89,12 @@ public final class AnyClientServerTest extends AbstractBusClientServerTestBase {
         List<Port> any = new ArrayList<>();
         Port anyPort = new Port();
         Port anyPort1 = new Port();
-        JAXBElement<String> ele1 = new JAXBElement<String>(
+        JAXBElement<String> ele1 = new JAXBElement<>(
             new QName("http://apache.org/hello_world_soap_http/other", "port"),
             String.class, "hello");
 
         anyPort.setAny(ele1);
-        JAXBElement<String> ele2 = new JAXBElement<String>(
+        JAXBElement<String> ele2 = new JAXBElement<>(
             new QName("http://apache.org/hello_world_soap_http/other", "port"),
             String.class, "Bon");
         anyPort1.setAny(ele2);
@@ -114,7 +115,7 @@ public final class AnyClientServerTest extends AbstractBusClientServerTestBase {
         updateAddressPort(port, PORT);
 
         List<org.apache.hello_world_soap_http.any_types.SayHi1.Port> list =
-                new ArrayList<org.apache.hello_world_soap_http.any_types.SayHi1.Port>();
+                new ArrayList<>();
         org.apache.hello_world_soap_http.any_types.SayHi1.Port port1 =
             new org.apache.hello_world_soap_http.any_types.SayHi1.Port();
         port1.setRequestType("hello");

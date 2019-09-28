@@ -39,7 +39,6 @@ import javax.transaction.xa.XAResource;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jca.core.resourceadapter.ResourceBean;
-
 import org.apache.cxf.jca.inbound.InboundEndpoint;
 import org.apache.cxf.jca.inbound.MDBActivationSpec;
 import org.apache.cxf.jca.inbound.MDBActivationWork;
@@ -100,7 +99,7 @@ public class ResourceAdapterImpl extends ResourceBean implements ResourceAdapter
         endpoints.clear();
     }
 
-    public XAResource[] getXAResources(ActivationSpec as[])
+    public XAResource[] getXAResources(ActivationSpec[] as)
         throws ResourceException {
         throw new NotSupportedException();
     }

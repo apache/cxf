@@ -29,17 +29,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.activation.DataSource;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 
 public class AttachmentDeserializer {
     public static final String ATTACHMENT_PART_HEADERS = AttachmentDeserializer.class.getName() + ".headers";
@@ -49,24 +53,37 @@ public class AttachmentDeserializer {
 
     public static final String ATTACHMENT_MAX_SIZE = "attachment-max-size";
 
+    /**
+     * The maximum number of attachments permitted in a message. The default is 50.
+     */
+    public static final String ATTACHMENT_MAX_COUNT = "attachment-max-count";
+
+    /**
+     * The maximum MIME Header Length. The default is 300.
+     */
+    public static final String ATTACHMENT_MAX_HEADER_SIZE = "attachment-max-header-size";
+    public static final int DEFAULT_MAX_HEADER_SIZE =
+        SystemPropertyAction.getInteger("org.apache.cxf.attachment-max-header-size", 300);
+
     public static final int THRESHOLD = 1024 * 100; //100K (byte unit)
 
     private static final Pattern CONTENT_TYPE_BOUNDARY_PATTERN = Pattern.compile("boundary=\"?([^\";]*)");
 
-    // TODO: Is there a better way to detect boundaries in the message content?
-    // It seems constricting to assume the boundary will start with ----=_Part_
     private static final Pattern INPUT_STREAM_BOUNDARY_PATTERN =
             Pattern.compile("^--(\\S*)$", Pattern.MULTILINE);
 
+    private static final Logger LOG = LogUtils.getL7dLogger(AttachmentDeserializer.class);
+
+    private static final int PUSHBACK_AMOUNT = 2048;
+
     private boolean lazyLoading = true;
 
-    private int pbAmount = 2048;
     private PushbackInputStream stream;
     private int createCount;
     private int closedCount;
     private boolean closed;
 
-    private byte boundary[];
+    private byte[] boundary;
 
     private String contentType;
 
@@ -79,6 +96,8 @@ public class AttachmentDeserializer {
     private Set<DelegatingInputStream> loaded = new HashSet<>();
     private List<String> supportedTypes;
 
+    private int maxHeaderLength = DEFAULT_MAX_HEADER_SIZE;
+
     public AttachmentDeserializer(Message message) {
         this(message, Collections.singletonList("multipart/related"));
     }
@@ -86,12 +105,26 @@ public class AttachmentDeserializer {
     public AttachmentDeserializer(Message message, List<String> supportedTypes) {
         this.message = message;
         this.supportedTypes = supportedTypes;
+
+        // Get the maximum Header length from configuration
+        maxHeaderLength = MessageUtils.getContextualInteger(message, ATTACHMENT_MAX_HEADER_SIZE,
+                                                            DEFAULT_MAX_HEADER_SIZE);
     }
 
     public void initializeAttachments() throws IOException {
         initializeRootMessage();
 
-        attachments = new LazyAttachmentCollection(this);
+        Object maxCountProperty = message.getContextualProperty(AttachmentDeserializer.ATTACHMENT_MAX_COUNT);
+        int maxCount = 50;
+        if (maxCountProperty != null) {
+            if (maxCountProperty instanceof Integer) {
+                maxCount = (Integer)maxCountProperty;
+            } else {
+                maxCount = Integer.parseInt((String)maxCountProperty);
+            }
+        }
+
+        attachments = new LazyAttachmentCollection(this, maxCount);
         message.setAttachments(attachments);
     }
 
@@ -117,8 +150,7 @@ public class AttachmentDeserializer {
             }
             boundary = boundaryString.getBytes("utf-8");
 
-            stream = new PushbackInputStream(message.getContent(InputStream.class),
-                                             pbAmount);
+            stream = new PushbackInputStream(message.getContent(InputStream.class), PUSHBACK_AMOUNT);
             if (!readTillFirstBoundary(stream, boundary)) {
                 throw new IOException("Couldn't find MIME boundary: " + boundaryString);
             }
@@ -134,7 +166,7 @@ public class AttachmentDeserializer {
             }
             val = AttachmentUtil.getHeader(ih, "Content-Transfer-Encoding");
 
-            MimeBodyPartInputStream mmps = new MimeBodyPartInputStream(stream, boundary, pbAmount);
+            MimeBodyPartInputStream mmps = new MimeBodyPartInputStream(stream, boundary, PUSHBACK_AMOUNT);
             InputStream ins = AttachmentUtil.decode(mmps, val);
             if (ins != mmps) {
                 ih.remove("Content-Transfer-Encoding");
@@ -155,7 +187,7 @@ public class AttachmentDeserializer {
         InputStream is = message.getContent(InputStream.class);
         //boundary should definitely be in the first 2K;
         PushbackInputStream in = new PushbackInputStream(is, 4096);
-        byte buf[] = new byte[2048];
+        byte[] buf = new byte[2048];
         int i = in.read(buf);
         int len = i;
         while (i > 0 && len < buf.length) {
@@ -235,7 +267,7 @@ public class AttachmentDeserializer {
      *
      * @param pushbackInStream
      * @param boundary
-     * @throws MessagingException
+     * @throws IOException
      */
     private static boolean readTillFirstBoundary(PushbackInputStream pbs, byte[] bp) throws IOException {
 
@@ -276,9 +308,10 @@ public class AttachmentDeserializer {
      */
     private Attachment createAttachment(Map<String, List<String>> headers) throws IOException {
         InputStream partStream =
-            new DelegatingInputStream(new MimeBodyPartInputStream(stream, boundary, pbAmount),
+            new DelegatingInputStream(new MimeBodyPartInputStream(stream, boundary, PUSHBACK_AMOUNT),
                                       this);
         createCount++;
+
         return AttachmentUtil.createAttachment(partStream, headers);
     }
 
@@ -326,7 +359,8 @@ public class AttachmentDeserializer {
     private Map<String, List<String>> loadPartHeaders(InputStream in) throws IOException {
         StringBuilder buffer = new StringBuilder(128);
         StringBuilder b = new StringBuilder(128);
-        Map<String, List<String>> heads = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+        Map<String, List<String>> heads = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+
         // loop until we hit the end or a null line
         while (readLine(in, b)) {
             // lines beginning with white space get special handling
@@ -373,6 +407,11 @@ public class AttachmentDeserializer {
                 // just add to the buffer
                 buffer.append((char)c);
             }
+
+            if (buffer.length() > maxHeaderLength) {
+                LOG.fine("The attachment header size has exceeded the configured parameter: " + maxHeaderLength);
+                throw new HeaderSizeExceededException();
+            }
         }
 
         // no characters found...this was either an eof or a null line.
@@ -386,7 +425,7 @@ public class AttachmentDeserializer {
             return;
         }
         int separator = line.indexOf(":");
-        String name = null;
+        final String name;
         String value = "";
         if (separator == -1) {
             name = line.toString().trim();

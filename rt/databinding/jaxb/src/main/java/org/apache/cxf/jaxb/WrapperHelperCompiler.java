@@ -31,18 +31,18 @@ final class WrapperHelperCompiler extends ASMHelper {
 
 
     final Class<?> wrapperType;
-    final Method setMethods[];
-    final Method getMethods[];
-    final Method jaxbMethods[];
-    final Field fields[];
+    final Method[] setMethods;
+    final Method[] getMethods;
+    final Method[] jaxbMethods;
+    final Field[] fields;
     final Object objectFactory;
     final ClassWriter cw;
 
     private WrapperHelperCompiler(Class<?> wrapperType,
-                                  Method setMethods[],
-                                  Method getMethods[],
-                                  Method jaxbMethods[],
-                                  Field fields[],
+                                  Method[] setMethods,
+                                  Method[] getMethods,
+                                  Method[] jaxbMethods,
+                                  Field[] fields,
                                   Object objectFactory) {
         this.wrapperType = wrapperType;
         this.setMethods = setMethods;
@@ -54,10 +54,10 @@ final class WrapperHelperCompiler extends ASMHelper {
     }
 
     static WrapperHelper compileWrapperHelper(Class<?> wrapperType,
-                                              Method setMethods[],
-                                              Method getMethods[],
-                                              Method jaxbMethods[],
-                                              Field fields[],
+                                              Method[] setMethods,
+                                              Method[] getMethods,
+                                              Method[] jaxbMethods,
+                                              Field[] fields,
                                               Object objectFactory) {
         try {
             return new WrapperHelperCompiler(wrapperType,
@@ -126,7 +126,7 @@ final class WrapperHelperCompiler extends ASMHelper {
         try {
             if (b) {
                 cw.visitEnd();
-                byte bt[] = cw.toByteArray();
+                byte[] bt = cw.toByteArray();
                 Class<?> cl = loadClass(newClassName.replace('/', '.'), wrapperType, bt);
                 Object o = cl.newInstance();
                 return WrapperHelper.class.cast(o);
@@ -237,9 +237,8 @@ final class WrapperHelperCompiler extends ASMHelper {
                     && fields[x] == null) {
                     // null placeholder
                     continue;
-                } else {
-                    return false;
                 }
+                return false;
             }
             Class<?> tp = getMethods[x].getReturnType();
             mv.visitVarInsn(Opcodes.ALOAD, 2);

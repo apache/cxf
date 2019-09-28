@@ -19,8 +19,7 @@
 
 package demo.hw.server;
 
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 
 public class Server {
@@ -32,12 +31,11 @@ public class Server {
         svrFactory.setServiceClass(HelloWorld.class);
         svrFactory.setAddress("http://localhost:9000/helloWorld");
         svrFactory.setServiceBean(implementor);
-        svrFactory.getInInterceptors().add(new LoggingInInterceptor());
-        svrFactory.getOutInterceptors().add(new LoggingOutInterceptor());
+        svrFactory.getFeatures().add(new LoggingFeature());
         svrFactory.create();
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         new Server();
         System.out.println("Server ready...");
 

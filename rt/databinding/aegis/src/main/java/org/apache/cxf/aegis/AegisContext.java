@@ -100,7 +100,7 @@ public class AegisContext {
      */
     public AegisContext() {
         beanImplementationMap = new HashMap<>();
-        rootClasses = new HashSet<java.lang.reflect.Type>();
+        rootClasses = new HashSet<>();
         rootTypeQNames = new HashSet<>();
     }
 
@@ -179,9 +179,8 @@ public class AegisContext {
     public AegisType getRootType(Class<?> clazz) {
         if (rootClasses.contains(clazz)) {
             return typeMapping.getType(clazz);
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**
@@ -193,13 +192,12 @@ public class AegisContext {
     public AegisType getRootType(QName schemaTypeName) {
         if (rootTypeQNames.contains(schemaTypeName)) {
             return typeMapping.getType(schemaTypeName);
-        } else {
-            return null;
         }
+        return null;
     }
 
     private Set<Class<?>> rootMappableClasses() {
-        Set<Class<?>> mappableClasses = new HashSet<Class<?>>();
+        Set<Class<?>> mappableClasses = new HashSet<>();
         for (java.lang.reflect.Type jtype : rootClasses) {
             addTypeToMappableClasses(mappableClasses, jtype);
         }
@@ -236,7 +234,7 @@ public class AegisContext {
         rootTypes = new HashSet<>();
         // app may have already supplied classes.
         if (rootClasses == null) {
-            rootClasses = new HashSet<java.lang.reflect.Type>();
+            rootClasses = new HashSet<>();
         }
         rootTypeQNames = new HashSet<>();
         if (this.rootClassNames != null) {

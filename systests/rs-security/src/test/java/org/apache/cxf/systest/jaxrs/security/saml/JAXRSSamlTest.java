@@ -19,7 +19,9 @@
 
 package org.apache.cxf.systest.jaxrs.security.saml;
 
+import java.io.StringWriter;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,14 +32,22 @@ import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.common.util.Base64Exception;
+import org.apache.cxf.common.util.Base64Utility;
+import org.apache.cxf.configuration.security.AuthorizationPolicy;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.rs.security.saml.DeflateEncoderDecoder;
 import org.apache.cxf.rs.security.saml.SamlEnvelopedOutInterceptor;
 import org.apache.cxf.rs.security.saml.SamlFormOutInterceptor;
 import org.apache.cxf.rs.security.saml.SamlHeaderOutInterceptor;
@@ -45,10 +55,20 @@ import org.apache.cxf.rs.security.xml.XmlSigOutInterceptor;
 import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.wss4j.common.WSS4JConstants;
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.util.DOM2Writer;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerSaml.PORT;
@@ -57,6 +77,49 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
                    launchServer(BookServerSaml.class, true));
+    }
+
+    @Test
+    public void testSAMLTokenHeaderUsingAuthorizationPolicy() throws Exception {
+        String address = "https://localhost:" + PORT + "/samlheader/bookstore/books/123";
+
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(address);
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAXRSSamlTest.class.getResource("client.xml");
+        Bus springBus = bf.createBus(busFile.toString());
+        bean.setBus(springBus);
+
+        // Create SAML Token
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(new SamlCallbackHandler(), samlCallback);
+        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
+        Document doc = DOMUtils.createDocument();
+        Element token = assertion.toDOM(doc);
+
+        WebClient wc =  bean.createWebClient();
+
+        HTTPConduit http = (HTTPConduit) WebClient.getConfig(wc).getConduit();
+        AuthorizationPolicy authorizationPolicy = new AuthorizationPolicy();
+        String encodedToken = encodeToken(DOM2Writer.nodeToString(token));
+        authorizationPolicy.setAuthorization(encodedToken);
+        authorizationPolicy.setAuthorizationType("SAML");
+        http.setAuthorization(authorizationPolicy);
+
+        try {
+            Book book = wc.get(Book.class);
+            assertEquals(123L, book.getId());
+        } catch (WebApplicationException ex) {
+            fail(ex.getMessage());
+        } catch (ProcessingException ex) {
+            if (ex.getCause() != null && ex.getCause().getMessage() != null) {
+                fail(ex.getCause().getMessage());
+            } else {
+                fail(ex.getMessage());
+            }
+        }
+
     }
 
     @Test
@@ -101,7 +164,7 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetBookSAMLTokenInForm() throws Exception {
         String address = "https://localhost:" + PORT + "/samlform/bookstore/books";
-        FormEncodingProvider<Form> formProvider = new FormEncodingProvider<Form>();
+        FormEncodingProvider<Form> formProvider = new FormEncodingProvider<>();
         formProvider.setExpectedEncoded(true);
         WebClient wc = createWebClient(address, new SamlFormOutInterceptor(), formProvider);
 
@@ -131,7 +194,7 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
     public void testBearerSignedDifferentAlgorithms() throws Exception {
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
         callbackHandler.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
-        callbackHandler.setDigestAlgorithm(WSConstants.SHA256);
+        callbackHandler.setDigestAlgorithm(WSS4JConstants.SHA256);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
         callbackHandler.setSignAssertion(true);
         doTestEnvelopedSAMLToken(true, callbackHandler);
@@ -167,7 +230,7 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetBookPreviousSAMLTokenInForm() throws Exception {
         String address = "https://localhost:" + PORT + "/samlform/bookstore/books";
-        FormEncodingProvider<Form> formProvider = new FormEncodingProvider<Form>();
+        FormEncodingProvider<Form> formProvider = new FormEncodingProvider<>();
         formProvider.setExpectedEncoded(true);
         WebClient wc = createWebClientForExistingToken(address, new SamlFormOutInterceptor(),
                                        formProvider);
@@ -269,5 +332,14 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
             bean.setProvider(provider);
         }
         return bean.createWebClient();
+    }
+
+    private String encodeToken(String assertion) throws Base64Exception {
+        byte[] tokenBytes = assertion.getBytes(StandardCharsets.UTF_8);
+
+        tokenBytes = new DeflateEncoderDecoder().deflateToken(tokenBytes);
+        StringWriter writer = new StringWriter();
+        Base64Utility.encode(tokenBytes, 0, tokenBytes.length, writer);
+        return writer.toString();
     }
 }

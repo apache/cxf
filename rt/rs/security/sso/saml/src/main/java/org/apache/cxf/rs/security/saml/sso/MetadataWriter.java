@@ -175,7 +175,7 @@ public class MetadataWriter {
             writer.writeStartElement("ds", "X509Certificate", "http://www.w3.org/2000/09/xmldsig#");
 
             // Write the Base-64 encoded certificate
-            byte data[] = signingCert.getEncoded();
+            byte[] data = signingCert.getEncoded();
             String encodedCertificate = Base64.getMimeEncoder().encodeToString(data);
             writer.writeCharacters(encodedCertificate);
 

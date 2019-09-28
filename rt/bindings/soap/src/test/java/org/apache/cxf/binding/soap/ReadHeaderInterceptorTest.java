@@ -49,6 +49,12 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class ReadHeaderInterceptorTest extends TestBase {
 
     private ReadHeadersInterceptor rhi;
@@ -184,7 +190,7 @@ public class ReadHeaderInterceptorTest extends TestBase {
         assertEquals(2, headerChilds.size());
         for (int i = 0; i < headerChilds.size(); i++) {
             Element ele = headerChilds.get(i);
-            if (ele.getLocalName().equals("reservation")) {
+            if ("reservation".equals(ele.getLocalName())) {
                 Element reservation = ele;
                 List<Element> reservationChilds = new ArrayList<>();
                 Element elem = DOMUtils.getFirstElement(reservation);
@@ -201,7 +207,7 @@ public class ReadHeaderInterceptorTest extends TestBase {
                     .getTextContent());
 
             }
-            if (ele.getLocalName().equals("passenger")) {
+            if ("passenger".equals(ele.getLocalName())) {
                 Element passenger = ele;
                 assertNotNull(passenger);
                 Element child = DOMUtils.getFirstElement(passenger);

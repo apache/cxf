@@ -23,13 +23,16 @@
     <packaging>bundle</packaging>
     <name>Apache CXF Command Line Tools WSDL to JavaScript Front End</name>
     <description>Apache CXF Command Line Tools WSDL to JavaScript Front End</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
+    <properties>
+        <cxf.module.name>org.apache.cxf.tools.wsdl.js</cxf.module.name>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>

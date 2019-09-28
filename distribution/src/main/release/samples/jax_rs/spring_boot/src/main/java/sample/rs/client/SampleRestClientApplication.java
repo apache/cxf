@@ -22,11 +22,12 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.client.spring.EnableJaxRsProxyClient;
 import org.apache.cxf.jaxrs.client.spring.EnableJaxRsWebClient;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.Bean;
 
-import sample.rs.service.HelloService;
+import sample.rs.service.api.HelloService;
 
 @SpringBootApplication
 @EnableJaxRsWebClient
@@ -34,7 +35,7 @@ import sample.rs.service.HelloService;
 public class SampleRestClientApplication {
     public static void main(String[] args) {
         new SpringApplicationBuilder(SampleRestClientApplication.class)
-            .web(false)
+            .web(WebApplicationType.NONE)
             .run(args);
     }
     @Bean

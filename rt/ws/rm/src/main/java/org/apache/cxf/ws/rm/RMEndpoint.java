@@ -314,9 +314,7 @@ public class RMEndpoint {
             int seq = acknowledgementSequence.incrementAndGet();
             try {
                 modelMBean.sendNotification(new AcknowledgementNotification(this, seq, ssid, number));
-            } catch (RuntimeOperationsException e) {
-                LOG.log(Level.WARNING, "Error handling JMX notification", e);
-            } catch (MBeanException e) {
+            } catch (RuntimeOperationsException | MBeanException e) {
                 LOG.log(Level.WARNING, "Error handling JMX notification", e);
             }
         }
@@ -410,7 +408,7 @@ public class RMEndpoint {
                                                                  .getResource("/schemas/wsdl/wsrm.xsd")
                                                                  .openStream());
 
-                javax.xml.transform.Source schemas[] = new javax.xml.transform.Source[] {ad, rm};
+                javax.xml.transform.Source[] schemas = new javax.xml.transform.Source[] {ad, rm};
                 rmSchema = factory.newSchema(schemas);
             } catch (Exception ex) {
                 //ignore

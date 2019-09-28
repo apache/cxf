@@ -35,8 +35,8 @@ public class ServiceInfo extends AbstractDescriptionElement implements NamedItem
     QName name;
     String targetNamespace;
     InterfaceInfo intf;
-    List<BindingInfo> bindings = new CopyOnWriteArrayList<BindingInfo>();
-    List<EndpointInfo> endpoints = new CopyOnWriteArrayList<EndpointInfo>();
+    List<BindingInfo> bindings = new CopyOnWriteArrayList<>();
+    List<EndpointInfo> endpoints = new CopyOnWriteArrayList<>();
     Map<QName, MessageInfo> messages;
     List<SchemaInfo> schemas = new ArrayList<>(4);
     private SchemaCollection xmlSchemaCollection;
@@ -137,7 +137,7 @@ public class ServiceInfo extends AbstractDescriptionElement implements NamedItem
     }
 
     private void initMessagesMap() {
-        messages = new ConcurrentHashMap<QName, MessageInfo>(16, 0.75f, 2);
+        messages = new ConcurrentHashMap<>(16, 0.75f, 2);
         for (OperationInfo operation : getInterface().getOperations()) {
             if (operation.getInput() != null) {
                 messages.put(operation.getInput().getName(), operation.getInput());

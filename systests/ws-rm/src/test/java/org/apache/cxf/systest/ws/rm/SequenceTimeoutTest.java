@@ -54,9 +54,11 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
- * 
+ *
  */
 public class SequenceTimeoutTest extends AbstractBusClientServerTestBase {
     public static final String PORT = TestUtil.getPortNumber(SequenceTimeoutTest.class);
@@ -67,7 +69,7 @@ public class SequenceTimeoutTest extends AbstractBusClientServerTestBase {
         = new QName("http://cxf.apache.org/greeter_control", "GreeterService");
 
     private static RMManager rmManager;
-    
+
     private Bus greeterBus;
     private Greeter greeter;
 
@@ -81,9 +83,9 @@ public class SequenceTimeoutTest extends AbstractBusClientServerTestBase {
             Bus bus = bf.createBus("org/apache/cxf/systest/ws/rm/rminterceptors.xml");
             System.clearProperty("db.name");
             BusFactory.setDefaultBus(bus);
-            
+
             setBus(bus);
-            
+
             rmManager = bus.getExtension(RMManager.class);
             rmManager.getConfiguration().setInactivityTimeout(1000L);
 
@@ -99,8 +101,8 @@ public class SequenceTimeoutTest extends AbstractBusClientServerTestBase {
             endpoint.stop();
         }
     }
-    
-    
+
+
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
@@ -111,12 +113,11 @@ public class SequenceTimeoutTest extends AbstractBusClientServerTestBase {
     public static void tearDownAfterClass() throws Exception {
     }
 
-    private void init(String cfgResource, boolean useDecoupledEndpoint, boolean useDispatchClient) {
-        init(cfgResource, useDecoupledEndpoint, useDispatchClient, null);
+    private void init(String cfgResource, boolean useDispatchClient) {
+        init(cfgResource, useDispatchClient, null);
     }
 
     private void init(String cfgResource,
-                      boolean useDecoupledEndpoint,
                       boolean useDispatchClient,
                       Executor executor) {
 
@@ -125,7 +126,7 @@ public class SequenceTimeoutTest extends AbstractBusClientServerTestBase {
         if (useDispatchClient) {
             initDispatch();
         } else {
-            initProxy(useDecoupledEndpoint, executor);
+            initProxy(executor);
         }
     }
     private void initGreeterBus(SpringBusFactory bf,
@@ -133,8 +134,8 @@ public class SequenceTimeoutTest extends AbstractBusClientServerTestBase {
         greeterBus = bf.createBus(cfgResource);
         BusFactory.setDefaultBus(greeterBus);
     }
-    
-    
+
+
     private Dispatch<DOMSource> initDispatch() {
         GreeterService gs = new GreeterService();
         Dispatch<DOMSource> dispatch = gs.createDispatch(GreeterService.GreeterPort,
@@ -151,7 +152,7 @@ public class SequenceTimeoutTest extends AbstractBusClientServerTestBase {
         return dispatch;
     }
 
-    private void initProxy(boolean useDecoupledEndpoint, Executor executor) {
+    private void initProxy(Executor executor) {
         GreeterService gs = new GreeterService();
 
         if (null != executor) {
@@ -169,16 +170,16 @@ public class SequenceTimeoutTest extends AbstractBusClientServerTestBase {
     }
     @Test
     public void testTimeout() throws Exception {
-        init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", true, true);
+        init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", true);
 
         List<Dispatch<DOMSource>> dispatches = new ArrayList<>(5);
         int count = 5;
         for (int x = 0; x < count; x++) {
             Dispatch<DOMSource> dispatch = initDispatch();
-            AcksPolicyType ap = new AcksPolicyType();            
+            AcksPolicyType ap = new AcksPolicyType();
             //don't send the acks to cause a memory leak - CXF-7096
             ap.setImmediaAcksTimeout(500000L);
-            greeterBus.getExtension(RMManager.class).getDestinationPolicy().setAcksPolicy(ap);          
+            greeterBus.getExtension(RMManager.class).getDestinationPolicy().setAcksPolicy(ap);
             dispatch.invoke(getDOMRequest("One"));
             dispatches.add(dispatch);
         }
@@ -195,7 +196,7 @@ public class SequenceTimeoutTest extends AbstractBusClientServerTestBase {
             fail("The sequence should have been terminated");
         } catch (Throwable t) {
             //expected
-            Assert.assertTrue(t.getMessage().contains("not a known Sequence identifier"));
+            assertTrue(t.getMessage().contains("not a known Sequence identifier"));
         }
         rmManager.getStore();
     }

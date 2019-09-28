@@ -34,14 +34,15 @@ import javax.management.modelmbean.RequiredModelMBean;
 
 
 import org.apache.cxf.management.jmx.export.runtime.ModelMBeanAssembler;
+
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-
-public class ModelMBeanAssemblerTest extends  Assert {
+public class ModelMBeanAssemblerTest {
 
     protected static final String AGE_ATTRIBUTE = "Age";
 
@@ -83,9 +84,7 @@ public class ModelMBeanAssemblerTest extends  Assert {
 
         try {
             ton = new ObjectName("org.apache.cxf:Type=testInstrumentation");
-        } catch (MalformedObjectNameException e) {
-            e.printStackTrace();
-        } catch (NullPointerException e) {
+        } catch (MalformedObjectNameException | NullPointerException e) {
             e.printStackTrace();
         }
 
@@ -176,8 +175,8 @@ public class ModelMBeanAssemblerTest extends  Assert {
     @Test
     public void testOperationInvocation() throws Exception {
         Object result = getServer().invoke(ton, "add",
-                                new Object[] {new Integer(20), new Integer(30)}, new String[] {"int", "int"});
-        assertEquals("Incorrect result", new Integer(50), result);
+                                new Object[] {Integer.valueOf(20), Integer.valueOf(30)}, new String[] {"int", "int"});
+        assertEquals("Incorrect result", Integer.valueOf(50), result);
     }
 
     @Test

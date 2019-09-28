@@ -34,7 +34,7 @@ public class OAuthRedirectionState implements Serializable {
     private String nonce;
     private String clientCodeChallenge;
     private String responseType;
-    private Map<String, String> extraProperties = new LinkedHashMap<String, String>();
+    private Map<String, String> extraProperties = new LinkedHashMap<>();
 
     public OAuthRedirectionState() {
     }

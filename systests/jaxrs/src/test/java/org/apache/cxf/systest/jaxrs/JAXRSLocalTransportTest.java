@@ -46,6 +46,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
 
     private Server localServer;
@@ -59,11 +63,11 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
         sf.setResourceProvider(BookStoreSpring.class,
                                new SingletonResourceProvider(new BookStoreSpring(), true));
         sf.setProvider(new JacksonJsonProvider());
-        List<Interceptor<? extends Message>> outInts = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> outInts = new ArrayList<>();
         outInts.add(new CustomOutInterceptor());
         sf.setOutInterceptors(outInts);
 
-        List<Interceptor<? extends Message>> inInts = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> inInts = new ArrayList<>();
         inInts.add(new CustomInFaultyInterceptor());
         sf.setInInterceptors(inInts);
 
@@ -219,7 +223,7 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
         WebClient localClient = WebClient.create("local://books");
         localClient.accept("text/xml");
         localClient.path("bookstore/books");
-        Book book = localClient.post(new Book("New", 124L), Book.class);
+        Book book = localClient.type("application/xml").post(new Book("New", 124L), Book.class);
         assertEquals(124L, book.getId());
     }
 
@@ -236,12 +240,7 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
 
     private static class TestFaultInInterceptor extends AbstractPhaseInterceptor<Message> {
         TestFaultInInterceptor() {
-            this(Phase.PRE_STREAM);
-        }
-
-        TestFaultInInterceptor(String s) {
             super(Phase.PRE_STREAM);
-
         }
 
         public void handleMessage(Message message) throws Fault {

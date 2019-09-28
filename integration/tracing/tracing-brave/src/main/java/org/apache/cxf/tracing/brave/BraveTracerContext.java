@@ -20,13 +20,13 @@ package org.apache.cxf.tracing.brave;
 
 import java.util.concurrent.Callable;
 
-import org.apache.cxf.tracing.Traceable;
-import org.apache.cxf.tracing.TracerContext;
-
 import brave.Span;
 import brave.Tracer;
 import brave.Tracer.SpanInScope;
+import brave.Tracing;
 import brave.http.HttpTracing;
+import org.apache.cxf.tracing.Traceable;
+import org.apache.cxf.tracing.TracerContext;
 
 public class BraveTracerContext implements TracerContext {
     private final HttpTracing brave;
@@ -58,7 +58,7 @@ public class BraveTracerContext implements TracerContext {
             scope = tracer.withSpanInScope(continuationSpan);
         }
 
-        try {
+        try { //NOPMD
             return traceable.call(new BraveTracerContext(brave));
         } finally {
             if (continuationSpan != null && scope != null) {
@@ -101,11 +101,25 @@ public class BraveTracerContext implements TracerContext {
         }
     }
     
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T unwrap(final Class<T> clazz) {
+        if (HttpTracing.class.equals(clazz)) {
+            return (T)brave;
+        } else if (Tracing.class.equals(clazz)) {
+            return (T)brave.tracing();
+        } else if (Tracer.class.equals(clazz)) {
+            return (T)tracer;
+        } else {
+            throw new IllegalArgumentException("The class is '" + clazz
+                  + "'not supported and cannot be unwrapped");
+        }
+    }
+    
     private TraceScope newOrChildSpan(final String description, final Span parent) {
         if (parent == null) { 
             return new TraceScope(brave, tracer.newTrace().name(description).start());
-        } else {
-            return new TraceScope(brave, tracer.newChild(parent.context()).name(description).start());
         }
+        return new TraceScope(brave, tracer.newChild(parent.context()).name(description).start());
     }
 }

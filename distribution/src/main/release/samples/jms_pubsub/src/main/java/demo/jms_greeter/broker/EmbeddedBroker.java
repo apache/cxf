@@ -18,23 +18,43 @@
  */
 
 package demo.jms_greeter.broker;
-import org.apache.activemq.broker.BrokerService;
-import org.apache.activemq.store.memory.MemoryPersistenceAdapter;
+
+import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.apache.activemq.artemis.api.core.TransportConfiguration;
+import org.apache.activemq.artemis.core.config.Configuration;
+import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
+import org.apache.activemq.artemis.core.remoting.impl.invm.InVMAcceptorFactory;
+import org.apache.activemq.artemis.core.remoting.impl.netty.NettyAcceptorFactory;
+import org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ;
 
 public final class EmbeddedBroker {
     private EmbeddedBroker() {
     }
 
     public static void main(String[] args) throws Exception {
-        BrokerService broker = new BrokerService();
-        broker.setPersistenceAdapter(new MemoryPersistenceAdapter());
-        broker.setDataDirectory("target/activemq_data");
-        broker.addConnector("tcp://localhost:61616");
-        broker.start();
-        System.out.println("JMS broker ready ...");
-        Thread.sleep(125 * 60 * 1000);
-        System.out.println("JMS broker exiting");
-        broker.stop();
+        Configuration config = new ConfigurationImpl();
+        Set<TransportConfiguration> transports = new HashSet<>();
+        transports.add(new TransportConfiguration(NettyAcceptorFactory.class.getName()));
+        transports.add(new TransportConfiguration(InVMAcceptorFactory.class.getName()));
+        config.setAcceptorConfigurations(transports); 
+        config.setBrokerInstance(new File("target/artemis"));
+        config.setPersistenceEnabled(false);
+        config.setSecurityEnabled(false);
+        config.setJMXManagementEnabled(false);
+        
+        EmbeddedActiveMQ server = new EmbeddedActiveMQ();
+        server.setConfiguration(config);
+        server.start();
+        try {
+            System.out.println("JMS broker ready ...");
+            Thread.sleep(125 * 60 * 1000);
+        } finally {
+            System.out.println("JMS broker exiting");
+            server.stop();
+        }
         System.exit(0);
     }
 }

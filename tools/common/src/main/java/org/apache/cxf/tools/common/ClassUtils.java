@@ -110,17 +110,15 @@ public class ClassUtils {
                     // Those files can not be allocated into the ClassCollector
                     File jaxbRuntime = new File(path, "runtime");
                     if (jaxbRuntime.isDirectory() && jaxbRuntime.exists()) {
-                        List<File> files = FileUtils.getFiles(jaxbRuntime, ".+\\.java$");
-                        for (File f : files) {
-                            fileList.add(f.toString());
-                        }
+                        List<File> files = FileUtils.getFilesUsingSuffix(jaxbRuntime, ".java");
+                        files.forEach(f -> fileList.add(f.toString()));
                     }
                 }
             }
 
         }
 
-        if (!compiler.compileFiles(fileList.toArray(new String[fileList.size()]))) {
+        if (!compiler.compileFiles(fileList.toArray(new String[0]))) {
             Message msg = new Message("FAIL_TO_COMPILE_GENERATE_CODES", LOG);
             throw new ToolException(msg);
         }

@@ -76,14 +76,14 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         this.writer = w;
     }
 
-    public void handleMessage(Message message) throws Fault {
+    public void handleMessage(Message message) {
         Logger logger = getMessageLogger(message);
         if (logger != null && (writer != null || logger.isLoggable(Level.INFO))) {
             logging(logger, message);
         }
     }
 
-    protected void logging(Logger logger, Message message) throws Fault {
+    protected void logging(Logger logger, Message message) {
         if (message.containsKey(LoggingMessage.ID_KEY)) {
             return;
         }
@@ -141,7 +141,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
             buffer.getAddress().append(uri);
             String query = (String)message.get(Message.QUERY_STRING);
             if (query != null) {
-                buffer.getAddress().append("?").append(query);
+                buffer.getAddress().append('?').append(query);
             }
         }
 
@@ -183,6 +183,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
                 buffer.getMessage().append("(message truncated to " + limit + " bytes)\n");
             }
             writer.writeCacheTo(buffer.getPayload(), limit);
+            writer.close();
         } catch (Exception e) {
             throw new Fault(e);
         }
@@ -217,10 +218,12 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
                 buffer.getMessage().append("\nMessage (saved to tmp file):\n");
                 buffer.getMessage().append("Filename: " + bos.getTempFile().getAbsolutePath() + "\n");
             }
+            boolean truncated = false;
             if (bos.size() > limit && limit != -1) {
                 buffer.getMessage().append("(message truncated to " + limit + " bytes)\n");
+                truncated = true;
             }
-            writePayload(buffer.getPayload(), bos, encoding, ct);
+            writePayload(buffer.getPayload(), bos, encoding, ct, truncated);
 
             bos.close();
         } catch (Exception e) {

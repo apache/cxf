@@ -40,6 +40,9 @@ import org.apache.cxf.transport.https.SSLUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class JAXRS20HttpsBookTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookHttpsServer.PORT;
 

@@ -17,21 +17,25 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:cxf="http://cxf.apache.org/core" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:jaxws="http://cxf.apache.org/jaxws"
+    xmlns:cxf="http://cxf.apache.org/core"
+    xmlns:http="http://cxf.apache.org/transports/http/configuration"
+    xmlns:sec="http://cxf.apache.org/configuration/security"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItCrossDomainPort" createdFromAPI="true">
-        <jaxws:properties>
-            <entry key="security.sts.client">
-                <bean class="org.apache.cxf.ws.security.trust.STSClient">
+    
+    <bean class="org.apache.cxf.ws.security.trust.STSClient" name="default.sts-client">
                     <constructor-arg ref="cxf"/>
-                    <property name="wsdlLocation" value="https://localhost:${testutil.ports.cross_domain.STSServer.2}/SecurityTokenService/a?wsdl"/>
+                    <property name="wsdlLocation" value="https://localhost:30102/SecurityTokenService/b?wsdl"/>
                     <property name="serviceName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
-                    <property name="endpointName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port"/>
+                    <property name="endpointName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_STSB_Port"/>
                     <property name="properties">
                         <map>
                             <entry key="security.username" value="alice"/>
@@ -42,15 +46,8 @@
                         </map>
                     </property>
                 </bean>
-            </entry>
-        </jaxws:properties>
-    </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItCrossDomainMEXPort" createdFromAPI="true">
-        <jaxws:properties>
-            <entry key="security.sts.prefer-wsmex" value="true"/>
-            <entry key="security.sts.client">
-                <bean class="org.apache.cxf.ws.security.trust.STSClient">
+                
+    <bean class="org.apache.cxf.ws.security.trust.STSClient" name="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_STSB_Port.sts-client">
                     <constructor-arg ref="cxf"/>
                     <property name="wsdlLocation" value="https://localhost:30101/SecurityTokenService/a?wsdl"/>
                     <property name="serviceName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
@@ -64,11 +61,8 @@
                             <entry key="security.sts.token.usecert" value="true"/>
                         </map>
                     </property>
-                    <property name="enableAppliesTo" value="false"/>
                 </bean>
-            </entry>
-        </jaxws:properties>
-    </jaxws:client>
+                
     
     <http:conduit name="https://localhost:.*">
         <http:tlsClientParameters disableCNCheck="true">

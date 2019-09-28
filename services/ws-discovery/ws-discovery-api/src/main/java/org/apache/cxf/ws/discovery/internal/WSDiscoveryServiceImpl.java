@@ -58,7 +58,6 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.spi.ProviderImpl;
@@ -91,7 +90,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
     Bus bus;
     Endpoint udpEndpoint;
     WSDiscoveryClient client;
-    List<HelloType> registered = new CopyOnWriteArrayList<HelloType>();
+    List<HelloType> registered = new CopyOnWriteArrayList<>();
     ObjectFactory factory = new ObjectFactory();
     boolean started;
 
@@ -262,9 +261,8 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
             } catch (RuntimeException ex) {
                 if (!optional) {
                     throw ex;
-                } else {
-                    LOG.log(Level.WARNING, "Could not start WS-Discovery Service.", ex);
                 }
+                LOG.log(Level.WARNING, "Could not start WS-Discovery Service.", ex);
             } finally {
                 if (b != bus) {
                     BusFactory.setThreadDefaultBus(b);
@@ -276,7 +274,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
 
 
     public ProbeMatchesType handleProbe(ProbeType pt) {
-        List<HelloType> consider = new LinkedList<HelloType>(registered);
+        List<HelloType> consider = new LinkedList<>(registered);
         //step one, consider the "types"
         //ALL types in the probe must be in the registered type
         if (pt.getTypes() != null && !pt.getTypes().isEmpty()) {
@@ -318,13 +316,12 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
         URI uri = URI.create(scope);
         if (uri.getScheme() == null) {
             return UUID.fromString(scope);
-        } else {
-            if (uri.getScheme().equals("urn")) {
-                uri = URI.create(uri.getSchemeSpecificPart());
-            }
-            if (uri.getScheme().equals("uuid")) {
-                return UUID.fromString(uri.getSchemeSpecificPart());
-            }
+        }
+        if ("urn".equals(uri.getScheme())) {
+            uri = URI.create(uri.getSchemeSpecificPart());
+        }
+        if ("uuid".equals(uri.getScheme())) {
+            return UUID.fromString(uri.getSchemeSpecificPart());
         }
         return null;
     }
@@ -338,8 +335,8 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
     private boolean matchURIs(URI probe, URI target) {
         if (compare(target.getScheme(), probe.getScheme())
             && compare(target.getAuthority(), probe.getAuthority())) {
-            String[] ppath = StringUtils.split(probe.getPath(), "/");
-            String[] tpath = StringUtils.split(target.getPath(), "/");
+            String[] ppath = probe.getPath().split("/");
+            String[] tpath = target.getPath().split("/");
 
             if (ppath.length <= tpath.length) {
                 for (int i = 0; i < ppath.length; i++) {

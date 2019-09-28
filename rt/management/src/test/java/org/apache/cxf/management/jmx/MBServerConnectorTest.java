@@ -26,12 +26,12 @@ import javax.management.MBeanServerFactory;
 
 import org.apache.cxf.testutil.common.TestUtil;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.fail;
 
 
-public class MBServerConnectorTest extends Assert {
+public class MBServerConnectorTest {
     private static final String PORT = TestUtil.getPortNumber(MBServerConnectorTest.class);
 
     @Test
@@ -50,7 +50,7 @@ public class MBServerConnectorTest extends Assert {
             mcf.destroy();
         } catch (Exception ex) {
             ex.printStackTrace();
-            assertFalse("Some Exception happen to MBServerConnectorTest", true);
+            fail("Some Exception happened to MBServerConnectorTest");
         }
     }
 

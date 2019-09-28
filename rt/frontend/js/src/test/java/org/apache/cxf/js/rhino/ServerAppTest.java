@@ -25,11 +25,15 @@ import java.io.PrintStream;
 
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ServerAppTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class ServerAppTest {
 
     private String epAddr = "http://cxf.apache.org/";
 
@@ -218,7 +222,7 @@ public class ServerAppTest extends Assert {
     public void testDirectory() throws Exception {
         File f = new File(emptyFile);
         String dir = f.getParent();
-        assertTrue(dir != null);
+        assertNotNull(dir);
         EasyMock.checkOrder(phMock, false);
         phMock.createAndPublish(new File(emptyFile), epAddr, true);
         String file = getClass().getResource("empty/empty2.jsx").toURI().getPath();

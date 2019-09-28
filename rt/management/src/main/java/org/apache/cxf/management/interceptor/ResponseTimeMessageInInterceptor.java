@@ -36,7 +36,7 @@ public class ResponseTimeMessageInInterceptor extends AbstractMessageResponseTim
     public void handleMessage(Message message) throws Fault {
         Exchange ex = message.getExchange();
         //if serviceCounter is disabled , all responseTimeInterceptors will be skipped
-        Boolean forceDisabled = Boolean.FALSE.equals((Boolean)ex.get("org.apache.cxf.management.counter.enabled"));
+        Boolean forceDisabled = Boolean.FALSE.equals(ex.get("org.apache.cxf.management.counter.enabled"));
         if (!forceDisabled && isServiceCounterEnabled(ex)) {
             if (isClient(message)) {
                 if (!ex.isOneWay()) {
@@ -51,7 +51,7 @@ public class ResponseTimeMessageInInterceptor extends AbstractMessageResponseTim
     @Override
     public void handleFault(Message message) {
         Exchange ex = message.getExchange();
-        if (Boolean.TRUE.equals((Boolean)ex.get("org.apache.cxf.management.counter.enabled"))) {
+        if (Boolean.TRUE.equals(ex.get("org.apache.cxf.management.counter.enabled"))) {
             FaultMode mode = message.get(FaultMode.class);
             if (mode == null) {
                 mode = FaultMode.UNCHECKED_APPLICATION_FAULT;

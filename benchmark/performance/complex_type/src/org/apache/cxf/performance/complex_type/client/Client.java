@@ -59,7 +59,7 @@ public final class Client extends TestCaseBase<ComplexPortType> {
         packetSize = 1;
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         Client client = new Client(args);
 

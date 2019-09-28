@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
+import javax.security.auth.DestroyFailedException;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
@@ -114,14 +115,23 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     }
     protected byte[] encryptInternal(JweEncryptionInternal state, byte[] content) {
         try {
-            return CryptoUtils.encryptBytes(content, createCekSecretKey(state), state.keyProps);
+            SecretKey createCekSecretKey = createCekSecretKey(state);
+            byte[] encryptedBytes = CryptoUtils.encryptBytes(content, createCekSecretKey, state.keyProps);
+
+            // Here we're finished with the SecretKey we created, so we can destroy it
+            try {
+                createCekSecretKey.destroy();
+            } catch (DestroyFailedException e) {
+                // ignore
+            }
+            return encryptedBytes;
         } catch (SecurityException ex) {
             LOG.fine(ex.getMessage());
             if (ex.getCause() instanceof NoSuchAlgorithmException) {
                 LOG.warning("Unsupported algorithm: " + state.keyProps.getKeyAlgo());
                 throw new JweException(JweException.Error.INVALID_CONTENT_ALGORITHM);
             }
-            throw new JweException(JweException.Error.CONTENT_ENCRYPTION_FAILURE);
+            throw new JweException(JweException.Error.CONTENT_ENCRYPTION_FAILURE, ex);
         }
     }
     protected byte[] getActualCipher(byte[] cipher) {
@@ -200,15 +210,14 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
 
             String protectedHeadersJson = writer.toJson(protectedHeaders);
 
-            byte[] additionalEncryptionParam = getAAD(protectedHeadersJson,
-                                                      jweInput == null ? null : jweInput.getAad());
+            byte[] additionalEncryptionParam = getAAD(protectedHeadersJson, jweInput.getAad());
             keyProps.setAdditionalData(additionalEncryptionParam);
 
             state.keyProps = keyProps;
             state.theIv = theIv;
             state.theHeaders = theHeaders;
             state.protectedHeadersJson = protectedHeadersJson;
-            state.aad = jweInput != null ? jweInput.getAad() : null;
+            state.aad = jweInput.getAad();
             state.secretKey = theCek;
         }
 

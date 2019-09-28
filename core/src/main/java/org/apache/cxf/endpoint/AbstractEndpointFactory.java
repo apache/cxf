@@ -34,12 +34,12 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.binding.BindingFactory;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.interceptor.AnnotationInterceptors;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -212,11 +212,11 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
      */
     @SuppressWarnings("unchecked")
     protected boolean checkPrivateEndpoint(Endpoint ep) {
-        if (MessageUtils.isTrue(ep.get(PRIVATE_ENDPOINT))) {
+        if (PropertyUtils.isTrue(ep.get(PRIVATE_ENDPOINT))) {
             List<String> addresses =
                 (List<String>)getBus().getProperty(PRIVATE_ENDPOINTS);
             if (addresses == null) {
-                addresses = new LinkedList<String>();
+                addresses = new LinkedList<>();
             }
             addresses.add(getAddress());
             bus.setProperty(PRIVATE_ENDPOINTS, addresses);

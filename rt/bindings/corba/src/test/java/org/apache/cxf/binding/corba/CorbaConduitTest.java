@@ -21,7 +21,6 @@ package org.apache.cxf.binding.corba;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -35,7 +34,6 @@ import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.binding.corba.wsdl.OperationType;
 import org.apache.cxf.binding.corba.wsdl.RaisesType;
 import org.apache.cxf.binding.corba.wsdl.TypeMappingType;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
@@ -46,12 +44,6 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.omg.CORBA.Context;
 import org.omg.CORBA.ContextList;
 import org.omg.CORBA.ExceptionList;
@@ -62,8 +54,17 @@ import org.omg.CORBA.Request;
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
 
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class CorbaConduitTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+
+public class CorbaConduitTest {
 
     private static IMocksControl control;
     private static ORB orb;
@@ -103,7 +104,7 @@ public class CorbaConduitTest extends Assert {
     @Test
     public void testCorbaConduit() throws Exception {
         CorbaConduit conduit = setupCorbaConduit(false);
-        assertTrue("conduit should not be null", conduit != null);
+        assertNotNull("conduit should not be null", conduit);
     }
 
     @Test
@@ -128,11 +129,11 @@ public class CorbaConduitTest extends Assert {
             ex.printStackTrace();
         }
         OutputStream os = message.getContent(OutputStream.class);
-        assertTrue("OutputStream should not be null", os != null);
+        assertNotNull("OutputStream should not be null", os);
         ORB orb2 = (ORB)message.get("orb");
-        assertTrue("Orb should not be null", orb2 != null);
+        assertNotNull("Orb should not be null", orb2);
         Object obj = message.get("endpoint");
-        assertTrue("EndpointReferenceType should not be null", obj != null);
+        assertNotNull("EndpointReferenceType should not be null", obj);
     }
 
 
@@ -147,7 +148,7 @@ public class CorbaConduitTest extends Assert {
 
         EndpointReferenceType t = null;
         EndpointReferenceType ref = conduit.getTargetReference(t);
-        assertTrue("ref should not be null", ref != null);
+        assertNotNull("ref should not be null", ref);
     }
 
     @Test
@@ -160,7 +161,7 @@ public class CorbaConduitTest extends Assert {
         endpointInfo.setAddress("corbaloc::localhost:40000/Simple");
         CorbaConduit conduit = new CorbaConduit(endpointInfo, destination.getAddress(), orbConfig);
         String address = conduit.getAddress();
-        assertTrue("address should not be null", address != null);
+        assertNotNull("address should not be null", address);
         assertEquals(address, "corbaloc::localhost:40000/Simple");
     }
 
@@ -197,7 +198,7 @@ public class CorbaConduitTest extends Assert {
     public void testGetTarget() throws Exception {
         CorbaConduit conduit = setupCorbaConduit(false);
         EndpointReferenceType endpoint = conduit.getTarget();
-        assertTrue("EndpointReferenceType should not be null", endpoint != null);
+        assertNotNull("EndpointReferenceType should not be null", endpoint);
     }
 
     @Test
@@ -206,7 +207,7 @@ public class CorbaConduitTest extends Assert {
         OperationType opType = control.createMock(OperationType.class);
         CorbaTypeMap typeMap = control.createMock(CorbaTypeMap.class);
 
-        List<RaisesType> exlist = CastUtils.cast(control.createMock(ArrayList.class));
+        List<RaisesType> exlist = control.createMock(List.class);
         opType.getRaises();
         EasyMock.expectLastCall().andReturn(exlist);
         int i = 0;
@@ -228,7 +229,7 @@ public class CorbaConduitTest extends Assert {
         EasyMock.expectLastCall().andReturn(exchange);
         ServiceInfo service = control.createMock(ServiceInfo.class);
         EasyMock.expect(exchange.get(ServiceInfo.class)).andReturn(service);
-        List<CorbaTypeMap> list = CastUtils.cast(control.createMock(List.class));
+        List<CorbaTypeMap> list = control.createMock(List.class);
         CorbaTypeMap typeMap = control.createMock(CorbaTypeMap.class);
         EasyMock.expect(service.getExtensors(CorbaTypeMap.class)).andReturn(list);
 

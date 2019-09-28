@@ -44,7 +44,7 @@ public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
             LogUtils.getL7dLogger(NettyHttpServerEngineFactory.class);
 
     private static ConcurrentHashMap<Integer, NettyHttpServerEngine> portMap =
-            new ConcurrentHashMap<Integer, NettyHttpServerEngine>();
+            new ConcurrentHashMap<>();
 
     private Bus bus;
 
@@ -55,10 +55,10 @@ public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
      * to new Engines when bound to the reference id.
      */
     private Map<String, ThreadingParameters> threadingParametersMap =
-        new TreeMap<String, ThreadingParameters>();
+        new TreeMap<>();
 
     private Map<String, TLSServerParameters> tlsServerParametersMap =
-        new TreeMap<String, TLSServerParameters>();
+        new TreeMap<>();
 
     public NettyHttpServerEngineFactory() {
         // Empty

@@ -31,9 +31,13 @@ import javax.jms.Queue;
 import javax.jms.QueueBrowser;
 import javax.jms.Session;
 
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.transport.jms.JMSConstants;
 
 public final class JMSUtil {
+    
+    public static final String JMS_MESSAGE_CONSUMER = "jms_message_consumer";
+    public static final String JMS_IGNORE_TIMEOUT = "jms_ignore_timeout";
     private static final char[] CORRELATTION_ID_PADDING = {
         '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'
     };
@@ -54,6 +58,35 @@ public final class JMSUtil {
             if (replyMessage == null) {
                 throw new RuntimeException("Timeout receiving message with correlationId "
                                            + correlationId);
+            }
+            return replyMessage;
+        } catch (JMSException e) {
+            throw convertJmsException(e);
+        }
+    }
+    
+    public static Message receive(Session session,
+                                  Destination replyToDestination,
+                                  String correlationId,
+                                  long receiveTimeout,
+                                  boolean pubSubNoLocal,
+                                  Exchange exchange) {
+        try (ResourceCloser closer = new ResourceCloser()) {
+            String messageSelector = correlationId == null ? null : "JMSCorrelationID = '" + correlationId + "'";
+            MessageConsumer consumer = closer.register(session.createConsumer(replyToDestination, messageSelector,
+                                                 pubSubNoLocal));
+            if (exchange != null) {
+                exchange.put(JMS_MESSAGE_CONSUMER, consumer);
+            }
+            javax.jms.Message replyMessage = consumer.receive(receiveTimeout);
+            if (replyMessage == null) {
+                if ((boolean)exchange.get(JMSUtil.JMS_IGNORE_TIMEOUT)) {
+                    throw new RuntimeException("Timeout receiving message with correlationId "
+                                           + correlationId);
+                } else {
+                    throw new JMSException("Timeout receiving message with correlationId "
+                        + correlationId);
+                }
             }
             return replyMessage;
         } catch (JMSException e) {
@@ -119,6 +152,7 @@ public final class JMSUtil {
             actualNum++;
             messages.nextElement();
         }
+        browser.close();
         return actualNum;
     }
 }

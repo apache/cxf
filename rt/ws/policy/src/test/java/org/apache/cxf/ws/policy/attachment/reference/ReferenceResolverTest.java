@@ -33,16 +33,19 @@ import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.neethi.Constants;
 import org.apache.neethi.Policy;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 
 /**
  *
  */
-public class ReferenceResolverTest extends Assert {
+public class ReferenceResolverTest {
 
     private IMocksControl control;
 

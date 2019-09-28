@@ -62,9 +62,8 @@ public class Java5TypeCreator extends AbstractTypeCreator {
         }
         if (AegisType.class.isAssignableFrom(c)) {
             return c.asSubclass(AegisType.class);
-        } else {
-            throw new DatabindingException("Invalid Aegis type annotation to non-type class" + c);
         }
+        throw new DatabindingException("Invalid Aegis type annotation to non-type class" + c);
     }
 
     @Override
@@ -90,32 +89,31 @@ public class Java5TypeCreator extends AbstractTypeCreator {
                                              annotationReader.getParamNamespace(m, index)));
             }
             return info;
-        } else {
-            Type genericReturnType = m.getGenericReturnType();
-            TypeClassInfo info;
-            if (genericReturnType instanceof Class) {
-                info = nextCreator.createClassInfo(m, index);
-            } else {
-                info = new TypeClassInfo();
-                info.setDescription("method " + m.getName() + " parameter " + index);
-                info.setType(genericReturnType);
-            }
-
-            if (m.getParameterAnnotations() != null && m.getAnnotations().length > 0) {
-                info.setAnnotations(m.getAnnotations());
-            }
-
-            info.setAegisTypeClass(castToAegisTypeClass(annotationReader.getReturnType(m)));
-            String returnName = annotationReader.getReturnTypeName(m);
-            if (returnName != null) {
-                info.setTypeName(createQName(m.getReturnType(),
-                                             genericReturnType,
-                                             returnName,
-                                             annotationReader.getReturnNamespace(m)));
-
-            }
-            return info;
         }
+        Type genericReturnType = m.getGenericReturnType();
+        TypeClassInfo info;
+        if (genericReturnType instanceof Class) {
+            info = nextCreator.createClassInfo(m, index);
+        } else {
+            info = new TypeClassInfo();
+            info.setDescription("method " + m.getName() + " parameter " + index);
+            info.setType(genericReturnType);
+        }
+
+        if (m.getParameterAnnotations() != null && m.getAnnotations().length > 0) {
+            info.setAnnotations(m.getAnnotations());
+        }
+
+        info.setAegisTypeClass(castToAegisTypeClass(annotationReader.getReturnType(m)));
+        String returnName = annotationReader.getReturnTypeName(m);
+        if (returnName != null) {
+            info.setTypeName(createQName(m.getReturnType(),
+                                         genericReturnType,
+                                         returnName,
+                                         annotationReader.getReturnNamespace(m)));
+
+        }
+        return info;
     }
 
     /*
@@ -140,9 +138,8 @@ public class Java5TypeCreator extends AbstractTypeCreator {
 
         if (componentType != null) {
             return createCollectionTypeFromGeneric(info);
-        } else {
-            return nextCreator.createCollectionType(info);
         }
+        return nextCreator.createCollectionType(info);
     }
 
     // should be called 'collection'
@@ -216,12 +213,10 @@ public class Java5TypeCreator extends AbstractTypeCreator {
                 // we really aren't prepared to deal with multiple upper bounds,
                 // so we just look at the first one.
                 return wildcardType.getUpperBounds()[0];
-            } else {
-                return paramType; // take our chances.
             }
-        } else {
-            return null;
+            return paramType; // take our chances.
         }
+        return null;
     }
 
     protected Type getComponentTypeForMap(Type genericType, Map<String, Type> pm, boolean key) {
@@ -238,7 +233,7 @@ public class Java5TypeCreator extends AbstractTypeCreator {
         }
         if (cls instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType)cls;
-            Type types[] = pt.getActualTypeArguments();
+            Type[] types = pt.getActualTypeArguments();
             TypeVariable<?>[] params = ((Class<?>)pt.getRawType()).getTypeParameters();
             for (int x = 0; x < types.length; x++) {
                 Type type = types[x];
@@ -254,7 +249,7 @@ public class Java5TypeCreator extends AbstractTypeCreator {
             if (Map.class.equals(pt.getRawType())) {
                 return types[key ? 0 : 1];
             }
-            return findMapGenericTypes((Class<?>)pt.getRawType(), pm, key);
+            return findMapGenericTypes(pt.getRawType(), pm, key);
         } else if (cls instanceof Class) {
             Class<?> c = (Class<?>)cls;
             if (Map.class.isAssignableFrom(c)) {

@@ -141,7 +141,7 @@ public class StandaloneWriteTest {
     @Test
     public void testBean() throws Exception {
         context = new AegisContext();
-        Set<java.lang.reflect.Type> rootClasses = new HashSet<java.lang.reflect.Type>();
+        Set<java.lang.reflect.Type> rootClasses = new HashSet<>();
         rootClasses.add(SimpleBean.class);
         context.setRootClasses(rootClasses);
         context.initialize();

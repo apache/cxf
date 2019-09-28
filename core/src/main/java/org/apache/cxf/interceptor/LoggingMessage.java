@@ -93,7 +93,7 @@ public final class LoggingMessage {
     }
 
     public String toString() {
-        StringBuilder buffer = new StringBuilder();
+        StringBuilder buffer = new StringBuilder(128);
         buffer.append(heading);
         buffer.append("\nID: ").append(id);
         if (address.length() > 0) {

@@ -19,9 +19,8 @@
 
 package org.apache.cxf.sts.event;
 
-import org.apache.cxf.sts.event.map.MapEventLogger;
-
 import ch.qos.logback.classic.PatternLayout;
+import org.apache.cxf.sts.event.map.MapEventLogger;
 
 public class LoggerPatternLayoutLogback extends PatternLayout {
 
@@ -35,7 +34,7 @@ public class LoggerPatternLayoutLogback extends PatternLayout {
         MapEventLogger ll = new MapEventLogger();
         StringBuilder line = new StringBuilder();
         for (String item : ll.getFieldOrder()) {
-            line.append(item).append(";");
+            line.append(item).append(';');
         }
         return line.toString() + System.getProperty("line.separator");
     }

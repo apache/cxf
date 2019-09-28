@@ -331,7 +331,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
                     code.append("// - Object constructor is "
                                     + nameManager.getJavascriptName(baseName) + "\n");
                 } else if (type != null) {
-                    code.append("// - simple type " + type.getQName());
+                    code.append("// - simple type ").append(type.getQName());
                 }
             }
         }
@@ -555,12 +555,10 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         if (!element.isEmpty()) {
             if (type instanceof XmlSchemaComplexType) {
                 return nameManager.getJavascriptName(element.getControllingName());
-            } else {
-                return "type " + type.getQName(); // could it be anonymous?
             }
-        } else {
-            return "empty element?";
+            return "type " + type.getQName(); // could it be anonymous?
         }
+        return "empty element?";
     }
 
     private void createInputSerializer() {
@@ -679,7 +677,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
                 return true;
             }
             XmlSchemaSequence sequence = getTypeSequence(complexType, parentName);
-            if (sequence.getItems().size() == 0) {
+            if (sequence.getItems().isEmpty()) {
                 return true;
             }
         }
@@ -1009,9 +1007,8 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
     public static String cleanedUpSchemaSource(XmlSchemaObject subject) {
         if (subject == null || subject.getSourceURI() == null) {
             return "";
-        } else {
-            return subject.getSourceURI() + ":" + subject.getLineNumber();
         }
+        return subject.getSourceURI() + ":" + subject.getLineNumber();
     }
 
 }

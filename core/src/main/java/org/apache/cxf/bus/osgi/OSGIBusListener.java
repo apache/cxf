@@ -61,7 +61,7 @@ public class OSGIBusListener implements BusLifeCycleListener {
     public OSGIBusListener(Bus b) {
         this(b, null);
     }
-    public OSGIBusListener(Bus b, Object args[]) {
+    public OSGIBusListener(Bus b, Object[] args) {
         bus = b;
         if (args != null && args.length > 0
             && args[0] instanceof BundleContext) {
@@ -121,13 +121,13 @@ public class OSGIBusListener implements BusLifeCycleListener {
             // ignore
         }
         if (refs == null) {
-            refs = new ServiceReference[]{};
+            refs = new ServiceReference<?>[]{};
         }
         return refs;
     }
 
     private void sendBusCreatedToBusCreationListeners() {
-        ServiceReference<?> refs[] = getServiceReferences(defaultContext, BusCreationListener.class);
+        ServiceReference<?>[] refs = getServiceReferences(defaultContext, BusCreationListener.class);
         for (ServiceReference<?> ref : refs) {
             if (!isPrivate(ref) && !isExcluded(ref)) {
                 BusCreationListener listener = (BusCreationListener)defaultContext.getService(ref);
@@ -137,7 +137,7 @@ public class OSGIBusListener implements BusLifeCycleListener {
     }
 
     private void registerServerLifecycleListeners() {
-        ServiceReference<?> refs[] = getServiceReferences(defaultContext, ServerLifeCycleListener.class);
+        ServiceReference<?>[] refs = getServiceReferences(defaultContext, ServerLifeCycleListener.class);
         ServerLifeCycleManager clcm = bus.getExtension(ServerLifeCycleManager.class);
         for (ServiceReference<?> ref : refs) {
             if (!isPrivate(ref) && !isExcluded(ref)) {
@@ -147,7 +147,7 @@ public class OSGIBusListener implements BusLifeCycleListener {
         }
     }
     private void registerClientLifeCycleListeners() {
-        ServiceReference<?> refs[] = getServiceReferences(defaultContext, ClientLifeCycleListener.class);
+        ServiceReference<?>[] refs = getServiceReferences(defaultContext, ClientLifeCycleListener.class);
         ClientLifeCycleManager clcm = bus.getExtension(ClientLifeCycleManager.class);
         for (ServiceReference<?> ref : refs) {
             if (!isPrivate(ref) && !isExcluded(ref)) {
@@ -158,7 +158,7 @@ public class OSGIBusListener implements BusLifeCycleListener {
     }
 
     private void registerBusFeatures() {
-        ServiceReference<?> refs[] = getServiceReferences(defaultContext, Feature.class);
+        ServiceReference<?>[] refs = getServiceReferences(defaultContext, Feature.class);
         for (ServiceReference<?> ref : refs) {
             if (!isPrivate(ref) && !isExcluded(ref)) {
                 Feature feature = (Feature)defaultContext.getService(ref);

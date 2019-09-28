@@ -38,7 +38,11 @@ import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.hello_world.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeOneWay;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ServerFactoryTest extends AbstractSimpleFrontendTest {
 
@@ -49,7 +53,7 @@ public class ServerFactoryTest extends AbstractSimpleFrontendTest {
         svrBean.setServiceClass(HelloService.class);
         svrBean.setServiceBean(new HelloServiceImpl());
         svrBean.setBus(getBus());
-        svrBean.setDestinationFactory(new CustomDestinationFactory(getBus()));
+        svrBean.setDestinationFactory(new CustomDestinationFactory());
 
         ServerImpl server = (ServerImpl)svrBean.create();
         assertTrue(server.getDestination() instanceof CustomDestination);
@@ -104,7 +108,7 @@ public class ServerFactoryTest extends AbstractSimpleFrontendTest {
     }
 
     public class CustomDestinationFactory extends AbstractTransportFactory implements DestinationFactory {
-        public CustomDestinationFactory(Bus b) {
+        public CustomDestinationFactory() {
             super(Arrays.asList("id"));
         }
         public Destination getDestination(EndpointInfo ei, Bus b) throws IOException {
@@ -116,27 +120,22 @@ public class ServerFactoryTest extends AbstractSimpleFrontendTest {
     public static class CustomDestination implements Destination {
 
         public EndpointReferenceType getAddress() {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public Conduit getBackChannel(Message inMessage) throws IOException {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public void shutdown() {
-            // TODO Auto-generated method stub
 
         }
 
         public void setMessageObserver(MessageObserver observer) {
-            // TODO Auto-generated method stub
 
         }
 
         public MessageObserver getMessageObserver() {
-            // TODO Auto-generated method stub
             return null;
         }
 

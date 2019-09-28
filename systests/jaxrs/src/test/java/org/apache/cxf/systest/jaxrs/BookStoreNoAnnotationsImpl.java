@@ -29,7 +29,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 
 public class BookStoreNoAnnotationsImpl implements BookStoreNoAnnotationsInterface,
     HttpHeadersContext {
@@ -55,7 +55,7 @@ public class BookStoreNoAnnotationsImpl implements BookStoreNoAnnotationsInterfa
         if (hs == null) {
             throw new WebApplicationException(Response.serverError().build());
         }
-        boolean springProxy = MessageUtils.isTrue(hs.getHeaderString("SpringProxy"));
+        boolean springProxy = PropertyUtils.isTrue(hs.getHeaderString("SpringProxy"));
         if (!springProxy && ui == null) {
             throw new WebApplicationException(Response.serverError().build());
         }

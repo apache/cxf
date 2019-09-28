@@ -32,12 +32,12 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.systest.aegis.bean.Item;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 /**
  *
@@ -92,7 +92,7 @@ public class AegisJaxWsTest extends AbstractJUnit4SpringContextTests {
     public void testMapSpecified() throws Exception {
         setupForTest(false);
         Item item = new Item();
-        item.setKey(new Integer(42));
+        item.setKey(Integer.valueOf(42));
         item.setData("Godzilla");
         client.addItem(item);
 
@@ -112,7 +112,7 @@ public class AegisJaxWsTest extends AbstractJUnit4SpringContextTests {
 
         Integer soucet = client.getSimpleValue(5, "aa");
         //this one fail, when comment org.apache.cxf.systest.aegis.AegisJaxWs.getStringList test pass
-        Assert.assertEquals(new Integer(5), soucet);
+        Assert.assertEquals(Integer.valueOf(5), soucet);
 
         List<String> item = client.getStringList();
         Assert.assertEquals(Arrays.asList("a", "b", "c"), item);

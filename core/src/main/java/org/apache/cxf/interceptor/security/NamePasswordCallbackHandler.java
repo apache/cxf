@@ -38,7 +38,7 @@ public class NamePasswordCallbackHandler implements CallbackHandler {
     private static final Logger LOG = LogUtils.getL7dLogger(NamePasswordCallbackHandler.class);
     private static final String PASSWORD_CALLBACK_NAME = "setObject";
     private static final Class<?>[] PASSWORD_CALLBACK_TYPES =
-        new Class[]{Object.class, char[].class, String.class};
+        new Class<?>[]{Object.class, char[].class, String.class};
 
     private String username;
     private String password;
@@ -93,7 +93,10 @@ public class NamePasswordCallbackHandler implements CallbackHandler {
         for (Class<?> arg : PASSWORD_CALLBACK_TYPES) {
             try {
                 Method method = callback.getClass().getMethod(cbname, arg);
-                method.invoke(callback, arg == String.class ? password : password.toCharArray());
+                Object[] args = new Object[] {
+                    arg == String.class ? password : password.toCharArray()
+                };
+                method.invoke(callback, args);
                 return true;
             } catch (Exception e) {
                 // ignore and continue

@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.STSConstants;
@@ -45,6 +46,7 @@ import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.sts.token.validator.SCTValidator;
 import org.apache.cxf.ws.security.sts.provider.STSException;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
@@ -52,7 +54,6 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
-import org.apache.wss4j.dom.WSConstants;
 
 /**
  * A TokenProvider implementation that provides a SAML Token that contains a Symmetric Key that is obtained
@@ -72,8 +73,8 @@ public class SCTSAMLTokenProvider implements TokenProvider {
      * that corresponds to the given TokenType.
      */
     public boolean canHandleToken(String tokenType) {
-        return WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType) || WSConstants.SAML2_NS.equals(tokenType)
-            || WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType) || WSConstants.SAML_NS.equals(tokenType);
+        return WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType) || WSS4JConstants.SAML2_NS.equals(tokenType)
+            || WSS4JConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType) || WSS4JConstants.SAML_NS.equals(tokenType);
     }
 
     public boolean canHandleToken(String tokenType, String realm) {
@@ -104,8 +105,8 @@ public class SCTSAMLTokenProvider implements TokenProvider {
             TokenProviderResponse response = new TokenProviderResponse();
             response.setToken(token);
             String tokenType = tokenRequirements.getTokenType();
-            if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
-                    || WSConstants.SAML2_NS.equals(tokenType)) {
+            if (WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+                    || WSS4JConstants.SAML2_NS.equals(tokenType)) {
                 response.setTokenId(token.getAttributeNS(null, "ID"));
             } else {
                 response.setTokenId(token.getAttributeNS(null, "AssertionID"));
@@ -265,8 +266,8 @@ public class SCTSAMLTokenProvider implements TokenProvider {
 
         String keyType = keyRequirements.getKeyType();
         if (STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
-            if (keyRequirements.getReceivedKey() == null
-                || keyRequirements.getReceivedKey().getX509Cert() == null) {
+            if (keyRequirements.getReceivedCredential() == null
+                || keyRequirements.getReceivedCredential().getX509Cert() == null) {
                 LOG.log(Level.WARNING, "A PublicKey Keytype is requested, but no certificate is provided");
                 throw new STSException(
                     "No client certificate for PublicKey KeyType", STSException.INVALID_REQUEST

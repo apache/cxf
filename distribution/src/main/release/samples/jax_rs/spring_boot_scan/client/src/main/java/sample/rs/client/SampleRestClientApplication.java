@@ -31,6 +31,7 @@ import org.apache.cxf.clustering.circuitbreaker.CircuitBreakerFailoverFeature;
 import org.apache.cxf.jaxrs.client.spring.EnableJaxRsProxyClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.client.ServiceInstance;
@@ -47,7 +48,7 @@ import sample.rs.service.HelloService;
 public class SampleRestClientApplication {
     public static void main(String[] args) {
         new SpringApplicationBuilder(SampleRestClientApplication.class)
-            .web(false)
+            .web(WebApplicationType.NONE)
             .run(args);
     }
     @Bean
@@ -72,7 +73,7 @@ public class SampleRestClientApplication {
     static class EurekaFailoverFeature extends CircuitBreakerFailoverFeature {
         @Autowired
         DiscoveryClient discoveryClient;
-        List<String> addresses = new LinkedList<String>();
+        List<String> addresses = new LinkedList<>();
 
         EurekaFailoverFeature() {
             super("eureka://registry");

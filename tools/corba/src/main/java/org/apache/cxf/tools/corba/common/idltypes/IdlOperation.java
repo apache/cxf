@@ -20,10 +20,10 @@
 package org.apache.cxf.tools.corba.common.idltypes;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 public final class IdlOperation extends IdlScopeBase {
     private IdlType returnType;
@@ -32,7 +32,7 @@ public final class IdlOperation extends IdlScopeBase {
 
     private IdlOperation(IdlScopeBase parent, String name, boolean isOneway) {
         super(parent, name);
-        exceptions = new Vector<IdlException>();
+        exceptions = new ArrayList<>();
         oneway = isOneway;
     }
 
@@ -74,7 +74,7 @@ public final class IdlOperation extends IdlScopeBase {
 
         Collection<IdlDefn> defns = definitions();
 
-        if (defns.size() != 0) {
+        if (!defns.isEmpty()) {
             pw.println();
             indentMore();
 

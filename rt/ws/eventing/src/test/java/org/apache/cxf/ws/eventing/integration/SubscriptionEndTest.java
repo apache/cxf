@@ -42,6 +42,7 @@ import org.apache.cxf.ws.eventing.base.SimpleEventingIntegrationTest;
 import org.apache.cxf.ws.eventing.base.SingletonSubscriptionManagerContainer;
 import org.apache.cxf.ws.eventing.base.TestUtil;
 import org.apache.cxf.ws.eventing.integration.eventsink.TestingEndToEndpointImpl;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -63,7 +64,7 @@ public class SubscriptionEndTest extends SimpleEventingIntegrationTest {
         subscribe.getDelivery().getContent().add(new ObjectFactory().createNotifyTo(eventSinkERT));
 
         JAXBElement<String> idqn
-            = new JAXBElement<String>(new QName("http://www.example.org", "MyReferenceParameter"),
+            = new JAXBElement<>(new QName("http://www.example.org", "MyReferenceParameter"),
                 String.class,
                 "380");
         ReferenceParametersType myParams = new ReferenceParametersType();

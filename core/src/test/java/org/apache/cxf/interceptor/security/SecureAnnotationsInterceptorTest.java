@@ -34,14 +34,13 @@ import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
-import org.easymock.EasyMock;
 
-import org.junit.Assert;
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
 
-public class SecureAnnotationsInterceptorTest extends Assert {
+public class SecureAnnotationsInterceptorTest {
 
     private Method method;
     private Message message = new MessageImpl();
@@ -56,13 +55,11 @@ public class SecureAnnotationsInterceptorTest extends Assert {
         Service service = EasyMock.createMock(Service.class);
         ex.put(Service.class, service);
         MethodDispatcher md = EasyMock.createMock(MethodDispatcher.class);
-        service.get(MethodDispatcher.class.getName());
-        EasyMock.expectLastCall().andReturn(md);
+        EasyMock.expect(service.get(MethodDispatcher.class.getName())).andReturn(md);
 
         BindingOperationInfo boi = EasyMock.createMock(BindingOperationInfo.class);
         ex.put(BindingOperationInfo.class, boi);
-        md.getMethod(boi);
-        EasyMock.expectLastCall().andReturn(method);
+        EasyMock.expect(md.getMethod(boi)).andReturn(method);
         EasyMock.replay(service, md);
     }
 

@@ -30,17 +30,19 @@ import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.message.Message;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  *
  */
-public class SoapActionInInterceptorTest extends Assert {
+public class SoapActionInInterceptorTest {
     private IMocksControl control;
 
     @Before
@@ -173,8 +175,8 @@ public class SoapActionInInterceptorTest extends Assert {
 
     private SoapMessage setUpMessage(String contentType, SoapVersion version, String prop) {
         SoapMessage message = control.createMock(SoapMessage.class);
-        Map<String, List<String>> headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
-        Map<String, List<String>> partHeaders = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+        Map<String, List<String>> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        Map<String, List<String>> partHeaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         if (version instanceof Soap11 && prop != null) {
             headers.put("SOAPAction", Collections.singletonList(prop));
         } else if (version instanceof Soap12 && prop != null) {

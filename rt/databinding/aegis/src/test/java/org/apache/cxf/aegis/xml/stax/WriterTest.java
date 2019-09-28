@@ -27,6 +27,7 @@ import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.test.AbstractCXFTest;
 import org.jdom.Document;
 import org.jdom.output.DOMOutputter;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -71,7 +72,7 @@ public class WriterTest extends AbstractCXFTest {
         nons.close();
 
         MessageWriter intval = writer.getElementWriter("int");
-        intval.writeValueAsInt(new Integer(10000));
+        intval.writeValueAsInt(Integer.valueOf(10000));
         intval.close();
 
         MessageWriter child1 = writer.getElementWriter("child1", "urn:child1");

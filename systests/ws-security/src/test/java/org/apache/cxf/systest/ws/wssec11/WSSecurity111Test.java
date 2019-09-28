@@ -28,11 +28,14 @@ import org.apache.cxf.systest.ws.wssec11.server.Server11;
 import org.apache.cxf.systest.ws.wssec11.server.Server11Restricted;
 import org.apache.cxf.systest.ws.wssec11.server.StaxServer11;
 import org.apache.cxf.systest.ws.wssec11.server.StaxServer11Restricted;
+import org.apache.cxf.test.TestUtilities;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertTrue;
 
 /**
  * This class runs the first half of the tests, as having all in
@@ -43,7 +46,7 @@ public class WSSecurity111Test extends WSSecurity11Common {
     private static boolean unrestrictedPoliciesInstalled;
 
     static {
-        unrestrictedPoliciesInstalled = SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
+        unrestrictedPoliciesInstalled = TestUtilities.checkUnrestrictedPoliciesInstalled();
     };
 
     final TestParam test;
@@ -83,11 +86,6 @@ public class WSSecurity111Test extends WSSecurity11Common {
                        launchServer(StaxServer11.class, true)
             );
         } else {
-            if (WSSecurity11Common.isIBMJDK16()) {
-                System.out.println("Not running as there is a problem with 1.6 jdk and restricted jars");
-                return;
-            }
-
             assertTrue(
                     "Server failed to launch",
                     // run the server in the same process
@@ -104,7 +102,7 @@ public class WSSecurity111Test extends WSSecurity11Common {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
+    public static Collection<TestParam> data() {
         String domPort = null;
         if (unrestrictedPoliciesInstalled) {
             domPort = Server11.PORT;
@@ -119,50 +117,50 @@ public class WSSecurity111Test extends WSSecurity11Common {
             staxPort = StaxServer11Restricted.PORT;
         }
 
-        return Arrays.asList(new TestParam[][] {
-            {new TestParam("A", domPort, false)},
-            {new TestParam("A-NoTimestamp", domPort, false)},
-            {new TestParam("AD", domPort, false)},
-            {new TestParam("A-ES", domPort, false)},
-            {new TestParam("AD-ES", domPort, false)},
-            {new TestParam("UX", domPort, false)},
-            {new TestParam("UX-NoTimestamp", domPort, false)},
-            {new TestParam("UXD", domPort, false)},
-            {new TestParam("UX-SEES", domPort, false)},
-            {new TestParam("UXD-SEES", domPort, false)},
+        return Arrays.asList(new TestParam[] {
+            new TestParam("A", domPort, false),
+            new TestParam("A-NoTimestamp", domPort, false),
+            new TestParam("AD", domPort, false),
+            new TestParam("A-ES", domPort, false),
+            new TestParam("AD-ES", domPort, false),
+            new TestParam("UX", domPort, false),
+            new TestParam("UX-NoTimestamp", domPort, false),
+            new TestParam("UXD", domPort, false),
+            new TestParam("UX-SEES", domPort, false),
+            new TestParam("UXD-SEES", domPort, false),
 
-            {new TestParam("A", domPort, true)},
-            {new TestParam("A-NoTimestamp", domPort, true)},
-            {new TestParam("AD", domPort, true)},
-            {new TestParam("A-ES", domPort, true)},
-            {new TestParam("AD-ES", domPort, true)},
-            {new TestParam("UX", domPort, true)},
-            {new TestParam("UX-NoTimestamp", domPort, true)},
-            {new TestParam("UXD", domPort, true)},
-            {new TestParam("UX-SEES", domPort, true)},
-            {new TestParam("UXD-SEES", domPort, true)},
+            new TestParam("A", domPort, true),
+            new TestParam("A-NoTimestamp", domPort, true),
+            new TestParam("AD", domPort, true),
+            new TestParam("A-ES", domPort, true),
+            new TestParam("AD-ES", domPort, true),
+            new TestParam("UX", domPort, true),
+            new TestParam("UX-NoTimestamp", domPort, true),
+            new TestParam("UXD", domPort, true),
+            new TestParam("UX-SEES", domPort, true),
+            new TestParam("UXD-SEES", domPort, true),
 
-            {new TestParam("A", staxPort, false)},
-            {new TestParam("A-NoTimestamp", staxPort, false)},
-            {new TestParam("AD", staxPort, false)},
-            {new TestParam("A-ES", staxPort, false)},
-            {new TestParam("AD-ES", staxPort, false)},
-            {new TestParam("UX", staxPort, false)},
-            {new TestParam("UX-NoTimestamp", staxPort, false)},
-            {new TestParam("UXD", staxPort, false)},
-            {new TestParam("UX-SEES", staxPort, false)},
-            {new TestParam("UXD-SEES", staxPort, false)},
+            new TestParam("A", staxPort, false),
+            new TestParam("A-NoTimestamp", staxPort, false),
+            new TestParam("AD", staxPort, false),
+            new TestParam("A-ES", staxPort, false),
+            new TestParam("AD-ES", staxPort, false),
+            new TestParam("UX", staxPort, false),
+            new TestParam("UX-NoTimestamp", staxPort, false),
+            new TestParam("UXD", staxPort, false),
+            new TestParam("UX-SEES", staxPort, false),
+            new TestParam("UXD-SEES", staxPort, false),
 
-            {new TestParam("A", staxPort, true)},
-            {new TestParam("A-NoTimestamp", staxPort, true)},
-            {new TestParam("AD", staxPort, true)},
-            {new TestParam("A-ES", staxPort, true)},
-            {new TestParam("AD-ES", staxPort, true)},
-            {new TestParam("UX", staxPort, true)},
-            {new TestParam("UX-NoTimestamp", staxPort, true)},
-            {new TestParam("UXD", staxPort, true)},
-            {new TestParam("UX-SEES", staxPort, true)},
-            {new TestParam("UXD-SEES", staxPort, true)},
+            new TestParam("A", staxPort, true),
+            new TestParam("A-NoTimestamp", staxPort, true),
+            new TestParam("AD", staxPort, true),
+            new TestParam("A-ES", staxPort, true),
+            new TestParam("AD-ES", staxPort, true),
+            new TestParam("UX", staxPort, true),
+            new TestParam("UX-NoTimestamp", staxPort, true),
+            new TestParam("UXD", staxPort, true),
+            new TestParam("UX-SEES", staxPort, true),
+            new TestParam("UXD-SEES", staxPort, true),
         });
     }
 
@@ -174,8 +172,7 @@ public class WSSecurity111Test extends WSSecurity11Common {
 
     @Test
     public void testClientServer() throws IOException {
-        if ((!unrestrictedPoliciesInstalled)
-                && (WSSecurity11Common.isIBMJDK16())) {
+        if (!unrestrictedPoliciesInstalled) {
             System.out.println("Not running as there is a problem with 1.6 jdk and restricted jars");
             return;
         }

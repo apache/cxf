@@ -38,6 +38,7 @@ public class JAXWSBindingSerializer implements ExtensionSerializer, Serializable
                          Definition def,
                          ExtensionRegistry extReg)
         throws WSDLException {
-        // TODO
+        // This class is needed to generate the WSDL file included in the client jar. 
+        // It simply ignores the JAXWS Binding when generating the WSDL file. 
     }
 }

@@ -106,7 +106,8 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
             }
             if (sigAlgo != SignatureAlgorithm.NONE) {
                 if (atHashRequired) {
-                    String atHash = OidcUtils.calculateAccessTokenHash(st.getTokenKey(), sigAlgo);
+                    String tokenKey = st.getEncodedToken() != null ? st.getEncodedToken() : st.getTokenKey();
+                    String atHash = OidcUtils.calculateAccessTokenHash(tokenKey, sigAlgo);
                     idToken.setAccessTokenHash(atHash);
                 }
                 if (cHashRequired) {
@@ -139,7 +140,7 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
     @Override
     public String processJwt(JwtToken jwt, Client client) {
         if (keyServiceClient != null) {
-            List<String> opers = new LinkedList<String>();
+            List<String> opers = new LinkedList<>();
             if (super.isJwsRequired()) {
                 opers.add(JsonWebKey.KEY_OPER_SIGN);
             }
@@ -152,9 +153,8 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
             //TODO: OIDC core talks about various security algorithm preferences
             // that may be set during the client registrations, they can be passed along too
             return keyServiceClient.post(jwt, String.class);
-        } else {
-            return super.processJwt(jwt, client);
         }
+        return super.processJwt(jwt, client);
     }
     public void setKeyServiceClient(WebClient keyServiceClient) {
         this.keyServiceClient = keyServiceClient;

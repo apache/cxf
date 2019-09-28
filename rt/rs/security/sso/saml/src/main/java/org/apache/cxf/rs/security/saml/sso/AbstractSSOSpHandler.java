@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.saml.sso;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Properties;
@@ -122,26 +123,20 @@ public class AbstractSSOSpHandler {
             contextCookie += ";Domain=" + domain;
         }
 
-        // Keep the cookie across the browser restarts until it actually expires.
-        // Note that the Expires property has been deprecated but apparently is
-        // supported better than 'max-age' property by different browsers
-        // (Firefox, IE, etc)
-        Instant expires = Instant.ofEpochMilli(System.currentTimeMillis() + stateTimeToLive);
-        String cookieExpires = HttpUtils.getHttpDateFormat().format(expires.atZone(ZoneOffset.UTC));
-        contextCookie += ";Expires=" + cookieExpires;
+        if (stateTimeToLive > 0) {
+            // Keep the cookie across the browser restarts until it actually expires.
+            // Note that the Expires property has been deprecated but apparently is
+            // supported better than 'max-age' property by different browsers
+            // (Firefox, IE, etc)
+            Instant expires = Instant.ofEpochMilli(System.currentTimeMillis() + stateTimeToLive);
+            String cookieExpires =
+                HttpUtils.getHttpDateFormat().format(Date.from(expires.atZone(ZoneOffset.UTC).toInstant()));
+            contextCookie += ";Expires=" + cookieExpires;
+        }
+
         //TODO: Consider adding an 'HttpOnly' attribute
 
         return contextCookie;
-    }
-
-    protected boolean isStateExpired(long stateCreatedAt, long expiresAt) {
-        Instant currentTime = Instant.now();
-        Instant expires = Instant.ofEpochMilli(stateCreatedAt  + getStateTimeToLive());
-        if (currentTime.isAfter(expires)) {
-            return true;
-        }
-
-        return expiresAt > 0 && currentTime.isAfter(Instant.ofEpochMilli(expiresAt));
     }
 
     public void setStateProvider(SPStateManager stateProvider) {
@@ -164,13 +159,13 @@ public class AbstractSSOSpHandler {
         if (signatureCrypto == null && signaturePropertiesFile != null) {
             Properties sigProperties = SecurityUtils.loadProperties(signaturePropertiesFile);
             if (sigProperties == null) {
-                LOG.fine("Cannot load signature properties using: " + signaturePropertiesFile);
+                LOG.warning("Cannot load signature properties using: " + signaturePropertiesFile);
                 return null;
             }
             try {
                 signatureCrypto = CryptoFactory.getInstance(sigProperties);
             } catch (WSSecurityException ex) {
-                LOG.fine("Error in loading the signature Crypto object: " + ex.getMessage());
+                LOG.warning("Error in loading the signature Crypto object: " + ex.getMessage());
                 return null;
             }
         }
@@ -182,7 +177,7 @@ public class AbstractSSOSpHandler {
             try {
                 callbackHandler = SecurityUtils.getCallbackHandler(callbackHandlerClass);
                 if (callbackHandler == null) {
-                    LOG.fine("Cannot load CallbackHandler using: " + callbackHandlerClass);
+                    LOG.warning("Cannot load CallbackHandler using: " + callbackHandlerClass);
                     return null;
                 }
             } catch (Exception ex) {
@@ -225,9 +220,8 @@ public class AbstractSSOSpHandler {
     protected String getIssuerId(Message m) {
         if (issuerId == null) {
             return new UriInfoImpl(m).getBaseUri().toString();
-        } else {
-            return issuerId;
         }
+        return issuerId;
     }
 
     public boolean isSupportUnsolicited() {

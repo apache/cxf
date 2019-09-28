@@ -18,10 +18,11 @@
  */
 package org.apache.cxf.common.util;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class XmlSchemaPrimitiveUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class XmlSchemaPrimitiveUtilsTest {
 
     @Test
     public void testDefaultRepresentation() {

@@ -23,6 +23,8 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collections;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,6 +32,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.bean.ActionBean;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
@@ -39,6 +42,7 @@ import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
 
@@ -58,7 +62,6 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     protected X509Certificate[] certs;
     protected Statement statement = Statement.AUTHN;
     protected CERT_IDENTIFIER certIdentifier = CERT_IDENTIFIER.X509_CERT;
-    protected byte[] ephemeralKey;
     protected boolean multiValue = true;
 
     public void setConfirmationMethod(String confMethod) {
@@ -75,10 +78,6 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
 
     public void setCerts(X509Certificate[] certs) {
         this.certs = certs;
-    }
-
-    public byte[] getEphemeralKey() {
-        return ephemeralKey;
     }
 
     /**
@@ -174,17 +173,19 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
             WSSecEncryptedKey encrKey = new WSSecEncryptedKey(doc);
             encrKey.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
             encrKey.setUseThisCert(certs[0]);
-            encrKey.prepare(null);
-            ephemeralKey = encrKey.getEphemeralKey();
+
+            KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+            SecretKey symmetricKey = keyGen.generateKey();
+            encrKey.prepare(null, symmetricKey);
             Element encryptedKeyElement = encrKey.getEncryptedKeyElement();
 
             // Append the EncryptedKey to a KeyInfo element
             Element keyInfoElement =
                 doc.createElementNS(
-                    WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN
+                    WSS4JConstants.SIG_NS, WSS4JConstants.SIG_PREFIX + ":" + WSS4JConstants.KEYINFO_LN
                 );
             keyInfoElement.setAttributeNS(
-                WSConstants.XMLNS_NS, "xmlns:" + WSConstants.SIG_PREFIX, WSConstants.SIG_NS
+                WSS4JConstants.XMLNS_NS, "xmlns:" + WSS4JConstants.SIG_PREFIX, WSS4JConstants.SIG_NS
             );
             keyInfoElement.appendChild(encryptedKeyElement);
 

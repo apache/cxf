@@ -20,8 +20,8 @@
 package org.apache.cxf.transport.jms;
 
 import java.io.IOException;
-
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -41,10 +41,10 @@ public class JMSTransportFactory extends AbstractTransportFactory implements Con
     DestinationFactory {
 
     public static final List<String> DEFAULT_NAMESPACES
-        = Arrays.asList(
+        = Collections.unmodifiableList(Arrays.asList(
             "http://cxf.apache.org/transports/jms",
             "http://cxf.apache.org/transports/jms/configuration"
-        );
+        ));
 
     private static final Set<String> URI_PREFIXES = new HashSet<>();
     static {

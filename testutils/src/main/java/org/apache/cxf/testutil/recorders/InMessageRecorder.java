@@ -26,8 +26,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -36,36 +34,25 @@ import org.apache.cxf.phase.Phase;
 public class InMessageRecorder extends AbstractPhaseInterceptor<Message> {
 
     private static final Logger LOG = LogUtils.getLogger(InMessageRecorder.class);
-    private List<byte[]> inbound;
+    private final List<byte[]> inbound = new CopyOnWriteArrayList<>();
 
     public InMessageRecorder() {
         super(Phase.RECEIVE);
-        inbound = new CopyOnWriteArrayList<byte[]>();
     }
 
     public void handleMessage(Message message) throws Fault {
-        InputStream is = message.getContent(InputStream.class);
-
-        if (is == null) {
-            return;
-        }
-
-        LoadingByteArrayOutputStream bos = new LoadingByteArrayOutputStream();
-        try {
-            IOUtils.copy(is, bos);
-            is.close();
-            bos.close();
-            byte bytes[] = bos.toByteArray();
-            synchronized (inbound) {
-                inbound.add(bytes);
+        try (InputStream is = message.getContent(InputStream.class)) {
+            if (is != null) {
+                byte[] b = new byte[is.available()];
+                is.read(b);
+                inbound.add(b);
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.fine("inbound: " + new String(b));
+                }
+                message.setContent(InputStream.class, new ByteArrayInputStream(b));
             }
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("inbound: " + bos.toString());
-            }
-            ByteArrayInputStream bis = bos.createInputStream();
-            message.setContent(InputStream.class, bis);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            throw new Fault(ex);
         }
     }
 

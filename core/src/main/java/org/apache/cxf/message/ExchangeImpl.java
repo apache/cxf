@@ -129,7 +129,7 @@ public class ExchangeImpl extends ConcurrentHashMap<String, Object>  implements 
 
     public <T> void put(Class<T> key, T value) {
         if (value == null) {
-            super.remove(key);
+            super.remove((Object)key);
         } else if (key == Bus.class) {
             resetContextCaches();
             bus = (Bus)value;

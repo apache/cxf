@@ -28,8 +28,12 @@ import org.apache.cxf.bus.managers.ServiceContractResolverRegistryImpl;
 import org.apache.cxf.endpoint.ServiceContractResolverRegistry;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world_soap_http.Greeter;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class JarResolverTest extends AbstractBusClientServerTestBase {
     public static final String PORT = Server.PORT;

@@ -23,7 +23,10 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systests.cdi.base.AbstractCdiMultiAppTest;
 import org.apache.cxf.systests.cdi.base.jetty.AbstractJettyServer;
 import org.apache.webbeans.servlet.WebBeansConfigurationListener;
+
 import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertTrue;
 
 public class JettyWarTest extends AbstractCdiMultiAppTest {
     public static class EmbeddedJettyServer extends AbstractJettyServer {

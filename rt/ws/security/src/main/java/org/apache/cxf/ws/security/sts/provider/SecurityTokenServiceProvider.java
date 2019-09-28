@@ -146,7 +146,7 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
     private WebServiceContext context;
 
     public SecurityTokenServiceProvider() throws Exception {
-        Set<Class<?>> classes = new HashSet<Class<?>>();
+        Set<Class<?>> classes = new HashSet<>();
         classes.add(ObjectFactory.class);
         classes.add(org.apache.cxf.ws.security.sts.provider.model.wstrust14.ObjectFactory.class);
 

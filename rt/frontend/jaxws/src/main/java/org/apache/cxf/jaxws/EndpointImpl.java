@@ -116,15 +116,15 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     private List<String> schemaLocations;
     private List<Feature> features;
     private List<Interceptor<? extends Message>> in
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+        = new ModCountCopyOnWriteArrayList<>();
     private List<Interceptor<? extends Message>> out
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+        = new ModCountCopyOnWriteArrayList<>();
     private List<Interceptor<? extends Message>> outFault
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+        = new ModCountCopyOnWriteArrayList<>();
     private List<Interceptor<? extends Message>> inFault
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+        = new ModCountCopyOnWriteArrayList<>();
     @SuppressWarnings("rawtypes")
-    private List<Handler> handlers = new ModCountCopyOnWriteArrayList<Handler>();
+    private List<Handler> handlers = new ModCountCopyOnWriteArrayList<>();
     private EndpointContext endpointContext;
 
     /**
@@ -156,7 +156,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     public EndpointImpl(Bus b, Object i, String bindingUri, String wsdl) {
         this(b, i, bindingUri, wsdl, null);
     }
-    public EndpointImpl(Bus b, Object i, String bindingUri, String wsdl, WebServiceFeature f[]) {
+    public EndpointImpl(Bus b, Object i, String bindingUri, String wsdl, WebServiceFeature[] f) {
         bus = b;
         implementor = i;
         this.bindingUri = bindingUri;
@@ -170,7 +170,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     public EndpointImpl(Bus b, Object i, String bindingUri) {
         this(b, i, bindingUri, (String)null);
     }
-    public EndpointImpl(Bus b, Object i, String bindingUri, WebServiceFeature features[]) {
+    public EndpointImpl(Bus b, Object i, String bindingUri, WebServiceFeature[] features) {
         this(b, i, bindingUri, (String)null, features);
     }
 
@@ -515,7 +515,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     protected void checkPublishPermission() {
         SecurityManager sm = System.getSecurityManager();
         boolean checkPublishEndpointPermissionWithSecurityManager
-            = Boolean.valueOf(
+            = Boolean.parseBoolean(
                       SystemPropertyAction.getProperty(
                                          CHECK_PUBLISH_ENDPOINT_PERMISSON_PROPERTY_WITH_SECURITY_MANAGER,
                                          "true"));
@@ -836,11 +836,10 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
                                                                 Element... referenceParameters) {
         if (W3CEndpointReference.class.isAssignableFrom(clazz)) {
             return clazz.cast(getEndpointReference(referenceParameters));
-        } else {
-            throw new WebServiceException(new org.apache.cxf.common.i18n.Message(
-                "ENDPOINTREFERENCE_TYPE_NOT_SUPPORTED", LOG, clazz
-                .getName()).toString());
         }
+        throw new WebServiceException(new org.apache.cxf.common.i18n.Message(
+            "ENDPOINTREFERENCE_TYPE_NOT_SUPPORTED", LOG, clazz
+            .getName()).toString());
     }
 
     public void setEndpointContext(EndpointContext ctxt) {

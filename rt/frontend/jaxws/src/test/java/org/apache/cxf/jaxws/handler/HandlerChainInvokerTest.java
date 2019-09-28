@@ -50,11 +50,17 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.junit.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 
-public class HandlerChainInvokerTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class HandlerChainInvokerTest {
 
     private static final int HANDLER_COUNT = 4;
 
@@ -111,7 +117,7 @@ public class HandlerChainInvokerTest extends Assert {
 
         assertEquals(HANDLER_COUNT, invoker.getProtocolHandlers().size());
         for (Handler<?> h : invoker.getProtocolHandlers()) {
-            assertTrue(!(h instanceof LogicalHandler));
+            assertFalse(h instanceof LogicalHandler);
         }
 
     }
@@ -154,7 +160,7 @@ public class HandlerChainInvokerTest extends Assert {
 
         boolean ret = invoker.invokeLogicalHandlers(false, lmc);
 
-        assertEquals(false, ret);
+        assertFalse(ret);
         assertFalse(invoker.isClosed());
         assertEquals(1, logicalHandlers[0].getHandleMessageCount());
         assertEquals(1, logicalHandlers[1].getHandleMessageCount());
@@ -187,7 +193,7 @@ public class HandlerChainInvokerTest extends Assert {
         boolean ret = invoker.invokeLogicalHandlers(false, lmc);
         assertFalse(invoker.isClosed());
 
-        assertEquals(false, ret);
+        assertFalse(ret);
         assertEquals(0, logicalHandlers[0].getHandleMessageCount());
         assertEquals(1, logicalHandlers[1].getHandleMessageCount());
         assertTrue(invoker.isOutbound());
@@ -205,8 +211,8 @@ public class HandlerChainInvokerTest extends Assert {
         invoker.setProtocolMessageContext(pmc);
         continueProcessing = invoker.invokeProtocolHandlers(false, pmc);
 
-        assertFalse((Boolean)pmc.get(SOAPMessageContext.MESSAGE_OUTBOUND_PROPERTY));
-        assertFalse((Boolean)lmc.get(LogicalMessageContext.MESSAGE_OUTBOUND_PROPERTY));
+        assertFalse((Boolean)pmc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY));
+        assertFalse((Boolean)lmc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY));
         assertTrue(invoker.isInbound());
         assertFalse(continueProcessing);
 
@@ -286,8 +292,8 @@ public class HandlerChainInvokerTest extends Assert {
             assertEquals("banzai", e.getMessage());
         }
 
-        assertFalse((Boolean)pmc.get(SOAPMessageContext.MESSAGE_OUTBOUND_PROPERTY));
-        assertFalse((Boolean)lmc.get(LogicalMessageContext.MESSAGE_OUTBOUND_PROPERTY));
+        assertFalse((Boolean)pmc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY));
+        assertFalse((Boolean)lmc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY));
         assertTrue(invoker.isInbound());
 
         //the message is replaced by fault message
@@ -363,8 +369,8 @@ public class HandlerChainInvokerTest extends Assert {
             assertEquals("banzai", e.getMessage());
         }
 
-        assertFalse((Boolean)pmc.get(SOAPMessageContext.MESSAGE_OUTBOUND_PROPERTY));
-        assertFalse((Boolean)lmc.get(LogicalMessageContext.MESSAGE_OUTBOUND_PROPERTY));
+        assertFalse((Boolean)pmc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY));
+        assertFalse((Boolean)lmc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY));
         assertTrue(invoker.isInbound());
         //assertFalse(continueProcessing);
 
@@ -466,7 +472,7 @@ public class HandlerChainInvokerTest extends Assert {
 
         assertFalse(continueProcessing);
 
-        assertFalse((Boolean)lmc.get(LogicalMessageContext.MESSAGE_OUTBOUND_PROPERTY));
+        assertFalse((Boolean)lmc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY));
 
         assertEquals(1, logicalHandlers[0].getHandleMessageCount());
         assertEquals(1, logicalHandlers[1].getHandleMessageCount());
@@ -567,7 +573,7 @@ public class HandlerChainInvokerTest extends Assert {
         //assertTrue(invoker.isClosed());
         assertSame(pe, invoker.getFault());
 
-        assertFalse((Boolean)lmc.get(LogicalMessageContext.MESSAGE_OUTBOUND_PROPERTY));
+        assertFalse((Boolean)lmc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY));
 
         assertEquals(1, logicalHandlers[0].getHandleMessageCount());
         assertEquals(1, logicalHandlers[1].getHandleMessageCount());
@@ -944,7 +950,7 @@ public class HandlerChainInvokerTest extends Assert {
         invoker.invokeLogicalHandlers(true, lmc);
 
         assertEquals(7, invoker.getInvokedHandlers().size());
-//        assertTrue(!invoker.getInvokedHandlers().contains(logicalHandlers[1]));
+//        assertFalse(invoker.getInvokedHandlers().contains(logicalHandlers[1]));
         assertTrue(invoker.getInvokedHandlers().contains(protocolHandlers[0]));
         assertTrue(invoker.getInvokedHandlers().contains(protocolHandlers[1]));
         assertEquals(0, logicalHandlers[0].getHandleMessageCount());
@@ -1079,12 +1085,10 @@ public class HandlerChainInvokerTest extends Assert {
 
 
         public void init(Map<String, Object> arg0) {
-            // TODO Auto-generated method stub
         }
 
 
         public void destroy() {
-            // TODO Auto-generated method stub
         }
 
         public int getHandleMessageCount() {

@@ -91,9 +91,9 @@ public class SchemaJavascriptBuilder {
         xmlSchema = schema;
         code = new StringBuilder();
         code.append("//\n");
-        code.append("// Definitions for schema: " + schema.getTargetNamespace());
+        code.append("// Definitions for schema: ").append(schema.getTargetNamespace());
         if (schema.getSourceURI() != null) {
-            code.append("\n//  " + schema.getSourceURI());
+            code.append("\n//  ").append(schema.getSourceURI());
         }
         code.append("\n//\n");
 
@@ -422,7 +422,7 @@ public class SchemaJavascriptBuilder {
         nslist.append("[ ");
         for (int x = 0; x < namespaces.length; x++) {
             String ns = namespaces[x];
-            nslist.append("'");
+            nslist.append('\'');
             if ("##targetNamespace".equals(ns)) {
                 nslist.append(xmlSchema.getTargetNamespace());
             } else if ("##local".equals(ns)) {
@@ -430,12 +430,12 @@ public class SchemaJavascriptBuilder {
             } else {
                 nslist.append(ns);
             }
-            nslist.append("'");
+            nslist.append('\'');
             if (x < namespaces.length - 1) {
-                nslist.append(",");
+                nslist.append(',');
             }
         }
-        nslist.append("]");
+        nslist.append(']');
         return nslist.toString();
     }
 

@@ -47,8 +47,13 @@ import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.ext.SecurePart;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  */
@@ -76,7 +81,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.USERNAMETOKEN);
         properties.setActions(actions);
         properties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
@@ -174,7 +179,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.USERNAMETOKEN);
         properties.setActions(actions);
         properties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
@@ -214,7 +219,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.USERNAMETOKEN);
         properties.setActions(actions);
         properties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
@@ -257,7 +262,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.USERNAMETOKEN);
         properties.setActions(actions);
         properties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
@@ -355,7 +360,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.USERNAMETOKEN);
         properties.setActions(actions);
         properties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
@@ -395,7 +400,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.USERNAMETOKEN);
         properties.setActions(actions);
         properties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
@@ -437,10 +442,10 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
-        actions.add(WSSConstants.ENCRYPT);
+        List<WSSConstants.Action> actions = new ArrayList<>();
+        actions.add(XMLSecurityConstants.ENCRYPT);
         properties.setActions(actions);
-        properties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
+        properties.setEncryptionSymAlgorithm(XMLSecurityConstants.NS_XENC_AES128);
         properties.setEncryptionUser("myalias");
 
         Properties outCryptoProperties =
@@ -474,7 +479,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         Map<String, Object> outConfig = new HashMap<>();
         outConfig.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
         outConfig.put(ConfigurationConstants.ENCRYPTION_USER, "myalias");
-        outConfig.put(ConfigurationConstants.ENC_SYM_ALGO, WSSConstants.NS_XENC_AES128);
+        outConfig.put(ConfigurationConstants.ENC_SYM_ALGO, XMLSecurityConstants.NS_XENC_AES128);
         outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         outConfig.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(outConfig);
@@ -505,16 +510,16 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.USERNAMETOKEN);
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(XMLSecurityConstants.ENCRYPT);
         properties.setActions(actions);
         properties.addEncryptionPart(
             new SecurePart(new QName(WSSConstants.NS_WSSE10, "UsernameToken"), SecurePart.Modifier.Element)
         );
         properties.setEncryptionUser("myalias");
         properties.setTokenUser("username");
-        properties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
+        properties.setEncryptionSymAlgorithm(XMLSecurityConstants.NS_XENC_AES128);
 
         Properties outCryptoProperties =
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
@@ -557,7 +562,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         outConfig.put(ConfigurationConstants.ENCRYPTION_USER, "myalias");
         outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         outConfig.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
-        outConfig.put(ConfigurationConstants.ENC_SYM_ALGO, WSSConstants.NS_XENC_AES128);
+        outConfig.put(ConfigurationConstants.ENC_SYM_ALGO, XMLSecurityConstants.NS_XENC_AES128);
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(outConfig);
 
         client.getOutInterceptors().add(ohandler);
@@ -589,8 +594,8 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
-        actions.add(WSSConstants.SIGNATURE);
+        List<WSSConstants.Action> actions = new ArrayList<>();
+        actions.add(XMLSecurityConstants.SIGNATURE);
         properties.setActions(actions);
         properties.setSignatureUser("myalias");
 
@@ -662,9 +667,9 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.USERNAMETOKEN);
-        actions.add(WSSConstants.SIGNATURE);
+        actions.add(XMLSecurityConstants.SIGNATURE);
         properties.setActions(actions);
         properties.setSignatureUser("myalias");
 
@@ -745,7 +750,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         properties.setActions(actions);
 
@@ -801,9 +806,9 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
-        actions.add(WSSConstants.SIGNATURE);
+        actions.add(XMLSecurityConstants.SIGNATURE);
         properties.setActions(actions);
         properties.addSignaturePart(
             new SecurePart(new QName(WSSConstants.NS_WSU10, "Timestamp"), SecurePart.Modifier.Element)
@@ -885,8 +890,8 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
-        actions.add(WSSConstants.SIGNATURE);
+        List<WSSConstants.Action> actions = new ArrayList<>();
+        actions.add(XMLSecurityConstants.SIGNATURE);
         properties.setActions(actions);
         properties.setSignatureUser("alice");
 
@@ -962,13 +967,13 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
-        actions.add(WSSConstants.ENCRYPT);
-        actions.add(WSSConstants.SIGNATURE);
+        List<WSSConstants.Action> actions = new ArrayList<>();
+        actions.add(XMLSecurityConstants.ENCRYPT);
+        actions.add(XMLSecurityConstants.SIGNATURE);
         properties.setActions(actions);
         properties.setEncryptionUser("myalias");
         properties.setSignatureUser("myalias");
-        properties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
+        properties.setEncryptionSymAlgorithm(XMLSecurityConstants.NS_XENC_AES128);
 
         Properties outCryptoProperties =
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
@@ -1010,7 +1015,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         outConfig.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
         outConfig.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
-        outConfig.put(ConfigurationConstants.ENC_SYM_ALGO, WSSConstants.NS_XENC_AES128);
+        outConfig.put(ConfigurationConstants.ENC_SYM_ALGO, XMLSecurityConstants.NS_XENC_AES128);
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(outConfig);
 
         client.getOutInterceptors().add(ohandler);
@@ -1032,8 +1037,8 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         service.getInInterceptors().add(inhandler);
 
         WSSSecurityProperties outProperties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
-        actions.add(WSSConstants.SIGNATURE);
+        List<WSSConstants.Action> actions = new ArrayList<>();
+        actions.add(XMLSecurityConstants.SIGNATURE);
         actions.add(WSSConstants.SIGNATURE_CONFIRMATION);
         outProperties.setActions(actions);
         outProperties.setSignatureUser("myalias");
@@ -1053,8 +1058,8 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        actions = new ArrayList<WSSConstants.Action>();
-        actions.add(WSSConstants.SIGNATURE);
+        actions = new ArrayList<>();
+        actions.add(XMLSecurityConstants.SIGNATURE);
         properties.setActions(actions);
         properties.setSignatureUser("myalias");
 

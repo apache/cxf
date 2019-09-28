@@ -40,7 +40,7 @@ public class Activator implements BundleActivator {
     public void start(BundleContext context) throws Exception {
         conduitConfigurer = new ConduitConfigurer(context);
         conduitConfigurer.open();
-        Dictionary<String, Object> properties = new Hashtable<String, Object>();
+        Dictionary<String, Object> properties = new Hashtable<>();
         properties.put(Constants.SERVICE_PID, "org.apache.cxf.transport.http.async");
         context.registerService(ManagedService.class.getName(), conduitConfigurer, properties);
     }

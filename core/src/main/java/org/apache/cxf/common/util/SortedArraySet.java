@@ -45,7 +45,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @param <T>
  */
 public final class SortedArraySet<T> implements SortedSet<T> {
-    final AtomicReference<T[]> data = new AtomicReference<T[]>();
+    final AtomicReference<T[]> data = new AtomicReference<>();
 
     public void clear() {
         data.set(null);
@@ -224,7 +224,7 @@ public final class SortedArraySet<T> implements SortedSet<T> {
 
         public void remove() {
             if (idx > 0) {
-                SortedArraySet.this.remove(data[idx - 1]);
+                SortedArraySet.this.remove((Object)data[idx - 1]);
             }
         }
     }

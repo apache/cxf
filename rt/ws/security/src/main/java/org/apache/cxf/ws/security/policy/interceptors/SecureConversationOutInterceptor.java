@@ -41,7 +41,7 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSUtils;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.SecureConversationToken;
 import org.apache.wss4j.policy.model.Trust10;
@@ -151,9 +151,8 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                 if (issueAfterFailedRenew) {
                     // Perhaps the STS does not support renewing, so try to issue a new token
                     return issueToken(message, aim, itok);
-                } else {
-                    throw ex;
                 }
+                throw ex;
             } catch (Exception ex) {
                 LOG.log(Level.WARNING, "Error renewing a token", ex);
                 boolean issueAfterFailedRenew =
@@ -163,9 +162,8 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                 if (issueAfterFailedRenew) {
                     // Perhaps the STS does not support renewing, so try to issue a new token
                     return issueToken(message, aim, itok);
-                } else {
-                    throw new Fault(ex);
                 }
+                throw new Fault(ex);
             } finally {
                 client.setTrust((Trust10)null);
                 client.setTrust((Trust13)null);
@@ -191,15 +189,14 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                 String s = SecureConversationTokenInterceptorProvider
                     .setupClient(client, message, aim, itok, false);
 
-                SecurityToken tok = null;
                 if (maps != null) {
                     client.setAddressingNamespace(maps.getNamespaceURI());
                 }
-                tok = client.requestSecurityToken(s);
+                SecurityToken tok = client.requestSecurityToken(s);
                 String tokenType = tok.getTokenType();
                 tok.setTokenType(tokenType);
                 if (tokenType == null || "".equals(tokenType)) {
-                    tok.setTokenType(WSConstants.WSC_SCT);
+                    tok.setTokenType(WSS4JConstants.WSC_SCT);
                 }
                 return tok;
             } catch (RuntimeException e) {

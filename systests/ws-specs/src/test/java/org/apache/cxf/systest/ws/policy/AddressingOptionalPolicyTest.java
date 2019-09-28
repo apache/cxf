@@ -48,6 +48,9 @@ import org.apache.cxf.ws.rm.RMUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests the use of the WS-Policy Framework to automatically engage WS-Addressing and
@@ -67,7 +70,7 @@ public class AddressingOptionalPolicyTest extends AbstractBusClientServerTestBas
         public Server(String dir) {
             tmpDir = dir;
         }
-        public Server(String args[]) {
+        public Server(String[] args) {
             tmpDir = args[0];
         }
         protected void run()  {

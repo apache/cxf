@@ -37,7 +37,6 @@ import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
 import org.apache.cxf.transport.http_jetty.ThreadingParameters;
 import org.apache.cxf.transports.http_jetty.configuration.TLSServerParametersIdentifiedType;
 import org.apache.cxf.transports.http_jetty.configuration.ThreadingParametersIdentifiedType;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -110,7 +109,7 @@ public class JettyHTTPServerEngineFactoryBeanDefinitionParser
         List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(parent,
                                                                      name.getNamespaceURI(),
                                                                      name.getLocalPart());
-        ManagedList<Object> list = new ManagedList<Object>(elemList.size());
+        ManagedList<Object> list = new ManagedList<>(elemList.size());
         list.setSource(ctx.extractSource(parent));
 
         for (Element elem : elemList) {

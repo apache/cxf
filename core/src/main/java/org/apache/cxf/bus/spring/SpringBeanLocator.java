@@ -132,7 +132,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
 
     /** {@inheritDoc}*/
     public List<String> getBeanNamesOfType(Class<?> type) {
-        Set<String> s = new LinkedHashSet<String>(Arrays.asList(context.getBeanNamesForType(type,
+        Set<String> s = new LinkedHashSet<>(Arrays.asList(context.getBeanNamesForType(type,
                                                                                          false,
                                                                                          false)));
         s.removeAll(passThroughs);
@@ -142,11 +142,11 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
 
     /** {@inheritDoc}*/
     public <T> Collection<? extends T> getBeansOfType(Class<T> type) {
-        Set<String> s = new LinkedHashSet<String>(Arrays.asList(context.getBeanNamesForType(type,
+        Set<String> s = new LinkedHashSet<>(Arrays.asList(context.getBeanNamesForType(type,
                                                                                             false,
                                                                                             false)));
         s.removeAll(passThroughs);
-        List<T> lst = new LinkedList<T>();
+        List<T> lst = new LinkedList<>();
         for (String n : s) {
             lst.add(type.cast(context.getBean(n, type)));
         }
@@ -184,7 +184,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
     }
     private Class<?> findContextClass(Class<?> cls) {
         for (Class<?> c : cls.getInterfaces()) {
-            if (c.getName().equals("org.osgi.framework.BundleContext")) {
+            if ("org.osgi.framework.BundleContext".equals(c.getName())) {
                 return c;
             }
         }

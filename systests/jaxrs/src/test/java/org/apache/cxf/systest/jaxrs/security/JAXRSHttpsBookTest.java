@@ -33,12 +33,15 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.systest.jaxrs.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookHttpsServer.PORT;
@@ -112,10 +115,6 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testCustomVerbProxyFromSpringWildcard() throws Exception {
-        if (System.getProperty("java.version").startsWith("9")) {
-            //CXF-7270
-            return;
-        }
         ClassPathXmlApplicationContext ctx =
             new ClassPathXmlApplicationContext(new String[] {CLIENT_CONFIG_FILE3});
         Object bean = ctx.getBean("bookService.proxyFactory");

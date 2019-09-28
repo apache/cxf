@@ -22,14 +22,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import brave.http.HttpTracing;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
-
-import brave.http.HttpTracing;
 
 @NoJSR250Annotations
 public class BraveStopInterceptor extends AbstractBraveInterceptor {

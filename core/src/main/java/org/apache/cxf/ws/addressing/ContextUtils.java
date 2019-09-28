@@ -22,18 +22,11 @@ package org.apache.cxf.ws.addressing;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-
 import org.apache.cxf.Bus;
-import org.apache.cxf.common.jaxb.JAXBContextCache;
-import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
@@ -59,8 +52,7 @@ public final class ContextUtils {
     public static final ObjectFactory WSA_OBJECT_FACTORY = new ObjectFactory();
     public static final String ACTION = ContextUtils.class.getName() + ".ACTION";
 
-    private static final EndpointReferenceType NONE_ENDPOINT_REFERENCE =
-        EndpointReferenceUtils.getEndpointReference(Names.WSA_NONE_ADDRESS);
+    private static final EndpointReferenceType NONE_ENDPOINT_REFERENCE = new EndpointReferenceType();
 
     private static final Logger LOG = LogUtils.getL7dLogger(ContextUtils.class);
 
@@ -68,9 +60,6 @@ public final class ContextUtils {
      * Used to fabricate a Uniform Resource Name from a UUID string
      */
     private static final String URN_UUID = "urn:uuid:";
-
-    private static JAXBContext jaxbContext;
-    private static Set<Class<?>> jaxbContextClasses;
 
     /**
      * Used by MAPAggregator to cache bad MAP fault name
@@ -89,6 +78,11 @@ public final class ContextUtils {
      */
     private static final String PARTIAL_RESPONSE_SENT_PROPERTY =
         "org.apache.cxf.ws.addressing.partial.response.sent";
+
+    static {
+        NONE_ENDPOINT_REFERENCE.setAddress(new AttributedURIType());
+        NONE_ENDPOINT_REFERENCE.getAddress().setValue(Names.WSA_NONE_ADDRESS);
+    }
 
    /**
     * Prevents instantiation.
@@ -342,7 +336,7 @@ public final class ContextUtils {
     public static boolean hasEmptyAction(AddressingProperties maps) {
         boolean empty = maps.getAction() == null;
         if (maps.getAction() != null
-            && maps.getAction().getValue().length() == 0) {
+            && maps.getAction().getValue().isEmpty()) {
             maps.setAction(null);
             empty = false;
         }
@@ -514,41 +508,6 @@ public final class ContextUtils {
         Boolean ret = (Boolean)message.get(Message.ASYNC_POST_RESPONSE_DISPATCH);
         return ret != null && ret.booleanValue();
     }
-
-    /**
-     * Retrieve a JAXBContext for marshalling and unmarshalling JAXB generated
-     * types.
-     *
-     * @return a JAXBContext
-     */
-    public static JAXBContext getJAXBContext() throws JAXBException {
-        synchronized (ContextUtils.class) {
-            if (jaxbContext == null || jaxbContextClasses == null) {
-                Set<Class<?>> tmp = new HashSet<Class<?>>();
-                JAXBContextCache.addPackage(tmp, WSA_OBJECT_FACTORY.getClass().getPackage().getName(),
-                                            WSA_OBJECT_FACTORY.getClass().getClassLoader());
-                JAXBContextCache.scanPackages(tmp);
-                CachedContextAndSchemas ccs
-                    = JAXBContextCache.getCachedContextAndSchemas(tmp, null, null, null, false);
-                jaxbContextClasses = ccs.getClasses();
-                jaxbContext = ccs.getContext();
-            }
-        }
-        return jaxbContext;
-    }
-
-    /**
-     * Set the encapsulated JAXBContext (used by unit tests).
-     *
-     * @param ctx JAXBContext
-     */
-    public static void setJAXBContext(JAXBContext ctx) throws JAXBException {
-        synchronized (ContextUtils.class) {
-            jaxbContext = ctx;
-            jaxbContextClasses = new HashSet<Class<?>>();
-        }
-    }
-
 
     /**
      * @return a generated UUID

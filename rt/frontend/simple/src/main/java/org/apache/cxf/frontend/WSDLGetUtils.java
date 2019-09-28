@@ -53,7 +53,9 @@ import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.xml.sax.InputSource;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.catalog.OASISCatalogManagerHelper;
@@ -294,7 +296,7 @@ public class WSDLGetUtils {
                     base), e);
         }
 
-        boolean rewriteAllSoapAddress = MessageUtils.isTrue(message.getContextualProperty(AUTO_REWRITE_ADDRESS_ALL));
+        boolean rewriteAllSoapAddress = MessageUtils.getContextualBoolean(message, AUTO_REWRITE_ADDRESS_ALL, false);
         if (rewriteAllSoapAddress) {
             List<Element> portList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
                                                                          "http://schemas.xmlsoap.org/wsdl/",
@@ -305,8 +307,7 @@ public class WSDLGetUtils {
                 rewriteAddressProtocolHostPort(base, el, basePath, "http://schemas.xmlsoap.org/wsdl/soap12/");
             }
         }
-        Object rewriteSoapAddress = message.getContextualProperty(AUTO_REWRITE_ADDRESS);
-        if (rewriteSoapAddress == null || MessageUtils.isTrue(rewriteSoapAddress) || rewriteAllSoapAddress) {
+        if (MessageUtils.getContextualBoolean(message, AUTO_REWRITE_ADDRESS, true) || rewriteAllSoapAddress) {
             List<Element> serviceList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
                                                               "http://schemas.xmlsoap.org/wsdl/",
                                                               "service");
@@ -358,7 +359,7 @@ public class WSDLGetUtils {
                     sb.append("://").append(baseUrl.getHost());
                     int port = baseUrl.getPort();
                     if (port > 0) {
-                        sb.append(":").append(port);
+                        sb.append(':').append(port);
                     }
                     sb.append(locUri.getPath());
                     soapAddress.setAttribute("location", sb.toString());
@@ -482,11 +483,10 @@ public class WSDLGetUtils {
             if (name == null) {
                 setSoapAddressLocationOn(ports.iterator().next(), publishingUrl);
                 break; // only update the first port since we don't target any specific port
-            } else {
-                for (Port port : ports) {
-                    if (name.getLocalPart().equals(port.getName())) {
-                        setSoapAddressLocationOn(port, publishingUrl);
-                    }
+            }
+            for (Port port : ports) {
+                if (name.getLocalPart().equals(port.getName())) {
+                    setSoapAddressLocationOn(port, publishingUrl);
                 }
             }
         }

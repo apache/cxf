@@ -27,14 +27,18 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.wssec.examples.common.SecurityTestUtil;
 import org.apache.cxf.systest.wssec.examples.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * A set of tests for Username Tokens using policies defined in the OASIS spec:
@@ -73,12 +77,12 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
+    public static Collection<TestParam> data() {
 
-        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
-                                                {new TestParam(PORT, true)},
-                                                {new TestParam(STAX_PORT, false)},
-                                                {new TestParam(STAX_PORT, true)},
+        return Arrays.asList(new TestParam[] {new TestParam(PORT, false),
+                                              new TestParam(PORT, true),
+                                              new TestParam(STAX_PORT, false),
+                                              new TestParam(STAX_PORT, true),
         });
     }
 
@@ -98,8 +102,8 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = UsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -128,8 +132,8 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = UsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -158,8 +162,8 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = UsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -188,8 +192,8 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = UsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -222,8 +226,8 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = UsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -252,8 +256,8 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = UsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -282,8 +286,8 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = UsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);

@@ -188,9 +188,8 @@ public class Form implements TokenConsumer {
     public String getName() {
         if (element.hasAttribute("value")) {
             return element.getAttribute("value");
-        } else {
-            return "default";
         }
+        return "default";
 
     }
 

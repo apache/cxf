@@ -72,7 +72,7 @@ public class ProcessedClaim extends Claim {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder(128);
         builder.append("ProcessedClaim [");
         builder.append(super.toString());
         builder.append(", issuer=");
@@ -81,7 +81,7 @@ public class ProcessedClaim extends Claim {
         builder.append(originalIssuer);
         builder.append(", principal=");
         builder.append(principal);
-        builder.append("]");
+        builder.append(']');
         return builder.toString();
     }
 
@@ -128,7 +128,7 @@ public class ProcessedClaim extends Claim {
     }
 
     @Override
-    public ProcessedClaim clone() {
+    public ProcessedClaim clone() { //NOPMD
         super.clone(); // Checkstyle requires this call
         return new ProcessedClaim(this);
     }

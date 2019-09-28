@@ -37,15 +37,19 @@ import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.netty.server.NettyHttpDestination;
 import org.apache.cxf.transport.http.netty.server.NettyHttpServerEngine;
-
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionStoreException;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class ApplicationContextTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+
+public class ApplicationContextTest {
 
     private static final String S1 =
         ApplicationContextTest.class.getResource("/META-INF/cxf/cxf.xml").toString();
@@ -85,7 +89,6 @@ public class ApplicationContextTest extends Assert {
         //ctx.refresh();
         checkContext(ctx);
         ctx.close();
-        ctx.destroy();
     }
 
     @Test
@@ -97,7 +100,6 @@ public class ApplicationContextTest extends Assert {
             new String[] {S1, s4});
         checkContext(ctx);
         ctx.close();
-        ctx.destroy();
     }
     private void checkContext(TestApplicationContext ctx) throws Exception {
         ConfigurerImpl cfg = new ConfigurerImpl(ctx);
@@ -141,16 +143,16 @@ public class ApplicationContextTest extends Assert {
                 getEndpointInfo("sna", "foo", "https://localhost:9002"), bus);
 
         engine = (NettyHttpServerEngine)jd3.getEngine();
-        assertEquals(engine.getTlsServerParameters().getClientAuthentication().isWant(), true);
-        assertEquals(engine.getTlsServerParameters().getClientAuthentication().isRequired(), true);
+        assertTrue(engine.getTlsServerParameters().getClientAuthentication().isWant());
+        assertTrue(engine.getTlsServerParameters().getClientAuthentication().isRequired());
 
         NettyHttpDestination jd4 =
             (NettyHttpDestination)factory.getDestination(
                 getEndpointInfo("sna", "foo2", "https://localhost:9003"), bus);
 
         engine = (NettyHttpServerEngine)jd4.getEngine();
-        assertEquals(engine.getTlsServerParameters().getClientAuthentication().isWant(), false);
-        assertEquals(engine.getTlsServerParameters().getClientAuthentication().isRequired(), false);
+        assertFalse(engine.getTlsServerParameters().getClientAuthentication().isWant());
+        assertFalse(engine.getTlsServerParameters().getClientAuthentication().isRequired());
 
         /*NettyHttpDestination jd5 =
             (NettyHttpDestination)factory.getDestination(

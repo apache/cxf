@@ -57,7 +57,7 @@ public final class SparkUtils {
         });
     }
     public static Iterator<String> splitInputString(String x) {
-        List<String> list = new LinkedList<String>();
+        List<String> list = new LinkedList<>();
         for (String s : Arrays.asList(x.split(" "))) {
             s = s.trim();
             if (s.endsWith(":") || s.endsWith(",") || s.endsWith(";") || s.endsWith(".")) {
@@ -70,11 +70,11 @@ public final class SparkUtils {
         return list.iterator();
     }
     public static Iterator<String> splitInputStringWithId(String x) {
-        int index = x.indexOf(":");
+        int index = x.indexOf(':');
         String jobId = x.substring(0, index);
         x = x.substring(index + 1);
 
-        List<String> list = new LinkedList<String>();
+        List<String> list = new LinkedList<>();
         for (String s : Arrays.asList(x.split(" "))) {
             s = s.trim();
             if (s.endsWith(":") || s.endsWith(",") || s.endsWith(";") || s.endsWith(".")) {
@@ -99,7 +99,7 @@ public final class SparkUtils {
     }
     public static List<String> getStringsFromReader(BufferedReader reader) {
 
-        List<String> inputStrings = new LinkedList<String>();
+        List<String> inputStrings = new LinkedList<>();
         String userInput = null;
         try {
             while ((userInput = reader.readLine()) != null) {

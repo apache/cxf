@@ -30,6 +30,8 @@ import org.apache.cxf.helpers.IOUtils;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 
 
 public class JaxRsServletTest extends AbstractServletTest {

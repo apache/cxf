@@ -43,11 +43,15 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.util.DateUtil;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Some unit tests for creating JWT Tokens with lifetime
  */
-public class JWTProviderLifetimeTest extends org.junit.Assert {
+public class JWTProviderLifetimeTest {
 
     /**
      * Issue JWT token with a valid requested lifetime
@@ -71,13 +75,13 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         Lifetime lifetime = new Lifetime();
         lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
-        
+
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        
+
         long duration = Duration.between(providerResponse.getCreated(), providerResponse.getExpires()).getSeconds();
         assertEquals(requestedLifetime, duration);
 
@@ -105,7 +109,7 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         TokenProviderParameters providerParameters = createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE);
 
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         long duration = Duration.between(providerResponse.getCreated(), providerResponse.getExpires()).getSeconds();
@@ -117,8 +121,11 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
         assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getEpochSecond());
-    }
 
+        Instant now = Instant.now();
+        Long expiry = (Long)jwt.getClaim(JwtConstants.CLAIM_EXPIRY);
+        Instant.ofEpochSecond(expiry).isAfter(now);
+    }
 
     /**
      * Issue JWT token with a with a lifetime
@@ -144,7 +151,7 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         Lifetime lifetime = new Lifetime();
         lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
-        
+
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         try {
@@ -178,7 +185,7 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         Lifetime lifetime = new Lifetime();
         lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
-        
+
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         try {
@@ -216,11 +223,11 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         Lifetime lifetime = new Lifetime();
         lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
-        
+
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         long duration = Duration.between(providerResponse.getCreated(), providerResponse.getExpires()).getSeconds();
         assertEquals(maxLifetime, duration);
@@ -257,11 +264,11 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         Lifetime lifetime = new Lifetime();
         lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
-        
+
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         long duration = Duration.between(providerResponse.getCreated(), providerResponse.getExpires()).getSeconds();
         assertEquals(50, duration);
@@ -297,7 +304,7 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         Lifetime lifetime = new Lifetime();
         lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
-        
+
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         try {
@@ -311,7 +318,7 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         claimsProvider.setFutureTimeToLive(60L * 60L);
 
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
@@ -342,11 +349,11 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
 
         Lifetime lifetime = new Lifetime();
         lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
-        
+
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         long duration = Duration.between(providerResponse.getCreated(), providerResponse.getExpires()).getSeconds();
         assertEquals(claimsProvider.getLifetime(), duration);

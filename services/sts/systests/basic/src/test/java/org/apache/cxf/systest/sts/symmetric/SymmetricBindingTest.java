@@ -38,6 +38,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.jaxws.DispatchImpl;
@@ -49,12 +50,16 @@ import org.apache.cxf.systest.sts.deployment.StaxSTSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.trust.STSClient;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test the Symmetric binding. The CXF client gets a token from the STS by authenticating via a
@@ -113,17 +118,17 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
+    public static Collection<TestParam> data() {
 
-        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false, STSPORT2)},
-                                                {new TestParam(PORT, true, STSPORT2)},
-                                                {new TestParam(STAX_PORT, false, STSPORT2)},
-                                                {new TestParam(STAX_PORT, true, STSPORT2)},
+        return Arrays.asList(new TestParam[] {new TestParam(PORT, false, STSPORT2),
+                                              new TestParam(PORT, true, STSPORT2),
+                                              new TestParam(STAX_PORT, false, STSPORT2),
+                                              new TestParam(STAX_PORT, true, STSPORT2),
 
-                                                {new TestParam(PORT, false, STAX_STSPORT2)},
-                                                {new TestParam(PORT, true, STAX_STSPORT2)},
-                                                {new TestParam(STAX_PORT, false, STAX_STSPORT2)},
-                                                {new TestParam(STAX_PORT, true, STAX_STSPORT2)},
+                                              new TestParam(PORT, false, STAX_STSPORT2),
+                                              new TestParam(PORT, true, STAX_STSPORT2),
+                                              new TestParam(STAX_PORT, false, STAX_STSPORT2),
+                                              new TestParam(STAX_PORT, true, STAX_STSPORT2),
         });
     }
 
@@ -139,8 +144,8 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL busFile = SymmetricBindingTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -169,12 +174,46 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL busFile = SymmetricBindingTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML2Port");
+        DoubleItPortType symmetricSaml2Port =
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(symmetricSaml2Port, test.getPort());
+
+        TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml2Port, test.getStsPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(symmetricSaml2Port);
+        }
+
+        doubleIt(symmetricSaml2Port, 30);
+        TokenTestUtils.verifyToken(symmetricSaml2Port);
+
+        ((java.io.Closeable)symmetricSaml2Port).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
+    public void testUsernameTokenSAML2ProtectTokens() throws Exception {
+
+        if (test.isStreaming()) {
+            // We don't support ProtectTokens + the streaming clients.
+            return;
+        }
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SymmetricBindingTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML2ProtectTokensPort");
         DoubleItPortType symmetricSaml2Port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(symmetricSaml2Port, test.getPort());
@@ -198,8 +237,8 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL busFile = SymmetricBindingTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -227,8 +266,8 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL busFile = SymmetricBindingTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -256,8 +295,8 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL busFile = SymmetricBindingTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -297,8 +336,8 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL busFile = SymmetricBindingTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -339,7 +378,7 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document requestDoc = db.newDocument();
         Element root = requestDoc.createElementNS("http://www.example.org/schema/DoubleIt", "ns2:DoubleIt");
-        root.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:ns2", "http://www.example.org/schema/DoubleIt");
+        root.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:ns2", "http://www.example.org/schema/DoubleIt");
         Element number = requestDoc.createElementNS(null, "numberToDouble");
         number.setTextContent("25");
         root.appendChild(number);

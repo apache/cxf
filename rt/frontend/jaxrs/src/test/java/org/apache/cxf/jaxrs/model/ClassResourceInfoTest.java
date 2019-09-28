@@ -47,10 +47,16 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ClassResourceInfoTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+public class ClassResourceInfoTest {
 
     @Path("/bar")
     @Produces("test/bar")
@@ -136,7 +142,7 @@ public class ClassResourceInfoTest extends Assert {
     public void testGetHttpContexts() {
         ClassResourceInfo c = new ClassResourceInfo(TestClass.class, true);
         List<Field> fields = c.getContextFields();
-        Set<Class<?>> clses = new HashSet<Class<?>>();
+        Set<Class<?>> clses = new HashSet<>();
         for (Field f : fields) {
             clses.add(f.getType());
         }
@@ -266,7 +272,7 @@ public class ClassResourceInfoTest extends Assert {
     public class TestApplication extends Application {
         @Override
         public Set<Class<?>> getClasses() {
-            Set<Class<?>> classes = new HashSet<Class<?>>();
+            Set<Class<?>> classes = new HashSet<>();
             classes.add(TestClass.class);
             return classes;
         }

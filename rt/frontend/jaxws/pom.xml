@@ -23,20 +23,25 @@
     <packaging>bundle</packaging>
     <name>Apache CXF Runtime JAX-WS Frontend</name>
     <description>Apache CXF Runtime JAX-WS Frontend</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.frontend.jaxws</cxf.module.name>
         <cxf.osgi.import>
+            javax.xml.soap;version="${cxf.osgi.saaj.version}",
+            javax.activation;version="${cxf.osgi.javax.activation.version}",
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
             javax.xml.ws.spi.http;version="${cxf.osgi.javax.xml.ws.version}";resolution:="optional",
             javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
-            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
+            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
+            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
+            javax.annotation*;version="${cxf.osgi.javax.annotation.version}"
         </cxf.osgi.import>
         <!-- keep in sync with services exported in activator -->
         <cxf.export.service>
@@ -182,8 +187,8 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-javamail_1.4_spec</artifactId>
+            <groupId>org.apache.geronimo.javamail</groupId>
+            <artifactId>geronimo-javamail_1.4_mail</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

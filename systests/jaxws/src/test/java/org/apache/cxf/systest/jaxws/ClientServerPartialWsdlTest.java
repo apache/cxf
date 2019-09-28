@@ -23,10 +23,14 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.dynamic.DynamicClientFactory;
-
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ClientServerPartialWsdlTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(ServerPartialWsdl.class);

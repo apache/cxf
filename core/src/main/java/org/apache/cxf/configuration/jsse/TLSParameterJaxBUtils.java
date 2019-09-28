@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -163,10 +164,20 @@ public final class TLSParameterJaxBUtils {
         } else if (kst.isSetUrl()) {
             keyStore.load(new URL(kst.getUrl()).openStream(), password);
         } else {
-            String loc = SSLUtils.getKeystore(null, LOG);
+            String loc = null;
+            if (trustStore) {
+                loc = SSLUtils.getTruststore(null, LOG);
+            } else {
+                loc = SSLUtils.getKeystore(null, LOG);
+            }
             if (loc != null) {
                 try (InputStream ins = Files.newInputStream(Paths.get(loc))) {
                     keyStore.load(ins, password);
+                } catch (NoSuchFileException ex) {
+                    // Fall back to load the location as a stream
+                    try (InputStream ins = getResourceAsStream(loc)) {
+                        keyStore.load(ins, password);
+                    }
                 }
             }
         }
@@ -205,8 +216,7 @@ public final class TLSParameterJaxBUtils {
         if (pst.isSetUrl()) {
             return createTrustStore(new URL(pst.getUrl()).openStream(), type);
         }
-        // TODO error?
-        return null;
+        throw new IllegalArgumentException("Could not create KeyStore based on information in CertStoreType");
     }
 
     private static InputStream getResourceAsStream(String resource) {
@@ -297,7 +307,7 @@ public final class TLSParameterJaxBUtils {
 
         return fac.getKeyManagers();
     }
-    
+
     /**
      * This method converts the JAXB KeyManagersType into a list of
      * JSSE KeyManagers.
@@ -318,8 +328,8 @@ public final class TLSParameterJaxBUtils {
                      kmc.isSetProvider()
                      ? KeyManagerFactory.getInstance(alg, kmc.getProvider())
                      : KeyManagerFactory.getInstance(alg);
-                     
-        try {             
+
+        try {
             fac.init(keyStore, keyPass);
 
             return fac.getKeyManagers();
@@ -386,7 +396,7 @@ public final class TLSParameterJaxBUtils {
                 ? getKeyStore(tmc.getKeyStore(), true)
                 : (tmc.isSetCertStore()
                     ? getKeyStore(tmc.getCertStore())
-                    : (KeyStore) null);
+                    : null);
 
         String alg = tmc.isSetFactoryAlgorithm()
                      ? tmc.getFactoryAlgorithm()

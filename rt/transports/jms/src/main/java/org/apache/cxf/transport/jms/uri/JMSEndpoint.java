@@ -87,6 +87,9 @@ public class JMSEndpoint {
     private String username;
     private int concurrentConsumers = 1;
     private String messageSelector;
+    private int retryInterval = 5000;
+    private boolean oneSessionPerConnection;
+    private boolean ignoreTimeoutException;
 
     /**
      * @param uri
@@ -209,15 +212,15 @@ public class JMSEndpoint {
         } else {
             requestUri.append(jmsVariant);
         }
-        requestUri.append(":" + destinationName);
+        requestUri.append(':').append(destinationName);
         boolean first = true;
         for (Map.Entry<String, String> entry : parameters.entrySet()) {
             String value = entry.getValue();
             if (first) {
-                requestUri.append("?" + entry.getKey() + "=" + value);
+                requestUri.append('?').append(entry.getKey()).append('=').append(value);
                 first = false;
             } else {
-                requestUri.append("&" + entry.getKey() + "=" + value);
+                requestUri.append('&').append(entry.getKey()).append('=').append(value);
             }
         }
         return requestUri.toString();
@@ -487,5 +490,35 @@ public class JMSEndpoint {
     }
 
 
+
+    public int getRetryInterval() {
+        return retryInterval;
+    }
+    public void setRetryInterval(int retryInterval) {
+        this.retryInterval = retryInterval;
+    }
+    public void setRetryInterval(String retryInterval) {
+        this.retryInterval = Integer.parseInt(retryInterval);
+    }
+
+    public boolean isOneSessionPerConnection() {
+        return oneSessionPerConnection;
+    }
+
+    public void setOneSessionPerConnection(String oneSessionPerConnection) {
+        this.oneSessionPerConnection = Boolean.parseBoolean(oneSessionPerConnection);
+    }
+
+    public void setOneSessionPerConnection(boolean oneSessionPerConnection) {
+        this.oneSessionPerConnection = oneSessionPerConnection;
+    }
+
+    public boolean isIgnoreTimeoutException() {
+        return ignoreTimeoutException;
+    }
+
+    public void setIgnoreTimeoutException(boolean ignoreTimeoutException) {
+        this.ignoreTimeoutException = ignoreTimeoutException;
+    }
 
 }

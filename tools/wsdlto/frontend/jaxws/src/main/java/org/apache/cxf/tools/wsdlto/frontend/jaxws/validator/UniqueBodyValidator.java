@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.i18n.Message;
@@ -92,15 +93,14 @@ public class UniqueBodyValidator extends ServiceValidator {
                                               endpoint.getName(), op.getName(), opName, mName);
                     addErrorMessage(msg.toString());
                     return false;
-                } else {
-                    uniqueNames.put(mName, op.getName());
-                    if (action != null) {
-                        if (opActions == null) {
-                            opActions = new HashSet<>();
-                            actions.put(mName, opActions);
-                        }
-                        opActions.add(action);
+                }
+                uniqueNames.put(mName, op.getName());
+                if (action != null) {
+                    if (opActions == null) {
+                        opActions = new HashSet<>();
+                        actions.put(mName, opActions);
                     }
+                    opActions.add(action);
                 }
             }
 

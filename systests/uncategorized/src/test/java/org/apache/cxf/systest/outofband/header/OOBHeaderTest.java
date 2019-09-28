@@ -23,7 +23,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -42,17 +41,20 @@ import org.w3c.dom.Node;
 import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.jaxb.JAXBDataBinding;
-
 import org.apache.cxf.outofband.header.ObjectFactory;
 import org.apache.cxf.outofband.header.OutofBandHeader;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-
 import org.apache.hello_world_doc_lit_bare.PutLastTradedPricePortType;
 import org.apache.hello_world_doc_lit_bare.SOAPService;
 import org.apache.hello_world_doc_lit_bare.types.TradePriceData;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class OOBHeaderTest extends AbstractBusClientServerTestBase {
     public static final String PORT = Server.PORT;
@@ -123,7 +125,7 @@ public class OOBHeaderTest extends AbstractBusClientServerTestBase {
             assertTrue("HeaderHolder list expected to conain 1 object received " + oobHdr.size(),
                     oobHdr.size() == 1);
 
-            if (oobHdr != null & oobHdr instanceof List) {
+            if (oobHdr != null) {
                 Iterator<?> iter = oobHdr.iterator();
                 while (iter.hasNext()) {
                     Object hdr = iter.next();
@@ -222,7 +224,7 @@ public class OOBHeaderTest extends AbstractBusClientServerTestBase {
         ((BindingProvider)putLastTradedPrice).getRequestContext()
             .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, address);
 
-        Holder<TradePriceData> holder = new Holder<TradePriceData>(priceData);
+        Holder<TradePriceData> holder = new Holder<>(priceData);
         try {
             addOutOfBoundHeader(putLastTradedPrice, invalid, mu);
             putLastTradedPrice.sayHi(holder);

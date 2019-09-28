@@ -53,21 +53,21 @@ public class StatsRestServiceImpl {
             public void run() {
                 try {
                     final Builder builder = sse.newEventBuilder();
-                    sink.send(createStatsEvent(builder.name("stats"), 1));
+                    sink.send(createStatsEvent(builder, 1));
                     Thread.sleep(1000);
-                    sink.send(createStatsEvent(builder.name("stats"), 2));
+                    sink.send(createStatsEvent(builder, 2));
                     Thread.sleep(1000);
-                    sink.send(createStatsEvent(builder.name("stats"), 3));
+                    sink.send(createStatsEvent(builder, 3));
                     Thread.sleep(1000);
-                    sink.send(createStatsEvent(builder.name("stats"), 4));
+                    sink.send(createStatsEvent(builder, 4));
                     Thread.sleep(1000);
-                    sink.send(createStatsEvent(builder.name("stats"), 5));
+                    sink.send(createStatsEvent(builder, 5));
                     Thread.sleep(1000);
-                    sink.send(createStatsEvent(builder.name("stats"), 6));
+                    sink.send(createStatsEvent(builder, 6));
                     Thread.sleep(1000);
-                    sink.send(createStatsEvent(builder.name("stats"), 7));
+                    sink.send(createStatsEvent(builder, 7));
                     Thread.sleep(1000);
-                    sink.send(createStatsEvent(builder.name("stats"), 8));
+                    sink.send(createStatsEvent(builder, 8));
                     sink.close();
                 } catch (final Exception e) {
                     e.printStackTrace();

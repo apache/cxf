@@ -19,19 +19,14 @@
 
 package org.apache.cxf.transport.jms;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
-
+import javax.jms.Connection;
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
+import javax.jms.InvalidClientIDException;
 import javax.jms.JMSException;
 import javax.jms.Queue;
 import javax.jms.Topic;
 
-import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -41,8 +36,15 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.MultiplexDestination;
+import org.apache.cxf.transport.jms.util.ResourceCloser;
+
 import org.junit.Ignore;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class JMSDestinationTest extends AbstractJMSTester {
 
@@ -58,23 +60,43 @@ public class JMSDestinationTest extends AbstractJMSTester {
 
     @Test
     public void testDurableSubscriber() throws Exception {
-        destMessage = null;
         EndpointInfo ei = setupServiceInfo("HelloWorldPubSubService", "HelloWorldPubSubPort");
         JMSConduit conduit = setupJMSConduitWithObserver(ei);
-        Message outMessage = new MessageImpl();
-        setupMessageHeader(outMessage);
+        Message outMessage = createMessage();
         JMSDestination destination = setupJMSDestination(ei);
         destination.setMessageObserver(createMessageObserver());
         // The JMSBroker (ActiveMQ 5.x) need to take some time to setup the DurableSubscriber
-        Thread.sleep(500);
+        Thread.sleep(500L);
         sendOneWayMessage(conduit, outMessage);
-        waitForReceiveDestMessage();
+        Message destMessage = waitForReceiveDestMessage();
 
-        assertTrue("The destiantion should have got the message ", destMessage != null);
+        assertNotNull("The destiantion should have got the message ", destMessage);
         verifyReceivedMessage(destMessage);
         verifyHeaders(destMessage, outMessage);
         conduit.close();
         destination.shutdown();
+    }
+
+    @Test(expected = InvalidClientIDException.class)
+    public void testDurableInvalidClientId() throws Throwable {
+        Connection con = cf1.createConnection();
+        JMSDestination destination = null;
+        try {
+            con.setClientID("testClient");
+            con.start();
+            EndpointInfo ei = setupServiceInfo("HelloWorldPubSubService", "HelloWorldPubSubPort");
+            JMSConfiguration jmsConfig = JMSConfigFactory.createFromEndpointInfo(bus, ei, null);
+            jmsConfig.setDurableSubscriptionClientId("testClient");
+            jmsConfig.setDurableSubscriptionName("testsub");
+            jmsConfig.setConnectionFactory(cf);
+            destination = new JMSDestination(bus, ei, jmsConfig);
+            destination.setMessageObserver(createMessageObserver());
+        } catch (RuntimeException e) {
+            throw e.getCause();
+        } finally {
+            ResourceCloser.close(con);
+            destination.shutdown();
+        }
     }
 
     @Test
@@ -84,63 +106,28 @@ public class JMSDestinationTest extends AbstractJMSTester {
         destination.setMessageObserver(createMessageObserver());
 
         JMSConduit conduit = setupJMSConduitWithObserver(ei);
-        Message outMessage = new MessageImpl();
-        setupMessageHeader(outMessage);
+        Message outMessage = createMessage();
 
         sendOneWayMessage(conduit, outMessage);
         // wait for the message to be get from the destination
-        waitForReceiveDestMessage();
+        Message destMessage = waitForReceiveDestMessage();
         // just verify the Destination inMessage
-        assertTrue("The destiantion should have got the message ", destMessage != null);
+        assertNotNull("The destiantion should have got the message ", destMessage);
         verifyReceivedMessage(destMessage);
         verifyHeaders(destMessage, outMessage);
         conduit.close();
         destination.shutdown();
     }
 
-    private void setupMessageHeader(Message outMessage, String correlationId, String replyTo) {
+    private static void setupMessageHeader(Message outMessage, String correlationId, String replyTo) {
         JMSMessageHeadersType header = new JMSMessageHeadersType();
         header.setJMSCorrelationID(correlationId);
         header.setJMSDeliveryMode(DeliveryMode.PERSISTENT);
         header.setJMSPriority(1);
-        header.setTimeToLive(1000);
-        header.setJMSReplyTo(replyTo != null ? replyTo : null);
+        header.setTimeToLive(1000L);
+        header.setJMSReplyTo(replyTo);
         outMessage.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, header);
         outMessage.put(Message.ENCODING, "US-ASCII");
-    }
-
-    private void setupMessageHeader(Message outMessage) {
-        setupMessageHeader(outMessage, "Destination test", null);
-    }
-
-    private void setupMessageHeader(Message outMessage, String correlationId) {
-        setupMessageHeader(outMessage, correlationId, null);
-    }
-
-    private void verifyReceivedMessage(Message message) {
-        ByteArrayInputStream bis = (ByteArrayInputStream)message.getContent(InputStream.class);
-        String response = "<not found>";
-        if (bis != null) {
-            byte bytes[] = new byte[bis.available()];
-            try {
-                bis.read(bytes);
-            } catch (IOException ex) {
-                assertFalse("Read the Destination recieved Message error ", false);
-                ex.printStackTrace();
-            }
-            response = IOUtils.newStringFromBytes(bytes);
-        } else {
-            StringReader reader = (StringReader)message.getContent(Reader.class);
-            char buffer[] = new char[5000];
-            try {
-                int i = reader.read(buffer);
-                response = new String(buffer, 0, i);
-            } catch (IOException e) {
-                assertFalse("Read the Destination recieved Message error ", false);
-                e.printStackTrace();
-            }
-        }
-        assertEquals("The response content should be equal", AbstractJMSTester.MESSAGE_CONTENT, response);
     }
 
     private void verifyRequestResponseHeaders(Message msgIn, Message msgOut) {
@@ -155,27 +142,6 @@ public class JMSDestinationTest extends AbstractJMSTester {
             .get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
 
         verifyJmsHeaderEquality(outHeader, inHeader);
-
-    }
-
-    private void verifyHeaders(Message msgIn, Message msgOut) {
-        JMSMessageHeadersType outHeader = (JMSMessageHeadersType)msgOut
-            .get(JMSConstants.JMS_CLIENT_REQUEST_HEADERS);
-
-        JMSMessageHeadersType inHeader = (JMSMessageHeadersType)msgIn
-            .get(JMSConstants.JMS_SERVER_REQUEST_HEADERS);
-
-        verifyJmsHeaderEquality(outHeader, inHeader);
-
-    }
-
-    private void verifyJmsHeaderEquality(JMSMessageHeadersType outHeader, JMSMessageHeadersType inHeader) {
-        assertEquals("The inMessage and outMessage JMS Header's JMSPriority should be equals", outHeader
-            .getJMSPriority(), inHeader.getJMSPriority());
-        assertEquals("The inMessage and outMessage JMS Header's JMSDeliveryMode should be equals", outHeader
-                     .getJMSDeliveryMode(), inHeader.getJMSDeliveryMode());
-        assertEquals("The inMessage and outMessage JMS Header's JMSType should be equals", outHeader
-            .getJMSType(), inHeader.getJMSType());
     }
 
     @Test
@@ -200,8 +166,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         JMSConduit conduit = setupJMSConduitWithObserver(ei);
         conduit.getJmsConfig().setCreateSecurityContext(createSecurityContext);
 
-        final Message outMessage = new MessageImpl();
-        setupMessageHeader(outMessage, null);
+        final Message outMessage = createMessage();
         final JMSDestination destination = setupJMSDestination(ei);
 
 
@@ -230,19 +195,17 @@ public class JMSDestinationTest extends AbstractJMSTester {
         // wait for the message to be got from the destination,
         // create the thread to handler the Destination incoming message
 
-        waitForReceiveInMessage();
-        verifyReceivedMessage(inMessage);
+        verifyReceivedMessage(waitForReceiveInMessage());
         // wait for a while for the jms session recycling
 
-        inMessage = null;
         // Send a second message to check for an issue
         // Where the session was closed the second time
         sendMessageSync(conduit, outMessage);
-        waitForReceiveInMessage();
+        Message inMessage = waitForReceiveInMessage();
         verifyReceivedMessage(inMessage);
 
         // wait for a while for the jms session recycling
-        Thread.sleep(1000);
+//        Thread.sleep(1000L);
         conduit.close();
         destination.shutdown();
 
@@ -256,8 +219,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
 
         // set up the conduit send to be true
         JMSConduit conduit = setupJMSConduitWithObserver(ei);
-        final Message outMessage = new MessageImpl();
-        setupMessageHeader(outMessage, null);
+        final Message outMessage = createMessage();
 
         JMSMessageHeadersType headers = (JMSMessageHeadersType)outMessage
             .get(JMSConstants.JMS_CLIENT_REQUEST_HEADERS);
@@ -292,7 +254,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         // wait for the message to be got from the destination,
         // create the thread to handler the Destination incoming message
 
-        waitForReceiveInMessage();
+        Message inMessage = waitForReceiveInMessage();
         verifyReceivedMessage(inMessage);
 
         verifyRequestResponseHeaders(inMessage, outMessage);
@@ -303,7 +265,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         // TODO we need to check the SOAP JMS transport properties here
 
         // wait for a while for the jms session recycling
-        Thread.sleep(1000);
+//        Thread.sleep(1000L);
         conduit.close();
         destination.shutdown();
     }
@@ -338,10 +300,9 @@ public class JMSDestinationTest extends AbstractJMSTester {
         destination.setMessageObserver(createMessageObserver());
         // set up the conduit send to be true
         JMSConduit conduit = setupJMSConduitWithObserver(ei);
-        final Message outMessage = new MessageImpl();
-        setupMessageHeader(outMessage, null);
+        final Message outMessage = createMessage();
         sendOneWayMessage(conduit, outMessage);
-        waitForReceiveDestMessage();
+        Message destMessage = waitForReceiveDestMessage();
         SecurityContext securityContext = destMessage.get(SecurityContext.class);
 
         conduit.close();
@@ -357,30 +318,26 @@ public class JMSDestinationTest extends AbstractJMSTester {
         /* 1. Test that replyTo destination set in WSDL is NOT used
          * in spec compliant mode */
 
-        destMessage = null;
         EndpointInfo ei = setupServiceInfo(
                          "HWStaticReplyQBinMsgService", "HWStaticReplyQBinMsgPort");
         JMSConduit conduit = setupJMSConduitWithObserver(ei);
-        Message outMessage = new MessageImpl();
-        setupMessageHeader(outMessage);
+        Message outMessage = createMessage();
         JMSDestination destination = setupJMSDestination(ei);
         destination.setMessageObserver(createMessageObserver());
         sendOneWayMessage(conduit, outMessage);
-        waitForReceiveDestMessage();
+        Message destMessage = waitForReceiveDestMessage();
         // just verify the Destination inMessage
-        assertTrue("The destination should have got the message ", destMessage != null);
+        assertNotNull("The destination should have got the message ", destMessage);
         verifyReplyToNotSet(destMessage);
-        destMessage = null;
 
         /* 2. Test that replyTo destination set in WSDL IS used
          * in spec non-compliant mode */
 
         sendOneWayMessage(conduit, outMessage);
-        waitForReceiveDestMessage();
-        assertTrue("The destination should have got the message ", destMessage != null);
+        destMessage = waitForReceiveDestMessage();
+        assertNotNull("The destination should have got the message ", destMessage);
         String exName = getQueueName(conduit.getJmsConfig().getReplyDestination());
         verifyReplyToSet(destMessage, Queue.class, exName);
-        destMessage = null;
 
         /* 3. Test that replyTo destination provided via invocation context
          * overrides the value set in WSDL and IS used in spec non-compliant mode */
@@ -389,34 +346,31 @@ public class JMSDestinationTest extends AbstractJMSTester {
         exName += ".context";
         setupMessageHeader(outMessage, "cidValue", contextReplyTo);
         sendOneWayMessage(conduit, outMessage);
-        waitForReceiveDestMessage();
-        assertTrue("The destiantion should have got the message ", destMessage != null);
+        destMessage = waitForReceiveDestMessage();
+        assertNotNull("The destiantion should have got the message ", destMessage);
         verifyReplyToSet(destMessage, Queue.class, exName);
-        destMessage = null;
 
         /* 4. Test that replyTo destination provided via invocation context
          * and the value set in WSDL are NOT used in spec non-compliant mode
          * when JMSConstants.JMS_SET_REPLY_TO == false */
 
-        setupMessageHeader(outMessage);
+        setupMessageHeader(outMessage, null, null);
         outMessage.put(JMSConstants.JMS_SET_REPLY_TO, Boolean.FALSE);
         sendOneWayMessage(conduit, outMessage);
-        waitForReceiveDestMessage();
-        assertTrue("The destiantion should have got the message ", destMessage != null);
+        destMessage = waitForReceiveDestMessage();
+        assertNotNull("The destiantion should have got the message ", destMessage);
         verifyReplyToNotSet(destMessage);
-        destMessage = null;
 
         /* 5. Test that replyTo destination set in WSDL IS used in spec non-compliant
          * mode when JMSConstants.JMS_SET_REPLY_TO == true */
 
-        setupMessageHeader(outMessage);
+        setupMessageHeader(outMessage, null, null);
         outMessage.put(JMSConstants.JMS_SET_REPLY_TO, Boolean.TRUE);
         sendOneWayMessage(conduit, outMessage);
-        waitForReceiveDestMessage();
-        assertTrue("The destiantion should have got the message ", destMessage != null);
+        destMessage = waitForReceiveDestMessage();
+        assertNotNull("The destiantion should have got the message ", destMessage);
         exName = getQueueName(conduit.getJmsConfig().getReplyDestination());
         verifyReplyToSet(destMessage, Queue.class, exName);
-        destMessage = null;
 
         conduit.close();
         destination.shutdown();
@@ -440,9 +394,8 @@ public class JMSDestinationTest extends AbstractJMSTester {
     private String getDestinationName(Destination dest) throws JMSException {
         if (dest instanceof Queue) {
             return ((Queue)dest).getQueueName();
-        } else {
-            return ((Topic)dest).getTopicName();
         }
+        return ((Topic)dest).getTopicName();
     }
 
     protected void verifyReplyToSet(Message cxfMsg,

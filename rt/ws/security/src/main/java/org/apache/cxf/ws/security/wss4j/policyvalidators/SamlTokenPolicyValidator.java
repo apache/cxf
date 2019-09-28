@@ -24,9 +24,11 @@ import java.util.Collection;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
@@ -77,6 +79,14 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator {
                 continue;
             }
 
+            String valSAMLSubjectConf =
+                (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION,
+                                                               parameters.getMessage());
+            boolean validateSAMLSubjectConf = true;
+            if (valSAMLSubjectConf != null) {
+                validateSAMLSubjectConf = Boolean.parseBoolean(valSAMLSubjectConf);
+            }
+
             // All of the received SAML Assertions must conform to the policy
             for (WSSecurityEngineResult result : parameters.getSamlResults()) {
                 SamlAssertionWrapper assertionWrapper =
@@ -86,19 +96,23 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator {
                     ai.setNotAsserted("Wrong SAML Version");
                     continue;
                 }
-                TLSSessionInfo tlsInfo = parameters.getMessage().get(TLSSessionInfo.class);
-                Certificate[] tlsCerts = null;
-                if (tlsInfo != null) {
-                    tlsCerts = tlsInfo.getPeerCertificates();
-                }
-                if (!checkHolderOfKey(assertionWrapper, parameters.getSignedResults(), tlsCerts)) {
-                    ai.setNotAsserted("Assertion fails holder-of-key requirements");
-                    continue;
-                }
-                if (!DOMSAMLUtil.checkSenderVouches(assertionWrapper, tlsCerts, parameters.getSoapBody(),
-                                                    parameters.getSignedResults())) {
-                    ai.setNotAsserted("Assertion fails sender-vouches requirements");
-                    continue;
+
+                if (validateSAMLSubjectConf) {
+                    TLSSessionInfo tlsInfo = parameters.getMessage().get(TLSSessionInfo.class);
+                    Certificate[] tlsCerts = null;
+                    if (tlsInfo != null) {
+                        tlsCerts = tlsInfo.getPeerCertificates();
+                    }
+                    if (!checkHolderOfKey(assertionWrapper, parameters.getSignedResults(), tlsCerts)) {
+                        ai.setNotAsserted("Assertion fails holder-of-key requirements");
+                        continue;
+                    }
+                    if (parameters.getSoapBody() == null
+                        || !DOMSAMLUtil.checkSenderVouches(assertionWrapper, tlsCerts, parameters.getSoapBody(),
+                                                        parameters.getSignedResults())) {
+                        ai.setNotAsserted("Assertion fails sender-vouches requirements");
+                        continue;
+                    }
                 }
                 /*
                     if (!checkIssuerName(samlToken, assertionWrapper)) {

@@ -57,13 +57,14 @@ import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaSimpleTypeRestriction;
 import org.apache.ws.commons.schema.utils.NamespaceMap;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  *
  */
-public class ImportRepairTest extends Assert {
+public class ImportRepairTest {
 
     static boolean dumpSchemas;
 
@@ -206,7 +207,7 @@ public class ImportRepairTest extends Assert {
             name = name.replace("xs.LS", "impl.xs.util.LS");
             Class<?> c = Class.forName(name);
             Object inputList = c.getConstructor(LSInput[].class, Integer.TYPE)
-            .newInstance(inputs.toArray(new LSInput[inputs.size()]), inputs.size());
+            .newInstance(inputs.toArray(new LSInput[0]), inputs.size());
 
             findMethod(schemaLoader, "loadInputList").invoke(schemaLoader, inputList);
         } catch (InvocationTargetException ite) {

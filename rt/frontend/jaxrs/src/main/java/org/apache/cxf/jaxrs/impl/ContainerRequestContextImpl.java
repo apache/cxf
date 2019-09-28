@@ -68,10 +68,6 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
 
     @Override
     public boolean hasEntity() {
-        InputStream is = getEntityStream();
-        if (is == null) {
-            return false;
-        }
         // Is Content-Length is explicitly set to 0 ?
         if (HttpUtils.isPayloadEmpty(getHeaders())) {
             return false;
@@ -103,13 +99,12 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
             if (!requestUriString.startsWith(baseUriString)) {
                 setRequestUri(requestUri, URI.create("/"));
                 return;
-            } else {
-                requestUriString = requestUriString.substring(baseUriString.length());
-                if (requestUriString.isEmpty()) {
-                    requestUriString = "/";
-                }
-                requestUri = URI.create(requestUriString);
             }
+            requestUriString = requestUriString.substring(baseUriString.length());
+            if (requestUriString.isEmpty()) {
+                requestUriString = "/";
+            }
+            requestUri = URI.create(requestUriString);
 
         }
         doSetRequestUri(requestUri);

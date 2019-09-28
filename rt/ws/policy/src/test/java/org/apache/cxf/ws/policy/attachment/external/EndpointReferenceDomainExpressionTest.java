@@ -26,16 +26,21 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  */
-public class EndpointReferenceDomainExpressionTest extends Assert {
+public class EndpointReferenceDomainExpressionTest {
 
     private IMocksControl control;
 
@@ -65,10 +70,10 @@ public class EndpointReferenceDomainExpressionTest extends Assert {
         bmi = control.createMock(BindingMessageInfo.class);
         bfi = control.createMock(BindingFaultInfo.class);
 
-        assertTrue(!eprde.appliesTo(si));
-        assertTrue(!eprde.appliesTo(boi));
-        assertTrue(!eprde.appliesTo(bmi));
-        assertTrue(!eprde.appliesTo(bfi));
+        assertFalse(eprde.appliesTo(si));
+        assertFalse(eprde.appliesTo(boi));
+        assertFalse(eprde.appliesTo(bmi));
+        assertFalse(eprde.appliesTo(bfi));
 
         EndpointInfo ei = control.createMock(EndpointInfo.class);
         EasyMock.expect(ei.getAddress()).andReturn("http://localhost:8080/GreeterPort");
@@ -76,7 +81,7 @@ public class EndpointReferenceDomainExpressionTest extends Assert {
         EasyMock.expect(epr.getAddress()).andReturn(auri);
         EasyMock.expect(auri.getValue()).andReturn("http://localhost:8080/Greeter");
         control.replay();
-        assertTrue(!eprde.appliesTo(ei));
+        assertFalse(eprde.appliesTo(ei));
         control.verify();
 
         control.reset();

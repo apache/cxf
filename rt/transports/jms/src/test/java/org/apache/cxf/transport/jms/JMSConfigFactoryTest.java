@@ -30,6 +30,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.jms.uri.JMSEndpoint;
 import org.apache.cxf.transport.jms.uri.MyBeanLocator;
 import org.apache.geronimo.transaction.manager.GeronimoTransactionManager;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -38,7 +39,7 @@ public class JMSConfigFactoryTest extends AbstractJMSTester {
     @Test
     public void testUsernameAndPassword() throws Exception {
         EndpointInfo ei = setupServiceInfo("HelloWorldService", "HelloWorldPort");
-        JMSConfiguration config = JMSConfigFactory.createFromEndpointInfo(bus, ei, target);
+        JMSConfiguration config = JMSConfigFactory.createFromEndpointInfo(bus, ei, null);
         Assert.assertEquals("User name does not match.", "testUser", config.getUserName());
         Assert.assertEquals("Password does not match.", "testPassword", config.getPassword());
     }
@@ -91,7 +92,7 @@ public class JMSConfigFactoryTest extends AbstractJMSTester {
     @Test
     public void testMessageSelectorIsSet() {
         EndpointInfo ei = setupServiceInfo("HelloWorldSelectorService", "HelloWorldPort");
-        JMSConfiguration config = JMSConfigFactory.createFromEndpointInfo(bus, ei, target);
+        JMSConfiguration config = JMSConfigFactory.createFromEndpointInfo(bus, ei, null);
         Assert.assertEquals("customJMSAttribute=helloWorld", config.getMessageSelector());
     }
 }

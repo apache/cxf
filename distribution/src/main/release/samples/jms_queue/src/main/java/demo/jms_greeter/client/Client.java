@@ -86,7 +86,7 @@ public final class Client {
             requestHeader.putProperty("Test.Prop", "mustReturn");
             requestContext.put("org.apache.cxf.jms.client.request.headers", requestHeader);
             //To override the default receive timeout.
-            requestContext.put("org.apache.cxf.jms.client.timeout", new Long(1000));
+            requestContext.put("org.apache.cxf.jms.client.timeout", Long.valueOf(1000));
         }
 
         System.out.println("Invoking sayHi with JMS Context information ...");

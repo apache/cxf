@@ -44,7 +44,7 @@ public class JPACriteriaQueryVisitor<T, E> extends AbstractJPATypedQueryVisitor<
                                    Class<T> tClass,
                                    Class<E> queryClass,
                                    List<String> joinProps) {
-        this(em, tClass, queryClass, null, null);
+        this(em, tClass, queryClass, null, joinProps);
     }
 
     public JPACriteriaQueryVisitor(EntityManager em,
@@ -141,7 +141,7 @@ public class JPACriteriaQueryVisitor<T, E> extends AbstractJPATypedQueryVisitor<
     }
 
     private List<Selection<?>> toSelectionsList(List<SingularAttribute<T, ?>> attributes, boolean setAlias) {
-        List<Selection<?>> selections = new ArrayList<Selection<?>>(attributes.size());
+        List<Selection<?>> selections = new ArrayList<>(attributes.size());
         for (SingularAttribute<T, ?> attr : attributes) {
             Path<?> path = getRoot().get(attr);
             path.alias(attr.getName());
@@ -151,7 +151,7 @@ public class JPACriteriaQueryVisitor<T, E> extends AbstractJPATypedQueryVisitor<
     }
 
     private static Selection<?>[] toSelectionsArray(List<Selection<?>> selections) {
-        return selections.toArray(new Selection[selections.size()]);
+        return selections.toArray(new Selection[0]);
     }
 
     private TypedQuery<E> getTypedQuery(CriteriaQuery<E> theCriteriaQuery) {

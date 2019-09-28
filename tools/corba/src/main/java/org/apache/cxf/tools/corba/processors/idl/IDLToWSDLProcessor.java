@@ -386,12 +386,10 @@ public class IDLToWSDLProcessor extends IDLProcessor {
         if (token.countTokens() == 1) {
             if (env.get(ToolConstants.CFG_OUTPUTDIR) != null) {
                 return new File(outputDir + separator + ifile);
-            } else {
-                return new File(ifile);
             }
-        } else {
             return new File(ifile);
         }
+        return new File(ifile);
     }
 
     public Writer getOutputWriter(String filename, String outputDirectory) throws Exception {
@@ -401,19 +399,17 @@ public class IDLToWSDLProcessor extends IDLProcessor {
             String encoding = env.get(ToolCorbaConstants.CFG_WSDL_ENCODING).toString();
             return new FileWriterUtil()
                 .getWriter(new File(outputDirectory, filename), encoding);
-        } else {
-            FileWriterUtil fw = new FileWriterUtil(outputDirectory, null);
-            return fw.getWriter("", filename);
         }
+        FileWriterUtil fw = new FileWriterUtil(outputDirectory, null);
+        return fw.getWriter("", filename);
     }
 
     public Writer getOutputWriter(File file) throws Exception {
         if (env.optionSet(ToolCorbaConstants.CFG_WSDL_ENCODING)) {
             String encoding = env.get(ToolCorbaConstants.CFG_WSDL_ENCODING).toString();
             return new FileWriterUtil().getWriter(file, encoding);
-        } else {
-            return new FileWriterUtil().getWriter(file, StandardCharsets.UTF_8.name());
         }
+        return new FileWriterUtil().getWriter(file, StandardCharsets.UTF_8.name());
     }
 
     public String getBaseFilename(String ifile) {
@@ -439,7 +435,7 @@ public class IDLToWSDLProcessor extends IDLProcessor {
                 if (bindingTokens.length > 1) {
                     StringBuilder name = new StringBuilder("");
                     for (int j = 0; j < bindingTokens.length - 2; j++) {
-                        name.append(bindingTokens[j] + ".");
+                        name.append(bindingTokens[j]).append('.');
                     }
                     name.append(bindingTokens[bindingTokens.length - 2] + "CORBAService");
                     serviceNames.put(ns, name.toString());
@@ -500,18 +496,14 @@ public class IDLToWSDLProcessor extends IDLProcessor {
             String addr = null;
             String addrFileName = (String) env.get(ToolCorbaConstants.CFG_ADDRESSFILE);
             if (addrFileName != null) {
-                BufferedReader bufferedReader = null;
+                File addrFile = new File(addrFileName);
                 try {
-                    File addrFile = new File(addrFileName);
                     FileReader fileReader = new FileReader(addrFile);
-                    bufferedReader = new BufferedReader(fileReader);
-                    addr = bufferedReader.readLine();
+                    try (BufferedReader bufferedReader = new BufferedReader(fileReader)) {
+                        addr = bufferedReader.readLine();
+                    }
                 } catch (Exception ex) {
                     throw new ToolException(ex.getMessage(), ex);
-                } finally {
-                    if (bufferedReader != null) {
-                        bufferedReader.close();
-                    }
                 }
             } else {
                 addr = (String) env.get(ToolCorbaConstants.CFG_ADDRESS);
@@ -622,7 +614,7 @@ public class IDLToWSDLProcessor extends IDLProcessor {
                 StringTokenizer tokens = new StringTokenizer(mapping, ",;");
                 while (tokens.hasMoreTokens()) {
                     String token = tokens.nextToken();
-                    int pos = token.indexOf("=");
+                    int pos = token.indexOf('=');
                     if (pos == -1) {
                         throw new RuntimeException("Mapping of idl modules to namespaces "
                                                    + "is not specified correctly."
@@ -637,7 +629,7 @@ public class IDLToWSDLProcessor extends IDLProcessor {
                 try (BufferedReader reader = new BufferedReader(new FileReader(mapping))) {
                     String token = reader.readLine();
                     while (token != null) {
-                        int pos = token.indexOf("=");
+                        int pos = token.indexOf('=');
                         if (pos == -1) {
                             reader.close();
                             throw new RuntimeException("Mapping of idl modules to namespaces "

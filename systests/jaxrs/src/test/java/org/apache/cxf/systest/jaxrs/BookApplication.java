@@ -58,7 +58,7 @@ public class BookApplication extends Application {
 
     @Override
     public Set<Class<?>> getClasses() {
-        Set<Class<?>> classes = new HashSet<Class<?>>();
+        Set<Class<?>> classes = new HashSet<>();
         classes.add(org.apache.cxf.systest.jaxrs.BookStorePerRequest.class);
         classes.add(org.apache.cxf.systest.jaxrs.jaxws.BookStoreJaxrsJaxws.class);
         classes.add(org.apache.cxf.systest.jaxrs.RuntimeExceptionMapper.class);

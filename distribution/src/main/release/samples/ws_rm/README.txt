@@ -55,7 +55,7 @@ Using either UNIX or Windows:
 
   mvn install (builds the demo)
   mvn -Pserver  (from one command line window)
-  Mvn -Pclient  (from a second command line window)
+  mvn -Pclient  (from a second command line window)
 
 On startup, the client makes a sequence of 4 oneway invocations.
 The output of the logging interceptors will show that only the 1st and 3rd

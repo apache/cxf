@@ -29,8 +29,14 @@ import org.apache.cxf.systest.https.BusServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * This test is meant to run against a spring-loaded HTTP/S service. It tests the certificate
@@ -61,7 +67,7 @@ public class CertConstraintsTest extends AbstractBusClientServerTestBase {
         }
     }
 
-    public void startServers() throws Exception {
+    protected void startServers() throws Exception {
         assertTrue(
             "Server failed to launch",
             // run the server in the same process
@@ -71,7 +77,7 @@ public class CertConstraintsTest extends AbstractBusClientServerTestBase {
     }
 
 
-    public void stopServers() throws Exception {
+    protected void stopServers() throws Exception {
         stopAllServers();
         System.clearProperty(Configurer.USER_CFG_FILE_PROPERTY_URL);
         BusFactory.setDefaultBus(null);
@@ -81,7 +87,7 @@ public class CertConstraintsTest extends AbstractBusClientServerTestBase {
 
     //
     // tests
-    //
+    //s
     public final void testSuccessfulCall(String address) throws Exception {
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -112,8 +118,6 @@ public class CertConstraintsTest extends AbstractBusClientServerTestBase {
         try {
             assertEquals(port.greetMe("Kitty"), "Hello Kitty");
             fail("Failure expected");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // expected
         } catch (javax.xml.ws.WebServiceException ex) {
             // expected
         }

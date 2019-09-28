@@ -21,6 +21,7 @@ package org.apache.cxf.systest.sts.username_actas;
 import java.util.List;
 
 import org.w3c.dom.Element;
+
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.handler.RequestData;

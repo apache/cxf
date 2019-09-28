@@ -24,6 +24,7 @@ import org.apache.cxf.systest.jms.AbstractVmJMSTest;
 import org.apache.cxf.systest.jms.Hello;
 import org.apache.cxf.systest.jms.HelloImpl;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;

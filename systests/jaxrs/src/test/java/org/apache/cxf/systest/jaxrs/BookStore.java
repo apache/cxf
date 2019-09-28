@@ -19,7 +19,6 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,6 +31,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -47,9 +47,11 @@ import javax.ws.rs.CookieParam;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Encoded;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
@@ -60,6 +62,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ResourceContext;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Cookie;
@@ -166,6 +169,30 @@ public class BookStore {
         return new BookType("root", 124L);
     }
     @GET
+    @Path("/listoflonganddouble")
+    @Produces("text/xml")
+    public Book getBookFromListOfLongAndDouble(@QueryParam("value") List<Long> lValue,
+                                               @QueryParam("value") List<Double> dValue) {
+        StringBuilder lBuilder = new StringBuilder();
+        for (Long v : lValue) {
+            lBuilder.append(v.longValue());
+        }
+        StringBuilder dBuilder = new StringBuilder();
+        for (Double v : dValue) {
+            dBuilder.append(v.longValue());
+        }
+        String lStr = lBuilder.toString();
+        String dStr = dBuilder.toString();
+        if (!lStr.equals(dStr)) {
+            throw new InternalServerErrorException();
+        } else if ("".equalsIgnoreCase(lStr)) {
+            lStr = "0";
+        }
+        
+        return new Book("cxf", Long.parseLong(lStr));
+    }
+    
+    @GET
     @Path("/")
     public Book getBookRoot() {
         return new Book("root", 124L);
@@ -225,12 +252,11 @@ public class BookStore {
                 ? ui.getAbsolutePathBuilder().queryParam("redirect", "true").build().toString()
                 : "http://otherhost/redirect";
             return Response.status(303).cookie(NewCookie.valueOf("a=b")).header("Location", uri).build();
-        } else {
-            return Response.ok(new Book("CXF", 123L), "application/xml")
-                .header("RequestURI", this.ui.getRequestUri().toString())
-                .header("TheCookie", cookie)
-                .build();
         }
+        return Response.ok(new Book("CXF", 123L), "application/xml")
+            .header("RequestURI", this.ui.getRequestUri().toString())
+            .header("TheCookie", cookie)
+            .build();
     }
 
     @GET
@@ -240,12 +266,10 @@ public class BookStore {
         if (done == null) {
             if (loop) {
                 return Response.status(303).header("Location", "relative?loop=true").build();
-            } else {
-                return Response.status(303).header("Location", "relative?redirect=true").build();
             }
-        } else {
-            return Response.ok(new Book("CXF", 124L), "application/xml").build();
+            return Response.status(303).header("Location", "relative?redirect=true").build();
         }
+        return Response.ok(new Book("CXF", 124L), "application/xml").build();
     }
 
     @GET
@@ -293,15 +317,14 @@ public class BookStore {
     @Produces("application/xml")
     @Consumes("application/xml")
     public Response patchBook(Book book) {
-        if (book.getName().equals("Timeout")) {
+        if ("Timeout".equals(book.getName())) {
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
             }
             return Response.ok(book).build();
-        } else {
-            return Response.ok(book).build();
         }
+        return Response.ok(book).build();
     }
 
     @DELETE
@@ -316,7 +339,7 @@ public class BookStore {
     @Path("/echoxmlbookquery")
     @Produces("application/xml")
     public Book echoXmlBookQuery(@QueryParam("book") Book book, @QueryParam("id") byte id) {
-        if (book.getId() != (long)id) {
+        if (book.getId() != id) {
             throw new RuntimeException();
         }
         return book;
@@ -372,6 +395,11 @@ public class BookStore {
     public BookStoreSub getBeanParamBookSub() {
         return new BookStoreSub(this);
     }
+    
+    @Path("/querysub")
+    public BookStoreQuerySub getQuerySub() {
+        return new BookStoreQuerySub();
+    }
 
     @GET
     @Path("/twoBeanParams/{id}")
@@ -381,9 +409,53 @@ public class BookStore {
 
         long id = bean1.getId() + bean1.getId2() + bean1.getId3();
         if (bean2.getId4() != id) {
-            throw new RuntimeException();
+            throw new RuntimeException("id4 != id");
         }
         return books.get(id);
+    }
+
+    @POST
+    @Path("/formBeanParams/{id}")
+    @Produces("application/xml")
+    public Book postFormBeanParamsBook(@BeanParam BookBeanForm bean) {
+        long id = bean.getId() + bean.getId2();
+        if (bean.getId3() != id) {
+            throw new RuntimeException("id3 != id");
+        }
+        return books.get(id);
+    }
+
+    @POST
+    @Path("/formParams/{id}")
+    @Produces("application/xml")
+    public Book postFormParamsBook(@PathParam("id") long id, @QueryParam("id2") long id2, @FormParam("id3") long id3) {
+        long theBookId = id + id2;
+        if (id3 != theBookId) {
+            throw new RuntimeException("id3 != id");
+        }
+        return books.get(theBookId);
+    }
+
+    @GET
+    @Path("/formBeanParams/{id}")
+    @Produces("application/xml")
+    public Book getFormBeanParamsBook(@BeanParam BookBeanForm bean) {
+        long id = bean.getId() + bean.getId2();
+        if (bean.getId3() != 0) {
+            throw new RuntimeException("id3 != 0");
+        }
+        return books.get(id);
+    }
+
+    @GET
+    @Path("/formParams/{id}")
+    @Produces("application/xml")
+    public Book getFormParamsBook(@PathParam("id") long id, @QueryParam("id2") long id2, @FormParam("id3") long id3) {
+        long theBookId = id + id2;
+        if (id3 != 0) {
+            throw new RuntimeException("id3 != 0");
+        }
+        return books.get(theBookId);
     }
 
     @POST
@@ -456,7 +528,7 @@ public class BookStore {
     @Path("emptyput")
     @Consumes("application/json")
     public void emptyput() {
-        if (!httpHeaders.getMediaType().toString().equals("application/json")) {
+        if (!"application/json".equals(httpHeaders.getMediaType().toString())) {
             throw new RuntimeException();
         }
     }
@@ -508,8 +580,8 @@ public class BookStore {
     @Path("setmanycookies")
     public Response setTwoCookies() {
         return Response.ok().header("Set-Cookie", "JSESSIONID=0475F7F30A26E5B0C15D69; Path=/")
-            .header("Set-Cookie", "COOKIETWO=dummy; Expires=Sat, 20-Nov-2010 19:11:32 GMT; Path=/")
-            .header("Set-Cookie", "COOKIETWO=dummy2; expires=Sat, 20-Nov-2010 19:11:32 GMT; Path=/")
+            .header("Set-cookie", "COOKIETWO=dummy; Expires=Sat, 20-Nov-2010 19:11:32 GMT; Path=/")
+            .header("set-cookie", "COOKIETWO=dummy2; expires=Sat, 20-Nov-2010 19:11:32 GMT; Path=/")
             .build();
     }
 
@@ -525,9 +597,8 @@ public class BookStore {
         throws BookNotFoundFault, BookNotReturnedException {
         if (notReturned) {
             throw new WebApplicationException(Response.status(404).header("Status", "notReturned").build());
-        } else {
-            throw new WebApplicationException(Response.status(404).header("Status", "notFound").build());
         }
+        throw new WebApplicationException(Response.status(404).header("Status", "notFound").build());
     }
 
     @GET
@@ -1014,16 +1085,58 @@ public class BookStore {
         return books.get(id + 123);
     }
 
-
-
     @GET
     @Path("/books/response/{bookId}/")
     @Produces("application/xml")
     public Response getBookAsResponse(@PathParam("bookId") String id) throws BookNotFoundFault {
         Book entity = doGetBook(id);
         EntityTag etag = new EntityTag(Integer.toString(entity.hashCode()));
-        return Response.ok().tag(etag).entity(entity).build();
+
+        CacheControl cacheControl = new CacheControl();
+        cacheControl.setMaxAge(100000);
+        cacheControl.setPrivate(true);
+
+        return Response.ok().tag(etag).entity(entity).cacheControl(cacheControl).build();
     }
+
+    @GET
+    @Path("/books/response2/{bookId}/")
+    @Produces("application/xml")
+    public Response getBookAsResponse2(@PathParam("bookId") String id) throws BookNotFoundFault {
+        Book entity = doGetBook(id);
+        EntityTag etag = new EntityTag(Integer.toString(entity.hashCode()));
+
+        CacheControl cacheControl = new CacheControl();
+        cacheControl.setMaxAge(1);
+        cacheControl.setPrivate(true);
+
+        return Response.ok().tag(etag).entity(entity).cacheControl(cacheControl).build();
+    }
+
+    @GET
+    @Path("/books/response3/{bookId}/")
+    @Produces("application/xml")
+    public Response getBookAsResponse3(@PathParam("bookId") String id,
+                                       @HeaderParam("If-Modified-Since") String modifiedSince
+    ) throws BookNotFoundFault {
+        Book entity = doGetBook(id);
+
+        EntityTag etag = new EntityTag(Integer.toString(entity.hashCode()));
+
+        CacheControl cacheControl = new CacheControl();
+        cacheControl.setMaxAge(1);
+        cacheControl.setPrivate(true);
+
+        if (modifiedSince != null) {
+            return Response.status(304).tag(etag)
+                .cacheControl(cacheControl).lastModified(new Date()).build();
+        } else {
+            return Response.ok().tag(etag).entity(entity)
+                .cacheControl(cacheControl).lastModified(new Date()).build();
+        }
+    }
+
+
 
     @GET
     @Path("/books/{bookId}/cglib")
@@ -1080,7 +1193,7 @@ public class BookStore {
     public String getBookQueryContext(@PathParam("expression") String expression,
                                       @Context QueryContext searchContext)
         throws BookNotFoundFault {
-        return searchContext.getConvertedExpression(expression);
+        return searchContext.getConvertedExpression(expression, Book.class);
     }
 
     @GET
@@ -1185,7 +1298,6 @@ public class BookStore {
     @POST
     @Path("/books/element/echo")
     public JAXBElement<Book> echoBookElement(JAXBElement<Book> element) throws Exception {
-        Assert.assertTrue(element instanceof JAXBElement);
         return element;
     }
     @POST
@@ -1318,11 +1430,10 @@ public class BookStore {
         Book book = books.get(Long.parseLong(id));
         if (book != null) {
             return book;
-        } else {
-            BookNotFoundDetails details = new BookNotFoundDetails();
-            details.setId(Long.parseLong(id));
-            throw new BookNotFoundFault(details);
         }
+        BookNotFoundDetails details = new BookNotFoundDetails();
+        details.setId(Long.parseLong(id));
+        throw new BookNotFoundFault(details);
     }
 
     @Path("/booksubresource/{bookId}/")
@@ -1330,11 +1441,10 @@ public class BookStore {
         Book book = books.get(Long.parseLong(id));
         if (book != null) {
             return book;
-        } else {
-            BookNotFoundDetails details = new BookNotFoundDetails();
-            details.setId(Long.parseLong(id));
-            throw new BookNotFoundFault(details);
         }
+        BookNotFoundDetails details = new BookNotFoundDetails();
+        details.setId(Long.parseLong(id));
+        throw new BookNotFoundFault(details);
     }
 
     @Path("/booksubresource/context")
@@ -1349,6 +1459,11 @@ public class BookStore {
         return rc.initResource(book2Sub);
     }
 
+    @Path("/booksubresource/class/context")
+    public Class<Book2> getBookSubResourceClass() {
+        return Book2.class;
+    }
+
     @Path("/booksubresourceobject/{bookId}/")
     public Object getBookSubResourceObject(@PathParam("bookId") String id) throws BookNotFoundFault {
         return getBookSubResource(id);
@@ -1358,14 +1473,13 @@ public class BookStore {
     @Path("/booknames/{bookId}/")
     @Produces("text/*")
     public String getBookName(@PathParam("bookId") int id) throws BookNotFoundFault {
-        Book book = books.get(new Long(id));
+        Book book = books.get(Long.valueOf(id));
         if (book != null) {
             return book.getName();
-        } else {
-            BookNotFoundDetails details = new BookNotFoundDetails();
-            details.setId(id);
-            throw new BookNotFoundFault(details);
         }
+        BookNotFoundDetails details = new BookNotFoundDetails();
+        details.setId(id);
+        throw new BookNotFoundFault(details);
     }
 
     @POST
@@ -1517,7 +1631,7 @@ public class BookStore {
         if (id != 123) {
             throw new WebApplicationException();
         }
-        Book b = books.get(new Long(id));
+        Book b = books.get(Long.valueOf(id));
 
         Response r;
         if (b != null) {
@@ -1534,7 +1648,7 @@ public class BookStore {
     @Consumes("text/plain")
     @Produces("text/plain")
     public Long echoBookId(long theBookId) {
-        return new Long(theBookId);
+        return Long.valueOf(theBookId);
     }
 
     @POST
@@ -1650,6 +1764,14 @@ public class BookStore {
     @Path("/interface")
     public BookSubresource getBookFromSubresource() {
         return new BookSubresourceImpl();
+    }
+
+    @POST
+    @Path("/entityecho")
+    @Consumes("text/plain")
+    @Produces("text/plain")
+    public Response echoEntity(String entity) {
+        return Response.ok().entity(entity).build();
     }
 
     public final String init() {
@@ -1768,10 +1890,9 @@ public class BookStore {
                 throw new WebApplicationException(
                      Response.status(410).header("content-type", "text/plain")
                      .entity("This is supposed to go on the wire").build());
-            } else {
-                output.write("This is not supposed to go on the wire".getBytes());
-                throw new WebApplicationException(410);
             }
+            output.write("This is not supposed to go on the wire".getBytes());
+            throw new WebApplicationException(410);
         }
 
     }
@@ -1781,7 +1902,7 @@ public class BookStore {
                 throw new RuntimeException();
             }
             BookStore.this.messageContext.put(Message.RESPONSE_CODE, 503);
-            MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+            MultivaluedMap<String, String> headers = new MetadataMap<>();
             headers.putSingle("Content-Type", "text/custom+plain");
             headers.putSingle("CustomHeader", "CustomValue");
             BookStore.this.messageContext.put(Message.PROTOCOL_HEADERS, headers);
@@ -1866,11 +1987,44 @@ public class BookStore {
         public long getId4() {
             return id4;
         }
+        
         @QueryParam("id4")
         public void setId4(long id4) {
             this.id4 = id4;
         }
+    }
 
+    public static class BookBeanForm {
+        private long id;
+        private long id2;
+        private long id3;
+
+        public long getId() {
+            return id;
+        }
+
+        @PathParam("id")
+        public void setId(long id) {
+            this.id = id;
+        }
+
+        @QueryParam("id2")
+        public void setId2(long id2) {
+            this.id2 = id2;
+        }
+        
+        public long getId2() {
+            return id2;
+        }
+
+        @FormParam("id3")
+        public void setId3(long id3) {
+            this.id3 = id3;
+        }
+        
+        public long getId3() {
+            return id3;
+        }
     }
 
     public static class BookBean2 {
@@ -2019,7 +2173,7 @@ public class BookStore {
             for (int i = 0; i < arg0.length; i++) {
                 sb.append(Integer.toString(arg0[i]));
                 if (i + 1 < arg0.length) {
-                    sb.append(",");
+                    sb.append(',');
                 }
             }
             arg6.write(sb.toString().getBytes());
@@ -2061,7 +2215,7 @@ public class BookStore {
             for (int i = 0; i < arr.length; i++) {
                 sb.append(Double.toString(arr[i]));
                 if (i + 1 < arr.length) {
-                    sb.append(",");
+                    sb.append(',');
                 }
             }
             arg6.write(sb.toString().getBytes());
@@ -2080,6 +2234,26 @@ public class BookStore {
             return bookStore.getBeanParamBook(bean);
         }
     }
+    
+    public static class BookStoreQuerySub {
+        @GET
+        @Path("/listofstrings")
+        @Produces("text/xml")
+        public Book getBookFromListStrings(@QueryParam("value") List<String> value) {
+            final StringBuilder builder = new StringBuilder();
+            
+            for (String v : value) {
+                if (builder.length() > 0) {
+                    builder.append(' ');
+                }
+                
+                builder.append(v);
+            }
+            
+            return new Book(builder.toString(), 0L);
+        }
+    }
+
 }
 
 

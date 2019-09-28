@@ -58,6 +58,7 @@ import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.ext.OutboundSecurityContext;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.SecurePart.Modifier;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 
 /**
  *
@@ -88,12 +89,12 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
         String asymSignatureAlgorithm =
             (String)getMessage().getContextualProperty(SecurityConstants.ASYMMETRIC_SIGNATURE_ALGORITHM);
         if (asymSignatureAlgorithm != null && abinding.getAlgorithmSuite() != null) {
-            abinding.getAlgorithmSuite().setAsymmetricSignature(asymSignatureAlgorithm);
+            abinding.getAlgorithmSuite().getAlgorithmSuiteType().setAsymmetricSignature(asymSignatureAlgorithm);
         }
         String symSignatureAlgorithm =
             (String)getMessage().getContextualProperty(SecurityConstants.SYMMETRIC_SIGNATURE_ALGORITHM);
         if (symSignatureAlgorithm != null && abinding.getAlgorithmSuite() != null) {
-            abinding.getAlgorithmSuite().setSymmetricSignature(symSignatureAlgorithm);
+            abinding.getAlgorithmSuite().getAlgorithmSuiteType().setSymmetricSignature(symSignatureAlgorithm);
         }
 
         if (abinding.getProtectionOrder()
@@ -130,11 +131,11 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 AbstractToken initiatorToken = initiatorWrapper.getToken();
                 if (initiatorToken instanceof IssuedToken) {
                     SecurityToken sigTok = getSecurityToken();
-                    addIssuedToken((IssuedToken)initiatorToken, sigTok, false, true);
+                    addIssuedToken(initiatorToken, sigTok, false, true);
 
                     if (sigTok != null) {
                         storeSecurityToken(initiatorToken, sigTok);
-                        outboundSecurityContext.remove(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION);
+                        outboundSecurityContext.remove(XMLSecurityConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION);
                     }
 
                     // Set up CallbackHandler which wraps the configured Handler
@@ -187,7 +188,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             //Check for signature protection
             if (abinding.isEncryptSignature()) {
                 SecurePart part =
-                    new SecurePart(new QName(WSSConstants.NS_DSIG, "Signature"), Modifier.Element);
+                    new SecurePart(new QName(XMLSecurityConstants.NS_DSIG, "Signature"), Modifier.Element);
                 enc.add(part);
                 if (signatureConfirmationAdded) {
                     SecurePart securePart =
@@ -216,7 +217,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 assertTokenWrapper(encToken);
                 assertToken(encToken.getToken());
             }
-            doEncryption(encToken, enc, false);
+            doEncryption(encToken, enc);
 
             putCustomTokenAfterSignature();
         } catch (Exception e) {
@@ -257,11 +258,11 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 AbstractToken initiatorToken = initiatorWrapper.getToken();
                 if (initiatorToken instanceof IssuedToken) {
                     SecurityToken sigTok = getSecurityToken();
-                    addIssuedToken((IssuedToken)initiatorToken, sigTok, false, true);
+                    addIssuedToken(initiatorToken, sigTok, false, true);
 
                     if (sigTok != null) {
                         storeSecurityToken(initiatorToken, sigTok);
-                        outboundSecurityContext.remove(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION);
+                        outboundSecurityContext.remove(XMLSecurityConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION);
                     }
 
                     // Set up CallbackHandler which wraps the configured Handler
@@ -299,7 +300,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 //Check for signature protection
                 if (abinding.isEncryptSignature()) {
                     SecurePart part =
-                        new SecurePart(new QName(WSSConstants.NS_DSIG, "Signature"), Modifier.Element);
+                        new SecurePart(new QName(XMLSecurityConstants.NS_DSIG, "Signature"), Modifier.Element);
                     encrParts.add(part);
                     if (signatureConfirmationAdded) {
                         SecurePart securePart =
@@ -310,7 +311,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                         new QName(abinding.getName().getNamespaceURI(), SPConstants.ENCRYPT_SIGNATURE));
                 }
 
-                doEncryption(wrapper, encrParts, true);
+                doEncryption(wrapper, encrParts);
             }
 
             if (timestampAdded) {
@@ -347,8 +348,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
     }
 
     private void doEncryption(AbstractTokenWrapper recToken,
-                                    List<SecurePart> encrParts,
-                                    boolean externalRef) throws SOAPException {
+                                    List<SecurePart> encrParts) throws SOAPException {
         //Do encryption
         if (recToken != null && recToken.getToken() != null && !encrParts.isEmpty()) {
             AbstractToken encrToken = recToken.getToken();
@@ -356,7 +356,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
 
             // Action
             WSSSecurityProperties properties = getProperties();
-            WSSConstants.Action actionToPerform = WSSConstants.ENCRYPT;
+            WSSConstants.Action actionToPerform = XMLSecurityConstants.ENCRYPT;
             if (recToken.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
                 actionToPerform = WSSConstants.ENCRYPT_WITH_DERIVED_KEY;
             }
@@ -414,7 +414,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
 
         // Action
         WSSSecurityProperties properties = getProperties();
-        WSSConstants.Action actionToPerform = WSSConstants.SIGNATURE;
+        WSSConstants.Action actionToPerform = XMLSecurityConstants.SIGNATURE;
         if (wrapper.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
             actionToPerform = WSSConstants.SIGNATURE_WITH_DERIVED_KEY;
         }
@@ -451,7 +451,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
 
         if (sigToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
             properties.setSignatureAlgorithm(
-                   abinding.getAlgorithmSuite().getSymmetricSignature());
+                   abinding.getAlgorithmSuite().getAlgorithmSuiteType().getSymmetricSignature());
         }
     }
 

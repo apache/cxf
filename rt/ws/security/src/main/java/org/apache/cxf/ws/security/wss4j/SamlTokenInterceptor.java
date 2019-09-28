@@ -32,6 +32,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -46,6 +47,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
@@ -89,8 +91,8 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
         Element child = DOMUtils.getFirstElement(el);
         while (child != null) {
             if ("Assertion".equals(child.getLocalName())
-                && (WSConstants.SAML_NS.equals(child.getNamespaceURI())
-                    || WSConstants.SAML2_NS.equals(child.getNamespaceURI()))) {
+                && (WSS4JConstants.SAML_NS.equals(child.getNamespaceURI())
+                    || WSS4JConstants.SAML2_NS.equals(child.getNamespaceURI()))) {
                 try {
                     List<WSSecurityEngineResult> samlResults = processToken(child, message);
                     if (samlResults != null) {
@@ -181,7 +183,7 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
         data.setMsgContext(message);
         data.setWssConfig(WSSConfig.getNewInstance());
 
-        data.setSigVerCrypto(getCrypto(null, SecurityConstants.SIGNATURE_CRYPTO,
+        data.setSigVerCrypto(getCrypto(SecurityConstants.SIGNATURE_CRYPTO,
                                      SecurityConstants.SIGNATURE_PROPERTIES, message));
 
         WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
@@ -278,13 +280,17 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
                     (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.PASSWORD, message);
                 if (StringUtils.isEmpty(password)) {
                     password =
+                        (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_PASSWORD, message);
+                }
+                if (StringUtils.isEmpty(password)) {
+                    password =
                         getPassword(issuerName, token, WSPasswordCallback.SIGNATURE, message);
                 }
             }
             Crypto crypto = samlCallback.getIssuerCrypto();
             if (crypto == null) {
                 crypto =
-                    getCrypto(token, SecurityConstants.SIGNATURE_CRYPTO,
+                    getCrypto(SecurityConstants.SIGNATURE_CRYPTO,
                               SecurityConstants.SIGNATURE_PROPERTIES, message);
             }
 
@@ -302,7 +308,6 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
     }
 
     private Crypto getCrypto(
-        SamlToken samlToken,
         String cryptoKey,
         String propKey,
         SoapMessage message

@@ -24,7 +24,7 @@ public class CachedClass {
     private WeakReference<Class<?>> cachedClass;
 
     public CachedClass(Class<?> cachedClass) {
-        this.cachedClass = new WeakReference<Class<?>>(cachedClass);
+        this.cachedClass = new WeakReference<>(cachedClass);
     }
 
     public Class<?> getCachedClass() {
@@ -32,6 +32,6 @@ public class CachedClass {
     }
 
     public void setCachedClass(Class<?> cachedClass) {
-        this.cachedClass = new WeakReference<Class<?>>(cachedClass);
+        this.cachedClass = new WeakReference<>(cachedClass);
     }
 }

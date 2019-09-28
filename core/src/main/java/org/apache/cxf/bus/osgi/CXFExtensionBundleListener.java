@@ -45,7 +45,7 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
     private static final Logger LOG = LogUtils.getL7dLogger(CXFActivator.class);
     private long id;
     private ConcurrentMap<Long, List<OSGiExtension>> extensions
-        = new ConcurrentHashMap<Long, List<OSGiExtension>>(16, 0.75f, 4);
+        = new ConcurrentHashMap<>(16, 0.75f, 4);
 
     public CXFExtensionBundleListener(long bundleId) {
         this.id = bundleId;
@@ -93,7 +93,7 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
                  + " (" + bundle.getBundleId() + ") " + names);
         List<OSGiExtension> list = extensions.get(bundle.getBundleId());
         if (list == null) {
-            list = new CopyOnWriteArrayList<OSGiExtension>();
+            list = new CopyOnWriteArrayList<>();
             List<OSGiExtension> preList = extensions.putIfAbsent(bundle.getBundleId(), list);
             if (preList != null) {
                 list = preList;
@@ -160,9 +160,8 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
                         throw new ExtensionException(new Message("PROBLEM_LOADING_EXTENSION_CLASS",
                                                                  Extension.LOG, name),
                                                      origExc);
-                    } else {
-                        throw ee;
                     }
+                    throw ee;
                 }
             }
             return c;

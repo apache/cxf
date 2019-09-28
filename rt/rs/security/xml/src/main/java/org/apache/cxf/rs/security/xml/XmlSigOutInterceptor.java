@@ -26,10 +26,12 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import javax.security.auth.DestroyFailedException;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -38,7 +40,6 @@ import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.RSSecurityUtils;
 import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
@@ -115,8 +116,7 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
             throw new Exception("User name is not available");
         }
 
-        String password =
-            RSSecurityUtils.getPassword(message, user, WSPasswordCallback.SIGNATURE, this.getClass());
+        String password = RSSecurityUtils.getSignaturePassword(message, user, this.getClass());
 
         X509Certificate[] issuerCerts = RSSecurityUtils.getCertificates(crypto, user);
 
@@ -124,7 +124,7 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
             ? SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1 : sigProps.getSignatureAlgo();
 
         String pubKeyAlgo = issuerCerts[0].getPublicKey().getAlgorithm();
-        if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
+        if ("DSA".equalsIgnoreCase(pubKeyAlgo)) {
             sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_DSA;
         }
         PrivateKey privateKey = null;
@@ -136,7 +136,7 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
         }
 
-        String id = UUID.randomUUID().toString();
+        String id = "_" + UUID.randomUUID().toString();
         String referenceId = "#" + id;
 
         String digestAlgo = sigProps.getSignatureDigestAlgo() == null
@@ -156,6 +156,14 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
             sig.addKeyInfo(issuerCerts[0].getPublicKey());
         }
         sig.sign(privateKey);
+
+        // Clean the private key from memory when we're done
+        try {
+            privateKey.destroy();
+        } catch (DestroyFailedException ex) {
+            // ignore
+        }
+
         return sig.getElement().getOwnerDocument();
     }
 

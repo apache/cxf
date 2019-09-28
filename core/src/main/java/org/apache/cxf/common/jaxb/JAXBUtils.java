@@ -46,6 +46,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
@@ -85,6 +86,7 @@ import org.apache.cxf.common.util.ASMHelper.MethodVisitor;
 import org.apache.cxf.common.util.ASMHelper.Opcodes;
 import org.apache.cxf.common.util.CachedClass;
 import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.common.util.ProxyHelper;
 import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.common.util.ReflectionInvokationHandler.WrapReturn;
 import org.apache.cxf.common.util.ReflectionUtil;
@@ -123,7 +125,9 @@ public final class JAXBUtils {
     private static final Map<String, String> BUILTIN_DATATYPES_MAP;
     private static final Map<String, Class<?>> HOLDER_TYPES_MAP;
     private static ClassLoader jaxbXjcLoader;
-
+    private static volatile Optional<Object> jaxbMinimumEscapeHandler;
+    private static volatile Optional<Object> jaxbNoEscapeHandler;
+    
     static {
         BUILTIN_DATATYPES_MAP = new HashMap<>();
         BUILTIN_DATATYPES_MAP.put("string", "java.lang.String");
@@ -152,7 +156,6 @@ public final class JAXBUtils {
         BUILTIN_DATATYPES_MAP.put("gDay", "javax.xml.datatype.XMLGregorianCalendar");
         BUILTIN_DATATYPES_MAP.put("duration", "javax.xml.datatype.Duration");
         BUILTIN_DATATYPES_MAP.put("NOTATION", "javax.xml.namespace.QName");
-        BUILTIN_DATATYPES_MAP.put("string", "java.lang.String");
 
         HOLDER_TYPES_MAP = new HashMap<>();
         HOLDER_TYPES_MAP.put("int", java.lang.Integer.class);
@@ -299,7 +302,7 @@ public final class JAXBUtils {
                 while (st.hasMoreTokens()) {
                     String token = st.nextToken();
                     if (packageName.length() > 0) {
-                        packageName.insert(0, ".");
+                        packageName.insert(0, '.');
                         packageName.insert(0, normalizePackageNamePart(token));
                     } else {
                         packageName.insert(0, token);
@@ -312,22 +315,21 @@ public final class JAXBUtils {
 
             StringTokenizer st = new StringTokenizer(authority, ".");
             if (st.hasMoreTokens()) {
-                String token = null;
                 while (st.hasMoreTokens()) {
-                    token = st.nextToken();
+                    String token = st.nextToken();
                     if (packageName.length() == 0) {
                         if ("www".equals(token)) {
                             continue;
                         }
                     } else {
-                        packageName.insert(0, ".");
+                        packageName.insert(0, '.');
                     }
                     packageName.insert(0, normalizePackageNamePart(token));
                 }
             }
 
             if (!("http".equalsIgnoreCase(scheme) || "urn".equalsIgnoreCase(scheme))) {
-                packageName.insert(0, ".");
+                packageName.insert(0, '.');
                 packageName.insert(0, normalizePackageNamePart(scheme));
             }
 
@@ -400,12 +402,13 @@ public final class JAXBUtils {
         // algorithm will not change an XML name that is already a legal and
         // conventional (!) Java class, method, or constant identifier
 
-        boolean legalIdentifier = false;
         StringBuilder buf = new StringBuilder(name);
-        legalIdentifier = Character.isJavaIdentifierStart(buf.charAt(0));
+        boolean hasUnderscore = false;
+        boolean legalIdentifier = Character.isJavaIdentifierStart(buf.charAt(0));
 
         for (int i = 1; i < name.length() && legalIdentifier; i++) {
-            legalIdentifier = legalIdentifier && Character.isJavaIdentifierPart(buf.charAt(i));
+            legalIdentifier &= Character.isJavaIdentifierPart(buf.charAt(i));
+            hasUnderscore |= '_' == buf.charAt(i);
         }
 
         boolean conventionalIdentifier = isConventionalIdentifier(buf, type);
@@ -413,7 +416,9 @@ public final class JAXBUtils {
             if (JAXBUtils.isJavaKeyword(name) && type == IdentifierType.VARIABLE) {
                 name = normalizePackageNamePart(name);
             }
-            return name;
+            if (!hasUnderscore || IdentifierType.CLASS != type) {
+                return name;
+            }
         }
 
         // split into words
@@ -478,10 +483,9 @@ public final class JAXBUtils {
             index++;
             if (i >= sword.length()) {
                 break;
-            } else {
-                first = i;
-                firstChar = sword.charAt(first);
             }
+            first = i;
+            firstChar = sword.charAt(first);
         }
 
         if (index > (listIndex + 1)) {
@@ -501,7 +505,7 @@ public final class JAXBUtils {
         if (null == buf || buf.length() == 0) {
             return false;
         }
-        boolean result = false;
+        final boolean result;
         if (IdentifierType.CONSTANT == type) {
             for (int i = 0; i < buf.length(); i++) {
                 if (Character.isLowerCase(buf.charAt(i))) {
@@ -564,31 +568,23 @@ public final class JAXBUtils {
     }
 
     public static Class<?> getValidClass(Class<?> cls) {
-        if (cls.isEnum()) {
-            return cls;
-        }
-        if (cls.isArray()) {
+        if (cls.isEnum() || cls.isArray()) {
             return cls;
         }
 
-        if (cls == Object.class || cls == String.class
+        if (cls == Object.class || cls == String.class || cls.isPrimitive() || cls.isAnnotation()
             || "javax.xml.ws.Holder".equals(cls.getName())) {
-            cls = null;
-        } else if (cls.isPrimitive() || cls.isAnnotation()) {
-            cls = null;
-        } else if (cls.isInterface()) {
+            return null;
+        } else if (cls.isInterface()
+            || "javax.xml.ws.wsaddressing.W3CEndpointReference".equals(cls.getName())) {
             return cls;
         }
-        if (cls != null) {
-            if (cls.getName().equals("javax.xml.ws.wsaddressing.W3CEndpointReference")) {
-                return cls;
-            }
-            Constructor<?> cons = ReflectionUtil.getDeclaredConstructor(cls);
+
+        Constructor<?> cons = ReflectionUtil.getDeclaredConstructor(cls);
+        if (cons == null) {
+            cons = ReflectionUtil.getConstructor(cls);
             if (cons == null) {
-                cons = ReflectionUtil.getConstructor(cls);
-            }
-            if (cons == null) {
-                cls = null;
+                return null;
             }
         }
         return cls;
@@ -643,7 +639,7 @@ public final class JAXBUtils {
     public static BridgeWrapper createBridge(Set<Class<?>> ctxClasses,
                                       QName qname,
                                       Class<?> refcls,
-                                      Annotation anns[]) throws JAXBException {
+                                      Annotation[] anns) throws JAXBException {
         try {
             Class<?> cls;
             Class<?> refClass;
@@ -652,7 +648,6 @@ public final class JAXBUtils {
                 cls = Class.forName("com.sun.xml.bind.api.JAXBRIContext");
                 refClass = Class.forName(pkg + "api.TypeReference");
             } catch (ClassNotFoundException e) {
-                // TODO Auto-generated catch block
                 cls = Class.forName("com.sun.xml.internal.bind.api.JAXBRIContext", true, getXJCClassLoader());
                 pkg = "com.sun.xml.internal.bind.";
                 refClass = Class.forName(pkg + "api.TypeReference", true, getXJCClassLoader());
@@ -662,7 +657,7 @@ public final class JAXBUtils {
                                                  anns.getClass()).newInstance(qname, refcls, anns);
             List<Object> typeRefs = new ArrayList<>();
             typeRefs.add(ref);
-            List<Class<?>> clses = new ArrayList<Class<?>>(ctxClasses);
+            List<Class<?>> clses = new ArrayList<>(ctxClasses);
             clses.add(refClass.getField("type").get(ref).getClass());
             if (!refcls.isInterface()) {
                 clses.add(refcls);
@@ -670,9 +665,9 @@ public final class JAXBUtils {
 
             Object ctx = null;
             for (Method m : cls.getDeclaredMethods()) {
-                if (m.getName().equals("newInstance")
+                if ("newInstance".equals(m.getName())
                     && m.getParameterTypes().length == 6) {
-                    ctx = m.invoke(null, clses.toArray(new Class[clses.size()]),
+                    ctx = m.invoke(null, clses.toArray(new Class<?>[0]),
                                          typeRefs, null, null, true, null);
 
                 }
@@ -783,7 +778,6 @@ public final class JAXBUtils {
             try {
                 cls = Class.forName("com.sun.codemodel.writer.FileCodeWriter");
             } catch (ClassNotFoundException e) {
-                // TODO Auto-generated catch block
                 cls = Class.forName("com.sun.codemodel.internal.writer.FileCodeWriter",
                                     true, getXJCClassLoader());
             }
@@ -869,7 +863,7 @@ public final class JAXBUtils {
         // that are in the same package. Also check for ObjectFactory classes
         Map<String, InputStream> packages = new HashMap<>();
         Map<String, ClassLoader> packageLoaders = new HashMap<>();
-        Set<Class<?>> objectFactories = new HashSet<Class<?>>();
+        Set<Class<?>> objectFactories = new HashSet<>();
         for (Class<?> jcls : classes) {
             String pkgName = PackageUtils.getPackageName(jcls);
             if (!packages.containsKey(pkgName)) {
@@ -903,9 +897,8 @@ public final class JAXBUtils {
         }
         for (Map.Entry<String, InputStream> entry : packages.entrySet()) {
             if (entry.getValue() != null) {
-                BufferedReader reader = null;
-                try {
-                    reader = new BufferedReader(new InputStreamReader(entry.getValue(), StandardCharsets.UTF_8));
+                try (BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(entry.getValue(), StandardCharsets.UTF_8))) {
                     String pkg = entry.getKey();
                     ClassLoader loader = packageLoaders.get(pkg);
                     if (!StringUtils.isEmpty(pkg)) {
@@ -915,8 +908,8 @@ public final class JAXBUtils {
                     String line = reader.readLine();
                     while (line != null) {
                         line = line.trim();
-                        if (line.indexOf("#") != -1) {
-                            line = line.substring(0, line.indexOf("#"));
+                        if (line.indexOf('#') != -1) {
+                            line = line.substring(0, line.indexOf('#'));
                         }
                         if (!StringUtils.isEmpty(line)) {
                             try {
@@ -928,15 +921,12 @@ public final class JAXBUtils {
                         }
                         line = reader.readLine();
                     }
-                } catch (Exception e) {
+                } catch (IOException e) {
                     // ignore
                 } finally {
                     try {
-                        if (reader != null) {
-                            reader.close();
-                            entry.getValue().close();
-                        }
-                    } catch (Exception e) {
+                        entry.getValue().close();
+                    } catch (IOException e) {
                         // ignore
                     }
                 }
@@ -1142,13 +1132,13 @@ public final class JAXBUtils {
     public static class MapNamespacePrefixMapper2
         extends org.eclipse.persistence.internal.oxm.record.namespaces.MapNamespacePrefixMapper {
 
-        String nsctxt[];
+        String[] nsctxt;
 
         public MapNamespacePrefixMapper2(Map<String, String> foo) {
             super(foo);
         }
         public String[] getPreDeclaredNamespaceUris() {
-            String sup[] = super.getPreDeclaredNamespaceUris();
+            String[] sup = super.getPreDeclaredNamespaceUris();
             if (nsctxt == null) {
                 return sup;
             }
@@ -1158,7 +1148,7 @@ public final class JAXBUtils {
             }
             return s.toArray(new String[s.size()]);
         }
-        public void setContextualNamespaceDecls(String f[]) {
+        public void setContextualNamespaceDecls(String[] f) {
             nsctxt = f;
         }
         public String[] getContextualNamespaceDecls() {
@@ -1336,7 +1326,7 @@ public final class JAXBUtils {
 
             cw.visitEnd();
 
-            byte bts[] = cw.toByteArray();
+            byte[] bts = cw.toByteArray();
             cls = helper.loadClass(className,
                                    mcls, bts);
         }
@@ -1501,7 +1491,7 @@ public final class JAXBUtils {
 
         cw.visitEnd();
 
-        byte bts[] = cw.toByteArray();
+        byte[] bts = cw.toByteArray();
         return helper.loadClass(className,
                                 ref, bts);
     }
@@ -1529,5 +1519,81 @@ public final class JAXBUtils {
         }
         return ReflectionInvokationHandler.createProxyWrapper(o, JAXBBeanInfo.class);
     }
+
+    private static String getPostfix(Class<?> cls) {
+        String className = cls.getName();
+        if (className.contains("com.sun.xml.internal")
+            || className.contains("eclipse")) {
+            //eclipse moxy accepts sun package CharacterEscapeHandler 
+            return ".internal";
+        } else if (className.contains("com.sun.xml.bind")
+            || className.startsWith("com.ibm.xml")) {
+            return "";
+        }
+        return null;
+    }
+
+    public static void setMinimumEscapeHandler(Marshaller marshaller) {
+        if (jaxbMinimumEscapeHandler == null) {
+            jaxbMinimumEscapeHandler = Optional.ofNullable(createMininumEscapeHandler(marshaller.getClass()));
+        }
+        jaxbMinimumEscapeHandler.ifPresent(p -> setEscapeHandler(marshaller, p));
+    }
+
+    public static void setNoEscapeHandler(final Marshaller marshaller) {
+        if (jaxbNoEscapeHandler == null) {
+            jaxbNoEscapeHandler = Optional.ofNullable(createNoEscapeHandler(marshaller.getClass()));
+        }
+        jaxbNoEscapeHandler.ifPresent(p -> setEscapeHandler(marshaller, p));
+    }
+    
+    public static void setEscapeHandler(Marshaller marshaller, Object escapeHandler) {
+        try {
+            String postFix = getPostfix(marshaller.getClass());
+            if (postFix != null && escapeHandler != null) {
+                marshaller.setProperty("com.sun.xml" + postFix + ".bind.characterEscapeHandler", escapeHandler);
+            }
+        } catch (PropertyException e) {
+            LOG.log(Level.INFO, "Failed to set MinumEscapeHandler to jaxb marshaller", e);
+        }
+    }
+    
+    public static Object createMininumEscapeHandler(Class<?> cls) {
+        return createEscapeHandler(cls, "MinimumEscapeHandler");
+    }
+    
+    public static Object createNoEscapeHandler(Class<?> cls) {
+        return createEscapeHandler(cls, "NoEscapeHandler");
+    }
+    
+    private static Object createEscapeHandler(Class<?> cls, String simpleClassName) {
+        try {
+            String postFix = getPostfix(cls);
+            if (postFix == null) {
+                LOG.log(Level.WARNING, "Failed to create" + simpleClassName + " for unknown jaxb class:"
+                    + cls);
+                return null;
+            }
+            Class<?> handlerClass = ClassLoaderUtils.loadClass("com.sun.xml" + postFix
+                                                                   + ".bind.marshaller." + simpleClassName,
+                                                               cls);
+            Class<?> handlerInterface = ClassLoaderUtils
+                .loadClass("com.sun.xml" + postFix + ".bind.marshaller.CharacterEscapeHandler",
+                           cls);
+            Object targetHandler = ReflectionUtil.getDeclaredField(handlerClass, "theInstance").get(null);
+            return ProxyHelper.getProxy(cls.getClassLoader(),
+                                        new Class[] {handlerInterface},
+                                        new EscapeHandlerInvocationHandler(targetHandler));
+        } catch (Exception e) {
+            if ("NoEscapeHandler".equals(simpleClassName)) {
+                //this class doesn't exist in JAXB 2.2 so expected
+                LOG.log(Level.FINER, "Failed to create " + simpleClassName);
+            } else {
+                LOG.log(Level.INFO, "Failed to create " + simpleClassName);
+            }
+        }
+        return null;
+    }
+    
 
 }

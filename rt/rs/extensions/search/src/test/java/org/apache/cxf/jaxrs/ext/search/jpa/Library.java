@@ -31,7 +31,7 @@ public class Library {
     private int id;
     private String address;
     @OneToMany
-    private List<Book> books = new LinkedList<Book>();
+    private List<Book> books = new LinkedList<>();
 
     public int getId() {
         return id;

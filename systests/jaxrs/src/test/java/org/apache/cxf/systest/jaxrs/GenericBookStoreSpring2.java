@@ -34,7 +34,7 @@ import org.apache.cxf.ext.logging.Logging;
 @Consumes({"application/json", "application/xml" })
 @Produces({"application/json", "application/xml" })
 @Logging
-public class GenericBookStoreSpring2 extends AbstractBookStoreSpring {
+public class GenericBookStoreSpring2 {
     @POST
     @Path("/books/superbook")
     public <T extends Book> T echoSuperBook(T book) {

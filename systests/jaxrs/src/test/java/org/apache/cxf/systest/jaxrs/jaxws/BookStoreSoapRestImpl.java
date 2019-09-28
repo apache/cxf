@@ -126,7 +126,7 @@ public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
 
     private void init() {
         Book book = new Book();
-        book.setId(new Long(123));
+        book.setId(Long.valueOf(123));
         book.setName("CXF in Action");
         books.put(book.getId(), book);
     }
@@ -157,9 +157,8 @@ public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
     public Response checkBook(Long id) {
         if (id.longValue() != 0L) {
             return Response.status(HttpStatus.SC_NOT_FOUND).build();
-        } else {
-            return Response.ok().build();
         }
+        return Response.ok().build();
     }
 
 }

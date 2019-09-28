@@ -51,7 +51,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
     public static final String CLIENT_SECRET = "secret";
 
     private static final ConcurrentHashMap<String, OAuthPermission> AVAILABLE_PERMISSIONS =
-        new ConcurrentHashMap<String, OAuthPermission>();
+        new ConcurrentHashMap<>();
 
     static {
         AVAILABLE_PERMISSIONS
@@ -62,13 +62,13 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
                                     Collections.singletonList("ROLE_ADMIN")));
     }
 
-    protected ConcurrentHashMap<String, Client> clientAuthInfo = new ConcurrentHashMap<String, Client>();
+    protected ConcurrentHashMap<String, Client> clientAuthInfo = new ConcurrentHashMap<>();
 
-    protected MetadataMap<String, String> userRegisteredClients = new MetadataMap<String, String>();
+    protected MetadataMap<String, String> userRegisteredClients = new MetadataMap<>();
 
-    protected MetadataMap<String, String> userAuthorizedClients = new MetadataMap<String, String>();
+    protected MetadataMap<String, String> userAuthorizedClients = new MetadataMap<>();
 
-    protected ConcurrentHashMap<String, Token> oauthTokens = new ConcurrentHashMap<String, Token>();
+    protected ConcurrentHashMap<String, Token> oauthTokens = new ConcurrentHashMap<>();
 
     protected MD5SequenceGenerator tokenGenerator = new MD5SequenceGenerator();
 

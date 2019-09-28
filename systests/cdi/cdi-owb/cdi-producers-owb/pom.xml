@@ -18,20 +18,22 @@
   ~  under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.apache.cxf.systests</groupId>
         <artifactId>cxf-systests-cdi-owb</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-systests-cdi-owb-producers</artifactId>
     <name>Apache CXF CDI Integration System Tests - OWB with producers</name>
     <description>Apache CXF CDI Integration System Tests - OpenWebBeans with producers</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
+    
+    <properties>
+        <cxf.module.name>org.apache.cxf.systests.cdi.owb.producers</cxf.module.name>
+    </properties>
     
     <dependencies>
         <dependency>
@@ -46,6 +48,12 @@
         <dependency>
              <groupId>org.apache.abdera</groupId>
              <artifactId>abdera-parser</artifactId>
+        </dependency>
+        <dependency>
+             <groupId>org.mockito</groupId>
+             <artifactId>mockito-core</artifactId>
+             <version>${cxf.mockito.version}</version>
+             <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

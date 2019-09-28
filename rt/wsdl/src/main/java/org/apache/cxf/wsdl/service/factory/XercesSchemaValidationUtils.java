@@ -188,7 +188,7 @@ class XercesSchemaValidationUtils {
             name = name.replace("xs.LS", "impl.xs.util.LS");
             Class<?> c = Class.forName(name);
             Object inputList = c.getConstructor(LSInput[].class, Integer.TYPE)
-                .newInstance(inputs.toArray(new LSInput[inputs.size()]), inputs.size());
+                .newInstance(inputs.toArray(new LSInput[0]), inputs.size());
             m.invoke(schemaLoader, inputList);
         } catch (InvocationTargetException e) {
             throw (Exception)e.getTargetException();

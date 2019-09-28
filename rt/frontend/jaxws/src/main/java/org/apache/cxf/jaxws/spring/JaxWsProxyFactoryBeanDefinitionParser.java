@@ -27,7 +27,6 @@ import org.apache.cxf.frontend.ClientFactoryBean;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.frontend.spring.ClientProxyFactoryBeanDefinitionParser;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;

@@ -27,14 +27,24 @@ import org.apache.cxf.validation.ClientBeanValidationFeature;
 
 @Provider(value = Type.Feature, scope = Scope.Client)
 public class JAXRSClientBeanValidationFeature extends ClientBeanValidationFeature {
-    private boolean wrapInProcessingException;
-    @Override
-    protected void initializeProvider(InterceptorProvider interceptorProvider, Bus bus) {
-        JAXRSClientBeanValidationOutInterceptor out = new JAXRSClientBeanValidationOutInterceptor();
-        out.setWrapInProcessingException(wrapInProcessingException);
-        super.addInterceptor(interceptorProvider, out);
+    public JAXRSClientBeanValidationFeature() {
+        super(new Portable());
     }
+
     public void setWrapInProcessingException(boolean wrapInProcessingException) {
-        this.wrapInProcessingException = wrapInProcessingException;
+        Portable.class.cast(getDelegate()).setWrapInProcessingException(wrapInProcessingException);
+    }
+
+    public static class Portable extends ClientBeanValidationFeature.Portable {
+        private boolean wrapInProcessingException;
+        @Override
+        public void doInitializeProvider(InterceptorProvider interceptorProvider, Bus bus) {
+            JAXRSClientBeanValidationOutInterceptor out = new JAXRSClientBeanValidationOutInterceptor();
+            out.setWrapInProcessingException(wrapInProcessingException);
+            super.addInterceptor(interceptorProvider, out);
+        }
+        public void setWrapInProcessingException(boolean wrapInProcessingException) {
+            this.wrapInProcessingException = wrapInProcessingException;
+        }
     }
 }

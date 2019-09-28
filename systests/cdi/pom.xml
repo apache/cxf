@@ -21,7 +21,7 @@
     <parent>
         <artifactId>cxf-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -30,12 +30,10 @@
     <packaging>pom</packaging>
     <name>Apache CXF CDI Integration System Tests</name>
     <description>Apache CXF CDI Integration System Tests</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <properties>
-        <cxf.el.api.version>3.0-b02</cxf.el.api.version>
-        <cxf.glassfish.el.version>3.0-b01</cxf.glassfish.el.version>
-        <cxf.tomcat.version>8.0.32</cxf.tomcat.version>
-        <cxf.openwebbeans.version>1.7.0</cxf.openwebbeans.version>
+        <cxf.glassfish.el.version>3.0.1-b11</cxf.glassfish.el.version>
+        <cxf.openwebbeans.version>2.0.8</cxf.openwebbeans.version>
     </properties>
     <modules>
         <module>base</module>
@@ -48,11 +46,6 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-validator</artifactId>
                 <version>${cxf.hibernate.validator.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.el</groupId>
-                <artifactId>javax.el-api</artifactId>
-                <version>${cxf.el.api.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.glassfish</groupId>
@@ -109,7 +102,7 @@
             <dependency>
                 <groupId>javax.annotation</groupId>
                 <artifactId>jsr250-api</artifactId>
-                <version>1.0</version>
+                <version>${cxf.jsr250.api.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -118,42 +111,40 @@
                 <version>${cxf.tomcat.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.tomcat.embed</groupId>
-                <artifactId>tomcat-embed-logging-juli</artifactId>
-                <version>${cxf.tomcat.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.tomcat</groupId>
                 <artifactId>tomcat-jasper</artifactId>
                 <version>${cxf.tomcat.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.ning</groupId>
+                <groupId>org.asynchttpclient</groupId>
                 <artifactId>async-http-client</artifactId>
                 <version>${cxf.ahc.version}</version>
                 <scope>test</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>io.netty</groupId>
-                        <artifactId>netty</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
         </dependencies>
     </dependencyManagement>
     <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <goals>
+                                <goal>test-jar</goal>
+                            </goals>
+                            <configuration>
+                                <archive>
+                                    <manifestEntries>
+                                        <Automatic-Module-Name>${cxf.module.name}.tests</Automatic-Module-Name>
+                                    </manifestEntries>
+                                </archive>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 </project>

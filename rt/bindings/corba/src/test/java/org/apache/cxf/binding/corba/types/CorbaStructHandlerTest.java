@@ -25,19 +25,22 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.binding.corba.wsdl.MemberType;
 import org.apache.cxf.binding.corba.wsdl.Struct;
-
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.StructMember;
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 // Since the exception handler is essentially the same as the struct handler (just included in case
 // structs and exceptions diverge at a later date), this test should cover both.
-public class CorbaStructHandlerTest extends Assert {
+public class CorbaStructHandlerTest {
 
     private ORB orb;
 
@@ -107,17 +110,17 @@ public class CorbaStructHandlerTest extends Assert {
         assertTrue(memberSize == 2);
 
         QName nameResult = obj.getName();
-        assertTrue(structName.equals(nameResult));
+        assertEquals(structName, nameResult);
 
         QName idlTypeResult = obj.getIdlType();
-        assertTrue(structIdlType.equals(idlTypeResult));
+        assertEquals(structIdlType, idlTypeResult);
 
         CorbaObjectHandler member0Result = obj.getMemberByName("member0");
         assertNotNull(member0Result);
-        assertTrue(member0Result.getName().equals(objMember0.getName()));
+        assertEquals(member0Result.getName(), objMember0.getName());
 
         CorbaObjectHandler member1Result = obj.getMember(1);
         assertNotNull(member1Result);
-        assertTrue(member1Result.getName().equals(objMember1.getName()));
+        assertEquals(member1Result.getName(), objMember1.getName());
     }
 }

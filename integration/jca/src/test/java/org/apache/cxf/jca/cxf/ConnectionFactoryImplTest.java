@@ -31,11 +31,15 @@ import javax.resource.spi.ManagedConnectionFactory;
 import javax.xml.namespace.QName;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ConnectionFactoryImplTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class ConnectionFactoryImplTest {
 
     ManagedConnectionFactory mockConnectionFactory;
     ConnectionManager mockConnectionManager;
@@ -181,7 +185,7 @@ public class ConnectionFactoryImplTest extends Assert {
             cf.getConnection(param);
             fail("Expect exception on using of none interface class");
         } catch (ResourceException re) {
-            assertTrue(true);
+            // expected
         }
     }
 
@@ -192,7 +196,7 @@ public class ConnectionFactoryImplTest extends Assert {
             cf.getConnection(param);
             fail("Expect exception of no interface here");
         } catch (ResourceException re) {
-            assertTrue(true);
+            // expected
         }
     }
 

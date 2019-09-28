@@ -19,13 +19,14 @@
 
 package org.apache.cxf.ws.addressing.blueprint;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  *
  */
-public class WsBPHandlerTest extends Assert {
+public class WsBPHandlerTest {
     @Test
     public void testGetSchemaLocation() {
         WsBPHandler handler = new WsBPHandler();

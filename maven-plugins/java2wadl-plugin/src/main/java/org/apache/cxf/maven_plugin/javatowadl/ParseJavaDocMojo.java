@@ -21,19 +21,21 @@ package org.apache.cxf.maven_plugin.javatowadl;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Locale;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.javadoc.AbstractJavadocMojo;
-import org.apache.maven.plugin.javadoc.JavadocReport;
-import org.apache.maven.plugin.javadoc.options.DocletArtifact;
+import org.apache.maven.plugins.javadoc.AbstractJavadocMojo;
+import org.apache.maven.plugins.javadoc.JavadocReport;
+import org.apache.maven.plugins.javadoc.options.DocletArtifact;
+import org.apache.maven.plugins.javadoc.resolver.ResourceResolver;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.artifact.resolve.ArtifactResolver;
+import org.apache.maven.shared.dependencies.resolve.DependencyResolver;
 import org.apache.maven.toolchain.ToolchainManager;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
 
@@ -44,6 +46,15 @@ import org.codehaus.plexus.archiver.manager.ArchiverManager;
  * @threadSafe
  */
 public class ParseJavaDocMojo extends AbstractMojo {
+    
+    /**
+     * The Maven Session Object
+     *
+     * @parameter expression="${session}"
+     * @required
+     * @readonly
+     */
+    protected MavenSession session; 
 
     /**
      * The source encoding.
@@ -62,30 +73,31 @@ public class ParseJavaDocMojo extends AbstractMojo {
      * @component
      */
     private ArchiverManager archiverManager;
-
+    
     /**
      * @component
      */
-    @SuppressWarnings("deprecation")
-    private org.apache.maven.artifact.factory.ArtifactFactory mavenArtifactFactory;
+    private ResourceResolver resourceResolver;
+    
+    /**
+     * @component
+     */
+    private DependencyResolver dependencyResolver;
 
+    
     /**
      * @component
      */
     private ArtifactResolver artifactResolver;
+    
+    
 
     /**
      * @component
      */
-    @SuppressWarnings("deprecation")
-    private org.apache.maven.project.MavenProjectBuilder mavenProjectBuilder;
+    private org.apache.maven.project.ProjectBuilder mavenProjectBuilder;
 
-    /**
-     * @component
-     */
-    @SuppressWarnings("deprecation")
-    private org.apache.maven.artifact.metadata.ArtifactMetadataSource artifactMetadataSource;
-
+    
     /**
      * @component
      */
@@ -106,16 +118,7 @@ public class ParseJavaDocMojo extends AbstractMojo {
      */
     private ArtifactRepository localRepository;
 
-    /**
-     * The remote repositories where artifacts are located.
-     *
-     * @parameter expression="${project.remoteArtifactRepositories}"
-     * @required
-     * @readonly
-     */
-    private List<ArtifactRepository> remoteRepositories;
-
-
+    
     /**
      * Directory into which assembled {@link JavadocOptions} instances will be written before they
      * are added to javadoc resources bundles.
@@ -152,7 +155,7 @@ public class ParseJavaDocMojo extends AbstractMojo {
             for (Object o : this.mavenProject.getPluginArtifacts()) {
                 if (o instanceof Artifact) {
                     Artifact artifact = (Artifact)o;
-                    if (artifact.getArtifactId().equals("cxf-java2wadl-plugin")) {
+                    if ("cxf-java2wadl-plugin".equals(artifact.getArtifactId())) {
                         docletArtifact.setGroupId(artifact.getGroupId());
                         docletArtifact.setArtifactId(artifact.getArtifactId());
                         docletArtifact.setVersion(artifact.getVersion());
@@ -161,25 +164,31 @@ public class ParseJavaDocMojo extends AbstractMojo {
             }
             f.set(mojo, docletArtifact);
 
-            f = AbstractJavadocMojo.class.getDeclaredField("factory");
-            f.setAccessible(true);
-            f.set(mojo, this.mavenArtifactFactory);
-
+            
             f = AbstractJavadocMojo.class.getDeclaredField("mavenProjectBuilder");
             f.setAccessible(true);
             f.set(mojo, this.mavenProjectBuilder);
+            
+            f = AbstractJavadocMojo.class.getDeclaredField("resourceResolver");
+            f.setAccessible(true);
+            f.set(mojo, this.resourceResolver);
+            
+            f = AbstractJavadocMojo.class.getDeclaredField("session");
+            System.out.println("========>" + session.getProjects());
+            f.setAccessible(true);
+            f.set(mojo, this.session);
+            
+            f = AbstractJavadocMojo.class.getDeclaredField("dependencyResolver");
+            f.setAccessible(true);
+            f.set(mojo, this.dependencyResolver);
 
-            f = AbstractJavadocMojo.class.getDeclaredField("resolver");
+            f = AbstractJavadocMojo.class.getDeclaredField("artifactResolver");
             f.setAccessible(true);
             f.set(mojo, this.artifactResolver);
 
             f = AbstractJavadocMojo.class.getDeclaredField("archiverManager");
             f.setAccessible(true);
             f.set(mojo, this.archiverManager);
-
-            f = AbstractJavadocMojo.class.getDeclaredField("artifactMetadataSource");
-            f.setAccessible(true);
-            f.set(mojo, this.artifactMetadataSource);
 
             f = AbstractJavadocMojo.class.getDeclaredField("toolchainManager");
             f.setAccessible(true);
@@ -189,18 +198,14 @@ public class ParseJavaDocMojo extends AbstractMojo {
             f.setAccessible(true);
             f.set(mojo, this.localRepository);
 
-            f = AbstractJavadocMojo.class.getDeclaredField("remoteRepositories");
-            f.setAccessible(true);
-            f.set(mojo, this.remoteRepositories);
-
             f = AbstractJavadocMojo.class.getDeclaredField("applyJavadocSecurityFix");
             f.setAccessible(true);
             f.set(mojo, false);
-
-            f = AbstractJavadocMojo.class.getDeclaredField("additionalparam");
+            
+            f = AbstractJavadocMojo.class.getDeclaredField("additionalOptions");
             f.setAccessible(true);
-            f.set(mojo, "-dumpJavaDocFile " + this.dumpFileOutputDirectory.getAbsolutePath()
-                      + File.separator + "dumpFile.properties");
+            f.set(mojo, new String[] {"-dumpJavaDocFile " + this.dumpFileOutputDirectory.getAbsolutePath()
+                + File.separator + "dumpFile.properties"});
 
             f = AbstractJavadocMojo.class.getDeclaredField("useStandardDocletOptions");
             f.setAccessible(true);

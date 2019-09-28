@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.XMLConstants;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -33,10 +34,11 @@ import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 
 
@@ -73,11 +75,11 @@ public final class CryptoCoverageUtil {
             Element protectedElement = signedRef.getProtectedElement();
             if (protectedElement != null
                 && ("EncryptedData".equals(protectedElement.getLocalName())
-                && WSConstants.ENC_NS.equals(protectedElement.getNamespaceURI())
-                || WSConstants.ENCRYPTED_HEADER.equals(protectedElement.getLocalName())
-                && WSConstants.WSSE11_NS.equals(protectedElement.getNamespaceURI())
-                || WSConstants.ENCRYPED_ASSERTION_LN.equals(protectedElement.getLocalName())
-                && WSConstants.SAML2_NS.equals(protectedElement.getNamespaceURI()))) {
+                && WSS4JConstants.ENC_NS.equals(protectedElement.getNamespaceURI())
+                || WSS4JConstants.ENCRYPTED_HEADER.equals(protectedElement.getLocalName())
+                && WSS4JConstants.WSSE11_NS.equals(protectedElement.getNamespaceURI())
+                || WSS4JConstants.ENCRYPED_ASSERTION_LN.equals(protectedElement.getLocalName())
+                && WSS4JConstants.SAML2_NS.equals(protectedElement.getNamespaceURI()))) {
                 for (WSDataRef encryptedRef : encryptedRefs) {
                     if (protectedElement == encryptedRef.getEncryptedElement()) {
 
@@ -125,7 +127,7 @@ public final class CryptoCoverageUtil {
         CoverageType type,
         CoverageScope scope
     ) throws WSSecurityException {
-        if (!CryptoCoverageUtil.matchElement(refs, type, scope, soapBody)) {
+        if (!CryptoCoverageUtil.matchElement(refs, scope, soapBody)) {
             Exception ex = new Exception("The " + getCoverageTypeString(type)
                     + " does not cover the required elements (soap:Body).");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
@@ -140,9 +142,9 @@ public final class CryptoCoverageUtil {
     ) throws WSSecurityException {
         String requiredTransform = null;
         if (type == CoverageType.SIGNED && scope == CoverageScope.CONTENT) {
-            requiredTransform = WSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS;
+            requiredTransform = WSS4JConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS;
         } else if (type == CoverageType.SIGNED) {
-            requiredTransform = WSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS;
+            requiredTransform = WSS4JConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS;
         }
 
         if (attachments != null) {
@@ -214,7 +216,7 @@ public final class CryptoCoverageUtil {
         }
 
         for (Element el : elements) {
-            if (!CryptoCoverageUtil.matchElement(refs, type, scope, el)) {
+            if (!CryptoCoverageUtil.matchElement(refs, scope, el)) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                         new Exception("The " + getCoverageTypeString(type)
                         + " does not cover the required elements ({"
@@ -292,6 +294,11 @@ public final class CryptoCoverageUtil {
         // XPathFactory and XPath are not thread-safe so we must recreate them
         // each request.
         final XPathFactory factory = XPathFactory.newInstance();
+        try {
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+        } catch (javax.xml.xpath.XPathFactoryConfigurationException ex) {
+            // ignore
+        }
         final XPath xpath = factory.newXPath();
 
         if (namespaces != null) {
@@ -337,7 +344,7 @@ public final class CryptoCoverageUtil {
 
                     final Element el = (Element)list.item(x);
 
-                    boolean instanceMatched = CryptoCoverageUtil.matchElement(refs, type, scope, el);
+                    boolean instanceMatched = CryptoCoverageUtil.matchElement(refs, scope, el);
 
                     // We looked through all of the refs, but the element was
                     // not signed.
@@ -352,8 +359,10 @@ public final class CryptoCoverageUtil {
         }
     }
 
-    private static boolean matchElement(Collection<WSDataRef> refs,
-            CoverageType type, CoverageScope scope, Element el) {
+    private static boolean matchElement(Collection<WSDataRef> refs, CoverageScope scope, Element el) {
+        if (el == null) {
+            return false;
+        }
         final boolean content;
 
         switch (scope) {

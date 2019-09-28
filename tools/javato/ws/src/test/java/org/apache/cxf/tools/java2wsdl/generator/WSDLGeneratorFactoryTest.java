@@ -22,10 +22,12 @@ package org.apache.cxf.tools.java2wsdl.generator;
 import org.apache.cxf.tools.java2wsdl.generator.wsdl11.WSDL11Generator;
 import org.apache.cxf.wsdl.WSDLConstants;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class WSDLGeneratorFactoryTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class WSDLGeneratorFactoryTest {
 
     @Test
     public void testNewWSDL11Generator() {

@@ -66,7 +66,7 @@ public final class Server {
         return 0;
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         java.util.Properties props = new Properties();
         props.putAll(System.getProperties());
 

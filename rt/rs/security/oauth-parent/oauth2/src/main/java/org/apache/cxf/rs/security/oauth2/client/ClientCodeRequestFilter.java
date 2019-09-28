@@ -107,16 +107,15 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
             Response codeResponse = createCodeResponse(rc, ui);
             rc.abortWith(codeResponse);
             return;
-        } else {
-            // complete the code flow if possible
-            MultivaluedMap<String, String> requestParams = toRequestState(rc, ui);
-            if (codeResponseQueryParamsAvailable(requestParams)
-                && (completeUri == null || absoluteRequestUri.endsWith(completeUri))) {
-                processCodeResponse(rc, ui, requestParams);
-                checkSecurityContextEnd(rc, requestParams);
-                // let the request continue
-                return;
-            }
+        }
+        // complete the code flow if possible
+        MultivaluedMap<String, String> requestParams = toRequestState(rc, ui);
+        if (codeResponseQueryParamsAvailable(requestParams)
+            && (completeUri == null || absoluteRequestUri.endsWith(completeUri))) {
+            processCodeResponse(rc, ui, requestParams);
+            checkSecurityContextEnd(rc, requestParams);
+            // let the request continue
+            return;
         }
         // neither the start nor the end of the flow
         rc.abortWith(Response.status(401).build());
@@ -155,9 +154,9 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
 
     private void checkSecurityContextEnd(ContainerRequestContext rc,
                                          MultivaluedMap<String, String> requestParams) {
-        String codeParam = requestParams.getFirst(OAuthConstants.AUTHORIZATION_CODE_VALUE);
         SecurityContext sc = rc.getSecurityContext();
         if (sc == null || sc.getUserPrincipal() == null) {
+            String codeParam = requestParams.getFirst(OAuthConstants.AUTHORIZATION_CODE_VALUE);
             if (codeParam == null
                 && requestParams.containsKey(OAuthConstants.ERROR_KEY)
                 && !faultAccessDeniedResponses) {
@@ -236,7 +235,9 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         ClientAccessToken at = null;
         if (codeParam != null) {
             AuthorizationCodeGrant grant = prepareCodeGrant(codeParam, getAbsoluteRedirectUri(ui));
-            grant.setCodeVerifier(state.getFirst(OAuthConstants.AUTHORIZATION_CODE_VERIFIER));
+            if (state != null) {
+                grant.setCodeVerifier(state.getFirst(OAuthConstants.AUTHORIZATION_CODE_VERIFIER));
+            }
             at = OAuthClientUtils.getAccessToken(accessTokenServiceClient, consumer, grant, useAuthorizationHeader);
         }
         ClientTokenContext tokenContext = initializeClientTokenContext(rc, at, requestParams, state);
@@ -249,13 +250,12 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     private AuthorizationCodeGrant prepareCodeGrant(String codeParam, URI absoluteRedirectUri) {
         if (codeRequestJoseProducer == null) {
             return new AuthorizationCodeGrant(codeParam, absoluteRedirectUri);
-        } else {
-            JwtRequestCodeGrant grant =
-                new JwtRequestCodeGrant(codeParam, absoluteRedirectUri, consumer.getClientId());
-            grant.setClientSecret(consumer.getClientSecret());
-            grant.setJoseProducer(codeRequestJoseProducer);
-            return grant;
         }
+        JwtRequestCodeGrant grant =
+            new JwtRequestCodeGrant(codeParam, absoluteRedirectUri, consumer.getClientId());
+        grant.setClientSecret(consumer.getClientSecret());
+        grant.setJoseProducer(codeRequestJoseProducer);
+        return grant;
     }
 
     protected ClientTokenContext initializeClientTokenContext(ContainerRequestContext rc,
@@ -303,13 +303,13 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     protected MultivaluedMap<String, String> toCodeRequestState(ContainerRequestContext rc, UriInfo ui) {
         MultivaluedMap<String, String> state = toRequestState(rc, ui);
         if (state == null) {
-            state = new MetadataMap<String, String>();
+            state = new MetadataMap<>();
         }
         return state;
     }
 
     protected MultivaluedMap<String, String> toRequestState(ContainerRequestContext rc, UriInfo ui) {
-        MultivaluedMap<String, String> requestState = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> requestState = new MetadataMap<>();
         requestState.putAll(ui.getQueryParameters(decodeRequestParameters));
         if (MediaType.APPLICATION_FORM_URLENCODED_TYPE.isCompatible(rc.getMediaType())) {
             String body = FormUtils.readBody(rc.getEntityStream(), StandardCharsets.UTF_8.name());
@@ -320,14 +320,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     }
 
     public void setScopeList(List<String> list) {
-        StringBuilder sb = new StringBuilder();
-        for (String s : list) {
-            if (sb.length() > 0) {
-                sb.append(" ");
-            }
-            sb.append(s);
-        }
-        setScopes(sb.toString());
+        setScopes(String.join(" ", list));
     }
 
     public void setScopes(String scopes) {

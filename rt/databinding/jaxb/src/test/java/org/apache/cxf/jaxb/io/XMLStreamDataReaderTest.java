@@ -37,12 +37,18 @@ import org.apache.hello_world_doc_lit_bare.types.TradePriceData;
 import org.apache.hello_world_rpclit.types.MyComplexStruct;
 import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
+
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class XMLStreamDataReaderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class XMLStreamDataReaderTest {
 
     private XMLInputFactory factory;
     private XMLStreamReader reader;
@@ -187,7 +193,7 @@ public class XMLStreamDataReaderTest extends Assert {
         assertNotNull(val);
         assertTrue(val instanceof TradePriceData);
         assertEquals("CXF", ((TradePriceData)val).getTickerSymbol());
-        assertEquals(new Float(1.0f), new Float(((TradePriceData)val).getTickerPrice()));
+        assertEquals(Float.valueOf(1.0f), new Float(((TradePriceData)val).getTickerPrice()));
     }
 
     private JAXBDataBinding getDataBinding(Class<?>... clz) throws Exception {

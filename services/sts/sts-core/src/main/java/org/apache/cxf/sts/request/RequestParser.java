@@ -44,6 +44,7 @@ import javax.xml.crypto.dsig.keyinfo.X509Data;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.helpers.CastUtils;
@@ -110,7 +111,7 @@ public class RequestParser {
             // JAXB types
             if (requestObject instanceof JAXBElement<?>) {
                 JAXBElement<?> jaxbElement = (JAXBElement<?>) requestObject;
-                if (jaxbElement != null && LOG.isLoggable(Level.FINE)) {
+                if (LOG.isLoggable(Level.FINE)) {
                     LOG.fine("Found " + jaxbElement.getName() + ": " + jaxbElement.getValue());
                 }
                 try {
@@ -120,17 +121,18 @@ public class RequestParser {
                         found = parseKeyRequirements(jaxbElement, keyRequirements, messageContext, stsProperties);
                     }
                     if (!found) {
-                        LOG.log(
-                            Level.WARNING,
-                            "Found a JAXB object of unknown type: " + jaxbElement.getName()
-                        );
-                        throw new STSException(
-                            "An unknown element was received", STSException.BAD_REQUEST
-                        );
+                        if (allowCustomContent) {
+                            tokenRequirements.addCustomContent(jaxbElement);
+                        } else {
+                            LOG.log(
+                                Level.WARNING,
+                                "Found a JAXB object of unknown type: " + jaxbElement.getName()
+                            );
+                            throw new STSException(
+                                "An unknown element was received", STSException.BAD_REQUEST
+                            );
+                        }
                     }
-                } catch (STSException ex) {
-                    LOG.log(Level.WARNING, "", ex);
-                    throw ex;
                 } catch (RuntimeException ex) {
                     LOG.log(Level.WARNING, "", ex);
                     throw ex;
@@ -143,11 +145,12 @@ public class RequestParser {
                     parseSecondaryParameters(element, claimsParsers, tokenRequirements, keyRequirements);
                 } else if ("AppliesTo".equals(element.getLocalName())
                     && (STSConstants.WSP_NS.equals(element.getNamespaceURI())
-                        || STSConstants.WSP_NS_04.equals(element.getNamespaceURI()))) {
+                        || STSConstants.WSP_NS_04.equals(element.getNamespaceURI())
+                        || STSConstants.WSP_NS_06.equals(element.getNamespaceURI()))) {
                     tokenRequirements.setAppliesTo(element);
                     LOG.fine("Found AppliesTo element");
                 } else if (allowCustomContent) {
-                    tokenRequirements.addCustomContent((Element)requestObject);
+                    tokenRequirements.addCustomContent(requestObject);
                 } else {
                     LOG.log(
                         Level.WARNING,
@@ -211,8 +214,8 @@ public class RequestParser {
             keyRequirements.setKeywrapAlgorithm(keywrapAlgorithm);
         } else if (QNameConstants.USE_KEY.equals(jaxbElement.getName())) {
             UseKeyType useKey = (UseKeyType)jaxbElement.getValue();
-            ReceivedKey receivedKey = parseUseKey(useKey, messageContext);
-            keyRequirements.setReceivedKey(receivedKey);
+            ReceivedCredential receivedCredential = parseUseKey(useKey, messageContext);
+            keyRequirements.setReceivedCredential(receivedCredential);
         } else if (QNameConstants.ENTROPY.equals(jaxbElement.getName())) {
             EntropyType entropyType = (EntropyType)jaxbElement.getValue();
             Entropy entropy = parseEntropy(entropyType, stsProperties);
@@ -317,7 +320,7 @@ public class RequestParser {
      * @return the ReceivedKey that has been parsed
      * @throws STSException
      */
-    private static ReceivedKey parseUseKey(
+    private static ReceivedCredential parseUseKey(
         UseKeyType useKey,
         Map<String, Object> messageContext
     ) throws STSException {
@@ -369,19 +372,18 @@ public class RequestParser {
                 Element element = (Element)useKey.getAny();
                 if ("KeyInfo".equals(element.getLocalName())) {
                     return parseKeyInfoElement((Element)useKey.getAny());
-                } else {
-                    NodeList x509CertData =
-                        element.getElementsByTagNameNS(
-                            Constants.SignatureSpecNS, Constants._TAG_X509CERTIFICATE
-                        );
-                    if (x509CertData != null && x509CertData.getLength() > 0) {
-                        try {
-                            x509 = Base64Utility.decode(x509CertData.item(0).getTextContent().trim());
-                            LOG.fine("Found X509Certificate UseKey type");
-                        } catch (Exception e) {
-                            LOG.log(Level.WARNING, "", e);
-                            throw new STSException(e.getMessage(), e, STSException.INVALID_REQUEST);
-                        }
+                }
+                NodeList x509CertData =
+                    element.getElementsByTagNameNS(
+                        Constants.SignatureSpecNS, Constants._TAG_X509CERTIFICATE
+                    );
+                if (x509CertData != null && x509CertData.getLength() > 0) {
+                    try {
+                        x509 = Base64Utility.decode(x509CertData.item(0).getTextContent().trim());
+                        LOG.fine("Found X509Certificate UseKey type");
+                    } catch (Exception e) {
+                        LOG.log(Level.WARNING, "", e);
+                        throw new STSException(e.getMessage(), e, STSException.INVALID_REQUEST);
                     }
                 }
             }
@@ -398,9 +400,9 @@ public class RequestParser {
                 X509Certificate cert =
                     (X509Certificate)cf.generateCertificate(new ByteArrayInputStream(x509));
                 LOG.fine("Successfully parsed X509 Certificate from UseKey");
-                ReceivedKey receivedKey = new ReceivedKey();
-                receivedKey.setX509Cert(cert);
-                return receivedKey;
+                ReceivedCredential receivedCredential = new ReceivedCredential();
+                receivedCredential.setX509Cert(cert);
+                return receivedCredential;
             } catch (CertificateException ex) {
                 LOG.log(Level.WARNING, "", ex);
                 throw new STSException("Error in parsing certificate: ", ex, STSException.INVALID_REQUEST);
@@ -440,10 +442,10 @@ public class RequestParser {
     }
 
     /**
-     * Parse the KeyInfo Element to return a ReceivedKey object containing the found certificate or
+     * Parse the KeyInfo Element to return a ReceivedCredential object containing the found certificate or
      * public key.
      */
-    private static ReceivedKey parseKeyInfoElement(Element keyInfoElement) throws STSException {
+    private static ReceivedCredential parseKeyInfoElement(Element keyInfoElement) throws STSException {
         KeyInfoFactory keyInfoFactory = null;
         try {
             keyInfoFactory = KeyInfoFactory.getInstance("DOM", "ApacheXMLDSig");
@@ -458,28 +460,25 @@ public class RequestParser {
             for (int i = 0; i < list.size(); i++) {
                 if (list.get(i) instanceof KeyValue) {
                     KeyValue keyValue = (KeyValue)list.get(i);
-                    ReceivedKey receivedKey = new ReceivedKey();
+                    ReceivedCredential receivedKey = new ReceivedCredential();
                     receivedKey.setPublicKey(keyValue.getPublicKey());
                     return receivedKey;
                 } else if (list.get(i) instanceof X509Certificate) {
-                    ReceivedKey receivedKey = new ReceivedKey();
+                    ReceivedCredential receivedKey = new ReceivedCredential();
                     receivedKey.setX509Cert((X509Certificate)list.get(i));
                     return receivedKey;
                 } else if (list.get(i) instanceof X509Data) {
                     X509Data x509Data = (X509Data)list.get(i);
                     for (int j = 0; j < x509Data.getContent().size(); j++) {
                         if (x509Data.getContent().get(j) instanceof X509Certificate) {
-                            ReceivedKey receivedKey = new ReceivedKey();
+                            ReceivedCredential receivedKey = new ReceivedCredential();
                             receivedKey.setX509Cert((X509Certificate)x509Data.getContent().get(j));
                             return receivedKey;
                         }
                     }
                 }
             }
-        } catch (MarshalException e) {
-            LOG.log(Level.WARNING, "", e);
-            throw new STSException(e.getMessage(), e, STSException.INVALID_REQUEST);
-        } catch (KeyException e) {
+        } catch (MarshalException | KeyException e) {
             LOG.log(Level.WARNING, "", e);
             throw new STSException(e.getMessage(), e, STSException.INVALID_REQUEST);
         }

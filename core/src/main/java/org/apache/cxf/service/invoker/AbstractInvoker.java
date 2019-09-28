@@ -160,13 +160,12 @@ public abstract class AbstractInvoker implements Invoker {
 
         if (checked) {
             return new Fault(ex);
-        } else {
-            String message = (ex == null) ? "" : ex.getMessage();
-            String method = (m == null) ? "<null>" : m.toString();
-            return new Fault(new Message("EXCEPTION_INVOKING_OBJECT", LOG,
-                                         message, method, params),
-                                         ex);
         }
+        String message = (ex == null) ? "" : ex.getMessage();
+        String method = (m == null) ? "<null>" : m.toString();
+        return new Fault(new Message("EXCEPTION_INVOKING_OBJECT", LOG,
+                                     message, method, params),
+                                     ex);
     }
 
     protected Object performInvocation(Exchange exchange, final Object serviceObject, Method m,
@@ -229,9 +228,8 @@ public abstract class AbstractInvoker implements Invoker {
      */
     private static Method matchMethod(Method methodToMatch, Object targetObject) {
         if (isJdkDynamicProxy(targetObject)) {
-            Class<?>[] interfaces = targetObject.getClass().getInterfaces();
-            for (int i = 0; i < interfaces.length; i++) {
-                Method m = getMostSpecificMethod(methodToMatch, interfaces[i]);
+            for (Class<?> iface : targetObject.getClass().getInterfaces()) {
+                Method m = getMostSpecificMethod(methodToMatch, iface);
                 if (!methodToMatch.equals(m)) {
                     return m;
                 }

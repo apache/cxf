@@ -54,6 +54,9 @@ public class AesGcmWrapKeyEncryptionAlgorithm extends AbstractWrapKeyEncryptionA
         String encodedTag = Base64UrlUtility.encodeChunk(wrappedKeyAndTag,
                                                          wrappedKeyAndTag.length - 128 / 8, 128 / 8);
         headers.setHeader("tag", encodedTag);
+
+        // Cleanup
+        Arrays.fill(wrappedKeyAndTag, (byte) 0);
         return wrappedKey;
     }
     protected AlgorithmParameterSpec getAlgorithmParameterSpec(JweHeaders headers) {

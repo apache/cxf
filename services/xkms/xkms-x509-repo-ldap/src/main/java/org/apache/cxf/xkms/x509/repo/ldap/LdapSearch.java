@@ -57,9 +57,9 @@ public class LdapSearch {
 
     //CHECKSTYLE:OFF
     private InitialDirContext createInitialContext() throws NamingException {
-        Hashtable<String, String> env = new Hashtable<>(5);
+        Hashtable<String, String> env = new Hashtable<>(5); //NOPMD
         env.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        env.put(javax.naming.Context.PROVIDER_URL, ldapuri.toString());
+        env.put(javax.naming.Context.PROVIDER_URL, ldapuri);
         env.put(javax.naming.Context.SECURITY_AUTHENTICATION, SECURITY_AUTHENTICATION);
         env.put(javax.naming.Context.SECURITY_PRINCIPAL, bindDN);
         env.put(javax.naming.Context.SECURITY_CREDENTIALS, bindPassword);
@@ -123,9 +123,8 @@ public class LdapSearch {
         if (answer.hasMore()) {
             SearchResult sr = answer.next();
             return sr.getAttributes();
-        } else {
-            return null;
         }
+        return null;
     }
 
     public Attribute findAttribute(String rootDN, String filter, String attrName) throws NamingException {

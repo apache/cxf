@@ -42,19 +42,16 @@ public class Hello2 implements HelloInterface {
     }
 
     public String[] getStringArray(String[] strs) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public List<String> getStringList(List<String> list) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     @WebMethod
     public String addNumbers(int arg0, int arg1) throws AddNumbersException {
-        // TODO Auto-generated method stub
         return null;
     }
 

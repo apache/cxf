@@ -22,7 +22,10 @@ package org.apache.cxf.systest.handlers;
 import org.apache.cxf.test.AbstractCXFSpringTest;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.handlers.AddNumbers;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  *

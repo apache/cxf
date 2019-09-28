@@ -35,13 +35,13 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.binding.soap.SOAPBindingUtil;
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapBinding;
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapBody;
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapHeader;
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapOperation;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
@@ -69,19 +69,19 @@ import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBinding;
 
 public class ServiceProcessor extends AbstractProcessor {
 
+    private static final int IN_HEADER = 1;
+
+    private static final int OUT_HEADER = 2;
+
+    private static final int RESULT_HEADER = 3;
+
+    private static final int NO_HEADER = 0;
+
     private String soapOPAction = "SOAPACTION";
 
     private String soapOPStyle = "STYLE";
 
     private BindingType bindingType;
-
-    private final int inHEADER = 1;
-
-    private final int outHEADER = 2;
-
-    private final int resultHeader = 3;
-
-    private final int noHEADER = 0;
 
     private Object bindingObj;
     private ServiceInfo service;
@@ -159,7 +159,7 @@ public class ServiceProcessor extends AbstractProcessor {
             }
             JAXWSBinding serviceBinding2 = service.getExtensor(JAXWSBinding.class);
 
-            //TODO : Handle service customized class
+            //Handle service customized class
             if (serviceBinding != null) {
                 if (serviceBinding.getPackage() != null) {
                     jaxwsBinding.setPackage(serviceBinding.getPackage());
@@ -214,7 +214,7 @@ public class ServiceProcessor extends AbstractProcessor {
                     && serviceBinding2.getJaxwsClass().getComments() != null) {
                     jaxwsBinding.setClassJavaDoc(serviceBinding2.getJaxwsClass().getComments());
                 }
-                if (!serviceBinding2.getPackageJavaDoc().equals("")) {
+                if (!serviceBinding2.getPackageJavaDoc().isEmpty()) {
                     sclz.setPackageJavaDoc(serviceBinding2.getPackageJavaDoc());
                 }
             }
@@ -420,7 +420,7 @@ public class ServiceProcessor extends AbstractProcessor {
                 if (jaxwsBinding.isEnableMime() || enableMime) {
                     jm.setMimeEnable(true);
                 }
-                if ((jm.isWrapperStyle() && headerType > this.noHEADER)
+                if ((jm.isWrapperStyle() && headerType > NO_HEADER)
                     || !jaxwsBinding.isEnableWrapperStyle()
                     || (jm.enableMime() && jm.isWrapperStyle())
                     || !enableWrapperStyle) {
@@ -435,7 +435,7 @@ public class ServiceProcessor extends AbstractProcessor {
                     processor.processMethod(jm, bop.getOperationInfo());
                 }
 
-                if (headerType == this.resultHeader) {
+                if (headerType == RESULT_HEADER) {
                     JAnnotation resultAnno = jm.getAnnotationMap().get("WebResult");
                     if (resultAnno != null) {
                         resultAnno.addElement(new JAnnotationElement("header", true, true));
@@ -562,18 +562,17 @@ public class ServiceProcessor extends AbstractProcessor {
     private static String getJavaTypeForMimeType(MIMEPart mPart) {
         if (mPart.getExtensibilityElements().size() > 1) {
             return "javax.activation.DataHandler";
-        } else {
-            ExtensibilityElement extElement = (ExtensibilityElement)mPart.getExtensibilityElements().get(0);
-            if (extElement instanceof MIMEContent) {
-                MIMEContent mimeContent = (MIMEContent)extElement;
-                if ("image/jpeg".equals(mimeContent.getType()) || "image/gif".equals(mimeContent.getType())) {
-                    return "java.awt.Image";
-                } else if ("text/xml".equals(mimeContent.getType())
-                           || "application/xml".equals(mimeContent.getType())) {
-                    return "javax.xml.transform.Source";
-                }  else {
-                    return "javax.activation.DataHandler";
-                }
+        }
+        ExtensibilityElement extElement = (ExtensibilityElement)mPart.getExtensibilityElements().get(0);
+        if (extElement instanceof MIMEContent) {
+            MIMEContent mimeContent = (MIMEContent)extElement;
+            if ("image/jpeg".equals(mimeContent.getType()) || "image/gif".equals(mimeContent.getType())) {
+                return "java.awt.Image";
+            } else if ("text/xml".equals(mimeContent.getType())
+                       || "application/xml".equals(mimeContent.getType())) {
+                return "javax.xml.transform.Source";
+            }  else {
+                return "javax.activation.DataHandler";
             }
         }
         return "javax.activation.DataHandler";
@@ -685,7 +684,7 @@ public class ServiceProcessor extends AbstractProcessor {
         boolean isSameMessage = false;
         boolean isNonWrappable = false;
         boolean allPartsHeader = false;
-        int result = this.noHEADER;
+        int result = NO_HEADER;
 
         // begin process input
         if (bop.getInput() != null
@@ -715,7 +714,7 @@ public class ServiceProcessor extends AbstractProcessor {
             isNonWrappable = isSameMessage && containParts;
             // if is nonwrapple then return
             if (isNonWrappable) {
-                result = this.inHEADER;
+                result = IN_HEADER;
             }
         }
         isSameMessage = false;
@@ -749,10 +748,10 @@ public class ServiceProcessor extends AbstractProcessor {
             }
             isNonWrappable = isSameMessage && containParts;
             if (isNonWrappable && allPartsHeader) {
-                result = this.resultHeader;
+                result = RESULT_HEADER;
             }
             if (isNonWrappable && !allPartsHeader) {
-                result = this.outHEADER;
+                result = OUT_HEADER;
             }
         }
 
@@ -763,9 +762,8 @@ public class ServiceProcessor extends AbstractProcessor {
         for (OperationInfo operation : service.getInterface().getOperations()) {
             if (operationName.equals(operation.getName()) && isIn) {
                 return operation.getInput();
-            } else {
-                return operation.getOutput();
             }
+            return operation.getOutput();
         }
         return null;
     }

@@ -49,6 +49,7 @@ public class JMSConfiguration {
     private boolean pubSubNoLocal;
     private Long clientReceiveTimeout = 60000L;
     private Long serverReceiveTimeout;
+    private boolean ignoreTimeoutException;
     private boolean explicitQosEnabled;
     private int deliveryMode = Message.DEFAULT_DELIVERY_MODE;
     private int priority = Message.DEFAULT_PRIORITY;
@@ -91,12 +92,14 @@ public class JMSConfiguration {
     private boolean useConduitIdSelector = true;
     private String conduitSelectorPrefix;
     private boolean jmsProviderTibcoEms;
+    private boolean oneSessionPerConnection;
 
     private TransactionManager transactionManager;
 
     // For jms spec. Do not configure manually
     private String targetService;
     private String requestURI;
+    private int retryInterval = 5000;
 
     public void ensureProperlyConfigured() {
         ConnectionFactory cf = getConnectionFactory();
@@ -431,6 +434,14 @@ public class JMSConfiguration {
         this.jmsProviderTibcoEms = jmsProviderTibcoEms;
     }
 
+    public boolean isOneSessionPerConnection() {
+        return oneSessionPerConnection;
+    }
+
+    public void setOneSessionPerConnection(boolean oneSessionPerConnection) {
+        this.oneSessionPerConnection = oneSessionPerConnection;
+    }
+
     public static Destination resolveOrCreateDestination(final Session session,
                                                          final DestinationResolver resolver,
                                                          final String replyToDestinationName,
@@ -502,6 +513,22 @@ public class JMSConfiguration {
 
     public void setTransactionManager(TransactionManager transactionManager) {
         this.transactionManager = transactionManager;
+    }
+
+    public int getRetryInterval() {
+        return this.retryInterval;
+    }
+    
+    public void setRetryInterval(int retryInterval) {
+        this.retryInterval = retryInterval;
+    }
+
+    public boolean isIgnoreTimeoutException() {
+        return ignoreTimeoutException;
+    }
+
+    public void setIgnoreTimeoutException(boolean ignoreTimeoutException) {
+        this.ignoreTimeoutException = ignoreTimeoutException;
     }
 
 }

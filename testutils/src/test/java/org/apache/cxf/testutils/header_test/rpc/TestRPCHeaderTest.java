@@ -24,19 +24,21 @@ import java.lang.reflect.Method;
 import javax.jws.WebParam;
 
 import org.apache.header_test.rpc.TestRPCHeader;
-import org.junit.Assert;
+
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class TestRPCHeaderTest extends Assert {
+public class TestRPCHeaderTest {
     Class<TestRPCHeader> cls = TestRPCHeader.class;
 
     @Test
     public void testHeader1() {
-        Method meths[] = cls.getMethods();
+        Method[] meths = cls.getMethods();
         for (Method m : meths) {
             if ("testHeader1".equals(m.getName())) {
-                Annotation annotations[][] = m.getParameterAnnotations();
+                Annotation[][] annotations = m.getParameterAnnotations();
                 assertEquals(2, annotations.length);
                 assertEquals(1, annotations[0].length);
                 assertTrue(annotations[0][0] instanceof WebParam);
@@ -52,10 +54,10 @@ public class TestRPCHeaderTest extends Assert {
 
     @Test
     public void testInOutHeader() {
-        Method meths[] = cls.getMethods();
+        Method[] meths = cls.getMethods();
         for (Method m : meths) {
             if ("testInOutHeader".equals(m.getName())) {
-                Annotation annotations[][] = m.getParameterAnnotations();
+                Annotation[][] annotations = m.getParameterAnnotations();
                 assertEquals(2, annotations.length);
                 assertEquals(1, annotations[1].length);
                 assertTrue(annotations[1][0] instanceof WebParam);

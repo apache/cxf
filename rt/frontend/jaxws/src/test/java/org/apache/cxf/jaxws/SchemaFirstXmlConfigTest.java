@@ -23,10 +23,11 @@ import org.w3c.dom.Document;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.junit.Test;
 
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import static org.junit.Assert.assertNotNull;
 
 public class SchemaFirstXmlConfigTest extends AbstractJaxWsTest {
 

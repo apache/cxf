@@ -88,9 +88,8 @@ public final class Scope implements Comparable<Object> {
         int size = scope.size();
         if (size > 0) {
             return scope.get(size - 1);
-        } else {
-            return "";
         }
+        return "";
     }
 
     public Scope getParent() {
@@ -117,7 +116,7 @@ public final class Scope implements Comparable<Object> {
         StringBuilder result = new StringBuilder();
         result.append(CorbaConstants.REPO_STRING);
         if (prefix != null && prefix.length() > 0) {
-            result.append(prefix + "/");
+            result.append(prefix).append('/');
         }
         result.append(toString("/"));
         result.append(CorbaConstants.IDL_VERSION);
@@ -127,9 +126,8 @@ public final class Scope implements Comparable<Object> {
     public boolean equals(Object otherScope) {
         if (otherScope instanceof Scope) {
             return toString().equals(((Scope)otherScope).toString());
-        } else {
-            return false;
         }
+        return false;
     }
 
     public int hashCode() {
@@ -142,10 +140,9 @@ public final class Scope implements Comparable<Object> {
         }
         if (otherScope instanceof Scope) {
             return toString().compareTo(otherScope.toString());
-        } else {
-            throw new ClassCastException("Scope class expected but found "
-                                         + otherScope.getClass().getName());
         }
+        throw new ClassCastException("Scope class expected but found "
+                                     + otherScope.getClass().getName());
     }
 
     public void setPrefix(String prefix) {

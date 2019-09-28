@@ -81,6 +81,10 @@ import org.apache.hello_world_soap_http.types.GreetMeResponse;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
 
@@ -557,7 +561,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         Object response = disp.invoke(greetMe);
         assertNotNull(response);
         String responseValue = ((GreetMeResponse)response).getResponseType();
-        assertTrue("Expected string, " + expected, expected.equals(responseValue));
+        assertEquals("Expected string, " + expected, expected, responseValue);
 
         // Test oneway
         disp.invokeOneWay(greetMe);
@@ -567,7 +571,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(response2);
         GreetMeResponse greetMeResponse = (GreetMeResponse)response2.get();
         String responseValue2 = greetMeResponse.getResponseType();
-        assertTrue("Expected string, " + expected, expected.equals(responseValue2));
+        assertEquals("Expected string, " + expected, expected, responseValue2);
 
         // Test async callback
         TestJAXBHandler tjbh = new TestJAXBHandler();
@@ -576,7 +580,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         waitForFuture(fd);
 
         String responseValue3 = ((GreetMeResponse)tjbh.getResponse()).getResponseType();
-        assertTrue("Expected string, " + expected, expected.equals(responseValue3));
+        assertEquals("Expected string, " + expected, expected, responseValue3);
 
         org.apache.hello_world_soap_http.types.TestDocLitFault fr =
             new org.apache.hello_world_soap_http.types.TestDocLitFault();
@@ -648,7 +652,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         Object response = disp.invoke(greetMe);
         assertNotNull(response);
         String responseValue = ((GreetMeResponse)response).getResponseType();
-        assertTrue("Expected string, " + expected, expected.equals(responseValue));
+        assertEquals("Expected string, " + expected, expected, responseValue);
 
         assertEquals("Feature should be applied", 1, TestDispatchFeature.getCount());
         assertEquals("Feature based interceptors should be added",

@@ -23,9 +23,13 @@ import java.lang.reflect.Proxy;
 
 import org.apache.cxf.jca.cxf.CXFInvocationHandler;
 import org.apache.cxf.jca.cxf.CXFInvocationHandlerData;
+
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 public class ObjectMethodInvocationHandlerTest extends AbstractInvocationHandlerTest {
@@ -57,8 +61,8 @@ public class ObjectMethodInvocationHandlerTest extends AbstractInvocationHandler
         Method toString = Object.class.getMethod("toString", new Class[0]);
 
         Object result = handler.invoke(testTarget, toString, null);
-        assertTrue("object method must not be passed to next handler in chain",
-                   !dummyHandler.invokeCalled);
+        assertFalse("object method must not be passed to next handler in chain",
+                   dummyHandler.invokeCalled);
         assertTrue("object must be a String", result instanceof String);
         assertTrue("checking toString method ", ((String)result).startsWith("ConnectionHandle"));
     }
@@ -75,8 +79,8 @@ public class ObjectMethodInvocationHandlerTest extends AbstractInvocationHandler
 
         Method equals = Object.class.getMethod("equals", new Class[] {Object.class});
         handler.invoke(testTarget, equals, new Object[] {this});
-        assertTrue("object method must not be passed to next handler in chain",
-                   !dummyHandler.invokeCalled);
+        assertFalse("object method must not be passed to next handler in chain",
+                   dummyHandler.invokeCalled);
     }
 
     @Test
@@ -111,7 +115,7 @@ public class ObjectMethodInvocationHandlerTest extends AbstractInvocationHandler
             (TestInterface)Proxy.newProxyInstance(TestInterface.class.getClassLoader(), interfaces, handler2);
 
         assertEquals(proxy1, proxy1);
-        assertTrue(!proxy1.equals(proxy2));
+        assertFalse(proxy1.equals(proxy2));
     }
 
 
@@ -123,8 +127,8 @@ public class ObjectMethodInvocationHandlerTest extends AbstractInvocationHandler
 
         handler.invoke(testTarget, method, args);
 
-        assertTrue("object method must not be passed to next handler in chain",
-                   !dummyHandler.invokeCalled);
+        assertFalse("object method must not be passed to next handler in chain",
+                   dummyHandler.invokeCalled);
         assertEquals(method + " must be invoked directly on target object",
                      method.getName(), target.lastMethod.getName());
     }
@@ -135,4 +139,3 @@ public class ObjectMethodInvocationHandlerTest extends AbstractInvocationHandler
 
 
 }
-

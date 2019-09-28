@@ -46,11 +46,14 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.cxf.rt.security.crypto.KeyProperties;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class CryptoUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class CryptoUtilsTest {
 
     private CodeGrantEncryptingDataProvider p;
 
@@ -113,7 +116,7 @@ public class CryptoUtilsTest extends Assert {
         AccessTokenRegistration atr = prepareTokenRegistration();
 
         BearerAccessToken token = p.createAccessTokenInternal(atr);
-        JSONProvider<BearerAccessToken> jsonp = new JSONProvider<BearerAccessToken>();
+        JSONProvider<BearerAccessToken> jsonp = new JSONProvider<>();
         jsonp.setMarshallAsJaxbElement(true);
         jsonp.setUnmarshallAsJaxbElement(true);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -144,7 +147,7 @@ public class CryptoUtilsTest extends Assert {
         AccessTokenRegistration atr = prepareTokenRegistration();
 
         BearerAccessToken token = p.createAccessTokenInternal(atr);
-        JSONProvider<BearerAccessToken> jsonp = new JSONProvider<BearerAccessToken>();
+        JSONProvider<BearerAccessToken> jsonp = new JSONProvider<>();
         jsonp.setMarshallAsJaxbElement(true);
         jsonp.setUnmarshallAsJaxbElement(true);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -168,7 +171,7 @@ public class CryptoUtilsTest extends Assert {
     public void testClientJSON() throws Exception {
         Client c = new Client("client", "secret", true);
         c.setSubject(new UserSubject("subject", "id"));
-        JSONProvider<Client> jsonp = new JSONProvider<Client>();
+        JSONProvider<Client> jsonp = new JSONProvider<>();
         jsonp.setMarshallAsJaxbElement(true);
         jsonp.setUnmarshallAsJaxbElement(true);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -193,7 +196,7 @@ public class CryptoUtilsTest extends Assert {
     public void testCodeGrantJSON() throws Exception {
         Client c = new Client("client", "secret", true);
         ServerAuthorizationCodeGrant grant = new ServerAuthorizationCodeGrant(c, "code", 1, 2);
-        JSONProvider<ServerAuthorizationCodeGrant> jsonp = new JSONProvider<ServerAuthorizationCodeGrant>();
+        JSONProvider<ServerAuthorizationCodeGrant> jsonp = new JSONProvider<>();
         jsonp.setMarshallAsJaxbElement(true);
         jsonp.setUnmarshallAsJaxbElement(true);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();

@@ -32,20 +32,20 @@ import org.apache.cxf.interceptor.Fault;
  */
 public abstract class AbstractWrapperHelper implements WrapperHelper {
 
-    public static final Class<?> NO_CLASSES[] = new Class[0];
-    public static final Object NO_PARAMS[] = new Object[0];
+    public static final Class<?>[] NO_CLASSES = new Class<?>[0];
+    public static final Object[] NO_PARAMS = new Object[0];
 
     protected final Class<?> wrapperType;
-    protected final Method setMethods[];
-    protected final Method getMethods[];
-    protected final Field fields[];
+    protected final Method[] setMethods;
+    protected final Method[] getMethods;
+    protected final Field[] fields;
     protected boolean validate;
 
 
     protected AbstractWrapperHelper(Class<?> wt,
-                  Method sets[],
-                  Method gets[],
-                  Field f[]) {
+                  Method[] sets,
+                  Method[] gets,
+                  Field[] f) {
         setMethods = sets;
         getMethods = gets;
         fields = f;
@@ -66,7 +66,7 @@ public abstract class AbstractWrapperHelper implements WrapperHelper {
     }
 
     public String getSignature() {
-        return "" + System.identityHashCode(this);
+        return Integer.toString(System.identityHashCode(this));
     }
 
     protected abstract Object createWrapperObject(Class<?> typeClass) throws Exception;

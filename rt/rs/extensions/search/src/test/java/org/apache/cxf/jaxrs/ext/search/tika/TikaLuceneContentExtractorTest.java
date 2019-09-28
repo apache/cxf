@@ -19,10 +19,13 @@
 package org.apache.cxf.jaxrs.ext.search.tika;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.cxf.jaxrs.ext.search.SearchBean;
 import org.apache.cxf.jaxrs.ext.search.SearchConditionParser;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
@@ -37,32 +40,42 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.RAMDirectory;
-import org.apache.lucene.util.Version;
+import org.apache.lucene.store.MMapDirectory;
 import org.apache.tika.parser.pdf.PDFParser;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TikaLuceneContentExtractorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class TikaLuceneContentExtractorTest {
     private TikaLuceneContentExtractor extractor;
     private Directory directory;
     private IndexWriter writer;
     private SearchConditionParser< SearchBean > parser;
+    private Path tempDirectory;
 
     @Before
     public void setUp() throws Exception {
-        final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_4_9);
-        directory = new RAMDirectory();
+        final Analyzer analyzer = new StandardAnalyzer();
+        tempDirectory = Files.createTempDirectory("lucene");
+        directory = new MMapDirectory(tempDirectory);
 
-        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_4_9, analyzer);
+        IndexWriterConfig config = new IndexWriterConfig(analyzer);
         writer = new IndexWriter(directory, config);
         writer.commit();
 
-        parser = new FiqlParser<SearchBean>(SearchBean.class);
+        parser = new FiqlParser<>(SearchBean.class);
         extractor = new TikaLuceneContentExtractor(new PDFParser());
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        writer.close();
+        directory.close();
+        FileUtils.deleteQuietly(tempDirectory.toFile());
     }
 
     @Test
@@ -220,26 +233,18 @@ public class TikaLuceneContentExtractorTest extends Assert {
     }
 
     private ScoreDoc[] getHits(final String expression, final Map< String, Class<?> > fieldTypes) throws IOException {
-        IndexReader reader = DirectoryReader.open(directory);
-        IndexSearcher searcher = new IndexSearcher(reader);
 
-        try {
-            LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<SearchBean>("ct", "contents");
+        try (IndexReader reader = DirectoryReader.open(directory)) {
+            IndexSearcher searcher = new IndexSearcher(reader);
+            LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<>("ct", "contents");
             visitor.setPrimitiveFieldTypeMap(fieldTypes);
             visitor.visit(parser.parse(expression));
 
-            ScoreDoc[] hits = searcher.search(visitor.getQuery(), null, 1000).scoreDocs;
+            ScoreDoc[] hits = searcher.search(visitor.getQuery(), 1000).scoreDocs;
             assertNotNull(hits);
 
             return hits;
-        } finally {
-            reader.close();
         }
     }
 
-    @After
-    public void tearDown() throws Exception {
-        writer.close();
-        directory.close();
-    }
 }

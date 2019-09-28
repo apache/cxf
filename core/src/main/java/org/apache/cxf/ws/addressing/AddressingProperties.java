@@ -39,6 +39,7 @@ public class AddressingProperties  {
     private String namespaceURI;
     private QName duplicate;
     private List<QName> mustUnderstand;
+    private boolean isRequired;
 
     /**
      * Constructor, defaults to 2005/08 namespace.
@@ -213,10 +214,16 @@ public class AddressingProperties  {
         }
         return mustUnderstand;
     }
+    public boolean isRequired() {
+        return isRequired;
+    }
+    public void setRequired(boolean b) {
+        isRequired = b;
+    }
 
     public String toString() {
         StringBuilder buf = new StringBuilder();
-        buf.append("[");
+        buf.append('[');
         if (null != messageID) {
             if (buf.length() > 1) {
                 buf.append(", ");
@@ -265,7 +272,7 @@ public class AddressingProperties  {
             buf.append("RelatesTo: ");
             buf.append(relatesTo.getValue());
         }
-        buf.append("]");
+        buf.append(']');
         return buf.toString();
 
     }

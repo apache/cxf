@@ -42,17 +42,22 @@ import org.apache.neethi.Constants;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyOperator;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  *
  */
-public class EndpointPolicyImplTest extends Assert {
+public class EndpointPolicyImplTest {
 
     private IMocksControl control;
 
@@ -72,11 +77,10 @@ public class EndpointPolicyImplTest extends Assert {
         control = EasyMock.createNiceControl();
     }
 
-    @SuppressWarnings("unchecked")
     private List<Interceptor<? extends Message>> createMockInterceptorList() {
         Interceptor<? extends Message> i = control.createMock(Interceptor.class);
         Interceptor<? extends Message> m = i;
-        List<Interceptor<? extends Message>> a = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> a = new ArrayList<>();
         a.add(m);
         return a;
     }
@@ -298,7 +302,7 @@ public class EndpointPolicyImplTest extends Assert {
         assertEquals("1 assertion should be available", 1, assertions1.size());
 
         QName n1 = assertions1.get(0).getName();
-        assertTrue("Policy was not merged", n1.equals(aqn1));
+        assertEquals("Policy was not merged", n1, aqn1);
     }
 
     private PolicyAssertion mockAssertion(QName name, int howMany, boolean normalize) {

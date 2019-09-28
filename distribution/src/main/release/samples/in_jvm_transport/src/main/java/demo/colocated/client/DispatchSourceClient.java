@@ -64,7 +64,7 @@ public final class DispatchSourceClient {
     private DispatchSourceClient() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         Server.main(new String[]{"inProcess"});
 
@@ -106,8 +106,7 @@ public final class DispatchSourceClient {
 
     private static Source encodeSource(String template, String value) throws IOException {
         String payload = value == null ? template : String.format(template, value);
-        Source source = new StreamSource(new ByteArrayInputStream(payload.getBytes("utf-8")));
-        return source;
+        return new StreamSource(new ByteArrayInputStream(payload.getBytes("utf-8")));
     }
 
     private static String decodeSource(Source source, String uri, String name) throws Exception {

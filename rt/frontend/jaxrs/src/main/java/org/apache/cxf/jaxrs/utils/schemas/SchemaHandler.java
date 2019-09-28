@@ -27,7 +27,7 @@ import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.transform.Source;
@@ -83,19 +83,15 @@ public class SchemaHandler {
     public static Schema createSchema(List<String> locations, String catalogLocation, final Bus bus) {
 
         SchemaFactory factory = SchemaFactory.newInstance(Constants.URI_2001_SCHEMA_XSD);
-        Schema s = null;
         try {
             List<Source> sources = new ArrayList<>();
             for (String loc : locations) {
-                List<URL> schemaURLs = new LinkedList<URL>();
-
-                if (loc.lastIndexOf(".") == -1 || loc.lastIndexOf('*') != -1) {
+                final List<URL> schemaURLs;
+                if (loc.lastIndexOf('.') == -1 || loc.lastIndexOf('*') != -1) {
                     schemaURLs = ClasspathScanner.findResources(loc, "xsd");
                 } else {
                     URL url = ResourceUtils.getResourceURL(loc, bus);
-                    if (url != null) {
-                        schemaURLs.add(url);
-                    }
+                    schemaURLs = url != null ? Collections.singletonList(url) : Collections.emptyList();
                 }
                 if (schemaURLs.isEmpty()) {
                     throw new IllegalArgumentException("Cannot find XML schema location: " + loc);
@@ -152,12 +148,10 @@ public class SchemaHandler {
                     }
                 }
             }
-            s = factory.newSchema(sources.toArray(new Source[sources.size()]));
+            return factory.newSchema(sources.toArray(new Source[0]));
         } catch (Exception ex) {
             throw new IllegalArgumentException("Failed to load XML schema : " + ex.getMessage(), ex);
         }
-        return s;
-
     }
 
 }

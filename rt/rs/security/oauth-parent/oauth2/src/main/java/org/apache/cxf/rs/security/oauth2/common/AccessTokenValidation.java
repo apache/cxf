@@ -53,10 +53,11 @@ public class AccessTokenValidation {
     private String tokenGrantType;
     private long tokenIssuedAt;
     private long tokenLifetime;
+    private long tokenNotBefore;
     private String tokenIssuer;
     private UserSubject tokenSubject;
-    private List<OAuthPermission> tokenScopes = new LinkedList<OAuthPermission>();
-    private List<String> audiences = new LinkedList<String>();
+    private List<OAuthPermission> tokenScopes = new LinkedList<>();
+    private List<String> audiences = new LinkedList<>();
     private String clientCodeVerifier;
     private Map<String, String> extraProps = new HashMap<>();
 
@@ -74,6 +75,7 @@ public class AccessTokenValidation {
         this.tokenGrantType = token.getGrantType();
         this.tokenIssuedAt = token.getIssuedAt();
         this.tokenLifetime = token.getExpiresIn();
+        this.tokenNotBefore = token.getNotBefore();
         this.tokenIssuer = token.getIssuer();
         this.tokenSubject = token.getSubject();
         this.tokenScopes = token.getScopes();
@@ -192,6 +194,14 @@ public class AccessTokenValidation {
 
     public void setTokenIssuer(String tokenIssuer) {
         this.tokenIssuer = tokenIssuer;
+    }
+
+    public long getTokenNotBefore() {
+        return tokenNotBefore;
+    }
+
+    public void setTokenNotBefore(long tokenNotBefore) {
+        this.tokenNotBefore = tokenNotBefore;
     }
 
 }

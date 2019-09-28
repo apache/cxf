@@ -22,6 +22,7 @@ import java.io.Closeable;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -37,16 +38,17 @@ import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.Binding;
+import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.AbstractAttributedInterceptorProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
@@ -64,16 +66,26 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor.PolicyBasedWSS4JOutInterceptorInternal;
 import org.apache.neethi.Policy;
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.saml.OpenSAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP12Constants;
-import org.apache.wss4j.policy.model.AsymmetricBinding;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
     protected PolicyBuilder policyBuilder;
@@ -253,6 +265,14 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
 
         SoapMessage inmsg = this.getSoapMessageForDom(document, aim);
 
+        Element securityHeaderElem = WSSecurityUtil.getSecurityHeader(document, "");
+        if (securityHeaderElem != null) {
+            SoapHeader securityHeader = new SoapHeader(new QName(securityHeaderElem.getNamespaceURI(),
+                                                                 securityHeaderElem.getLocalName()),
+                                                       securityHeaderElem);
+            inmsg.getHeaders().add(securityHeader);
+        }
+
         inHandler.handleMessage(inmsg);
 
         for (CoverageType type : types) {
@@ -319,8 +339,6 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         return msg.getContent(SOAPMessage.class).getSOAPPart();
     }
 
-    // TODO: This method can be removed or reduced when testSignedElementsWithIssuedSAMLToken is
-    // cleaned up.
     protected void runOutInterceptorAndValidateSamlTokenAttached(String policyDoc) throws Exception {
         // create the request message
         final Document document = this.readDocument("wsse-request-clean.xml");
@@ -335,15 +353,22 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         Element issuedAssertion =
             this.readDocument("example-sts-issued-saml-assertion.xml").getDocumentElement();
 
+        Properties cryptoProps = new Properties();
+        URL url = ClassLoader.getSystemResource("outsecurity.properties");
+        cryptoProps.load(url.openStream());
+        Crypto crypto = CryptoFactory.getInstance(cryptoProps);
+
+        // Sign the "issued" assertion
+        SamlAssertionWrapper assertionWrapper = new SamlAssertionWrapper(issuedAssertion);
+        assertionWrapper.signAssertion("myalias", "myAliasPassword", crypto, false);
+
+        Document doc = DOMUtils.newDocument();
+        issuedAssertion = OpenSAMLUtil.toDom(assertionWrapper.getSaml1(), doc);
         String assertionId = issuedAssertion.getAttributeNodeNS(null, "AssertionID").getNodeValue();
 
         SecurityToken issuedToken =
             new SecurityToken(assertionId, issuedAssertion, null);
 
-        Properties cryptoProps = new Properties();
-        URL url = ClassLoader.getSystemResource("outsecurity.properties");
-        cryptoProps.load(url.openStream());
-        Crypto crypto = CryptoFactory.getInstance(cryptoProps);
         String alias = cryptoProps.getProperty("org.apache.ws.security.crypto.merlin.keystore.alias");
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias(alias);
@@ -362,7 +387,9 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         final Document signedDoc = this.runOutInterceptorAndValidate(
                 msg, policy, aim, null, null);
 
-        verifySignatureCoversAssertion(signedDoc, assertionId);
+        this.runInInterceptorAndValidate(signedDoc,
+                                         policy, Collections.singletonList(SP12Constants.ISSUED_TOKEN), null,
+                                         Collections.singletonList(CoverageType.SIGNED));
     }
 
     protected PolicyBasedWSS4JOutInterceptorInternal getOutInterceptor() {
@@ -376,23 +403,23 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         for (CoverageType type : types) {
             switch(type) {
             case SIGNED:
-                action += " " + WSHandlerConstants.SIGNATURE;
+                action += " " + ConfigurationConstants.SIGNATURE;
                 break;
             case ENCRYPTED:
-                action += " " + WSHandlerConstants.ENCRYPT;
+                action += " " + ConfigurationConstants.ENCRYPT;
                 break;
             default:
                 fail("Unsupported coverage type.");
             }
         }
-        inHandler.setProperty(WSHandlerConstants.ACTION, action);
-        inHandler.setProperty(WSHandlerConstants.SIG_VER_PROP_FILE,
+        inHandler.setProperty(ConfigurationConstants.ACTION, action);
+        inHandler.setProperty(ConfigurationConstants.SIG_VER_PROP_FILE,
                 "insecurity.properties");
-        inHandler.setProperty(WSHandlerConstants.DEC_PROP_FILE,
+        inHandler.setProperty(ConfigurationConstants.DEC_PROP_FILE,
                 "insecurity.properties");
-        inHandler.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS,
+        inHandler.setProperty(ConfigurationConstants.PW_CALLBACK_CLASS,
                 TestPwdCallback.class.getName());
-        inHandler.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
+        inHandler.setProperty(ConfigurationConstants.IS_BSP_COMPLIANT, "false");
 
         return inHandler;
     }
@@ -437,7 +464,7 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
 
         List<WSSecurityEngineResult> signatureResults =
             results.get(0).getActionResults().get(WSConstants.SIGN);
-        assertTrue(!(signatureResults == null || signatureResults.isEmpty()));
+        assertFalse(signatureResults == null || signatureResults.isEmpty());
     }
 
     protected void verifyWss4jEncResults(SoapMessage inmsg) {
@@ -466,101 +493,6 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
             }
         }
         assertTrue(foundReferenceList);
-    }
-
-    // TODO: This method can be removed when runOutInterceptorAndValidateAsymmetricBinding
-    // is cleaned up by adding server side enforcement of signature related algorithms.
-    // See https://issues.apache.org/jira/browse/WSS-222
-    protected void verifySignatureAlgorithms(Document signedDoc, AssertionInfoMap aim) throws Exception {
-        final AssertionInfo assertInfo = aim.get(SP12Constants.ASYMMETRIC_BINDING).iterator().next();
-        assertNotNull(assertInfo);
-
-        final AsymmetricBinding binding = (AsymmetricBinding) assertInfo.getAssertion();
-        final String expectedSignatureMethod = binding.getAlgorithmSuite().getAsymmetricSignature();
-        final String expectedDigestAlgorithm =
-            binding.getAlgorithmSuite().getAlgorithmSuiteType().getDigest();
-        final String expectedCanonAlgorithm = binding.getAlgorithmSuite().getC14n().getValue();
-
-        XPathFactory factory = XPathFactory.newInstance();
-        XPath xpath = factory.newXPath();
-        final NamespaceContext nsContext = this.getNamespaceContext();
-        xpath.setNamespaceContext(nsContext);
-
-        // Signature Algorithm
-        final XPathExpression sigAlgoExpr =
-            xpath.compile("/s:Envelope/s:Header/wsse:Security/ds:Signature/ds:SignedInfo"
-                              + "/ds:SignatureMethod/@Algorithm");
-
-        final String sigMethod = (String) sigAlgoExpr.evaluate(signedDoc, XPathConstants.STRING);
-        assertEquals(expectedSignatureMethod, sigMethod);
-
-        // Digest Method Algorithm
-        final XPathExpression digestAlgoExpr = xpath.compile(
-            "/s:Envelope/s:Header/wsse:Security/ds:Signature/ds:SignedInfo/ds:Reference/ds:DigestMethod");
-
-        final NodeList digestMethodNodes =
-            (NodeList) digestAlgoExpr.evaluate(signedDoc, XPathConstants.NODESET);
-
-        for (int i = 0; i < digestMethodNodes.getLength(); i++) {
-            Node node = (Node)digestMethodNodes.item(i);
-            String digestAlgorithm = node.getAttributes().getNamedItem("Algorithm").getNodeValue();
-            assertEquals(expectedDigestAlgorithm, digestAlgorithm);
-        }
-
-        // Canonicalization Algorithm
-        final XPathExpression canonAlgoExpr =
-            xpath.compile("/s:Envelope/s:Header/wsse:Security/ds:Signature/ds:SignedInfo"
-                              + "/ds:CanonicalizationMethod/@Algorithm");
-        final String canonMethod = (String) canonAlgoExpr.evaluate(signedDoc, XPathConstants.STRING);
-        assertEquals(expectedCanonAlgorithm, canonMethod);
-    }
-
-    // TODO: This method can be removed when runOutInterceptorAndValidateSamlTokenAttached
-    // is cleaned up.
-    protected void verifySignatureCoversAssertion(Document signedDoc, String assertionId) throws Exception {
-        XPathFactory factory = XPathFactory.newInstance();
-        XPath xpath = factory.newXPath();
-        final NamespaceContext nsContext = this.getNamespaceContext();
-        xpath.setNamespaceContext(nsContext);
-
-        // Find the SecurityTokenReference for the assertion
-        final XPathExpression strExpr = xpath.compile(
-            "/s:Envelope/s:Header/wsse:Security/wsse:SecurityTokenReference/wsse:KeyIdentifier");
-
-        final NodeList strKeyIdNodes =
-            (NodeList) strExpr.evaluate(signedDoc, XPathConstants.NODESET);
-
-        String strId = null;
-        for (int i = 0; i < strKeyIdNodes.getLength(); i++) {
-            Node keyIdNode = (Node) strKeyIdNodes.item(i);
-            String strKey = keyIdNode.getTextContent();
-            if (strKey.equals(assertionId)) {
-                Node strNode = (Node) keyIdNode.getParentNode();
-                strId = strNode.getAttributes().
-                    getNamedItemNS(nsContext.getNamespaceURI("wsu"), "Id").getNodeValue();
-                break;
-            }
-        }
-        assertNotNull("SecurityTokenReference for " + assertionId + " not found in security header.", strId);
-
-        // Verify STR is included in the signature references
-        final XPathExpression sigRefExpr =
-                xpath.compile("/s:Envelope/s:Header/wsse:Security/ds:Signature/ds:SignedInfo/ds:Reference");
-
-        final NodeList sigReferenceNodes =
-            (NodeList) sigRefExpr.evaluate(signedDoc, XPathConstants.NODESET);
-
-        boolean foundStrReference = false;
-        for (int i = 0; i < sigReferenceNodes.getLength(); i++) {
-            Node sigRefNode = (Node) sigReferenceNodes.item(i);
-            String sigRefURI = sigRefNode.getAttributes().getNamedItem("URI").getNodeValue();
-            if (sigRefURI.equals("#" + strId)) {
-                foundStrReference = true;
-                break;
-            }
-        }
-
-        assertTrue("SecurityTokenReference for " + assertionId + " is not signed.", foundStrReference);
     }
 
     protected void verifyEncryptedHeader(Document originalDoc, Document processedDoc) throws Exception {

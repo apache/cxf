@@ -47,7 +47,6 @@ public class MtoMParameterBeanNoDataHandler {
         try {
             this.notXml10 = new String(notXml10, "utf-8");
         } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

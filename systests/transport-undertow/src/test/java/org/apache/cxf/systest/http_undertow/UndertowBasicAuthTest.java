@@ -26,7 +26,6 @@ import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
@@ -37,8 +36,12 @@ import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.HTTPConduitConfigurer;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests thread pool config.
@@ -77,7 +80,7 @@ public class UndertowBasicAuthTest extends AbstractClientServerTestBase {
 
     @org.junit.Test
     public void testGetWSDL() throws Exception {
-        BusFactory bf = CXFBusFactory.newInstance();
+        BusFactory bf = BusFactory.newInstance();
         Bus bus = bf.createBus();
         bus.getInInterceptors().add(new LoggingInInterceptor());
         bus.getOutInterceptors().add(new LoggingOutInterceptor());

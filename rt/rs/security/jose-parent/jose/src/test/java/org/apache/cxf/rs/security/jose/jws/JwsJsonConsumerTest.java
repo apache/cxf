@@ -28,10 +28,13 @@ import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JwsJsonConsumerTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class JwsJsonConsumerTest {
     private static final String DUAL_SIGNED_DOCUMENT =
         "{\"payload\":\n"
         + "\t\"eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ\",\n"
@@ -76,13 +79,13 @@ public class JwsJsonConsumerTest extends Assert {
         List<JwsJsonSignatureEntry> sigEntries = consumer.getSignatureEntries();
         assertEquals(2, sigEntries.size());
         // 1st signature
-        String firstKid = (String)sigEntries.get(0).getKeyId();
+        String firstKid = sigEntries.get(0).getKeyId();
         assertEquals(KID_OF_THE_FIRST_SIGNER, firstKid);
         JsonWebKey rsaKey = jwks.getKey(firstKid);
         assertNotNull(rsaKey);
         assertTrue(sigEntries.get(0).verifySignatureWith(rsaKey));
         // 2nd signature
-        String secondKid = (String)sigEntries.get(1).getKeyId();
+        String secondKid = sigEntries.get(1).getKeyId();
         assertEquals(KID_OF_THE_SECOND_SIGNER, secondKid);
         JsonWebKey ecKey = jwks.getKey(secondKid);
         assertNotNull(ecKey);
@@ -96,7 +99,7 @@ public class JwsJsonConsumerTest extends Assert {
         List<JwsJsonSignatureEntry> sigEntries = consumer.getSignatureEntries();
         assertEquals(2, sigEntries.size());
         // 1st signature
-        String firstKid = (String)sigEntries.get(0).getKeyId();
+        String firstKid = sigEntries.get(0).getKeyId();
         assertEquals(KID_OF_THE_FIRST_SIGNER, firstKid);
         JsonWebKey rsaKey = jwks.getKey(firstKid);
         assertNotNull(rsaKey);

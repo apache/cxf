@@ -28,7 +28,6 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.lang.annotation.Annotation;
-import java.util.Arrays;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
@@ -38,14 +37,17 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class BinaryDataProviderTest extends Assert {
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class BinaryDataProviderTest {
 
     @Test
     public void testIsWriteable() {
-        MessageBodyWriter<Object> p = new BinaryDataProvider<Object>();
+        MessageBodyWriter<Object> p = new BinaryDataProvider<>();
         assertTrue(p.isWriteable(byte[].class, null, null, null)
                    && p.isWriteable(InputStream.class, null, null, null)
                    && p.isWriteable(File.class, null, null, null)
@@ -54,7 +56,7 @@ public class BinaryDataProviderTest extends Assert {
 
     @Test
     public void testIsReadable() {
-        MessageBodyReader<Object> p = new BinaryDataProvider<Object>();
+        MessageBodyReader<Object> p = new BinaryDataProvider<>();
         assertTrue(p.isReadable(byte[].class, null, null, null)
                    && p.isReadable(InputStream.class, null, null, null)
                    && p.isReadable(File.class, null, null, null)
@@ -70,14 +72,14 @@ public class BinaryDataProviderTest extends Assert {
                                           MediaType.APPLICATION_OCTET_STREAM_TYPE,
                                           new MetadataMap<String, Object>(),
                                           new ByteArrayInputStream("hi".getBytes()));
-        assertTrue(Arrays.equals(new String("hi").getBytes(), bytes));
+        assertArrayEquals(new String("hi").getBytes(), bytes);
 
         InputStream is = (InputStream)p.readFrom(InputStream.class, InputStream.class, new Annotation[]{},
                                                  MediaType.APPLICATION_OCTET_STREAM_TYPE,
                                                  new MetadataMap<String, Object>(),
             new ByteArrayInputStream("hi".getBytes()));
         bytes = IOUtils.readBytesFromStream(is);
-        assertTrue(Arrays.equals(new String("hi").getBytes(), bytes));
+        assertArrayEquals(new String("hi").getBytes(), bytes);
 
         Reader r = (Reader)p.readFrom(Reader.class, Reader.class, new Annotation[]{},
                                       MediaType.APPLICATION_OCTET_STREAM_TYPE,
@@ -93,7 +95,7 @@ public class BinaryDataProviderTest extends Assert {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         so.write(baos);
         bytes = baos.toByteArray();
-        assertTrue(Arrays.equals(new String("hi").getBytes(), bytes));
+        assertArrayEquals(new String("hi").getBytes(), bytes);
     }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -105,7 +107,7 @@ public class BinaryDataProviderTest extends Assert {
                                           MediaType.APPLICATION_OCTET_STREAM_TYPE,
                                           new MetadataMap<String, Object>(),
                                           new ByteArrayInputStream(utf8Bytes));
-        assertTrue(Arrays.equals(utf8Bytes, readBytes));
+        assertArrayEquals(utf8Bytes, readBytes);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -114,21 +116,21 @@ public class BinaryDataProviderTest extends Assert {
         MessageBodyWriter p = new BinaryDataProvider();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         p.writeTo(new byte[]{'h', 'i'}, null, null, null, null, null, os);
-        assertTrue(Arrays.equals(new String("hi").getBytes(), os.toByteArray()));
+        assertArrayEquals(new String("hi").getBytes(), os.toByteArray());
         ByteArrayInputStream is = new ByteArrayInputStream("hi".getBytes());
         os = new ByteArrayOutputStream();
         p.writeTo(is, null, null, null, null, null, os);
-        assertTrue(Arrays.equals(os.toByteArray(), new String("hi").getBytes()));
+        assertArrayEquals(os.toByteArray(), new String("hi").getBytes());
 
         Reader r = new StringReader("hi");
         os = new ByteArrayOutputStream();
         p.writeTo(r, null, null, null, MediaType.valueOf("text/xml"), null, os);
-        assertTrue(Arrays.equals(os.toByteArray(), new String("hi").getBytes()));
+        assertArrayEquals(os.toByteArray(), new String("hi").getBytes());
 
         os = new ByteArrayOutputStream();
         p.writeTo(new StreamingOutputImpl(), null, null, null,
                   MediaType.valueOf("text/xml"), null, os);
-        assertTrue(Arrays.equals(os.toByteArray(), new String("hi").getBytes()));
+        assertArrayEquals(os.toByteArray(), new String("hi").getBytes());
     }
 
 

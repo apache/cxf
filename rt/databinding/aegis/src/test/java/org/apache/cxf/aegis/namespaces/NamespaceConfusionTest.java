@@ -41,6 +41,9 @@ import org.apache.cxf.service.Service;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 
 /**
  * Regression test for CXF-959. This is a point test for consistent

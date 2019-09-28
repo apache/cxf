@@ -34,18 +34,21 @@ import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.wssec10.server.Server;
 import org.apache.cxf.systest.ws.wssec10.server.StaxServer;
+import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.ws.security.SecurityConstants;
+import wssec.wssec10.IPingService;
+import wssec.wssec10.PingService;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
-import wssec.wssec10.IPingService;
-import wssec.wssec10.PingService;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  */
@@ -60,7 +63,7 @@ public class WSSecurity10Test extends AbstractBusClientServerTestBase {
     private static boolean unrestrictedPoliciesInstalled;
 
     static {
-        unrestrictedPoliciesInstalled = SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
+        unrestrictedPoliciesInstalled = TestUtilities.checkUnrestrictedPoliciesInstalled();
     };
 
     final TestParam test;
@@ -85,25 +88,25 @@ public class WSSecurity10Test extends AbstractBusClientServerTestBase {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
+    public static Collection<TestParam> data() {
 
-        return Arrays.asList(new TestParam[][] {
-            {new TestParam("UserName", PORT, false)},
-            {new TestParam("UserNameOverTransport", SSL_PORT, false)},
-            {new TestParam("MutualCertificate10SignEncrypt", PORT, false)},
-            {new TestParam("MutualCertificate10SignEncryptRsa15TripleDes", PORT, false)},
-            {new TestParam("UserName", PORT, true)},
-            {new TestParam("UserNameOverTransport", SSL_PORT, true)},
-            {new TestParam("MutualCertificate10SignEncrypt", PORT, true)},
-            {new TestParam("MutualCertificate10SignEncryptRsa15TripleDes", PORT, true)},
-            {new TestParam("UserName", STAX_PORT, false)},
-            {new TestParam("UserNameOverTransport", STAX_SSL_PORT, false)},
-            {new TestParam("MutualCertificate10SignEncrypt", STAX_PORT, false)},
-            {new TestParam("MutualCertificate10SignEncryptRsa15TripleDes", STAX_PORT, false)},
-            {new TestParam("UserName", STAX_PORT, true)},
-            {new TestParam("UserNameOverTransport", STAX_SSL_PORT, true)},
-            {new TestParam("MutualCertificate10SignEncrypt", STAX_PORT, true)},
-            {new TestParam("MutualCertificate10SignEncryptRsa15TripleDes", STAX_PORT, true)}
+        return Arrays.asList(new TestParam[] {
+            new TestParam("UserName", PORT, false),
+            new TestParam("UserNameOverTransport", SSL_PORT, false),
+            new TestParam("MutualCertificate10SignEncrypt", PORT, false),
+            new TestParam("MutualCertificate10SignEncryptRsa15TripleDes", PORT, false),
+            new TestParam("UserName", PORT, true),
+            new TestParam("UserNameOverTransport", SSL_PORT, true),
+            new TestParam("MutualCertificate10SignEncrypt", PORT, true),
+            new TestParam("MutualCertificate10SignEncryptRsa15TripleDes", PORT, true),
+            new TestParam("UserName", STAX_PORT, false),
+            new TestParam("UserNameOverTransport", STAX_SSL_PORT, false),
+            new TestParam("MutualCertificate10SignEncrypt", STAX_PORT, false),
+            new TestParam("MutualCertificate10SignEncryptRsa15TripleDes", STAX_PORT, false),
+            new TestParam("UserName", STAX_PORT, true),
+            new TestParam("UserNameOverTransport", STAX_SSL_PORT, true),
+            new TestParam("MutualCertificate10SignEncrypt", STAX_PORT, true),
+            new TestParam("MutualCertificate10SignEncryptRsa15TripleDes", STAX_PORT, true)
         });
     }
 
@@ -182,9 +185,8 @@ public class WSSecurity10Test extends AbstractBusClientServerTestBase {
         try {
             if ("UserNameOverTransport".equals(portPrefix)) {
                 return new URL("https://localhost:" + port + "/" + portPrefix + "?wsdl");
-            } else {
-                return new URL("http://localhost:" + port + "/" + portPrefix + "?wsdl");
             }
+            return new URL("http://localhost:" + port + "/" + portPrefix + "?wsdl");
         } catch (MalformedURLException mue) {
             return null;
         }

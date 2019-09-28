@@ -169,9 +169,8 @@ public class ToolSpec {
                                                                      "streams");
         if (!elemList.isEmpty()) {
             return elemList.get(0);
-        } else {
-            return null;
         }
+        return null;
     }
 
     public List<String> getInstreamIds() {
@@ -225,9 +224,8 @@ public class ToolSpec {
                                             "pipeline");
         if (!elemList.isEmpty()) {
             return elemList.get(0);
-        } else {
-            return null;
         }
+        return null;
     }
 
     public List<Element> getUsageForms() {

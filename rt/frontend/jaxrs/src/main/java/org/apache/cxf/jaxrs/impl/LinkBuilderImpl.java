@@ -32,7 +32,6 @@ import javax.ws.rs.core.Link;
 import javax.ws.rs.core.Link.Builder;
 import javax.ws.rs.core.UriBuilder;
 
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 
 public class LinkBuilderImpl implements Builder {
@@ -67,9 +66,8 @@ public class LinkBuilderImpl implements Builder {
         if (!uri.isAbsolute() && baseUri != null && baseUri.isAbsolute()) {
             UriBuilder linkUriBuilder = UriBuilder.fromUri(baseUri);
             return HttpUtils.resolve(linkUriBuilder, uri);
-        } else {
-            return uri;
         }
+        return uri;
     }
 
     @Override
@@ -84,7 +82,7 @@ public class LinkBuilderImpl implements Builder {
 
         link = link.trim();
         if (link.length() > 1 && link.startsWith("<")) {
-            int index = link.lastIndexOf(">", link.length());
+            int index = link.lastIndexOf('>', link.length());
             if (index != -1) {
                 String uri = link.substring(1, index);
                 ub = UriBuilder.fromUri(uri);
@@ -96,7 +94,7 @@ public class LinkBuilderImpl implements Builder {
             }
         }
 
-        String[] tokens = StringUtils.split(link, ";");
+        String[] tokens = link.split(";");
         for (String token : tokens) {
             String theToken = token.trim();
             if (!theToken.isEmpty()) {
@@ -190,14 +188,13 @@ public class LinkBuilderImpl implements Builder {
             String rel = getRel();
             if (rel == null) {
                 return Collections.<String>emptyList();
-            } else {
-                String[] values = rel.split(" ");
-                List<String> rels = new ArrayList<>(values.length);
-                for (String val : values) {
-                    rels.add(val.trim());
-                }
-                return rels;
             }
+            String[] values = rel.split(" ");
+            List<String> rels = new ArrayList<>(values.length);
+            for (String val : values) {
+                rels.add(val.trim());
+            }
+            return rels;
         }
 
         @Override
@@ -223,23 +220,23 @@ public class LinkBuilderImpl implements Builder {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
-            sb.append("<").append(uri.toString()).append(">");
+            sb.append('<').append(uri.toString()).append('>');
             String rel = getRel();
             if (rel != null) {
-                sb.append(";").append(Link.REL).append("=\"").append(rel).append("\"");
+                sb.append(';').append(Link.REL).append("=\"").append(rel).append('"');
             }
             String title = getTitle();
             if (title != null) {
-                sb.append(";").append(Link.TITLE).append("=\"").append(title).append("\"");
+                sb.append(';').append(Link.TITLE).append("=\"").append(title).append('"');
             }
             String type = getType();
             if (type != null) {
-                sb.append(";").append(Link.TYPE).append("=\"").append(type).append("\"");
+                sb.append(';').append(Link.TYPE).append("=\"").append(type).append('"');
             }
             for (Map.Entry<String, String> entry : params.entrySet()) {
                 if (!MAIN_PARAMETERS.contains(entry.getKey())) {
-                    sb.append(";").append(entry.getKey()).append("=\"")
-                        .append(entry.getValue()).append("\"");
+                    sb.append(';').append(entry.getKey()).append("=\"")
+                        .append(entry.getValue()).append('"');
                 }
             }
             return sb.toString();
@@ -256,9 +253,8 @@ public class LinkBuilderImpl implements Builder {
                 Link other = (Link)o;
                 return uri.equals(other.getUri())
                     && getParams().equals(other.getParams());
-            } else {
-                return false;
             }
+            return false;
         }
     }
 

@@ -31,6 +31,7 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
@@ -40,27 +41,32 @@ import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
-import org.apache.cxf.sts.common.TestUtils;
 import org.apache.cxf.sts.service.ServiceMBean;
 import org.apache.cxf.sts.service.StaticService;
 import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.realm.RealmProperties;
+import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.dom.WSConstants;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Some unit tests for the issue operation to issue SAML tokens in a specific realm.
  */
-public class IssueSamlRealmUnitTest extends org.junit.Assert {
+public class IssueSamlRealmUnitTest {
 
     public static final QName REQUESTED_SECURITY_TOKEN =
         QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(null).getName();
@@ -104,7 +110,7 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
@@ -124,7 +130,7 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
             issueOperation.issue(request, principal, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
+        assertFalse(securityTokenResponse.isEmpty());
 
         // Test the generated token.
         Element assertion = null;
@@ -140,9 +146,9 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
 
         assertNotNull(assertion);
         String tokenString = DOM2Writer.nodeToString(assertion);
-        assertTrue(tokenString.contains("A-Issuer"));
-        assertFalse(tokenString.contains("B-Issuer"));
-        assertFalse(tokenString.contains("STS"));
+        assertTrue(tokenString.contains("Issuer=\"A-Issuer\""));
+        assertFalse(tokenString.contains("Issuer=\"B-Issuer\""));
+        assertFalse(tokenString.contains("Issuer=\"STS\""));
     }
 
     /**
@@ -180,7 +186,7 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
@@ -200,7 +206,7 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
             issueOperation.issue(request, principal, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
+        assertFalse(securityTokenResponse.isEmpty());
 
         // Test the generated token.
         Element assertion = null;
@@ -216,9 +222,9 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
 
         assertNotNull(assertion);
         String tokenString = DOM2Writer.nodeToString(assertion);
-        assertFalse(tokenString.contains("A-Issuer"));
-        assertTrue(tokenString.contains("B-Issuer"));
-        assertFalse(tokenString.contains("STS"));
+        assertFalse(tokenString.contains("Issuer=\"A-Issuer\""));
+        assertTrue(tokenString.contains("Issuer=\"B-Issuer\""));
+        assertFalse(tokenString.contains("Issuer=\"STS\""));
     }
 
     /**
@@ -256,7 +262,7 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
@@ -276,7 +282,7 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
             issueOperation.issue(request, principal, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
+        assertFalse(securityTokenResponse.isEmpty());
 
         // Test the generated token.
         Element assertion = null;
@@ -292,9 +298,9 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
 
         assertNotNull(assertion);
         String tokenString = DOM2Writer.nodeToString(assertion);
-        assertFalse(tokenString.contains("A-Issuer"));
-        assertFalse(tokenString.contains("B-Issuer"));
-        assertTrue(tokenString.contains("STS"));
+        assertFalse(tokenString.contains("Issuer=\"A-Issuer\""));
+        assertFalse(tokenString.contains("Issuer=\"B-Issuer\""));
+        assertTrue(tokenString.contains("Issuer=\"STS\""));
     }
 
 
@@ -341,7 +347,7 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
@@ -372,7 +378,7 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
             issueOperation.issue(request, principal, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
+        assertFalse(securityTokenResponse.isEmpty());
 
         // Test the generated token.
         Element assertion = null;
@@ -388,9 +394,9 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
 
         assertNotNull(assertion);
         String tokenString = DOM2Writer.nodeToString(assertion);
-        assertFalse(tokenString.contains("A-Issuer"));
-        assertTrue(tokenString.contains("B-Issuer"));
-        assertFalse(tokenString.contains("STS"));
+        assertFalse(tokenString.contains("Issuer=\"A-Issuer\""));
+        assertTrue(tokenString.contains("Issuer=\"B-Issuer\""));
+        assertFalse(tokenString.contains("Issuer=\"STS\""));
     }
 
 
@@ -400,7 +406,7 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
      */
     @org.junit.Test
     public void testIssueSaml1TokenRealmBCustomCryptoPKCS12() throws Exception {
-        if (!TestUtils.checkUnrestrictedPoliciesInstalled()) {
+        if (!TestUtilities.checkUnrestrictedPoliciesInstalled()) {
             return;
         }
         TokenIssueOperation issueOperation = new TokenIssueOperation();
@@ -439,7 +445,7 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
@@ -459,7 +465,7 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
             issueOperation.issue(request, principal, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
+        assertFalse(securityTokenResponse.isEmpty());
 
         // Test the generated token.
         Element assertion = null;
@@ -475,9 +481,9 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
 
         assertNotNull(assertion);
         String tokenString = DOM2Writer.nodeToString(assertion);
-        assertFalse(tokenString.contains("A-Issuer"));
-        assertTrue(tokenString.contains("B-Issuer"));
-        assertFalse(tokenString.contains("STS"));
+        assertFalse(tokenString.contains("Issuer=\"A-Issuer\""));
+        assertTrue(tokenString.contains("Issuer=\"B-Issuer\""));
+        assertFalse(tokenString.contains("Issuer=\"STS\""));
     }
 
 
@@ -514,13 +520,13 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
      * Mock up an AppliesTo element using the supplied address
      */
     private Element createAppliesToElement(String addressUrl) {
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element appliesTo = doc.createElementNS(STSConstants.WSP_NS, "wsp:AppliesTo");
-        appliesTo.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsp", STSConstants.WSP_NS);
+        appliesTo.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsp", STSConstants.WSP_NS);
         Element endpointRef = doc.createElementNS(STSConstants.WSA_NS_05, "wsa:EndpointReference");
-        endpointRef.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
+        endpointRef.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
         Element address = doc.createElementNS(STSConstants.WSA_NS_05, "wsa:Address");
-        address.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
+        address.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
         address.setTextContent(addressUrl);
         endpointRef.appendChild(address);
         appliesTo.appendChild(endpointRef);

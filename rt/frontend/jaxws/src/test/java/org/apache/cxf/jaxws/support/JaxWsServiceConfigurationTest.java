@@ -20,7 +20,6 @@
 package org.apache.cxf.jaxws.support;
 
 import java.lang.reflect.Method;
-
 import java.util.Iterator;
 
 import javax.jws.WebMethod;
@@ -40,13 +39,18 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.wsdl11.CatalogWSDLLocator;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JaxWsServiceConfigurationTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class JaxWsServiceConfigurationTest {
 
 
     @Before

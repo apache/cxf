@@ -23,6 +23,7 @@ import java.io.File;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
+
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.hello_world_corba.Greeter;
 import org.apache.cxf.hello_world_corba.GreeterCORBAService;
@@ -32,6 +33,10 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  *
@@ -72,7 +77,7 @@ public class CorbaTest extends AbstractBusClientServerTestBase {
 
 
         String output = port.greetMe("Betty");
-        assertTrue("Unexpected returned string: " + output, "Hello Betty".equals(output));
+        assertEquals("Unexpected returned string: " + output, "Hello Betty", output);
     }
 
     @Test

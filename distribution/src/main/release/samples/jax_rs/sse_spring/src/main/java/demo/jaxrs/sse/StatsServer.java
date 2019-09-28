@@ -19,7 +19,6 @@
 package demo.jaxrs.sse;
 
 import org.apache.cxf.transport.servlet.CXFServlet;
-import org.apache.cxf.transport.sse.SseHttpTransportFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.servlet.DefaultServlet;
@@ -43,7 +42,6 @@ public final class StatsServer {
 
          // Register and map the dispatcher servlet
         final ServletHolder cxfServletHolder = new ServletHolder(new CXFServlet());
-        cxfServletHolder.setInitParameter(CXFServlet.TRANSPORT_ID, SseHttpTransportFactory.TRANSPORT_ID);
         final ServletContextHandler context = new ServletContextHandler();
         context.setContextPath("/");
         context.addEventListener(new ContextLoaderListener());

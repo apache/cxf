@@ -24,6 +24,7 @@ import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
+import java.time.Instant;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -42,6 +43,7 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SimplePrincipal;
@@ -82,6 +84,7 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
     private String webAppDomain;
     private boolean addWebAppContext = true;
     private boolean addEndpointAddressToContext;
+    private String signatureAlgorithm = SSOConstants.RSA_SHA1;
 
     public void setAddEndpointAddressToContext(boolean add) {
         addEndpointAddressToContext = add;
@@ -211,6 +214,16 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
         return responseState;
     }
 
+    protected boolean isStateExpired(long stateCreatedAt, long expiresAt) {
+        Instant currentTime = Instant.now();
+        Instant expires = Instant.ofEpochMilli(stateCreatedAt + getStateTimeToLive());
+        if (currentTime.isAfter(expires)) {
+            return true;
+        }
+
+        return expiresAt > 0 && currentTime.isAfter(Instant.ofEpochMilli(expiresAt));
+    }
+
     protected SamlRequestInfo createSamlRequestInfo(Message m) throws Exception {
         Document doc = DOMUtils.createDocument();
         doc.appendChild(doc.createElement("root"));
@@ -239,7 +252,8 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
                                                      getIssuerId(m),
                                                      webAppContext,
                                                      getWebAppDomain(),
-                                                     System.currentTimeMillis());
+                                                     System.currentTimeMillis(),
+                                                     getStateTimeToLive());
 
         String relayState = URLEncoder.encode(UUID.randomUUID().toString(), StandardCharsets.UTF_8.name());
         getStateProvider().setRequestState(relayState, requestState);
@@ -269,9 +283,8 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
                              .path(assertionConsumerServiceAddress)
                              .build()
                              .toString();
-        } else {
-            return assertionConsumerServiceAddress;
         }
+        return assertionConsumerServiceAddress;
     }
 
     protected void reportError(String code) {
@@ -292,13 +305,11 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
         if (addWebAppContext) {
             if (addEndpointAddressToContext) {
                 return new UriInfoImpl(m).getBaseUri().getRawPath();
-            } else {
-                String httpBasePath = (String)m.get("http.base.path");
-                return URI.create(httpBasePath).getRawPath();
             }
-        } else {
-            return "/";
+            String httpBasePath = (String)m.get("http.base.path");
+            return URI.create(httpBasePath).getRawPath();
         }
+        return "/";
     }
 
     public String getWebAppDomain() {
@@ -311,6 +322,14 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
 
     public void setAddWebAppContext(boolean addWebAppContext) {
         this.addWebAppContext = addWebAppContext;
+    }
+
+    public String getSignatureAlgorithm() {
+        return signatureAlgorithm;
+    }
+
+    public void setSignatureAlgorithm(String signatureAlgorithm) {
+        this.signatureAlgorithm = signatureAlgorithm;
     }
 
 }

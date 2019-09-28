@@ -38,8 +38,7 @@ public class OidcIdTokenProvider implements ContextProvider<IdTokenContext> {
                 }
 
             };
-        } else {
-            return null;
         }
+        return null;
     }
 }

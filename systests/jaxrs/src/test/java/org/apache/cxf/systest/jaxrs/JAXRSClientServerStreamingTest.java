@@ -49,9 +49,13 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
@@ -64,7 +68,7 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
             sf.setResourceClasses(BookStore.class);
             sf.setResourceProvider(BookStore.class,
                                    new SingletonResourceProvider(new BookStore()));
-            JAXBElementProvider<?> p1 = new JAXBElementProvider<Object>();
+            JAXBElementProvider<?> p1 = new JAXBElementProvider<>();
             p1.setEnableBuffering(true);
             p1.setEnableStreaming(true);
 
@@ -155,9 +159,8 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
         protected XMLStreamWriter getStreamWriter(Object obj, OutputStream os, MediaType mt) {
             if (mt.equals(MediaType.TEXT_XML_TYPE)) {
                 return new CachingXmlEventWriter();
-            } else {
-                throw new RuntimeException();
             }
+            throw new RuntimeException();
         }
         @Override
         public void writeTo(Object obj, Class<?> cls, Type genericType, Annotation[] anns,
@@ -166,9 +169,8 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
             if (failHeaders != null && !failHeaders.isEmpty()) {
                 os.write("fail".getBytes());
                 throw new IOException();
-            } else {
-                super.writeTo(obj, cls, genericType, anns, m, headers, os);
             }
+            super.writeTo(obj, cls, genericType, anns, m, headers, os);
         }
     }
 }

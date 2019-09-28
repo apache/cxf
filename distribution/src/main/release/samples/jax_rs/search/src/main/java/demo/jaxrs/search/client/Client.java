@@ -36,7 +36,7 @@ public final class Client {
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         final String url = "http://localhost:9000/catalog";
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 

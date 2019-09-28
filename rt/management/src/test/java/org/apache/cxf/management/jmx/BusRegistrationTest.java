@@ -31,15 +31,18 @@ import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.management.ManagementConstants;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 
 /**
  *
  */
-public class BusRegistrationTest extends Assert {
+public class BusRegistrationTest {
     private Bus serverBus;
     private Bus clientBus;
     private InstrumentationManager serverIM;
@@ -78,12 +81,12 @@ public class BusRegistrationTest extends Assert {
         serverBus = factory.createBus(conf);
         assertEquals("CXF-Test-Bus", serverBus.getId());
         serverIM = serverBus.getExtension(InstrumentationManager.class);
-        assertTrue("Instrumentation Manager should not be null", serverIM != null);
+        assertNotNull("Instrumentation Manager should not be null", serverIM);
         Thread t = new Thread(new Runnable() {
             public void run() {
                 clientBus = factory.createBus("no-connector-spring.xml");
                 clientIM = clientBus.getExtension(InstrumentationManager.class);
-                assertTrue("Instrumentation Manager should not be null", clientIM != null);
+                assertNotNull("Instrumentation Manager should not be null", clientIM);
                 ready = true;
                 running = true;
                 while (running) {
@@ -132,11 +135,11 @@ public class BusRegistrationTest extends Assert {
     }
 
     private static ObjectName getObjectName(String id, Bus bus) throws JMException {
-        StringBuilder buffer = new StringBuilder(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");
-        buffer.append(ManagementConstants.BUS_ID_PROP + "=" +  id + ",");
-        buffer.append(ManagementConstants.TYPE_PROP + "=Bus,");
+        StringBuilder buffer = new StringBuilder(ManagementConstants.DEFAULT_DOMAIN_NAME + ':');
+        buffer.append(ManagementConstants.BUS_ID_PROP).append('=').append(id).append(',');
+        buffer.append(ManagementConstants.TYPE_PROP).append("=Bus,");
         // Added the instance id to make the ObjectName unique
-        buffer.append(ManagementConstants.INSTANCE_ID_PROP + "=" + bus.hashCode());
+        buffer.append(ManagementConstants.INSTANCE_ID_PROP).append('=').append(bus.hashCode());
         return new ObjectName(buffer.toString());
     }
 }

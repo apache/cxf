@@ -61,7 +61,7 @@ public class EcDsaJwsSignatureProvider extends PrivateKeyJwsSignatureProvider {
         }
     }
 
-    private static byte[] jcaOutputToJoseOutput(int jwsSignatureLen, byte jcaDer[]) {
+    private static byte[] jcaOutputToJoseOutput(int jwsSignatureLen, byte[] jcaDer) {
         // Apache2 Licensed Jose4j code which adapts the Apache Santuario XMLSecurity
         // code and aligns it with JWS/JWA requirements
         if (jcaDer.length < 8 || jcaDer[0] != 48) {
@@ -101,7 +101,7 @@ public class EcDsaJwsSignatureProvider extends PrivateKeyJwsSignatureProvider {
             throw new JoseException("Invalid format of ECDSA signature");
         }
         
-        byte concatenatedSignatureBytes[] = new byte[2 * rawLen];
+        byte[] concatenatedSignatureBytes = new byte[2 * rawLen];
 
         System.arraycopy(jcaDer, (offset + 2 + rLength) - i, concatenatedSignatureBytes, rawLen - i, i);
         System.arraycopy(jcaDer, (offset + 2 + rLength + 2 + sLength) - j, 

@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -73,11 +74,10 @@ public abstract class AbstractXmlSecInHandler {
     protected Document getDocument(Message message) {
         if (isServerGet(message)) {
             return null;
-        } else {
-            Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
-            if (responseCode != null && responseCode != 200) {
-                return null;
-            }
+        }
+        Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
+        if (responseCode != null && responseCode != 200) {
+            return null;
         }
         Document doc = null;
         InputStream is = message.getContent(InputStream.class);

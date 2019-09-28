@@ -67,7 +67,7 @@ public class EntityTagHeaderProvider implements HeaderDelegate<EntityTag> {
         }
         String tagValue = tag.getValue();
         if (!tagValue.startsWith("\"")) {
-            sb.append("\"").append(tagValue).append("\"");
+            sb.append('"').append(tagValue).append('"');
         } else {
             sb.append(tagValue);
         }

@@ -75,7 +75,7 @@ public class SignedTokenPolicyValidator extends AbstractSupportingTokenPolicyVal
                         processingFailed = true;
                     }
                 } else if (token instanceof SamlToken) {
-                    if (!processSAMLTokens(parameters)) {
+                    if (!processSAMLTokens(parameters, false)) {
                         processingFailed = true;
                     }
                 } else if (token instanceof KerberosToken) {
@@ -94,7 +94,12 @@ public class SignedTokenPolicyValidator extends AbstractSupportingTokenPolicyVal
                     if (!processSCTokens(parameters, false)) {
                         processingFailed = true;
                     }
-                } else if (!(token instanceof IssuedToken)) {
+                } else if (token instanceof IssuedToken) {
+                    IssuedToken issuedToken = (IssuedToken)token;
+                    if (isSamlTokenRequiredForIssuedToken(issuedToken) && !processSAMLTokens(parameters, false)) {
+                        processingFailed = true;
+                    }
+                } else {
                     processingFailed = true;
                 }
 

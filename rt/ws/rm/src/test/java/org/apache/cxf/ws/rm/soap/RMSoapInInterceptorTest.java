@@ -43,15 +43,19 @@ import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange;
 import org.apache.cxf.ws.rm.v200702.SequenceType;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class RMSoapInInterceptorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class RMSoapInInterceptorTest {
 
     private static final String SEQ_IDENTIFIER = "http://Business456.com/RM/ABC";
-    private static final Long ONE = new Long(1);
+    private static final Long ONE = Long.valueOf(1);
     private static final Long MSG1_MESSAGE_NUMBER = ONE;
-    private static final Long MSG2_MESSAGE_NUMBER = new Long(2);
+    private static final Long MSG2_MESSAGE_NUMBER = Long.valueOf(2);
 
     @Test
     public void testGetUnderstoodHeaders() throws Exception {

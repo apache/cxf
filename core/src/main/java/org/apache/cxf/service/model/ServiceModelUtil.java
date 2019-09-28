@@ -114,8 +114,7 @@ public final class ServiceModelUtil {
         return wrapperMap.get(opName);
     }
     public static SchemaInfo getSchema(ServiceInfo serviceInfo, MessagePartInfo messagePartInfo) {
-        SchemaInfo schemaInfo = null;
-        String tns = null;
+        final String tns;
         if (messagePartInfo.isElement()) {
             tns = messagePartInfo.getElementQName().getNamespaceURI();
         } else {
@@ -123,16 +122,16 @@ public final class ServiceModelUtil {
         }
         for (SchemaInfo schema : serviceInfo.getSchemas()) {
             if (tns.equals(schema.getNamespaceURI())) {
-                schemaInfo = schema;
+                return schema;
             }
         }
-        return schemaInfo;
+        return null;
     }
 
     public static List<String> getOperationInputPartNames(OperationInfo operation) {
         List<String> names = new ArrayList<>();
         List<MessagePartInfo> parts = operation.getInput().getMessageParts();
-        if (parts == null || parts.size() == 0) {
+        if (parts == null || parts.isEmpty()) {
             return names;
         }
 
@@ -175,7 +174,7 @@ public final class ServiceModelUtil {
                 if (best == null) {
                     best = ep;
                 }
-                if (ep.getTransportId().equals("http://schemas.xmlsoap.org/wsdl/soap/")) {
+                if ("http://schemas.xmlsoap.org/wsdl/soap/".equals(ep.getTransportId())) {
                     return ep;
                 }
             }

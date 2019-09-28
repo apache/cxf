@@ -27,7 +27,7 @@ under the License.
     xmlns:util="http://www.springframework.org/schema/util"
     xsi:schemaLocation="http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
              http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-             http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+             http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
              http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util-4.2.xsd
              http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd
              http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd 
@@ -62,7 +62,7 @@ under the License.
         </httpj:engine>
     </httpj:engine-factory>
     
-   <bean id="oauthProvider" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuthDataProviderImpl">
+   <bean id="oauthProvider" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.JCacheOAuthDataProviderImpl">
        <constructor-arg><value>${testutil.ports.jaxrs-oauth2-filtersJwt}</value></constructor-arg>
        <property name="useJwtFormatForAccessTokens" value="true"/>
    </bean>
@@ -79,10 +79,11 @@ under the License.
        <property name="dataProvider" ref="oauthProvider"/>
    </bean>
    
-   <bean id="oauthProvider2" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuthDataProviderImpl">
+   <bean id="oauthProvider2" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.JCacheOAuthDataProviderImpl">
        <constructor-arg><value>${testutil.ports.jaxrs-oauth2-filtersJwt}</value></constructor-arg>
+       <constructor-arg><null /></constructor-arg>
+       <constructor-arg><value>true</value></constructor-arg>
        <property name="useJwtFormatForAccessTokens" value="true"/>
-       <property name="storeJwtTokenKeyOnly" value="true"/>
    </bean>
    
    <bean id="authorizationService2" class="org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService">

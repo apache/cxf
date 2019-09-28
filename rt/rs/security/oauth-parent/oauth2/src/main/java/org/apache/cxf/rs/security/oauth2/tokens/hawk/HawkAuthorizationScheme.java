@@ -75,7 +75,7 @@ public class HawkAuthorizationScheme {
                                                       data);
 
         StringBuilder sb = new StringBuilder();
-        sb.append(OAuthConstants.HAWK_AUTHORIZATION_SCHEME).append(" ");
+        sb.append(OAuthConstants.HAWK_AUTHORIZATION_SCHEME).append(' ');
         addParameter(sb, OAuthConstants.HAWK_TOKEN_ID, macKey, false);
         addParameter(sb, OAuthConstants.HAWK_TOKEN_TIMESTAMP, timestamp, false);
         addParameter(sb, OAuthConstants.HAWK_TOKEN_NONCE, nonce, false);
@@ -106,8 +106,8 @@ public class HawkAuthorizationScheme {
             + requestURI + SEPARATOR
             + props.getHostName() + SEPARATOR
             + props.getPort() + SEPARATOR
-            + "" + SEPARATOR
-            + "" + SEPARATOR;
+            + SEPARATOR
+            + SEPARATOR;
     }
 
     private static String normalizeQuery(String query) {

@@ -23,7 +23,7 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.cxf.common.util.URIParserUtil;
+import org.apache.cxf.helpers.JavaUtils;
 
 public class JavaField extends JavaType implements JavaAnnotatable {
     private String modifier;
@@ -80,10 +80,10 @@ public class JavaField extends JavaType implements JavaAnnotatable {
     }
 
     public String getParaName() {
-        if (URIParserUtil.containsReservedKeywords(this.name)) {
-            return "_" + this.name;
+        if (JavaUtils.isJavaKeyword(name)) {
+            return "_" + name;
         }
-        return this.name;
+        return name;
     }
 
 }

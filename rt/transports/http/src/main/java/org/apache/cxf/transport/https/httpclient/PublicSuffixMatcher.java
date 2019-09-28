@@ -27,7 +27,6 @@ package org.apache.cxf.transport.https.httpclient;
 
 import java.net.IDN;
 import java.util.Collection;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -57,13 +56,13 @@ public final class PublicSuffixMatcher {
         if (rules == null) {
             throw new IllegalArgumentException("Domain suffix rules are null");
         }
-        this.rules = new ConcurrentHashMap<String, DomainType>(rules.size());
-        for (String rule: rules) {
+        this.rules = new ConcurrentHashMap<>(rules.size());
+        for (final String rule : rules) {
             this.rules.put(rule, domainType);
         }
-        this.exceptions = new ConcurrentHashMap<String, DomainType>();
+        this.exceptions = new ConcurrentHashMap<>();
         if (exceptions != null) {
-            for (String exception: exceptions) {
+            for (final String exception: exceptions) {
                 this.exceptions.put(exception, domainType);
             }
         }
@@ -73,16 +72,15 @@ public final class PublicSuffixMatcher {
         if (lists == null) {
             throw new IllegalArgumentException("Domain suffix lists are null");
         }
-        this.rules = new ConcurrentHashMap<String, DomainType>();
-        this.exceptions = new ConcurrentHashMap<String, DomainType>();
-        for (PublicSuffixList list: lists) {
+        this.rules = new ConcurrentHashMap<>();
+        this.exceptions = new ConcurrentHashMap<>();
+        for (final PublicSuffixList list : lists) {
             final DomainType domainType = list.getType();
-            for (String rule: list.getRules()) {
+            for (final String rule: list.getRules()) {
                 this.rules.put(rule, domainType);
             }
-            final List<String> listExceptions = list.getExceptions();
-            if (listExceptions != null) {
-                for (String exception: listExceptions) {
+            if (list.getExceptions() != null) {
+                for (final String exception : list.getExceptions()) {
                     this.exceptions.put(exception, domainType);
                 }
             }
@@ -97,9 +95,8 @@ public final class PublicSuffixMatcher {
         final DomainType domainType = map.get(rule);
         if (domainType == null) {
             return false;
-        } else {
-            return expectedType == null || domainType.equals(expectedType);
         }
+        return expectedType == null || domainType.equals(expectedType);
     }
 
     private boolean hasRule(final String rule, final DomainType expectedType) {

@@ -36,13 +36,12 @@ import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ConfigurationConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
 
 public abstract class AbstractWSS4JInterceptor extends WSHandler implements SoapInterceptor,
     PhaseInterceptor<SoapMessage> {
@@ -50,9 +49,9 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
     private static final Set<QName> HEADERS = new HashSet<>();
 
     static {
-        HEADERS.add(new QName(WSConstants.WSSE_NS, "Security"));
-        HEADERS.add(new QName(WSConstants.ENC_NS, "EncryptedData"));
-        HEADERS.add(new QName(WSConstants.WSSE11_NS, "EncryptedHeader"));
+        HEADERS.add(new QName(WSS4JConstants.WSSE_NS, "Security"));
+        HEADERS.add(new QName(WSS4JConstants.ENC_NS, "EncryptedData"));
+        HEADERS.add(new QName(WSS4JConstants.WSSE11_NS, "EncryptedHeader"));
     }
 
     private Map<String, Object> properties = new ConcurrentHashMap<>();
@@ -100,6 +99,10 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
     }
 
     public Object getProperty(Object msgContext, String key) {
+        if (msgContext == null) {
+            return null;
+        }
+
         Object obj = SecurityUtils.getSecurityPropertyValue(key, (Message)msgContext);
         if (obj == null) {
             obj = getOption(key);
@@ -150,34 +153,40 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
     protected void translateProperties(SoapMessage msg) {
         String bspCompliant = (String)msg.getContextualProperty(SecurityConstants.IS_BSP_COMPLIANT);
         if (bspCompliant != null) {
-            msg.put(WSHandlerConstants.IS_BSP_COMPLIANT, bspCompliant);
+            msg.put(ConfigurationConstants.IS_BSP_COMPLIANT, bspCompliant);
         }
         String futureTTL =
             (String)msg.getContextualProperty(SecurityConstants.TIMESTAMP_FUTURE_TTL);
         if (futureTTL != null) {
-            msg.put(WSHandlerConstants.TTL_FUTURE_TIMESTAMP, futureTTL);
+            msg.put(ConfigurationConstants.TTL_FUTURE_TIMESTAMP, futureTTL);
         }
         String ttl =
                 (String)msg.getContextualProperty(SecurityConstants.TIMESTAMP_TTL);
         if (ttl != null) {
-            msg.put(WSHandlerConstants.TTL_TIMESTAMP, ttl);
+            msg.put(ConfigurationConstants.TTL_TIMESTAMP, ttl);
         }
 
         String utFutureTTL =
             (String)msg.getContextualProperty(SecurityConstants.USERNAMETOKEN_FUTURE_TTL);
         if (utFutureTTL != null) {
-            msg.put(WSHandlerConstants.TTL_FUTURE_USERNAMETOKEN, utFutureTTL);
+            msg.put(ConfigurationConstants.TTL_FUTURE_USERNAMETOKEN, utFutureTTL);
         }
         String utTTL =
             (String)msg.getContextualProperty(SecurityConstants.USERNAMETOKEN_TTL);
         if (utTTL != null) {
-            msg.put(WSHandlerConstants.TTL_USERNAMETOKEN, utTTL);
+            msg.put(ConfigurationConstants.TTL_USERNAMETOKEN, utTTL);
         }
 
         String certConstraints =
             (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SUBJECT_CERT_CONSTRAINTS, msg);
         if (certConstraints != null) {
-            msg.put(WSHandlerConstants.SIG_SUBJECT_CERT_CONSTRAINTS, certConstraints);
+            msg.put(ConfigurationConstants.SIG_SUBJECT_CERT_CONSTRAINTS, certConstraints);
+        }
+
+        String certConstraintsSeparator =
+            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.CERT_CONSTRAINTS_SEPARATOR, msg);
+        if (certConstraintsSeparator != null && !certConstraintsSeparator.isEmpty()) {
+            msg.put(ConfigurationConstants.SIG_CERT_CONSTRAINTS_SEPARATOR, certConstraintsSeparator);
         }
 
         // Now set SAML SenderVouches + Holder Of Key requirements
@@ -189,7 +198,7 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
             validateSAMLSubjectConf = Boolean.parseBoolean(valSAMLSubjectConf);
         }
         msg.put(
-            WSHandlerConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION,
+            ConfigurationConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION,
             Boolean.toString(validateSAMLSubjectConf)
         );
 

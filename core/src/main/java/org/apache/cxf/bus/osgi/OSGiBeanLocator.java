@@ -53,15 +53,14 @@ public class OSGiBeanLocator implements ConfiguredBeanLocator {
         Collection<? extends T> ret = cbl.getBeansOfType(type);
         if (ret == null || ret.isEmpty()) {
             return getBeansFromOsgiService(type);
-        } else {
-            return ret;
         }
+        return ret;
     }
 
     private <T> List<T> getBeansFromOsgiService(Class<T> type) {
         List<T> list = new ArrayList<>();
         try {
-            ServiceReference<?> refs[] = context.getServiceReferences(type.getName(), null);
+            ServiceReference<?>[] refs = context.getServiceReferences(type.getName(), null);
             if (refs != null) {
                 for (ServiceReference<?> r : refs) {
                     if (type == ClassLoader.class

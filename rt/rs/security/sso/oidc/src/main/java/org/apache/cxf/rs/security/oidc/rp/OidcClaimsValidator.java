@@ -42,7 +42,7 @@ public class OidcClaimsValidator extends OAuthJoseJwtConsumer {
     private WebClient jwkSetClient;
     private boolean supportSelfIssuedProvider;
     private boolean strictTimeValidation;
-    private ConcurrentHashMap<String, JsonWebKey> keyMap = new ConcurrentHashMap<String, JsonWebKey>();
+    private ConcurrentHashMap<String, JsonWebKey> keyMap = new ConcurrentHashMap<>();
 
     /**
      * Validate core JWT claims
@@ -100,12 +100,12 @@ public class OidcClaimsValidator extends OAuthJoseJwtConsumer {
             } catch (JwtException ex) {
                 throw new OAuthServiceException("Invalid issuedAt claim", ex);
             }
-            if (strictTimeValidation) {
-                try {
-                    JwtUtils.validateJwtNotBefore(claims, getClockOffset(), strictTimeValidation);
-                } catch (JwtException ex) {
-                    throw new OAuthServiceException("ID Token can not be used yet", ex);
-                }
+
+            // Validate nbf - but don't require it to be present
+            try {
+                JwtUtils.validateJwtNotBefore(claims, getClockOffset(), false);
+            } catch (JwtException ex) {
+                throw new OAuthServiceException("ID Token can not be used yet", ex);
             }
         }
     }
@@ -153,7 +153,7 @@ public class OidcClaimsValidator extends OAuthJoseJwtConsumer {
         }
         JwsSignatureVerifier theJwsVerifier = null;
         if (key != null) {
-            theJwsVerifier = JwsUtils.getSignatureVerifier(key);
+            theJwsVerifier = JwsUtils.getSignatureVerifier(key, jwt.getJwsHeaders().getSignatureAlgorithm());
         } else {
             theJwsVerifier = super.getInitializedSignatureVerifier(jwt.getJwsHeaders());
         }

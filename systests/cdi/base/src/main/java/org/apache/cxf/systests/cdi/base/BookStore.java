@@ -30,21 +30,38 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 @Path("/bookstore/")
 public class BookStore {
-    @Inject private BookStoreService service;
-    @Inject private String version;
+    private BookStoreService service;
+    private BookStoreVersion bookStoreVersion;
+    private UriInfo uriInfo;
+    private Injections injections;
+
+    public BookStore() {
+    }
+
+    @Inject
+    public BookStore(BookStoreService service, BookStoreVersion bookStoreVersion, UriInfo uriInfo,
+                     Injections injections) {
+        this.service = service;
+        this.bookStoreVersion = bookStoreVersion;
+        this.uriInfo = uriInfo;
+        this.injections = injections;
+    }
 
     @GET
+    @Path("injections")
+    public String injections() {
+        return injections.state();
+    }
+
     @Path("/version")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getVersion() {
-        return version;
+    public BookStoreVersion getVersion() {
+        return bookStoreVersion;
     }
 
     @GET
@@ -66,8 +83,7 @@ public class BookStore {
     @POST
     @Path("/books")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addBook(@Context final UriInfo uriInfo,
-                            @NotNull @Size(min = 1, max = 50) @FormParam("id") String id,
+    public Response addBook(@NotNull @Size(min = 1, max = 50) @FormParam("id") String id,
                             @NotNull @FormParam("name") String name) {
         final Book book = service.store(id, name);
         return Response.created(uriInfo.getRequestUriBuilder().path(id).build()).entity(book).build();

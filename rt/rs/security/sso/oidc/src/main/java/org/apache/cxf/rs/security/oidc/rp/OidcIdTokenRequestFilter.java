@@ -59,7 +59,7 @@ public class OidcIdTokenRequestFilter implements ContainerRequestFilter {
     }
 
     private MultivaluedMap<String, String> toFormData(ContainerRequestContext rc) {
-        MultivaluedMap<String, String> requestState = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> requestState = new MetadataMap<>();
         if (MediaType.APPLICATION_FORM_URLENCODED_TYPE.isCompatible(rc.getMediaType())) {
             String body = FormUtils.readBody(rc.getEntityStream(), StandardCharsets.UTF_8.name());
             FormUtils.populateMapFromString(requestState, JAXRSUtils.getCurrentMessage(), body,

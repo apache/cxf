@@ -21,6 +21,7 @@ package org.apache.cxf.transport.local;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +53,7 @@ public class LocalTransportFactory extends AbstractTransportFactory
 
     public static final String TRANSPORT_ID = "http://cxf.apache.org/transports/local";
     public static final List<String> DEFAULT_NAMESPACES
-        = Arrays.asList(TRANSPORT_ID);
+        = Collections.unmodifiableList(Arrays.asList(TRANSPORT_ID));
 
 
     public static final String MESSAGE_FILTER_PROPERTIES
@@ -70,7 +71,7 @@ public class LocalTransportFactory extends AbstractTransportFactory
     }
 
     private ConcurrentMap<String, Destination> destinations
-        = new ConcurrentHashMap<String, Destination>();
+        = new ConcurrentHashMap<>();
 
     private Set<String> messageFilterProperties;
     private Set<String> messageIncludeProperties;

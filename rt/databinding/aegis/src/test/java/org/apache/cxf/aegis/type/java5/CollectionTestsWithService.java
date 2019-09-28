@@ -36,6 +36,10 @@ import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  *
  */
@@ -85,7 +89,7 @@ public class CollectionTestsWithService extends AbstractAegisTest {
 
     @Test
     public void testListTypes() throws Exception {
-        SortedSet<String> strings = new TreeSet<String>();
+        SortedSet<String> strings = new TreeSet<>();
         strings.add("Able");
         strings.add("Baker");
         String first = csi.takeSortedStrings(strings);

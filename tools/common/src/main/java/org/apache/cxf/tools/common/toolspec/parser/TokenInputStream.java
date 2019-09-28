@@ -112,7 +112,7 @@ public class TokenInputStream {
         for (int i = pos; i < tokens.length; i++) {
             sb.append(tokens[i]);
             if (i < tokens.length - 1) {
-                sb.append(" ");
+                sb.append(' ');
             }
         }
         sb.append(" ]");

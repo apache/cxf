@@ -178,6 +178,14 @@
             </xs:annotation>      
         </xs:attribute>
 
+        <xs:attribute name="ConnectionRequestTimeout" type="ptp:ParameterizedUInt" use="optional" default="60000">
+            <xs:annotation>
+                <xs:documentation>
+                Specifies the amount of time, in milliseconds, used when requesting a connection from the connection manager(if appliable). 0 is infinite.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+
         <xs:attribute name="AsyncExecuteTimeout" type="ptp:ParameterizedUInt" use="optional" default="5000">
             <xs:annotation>
                 <xs:documentation>

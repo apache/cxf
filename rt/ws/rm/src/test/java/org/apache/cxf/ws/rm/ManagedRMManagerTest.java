@@ -50,15 +50,21 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.apache.cxf.wsdl.WSDLConstants;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ManagedRMManagerTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class ManagedRMManagerTest {
     private static final String TEST_URI = "http://nowhere.com/bar/foo";
     private IMocksControl control;
 
@@ -87,8 +93,8 @@ public class ManagedRMManagerTest extends Assert {
         im = bus.getExtension(InstrumentationManager.class);
         manager = bus.getExtension(RMManager.class);
         endpoint = createTestEndpoint();
-        assertTrue("Instrumentation Manager should not be null", im != null);
-        assertTrue("RMManager should not be null", manager != null);
+        assertNotNull("Instrumentation Manager should not be null", im);
+        assertNotNull("RMManager should not be null", manager);
 
         MBeanServer mbs = im.getMBeanServer();
         assertNotNull("MBeanServer should be available.", mbs);
@@ -487,11 +493,9 @@ public class ManagedRMManagerTest extends Assert {
         }
 
         public void addUnacknowledged(Message message) {
-            // TODO Auto-generated method stub
         }
 
         public void purgeAcknowledged(SourceSequence seq) {
-            // TODO Auto-generated method stub
         }
 
         public void purgeAll(SourceSequence seq) {
@@ -515,16 +519,13 @@ public class ManagedRMManagerTest extends Assert {
         }
 
         public Map<Long, RetryStatus> getRetransmissionStatuses(SourceSequence seq) {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public void start() {
-            // TODO Auto-generated method stub
         }
 
         public void stop(SourceSequence seq) {
-            // TODO Auto-generated method stub
         }
 
         public void suspend(SourceSequence seq) {

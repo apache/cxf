@@ -29,12 +29,19 @@ import org.apache.cxf.aegis.type.basic.BeanTypeInfo;
 import org.apache.cxf.aegis.xml.stax.ElementReader;
 import org.apache.ws.commons.schema.constants.Constants;
 
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class ArrayTypeInfoTest extends AbstractAegisTest {
     private TypeMapping mapping;
     private StructType addressType;
 
+    @Before
     public void setUp() throws Exception {
         super.setUp();
 
@@ -93,10 +100,10 @@ public class ArrayTypeInfoTest extends AbstractAegisTest {
         ArrayTypeInfo actual = new ArrayTypeInfo(getNamespaceContext(), actualString);
 
         // only compare local part because prefix is only resolved when using the MessageReader constructor
-        assertEquals(expected.getRanks(), actual.getRanks());
-        assertEquals(expected.getDimensions(), actual.getDimensions());
+        Assert.assertEquals(expected.getRanks(), actual.getRanks());
+        Assert.assertEquals(expected.getDimensions(), actual.getDimensions());
         if (expected.getType() != null) {
-            assertEquals(expected.getTypeName().getLocalPart(), actual.getTypeName().getLocalPart());
+            Assert.assertEquals(expected.getTypeName().getLocalPart(), actual.getTypeName().getLocalPart());
             if (expected.getRanks() == 0) {
                 assertSame(addressType, actual.getType());
             } else {
@@ -104,7 +111,7 @@ public class ArrayTypeInfoTest extends AbstractAegisTest {
                         + actual.getType().getClass().getName(), actual.getType() instanceof SoapArrayType);
             }
         }
-        assertEquals(expected.toString(), actual.toString());
+        Assert.assertEquals(expected.toString(), actual.toString());
 
         String xml = "<b:array xmlns:b=\"urn:Bean\"\n"
                 + "    xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"\n"
@@ -114,10 +121,10 @@ public class ArrayTypeInfoTest extends AbstractAegisTest {
 
         ElementReader reader = new ElementReader(new ByteArrayInputStream(xml.getBytes()));
         actual = new ArrayTypeInfo(reader, mapping);
-        assertEquals(expected.getRanks(), actual.getRanks());
-        assertEquals(expected.getDimensions(), actual.getDimensions());
+        Assert.assertEquals(expected.getRanks(), actual.getRanks());
+        Assert.assertEquals(expected.getDimensions(), actual.getDimensions());
         if (expected.getType() != null) {
-            assertEquals(expected.getTypeName(), actual.getTypeName());
+            Assert.assertEquals(expected.getTypeName(), actual.getTypeName());
             if (expected.getRanks() == 0) {
                 assertSame(addressType, actual.getType());
             } else {
@@ -125,7 +132,7 @@ public class ArrayTypeInfoTest extends AbstractAegisTest {
                         + actual.getType().getClass().getName(), actual.getType() instanceof SoapArrayType);
             }
         }
-        assertEquals(expected.toString(), actual.toString());
+        Assert.assertEquals(expected.toString(), actual.toString());
     }
 
     public void assertInvalid(String actualString) {

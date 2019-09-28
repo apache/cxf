@@ -18,12 +18,22 @@
  */
 package org.apache.cxf.helpers;
 
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
 
-
-import org.junit.Assert;
 import org.junit.Test;
 
-public class FileUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class FileUtilsTest {
 
 
     @Test
@@ -38,5 +48,35 @@ public class FileUtilsTest extends Assert {
         } finally {
             System.setProperty("java.io.tmpdir", originaltmpdir);
         }
+    }
+
+    @Test
+    public void testReadLines() throws Exception {
+        String basedir = System.getProperty("basedir");
+        if (basedir == null) {
+            basedir = new File(".").getCanonicalPath();
+        }
+
+        Optional<Path> p =
+            Files.find(Paths.get(basedir), 20, (path, attrs) -> path.getFileName().endsWith("FileUtilsTest.java"))
+                .findFirst();
+        assertTrue(p.isPresent());
+
+        List<String> lines = FileUtils.readLines(p.get().toFile());
+        assertFalse(lines.isEmpty());
+    }
+
+    @Test
+    public void testGetFiles() throws URISyntaxException {
+        URL resource = FileUtilsTest.class.getResource("FileUtilsTest.class");
+        File directory = Paths.get(resource.toURI()).getParent().toFile();
+        assertTrue(directory.exists());
+
+        List<File> foundFiles = FileUtils.getFilesUsingSuffix(directory, ".class");
+        assertFalse(foundFiles.isEmpty());
+
+        List<File> foundFiles2 = FileUtils.getFiles(directory, ".*\\.class$");
+
+        assertEquals(foundFiles, foundFiles2);
     }
 }

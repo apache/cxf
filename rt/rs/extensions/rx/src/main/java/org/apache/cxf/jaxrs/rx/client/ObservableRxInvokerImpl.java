@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.jaxrs.rx.client;
 
-import java.lang.reflect.Type;
 import java.util.concurrent.ExecutorService;
 
 import javax.ws.rs.HttpMethod;
@@ -26,16 +25,17 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
-import org.apache.cxf.jaxrs.client.AsyncClient;
-
+import org.apache.cxf.jaxrs.client.WebClient;
 import rx.Observable;
+import rx.Scheduler;
+import rx.schedulers.Schedulers;
 
 public class ObservableRxInvokerImpl implements ObservableRxInvoker {
-    private ExecutorService ex;
-    private AsyncClient wc;
-    public ObservableRxInvokerImpl(AsyncClient wc, ExecutorService ex) {
+    private Scheduler sc;
+    private WebClient wc;
+    public ObservableRxInvokerImpl(WebClient wc, ExecutorService ex) {
         this.wc = wc;
-        this.ex = ex;
+        this.sc = ex == null ? null : Schedulers.from(ex);
     }
 
     @Override
@@ -145,31 +145,34 @@ public class ObservableRxInvokerImpl implements ObservableRxInvoker {
 
     @Override
     public <T> Observable<T> method(String name, Entity<?> entity, Class<T> responseType) {
-        return doInvokeAsync(name, entity, responseType, responseType);
+        if (sc == null) {
+            return Observable.from(wc.async().method(name, entity, responseType));
+        }
+        return Observable.from(wc.async().method(name, entity, responseType), sc);
     }
 
     @Override
     public <T> Observable<T> method(String name, Entity<?> entity, GenericType<T> responseType) {
-        return doInvokeAsync(name, entity, responseType.getRawType(), responseType.getType());
+        if (sc == null) {
+            return Observable.from(wc.async().method(name, entity, responseType));
+        }
+        return Observable.from(wc.async().method(name, entity, responseType), sc);
     }
 
     @Override
     public <T> Observable<T> method(String name, Class<T> responseType) {
-        return doInvokeAsync(name, null, responseType, responseType);
+        if (sc == null) {
+            return Observable.from(wc.async().method(name, responseType));
+        }
+        return Observable.from(wc.async().method(name, responseType), sc);
     }
 
     @Override
     public <T> Observable<T> method(String name, GenericType<T> responseType) {
-        return doInvokeAsync(name, null, responseType.getRawType(), responseType.getType());
-    }
-
-    protected <T> Observable<T> doInvokeAsync(String httpMethod,
-                                              Object body,
-                                              Class<?> respClass,
-                                              Type outType) {
-        JaxrsClientObservableCallback<T> cb = new JaxrsClientObservableCallback<T>(respClass, outType, ex);
-        wc.prepareAsyncClient(httpMethod, body, null, null, respClass, outType, cb);
-        return cb.getObservable();
+        if (sc == null) {
+            return Observable.from(wc.async().method(name, responseType));
+        }
+        return Observable.from(wc.async().method(name, responseType), sc);
     }
 
 }

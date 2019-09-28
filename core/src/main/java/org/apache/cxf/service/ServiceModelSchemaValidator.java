@@ -49,18 +49,18 @@ public class ServiceModelSchemaValidator extends ServiceModelVisitor {
             try {
                 schemaCollection.validateElementName(part.getName(), part.getElementQName());
             } catch (InvalidXmlSchemaReferenceException ixsre) {
-                complaints.append(part.getName() + " part element name " + ixsre.getMessage() + "\n");
+                complaints.append(part.getName()).append(" part element name ").append(ixsre.getMessage()).append('\n');
             }
         } else if (!part.getMessageInfo().getOperation().isUnwrapped()) {
             if (part.getTypeQName() == null) {
-                complaints.append(part.getName() + " of message "
-                                  + part.getMessageInfo().getName()
-                                  + " part type QName null.\n");
+                complaints.append(part.getName()).append(" of message ").append(part.getMessageInfo().getName())
+                        .append(" part type QName null.\n");
             } else {
                 try {
                     schemaCollection.validateTypeName(part.getName(), part.getTypeQName());
                 } catch (InvalidXmlSchemaReferenceException ixsre) {
-                    complaints.append(part.getName() + " part type name " + ixsre.getMessage() + "\n");
+                    complaints.append(part.getName()).append(" part type name ").append(ixsre.getMessage())
+                            .append('\n');
                 }
             }
         }

@@ -30,7 +30,14 @@ if not defined CXF_HOME goto set_cxf_home
 :cont
 if not defined JAVA_HOME goto no_java_home
 
-set TOOLS_JAR=%JAVA_HOME%\lib\tools.jar;
+rem Retrieve java version
+for /f tokens^=2-5^ delims^=.-_+^" %%j in ('"%JAVA_HOME%\bin\java" -fullversion 2^>^&1') do (
+    if %%j==1 (set JAVA_VERSION=%%k) else (set JAVA_VERSION=%%j)
+)
+
+if %JAVA_VERSION% LSS 9 (
+    set TOOLS_JAR=%JAVA_HOME%\lib\tools.jar;
+)
 
 if not exist "%CXF_HOME%\lib\cxf-manifest.jar" goto no_cxf_jar
 
@@ -40,7 +47,11 @@ if "%JAVA_MAX_MEM%" == "" (
     set JAVA_MAX_MEM=512M
 )
 
-"%JAVA_HOME%\bin\java" -Xmx%JAVA_MAX_MEM% -Djava.endorsed.dirs="%CXF_HOME%\lib\endorsed" -cp "%CXF_JAR%;%TOOLS_JAR%;%CLASSPATH%" -Djava.util.logging.config.file="%CXF_HOME%\etc\logging.properties" org.apache.cxf.tools.java2ws.JavaToWS %*
+if %JAVA_VERSION% GTR 8 (
+    "%JAVA_HOME%\bin\java" -Xmx%JAVA_MAX_MEM% -cp "%CXF_JAR%;%CLASSPATH%" -Djava.util.logging.config.file="%CXF_HOME%\etc\logging.properties" org.apache.cxf.tools.java2ws.JavaToWS %*
+) else (
+    "%JAVA_HOME%\bin\java" -Xmx%JAVA_MAX_MEM% -Djava.endorsed.dirs="%CXF_HOME%\lib\endorsed" -cp "%CXF_JAR%;%TOOLS_JAR%;%CLASSPATH%" -Djava.util.logging.config.file="%CXF_HOME%\etc\logging.properties" org.apache.cxf.tools.java2ws.JavaToWS %*
+)
 
 @endlocal
 

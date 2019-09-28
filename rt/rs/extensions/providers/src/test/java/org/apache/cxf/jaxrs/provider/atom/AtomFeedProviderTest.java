@@ -29,11 +29,15 @@ import javax.ws.rs.Produces;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.parser.stax.FOMFeed;
-import org.junit.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 
-public class AtomFeedProviderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class AtomFeedProviderTest {
 
     private AtomFeedProvider afd;
 
@@ -50,6 +54,7 @@ public class AtomFeedProviderTest extends Assert {
 
     }
 
+    @Test
     public void testWriteTo() throws Exception {
         InputStream is = getClass().getResourceAsStream("atomFeed.xml");
         Feed simple = afd.readFrom(Feed.class, null, null, null, null, is);

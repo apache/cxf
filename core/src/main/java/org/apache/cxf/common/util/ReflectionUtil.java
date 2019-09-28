@@ -52,9 +52,7 @@ public final class ReflectionUtil {
                 try {
                     f.setAccessible(true);
                     return responseClass.cast(f.get(o));
-                } catch (SecurityException e) {
-                    return null;
-                } catch (IllegalAccessException e) {
+                } catch (SecurityException | IllegalAccessException e) {
                     return null;
                 } finally {
                     f.setAccessible(b);
@@ -73,9 +71,7 @@ public final class ReflectionUtil {
                 try {
                     f.setAccessible(true);
                     return responseClass.cast(f.get(o));
-                } catch (SecurityException e) {
-                    return null;
-                } catch (IllegalAccessException e) {
+                } catch (SecurityException | IllegalAccessException e) {
                     return null;
                 } finally {
                     f.setAccessible(b);
@@ -89,9 +85,7 @@ public final class ReflectionUtil {
             public Field run() {
                 try {
                     return cls.getDeclaredField(name);
-                } catch (SecurityException e) {
-                    return null;
-                } catch (NoSuchFieldException e) {
+                } catch (SecurityException | NoSuchFieldException e) {
                     return null;
                 }
             }
@@ -103,9 +97,7 @@ public final class ReflectionUtil {
             public Constructor<T> run() {
                 try {
                     return cls.getDeclaredConstructor(args);
-                } catch (SecurityException e) {
-                    return null;
-                } catch (NoSuchMethodException e) {
+                } catch (SecurityException | NoSuchMethodException e) {
                     return null;
                 }
             }
@@ -117,9 +109,7 @@ public final class ReflectionUtil {
             public Constructor<T> run() {
                 try {
                     return cls.getConstructor(args);
-                } catch (SecurityException e) {
-                    return null;
-                } catch (NoSuchMethodException e) {
+                } catch (SecurityException | NoSuchMethodException e) {
                     return null;
                 }
             }
@@ -159,9 +149,8 @@ public final class ReflectionUtil {
             Exception e = pae.getException();
             if (e instanceof NoSuchMethodException) {
                 throw (NoSuchMethodException)e;
-            } else {
-                throw new SecurityException(e);
             }
+            throw new SecurityException(e);
         }
     }
     public static Method getMethod(final Class<?> clazz, final String name,
@@ -176,9 +165,8 @@ public final class ReflectionUtil {
             Exception e = pae.getException();
             if (e instanceof NoSuchMethodException) {
                 throw (NoSuchMethodException)e;
-            } else {
-                throw new SecurityException(e);
             }
+            throw new SecurityException(e);
         }
     }
 
@@ -231,7 +219,7 @@ public final class ReflectionUtil {
                 Class<?> cls = ClassLoaderUtils
                     .loadClass("org.springframework.beans.BeanUtils", refClass);
                 springBeanUtilsDescriptorFetcher
-                    = cls.getMethod("getPropertyDescriptor", new Class[] {Class.class, String.class});
+                    = cls.getMethod("getPropertyDescriptor", Class.class, String.class);
             } catch (Exception e) {
                 //ignore - just assume it's an unsupported/unknown annotation
             }
@@ -249,20 +237,17 @@ public final class ReflectionUtil {
                         if (propertyDescriptor != null) {
                             descriptors.add(propertyDescriptor);
                         }
-                    } catch (IllegalArgumentException e) {
-                        throw new RuntimeException(e);
-                    } catch (IllegalAccessException e) {
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
                         throw new RuntimeException(e);
                     } catch (InvocationTargetException e) {
                         throw new RuntimeException(e.getCause());
                     }
                 }
-                return descriptors.toArray(new PropertyDescriptor[descriptors.size()]);
+                return descriptors.toArray(new PropertyDescriptor[0]);
             }
             return null;
-        } else {
-            return beanInfo.getPropertyDescriptors();
         }
+        return beanInfo.getPropertyDescriptors();
     }
 
     /**
@@ -278,6 +263,27 @@ public final class ReflectionUtil {
         if (annotation != null) {
             return annotation;
         }
-        return m.getDeclaringClass().getAnnotation(annotationType);
+        annotation = m.getDeclaringClass().getAnnotation(annotationType);
+        if (annotation != null) {
+            return annotation;
+        }
+        for (Class<?> intf : m.getDeclaringClass().getInterfaces()) {
+            annotation = getAnnotationForInterface(intf, annotationType);
+            if (annotation != null) {
+                return annotation;
+            }
+        }
+        return null;
+    }
+    
+    private static <T extends Annotation> T getAnnotationForInterface(Class<?> intf, Class<T> annotationType) {
+        T annotation = intf.getAnnotation(annotationType);
+        if (annotation != null) {
+            return annotation;
+        }
+        for (Class<?> intf2 : intf.getInterfaces()) {
+            return getAnnotationForInterface(intf2, annotationType);
+        }
+        return null;
     }
 }

@@ -35,8 +35,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
 
-import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.interceptor.security.AuthenticationException;
 import org.apache.cxf.interceptor.security.JAASLoginInterceptor;
 import org.apache.cxf.interceptor.security.NamePasswordCallbackHandler;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
@@ -110,8 +108,6 @@ public class JAASAuthenticationFilter implements ContainerRequestFilter {
         Message m = JAXRSUtils.getCurrentMessage();
         try {
             interceptor.handleMessage(m);
-        } catch (AuthenticationException ex) {
-            context.abortWith(handleAuthenticationException(ex, m));
         } catch (SecurityException ex) {
             context.abortWith(handleAuthenticationException(ex, m));
         }
@@ -139,28 +135,27 @@ public class JAASAuthenticationFilter implements ContainerRequestFilter {
 
             return Response.status(getRedirectStatus()).
                     header(HttpHeaders.LOCATION, finalRedirectURI).build();
-        } else {
-            ResponseBuilder builder = Response.status(Response.Status.UNAUTHORIZED);
-
-            StringBuilder sb = new StringBuilder();
-
-            List<String> authHeader = headers.getRequestHeader(HttpHeaders.AUTHORIZATION);
-            if (authHeader != null && !authHeader.isEmpty()) {
-                // should HttpHeadersImpl do it ?
-                String[] authValues = StringUtils.split(authHeader.get(0), " ");
-                if (authValues.length > 0) {
-                    sb.append(authValues[0]);
-                }
-            } else {
-                sb.append("Basic");
-            }
-            if (realmName != null) {
-                sb.append(" realm=\"").append(realmName).append('"');
-            }
-            builder.header(HttpHeaders.WWW_AUTHENTICATE, sb.toString());
-
-            return builder.build();
         }
+        ResponseBuilder builder = Response.status(Response.Status.UNAUTHORIZED);
+
+        StringBuilder sb = new StringBuilder();
+
+        List<String> authHeader = headers.getRequestHeader(HttpHeaders.AUTHORIZATION);
+        if (authHeader != null && !authHeader.isEmpty()) {
+            // should HttpHeadersImpl do it ?
+            String[] authValues = authHeader.get(0).split(" ");
+            if (authValues.length > 0) {
+                sb.append(authValues[0]);
+            }
+        } else {
+            sb.append("Basic");
+        }
+        if (realmName != null) {
+            sb.append(" realm=\"").append(realmName).append('"');
+        }
+        builder.header(HttpHeaders.WWW_AUTHENTICATE, sb.toString());
+
+        return builder.build();
     }
 
     protected Response.Status getRedirectStatus() {

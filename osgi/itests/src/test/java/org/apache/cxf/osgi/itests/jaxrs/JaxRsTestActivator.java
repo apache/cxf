@@ -22,27 +22,19 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
+import org.apache.cxf.osgi.itests.AbstractServerActivator;
 
-public class JaxRsTestActivator implements BundleActivator {
-//    public static final String PORT = TestUtil.getPortNumber(JaxRsTestActivator.class);
-    private Server server;
+public class JaxRsTestActivator extends AbstractServerActivator {
 
     @Override
-    public void start(BundleContext arg0) throws Exception {
+    protected Server createServer() {
         Bus bus = BusFactory.newInstance().createBus();
         bus.setExtension(JaxRsTestActivator.class.getClassLoader(), ClassLoader.class);
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setBus(bus);
         sf.setResourceClasses(BookStore.class);
         sf.setAddress("/jaxrs");
-        server = sf.create();
-    }
-
-    @Override
-    public void stop(BundleContext arg0) throws Exception {
-        server.destroy();
+        return sf.create();
     }
 
 }

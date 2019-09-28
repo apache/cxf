@@ -123,7 +123,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
                 context.abortWith(r);
             }
         } else if (findResourceMethod) {
-            Method method = findResourceMethod ? getResourceMethod(m, httpMethod) : null;
+            Method method = getResourceMethod(m, httpMethod);
             simpleRequest(m, method);
         } else {
             m.getInterceptorChain().add(new CorsInInterceptor());
@@ -136,7 +136,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
             getAnnotation(resourceMethod, CrossOriginResourceSharing.class);
         List<String> headerOriginValues = getHeaderValues(CorsHeaderConstants.HEADER_ORIGIN, true);
         // 5.1.1 there has to be an origin
-        if (headerOriginValues == null || headerOriginValues.size() == 0) {
+        if (headerOriginValues == null || headerOriginValues.isEmpty()) {
             return null;
         }
 
@@ -150,7 +150,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
 
         // 5.1.4
         List<String> effectiveExposeHeaders = effectiveExposeHeaders(ann);
-        if (effectiveExposeHeaders != null && effectiveExposeHeaders.size() != 0) {
+        if (effectiveExposeHeaders != null && !effectiveExposeHeaders.isEmpty()) {
             m.getExchange().put(CorsHeaderConstants.HEADER_AC_EXPOSE_HEADERS, effectiveExposeHeaders);
         }
 
@@ -279,7 +279,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
         if (matchedResources == null) {
             return null;
         }
-        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> values = new MetadataMap<>();
         OperationResourceInfo ori = findPreflightMethod(matchedResources, requestUri, httpMethod, values, m);
         return ori == null ? null : ori.getAnnotatedMethod();
     }
@@ -296,7 +296,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
         OperationResourceInfo ori = JAXRSUtils.findTargetMethod(matchedResources,
                                     m, httpMethod, values,
                                     contentType,
-                                    Collections.singletonList(acceptType), 
+                                    Collections.singletonList(acceptType),
                                     false,
                                     false);
         if (ori == null) {
@@ -307,18 +307,16 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
             ClassResourceInfo subcri = ori.getClassResourceInfo().getSubResource(cls, cls);
             if (subcri == null) {
                 return null;
-            } else {
-                MultivaluedMap<String, String> newValues = new MetadataMap<String, String>();
-                newValues.putAll(values);
-                return findPreflightMethod(Collections.singletonMap(subcri, newValues),
-                                           values.getFirst(URITemplate.FINAL_MATCH_GROUP),
-                                           httpMethod,
-                                           newValues,
-                                           m);
             }
-        } else {
-            return ori;
+            MultivaluedMap<String, String> newValues = new MetadataMap<>();
+            newValues.putAll(values);
+            return findPreflightMethod(Collections.singletonMap(subcri, newValues),
+                                       values.getFirst(URITemplate.FINAL_MATCH_GROUP),
+                                       httpMethod,
+                                       newValues,
+                                       m);
         }
+        return ori;
     }
 
     private void setAllowOriginAndCredentials(Message m,
@@ -392,17 +390,15 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
     private boolean effectiveAllowAllOrigins(CrossOriginResourceSharing ann) {
         if (ann != null) {
             return ann.allowAllOrigins();
-        } else {
-            return allowOrigins.isEmpty();
         }
+        return allowOrigins.isEmpty();
     }
 
     private boolean effectiveAllowCredentials(CrossOriginResourceSharing ann) {
         if (ann != null) {
             return ann.allowCredentials();
-        } else {
-            return allowCredentials;
         }
+        return allowCredentials;
     }
 
     private boolean effectiveAllowOrigins(CrossOriginResourceSharing ann, List<String> origins) {
@@ -424,9 +420,8 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
     private boolean effectiveAllowAnyHeaders(CrossOriginResourceSharing ann) {
         if (ann != null) {
             return ann.allowHeaders().length == 0;
-        } else {
-            return allowHeaders.isEmpty();
         }
+        return allowHeaders.isEmpty();
     }
 
     private boolean effectiveAllowHeaders(CrossOriginResourceSharing ann, List<String> aHeaders) {
@@ -439,7 +434,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
         } else {
             actualHeaders = allowHeaders;
         }
-        Set<String> actualHeadersSet = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+        Set<String> actualHeadersSet = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
         actualHeadersSet.addAll(actualHeaders);
         return actualHeadersSet.containsAll(aHeaders);
     }
@@ -460,12 +455,10 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
             int ma = ann.maxAge();
             if (ma < 0) {
                 return null;
-            } else {
-                return Integer.valueOf(ma);
             }
-        } else {
-            return maxAge;
+            return Integer.valueOf(ma);
         }
+        return maxAge;
     }
 
     /**
@@ -522,7 +515,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
             sb.append(values.get(x));
             if (x != values.size() - 1) {
                 if (spaceSeparated) {
-                    sb.append(" ");
+                    sb.append(' ');
                 } else {
                     sb.append(", ");
                 }

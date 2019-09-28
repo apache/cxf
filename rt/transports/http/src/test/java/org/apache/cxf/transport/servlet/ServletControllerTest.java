@@ -30,13 +30,15 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
-import org.easymock.EasyMock;
 
-import org.junit.Assert;
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ServletControllerTest extends Assert {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class ServletControllerTest {
 
     private HttpServletRequest req;
     private HttpServletResponse res;
@@ -67,7 +69,7 @@ public class ServletControllerTest extends Assert {
         req.getParameter("formatted");
         EasyMock.expectLastCall().andReturn(formatted);
         req.getRequestURL();
-        EasyMock.expectLastCall().andReturn(new StringBuffer("http://localhost:8080" + requestUri));
+        EasyMock.expectLastCall().andReturn(new StringBuffer("http://localhost:8080" + requestUri)); //NOPMD
         registry.getDestinationsPaths();
         EasyMock.expectLastCall().andReturn(Collections.emptySet()).atLeastOnce();
         registry.getDestinationForPath("", true);

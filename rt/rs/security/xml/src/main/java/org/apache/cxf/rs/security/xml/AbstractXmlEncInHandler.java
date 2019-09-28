@@ -25,14 +25,17 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
+import javax.security.auth.DestroyFailedException;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.message.Message;
@@ -79,6 +82,9 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
         } catch (Exception ex) {
             throwFault("Payload can not be decrypted", ex);
         }
+
+        // Clean the secret key from memory
+        Arrays.fill(symmetricKeyBytes, (byte) 0);
 
         Document payloadDoc = null;
         try {
@@ -243,7 +249,16 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
             EncryptionUtils.initCipherWithKey(keyEncAlgo, digestAlgo, Cipher.DECRYPT_MODE, key);
         try {
             byte[] encryptedBytes = Base64Utility.decode(base64EncodedKey);
-            return cipher.doFinal(encryptedBytes);
+            byte[] decryptedKey = cipher.doFinal(encryptedBytes);
+
+            // Clean the private key from memory now that we're finished with it
+            try {
+                key.destroy();
+            } catch (DestroyFailedException ex) {
+                // ignore
+            }
+
+            return decryptedKey;
         } catch (Base64Exception ex) {
             throwFault("Base64 decoding has failed", ex);
         } catch (Exception ex) {
@@ -260,7 +275,16 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
         try {
             XMLCipher xmlCipher =
                 EncryptionUtils.initXMLCipher(symEncAlgo, XMLCipher.DECRYPT_MODE, key);
-            return xmlCipher.decryptToByteArray(root);
+            byte[] decryptedContent = xmlCipher.decryptToByteArray(root);
+
+            // Clean the private key from memory now that we're finished with it
+            try {
+                key.destroy();
+            } catch (DestroyFailedException ex) {
+                // ignore
+            }
+
+            return decryptedContent;
         } catch (XMLEncryptionException ex) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex);
         }

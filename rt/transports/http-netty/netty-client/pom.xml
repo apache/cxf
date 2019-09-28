@@ -23,14 +23,15 @@
     <packaging>bundle</packaging>
     <name>Apache CXF Runtime HTTP Netty Client Transport</name>
     <description>Apache CXF Runtime HTTP Netty Client Transport</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.transport.http.netty.client</cxf.module.name>
         <cxf.osgi.import>
             javax.servlet*;version="[2,4)",
             io.netty.*;version="${cxf.netty.version.range}",
@@ -79,6 +80,13 @@
             <artifactId>cxf-testutils</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-testutils</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+            <classifier>keys</classifier>
         </dependency>
         <!-- Need to run some integration with jaxws frond end -->
         <dependency>

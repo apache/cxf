@@ -19,9 +19,11 @@
 
 package org.apache.cxf.tools.validator.internal.model;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Stack;
+
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
@@ -104,18 +106,18 @@ public class XNode {
 
     public String getText() {
         StringBuilder sb = new StringBuilder();
-        sb.append("[");
+        sb.append('[');
         sb.append(name.getLocalPart());
-        sb.append(":");
+        sb.append(':');
         sb.append(getAttributeValue());
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 
     public String getPlainText() {
         StringBuilder sb = new StringBuilder();
-        Stack<XNode> parentNodes = getParentNodes();
-        while (!parentNodes.empty()) {
+        Deque<XNode> parentNodes = getParentNodes();
+        while (!parentNodes.isEmpty()) {
             sb.append(parentNodes.pop().getText());
         }
         sb.append(getText());
@@ -125,29 +127,29 @@ public class XNode {
 
     public String getXPath() {
         StringBuilder sb = new StringBuilder();
-        sb.append("/");
+        sb.append('/');
         sb.append(prefix);
-        sb.append(":");
+        sb.append(':');
         sb.append(name.getLocalPart());
         if (!StringUtils.isEmpty(attributeName) && !StringUtils.isEmpty(attributeValue)) {
-            sb.append("[");
+            sb.append('[');
             if (isDefaultAttributeValue) {
                 sb.append("not(@");
                 sb.append(attributeName);
                 sb.append(") or ");
             }
-            sb.append("@");
+            sb.append('@');
             sb.append(attributeName);
             sb.append("='");
             sb.append(attributeValue);
-            sb.append("'");
-            sb.append("]");
+            sb.append('\'');
+            sb.append(']');
         }
         return sb.toString();
     }
 
-    private Stack<XNode> getParentNodes() {
-        Stack<XNode> parentNodes = new Stack<XNode>();
+    private Deque<XNode> getParentNodes() {
+        Deque<XNode> parentNodes = new ArrayDeque<>();
 
         XNode pNode = getParentNode();
         while (pNode != null) {
@@ -160,9 +162,9 @@ public class XNode {
     }
 
     public String toString() {
-        Stack<XNode> parentNodes = getParentNodes();
+        Deque<XNode> parentNodes = getParentNodes();
         StringBuilder sb = new StringBuilder();
-        while (!parentNodes.empty()) {
+        while (!parentNodes.isEmpty()) {
             sb.append(parentNodes.pop().getXPath());
         }
         sb.append(getXPath());
@@ -185,7 +187,7 @@ public class XNode {
         }
         return false;
     }
-    private boolean matches(Element el, Stack<XNode> stack) {
+    private boolean matches(Element el, Deque<XNode> stack) {
         if (matches(el)) {
             if (stack.isEmpty()) {
                 return true;
@@ -207,7 +209,7 @@ public class XNode {
     }
 
     public boolean matches(Document doc) {
-        Stack<XNode> nodes = new Stack<XNode>();
+        Deque<XNode> nodes = new ArrayDeque<>();
         nodes.push(this);
         XNode pNode = getParentNode();
         while (pNode != null) {

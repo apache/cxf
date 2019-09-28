@@ -19,28 +19,28 @@
 
 package org.apache.cxf.transport.jms;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JMSMessageUtilTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+public class JMSMessageUtilTest {
 
     @Test
-    public void testGetEncoding() throws IOException {
-        assertEquals("Get the wrong encoding", JMSMessageUtils.getEncoding("text/xml; charset=utf-8"),
-                     StandardCharsets.UTF_8.name());
-        assertEquals("Get the wrong encoding", JMSMessageUtils.getEncoding("text/xml"),
-                     StandardCharsets.UTF_8.name());
-        assertEquals("Get the wrong encoding", JMSMessageUtils.getEncoding("text/xml; charset=GBK"), "GBK");
+    public void testGetEncoding() throws Exception {
+        assertEquals("Get the wrong encoding", StandardCharsets.UTF_8.name(),
+                JMSMessageUtils.getEncoding("text/xml; charset=utf-8"));
+        assertEquals("Get the wrong encoding", StandardCharsets.UTF_8.name(),
+                JMSMessageUtils.getEncoding("text/xml"));
+        assertEquals("Get the wrong encoding", "GBK", JMSMessageUtils.getEncoding("text/xml; charset=GBK"));
         try {
             JMSMessageUtils.getEncoding("text/xml; charset=asci");
             fail("Expect the exception here");
-        } catch (Exception ex) {
-            assertTrue("we should get the UnsupportedEncodingException here",
-                       ex instanceof UnsupportedEncodingException);
+        } catch (UnsupportedEncodingException ex) {
+            // we should get the UnsupportedEncodingException here
         }
     }
 

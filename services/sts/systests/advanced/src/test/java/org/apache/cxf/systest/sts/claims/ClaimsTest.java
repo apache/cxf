@@ -27,6 +27,7 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
@@ -35,9 +36,14 @@ import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.systest.sts.deployment.StaxSTSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test sending claims that are defined in the policy of the WSDL to the STS for evaluation.
@@ -92,17 +98,17 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
+    public static Collection<TestParam> data() {
 
-        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false, STSPORT)},
-                                                {new TestParam(PORT, true, STSPORT)},
-                                                {new TestParam(STAX_PORT, false, STSPORT)},
-                                                {new TestParam(STAX_PORT, true, STSPORT)},
+        return Arrays.asList(new TestParam[] {new TestParam(PORT, false, STSPORT),
+                                              new TestParam(PORT, true, STSPORT),
+                                              new TestParam(STAX_PORT, false, STSPORT),
+                                              new TestParam(STAX_PORT, true, STSPORT),
 
-                                                {new TestParam(PORT, false, STAX_STSPORT)},
-                                                {new TestParam(PORT, true, STAX_STSPORT)},
-                                                {new TestParam(STAX_PORT, false, STAX_STSPORT)},
-                                                {new TestParam(STAX_PORT, true, STAX_STSPORT)},
+                                              new TestParam(PORT, false, STAX_STSPORT),
+                                              new TestParam(PORT, true, STAX_STSPORT),
+                                              new TestParam(STAX_PORT, false, STAX_STSPORT),
+                                              new TestParam(STAX_PORT, true, STAX_STSPORT),
         });
     }
 
@@ -119,8 +125,8 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
         URL busFile = ClaimsTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = ClaimsTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -148,12 +154,42 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
         URL busFile = ClaimsTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = ClaimsTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1CustomClaimsPort");
+        DoubleItPortType transportClaimsPort =
+            service.getPort(portQName, DoubleItPortType.class);
+
+        updateAddressPort(transportClaimsPort, test.getPort());
+
+        TokenTestUtils.updateSTSPort((BindingProvider)transportClaimsPort, test.getStsPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(transportClaimsPort);
+        }
+
+        doubleIt(transportClaimsPort, 25);
+
+        ((java.io.Closeable)transportClaimsPort).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
+    public void testSaml2CustomClaims() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = ClaimsTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = ClaimsTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2CustomClaimsPort");
         DoubleItPortType transportClaimsPort =
             service.getPort(portQName, DoubleItPortType.class);
 
@@ -178,8 +214,8 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
         URL busFile = ClaimsTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = ClaimsTest.class.getResource("DoubleItWrongClaims.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -213,8 +249,8 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
         URL busFile = ClaimsTest.class.getResource("cxf-bad-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = ClaimsTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -248,8 +284,8 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
         URL busFile = ClaimsTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = ClaimsTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -278,8 +314,8 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
         URL busFile = ClaimsTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = ClaimsTest.class.getResource("DoubleItWrongClaims.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -316,8 +352,8 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
         URL busFile = ClaimsTest.class.getResource("cxf-client-cbhandler.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = ClaimsTest.class.getResource("DoubleItNoClaims.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -346,8 +382,8 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
         URL busFile = ClaimsTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = ClaimsTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);

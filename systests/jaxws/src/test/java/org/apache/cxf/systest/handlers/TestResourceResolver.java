@@ -32,7 +32,7 @@ public class TestResourceResolver implements ResourceResolver {
 
     public final <T> T resolve(final String entryName, final Class<T> clz) {
 
-        if (String.class.isAssignableFrom(clz) && entryName.equalsIgnoreCase("handlerResource")) {
+        if (String.class.isAssignableFrom(clz) && "handlerResource".equalsIgnoreCase(entryName)) {
             return clz.cast(new String("injectedValue"));
         }
         return null;

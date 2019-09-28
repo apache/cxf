@@ -25,8 +25,11 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.servlet.AbstractSciTest;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.webapp.WebAppContext;
+
 import org.junit.BeforeClass;
 import org.junit.Ignore;
+
+import static org.junit.Assert.assertTrue;
 
 public class JettyEmptyPathApplicationTest extends AbstractSciTest {
     @Ignore

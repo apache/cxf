@@ -17,10 +17,9 @@
  * under the License.
  */
 package sample.rs.service.hello1;
-import io.swagger.annotations.Api;
-import sample.rs.service.HelloService;
 
-@Api("/sayHello")
+import sample.rs.service.api.HelloService;
+
 public class HelloServiceImpl1 implements HelloService {
 
     public String sayHello(String a) {

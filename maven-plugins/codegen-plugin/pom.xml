@@ -23,12 +23,15 @@
     <packaging>maven-plugin</packaging>
     <name>Apache CXF Code Generation Maven2 Plugins</name>
     <description>Apache CXF Code Generation Maven2 Plugins</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-maven-plugins</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
     </parent>
+    <properties>
+        <cxf.module.name>org.apache.cxf.plugin.codegen</cxf.module.name>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -58,12 +61,12 @@
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
-            <version>2.0.5</version>
+            <version>${cxf.plexus-utils.version}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-archiver</artifactId>
-            <version>1.2</version>
+            <version>${cxf.plexus-archiver.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -121,10 +124,6 @@
             <artifactId>ant</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.ant</groupId>
-            <artifactId>ant-nodeps</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.sonatype.plexus</groupId>
             <artifactId>plexus-build-api</artifactId>
             <version>0.0.7</version>
@@ -147,6 +146,12 @@
                             <goal>descriptor</goal>
                         </goals>
                     </execution>
+                    <execution>
+                        <id>generate-helpmojo</id>
+                        <goals>
+                            <goal>helpmojo</goal>
+                        </goals>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -167,20 +172,33 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-invoker-plugin</artifactId>
-                <version>3.0.0</version>
                 <executions>
                     <execution>
                         <id>test-integration</id>
-                        <phase>integration-test</phase>
                         <goals>
+                            <goal>install</goal>
                             <goal>integration-test</goal>
+                            <goal>verify</goal>
                         </goals>
                         <configuration>
+                            <pomIncludes>
+                                <pomInclude>jdk-cxf-with-toolchain</pomInclude>
+                                <pomInclude>wsdl-artifact-resolution/pom.xml</pomInclude>
+                                <pomInclude>mark-generated/pom.xml</pomInclude>
+                            </pomIncludes>
                             <settingsFile>src/it/settings.xml</settingsFile>
                             <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+                            <postBuildHookScript>verify</postBuildHookScript>
                         </configuration>
                     </execution>
                 </executions>
+                <dependencies>
+                   <dependency>
+                       <groupId>jakarta.xml.bind</groupId>
+                       <artifactId>jakarta.xml.bind-api</artifactId>
+                       <version>${cxf.jaxb.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

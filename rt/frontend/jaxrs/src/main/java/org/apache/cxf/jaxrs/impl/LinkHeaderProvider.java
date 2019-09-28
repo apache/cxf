@@ -54,7 +54,7 @@ public class LinkHeaderProvider implements HeaderDelegate<Link> {
         builder.uri(value.substring(1, closeIndex).trim());
         if (closeIndex < value.length() - 1) {
 
-            String[] tokens = StringUtils.split(value.substring(closeIndex + 1), ";");
+            String[] tokens = value.substring(closeIndex + 1).split(";");
             for (String token : tokens) {
                 String theToken = token.trim();
                 if (theToken.isEmpty()) {
@@ -68,7 +68,7 @@ public class LinkHeaderProvider implements HeaderDelegate<Link> {
                     paramValue = i == theToken.length() - 1 ? "" : theToken.substring(i + 1).trim();
                 }
                 if (REL.equals(paramName)) {
-                    String[] rels = StringUtils.split(removeQuotesIfNeeded(paramValue), ",");
+                    String[] rels = removeQuotesIfNeeded(paramValue).split(",");
                     for (String rel : rels) {
                         builder.rel(rel.trim());
                     }
@@ -85,12 +85,11 @@ public class LinkHeaderProvider implements HeaderDelegate<Link> {
 
     }
 
-    private String removeQuotesIfNeeded(String value) {
+    private static String removeQuotesIfNeeded(String value) {
         if (value.length() > 1 && value.startsWith("\"") && value.endsWith("\"")) {
             return value.substring(1, value.length() - 1);
-        }  else {
-            return value;
         }
+        return value;
     }
 
     public String toString(Link link) {
@@ -102,20 +101,20 @@ public class LinkHeaderProvider implements HeaderDelegate<Link> {
 
         String rels = link.getRel();
         if (!rels.isEmpty()) {
-            sb.append(";").append(REL).append('=');
+            sb.append(';').append(REL).append('=');
             writeListParamValues(sb, rels);
         }
         if (link.getTitle() != null) {
-            sb.append(";").append(TITLE).append("=\"").append(link.getTitle()).append('"');
+            sb.append(';').append(TITLE).append("=\"").append(link.getTitle()).append('"');
         }
         if (link.getType() != null) {
-            sb.append(";").append(TYPE).append('=').append(link.getType());
+            sb.append(';').append(TYPE).append('=').append(link.getType());
         }
         for (Map.Entry<String, String> entry : link.getParams().entrySet()) {
             if (KNOWN_PARAMETERS.contains(entry.getKey())) {
                 continue;
             }
-            sb.append(";").append(entry.getKey()).append('=');
+            sb.append(';').append(entry.getKey()).append('=');
             writeListParamValues(sb, entry.getValue());
         }
 

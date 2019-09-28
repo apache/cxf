@@ -44,7 +44,7 @@ public class ManagedWorkQueueList implements ManagedServiceFactory, PropertyChan
     private static final Logger LOG = LogUtils.getL7dLogger(ManagedWorkQueueList.class);
 
     private Map<String, AutomaticWorkQueueImpl> queues =
-        new ConcurrentHashMap<String, AutomaticWorkQueueImpl>(4, 0.75f, 2);
+        new ConcurrentHashMap<>(4, 0.75f, 2);
     private ServiceTracker<ConfigurationAdmin, ConfigurationAdmin> configAdminTracker;
 
     public String getName() {
@@ -79,7 +79,7 @@ public class ManagedWorkQueueList implements ManagedServiceFactory, PropertyChan
     public void propertyChange(PropertyChangeEvent evt) {
         try {
             AutomaticWorkQueueImpl queue = (AutomaticWorkQueueImpl)evt.getSource();
-            ConfigurationAdmin configurationAdmin = (ConfigurationAdmin)configAdminTracker.getService();
+            ConfigurationAdmin configurationAdmin = configAdminTracker.getService();
             if (configurationAdmin != null) {
                 Configuration selectedConfig = findConfigForQueueName(queue, configurationAdmin);
                 if (selectedConfig != null) {

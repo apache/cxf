@@ -95,7 +95,7 @@ public final class Address {
             return Proxy.NO_PROXY;
         }
         //detect usage of user-defined proxy and avoid optimizations in that case
-        if (!sel.getClass().getName().equals("sun.net.spi.DefaultProxySelector")) {
+        if (!"sun.net.spi.DefaultProxySelector".equals(sel.getClass().getName())) {
             return null;
         }
         Iterator<Proxy> it = sel.select(uri).iterator();

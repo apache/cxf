@@ -56,14 +56,13 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
-import org.apache.lucene.util.Version;
 import org.apache.tika.parser.pdf.PDFParser;
 
 @Path("/catalog")
 public class BookCatalog {
     private final TikaLuceneContentExtractor extractor = new TikaLuceneContentExtractor(new PDFParser());
     private final Directory directory = new RAMDirectory();
-    private final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_4_9);
+    private final Analyzer analyzer = new StandardAnalyzer();
     private final LuceneQueryVisitor<SearchBean> visitor = createVisitor();
 
     @POST
@@ -80,13 +79,9 @@ public class BookCatalog {
 
                 final Document document = extractor.extract(handler.getInputStream(), metadata);
                 if (document != null) {
-                    final IndexWriter writer = getIndexWriter();
-
-                    try {
+                    try (IndexWriter writer = getIndexWriter()) {
                         writer.addDocument(document);
                         writer.commit();
-                    } finally {
-                        writer.close();
                     }
                 }
             }
@@ -98,40 +93,32 @@ public class BookCatalog {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Collection<ScoreDoc> findBook(@Context SearchContext searchContext) throws IOException {
-        IndexReader reader = DirectoryReader.open(directory);
-        IndexSearcher searcher = new IndexSearcher(reader);
-
-        try {
+        try (IndexReader reader = DirectoryReader.open(directory)) {
+            IndexSearcher searcher = new IndexSearcher(reader);
             visitor.visit(searchContext.getCondition(SearchBean.class));
-            return Arrays.asList(searcher.search(visitor.getQuery(), null, 1000).scoreDocs);
-        } finally {
-            reader.close();
+            return Arrays.asList(searcher.search(visitor.getQuery(), 1000).scoreDocs);
         }
     }
 
     @DELETE
     public Response delete() throws IOException {
-        final IndexWriter writer = getIndexWriter();
-
-        try {
+        try (IndexWriter writer = getIndexWriter()) {
             writer.deleteAll();
             writer.commit();
-        } finally {
-            writer.close();
         }
 
         return Response.ok().build();
     }
 
     private IndexWriter getIndexWriter() throws IOException {
-        return new IndexWriter(directory, new IndexWriterConfig(Version.LUCENE_4_9, analyzer));
+        return new IndexWriter(directory, new IndexWriterConfig(analyzer));
     }
 
     private static LuceneQueryVisitor< SearchBean > createVisitor() {
         final Map< String, Class< ? > > fieldTypes = new HashMap<>();
         fieldTypes.put("modified", Date.class);
 
-        LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<SearchBean>("ct", "contents");
+        LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<>("ct", "contents");
         visitor.setPrimitiveFieldTypeMap(fieldTypes);
         return visitor;
     }

@@ -37,6 +37,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import org.w3c.dom.Document;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -66,6 +67,7 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
     private boolean enforceAssertionsSigned = true;
     private boolean enforceKnownIssuer = true;
     private boolean keyInfoMustBeAvailable = true;
+    private boolean checkClientAddress = true;
     private boolean enforceResponseSigned;
     private TokenReplayCache<String> replayCache;
 
@@ -207,7 +209,8 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
             if (relayState != null && relayState.getBytes().length > 0 && relayState.getBytes().length < 80) {
                 // First see if we have a valid RequestState
                 RequestState requestState = getStateProvider().removeRequestState(relayState);
-                if (requestState != null && !isStateExpired(requestState.getCreatedAt(), 0)) {
+                if (requestState != null
+                    && !isStateExpired(requestState.getCreatedAt(), requestState.getTimeToLive())) {
                     return requestState;
                 }
 
@@ -225,7 +228,8 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
                                     getIssuerId(JAXRSUtils.getCurrentMessage()),
                                     "/",
                                     null,
-                                    now.toEpochMilli());
+                                    now.toEpochMilli(),
+                                    getStateTimeToLive());
         }
 
         if (relayState == null) {
@@ -241,7 +245,7 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
             reportError("MISSING_REQUEST_STATE");
             throw ExceptionUtils.toBadRequestException(null, null);
         }
-        if (isStateExpired(requestState.getCreatedAt(), 0)) {
+        if (isStateExpired(requestState.getCreatedAt(), requestState.getTimeToLive())) {
             reportError("EXPIRED_REQUEST_STATE");
             throw ExceptionUtils.toBadRequestException(null, null);
         }
@@ -276,9 +280,7 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
                 tokenStream = !postBinding && isSupportDeflateEncoding()
                     ? new DeflateEncoderDecoder().inflateToken(deflatedToken)
                     : new ByteArrayInputStream(deflatedToken);
-            } catch (Base64Exception ex) {
-                throw ExceptionUtils.toBadRequestException(ex, null);
-            } catch (DataFormatException ex) {
+            } catch (Base64Exception | DataFormatException ex) {
                 throw ExceptionUtils.toBadRequestException(ex, null);
             }
         } else {
@@ -341,8 +343,10 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
             }
             ssoResponseValidator.setAssertionConsumerURL(racsAddress);
 
-            ssoResponseValidator.setClientAddress(
-                 messageContext.getHttpServletRequest().getRemoteAddr());
+            if (checkClientAddress) {
+                ssoResponseValidator.setClientAddress(
+                    messageContext.getHttpServletRequest().getRemoteAddr());
+            }
 
             ssoResponseValidator.setIssuerIDP(requestState.getIdpServiceAddress());
             ssoResponseValidator.setRequestId(requestState.getSamlRequestId());
@@ -412,6 +416,19 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
 
     public void setAssertionConsumerServiceAddress(String assertionConsumerServiceAddress) {
         this.assertionConsumerServiceAddress = assertionConsumerServiceAddress;
+    }
+
+    public boolean isCheckClientAddress() {
+        return checkClientAddress;
+    }
+
+    public void setCheckClientAddress(boolean checkClientAddress) {
+        this.checkClientAddress = checkClientAddress;
+    }
+
+    protected boolean isStateExpired(long stateCreatedAt, long expiresAt) {
+        Instant currentTime = Instant.now();
+        return expiresAt > 0 && currentTime.isAfter(Instant.ofEpochMilli(stateCreatedAt + expiresAt));
     }
 
 }

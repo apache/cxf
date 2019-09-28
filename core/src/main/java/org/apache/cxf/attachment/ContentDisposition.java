@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 
 public class ContentDisposition {
     private static final String CD_HEADER_PARAMS_EXPRESSION =
-        "(([\\w-]+( )?\\*?=( )?\"[^\"]+\")|([\\w-]+( )?\\*?=( )?[^;]+))";
+       "[\\w-]++( )?\\*?=( )?((\"[^\"]++\")|([^;]+))";
     private static final Pattern CD_HEADER_PARAMS_PATTERN =
             Pattern.compile(CD_HEADER_PARAMS_EXPRESSION);
 
@@ -40,7 +40,7 @@ public class ContentDisposition {
 
     private String value;
     private String type;
-    private Map<String, String> params = new LinkedHashMap<String, String>();
+    private Map<String, String> params = new LinkedHashMap<>();
 
     public ContentDisposition(String value) {
         this.value = value;
@@ -48,7 +48,7 @@ public class ContentDisposition {
         String tempValue = value;
 
         int index = tempValue.indexOf(';');
-        if (index > 0 && !(tempValue.indexOf('=') < index)) {
+        if (index > 0 && (tempValue.indexOf('=') >= index)) {
             type = tempValue.substring(0, index).trim();
             tempValue = tempValue.substring(index + 1);
         }

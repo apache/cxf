@@ -25,21 +25,14 @@ import java.nio.charset.StandardCharsets;
 
 import org.apache.cxf.helpers.IOUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class Base64UtilityTest extends Assert {
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
-    public Base64UtilityTest() {
-        super();
-    }
-
-    void assertEquals(byte b1[], byte b2[]) {
-        assertEquals(b1.length, b2.length);
-        for (int x = 0; x < b1.length; x++) {
-            assertEquals(b1[x], b2[x]);
-        }
-    }
+public class Base64UtilityTest {
 
     @Test
     public void testEncodeMultipleChunks() throws Exception {
@@ -73,17 +66,17 @@ public class Base64UtilityTest extends Assert {
 
     @Test
     public void testEncodeDecodeChunk() throws Exception {
-        byte bytes[] = new byte[100];
+        byte[] bytes = new byte[100];
         for (int x = 0; x < bytes.length; x++) {
             bytes[x] = (byte)x;
         }
 
-        char encodedChars[] = Base64Utility.encodeChunk(bytes, 0, -2);
+        char[] encodedChars = Base64Utility.encodeChunk(bytes, 0, -2);
         assertNull(encodedChars);
         encodedChars = Base64Utility.encodeChunk(bytes, 0, bytes.length);
         assertNotNull(encodedChars);
-        byte bytesDecoded[] = Base64Utility.decodeChunk(encodedChars, 0, encodedChars.length);
-        assertEquals(bytes, bytesDecoded);
+        byte[] bytesDecoded = Base64Utility.decodeChunk(encodedChars, 0, encodedChars.length);
+        assertArrayEquals(bytes, bytesDecoded);
 
         //require padding
         bytes = new byte[99];
@@ -93,7 +86,7 @@ public class Base64UtilityTest extends Assert {
         encodedChars = Base64Utility.encodeChunk(bytes, 0, bytes.length);
         assertNotNull(encodedChars);
         bytesDecoded = Base64Utility.decodeChunk(encodedChars, 0, encodedChars.length);
-        assertEquals(bytes, bytesDecoded);
+        assertArrayEquals(bytes, bytesDecoded);
 
         //require padding
         bytes = new byte[98];
@@ -103,7 +96,7 @@ public class Base64UtilityTest extends Assert {
         encodedChars = Base64Utility.encodeChunk(bytes, 0, bytes.length);
         assertNotNull(encodedChars);
         bytesDecoded = Base64Utility.decodeChunk(encodedChars, 0, encodedChars.length);
-        assertEquals(bytes, bytesDecoded);
+        assertArrayEquals(bytes, bytesDecoded);
 
         //require padding
         bytes = new byte[97];
@@ -113,7 +106,7 @@ public class Base64UtilityTest extends Assert {
         encodedChars = Base64Utility.encodeChunk(bytes, 0, bytes.length);
         assertNotNull(encodedChars);
         bytesDecoded = Base64Utility.decodeChunk(encodedChars, 0, encodedChars.length);
-        assertEquals(bytes, bytesDecoded);
+        assertArrayEquals(bytes, bytesDecoded);
 
 
         bytesDecoded = Base64Utility.decodeChunk(new char[3], 0, 3);
@@ -123,26 +116,21 @@ public class Base64UtilityTest extends Assert {
     @Test
     public void testEncodeDecodeString() throws Exception {
         String in = "QWxhZGRpbjpvcGVuIHNlc2FtZQ==";
-        byte bytes[] = Base64Utility.decode(in);
+        byte[] bytes = Base64Utility.decode(in);
         assertEquals("Aladdin:open sesame", IOUtils.newStringFromBytes(bytes));
         String encoded = Base64Utility.encode(bytes);
         assertEquals(in, encoded);
     }
 
-    @Test
+    @Test(expected = Base64Exception.class)
     public void testDecodeInvalidString() throws Exception {
-        try {
-            String in = "QWxhZGRpbjpcGVuIHNlc2FtZQ==";
-            Base64Utility.decode(in);
-            fail("This test should be fail");
-        } catch (Base64Exception e) {
-            //nothing to do
-        }
+        String in = "QWxhZGRpbjpcGVuIHNlc2FtZQ==";
+        Base64Utility.decode(in);
     }
 
     @Test
     public void testEncodeDecodeStreams() throws Exception {
-        byte bytes[] = new byte[100];
+        byte[] bytes = new byte[100];
         for (int x = 0; x < bytes.length; x++) {
             bytes[x] = (byte)x;
         }
@@ -154,7 +142,7 @@ public class Base64UtilityTest extends Assert {
                              0,
                              encodedString.length(),
                              bout2);
-        assertEquals(bytes, bout2.toByteArray());
+        assertArrayEquals(bytes, bout2.toByteArray());
 
 
         String in = "QWxhZGRpbjpvcGVuIHNlc2FtZQ==";
@@ -169,5 +157,24 @@ public class Base64UtilityTest extends Assert {
 
     }
 
+    // See https://tools.ietf.org/html/rfc4648#section-10
+    @Test
+    public void testVectors() throws Exception {
+        assertEquals("", Base64Utility.encode("".getBytes()));
+        assertEquals("Zg==", Base64Utility.encode("f".getBytes()));
+        assertEquals("Zm8=", Base64Utility.encode("fo".getBytes()));
+        assertEquals("Zm9v", Base64Utility.encode("foo".getBytes()));
+        assertEquals("Zm9vYg==", Base64Utility.encode("foob".getBytes()));
+        assertEquals("Zm9vYmE=", Base64Utility.encode("fooba".getBytes()));
+        assertEquals("Zm9vYmFy", Base64Utility.encode("foobar".getBytes()));
+
+        assertEquals("", new String(Base64Utility.decode("")));
+        assertEquals("f", new String(Base64Utility.decode("Zg==")));
+        assertEquals("fo", new String(Base64Utility.decode("Zm8=")));
+        assertEquals("foo", new String(Base64Utility.decode("Zm9v")));
+        assertEquals("foob", new String(Base64Utility.decode("Zm9vYg==")));
+        assertEquals("fooba", new String(Base64Utility.decode("Zm9vYmE=")));
+        assertEquals("foobar", new String(Base64Utility.decode("Zm9vYmFy")));
+    }
 
 }

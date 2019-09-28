@@ -20,6 +20,7 @@ package org.apache.cxf.binding.xml;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 import javax.xml.namespace.QName;
 
@@ -47,10 +48,10 @@ import org.apache.cxf.wsdl.interceptors.WrappedOutInterceptor;
 @NoJSR250Annotations(unlessNull = { "bus" })
 public class XMLBindingFactory extends AbstractBindingFactory {
     public static final Collection<String> DEFAULT_NAMESPACES
-        = Arrays.asList(
+        = Collections.unmodifiableList(Arrays.asList(
             "http://cxf.apache.org/bindings/xformat",
             "http://www.w3.org/2004/08/wsdl/http",
-            "http://schemas.xmlsoap.org/wsdl/http/");
+            "http://schemas.xmlsoap.org/wsdl/http/"));
 
     public XMLBindingFactory() {
     }

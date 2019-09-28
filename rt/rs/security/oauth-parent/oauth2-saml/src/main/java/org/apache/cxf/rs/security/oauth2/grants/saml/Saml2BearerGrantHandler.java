@@ -34,6 +34,7 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
@@ -137,7 +138,7 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
             SAMLSecurityContext jaxrsSc = (SAMLSecurityContext)sc;
             Set<Principal> rolesP = jaxrsSc.getUserRoles();
             List<String> roles = new ArrayList<>();
-            if (roles != null) {
+            if (rolesP != null) {
                 for (Principal p : rolesP) {
                     roles.add(p.getName());
                 }
@@ -145,9 +146,8 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
             return new SamlUserSubject(jaxrsSc.getUserPrincipal().getName(),
                                        roles,
                                        jaxrsSc.getClaims());
-        } else {
-            return new UserSubject(sc.getUserPrincipal().getName());
         }
+        return new UserSubject(sc.getUserPrincipal().getName());
 
     }
 

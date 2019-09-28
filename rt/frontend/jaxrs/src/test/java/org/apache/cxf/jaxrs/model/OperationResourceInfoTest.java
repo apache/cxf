@@ -31,12 +31,13 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.easymock.EasyMock;
 
-import org.junit.Assert;
+import org.easymock.EasyMock;
 import org.junit.Test;
 
-public class OperationResourceInfoTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class OperationResourceInfoTest {
 
     @Produces("text/xml")
     @Consumes("application/xml")
@@ -137,14 +138,13 @@ public class OperationResourceInfoTest extends Assert {
     }
 
 
-    private Message createMessage() {
+    private static Message createMessage() {
         Message m = new MessageImpl();
         Exchange e = new ExchangeImpl();
         m.setExchange(e);
         e.setInMessage(m);
         Endpoint endpoint = EasyMock.createMock(Endpoint.class);
-        endpoint.get("org.apache.cxf.jaxrs.comparator");
-        EasyMock.expectLastCall().andReturn(null);
+        EasyMock.expect(endpoint.get("org.apache.cxf.jaxrs.comparator")).andReturn(null);
         EasyMock.replay(endpoint);
         e.put(Endpoint.class, endpoint);
         return m;

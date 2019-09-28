@@ -28,7 +28,6 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -40,7 +39,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.AsyncHandler;
@@ -50,6 +48,8 @@ import javax.xml.ws.Endpoint;
 import javax.xml.ws.Response;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
+import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Document;
 
@@ -59,6 +59,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.dynamic.DynamicClientFactory;
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.message.Message;
@@ -77,8 +78,17 @@ import org.apache.hello_world_soap_http.SOAPServiceMultiPortTypeTest;
 import org.apache.hello_world_soap_http.types.BareDocumentResponse;
 import org.apache.hello_world_soap_http.types.GreetMeLaterResponse;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class ClientServerTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
@@ -535,9 +545,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
             try {
                 GreetMeLaterResponse reply = response.get();
                 replyBuffer = reply.getResponseType();
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-            } catch (ExecutionException ex) {
+            } catch (InterruptedException | ExecutionException ex) {
                 ex.printStackTrace();
             }
         }
@@ -577,7 +585,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         assertEquals(((TestExecutor)executor).getCount(), 0);
         Greeter greeter = service.getPort(portName, Greeter.class);
         updateAddressPort(greeter, PORT);
-        List<Response<GreetMeResponse>> responses = new ArrayList<Response<GreetMeResponse>>();
+        List<Response<GreetMeResponse>> responses = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             responses.add(greeter.greetMeAsync("asyn call" + i));
         }
@@ -710,6 +718,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
 
         String noSuchCodeFault = "NoSuchCodeLitFault";
         String badRecordFault = "BadRecordLitFault";
+        String illegalArgumentException = "IllegalArgumentException";
 
         Greeter greeter = service.getPort(portName, Greeter.class);
         updateAddressPort(greeter, PORT);
@@ -718,8 +727,18 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
                 greeter.testDocLitFault(noSuchCodeFault);
                 fail("Should have thrown NoSuchCodeLitFault exception");
             } catch (NoSuchCodeLitFault nslf) {
+                int responseCode = (Integer) ((BindingProvider) greeter).getResponseContext().get(
+                    MessageContext.HTTP_RESPONSE_CODE);
+                assertEquals(responseCode, 500);
                 assertNotNull(nslf.getFaultInfo());
                 assertNotNull(nslf.getFaultInfo().getCode());
+            }
+            try {
+                greeter.testDocLitFault(illegalArgumentException);
+                fail("Should have thrown SOAPFaultException exception");
+            } catch (SOAPFaultException sfe) {
+                assertEquals("TestIllegalArgumentException", sfe.getCause().getMessage());
+                sfe.printStackTrace();
             }
 
             try {
@@ -736,8 +755,23 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
                 assertEquals("BadRecordLitFault", brlf.getFaultInfo());
             }
 
-        }
+            try {
+                greeter.testDocLitFaultAsync(noSuchCodeFault).get();
+                fail("Should have thrown NoSuchCodeLitFault exception");
+            } catch (ExecutionException ee) {
+                NoSuchCodeLitFault nslf = (NoSuchCodeLitFault)ee.getCause();
+                assertNotNull(nslf.getFaultInfo());
+                assertNotNull(nslf.getFaultInfo().getCode());
+            }
 
+            try {
+                greeter.testDocLitFaultAsync(illegalArgumentException).get();
+                fail("Should have thrown SOAPFaultException exception");
+            } catch (ExecutionException ee) {
+                SOAPFaultException sfe = (SOAPFaultException)ee.getCause();
+                assertEquals("TestIllegalArgumentException", sfe.getCause().getMessage());
+            }
+        }
     }
 
     @Test
@@ -881,23 +915,6 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
 
     }
 
-    /*
-    @Test
-    public void testDynamicClientFactory2() throws Exception {
-        String wsdlUrl = "http://sdpwsparam.strikeiron.com/sdpNFLTeams?WSDL";
-
-        //TODO test fault exceptions
-        DynamicClientFactory dcf = DynamicClientFactory.newInstance();
-        Client client = dcf.createClient(wsdlUrl);
-        Object o = Class.forName("com.strikeiron.GetTeamInfoByCity", true,
-                                 Thread.currentThread().getContextClassLoader()).newInstance();
-        Object[] result = client.invoke("GetTeamInfoByCity", "a", "b", "New England");
-
-
-        //System.out.println(Arrays.asList(result));
-
-    }
-    */
     @Test
     public void testDynamicClientFactory() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
@@ -905,7 +922,6 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         String wsdlUrl = null;
         wsdlUrl = wsdl.toURI().toString();
 
-        //TODO test fault exceptions
         DynamicClientFactory dcf = DynamicClientFactory.newInstance();
         Client client = dcf.createClient(wsdlUrl, serviceName, portName);
         updateAddressPort(client, PORT);
@@ -913,17 +929,9 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         Object[] result = client.invoke("sayHi");
         assertNotNull("no response received from service", result);
         assertEquals("Bonjour", result[0]);
-        //TODO: the following isn't a real test. We need to test against a service
-        // that would actually notice the difference. At least it ensures that
-        // specifying the property does not explode.
-        Map<String, Object> jaxbContextProperties = new HashMap<>();
-        if (JAXBContext.newInstance(String.class).getClass().getName().contains("internal")) {
-            jaxbContextProperties.put("com.sun.xml.internal.bind.defaultNamespaceRemap", "uri:ultima:thule");
-        } else {
-            jaxbContextProperties.put("com.sun.xml.bind.defaultNamespaceRemap", "uri:ultima:thule");
-        }
-        dcf.setJaxbContextProperties(jaxbContextProperties);
+
         client = dcf.createClient(wsdlUrl, serviceName, portName);
+        new LoggingFeature().initialize(client, client.getBus());
         updateAddressPort(client, PORT);
         client.invoke("greetMe", "test");
         result = client.invoke("sayHi");
@@ -955,7 +963,6 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         InvocationHandler handler = new InvocationHandler() {
 
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                // TODO Auto-generated method stub
                 return null;
             }
 
@@ -1003,7 +1010,8 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
                         "http://localhost:" + PORT + "/SoapContext/AsyncEchoProvider");
         Dispatch<StreamSource> dispatcher = service.createDispatch(fakePortName,
                                                                    StreamSource.class,
-                                                                   Service.Mode.PAYLOAD);
+                                                                   Service.Mode.PAYLOAD,
+                                                                   new LoggingFeature());
 
         Client client = ((DispatchImpl<StreamSource>)dispatcher).getClient();
         WSAddressingFeature wsAddressingFeature = new WSAddressingFeature();

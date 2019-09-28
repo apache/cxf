@@ -67,7 +67,6 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
 
     public void write(Object obj, XMLStreamWriter writer) {
         try {
-            XMLStreamReader reader = null;
             if (obj instanceof DataSource) {
                 DataSource ds = (DataSource)obj;
                 if (schema != null) {
@@ -78,12 +77,15 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
                     schemaValidator.validate(domSource);
                     StaxUtils.copy(domSource, writer);
                 } else {
-                    reader = StaxUtils.createXMLStreamReader(ds.getInputStream());
+                    XMLStreamReader reader = StaxUtils.createXMLStreamReader(ds.getInputStream());
                     StaxUtils.copy(reader, writer);
                     reader.close();
                 }
 
             } else if (obj instanceof Node) {
+                if (obj instanceof DocumentFragment) {
+                    obj = org.apache.cxf.helpers.DOMUtils.getDomDocumentFragment((DocumentFragment)obj);
+                }
                 if (schema != null) {
                     Validator schemaValidator = schema.newValidator();
                     schemaValidator.setErrorHandler(
@@ -131,7 +133,7 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
                     Node ch = nd.getFirstChild();
                     while (ch != null) {
                         nd.removeChild(ch);
-                        dw.getCurrentNode().appendChild(ch);
+                        dw.getCurrentNode().appendChild(org.apache.cxf.helpers.DOMUtils.getDomElement(ch));
                         ch = nd.getFirstChild();
                     }
                 } else if (nd.getOwnerDocument() == dw.getCurrentNode().getOwnerDocument()) {
@@ -222,7 +224,7 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
         
         private boolean isCVC312Exception(SAXParseException exception) {
             String msg = exception.getMessage();
-            return msg.startsWith("cvc-type.3.1.2") 
+            return (msg.startsWith("cvc-type.3.1.2") || msg.startsWith("cvc-complex-type.2.2"))
                 && msg.endsWith("is a simple type, so it must have no element information item [children].");
                 
            
@@ -230,7 +232,7 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
         
         private String getAttachmentElementName(SAXParseException exception) {
             String msg = exception.getMessage();
-            String str[] = msg.split("'");
+            String[] str = msg.split("'");
             return str[1];
         }
         
@@ -244,8 +246,8 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
                     NodeList subNodeList = nNode.getChildNodes();
                     for (int j = 0; j < subNodeList.getLength(); j++) {
                         Node subNode = subNodeList.item(j);
-                        if (subNode.getNamespaceURI().equals("http://www.w3.org/2004/08/xop/include")
-                            && subNode.getLocalName().equals("Include")) {
+                        if ("http://www.w3.org/2004/08/xop/include".equals(subNode.getNamespaceURI())
+                            && "Include".equals(subNode.getLocalName())) {
                             // This is the Mtom element which break the SchemaValidation so ignore this
                             return true;
                         }

@@ -31,11 +31,13 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.transport.local.LocalTransportFactory;
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.CryptoFactory;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 
 /**
  * In these test-cases, the client is using DOM and the service is using StaX. The tests are
@@ -64,11 +66,11 @@ public class DOMToStaxEncryptionIdentifierTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
-        properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        properties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
-        properties.put(WSHandlerConstants.USER, "myalias");
-        properties.put(WSHandlerConstants.ENC_KEY_ID, "DirectReference");
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        properties.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
+        properties.put(ConfigurationConstants.USER, "myalias");
+        properties.put(ConfigurationConstants.ENC_KEY_ID, "DirectReference");
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
@@ -97,11 +99,11 @@ public class DOMToStaxEncryptionIdentifierTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
-        properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        properties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
-        properties.put(WSHandlerConstants.USER, "myalias");
-        properties.put(WSHandlerConstants.ENC_KEY_ID, "IssuerSerial");
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        properties.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
+        properties.put(ConfigurationConstants.USER, "myalias");
+        properties.put(ConfigurationConstants.ENC_KEY_ID, "IssuerSerial");
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
@@ -130,11 +132,11 @@ public class DOMToStaxEncryptionIdentifierTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
-        properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        properties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
-        properties.put(WSHandlerConstants.USER, "myalias");
-        properties.put(WSHandlerConstants.ENC_KEY_ID, "Thumbprint");
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        properties.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
+        properties.put(ConfigurationConstants.USER, "myalias");
+        properties.put(ConfigurationConstants.ENC_KEY_ID, "Thumbprint");
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
@@ -163,11 +165,11 @@ public class DOMToStaxEncryptionIdentifierTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
-        properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        properties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
-        properties.put(WSHandlerConstants.USER, "myalias");
-        properties.put(WSHandlerConstants.ENC_KEY_ID, "X509KeyIdentifier");
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        properties.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
+        properties.put(ConfigurationConstants.USER, "myalias");
+        properties.put(ConfigurationConstants.ENC_KEY_ID, "X509KeyIdentifier");
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
@@ -196,11 +198,11 @@ public class DOMToStaxEncryptionIdentifierTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
-        properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        properties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
-        properties.put(WSHandlerConstants.USER, "myalias");
-        properties.put(WSHandlerConstants.ENC_KEY_ID, "EncryptedKeySHA1");
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        properties.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
+        properties.put(ConfigurationConstants.USER, "myalias");
+        properties.put(ConfigurationConstants.ENC_KEY_ID, "EncryptedKeySHA1");
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);

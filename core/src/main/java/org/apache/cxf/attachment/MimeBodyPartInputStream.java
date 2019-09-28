@@ -43,8 +43,8 @@ public class MimeBodyPartInputStream extends InputStream {
         this.pbAmount = pbsize;
     }
 
-    public int read(byte buf[], int origOff, int origLen) throws IOException {
-        byte b[] = buf;
+    public int read(byte[] buf, int origOff, int origLen) throws IOException {
+        byte[] b = buf;
         int off = origOff;
         int len = origLen;
         if (boundaryFound || closed) {
@@ -134,19 +134,17 @@ public class MimeBodyPartInputStream extends InputStream {
                 value = buffer[initialI + 1];
                 if (value != 10) {
                     continue;
-                } else {  //if it comes here then 13, 10 are values and will try to match boundaries
-                    if (!hasData(buffer, initialI, initialI + 2, off, len)) {
-                        return initialI - off;
-                    }
-                    value = buffer[initialI + 2];
-                    if ((byte) value != boundary[0]) {
-                        i++;
-                        continue;
-                    } else { //13, 10, boundaries first value matched
-                        needUnread0d0a = true;
-                        i += 2; //i after this points to boundary[0] element
-                    }
                 }
+                if (!hasData(buffer, initialI, initialI + 2, off, len)) {
+                    return initialI - off;
+                }
+                value = buffer[initialI + 2];
+                if ((byte) value != boundary[0]) {
+                    i++;
+                    continue;
+                }
+                needUnread0d0a = true;
+                i += 2; //i after this points to boundary[0] element
             } else if (value != boundary[0]) {
                 continue;
             }
@@ -194,11 +192,11 @@ public class MimeBodyPartInputStream extends InputStream {
             if (needUnread0d0a) { //Pushing all,  returning 13
                 i = i - boundaryIndex;
                 i--; //for 10
-                value = 13;
+//                value = 13;
             } else {
                 i = i - boundaryIndex;
                 i++;
-                value = boundary[0];
+//                value = boundary[0];
             }
         }
         return len;
@@ -221,16 +219,14 @@ public class MimeBodyPartInputStream extends InputStream {
             if (value != 10) {
                 inStream.unread(value);
                 return 13;
-            } else {
-                value = inStream.read();
-                if ((byte) value != boundary[0]) {
-                    inStream.unread(value);
-                    inStream.unread(10);
-                    return 13;
-                } else {
-                    needUnread0d0a = true;
-                }
             }
+            value = inStream.read();
+            if ((byte) value != boundary[0]) {
+                inStream.unread(value);
+                inStream.unread(10);
+                return 13;
+            }
+            needUnread0d0a = true;
         } else if ((byte) value != boundary[0]) {
             return value;
         }

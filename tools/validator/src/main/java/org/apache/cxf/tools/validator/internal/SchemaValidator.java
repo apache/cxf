@@ -108,6 +108,7 @@ public class SchemaValidator extends AbstractDefinitionValidator {
         try {
             docFactory.setNamespaceAware(true);
             docFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+            docFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
             docBuilder = docFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
             throw new ToolException(e);
@@ -185,6 +186,7 @@ public class SchemaValidator extends AbstractDefinitionValidator {
             SAXParserFactory saxFactory = SAXParserFactory.newInstance();
             saxFactory.setFeature("http://xml.org/sax/features/namespaces", true);
             saxFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+            saxFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
             saxParser = saxFactory.newSAXParser();
 
             if (defaultSchemas != null) {
@@ -264,7 +266,7 @@ public class SchemaValidator extends AbstractDefinitionValidator {
                         throw new ToolException(e);
                     }
                 }
-                return xsdUrls.toArray(new String[xsdUrls.size()]);
+                return xsdUrls.toArray(new String[0]);
             }
         }
         return null;
@@ -316,13 +318,13 @@ class NewStackTraceErrorHandler implements ErrorHandler {
         if (errors == null) {
             return null;
         }
-        return errors.toArray(new SAXParseException[errors.size()]);
+        return errors.toArray(new SAXParseException[0]);
     }
 
     void addError(String msg, SAXParseException ex) {
         valid = false;
         if (numErrors == 0) {
-            buffer.append("\n");
+            buffer.append('\n');
         } else {
             buffer.append("\n\n");
         }
@@ -379,7 +381,7 @@ class SchemaResourceResolver implements LSResourceResolver {
         if (systemId != null) {
             String schemaLocation = "";
             if (baseURI != null) {
-                schemaLocation = baseURI.substring(0, baseURI.lastIndexOf("/") + 1);
+                schemaLocation = baseURI.substring(0, baseURI.lastIndexOf('/') + 1);
             }
             if (systemId.indexOf("http://") < 0) {
                 resURL = schemaLocation + systemId;

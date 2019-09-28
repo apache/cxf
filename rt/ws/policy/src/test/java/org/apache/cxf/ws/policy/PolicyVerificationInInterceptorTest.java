@@ -28,16 +28,16 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.neethi.Policy;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
  *
  */
-public class PolicyVerificationInInterceptorTest extends Assert {
+public class PolicyVerificationInInterceptorTest {
 
     private IMocksControl control;
     private Bus bus;

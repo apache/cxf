@@ -49,8 +49,8 @@ public class InTransformReader extends DepthXMLStreamReader {
     private Map<QName, ElementProperty> inAppendMap = new HashMap<>(5);
     private Set<QName> inDropSet = new HashSet<>(5);
     private Map<String, String> nsMap = new HashMap<>(5);
-    private List<ParsingEvent> pushedBackEvents = new LinkedList<ParsingEvent>();
-    private List<List<ParsingEvent>> pushedAheadEvents = new LinkedList<List<ParsingEvent>>();
+    private List<ParsingEvent> pushedBackEvents = new LinkedList<>();
+    private List<List<ParsingEvent>> pushedAheadEvents = new LinkedList<>();
     private String replaceText;
     private ParsingEvent currentEvent;
     private List<Integer> attributesIndexes = new ArrayList<>();
@@ -102,10 +102,9 @@ public class InTransformReader extends DepthXMLStreamReader {
                 LOG.fine("pushed event available: " + currentEvent);
             }
             return currentEvent.getEvent();
-        } else {
-            if (doDebug) {
-                LOG.fine("no pushed event");
-            }
+        }
+        if (doDebug) {
+            LOG.fine("no pushed event");
         }
 
         int event = super.next();
@@ -125,13 +124,13 @@ public class InTransformReader extends DepthXMLStreamReader {
                 expected = theName;
             } else {
                 String prefix = theName.getPrefix();
-                if (prefix.length() == 0 && theName.getNamespaceURI().length() == 0
-                    && expected.getNamespaceURI().length() > 0) {
+                if (prefix.isEmpty() && theName.getNamespaceURI().isEmpty()
+                    && !expected.getNamespaceURI().isEmpty()) {
                     prefix = namespaceContext.getPrefix(expected.getNamespaceURI());
                     if (prefix == null) {
                         prefix = namespaceContext.findUniquePrefix(expected.getNamespaceURI());
                     }
-                } else if (prefix.length() > 0 && expected.getNamespaceURI().length() == 0) {
+                } else if (!prefix.isEmpty() && expected.getNamespaceURI().isEmpty()) {
                     prefix = "";
                 }
                 expected = new QName(expected.getNamespaceURI(), expected.getLocalPart(), prefix);
@@ -140,7 +139,7 @@ public class InTransformReader extends DepthXMLStreamReader {
             if (null != appendProp && !replaceContent) {
                 // handle one of the four append modes
                 handleAppendMode(expected, appendProp);
-            } else if (replaceContent) {
+            } else if (null != appendProp && replaceContent) {
                 replaceText = appendProp.getText();
                 if (doDebug) {
                     LOG.fine("replacing content with " + replaceText);
@@ -269,7 +268,7 @@ public class InTransformReader extends DepthXMLStreamReader {
     }
 
 
-    public Object getProperty(String name) throws IllegalArgumentException {
+    public Object getProperty(String name) {
         if (INTERN_NAMES.equals(name) || INTERN_NS.equals(name)) {
             return Boolean.FALSE;
         }
@@ -279,9 +278,8 @@ public class InTransformReader extends DepthXMLStreamReader {
     public String getLocalName() {
         if (currentEvent != null) {
             return currentEvent.getName().getLocalPart();
-        } else {
-            return super.getLocalName();
         }
+        return super.getLocalName();
     }
 
 
@@ -292,7 +290,7 @@ public class InTransformReader extends DepthXMLStreamReader {
     public String getPrefix() {
         QName name = readCurrentElement();
         String prefix = name.getPrefix();
-        if (prefix.length() == 0 && getNamespaceURI().length() > 0) {
+        if (prefix.isEmpty() && !getNamespaceURI().isEmpty()) {
             prefix = namespaceContext.getPrefix(getNamespaceURI());
             if (prefix == null) {
                 prefix = "";
@@ -319,9 +317,8 @@ public class InTransformReader extends DepthXMLStreamReader {
         if (actualNs != null) {
             if (actualNs.length() > 0) {
                 return super.getNamespacePrefix(index);
-            } else {
-                return "";
             }
+            return "";
         } else if (ns.equals(reader.getNamespaceURI())) {
             return getPrefix();
         } else {
@@ -335,17 +332,15 @@ public class InTransformReader extends DepthXMLStreamReader {
         String actualNs = nsMap.get(ns);
         if (actualNs != null) {
             return actualNs;
-        } else {
-            return ns != null ? ns : namespaceContext.getNamespaceURI(prefix);
         }
+        return ns != null ? ns : namespaceContext.getNamespaceURI(prefix);
     }
 
     public String getNamespaceURI() {
         if (currentEvent != null) {
             return currentEvent.getName().getNamespaceURI();
-        } else {
-            return super.getNamespaceURI();
         }
+        return super.getNamespaceURI();
     }
 
     private QName readCurrentElement() {
@@ -408,14 +403,12 @@ public class InTransformReader extends DepthXMLStreamReader {
         QName aname = getAttributeName(arg0);
         if (XMLConstants.NULL_NS_URI.equals(aname.getNamespaceURI())) {
             return "";
-        } else {
-            String actualNs = nsMap.get(aname.getNamespaceURI());
-            if (actualNs != null) {
-                return namespaceContext.findUniquePrefix(actualNs);
-            } else {
-                return namespaceContext.getPrefix(aname.getNamespaceURI());
-            }
         }
+        String actualNs = nsMap.get(aname.getNamespaceURI());
+        if (actualNs != null) {
+            return namespaceContext.findUniquePrefix(actualNs);
+        }
+        return namespaceContext.getPrefix(aname.getNamespaceURI());
     }
 
     public String getAttributeType(int arg0) {
@@ -439,7 +432,6 @@ public class InTransformReader extends DepthXMLStreamReader {
             return null;
         }
         checkAttributeIndexRange(-1);
-        //TODO need reverse lookup
         return super.getAttributeValue(namespace, localName);
     }
 

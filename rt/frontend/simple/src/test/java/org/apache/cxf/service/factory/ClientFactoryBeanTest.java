@@ -35,7 +35,12 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.hello_world.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeOneWay;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ClientFactoryBeanTest extends AbstractSimpleFrontendTest {
 

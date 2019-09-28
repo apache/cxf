@@ -23,21 +23,24 @@
     <packaging>bundle</packaging>
     <name>Apache CXF Runtime HTTP Undertow Transport</name>
     <description>Apache CXF Runtime HTTP Undertow Transport</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.transport.http.undertow</cxf.module.name>
         <cxf.bundle.activator>org.apache.cxf.transport.http_undertow.osgi.HTTPUndertowTransportActivator</cxf.bundle.activator>
         <cxf.osgi.import>
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
             io.undertow*;version="${cxf.undertow.osgi.version}",
             org.osgi.service.blueprint*;resolution:=optional,
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
-            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
+            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
+            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
+            javax.annotation*;version="${cxf.osgi.javax.annotation.version}"
         </cxf.osgi.import>
         <!-- keep in sync with services exported in activator -->
         <cxf.export.service>
@@ -157,12 +160,14 @@
                             <additionalJvmArgs>${cxf.xjc.jvmArgs}</additionalJvmArgs>
                             <extensions>
                                 <extension>org.apache.cxf.xjcplugins:cxf-xjc-bug986:${cxf.xjc-utils.version}</extension>
+                                <extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:${cxf.xjc-utils.version}</extension>
                             </extensions>
                             <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
                             <xsdOptions>
                                 <xsdOption>
                                     <extensionArgs>
                                         <arg>-Xbug986</arg>
+                                        <arg>-Xdv</arg>
                                     </extensionArgs>
                                     <xsd>${basedir}/src/main/resources/schemas/configuration/http-undertow.xsd</xsd>
                                     <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>

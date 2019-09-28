@@ -66,7 +66,7 @@ public class EcDsaJwsSignatureVerifier extends PublicKeyJwsSignatureVerifier {
         return AlgorithmUtils.isEcDsaSign(algo);
     }
     
-    private static byte[] signatureToDer(byte joseSig[]) {
+    private static byte[] signatureToDer(byte[] joseSig) {
         // Apache2 Licensed Jose4j code which adapts the Apache Santuario XMLSecurity
         // code and aligns it with JWS/JWA requirements
         int rawLen = joseSig.length / 2;
@@ -100,7 +100,7 @@ public class EcDsaJwsSignatureVerifier extends PublicKeyJwsSignatureVerifier {
             throw new JoseException("Invalid format of ECDSA signature");
         }
         int offset;
-        byte derEncodedSignatureBytes[];
+        byte[] derEncodedSignatureBytes;
         if (len < 128) {
             derEncodedSignatureBytes = new byte[2 + 2 + j + 2 + l];
             offset = 1;

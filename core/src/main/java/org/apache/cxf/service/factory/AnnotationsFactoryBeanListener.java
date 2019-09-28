@@ -117,7 +117,7 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
             if (docs != null) {
                 addDocumentation(ep,
                                  WSDLDocumentation.Placement.SERVICE,
-                                 docs.toArray(new WSDLDocumentation[docs.size()]));
+                                 docs.toArray(new WSDLDocumentation[0]));
             }
             addBindingOperationDocs(ep);
             for (Method method : implCls.getMethods()) {
@@ -205,7 +205,7 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
                     }
                 } else {
                     try {
-                        f = (Factory)scope.factoryClass().getConstructor(Class.class, String[].class)
+                        f = scope.factoryClass().getConstructor(Class.class, String[].class)
                             .newInstance(cls, scope.args());
                     } catch (Throwable t) {
                         throw new ServiceConstructionException(t);
@@ -224,8 +224,8 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
             }
             String ref = prop.ref();
             Class<?> cls = prop.beanClass();
-            Object obj = null;
-            String s[] = prop.value();
+            final Object obj;
+            String[] s = prop.value();
             if (!StringUtils.isEmpty(ref)) {
                 obj = bus.getExtension(ConfiguredBeanLocator.class).getBeanOfType(ref, cls);
             } else if (s.length == 0 && cls != Object.class) {
@@ -248,7 +248,7 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
                 try {
                     return cls.getConstructor(Endpoint.class).newInstance(ep);
                 } catch (NoSuchMethodException e2) {
-                    return cls.newInstance();
+                    return cls.getConstructor().newInstance();
                 }
             }
         } catch (Exception ex) {
@@ -265,7 +265,7 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
                         .resolveResource(annotation.ref(), annotation.value()));
                 }
 
-                factory.setDataBinding(annotation.value().newInstance());
+                factory.setDataBinding(annotation.value().getConstructor().newInstance());
             } catch (Exception e) {
                 //REVISIT - log a warning
             }

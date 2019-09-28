@@ -139,7 +139,7 @@ public class WSDLSchemaManager {
     }
 
     public void addWSDLDefinitionImport(Definition rootDefn, Definition defn, String prefix, File file) {
-        if (rootDefn.getImports().get(defn.getTargetNamespace()) == null && !file.getName().equals(".wsdl")) {
+        if (rootDefn.getImports().get(defn.getTargetNamespace()) == null && !".wsdl".equals(file.getName())) {
             // Only import if not already done to prevent multiple imports of the same file
             // in the WSDL. Also watch out for empty fileNames, which by this point in the
             // code would show up as ".wsdl".

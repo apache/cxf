@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.jaxrs.ext.search.AbstractSearchConditionParser;
 import org.apache.cxf.jaxrs.ext.search.AndSearchCondition;
@@ -35,7 +36,6 @@ import org.apache.cxf.jaxrs.ext.search.SearchBean;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchParseException;
 import org.apache.cxf.jaxrs.ext.search.SimpleSearchCondition;
-import org.apache.cxf.message.MessageUtils;
 
 
 /**
@@ -133,7 +133,7 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
                       Map<String, String> beanProperties) {
         super(tclass, contextProperties, beanProperties);
 
-        if (MessageUtils.isTrue(this.contextProperties.get(SUPPORT_SINGLE_EQUALS))) {
+        if (PropertyUtils.isTrue(this.contextProperties.get(SUPPORT_SINGLE_EQUALS))) {
             operatorsMap = new HashMap<>(operatorsMap);
             operatorsMap.put("=", ConditionType.EQUALS);
             comparatorsPattern = COMPARATORS_PATTERN_SINGLE_EQUALS;
@@ -242,9 +242,8 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
         }
         if (ors.getSubnodes().size() == 1) {
             return ors.getSubnodes().get(0);
-        } else {
-            return ors;
         }
+        return ors;
     }
 
     protected ASTNode<T> parseComparison(String expr) throws SearchParseException {
@@ -263,12 +262,10 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
             TypeInfoObject castedValue = parseType(propertyName, name, value);
             if (castedValue != null) {
                 return new Comparison(name, operator, castedValue);
-            } else {
-                return null;
             }
-        } else {
-            throw new SearchParseException("Not a comparison expression: " + expr);
+            return null;
         }
+        throw new SearchParseException("Not a comparison expression: " + expr);
     }
 
 
@@ -290,9 +287,8 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
     protected String unwrapSetter(String setter) {
         if (setter.startsWith(EXTENSION_COUNT_OPEN) && setter.endsWith(")")) {
             return setter.substring(EXTENSION_COUNT_OPEN.length(), setter.length() - 1);
-        } else {
-            return setter;
         }
+        return setter;
     }
 
     // node of abstract syntax tree
@@ -327,7 +323,7 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
                     builder.append(", ");
                 }
             }
-            builder.append("]");
+            builder.append(']');
             return builder.toString();
         }
 
@@ -339,9 +335,8 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
             }
             if (OR.equals(operator)) {
                 return new OrSearchCondition<>(scNodes);
-            } else {
-                return new AndSearchCondition<>(scNodes);
             }
+            return new AndSearchCondition<>(scNodes);
 
         }
     }
@@ -371,13 +366,12 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
 
             if (isPrimitive(cond)) {
                 return new SimpleSearchCondition<>(ct, cond);
-            } else {
-                String templateNameLCase = templateName.toLowerCase();
-                return new SimpleSearchCondition<>(Collections.singletonMap(templateNameLCase, ct),
-                                                    Collections.singletonMap(templateNameLCase, name),
-                                                    Collections.singletonMap(templateNameLCase, tvalue.getTypeInfo()),
-                                                    cond);
             }
+            String templateNameLCase = templateName.toLowerCase();
+            return new SimpleSearchCondition<>(Collections.singletonMap(templateNameLCase, ct),
+                                                Collections.singletonMap(templateNameLCase, name),
+                                                Collections.singletonMap(templateNameLCase, tvalue.getTypeInfo()),
+                                                cond);
         }
 
         private boolean isPrimitive(T pojo) {
@@ -390,11 +384,10 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
                 if (beanspector != null) {
                     beanspector.instantiate().setValue(setter, tvalue.getObject());
                     return beanspector.getBean();
-                } else {
-                    SearchBean bean = (SearchBean)conditionClass.newInstance();
-                    bean.set(setter, tvalue.getObject().toString());
-                    return (T)bean;
                 }
+                SearchBean bean = (SearchBean)conditionClass.newInstance();
+                bean.set(setter, tvalue.getObject().toString());
+                return (T)bean;
             } catch (Throwable e) {
                 throw new SearchParseException(e);
             }

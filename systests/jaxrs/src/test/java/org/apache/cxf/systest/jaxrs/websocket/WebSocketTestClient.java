@@ -30,16 +30,14 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.ws.WebSocket;
-import com.ning.http.client.ws.WebSocketByteListener;
-import com.ning.http.client.ws.WebSocketTextListener;
-import com.ning.http.client.ws.WebSocketUpgradeHandler;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.transport.websocket.WebSocketConstants;
-
-
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.DefaultAsyncHttpClient;
+import org.asynchttpclient.ws.WebSocket;
+import org.asynchttpclient.ws.WebSocketByteListener;
+import org.asynchttpclient.ws.WebSocketTextListener;
+import org.asynchttpclient.ws.WebSocketUpgradeHandler;
 
 /**
  * Test client to do websocket calls.
@@ -62,7 +60,7 @@ class WebSocketTestClient {
         this.received = Collections.synchronizedList(new ArrayList<>());
         this.fragments = Collections.synchronizedList(new ArrayList<>());
         this.latch = new CountDownLatch(1);
-        this.client = new AsyncHttpClient();
+        this.client = new DefaultAsyncHttpClient();
         this.url = url;
     }
 
@@ -104,7 +102,7 @@ class WebSocketTestClient {
         return responses;
     }
 
-    public void close() {
+    public void close() throws IOException {
         if (websocket != null) {
             websocket.close();
         }
@@ -134,7 +132,7 @@ class WebSocketTestClient {
         }
 
         public void onFragment(byte[] fragment, boolean last) {
-            LOG.info("[ws] received fragment bytes (last?" + last + ") --> " + fragment);
+            LOG.info("[ws] received fragment bytes (last?" + last + ") --> " + new String(fragment));
             processFragments(fragment, last);
         }
 
@@ -234,9 +232,8 @@ class WebSocketTestClient {
                 if (first && isStatusCode(line)) {
                     statusCode = Integer.parseInt(line);
                     continue;
-                } else {
-                    first = false;
                 }
+                first = false;
 
                 int del = line.indexOf(':');
                 String h = line.substring(0, del).trim();
@@ -251,7 +248,7 @@ class WebSocketTestClient {
                 entity = ((String)data).substring(pos);
             } else if (data instanceof byte[]) {
                 entity = new byte[((byte[])data).length - pos];
-                System.arraycopy((byte[])data, pos, (byte[])entity, 0, ((byte[])entity).length);
+                System.arraycopy(data, pos, entity, 0, ((byte[])entity).length);
             }
         }
 
@@ -281,7 +278,7 @@ class WebSocketTestClient {
         }
 
         public String toString() {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder(64);
             sb.append("Status: ").append(statusCode).append("\r\n");
             sb.append("Type: ").append(contentType).append("\r\n");
             sb.append("Entity: ").append(gettext(entity)).append("\r\n");

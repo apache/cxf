@@ -27,16 +27,24 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.helpers.IOUtils;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Test;
 
-public abstract class CachedStreamTestBase extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public abstract class CachedStreamTestBase {
     // use two typical ciphers for testing
     private static final String[] CIPHER_LIST = {"RC4", "AES/CTR/NoPadding"};
 
@@ -187,16 +195,16 @@ public abstract class CachedStreamTestBase extends Assert {
 
     @Test
     public void testUseSysProps() throws Exception {
-        String old = System.getProperty("org.apache.cxf.io.CachedOutputStream.Threshold");
+        String old = System.getProperty(CachedConstants.THRESHOLD_SYS_PROP);
         try {
-            System.clearProperty("org.apache.cxf.io.CachedOutputStream.Threshold");
+            System.clearProperty(CachedConstants.THRESHOLD_SYS_PROP);
             reloadDefaultProperties();
             Object cache = createCache();
             File tmpfile = getTmpFile("Hello World!", cache);
             assertNull("expects no tmp file", tmpfile);
             close(cache);
 
-            System.setProperty("org.apache.cxf.io.CachedOutputStream.Threshold", "4");
+            System.setProperty(CachedConstants.THRESHOLD_SYS_PROP, "4");
             reloadDefaultProperties();
             cache = createCache();
             tmpfile = getTmpFile("Hello World!", cache);
@@ -205,8 +213,9 @@ public abstract class CachedStreamTestBase extends Assert {
             close(cache);
             assertFalse("expects no tmp file", tmpfile.exists());
         } finally {
+            System.clearProperty(CachedConstants.THRESHOLD_SYS_PROP);
             if (old != null) {
-                System.setProperty("org.apache.cxf.io.CachedOutputStream.Threshold", old);
+                System.setProperty(CachedConstants.THRESHOLD_SYS_PROP, old);
             }
         }
     }
@@ -224,9 +233,11 @@ public abstract class CachedStreamTestBase extends Assert {
             IMocksControl control = EasyMock.createControl();
 
             Bus b = control.createMock(Bus.class);
-            EasyMock.expect(b.getProperty("bus.io.CachedOutputStream.Threshold")).andReturn("4");
-            EasyMock.expect(b.getProperty("bus.io.CachedOutputStream.MaxSize")).andReturn(null);
-            EasyMock.expect(b.getProperty("bus.io.CachedOutputStream.CipherTransformation")).andReturn(null);
+            EasyMock.expect(b.getProperty(CachedConstants.THRESHOLD_BUS_PROP)).andReturn("4");
+            EasyMock.expect(b.getProperty(CachedConstants.MAX_SIZE_BUS_PROP)).andReturn(null);
+            EasyMock.expect(b.getProperty(CachedConstants.CIPHER_TRANSFORMATION_BUS_PROP)).andReturn(null);
+            Path tmpDirPath = Files.createTempDirectory("temp-dir");
+            EasyMock.expect(b.getProperty(CachedConstants.OUTPUT_DIRECTORY_BUS_PROP)).andReturn(tmpDirPath.toString());
 
             BusFactory.setThreadDefaultBus(b);
 
@@ -234,6 +245,7 @@ public abstract class CachedStreamTestBase extends Assert {
 
             cache = createCache();
             tmpfile = getTmpFile("Hello World!", cache);
+            assertEquals(tmpfile.getParent(), tmpDirPath.toString());
             assertNotNull("expects a tmp file", tmpfile);
             assertTrue("expects a tmp file", tmpfile.exists());
             close(cache);
@@ -288,5 +300,4 @@ public abstract class CachedStreamTestBase extends Assert {
         return result;
     }
 }
-
 

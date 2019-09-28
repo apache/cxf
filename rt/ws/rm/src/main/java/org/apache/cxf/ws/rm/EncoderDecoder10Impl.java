@@ -32,7 +32,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.binding.soap.SoapHeader;
@@ -58,7 +58,7 @@ public final class EncoderDecoder10Impl extends EncoderDecoder {
 
     public static final EncoderDecoder10Impl INSTANCE = new EncoderDecoder10Impl();
 
-    private static AtomicReference<JAXBContext> jaxbContextReference = new AtomicReference<JAXBContext>();
+    private static AtomicReference<JAXBContext> jaxbContextReference = new AtomicReference<>();
 
     private static final Logger LOG = LogUtils.getL7dLogger(EncoderDecoder10Impl.class);
 
@@ -163,14 +163,14 @@ public final class EncoderDecoder10Impl extends EncoderDecoder {
     }
 
     public Element encodeSequenceAcknowledgement(SequenceAcknowledgement ack) throws JAXBException {
-        Document doc = DOMUtils.createDocument();
+        DocumentFragment doc = DOMUtils.getEmptyDocument().createDocumentFragment();
         Marshaller marshaller = getContext().createMarshaller();
         marshaller.marshal(VersionTransformer.convert200502(ack), doc);
         return (Element)doc.getFirstChild();
     }
 
     public Element encodeIdentifier(Identifier id) throws JAXBException {
-        Document doc = DOMUtils.createDocument();
+        DocumentFragment doc = DOMUtils.getEmptyDocument().createDocumentFragment();
         Marshaller marshaller = getContext().createMarshaller();
         marshaller.marshal(VersionTransformer.convert200502(id), doc);
         return (Element)doc.getFirstChild();
@@ -193,9 +193,8 @@ public final class EncoderDecoder10Impl extends EncoderDecoder {
             close.setIdentifier(VersionTransformer.convert(seq.getIdentifier()));
             close.setLastMsgNumber(seq.getMessageNumber());
             return close;
-        } else {
-            return null;
         }
+        return null;
     }
 
     public SequenceAcknowledgement decodeSequenceAcknowledgement(Element elem) throws JAXBException {

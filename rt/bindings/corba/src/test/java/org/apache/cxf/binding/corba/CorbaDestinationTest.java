@@ -18,20 +18,19 @@
  */
 package org.apache.cxf.binding.corba;
 
-
-
-
 import org.apache.cxf.binding.corba.utils.OrbConfig;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.junit.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 
-public class CorbaDestinationTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+
+public class CorbaDestinationTest {
 
     protected static TestUtils testUtils;
     EndpointInfo endpointInfo;
@@ -52,11 +51,11 @@ public class CorbaDestinationTest extends Assert {
         CorbaDestination destination = new CorbaDestination(endpointInfo, orbConfig);
 
         EndpointReferenceType rtype = destination.getAddress();
-        assertTrue("EndpointReferenceType should not be null", rtype != null);
+        assertNotNull("EndpointReferenceType should not be null", rtype);
         BindingInfo bindingInfo = destination.getBindingInfo();
-        assertTrue("BindingInfo should not be null", bindingInfo != null);
+        assertNotNull("BindingInfo should not be null", bindingInfo);
         EndpointInfo e2 = destination.getEndPointInfo();
-        assertTrue("EndpointInfo should not be null", e2 != null);
+        assertNotNull("EndpointInfo should not be null", e2);
 
         Message m = new MessageImpl();
         CorbaServerConduit serverConduit = (CorbaServerConduit)destination.getBackChannel(m);
@@ -78,7 +77,7 @@ public class CorbaDestinationTest extends Assert {
        Endpoint endpoint = new EndpointImpl(bus, service, endpointInfo);
        MessageObserver observer = new ChainInitiationObserver(endpoint, bus);
        destination.setMessageObserver(observer);
-       assertTrue("orb should not be null",  destination.getOrb() != null);
+       assertNotNull("orb should not be null",  destination.getOrb());
 
        try {
            File file = new File("endpoint.ior");

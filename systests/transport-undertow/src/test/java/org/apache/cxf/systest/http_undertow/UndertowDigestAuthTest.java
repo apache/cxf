@@ -29,7 +29,6 @@ import javax.xml.ws.WebServiceException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
@@ -52,8 +51,13 @@ import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests thread pool config.
@@ -78,7 +82,7 @@ public class UndertowDigestAuthTest extends AbstractClientServerTestBase {
             Bus bus = new SpringBusFactory().createBus(configure, true);
             //bus.getInInterceptors().add(new LoggingInInterceptor());
             //bus.getOutInterceptors().add(new LoggingOutInterceptor());
-            SpringBusFactory.setDefaultBus(bus);
+            BusFactory.setDefaultBus(bus);
             setBus(bus);
 
             GreeterImpl implementor = new GreeterImpl();
@@ -177,7 +181,7 @@ public class UndertowDigestAuthTest extends AbstractClientServerTestBase {
 
     @Test
     public void testGetWSDL() throws Exception {
-        BusFactory bf = CXFBusFactory.newInstance();
+        BusFactory bf = BusFactory.newInstance();
         Bus bus = bf.createBus();
         bus.getInInterceptors().add(new LoggingInInterceptor());
         bus.getOutInterceptors().add(new LoggingOutInterceptor());

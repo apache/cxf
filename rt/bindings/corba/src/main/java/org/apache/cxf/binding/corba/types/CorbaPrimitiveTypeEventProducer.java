@@ -21,14 +21,14 @@ package org.apache.cxf.binding.corba.types;
 import java.util.List;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
 
 public class CorbaPrimitiveTypeEventProducer implements CorbaTypeEventProducer {
 
     int state;
-    int[] states = {XMLStreamReader.START_ELEMENT, XMLStreamReader.CHARACTERS, XMLStreamReader.END_ELEMENT};
+    int[] states = {XMLStreamConstants.START_ELEMENT, XMLStreamConstants.CHARACTERS, XMLStreamConstants.END_ELEMENT};
     final CorbaPrimitiveHandler handler;
     final QName name;
 

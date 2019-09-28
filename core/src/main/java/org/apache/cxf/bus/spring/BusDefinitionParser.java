@@ -36,7 +36,6 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -194,7 +193,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             bus = bb;
         }
 
-        public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        public void setApplicationContext(ApplicationContext applicationContext) {
             if (bus != null) {
                 return;
             }

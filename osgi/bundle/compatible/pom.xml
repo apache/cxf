@@ -23,14 +23,15 @@
     <packaging>bundle</packaging>
     <name>Apache CXF Compatibility Bundle Jar</name>
     <description>Apache CXF Compatibility Bundle Jar</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-bundle-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
     </parent>
     <properties>
         <cxf.osgi.symbolic.name>${project.groupId}.bundle</cxf.osgi.symbolic.name>
+        <cxf.module.name>org.apache.cxf.bundle</cxf.module.name>
     </properties>
     <dependencies>
         <dependency>
@@ -168,9 +169,7 @@
                             org.apache.commons.pool*;resolution:=optional,
                             org.apache.log4j*;resolution:=optional,
                             org.apache.mina*;resolution:=optional,
-                            org.apache.tuscany.sdo*;resolution:=optional,
                             org.apache.velocity*;resolution:=optional,
-                            org.apache.xmlbeans*;resolution:=optional,
                             org.apache.xml.security*;resolution:=optional,
                             org.apache.ws.security*;resolution:=optional,
                             org.codehaus.jettison*;resolution:=optional,

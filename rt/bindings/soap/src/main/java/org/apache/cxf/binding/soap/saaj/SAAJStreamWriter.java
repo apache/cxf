@@ -83,9 +83,8 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
                     Iterator<String> it = new W3CNamespaceContext((Element)nd).getPrefixes(nsuri);
                     if (it.hasNext()) {
                         return it.next();
-                    } else {
-                        nd = null;
                     }
+                    nd = null;
                 } else {
                     nd = nd.getNextSibling();
                 }
@@ -134,8 +133,13 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
                     setChild(adjustPrefix(getEnvelope(), prefix), false);
                     adjustPrefix(getEnvelope().getHeader(), prefix);
                     adjustPrefix(getEnvelope().getBody(), prefix);
-                    getEnvelope().removeChild(getEnvelope().getHeader());
-                    getEnvelope().removeChild(getEnvelope().getBody());
+                    if (getEnvelope().getHeader() != null) {
+                        getEnvelope().removeChild(getEnvelope().getHeader());
+                    }
+                    if (getEnvelope().getBody() != null) {
+                        getEnvelope().removeChild(getEnvelope().getBody());
+                    }
+
                     return;
                 } else if ("Body".equals(local)) {
                     if (getEnvelope().getBody() == null) {
@@ -219,7 +223,7 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
                     el = ((SOAPElement)cur).addChildElement(local, "", "");
                 } else {
                     el = ((SOAPElement)cur).addChildElement(local, pfx == null ? "" : pfx, ns);
-                    adjustPrefix((SOAPElement)el, pfx);
+                    adjustPrefix(el, pfx);
                 }
                 cur.removeChild(el);
                 return el;

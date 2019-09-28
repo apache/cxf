@@ -81,7 +81,7 @@ public class TestBean3 {
                 return false;
             }
         } else {
-            if (!base64Item.equals(other.base64Item)) {
+            if (!Arrays.equals(base64Item, other.base64Item)) {
                 return false;
             }
         }
@@ -109,9 +109,8 @@ public class TestBean3 {
         // decisions are simpler for the last one.
         if (null == beanTwoNotRequiredItem) {
             return other.beanTwoNotRequiredItem == null;
-        } else {
-            return beanTwoNotRequiredItem.equals(other.beanTwoNotRequiredItem);
         }
+        return beanTwoNotRequiredItem.equals(other.beanTwoNotRequiredItem);
     }
 
     @Override
@@ -122,7 +121,7 @@ public class TestBean3 {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder(256);
         builder.append("TestBean3");
         builder.append(" stringItem ");
         builder.append(stringItem == null ? "Null" : stringItem);
@@ -135,7 +134,7 @@ public class TestBean3 {
             builder.append("Null");
         } else {
             for (byte b : base64Item) {
-                builder.append(" ");
+                builder.append(' ');
                 builder.append(Integer.toHexString(b));
             }
         }
@@ -147,7 +146,7 @@ public class TestBean3 {
             builder.append("Null");
         } else {
             for (int i : optionalIntArrayItem) {
-                builder.append(" ");
+                builder.append(' ');
                 builder.append(i);
             }
         }

@@ -20,8 +20,8 @@
 package org.apache.cxf.tools.corba.common.idltypes;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 
 public class IdlArrayBase extends IdlDefnImplBase implements IdlType {
@@ -32,7 +32,7 @@ public class IdlArrayBase extends IdlDefnImplBase implements IdlType {
     protected IdlArrayBase(IdlScopeBase parent, String name, IdlType elem, int length) {
         super(parent, name);
         this.size = length;
-        dims = new Vector<Integer>();
+        dims = new ArrayList<>();
 
         if (elem instanceof IdlAnonArray) {
             IdlAnonArray arr = (IdlAnonArray)elem;

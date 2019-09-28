@@ -30,7 +30,6 @@ import javax.activation.URLDataSource;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPElement;
@@ -51,7 +50,6 @@ import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 import javax.xml.ws.soap.SOAPFaultException;
 
-
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.handlers.AddNumbersService;
@@ -59,9 +57,14 @@ import org.apache.handlers.types.AddNumbers;
 import org.apache.handlers.types.AddNumbersResponse;
 import org.apache.handlers.types.ObjectFactory;
 import org.apache.hello_world_xml_http.wrapped.XMLService;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBase {
     private static String addNumbersAddress
@@ -484,11 +487,11 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
                                 if (elem2 instanceof SOAPElement) {
                                     String value = ((SOAPElement)elem2).getValue();
                                     String name = ((SOAPElement)elem2).getLocalName();
-                                    if (name.indexOf("arg0") >= 0 && value.equalsIgnoreCase("11")) {
+                                    if (name.indexOf("arg0") >= 0 && "11".equalsIgnoreCase(value)) {
                                         value = "12";
                                         ((SOAPElement)elem2).setValue(value);
                                     }
-                                    if (name.indexOf("arg1") >= 0 && value.equalsIgnoreCase("21")) {
+                                    if (name.indexOf("arg1") >= 0 && "21".equalsIgnoreCase(value)) {
                                         value = "22";
                                         ((SOAPElement)elem2).setValue(value);
                                     }
@@ -519,7 +522,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
                                 if (elem2 instanceof SOAPElement) {
                                     String value = ((SOAPElement)elem2).getValue();
                                     String name = ((SOAPElement)elem2).getLocalName();
-                                    if (name.indexOf("return") >= 0 && value.equalsIgnoreCase("264")) {
+                                    if (name.indexOf("return") >= 0 && "264".equalsIgnoreCase(value)) {
                                         value = "333";
                                         ((SOAPElement)elem2).setValue(value);
                                     }

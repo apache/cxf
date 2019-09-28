@@ -143,7 +143,8 @@ public class CorbaObjectReader {
             this.readObjectReference((CorbaObjectReferenceHandler)obj);
             break;
         default:
-        // TODO: Provide Implementation. Do we throw an exception.
+            throw new CorbaBindingException("CorbaObjectReader: unhandled TypeCode.Kind: "
+                                            + obj.getTypeCode().kind().value());
         }
     }
 
@@ -462,7 +463,7 @@ public class CorbaObjectReader {
                 int[] values = new int[arraySize];
                 stream.read_ulong_array(values, 0, arraySize);
                 long[] v2 = new long[arraySize];
-                for (int x = 0; x < arraySize; x++) {
+                for (int x = 0; x < arraySize; x++) { //NOPMD
                     v2[x] = values[x];
                     v2[x] &= 0xFFFFFFFFL;
                 }

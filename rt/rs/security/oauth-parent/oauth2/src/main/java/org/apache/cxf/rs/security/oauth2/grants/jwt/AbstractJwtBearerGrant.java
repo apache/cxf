@@ -44,7 +44,7 @@ public abstract class AbstractJwtBearerGrant implements AccessTokenGrant {
     }
 
     protected MultivaluedMap<String, String> initMap() {
-        MultivaluedMap<String, String> map = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> map = new MetadataMap<>();
         map.putSingle(OAuthConstants.GRANT_TYPE, grantType);
         return map;
     }

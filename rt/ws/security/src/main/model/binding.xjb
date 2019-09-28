@@ -58,11 +58,6 @@
             <jaxb:package name="org.apache.cxf.ws.security.sts.provider.model.secext"/>
         </jaxb:schemaBindings>
     </jaxb:bindings>
-    <jaxb:bindings schemaLocation="xmldsig-core-schema.xsd" node="/xs:schema">
-        <jaxb:schemaBindings>
-            <jaxb:package name="org.apache.cxf.ws.security.sts.provider.model.xmldsig"/>
-        </jaxb:schemaBindings>
-    </jaxb:bindings>
     <jaxb:bindings schemaLocation="ws-policy.xsd" node="/xs:schema">
         <jaxb:schemaBindings map="false">
         </jaxb:schemaBindings>

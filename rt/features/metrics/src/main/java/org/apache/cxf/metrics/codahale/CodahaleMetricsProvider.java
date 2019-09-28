@@ -98,7 +98,7 @@ public class CodahaleMetricsProvider implements MetricsProvider {
             String serviceName = "\"" + escapePatternChars(service.getName().toString()) + "\"";
             String portName = "\"" + endpoint.getEndpointInfo().getName().getLocalPart() + "\"";
 
-            buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");
+            buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME).append(':');
             buffer.append(ManagementConstants.BUS_ID_PROP + "=" + bus.getId() + ",");
             buffer.append(ManagementConstants.TYPE_PROP).append("=Metrics");
             if (isClient) {

@@ -161,7 +161,8 @@ public class SchemaCollection {
      */
     public XmlSchema getSchemaByTargetNamespace(String namespaceURI) {
         for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
-            if (namespaceURI.equals(schema.getTargetNamespace())) {
+            if (namespaceURI != null && namespaceURI.equals(schema.getTargetNamespace())
+                || namespaceURI == null && schema.getTargetNamespace() == null) {
                 return schema;
             }
         }
@@ -336,7 +337,7 @@ public class SchemaCollection {
 
     private void addCrossImportsAttributeList(XmlSchema schema, List<XmlSchemaAttributeOrGroupRef> list) {
         for (XmlSchemaAttributeOrGroupRef attr : list) {
-            QName ref = null;
+            final QName ref;
             if (attr instanceof XmlSchemaAttribute) {
                 ref = ((XmlSchemaAttribute)attr).getRef().getTargetQName();
             } else {

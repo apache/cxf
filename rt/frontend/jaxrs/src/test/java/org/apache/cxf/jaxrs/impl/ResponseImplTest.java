@@ -20,12 +20,14 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.io.ByteArrayInputStream;
+import java.net.URI;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Link;
@@ -59,13 +61,20 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.easymock.EasyMock;
 
-import org.junit.Assert;
+import org.easymock.EasyMock;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
-public class ResponseImplTest extends Assert {
+
+@SuppressWarnings("resource") // Responses built in this test don't need to be closed
+public class ResponseImplTest {
 
     @Test
     public void testReadEntityWithNullOutMessage() {
@@ -74,7 +83,7 @@ public class ResponseImplTest extends Assert {
         Response response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                   .entity(str)
                   .build();
-        Assert.assertEquals(str, response.readEntity(String.class));
+        assertEquals(str, response.readEntity(String.class));
     }
 
     @Test
@@ -106,7 +115,7 @@ public class ResponseImplTest extends Assert {
             + " Value=\"urn:oasis:names:tc:xacml:1.0:status:ok\"/></Status></Result></Response>";
 
 
-        MultivaluedMap<String, Object> headers = new MetadataMap<String, Object>();
+        MultivaluedMap<String, Object> headers = new MetadataMap<>();
         headers.putSingle("Content-Type", "text/xml");
         r.addMetadata(headers);
         r.setEntity(new ByteArrayInputStream(content.getBytes()), null);
@@ -124,16 +133,11 @@ public class ResponseImplTest extends Assert {
         e.setInMessage(m);
         e.setOutMessage(new MessageImpl());
         Endpoint endpoint = EasyMock.createMock(Endpoint.class);
-        endpoint.getEndpointInfo();
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
-        endpoint.get(Application.class.getName());
-        EasyMock.expectLastCall().andReturn(null);
-        endpoint.size();
-        EasyMock.expectLastCall().andReturn(0).anyTimes();
-        endpoint.isEmpty();
-        EasyMock.expectLastCall().andReturn(true).anyTimes();
-        endpoint.get(ServerProviderFactory.class.getName());
-        EasyMock.expectLastCall().andReturn(factory).anyTimes();
+        EasyMock.expect(endpoint.getEndpointInfo()).andReturn(null).anyTimes();
+        EasyMock.expect(endpoint.get(Application.class.getName())).andReturn(null);
+        EasyMock.expect(endpoint.size()).andReturn(0).anyTimes();
+        EasyMock.expect(endpoint.isEmpty()).andReturn(true).anyTimes();
+        EasyMock.expect(endpoint.get(ServerProviderFactory.class.getName())).andReturn(factory).anyTimes();
         EasyMock.replay(endpoint);
         e.put(Endpoint.class, endpoint);
         return m;
@@ -146,7 +150,7 @@ public class ResponseImplTest extends Assert {
         assertEquals("Wrong status", ri.getStatus(), 200);
         assertSame("Wrong entity", entity, ri.getEntity());
 
-        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> meta = new MetadataMap<>();
         ri.addMetadata(meta);
         ri.getMetadata();
         assertSame("Wrong metadata", meta, ri.getMetadata());
@@ -254,7 +258,7 @@ public class ResponseImplTest extends Assert {
     @Test
     public void testGetHeaderString() {
         ResponseImpl ri = new ResponseImpl(200);
-        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> meta = new MetadataMap<>();
         ri.addMetadata(meta);
         assertNull(ri.getHeaderString("a"));
         meta.putSingle("a", "aValue");
@@ -266,7 +270,7 @@ public class ResponseImplTest extends Assert {
     @Test
     public void testGetHeaderStrings() {
         ResponseImpl ri = new ResponseImpl(200);
-        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> meta = new MetadataMap<>();
         meta.add("Set-Cookie", NewCookie.valueOf("a=b"));
         ri.addMetadata(meta);
         MultivaluedMap<String, String> headers = ri.getStringHeaders();
@@ -277,7 +281,7 @@ public class ResponseImplTest extends Assert {
     @Test
     public void testGetCookies() {
         ResponseImpl ri = new ResponseImpl(200);
-        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> meta = new MetadataMap<>();
         meta.add("Set-Cookie", NewCookie.valueOf("a=b"));
         meta.add("Set-Cookie", NewCookie.valueOf("c=d"));
         ri.addMetadata(meta);
@@ -290,7 +294,7 @@ public class ResponseImplTest extends Assert {
     @Test
     public void testGetContentLength() {
         ResponseImpl ri = new ResponseImpl(200);
-        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> meta = new MetadataMap<>();
         ri.addMetadata(meta);
         assertEquals(-1, ri.getLength());
         meta.add("Content-Length", "10");
@@ -310,7 +314,7 @@ public class ResponseImplTest extends Assert {
     public void doTestDate(String dateHeader) {
         boolean date = HttpHeaders.DATE.equals(dateHeader);
         ResponseImpl ri = new ResponseImpl(200);
-        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> meta = new MetadataMap<>();
         meta.add(dateHeader, "Tue, 21 Oct 2008 17:00:00 GMT");
         ri.addMetadata(meta);
         assertEquals(HttpUtils.getHttpDate("Tue, 21 Oct 2008 17:00:00 GMT"),
@@ -320,37 +324,37 @@ public class ResponseImplTest extends Assert {
     @Test
     public void testEntityTag() {
         ResponseImpl ri = new ResponseImpl(200);
-        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> meta = new MetadataMap<>();
         meta.add(HttpHeaders.ETAG, "1234");
         ri.addMetadata(meta);
-        assertEquals("\"1234\"", ri.getEntityTag().toString());
+        assertEquals(EntityTag.valueOf("\"1234\""), ri.getEntityTag());
     }
 
     @Test
     public void testLocation() {
         ResponseImpl ri = new ResponseImpl(200);
-        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> meta = new MetadataMap<>();
         meta.add(HttpHeaders.LOCATION, "http://localhost:8080");
         ri.addMetadata(meta);
-        assertEquals("http://localhost:8080", ri.getLocation().toString());
+        assertEquals(URI.create("http://localhost:8080"), ri.getLocation());
     }
 
     @Test
     public void testGetLanguage() {
         ResponseImpl ri = new ResponseImpl(200);
-        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> meta = new MetadataMap<>();
         meta.add(HttpHeaders.CONTENT_LANGUAGE, "en-US");
         ri.addMetadata(meta);
-        assertEquals("en_US", ri.getLanguage().toString());
+        assertEquals(Locale.US, ri.getLanguage());
     }
 
     @Test
     public void testGetMediaType() {
         ResponseImpl ri = new ResponseImpl(200);
-        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
-        meta.add(HttpHeaders.CONTENT_TYPE, "text/xml");
+        MetadataMap<String, Object> meta = new MetadataMap<>();
+        meta.add(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_XML);
         ri.addMetadata(meta);
-        assertEquals("text/xml", ri.getMediaType().toString());
+        assertEquals(MediaType.TEXT_XML_TYPE, ri.getMediaType());
     }
 
     @Test
@@ -373,7 +377,7 @@ public class ResponseImplTest extends Assert {
     @Test
     public void testGetLinks() {
         ResponseImpl ri = new ResponseImpl(200);
-        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> meta = new MetadataMap<>();
         ri.addMetadata(meta);
         assertFalse(ri.hasLink("next"));
         assertNull(ri.getLink("next"));
@@ -402,27 +406,27 @@ public class ResponseImplTest extends Assert {
 
     @Test
     public void testGetLinksNoRel() {
-        ResponseImpl ri = new ResponseImpl(200);
-        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
-        ri.addMetadata(meta);
-
-        Set<Link> links = ri.getLinks();
-        assertTrue(links.isEmpty());
-
-        meta.add(HttpHeaders.LINK, "<http://next>");
-        meta.add(HttpHeaders.LINK, "<http://prev>");
-
-        assertFalse(ri.hasLink("next"));
-        Link next = ri.getLink("next");
-        assertNull(next);
-        assertFalse(ri.hasLink("prev"));
-        Link prev = ri.getLink("prev");
-        assertNull(prev);
-
-        links = ri.getLinks();
-        assertTrue(links.contains(Link.fromUri("http://next").build()));
-        assertTrue(links.contains(Link.fromUri("http://prev").build()));
-
+        try (ResponseImpl ri = new ResponseImpl(200)) {
+            MetadataMap<String, Object> meta = new MetadataMap<>();
+            ri.addMetadata(meta);
+    
+            Set<Link> links = ri.getLinks();
+            assertTrue(links.isEmpty());
+    
+            meta.add(HttpHeaders.LINK, "<http://next>");
+            meta.add(HttpHeaders.LINK, "<http://prev>");
+    
+            assertFalse(ri.hasLink("next"));
+            Link next = ri.getLink("next");
+            assertNull(next);
+            assertFalse(ri.hasLink("prev"));
+            Link prev = ri.getLink("prev");
+            assertNull(prev);
+    
+            links = ri.getLinks();
+            assertTrue(links.contains(Link.fromUri("http://next").build()));
+            assertTrue(links.contains(Link.fromUri("http://prev").build()));
+        }
     }
 
     public static class StringBean {
@@ -467,9 +471,8 @@ public class ResponseImplTest extends Assert {
             throws IllegalArgumentException {
             if (arg0 == StringBean.class) {
                 return (HeaderDelegate<T>) new StringBeanHeaderDelegate();
-            } else {
-                return original.createHeaderDelegate(arg0);
             }
+            return original.createHeaderDelegate(arg0);
         }
 
         @Override

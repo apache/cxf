@@ -21,7 +21,7 @@
     <parent>
         <artifactId>cxf-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -29,10 +29,11 @@
     <artifactId>cxf-systests-databinding</artifactId>
     <name>Apache CXF Databinding System Tests</name>
     <description>Apache CXF Databinding System Tests</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <properties>
         <hello.world.binding.file>hello_world.xml</hello.world.binding.file>
         <doc.lit.bare.binding.file>doc_lit_bare.xml</doc.lit.bare.binding.file>
+        <cxf.module.name>org.apache.cxf.systests.databinding</cxf.module.name>
     </properties>
     <build>
         <plugins>
@@ -44,6 +45,13 @@
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
+                        <configuration>
+                            <archive>
+                                <manifestEntries>
+                                    <Automatic-Module-Name>${cxf.module.name}.tests</Automatic-Module-Name>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -269,12 +277,6 @@
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>

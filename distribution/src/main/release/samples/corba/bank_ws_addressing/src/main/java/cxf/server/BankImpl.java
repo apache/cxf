@@ -35,8 +35,7 @@ import cxf.common.Bank;
 
 public class BankImpl implements Bank {
 
-    private Map<String, W3CEndpointReference> accountList =
-        new HashMap<String, W3CEndpointReference>();
+    private Map<String, W3CEndpointReference> accountList = new HashMap<>();
     private Map<String, Endpoint> endpointList = new HashMap<>();
 
     public BankImpl() {

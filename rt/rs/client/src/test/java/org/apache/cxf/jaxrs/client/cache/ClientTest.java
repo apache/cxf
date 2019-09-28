@@ -25,10 +25,12 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ClientTest extends Assert {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class ClientTest {
     public static final String ADDRESS = "local://transport";
 
     @Test

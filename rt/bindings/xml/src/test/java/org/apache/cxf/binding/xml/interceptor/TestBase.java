@@ -37,6 +37,7 @@ import org.apache.cxf.binding.xml.XMLBindingFactory;
 import org.apache.cxf.binding.xml.wsdl11.XMLWSDLExtensionLoader;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointImpl;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -51,13 +52,15 @@ import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLManagerImpl;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 
-public class TestBase extends Assert {
+import static org.junit.Assert.assertNotNull;
+
+public class TestBase {
 
     protected PhaseInterceptorChain chain;
 
@@ -71,7 +74,7 @@ public class TestBase extends Assert {
 
     @Before
     public void setUp() throws Exception {
-        SortedSet<Phase> phases = new TreeSet<Phase>();
+        SortedSet<Phase> phases = new TreeSet<>();
         Phase phase1 = new Phase("phase1", 1);
         Phase phase2 = new Phase("phase2", 2);
         Phase phase3 = new Phase("phase3", 3);
@@ -85,6 +88,10 @@ public class TestBase extends Assert {
         messageImpl.setInterceptorChain(chain);
         messageImpl.setExchange(exchange);
         xmlMessage = messageImpl;
+        if (JavaUtils.isJava11Compatible()) {
+            //we need this property with JDK11 and easymock4
+            System.setProperty("org.easymock.cglib.experimental_asm7", "true");
+        }
     }
 
     @After

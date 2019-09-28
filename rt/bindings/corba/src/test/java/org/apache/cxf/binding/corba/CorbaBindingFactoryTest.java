@@ -25,8 +25,6 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.BindingFactoryManager;
@@ -41,15 +39,19 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-public class CorbaBindingFactoryTest extends Assert {
+
+public class CorbaBindingFactoryTest {
 
     protected Bus bus;
     protected EndpointInfo endpointInfo;
@@ -140,9 +142,9 @@ public class CorbaBindingFactoryTest extends Assert {
         List<String> retStrs = factory.getTransportIds();
         assertNotNull(retStrs);
         String str = retStrs.get(0);
-        assertEquals("one", str.toString());
+        assertEquals("one", str);
         str = retStrs.get(1);
-        assertEquals("two", str.toString());
+        assertEquals("two", str);
     }
 
     @Test

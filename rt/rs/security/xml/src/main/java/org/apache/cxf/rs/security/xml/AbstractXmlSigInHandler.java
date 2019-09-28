@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.common.CryptoLoader;
@@ -190,9 +191,8 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
         SecurityContext sc = message.get(SecurityContext.class);
         if (sc != null && sc.getUserPrincipal() != null) {
             return sc.getUserPrincipal().getName();
-        } else {
-            return RSSecurityUtils.getUserName(crypto, null);
         }
+        return RSSecurityUtils.getUserName(crypto, null);
 
     }
 
@@ -297,9 +297,8 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
 
         if (!expectedID.equals(rootId)) {
             return XMLUtils.findElementById(root, expectedID, true);
-        } else {
-            return root;
         }
+        return root;
     }
 
     public void setSignatureProperties(SignatureProperties properties) {

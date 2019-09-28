@@ -96,7 +96,7 @@ public final class Client {
         return 0;
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         int status = 0;
         ORB orb = null;
 

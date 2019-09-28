@@ -45,26 +45,31 @@ Install CXF's cxf-jaxrs and cxf-transports-websocket-server features that instal
 for this demo bundle.
 
   feature:install cxf-jaxrs cxf-transports-websocket-server
+  feature:install aries-blueprint
 
 Install this demo bundle (using the appropriate bundle version number)
 
+  install -s mvn:org.eclipse.jetty.websocket/websocket-api/9.4.12.v20180830
+  install -s mvn:org.eclipse.jetty.websocket/websocket-common/9.4.12.v20180830
+  install -s mvn:org.eclipse.jetty.websocket/websocket-servlet/9.4.12.v20180830
+  install -s mvn:org.eclipse.jetty.websocket/websocket-server/9.4.12.v20180830
   install -s mvn:org.apache.cxf.samples/jax_rs_websocket_osgi/3.n.m
 
-And verify the bundles are installed.
+And verify the bundles are installed, e.g.:
 
-karaf@root()> feature:repo-add cxf 3.2.0-SNAPSHOT
-Adding feature url mvn:org.apache.cxf.karaf/apache-cxf/3.2.0-SNAPSHOT/xml/features
+karaf@root()> feature:repo-add cxf 3.3.0
+Adding feature url mvn:org.apache.cxf.karaf/apache-cxf/3.3.0/xml/features
 karaf@root()> feature:install cxf-jaxrs cxf-transports-websocket-server
 karaf@root()> list -t 0 | grep CXF
- 80 | Active   |  40 | 3.2.0.SNAPSHOT   | Apache CXF Core                                                    
- 81 | Active   |  40 | 3.2.0.SNAPSHOT   | Apache CXF Runtime Management                                      
-100 | Active   |  40 | 3.2.0.SNAPSHOT   | Apache CXF Runtime HTTP Transport                                  
-102 | Active   |  40 | 3.2.0.SNAPSHOT   | Apache CXF JAX-RS Extensions: Providers                            
-103 | Active   |  40 | 3.2.0.SNAPSHOT   | Apache CXF JAX-RS Extensions: Search                               
-104 | Active   |  40 | 3.2.0.SNAPSHOT   | Apache CXF JAX-RS Service Description                              
-105 | Active   |  40 | 3.2.0.SNAPSHOT   | Apache CXF Runtime JAX-RS Frontend                                 
-106 | Active   |  40 | 3.2.0.SNAPSHOT   | Apache CXF JAX-RS Client                                           
-108 | Active   |  40 | 3.2.0.SNAPSHOT   | Apache CXF Runtime WebSocket Transport                             
+ 80 | Active   |  40 | 3.3.0   | Apache CXF Core                                                    
+ 81 | Active   |  40 | 3.3.0   | Apache CXF Runtime Management                                      
+100 | Active   |  40 | 3.3.0   | Apache CXF Runtime HTTP Transport                                  
+102 | Active   |  40 | 3.3.0   | Apache CXF JAX-RS Extensions: Providers                            
+103 | Active   |  40 | 3.3.0   | Apache CXF JAX-RS Extensions: Search                               
+104 | Active   |  40 | 3.3.0   | Apache CXF JAX-RS Service Description                              
+105 | Active   |  40 | 3.3.0   | Apache CXF Runtime JAX-RS Frontend                                 
+106 | Active   |  40 | 3.3.0   | Apache CXF JAX-RS Client                                           
+108 | Active   |  40 | 3.3.0   | Apache CXF Runtime WebSocket Transport                             
 karaf@root()> install -s mvn:org.apache.cxf.samples/jax_rs_websocket_osgi
 Bundle ID: 109
 karaf@root()> list
@@ -72,7 +77,7 @@ START LEVEL 100 , List Threshold: 50
  ID | State  | Lvl | Version        | Name                           
 ---------------------------------------------------------------------
 107 | Active |  80 | 2.4.3          | atmosphere-runtime             
-109 | Active |  80 | 3.2.0.SNAPSHOT | JAX-RS WebSocket Blueprint Demo
+109 | Active |  80 | 3.3.0 | JAX-RS WebSocket Blueprint Demo
 karaf@root()>
 
 

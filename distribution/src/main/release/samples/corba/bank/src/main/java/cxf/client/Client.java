@@ -35,7 +35,7 @@ public final class Client {
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         URL wsdlUrl = Client.class.getResource("/wsdl/bank.wsdl");
 
         BankCORBAService ss = new BankCORBAService(wsdlUrl, SERVICE_NAME);
@@ -43,7 +43,7 @@ public final class Client {
 
 
         System.out.print("Invoking createAccount for Mr. John... ");
-        javax.xml.ws.Holder<Account> account = new javax.xml.ws.Holder<Account>(new Account());
+        javax.xml.ws.Holder<Account> account = new javax.xml.ws.Holder<>(new Account());
         try {
             if (port.createAccount("John", account)) {
                 System.out.println("success");

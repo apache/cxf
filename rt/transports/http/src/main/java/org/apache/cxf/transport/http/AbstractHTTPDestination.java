@@ -29,7 +29,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -167,13 +166,18 @@ public abstract class AbstractHTTPDestination
         if (credentials == null || StringUtils.isEmpty(credentials.trim())) {
             return null;
         }
-        List<String> creds = StringUtils.getParts(credentials, " ");
-        String authType = creds.get(0);
-        if ("Basic".equals(authType) && creds.size() == 2) {
-            String authEncoded = creds.get(1);
+
+        final String[] creds = credentials.split(" ");
+        String authType = creds[0];
+        if ("Basic".equals(authType) && creds.length == 2) {
+            String authEncoded = creds[1];
             try {
                 byte[] authBytes = Base64Utility.decode(authEncoded);
 
+                if (authBytes == null) {
+                    throw new Base64Exception(new Throwable("Invalid Base64 data."));
+                }
+                
                 String authDecoded = decodeBasicAuthWithIso8859
                     ? new String(authBytes, StandardCharsets.ISO_8859_1) : new String(authBytes);
 
@@ -232,7 +236,7 @@ public abstract class AbstractHTTPDestination
      */
     protected final boolean isOneWay(Message message) {
         Exchange ex = message.getExchange();
-        return ex == null ? false : ex.isOneWay();
+        return ex != null && ex.isOneWay();
     }
 
     public void invoke(final ServletConfig config,
@@ -271,9 +275,8 @@ public abstract class AbstractHTTPDestination
             Throwable cause = ex.getCause();
             if (cause instanceof RuntimeException) {
                 throw (RuntimeException)cause;
-            } else {
-                throw ex;
             }
+            throw ex;
         } catch (RuntimeException ex) {
             throw ex;
         } finally {
@@ -582,7 +585,7 @@ public abstract class AbstractHTTPDestination
         }
         Object o = inMessage.get("cxf.io.cacheinput");
         DelegatingInputStream in = inMessage.getContent(DelegatingInputStream.class);
-        if (MessageUtils.isTrue(o)) {
+        if (PropertyUtils.isTrue(o)) {
             Collection<Attachment> atts = inMessage.getAttachments();
             if (atts != null) {
                 for (Attachment a : atts) {
@@ -645,9 +648,9 @@ public abstract class AbstractHTTPDestination
         if (hasNoResponseContent(outMessage)) {
             response.setContentLength(0);
             response.flushBuffer();
-            response.getOutputStream().close();
+            closeResponseOutputStream(response);
         } else if (!getStream) {
-            response.getOutputStream().close();
+            closeResponseOutputStream(response);
         } else {
             responseStream = response.getOutputStream();
         }
@@ -658,16 +661,23 @@ public abstract class AbstractHTTPDestination
         return responseStream;
     }
 
+    private void closeResponseOutputStream(HttpServletResponse response) throws IOException {
+        try {
+            response.getOutputStream().close();
+        } catch (IllegalStateException ex) {
+            // response.getWriter() has already been called
+        }
+    }
+
     private int getReponseCodeFromMessage(Message message) {
         Integer i = (Integer)message.get(Message.RESPONSE_CODE);
         if (i != null) {
             return i.intValue();
-        } else {
-            int code = hasNoResponseContent(message) ? HttpURLConnection.HTTP_ACCEPTED : HttpURLConnection.HTTP_OK;
-            // put the code in the message so that others can get it
-            message.put(Message.RESPONSE_CODE, code);
-            return code;
         }
+        int code = hasNoResponseContent(message) ? HttpURLConnection.HTTP_ACCEPTED : HttpURLConnection.HTTP_OK;
+        // put the code in the message so that others can get it
+        message.put(Message.RESPONSE_CODE, code);
+        return code;
     }
 
     /**
@@ -883,7 +893,7 @@ public abstract class AbstractHTTPDestination
         if (isMultiplexWithAddress()) {
             String address = (String)context.get(Message.PATH_INFO);
             if (null != address) {
-                int afterLastSlashIndex = address.lastIndexOf("/") + 1;
+                int afterLastSlashIndex = address.lastIndexOf('/') + 1;
                 if (afterLastSlashIndex > 0
                         && afterLastSlashIndex < address.length()) {
                     id = address.substring(afterLastSlashIndex);

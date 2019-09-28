@@ -269,6 +269,13 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
             throw new InvalidPathException();
         }
 
+        String queryString = "";
+        int index = path.indexOf('?');
+        if (index != -1) {
+            queryString = path.substring(index + 1);
+            path = path.substring(0, index);
+        }
+
         String requestURI = path;
         String requestURL = r.getRequestURL() + requestURI.substring(r.getRequestURI().length());
         String contentType = hdrs.get("Content-Type");
@@ -280,6 +287,7 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
                 .method(method)
                 .requestURI(requestURI)
                 .requestURL(requestURL)
+                .queryString(queryString)
                 .request(r);
         // add the body only if it is present
         byte[] body = WebSocketUtils.readBody(in);
@@ -343,9 +351,8 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
             if (request.attributes().get(RESPONSE_PARENT) == null) {
                 request.attributes().put(RESPONSE_PARENT, "true");
                 return createResponse(response, responseDraft, true);
-            } else {
-                return createResponse(response, responseDraft, false);
             }
+            return createResponse(response, responseDraft, false);
         }
 
         @Override

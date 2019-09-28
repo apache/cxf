@@ -92,7 +92,7 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
             BindingOperationInfo bop = ex.getBindingOperationInfo();
             Method ret = bop.getProperty(ASYNC_METHOD, Method.class);
             if (ret == null) {
-                Class<?> ptypes[] = new Class<?>[mso.getParameterTypes().length + 1];
+                Class<?>[] ptypes = new Class<?>[mso.getParameterTypes().length + 1];
                 System.arraycopy(mso.getParameterTypes(), 0, ptypes, 0, mso.getParameterTypes().length);
                 ptypes[mso.getParameterTypes().length] = AsyncHandler.class;
                 try {

@@ -32,8 +32,12 @@ import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageChecker.XPathExpression;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.common.ConfigurationConstants;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test the DefaultCryptoCoverageChecker, which extends the CryptoCoverageChecker to provide
@@ -122,16 +126,16 @@ public class DefaultCryptoCoverageCheckerTest extends AbstractSecurityTest {
 
     private PhaseInterceptor<SoapMessage> getWss4jInInterceptor() {
         final WSS4JInInterceptor inHandler = new WSS4JInInterceptor(true);
-        final String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+        final String action = ConfigurationConstants.SIGNATURE + " " + ConfigurationConstants.ENCRYPT;
 
-        inHandler.setProperty(WSHandlerConstants.ACTION, action);
-        inHandler.setProperty(WSHandlerConstants.SIG_VER_PROP_FILE,
+        inHandler.setProperty(ConfigurationConstants.ACTION, action);
+        inHandler.setProperty(ConfigurationConstants.SIG_VER_PROP_FILE,
                 "insecurity.properties");
-        inHandler.setProperty(WSHandlerConstants.DEC_PROP_FILE,
+        inHandler.setProperty(ConfigurationConstants.DEC_PROP_FILE,
                 "insecurity.properties");
-        inHandler.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS,
+        inHandler.setProperty(ConfigurationConstants.PW_CALLBACK_CLASS,
                 TestPwdCallback.class.getName());
-        inHandler.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
+        inHandler.setProperty(ConfigurationConstants.IS_BSP_COMPLIANT, "false");
 
         return inHandler;
     }

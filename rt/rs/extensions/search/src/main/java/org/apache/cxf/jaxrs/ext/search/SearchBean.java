@@ -50,8 +50,7 @@ public class SearchBean {
     public boolean equals(Object o) {
         if (o instanceof SearchBean) {
             return values.equals(((SearchBean)o).values);
-        } else {
-            return false;
         }
+        return false;
     }
 }

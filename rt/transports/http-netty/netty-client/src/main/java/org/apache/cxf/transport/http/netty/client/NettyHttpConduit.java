@@ -41,6 +41,7 @@ import javax.net.ssl.SSLSession;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.helpers.HttpHeaderHelper;
@@ -135,7 +136,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         if (clientParameters == null) {
             clientParameters = tlsClientParameters;
         }
-        if (uri.getScheme().equals("https")
+        if ("https".equals(uri.getScheme())
             && clientParameters != null
             && clientParameters.getSSLSocketFactory() != null) {
             //if they configured in an SSLSocketFactory, we cannot do anything
@@ -143,7 +144,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
             //the SSLSocketFactory.
             o = false;
         }
-        if (!MessageUtils.isTrue(o)) {
+        if (!PropertyUtils.isTrue(o)) {
             message.put(USE_ASYNC, Boolean.FALSE);
             super.setupConnection(message, addressChanged ? new Address(uriString, uri) : address, csPolicy);
             return;
@@ -190,7 +191,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
             entity.createRequest(out.getOutBuffer());
             // TODO need to check how to set the Chunked feature
             //request.getRequest().setChunked(true);
-            entity.getRequest().headers().set(Message.CONTENT_TYPE, (String)message.get(Message.CONTENT_TYPE));
+            entity.getRequest().headers().set(Message.CONTENT_TYPE, message.get(Message.CONTENT_TYPE));
             return out;
         }
         return super.createOutputStream(message, needToCacheRequest, isChunking, chunkThreshold);
@@ -288,7 +289,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         protected void setupWrappedStream() throws IOException {
             connect(true);
             wrappedStream = new OutputStream() {
-                public void write(byte b[], int off, int len) throws IOException {
+                public void write(byte[] b, int off, int len) throws IOException {
                     outputStream.write(b, off, len);
                 }
                 public void write(int b) throws IOException {
@@ -330,7 +331,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         }
 
         protected void connect(boolean output) {
-            if (url.getScheme().equals("https")) {
+            if ("https".equals(url.getScheme())) {
                 TLSClientParameters clientParameters = findTLSClientParameters();
                 bootstrap.handler(new NettyHttpClientPipelineFactory(clientParameters));
             } else {
@@ -352,7 +353,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
                             session = sslHandler.engine().getSession();
                         }
                     } else {
-                        setException((Exception) future.cause());
+                        setException(future.cause());
                     }
                 }
             };
@@ -411,7 +412,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         protected void setProtocolHeaders() throws IOException {
             Headers h = new Headers(outMessage);
             entity.getRequest().headers().set(Message.CONTENT_TYPE, h.determineContentType());
-            boolean addHeaders = MessageUtils.isTrue(outMessage.getContextualProperty(Headers.ADD_HEADERS_PROPERTY));
+            boolean addHeaders = MessageUtils.getContextualBoolean(outMessage, Headers.ADD_HEADERS_PROPERTY, false);
 
             for (Map.Entry<String, List<String>> header : h.headerMap().entrySet()) {
                 if (HttpHeaderHelper.CONTENT_TYPE.equalsIgnoreCase(header.getKey())) {
@@ -447,12 +448,12 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
 
         @Override
         protected int getResponseCode() throws IOException {
-            return getHttpResponse().getStatus().code();
+            return getHttpResponse().status().code();
         }
 
         @Override
         protected String getResponseMessage() throws IOException {
-            return getHttpResponse().getStatus().reasonPhrase();
+            return getHttpResponse().status().reasonPhrase();
         }
 
         @Override
@@ -621,7 +622,6 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
 
     @Override
     public void initComplete() {
-        // TODO Auto-generated method stub
 
     }
 
@@ -634,8 +634,6 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
 
     @Override
     public void preShutdown() {
-        // TODO Auto-generated method stub
-
     }
 
 

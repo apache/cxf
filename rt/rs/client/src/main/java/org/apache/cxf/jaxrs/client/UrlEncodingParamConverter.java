@@ -52,18 +52,17 @@ public class UrlEncodingParamConverter implements ParamConverter<String> {
     public String toString(String s) {
         if (encodeClientParametersList == null || encodeClientParametersList.isEmpty()) {
             return HttpUtils.urlEncode(s);
-        } else {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < s.length(); i++) {
-                Character ch = s.charAt(i);
-                if (encodeClientParametersList.contains(ch)) {
-                    sb.append(HttpUtils.urlEncode(ch.toString()));
-                } else {
-                    sb.append(ch);
-                }
-            }
-            return sb.toString();
         }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            Character ch = s.charAt(i);
+            if (encodeClientParametersList.contains(ch)) {
+                sb.append(HttpUtils.urlEncode(ch.toString()));
+            } else {
+                sb.append(ch);
+            }
+        }
+        return sb.toString();
 
     }
 

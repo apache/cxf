@@ -87,7 +87,7 @@ public final class STSTokenRetriever {
                 Element actAsToken = client.getActAsToken();
 
                 String key = appliesTo;
-                if (!enableAppliesTo || key == null || "".equals(key)) {
+                if (!enableAppliesTo || key == null || key.isEmpty()) {
                     key = ASSOCIATED_TOKEN;
                 }
                 
@@ -192,9 +192,8 @@ public final class STSTokenRetriever {
                 if (issueAfterFailedRenew) {
                     // Perhaps the STS does not support renewing, so try to issue a new token
                     return getToken(message, params, tokenCacher);
-                } else {
-                    throw ex;
                 }
+                throw ex;
             } catch (Exception ex) {
                 LOG.log(Level.WARNING, "Error renewing a token", ex);
                 boolean issueAfterFailedRenew =
@@ -203,9 +202,8 @@ public final class STSTokenRetriever {
                 if (issueAfterFailedRenew) {
                     // Perhaps the STS does not support renewing, so try to issue a new token
                     return getToken(message, params, tokenCacher);
-                } else {
-                    throw new Fault(ex);
                 }
+                throw new Fault(ex);
             } finally {
                 client.setTrust((Trust10)null);
                 client.setTrust((Trust13)null);

@@ -23,7 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.cxf.helpers.CastUtils;
@@ -71,27 +71,19 @@ public class WSDLValidatorMojo extends AbstractMojo {
      *
      * @parameter
      */
-    private String includes[];
+    private String[] includes;
     /**
      * A list of wsdl files to exclude. Can contain ant-style wildcards and double wildcards.
      *
      * @parameter
      */
-    private String excludes[];
+    private String[] excludes;
 
     private String getIncludeExcludeString(String[] arr) {
-        if (arr == null) {
+        if (arr == null || arr.length == 0) {
             return "";
         }
-        StringBuilder str = new StringBuilder();
-
-        for (String s : arr) {
-            if (str.length() > 0) {
-                str.append(',');
-            }
-            str.append(s);
-        }
-        return str.toString();
+        return String.join(",", arr);
     }
 
     private List<File> getWsdlFiles(File dir)
@@ -99,12 +91,12 @@ public class WSDLValidatorMojo extends AbstractMojo {
 
         List<String> exList = new ArrayList<>();
         if (excludes != null) {
-            exList.addAll(Arrays.asList(excludes));
+            Collections.addAll(exList, excludes);
         }
-        exList.addAll(Arrays.asList(org.codehaus.plexus.util.FileUtils.getDefaultExcludes()));
+        Collections.addAll(exList, org.codehaus.plexus.util.FileUtils.getDefaultExcludes());
 
         String inc = getIncludeExcludeString(includes);
-        String ex = getIncludeExcludeString(exList.toArray(new String[exList.size()]));
+        String ex = getIncludeExcludeString(exList.toArray(new String[0]));
 
         try {
             List<?> newfiles = org.codehaus.plexus.util.FileUtils.getFiles(dir, inc, ex);
@@ -144,7 +136,7 @@ public class WSDLValidatorMojo extends AbstractMojo {
             getLog().debug("Calling wsdlvalidator with args: " + list);
             try {
                 list.add(file.getCanonicalPath());
-                String[] pargs = list.toArray(new String[list.size()]);
+                String[] pargs = list.toArray(new String[0]);
 
                 ToolSpec spec = null;
                 try (InputStream toolspecStream = WSDLValidator.class .getResourceAsStream("wsdlvalidator.xml")) {

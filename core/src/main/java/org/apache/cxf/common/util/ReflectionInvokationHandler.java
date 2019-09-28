@@ -27,7 +27,6 @@ import java.lang.annotation.Target;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
 import java.lang.reflect.Proxy;
 import java.util.Iterator;
 
@@ -156,24 +155,24 @@ public class ReflectionInvokationHandler implements InvocationHandler {
 
     public static <T> T createProxyWrapper(Object target, Class<T> inf) {
         InvocationHandler h = new ReflectionInvokationHandler(target);
-        return inf.cast(Proxy.newProxyInstance(inf.getClassLoader(), new Class[] {inf}, h));
+        return inf.cast(Proxy.newProxyInstance(inf.getClassLoader(), new Class<?>[] {inf}, h));
     }
 
     @Target(ElementType.PARAMETER)
     @Retention(RetentionPolicy.RUNTIME)
-    public static @interface Optional {
+    public @interface Optional {
     }
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
-    public static @interface WrapReturn {
+    public @interface WrapReturn {
         Class<?> value();
         boolean iterator() default false;
     }
 
     @Target(ElementType.PARAMETER)
     @Retention(RetentionPolicy.RUNTIME)
-    public static @interface UnwrapParam {
+    public @interface UnwrapParam {
         String methodName() default "getValue";
         String typeMethodName() default "#default";
     }

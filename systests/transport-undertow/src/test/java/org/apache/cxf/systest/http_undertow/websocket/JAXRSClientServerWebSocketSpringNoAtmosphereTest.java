@@ -19,11 +19,12 @@
 
 package org.apache.cxf.systest.http_undertow.websocket;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * JAXRSClientServerWebSocketSpringTest without atmosphere
@@ -43,7 +44,7 @@ public class JAXRSClientServerWebSocketSpringNoAtmosphereTest extends JAXRSClien
 
     @AfterClass
     public static void cleanup() {
-        System.clearProperty("org.apache.cxf.transport.websocket.atmosphere.disabled");
+        //System.clearProperty("org.apache.cxf.transport.websocket.atmosphere.disabled");
     }
 
     protected String getPort() {

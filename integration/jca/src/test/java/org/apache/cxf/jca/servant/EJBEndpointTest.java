@@ -19,9 +19,10 @@
 
 package org.apache.cxf.jca.servant;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 
 
@@ -30,7 +31,7 @@ import org.junit.Test;
 /**
  *
  */
-public class EJBEndpointTest extends Assert {
+public class EJBEndpointTest {
 
     private EJBEndpoint endpoint;
 

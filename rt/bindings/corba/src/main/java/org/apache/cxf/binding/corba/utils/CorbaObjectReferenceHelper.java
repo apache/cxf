@@ -149,10 +149,10 @@ public final class CorbaObjectReferenceHelper {
 
     public static String extractTypeIdFromIOR(String url) {
         String ret = "";
-        byte data[] = DatatypeConverter.parseHexBinary(url.substring(4));
+        byte[] data = DatatypeConverter.parseHexBinary(url.substring(4));
         if (data.length > 0) {
             // parse out type_id from IOR CDR encapsulation
-            boolean bigIndian = !(data[0] > 0);
+            boolean bigIndian = data[0] <= 0;
             int typeIdStringSize = readIntFromAlignedCDREncaps(data, 4, bigIndian);
             if (typeIdStringSize > 1) {
                 ret = readStringFromAlignedCDREncaps(data, 8, typeIdStringSize - 1);
@@ -175,12 +175,11 @@ public final class CorbaObjectReferenceHelper {
                 | ((data[index + 1] << 16) & 0x00ff0000);
             return partial | ((data[index + 2] << 8) & 0x0000ff00)
                 | ((data[index + 3]) & 0x000000ff);
-        } else {
-            int partial = ((data[index]) & 0x000000ff)
-                | ((data[index + 1] << 8) & 0x0000ff00);
-            return partial | ((data[index + 2] << 16) & 0x00ff0000)
-                | ((data[index + 3] << 24) & 0xff000000);
         }
+        int partial = ((data[index]) & 0x000000ff)
+            | ((data[index + 1] << 8) & 0x0000ff00);
+        return partial | ((data[index + 2] << 16) & 0x00ff0000)
+            | ((data[index + 3] << 24) & 0xff000000);
     }
 
     public static void populateEprInfo(EprMetaData info) {

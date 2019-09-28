@@ -19,12 +19,10 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-import java.net.URISyntaxException;
-
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 public abstract class AbstractSpringServer extends AbstractBusTestServerBase {
@@ -49,20 +47,9 @@ public abstract class AbstractSpringServer extends AbstractBusTestServerBase {
 
         WebAppContext webappcontext = new WebAppContext();
         webappcontext.setContextPath(contextPath);
+        webappcontext.setBaseResource(Resource.newClassPathResource(resourcePath));
 
-        String warPath = null;
-        try {
-            warPath = getClass().getResource(resourcePath).toURI().getPath();
-        } catch (URISyntaxException e1) {
-            e1.printStackTrace();
-        }
-
-        webappcontext.setWar(warPath);
-
-        HandlerCollection handlers = new HandlerCollection();
-        handlers.setHandlers(new Handler[] {webappcontext, new DefaultHandler()});
-
-        server.setHandler(handlers);
+        server.setHandler(new HandlerCollection(webappcontext, new DefaultHandler()));
 
         try {
             configureServer(server);

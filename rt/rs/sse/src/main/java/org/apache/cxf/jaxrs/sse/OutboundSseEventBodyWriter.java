@@ -43,7 +43,7 @@ public class OutboundSseEventBodyWriter implements MessageBodyWriter<OutboundSse
     public static final MediaType SERVER_SENT_EVENTS_TYPE = MediaType.valueOf(SERVER_SENT_EVENTS);
 
     private static final byte[] COMMENT = ": ".getBytes(StandardCharsets.UTF_8);
-    private static final byte[] EVENT = "    ".getBytes(StandardCharsets.UTF_8);
+    private static final byte[] EVENT = "event: ".getBytes(StandardCharsets.UTF_8);
     private static final byte[] ID = "id: ".getBytes(StandardCharsets.UTF_8);
     private static final byte[] RETRY = "retry: ".getBytes(StandardCharsets.UTF_8);
     private static final byte[] DATA = "data: ".getBytes(StandardCharsets.UTF_8);
@@ -112,6 +112,8 @@ public class OutboundSseEventBodyWriter implements MessageBodyWriter<OutboundSse
             writePayloadTo(payloadClass, payloadType, anns, p.getMediaType(), headers, p.getData(), os);
             os.write(NEW_LINE);
         }
+
+        os.write(NEW_LINE);
     }
 
     @SuppressWarnings("unchecked")

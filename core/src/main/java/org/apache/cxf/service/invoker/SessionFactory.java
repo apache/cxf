@@ -51,7 +51,7 @@ public class SessionFactory implements Factory {
     /** {@inheritDoc}*/
     public Object create(Exchange e) throws Throwable {
         Service serv = e.getService();
-        Object o = null;
+        Object o;
         synchronized (serv) {
             o = e.getSession().get(serv.getName().toString());
             if (o == null) {

@@ -39,6 +39,11 @@ import org.apache.ws.commons.schema.constants.Constants;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class JaxbTypeTest extends AbstractAegisTest {
     private TypeMapping tm;
     private Service service;

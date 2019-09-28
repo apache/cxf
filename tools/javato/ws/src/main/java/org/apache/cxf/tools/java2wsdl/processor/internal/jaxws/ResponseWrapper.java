@@ -83,7 +83,7 @@ public final class ResponseWrapper extends Wrapper {
         if (method.getAnnotation(WebResult.class) == null
             && method.getAnnotation(javax.xml.ws.ResponseWrapper.class) == null
             || method.getAnnotation(WebResult.class) != null
-            && method.getAnnotation(WebResult.class).targetNamespace().equals("")) {
+            && method.getAnnotation(WebResult.class).targetNamespace().isEmpty()) {
             field.setTargetNamespace("");
         }
 
@@ -94,7 +94,7 @@ public final class ResponseWrapper extends Wrapper {
             String type = getTypeString(method.getGenericReturnType());
             List<Annotation> jaxbAnns = WrapperUtil.getJaxbAnnotations(method);
             field.setType(type);
-            field.setJaxbAnnotations(jaxbAnns.toArray(new Annotation[jaxbAnns.size()]));
+            field.setJaxbAnnotations(jaxbAnns.toArray(new Annotation[0]));
         }
         fields.add(field);
 
@@ -107,7 +107,7 @@ public final class ResponseWrapper extends Wrapper {
                 String type = getTypeString(t);
                 JavaField jf = new JavaField(name, type, "");
                 List<Annotation> jaxbAnns = WrapperUtil.getJaxbAnnotations(method, idx - 1);
-                jf.setJaxbAnnotations(jaxbAnns.toArray(new Annotation[jaxbAnns.size()]));
+                jf.setJaxbAnnotations(jaxbAnns.toArray(new Annotation[0]));
                 if (t instanceof ParameterizedType) {
                     ParameterizedType pt = (ParameterizedType)t;
                     Class<?> c = (Class<?>)pt.getRawType();

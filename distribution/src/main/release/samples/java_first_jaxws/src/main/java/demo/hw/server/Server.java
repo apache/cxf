@@ -21,6 +21,8 @@ package demo.hw.server;
 
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.ext.logging.LoggingFeature;
+
 public class Server {
 
     protected Server() throws Exception {
@@ -28,11 +30,11 @@ public class Server {
         System.out.println("Starting Server");
         HelloWorldImpl implementor = new HelloWorldImpl();
         String address = "http://localhost:9000/helloWorld";
-        Endpoint.publish(address, implementor);
+        Endpoint.publish(address, implementor, new LoggingFeature());
         // END SNIPPET: publish
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         new Server();
         System.out.println("Server ready...");
 

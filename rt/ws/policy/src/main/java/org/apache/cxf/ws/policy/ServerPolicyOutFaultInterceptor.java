@@ -84,8 +84,7 @@ public class ServerPolicyOutFaultInterceptor extends AbstractPolicyInterceptor {
 
         Exception ex = exchange.get(Exception.class);
 
-        List<Interceptor<? extends Message>> faultInterceptors =
-            new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> faultInterceptors = new ArrayList<>();
         Collection<Assertion> assertions = new ArrayList<>();
 
         // 1. Check overridden policy
@@ -93,7 +92,7 @@ public class ServerPolicyOutFaultInterceptor extends AbstractPolicyInterceptor {
         if (p != null) {
             EndpointPolicyImpl endpi = new EndpointPolicyImpl(p);
             EffectivePolicyImpl effectivePolicy = new EffectivePolicyImpl();
-            effectivePolicy.initialise(endpi, (PolicyEngineImpl)pe, false, true, msg);
+            effectivePolicy.initialise(endpi, pe, false, true, msg);
             PolicyUtils.logPolicy(LOG, Level.FINEST, "Using effective policy: ",
                                   effectivePolicy.getPolicy());
 

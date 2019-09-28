@@ -47,7 +47,7 @@ public final class Client {
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         String keyStoreLoc = "src/main/config/clientKeystore.jks";
 
         KeyStore keyStore = KeyStore.getInstance("JKS");
@@ -55,7 +55,9 @@ public final class Client {
 
         SSLContext sslcontext = SSLContexts.custom()
                 .loadTrustMaterial(keyStore, null)
-                .loadKeyMaterial(keyStore, "ckpass".toCharArray()).build();
+                .loadKeyMaterial(keyStore, "ckpass".toCharArray())
+                .useProtocol("TLSv1.2")
+                .build();
 
         /*
          * Send HTTP GET request to query customer info using portable HttpClient

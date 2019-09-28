@@ -59,7 +59,7 @@ public abstract class AbstractGrant implements AccessTokenGrant {
     }
 
     public MultivaluedMap<String, String> toMap() {
-        MultivaluedMap<String, String> map = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> map = new MetadataMap<>();
         map.putSingle(OAuthConstants.GRANT_TYPE, getType());
         if (scope != null) {
             map.putSingle(OAuthConstants.SCOPE, scope);

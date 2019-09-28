@@ -40,11 +40,6 @@ public class QueryContextProvider implements ContextProvider<QueryContext> {
         }
 
         @Override
-        public String getConvertedExpression() {
-            return getConvertedExpression((String)null);
-        }
-
-        @Override
         public <T> String getConvertedExpression(Class<T> beanClass) {
             return getConvertedExpression((String)null, beanClass);
         }
@@ -54,15 +49,13 @@ public class QueryContextProvider implements ContextProvider<QueryContext> {
             return getConvertedExpression((String)null, beanClass, queryClass);
         }
 
-        public String getConvertedExpression(String originalExpression) {
-            return getConvertedExpression(originalExpression, SearchBean.class);
-        }
-
+        @Override
         public <T> String getConvertedExpression(String originalExpression, Class<T> beanClass) {
             return getConvertedExpression(originalExpression, beanClass, String.class);
 
         }
 
+        @Override
         public <T, E> E getConvertedExpression(String originalExpression,
                                                Class<T> beanClass,
                                                Class<E> queryClass) {
@@ -85,11 +78,10 @@ public class QueryContextProvider implements ContextProvider<QueryContext> {
             Object visitor = message.getContextualProperty(SearchUtils.SEARCH_VISITOR_PROPERTY);
             if (visitor == null) {
                 return null;
-            } else {
-                //TODO: consider introducing SearchConditionVisitor.getBeanClass &&
-                //      SearchConditionVisitor.getQueryClass to avoid such casts
-                return (SearchConditionVisitor<T, Y>)visitor;
             }
+            //TODO: consider introducing SearchConditionVisitor.getBeanClass &&
+            //      SearchConditionVisitor.getQueryClass to avoid such casts
+            return (SearchConditionVisitor<T, Y>)visitor;
         }
 
 

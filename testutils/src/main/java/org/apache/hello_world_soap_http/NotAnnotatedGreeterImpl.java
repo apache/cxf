@@ -156,7 +156,6 @@ public class NotAnnotatedGreeterImpl implements Greeter {
     }
 
     public String testNillable(String nillElem, int intElem) {
-        // TODO Auto-generated method stub
         return null;
     }
 

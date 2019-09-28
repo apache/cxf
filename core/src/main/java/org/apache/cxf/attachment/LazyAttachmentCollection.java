@@ -37,10 +37,12 @@ public class LazyAttachmentCollection
 
     private AttachmentDeserializer deserializer;
     private final List<Attachment> attachments = new ArrayList<>();
+    private final int maxAttachmentCount;
 
-    public LazyAttachmentCollection(AttachmentDeserializer deserializer) {
+    public LazyAttachmentCollection(AttachmentDeserializer deserializer, int maxAttachmentCount) {
         super();
         this.deserializer = deserializer;
+        this.maxAttachmentCount = maxAttachmentCount;
     }
 
     public List<Attachment> getLoadedAttachments() {
@@ -50,8 +52,13 @@ public class LazyAttachmentCollection
     private void loadAll() {
         try {
             Attachment a = deserializer.readNext();
+            int count = 0;
             while (a != null) {
                 attachments.add(a);
+                count++;
+                if (count > maxAttachmentCount) {
+                    throw new IOException("The message contains more attachments than are permitted");
+                }
                 a = deserializer.readNext();
             }
         } catch (IOException e) {
@@ -95,10 +102,9 @@ public class LazyAttachmentCollection
                     Attachment a = deserializer.readNext();
                     if (a == null) {
                         return false;
-                    } else {
-                        attachments.add(a);
-                        return true;
                     }
+                    attachments.add(a);
+                    return true;
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -280,9 +286,8 @@ public class LazyAttachmentCollection
                                         DataHandler h = at.getDataHandler();
                                         ((AttachmentImpl)at).setDataHandler(value);
                                         return h;
-                                    } else {
-                                        throw new UnsupportedOperationException();
                                     }
+                                    throw new UnsupportedOperationException();
                                 }
                             };
                         }

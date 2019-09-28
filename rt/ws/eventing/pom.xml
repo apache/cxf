@@ -5,13 +5,22 @@
     <packaging>bundle</packaging>
     <name>Apache CXF Runtime WS Eventing</name>
     <description>Apache CXF Runtime WS Eventing</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
+    <properties>
+        <cxf.module.name>org.apache.cxf.ws.eventing</cxf.module.name>
+        <cxf.osgi.import>
+            javax.xml.soap;version="${cxf.osgi.saaj.version}",
+            javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
+            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
+            javax.annotation*;version="${cxf.osgi.javax.annotation.version}"
+        </cxf.osgi.import>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -114,12 +123,18 @@
                                     <bindingFile>${basedir}/src/main/resources/schemas/eventing.xjb</bindingFile>
                                     <catalog>${basedir}/src/main/resources/schemas/catalog.cat</catalog>
                                     <extension>true</extension>
+                                    <extensionArgs>
+                                        <extensionArg>-Xdv</extensionArg>
+                                    </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/schemas/eventdescriptions.xsd</xsd>
                                     <packagename>org.apache.cxf.ws.eventing.descriptions</packagename>
                                     <catalog>${basedir}/src/main/resources/schemas/catalog.cat</catalog>
                                     <extension>true</extension>
+                                    <extensionArgs>
+                                        <extensionArg>-Xdv</extensionArg>
+                                    </extensionArgs>
                                 </xsdOption>
                             </xsdOptions>
                         </configuration>

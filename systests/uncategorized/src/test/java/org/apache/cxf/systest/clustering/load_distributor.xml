@@ -17,7 +17,12 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:clustering="http://cxf.apache.org/clustering" xsi:schemaLocation=" http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/clustering http://cxf.apache.org/schemas/clustering.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:http="http://cxf.apache.org/transports/http/configuration"
+    xmlns:jaxws="http://cxf.apache.org/jaxws"
+    xmlns:clustering="http://cxf.apache.org/clustering"
+    xsi:schemaLocation="http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/clustering http://cxf.apache.org/schemas/clustering.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean id="Sequential" class="org.apache.cxf.systest.clustering.LoadDistributorSequentialStrategy"/>
     <bean id="Random" class="org.apache.cxf.clustering.RandomStrategy"/>
     <jaxws:client name="{http://cxf.apache.org/greeter_control}ReplicatedPortA" createdFromAPI="true">

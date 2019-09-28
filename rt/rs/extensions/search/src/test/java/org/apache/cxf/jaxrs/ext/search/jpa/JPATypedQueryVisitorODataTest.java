@@ -28,7 +28,11 @@ import javax.persistence.Tuple;
 
 import org.apache.cxf.jaxrs.ext.search.SearchConditionParser;
 import org.apache.cxf.jaxrs.ext.search.odata.ODataParser;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class JPATypedQueryVisitorODataTest extends AbstractJPATypedQueryVisitorTest {
     @Test
@@ -170,7 +174,7 @@ public class JPATypedQueryVisitorODataTest extends AbstractJPATypedQueryVisitorT
         assertEquals(1, books.size());
         Object[] info = books.get(0);
         assertEquals(10, ((Integer)info[0]).intValue());
-        assertEquals("num10", (String)info[1]);
+        assertEquals("num10", info[1]);
     }
 
     @Test
@@ -304,8 +308,7 @@ public class JPATypedQueryVisitorODataTest extends AbstractJPATypedQueryVisitorT
     public void testLessEqualQuery() throws Exception {
         List<Book> books = queryBooks("id le 10");
         assertEquals(2, books.size());
-        assertTrue(9 == books.get(0).getId() && 10 == books.get(1).getId()
-            || 9 == books.get(0).getId() && 10 == books.get(1).getId());
+        assertTrue(9 == books.get(0).getId() && 10 == books.get(1).getId());
     }
 
     @Test

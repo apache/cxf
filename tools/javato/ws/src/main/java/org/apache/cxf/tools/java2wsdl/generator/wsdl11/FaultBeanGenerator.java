@@ -25,6 +25,7 @@ import java.rmi.ServerException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.wsdl.Fault;
 
 import org.apache.cxf.common.util.PackageUtils;
@@ -40,13 +41,12 @@ public final class FaultBeanGenerator extends BeanGenerator {
         String pkg = PackageUtils.getPackageName(method.getDeclaringClass());
         if (pkg.length() == 0) {
             return ToolConstants.DEFAULT_PACKAGE_NAME;
-        } else {
-            return pkg;
         }
+        return pkg;
     }
 
     protected Collection<JavaClass> generateBeanClasses(final ServiceInfo serviceInfo) {
-        Set<Class<?>> exceptionClasses = new HashSet<Class<?>>();
+        Set<Class<?>> exceptionClasses = new HashSet<>();
         String seiPackageName = null;
         for (OperationInfo op : serviceInfo.getInterface().getOperations()) {
             Method method = (Method) op.getProperty("operation.method");
@@ -67,7 +67,7 @@ public final class FaultBeanGenerator extends BeanGenerator {
     }
 
     protected Set<Class<?>> getExceptionClasses(final Method method) {
-        Set<Class<?>> exps = new HashSet<Class<?>>();
+        Set<Class<?>> exps = new HashSet<>();
         final Class<?>[] exceptionClasses = method.getExceptionTypes();
         for (int i = 0; i < exceptionClasses.length; i++) {
             boolean exclude = false;

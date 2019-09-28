@@ -21,10 +21,12 @@ package org.apache.cxf.binding.corba;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.corba.wsdl.CorbaType;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class CorbaTypeMapTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class CorbaTypeMapTest {
 
     @Test
     public void testCorbaTypeMap() throws Exception {

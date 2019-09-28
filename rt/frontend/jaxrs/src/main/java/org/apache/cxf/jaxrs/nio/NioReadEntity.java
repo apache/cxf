@@ -18,45 +18,46 @@
  */
 package org.apache.cxf.jaxrs.nio;
 
-import java.io.IOException;
-
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.container.AsyncResponse;
 
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 public class NioReadEntity {
-    private final NioReaderHandler reader;
-    private final NioCompletionHandler completion;
+    private final NioReadHandler reader;
+    private final NioReadCompletionHandler completion;
     private final NioErrorHandler error;
-
-    public NioReadEntity(NioReaderHandler reader, NioCompletionHandler completion, NioErrorHandler error) {
+    public NioReadEntity(NioReadHandler reader, NioReadCompletionHandler completion) {
+        this(reader, completion, null);
+    }
+    public NioReadEntity(NioReadHandler reader, NioReadCompletionHandler completion, NioErrorHandler error) {
         this.reader = reader;
         this.completion = completion;
         this.error = error;
         
+        final Message m = JAXRSUtils.getCurrentMessage();
         try {
-            final Message m = JAXRSUtils.getCurrentMessage();
-            if (m != null) {
-                final HttpServletRequest request = (HttpServletRequest)m.get(AbstractHTTPDestination.HTTP_REQUEST);
-                if (request != null) {
-                    request.getInputStream().setReadListener(new NioReadListenerImpl(this, request.getInputStream()));
-                }
+            if (m.get(AsyncResponse.class) == null) {
+                throw new IllegalStateException("AsyncResponse is not available");
             }
-        } catch (final IOException ex) {
+            final HttpServletRequest request = (HttpServletRequest)m.get(AbstractHTTPDestination.HTTP_REQUEST);
+            request.getInputStream().setReadListener(new NioReadListenerImpl(this, request.getInputStream()));
+        } catch (final Throwable ex) {
             throw new RuntimeException("Unable to initialize NIO entity", ex);
         }
+        
     }
 
-    public NioReaderHandler getReader() {
+    public NioReadHandler getReader() {
         return reader;
     }
 
-    public NioCompletionHandler getCompletion() {
+    public NioReadCompletionHandler getCompletion() {
         return completion;
     }
-
+    
     public NioErrorHandler getError() {
         return error;
     }

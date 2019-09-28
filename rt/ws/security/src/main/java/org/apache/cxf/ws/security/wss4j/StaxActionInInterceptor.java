@@ -56,7 +56,7 @@ public class StaxActionInInterceptor extends AbstractPhaseInterceptor<SoapMessag
     @Override
     public void handleMessage(SoapMessage soapMessage) throws Fault {
 
-        if (inActions == null || inActions.size() == 0) {
+        if (inActions == null || inActions.isEmpty()) {
             return;
         }
 
@@ -91,7 +91,7 @@ public class StaxActionInInterceptor extends AbstractPhaseInterceptor<SoapMessag
                 requiredEvent = WSSecurityEventConstants.TIMESTAMP;
             } else if (WSSConstants.USERNAMETOKEN.equals(action)) {
                 requiredEvent = WSSecurityEventConstants.USERNAME_TOKEN;
-            } else if (WSSConstants.SIGNATURE.equals(action)) {
+            } else if (XMLSecurityConstants.SIGNATURE.equals(action)) {
                 requiredEvent = WSSecurityEventConstants.SignatureValue;
             } else if (WSSConstants.SAML_TOKEN_SIGNED.equals(action)
                 || WSSConstants.SAML_TOKEN_UNSIGNED.equals(action)) {
@@ -106,7 +106,7 @@ public class StaxActionInInterceptor extends AbstractPhaseInterceptor<SoapMessag
                 throw WSS4JUtils.createSoapFault(soapMessage, soapMessage.getVersion(), ex);
             }
 
-            if (WSSConstants.ENCRYPT.equals(action)) {
+            if (XMLSecurityConstants.ENCRYPT.equals(action)) {
                 boolean foundEncryptionPart =
                     isEventInResults(WSSecurityEventConstants.ENCRYPTED_PART, incomingSecurityEventList);
                 if (!foundEncryptionPart) {

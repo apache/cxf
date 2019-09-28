@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.transfer.integration;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -29,6 +30,7 @@ import org.apache.cxf.ws.transfer.CreateResponse;
 import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.manager.ResourceManager;
 import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory;
+
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
@@ -43,7 +45,7 @@ public class ResourceFactoryTest extends IntegrationBaseTest {
 
     private ReferenceParametersType createReferenceParameters() {
         ReferenceParametersType refParam = new ReferenceParametersType();
-        Element uuidEl = DOMUtils.createDocument().createElementNS(
+        Element uuidEl = DOMUtils.getEmptyDocument().createElementNS(
                 REF_PARAM_NAMESPACE, REF_PARAM_LOCAL_NAME);
         uuidEl.setTextContent(RESOURCE_UUID);
         refParam.getAny().add(uuidEl);

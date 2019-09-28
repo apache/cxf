@@ -19,6 +19,7 @@
 package org.apache.cxf.testutil.handler;
 
 import java.util.Set;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;

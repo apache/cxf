@@ -60,7 +60,7 @@ public class JwsJsonWriterInterceptor extends AbstractJwsJsonWriterProvider impl
             return;
         }
         List<String> propLocs = getPropertyLocations();
-        List<JwsHeaders> protectedHeaders = new ArrayList<JwsHeaders>(propLocs.size());
+        List<JwsHeaders> protectedHeaders = new ArrayList<>(propLocs.size());
         for (int i = 0; i < propLocs.size(); i++) {
             protectedHeaders.add(new JwsHeaders());
         }
@@ -93,7 +93,7 @@ public class JwsJsonWriterInterceptor extends AbstractJwsJsonWriterProvider impl
                 ctx.setOutputStream(jwsStream);
             }
             ctx.proceed();
-            if (encodePayload) {
+            if (base64Stream != null) {
                 base64Stream.flush();
             }
             jwsStream.flush();

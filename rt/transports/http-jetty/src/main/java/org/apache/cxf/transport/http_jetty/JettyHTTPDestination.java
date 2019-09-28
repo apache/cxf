@@ -63,6 +63,7 @@ public class JettyHTTPDestination extends ServletDestination {
 
     protected JettyHTTPServerEngine engine;
     protected JettyHTTPServerEngineFactory serverEngineFactory;
+    protected JettyHTTPHandler handler;
     protected ServletContext servletContext;
     protected URL nurl;
     protected ClassLoader loader;
@@ -182,8 +183,8 @@ public class JettyHTTPDestination extends ServletDestination {
         // pick the handler supporting websocket if jetty-websocket is available otherwise pick the default handler.
 
         if (engine != null) {
-            JettyHTTPHandler jhd = createJettyHTTPHandler(this, contextMatchOnExact());
-            engine.addServant(nurl, jhd);
+            handler = createJettyHTTPHandler(this, contextMatchOnExact());
+            engine.addServant(nurl, handler);
         }
     }
 
@@ -201,6 +202,7 @@ public class JettyHTTPDestination extends ServletDestination {
         if (engine != null) {
             engine.removeServant(nurl);
         }
+        handler = null;
     }
 
 
@@ -315,7 +317,7 @@ public class JettyHTTPDestination extends ServletDestination {
             written = true;
             out.write(b);
         }
-        public void write(byte b[], int off, int len) throws IOException {
+        public void write(byte[] b, int off, int len) throws IOException {
             written = true;
             out.write(b, off, len);
         }

@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.charset.Charset;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -33,20 +32,23 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.test.AbstractCXFSpringTest;
 import org.apache.cxf.testutil.common.TestUtil;
+import org.springframework.context.support.GenericApplicationContext;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.support.GenericApplicationContext;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
 
 /**
  *
  */
 public class QueryHandlerTest extends AbstractCXFSpringTest {
-    private static final Charset UTF8 = Charset.forName("utf-8");
     private static final Logger LOG = LogUtils.getL7dLogger(QueryHandlerTest.class);
     private Endpoint hwEndpoint;
     private Endpoint dlbEndpoint;
-    private Endpoint hwgEndpoint;
 
     public QueryHandlerTest() throws Exception {
         super();
@@ -72,8 +74,6 @@ public class QueryHandlerTest extends AbstractCXFSpringTest {
     public void before() {
         ServerFactoryBean serverFactoryBean = getBean(ServerFactoryBean.class, "hw-service-endpoint");
         hwEndpoint = serverFactoryBean.create().getEndpoint();
-        serverFactoryBean = getBean(ServerFactoryBean.class, "hwg-service-endpoint");
-        hwgEndpoint = serverFactoryBean.create().getEndpoint();
         serverFactoryBean = getBean(ServerFactoryBean.class, "dlb-service-endpoint");
         dlbEndpoint = serverFactoryBean.create().getEndpoint();
     }
@@ -84,7 +84,7 @@ public class QueryHandlerTest extends AbstractCXFSpringTest {
     }
 
     private String readStringFromStream(InputStream jsStream) throws IOException {
-        InputStreamReader isr = new InputStreamReader(jsStream, UTF8);
+        InputStreamReader isr = new InputStreamReader(jsStream, UTF_8);
         BufferedReader in = new BufferedReader(isr);
         String line = in.readLine();
         StringBuilder js = new StringBuilder();
@@ -93,7 +93,7 @@ public class QueryHandlerTest extends AbstractCXFSpringTest {
 
             for (int x = 0; x < tok.length; x++) {
                 String token = tok[x];
-                js.append("  " + token);
+                js.append("  ").append(token);
             }
             line = in.readLine();
         }
@@ -128,12 +128,4 @@ public class QueryHandlerTest extends AbstractCXFSpringTest {
         assertFalse(jsString.contains("function CxfApacheOrgUtil"));
     }
 
-    // this is in here since we need to use the query handler to perform the test.
-    @org.junit.Ignore
-    @Test
-    public void namespacePrefixTest() throws Exception {
-        URL endpointURL = new URL(hwgEndpoint.getEndpointInfo().getAddress()  + "?js");
-        String js = getStringFromURL(endpointURL);
-        assertTrue(js.contains("hg_Greeter"));
-    }
 }

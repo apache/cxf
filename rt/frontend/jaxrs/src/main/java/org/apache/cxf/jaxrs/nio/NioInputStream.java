@@ -18,17 +18,67 @@
  */
 package org.apache.cxf.jaxrs.nio;
 
+import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * Class NioReader.
- */
-public abstract class NioInputStream extends InputStream {
-    /**
-     * Checks if the the input stream has been consumed.
-     *
-     * @return outcome of test.
-     */
-    public abstract boolean isFinished();
-}
+import javax.servlet.ServletInputStream;
 
+public class NioInputStream extends InputStream {
+    private final ServletInputStream in;
+
+    public NioInputStream(final ServletInputStream in) {
+        this.in = in;
+    }
+
+    public boolean isFinished() {
+        return in.isFinished();
+    }
+
+    @Override
+    public int read() throws IOException {
+        return in.read();
+    }
+
+    @Override
+    public int read(byte[] b, int off, int len) throws IOException {
+        return in.read(b, off, len);
+    }
+
+    @Override
+    public int read(byte[] b) throws IOException {
+        return in.read(b);
+    }
+
+    @Override
+    public synchronized void reset() throws IOException {
+        in.reset();
+    }
+
+    @Override
+    public void close() throws IOException {
+        in.close();
+    }
+
+    @Override
+    public long skip(long n) throws IOException {
+        return in.skip(n);
+    }
+    @Override
+    public int available() throws IOException {
+        return in.available();
+    }
+
+    @Override
+    public synchronized void mark(int readlimit) {
+        in.mark(readlimit);
+    }
+
+    @Override
+    public boolean markSupported() {
+        return in.markSupported();
+    }
+
+    public boolean isReady() {
+        return in.isReady();
+    }
+}

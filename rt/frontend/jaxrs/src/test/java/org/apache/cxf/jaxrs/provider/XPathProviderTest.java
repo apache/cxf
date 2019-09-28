@@ -25,14 +25,18 @@ import java.util.Map;
 import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.BookStore;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class XPathProviderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class XPathProviderTest {
 
     @Test
     public void testIsReadableClassName() {
-        XPathProvider<?> provider = new XPathProvider<Object>();
+        XPathProvider<?> provider = new XPathProvider<>();
         provider.setExpression("/");
         assertTrue(provider.isReadable(Book.class, null, null, null));
         assertTrue(provider.isReadable(BookStore.class, null, null, null));
@@ -46,7 +50,7 @@ public class XPathProviderTest extends Assert {
 
     @Test
     public void testIsReadableClassNames() {
-        XPathProvider<?> provider = new XPathProvider<Object>();
+        XPathProvider<?> provider = new XPathProvider<>();
         assertFalse(provider.isReadable(Book.class, null, null, null));
         assertFalse(provider.isReadable(BookStore.class, null, null, null));
         Map<String, String> map = new HashMap<>();
@@ -59,11 +63,11 @@ public class XPathProviderTest extends Assert {
     @Test
     public void testReadFrom() throws Exception {
         String value = "<Book><name>The Book</name><id>2</id></Book>";
-        XPathProvider<Book> provider = new XPathProvider<Book>();
+        XPathProvider<Book> provider = new XPathProvider<>();
         provider.setExpression("/Book");
         provider.setClassName(Book.class.getName());
         provider.setForceDOM(true);
-        Book book = (Book)provider.readFrom(Book.class, null, null, null, null,
+        Book book = provider.readFrom(Book.class, null, null, null, null,
                           new ByteArrayInputStream(value.getBytes()));
         assertNotNull(book);
         assertEquals(2L, book.getId());

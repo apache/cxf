@@ -36,14 +36,14 @@ public class MarshalRegistry implements Iterable<Object> {
      * All objects instances with ids.  It is CRITICAL that is be an IdentityHashMap to assure we don't
      * exclude instances that are equivilant but different instances.
      */
-    private final Map<Object, String> instances = new IdentityHashMap<Object, String>();
+    private final Map<Object, String> instances = new IdentityHashMap<>();
 
     /**
      * The objects not yet marshaled.  The is maintained as a map for debugging purposes. It is IMPORTANT
      * that this be a LinkedHashMap so we write the objects in the order they were discovered in the object
      * graphs (and writes them in numeric order).
      */
-    private final Map<String, Object> notMarshalled = new LinkedHashMap<String, Object>();
+    private final Map<String, Object> notMarshalled = new LinkedHashMap<>();
 
     /**
      * The next id.
@@ -69,7 +69,8 @@ public class MarshalRegistry implements Iterable<Object> {
     public String getInstanceId(Object instance) {
         String id = instances.get(instance);
         if (id == null) {
-            id = "" + nextId++;
+            id = Integer.toString(nextId);
+            nextId++;
             instances.put(instance, id);
             notMarshalled.put(id, instance);
         }

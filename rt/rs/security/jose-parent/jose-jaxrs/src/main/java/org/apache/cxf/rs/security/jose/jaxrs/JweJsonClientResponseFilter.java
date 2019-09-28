@@ -22,10 +22,14 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import javax.annotation.Priority;
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
+import javax.ws.rs.core.Response;
 
+import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 
@@ -33,7 +37,16 @@ import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 public class JweJsonClientResponseFilter extends AbstractJweJsonDecryptingFilter implements ClientResponseFilter {
     @Override
     public void filter(ClientRequestContext req, ClientResponseContext res) throws IOException {
-        JweDecryptionOutput out = decrypt(res.getEntityStream());
+        if (isMethodWithNoContent(req.getMethod())
+            || isStatusCodeWithNoContent(res.getStatus())
+            || isCheckEmptyStream() && !res.hasEntity()) {
+            return;
+        }
+        final byte[] encryptedContent = IOUtils.readBytesFromStream(res.getEntityStream());
+        if (encryptedContent.length == 0) {
+            return;
+        }
+        JweDecryptionOutput out = decrypt(encryptedContent);
         byte[] bytes = out.getContent();
         res.setEntityStream(new ByteArrayInputStream(bytes));
         res.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
@@ -46,4 +59,11 @@ public class JweJsonClientResponseFilter extends AbstractJweJsonDecryptingFilter
         }
     }
 
+    protected boolean isMethodWithNoContent(String method) {
+        return HttpMethod.DELETE.equals(method) || HttpUtils.isMethodWithNoResponseContent(method);
+    }
+
+    protected boolean isStatusCodeWithNoContent(int statusCode) {
+        return statusCode == Response.Status.NO_CONTENT.getStatusCode();
+    }
 }

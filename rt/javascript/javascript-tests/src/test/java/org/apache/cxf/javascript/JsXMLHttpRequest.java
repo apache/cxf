@@ -46,7 +46,6 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -67,6 +66,8 @@ import org.mozilla.javascript.Function;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.ScriptableObject;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * Implementation of XMLHttpRequest for Rhino. This might be given knowledge of
  * CXF 'local' URLs if the author is feeling frisky.
@@ -74,7 +75,6 @@ import org.mozilla.javascript.ScriptableObject;
 public class JsXMLHttpRequest extends ScriptableObject {
     private static final long serialVersionUID = 6993486986900120981L;
     private static final Logger LOG = LogUtils.getL7dLogger(JsXMLHttpRequest.class);
-    private static Charset utf8 = Charset.forName("utf-8");
     private static Set<String> validMethods;
     static {
         validMethods = new HashSet<>();
@@ -118,11 +118,7 @@ public class JsXMLHttpRequest extends ScriptableObject {
     public static void register(ScriptableObject scope) {
         try {
             ScriptableObject.defineClass(scope, JsXMLHttpRequest.class);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
     }
@@ -187,7 +183,7 @@ public class JsXMLHttpRequest extends ScriptableObject {
             throwError("SYNTAX_ERR");
         }
         // 7 scheme check. Well, for now ...
-        if (!uri.getScheme().equals("http") && !uri.getScheme().equals("https")) {
+        if (!"http".equals(uri.getScheme()) && !"https".equals(uri.getScheme())) {
             LOG.severe("Not http " + uri.toString());
             throwError("NOT_SUPPORTED_ERR");
         }
@@ -442,7 +438,7 @@ public class JsXMLHttpRequest extends ScriptableObject {
     }
 
     private byte[] utf8Bytes(String data) {
-        ByteBuffer bb = utf8.encode(data);
+        ByteBuffer bb = UTF_8.encode(data);
         byte[] val = new byte[bb.limit()];
         bb.get(val);
         return val;
@@ -459,11 +455,7 @@ public class JsXMLHttpRequest extends ScriptableObject {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
             transformerFactory.newTransformer().transform(source, result);
-        } catch (TransformerConfigurationException e) {
-            throw new RuntimeException(e);
-        } catch (TransformerException e) {
-            throw new RuntimeException(e);
-        } catch (TransformerFactoryConfigurationError e) {
+        } catch (TransformerException | TransformerFactoryConfigurationError e) {
             throw new RuntimeException(e);
         }
         return baos.toByteArray();

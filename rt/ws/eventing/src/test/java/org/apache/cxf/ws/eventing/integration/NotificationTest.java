@@ -45,6 +45,7 @@ import org.apache.cxf.ws.eventing.integration.notificationapi.EarthquakeEvent;
 import org.apache.cxf.ws.eventing.integration.notificationapi.FireEvent;
 import org.apache.cxf.ws.eventing.shared.EventingConstants;
 import org.apache.cxf.ws.eventing.shared.utils.DurationAndDateUtil;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -201,11 +202,11 @@ public class NotificationTest extends SimpleEventingIntegrationTest {
         EndpointReferenceType eventSinkERT = new EndpointReferenceType();
 
         JAXBElement<String> idqn
-            = new JAXBElement<String>(new QName("http://www.example.org", "MyReferenceParameter"),
+            = new JAXBElement<>(new QName("http://www.example.org", "MyReferenceParameter"),
                 String.class,
                 "380");
         JAXBElement<String> idqn2
-            = new JAXBElement<String>(new QName("http://www.example.org", "MyReferenceParameter2"),
+            = new JAXBElement<>(new QName("http://www.example.org", "MyReferenceParameter2"),
                 String.class,
                 "381");
         eventSinkERT.setReferenceParameters(new ReferenceParametersType());

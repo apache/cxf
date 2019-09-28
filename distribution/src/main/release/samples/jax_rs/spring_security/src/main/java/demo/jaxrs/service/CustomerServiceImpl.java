@@ -36,8 +36,7 @@ public class CustomerServiceImpl implements CustomerService {
     public Customer getCustomer(String id) {
         System.out.println("----invoking getCustomer, Customer id is: " + id);
         long idNumber = Long.parseLong(id);
-        Customer c = customers.get(idNumber);
-        return c;
+        return customers.get(idNumber);
     }
 
     public Response updateCustomer(Long id, Customer customer) {
@@ -77,8 +76,7 @@ public class CustomerServiceImpl implements CustomerService {
     public Order getOrder(String orderId) {
         System.out.println("----invoking getOrder, Order id is: " + orderId);
         long idNumber = Long.parseLong(orderId);
-        Order c = orders.get(idNumber);
-        return c;
+        return orders.get(idNumber);
     }
 
     final void init() {

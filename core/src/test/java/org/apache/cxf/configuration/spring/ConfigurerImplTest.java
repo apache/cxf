@@ -30,17 +30,21 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.bus.spring.BusApplicationContext;
 import org.apache.cxf.configuration.Configurable;
-import org.junit.Assert;
-import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 
 
 
-public class ConfigurerImplTest extends Assert {
+public class ConfigurerImplTest {
 
     static {
         Class<?> cls;
@@ -83,7 +87,7 @@ public class ConfigurerImplTest extends Assert {
         assertEquals("Unexpected value for attribute decimalAttr",
                      new BigDecimal("5"), sb.getDecimalAttr());
         assertEquals("Unexpected value for attribute floatAttr",
-                     new Float(6F), sb.getFloatAttr());
+                     Float.valueOf(6F), sb.getFloatAttr());
         assertEquals("Unexpected value for attribute doubleAttr",
                      Double.valueOf(7.0D), sb.getDoubleAttr());
         assertEquals("Unexpected value for attribute byteAttr",
@@ -137,8 +141,8 @@ public class ConfigurerImplTest extends Assert {
         configurer.configureBean(sb);
         assertEquals("Unexpected value for attribute stringAttr",
                      "hallo", sb.getStringAttr());
-        assertTrue("Unexpected value for attribute booleanAttr",
-                   !sb.getBooleanAttr());
+        assertFalse("Unexpected value for attribute booleanAttr",
+                   sb.getBooleanAttr());
         assertEquals("Unexpected value for attribute integerAttr",
                      BigInteger.TEN, sb.getIntegerAttr());
         assertEquals("Unexpected value for attribute intAttr",
@@ -150,7 +154,7 @@ public class ConfigurerImplTest extends Assert {
         assertEquals("Unexpected value for attribute decimalAttr",
                      new BigDecimal("15"), sb.getDecimalAttr());
         assertEquals("Unexpected value for attribute floatAttr",
-                     new Float(16F), sb.getFloatAttr());
+                     Float.valueOf(16F), sb.getFloatAttr());
         assertEquals("Unexpected value for attribute doubleAttr",
                      Double.valueOf(17D), sb.getDoubleAttr());
         assertEquals("Unexpected value for attribute byteAttr",
@@ -174,8 +178,8 @@ public class ConfigurerImplTest extends Assert {
         ConfigurerImpl configurer = new ConfigurerImpl();
         configurer.setApplicationContext(ac);
         configurer.configureBean(sb);
-        assertTrue("Unexpected value for attribute booleanAttr",
-                   !sb.getBooleanAttr());
+        assertFalse("Unexpected value for attribute booleanAttr",
+                   sb.getBooleanAttr());
         assertEquals("Unexpected value for attribute integerAttr",
                      BigInteger.TEN, sb.getIntegerAttr());
         assertEquals("Unexpected value for attribute stringAttr",
@@ -192,8 +196,8 @@ public class ConfigurerImplTest extends Assert {
         ConfigurerImpl configurer = new ConfigurerImpl();
         configurer.setApplicationContext(ac);
         configurer.configureBean(sb);
-        assertTrue("Unexpected value for attribute booleanAttr",
-                   !sb.getBooleanAttr());
+        assertFalse("Unexpected value for attribute booleanAttr",
+                   sb.getBooleanAttr());
         assertEquals("Unexpected value for attribute integerAttr",
                      BigInteger.TEN, sb.getIntegerAttr());
         assertEquals("Unexpected value for attribute stringAttr",
@@ -250,7 +254,7 @@ public class ConfigurerImplTest extends Assert {
         private Long longAttr = Long.valueOf(3);
         private Short shortAttr = Short.valueOf((short)4);
         private BigDecimal decimalAttr = new BigDecimal("5");
-        private Float floatAttr = new Float(6F);
+        private Float floatAttr = Float.valueOf(6F);
         private Double doubleAttr = Double.valueOf(7D);
         private Byte byteAttr = Byte.valueOf((byte)8);
         private QName qnameAttr = new QName("http://www.w3.org/2001/XMLSchema", "schema", "xs");

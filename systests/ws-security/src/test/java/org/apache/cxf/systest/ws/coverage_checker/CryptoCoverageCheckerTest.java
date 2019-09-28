@@ -29,17 +29,24 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
+import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxOutInterceptor;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * A set of tests for the CryptoCoverageChecker functionality.
@@ -55,7 +62,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
     private static boolean unrestrictedPoliciesInstalled;
 
     static {
-        unrestrictedPoliciesInstalled = SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
+        unrestrictedPoliciesInstalled = TestUtilities.checkUnrestrictedPoliciesInstalled();
     };
 
     final TestParam test;
@@ -81,12 +88,12 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
+    public static Collection<TestParam> data() {
 
-        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
-                                                {new TestParam(PORT, true)},
-                                                {new TestParam(STAX_PORT, false)},
-                                                {new TestParam(STAX_PORT, true)},
+        return Arrays.asList(new TestParam[] {new TestParam(PORT, false),
+                                              new TestParam(PORT, true),
+                                              new TestParam(STAX_PORT, false),
+                                              new TestParam(STAX_PORT, true),
         });
     }
 
@@ -102,8 +109,8 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         URL busFile = CryptoCoverageCheckerTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -135,7 +142,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
             bus.getOutInterceptors().add(outInterceptor);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -147,8 +154,8 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         URL busFile = CryptoCoverageCheckerTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -195,8 +202,8 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         URL busFile = CryptoCoverageCheckerTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -244,8 +251,8 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         URL busFile = CryptoCoverageCheckerTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -277,7 +284,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
             bus.getOutInterceptors().add(outInterceptor);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -289,8 +296,8 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         URL busFile = CryptoCoverageCheckerTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -337,8 +344,8 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         URL busFile = CryptoCoverageCheckerTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -390,8 +397,8 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         URL busFile = CryptoCoverageCheckerTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -425,7 +432,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
             bus.getOutInterceptors().add(outInterceptor);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -437,8 +444,8 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         URL busFile = CryptoCoverageCheckerTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -490,8 +497,8 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         URL busFile = CryptoCoverageCheckerTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -554,7 +561,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
             bus.getOutInterceptors().add(outInterceptor);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -566,8 +573,8 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         URL busFile = CryptoCoverageCheckerTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -602,7 +609,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
             bus.getOutInterceptors().add(outInterceptor);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -617,8 +624,8 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         URL busFile = CryptoCoverageCheckerTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -653,8 +660,8 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         URL busFile = CryptoCoverageCheckerTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -665,7 +672,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
 
         // This test only applies to the DOM implementation
         if (PORT.equals(test.getPort()) && !test.isStreaming()) {
-            port.doubleIt(25);
+            assertEquals(50, port.doubleIt(25));
 
             // Now try with a message that will create a Fault in the SEI
             try {
@@ -690,8 +697,8 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         URL busFile = CryptoCoverageCheckerTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -709,7 +716,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
                      "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
         outProps.put("encryptionParts",
                      "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;"
-                     + "{Element}{" + WSConstants.WSSE_NS + "}UsernameToken;");
+                     + "{Element}{" + WSS4JConstants.WSSE_NS + "}UsernameToken;");
 
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
@@ -723,7 +730,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
             bus.getOutInterceptors().add(outInterceptor);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -739,8 +746,8 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         URL busFile = CryptoCoverageCheckerTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);

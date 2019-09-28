@@ -29,7 +29,7 @@ public class BookServerSecuritySpringInterface extends AbstractSpringServer {
         super("/jaxrs_security", PORT);
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         try {
             BookServerSecuritySpringInterface s = new BookServerSecuritySpringInterface();
             s.start();

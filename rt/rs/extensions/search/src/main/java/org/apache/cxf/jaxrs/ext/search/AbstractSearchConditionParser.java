@@ -42,7 +42,6 @@ import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 
 public abstract class AbstractSearchConditionParser<T> implements SearchConditionParser<T> {
 
@@ -97,7 +96,7 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
         } catch (Exception e) {
             // continue
         }
-        if (typeInfo == null && !MessageUtils.isTrue(contextProperties.get(SearchUtils.LAX_PROPERTY_MATCH))) {
+        if (typeInfo == null && !PropertyUtils.isTrue(contextProperties.get(SearchUtils.LAX_PROPERTY_MATCH))) {
             throw new PropertyNotFoundException(name, value);
         }
         return typeInfo;
@@ -107,9 +106,8 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
         int index = getDotIndex(setter);
         if (index != -1) {
             return setter.substring(0, index).toLowerCase();
-        } else {
-            return setter;
         }
+        return setter;
     }
 
     protected Object parseType(String originalPropName,
@@ -165,88 +163,85 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
                 castedValue = lastCastedValue;
             }
             return castedValue;
-        } else {
-            String[] names = setter.split("\\.");
-            try {
-                String nextPart = getMethodNameSuffix(names[1]);
-                Method getterM = actualType.getMethod("get" + nextPart, new Class[]{});
-                Class<?> returnType = getterM.getReturnType();
-                boolean returnCollection = InjectionUtils.isSupportedCollectionOrArray(returnType);
-                Class<?> actualReturnType = !returnCollection ? returnType
-                    : InjectionUtils.getActualType(getterM.getGenericReturnType());
+        }
+        String[] names = setter.split("\\.");
+        try {
+            String nextPart = getMethodNameSuffix(names[1]);
+            Method getterM = actualType.getMethod("get" + nextPart, new Class[]{});
+            Class<?> returnType = getterM.getReturnType();
+            boolean returnCollection = InjectionUtils.isSupportedCollectionOrArray(returnType);
+            Class<?> actualReturnType = !returnCollection ? returnType
+                : InjectionUtils.getActualType(getterM.getGenericReturnType());
 
-                boolean isPrimitive = !returnCollection
-                    && InjectionUtils.isPrimitive(returnType) || returnType.isEnum();
-                boolean lastTry = names.length == 2
-                    && (isPrimitive
-                        ||
-                        Date.class.isAssignableFrom(returnType)
-                        || returnCollection
-                        || paramConverterAvailable(returnType));
+            boolean isPrimitive = !returnCollection
+                && InjectionUtils.isPrimitive(returnType) || returnType.isEnum();
+            boolean lastTry = names.length == 2
+                && (isPrimitive
+                    ||
+                    Date.class.isAssignableFrom(returnType)
+                    || returnCollection
+                    || paramConverterAvailable(returnType));
 
-                Object valueObject = ownerBean != null ? ownerBean
-                    : actualType.isInterface()
-                    ? Proxy.newProxyInstance(this.getClass().getClassLoader(),
-                                             new Class[]{actualType},
-                                             new InterfaceProxy())
-                    : actualType.newInstance();
-                Object nextObject;
+            Object valueObject = ownerBean != null ? ownerBean
+                : actualType.isInterface()
+                ? Proxy.newProxyInstance(this.getClass().getClassLoader(),
+                                         new Class[]{actualType},
+                                         new InterfaceProxy())
+                : actualType.newInstance();
+            Object nextObject;
 
-                if (lastTry) {
-                    if (!returnCollection) {
-                        nextObject = isPrimitive ? InjectionUtils.convertStringToPrimitive(value, returnType)
-                            : convertToDate(returnType, value);
+            if (lastTry) {
+                if (!returnCollection) {
+                    nextObject = isPrimitive ? InjectionUtils.convertStringToPrimitive(value, returnType)
+                        : convertToDate(returnType, value);
+                } else {
+                    CollectionCheck collCheck = getCollectionCheck(originalPropName, true, actualReturnType);
+                    if (collCheck == null) {
+                        nextObject = getCollectionSingleton(valueType, value);
                     } else {
-                        CollectionCheck collCheck = getCollectionCheck(originalPropName, true, actualReturnType);
-                        if (collCheck == null) {
-                            nextObject = getCollectionSingleton(valueType, value);
-                        } else {
-                            typeInfo.setCollectionCheckInfo(new CollectionCheckInfo(collCheck, value));
-                            nextObject = getEmptyCollection(valueType);
-                        }
+                        typeInfo.setCollectionCheckInfo(new CollectionCheckInfo(collCheck, value));
+                        nextObject = getEmptyCollection(valueType);
                     }
-                } else if (!returnCollection) {
-                    nextObject = returnType.newInstance();
-                } else {
-                    nextObject = actualReturnType.newInstance();
                 }
-                Method setterM = actualType.getMethod("set" + nextPart, new Class[]{returnType});
-                Object valueObjectValue = null;
-                if (lastTry || !returnCollection) {
-                    valueObjectValue = nextObject;
-                } else {
-                    Class<?> collCls = Collection.class.isAssignableFrom(valueType) ? valueType : returnType;
-                    valueObjectValue = getCollectionSingleton(collCls, nextObject);
-                }
-                setterM.invoke(valueObject, new Object[]{valueObjectValue});
-
-                if (lastTry) {
-                    lastCastedValue = lastCastedValue == null ? valueObject : lastCastedValue;
-                    return isCollection ? getCollectionSingleton(valueType, lastCastedValue) : lastCastedValue;
-                } else {
-                    lastCastedValue = valueObject;
-                }
-
-                TypeInfo nextTypeInfo = new TypeInfo(valueObjectValue.getClass(), getterM.getGenericReturnType());
-                Object response = parseType(originalPropName,
-                                 nextObject,
-                                 lastCastedValue,
-                                 setter.substring(index + 1),
-                                 nextTypeInfo,
-                                 value);
-                if (ownerBean == null) {
-                    return isCollection ? getCollectionSingleton(valueType, lastCastedValue) : lastCastedValue;
-                } else {
-                    return response;
-                }
-            } catch (Throwable e) {
-                throw new SearchParseException("Cannot convert String value \"" + value
-                                               + "\" to a value of class " + valueType.getName(), e);
+            } else if (!returnCollection) {
+                nextObject = returnType.newInstance();
+            } else {
+                nextObject = actualReturnType.newInstance();
             }
+            Method setterM = actualType.getMethod("set" + nextPart, new Class[]{returnType});
+            Object valueObjectValue = null;
+            if (lastTry || !returnCollection) {
+                valueObjectValue = nextObject;
+            } else {
+                Class<?> collCls = Collection.class.isAssignableFrom(valueType) ? valueType : returnType;
+                valueObjectValue = getCollectionSingleton(collCls, nextObject);
+            }
+            setterM.invoke(valueObject, new Object[]{valueObjectValue});
+
+            if (lastTry) {
+                lastCastedValue = lastCastedValue == null ? valueObject : lastCastedValue;
+                return isCollection ? getCollectionSingleton(valueType, lastCastedValue) : lastCastedValue;
+            }
+            lastCastedValue = valueObject;
+
+            TypeInfo nextTypeInfo = new TypeInfo(valueObjectValue.getClass(), getterM.getGenericReturnType());
+            Object response = parseType(originalPropName,
+                             nextObject,
+                             lastCastedValue,
+                             setter.substring(index + 1),
+                             nextTypeInfo,
+                             value);
+            if (ownerBean == null) {
+                return isCollection ? getCollectionSingleton(valueType, lastCastedValue) : lastCastedValue;
+            }
+            return response;
+        } catch (Throwable e) {
+            throw new SearchParseException("Cannot convert String value \"" + value
+                                           + "\" to a value of class " + valueType.getName(), e);
         }
     }
 
-    private boolean paramConverterAvailable(Class<?> pClass) {
+    private boolean paramConverterAvailable(final Class<?> pClass) {
         Message m = JAXRSUtils.getCurrentMessage();
         ServerProviderFactory pf = m == null ? null : ServerProviderFactory.getInstance(m);
         return pf != null && pf.createParameterHandler(pClass, pClass, EMPTY_ANNOTTAIONS, m) != null;
@@ -272,17 +267,15 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
     private Object getCollectionSingleton(Class<?> collectionCls, Object value) {
         if (Set.class.isAssignableFrom(collectionCls)) {
             return Collections.singleton(value);
-        } else {
-            return Collections.singletonList(value);
         }
+        return Collections.singletonList(value);
     }
 
     private Object getEmptyCollection(Class<?> collectionCls) {
         if (Set.class.isAssignableFrom(collectionCls)) {
             return Collections.emptySet();
-        } else {
-            return Collections.emptyList();
         }
+        return Collections.emptyList();
     }
 
     private Object convertToDate(Class<?> valueType, String value) throws SearchParseException {
@@ -342,12 +335,11 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
     private String getMethodNameSuffix(String name) {
         if (name.length() == 1) {
             return name.toUpperCase();
-        } else {
-            return Character.toUpperCase(name.charAt(0)) + name.substring(1);
         }
+        return Character.toUpperCase(name.charAt(0)) + name.substring(1);
     }
 
     private int getDotIndex(String setter) {
-        return this.conditionClass == SearchBean.class ? -1 : setter.indexOf(".");
+        return this.conditionClass == SearchBean.class ? -1 : setter.indexOf('.');
     }
 }

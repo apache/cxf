@@ -19,7 +19,6 @@
 package org.apache.cxf.binding.corba;
 
 import org.apache.cxf.binding.corba.types.CorbaObjectHandler;
-
 import org.omg.CORBA.portable.Streamable;
 
 public interface CorbaStreamable extends Streamable {

@@ -85,47 +85,45 @@ public class ModuleToNSMapper {
     public String map(Scope scope, String separator) {
         if (defaultMapping) {
             return null;
-        } else {
-            String uri = userMap.get(scope.toString(separator));
-            if (uri == null) {
-                //try the parent scope for mapping
-                Scope currentScope = scope;
-                String parentURI = null;
-                uri = "";
-                while (parentURI == null && !currentScope.toString().equals("")
-                       && currentScope != currentScope.getParent()) {
-                    parentURI = userMap.get(currentScope.toString(separator));
-                    if (parentURI == null) {
-                        if (!"".equals(uri)) {
-                            uri = "/" + uri;
-                        }
-                        uri = currentScope.tail() + uri;
-                    }
-                    currentScope = currentScope.getParent();
-                }
-                if (parentURI != null) {
-                    if (!parentURI.endsWith("/")) {
-                        parentURI = parentURI + "/";
-                    }
-                    uri = parentURI + uri;
-                } else {
-                    uri = "urn:" + uri;
-                }
-            }
-            return uri;
         }
+        String uri = userMap.get(scope.toString(separator));
+        if (uri == null) {
+            //try the parent scope for mapping
+            Scope currentScope = scope;
+            String parentURI = null;
+            uri = "";
+            while (parentURI == null && !currentScope.toString().isEmpty()
+                   && currentScope != currentScope.getParent()) {
+                parentURI = userMap.get(currentScope.toString(separator));
+                if (parentURI == null) {
+                    if (!"".equals(uri)) {
+                        uri = "/" + uri;
+                    }
+                    uri = currentScope.tail() + uri;
+                }
+                currentScope = currentScope.getParent();
+            }
+            if (parentURI != null) {
+                if (!parentURI.endsWith("/")) {
+                    parentURI = parentURI + "/";
+                }
+                uri = parentURI + uri;
+            } else {
+                uri = "urn:" + uri;
+            }
+        }
+        return uri;
     }
 
     public String mapToQName(Scope scope) {
         if (defaultMapping) {
             return scope.toString();
-        } else {
-            return scope.tail();
         }
+        return scope.tail();
     }
 
     public String mapNSToPrefix(String nsURI) {
-        int pos = nsURI.indexOf(":");
+        int pos = nsURI.indexOf(':');
         if (pos != -1) {
             nsURI = nsURI.substring(pos + 1);
         }

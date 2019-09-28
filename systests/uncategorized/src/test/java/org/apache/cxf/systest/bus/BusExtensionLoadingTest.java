@@ -34,10 +34,12 @@ import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.endpoint.ServerRegistry;
 import org.apache.cxf.headers.HeaderManager;
 import org.apache.cxf.wsdl.WSDLManager;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class BusExtensionLoadingTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+
+public class BusExtensionLoadingTest {
 
     /**
      * Tests the ExtensionManagerBus can be built using a given classloader
@@ -88,9 +90,8 @@ public class BusExtensionLoadingTest extends Assert {
         public Class<?> loadClass(final String className) throws ClassNotFoundException {
             if (className.contains("cxf")) {
                 throw new ClassNotFoundException("TestClassLoader does not load CXF classes: " +  className);
-            } else {
-                return super.loadClass(className);
             }
+            return super.loadClass(className);
         }
 
         @Override

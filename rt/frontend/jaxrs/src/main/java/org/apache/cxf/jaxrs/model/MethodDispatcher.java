@@ -27,10 +27,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class MethodDispatcher {
     private Map<OperationResourceInfo, Method> oriToMethod =
-        new LinkedHashMap<OperationResourceInfo, Method>();
+        new LinkedHashMap<>();
     private Map<Method, OperationResourceInfo> methodToOri =
-        new LinkedHashMap<Method, OperationResourceInfo>();
-    private ConcurrentHashMap<Method, Method> proxyMethodMap = new ConcurrentHashMap<Method, Method>();
+        new LinkedHashMap<>();
+    private ConcurrentHashMap<Method, Method> proxyMethodMap = new ConcurrentHashMap<>();
 
     public MethodDispatcher() {
 

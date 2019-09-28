@@ -50,7 +50,7 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
     }
 
     protected boolean isClient(Message msg) {
-        return msg == null ? false : Boolean.TRUE.equals(msg.get(Message.REQUESTOR_ROLE));
+        return msg != null && Boolean.TRUE.equals(msg.get(Message.REQUESTOR_ROLE));
     }
 
     protected void beginHandlingMessage(Exchange ex) {
@@ -101,13 +101,12 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
         if (null == cr) {
             LOG.log(Level.WARNING, "NO_COUNTER_REPOSITORY");
             return;
-        } else {
-            ObjectName serviceCountername = this.getServiceCounterName(ex);
-            cr.increaseCounter(serviceCountername, mhtr);
-
-            ObjectName operationCounter = this.getOperationCounterName(ex, serviceCountername);
-            cr.increaseCounter(operationCounter, mhtr);
         }
+        ObjectName serviceCountername = this.getServiceCounterName(ex);
+        cr.increaseCounter(serviceCountername, mhtr);
+
+        ObjectName operationCounter = this.getOperationCounterName(ex, serviceCountername);
+        cr.increaseCounter(operationCounter, mhtr);
     }
 
     protected ObjectName getServiceCounterName(Exchange ex) {
@@ -129,19 +128,19 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
                 String serviceName = "\"" + escapePatternChars(service.getName().toString()) + "\"";
                 String portName = "\"" + endpoint.getEndpointInfo().getName().getLocalPart() + "\"";
 
-                buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");
-                buffer.append(ManagementConstants.BUS_ID_PROP + "=" + bus.getId() + ",");
+                buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME).append(':');
+                buffer.append(ManagementConstants.BUS_ID_PROP).append('=').append(bus.getId()).append(',');
                 Message message = ex.getOutMessage();
                 if (isClient(message)) {
-                    buffer.append(ManagementConstants.TYPE_PROP + "=" + Counter.PERFORMANCE_COUNTER
-                                  + ".Client,");
+                    buffer.append(ManagementConstants.TYPE_PROP).append('=')
+                        .append(Counter.PERFORMANCE_COUNTER).append(".Client,");
                 } else {
-                    buffer.append(ManagementConstants.TYPE_PROP + "=" + Counter.PERFORMANCE_COUNTER
-                                  + ".Server,");
+                    buffer.append(ManagementConstants.TYPE_PROP).append('=')
+                        .append(Counter.PERFORMANCE_COUNTER).append(".Server,");
                 }
-                buffer.append(ManagementConstants.SERVICE_NAME_PROP + "=" + serviceName + ",");
+                buffer.append(ManagementConstants.SERVICE_NAME_PROP).append('=').append(serviceName).append(',');
 
-                buffer.append(ManagementConstants.PORT_NAME_PROP + "=" + portName);
+                buffer.append(ManagementConstants.PORT_NAME_PROP).append('=').append(portName);
 
                 try {
                     serviceCounterName = new ObjectName(buffer.toString());
@@ -186,7 +185,7 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
         }
         StringBuilder buffer = new StringBuilder(sericeCounterName.toString());
         if (operationName != null) {
-            buffer.append("," + ManagementConstants.OPERATION_NAME_PROP + "=" + operationName);
+            buffer.append(',').append(ManagementConstants.OPERATION_NAME_PROP).append('=').append(operationName);
         }
         String operationCounterName = buffer.toString();
         ObjectName operationCounter = null;

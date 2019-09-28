@@ -35,8 +35,11 @@ import org.apache.cxf.service.invoker.BeanInvoker;
 import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import org.apache.hello_world_soap_http.GreeterImpl;
+
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 public class SoapFaultTest extends AbstractJaxWsTest {
 

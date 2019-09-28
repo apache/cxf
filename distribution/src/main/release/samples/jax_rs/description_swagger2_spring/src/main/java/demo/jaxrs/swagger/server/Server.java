@@ -26,7 +26,7 @@ public final class Server {
     private Server() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         ApplicationContext appctxt =
             new ClassPathXmlApplicationContext(Server.class.getResource("/context.xml").toString());
 

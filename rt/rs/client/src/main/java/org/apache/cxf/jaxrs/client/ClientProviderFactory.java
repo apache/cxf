@@ -20,7 +20,6 @@ package org.apache.cxf.jaxrs.client;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.ws.rs.client.ClientRequestFilter;
@@ -38,11 +37,11 @@ import org.apache.cxf.message.Message;
 
 public final class ClientProviderFactory extends ProviderFactory {
     private List<ProviderInfo<ClientRequestFilter>> clientRequestFilters =
-        new ArrayList<ProviderInfo<ClientRequestFilter>>(1);
+        new ArrayList<>(1);
     private List<ProviderInfo<ClientResponseFilter>> clientResponseFilters =
-        new ArrayList<ProviderInfo<ClientResponseFilter>>(1);
+        new ArrayList<>(1);
     private List<ProviderInfo<ResponseExceptionMapper<?>>> responseExceptionMappers =
-        new ArrayList<ProviderInfo<ResponseExceptionMapper<?>>>(1);
+        new ArrayList<>(1);
     private RxInvokerProvider<?> rxInvokerProvider;
     private ClientProviderFactory(Bus bus) {
         super(bus);
@@ -59,8 +58,7 @@ public final class ClientProviderFactory extends ProviderFactory {
     }
 
     public static ClientProviderFactory getInstance(Message m) {
-        Endpoint e = m.getExchange().getEndpoint();
-        return (ClientProviderFactory)e.get(CLIENT_FACTORY_NAME);
+        return getInstance(m.getExchange().getEndpoint());
     }
 
     public static ClientProviderFactory getInstance(Endpoint e) {
@@ -71,10 +69,14 @@ public final class ClientProviderFactory extends ProviderFactory {
     @Override
     protected void setProviders(boolean custom, boolean busGlobal, Object... providers) {
         List<ProviderInfo<? extends Object>> theProviders =
-            prepareProviders(custom, busGlobal, (Object[])providers, null);
+            prepareProviders(custom, busGlobal, providers, null);
         super.setCommonProviders(theProviders);
         for (ProviderInfo<? extends Object> provider : theProviders) {
             Class<?> providerCls = ClassHelper.getRealClass(getBus(), provider.getProvider());
+            if (providerCls == Object.class) {
+                // If the provider is a lambda, ClassHelper.getRealClass returns Object.class
+                providerCls = provider.getProvider().getClass();
+            }
             if (filterContractSupported(provider, providerCls, ClientRequestFilter.class)) {
                 addProviderToList(clientRequestFilters, provider);
             }
@@ -103,18 +105,12 @@ public final class ClientProviderFactory extends ProviderFactory {
     public <T extends Throwable> ResponseExceptionMapper<T> createResponseExceptionMapper(
                                  Message m, Class<?> paramType) {
 
-        List<ResponseExceptionMapper<?>> candidates = new LinkedList<ResponseExceptionMapper<?>>();
-
-        for (ProviderInfo<ResponseExceptionMapper<?>> em : responseExceptionMappers) {
-            if (handleMapper(em, paramType, m, ResponseExceptionMapper.class, true)) {
-                candidates.add(em.getProvider());
-            }
-        }
-        if (candidates.size() == 0) {
-            return null;
-        }
-        Collections.sort(candidates, new ProviderFactory.ClassComparator(paramType));
-        return (ResponseExceptionMapper<T>) candidates.get(0);
+        return (ResponseExceptionMapper<T>)responseExceptionMappers.stream()
+                .filter(em -> handleMapper(em, paramType, m, ResponseExceptionMapper.class, true))
+                .map(ProviderInfo::getProvider)
+                .sorted(new ProviderFactory.ClassComparator(paramType))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override

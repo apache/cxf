@@ -20,15 +20,18 @@
 package org.apache.cxf.ws.policy;
 
 import org.apache.neethi.Policy;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 
 /**
  *
  */
-public class PolicyRegistryImplTest extends Assert {
+public class PolicyRegistryImplTest {
 
     @Test
     public void testAll() {

@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.SequenceInputStream;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -44,6 +43,7 @@ import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.binding.soap.saaj.SAAJStreamWriter;
@@ -53,6 +53,8 @@ import org.apache.cxf.staxutils.OverlayW3CDOMStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.xml.security.encryption.AbstractSerializer;
 import org.apache.xml.security.encryption.XMLEncryptionException;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Converts <code>String</code>s into <code>Node</code>s and visa versa using CXF's StaxUtils
@@ -139,11 +141,11 @@ public class StaxSerializer extends AbstractSerializer {
     }
 
     InputStream createStreamContext(byte[] source, Node ctx) throws XMLEncryptionException {
-        Vector<InputStream> v = new Vector<>(2);
+        Vector<InputStream> v = new Vector<>(2); //NOPMD
 
         LoadingByteArrayOutputStream byteArrayOutputStream = new LoadingByteArrayOutputStream();
         try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(byteArrayOutputStream, "UTF-8");
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(byteArrayOutputStream, UTF_8);
             outputStreamWriter.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?><dummy");
 
             // Run through each node up to the document node and find any xmlns: nodes
@@ -173,12 +175,10 @@ public class StaxSerializer extends AbstractSerializer {
             v.add(byteArrayOutputStream.createInputStream());
             v.addElement(new ByteArrayInputStream(source));
             byteArrayOutputStream = new LoadingByteArrayOutputStream();
-            outputStreamWriter = new OutputStreamWriter(byteArrayOutputStream, "UTF-8");
+            outputStreamWriter = new OutputStreamWriter(byteArrayOutputStream, UTF_8);
             outputStreamWriter.write("</dummy>");
             outputStreamWriter.close();
             v.add(byteArrayOutputStream.createInputStream());
-        } catch (UnsupportedEncodingException e) {
-            throw new XMLEncryptionException(e);
         } catch (IOException e) {
             throw new XMLEncryptionException(e);
         }

@@ -70,15 +70,23 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
-import org.easymock.EasyMock;
 import org.eclipse.jetty.http.HttpFields;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Response;
+
+import org.easymock.EasyMock;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JettyHTTPDestinationTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class JettyHTTPDestinationTest {
     protected static final String AUTH_HEADER = "Authorization";
     protected static final String USER = "copernicus";
     protected static final String PASSWD = "epicycles";
@@ -772,10 +780,10 @@ public class JettyHTTPDestinationTest extends Assert {
                     bus, threadDefaultBus);
         assertNotNull("unexpected null message", inMessage);
         assertSame("unexpected HTTP request",
-                   inMessage.get(JettyHTTPDestination.HTTP_REQUEST),
+                   inMessage.get(AbstractHTTPDestination.HTTP_REQUEST),
                    request);
         assertSame("unexpected HTTP response",
-                   inMessage.get(JettyHTTPDestination.HTTP_RESPONSE),
+                   inMessage.get(AbstractHTTPDestination.HTTP_RESPONSE),
                    response);
         assertEquals("unexpected method",
                      inMessage.get(Message.HTTP_REQUEST_METHOD),
@@ -879,10 +887,10 @@ public class JettyHTTPDestinationTest extends Assert {
 
         if (oneway) {
             assertNull("unexpected HTTP response",
-                       outMsg.get(JettyHTTPDestination.HTTP_RESPONSE));
+                       outMsg.get(AbstractHTTPDestination.HTTP_RESPONSE));
         } else {
             assertNotNull("expected HTTP response",
-                           outMsg.get(JettyHTTPDestination.HTTP_RESPONSE));
+                           outMsg.get(AbstractHTTPDestination.HTTP_RESPONSE));
             responseOS.close();
         }
     }

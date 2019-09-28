@@ -75,10 +75,10 @@ public final class Client extends TestCaseBase<BasicPortType> {
         System.out.println("      echoString");
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         Client client = new Client(args);
         client.initialize();
-        if (client.getOperationName().equals("echoString")) {
+        if ("echoString".equals(client.getOperationName())) {
             opid = 0;
         } else {
             opid = 1;

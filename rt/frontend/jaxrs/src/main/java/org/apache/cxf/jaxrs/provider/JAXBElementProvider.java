@@ -137,18 +137,6 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         super.setContext(mc);
     }
 
-    public void setEnableBuffering(boolean enableBuf) {
-        super.setEnableBuffering(enableBuf);
-    }
-
-    public void setConsumeMediaTypes(List<String> types) {
-        super.setConsumeMediaTypes(types);
-    }
-
-    public void setProduceMediaTypes(List<String> types) {
-        super.setProduceMediaTypes(types);
-    }
-
     public void setMarshallerProperties(Map<String, Object> marshallProperties) {
         mProperties = marshallProperties;
     }
@@ -163,9 +151,8 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         if (isPayloadEmpty(headers)) {
             if (AnnotationUtils.getAnnotation(anns, Nullable.class) != null) {
                 return null;
-            } else {
-                reportEmptyContentLength();
             }
+            reportEmptyContentLength();
         }
 
         XMLStreamReader reader = null;
@@ -268,9 +255,8 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         reader = createDepthReaderIfNeeded(reader, is);
         if (InjectionUtils.isSupportedCollectionOrArray(type)) {
             return new JAXBCollectionWrapperReader(TransformUtils.createNewReaderIfNeeded(reader, is));
-        } else {
-            return reader;
         }
+        return reader;
 
     }
 
@@ -510,9 +496,8 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
                 builder = mc.getUriInfo().getBaseUriBuilder();
             }
             return builder.path(path).path(xmlResourceOffset).build().toString();
-        } else {
-            return path;
         }
+        return path;
     }
 
 
@@ -541,12 +526,11 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             // TODO: there has to be a better fix
             String propertyName = write ? "WRITE-" + Message.ATTACHMENTS : Message.ATTACHMENTS;
             return CastUtils.cast((Collection<?>)mc.get(propertyName));
-        } else {
-            return null;
         }
+        return null;
     }
     //CHECKSTYLE:OFF
-    protected void marshal(Object obj, Class<?> cls, Type genericType,
+    protected final void marshal(Object obj, Class<?> cls, Type genericType,
                            String enc, OutputStream os,
                            Annotation[] anns, MediaType mt, Marshaller ms)
         throws Exception {
@@ -615,6 +599,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
     protected void marshalToOutputStream(Marshaller ms, Object obj, OutputStream os,
                                          Annotation[] anns, MediaType mt)
         throws Exception {
+        org.apache.cxf.common.jaxb.JAXBUtils.setMinimumEscapeHandler(ms);
         if (os == null) {
             Writer writer = getStreamHandlerFromCurrentMessage(Writer.class);
             if (writer == null) {
@@ -631,6 +616,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
     protected void marshalToWriter(Marshaller ms, Object obj, XMLStreamWriter writer,
                                    Annotation[] anns, MediaType mt)
         throws Exception {
+        org.apache.cxf.common.jaxb.JAXBUtils.setNoEscapeHandler(ms);
         ms.marshal(obj, writer);
     }
 

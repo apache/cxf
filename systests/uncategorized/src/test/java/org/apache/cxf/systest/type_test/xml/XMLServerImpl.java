@@ -40,7 +40,7 @@ public class XMLServerImpl extends AbstractBusTestServerBase {
         Endpoint.publish(address, implementor);
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         try {
             XMLServerImpl s = new XMLServerImpl();
             s.start();
@@ -56,7 +56,7 @@ public class XMLServerImpl extends AbstractBusTestServerBase {
                 portName = "XMLPort",
                 endpointInterface = "org.apache.type_test.xml.TypeTestPortType",
                 targetNamespace = "http://apache.org/type_test/xml",
-                wsdlLocation = "testutils/type_test/type_test_xml.wsdl")
+                wsdlLocation = "wsdl/type_test/type_test_xml.wsdl")
     @javax.xml.ws.BindingType(value = "http://cxf.apache.org/bindings/xmlformat")
     class XMLTypeTestImpl extends TypeTestImpl implements TypeTestPortType {
     }

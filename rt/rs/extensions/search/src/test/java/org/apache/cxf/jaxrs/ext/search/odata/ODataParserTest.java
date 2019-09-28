@@ -23,11 +23,13 @@ import java.util.Collections;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchParseException;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ODataParserTest extends Assert {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class ODataParserTest {
     private ODataParser<Person> parser;
 
     public static class Person {
@@ -117,7 +119,7 @@ public class ODataParserTest extends Assert {
 
     @Before
     public void setUp() {
-        parser = new ODataParser<Person>(Person.class, Collections.<String, String>emptyMap(),
+        parser = new ODataParser<>(Person.class, Collections.<String, String>emptyMap(),
             Collections.singletonMap("thename", "FirstName"));
     }
 

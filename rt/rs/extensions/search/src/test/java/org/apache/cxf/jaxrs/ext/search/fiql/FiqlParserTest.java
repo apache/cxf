@@ -35,12 +35,16 @@ import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchParseException;
 import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class FiqlParserTest extends Assert {
-    private FiqlParser<Condition> parser = new FiqlParser<Condition>(Condition.class);
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class FiqlParserTest {
+    private FiqlParser<Condition> parser = new FiqlParser<>(Condition.class);
 
     @Test(expected = SearchParseException.class)
     public void testCompareWrongComparator() throws SearchParseException {
@@ -182,7 +186,7 @@ public class FiqlParserTest extends Assert {
         Map<String, String> props = new HashMap<>();
         props.put(SearchUtils.DATE_FORMAT_PROPERTY, "yyyy-MM-dd'T'HH:mm:ss");
         props.put(SearchUtils.TIMEZONE_SUPPORT_PROPERTY, "false");
-        parser = new FiqlParser<Condition>(Condition.class, props);
+        parser = new FiqlParser<>(Condition.class, props);
 
         SearchCondition<Condition> filter = parser.parse("time=le=2010-03-11T18:00:00");
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -291,7 +295,7 @@ public class FiqlParserTest extends Assert {
     public void testSQL5() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==test");
         String sql = SearchUtils.toSQL(filter, "table");
-        assertTrue("SELECT * FROM table WHERE name = 'test'".equals(sql));
+        assertEquals("SELECT * FROM table WHERE name = 'test'", sql);
     }
 
     @Test
@@ -305,12 +309,23 @@ public class FiqlParserTest extends Assert {
 
     @Test
     public void testMultipleLists() throws SearchParseException {
-        FiqlParser<Job> jobParser = new FiqlParser<Job>(Job.class,
+        FiqlParser<Job> jobParser = new FiqlParser<>(Job.class,
                                                         Collections.<String, String>emptyMap(),
                                                         Collections.singletonMap("itemName", "tasks.items.itemName"));
         SearchCondition<Job> jobCondition = jobParser.parse("itemName==myitem");
         Job job = jobCondition.getCondition();
         assertEquals("myitem", job.getTasks().get(0).getItems().get(0).getItemName());
+    }
+
+    @Test
+    public void testWildcard() throws SearchParseException {
+        SearchCondition<Condition> filter = parser.parse("name==*");
+        try {
+            filter.isMet(new Condition("foobaz", 0, null));
+            fail("Failure expected on an invalid search condition");
+        } catch (SearchParseException ex) {
+            // expected
+        }
     }
 
     @Ignore

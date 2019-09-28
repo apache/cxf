@@ -33,11 +33,14 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.handlers.types.AddNumbers;
 import org.apache.handlers.types.ObjectFactory;
-import org.junit.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 
-public class LogicalMessageImplTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class LogicalMessageImplTest {
     AddNumbers req;
     List<Object> args;
 

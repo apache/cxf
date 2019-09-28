@@ -27,6 +27,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
@@ -55,7 +56,7 @@ public class WSSUsernameCallbackHandler implements CallbackHandler {
                     if (contentNode != null) {
                         doc = contentNode.getOwnerDocument();
                     } else {
-                        doc = DOMUtils.createDocument();
+                        doc = DOMUtils.getEmptyDocument();
                     }
                     UsernameToken usernameToken = createWSSEUsernameToken(username, doc);
                     callback.setToken(usernameToken.getElement());

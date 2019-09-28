@@ -19,13 +19,16 @@
 package org.apache.cxf.jaxrs.spring;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.Feature;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.springframework.beans.BeansException;
@@ -39,6 +42,8 @@ public abstract class AbstractSpringConfigurationFactory
     protected ApplicationContext applicationContext;
     @Value("${cxf.jaxrs.server.address:}")
     private String jaxrsServerAddress;
+    @Value("${cxf.jaxrs.extensions:}")
+    private String jaxrsExtensions;
 
     protected Server createJaxRsServer() {
 
@@ -53,6 +58,9 @@ public abstract class AbstractSpringConfigurationFactory
         factory.setOutInterceptors(getOutInterceptors());
         factory.setOutFaultInterceptors(getOutFaultInterceptors());
         factory.setFeatures(getFeatures());
+        if (!StringUtils.isEmpty(jaxrsExtensions)) {
+            factory.setExtensionMappings(CastUtils.cast((Map<?, ?>)parseMapSequence(jaxrsExtensions)));
+        }
         finalizeFactorySetup(factory);
         return factory.create();
     }
@@ -79,9 +87,8 @@ public abstract class AbstractSpringConfigurationFactory
     protected String getAddress() {
         if (!StringUtils.isEmpty(jaxrsServerAddress)) {
             return jaxrsServerAddress;
-        } else {
-            return "/";
         }
+        return "/";
     }
 
     protected String getTransportId() {
@@ -90,5 +97,26 @@ public abstract class AbstractSpringConfigurationFactory
 
     protected void finalizeFactorySetup(JAXRSServerFactoryBean factory) {
         // complete
+    }
+    protected static Map<String, String> parseMapSequence(String sequence) {
+        if (sequence != null) {
+            sequence = sequence.trim();
+            Map<String, String> map = new HashMap<>();
+            String[] pairs = sequence.split(",");
+            for (String pair : pairs) {
+                String thePair = pair.trim();
+                if (thePair.length() == 0) {
+                    continue;
+                }
+                String[] value = thePair.split("=");
+                if (value.length == 2) {
+                    map.put(value[0].trim(), value[1].trim());
+                } else {
+                    map.put(thePair, "");
+                }
+            }
+            return map;
+        }
+        return Collections.emptyMap();
     }
 }

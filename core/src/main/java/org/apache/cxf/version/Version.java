@@ -48,10 +48,8 @@ public final class Version {
         if (version == null) {
             Properties p = new Properties();
 
-            try {
-                InputStream ins = getResourceAsStream(VERSION_BASE + "version.properties");
+            try (InputStream ins = getResourceAsStream(VERSION_BASE + "version.properties")) {
                 p.load(ins);
-                ins.close();
             } catch (IOException ex) {
                 // ignore, will end up with defaults
             }

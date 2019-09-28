@@ -26,15 +26,23 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Provider;
 import java.security.spec.AlgorithmParameterSpec;
+import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import javax.security.auth.DestroyFailedException;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.Base64Utility;
 
 public final class HmacUtils {
+
+    private static final Logger LOG = LogUtils.getL7dLogger(CryptoUtils.class);
 
     private HmacUtils() {
 
@@ -56,9 +64,7 @@ public final class HmacUtils {
     public static Mac getMac(String macAlgoJavaName, String provider) {
         try {
             return provider == null ? Mac.getInstance(macAlgoJavaName) : Mac.getInstance(macAlgoJavaName, provider);
-        } catch (NoSuchAlgorithmException e) {
-            throw new SecurityException(e);
-        } catch (NoSuchProviderException e) {
+        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
             throw new SecurityException(e);
         }
     }
@@ -82,7 +88,16 @@ public final class HmacUtils {
     public static byte[] computeHmac(byte[] key, String macAlgoJavaName, AlgorithmParameterSpec spec,
                                      String data) {
         Mac mac = getMac(macAlgoJavaName);
-        return computeHmac(new SecretKeySpec(key, mac.getAlgorithm()), mac, spec, data);
+        SecretKeySpec secretKey = new SecretKeySpec(key, mac.getAlgorithm());
+        byte[] digest = computeHmac(secretKey, mac, spec, data);
+
+        // Here we're finished with the SecretKey we created, so we can destroy it
+        try {
+            secretKey.destroy();
+        } catch (DestroyFailedException e) {
+            LOG.log(Level.FINE, "Error destroying key: {}", e.getMessage());
+        }
+        return digest;
     }
 
     public static byte[] computeHmac(String key, Mac hmac, String data) {
@@ -91,7 +106,15 @@ public final class HmacUtils {
 
     public static byte[] computeHmac(byte[] key, Mac hmac, String data) {
         SecretKeySpec secretKey = new SecretKeySpec(key, hmac.getAlgorithm());
-        return computeHmac(secretKey, hmac, data);
+        byte[] digest = computeHmac(secretKey, hmac, data);
+
+        // Here we're finished with the SecretKey we created, so we can destroy it
+        try {
+            secretKey.destroy();
+        } catch (DestroyFailedException e) {
+            // ignore
+        }
+        return digest;
     }
 
     public static byte[] computeHmac(Key secretKey, Mac hmac, String data) {
@@ -120,9 +143,7 @@ public final class HmacUtils {
             } else {
                 hmac.init(secretKey, spec);
             }
-        } catch (InvalidKeyException e) {
-            throw new SecurityException(e);
-        } catch (InvalidAlgorithmParameterException e) {
+        } catch (InvalidKeyException | InvalidAlgorithmParameterException e) {
             throw new SecurityException(e);
         }
     }
@@ -130,7 +151,19 @@ public final class HmacUtils {
     public static String generateKey(String algo) {
         try {
             KeyGenerator keyGen = KeyGenerator.getInstance(algo);
-            return Base64Utility.encode(keyGen.generateKey().getEncoded());
+            SecretKey secretKey = keyGen.generateKey();
+            byte[] encodedSecretKey = secretKey.getEncoded();
+            String encodedKey = Base64Utility.encode(encodedSecretKey);
+
+            // Clean the key after we're done with it
+            Arrays.fill(encodedSecretKey, (byte) 0);
+            try {
+                secretKey.destroy();
+            } catch (DestroyFailedException e) {
+                // ignore
+            }
+
+            return encodedKey;
         } catch (NoSuchAlgorithmException e) {
             throw new SecurityException(e);
         }

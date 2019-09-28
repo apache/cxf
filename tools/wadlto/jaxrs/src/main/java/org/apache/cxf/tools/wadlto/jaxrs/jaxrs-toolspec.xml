@@ -58,6 +58,16 @@ Examples:
                     <annotation>[schema-namespace =]package-name</annotation>
                 </associatedArgument>
             </option>
+            <option id="jaxbClassNameSuffix">
+                <annotation>
+                    Specify the JAXB class name suffix which will be used to modify
+                    the method signatures where schema-generated types are used
+                </annotation>
+                <switch>jaxbClassNameSuffix</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>jaxb-class-name-suffix</annotation>
+                </associatedArgument>
+            </option>
             <option id="schemaTypeMap" maxOccurs="unbounded">
                 <annotation>
                     Specifies the optional mapping between WADL parameter 
@@ -258,6 +268,26 @@ Examples:
             <option id="javaDocs" maxOccurs="1">
                 <annotation>Convert WADL doc elements to JavaDocs</annotation>
                 <switch>javaDocs</switch>
+            </option>
+            <option id="authentication" maxOccurs="1">
+                <annotation>
+                    Specifies a colon separated user name and password for retrieving the
+                    remote WADL content from the servers requiring the authentication                      
+                </annotation>
+                <associatedArgument placement="afterSpace">
+                    <annotation>authentication</annotation>
+                </associatedArgument>
+                <switch>authentication</switch>
+            </option>
+            <option id="oneway" maxOccurs="1">
+                <annotation>
+                    Specifies a comma separated list of method names or identifiers 
+                    which need to support oneway invocations
+                </annotation>
+                <associatedArgument placement="immediate">
+                    <annotation> methodNames</annotation>
+                </associatedArgument>
+                <switch>oneway</switch>
             </option>
         </optionGroup>
         <optionGroup id="common_options">

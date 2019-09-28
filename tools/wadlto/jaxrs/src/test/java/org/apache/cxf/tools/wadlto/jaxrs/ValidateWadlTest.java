@@ -19,30 +19,26 @@
 
 package org.apache.cxf.tools.wadlto.jaxrs;
 
-import java.net.URISyntaxException;
-
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.wadlto.WadlToolConstants;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class ValidateWadlTest extends ProcessorTestBase {
 
-    @Test
+    @Test(expected = ValidationException.class)
     public void testInvalidWadl() throws Exception {
-        try {
-            JAXRSContainer container = new JAXRSContainer(null);
+        JAXRSContainer container = new JAXRSContainer(null);
 
-            ToolContext context = new ToolContext();
-            context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/invalidWadl.xml"));
-            context.put(WadlToolConstants.CFG_VALIDATE_WADL, "true");
-            container.setContext(context);
-            container.execute();
-            fail("Validation exception expected");
-        } catch (ValidationException e) {
-            // expected
-        }
+        ToolContext context = new ToolContext();
+        context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/invalidWadl.xml"));
+        context.put(WadlToolConstants.CFG_VALIDATE_WADL, "true");
+        container.setContext(context);
+        container.execute();
     }
 
     @Test
@@ -61,7 +57,4 @@ public class ValidateWadlTest extends ProcessorTestBase {
         }
     }
 
-    protected String getLocation(String wsdlFile) throws URISyntaxException {
-        return getClass().getResource(wsdlFile).toString();
-    }
 }

@@ -42,7 +42,9 @@ public class CalendarType extends AegisType {
         }
 
         try {
-            return format.parseObject(value.trim());
+            synchronized (format) {
+                return format.parseObject(value.trim());
+            }
         } catch (ParseException e) {
             throw new DatabindingException("Could not parse xs:dateTime: " + e.getMessage(), e);
         }
@@ -50,6 +52,8 @@ public class CalendarType extends AegisType {
 
     @Override
     public void writeObject(Object object, MessageWriter writer, Context context) {
-        writer.writeValue(format.format(object));
+        synchronized (format) {
+            writer.writeValue(format.format(object));
+        }
     }
 }

@@ -19,6 +19,9 @@
 
 package org.apache.cxf.wsdl11;
 
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,6 +46,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.xml.sax.InputSource;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
@@ -81,7 +85,17 @@ public class WSDLManagerImpl implements WSDLManager {
     }
     private WSDLManagerImpl(Bus b) throws BusException {
         try {
-            factory = WSDLFactory.newInstance();
+            // This is needed to avoid security exceptions when running with a security manager
+            if (System.getSecurityManager() == null) {
+                factory = WSDLFactory.newInstance();
+            } else {
+                try {
+                    factory = AccessController.doPrivileged(
+                            (PrivilegedExceptionAction<WSDLFactory>) WSDLFactory::newInstance);
+                } catch (PrivilegedActionException paex) {
+                    throw new BusException(paex);
+                }
+            }
             registry = factory.newPopulatedExtensionRegistry();
             registry.registerSerializer(Types.class,
                                         WSDLConstants.QNAME_SCHEMA,
@@ -106,8 +120,8 @@ public class WSDLManagerImpl implements WSDLManager {
         } catch (WSDLException e) {
             throw new BusException(e);
         }
-        definitionsMap = new CacheMap<Object, Definition>();
-        schemaCacheMap = new CacheMap<Object, ServiceSchemaInfo>();
+        definitionsMap = new CacheMap<>();
+        schemaCacheMap = new CacheMap<>();
 
         setBus(b);
     }
@@ -138,22 +152,10 @@ public class WSDLManagerImpl implements WSDLManager {
         return bus;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * XXX - getExtensionRegistry()
-     *
-     * @see org.apache.cxf.wsdl.WSDLManager#getExtenstionRegistry()
-     */
     public ExtensionRegistry getExtensionRegistry() {
         return registry;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.cxf.wsdl.WSDLManager#getDefinition(java.lang.String)
-     */
     public Definition getDefinition(String url) throws WSDLException {
         synchronized (definitionsMap) {
             if (definitionsMap.containsKey(url)) {
@@ -167,16 +169,30 @@ public class WSDLManagerImpl implements WSDLManager {
         return def;
     }
 
-    public Definition getDefinition(Element el) throws WSDLException {
+    public Definition getDefinition(final Element el) throws WSDLException {
         synchronized (definitionsMap) {
             if (definitionsMap.containsKey(el)) {
                 return definitionsMap.get(el);
             }
         }
-        WSDLReader reader = factory.newWSDLReader();
+        final WSDLReader reader = factory.newWSDLReader();
         reader.setFeature("javax.wsdl.verbose", false);
         reader.setExtensionRegistry(registry);
-        Definition def = reader.readWSDL("", el);
+
+        final Definition def;
+
+        // This is needed to avoid security exceptions when running with a security manager
+        if (System.getSecurityManager() == null) {
+            def = reader.readWSDL("", el);
+        } else {
+            try {
+                def = AccessController.doPrivileged(
+                        (PrivilegedExceptionAction<Definition>) () -> reader.readWSDL("", el));
+            } catch (PrivilegedActionException paex) {
+                throw new WSDLException(WSDLException.PARSER_ERROR, paex.getMessage(), paex);
+            }
+        }
+
         synchronized (definitionsMap) {
             definitionsMap.put(el, def);
         }
@@ -191,7 +207,7 @@ public class WSDLManagerImpl implements WSDLManager {
     }
 
     protected Definition loadDefinition(String url) throws WSDLException {
-        WSDLReader reader = factory.newWSDLReader();
+        final WSDLReader reader = factory.newWSDLReader();
         reader.setFeature("javax.wsdl.verbose", false);
         reader.setFeature("javax.wsdl.importDocuments", true);
         reader.setExtensionRegistry(registry);
@@ -203,13 +219,13 @@ public class WSDLManagerImpl implements WSDLManager {
         //from the definition.  With this, the String the definition holds onto would be unique
         url = new String(url);
         CatalogWSDLLocator catLocator = new CatalogWSDLLocator(url, bus);
-        ResourceManagerWSDLLocator wsdlLocator = new ResourceManagerWSDLLocator(url,
+        final ResourceManagerWSDLLocator wsdlLocator = new ResourceManagerWSDLLocator(url,
                                                                                 catLocator,
                                                                                 bus);
         InputSource src = wsdlLocator.getBaseInputSource();
         Definition def = null;
         if (src.getByteStream() != null || src.getCharacterStream() != null) {
-            Document doc;
+            final Document doc;
             XMLStreamReader xmlReader = null;
             try {
                 xmlReader = StaxUtils.createXMLStreamReader(src);
@@ -233,9 +249,29 @@ public class WSDLManagerImpl implements WSDLManager {
                     throw new WSDLException(WSDLException.PARSER_ERROR, ex.getMessage(), ex);
                 }
             }
-            def = reader.readWSDL(wsdlLocator, doc.getDocumentElement());
+
+            // This is needed to avoid security exceptions when running with a security manager
+            if (System.getSecurityManager() == null) {
+                def = reader.readWSDL(wsdlLocator, doc.getDocumentElement());
+            } else {
+                try {
+                    def = AccessController.doPrivileged((PrivilegedExceptionAction<Definition>) () ->
+                                    reader.readWSDL(wsdlLocator, doc.getDocumentElement()));
+                } catch (PrivilegedActionException paex) {
+                    throw new WSDLException(WSDLException.PARSER_ERROR, paex.getMessage(), paex);
+                }
+            }
         } else {
-            def = reader.readWSDL(wsdlLocator);
+            if (System.getSecurityManager() == null) {
+                def = reader.readWSDL(wsdlLocator);
+            } else {
+                try {
+                    def = AccessController.doPrivileged((PrivilegedExceptionAction<Definition>) () ->
+                                    reader.readWSDL(wsdlLocator));
+                } catch (PrivilegedActionException paex) {
+                    throw new WSDLException(WSDLException.PARSER_ERROR, paex.getMessage(), paex);
+                }
+            }
         }
 
         return def;

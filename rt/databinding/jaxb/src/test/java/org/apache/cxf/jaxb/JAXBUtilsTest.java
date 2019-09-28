@@ -31,11 +31,14 @@ import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.hello_world_soap_http.types.GreetMe;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
-public class JAXBUtilsTest extends Assert {
+
+public class JAXBUtilsTest {
 
     @Test
     public void testBuiltInTypeToJavaType() {
@@ -88,7 +91,7 @@ public class JAXBUtilsTest extends Assert {
     }
 
     @Test
-    public void testNameToIdentifier() {
+    public void testNameToIdentifier() {        
         assertEquals("_return",
                      JAXBUtils.nameToIdentifier("return", JAXBUtils.IdentifierType.VARIABLE));
         assertEquals("getReturn",
@@ -146,6 +149,10 @@ public class JAXBUtilsTest extends Assert {
                      JAXBUtils.nameToIdentifier("other_punct-chars", JAXBUtils.IdentifierType.GETTER));
         assertEquals("OTHER_PUNCT_CHARS",
                      JAXBUtils.nameToIdentifier("other_punct-chars", JAXBUtils.IdentifierType.CONSTANT));
+        
+        assertEquals("XMLTransfer",
+                     JAXBUtils.nameToIdentifier("XMLTransfer", JAXBUtils.IdentifierType.CLASS));
+
     }
 
     @Test

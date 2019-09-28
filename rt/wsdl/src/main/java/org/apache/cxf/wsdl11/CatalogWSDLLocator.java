@@ -19,7 +19,6 @@
 package org.apache.cxf.wsdl11;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 
 import javax.wsdl.xml.WSDLLocator;
 
@@ -64,8 +63,6 @@ public class CatalogWSDLLocator implements WSDLLocator {
                 if (s != null) {
                     result = resolver.resolve(s, null);
                 }
-            } catch (MalformedURLException e) {
-                //ignore
             } catch (IOException e) {
                 //ignore
             }
@@ -116,7 +113,7 @@ public class CatalogWSDLLocator implements WSDLLocator {
             in = this.resolver.resolve(resolvedImportLocation, null);
         }
 
-        // XXX: If we return null (as per javadoc), a NPE is raised in WSDL4J code.
+        // If we return null (as per javadoc), a NPE is raised in WSDL4J code.
         // So let's return new InputSource() and let WSDL4J fail. Optionally,
         // we can throw a similar exception as in CatalogXmlSchemaURIResolver.
         if (in == null) {

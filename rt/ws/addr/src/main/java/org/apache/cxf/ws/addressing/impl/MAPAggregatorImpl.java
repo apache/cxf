@@ -43,6 +43,7 @@ import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientLifeCycleListener;
@@ -68,7 +69,6 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.MessageObserver;
-import org.apache.cxf.transport.Observable;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
@@ -433,6 +433,10 @@ public class MAPAggregatorImpl extends MAPAggregator {
             }
             AddressingProperties theMaps =
                 ContextUtils.retrieveMAPs(message, false, ContextUtils.isOutbound(message));
+
+            if (isAddressingRequired() && ContextUtils.isRequestor(message)) {
+                theMaps.setRequired(true);
+            }
             if (null != theMaps) {
                 if (ContextUtils.isRequestor(message)) {
                     assertAddressing(message,
@@ -522,7 +526,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
                 && getWSAddressingFeature(message).isAddressingRequired()) {
                 boolean missingWsaHeader = false;
                 AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-                if (aim == null || aim.size() == 0) {
+                if (aim == null || aim.isEmpty()) {
                     missingWsaHeader = true;
                 }
                 if (aim != null && !aim.isEmpty()) {
@@ -576,8 +580,8 @@ public class MAPAggregatorImpl extends MAPAggregator {
             && isAnonymous) {
             passed = true;
         } else if (WSAddressingFeature.AddressingResponses.NON_ANONYMOUS == addressingResponses
-                   && (!anonReply && (faultTo.getAddress() != null && !anonFault)
-                       || !anonReply && faultTo.getAddress() == null)) {
+                   && (!anonReply && (!anonFault && faultTo.getAddress() != null)
+                       || !anonReply && faultTo == null)) {
             passed = true;
         }
         if (!passed) {
@@ -631,7 +635,6 @@ public class MAPAggregatorImpl extends MAPAggregator {
                 maps.setAction(ContextUtils.getAttributedURI(getActionUri(message, true)));
             }
         }
-
         return maps;
     }
 
@@ -983,7 +986,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
             destination = factory.getDestination(ei, bus);
             Conduit conduit = ContextUtils.getConduit(null, message);
             if (conduit != null) {
-                MessageObserver ob = ((Observable)conduit).getMessageObserver();
+                MessageObserver ob = conduit.getMessageObserver();
                 ob = new InterposedMessageObserver(bus, ob);
                 destination.setMessageObserver(ob);
             }
@@ -1115,7 +1118,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
             }
 
             if (!StringUtils.isEmpty(sa) && valid
-                && !MessageUtils.isTrue(message.get(MAPAggregator.ACTION_VERIFIED))) {
+                && !PropertyUtils.isTrue(message.get(MAPAggregator.ACTION_VERIFIED))) {
                 if (sa.startsWith("\"")) {
                     sa = sa.substring(1, sa.lastIndexOf('"'));
                 }

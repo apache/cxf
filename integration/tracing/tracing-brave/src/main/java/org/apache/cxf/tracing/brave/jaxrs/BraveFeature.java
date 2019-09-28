@@ -24,10 +24,9 @@ import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.ext.Provider;
 
-import org.apache.cxf.tracing.brave.HttpServerSpanParser;
-
 import brave.Tracing;
 import brave.http.HttpTracing;
+import org.apache.cxf.tracing.brave.HttpServerSpanParser;
 
 @Provider
 public class BraveFeature implements Feature {
@@ -52,7 +51,7 @@ public class BraveFeature implements Feature {
               .newBuilder(tracing)
               .serverParser(new HttpServerSpanParser())
               .build()
-         );
+        );
     }
 
     public BraveFeature(final HttpTracing brave) {

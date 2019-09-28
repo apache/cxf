@@ -77,7 +77,7 @@ public final class PolicyConstants {
         return findAllPolicyElementsOfLocalName(doc.getDocumentElement(), localName);
     }
     public static List<Element> findAllPolicyElementsOfLocalName(Element el, String localName) {
-        List<Element> ret = new LinkedList<Element>();
+        List<Element> ret = new LinkedList<>();
         findAllPolicyElementsOfLocalName(el, localName, ret);
         return ret;
     }

@@ -38,7 +38,7 @@ import java.lang.annotation.Target;
  * <pre>
  * public Future<?> greetMeAsync(final String requestType,
  *                               final AsyncHandler<GreetMeResponse> asyncHandler) {
- *     final ServerAsyncResponse<GreetMeResponse> r = new ServerAsyncResponse<GreetMeResponse>();
+ *     final ServerAsyncResponse<GreetMeResponse> r = new ServerAsyncResponse<>();
  *     new Thread() {
  *         public void run() {
  *            //do some work on a backgound thread to generate the response...

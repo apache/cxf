@@ -28,10 +28,12 @@ import java.util.Collections;
 
 import org.apache.cxf.validation.BeanValidationProvider;
 import org.apache.cxf.validation.ValidationConfiguration;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class PackageUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class PackageUtilsTest {
     @Test
     public void testGetClassPackageName() throws Exception {
         String packageName = PackageUtils.getPackageName(this.getClass());
@@ -113,4 +115,32 @@ public class PackageUtilsTest extends Assert {
               org.apache.cxf.configuration.spring.JAXBBeanFactory.class));
         assertEquals("org.apache.cxf", packageName);
     }
+
+    @Test
+    public void testParsePackageName() throws Exception {
+        assertEquals("com.example.test.passed",
+                PackageUtils.parsePackageName("http://www.example.com/test:passed", " "));
+        assertEquals("org.apache.cxf.no_body_parts.wsdl",
+                PackageUtils.parsePackageName("urn:org:apache:cxf:no_body_parts/wsdl", ""));
+    }
+
+    @Test
+    public void testGetPackageNameByNameSpaceURI() throws Exception {
+        assertEquals("com.iona.cxf", PackageUtils.getPackageNameByNameSpaceURI("http://www.cxf.iona.com"));
+        assertEquals("com.iona._class", PackageUtils.getPackageNameByNameSpaceURI("urn:www.class.iona.com"));
+        assertEquals("uri.cxf_apache_org.jstest",
+                PackageUtils.getPackageNameByNameSpaceURI("uri:cxf.apache.org:jstest"));
+        assertEquals("soapinterface.ems.esendex.com",
+                PackageUtils.getPackageNameByNameSpaceURI("com.esendex.ems.soapinterface"));
+        assertEquals("ddd.cc.bb.aa.eee.fff_v01_00",
+                PackageUtils.getPackageNameByNameSpaceURI("http://aa.bb.cc.ddd/eee/fff_v01.00"));
+    }
+
+    @Test
+    public void testGetNamespace() throws Exception {
+        final String packageName = PackageUtils.getNamespace(getClass().getPackage().getName());
+        assertEquals("http://util.common.cxf.apache.org/", packageName);
+    }
+
+
 }

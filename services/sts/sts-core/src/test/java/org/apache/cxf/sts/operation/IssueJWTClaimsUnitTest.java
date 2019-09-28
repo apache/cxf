@@ -32,7 +32,9 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
@@ -77,19 +79,23 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenRespons
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.dom.WSConstants;
-import org.junit.Assert;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Some unit tests for the issue operation to issue JWT tokens with Claims information.
  */
-public class IssueJWTClaimsUnitTest extends org.junit.Assert {
+public class IssueJWTClaimsUnitTest {
 
     public static final QName REQUESTED_SECURITY_TOKEN =
         QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(null).getName();
@@ -153,7 +159,7 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         // Validate the token
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token.getTextContent());
         JwtToken jwt = jwtConsumer.getJwtToken();
-        Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
+        assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
         assertEquals(jwt.getClaim(ClaimTypes.LASTNAME.toString()), "doe");
         assertEquals(jwt.getClaim(ROLE_CLAIM.toString()), "administrator");
     }
@@ -170,7 +176,7 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
             issueOperation.issue(request, principal, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
+        assertFalse(securityTokenResponse.isEmpty());
         return securityTokenResponse;
     }
 
@@ -246,7 +252,7 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         // Add a ClaimsType
         ClaimsType claimsType = new ClaimsType();
         claimsType.setDialect(STSConstants.IDT_NS_05_05);
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element claimType = createClaimsType(doc);
         claimsType.getAny().add(claimType);
 
@@ -281,7 +287,7 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         // Validate the token
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token.getTextContent());
         JwtToken jwt = jwtConsumer.getJwtToken();
-        Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
+        assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
         assertEquals(jwt.getClaim(ClaimTypes.LASTNAME.toString()), "doe");
     }
 
@@ -347,7 +353,7 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         ClaimsType claimsType = new ClaimsType();
         claimsType.setDialect(STSConstants.IDT_NS_05_05);
 
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element claimType = createClaimsType(doc);
         claimsType.getAny().add(claimType);
 
@@ -362,8 +368,11 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         // create a SAML Token via the SAMLTokenProvider which contains claims
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
+            createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
                     callbackHandler, realms);
+
+        DocumentFragment f = samlToken.getOwnerDocument().createDocumentFragment();
+        f.appendChild(samlToken);
         Document docToken = samlToken.getOwnerDocument();
         samlToken = (Element)docToken.appendChild(samlToken);
         String samlString = DOM2Writer.nodeToString(samlToken);
@@ -407,7 +416,7 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token.getTextContent());
         JwtToken jwt = jwtConsumer.getJwtToken();
         // subject unchanged
-        Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
+        assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
         // transformed claim (to uppercase)
         assertEquals(jwt.getClaim(ClaimTypes.LASTNAME.toString()), "DOE");
     }
@@ -499,8 +508,7 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         ClaimsType claimsType = new ClaimsType();
         claimsType.setDialect(STSConstants.IDT_NS_05_05);
 
-        Document doc = DOMUtils.createDocument();
-        Element claimType = createClaimsType(doc);
+        Element claimType = createClaimsType(DOMUtils.getEmptyDocument());
         claimsType.getAny().add(claimType);
 
         JAXBElement<ClaimsType> claimsTypeJaxb =
@@ -514,7 +522,7 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         // create a SAML Token via the SAMLTokenProvider which contains claims
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
+            createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
                     callbackHandler, realms);
         Document docToken = samlToken.getOwnerDocument();
         samlToken = (Element)docToken.appendChild(samlToken);
@@ -559,7 +567,7 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token.getTextContent());
         JwtToken jwt = jwtConsumer.getJwtToken();
         // subject changed (to uppercase)
-        Assert.assertEquals("ALICE", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
+        assertEquals("ALICE", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
         // claim unchanged but requested
         assertEquals(jwt.getClaim(ClaimTypes.LASTNAME.toString()), "doe");
     }
@@ -609,13 +617,13 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
      * Mock up an AppliesTo element using the supplied address
      */
     private Element createAppliesToElement(String addressUrl) {
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element appliesTo = doc.createElementNS(STSConstants.WSP_NS, "wsp:AppliesTo");
-        appliesTo.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsp", STSConstants.WSP_NS);
+        appliesTo.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsp", STSConstants.WSP_NS);
         Element endpointRef = doc.createElementNS(STSConstants.WSA_NS_05, "wsa:EndpointReference");
-        endpointRef.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
+        endpointRef.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
         Element address = doc.createElementNS(STSConstants.WSA_NS_05, "wsa:Address");
-        address.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
+        address.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
         address.setTextContent(addressUrl);
         endpointRef.appendChild(address);
         appliesTo.appendChild(endpointRef);
@@ -637,9 +645,9 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
      * Mock up a SecondaryParameters DOM Element containing some claims
      */
     private Element createSecondaryParameters() {
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element secondary = doc.createElementNS(STSConstants.WST_NS_05_12, "SecondaryParameters");
-        secondary.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", STSConstants.WST_NS_05_12);
+        secondary.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns", STSConstants.WST_NS_05_12);
 
         Element claims = doc.createElementNS(STSConstants.WST_NS_05_12, "Claims");
         claims.setAttributeNS(null, "Dialect", STSConstants.IDT_NS_05_05);
@@ -658,7 +666,7 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         claimType.setAttributeNS(
             null, "Uri", ClaimTypes.LASTNAME.toString()
         );
-        claimType.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", STSConstants.IDT_NS_05_05);
+        claimType.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns", STSConstants.IDT_NS_05_05);
 
         return claimType;
     }
@@ -666,7 +674,7 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
     private Element createClaimValue(Document doc) {
         Element claimValue = doc.createElementNS(STSConstants.IDT_NS_05_05, "ClaimValue");
         claimValue.setAttributeNS(null, "Uri", ROLE_CLAIM.toString());
-        claimValue.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", STSConstants.IDT_NS_05_05);
+        claimValue.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns", STSConstants.IDT_NS_05_05);
         Element value = doc.createElementNS(STSConstants.IDT_NS_05_05, "Value");
         value.setTextContent("administrator");
         claimValue.appendChild(value);
@@ -722,7 +730,7 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         providerParameters.setRequestedSecondaryClaims(requestedClaims);
 
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         return (Element)providerResponse.getToken();

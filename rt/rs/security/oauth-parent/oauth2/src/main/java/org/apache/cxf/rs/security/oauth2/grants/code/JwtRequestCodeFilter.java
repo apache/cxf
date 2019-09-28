@@ -83,7 +83,7 @@ public class JwtRequestCodeFilter extends OAuthJoseJwtConsumer implements Author
                 throw new SecurityException();
             }
 
-            MultivaluedMap<String, String> newParams = new MetadataMap<String, String>(params);
+            MultivaluedMap<String, String> newParams = new MetadataMap<>(params);
             Map<String, Object> claimsMap = claims.asMap();
             for (Map.Entry<String, Object> entry : claimsMap.entrySet()) {
                 String key = entry.getKey();
@@ -98,9 +98,8 @@ public class JwtRequestCodeFilter extends OAuthJoseJwtConsumer implements Author
                 newParams.putSingle(key, value.toString());
             }
             return newParams;
-        } else {
-            return params;
         }
+        return params;
     }
     private boolean isRequestUriValid(Client client, String requestUri) {
         //TODO: consider restricting to specific hosts

@@ -79,18 +79,16 @@ public final class TypeUtil {
                          + "\" was specified, but no corresponding AegisType was registered; defaulting to "
                          + baseType.getSchemaType());
                 return baseType;
-            } else {
-                LOG.warning("xsi:type=\"" + overrideName
-                         + "\" was specified, but no corresponding AegisType was registered; no default.");
-                return null;
             }
-        } else {
-            if (baseType == null) {
-                LOG.warning("xsi:type absent, and no type available for "
-                         + xsr.getName());
-            }
-            return baseType;
+            LOG.warning("xsi:type=\"" + overrideName
+                     + "\" was specified, but no corresponding AegisType was registered; no default.");
+            return null;
         }
+        if (baseType == null) {
+            LOG.warning("xsi:type absent, and no type available for "
+                     + xsr.getName());
+        }
+        return baseType;
     }
 
     /**
@@ -174,9 +172,8 @@ public final class TypeUtil {
                                               java.lang.reflect.Type reflectType) {
         if (reflectType == null) {
             return getWriteTypeStandalone(globalContext, value, (AegisType)null);
-        } else {
-            return globalContext.getTypeMapping().getTypeCreator().createType(reflectType);
         }
+        return globalContext.getTypeMapping().getTypeCreator().createType(reflectType);
 
 
     }

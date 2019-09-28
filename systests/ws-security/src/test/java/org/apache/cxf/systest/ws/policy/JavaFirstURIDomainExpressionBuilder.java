@@ -22,8 +22,11 @@ package org.apache.cxf.systest.ws.policy;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+
 import javax.xml.namespace.QName;
+
 import org.w3c.dom.Element;
+
 import org.apache.cxf.ws.policy.attachment.external.DomainExpression;
 import org.apache.cxf.ws.policy.attachment.external.DomainExpressionBuilder;
 

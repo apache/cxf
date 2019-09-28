@@ -22,9 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.cxf.sts.request.TokenRequirements;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
 import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
-import org.apache.wss4j.dom.WSConstants;
 
 /**
  * A default AttributeStatementProvider implementation. It simply creates a default attribute with
@@ -55,8 +55,8 @@ public class DefaultAttributeStatementProvider implements AttributeStatementProv
     private AttributeBean createDefaultAttribute(String tokenType) {
         AttributeBean attributeBean = new AttributeBean();
 
-        if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
-            || WSConstants.SAML_NS.equals(tokenType)) {
+        if (WSS4JConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+            || WSS4JConstants.SAML_NS.equals(tokenType)) {
             attributeBean.setSimpleName("token-requestor");
             attributeBean.setQualifiedName("http://cxf.apache.org/sts");
         } else {

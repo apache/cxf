@@ -66,10 +66,10 @@ public class EndpointBean implements EndpointInterface {
         DataHandler dataHandler = request.getDataHandler();
 
         try {
-            if (!dataHandler.getContentType().equals("text/plain")) {
+            if (!"text/plain".equals(dataHandler.getContentType())) {
                 throw new WebServiceException("Wrong content type");
             }
-            if (!dataHandler.getContent().equals("some string")) {
+            if (!"some string".equals(dataHandler.getContent())) {
                 throw new WebServiceException("Wrong data");
             }
         } catch (IOException e) {

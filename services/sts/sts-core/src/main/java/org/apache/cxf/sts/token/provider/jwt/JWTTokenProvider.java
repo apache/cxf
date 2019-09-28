@@ -46,7 +46,6 @@ import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.SignatureProperties;
-import org.apache.cxf.sts.cache.CacheUtils;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
@@ -55,7 +54,6 @@ import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.sts.token.realm.RealmProperties;
 import org.apache.cxf.ws.security.sts.provider.STSException;
-import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
@@ -139,23 +137,9 @@ public class JWTTokenProvider implements TokenProvider {
                 response.setExpires(expires);
             }
 
-            // set the token in cache (only if the token is signed)
-            if (signToken && tokenParameters.getTokenStore() != null) {
-                SecurityToken securityToken =
-                    CacheUtils.createSecurityTokenForStorage(null, claims.getTokenId(),
-                        expires, tokenParameters.getPrincipal(), tokenParameters.getRealm(),
-                        tokenParameters.getTokenRequirements().getRenewing());
-                securityToken.setData(tokenData.getBytes());
-
-                String signature = tokenData.substring(tokenData.lastIndexOf(".") + 1);
-                CacheUtils.storeTokenInCache(
-                    securityToken, tokenParameters.getTokenStore(), signature.getBytes());
-            }
-
             LOG.fine("JWT Token successfully created");
             return response;
         } catch (Exception e) {
-            e.printStackTrace();
             LOG.log(Level.WARNING, "", e);
             throw new STSException("Can't serialize JWT token", e, STSException.REQUEST_FAILED);
         }
@@ -245,9 +229,12 @@ public class JWTTokenProvider implements TokenProvider {
                 }
             }
             // Get the password
-            WSPasswordCallback[] cb = {new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE)};
-            callbackHandler.handle(cb);
-            String password = cb[0].getPassword();
+            String password = null;
+            if (callbackHandler != null) {
+                WSPasswordCallback[] cb = {new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE)};
+                callbackHandler.handle(cb);
+                password = cb[0].getPassword();
+            }
 
             Properties signingProperties = new Properties();
 
@@ -274,11 +261,10 @@ public class JWTTokenProvider implements TokenProvider {
                 JwsUtils.loadSignatureProvider(signingProperties, jwsHeaders);
 
             return jws.signWith(sigProvider);
-        } else {
-            JwsHeaders jwsHeaders = new JwsHeaders(SignatureAlgorithm.NONE);
-            JwsJwtCompactProducer jws = new JwsJwtCompactProducer(jwsHeaders, claims);
-            return jws.getSignedEncodedJws();
         }
+        JwsHeaders jwsHeaders = new JwsHeaders(SignatureAlgorithm.NONE);
+        JwsJwtCompactProducer jws = new JwsJwtCompactProducer(jwsHeaders, claims);
+        return jws.getSignedEncodedJws();
 
     }
 

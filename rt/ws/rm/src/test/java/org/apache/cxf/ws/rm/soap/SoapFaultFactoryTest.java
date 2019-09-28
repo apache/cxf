@@ -37,17 +37,20 @@ import org.apache.cxf.ws.rm.SequenceFault;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.apache.cxf.ws.rm.v200702.SequenceFaultType;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 
 /**
  *
  */
-public class SoapFaultFactoryTest extends Assert {
+public class SoapFaultFactoryTest {
 
     private IMocksControl control;
     private SequenceFault sf;
@@ -135,8 +138,8 @@ public class SoapFaultFactoryTest extends Assert {
         ack.setIdentifier(id);
         SequenceAcknowledgement.AcknowledgementRange range =
             new SequenceAcknowledgement.AcknowledgementRange();
-        range.setLower(new Long(1));
-        range.setUpper(new Long(10));
+        range.setLower(Long.valueOf(1));
+        range.setUpper(Long.valueOf(10));
         ack.getAcknowledgementRange().add(range);
         setupSequenceFault(true, RM10Constants.INVALID_ACKNOWLEDGMENT_FAULT_QNAME, ack);
         control.replay();

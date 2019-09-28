@@ -19,7 +19,7 @@
 
 package org.apache.cxf.javascript.fortest;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -159,7 +159,7 @@ public class AnyImpl implements AcceptAny {
         a1 = new Alternative1();
         a1.setChalk("sidewalk");
         objects[3] = a1;
-        r.getAny().addAll(Arrays.asList(objects));
+        Collections.addAll(r.getAny(), objects);
         return r;
     }
 

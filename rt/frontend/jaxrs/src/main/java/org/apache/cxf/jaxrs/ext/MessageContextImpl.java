@@ -45,6 +45,7 @@ import javax.ws.rs.ext.Providers;
 import org.apache.cxf.attachment.AttachmentDeserializer;
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.attachment.AttachmentUtil;
+import org.apache.cxf.attachment.HeaderSizeExceededException;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
@@ -64,6 +65,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
 
 public class MessageContextImpl implements MessageContext {
+
     private Message m;
     public MessageContextImpl(Message m) {
         this.m = m;
@@ -77,6 +79,8 @@ public class MessageContextImpl implements MessageContext {
                 return createAttachments(key.toString());
             } catch (CacheSizeExceededException e) {
                 m.getExchange().put("cxf.io.cacheinput", Boolean.FALSE);
+                throw new WebApplicationException(e, 413);
+            } catch (HeaderSizeExceededException e) {
                 throw new WebApplicationException(e, 413);
             }
         }
@@ -125,9 +129,8 @@ public class MessageContextImpl implements MessageContext {
         Object value = m.getContextualProperty(key.toString());
         if (value == null && key.getClass() == Class.class) {
             return m.getExchange().get((Class<?>)key);
-        } else {
-            return value;
         }
+        return value;
     }
 
     public <T> T getContext(Class<T> contextClass) {
@@ -198,7 +201,7 @@ public class MessageContextImpl implements MessageContext {
     private void convertToAttachments(Object value) {
         List<?> handlers = (List<?>)value;
         List<org.apache.cxf.message.Attachment> atts =
-            new ArrayList<org.apache.cxf.message.Attachment>();
+            new ArrayList<>();
 
         for (int i = 1; i < handlers.size(); i++) {
             Attachment handler = (Attachment)handlers.get(i);
@@ -215,7 +218,7 @@ public class MessageContextImpl implements MessageContext {
         Attachment root = (Attachment)handlers.get(0);
 
         String rootContentType = root.getContentType().toString();
-        MultivaluedMap<String, String> rootHeaders = new MetadataMap<String, String>(root.getHeaders());
+        MultivaluedMap<String, String> rootHeaders = new MetadataMap<>(root.getHeaders());
         if (!AttachmentUtil.isMtomEnabled(outMessage)) {
             rootHeaders.putSingle(Message.CONTENT_TYPE, rootContentType);
         }
@@ -269,6 +272,8 @@ public class MessageContextImpl implements MessageContext {
                 m.getExchange().getInMessage().get(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD));
             inMessage.put(AttachmentDeserializer.ATTACHMENT_MAX_SIZE,
                 m.getExchange().getInMessage().get(AttachmentDeserializer.ATTACHMENT_MAX_SIZE));
+            inMessage.put(AttachmentDeserializer.ATTACHMENT_MAX_HEADER_SIZE,
+                m.getExchange().getInMessage().get(AttachmentDeserializer.ATTACHMENT_MAX_HEADER_SIZE));
             inMessage.setContent(InputStream.class,
                 m.getExchange().getInMessage().get("org.apache.cxf.multipart.embedded.input"));
             inMessage.put(Message.CONTENT_TYPE,
@@ -278,10 +283,11 @@ public class MessageContextImpl implements MessageContext {
 
         new AttachmentInputInterceptor().handleMessage(inMessage);
 
-        List<Attachment> newAttachments = new LinkedList<Attachment>();
+        List<Attachment> newAttachments = new LinkedList<>();
         try {
             Map<String, List<String>> headers
                 = CastUtils.cast((Map<?, ?>)inMessage.get(AttachmentDeserializer.ATTACHMENT_PART_HEADERS));
+
             Attachment first = new Attachment(AttachmentUtil.createAttachment(
                                      inMessage.getContent(InputStream.class),
                                      headers),
@@ -296,7 +302,6 @@ public class MessageContextImpl implements MessageContext {
         if (childAttachments == null) {
             childAttachments = Collections.emptyList();
         }
-        childAttachments.size();
         for (org.apache.cxf.message.Attachment a : childAttachments) {
             newAttachments.add(new Attachment(a, new ProvidersImpl(inMessage)));
         }

@@ -109,10 +109,9 @@ public class AssertionBuilderRegistryImpl extends AssertionBuilderFactoryImpl im
                 LOG.warning(m.toString());
             }
             return new XMLPrimitiveAssertionBuilder();
-        } else {
-            Message m = new Message("NO_ASSERTIONBUILDER_EXC", BUNDLE, qname.toString());
-            throw new PolicyException(m);
         }
+        Message m = new Message("NO_ASSERTIONBUILDER_EXC", BUNDLE, qname.toString());
+        throw new PolicyException(m);
     }
 
 }

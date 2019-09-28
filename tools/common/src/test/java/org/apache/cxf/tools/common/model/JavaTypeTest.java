@@ -19,10 +19,11 @@
 
 package org.apache.cxf.tools.common.model;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JavaTypeTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class JavaTypeTest {
     @Test
     public void testGetPredefinedDefaultTypeValue() throws Exception {
         assertEquals("0", new JavaType("i", int.class.getName(), null).getDefaultTypeValue());

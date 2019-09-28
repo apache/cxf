@@ -44,14 +44,13 @@ import net.oauth.OAuthMessage;
 import net.oauth.OAuthProblemException;
 import net.oauth.OAuthValidator;
 import net.oauth.server.OAuthServlet;
-
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.FormUtils;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.oauth.data.Client;
 import org.apache.cxf.rs.security.oauth.data.RequestToken;
@@ -74,7 +73,7 @@ public final class OAuthUtils {
         String theURI = wildcard ? uri.substring(0, uri.length() - 1) : uri;
         try {
             URITemplate template = new URITemplate(theURI);
-            MultivaluedMap<String, String> map = new MetadataMap<String, String>();
+            MultivaluedMap<String, String> map = new MetadataMap<>();
             if (template.match(servletPath, map)) {
                 String finalGroup = map.getFirst(URITemplate.FINAL_MATCH_GROUP);
                 if (wildcard || StringUtils.isEmpty(finalGroup) || "/".equals(finalGroup)) {
@@ -139,7 +138,7 @@ public final class OAuthUtils {
             InputStream stream = mc != null
                 ? mc.getContent(InputStream.class) : oAuthMessage.getBodyAsStream();
             String body = FormUtils.readBody(stream, enc);
-            MultivaluedMap<String, String> map = new MetadataMap<String, String>();
+            MultivaluedMap<String, String> map = new MetadataMap<>();
             FormUtils.populateMapFromString(map, PhaseInterceptorChain.getCurrentMessage(), body, enc, true,
                                             request);
             for (String key : map.keySet()) {
@@ -149,7 +148,7 @@ public final class OAuthUtils {
             // This path will most likely work only for the AuthorizationRequestService
             // when processing a user confirmation with only 3 parameters expected
             String ct = request.getContentType();
-            if (ct != null && MediaType.APPLICATION_FORM_URLENCODED.equals(ct)) {
+            if (MediaType.APPLICATION_FORM_URLENCODED.equals(ct)) {
                 Map<String, List<String>> map = new HashMap<>();
                 for (Entry<String, String> param : params) {
                     map.put(param.getKey(), Collections.singletonList(param.getValue()));
@@ -164,8 +163,8 @@ public final class OAuthUtils {
                                            Exception e,
                                            int status) {
         ResponseBuilder builder = Response.status(status);
-        if (MessageUtils.isTrue(mc.getContextualProperty(REPORT_FAILURE_DETAILS))) {
-            boolean asHeader = MessageUtils.isTrue(
+        if (PropertyUtils.isTrue(mc.getContextualProperty(REPORT_FAILURE_DETAILS))) {
+            boolean asHeader = PropertyUtils.isTrue(
                 mc.getContextualProperty(REPORT_FAILURE_DETAILS_AS_HEADER));
             String text = null;
             if (e instanceof OAuthProblemException) {

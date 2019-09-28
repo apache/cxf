@@ -18,14 +18,14 @@
  */
 package org.apache.cxf.aegis.type.basic;
 
-import junit.framework.TestCase;
-
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.type.TypeMapping;
+
+import org.junit.Assert;
 import org.junit.Test;
 
-public class BadXMLTest extends TestCase {
+public class BadXMLTest {
     TypeMapping mapping;
 
 
@@ -36,7 +36,7 @@ public class BadXMLTest extends TestCase {
         mapping = context.getTypeMapping();
         try {
             mapping.getTypeCreator().createType(BadBeanDescriptor.class);
-            fail("No exception was thrown");
+            Assert.fail("No exception was thrown");
         } catch (DatabindingException e) {
             // this is supposed to happen
         }

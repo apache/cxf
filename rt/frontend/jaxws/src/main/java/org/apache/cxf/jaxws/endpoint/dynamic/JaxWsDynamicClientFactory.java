@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxws.endpoint.dynamic;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.endpoint.EndpointImplFactory;
 import org.apache.cxf.endpoint.dynamic.DynamicClientFactory;
@@ -68,7 +69,7 @@ public class JaxWsDynamicClientFactory extends DynamicClientFactory {
      * @see CXFBusFactory#getDefaultBus()
      */
     public static JaxWsDynamicClientFactory newInstance() {
-        Bus bus = CXFBusFactory.getThreadDefaultBus();
+        Bus bus = BusFactory.getThreadDefaultBus();
         return new JaxWsDynamicClientFactory(bus);
     }
 }

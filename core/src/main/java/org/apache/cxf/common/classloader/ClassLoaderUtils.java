@@ -36,26 +36,46 @@ import java.util.List;
  * verify any change on 6 different application servers.
  */
 public final class ClassLoaderUtils {
+    private static final boolean SKIP_SM = System.getSecurityManager() == null;
 
     private ClassLoaderUtils() {
     }
 
     public static class ClassLoaderHolder {
         ClassLoader loader;
-        ClassLoaderHolder(ClassLoader c) {
-            loader = c;
+        Thread thread;
+
+        ClassLoaderHolder(final ClassLoader c, final Thread thread) {
+            this.loader = c;
+            this.thread = thread;
         }
 
         public void reset() {
-            ClassLoaderUtils.setThreadContextClassloader(loader);
+            if (SKIP_SM) {
+                thread.setContextClassLoader(loader);
+            } else {
+                AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                    public Void run() {
+                        thread.setContextClassLoader(loader);
+                        return null;
+                    }
+                });
+            }
         }
     }
     public static ClassLoaderHolder setThreadContextClassloader(final ClassLoader newLoader) {
+        if (SKIP_SM) {
+            final Thread thread = Thread.currentThread();
+            final ClassLoader l = thread.getContextClassLoader();
+            thread.setContextClassLoader(newLoader);
+            return new ClassLoaderHolder(l, thread);
+        }
         return AccessController.doPrivileged(new PrivilegedAction<ClassLoaderHolder>() {
             public ClassLoaderHolder run() {
-                ClassLoader l = Thread.currentThread().getContextClassLoader();
-                Thread.currentThread().setContextClassLoader(newLoader);
-                return new ClassLoaderHolder(l);
+                final Thread thread = Thread.currentThread();
+                final ClassLoader l = thread.getContextClassLoader();
+                thread.setContextClassLoader(newLoader);
+                return new ClassLoaderHolder(l, thread);
             }
         });
     }
@@ -73,7 +93,7 @@ public final class ClassLoaderUtils {
     public static ClassLoader getURLClassLoader(
         final List<URL> urlList, final ClassLoader parent
     ) {
-        return getURLClassLoader(urlList.toArray(new URL[urlList.size()]), parent);
+        return getURLClassLoader(urlList.toArray(new URL[0]), parent);
     }
 
     /**
@@ -89,10 +109,11 @@ public final class ClassLoaderUtils {
      * @param callingClass The Class object of the calling object
      */
     public static URL getResource(String resourceName, Class<?> callingClass) {
-        URL url = getContextClassLoader().getResource(resourceName);
+        ClassLoader contextClassLoader = getContextClassLoader();
+        URL url = contextClassLoader.getResource(resourceName);
         if (url == null && resourceName.startsWith("/")) {
             //certain classloaders need it without the leading /
-            url = getContextClassLoader().getResource(resourceName.substring(1));
+            url = contextClassLoader.getResource(resourceName.substring(1));
         }
 
         ClassLoader cluClassloader = ClassLoaderUtils.class.getClassLoader();
@@ -107,7 +128,7 @@ public final class ClassLoaderUtils {
             url = cluClassloader.getResource(resourceName.substring(1));
         }
 
-        if (url == null) {
+        if (url == null && callingClass != null) {
             ClassLoader cl = callingClass.getClassLoader();
 
             if (cl != null) {
@@ -115,7 +136,7 @@ public final class ClassLoaderUtils {
             }
         }
 
-        if (url == null) {
+        if (url == null && callingClass != null) {
             url = callingClass.getResource(resourceName);
         }
 
@@ -257,6 +278,7 @@ public final class ClassLoaderUtils {
         }
         return loadClass2(className, callingClass);
     }
+
     public static <T> Class<? extends T> loadClass(String className, Class<?> callingClass, Class<T> type)
         throws ClassNotFoundException {
         try {
@@ -270,6 +292,16 @@ public final class ClassLoaderUtils {
         }
         return loadClass2(className, callingClass).asSubclass(type);
     }
+
+    public static String getClassLoaderName(Class<?> type) {
+        ClassLoader loader = getClassLoader(type);
+        return loader == null ? "null" : loader.toString();
+    }
+
+    public static Class<?> loadClassFromContextLoader(String className) throws ClassNotFoundException {
+        return getContextClassLoader().loadClass(className);
+    }
+
     private static Class<?> loadClass2(String className, Class<?> callingClass)
         throws ClassNotFoundException {
         try {
@@ -301,7 +333,7 @@ public final class ClassLoaderUtils {
                     return loader != null ? loader : ClassLoader.getSystemClassLoader();
                 }
             });
-        } 
+        }
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         return loader != null ? loader : ClassLoader.getSystemClassLoader();
     }

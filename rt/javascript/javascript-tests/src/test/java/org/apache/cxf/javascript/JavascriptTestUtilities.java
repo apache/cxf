@@ -36,7 +36,6 @@ import org.apache.cxf.javascript.types.SchemaJavascriptBuilder;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.test.TestUtilities;
-import org.junit.Assert;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Function;
@@ -44,6 +43,8 @@ import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
+
+import org.junit.Assert;
 
 /**
  * Test utilities class with some Javascript capability included.
@@ -210,11 +211,7 @@ public class JavascriptTestUtilities extends TestUtilities {
 
             // so that the stock test for IE can gracefully fail.
             rhinoContext.evaluateString(rhinoScope, "var window = new Object();", "<internal>", 0, null);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new RuntimeException(e);
         } finally {
             Context.exit();

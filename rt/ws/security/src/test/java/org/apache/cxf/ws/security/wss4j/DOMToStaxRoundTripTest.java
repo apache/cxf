@@ -34,13 +34,18 @@ import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.wss4j.common.ConfigurationConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.CryptoFactory;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * In these test-cases, the client is using DOM and the service is using StaX.
@@ -66,10 +71,10 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
-        properties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
-        properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        properties.put(WSHandlerConstants.USER, "username");
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
+        properties.put(ConfigurationConstants.PASSWORD_TYPE, WSS4JConstants.PW_TEXT);
+        properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        properties.put(ConfigurationConstants.USER, "username");
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
@@ -114,10 +119,10 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
-        properties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
-        properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        properties.put(WSHandlerConstants.USER, "username");
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
+        properties.put(ConfigurationConstants.PASSWORD_TYPE, WSS4JConstants.PW_DIGEST);
+        properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        properties.put(ConfigurationConstants.USER, "username");
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
@@ -163,10 +168,10 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
-        properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        properties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
-        properties.put(WSHandlerConstants.USER, "myalias");
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        properties.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
+        properties.put(ConfigurationConstants.USER, "myalias");
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
@@ -195,12 +200,12 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
-        properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        properties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
-        properties.put(WSHandlerConstants.USER, "myalias");
-        properties.put(WSHandlerConstants.ENC_KEY_TRANSPORT, WSConstants.KEYTRANSPORT_RSA15);
-        properties.put(WSHandlerConstants.ENC_SYM_ALGO, WSConstants.TRIPLE_DES);
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        properties.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
+        properties.put(ConfigurationConstants.USER, "myalias");
+        properties.put(ConfigurationConstants.ENC_KEY_TRANSPORT, WSS4JConstants.KEYTRANSPORT_RSA15);
+        properties.put(ConfigurationConstants.ENC_SYM_ALGO, WSS4JConstants.TRIPLE_DES);
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
@@ -241,13 +246,13 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
 
         Map<String, Object> properties = new HashMap<>();
         properties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.ENCRYPT
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.ENCRYPT
         );
-        properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        properties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
-        properties.put(WSHandlerConstants.USER, "username");
-        properties.put(WSHandlerConstants.ENCRYPTION_USER, "myalias");
+        properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        properties.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
+        properties.put(ConfigurationConstants.USER, "username");
+        properties.put(ConfigurationConstants.ENCRYPTION_USER, "myalias");
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
@@ -276,10 +281,10 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        properties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
-        properties.put(WSHandlerConstants.USER, "myalias");
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        properties.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        properties.put(ConfigurationConstants.USER, "myalias");
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
@@ -309,12 +314,12 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
 
         Map<String, Object> properties = new HashMap<>();
         properties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.USERNAME_TOKEN
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.SIGNATURE + " " + ConfigurationConstants.USERNAME_TOKEN
         );
-        properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        properties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
-        properties.put(WSHandlerConstants.USER, "myalias");
+        properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        properties.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        properties.put(ConfigurationConstants.USER, "myalias");
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
@@ -340,7 +345,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.TIMESTAMP);
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.TIMESTAMP);
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
@@ -370,17 +375,17 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
 
         Map<String, Object> properties = new HashMap<>();
         properties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.TIMESTAMP + " " + ConfigurationConstants.SIGNATURE
         );
         properties.put(
-            WSHandlerConstants.SIGNATURE_PARTS,
+            ConfigurationConstants.SIGNATURE_PARTS,
             "{}{" + WSSConstants.NS_WSU10 + "}Timestamp;"
             + "{}{" + WSSConstants.NS_SOAP11 + "}Body;"
         );
-        properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        properties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
-        properties.put(WSHandlerConstants.USER, "myalias");
+        properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        properties.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        properties.put(ConfigurationConstants.USER, "myalias");
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
@@ -410,17 +415,17 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
 
         Map<String, Object> properties = new HashMap<>();
         properties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.TIMESTAMP + " " + ConfigurationConstants.SIGNATURE
         );
         properties.put(
-            WSHandlerConstants.SIGNATURE_PARTS,
+            ConfigurationConstants.SIGNATURE_PARTS,
             "{}{" + WSSConstants.NS_WSSE10 + "}Timestamp;"
             + "{}{" + WSSConstants.NS_SOAP11 + "}Body;"
         );
-        properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        properties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
-        properties.put(WSHandlerConstants.USER, "myalias");
+        properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        properties.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        properties.put(ConfigurationConstants.USER, "myalias");
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
@@ -454,12 +459,12 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        properties.put(WSHandlerConstants.PW_CALLBACK_REF, new KeystorePasswordCallback());
-        properties.put(WSHandlerConstants.SIG_PROP_FILE, "alice.properties");
-        properties.put(WSHandlerConstants.USER, "alice");
-        properties.put(WSHandlerConstants.USE_SINGLE_CERTIFICATE, "true");
-        properties.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        properties.put(ConfigurationConstants.PW_CALLBACK_REF, new KeystorePasswordCallback());
+        properties.put(ConfigurationConstants.SIG_PROP_FILE, "alice.properties");
+        properties.put(ConfigurationConstants.USER, "alice");
+        properties.put(ConfigurationConstants.USE_SINGLE_CERTIFICATE, "true");
+        properties.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
@@ -490,13 +495,13 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
 
         Map<String, Object> properties = new HashMap<>();
         properties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.SIGNATURE + " " + ConfigurationConstants.ENCRYPT
         );
-        properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        properties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
-        properties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
-        properties.put(WSHandlerConstants.USER, "myalias");
+        properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        properties.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        properties.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
+        properties.put(ConfigurationConstants.USER, "myalias");
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
@@ -518,8 +523,8 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         service.getInInterceptors().add(inhandler);
 
         WSSSecurityProperties outProperties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
-        actions.add(WSSConstants.SIGNATURE);
+        List<WSSConstants.Action> actions = new ArrayList<>();
+        actions.add(XMLSecurityConstants.SIGNATURE);
         actions.add(WSSConstants.SIGNATURE_CONFIRMATION);
         outProperties.setActions(actions);
         outProperties.setSignatureUser("myalias");
@@ -539,20 +544,20 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        properties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
-        properties.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
-        properties.put(WSHandlerConstants.USER, "myalias");
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        properties.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        properties.put(ConfigurationConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
+        properties.put(ConfigurationConstants.USER, "myalias");
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
 
         Map<String, Object> domInProperties = new HashMap<>();
-        domInProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        domInProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        domInProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
-        domInProperties.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
+        domInProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        domInProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        domInProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        domInProperties.put(ConfigurationConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(domInProperties);
         client.getInInterceptors().add(inInterceptor);
 

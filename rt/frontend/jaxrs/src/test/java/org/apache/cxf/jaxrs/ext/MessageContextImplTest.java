@@ -47,12 +47,16 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
-import org.easymock.EasyMock;
 
-import org.junit.Assert;
+import org.easymock.EasyMock;
 import org.junit.Test;
 
-public class MessageContextImplTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+
+public class MessageContextImplTest {
 
     @Test
     public void testGetProperty() {
@@ -178,8 +182,7 @@ public class MessageContextImplTest extends Assert {
         m.setExchange(ex);
         ex.setInMessage(m);
         Endpoint e = EasyMock.createMock(Endpoint.class);
-        e.get(ServerProviderFactory.class.getName());
-        EasyMock.expectLastCall().andReturn(factory);
+        EasyMock.expect(e.get(ServerProviderFactory.class.getName())).andReturn(factory);
         EasyMock.replay(e);
         ex.put(Endpoint.class, e);
         MessageContext mc = new MessageContextImpl(m);
@@ -202,17 +205,12 @@ public class MessageContextImplTest extends Assert {
         Exchange e = new ExchangeImpl();
         m.setExchange(e);
         e.setInMessage(m);
-        Endpoint endpoint = EasyMock.createMock(Endpoint.class);
-        endpoint.getEndpointInfo();
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
-        endpoint.get(Application.class.getName());
-        EasyMock.expectLastCall().andReturn(null);
-        endpoint.size();
-        EasyMock.expectLastCall().andReturn(0).anyTimes();
-        endpoint.isEmpty();
-        EasyMock.expectLastCall().andReturn(true).anyTimes();
-        endpoint.get(ServerProviderFactory.class.getName());
-        EasyMock.expectLastCall().andReturn(factory).anyTimes();
+        Endpoint endpoint = EasyMock.mock(Endpoint.class);
+        EasyMock.expect(endpoint.getEndpointInfo()).andReturn(null).anyTimes();
+        EasyMock.expect(endpoint.get(Application.class.getName())).andReturn(null);
+        EasyMock.expect(endpoint.size()).andReturn(0).anyTimes();
+        EasyMock.expect(endpoint.isEmpty()).andReturn(true).anyTimes();
+        EasyMock.expect(endpoint.get(ServerProviderFactory.class.getName())).andReturn(factory).anyTimes();
         EasyMock.replay(endpoint);
         e.put(Endpoint.class, endpoint);
         return m;
@@ -221,7 +219,6 @@ public class MessageContextImplTest extends Assert {
     public static class CustomContextResolver implements ContextResolver<JAXBContext> {
 
         public JAXBContext getContext(Class<?> type) {
-            // TODO Auto-generated method stub
             return null;
         }
 

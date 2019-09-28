@@ -27,6 +27,7 @@ import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.logging.Level;
 
+import javax.security.auth.DestroyFailedException;
 import javax.security.auth.callback.CallbackHandler;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
@@ -34,6 +35,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -43,6 +45,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.util.DOM2Writer;
+import org.apache.xml.security.algorithms.JCEMapper;
 import org.opensaml.saml.saml2.core.AuthnRequest;
 
 public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
@@ -52,34 +55,33 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
         Message m = JAXRSUtils.getCurrentMessage();
         if (checkSecurityContext(m)) {
             return;
-        } else {
-            try {
-                SamlRequestInfo info = createSamlRequestInfo(m);
-                String urlEncodedRequest =
-                    URLEncoder.encode(info.getSamlRequest(), StandardCharsets.UTF_8.name());
+        }
+        try {
+            SamlRequestInfo info = createSamlRequestInfo(m);
+            String urlEncodedRequest =
+                URLEncoder.encode(info.getSamlRequest(), StandardCharsets.UTF_8.name());
 
-                UriBuilder ub = UriBuilder.fromUri(getIdpServiceAddress());
+            UriBuilder ub = UriBuilder.fromUri(getIdpServiceAddress());
 
-                ub.queryParam(SSOConstants.SAML_REQUEST, urlEncodedRequest);
-                ub.queryParam(SSOConstants.RELAY_STATE, info.getRelayState());
-                if (isSignRequest()) {
-                    signRequest(urlEncodedRequest, info.getRelayState(), ub);
-                }
-
-                String contextCookie = createCookie(SSOConstants.RELAY_STATE,
-                                                    info.getRelayState(),
-                                                    info.getWebAppContext(),
-                                                    info.getWebAppDomain());
-
-                context.abortWith(Response.seeOther(ub.build())
-                               .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store")
-                               .header("Pragma", "no-cache")
-                               .header(HttpHeaders.SET_COOKIE, contextCookie)
-                               .build());
-            } catch (Exception ex) {
-                LOG.log(Level.FINE, ex.getMessage(), ex);
-                throw ExceptionUtils.toInternalServerErrorException(ex, null);
+            ub.queryParam(SSOConstants.SAML_REQUEST, urlEncodedRequest);
+            ub.queryParam(SSOConstants.RELAY_STATE, info.getRelayState());
+            if (isSignRequest()) {
+                signRequest(urlEncodedRequest, info.getRelayState(), ub);
             }
+
+            String contextCookie = createCookie(SSOConstants.RELAY_STATE,
+                                                info.getRelayState(),
+                                                info.getWebAppContext(),
+                                                info.getWebAppDomain());
+
+            context.abortWith(Response.seeOther(ub.build())
+                           .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store")
+                           .header("Pragma", "no-cache")
+                           .header(HttpHeaders.SET_COOKIE, contextCookie)
+                           .build());
+        } catch (Exception ex) {
+            LOG.log(Level.FINE, ex.getMessage(), ex);
+            throw ExceptionUtils.toInternalServerErrorException(ex, null);
         }
     }
 
@@ -106,17 +108,17 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
     ) throws Exception {
         Crypto crypto = getSignatureCrypto();
         if (crypto == null) {
-            LOG.fine("No crypto instance of properties file configured for signature");
+            LOG.warning("No crypto instance of properties file configured for signature");
             throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
         String signatureUser = getSignatureUsername();
         if (signatureUser == null) {
-            LOG.fine("No user configured for signature");
+            LOG.warning("No user configured for signature");
             throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
         CallbackHandler callbackHandler = getCallbackHandler();
         if (callbackHandler == null) {
-            LOG.fine("No CallbackHandler configured to supply a password for signature");
+            LOG.warning("No CallbackHandler configured to supply a password for signature");
             throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
 
@@ -129,14 +131,13 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
             );
         }
 
-        String sigAlgo = SSOConstants.RSA_SHA1;
+        String sigAlgo = getSignatureAlgorithm();
         String pubKeyAlgo = issuerCerts[0].getPublicKey().getAlgorithm();
-        String jceSigAlgo = "SHA1withRSA";
         LOG.fine("automatic sig algo detection: " + pubKeyAlgo);
-        if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
+        if ("DSA".equalsIgnoreCase(pubKeyAlgo)) {
             sigAlgo = SSOConstants.DSA_SHA1;
-            jceSigAlgo = "SHA1withDSA";
         }
+
         LOG.fine("Using Signature algorithm " + sigAlgo);
         ub.queryParam(SSOConstants.SIG_ALG, URLEncoder.encode(sigAlgo, StandardCharsets.UTF_8.name()));
 
@@ -149,6 +150,7 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
         PrivateKey privateKey = crypto.getPrivateKey(signatureUser, password);
 
         // Sign the request
+        String jceSigAlgo = JCEMapper.translateURItoJCEID(sigAlgo);
         Signature signature = Signature.getInstance(jceSigAlgo);
         signature.initSign(privateKey);
 
@@ -160,7 +162,14 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
         signature.update(requestToSign.getBytes(StandardCharsets.UTF_8));
         byte[] signBytes = signature.sign();
 
-        String encodedSignature = Base64.getMimeEncoder().encodeToString(signBytes);
+        String encodedSignature = Base64.getEncoder().encodeToString(signBytes);
+
+        // Clean the private key from memory when we're done
+        try {
+            privateKey.destroy();
+        } catch (DestroyFailedException ex) {
+            // ignore
+        }
 
         ub.queryParam(SSOConstants.SIGNATURE, URLEncoder.encode(encodedSignature, StandardCharsets.UTF_8.name()));
 

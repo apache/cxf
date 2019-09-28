@@ -32,6 +32,9 @@ import org.apache.ws.commons.schema.constants.Constants;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 
 
 public class DateTimezoneTest extends AbstractAegisTest {
@@ -93,8 +96,6 @@ public class DateTimezoneTest extends AbstractAegisTest {
         assertFalse(dateString.contains("+"));
         assertFalse(dateString.contains("Z"));
     }
-
-    //TODO add tests with Timezones
 
     public static class CalendarBean {
         private Calendar calendar;

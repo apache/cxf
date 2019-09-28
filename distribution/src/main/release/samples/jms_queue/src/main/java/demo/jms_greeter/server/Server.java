@@ -24,6 +24,7 @@ import java.util.Collections;
 import javax.jms.ConnectionFactory;
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
 
@@ -33,7 +34,7 @@ public class Server {
     protected Server() throws Exception {
         System.out.println("Starting Server");
         Object implementor = new GreeterJMSImpl();
-        ep = Endpoint.publish(null, implementor);
+        ep = Endpoint.publish(null, implementor, new LoggingFeature());
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
@@ -61,7 +62,7 @@ public class Server {
         }
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         Server s = new Server();
         System.out.println("Server ready...");
         try {

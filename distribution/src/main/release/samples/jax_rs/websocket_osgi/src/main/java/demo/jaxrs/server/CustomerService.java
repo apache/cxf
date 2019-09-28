@@ -124,8 +124,7 @@ public class CustomerService {
     public Order getOrder(@PathParam("orderId") String orderId) {
         System.out.println("----invoking getOrder, Order id is: " + orderId);
         long idNumber = Long.parseLong(orderId);
-        Order c = orders.get(idNumber);
-        return c;
+        return orders.get(idNumber);
     }
 
     @GET

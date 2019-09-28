@@ -20,11 +20,14 @@
 package org.apache.cxf.continuations;
 
 import org.apache.cxf.common.i18n.UncheckedException;
-import org.junit.Assert;
+
 import org.junit.Test;
 
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 
-public class SuspendedInvocationExceptionTest extends Assert {
+
+public class SuspendedInvocationExceptionTest {
 
     @Test
     public void testValidRuntimeException() {

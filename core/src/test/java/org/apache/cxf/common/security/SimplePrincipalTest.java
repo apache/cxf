@@ -19,21 +19,25 @@
 
 package org.apache.cxf.common.security;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class SimplePrincipalTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+
+public class SimplePrincipalTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullName() {
         new SimplePrincipal(null);
     }
 
+    @Test
     public void testEquals() {
         assertEquals(new SimplePrincipal("barry"), new SimplePrincipal("barry"));
     }
 
+    @Test
     public void testNotEquals() {
-        assertFalse(new SimplePrincipal("barry").equals(new SimplePrincipal("john")));
+        assertNotEquals(new SimplePrincipal("barry"), new SimplePrincipal("john"));
     }
 }

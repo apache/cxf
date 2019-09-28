@@ -39,7 +39,7 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.message.MessageImpl;
@@ -94,7 +94,7 @@ final class JMSMessageUtils {
     }
 
     private static void populateIncomingContext(JMSMessageHeadersType messageHeaders,
-                                               org.apache.cxf.message.Message inMessage) 
+                                               org.apache.cxf.message.Message inMessage)
                                                    throws UnsupportedEncodingException {
         String contentType = messageHeaders.getContentType();
         if (contentType != null) {
@@ -105,7 +105,7 @@ final class JMSMessageUtils {
         if (responseCode != null) {
             inMessage.put(org.apache.cxf.message.Message.RESPONSE_CODE, Integer.valueOf(responseCode));
         }
-        Map<String, List<String>> protHeaders = new TreeMap<String, List<String>>();
+        Map<String, List<String>> protHeaders = new TreeMap<>();
         for (String name : messageHeaders.getPropertyKeys()) {
             String val = (String)messageHeaders.getProperty(name);
             protHeaders.put(name, Collections.singletonList(val));
@@ -118,9 +118,7 @@ final class JMSMessageUtils {
                     protHeaders.put(JMSConstants.TARGET_SERVICE_IN_REQUESTURI,
                                     Collections.singletonList("true"));
                 }
-                if (requestURI != null) {
-                    inMessage.put(org.apache.cxf.message.Message.REQUEST_URI, requestURI);
-                }
+                inMessage.put(org.apache.cxf.message.Message.REQUEST_URI, requestURI);
             } catch (Exception e) {
                 protHeaders.put(JMSConstants.MALFORMED_REQUESTURI, Collections.singletonList("true"));
             }
@@ -130,18 +128,7 @@ final class JMSMessageUtils {
 
 
     static String getEncoding(String ct) throws UnsupportedEncodingException {
-        String contentType = ct.toLowerCase();
-        String enc = null;
-
-        String[] tokens = StringUtils.split(contentType, ";");
-        for (String token : tokens) {
-            int index = token.indexOf("charset=");
-            if (index >= 0) {
-                enc = token.substring(index + 8);
-                break;
-            }
-        }
-
+        String enc = HttpHeaderHelper.findCharset(ct);
         String normalizedEncoding = HttpHeaderHelper.mapCharset(enc, StandardCharsets.UTF_8.name());
         if (normalizedEncoding == null) {
             String m = new org.apache.cxf.common.i18n.Message("INVALID_ENCODING_MSG", LOG, new Object[] {
@@ -173,7 +160,7 @@ final class JMSMessageUtils {
         Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)message
             .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
         if (null == headers) {
-            headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+            headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
             message.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, headers);
         }
         return contentType;
@@ -214,10 +201,10 @@ final class JMSMessageUtils {
         // Retrieve or create protocol headers
         Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)outMessage
             .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
-        
+
         boolean isSoapMessage =
-            !MessageUtils.isTrue(outMessage.getExchange().get(org.apache.cxf.message.Message.REST_MESSAGE));
-        
+            !PropertyUtils.isTrue(outMessage.getExchange().get(org.apache.cxf.message.Message.REST_MESSAGE));
+
         if (isSoapMessage) {
             if (!messageHeaders.isSetSOAPJMSTargetService()) {
                 messageHeaders.setSOAPJMSTargetService(jmsConfig.getTargetService());
@@ -252,13 +239,28 @@ final class JMSMessageUtils {
                                           outMessage,
                                           org.apache.cxf.message.Message.RESPONSE_CODE);
             }
+            String contentType = (String)outMessage.remove(org.apache.cxf.message.Message.CONTENT_TYPE);
+            if (contentType != null) {
+                outMessage.put(JMSConstants.RS_CONTENT_TYPE, contentType);
+            }
             addJMSPropertyFromMessage(messageHeaders,
                                       outMessage,
                                       JMSConstants.RS_CONTENT_TYPE);
+            
+            String contentLength = (String)outMessage.remove(HttpHeaderHelper.CONTENT_LENGTH);
+            if (contentLength != null) {
+                outMessage.put(JMSConstants.RS_CONTENT_LENGTH, contentLength);
+            }
+            addJMSPropertyFromMessage(messageHeaders,
+                                      outMessage,
+                                      JMSConstants.RS_CONTENT_LENGTH);
         }
         if (headers != null) {
             for (Map.Entry<String, List<String>> ent : headers.entrySet()) {
-                messageHeaders.putProperty(ent.getKey(), JMSMessageUtils.join(ent.getValue(), ','));
+                if (!ent.getKey().equals(org.apache.cxf.message.Message.CONTENT_TYPE)
+                    && !ent.getKey().equals(HttpHeaderHelper.CONTENT_LENGTH)) {
+                    messageHeaders.putProperty(ent.getKey(), String.join(",", ent.getValue()));
+                }
             }
         }
         messageHeaders.writeTo(jmsMessage);
@@ -275,17 +277,6 @@ final class JMSMessageUtils {
             message.put(headerName, messageProperties);
         }
         return messageProperties;
-    }
-
-    private static String join(List<String> valueList, char seperator) {
-        StringBuilder b = new StringBuilder();
-        for (String s : valueList) {
-            if (b.length() > 0) {
-                b.append(seperator);
-            }
-            b.append(s);
-        }
-        return b.toString();
     }
 
     private static String getSoapAction(JMSMessageHeadersType messageProperties,
@@ -366,7 +357,6 @@ final class JMSMessageUtils {
     }
 
     public static boolean isMtomEnabled(final org.apache.cxf.message.Message message) {
-        return MessageUtils.isTrue(message.getContextualProperty(
-                                                       org.apache.cxf.message.Message.MTOM_ENABLED));
+        return MessageUtils.getContextualBoolean(message, org.apache.cxf.message.Message.MTOM_ENABLED);
     }
 }

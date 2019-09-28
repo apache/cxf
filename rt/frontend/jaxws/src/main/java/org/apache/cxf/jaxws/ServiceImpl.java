@@ -23,7 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -64,7 +64,6 @@ import org.apache.cxf.common.i18n.UncheckedException;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.source.SourceDataBinding;
@@ -117,7 +116,7 @@ public class ServiceImpl extends ServiceDelegate {
     private Class<?> clazz;
 
     private Map<QName, PortInfoImpl> portInfos = new HashMap<>();
-    private WebServiceFeature serviceFeatures[];
+    private WebServiceFeature[] serviceFeatures;
 
     public ServiceImpl(Bus b, URL url, QName name, Class<?> cls, WebServiceFeature ... f) {
         clazz = cls;
@@ -232,13 +231,13 @@ public class ServiceImpl extends ServiceDelegate {
         portInfos.put(portName, portInfo);
     }
 
-    private List<WebServiceFeature> getAllFeatures(WebServiceFeature features[]) {
+    private List<WebServiceFeature> getAllFeatures(WebServiceFeature[] features) {
         List<WebServiceFeature> f = new ArrayList<>();
         if (features != null) {
-            f.addAll(Arrays.asList(features));
+            Collections.addAll(f, features);
         }
         if (serviceFeatures != null) {
-            f.addAll(Arrays.asList(serviceFeatures));
+            Collections.addAll(f, serviceFeatures);
         }
         return f;
     }
@@ -570,7 +569,9 @@ public class ServiceImpl extends ServiceDelegate {
     }
 
     private PortInfoImpl getPortInfo(QName portName) {
-        // TODO if the portName null ?
+        if (portName == null) {
+            return null;
+        }
         return portInfos.get(portName);
     }
 
@@ -607,8 +608,8 @@ public class ServiceImpl extends ServiceDelegate {
         }
 
         String tns = webService.targetNamespace();
-        if (tns.length() == 0) {
-            tns = URIParserUtil.getNamespace(PackageUtils.getPackageName(seiClass));
+        if (tns.isEmpty()) {
+            tns = PackageUtils.getNamespace(PackageUtils.getPackageName(seiClass));
         }
 
         return new QName(tns, name);
@@ -691,7 +692,7 @@ public class ServiceImpl extends ServiceDelegate {
             }
         }
 
-        Dispatch<T> disp = new DispatchImpl<T>(client, mode, context, type);
+        Dispatch<T> disp = new DispatchImpl<>(client, mode, context, type);
         configureObject(disp);
         return disp;
     }

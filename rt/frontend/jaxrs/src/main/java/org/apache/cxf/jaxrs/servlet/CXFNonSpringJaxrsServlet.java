@@ -39,6 +39,7 @@ import javax.ws.rs.core.Application;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PrimitiveUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.CastUtils;
@@ -53,7 +54,6 @@ import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 
@@ -167,17 +167,15 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         String param = servletConfig.getInitParameter(PARAMETER_SPLIT_CHAR);
         if (!StringUtils.isEmpty(param) && SPACE_PARAMETER_SPLIT_CHAR.equals(param.trim())) {
             return " ";
-        } else {
-            return DEFAULT_PARAMETER_SPLIT_CHAR;
         }
+        return DEFAULT_PARAMETER_SPLIT_CHAR;
     }
     protected boolean getStaticSubResolutionValue(ServletConfig servletConfig) {
         String param = servletConfig.getInitParameter(STATIC_SUB_RESOLUTION_PARAM);
         if (param != null) {
             return Boolean.valueOf(param.trim());
-        } else {
-            return false;
         }
+        return false;
     }
 
     protected void setExtensions(JAXRSServerFactoryBean bean, ServletConfig servletConfig) {
@@ -203,11 +201,11 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         if (schemas == null) {
             return;
         }
-        String[] locations = StringUtils.split(schemas, " ");
+        String[] locations = schemas.split(" ");
         List<String> list = new ArrayList<>();
         for (String loc : locations) {
             String theLoc = loc.trim();
-            if (theLoc.length() != 0) {
+            if (!theLoc.isEmpty()) {
                 list.add(theLoc);
             }
         }
@@ -231,12 +229,12 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         if (value == null) {
             return;
         }
-        String[] values = StringUtils.split(value, splitChar);
-        List<Interceptor<? extends Message>> list = new ArrayList<Interceptor<? extends Message>>();
+        String[] values = value.split(splitChar);
+        List<Interceptor<? extends Message>> list = new ArrayList<>();
         for (String interceptorVal : values) {
             Map<String, List<String>> props = new HashMap<>();
             String theValue = getClassNameAndProperties(interceptorVal, props);
-            if (theValue.length() != 0) {
+            if (!theValue.isEmpty()) {
                 try {
                     Class<?> intClass = loadClass(theValue, "Interceptor");
                     Object object = intClass.newInstance();
@@ -269,7 +267,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         }
         Map<String, List<String>> props = new HashMap<>();
         String theValue = getClassNameAndProperties(value, props);
-        if (theValue.length() != 0) {
+        if (!theValue.isEmpty()) {
             try {
                 Class<?> intClass = loadClass(theValue, "Invoker");
                 Object object = intClass.newInstance();
@@ -296,13 +294,12 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             }
             throw new ServletException("At least one resource class should be specified");
         }
-        String[] classNames = StringUtils.split(serviceBeans, splitChar);
-        Map<Class<?>, Map<String, List<String>>> map =
-            new HashMap<Class<?>, Map<String, List<String>>>();
+        String[] classNames = serviceBeans.split(splitChar);
+        Map<Class<?>, Map<String, List<String>>> map = new HashMap<>();
         for (String cName : classNames) {
             Map<String, List<String>> props = new HashMap<>();
             String theName = getClassNameAndProperties(cName, props);
-            if (theName.length() != 0) {
+            if (!theName.isEmpty()) {
                 Class<?> cls = loadClass(theName);
                 map.put(cls, props);
             }
@@ -320,12 +317,12 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         if (featuresList == null) {
             return Collections.< Feature >emptyList();
         }
-        String[] classNames = StringUtils.split(featuresList, splitChar);
-        List< Feature > features = new ArrayList< Feature >();
+        String[] classNames = featuresList.split(splitChar);
+        List< Feature > features = new ArrayList<>();
         for (String cName : classNames) {
             Map<String, List<String>> props = new HashMap<>();
             String theName = getClassNameAndProperties(cName, props);
-            if (theName.length() != 0) {
+            if (!theName.isEmpty()) {
                 Class<?> cls = loadClass(theName);
                 if (Feature.class.isAssignableFrom(cls)) {
                     features.add((Feature)createSingletonInstance(cls, props, servletConfig));
@@ -340,12 +337,12 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         if (providersList == null) {
             return Collections.emptyList();
         }
-        String[] classNames = StringUtils.split(providersList, splitChar);
+        String[] classNames = providersList.split(splitChar);
         List<Object> providers = new ArrayList<>();
         for (String cName : classNames) {
             Map<String, List<String>> props = new HashMap<>();
             String theName = getClassNameAndProperties(cName, props);
-            if (theName.length() != 0) {
+            if (!theName.isEmpty()) {
                 Class<?> cls = loadClass(theName);
                 providers.add(createSingletonInstance(cls, props, servletConfig));
             }
@@ -355,7 +352,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
 
     private String getClassNameAndProperties(String cName, Map<String, List<String>> props) {
         String theName = cName.trim();
-        int ind = theName.indexOf("(");
+        int ind = theName.indexOf('(');
         if (ind != -1 && theName.endsWith(")")) {
             props.putAll(parseMapListSequence(theName.substring(ind + 1, theName.length() - 1)));
             theName = theName.substring(0, ind).trim();
@@ -367,13 +364,13 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         if (sequence != null) {
             sequence = sequence.trim();
             Map<String, List<String>> map = new HashMap<>();
-            String[] pairs = StringUtils.split(sequence, " ");
+            String[] pairs = sequence.split(" ");
             for (String pair : pairs) {
                 String thePair = pair.trim();
                 if (thePair.length() == 0) {
                     continue;
                 }
-                String[] values = StringUtils.split(thePair, "=");
+                String[] values = thePair.split("=");
                 String key;
                 String value;
                 if (values.length == 2) {
@@ -385,15 +382,14 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
                 }
                 List<String> list = map.get(key);
                 if (list == null) {
-                    list = new LinkedList<String>();
+                    list = new LinkedList<>();
                     map.put(key, list);
                 }
                 list.add(value);
             }
             return map;
-        } else {
-            return Collections.emptyMap();
         }
+        return Collections.emptyMap();
     }
 
     protected Map<Class<?>, ResourceProvider> getResourceProviders(ServletConfig servletConfig,
@@ -420,9 +416,9 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         if (scope == null) {
             scope = (String)app.getProperties().get(SERVICE_SCOPE_PARAM);
         }
-        return SERVICE_SCOPE_SINGLETON.equals(scope);    
+        return SERVICE_SCOPE_SINGLETON.equals(scope);
     }
-    
+
     protected Object createSingletonInstance(Class<?> cls, Map<String, List<String>> props, ServletConfig sc)
         throws ServletException {
         Constructor<?> c = ResourceUtils.findResourceConstructor(cls, false);
@@ -436,7 +432,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
                 if (isApplication) {
                     provider = new ApplicationInfo((Application)c.newInstance(), getBus());
                 } else {
-                    provider = new ProviderInfo<Object>(c.newInstance(), getBus(), false, true);
+                    provider = new ProviderInfo<>(c.newInstance(), getBus(), false, true);
                 }
             } else {
                 Map<Class<?>, Object> values = new HashMap<>();
@@ -497,7 +493,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
 
         boolean ignoreApplicationPath = isIgnoreApplicationPath(servletConfig);
 
-        String[] classNames = StringUtils.split(applicationNames, getParameterSplitChar(servletConfig));
+        String[] classNames = applicationNames.split(getParameterSplitChar(servletConfig));
 
         if (classNames.length > 1 && ignoreApplicationPath) {
             throw new ServletException("\"" + IGNORE_APP_PATH_PARAM
@@ -520,6 +516,12 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             setExtensions(bean, servletConfig);
             setDocLocation(bean, servletConfig);
             setSchemasLocations(bean, servletConfig);
+
+            List<?> providers = getProviders(servletConfig, splitChar);
+            bean.setProviders(providers);
+            List<? extends Feature> features = getFeatures(servletConfig, splitChar);
+            bean.setFeatures(features);
+
             bean.setBus(getBus());
             bean.setApplicationInfo(providerApp);
             bean.create();
@@ -528,7 +530,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
 
     protected boolean isIgnoreApplicationPath(ServletConfig servletConfig) {
         String ignoreParam = servletConfig.getInitParameter(IGNORE_APP_PATH_PARAM);
-        return ignoreParam == null || MessageUtils.isTrue(ignoreParam);
+        return ignoreParam == null || PropertyUtils.isTrue(ignoreParam);
     }
 
     protected void createServerFromApplication(ServletConfig servletConfig)
@@ -541,6 +543,18 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
                                           getStaticSubResolutionValue(servletConfig),
                                           isAppResourceLifecycleASingleton(app, servletConfig),
                                           getBus());
+        String splitChar = getParameterSplitChar(servletConfig);
+        setAllInterceptors(bean, servletConfig, splitChar);
+        setInvoker(bean, servletConfig);
+        setExtensions(bean, servletConfig);
+        setDocLocation(bean, servletConfig);
+        setSchemasLocations(bean, servletConfig);
+
+        List<?> providers = getProviders(servletConfig, splitChar);
+        bean.setProviders(providers);
+        List<? extends Feature> features = getFeatures(servletConfig, splitChar);
+        bean.setFeatures(features);
+
         bean.setBus(getBus());
         bean.setApplication(getApplication());
         bean.create();

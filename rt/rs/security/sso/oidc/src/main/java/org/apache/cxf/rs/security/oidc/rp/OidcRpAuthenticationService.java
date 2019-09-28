@@ -66,9 +66,8 @@ public class OidcRpAuthenticationService {
         }
         if (redirectUri != null) {
             return Response.seeOther(redirectUri).build();
-        } else {
-            return Response.ok(oidcContext).build();
         }
+        return Response.ok(oidcContext).build();
     }
 
     public void setDefaultLocation(String defaultLocation) {

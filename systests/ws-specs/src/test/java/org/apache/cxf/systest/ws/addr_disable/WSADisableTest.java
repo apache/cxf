@@ -39,6 +39,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class WSADisableTest extends AbstractWSATestBase {
     static final String PORT = allocatePort(Server.class);
 
@@ -128,8 +133,7 @@ public class WSADisableTest extends AbstractWSATestBase {
         try {
             port.addNumbers(1, 2);
             fail("Expected missing WSA header exception");
-        } catch (Exception e) {
-            assertTrue("expected WebServiceException", e instanceof WebServiceException);
+        } catch (WebServiceException e) {
             String expected = "A required header representing a Message Addressing"
                               + " Property is not present";
             assertTrue("Caught unexpected exception : " + e.getMessage(),

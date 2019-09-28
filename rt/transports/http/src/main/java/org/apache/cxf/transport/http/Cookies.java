@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 
@@ -30,7 +29,7 @@ public class Cookies {
     /**
      * Variables for holding session state if sessions are supposed to be maintained
      */
-    private final Map<String, Cookie> sessionCookies = new ConcurrentHashMap<String, Cookie>(4, 0.75f, 4);
+    private final Map<String, Cookie> sessionCookies = new ConcurrentHashMap<>(4, 0.75f, 4);
     private boolean maintainSession;
 
     public Map<String, Cookie> getSessionCookies() {
@@ -64,16 +63,16 @@ public class Cookies {
      * @return New set of cookies
      */
     private void handleSetCookie(List<String> headers) {
-        if (headers == null || headers.size() == 0) {
+        if (headers == null || headers.isEmpty()) {
             return;
         }
 
         for (String header : headers) {
-            String[] cookies = StringUtils.split(header, ",");
+            String[] cookies = header.split(",");
             for (String cookie : cookies) {
-                String[] parts = StringUtils.split(cookie, ";");
+                String[] parts = cookie.split(";");
 
-                String[] kv = StringUtils.split(parts[0], "=", 2);
+                String[] kv = parts[0].split("=", 2);
                 if (kv.length != 2) {
                     continue;
                 }
@@ -82,7 +81,7 @@ public class Cookies {
                 Cookie newCookie = new Cookie(name, value);
 
                 for (int i = 1; i < parts.length; i++) {
-                    kv = StringUtils.split(parts[i], "=", 2);
+                    kv = parts[i].split("=", 2);
                     name = kv[0].trim();
                     value = (kv.length > 1) ? kv[1].trim() : null;
                     if (name.equalsIgnoreCase(Cookie.DISCARD_ATTRIBUTE)) {

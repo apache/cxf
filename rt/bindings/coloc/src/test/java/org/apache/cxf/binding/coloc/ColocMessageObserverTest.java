@@ -38,14 +38,18 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ColocMessageObserverTest extends Assert {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class ColocMessageObserverTest {
     private IMocksControl control = EasyMock.createNiceControl();
     private ColocMessageObserver observer;
     private Message msg;
@@ -126,12 +130,10 @@ public class ColocMessageObserverTest extends Assert {
 
         Exchange inEx = inMsg.getExchange();
         assertNotNull("Should Have a valid Exchange", inEx);
-        assertEquals("Message.REQUESTOR_ROLE should be false",
-                     Boolean.FALSE,
-                     inMsg.get(Message.REQUESTOR_ROLE));
-        assertEquals("Message.INBOUND_MESSAGE should be true",
-                     Boolean.TRUE,
-                     inMsg.get(Message.INBOUND_MESSAGE));
+        assertFalse("Message.REQUESTOR_ROLE should be false",
+                     (Boolean)inMsg.get(Message.REQUESTOR_ROLE));
+        assertTrue("Message.INBOUND_MESSAGE should be true",
+                     (Boolean)inMsg.get(Message.INBOUND_MESSAGE));
         assertNotNull("Chain should be set", inMsg.getInterceptorChain());
         Exchange ex1 = msg.getExchange();
         assertNotNull("Exchange should be set", ex1);

@@ -51,6 +51,11 @@ import org.apache.hello_world_xml_http.wrapped.PingMeFault;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
     static final String REG_PORT = allocatePort(ServerXMLBinding.class);
     static final String WRAP_PORT = allocatePort(ServerXMLBinding.class, 1);
@@ -300,7 +305,7 @@ public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
         SOAPHeaderData headerInfo = new SOAPHeaderData();
         headerInfo.setMessage("inoutMessage");
         headerInfo.setOriginator("inoutOriginator");
-        Holder<SOAPHeaderData> holder = new Holder<SOAPHeaderData>();
+        Holder<SOAPHeaderData> holder = new Holder<>();
         holder.value = headerInfo;
         InoutHeaderResponse resp = proxy.inoutHeader(me, holder);
         assertNotNull(resp);
@@ -320,8 +325,8 @@ public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
         OutHeader me = new OutHeader();
         me.setRequestType("OutHeaderRequest");
 
-        Holder<OutHeaderResponse> outHeaderHolder = new Holder<OutHeaderResponse>();
-        Holder<SOAPHeaderData> soapHeaderHolder = new Holder<SOAPHeaderData>();
+        Holder<OutHeaderResponse> outHeaderHolder = new Holder<>();
+        Holder<SOAPHeaderData> soapHeaderHolder = new Holder<>();
         proxy.outHeader(me, outHeaderHolder, soapHeaderHolder);
         assertNotNull(outHeaderHolder.value);
         assertNotNull(soapHeaderHolder.value);

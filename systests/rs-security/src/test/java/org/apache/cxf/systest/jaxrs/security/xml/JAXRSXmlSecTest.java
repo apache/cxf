@@ -53,6 +53,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerXmlSec.PORT;
@@ -299,9 +303,9 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         Book book;
         if (!fromResponse) {
-            book = wc.post(new Book("CXF", 126L), Book.class);
+            book = wc.type("application/xml").post(new Book("CXF", 126L), Book.class);
         } else {
-            book = wc.post(new Book("CXF", 126L)).readEntity(Book.class);
+            book = wc.type("application/xml").post(new Book("CXF", 126L)).readEntity(Book.class);
         }
         assertEquals(126L, book.getId());
     }
@@ -344,7 +348,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         WebClient wc = bean.createWebClient();
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         try {
-            wc.post(new Book("CXF", 126L), Book.class);
+            wc.type("application/xml").post(new Book("CXF", 126L), Book.class);
             fail("Failure expected on signature trust failure");
         } catch (WebApplicationException ex) {
             assertTrue(ex.getMessage().contains("400 Bad Request"));
@@ -389,7 +393,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         WebClient wc = bean.createWebClient();
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         try {
-            wc.post(new Book("CXF", 126L), Book.class);
+            wc.type("application/xml").post(new Book("CXF", 126L), Book.class);
             fail("Failure expected on signature trust failure");
         } catch (ProcessingException ex) {
             assertTrue(ex.getCause() instanceof BadRequestException);
@@ -438,7 +442,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         WebClient wc = bean.createWebClient();
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         try {
-            wc.post(new Book("CXF", 126L), Book.class);
+            wc.type("application/xml").post(new Book("CXF", 126L), Book.class);
             fail("Failure expected on an unsigned response message");
         } catch (ProcessingException ex) {
             assertTrue(ex.getCause() instanceof BadRequestException);
@@ -485,7 +489,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
 
         WebClient wc = bean.createWebClient();
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
-        Book book = wc.post(new Book("CXF", 126L), Book.class);
+        Book book = wc.type("application/xml").post(new Book("CXF", 126L), Book.class);
         assertEquals(126L, book.getId());
     }
 
@@ -503,18 +507,6 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testPostEncryptedBookGCM() throws Exception {
-        //
-        // This test fails with the IBM JDK 7
-        // IBM JDK 7 appears to require a GCMParameter class to be used, which
-        // only exists in JDK 7. The Sun JDK appears to be more lenient and
-        // allows us to use the existing IVParameterSpec class.
-        //
-        if ("IBM Corporation".equals(System.getProperty("java.vendor"))
-            && System.getProperty("java.version") != null
-            &&  System.getProperty("java.version").startsWith("1.7")) {
-            return;
-        }
-
         String address = "https://localhost:" + test.port + "/xmlenc/bookstore/books";
         Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.CALLBACK_HANDLER,
@@ -686,14 +678,13 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         WebClient wc = bean.createWebClient();
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         try {
-            Book book = wc.post(new Book("CXF", 126L), Book.class);
+            Book book = wc.type("application/xml").post(new Book("CXF", 126L), Book.class);
             assertEquals(126L, book.getId());
         } catch (WebApplicationException ex) {
             if (propagateException) {
                 throw ex;
-            } else {
-                fail(ex.getMessage());
             }
+            fail(ex.getMessage());
         } catch (ProcessingException ex) {
             assertTrue(ex.getCause() instanceof BadRequestException);
         }
@@ -812,6 +803,49 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         } catch (WebApplicationException ex) {
             // expected
         }
+    }
+
+    @Test
+    public void testSignaturePassword() throws Exception {
+        String address = "https://localhost:" + test.port + "/xmlsig/bookstore/books";
+
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(address);
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAXRSXmlSecTest.class.getResource("client.xml");
+        Bus springBus = bf.createBus(busFile.toString());
+        bean.setBus(springBus);
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put(SecurityConstants.SIGNATURE_USERNAME, "alice");
+        properties.put(SecurityConstants.SIGNATURE_PASSWORD, "password");
+        properties.put(SecurityConstants.SIGNATURE_PROPERTIES,
+                       "org/apache/cxf/systest/jaxrs/security/alice.properties");
+        bean.setProperties(properties);
+        if (test.streaming) {
+            XmlSecOutInterceptor sigOutInterceptor = new XmlSecOutInterceptor();
+            sigOutInterceptor.setSignRequest(true);
+            sigOutInterceptor.setKeyInfoMustBeAvailable(true);
+            bean.getOutInterceptors().add(sigOutInterceptor);
+
+            XmlSecInInterceptor sigInInterceptor = new XmlSecInInterceptor();
+            sigInInterceptor.setRequireSignature(true);
+            bean.setProvider(sigInInterceptor);
+        } else {
+            XmlSigOutInterceptor sigOutInterceptor = new XmlSigOutInterceptor();
+            sigOutInterceptor.setKeyInfoMustBeAvailable(true);
+            bean.getOutInterceptors().add(sigOutInterceptor);
+
+            XmlSigInInterceptor sigInInterceptor = new XmlSigInInterceptor();
+            sigInInterceptor.setKeyInfoMustBeAvailable(true);
+            bean.getInInterceptors().add(sigInInterceptor);
+        }
+
+        WebClient wc = bean.createWebClient();
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
+        Book book = wc.type("application/xml").post(new Book("CXF", 126L), Book.class);
+        assertEquals(126L, book.getId());
     }
 
     private static final class TestParam {

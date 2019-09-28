@@ -37,6 +37,7 @@ import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -105,7 +106,7 @@ public final class WSS4JUtils {
         boolean specified = false;
         Object o = message.getContextualProperty(booleanKey);
         if (o != null) {
-            if (!MessageUtils.isTrue(o)) {
+            if (!PropertyUtils.isTrue(o)) {
                 return null;
             }
             specified = true;

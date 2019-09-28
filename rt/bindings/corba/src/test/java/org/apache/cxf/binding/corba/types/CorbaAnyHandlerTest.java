@@ -23,17 +23,20 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.corba.CorbaTypeMap;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class CorbaAnyHandlerTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+
+public class CorbaAnyHandlerTest {
 
     private ORB orb;
 
@@ -81,6 +84,6 @@ public class CorbaAnyHandlerTest extends Assert {
 
         // Test get/set CorbaTypeMap methods
         CorbaTypeMap resultTM = anyHandler.getTypeMap();
-        assertTrue(resultTM.getTargetNamespace().equals(CorbaConstants.NU_WSDL_CORBA));
+        assertEquals(resultTM.getTargetNamespace(), CorbaConstants.NU_WSDL_CORBA);
     }
 }

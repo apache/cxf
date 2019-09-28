@@ -19,21 +19,18 @@
 
 package org.apache.cxf.systest.aegis;
 
-
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.authservice.AuthService;
 import org.apache.cxf.authservice.Authenticate;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.dynamic.DynamicClientFactory;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
@@ -48,9 +45,14 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 public class AegisClientServerTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(AegisServer.class);
-    static final Logger LOG = LogUtils.getLogger(AegisClientServerTest.class);
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -73,7 +75,7 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         assertEquals("Joe", list.get(0));
         assertEquals("Joe-1", list.get(1));
         assertEquals("Joe-2", list.get(2));
-        String roles[] = service.getRolesAsArray("Joe");
+        String[] roles = service.getRolesAsArray("Joe");
         assertEquals(2, roles.length);
         assertEquals("Joe", roles[0]);
         assertEquals("Joe-1", roles[1]);
@@ -103,7 +105,7 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         assertEquals("Joe", list.get(0));
         assertEquals("Joe-1", list.get(1));
         assertEquals("Joe-2", list.get(2));
-        String roles[] = service.getRolesAsArray("Joe");
+        String[] roles = service.getRolesAsArray("Joe");
         assertEquals(2, roles.length);
         assertEquals("Joe", roles[0]);
         assertEquals("Joe-1", roles[1]);
@@ -209,7 +211,7 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         SportsService service = (SportsService) proxyFactory.create();
         Pair<String, Integer> ret = service.getReturnGenericPair("ffang", 111);
         assertEquals("ffang", ret.getFirst());
-        assertEquals(new Integer(111), ret.getSecond());
+        assertEquals(Integer.valueOf(111), ret.getSecond());
     }
 
     @Test
@@ -223,7 +225,7 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         proxyFactory.getOutInterceptors().add(new LoggingOutInterceptor());
         SportsService service = (SportsService) proxyFactory.create();
         Pair<Integer, String> ret = service.getReturnQualifiedPair(111, "ffang");
-        assertEquals(new Integer(111), ret.getFirst());
+        assertEquals(Integer.valueOf(111), ret.getFirst());
         assertEquals("ffang", ret.getSecond());
     }
 
@@ -259,9 +261,6 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testDynamicClient() throws Exception {
-        if (System.getProperty("java.version").startsWith("9")) {
-            System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
-        }
         DynamicClientFactory dcf = DynamicClientFactory.newInstance();
         Client client = dcf.createClient("http://localhost:" + PORT + "/jaxwsAndAegisSports?wsdl&dynamic");
 

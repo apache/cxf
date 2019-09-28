@@ -93,7 +93,7 @@ public class AegisServiceImpl implements AegisService {
         bwata.setString("lima");
         Object[] obs = new Object[3];
         obs[0] = new Mammal();
-        obs[1] = new Integer(42);
+        obs[1] = Integer.valueOf(42);
         obs[2] = new Vegetable(); // this is NOT in the WSDL.
         bwata.setObjects(obs);
         return bwata;

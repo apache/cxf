@@ -39,7 +39,7 @@ public class SubscriptionDatabaseImpl implements SubscriptionDatabase {
 
     public SubscriptionDatabaseImpl() {
         LOG.info("Instantiating SubscriptionDatabaseImpl");
-        ticketList = new CopyOnWriteArrayList<SubscriptionTicket>();
+        ticketList = new CopyOnWriteArrayList<>();
     }
 
 

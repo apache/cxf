@@ -64,9 +64,13 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
@@ -212,9 +216,8 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
                 String id = ui.getPathParameters().getFirst("id");
                 Book book = books.get(id);
                 return Response.ok(book, headers.getAcceptableMediaTypes().get(0)).build();
-            } else {
-                throw new NotAllowedException("GET");
             }
+            throw new NotAllowedException("GET");
         }
         public Book echo(Book book) {
             return book;

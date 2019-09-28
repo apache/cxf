@@ -59,6 +59,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Document;
 
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
@@ -71,7 +72,6 @@ import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXBUtils;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.staxutils.DocumentDepthProperties;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
@@ -98,7 +98,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
     }
 
     private ConcurrentHashMap<String, String> namespaceMap =
-        new ConcurrentHashMap<String, String>();
+        new ConcurrentHashMap<>();
     private boolean serializeAsArray;
     private List<String> arrayKeys;
     private List<String> primitiveArrayKeys;
@@ -175,18 +175,6 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         wrapperMap = map;
     }
 
-    public void setEnableBuffering(boolean enableBuf) {
-        super.setEnableBuffering(enableBuf);
-    }
-
-    public void setConsumeMediaTypes(List<String> types) {
-        super.setConsumeMediaTypes(types);
-    }
-
-    public void setProduceMediaTypes(List<String> types) {
-        super.setProduceMediaTypes(types);
-    }
-
     public void setSerializeAsArray(boolean asArray) {
         this.serializeAsArray = asArray;
     }
@@ -211,9 +199,8 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         if (isPayloadEmpty(headers)) {
             if (AnnotationUtils.getAnnotation(anns, Nullable.class) != null) {
                 return null;
-            } else {
-                reportEmptyContentLength();
             }
+            reportEmptyContentLength();
         }
 
         XMLStreamReader reader = null;
@@ -259,9 +246,8 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         } catch (XMLStreamException e) {
             if (e.getCause() instanceof JSONSequenceTooLargeException) {
                 throw new WebApplicationException(413);
-            } else {
-                handleXMLStreamException(e, true);
             }
+            handleXMLStreamException(e, true);
         } catch (WebApplicationException e) {
             throw e;
         } catch (Exception e) {
@@ -323,9 +309,8 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
 
             };
             return new SequenceInputStream(list);
-        } else {
-            return is;
         }
+        return is;
 
     }
 
@@ -364,7 +349,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         MediaType m, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
         if (os == null) {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder(256);
             sb.append("Jettison needs initialized OutputStream");
             if (getContext() != null && getContext().getContent(XMLStreamWriter.class) == null) {
                 sb.append("; if you need to customize Jettison output with the custom XMLStreamWriter"
@@ -496,7 +481,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         OutputStream actualOs = os;
 
         MessageContext mc = getContext();
-        if (mc != null && MessageUtils.isTrue(mc.get(Marshaller.JAXB_FORMATTED_OUTPUT))) {
+        if (mc != null && PropertyUtils.isTrue(mc.get(Marshaller.JAXB_FORMATTED_OUTPUT))) {
             actualOs = new CachedOutputStream();
         }
         XMLStreamWriter writer = createWriter(actualObject, actualClass, genericType, enc,
@@ -504,6 +489,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         if (namespaceMap.size() > 1 || namespaceMap.size() == 1 && !namespaceMap.containsKey(JSONUtils.XSI_URI)) {
             setNamespaceMapper(ms, namespaceMap);
         }
+        org.apache.cxf.common.jaxb.JAXBUtils.setNoEscapeHandler(ms);
         ms.marshal(actualObject, writer);
         writer.close();
         if (os != actualOs) {
@@ -568,9 +554,9 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
 
         if (ignoreNamespaces && rootIsArray && (theArrayKeys == null || dropRootInJsonStream)) {
             if (theArrayKeys == null) {
-                theArrayKeys = new LinkedList<String>();
+                theArrayKeys = new LinkedList<>();
             } else if (dropRootInJsonStream) {
-                theArrayKeys = new LinkedList<String>(theArrayKeys);
+                theArrayKeys = new LinkedList<>(theArrayKeys);
             }
             if (qname != null) {
                 theArrayKeys.add(qname.getLocalPart());
@@ -597,7 +583,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
     }
 
     protected boolean isRootArray(List<String> theArrayKeys) {
-        return theArrayKeys != null ? true : getBooleanJsonProperty(ROOT_IS_ARRAY_PROPERTY, serializeAsArray);
+        return theArrayKeys != null || getBooleanJsonProperty(ROOT_IS_ARRAY_PROPERTY, serializeAsArray);
     }
 
 
@@ -606,7 +592,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         if (mc != null) {
             Object prop = mc.get(name);
             if (prop != null) {
-                return MessageUtils.isTrue(prop);
+                return PropertyUtils.isTrue(prop);
             }
         }
         return defaultValue;
@@ -678,10 +664,10 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
             if (totalElementCountStr != null || innerElementCountStr != null || elementLevelStr != null) {
                 try {
                     int totalElementCount = totalElementCountStr != null
-                        ? Integer.valueOf(totalElementCountStr) : -1;
-                    int elementLevel = elementLevelStr != null ? Integer.valueOf(elementLevelStr) : -1;
+                        ? Integer.parseInt(totalElementCountStr) : -1;
+                    int elementLevel = elementLevelStr != null ? Integer.parseInt(elementLevelStr) : -1;
                     int innerElementCount = innerElementCountStr != null
-                        ? Integer.valueOf(innerElementCountStr) : -1;
+                        ? Integer.parseInt(innerElementCountStr) : -1;
                     return new DocumentDepthProperties(totalElementCount, elementLevel, innerElementCount);
                 } catch (Exception ex) {
                     throw ExceptionUtils.toInternalServerErrorException(ex, null);

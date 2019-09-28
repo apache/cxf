@@ -47,8 +47,7 @@ public class JDOMStreamReader extends AbstractDOMStreamReader<Element, Integer> 
 
     private Content content;
 
-    private FastStack<Map<String, Namespace>> namespaceStack
-        = new FastStack<Map<String, Namespace>>();
+    private FastStack<Map<String, Namespace>> namespaceStack = new FastStack<>();
 
     private List<Namespace> namespaces = new ArrayList<>();
 

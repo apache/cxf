@@ -231,7 +231,7 @@ public class WSDLServiceBuilder {
                 }
             }
 
-            if (def.getPortTypes().size() == 0) {
+            if (def.getPortTypes().isEmpty()) {
 
                 DescriptionInfo description = new DescriptionInfo();
                 if (recordOriginal) {
@@ -284,7 +284,7 @@ public class WSDLServiceBuilder {
                                             Service serv,
                                             QName endpointName,
                                             DescriptionInfo d) {
-        Map<QName, ServiceInfo> services = new LinkedHashMap<QName, ServiceInfo>();
+        Map<QName, ServiceInfo> services = new LinkedHashMap<>();
 
         DescriptionInfo description = d;
         if (null == description) {

@@ -32,6 +32,8 @@ import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.common.util.StringUtils;
+
 @Priority(Priorities.USER - 1)
 public class CacheControlClientRequestFilter implements ClientRequestFilter {
     static final String NO_CACHE_PROPERTY = "no_client_cache";
@@ -64,7 +66,16 @@ public class CacheControlClientRequestFilter implements ClientRequestFilter {
             //TODO: do the extra validation against the conditional headers
             //      which may be contained in the current request
             if (entry.isOutDated()) {
-                cache.remove(key, entry);
+                String ifNoneMatchHeader = entry.getCacheHeaders().get(HttpHeaders.IF_NONE_MATCH);
+                String ifModifiedSinceHeader = entry.getCacheHeaders().get(HttpHeaders.IF_MODIFIED_SINCE);
+
+                if (StringUtils.isEmpty(ifNoneMatchHeader) && StringUtils.isEmpty(ifModifiedSinceHeader)) {
+                    cache.remove(key, entry);
+                } else {
+                    request.getHeaders().add(HttpHeaders.IF_NONE_MATCH, ifNoneMatchHeader);
+                    request.getHeaders().add(HttpHeaders.IF_MODIFIED_SINCE, ifModifiedSinceHeader);
+                    request.setProperty(CACHED_ENTITY_PROPERTY, entry.getData());
+                }
             } else {
                 Object cachedEntity = entry.getData();
                 Response.ResponseBuilder ok = Response.ok(cachedEntity);

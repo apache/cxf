@@ -48,6 +48,7 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.container.ResourceInfo;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
@@ -55,6 +56,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
 import javax.ws.rs.ext.WriterInterceptor;
@@ -88,7 +90,11 @@ public class BookServer20 extends AbstractBusTestServerBase {
         providers.add(new PreMatchContainerRequestFilter2());
         providers.add(new PreMatchContainerRequestFilter());
         providers.add(new PostMatchContainerResponseFilter());
-        providers.add(new PostMatchContainerResponseFilter3());
+        providers.add((Feature) context -> {
+            context.register(new PostMatchContainerResponseFilter3());
+
+            return true;
+        });
         providers.add(new PostMatchContainerResponseFilter2());
         providers.add(new CustomReaderBoundInterceptor());
         providers.add(new CustomReaderInterceptor());
@@ -99,6 +105,8 @@ public class BookServer20 extends AbstractBusTestServerBase {
         providers.add(new PreMatchReplaceStreamOrAddress());
         providers.add(new ServerTestFeature());
         providers.add(new JacksonJaxbJsonProvider());
+        providers.add(new IOExceptionMapper());
+        sf.setApplication(new Application());
         sf.setProviders(providers);
         sf.setResourceProvider(BookStore.class,
                                new SingletonResourceProvider(new BookStore(), true));
@@ -135,7 +143,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
             UriInfo ui = context.getUriInfo();
             String path = ui.getPath(false);
 
-            if (context.getMethod().equals("POST")
+            if ("POST".equals(context.getMethod())
                 && "bookstore/bookheaders/simple".equals(path) && !context.hasEntity()) {
                 byte[] bytes = StringUtils.toBytesUTF8("<Book><name>Book</name><id>126</id></Book>");
                 context.getHeaders().putSingle(HttpHeaders.CONTENT_LENGTH, Integer.toString(bytes.length));
@@ -155,10 +163,13 @@ public class BookServer20 extends AbstractBusTestServerBase {
                 throw new InternalServerErrorException(
                     Response.status(500).type("text/plain")
                         .entity("Prematch filter error").build());
+            } else if ("throwExceptionIO".equals(path)) {
+                context.setProperty("filterexception", "prematch");
+                throw new IOException();
             }
 
             MediaType mt = context.getMediaType();
-            if (mt != null && mt.toString().equals("text/xml")) {
+            if (mt != null && "text/xml".equals(mt.toString())) {
                 String method = context.getMethod();
                 if ("PUT".equals(method)) {
                     context.setMethod("POST");
@@ -171,7 +182,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
                 }
             }
             List<MediaType> acceptTypes = context.getAcceptableMediaTypes();
-            if (acceptTypes.size() == 1 && acceptTypes.get(0).toString().equals("text/mistypedxml")) {
+            if (acceptTypes.size() == 1 && "text/mistypedxml".equals(acceptTypes.get(0).toString())) {
                 context.getHeaders().putSingle("Accept", "text/xml");
             }
         }
@@ -345,7 +356,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
         public void filter(ContainerRequestContext requestContext,
                            ContainerResponseContext responseContext) throws IOException {
             responseContext.getHeaders().add("Custom", "custom");
-            if (!responseContext.getEntity().equals("Postmatch filter error")) {
+            if (!"Postmatch filter error".equals(responseContext.getEntity())) {
                 Book book = (Book)responseContext.getEntity();
                 responseContext.setEntity(new Book(book.getName(), 1 + book.getId()), null, null);
             }
@@ -516,10 +527,25 @@ public class BookServer20 extends AbstractBusTestServerBase {
     }
     private static class ServerTestFeature implements Feature {
 
+        @Context
+        private Application app;
+        
         @Override
         public boolean configure(FeatureContext context) {
+            if (app == null) {
+                throw new RuntimeException();
+            }
             context.register(new GenericHandlerWriter());
             return true;
+        }
+
+    }
+    private static class IOExceptionMapper implements ExceptionMapper<IOException> {
+
+        @Override
+        public Response toResponse(IOException ex) {
+            return Response.status(500).type("text/plain")
+                .entity("Prematch filter error").header("IOException", "true").build();
         }
 
     }

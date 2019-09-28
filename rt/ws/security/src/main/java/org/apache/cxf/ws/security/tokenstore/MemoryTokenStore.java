@@ -38,19 +38,13 @@ public class MemoryTokenStore implements TokenStore {
 
     public void add(SecurityToken token) {
         if (token != null && !StringUtils.isEmpty(token.getId())) {
-            CacheEntry cacheEntry = createCacheEntry(token);
-            if (cacheEntry != null) {
-                tokens.put(token.getId(), cacheEntry);
-            }
+            tokens.put(token.getId(), createCacheEntry(token));
         }
     }
 
     public void add(String identifier, SecurityToken token) {
         if (token != null && !StringUtils.isEmpty(identifier)) {
-            CacheEntry cacheEntry = createCacheEntry(token);
-            if (cacheEntry != null) {
-                tokens.put(identifier, cacheEntry);
-            }
+            tokens.put(identifier, createCacheEntry(token));
         }
     }
 

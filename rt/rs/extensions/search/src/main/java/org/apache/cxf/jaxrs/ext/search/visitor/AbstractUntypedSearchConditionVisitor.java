@@ -22,7 +22,7 @@ import java.util.Map;
 
 public abstract class AbstractUntypedSearchConditionVisitor<T, E> extends AbstractSearchConditionVisitor<T, String> {
 
-    private VisitorState<StringBuilder> state = new LocalVisitorState<StringBuilder>();
+    private VisitorState<StringBuilder> state = new LocalVisitorState<>();
 
     protected AbstractUntypedSearchConditionVisitor(Map<String, String> fieldMap) {
         super(fieldMap);

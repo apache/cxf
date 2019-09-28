@@ -51,11 +51,11 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
     private static final String COMPLETE_IF_SERVICE_NOT_AVAIL_PROPERTY =
         "org.apache.cxf.transport.complete_if_service_not_available";
 
-    protected ConcurrentHashMap<InvocationKey, InvocationContext> inProgress
-        = new ConcurrentHashMap<InvocationKey, InvocationContext>();
     protected FailoverStrategy failoverStrategy;
+    private ConcurrentHashMap<String, InvocationContext> inProgress = new ConcurrentHashMap<>();
     private boolean supportNotAvailableErrorsOnly = true;
     private String clientBootstrapAddress;
+
     /**
      * Normal constructor.
      */
@@ -89,7 +89,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
         Exchange exchange = message.getExchange();
         setupExchangeExceptionProperties(exchange);
 
-        InvocationKey key = new InvocationKey(exchange);
+        String key = String.valueOf(System.identityHashCode(exchange));
         if (getInvocationContext(key) == null) {
 
             if (getClientBootstrapAddress() != null
@@ -137,8 +137,11 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
         return getSelectedConduit(message);
     }
 
-    protected InvocationContext getInvocationContext(InvocationKey key) {
-        return inProgress.get(key);
+    protected InvocationContext getInvocationContext(String key) {
+        if (key != null) {
+            return inProgress.get(key);
+        }
+        return null;
     }
 
     /**
@@ -147,7 +150,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
      * @param exchange represents the completed MEP
      */
     public void complete(Exchange exchange) {
-        InvocationKey key = new InvocationKey(exchange);
+        String key = String.valueOf(System.identityHashCode(exchange));
         InvocationContext invocation = getInvocationContext(key);
         if (invocation == null) {
             super.complete(exchange);
@@ -404,8 +407,8 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
                 message.put(Message.REQUEST_URI, endpointAddress);
 
                 Exchange exchange = message.getExchange();
-                InvocationKey key = new InvocationKey(exchange);
-                InvocationContext invocation = inProgress.get(key);
+                String key = String.valueOf(System.identityHashCode(exchange));
+                InvocationContext invocation = getInvocationContext(key);
                 if (invocation != null) {
                     overrideAddressProperty(invocation.getContext(),
                                             cond.getTarget().getAddress().getValue());
@@ -432,35 +435,9 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
         this.clientBootstrapAddress = clientBootstrapAddress;
     }
 
-    protected InvocationKey getInvocationKey(Exchange e) {
-        return new InvocationKey(e);
+    protected String getInvocationKey(Exchange e) {
+        return String.valueOf(System.identityHashCode(e));
     }
-
-    /**
-     * Used to wrap an Exchange for usage as a Map key. The raw Exchange
-     * is not a suitable key type, as the hashCode is computed from its
-     * current contents, which may obviously change over the lifetime of
-     * an invocation.
-     */
-    protected static class InvocationKey {
-        private Exchange exchange;
-
-        protected InvocationKey(Exchange ex) {
-            exchange = ex;
-        }
-
-        @Override
-        public int hashCode() {
-            return System.identityHashCode(exchange);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            return o instanceof InvocationKey
-                   && exchange == ((InvocationKey)o).exchange;
-        }
-    }
-
 
     /**
      * Records the context of an invocation.

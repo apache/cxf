@@ -126,7 +126,7 @@ public class SourceSequence extends AbstractSequence {
         if (currentMessageNumber != num) {
             return true;
         }
-        if (acknowledgement.getAcknowledgementRange().size() == 0) {
+        if (acknowledgement.getAcknowledgementRange().isEmpty()) {
             return false;
         }
         if (acknowledgement.getAcknowledgementRange().size() == 1) {
@@ -206,7 +206,7 @@ public class SourceSequence extends AbstractSequence {
      */
 
     boolean isExpired() {
-        return expires == null ? false : new Date().after(expires);
+        return expires != null && new Date().after(expires);
 
     }
 
@@ -271,13 +271,13 @@ public class SourceSequence extends AbstractSequence {
      *
      * @param to
      */
-    synchronized void setTarget(EndpointReferenceType to) {
+    public synchronized void setTarget(EndpointReferenceType to) {
         if (target == null && !ContextUtils.isGenericAddress(to)) {
             target = to;
         }
     }
 
-    synchronized EndpointReferenceType getTarget() {
+    public synchronized EndpointReferenceType getTarget() {
         return target;
     }
 

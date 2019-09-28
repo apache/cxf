@@ -38,7 +38,7 @@ public class JwsJsonConsumer {
     protected static final Logger LOG = LogUtils.getL7dLogger(JwsJsonConsumer.class);
     private String jwsSignedDocument;
     private String jwsPayload;
-    private List<JwsJsonSignatureEntry> signatures = new LinkedList<JwsJsonSignatureEntry>();
+    private List<JwsJsonSignatureEntry> signatures = new LinkedList<>();
     /**
      * @param jwsSignedDocument
      *            signed JWS Document
@@ -109,9 +109,8 @@ public class JwsJsonConsumer {
     public String getDecodedJwsPayload() {
         if (validateB64Status()) {
             return JoseUtils.decodeToString(jwsPayload);
-        } else {
-            return jwsPayload;
         }
+        return jwsPayload;
     }
     public byte[] getDecodedJwsPayloadBytes() {
         return StringUtils.toBytesUTF8(getDecodedJwsPayload());
@@ -182,7 +181,7 @@ public class JwsJsonConsumer {
 
     public List<JwsJsonSignatureEntry> verifyAndGetNonValidated(List<JwsSignatureVerifier> validators,
                                                                 Map<String, Object> entryProps) {
-        List<JwsJsonSignatureEntry> validatedSignatures = new LinkedList<JwsJsonSignatureEntry>();
+        List<JwsJsonSignatureEntry> validatedSignatures = new LinkedList<>();
         for (JwsSignatureVerifier validator : validators) {
             List<JwsJsonSignatureEntry> theSignatureEntries =
                 getSignatureEntryMap().get(validator.getAlgorithm());
@@ -202,7 +201,7 @@ public class JwsJsonConsumer {
         if (validatedSignatures.isEmpty()) {
             throw new JwsException(JwsException.Error.INVALID_SIGNATURE);
         }
-        List<JwsJsonSignatureEntry> nonValidatedSignatures = new LinkedList<JwsJsonSignatureEntry>();
+        List<JwsJsonSignatureEntry> nonValidatedSignatures = new LinkedList<>();
         for (JwsJsonSignatureEntry sigEntry : signatures) {
             if (!validatedSignatures.contains(sigEntry)) {
                 nonValidatedSignatures.add(sigEntry);
@@ -220,9 +219,8 @@ public class JwsJsonConsumer {
             JwsJsonProducer producer = new JwsJsonProducer(getDecodedJwsPayload());
             producer.getSignatureEntries().addAll(nonValidated);
             return producer.getJwsJsonSignedDocument();
-        } else {
-            return null;
         }
+        return null;
     }
 
 

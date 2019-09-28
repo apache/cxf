@@ -71,6 +71,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientCallback;
+import org.apache.cxf.endpoint.ClientImpl.IllegalEmptyResponseException;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.DOMUtils;
@@ -315,15 +316,16 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
                     addInvokeOperation(opName, isOneWay);
                 }
             }
-            Holder<T> holder = new Holder<T>(obj);
+            Holder<T> holder = new Holder<>(obj);
             opName = calculateOpName(holder, opName, hasOpName);
 
-            Object ret[] = client.invokeWrapped(opName,
-                                                holder.value);
+            Object[] ret = client.invokeWrapped(opName, holder.value);
             if (isOneWay || ret == null || ret.length == 0) {
                 return null;
             }
             return (T)ret[0];
+        } catch (IllegalEmptyResponseException ie) {
+            return null;
         } catch (Exception ex) {
             throw mapException(ex);
         }
@@ -420,9 +422,19 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
         checkError();
         client.setExecutor(getClient().getEndpoint().getExecutor());
 
-        ClientCallback callback = new JaxwsClientCallback<T>(asyncHandler, this);
+        ClientCallback callback = new JaxwsClientCallback<T>(asyncHandler, this) {
+            @Override
+            protected Throwable mapThrowable(Throwable t) {
+                if (t instanceof IOException) {
+                    return t;
+                } else if (t instanceof Exception) {
+                    t = mapException((Exception)t);
+                }
+                return t;
+            }
+        };            
 
-        Response<T> ret = new JaxwsResponseCallback<T>(callback);
+        Response<T> ret = new JaxwsResponseCallback<>(callback);
         try {
             boolean hasOpName;
 
@@ -439,7 +451,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
                 }
             }
 
-            Holder<T> holder = new Holder<T>(obj);
+            Holder<T> holder = new Holder<>(obj);
             opName = calculateOpName(holder, opName, hasOpName);
 
             client.invokeWrapped(callback,
@@ -538,7 +550,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
     }
 
     private Map<String, QName> createPayloadEleOpNameMap(BindingInfo bindingInfo, boolean reverseMapping) {
-        Map<String, QName> payloadElementMap = new java.util.HashMap<String, QName>();
+        Map<String, QName> payloadElementMap = new java.util.HashMap<>();
         // assume a document binding style, which is default according to W3C spec on WSDL
         String bindingStyle = "document";
         // if the bindingInfo is a SOAPBindingInfo instance then we can see if it has a style

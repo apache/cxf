@@ -24,17 +24,22 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Collections;
 
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.ext.ParamConverter;
 import javax.ws.rs.ext.ParamConverterProvider;
 
 import org.apache.cxf.jaxrs.resources.BookInterface;
 import org.apache.cxf.jaxrs.resources.BookStore;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class WebClientTest extends Assert {
+
+public class WebClientTest {
 
     @Test
     public void testReplaceHeader() {
@@ -319,6 +324,13 @@ public class WebClientTest extends Assert {
         proxy.getBook(null);
     }
 
+    @Test
+    public void testWebClientAuthorization() {
+        String auth = "auth";
+        WebClient wc = WebClient.create(URI.create("http://foo")).authorization(auth);
+        assertEquals(auth, wc.getHeaders().getFirst(HttpHeaders.AUTHORIZATION));
+    }
+
     private static class ParamConverterProviderImpl implements ParamConverterProvider {
 
         @SuppressWarnings("unchecked")
@@ -333,7 +345,6 @@ public class WebClientTest extends Assert {
 
         @Override
         public ComplexObject fromString(String value) throws IllegalArgumentException {
-            // TODO Auto-generated method stub
             return null;
         }
 

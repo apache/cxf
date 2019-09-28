@@ -21,6 +21,8 @@ package org.apache.cxf.systest.type_test;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPFactory;
 import javax.xml.ws.Holder;
 
 import org.apache.type_test.types1.ComplexRestriction;
@@ -33,7 +35,14 @@ import org.apache.type_test.types1.MixedArray;
 import org.apache.type_test.types1.MixedArray.Array10;
 import org.apache.type_test.types1.MixedArray.Array9;
 import org.apache.type_test.types1.UnboundedArray;
+import org.apache.type_test.types2.StructWithAnyArrayLax;
+import org.apache.type_test.types2.StructWithAnyStrict;
+
+import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
 
@@ -49,8 +58,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
         x.setValue("str_x");
         ComplexRestriction yOrig = new ComplexRestriction();
         yOrig.setValue("string_yyy");
-        Holder<ComplexRestriction> y = new Holder<ComplexRestriction>(yOrig);
-        Holder<ComplexRestriction> z = new Holder<ComplexRestriction>();
+        Holder<ComplexRestriction> y = new Holder<>(yOrig);
+        Holder<ComplexRestriction> z = new Holder<>();
 
         ComplexRestriction ret;
         if (testDocLiteral) {
@@ -61,11 +70,11 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
             ret = rpcClient.testComplexRestriction(x, y, z);
         }
         if (!perfTestOnly) {
-            assertEquals("testComplexRestriction(): Incorrect value for inout param",
+            Assert.assertEquals("testComplexRestriction(): Incorrect value for inout param",
                          x.getValue(), y.value.getValue());
-            assertEquals("testComplexRestriction(): Incorrect value for out param",
+            Assert.assertEquals("testComplexRestriction(): Incorrect value for out param",
                          yOrig.getValue(), z.value.getValue());
-            assertEquals("testComplexRestriction(): Incorrect return value",
+            Assert.assertEquals("testComplexRestriction(): Incorrect return value",
                          x.getValue(), ret.getValue());
         }
 
@@ -76,8 +85,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
                 x.setValue("string_x");
                 yOrig = new ComplexRestriction();
                 yOrig.setValue("string_yyyyyy");
-                y = new Holder<ComplexRestriction>(yOrig);
-                z = new Holder<ComplexRestriction>();
+                y = new Holder<>(yOrig);
+                z = new Holder<>();
 
                 ret = testDocLiteral ? docClient.testComplexRestriction(x, y, z)
                         : xmlClient.testComplexRestriction(x, y, z);
@@ -100,8 +109,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
         x.setValue("string_xxx");
         ComplexRestriction2 yOrig = new ComplexRestriction2();
         yOrig.setValue("string_yyy");
-        Holder<ComplexRestriction2> y = new Holder<ComplexRestriction2>(yOrig);
-        Holder<ComplexRestriction2> z = new Holder<ComplexRestriction2>();
+        Holder<ComplexRestriction2> y = new Holder<>(yOrig);
+        Holder<ComplexRestriction2> z = new Holder<>();
 
         ComplexRestriction2 ret;
         if (testDocLiteral) {
@@ -112,11 +121,11 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
             ret = rpcClient.testComplexRestriction2(x, y, z);
         }
         if (!perfTestOnly) {
-            assertEquals("testComplexRestriction2(): Incorrect value for inout param",
+            Assert.assertEquals("testComplexRestriction2(): Incorrect value for inout param",
                          x.getValue(), y.value.getValue());
-            assertEquals("testComplexRestriction2(): Incorrect value for out param",
+            Assert.assertEquals("testComplexRestriction2(): Incorrect value for out param",
                          yOrig.getValue(), z.value.getValue());
-            assertEquals("testComplexRestriction2(): Incorrect return value",
+            Assert.assertEquals("testComplexRestriction2(): Incorrect return value",
                          x.getValue(), ret.getValue());
         }
 
@@ -127,8 +136,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
                 x.setValue("str_x");
                 yOrig = new ComplexRestriction2();
                 yOrig.setValue("string_yyy");
-                y = new Holder<ComplexRestriction2>(yOrig);
-                z = new Holder<ComplexRestriction2>();
+                y = new Holder<>(yOrig);
+                z = new Holder<>();
 
                 ret = testDocLiteral ? docClient.testComplexRestriction2(x, y, z)
                         : xmlClient.testComplexRestriction2(x, y, z);
@@ -152,8 +161,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
         x.setValue("str_x");
         ComplexRestriction3 yOrig = new ComplexRestriction3();
         yOrig.setValue("string_yyy");
-        Holder<ComplexRestriction3> y = new Holder<ComplexRestriction3>(yOrig);
-        Holder<ComplexRestriction3> z = new Holder<ComplexRestriction3>();
+        Holder<ComplexRestriction3> y = new Holder<>(yOrig);
+        Holder<ComplexRestriction3> z = new Holder<>();
 
         ComplexRestriction3 ret;
         if (testDocLiteral) {
@@ -164,11 +173,11 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
             ret = rpcClient.testComplexRestriction3(x, y, z);
         }
         if (!perfTestOnly) {
-            assertEquals("testComplexRestriction3(): Incorrect value for inout param",
+            Assert.assertEquals("testComplexRestriction3(): Incorrect value for inout param",
                          x.getValue(), y.value.getValue());
-            assertEquals("testComplexRestriction3(): Incorrect value for out param",
+            Assert.assertEquals("testComplexRestriction3(): Incorrect value for out param",
                          yOrig.getValue(), z.value.getValue());
-            assertEquals("testComplexRestriction3(): Incorrect return value",
+            Assert.assertEquals("testComplexRestriction3(): Incorrect return value",
                          x.getValue(), ret.getValue());
         }
 
@@ -177,8 +186,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
             try {
                 x = new ComplexRestriction3();
                 x.setValue("str");
-                y = new Holder<ComplexRestriction3>(yOrig);
-                z = new Holder<ComplexRestriction3>();
+                y = new Holder<>(yOrig);
+                z = new Holder<>();
                 ret = testDocLiteral ? docClient.testComplexRestriction3(x, y, z)
                         : xmlClient.testComplexRestriction3(x, y, z);
                 fail("maxLength=10 && minLength=5 restriction is violated.");
@@ -190,8 +199,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
                 x.setValue("string_x");
                 yOrig = new ComplexRestriction3();
                 yOrig.setValue("string_yyyyyy");
-                y = new Holder<ComplexRestriction3>(yOrig);
-                z = new Holder<ComplexRestriction3>();
+                y = new Holder<>(yOrig);
+                z = new Holder<>();
                 ret = testDocLiteral ? docClient.testComplexRestriction3(x, y, z)
                         : xmlClient.testComplexRestriction3(x, y, z);
                 fail("maxLength=10 && minLength=5 restriction is violated.");
@@ -214,8 +223,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
         x.setValue("str_x");
         ComplexRestriction4 yOrig = new ComplexRestriction4();
         yOrig.setValue("y");
-        Holder<ComplexRestriction4> y = new Holder<ComplexRestriction4>(yOrig);
-        Holder<ComplexRestriction4> z = new Holder<ComplexRestriction4>();
+        Holder<ComplexRestriction4> y = new Holder<>(yOrig);
+        Holder<ComplexRestriction4> z = new Holder<>();
 
         ComplexRestriction4 ret;
         if (testDocLiteral) {
@@ -226,11 +235,11 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
             ret = rpcClient.testComplexRestriction4(x, y, z);
         }
         if (!perfTestOnly) {
-            assertEquals("testComplexRestriction4(): Incorrect value for inout param",
+            Assert.assertEquals("testComplexRestriction4(): Incorrect value for inout param",
                          x.getValue(), y.value.getValue());
-            assertEquals("testComplexRestriction4(): Incorrect value for out param",
+            Assert.assertEquals("testComplexRestriction4(): Incorrect value for out param",
                          yOrig.getValue(), z.value.getValue());
-            assertEquals("testComplexRestriction4(): Incorrect return value",
+            Assert.assertEquals("testComplexRestriction4(): Incorrect return value",
                          x.getValue(), ret.getValue());
         }
 
@@ -239,8 +248,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
             try {
                 x = new ComplexRestriction4();
                 x.setValue("str_xxx");
-                y = new Holder<ComplexRestriction4>(yOrig);
-                z = new Holder<ComplexRestriction4>();
+                y = new Holder<>(yOrig);
+                z = new Holder<>();
                 ret = testDocLiteral ? docClient.testComplexRestriction4(x, y, z)
                         : xmlClient.testComplexRestriction4(x, y, z);
                 fail("maxLength=5 restriction is violated.");
@@ -261,8 +270,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
         x.setValue("http://www.iona.com");
         ComplexRestriction5 yOrig = new ComplexRestriction5();
         yOrig.setValue("http://www.iona.com/info/services/oss/");
-        Holder<ComplexRestriction5> y = new Holder<ComplexRestriction5>(yOrig);
-        Holder<ComplexRestriction5> z = new Holder<ComplexRestriction5>();
+        Holder<ComplexRestriction5> y = new Holder<>(yOrig);
+        Holder<ComplexRestriction5> z = new Holder<>();
 
         ComplexRestriction5 ret;
         if (testDocLiteral) {
@@ -273,11 +282,11 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
             ret = rpcClient.testComplexRestriction5(x, y, z);
         }
         if (!perfTestOnly) {
-            assertEquals("testComplexRestriction5(): Incorrect value for inout param",
+            Assert.assertEquals("testComplexRestriction5(): Incorrect value for inout param",
                          x.getValue(), y.value.getValue());
-            assertEquals("testComplexRestriction5(): Incorrect value for out param",
+            Assert.assertEquals("testComplexRestriction5(): Incorrect value for out param",
                          yOrig.getValue(), z.value.getValue());
-            assertEquals("testComplexRestriction5(): Incorrect return value",
+            Assert.assertEquals("testComplexRestriction5(): Incorrect return value",
                          x.getValue(), ret.getValue());
         }
 
@@ -286,8 +295,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
             try {
                 x = new ComplexRestriction5();
                 x.setValue("uri");
-                y = new Holder<ComplexRestriction5>(yOrig);
-                z = new Holder<ComplexRestriction5>();
+                y = new Holder<>(yOrig);
+                z = new Holder<>();
                 ret = docClient.testComplexRestriction5(x, y, z);
                 fail("maxLength=50 && minLength=5 restriction is violated.");
             } catch (Exception ex) {
@@ -299,8 +308,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
                 x.setValue("http://www.iona.com");
                 yOrig = new ComplexRestriction5();
                 yOrig.setValue("http://www.iona.com/info/services/oss/info_services_oss_train.html");
-                y = new Holder<ComplexRestriction5>(yOrig);
-                z = new Holder<ComplexRestriction5>();
+                y = new Holder<>(yOrig);
+                z = new Holder<>();
                 ret = testDocLiteral ? docClient.testComplexRestriction5(x, y, z)
                         : xmlClient.testComplexRestriction5(x, y, z);
                 fail("maxLength=50 && minLength=5 restriction is violated.");
@@ -446,8 +455,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
         yOrig.getArray10().addAll(Arrays.asList(array101, array102, array103));
         yOrig.getArray11().addAll(Arrays.asList("XXX", "YYY", "ZZZ"));
 
-        Holder<MixedArray> y = new Holder<MixedArray>(yOrig);
-        Holder<MixedArray> z = new Holder<MixedArray>();
+        Holder<MixedArray> y = new Holder<>(yOrig);
+        Holder<MixedArray> z = new Holder<>();
         MixedArray ret;
         if (testDocLiteral) {
             ret = docClient.testMixedArray(x, y, z);
@@ -493,8 +502,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
         yOrig.getArray9().clear();
         yOrig.getArray11().clear();
 
-        y = new Holder<MixedArray>(yOrig);
-        z = new Holder<MixedArray>();
+        y = new Holder<>(yOrig);
+        z = new Holder<>();
         if (testDocLiteral) {
             ret = docClient.testMixedArray(x, y, z);
         } else if (testXMLBinding) {
@@ -506,6 +515,228 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
             assertTrue("testMixedArray(): Incorrect value for inout param", equals(x, y.value));
             assertTrue("testMixedArray(): Incorrect value for out param", equals(yOrig, z.value));
             assertTrue("testMixedArray(): Incorrect return value", equals(x, ret));
+        }
+    }
+    public void assertEqualsStructWithAnyStrict(StructWithAnyStrict a,
+                                                StructWithAnyStrict b) throws Exception {
+        Assert.assertEquals("StructWithAnyStrict names don't match", a.getName(), b.getName());
+        Assert.assertEquals("StructWithAnyStrict addresses don't match", a.getAddress(), b.getAddress());
+        if (a.getAny() instanceof SOAPElement && b.getAny() instanceof SOAPElement) {
+            assertEquals((SOAPElement)a.getAny(), (SOAPElement)b.getAny());
+        }
+    }
+
+    public void assertEqualsStructWithAnyArrayLax(StructWithAnyArrayLax a,
+            StructWithAnyArrayLax b) throws Exception {
+        Assert.assertEquals("StructWithAnyArrayLax names don't match", a.getName(), b.getName());
+        Assert.assertEquals("StructWithAnyArrayLax addresses don't match", a.getAddress(), b.getAddress());
+
+        List<Object> ae = a.getAny();
+        List<Object> be = b.getAny();
+        Assert.assertEquals("StructWithAnyArrayLax soap element lengths don't match", ae.size(), be.size());
+        for (int i = 0; i < ae.size(); i++) {
+            if (ae.get(i) instanceof SOAPElement && be.get(i) instanceof SOAPElement) {
+                Assert.assertEquals(ae.get(i), be.get(i));
+            }
+        }
+    }
+    @Test
+    public void testStructWithAnyStrict() throws Exception {
+        if (!shouldRunTest("StructWithAnyStrict")) {
+            return;
+        }
+        SOAPFactory factory = SOAPFactory.newInstance();
+        SOAPElement elem = factory.createElement("StringElementQualified",
+            "x1", "http://apache.org/type_test/types1");
+        elem.addNamespaceDeclaration("x1", "http://apache.org/type_test/types1");
+        elem.addTextNode("This is the text of the node");
+
+        StructWithAnyStrict x = new StructWithAnyStrict();
+        x.setName("Name x");
+        x.setAddress("Some Address x");
+        x.setAny(elem);
+
+        elem = factory.createElement("StringElementQualified",
+            "x1", "http://apache.org/type_test/types1");
+        elem.addNamespaceDeclaration("x1", "http://apache.org/type_test/types1");
+        elem.addTextNode("This is the text of the second node");
+
+        StructWithAnyStrict yOrig = new StructWithAnyStrict();
+        yOrig.setName("Name y");
+        yOrig.setAddress("Some Address y");
+        yOrig.setAny(elem);
+
+        Holder<StructWithAnyStrict> y = new Holder<>(yOrig);
+        Holder<StructWithAnyStrict> z = new Holder<>();
+        StructWithAnyStrict ret;
+        if (testDocLiteral) {
+            ret = docClient.testStructWithAnyStrict(x, y, z);
+        } else if (testXMLBinding) {
+            ret = xmlClient.testStructWithAnyStrict(x, y, z);
+        } else {
+            ret = rpcClient.testStructWithAnyStrict(x, y, z);
+        }
+
+        if (!perfTestOnly) {
+            assertEqualsStructWithAnyStrict(x, y.value);
+            assertEqualsStructWithAnyStrict(yOrig, z.value);
+            assertEqualsStructWithAnyStrict(x, ret);
+        }
+    }
+
+    @Test
+    public void testStructWithAnyArrayLax() throws Exception {
+        if (!shouldRunTest("StructWithAnyArrayLax")) {
+            return;
+        }
+        SOAPFactory factory = SOAPFactory.newInstance();
+        SOAPElement elem = factory.createElement("StringElementQualified",
+            "x1", "http://apache.org/type_test/types1");
+        elem.addNamespaceDeclaration("x1", "http://apache.org/type_test/types1");
+        elem.addTextNode("This is the text of the node");
+
+        StructWithAnyArrayLax x = new StructWithAnyArrayLax();
+        x.setName("Name x");
+        x.setAddress("Some Address x");
+        x.getAny().add(elem);
+
+        elem = factory.createElement("StringElementQualified", "x1",
+            "http://apache.org/type_test/types1");
+        elem.addNamespaceDeclaration("x1", "http://apache.org/type_test/types1");
+        elem.addTextNode("This is the text of the node for the second struct");
+
+        StructWithAnyArrayLax yOrig = new StructWithAnyArrayLax();
+        yOrig.setName("Name y");
+        yOrig.setAddress("Some Other Address y");
+        yOrig.getAny().add(elem);
+
+        Holder<StructWithAnyArrayLax> y = new Holder<>(yOrig);
+        Holder<StructWithAnyArrayLax> z = new Holder<>();
+        StructWithAnyArrayLax ret;
+        if (testDocLiteral) {
+            ret = docClient.testStructWithAnyArrayLax(x, y, z);
+        } else if (testXMLBinding) {
+            ret = xmlClient.testStructWithAnyArrayLax(x, y, z);
+        } else {
+            ret = rpcClient.testStructWithAnyArrayLax(x, y, z);
+        }
+        if (!perfTestOnly) {
+            assertEqualsStructWithAnyArrayLax(x, y.value);
+            assertEqualsStructWithAnyArrayLax(yOrig, z.value);
+            assertEqualsStructWithAnyArrayLax(x, ret);
+        }
+    }
+    @Test
+    public void testStructWithAnyStrictComplex() throws Exception {
+        if (!shouldRunTest("StructWithAnyStrictComplex")) {
+            return;
+        }
+        SOAPFactory factory = SOAPFactory.newInstance();
+        SOAPElement elem = factory.createElement("AnonTypeElementQualified",
+            "x1", "http://apache.org/type_test/types1");
+        elem.addNamespaceDeclaration("x1", "http://apache.org/type_test/types1");
+        SOAPElement floatElem = factory.createElement("varFloat", "x1",
+            "http://apache.org/type_test/types1");
+        floatElem.addTextNode("12.5");
+        elem.addChildElement(floatElem);
+        SOAPElement intElem = factory.createElement("varInt", "x1",
+            "http://apache.org/type_test/types1");
+        intElem.addTextNode("34");
+        elem.addChildElement(intElem);
+        SOAPElement stringElem = factory.createElement("varString", "x1",
+            "http://apache.org/type_test/types1");
+        stringElem.addTextNode("test string within any");
+        elem.addChildElement(stringElem);
+
+        StructWithAnyStrict x = new StructWithAnyStrict();
+        x.setName("Name x");
+        x.setAddress("Some Address x");
+        x.setAny(elem);
+
+        elem = factory.createElement("AnonTypeElementQualified", "x1",
+            "http://apache.org/type_test/types1");
+        elem.addNamespaceDeclaration("x1", "http://apache.org/type_test/types1");
+        floatElem = factory.createElement("varFloat", "x1",
+            "http://apache.org/type_test/types1");
+        floatElem.addTextNode("12.76");
+        elem.addChildElement(floatElem);
+        intElem = factory.createElement("varInt", "x1",
+            "http://apache.org/type_test/types1");
+        intElem.addTextNode("56");
+        elem.addChildElement(intElem);
+        stringElem = factory.createElement("varString", "x1",
+            "http://apache.org/type_test/types1");
+        stringElem.addTextNode("test string");
+        elem.addChildElement(stringElem);
+
+        StructWithAnyStrict yOrig = new StructWithAnyStrict();
+        yOrig.setName("Name y");
+        yOrig.setAddress("Some Address y");
+        yOrig.setAny(elem);
+
+        Holder<StructWithAnyStrict> y = new Holder<>(yOrig);
+        Holder<StructWithAnyStrict> z = new Holder<>();
+        StructWithAnyStrict ret;
+        if (testDocLiteral) {
+            ret = docClient.testStructWithAnyStrict(x, y, z);
+        } else if (testXMLBinding) {
+            ret = xmlClient.testStructWithAnyStrict(x, y, z);
+        } else {
+            ret = rpcClient.testStructWithAnyStrict(x, y, z);
+        }
+        if (!perfTestOnly) {
+            assertEqualsStructWithAnyStrict(x, y.value);
+            assertEqualsStructWithAnyStrict(yOrig, z.value);
+            assertEqualsStructWithAnyStrict(x, ret);
+        }
+    }
+
+
+    @Test
+    public void testStructWithAnyArrayLaxComplex() throws Exception {
+        if (!shouldRunTest("StructWithAnyArrayLaxComplex")) {
+            return;
+        }
+        SOAPFactory factory = SOAPFactory.newInstance();
+        SOAPElement elem = factory.createElement("AnonTypeElementQualified", "x1",
+            "http://apache.org/type_test/types1");
+        elem.addNamespaceDeclaration("x1", "http://apache.org/type_test/types1");
+        SOAPElement floatElem = factory.createElement("varFloat", "x1",
+            "http://apache.org/type_test/types1");
+        floatElem.addTextNode("12.76");
+        elem.addChildElement(floatElem);
+        SOAPElement intElem = factory.createElement("varInt", "x1",
+            "http://apache.org/type_test/types1");
+        intElem.addTextNode("56");
+        elem.addChildElement(intElem);
+        SOAPElement stringElem = factory.createElement("varString", "x1",
+            "http://apache.org/type_test/types1");
+        stringElem.addTextNode("test string");
+        elem.addChildElement(stringElem);
+
+        StructWithAnyArrayLax x = new StructWithAnyArrayLax();
+        x.setName("Name x");
+        x.setAddress("Some Address x");
+        x.getAny().add(elem);
+        StructWithAnyArrayLax yOrig = new StructWithAnyArrayLax();
+        yOrig.setName("Name y");
+        yOrig.setAddress("Some Other Address y");
+        yOrig.getAny().add(elem);
+
+        Holder<StructWithAnyArrayLax> y = new Holder<>(yOrig);
+        Holder<StructWithAnyArrayLax> z = new Holder<>();
+        StructWithAnyArrayLax ret;
+        if (testDocLiteral) {
+            ret = docClient.testStructWithAnyArrayLax(x, y, z);
+        } else if (testXMLBinding) {
+            ret = xmlClient.testStructWithAnyArrayLax(x, y, z);
+        } else {
+            ret = rpcClient.testStructWithAnyArrayLax(x, y, z);
+        }
+        if (!perfTestOnly) {
+            assertEqualsStructWithAnyArrayLax(x, y.value);
+            assertEqualsStructWithAnyArrayLax(yOrig, z.value);
+            assertEqualsStructWithAnyArrayLax(x, ret);
         }
     }
 

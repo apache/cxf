@@ -80,13 +80,11 @@ public class JCABusFactory {
             BusFactory bf = BusFactory.newInstance();
             bus = bf.createBus();
             initializeServants();
+        } catch (ResourceAdapterInternalException ex) {
+            throw ex;
         } catch (Exception ex) {
-            if (ex instanceof ResourceAdapterInternalException) {
-                throw (ResourceException)ex;
-            } else {
-                throw new ResourceAdapterInternalException(
-                                  new Message("FAIL_TO_INITIALIZE_JCABUSFACTORY", BUNDLE).toString(), ex);
-            }
+            throw new ResourceAdapterInternalException(
+                              new Message("FAIL_TO_INITIALIZE_JCABUSFACTORY", BUNDLE).toString(), ex);
         } finally {
             Thread.currentThread().setContextClassLoader(original);
         }
@@ -183,25 +181,15 @@ public class JCABusFactory {
 
     protected Properties loadProperties(URL propsUrl) throws ResourceException {
         Properties props = null;
-        InputStream istream = null;
 
         LOG.info("loadProperties, url=" + propsUrl);
 
-        try {
-            istream = propsUrl.openStream();
+        try (InputStream istream = propsUrl.openStream()) {
             props = new Properties();
             props.load(istream);
         } catch (IOException e) {
             throw new ResourceAdapterInternalException(
                        new Message("FAIL_TO_LOAD_EJB_SERVANT_PROPERTIES", BUNDLE, propsUrl).toString(), e);
-        } finally {
-            if (istream != null) {
-                try {
-                    istream.close();
-                } catch (IOException e) {
-                    //DO Nothing
-                }
-            }
         }
 
         return props;
@@ -258,7 +246,7 @@ public class JCABusFactory {
                         LOG.info("ejbServicePropertiesFile modified, initializing/updating servants");
                         initializeServantsFromProperties(loadProperties(propsFile.toURI().toURL()));
                     }
-                    Thread.sleep((long)pollIntervalSeconds * 1000L);
+                    Thread.sleep(pollIntervalSeconds * 1000L);
                 } catch (Exception e) {
                     LOG.info("MonitorThread: failed to initialiseServantsFromProperties "
                               + "with properties absolute path=" + propsFile.getAbsolutePath());

@@ -24,6 +24,7 @@ import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.xml.namespace.QName;
 
 public class JavaType {
@@ -95,11 +96,11 @@ public class JavaType {
     }
 
     private void resolvePackage(String clzName) {
-        if (clzName == null || clzName.lastIndexOf(".") == -1) {
+        if (clzName == null || clzName.lastIndexOf('.') == -1) {
             this.packageName = "";
             this.simpleName = clzName;
         } else {
-            int index = clzName.lastIndexOf(".");
+            int index = clzName.lastIndexOf('.');
             this.packageName = clzName.substring(0, index);
             this.simpleName = clzName.substring(index + 1);
         }
@@ -146,11 +147,10 @@ public class JavaType {
         Constructor<?>[] cons = clz.getConstructors();
         if (cons.length == 0) {
             return false;
-        } else {
-            for (int i = 0; i < cons.length; i++) {
-                if (cons[i].getParameterTypes().length == 0) {
-                    return true;
-                }
+        }
+        for (int i = 0; i < cons.length; i++) {
+            if (cons[i].getParameterTypes().length == 0) {
+                return true;
             }
         }
         return false;
@@ -216,7 +216,7 @@ public class JavaType {
     }
 
     public String toString() {
-        final StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder(128);
         sb.append("\nName: ");
         sb.append(this.name);
         sb.append("\nType: ");

@@ -42,6 +42,7 @@ public class AbstractJwsJsonReaderProvider {
     private JwsSignatureVerifier sigVerifier;
     private String defaultMediaType;
     private Map<String, Object> entryProps;
+    private boolean checkEmptyStream;
     
     public void setSignatureVerifier(JwsSignatureVerifier signatureVerifier) {
         this.sigVerifier = signatureVerifier;
@@ -96,4 +97,14 @@ public class AbstractJwsJsonReaderProvider {
     public void setProtectedHttpHeaders(Set<String> protectedHttpHeaders) {
         this.protectedHttpHeaders = protectedHttpHeaders;
     }
+
+    public boolean isCheckEmptyStream() {
+        return checkEmptyStream;
+    }
+
+    public void setCheckEmptyStream(boolean checkEmptyStream) {
+        this.checkEmptyStream = checkEmptyStream;
+    }
+
+    
 }

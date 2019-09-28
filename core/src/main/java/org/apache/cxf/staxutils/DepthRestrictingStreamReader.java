@@ -18,7 +18,8 @@
  */
 package org.apache.cxf.staxutils;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -36,7 +37,7 @@ public class DepthRestrictingStreamReader extends DepthXMLStreamReader {
 
     private DocumentDepthProperties props;
     private int totalElementCount;
-    private Stack<Integer> stack = new Stack<Integer>();
+    private final Deque<Integer> stack = new ArrayDeque<>();
 
     public DepthRestrictingStreamReader(XMLStreamReader reader,
                                         int elementCountThreshold,
@@ -66,13 +67,12 @@ public class DepthRestrictingStreamReader extends DepthXMLStreamReader {
                 throw new DepthExceededStaxException();
             }
             if (props.getInnerElementCountThreshold() != -1) {
-                if (!stack.empty()) {
+                if (!stack.isEmpty()) {
                     int currentCount = stack.pop();
                     if (++currentCount >= props.getInnerElementCountThreshold()) {
                         throw new DepthExceededStaxException();
-                    } else {
-                        stack.push(currentCount);
                     }
+                    stack.push(currentCount);
                 }
                 stack.push(0);
             }

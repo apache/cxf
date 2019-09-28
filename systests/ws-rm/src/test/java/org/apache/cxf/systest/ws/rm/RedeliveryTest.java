@@ -40,6 +40,11 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Tests the redelivery of the message upon a delivery error.
  */
@@ -57,7 +62,7 @@ public class RedeliveryTest extends AbstractBusClientServerTestBase {
         String pfx;
         Endpoint ep;
 
-        public Server(String args[]) {
+        public Server(String[] args) {
             port = args[0];
             pfx = args[1];
         }

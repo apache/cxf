@@ -34,10 +34,14 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.staxutils.PropertiesExpandingStreamReader;
 import org.apache.cxf.staxutils.XMLStreamReaderWrapper;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class WSDLManagerImplTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class WSDLManagerImplTest {
 
     @Test
     public void testBuildSimpleWSDL() throws Exception {

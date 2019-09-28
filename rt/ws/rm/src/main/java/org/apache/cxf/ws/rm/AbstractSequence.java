@@ -67,9 +67,8 @@ public abstract class AbstractSequence {
     public static boolean identifierEquals(Identifier id1, Identifier id2) {
         if (null == id1) {
             return null == id2;
-        } else {
-            return null != id2 && id1.getValue().equals(id2.getValue());
         }
+        return null != id2 && id1.getValue().equals(id2.getValue());
     }
 
     public synchronized boolean isAcknowledged(long m) {

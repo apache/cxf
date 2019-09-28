@@ -29,10 +29,13 @@ import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.resources.BookStore;
 import org.apache.cxf.message.MessageImpl;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JAXRSServerFactoryBeanTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+
+public class JAXRSServerFactoryBeanTest {
 
     @Test
     public void testRegisterProviders() {
@@ -68,7 +71,6 @@ public class JAXRSServerFactoryBeanTest extends Assert {
     private static class CustomExceptionMapper implements ExceptionMapper<Exception> {
 
         public Response toResponse(Exception exception) {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -77,7 +79,6 @@ public class JAXRSServerFactoryBeanTest extends Assert {
     private static class RuntimeExceptionMapper implements ExceptionMapper<RuntimeException> {
 
         public Response toResponse(RuntimeException exception) {
-            // TODO Auto-generated method stub
             return null;
         }
 

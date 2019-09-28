@@ -28,6 +28,7 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
@@ -35,9 +36,14 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.example.contract.doubleit.DoubleItSwaPortType;
 import org.example.schema.doubleit.DoubleIt3;
+import org.example.schema.doubleit.DoubleItResponse;
+
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * A set of tests for the SwA specification (SOAP with Attachments) via WS-SecurityPolicy.
@@ -73,12 +79,12 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
+    public static Collection<TestParam> data() {
 
-        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
-                                                {new TestParam(PORT, true)},
-                                                {new TestParam(STAX_PORT, false)},
-                                                {new TestParam(STAX_PORT, true)},
+        return Arrays.asList(new TestParam[] {new TestParam(PORT, false),
+                                              new TestParam(PORT, true),
+                                              new TestParam(STAX_PORT, false),
+                                              new TestParam(STAX_PORT, true),
         });
     }
 
@@ -95,8 +101,8 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
         URL busFile = SWAPolicyTest.class.getResource("policy-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SWAPolicyTest.class.getResource("DoubleItSwa.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -111,7 +117,8 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
 
         DoubleIt3 doubleIt = new DoubleIt3();
         doubleIt.setNumberToDouble(25);
-        port.doubleIt3(doubleIt, "12345".getBytes());
+        DoubleItResponse response = port.doubleIt3(doubleIt, "12345".getBytes());
+        assertEquals(50, response.getDoubledNumber());
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -124,8 +131,8 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
         URL busFile = SWAPolicyTest.class.getResource("policy-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SWAPolicyTest.class.getResource("DoubleItSwa.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -140,7 +147,8 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
 
         DoubleIt3 doubleIt = new DoubleIt3();
         doubleIt.setNumberToDouble(25);
-        port.doubleIt3(doubleIt, "12345".getBytes());
+        DoubleItResponse response = port.doubleIt3(doubleIt, "12345".getBytes());
+        assertEquals(50, response.getDoubledNumber());
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -153,8 +161,8 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
         URL busFile = SWAPolicyTest.class.getResource("policy-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SWAPolicyTest.class.getResource("DoubleItSwa.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -169,7 +177,8 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
 
         DoubleIt3 doubleIt = new DoubleIt3();
         doubleIt.setNumberToDouble(25);
-        port.doubleIt3(doubleIt, "12345".getBytes());
+        DoubleItResponse response = port.doubleIt3(doubleIt, "12345".getBytes());
+        assertEquals(50, response.getDoubledNumber());
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -182,8 +191,8 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
         URL busFile = SWAPolicyTest.class.getResource("policy-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SWAPolicyTest.class.getResource("DoubleItSwa.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -198,7 +207,8 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
 
         DoubleIt3 doubleIt = new DoubleIt3();
         doubleIt.setNumberToDouble(25);
-        port.doubleIt3(doubleIt, "12345".getBytes());
+        DoubleItResponse response = port.doubleIt3(doubleIt, "12345".getBytes());
+        assertEquals(50, response.getDoubledNumber());
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -211,8 +221,8 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
         URL busFile = SWAPolicyTest.class.getResource("policy-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SWAPolicyTest.class.getResource("DoubleItSwa.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -227,7 +237,8 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
 
         DoubleIt3 doubleIt = new DoubleIt3();
         doubleIt.setNumberToDouble(25);
-        port.doubleIt3(doubleIt, "12345".getBytes());
+        DoubleItResponse response = port.doubleIt3(doubleIt, "12345".getBytes());
+        assertEquals(50, response.getDoubledNumber());
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -240,8 +251,8 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
         URL busFile = SWAPolicyTest.class.getResource("policy-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SWAPolicyTest.class.getResource("DoubleItSwa.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -256,7 +267,8 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
 
         DoubleIt3 doubleIt = new DoubleIt3();
         doubleIt.setNumberToDouble(25);
-        port.doubleIt3(doubleIt, "12345".getBytes());
+        DoubleItResponse response = port.doubleIt3(doubleIt, "12345".getBytes());
+        assertEquals(50, response.getDoubledNumber());
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -269,8 +281,8 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
         URL busFile = SWAPolicyTest.class.getResource("policy-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SWAPolicyTest.class.getResource("DoubleItSwa.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -285,7 +297,8 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
 
         DoubleIt3 doubleIt = new DoubleIt3();
         doubleIt.setNumberToDouble(25);
-        port.doubleIt3(doubleIt, "12345".getBytes());
+        DoubleItResponse response = port.doubleIt3(doubleIt, "12345".getBytes());
+        assertEquals(50, response.getDoubledNumber());
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);

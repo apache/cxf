@@ -23,13 +23,17 @@ import org.apache.cxf.transport.http.policy.impl.ServerPolicyCalculator;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
 import org.apache.neethi.Assertion;
-import org.junit.Assert;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  */
-public class HTTPServerAssertionBuilderTest extends Assert {
+public class HTTPServerAssertionBuilderTest {
 
 
     @Test
@@ -39,7 +43,7 @@ public class HTTPServerAssertionBuilderTest extends Assert {
         assertTrue(a instanceof JaxbAssertion);
         assertTrue(a instanceof HTTPServerAssertionBuilder.HTTPServerPolicyAssertion);
         assertEquals(new ServerPolicyCalculator().getDataClassName(), a.getName());
-        assertTrue(!a.isOptional());
+        assertFalse(a.isOptional());
     }
 
     @Test
@@ -58,7 +62,7 @@ public class HTTPServerAssertionBuilderTest extends Assert {
         b.setData(pb);
         assertTrue(a.equal(b));
         pa.setSuppressClientSendErrors(true);
-        assertTrue(!a.equal(b));
+        assertFalse(a.equal(b));
     }
 
 }

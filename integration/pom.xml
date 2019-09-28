@@ -23,17 +23,17 @@
     <packaging>pom</packaging>
     <name>Apache CXF Integration</name>
     <description>Apache CXF Integration</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
     </parent>
     <modules>
         <module>jca</module>
         <module>cdi</module>
-        <module>tracing/tracing-htrace</module>
         <module>tracing/tracing-brave</module>
+        <module>tracing/tracing-opentracing</module>
         <module>spring-boot</module>
     </modules>
 </project>

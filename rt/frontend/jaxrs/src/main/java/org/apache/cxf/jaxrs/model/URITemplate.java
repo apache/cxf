@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,6 +33,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
@@ -44,7 +46,10 @@ public final class URITemplate {
     private static final String CHARACTERS_TO_ESCAPE = ".*+$()";
     private static final String SLASH = "/";
     private static final String SLASH_QUOTE = "/;";
-
+    private static final int MAX_URI_TEMPLATE_CACHE_SIZE = 
+        SystemPropertyAction.getInteger("org.apache.cxf.jaxrs.max_uri_template_cache_size", 2000);
+    private static final Map<String, URITemplate> URI_TEMPLATE_CACHE = new ConcurrentHashMap<>();
+    
     private final String template;
     private final List<String> variables = new ArrayList<>();
     private final List<String> customVariables = new ArrayList<>();
@@ -83,7 +88,7 @@ public final class URITemplate {
         literals = literalChars.toString();
 
         int endPos = patternBuilder.length() - 1;
-        boolean endsWithSlash = (endPos >= 0) ? patternBuilder.charAt(endPos) == '/' : false;
+        boolean endsWithSlash = (endPos >= 0) && patternBuilder.charAt(endPos) == '/';
         if (endsWithSlash) {
             patternBuilder.deleteCharAt(endPos);
         }
@@ -125,10 +130,34 @@ public final class URITemplate {
 
     private static String escapeCharacters(String expression) {
 
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < expression.length(); i++) {
-            char ch = expression.charAt(i);
-            sb.append(isReservedCharacter(ch) ? "\\" + ch : ch);
+        int length = expression.length();
+        int i = 0;
+        char ch = ' ';
+        for (; i < length; ++i) {
+            ch = expression.charAt(i);
+            if (isReservedCharacter(ch)) {
+                break;
+            }
+        }
+
+        if (i == length) {
+            return expression;
+        }
+
+        // Allows for up to 8 escaped characters before we start creating more
+        // StringBuilders. 8 is an arbitrary limit, but it seems to be
+        // sufficient in most cases.
+        StringBuilder sb = new StringBuilder(length + 8);
+        sb.append(expression, 0, i);
+        sb.append('\\');
+        sb.append(ch);
+        ++i;
+        for (; i < length; ++i) {
+            ch = expression.charAt(i);
+            if (isReservedCharacter(ch)) {
+                sb.append('\\');
+            }
+            sb.append(ch);
         }
         return sb.toString();
     }
@@ -327,40 +356,44 @@ public final class URITemplate {
     }
 
     public static URITemplate createTemplate(String pathValue) {
-
         if (pathValue == null) {
-            return new URITemplate("/");
-        }
-
-        if (!pathValue.startsWith("/")) {
+            pathValue = "/";
+        } else if (!pathValue.startsWith("/")) {
             pathValue = "/" + pathValue;
         }
-
-        return new URITemplate(pathValue);
+        return createExactTemplate(pathValue);
     }
-
-    public static int compareTemplates(URITemplate t1, URITemplate t2) {
-        String l1 = t1.getLiteralChars();
-        String l2 = t2.getLiteralChars();
-        if (!l1.equals(l2)) {
-            // descending order
-            return l1.length() < l2.length() ? 1 : -1;
-        }
-
-        int g1 = t1.getVariables().size();
-        int g2 = t2.getVariables().size();
-        // descending order
-        int result = g1 < g2 ? 1 : g1 > g2 ? -1 : 0;
-        if (result == 0) {
-            int gCustom1 = t1.getCustomVariables().size();
-            int gCustom2 = t2.getCustomVariables().size();
-            if (gCustom1 != gCustom2) {
-                // descending order
-                return gCustom1 < gCustom2 ? 1 : -1;
+    
+    public static URITemplate createExactTemplate(String pathValue) {
+        URITemplate template = URI_TEMPLATE_CACHE.get(pathValue);
+        if (template == null) {
+            template = new URITemplate(pathValue);
+            if (URI_TEMPLATE_CACHE.size() >= MAX_URI_TEMPLATE_CACHE_SIZE) {
+                URI_TEMPLATE_CACHE.clear();
             }
+            URI_TEMPLATE_CACHE.put(pathValue, template);
         }
+        return template;
+    }
+    
+    public static int compareTemplates(URITemplate t1, URITemplate t2) {
+        int l1 = t1.getLiteralChars().length();
+        int l2 = t2.getLiteralChars().length();
+        // descending order
+        int result = l1 < l2 ? 1 : l1 > l2 ? -1 : 0;
         if (result == 0) {
-            result = t1.getPatternValue().compareTo(t2.getPatternValue());
+            int g1 = t1.getVariables().size();
+            int g2 = t2.getVariables().size();
+            // descending order
+            result = g1 < g2 ? 1 : g1 > g2 ? -1 : 0;
+            if (result == 0) {
+                int gCustom1 = t1.getCustomVariables().size();
+                int gCustom2 = t2.getCustomVariables().size();
+                result = gCustom1 < gCustom2 ? 1 : gCustom1 > gCustom2 ? -1 : 0;
+                if (result == 0) {
+                    result = t1.getPatternValue().compareTo(t2.getPatternValue());
+                }
+            }
         }
 
         return result;
@@ -478,18 +511,16 @@ public final class URITemplate {
         public boolean matches(String value) {
             if (pattern == null) {
                 return true;
-            } else {
-                return pattern.matcher(value).matches();
             }
+            return pattern.matcher(value).matches();
         }
 
         @Override
         public String getValue() {
             if (pattern != null) {
                 return "{" + name + ":" + pattern + "}";
-            } else {
-                return "{" + name + "}";
             }
+            return "{" + name + "}";
         }
     }
 
@@ -566,9 +597,8 @@ public final class URITemplate {
         public static String stripBraces(String token) {
             if (insideBraces(token)) {
                 return token.substring(1, token.length() - 1);
-            } else {
-                return token;
             }
+            return token;
         }
 
         public boolean hasNext() {
@@ -578,9 +608,8 @@ public final class URITemplate {
         public String next() {
             if (hasNext()) {
                 return tokens.get(tokenIdx++);
-            } else {
-                throw new IllegalStateException("no more elements");
             }
+            throw new IllegalStateException("no more elements");
         }
     }
 }

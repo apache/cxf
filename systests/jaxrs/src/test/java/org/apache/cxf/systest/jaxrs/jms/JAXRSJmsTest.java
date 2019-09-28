@@ -54,6 +54,10 @@ import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     protected static boolean serversStarted;
     static final String JMS_PORT = EmbeddedJMSBrokerLauncher.PORT;
@@ -98,6 +102,25 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void testGetBookFromWebClientWithTextJMSMessage() throws Exception {
+        // setup the the client
+        String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
+             + "?replyToName=dynamicQueues/test.jmstransport.response"
+             + "&jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "&jndiURL=tcp://localhost:" + JMS_PORT
+             + "&messageType=text";
+
+        WebClient client = WebClient.create(endpointAddressUrlEncoded);
+        WebClient.getConfig(client).getInInterceptors().add(new LoggingInInterceptor());
+        WebClient.getConfig(client).getRequestContext()
+            .put(org.apache.cxf.message.Message.REQUEST_URI, "/bookstore/books/123");
+
+        Book book = client.get(Book.class);
+        assertEquals("Get a wrong response code.", 200, client.getResponse().getStatus());
+        assertEquals("Get a wrong book id.", 123, book.getId());
+    }
+
+    @Test
     public void testPutBookOneWayWithWebClient() throws Exception {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
@@ -109,7 +132,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(client).getRequestContext()
             .put(org.apache.cxf.message.Message.REQUEST_URI, "/bookstore/oneway");
         client.header("OnewayRequest", "true");
-        Response r = client.put(new Book("OneWay From WebClient", 129L));
+        Response r = client.type("application/xml").put(new Book("OneWay From WebClient", 129L));
         assertEquals(202, r.getStatus());
         assertFalse(r.hasEntity());
 
@@ -130,6 +153,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         }
     }
 
+
     @Test
     public void testGetBookFromWebClientWithPath() throws Exception {
         // setup the the client
@@ -148,6 +172,25 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void testGetBookFromWebClientWithPathWithTextJMSMessage() throws Exception {
+        // setup the the client
+        String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
+             + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "&replyToName=dynamicQueues/test.jmstransport.response"
+             + "&jndiURL=tcp://localhost:" + JMS_PORT
+             + "&jndiConnectionFactoryName=ConnectionFactory"
+             + "&messageType=text";
+
+        WebClient client = WebClient.create(endpointAddressUrlEncoded);
+        client.path("bookstore").path("books").path("123");
+
+        Book book = client.get(Book.class);
+        assertEquals("Get a wrong response code.", 200, client.getResponse().getStatus());
+        assertEquals("Get a wrong book id.", 123, book.getId());
+    }
+
+
+    @Test
     public void testGetBookFromProxyClient() throws Exception {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
@@ -155,6 +198,22 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
              + "&replyToName=dynamicQueues/test.jmstransport.response"
              + "&jndiURL=tcp://localhost:" + JMS_PORT
              + "&jndiConnectionFactoryName=ConnectionFactory";
+
+        JMSBookStore client = JAXRSClientFactory.create(endpointAddressUrlEncoded, JMSBookStore.class);
+        Book book = client.getBook("123");
+        assertEquals("Get a wrong response code.", 200, WebClient.client(client).getResponse().getStatus());
+        assertEquals("Get a wrong book id.", 123, book.getId());
+    }
+
+    @Test
+    public void testGetBookFromProxyClientWithTextJMSMessage() throws Exception {
+        // setup the the client
+        String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
+             + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "&replyToName=dynamicQueues/test.jmstransport.response"
+             + "&jndiURL=tcp://localhost:" + JMS_PORT
+             + "&jndiConnectionFactoryName=ConnectionFactory"
+             + "&messageType=text";
 
         JMSBookStore client = JAXRSClientFactory.create(endpointAddressUrlEncoded, JMSBookStore.class);
         Book book = client.getBook("123");
@@ -179,6 +238,23 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void testGetBookFromSubresourceProxyClientWithTextJMSMessage() throws Exception {
+        // setup the the client
+        String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
+             + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "&replyToName=dynamicQueues/test.jmstransport.response"
+             + "&jndiURL=tcp://localhost:" + JMS_PORT
+             + "&jndiConnectionFactoryName=ConnectionFactory"
+             + "&messageType=text";
+
+        JMSBookStore client = JAXRSClientFactory.create(endpointAddressUrlEncoded, JMSBookStore.class);
+        Book bookProxy = client.getBookSubResource("123");
+        Book book = bookProxy.retrieveState();
+        assertEquals("Get a wrong response code.", 200, WebClient.client(bookProxy).getResponse().getStatus());
+        assertEquals("Get a wrong book id.", 123, book.getId());
+    }
+
+    @Test
     public void testGetBookFromProxyClientWithQuery() throws Exception {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
@@ -192,6 +268,24 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         assertEquals("Get a wrong response code.", 200, WebClient.client(client).getResponse().getStatus());
         assertEquals("Get a wrong book id.", 123, book.getId());
     }
+
+
+    @Test
+    public void testGetBookFromProxyClientWithQueryWithTextJMSMessage() throws Exception {
+        // setup the the client
+        String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
+             + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "&replyToName=dynamicQueues/test.jmstransport.response"
+             + "&jndiURL=tcp://localhost:" + JMS_PORT
+             + "&jndiConnectionFactoryName=ConnectionFactory"
+             + "&messageType=text";
+
+        JMSBookStore client = JAXRSClientFactory.create(endpointAddressUrlEncoded, JMSBookStore.class);
+        Book book = client.getBookByURLQuery(new String[] {"1", "2", "3"});
+        assertEquals("Get a wrong response code.", 200, WebClient.client(client).getResponse().getStatus());
+        assertEquals("Get a wrong book id.", 123, book.getId());
+    }
+
 
     @Test
     public void testGetBook() throws Exception {

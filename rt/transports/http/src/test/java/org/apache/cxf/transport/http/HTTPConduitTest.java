@@ -26,26 +26,38 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
+import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.transport.http.HTTPConduit.WrappedOutputStream;
 import org.apache.cxf.transport.http.auth.HttpAuthSupplier;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class HTTPConduitTest extends Assert {
+
+public class HTTPConduitTest {
 
     @Before
     public void setUp() throws Exception {
@@ -58,9 +70,9 @@ public class HTTPConduitTest extends Assert {
     /**
      * Generates a new message.
      */
-    private Message getNewMessage() {
+    private Message getNewMessage() throws Exception {
         Message message = new MessageImpl();
-        Map<String, List<String>> headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+        Map<String, List<String>> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         List<String> contentTypes = new ArrayList<>();
         contentTypes.add("text/xml");
         contentTypes.add("charset=utf8");
@@ -228,4 +240,49 @@ public class HTTPConduitTest extends Assert {
     }
 
 
+    @Test
+    public void testHandleResponseOnWorkqueueAllowCurrentThread() throws Exception {
+        Message m = getNewMessage();
+        Exchange exchange = new ExchangeImpl();
+        Bus bus = new ExtensionManagerBus();
+        exchange.put(Bus.class, bus);
+
+        EndpointInfo endpointInfo = new EndpointInfo();
+        Endpoint endpoint = new EndpointImpl(null, null, endpointInfo);
+        exchange.put(Endpoint.class, endpoint);
+
+        m.setExchange(exchange);
+
+        HTTPClientPolicy policy = new HTTPClientPolicy();
+        policy.setAsyncExecuteTimeoutRejection(true);
+        m.put(HTTPClientPolicy.class, policy);
+        exchange.put(Executor.class, new Executor() {
+
+            @Override
+            public void execute(Runnable command) {
+                // simulates a maxxed-out executor
+                // forces us to use current thread
+                throw new RejectedExecutionException("expected");
+            } });
+
+        HTTPConduit conduit = new MockHTTPConduit(bus, endpointInfo, policy);
+        OutputStream os = conduit.createOutputStream(m, false, false, 0);
+        assertTrue(os instanceof WrappedOutputStream);
+        WrappedOutputStream wos = (WrappedOutputStream) os;
+
+        try {
+            wos.handleResponseOnWorkqueue(true, false);
+            assertEquals(Thread.currentThread(), m.get(Thread.class));
+
+            try {
+                wos.handleResponseOnWorkqueue(false, false);
+                fail("Expected RejectedExecutionException not thrown");
+            } catch (RejectedExecutionException ex) {
+                assertEquals("expected", ex.getMessage());
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw ex;
+        }
+    }
 }

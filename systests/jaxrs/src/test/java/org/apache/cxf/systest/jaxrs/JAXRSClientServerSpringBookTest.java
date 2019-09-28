@@ -73,6 +73,13 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerSpring.PORT;
 
@@ -89,7 +96,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         String baseAddress = "http://localhost:" + PORT + "/the/thebooks8/books";
         WebClient wc = WebClient.create(baseAddress);
         Long id = wc.type("application/xml").accept("text/plain").post(new Book("CXF", 1L), Long.class);
-        assertEquals(new Long(1), id);
+        assertEquals(Long.valueOf(1), id);
         Book book = wc.replaceHeader("Accept", "application/xml").query("id", 1L).get(Book.class);
         assertEquals("CXF", book.getName());
     }
@@ -226,7 +233,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @Test
     public void testPostGeneratedBook() throws Exception {
         String baseAddress = "http://localhost:" + PORT + "/the/generated";
-        JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
+        JAXBElementProvider<?> provider = new JAXBElementProvider<>();
         provider.setJaxbElementClassMap(Collections.singletonMap(
                                           "org.apache.cxf.systest.jaxrs.codegen.schema.Book",
                                           "{http://superbooks}thebook"));
@@ -265,7 +272,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         NodeList nd = doc.getChildNodes();
         for (int i = 0; i < nd.getLength(); i++) {
             Node n = nd.item(i);
-            if (n.getNodeType() == Document.PROCESSING_INSTRUCTION_NODE) {
+            if (n.getNodeType() == Node.PROCESSING_INSTRUCTION_NODE) {
                 String piData = ((ProcessingInstruction)n).getData();
                 int hRefStart = piData.indexOf("href=\"");
                 if (hRefStart > 0) {
@@ -335,7 +342,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
 
         String name = helloStringISO88591.substring(
             helloStringISO88591.indexOf("\"name\":\"") + "\"name\":\"".length(),
-            helloStringISO88591.lastIndexOf("\""));
+            helloStringISO88591.lastIndexOf('"'));
 
         compareNames(name);
     }
@@ -504,7 +511,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         String endpointAddress =
             "http://localhost:" + PORT + "/the/thebooks9/depth";
         WebClient wc = WebClient.create(endpointAddress);
-        Response r = wc.post(new Book("CXF", 123L));
+        Response r = wc.type("application/xml").post(new Book("CXF", 123L));
         assertEquals(413, r.getStatus());
     }
 
@@ -513,7 +520,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         String endpointAddress =
             "http://localhost:" + PORT + "/the/thebooks9stax/depth";
         WebClient wc = WebClient.create(endpointAddress);
-        Response r = wc.post(new Book("CXF", 123L));
+        Response r = wc.type("application/xml").post(new Book("CXF", 123L));
         assertEquals(413, r.getStatus());
     }
 
@@ -523,7 +530,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
             "http://localhost:" + PORT + "/the/thebooks9/depth-source";
         WebClient wc = WebClient.create(endpointAddress);
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
-        Response r = wc.post(new Book("CXF", 123L));
+        Response r = wc.type("application/xml").post(new Book("CXF", 123L));
         assertEquals(413, r.getStatus());
     }
 
@@ -532,7 +539,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         String endpointAddress =
             "http://localhost:" + PORT + "/the/thebooks9stax/depth-source";
         WebClient wc = WebClient.create(endpointAddress);
-        Response r = wc.post(new Book("CXF", 123L));
+        Response r = wc.type("application/xml").post(new Book("CXF", 123L));
         assertEquals(413, r.getStatus());
     }
 
@@ -541,7 +548,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         String endpointAddress =
             "http://localhost:" + PORT + "/the/thebooks9/depth-dom";
         WebClient wc = WebClient.create(endpointAddress);
-        Response r = wc.post(new Book("CXF", 123L));
+        Response r = wc.type("application/xml").post(new Book("CXF", 123L));
         assertEquals(413, r.getStatus());
     }
 
@@ -550,7 +557,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         String endpointAddress =
             "http://localhost:" + PORT + "/the/thebooks9stax/depth-dom";
         WebClient wc = WebClient.create(endpointAddress);
-        Response r = wc.post(new Book("CXF", 123L));
+        Response r = wc.type("application/xml").post(new Book("CXF", 123L));
         assertEquals(413, r.getStatus());
     }
 
@@ -642,7 +649,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @Test
     public void testPostBookXsiType() throws Exception {
         String address = "http://localhost:" + PORT + "/the/thebooksxsi/bookstore/books/xsitype";
-        JAXBElementProvider<Book> provider = new JAXBElementProvider<Book>();
+        JAXBElementProvider<Book> provider = new JAXBElementProvider<>();
         provider.setExtraClass(new Class[]{SuperBook.class});
         provider.setJaxbElementClassNames(Collections.singletonList(Book.class.getName()));
         WebClient wc = WebClient.create(address, Collections.singletonList(provider));
@@ -657,7 +664,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @Test
     public void testPostBookXsiTypeProxy() throws Exception {
         String address = "http://localhost:" + PORT + "/the/thebooksxsi/bookstore";
-        JAXBElementProvider<Book> provider = new JAXBElementProvider<Book>();
+        JAXBElementProvider<Book> provider = new JAXBElementProvider<>();
         provider.setExtraClass(new Class[]{SuperBook.class});
         provider.setJaxbElementClassNames(Collections.singletonList(Book.class.getName()));
         BookStoreSpring bookStore = JAXRSClientFactory.create(address, BookStoreSpring.class,

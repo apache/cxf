@@ -28,14 +28,18 @@ import org.w3c.dom.Document;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.phase.PhaseInterceptor;
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.SecurityActionToken;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.action.UsernameTokenAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
 
@@ -47,11 +51,11 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
         PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
 
-        msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
-        msg.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
-        msg.put(WSHandlerConstants.USER, "username");
+        msg.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
+        msg.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        msg.put(ConfigurationConstants.USER, "username");
         msg.put("password", "myAliasPassword");
-        msg.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        msg.put(ConfigurationConstants.PASSWORD_TYPE, WSS4JConstants.PW_TEXT);
         handler.handleMessage(msg);
 
         doc = msg.getContent(SOAPMessage.class).getSOAPPart();
@@ -70,11 +74,11 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
         PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
 
-        msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
-        msg.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
-        msg.put(WSHandlerConstants.USER, "username");
+        msg.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
+        msg.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        msg.put(ConfigurationConstants.USER, "username");
         msg.put("password", "myAliasPassword");
-        msg.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
+        msg.put(ConfigurationConstants.PASSWORD_TYPE, WSS4JConstants.PW_DIGEST);
         handler.handleMessage(msg);
 
         doc = msg.getContent(SOAPMessage.class).getSOAPPart();
@@ -93,10 +97,10 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
         PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
 
-        msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
-        msg.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
-        msg.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
-        msg.put(WSHandlerConstants.USER, "myalias");
+        msg.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        msg.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        msg.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
+        msg.put(ConfigurationConstants.USER, "myalias");
         msg.put("password", "myAliasPassword");
 
         handler.handleMessage(msg);
@@ -114,9 +118,9 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
         PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
 
-        msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        msg.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
-        msg.put(WSHandlerConstants.USER, "myAlias");
+        msg.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        msg.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        msg.put(ConfigurationConstants.USER, "myAlias");
         msg.put("password", "myAliasPassword");
 
         handler.handleMessage(msg);
@@ -134,9 +138,9 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
         PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
 
-        ohandler.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.TIMESTAMP);
-        ohandler.setProperty(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
-        msg.put(WSHandlerConstants.USER, "myalias");
+        ohandler.setProperty(ConfigurationConstants.ACTION, ConfigurationConstants.TIMESTAMP);
+        ohandler.setProperty(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        msg.put(ConfigurationConstants.USER, "myalias");
         msg.put("password", "myAliasPassword");
 
         handler.handleMessage(msg);
@@ -158,11 +162,11 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         Map<Object, Object> customActions = new HashMap<>(1);
         customActions.put(WSConstants.UT, action);
 
-        msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
-        msg.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
-        msg.put(WSHandlerConstants.USER, "username");
+        msg.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
+        msg.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        msg.put(ConfigurationConstants.USER, "username");
         msg.put("password", "myAliasPassword");
-        msg.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        msg.put(ConfigurationConstants.PASSWORD_TYPE, WSS4JConstants.PW_TEXT);
         msg.put(WSS4JOutInterceptor.WSS4J_ACTION_MAP, customActions);
         handler.handleMessage(msg);
 
@@ -202,11 +206,11 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         Map<Object, Object> customActions = new HashMap<>(1);
         customActions.put(12345, action);
 
-        msg.put(WSHandlerConstants.ACTION, "12345");
-        msg.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
-        msg.put(WSHandlerConstants.USER, "username");
+        msg.put(ConfigurationConstants.ACTION, "12345");
+        msg.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        msg.put(ConfigurationConstants.USER, "username");
         msg.put("password", "myAliasPassword");
-        msg.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        msg.put(ConfigurationConstants.PASSWORD_TYPE, WSS4JConstants.PW_TEXT);
         msg.put(WSS4JOutInterceptor.WSS4J_ACTION_MAP, customActions);
         handler.handleMessage(msg);
 
@@ -228,7 +232,7 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
                 RequestData reqData) throws WSSecurityException {
 
             this.executions++;
-            reqData.setPwType(WSConstants.PW_TEXT);
+            reqData.setPwType(WSS4JConstants.PW_TEXT);
             super.execute(handler, actionToken, reqData);
         }
 

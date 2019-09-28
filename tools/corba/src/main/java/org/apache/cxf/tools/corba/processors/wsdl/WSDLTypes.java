@@ -267,7 +267,7 @@ public final class WSDLTypes {
         boolean isUnion = false;
 
         if (type.getParticle() instanceof XmlSchemaSequence
-            && type.getAttributes().size() == 0) {
+            && type.getAttributes().isEmpty()) {
 
             XmlSchemaSequence stype = (XmlSchemaSequence)type.getParticle();
 
@@ -294,7 +294,7 @@ public final class WSDLTypes {
     public static boolean isUnion(XmlSchemaComplexType type) {
         boolean isUnion = false;
 
-        if (type.getParticle() instanceof XmlSchemaChoice && type.getAttributes().size() == 0) {
+        if (type.getParticle() instanceof XmlSchemaChoice && type.getAttributes().isEmpty()) {
             isUnion = true;
         }
 

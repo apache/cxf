@@ -33,6 +33,7 @@ import javax.xml.ws.WebServiceContext;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
@@ -73,18 +74,17 @@ public class MemoryResourceManager implements ResourceManager {
         String resource = storage.get(uuid);
         if (resource.isEmpty()) {
             return new Representation();
-        } else {
-            Document doc = null;
-            try {
-                doc = StaxUtils.read(new StringReader(storage.get(uuid)));
-            } catch (XMLStreamException e) {
-                LOG.severe(e.getLocalizedMessage());
-                throw new SoapFault("Internal Error", getSoapVersion().getReceiver());
-            }
-            Representation representation = new Representation();
-            representation.setAny(doc.getDocumentElement());
-            return representation;
         }
+        Document doc = null;
+        try {
+            doc = StaxUtils.read(new StringReader(storage.get(uuid)));
+        } catch (XMLStreamException e) {
+            LOG.severe(e.getLocalizedMessage());
+            throw new SoapFault("Internal Error", getSoapVersion().getReceiver());
+        }
+        Representation representation = new Representation();
+        representation.setAny(doc.getDocumentElement());
+        return representation;
     }
 
     @Override
@@ -121,7 +121,7 @@ public class MemoryResourceManager implements ResourceManager {
             storage.put(uuid, StaxUtils.toString(representationEl));
         }
 
-        Element uuidEl = DOMUtils.createDocument().createElementNS(REF_NAMESPACE, REF_LOCAL_NAME);
+        Element uuidEl = DOMUtils.getEmptyDocument().createElementNS(REF_NAMESPACE, REF_LOCAL_NAME);
         uuidEl.setTextContent(uuid);
 
         // Create referenceParameter

@@ -44,6 +44,7 @@ import javax.xml.transform.dom.DOMSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
@@ -91,6 +92,7 @@ import org.apache.cxf.ws.security.trust.TrustException;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -99,7 +101,6 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
@@ -162,13 +163,13 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
     protected Map<String, Object> ctx = new HashMap<>();
 
     protected List<Interceptor<? extends Message>> in
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+        = new ModCountCopyOnWriteArrayList<>();
     protected List<Interceptor<? extends Message>> out
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+        = new ModCountCopyOnWriteArrayList<>();
     protected List<Interceptor<? extends Message>> outFault
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+        = new ModCountCopyOnWriteArrayList<>();
     protected List<Interceptor<? extends Message>> inFault
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+        = new ModCountCopyOnWriteArrayList<>();
     protected List<AbstractFeature> features;
 
     public SimpleBatchSTSClient(Bus b) {
@@ -450,15 +451,14 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
     protected String findMEXLocation(Element ref) {
         Element el = DOMUtils.getFirstElement(ref);
         while (el != null) {
-            if (el.getLocalName().equals("Address")
+            if ("Address".equals(el.getLocalName())
                 && VersionTransformer.isSupported(el.getNamespaceURI())
                 && "MetadataReference".equals(ref.getLocalName())) {
                 return DOMUtils.getContent(el);
-            } else {
-                String ad = findMEXLocation(el);
-                if (ad != null) {
-                    return ad;
-                }
+            }
+            String ad = findMEXLocation(el);
+            if (ad != null) {
+                return ad;
             }
             el = DOMUtils.getNextElement(el);
         }
@@ -559,7 +559,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         }
         writer.writeEndElement();
 
-        Object obj[] = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
+        Object[] obj = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
 
         Element responseCollection = getDocumentElement((DOMSource)obj[0]);
         Node child = responseCollection.getFirstChild();
@@ -609,7 +609,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         }
         writer.writeEndElement();
 
-        Object obj[] = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
+        Object[] obj = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
 
         Element responseCollection = getDocumentElement((DOMSource)obj[0]);
         Node child = responseCollection.getFirstChild();
@@ -617,7 +617,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         while (child != null) {
             if (child instanceof Element
                 && "RequestSecurityTokenResponse".equals(((Element)child).getLocalName())) {
-                Element rstrChild = DOMUtils.getFirstElement((Element)child);
+                Element rstrChild = DOMUtils.getFirstElement(child);
                 while (rstrChild != null) {
                     if ("Status".equals(rstrChild.getLocalName())) {
                         Element e2 =
@@ -715,7 +715,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         W3CDOMStreamWriter writer
     ) throws XMLStreamException {
         writer.writeStartElement("wst", "BinaryExchange", namespace);
-        writer.writeAttribute("EncodingType", WSConstants.BASE64_ENCODING);
+        writer.writeAttribute("EncodingType", WSS4JConstants.BASE64_ENCODING);
         writer.writeAttribute("ValueType", namespace + "/spnego");
         writer.writeCharacters(binaryExchange);
         writer.writeEndElement();
@@ -788,7 +788,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias(alias);
 
-        X509Certificate certs[] = crypto.getX509Certificates(cryptoType);
+        X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         if (certs == null || certs.length == 0) {
             throw new Fault("Could not get X509Certificate for alias " + alias, LOG);
         }
@@ -800,12 +800,12 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         Instant expirationTime = creationTime.plusSeconds(ttl);
 
         writer.writeStartElement("wst", "Lifetime", namespace);
-        writer.writeNamespace("wsu", WSConstants.WSU_NS);
-        writer.writeStartElement("wsu", "Created", WSConstants.WSU_NS);
+        writer.writeNamespace("wsu", WSS4JConstants.WSU_NS);
+        writer.writeStartElement("wsu", "Created", WSS4JConstants.WSU_NS);
         writer.writeCharacters(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         writer.writeEndElement();
 
-        writer.writeStartElement("wsu", "Expires", WSConstants.WSU_NS);
+        writer.writeStartElement("wsu", "Expires", WSS4JConstants.WSU_NS);
         writer.writeCharacters(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         writer.writeEndElement();
         writer.writeEndElement();
@@ -898,7 +898,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
                 // First check for the binary secret
                 String b64Secret = DOMUtils.getContent(child);
                 secret = Base64.getMimeDecoder().decode(b64Secret);
-            } else if (childQname.equals(new QName(WSConstants.ENC_NS, WSConstants.ENC_KEY_LN))) {
+            } else if (childQname.equals(new QName(WSS4JConstants.ENC_NS, WSS4JConstants.ENC_KEY_LN))) {
                 secret = decryptKey(child);
             } else if (childQname.equals(new QName(namespace, "ComputedKey"))) {
                 // Handle the computed key
@@ -907,7 +907,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
 
                 if (computedKeyChild != null) {
                     QName computedKeyChildQName = DOMUtils.getElementQName(computedKeyChild);
-                    if (computedKeyChildQName.equals(new QName(WSConstants.ENC_NS, WSConstants.ENC_KEY_LN))) {
+                    if (computedKeyChildQName.equals(new QName(WSS4JConstants.ENC_NS, WSS4JConstants.ENC_KEY_LN))) {
                         serviceEntr = decryptKey(computedKeyChild);
                     } else if (computedKeyChildQName.equals(new QName(namespace, "BinarySecret"))) {
                         String content = DOMUtils.getContent(computedKeyChild);
@@ -949,11 +949,11 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         if (encryptionAlgorithm != null && encryptionAlgorithm.endsWith("spnego#GSS_Wrap")) {
             // Get the CipherValue
             Element tmpE =
-                XMLUtils.getDirectChildElement(child, "CipherData", WSConstants.ENC_NS);
+                XMLUtils.getDirectChildElement(child, "CipherData", WSS4JConstants.ENC_NS);
             byte[] cipherValue = null;
             if (tmpE != null) {
                 tmpE =
-                    XMLUtils.getDirectChildElement(tmpE, "CipherValue", WSConstants.ENC_NS);
+                    XMLUtils.getDirectChildElement(tmpE, "CipherValue", WSS4JConstants.ENC_NS);
                 if (tmpE != null) {
                     String content = DOMUtils.getContent(tmpE);
                     cipherValue = Base64.getMimeDecoder().decode(content);
@@ -963,25 +963,24 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noCipher");
             }
             return cipherValue;
-        } else {
-            try {
-                EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
-                RequestData data = new RequestData();
-                data.setWssConfig(WSSConfig.getNewInstance());
-                data.setDecCrypto(createCrypto(true));
-                data.setCallbackHandler(createHandler());
+        }
+        try {
+            EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
+            RequestData data = new RequestData();
+            data.setWssConfig(WSSConfig.getNewInstance());
+            data.setDecCrypto(createCrypto(true));
+            data.setCallbackHandler(createHandler());
 
-                WSDocInfo docInfo = new WSDocInfo(child.getOwnerDocument());
-                data.setWsDocInfo(docInfo);
+            WSDocInfo docInfo = new WSDocInfo(child.getOwnerDocument());
+            data.setWsDocInfo(docInfo);
 
-                List<WSSecurityEngineResult> result = proc.handleToken(child, data);
-                return
-                    (byte[])result.get(0).get(
-                        WSSecurityEngineResult.TAG_SECRET
-                    );
-            } catch (IOException e) {
-                throw new TrustException("ENCRYPTED_KEY_ERROR", e, LOG);
-            }
+            List<WSSecurityEngineResult> result = proc.handleToken(child, data);
+            return
+                (byte[])result.get(0).get(
+                    WSSecurityEngineResult.TAG_SECRET
+                );
+        } catch (IOException e) {
+            throw new TrustException("ENCRYPTED_KEY_ERROR", e, LOG);
         }
     }
 
@@ -1056,10 +1055,10 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         String id = null;
         if (rst != null) {
             QName elName = DOMUtils.getElementQName(rst);
-            if (elName.equals(new QName(WSConstants.SAML_NS, "Assertion"))
+            if (elName.equals(new QName(WSS4JConstants.SAML_NS, "Assertion"))
                 && rst.hasAttributeNS(null, "AssertionID")) {
                 id = rst.getAttributeNS(null, "AssertionID");
-            } else if (elName.equals(new QName(WSConstants.SAML2_NS, "Assertion"))
+            } else if (elName.equals(new QName(WSS4JConstants.SAML2_NS, "Assertion"))
                 && rst.hasAttributeNS(null, "ID")) {
                 id = rst.getAttributeNS(null, "ID");
             }
@@ -1074,7 +1073,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
             id = this.getIDFromSTR(rur);
         }
         if (id == null && rst != null) {
-            id = rst.getAttributeNS(WSConstants.WSU_NS, "Id");
+            id = rst.getAttributeNS(WSS4JConstants.WSU_NS, "Id");
         }
         return id;
     }
@@ -1085,8 +1084,8 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
             return null;
         }
         QName elName = DOMUtils.getElementQName(child);
-        if (elName.equals(new QName(WSConstants.SIG_NS, "KeyInfo"))
-            || elName.equals(new QName(WSConstants.WSSE_NS, "KeyIdentifier"))) {
+        if (elName.equals(new QName(WSS4JConstants.SIG_NS, "KeyInfo"))
+            || elName.equals(new QName(WSS4JConstants.WSSE_NS, "KeyIdentifier"))) {
             return DOMUtils.getContent(child);
         } else if (elName.equals(Reference.TOKEN)) {
             return child.getAttributeNS(null, "URI");

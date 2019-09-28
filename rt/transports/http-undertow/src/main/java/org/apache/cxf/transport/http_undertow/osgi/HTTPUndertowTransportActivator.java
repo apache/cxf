@@ -66,7 +66,7 @@ public class HTTPUndertowTransportActivator
 
     UndertowHTTPServerEngineFactory factory = new UndertowHTTPServerEngineFactory() {
         public MBeanServer getMBeanServer() {
-            return (MBeanServer)mbeanServerTracker.getService();
+            return mbeanServerTracker.getService();
         }
     };
 
@@ -119,9 +119,7 @@ public class HTTPUndertowTransportActivator
 
             UndertowHTTPServerEngine e = factory.retrieveUndertowHTTPServerEngine(port);
             configure(e, properties);
-        } catch (GeneralSecurityException e) {
-            throw new ConfigurationException(null, null, e);
-        } catch (IOException e) {
+        } catch (GeneralSecurityException | IOException e) {
             throw new ConfigurationException(null, null, e);
         }
     }

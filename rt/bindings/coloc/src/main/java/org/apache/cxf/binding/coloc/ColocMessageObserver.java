@@ -95,7 +95,7 @@ public class ColocMessageObserver extends ChainInitiationObserver {
             }
 
             //Add all interceptors between USER_LOGICAL and INVOKE.
-            SortedSet<Phase> phases = new TreeSet<Phase>(bus.getExtension(PhaseManager.class).getInPhases());
+            SortedSet<Phase> phases = new TreeSet<>(bus.getExtension(PhaseManager.class).getInPhases());
             ColocUtil.setPhases(phases, Phase.USER_LOGICAL, Phase.INVOKE);
             InterceptorChain chain = ColocUtil.getInInterceptorChain(ex, phases);
             chain.add(addColocInterceptors());
@@ -167,7 +167,7 @@ public class ColocMessageObserver extends ChainInitiationObserver {
     }
 
     protected List<Interceptor<? extends Message>> addColocInterceptors() {
-        List<Interceptor<? extends Message>> list = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> list = new ArrayList<>();
         list.add(new ColocInInterceptor());
         return list;
     }

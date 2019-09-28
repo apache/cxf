@@ -29,15 +29,20 @@ import org.apache.cxf.bus.managers.WorkQueueManagerImpl;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.management.counters.CounterRepository;
 import org.apache.cxf.management.jmx.InstrumentationManagerImpl;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-public class InstrumentationManagerTest extends Assert {
+
+public class InstrumentationManagerTest {
     InstrumentationManager im;
     Bus bus;
 
@@ -59,7 +64,7 @@ public class InstrumentationManagerTest extends Assert {
         SpringBusFactory factory = new SpringBusFactory();
         bus = factory.createBus();
         im = bus.getExtension(InstrumentationManager.class);
-        assertTrue("Instrumentation Manager should not be null", im != null);
+        assertNotNull("Instrumentation Manager should not be null", im);
         MBeanServer mbs = im.getMBeanServer();
         assertNull("MBeanServer should not be available.", mbs);
     }
@@ -69,7 +74,7 @@ public class InstrumentationManagerTest extends Assert {
         SpringBusFactory factory = new SpringBusFactory();
         bus = factory.createBus("managed-spring3.xml", true);
         im = bus.getExtension(InstrumentationManager.class);
-        assertTrue("Instrumentation Manager should not be null", im != null);
+        assertNotNull("Instrumentation Manager should not be null", im);
         MBeanServer mbs = im.getMBeanServer();
         assertNotNull("MBeanServer should be available.", mbs);
     }
@@ -80,7 +85,7 @@ public class InstrumentationManagerTest extends Assert {
         SpringBusFactory factory = new SpringBusFactory();
         bus = factory.createBus("managed-spring.xml", true);
         im = bus.getExtension(InstrumentationManager.class);
-        assertTrue("Instrumentation Manager should not be null", im != null);
+        assertNotNull("Instrumentation Manager should not be null", im);
         WorkQueueManagerImpl wqm = new WorkQueueManagerImpl();
         wqm.setBus(bus);
         wqm.getAutomaticWorkQueue();
@@ -111,11 +116,10 @@ public class InstrumentationManagerTest extends Assert {
 
     @Test
     public void testInstrumentTwoBuses() {
-        ClassPathXmlApplicationContext context = null;
         Bus cxf1 = null;
         Bus cxf2 = null;
-        try {
-            context = new ClassPathXmlApplicationContext("managed-spring-twobuses.xml");
+        try (ClassPathXmlApplicationContext context
+            = new ClassPathXmlApplicationContext("managed-spring-twobuses.xml")) {
 
             cxf1 = (Bus)context.getBean("cxf1");
             InstrumentationManager im1 = cxf1.getExtension(InstrumentationManager.class);
@@ -138,19 +142,15 @@ public class InstrumentationManagerTest extends Assert {
             if (cxf2 != null) {
                 cxf2.shutdown(true);
             }
-            if (context != null) {
-                context.close();
-            }
         }
     }
 
     @Test
     public void testInstrumentBusWithBusProperties() {
-        ClassPathXmlApplicationContext context = null;
         Bus cxf1 = null;
         Bus cxf2 = null;
-        try {
-            context = new ClassPathXmlApplicationContext("managed-spring-twobuses2.xml");
+        try (ClassPathXmlApplicationContext context
+            = new ClassPathXmlApplicationContext("managed-spring-twobuses2.xml")) {
 
             cxf1 = (Bus)context.getBean("cxf1");
             InstrumentationManagerImpl im1 =
@@ -174,9 +174,6 @@ public class InstrumentationManagerTest extends Assert {
             }
             if (cxf2 != null) {
                 cxf2.shutdown(true);
-            }
-            if (context != null) {
-                context.close();
             }
         }
     }

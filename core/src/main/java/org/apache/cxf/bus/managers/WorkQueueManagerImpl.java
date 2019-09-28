@@ -49,7 +49,7 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
         LogUtils.getL7dLogger(WorkQueueManagerImpl.class);
 
     Map<String, AutomaticWorkQueue> namedQueues
-        = new ConcurrentHashMap<String, AutomaticWorkQueue>(4, 0.75f, 2);
+        = new ConcurrentHashMap<>(4, 0.75f, 2);
 
     boolean inShutdown;
     InstrumentationManager imanager;
@@ -153,7 +153,7 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
             for (AutomaticWorkQueue q : namedQueues.values()) {
                 while (!q.isShutdown()) {
                     try {
-                        wait(100);
+                        wait(100L);
                     } catch (InterruptedException ex) {
                         // ignore
                     }

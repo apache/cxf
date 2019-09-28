@@ -71,7 +71,7 @@ public class WSDL2JavaScriptMojo extends AbstractCodegenMoho {
      * If you have not enabled wsdl scanning, these options call out the wsdls to process.
      */
     @Parameter
-    WsdlOption wsdlOptions[];
+    WsdlOption[] wsdlOptions;
 
     @Override
     protected Bus generate(GenericWsdlOption genericWsdlOption,
@@ -97,11 +97,11 @@ public class WSDL2JavaScriptMojo extends AbstractCodegenMoho {
 
         List<String> list = wsdlOption.generateCommandLine(outputDirFile, basedir, wsdlURI, getLog()
             .isDebugEnabled());
-        String[] args = list.toArray(new String[list.size()]);
+        String[] args = list.toArray(new String[0]);
         getLog().debug("Calling wsdl2js with args: " + Arrays.toString(args));
 
         if (!"false".equals(fork)) {
-            Set<URI> artifactsPath = new LinkedHashSet<URI>();
+            Set<URI> artifactsPath = new LinkedHashSet<>();
             for (Artifact a : pluginArtifacts) {
                 File file = a.getFile();
                 if (file == null) {
@@ -175,7 +175,7 @@ public class WSDL2JavaScriptMojo extends AbstractCodegenMoho {
         } else if (timestamp > doneFile.lastModified()) {
             doWork = true;
         } else {
-            File files[] = wsdlOption.getDependencies();
+            File[] files = wsdlOption.getDependencies();
             if (files != null) {
                 for (int z = 0; z < files.length; ++z) {
                     if (files[z].lastModified() > doneFile.lastModified()) {

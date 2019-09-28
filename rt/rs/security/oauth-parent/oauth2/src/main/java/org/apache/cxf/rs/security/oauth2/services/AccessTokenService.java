@@ -50,8 +50,8 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
  */
 @Path("/token")
 public class AccessTokenService extends AbstractTokenService {
-    private List<AccessTokenGrantHandler> grantHandlers = new LinkedList<AccessTokenGrantHandler>();
-    private List<AccessTokenResponseFilter> responseHandlers = new LinkedList<AccessTokenResponseFilter>();
+    private List<AccessTokenGrantHandler> grantHandlers = new LinkedList<>();
+    private List<AccessTokenResponseFilter> responseHandlers = new LinkedList<>();
 
     /**
      * Sets the list of optional grant handlers
@@ -65,10 +65,10 @@ public class AccessTokenService extends AbstractTokenService {
     protected void injectContextIntoOAuthProviders() {
         super.injectContextIntoOAuthProviders();
         for (AccessTokenGrantHandler grantHandler : grantHandlers) {
-            OAuthUtils.injectContextIntoOAuthProvider(getMessageContext(), grantHandler);    
+            OAuthUtils.injectContextIntoOAuthProvider(getMessageContext(), grantHandler);
         }
     }
-    
+
     /**
      * Sets a grant handler
      * @param handler the grant handler
@@ -125,6 +125,7 @@ public class AccessTokenService extends AbstractTokenService {
         } catch (WebApplicationException ex) {
             throw ex;
         } catch (RuntimeException ex) {
+            LOG.log(Level.FINE, "Error creating the access token", ex);
             // This is done to bypass a Check-Style
             // restriction on a number of return statements
             OAuthServiceException oauthEx = ex instanceof OAuthServiceException
@@ -153,7 +154,9 @@ public class AccessTokenService extends AbstractTokenService {
     protected void checkAudience(Client c, MultivaluedMap<String, String> params) {
         String audienceParam = params.getFirst(OAuthConstants.CLIENT_AUDIENCE);
         if (!OAuthUtils.validateAudience(audienceParam, c.getRegisteredAudiences())) {
-            LOG.fine("Error validating the audience parameter");
+            LOG.log(Level.FINE, "Error validating the audience parameter. Supplied audience {0} "
+                    + "does not match with the registered audiences {1}",
+                    new Object[] {audienceParam, c.getRegisteredAudiences() });
             throw new OAuthServiceException(new OAuthError(OAuthConstants.ACCESS_DENIED));
         }
 
@@ -175,7 +178,7 @@ public class AccessTokenService extends AbstractTokenService {
             if (super.getDataProvider() instanceof AuthorizationCodeDataProvider) {
                 AuthorizationCodeGrantHandler handler = new AuthorizationCodeGrantHandler();
                 if (handler.getSupportedGrantTypes().contains(grantType)) {
-                    handler.setDataProvider((AuthorizationCodeDataProvider)super.getDataProvider());
+                    handler.setDataProvider(super.getDataProvider());
                     return handler;
                 }
             }

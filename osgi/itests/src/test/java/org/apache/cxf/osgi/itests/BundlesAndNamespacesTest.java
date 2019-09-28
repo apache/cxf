@@ -38,22 +38,21 @@ public class BundlesAndNamespacesTest extends CXFOSGiTestSupport {
     @Test
     public void test() throws Exception {
         assertBundleStarted("org.apache.cxf.cxf-core");
-        assertBlueprintNamespacePublished("http://cxf.apache.org/blueprint/core", 1000);
-        assertBlueprintNamespacePublished("http://cxf.apache.org/configuration/beans", 1000);
-        assertBlueprintNamespacePublished("http://cxf.apache.org/configuration/parameterized-types", 1000);
-        assertBlueprintNamespacePublished("http://cxf.apache.org/configuration/security", 1000);
-        assertBlueprintNamespacePublished("http://schemas.xmlsoap.org/wsdl/", 1000);
+        assertBlueprintNamespacePublished("http://cxf.apache.org/blueprint/core", 1000L);
+        assertBlueprintNamespacePublished("http://cxf.apache.org/configuration/beans", 1000L);
+        assertBlueprintNamespacePublished("http://cxf.apache.org/configuration/parameterized-types", 1000L);
+        assertBlueprintNamespacePublished("http://cxf.apache.org/configuration/security", 1000L);
+        assertBlueprintNamespacePublished("http://schemas.xmlsoap.org/wsdl/", 1000L);
 
         assertBundleStarted("org.apache.cxf.cxf-rt-frontend-jaxws");
-        assertBlueprintNamespacePublished("http://cxf.apache.org/blueprint/jaxws", 1000);
-        assertBlueprintNamespacePublished("http://cxf.apache.org/blueprint/simple", 1000);
+        assertBlueprintNamespacePublished("http://cxf.apache.org/blueprint/jaxws", 1000L);
+        assertBlueprintNamespacePublished("http://cxf.apache.org/blueprint/simple", 1000L);
     }
 
     @Configuration
     public Option[] config() {
         return new Option[]{
                 cxfBaseConfig(),
-
                 features(cxfUrl, "aries-blueprint", "cxf-core", "cxf-jaxws"),
                 logLevel(LogLevel.INFO)};
     }

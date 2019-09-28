@@ -103,7 +103,7 @@ public abstract class JAXBDataBase {
                 annoList = extractJAXBAnnotations(getReturnMethodAnnotations(mpi));
             }
         }
-        return annoList == null ? new Annotation[0] : annoList.toArray(new Annotation[annoList.size()]);
+        return annoList == null ? new Annotation[0] : annoList.toArray(new Annotation[0]);
     }
 
     private List<Annotation> extractJAXBAnnotations(Annotation[] anns) {
@@ -157,7 +157,7 @@ public abstract class JAXBDataBase {
         //certain cases that use XmlJavaTypeAdapters will require this and the
         //JAXBSchemaInitializer will set this.
         Boolean b = (Boolean)part.getProperty("honor.jaxb.annotations");
-        return b == null ? false : b;
+        return b != null && b;
     }
     
     protected ValidationEventHandler getValidationEventHandler(String cn) {

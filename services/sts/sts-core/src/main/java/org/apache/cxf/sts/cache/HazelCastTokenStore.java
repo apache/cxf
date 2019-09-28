@@ -135,10 +135,10 @@ public class HazelCastTokenStore implements TokenStore {
             Duration duration = Duration.between(now, expires);
 
             parsedTTL = (int)duration.getSeconds();
-            if (duration.getSeconds() != (long)parsedTTL || parsedTTL > MAX_TTL) {
+            if (duration.getSeconds() != parsedTTL || parsedTTL > MAX_TTL) {
                 // Default to configured value
                 parsedTTL = (int)ttl;
-                if (ttl != (long)parsedTTL) {
+                if (ttl != parsedTTL) {
                     // Fall back to 60 minutes if the default TTL is set incorrectly
                     parsedTTL = 3600;
                 }
@@ -146,7 +146,7 @@ public class HazelCastTokenStore implements TokenStore {
         } else {
             // Default to configured value
             parsedTTL = (int)ttl;
-            if (ttl != (long)parsedTTL) {
+            if (ttl != parsedTTL) {
                 // Fall back to 60 minutes if the default TTL is set incorrectly
                 parsedTTL = 3600;
             }

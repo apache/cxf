@@ -31,10 +31,13 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class TokenGrantHandlerTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class TokenGrantHandlerTest {
 
 
 
@@ -74,7 +77,7 @@ public class TokenGrantHandlerTest extends Assert {
     }
 
     private MultivaluedMap<String, String> createMap(String grant) {
-        MultivaluedMap<String, String> map = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> map = new MetadataMap<>();
         map.putSingle(OAuthConstants.GRANT_TYPE, grant);
         return map;
     }

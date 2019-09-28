@@ -64,6 +64,7 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.xml.security.stax.ext.OutboundSecurityContext;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.SecurePart.Modifier;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 
 /**
  *
@@ -93,12 +94,12 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
                 String asymSignatureAlgorithm =
                     (String)getMessage().getContextualProperty(SecurityConstants.ASYMMETRIC_SIGNATURE_ALGORITHM);
                 if (asymSignatureAlgorithm != null && tbinding.getAlgorithmSuite() != null) {
-                    tbinding.getAlgorithmSuite().setAsymmetricSignature(asymSignatureAlgorithm);
+                    tbinding.getAlgorithmSuite().getAlgorithmSuiteType().setAsymmetricSignature(asymSignatureAlgorithm);
                 }
                 String symSignatureAlgorithm =
                     (String)getMessage().getContextualProperty(SecurityConstants.SYMMETRIC_SIGNATURE_ALGORITHM);
                 if (symSignatureAlgorithm != null && tbinding.getAlgorithmSuite() != null) {
-                    tbinding.getAlgorithmSuite().setSymmetricSignature(symSignatureAlgorithm);
+                    tbinding.getAlgorithmSuite().getAlgorithmSuiteType().setSymmetricSignature(symSignatureAlgorithm);
                 }
 
                 TransportToken token = tbinding.getTransportToken();
@@ -108,7 +109,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
                         unassertPolicy(token.getToken(), "No transport token id");
                         return;
                     }
-                    addIssuedToken((IssuedToken)token.getToken(), secToken, false, false);
+                    addIssuedToken(token.getToken(), secToken, false, false);
                 }
                 assertToken(token.getToken());
                 assertTokenWrapper(token);
@@ -222,7 +223,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
             if (token instanceof UsernameToken) {
                 addUsernameToken((UsernameToken)token);
             } else if (token instanceof IssuedToken) {
-                addIssuedToken((IssuedToken)token, getSecurityToken(), false, false);
+                addIssuedToken(token, getSecurityToken(), false, false);
             } else if (token instanceof KerberosToken) {
                 addKerberosToken((KerberosToken)token, false, false, false);
             } else if (token instanceof SamlToken) {
@@ -311,6 +312,18 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
             SecurityToken securityToken = getSecurityToken();
             addIssuedToken(token, securityToken, false, true);
             signPartsAndElements(wrapper.getSignedParts(), wrapper.getSignedElements());
+
+            WSSSecurityProperties properties = getProperties();
+            if (securityToken != null && securityToken.getSecret() != null) {
+                properties.setSignatureAlgorithm(
+                    tbinding.getAlgorithmSuite().getAlgorithmSuiteType().getSymmetricSignature());
+            } else {
+                properties.setSignatureAlgorithm(
+                    tbinding.getAlgorithmSuite().getAlgorithmSuiteType().getAsymmetricSignature());
+            }
+            properties.setSignatureCanonicalizationAlgorithm(tbinding.getAlgorithmSuite().getC14n().getValue());
+            AlgorithmSuiteType algType = tbinding.getAlgorithmSuite().getAlgorithmSuiteType();
+            properties.setSignatureDigestAlgorithm(algType.getDigest());
         } else if (token instanceof SecureConversationToken
             || token instanceof SecurityContextToken || token instanceof SpnegoContextToken) {
             SecurityToken securityToken = getSecurityToken();
@@ -333,7 +346,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
 
             properties.setIncludeSignatureToken(true);
             properties.setSignatureAlgorithm(
-                tbinding.getAlgorithmSuite().getSymmetricSignature());
+                tbinding.getAlgorithmSuite().getAlgorithmSuiteType().getSymmetricSignature());
             properties.setSignatureCanonicalizationAlgorithm(
                 tbinding.getAlgorithmSuite().getC14n().getValue());
             AlgorithmSuiteType algType = tbinding.getAlgorithmSuite().getAlgorithmSuiteType();
@@ -346,7 +359,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
 
             WSSSecurityProperties properties = getProperties();
             properties.setSignatureAlgorithm(
-                       tbinding.getAlgorithmSuite().getAsymmetricSignature());
+                       tbinding.getAlgorithmSuite().getAlgorithmSuiteType().getAsymmetricSignature());
             properties.setSignatureCanonicalizationAlgorithm(
                        tbinding.getAlgorithmSuite().getC14n().getValue());
             AlgorithmSuiteType algType = tbinding.getAlgorithmSuite().getAlgorithmSuiteType();
@@ -355,14 +368,14 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
             throw new Exception("Endorsing UsernameTokens are not supported in the streaming code");
         } else if (token instanceof KerberosToken) {
             WSSSecurityProperties properties = getProperties();
-            properties.addAction(WSSConstants.SIGNATURE);
+            properties.addAction(XMLSecurityConstants.SIGNATURE);
             configureSignature(token, false);
 
             addKerberosToken((KerberosToken)token, false, true, false);
             signPartsAndElements(wrapper.getSignedParts(), wrapper.getSignedElements());
 
             properties.setSignatureAlgorithm(
-                       tbinding.getAlgorithmSuite().getSymmetricSignature());
+                       tbinding.getAlgorithmSuite().getAlgorithmSuiteType().getSymmetricSignature());
             properties.setSignatureCanonicalizationAlgorithm(
                        tbinding.getAlgorithmSuite().getC14n().getValue());
             AlgorithmSuiteType algType = tbinding.getAlgorithmSuite().getAlgorithmSuiteType();
@@ -377,7 +390,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
 
         // Action
         WSSSecurityProperties properties = getProperties();
-        WSSConstants.Action actionToPerform = WSSConstants.SIGNATURE;
+        WSSConstants.Action actionToPerform = XMLSecurityConstants.SIGNATURE;
         if (token.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
             actionToPerform = WSSConstants.SIGNATURE_WITH_DERIVED_KEY;
         }
@@ -386,7 +399,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
         configureSignature(token, false);
         if (token.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
             properties.setSignatureAlgorithm(
-                   tbinding.getAlgorithmSuite().getSymmetricSignature());
+                   tbinding.getAlgorithmSuite().getAlgorithmSuiteType().getSymmetricSignature());
         }
     }
 

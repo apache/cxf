@@ -135,22 +135,22 @@ public abstract class TestCaseBase<T> {
     }
 
     private boolean validate() {
-        if (wsdlNameSpace == null || wsdlNameSpace.trim().equals("")) {
+        if (wsdlNameSpace == null || wsdlNameSpace.trim().isEmpty()) {
             System.out.println("WSDL name space is not specified");
             faultReason = "Missing WSDL name space";
             return false;
         }
-        if (serviceName == null || serviceName.trim().equals("")) {
+        if (serviceName == null || serviceName.trim().isEmpty()) {
             System.out.println("Service name is not specified");
             faultReason = "Missing Service name";
             return false;
         }
-        if (portName == null || portName.trim().equals("")) {
+        if (portName == null || portName.trim().isEmpty()) {
             System.out.println("Port name is not specified");
             faultReason = "Missing Port name";
             return false;
         }
-        if (wsdlPath == null || wsdlPath.trim().equals("")) {
+        if (wsdlPath == null || wsdlPath.trim().isEmpty()) {
             System.out.println("WSDL path is not specifed");
             faultReason = "Missing WSDL path";
             return false;
@@ -280,7 +280,7 @@ public abstract class TestCaseBase<T> {
 	}
         List<Thread> threadList = new ArrayList<>();
         for (int i = 0; i < numberOfThreads; i++) {
-            TestRunner<T> runner = new TestRunner<T>("No." + i + " TestRunner", this);
+            TestRunner<T> runner = new TestRunner<>("No." + i + " TestRunner", this);
             Thread thread = new Thread(runner, "RunnerThread No." + i);
             thread.start();
             threadList.add(thread);

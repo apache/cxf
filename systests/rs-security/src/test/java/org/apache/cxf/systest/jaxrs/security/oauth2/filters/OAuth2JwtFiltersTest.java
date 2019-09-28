@@ -36,6 +36,11 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some tests for the OAuth 2.0 filters
  */
@@ -106,7 +111,7 @@ public class OAuth2JwtFiltersTest extends AbstractBusClientServerTestBase {
                                             busFile.toString());
         client.header("Authorization", "Bearer " + accessToken.getTokenKey());
 
-        Response response = client.post(new Book("book", 123L));
+        Response response = client.type("application/xml").post(new Book("book", 123L));
         assertEquals(200, response.getStatus());
 
         Book returnedBook = response.readEntity(Book.class);

@@ -74,9 +74,8 @@ public class JDOMNamespaceContext implements NamespaceContext {
 
         if (element.getParentElement() != null) {
             return rawGetPrefix(element.getParentElement(), namespaceURI);
-        } else {
-            return null;
         }
+        return null;
     }
 
     static void rawGetPrefixes(Element element, String namespaceURI, List<String> prefixes) {

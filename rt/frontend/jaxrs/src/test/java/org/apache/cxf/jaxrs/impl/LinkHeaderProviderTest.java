@@ -21,10 +21,11 @@ package org.apache.cxf.jaxrs.impl;
 
 import javax.ws.rs.core.Link;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class LinkHeaderProviderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class LinkHeaderProviderTest {
 
     @Test
     public void testFromSimpleString() {

@@ -36,7 +36,6 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerDelegate;
 import javax.management.MBeanServerFactory;
 import javax.management.MalformedObjectNameException;
-
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
@@ -149,7 +148,7 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
                     if (mbeanServerID != null) {
                         servers = CastUtils.cast(MBeanServerFactory.findMBeanServer(mbeanServerID));
                     }
-                    if (servers == null || servers.size() == 0) {
+                    if (servers == null || servers.isEmpty()) {
                         mbs = MBeanServerFactory.createMBeanServer(mbeanServerName);
                         try {
                             mbeanServerID = (String) mbs.getAttribute(getDelegateName(),

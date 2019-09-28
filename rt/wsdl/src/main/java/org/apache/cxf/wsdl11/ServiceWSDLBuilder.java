@@ -102,8 +102,7 @@ public class ServiceWSDLBuilder {
     private int xsdCount;
     private final Bus bus;
     private final NSManager nsMan;
-    private Document docDoc;
-
+    
     /**
      * Sets up the builder on a bus with a list of services.
      * @param b the bus.
@@ -243,10 +242,7 @@ public class ServiceWSDLBuilder {
         if (text == null) {
             return;
         }
-        if (docDoc == null) {
-            docDoc = DOMUtils.newDocument();
-        }
-        Element el = docDoc.createElementNS(WSDLConstants.NS_WSDL11, "wsdl:documentation");
+        Element el = DOMUtils.getEmptyDocument().createElementNS(WSDLConstants.NS_WSDL11, "wsdl:documentation");
         el.setTextContent(text);
         wsdlel.setDocumentationElement(el);
     }

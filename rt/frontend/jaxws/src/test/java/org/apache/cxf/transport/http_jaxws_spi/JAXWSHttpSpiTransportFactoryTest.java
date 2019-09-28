@@ -24,14 +24,17 @@ import javax.xml.ws.spi.http.HttpHandler;
 import org.apache.cxf.Bus;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JAXWSHttpSpiTransportFactoryTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class JAXWSHttpSpiTransportFactoryTest {
 
     private IMocksControl control;
     private HttpContext context;

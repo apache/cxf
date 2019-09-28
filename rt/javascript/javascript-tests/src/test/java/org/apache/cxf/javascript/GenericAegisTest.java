@@ -33,6 +33,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.Test;
+
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -50,7 +51,7 @@ public class GenericAegisTest  {
     @Test
     public void testGenerateJavascript() throws Exception {
      // Create our service implementation
-        GenericGenericClass<String> impl = new GenericGenericClass<String>();
+        GenericGenericClass<String> impl = new GenericGenericClass<>();
 
         // Create our Server
         ServerFactoryBean svrFactory = new ServerFactoryBean();

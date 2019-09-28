@@ -162,5 +162,9 @@ public class JMSContinuation implements Continuation {
         return true;
     }
 
+    @Override
+    public boolean isTimeout() {
+        return false;
+    }
 
 }

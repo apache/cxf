@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -79,7 +80,7 @@ public class CXFHttpAsyncRequestProducer implements HttpAsyncRequestProducer {
                 }
             }
             int i = -1;
-            buffer.rewind();
+            ((Buffer)buffer).rewind();
             if (buffer.hasRemaining() && chan != null) {
                 i = chan.read(buffer);
                 buffer.flip();

@@ -135,9 +135,8 @@ public class JavaDocProvider implements DocumentationProvider {
             List<String> params = doc.getParamInfo();
             if (paramIndex < params.size()) {
                 return params.get(paramIndex);
-            } else {
-                return null;
             }
+            return null;
         } catch (Exception ex) {
             // ignore
         }
@@ -256,9 +255,8 @@ public class JavaDocProvider implements DocumentationProvider {
                         paramDocs.add(param);
                         if (next == paramString.length()) {
                             break;
-                        } else {
-                            codeIndex = next + 1;
                         }
+                        codeIndex = next + 1;
                         codeIndex = paramString.indexOf(codeTag, codeIndex);
                     }
 
@@ -290,20 +288,23 @@ public class JavaDocProvider implements DocumentationProvider {
     protected String getClassInfoTag() {
         if (javaDocsBuiltByVersion == JAVA_VERSION_16) {
             return "<P>";
-        } else {
-            return "<div class=\"block\">";
         }
+        return "<div class=\"block\">";
     }
     protected String getOperInfoTag() {
         if (javaDocsBuiltByVersion == JAVA_VERSION_16) {
             return "<DD>";
-        } else {
-            return "<div class=\"block\">";
         }
+        return "<div class=\"block\">";
     }
+
     protected String getOperLink() {
         String operLink = "<A NAME=\"";
-        return javaDocsBuiltByVersion == JAVA_VERSION_16 ? operLink : operLink.toLowerCase();
+        return javaDocsBuiltByVersion == JAVA_VERSION_16
+                ? operLink
+                : javaDocsBuiltByVersion <= JAVA_VERSION_18
+                        ? operLink.toLowerCase()
+                        : "<a id=\"";
     }
 
     protected String getResponseMarker() {

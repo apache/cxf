@@ -29,8 +29,8 @@ import javax.jws.WebService;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 
 import org.junit.BeforeClass;
-import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the addition of WS-Addressing Message Addressing Properties
@@ -52,12 +52,6 @@ public class NonDecoupledJMSTest extends MAPTestBase {
     }
     public String getPort() {
         return PORT;
-    }
-
-    @Test
-    @Override
-    public void testImplicitMAPs() throws Exception {
-        super.testImplicitMAPs();
     }
 
     public String getAddress() {

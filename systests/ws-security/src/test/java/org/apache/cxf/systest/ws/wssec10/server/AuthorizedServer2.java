@@ -27,7 +27,7 @@ public class AuthorizedServer2 extends AbstractBusTestServerBase {
     static final String PORT = allocatePort(AuthorizedServer2.class);
 
     private static String configFileName =
-        "org/apache/cxf/systest/ws/wssec10/server_restricted_authorized_2.xml";
+        "org/apache/cxf/systest/ws/wssec10/server_authorized_2.xml";
 
     public AuthorizedServer2() throws Exception {
 

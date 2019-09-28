@@ -21,15 +21,17 @@ package org.apache.cxf.helpers;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,7 +39,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
 
 public final class FileUtils {
-    private static final int RETRY_SLEEP_MILLIS = 10;
+    private static final long RETRY_SLEEP_MILLIS = 10L;
     private static File defaultTempDir;
     private static Thread shutdownHook;
     private static final char[] ILLEGAL_CHARACTERS
@@ -59,7 +61,7 @@ public final class FileUtils {
         File file = new File(getDefaultTempDir(), name);
         boolean isValid = true;
         try {
-            if (file.exists()) {
+            if (exists(file)) {
                 return true;
             }
             if (file.createNewFile()) {
@@ -73,7 +75,7 @@ public final class FileUtils {
 
     public static synchronized File getDefaultTempDir() {
         if (defaultTempDir != null
-            && defaultTempDir.exists()) {
+            && exists(defaultTempDir)) {
             return defaultTempDir;
         }
 
@@ -105,7 +107,7 @@ public final class FileUtils {
     public static synchronized void maybeDeleteDefaultTempDir() {
         if (defaultTempDir != null) {
             Runtime.getRuntime().gc(); // attempt a garbage collect to close any files
-            String files[] = defaultTempDir.list();
+            String[] files = defaultTempDir.list();
             if (files != null && files.length > 0) {
                 //there are files in there, we need to attempt some more cleanup
 
@@ -119,8 +121,12 @@ public final class FileUtils {
             }
             if (files == null || files.length == 0) {
                 //all the files are gone, we can remove the shutdownhook and reset
-                Runtime.getRuntime().removeShutdownHook(shutdownHook);
-                shutdownHook.run();
+                try {
+                    Runtime.getRuntime().removeShutdownHook(shutdownHook);
+                    shutdownHook.run();
+                } catch (IllegalStateException ex) {
+                    // The JVM is already shutting down so do nothing
+                }
                 shutdownHook = null;
                 defaultTempDir = null;
             }
@@ -133,7 +139,7 @@ public final class FileUtils {
     public static File createTmpDir(boolean addHook) {
         String s = SystemPropertyAction.getProperty("java.io.tmpdir");
         File checkExists = new File(s);
-        if (!checkExists.exists() || !checkExists.isDirectory()) {
+        if (!exists(checkExists) || !checkExists.isDirectory()) {
             throw new RuntimeException("The directory "
                                    + checkExists.getAbsolutePath()
                                    + " does not exist, please set java.io.tempdir"
@@ -158,19 +164,15 @@ public final class FileUtils {
             f.deleteOnExit();
             newTmpDir = f;
         } catch (IOException ex) {
-            int x = (int)(Math.random() * 1000000);
-            File f = new File(checkExists, "cxf-tmp-" + x);
-            int count = 0;
-            while (!f.mkdir()) {
-
+            Random r = new Random();
+            File f = new File(checkExists, "cxf-tmp-" + r.nextInt());
+            for (int count = 0; !f.mkdir(); count++) {
                 if (count > 10000) {
                     throw new RuntimeException("Could not create a temporary directory in "
                                                + s + ",  please set java.io.tempdir"
                                                + " to a writable directory");
                 }
-                x = (int)(Math.random() * 1000000);
-                f = new File(checkExists, "cxf-tmp-" + x);
-                count++;
+                f = new File(checkExists, "cxf-tmp-" + r.nextInt());
             }
             newTmpDir = f;
         }
@@ -197,7 +199,7 @@ public final class FileUtils {
                                     + "already exists with that name: " + dir.getAbsolutePath());
         }
 
-        if (!dir.exists()) {
+        if (!exists(dir)) {
             boolean result = doMkDirs(dir);
             if (!result) {
                 String msg = "Directory " + dir.getAbsolutePath()
@@ -249,9 +251,6 @@ public final class FileUtils {
     }
     public static void delete(File f, boolean inShutdown) {
         if (!f.delete()) {
-            if (isWindows()) {
-                System.gc();
-            }
             try {
                 Thread.sleep(RETRY_SLEEP_MILLIS);
             } catch (InterruptedException ex) {
@@ -263,31 +262,22 @@ public final class FileUtils {
         }
     }
 
-    private static boolean isWindows() {
-        String osName = SystemPropertyAction.getProperty("os.name").toLowerCase(Locale.US);
-        return osName.indexOf("windows") > -1;
-    }
-
     public static File createTempFile(String prefix, String suffix) throws IOException {
         return createTempFile(prefix, suffix, null, false);
     }
 
     public static File createTempFile(String prefix, String suffix, File parentDir,
                                boolean deleteOnExit) throws IOException {
-        File result = null;
         File parent = (parentDir == null)
             ? getDefaultTempDir()
             : parentDir;
 
-        if (suffix == null) {
-            suffix = ".tmp";
-        }
         if (prefix == null) {
             prefix = "cxf";
         } else if (prefix.length() < 3) {
             prefix = prefix + "cxf";
         }
-        result = Files.createTempFile(parent.toPath(), prefix, suffix).toFile();
+        File result = Files.createTempFile(parent.toPath(), prefix, suffix).toFile();
 
         //if parentDir is null, we're in our default dir
         //which will get completely wiped on exit from our exit
@@ -299,25 +289,12 @@ public final class FileUtils {
     }
 
     public static String getStringFromFile(File location) {
-        InputStream is = null;
-        String result = null;
-
-        try {
-            is = Files.newInputStream(location.toPath());
-            result = normalizeCRLF(is);
-        } catch (Exception e) {
+        try (InputStream is  = Files.newInputStream(location.toPath())) {
+            return normalizeCRLF(is);
+        } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (Exception e) {
-                    //do nothing
-                }
-            }
         }
-
-        return result;
+        return null;
     }
 
     public static String normalizeCRLF(InputStream instream) {
@@ -332,7 +309,7 @@ public final class FileUtils {
 
                 for (int x = 0; x < tok.length; x++) {
                     String token = tok[x];
-                    result.append("  " + token);
+                    result.append("  ").append(token);
                 }
                 line = in.readLine();
             }
@@ -359,34 +336,24 @@ public final class FileUtils {
         return rtn;
     }
 
-    public static List<File> getFiles(File dir, final String pattern) {
-        return getFiles(dir, pattern, null);
-    }
-    public static List<File> getFilesRecurse(File dir, final String pattern) {
-        return getFilesRecurse(dir, pattern, null);
+    public static List<File> getFilesUsingSuffix(File dir, final String suffix) {
+        return getFilesRecurseUsingSuffix(dir, suffix, false, new ArrayList<>());
     }
 
-    public static List<File> getFiles(File dir, final String pattern, File exclude) {
-        return getFilesRecurse(dir, Pattern.compile(pattern), exclude, false, new ArrayList<>());
+    public static List<File> getFilesRecurseUsingSuffix(File dir, final String suffix) {
+        return getFilesRecurseUsingSuffix(dir, suffix, true, new ArrayList<>());
     }
-    public static List<File> getFilesRecurse(File dir, final String pattern, File exclude) {
-        return getFilesRecurse(dir, Pattern.compile(pattern), exclude, true, new ArrayList<>());
-    }
-    private static List<File> getFilesRecurse(File dir,
-                                              Pattern pattern,
-                                              File exclude, boolean rec,
-                                              List<File> fileList) {
+
+    private static List<File> getFilesRecurseUsingSuffix(File dir, final String suffix,
+                                                        boolean rec, List<File> fileList) {
         File[] files = dir.listFiles();
         if (files != null) {
-            for (File file : dir.listFiles()) {
-                if (file.equals(exclude)) {
-                    continue;
-                }
+            int suffixLength = suffix.length();
+            for (File file : files) {
                 if (file.isDirectory() && rec) {
-                    getFilesRecurse(file, pattern, exclude, rec, fileList);
+                    getFilesRecurseUsingSuffix(file, suffix, rec, fileList);
                 } else {
-                    Matcher m = pattern.matcher(file.getName());
-                    if (m.matches()) {
+                    if (file.getName().endsWith(suffix) && file.getName().length() > suffixLength) {
                         fileList.add(file);
                     }
                 }
@@ -395,18 +362,52 @@ public final class FileUtils {
         return fileList;
     }
 
-    public static List<String> readLines(File file) throws Exception {
-        if (!file.exists()) {
-            return new ArrayList<>();
-        }
-        List<String> results = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line = reader.readLine();
-            while (line != null) {
-                results.add(line);
-                line = reader.readLine();
+    public static List<File> getFiles(File dir, final String pattern) {
+        List<File> fileList = new ArrayList<>();
+        File[] files = dir.listFiles();
+        if (files != null) {
+            Pattern p = Pattern.compile(pattern);
+            for (File file : files) {
+                Matcher m = p.matcher(file.getName());
+                if (m.matches()) {
+                    fileList.add(file);
+                }
             }
         }
-        return results;
+        return fileList;
     }
+
+    public static List<String> readLines(File file) throws Exception {
+        if (!exists(file)) {
+            return Collections.emptyList();
+        }
+        return Files.readAllLines(file.toPath());
+    }
+
+    public static boolean exists(File file) {
+        if (System.getSecurityManager() != null) {
+            return file.exists();
+        }
+        return AccessController.doPrivileged((PrivilegedAction<Boolean>) () -> {
+            return file.exists();
+        });
+    }
+
+    /**
+     * Strips any leading paths
+     */
+    public static String stripPath(String name) {
+        if (name == null) {
+            return null;
+        }
+        int posUnix = name.lastIndexOf('/');
+        int posWin = name.lastIndexOf('\\');
+        int pos = Math.max(posUnix, posWin);
+
+        if (pos != -1) {
+            return name.substring(pos + 1);
+        }
+        return name;
+    }
+
 }

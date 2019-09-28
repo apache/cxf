@@ -25,10 +25,12 @@ import java.util.List;
 import org.apache.cxf.tools.common.model.JAnnotation;
 import org.apache.cxf.tools.common.model.JavaClass;
 import org.apache.cxf.tools.common.model.JavaField;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class WrapperBeanFieldAnnotatorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class WrapperBeanFieldAnnotatorTest {
 
     @Test
     public void testAnnotate() {

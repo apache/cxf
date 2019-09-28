@@ -35,7 +35,10 @@ import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.apache.cxf.ws.addressing.soap.MAPCodec;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.GreeterImpl;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class WSAFeatureTest extends AbstractCXFTest {
     static final String PORT = TestUtil.getPortNumber(WSAFeatureTest.class);

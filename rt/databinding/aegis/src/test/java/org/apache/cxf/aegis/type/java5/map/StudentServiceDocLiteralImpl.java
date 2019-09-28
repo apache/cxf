@@ -39,9 +39,9 @@ public class StudentServiceDocLiteralImpl implements StudentServiceDocLiteral {
     }
 
     public List<Student> getStudents(Map<String, String> filters) {
-        List<Student> returnValue = new LinkedList<Student>();
+        List<Student> returnValue = new LinkedList<>();
         for (Map.Entry<Long, Student> e : studentMap.entrySet()) {
-            if (filters.containsKey(e.getValue())) {
+            if (filters.containsKey((Object)e.getValue())) {
                 returnValue.add(e.getValue());
             }
 
@@ -50,7 +50,7 @@ public class StudentServiceDocLiteralImpl implements StudentServiceDocLiteral {
     }
 
     public List<Student> getStudentsByIds(List<String> ids) {
-        List<Student> returnValue = new LinkedList<Student>();
+        List<Student> returnValue = new LinkedList<>();
         for (String id : ids) {
             Long longId = Long.decode(id);
             Student s = studentMap.get(longId);
@@ -64,7 +64,7 @@ public class StudentServiceDocLiteralImpl implements StudentServiceDocLiteral {
     }
 
     //CHECKSTYLE:OFF
-    public void takeMapMap(HashMap<String, HashMap<String, Student>> myComplexData) {
+    public void takeMapMap(HashMap<String, HashMap<String, Student>> myComplexData) { //NOPMD
         // original failure was explosion on this, no need to bother to fill it in.
     }
 

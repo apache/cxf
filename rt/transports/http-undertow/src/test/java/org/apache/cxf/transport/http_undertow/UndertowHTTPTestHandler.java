@@ -65,7 +65,7 @@ public class UndertowHTTPTestHandler extends UndertowHTTPHandler {
                     + "</head><body>Internal Error 500" + t.getMessage()
                     + "</body></html>";
                 undertowExchange.getResponseHeaders().put(Headers.CONTENT_LENGTH,
-                                                          "" + errorPage.length());
+                                                          Integer.toString(errorPage.length()));
                 undertowExchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/html");
                 Sender sender = undertowExchange.getResponseSender();
                 sender.send(errorPage);

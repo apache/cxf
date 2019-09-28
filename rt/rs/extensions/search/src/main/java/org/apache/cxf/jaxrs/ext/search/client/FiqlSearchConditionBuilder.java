@@ -131,9 +131,8 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
         protected String buildPartial(Builder exclude) {
             if (parent != null && !parent.equals(exclude)) {
                 return parent.buildPartial(exclude) + result;
-            } else {
-                return result;
             }
+            return result;
         }
 
         public CompleteCondition after(Date date) {
@@ -430,12 +429,10 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
                     // zone in XML is "+01:00" in Java is "+0100"; adding semicolon
                     int len = s.length();
                     return s.substring(0, len - 2) + ":" + s.substring(len - 2, len);
-                } else {
-                    return s;
                 }
-            } else {
-                return value.toString();
+                return s;
             }
+            return value.toString();
         }
 
         protected String toFiqlPrimitiveCondition(ConditionType type) {

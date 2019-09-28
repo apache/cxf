@@ -22,7 +22,7 @@
     xmlns:jaxrs="http://cxf.apache.org/jaxrs"
     xmlns:task="http://www.springframework.org/schema/task" 
     xsi:schemaLocation="
-     http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+     http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd
      http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd 
      http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
      

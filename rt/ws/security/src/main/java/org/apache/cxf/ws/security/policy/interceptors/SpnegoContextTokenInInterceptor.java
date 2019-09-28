@@ -20,7 +20,6 @@
 package org.apache.cxf.ws.security.policy.interceptors;
 
 import java.time.Instant;
-import java.util.Base64;
 import java.util.Collection;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -56,12 +55,13 @@ import org.apache.neethi.All;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.spnego.SpnegoTokenContext;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SPConstants;
+import org.apache.xml.security.utils.XMLUtils;
 
 class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
 
@@ -227,7 +227,7 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
 
             // KeySize
             writer.writeStartElement(prefix, "KeySize", namespace);
-            writer.writeCharacters("" + keySize);
+            writer.writeCharacters(Integer.toString(keySize));
             writer.writeEndElement();
 
             byte[] secret = WSSecurityUtil.generateNonce(keySize / 8);
@@ -278,7 +278,7 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 throw new Exception("No BinaryExchange element received");
             }
             String encoding = binaryExchange.getAttributeNS(null, "EncodingType");
-            if (!WSConstants.BASE64_ENCODING.equals(encoding)) {
+            if (!WSS4JConstants.BASE64_ENCODING.equals(encoding)) {
                 throw new Exception("Unknown encoding type: " + encoding);
             }
 
@@ -288,7 +288,7 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             }
 
             String content = DOMUtils.getContent(binaryExchange);
-            byte[] decodedContent = Base64.getMimeDecoder().decode(content);
+            byte[] decodedContent = XMLUtils.decode(content);
 
             String jaasContext =
                 (String)message.getContextualProperty(SecurityConstants.KERBEROS_JAAS_CONTEXT_NAME);
@@ -316,14 +316,14 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             writer.writeStartElement(prefix, "RequestedProofToken", namespace);
 
             // EncryptedKey
-            writer.writeStartElement(WSConstants.ENC_PREFIX, "EncryptedKey", WSConstants.ENC_NS);
-            writer.writeStartElement(WSConstants.ENC_PREFIX, "EncryptionMethod", WSConstants.ENC_NS);
+            writer.writeStartElement(WSS4JConstants.ENC_PREFIX, "EncryptedKey", WSS4JConstants.ENC_NS);
+            writer.writeStartElement(WSS4JConstants.ENC_PREFIX, "EncryptionMethod", WSS4JConstants.ENC_NS);
             writer.writeAttribute("Algorithm", namespace + "/spnego#GSS_Wrap");
             writer.writeEndElement();
-            writer.writeStartElement(WSConstants.ENC_PREFIX, "CipherData", WSConstants.ENC_NS);
-            writer.writeStartElement(WSConstants.ENC_PREFIX, "CipherValue", WSConstants.ENC_NS);
+            writer.writeStartElement(WSS4JConstants.ENC_PREFIX, "CipherData", WSS4JConstants.ENC_NS);
+            writer.writeStartElement(WSS4JConstants.ENC_PREFIX, "CipherValue", WSS4JConstants.ENC_NS);
 
-            writer.writeCharacters(Base64.getMimeEncoder().encodeToString(key));
+            writer.writeCharacters(XMLUtils.encodeToString(key));
 
             writer.writeEndElement();
             writer.writeEndElement();

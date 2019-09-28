@@ -67,7 +67,6 @@ public class SOAPHandlerFaultOutInterceptor extends
     }
 
     public Set<URI> getRoles() {
-        // TODO
         return new HashSet<>();
     }
 
@@ -183,6 +182,4 @@ public class SOAPHandlerFaultOutInterceptor extends
         return new SOAPMessageContextImpl(message);
     }
 
-    public void handleFault(SoapMessage message) {
-    }
 }

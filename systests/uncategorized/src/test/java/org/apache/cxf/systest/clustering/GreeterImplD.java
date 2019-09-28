@@ -27,7 +27,7 @@ import org.apache.cxf.greeter_control.AbstractGreeterImpl;
             portName = "ReplicatedPortD",
             endpointInterface = "org.apache.cxf.greeter_control.Greeter",
             targetNamespace = "http://cxf.apache.org/greeter_control",
-            wsdlLocation = "testutils/greeter_control.wsdl")
+            wsdlLocation = "wsdl/greeter_control.wsdl")
 public class GreeterImplD extends AbstractGreeterImpl {
 
     private String address;

@@ -23,14 +23,15 @@
     <packaging>bundle</packaging>
     <name>Apache CXF Runtime HTTP Async Transport</name>
     <description>Apache CXF Runtime HTTP Async Transport</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.transport.http.hc</cxf.module.name>
         <cxf.bundle.activator>org.apache.cxf.transport.http.asyncclient.Activator</cxf.bundle.activator>
         <cxf.osgi.import>
             javax.annotation;version="${cxf.osgi.javax.annotation.version}",

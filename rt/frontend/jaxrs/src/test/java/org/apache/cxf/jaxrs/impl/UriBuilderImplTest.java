@@ -37,10 +37,12 @@ import org.apache.cxf.jaxrs.resources.BookStore;
 import org.apache.cxf.jaxrs.resources.UriBuilderWrongAnnotations;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class UriBuilderImplTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+public class UriBuilderImplTest {
 
     @Test
     public void testFromUriRelativePath() throws Exception {
@@ -341,7 +343,7 @@ public class UriBuilderImplTest extends Assert {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCtorNull() throws Exception {
-        new UriBuilderImpl(null);
+        new UriBuilderImpl((URI)null);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -1236,10 +1238,11 @@ public class UriBuilderImplTest extends Assert {
         assertEquals(uri.toString(), expected);
     }
 
+    @Test
     public void testToTemplate() {
         String path1 = "ab";
         String[] path2 = {"a1", "{xy}", "3b "};
-        String expected = "ab/a1/{xy}/3b ";
+        String expected = "ab/a1/{xy}/3b%20";
 
         String template = UriBuilder.fromPath(path1).segment(path2).toTemplate();
         assertEquals(template, expected);
@@ -1448,7 +1451,7 @@ public class UriBuilderImplTest extends Assert {
             "foo://example.com:8042/over/there?name=ferret#nose"
         };
 
-        URI urisReplace[] = new URI[urisOriginal.length];
+        URI[] urisReplace = new URI[urisOriginal.length];
 
         urisReplace[0] = new URI("http", "//ftp.is.co.za/rfc/rfc1808.txt",
                 null);
@@ -1604,6 +1607,37 @@ public class UriBuilderImplTest extends Assert {
     public void testFromMethod() {
         URI uri = UriBuilder.fromMethod(TestPath.class, "headSub").build();
         assertEquals(uri.toString(), "/sub");
+    }
+
+    @Test
+    public void testURItoStringMatchesOriginalURI() {
+        String[] uriStrings = new String[]{"mailto:bob@apache.org",
+                                           "news:comp.lang.java",
+                                           "urn:isbn:096139210x",
+                                           "docs/guide/collections/designfaq.html#28",
+                                           "../../../demo/jfc/SwingSet2/src/SwingSet2.java",
+                                           "file:///~/calendar",
+                                           "bob@somehost.com",
+                                           "http://localhost/somePath",
+                                           "http://localhost:1234/someOtherPath",
+                                           "http://127.0.0.1",
+                                           "http://127.0.0.1/",
+                                           "http://127.0.0.1/index.html",
+                                           "myscheme://a.host:7575/",
+                                           "myscheme://not.really.a.host:fakePort/"
+        };
+        for (String uriString :uriStrings) {
+            URI uri = UriBuilder.fromUri(uriString).build();
+            assertEquals(uriString, uri.toString());
+        }
+    }
+
+    @Test
+    public void testURIWithNonIntegerPort() {
+        String url = "myscheme://not.really.a.host:port/";
+        UriBuilder builder = UriBuilder.fromUri(url);
+        URI uri = builder.build();
+        assertEquals(url, uri.toString());
     }
 
     @Path(value = "/TestPath")

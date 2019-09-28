@@ -29,7 +29,6 @@ import org.apache.cxf.binding.corba.wsdl.Enum;
 import org.apache.cxf.binding.corba.wsdl.Enumerator;
 import org.apache.cxf.binding.corba.wsdl.Union;
 import org.apache.cxf.binding.corba.wsdl.Unionbranch;
-
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
 
@@ -52,7 +51,7 @@ public class CorbaUnionHandler extends CorbaObjectHandler {
         for (Iterator<Unionbranch> branchesIter = branches.iterator(); branchesIter.hasNext();) {
             Unionbranch branch = branchesIter.next();
             List<CaseType> branchCases = branch.getCase();
-            if (branchCases.size() == 0) {
+            if (branchCases.isEmpty()) {
                 defaultIndex = index;
             } else {
                 for (Iterator<CaseType> casesIter = branchCases.iterator(); casesIter.hasNext();) {

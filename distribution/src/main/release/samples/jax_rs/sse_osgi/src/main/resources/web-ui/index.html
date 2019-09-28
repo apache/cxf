@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SSE: Apache CXF with OSGi example</title>
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js" type="text/javascript"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.min.js" type="text/javascript"></script>
+    </head>
+    
+    <body>
+        <div id="content" style="width: 80%">
+            <canvas id="chart">
+            </canvas>
+        </div>
+    </body>
+</html>
+
+<script type="text/javascript">
+var ctx = document.getElementById("chart").getContext('2d');
+
+var chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        datasets: [{
+            label: 'CPU Load, %',
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            xAxes: [{
+                display: true,
+                distribution: 'series',
+                type: 'time',
+                time: {
+                    unit: 'second',
+                    stepSize: 1
+                }
+            }],
+            yAxes: [{
+                display: true,
+                ticks: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }]
+        }
+    }
+}); 
+ 
+
+if( !!window.EventSource ) {
+    var event = new EventSource("http://localhost:8181/cxf/stats/sse");
+
+    event.addEventListener('message', function( event ) {    
+        var datapoint = jQuery.parseJSON( event.data );
+
+        chart.data.labels.push(datapoint.timestamp);
+        if (chart.data.labels.length > 30) {
+            chart.data.labels.shift();
+        }
+        
+        chart.data.datasets.forEach((dataset) => {
+            dataset.data.push(datapoint.load);
+            if (dataset.data.length > 30) {
+                dataset.data.shift();
+            }
+        });
+        
+        chart.update();
+    } );
+
+    $('#content').bind('unload',function() {
+        event.close();
+    });
+}
+</script>

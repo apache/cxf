@@ -41,6 +41,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapInterceptor;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -59,6 +60,7 @@ import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.setup.ConfigurationConverter;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 
 public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
     PhaseInterceptor<SoapMessage> {
@@ -68,7 +70,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
 
     static {
         HEADERS.add(new QName(WSSConstants.NS_WSSE10, "Security"));
-        HEADERS.add(new QName(WSSConstants.NS_XMLENC, "EncryptedData"));
+        HEADERS.add(new QName(XMLSecurityConstants.NS_XMLENC, "EncryptedData"));
         HEADERS.add(new QName(WSSConstants.NS_WSSE11, "EncryptedHeader"));
     }
 
@@ -104,15 +106,15 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
     protected WSSSecurityProperties createSecurityProperties() {
         if (userSecurityProperties != null) {
             return new WSSSecurityProperties(userSecurityProperties);
-        } else {
-            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            ConfigurationConverter.parseActions(properties, securityProperties);
-            ConfigurationConverter.parseUserProperties(properties, securityProperties);
-            ConfigurationConverter.parseCallback(properties, securityProperties);
-            ConfigurationConverter.parseBooleanProperties(properties, securityProperties);
-            ConfigurationConverter.parseNonBooleanProperties(properties, securityProperties);
-            return securityProperties;
         }
+        WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+        ConfigurationConverter.parseActions(properties, securityProperties);
+        ConfigurationConverter.parseUserProperties(properties, securityProperties);
+        ConfigurationConverter.parseCallback(properties, securityProperties);
+        ConfigurationConverter.parseBooleanProperties(properties, securityProperties);
+        ConfigurationConverter.parseNonBooleanProperties(properties, securityProperties);
+        securityProperties.setSkipDocumentEvents(true);
+        return securityProperties;
     }
 
     protected void translateProperties(SoapMessage msg, WSSSecurityProperties securityProperties) {
@@ -148,7 +150,13 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         String certConstraints =
             (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SUBJECT_CERT_CONSTRAINTS, msg);
         if (certConstraints != null && !"".equals(certConstraints)) {
-            securityProperties.setSubjectCertConstraints(convertCertConstraints(certConstraints));
+            String certConstraintsSeparator =
+                (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.CERT_CONSTRAINTS_SEPARATOR, msg);
+            if (certConstraintsSeparator == null || certConstraintsSeparator.isEmpty()) {
+                certConstraintsSeparator = ",";
+            }
+            securityProperties.setSubjectCertConstraints(
+                convertCertConstraints(certConstraints, certConstraintsSeparator));
         }
 
         // Now set SAML SenderVouches + Holder Of Key requirements
@@ -171,10 +179,12 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         boolean validateSchemas =
             MessageUtils.getContextualBoolean(msg, "schema-validation-enabled", false);
         securityProperties.setDisableSchemaValidation(!validateSchemas);
+
+        securityProperties.setSoap12(WSSConstants.NS_SOAP12.equals(msg.getVersion().getNamespace()));
     }
 
-    private Collection<Pattern> convertCertConstraints(String certConstraints) {
-        String[] certConstraintsList = certConstraints.split(",");
+    private Collection<Pattern> convertCertConstraints(String certConstraints, String separator) {
+        String[] certConstraintsList = certConstraints.split(separator);
         if (certConstraintsList.length > 0) {
             Collection<Pattern> subjectCertConstraints = new ArrayList<>(certConstraintsList.length);
             for (String certConstraint : certConstraintsList) {
@@ -213,25 +223,49 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
 
 
         // If we have a "password" but no CallbackHandler then construct one
-        if (callbackHandler == null && getPassword(soapMessage) != null) {
+        if (callbackHandler == null) {
+            final boolean outbound = MessageUtils.isOutbound(soapMessage);
             final String password = getPassword(soapMessage);
-            callbackHandler = new CallbackHandler() {
+            final String signatureUser =
+                (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_USERNAME, soapMessage);
+            final String signaturePassword =
+                (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_PASSWORD, soapMessage);
 
-                @Override
-                public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                    for (Callback callback : callbacks) {
-                        if (callback instanceof WSPasswordCallback) {
-                            WSPasswordCallback wsPasswordCallback = (WSPasswordCallback)callback;
-                            wsPasswordCallback.setPassword(password);
+            if (!(StringUtils.isEmpty(password) && StringUtils.isEmpty(signaturePassword))) {
+                callbackHandler = new CallbackHandler() {
+
+                    @Override
+                    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+                        for (Callback callback : callbacks) {
+                            if (callback instanceof WSPasswordCallback) {
+                                WSPasswordCallback wsPasswordCallback = (WSPasswordCallback)callback;
+
+                                if (signaturePassword != null && wsPasswordCallback.getIdentifier() != null
+                                    && wsPasswordCallback.getIdentifier().equals(signatureUser)
+                                    && (outbound && wsPasswordCallback.getUsage() == WSPasswordCallback.SIGNATURE)
+                                        || (!outbound && wsPasswordCallback.getUsage() == WSPasswordCallback.DECRYPT)) {
+                                    wsPasswordCallback.setPassword(signaturePassword);
+                                } else if (password != null) {
+                                    wsPasswordCallback.setPassword(password);
+                                }
+                            }
                         }
                     }
-                }
-            };
+                };
+            }
         }
 
         if (callbackHandler != null) {
             securityProperties.setCallbackHandler(callbackHandler);
         }
+    }
+
+    protected String getPassword(Object msgContext) {
+        String password = (String)((Message)msgContext).getContextualProperty("password");
+        if (password == null) {
+            password = (String)((Message)msgContext).getContextualProperty(SecurityConstants.PASSWORD);
+        }
+        return password;
     }
 
     public Set<URI> getRoles() {
@@ -260,10 +294,6 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
             return properties.get(key);
         }
         return null;
-    }
-
-    public String getPassword(Object msgContext) {
-        return (String)((Message)msgContext).getContextualProperty("password");
     }
 
     public Object getProperty(Object msgContext, String key) {

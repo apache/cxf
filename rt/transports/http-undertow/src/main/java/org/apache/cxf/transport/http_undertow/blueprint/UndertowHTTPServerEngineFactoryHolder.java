@@ -73,20 +73,24 @@ public class UndertowHTTPServerEngineFactoryHolder {
             Element element = StaxUtils.read(new StringReader(parsedElement)).getDocumentElement();
 
             UndertowHTTPServerEngineFactoryConfigType config
-                = (UndertowHTTPServerEngineFactoryConfigType) getJaxbObject(element,
-                    UndertowHTTPServerEngineFactoryConfigType.class);
+                = getJaxbObject(element,
+                UndertowHTTPServerEngineFactoryConfigType.class);
 
             factory = new UndertowHTTPServerEngineFactory();
 
             Map<String, ThreadingParameters> threadingParametersMap
-                = new TreeMap<String, ThreadingParameters>();
+                = new TreeMap<>();
 
             if (config.getIdentifiedThreadingParameters() != null) {
                 for (ThreadingParametersIdentifiedType threads : config.getIdentifiedThreadingParameters()) {
                     ThreadingParameters rThreads = new ThreadingParameters();
                     String id = threads.getId();
-                    rThreads.setMaxThreads(threads.getThreadingParameters().getMaxThreads());
-                    rThreads.setMinThreads(threads.getThreadingParameters().getMinThreads());
+                    if (threads.getThreadingParameters().getMaxThreads() != null) {
+                        rThreads.setMaxThreads(threads.getThreadingParameters().getMaxThreads());
+                    }
+                    if (threads.getThreadingParameters().getMinThreads() != null) {
+                        rThreads.setMinThreads(threads.getThreadingParameters().getMinThreads());
+                    }
                     rThreads.setWorkerIOThreads(threads.getThreadingParameters().getWorkerIOThreads());
                     threadingParametersMap.put(id, rThreads);
                 }
@@ -95,7 +99,7 @@ public class UndertowHTTPServerEngineFactoryHolder {
             }
 
             //SSL
-            Map<String, TLSServerParameters> sslMap = new TreeMap<String, TLSServerParameters>();
+            Map<String, TLSServerParameters> sslMap = new TreeMap<>();
             if (config.getIdentifiedTLSServerParameters() != null) {
 
                 for (TLSServerParametersIdentifiedType t : config.getIdentifiedTLSServerParameters()) {
@@ -143,14 +147,22 @@ public class UndertowHTTPServerEngineFactoryHolder {
                 if (engine.getThreadingParameters() != null) {
                     ThreadingParametersType threads = engine.getThreadingParameters();
                     ThreadingParameters rThreads = new ThreadingParameters();
-                    rThreads.setMaxThreads(threads.getMaxThreads());
-                    rThreads.setMinThreads(threads.getMinThreads());
-                    rThreads.setWorkerIOThreads(threads.getWorkerIOThreads());
+                    if (threads.getMaxThreads() != null) {
+                        rThreads.setMaxThreads(threads.getMaxThreads());
+                    } 
+                    if (threads.getMinThreads() != null) {
+                        rThreads.setMinThreads(threads.getMinThreads());
+                    }
+                    if (threads.getWorkerIOThreads() != null) {
+                        rThreads.setWorkerIOThreads(threads.getWorkerIOThreads());
+                    }
                     eng.setThreadingParameters(rThreads);
                 }
 
 
-                if (engine.getTlsServerParameters() != null) {
+                if (engine.getTlsServerParameters() != null
+                    && (engine.getTlsServerParameters().getKeyManagers() != null
+                    || engine.getTlsServerParameters().getTrustManagers() != null)) {
                     TLSServerParameters parameter = null;
                     try {
                         parameter = new TLSServerParametersConfig(engine.getTlsServerParameters());
@@ -188,6 +200,9 @@ public class UndertowHTTPServerEngineFactoryHolder {
         this.parsedElement = parsedElement;
     }
 
+    public void setHandlersMap(Map<String, List<CXFUndertowHttpHandler>> handlersMap) {
+        this.handlersMap = handlersMap;
+    }
 
     protected <T> T getJaxbObject(Element parent, Class<T> c) {
 
@@ -203,7 +218,7 @@ public class UndertowHTTPServerEngineFactoryHolder {
     protected synchronized JAXBContext getContext(Class<?> cls) {
         if (jaxbContext == null || jaxbClasses == null || !jaxbClasses.contains(cls)) {
             try {
-                Set<Class<?>> tmp = new HashSet<Class<?>>();
+                Set<Class<?>> tmp = new HashSet<>();
                 if (jaxbClasses != null) {
                     tmp.addAll(jaxbClasses);
                 }

@@ -21,10 +21,13 @@ package org.apache.cxf.tools.validator.internal;
 
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class WSDL11ValidatorTest extends Assert {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class WSDL11ValidatorTest {
     private ToolContext context = new ToolContext();
 
     @Test
@@ -33,11 +36,13 @@ public class WSDL11ValidatorTest extends Assert {
         context.put(ToolConstants.CFG_WSDLURL, wsdlSource);
         WSDL11Validator validator = new WSDL11Validator(null, context);
         try {
-            assertFalse(validator.isValid());
+            validator.isValid();
+            fail();
         } catch (Exception e) {
-            assertTrue(e.getMessage(), e.getMessage()
-                           .indexOf("Caused by {http://apache.org/hello_world/messages}"
-                                              + "[portType:GreeterA][operation:sayHi] not exist.") != -1);
+            final String error = "Caused by {http://apache.org/hello_world/messages}"
+                    + "[portType:GreeterA][operation:sayHi] not exist.";
+            assertTrue(e.getMessage(), e.getMessage().contains(error));
+            assertTrue(validator.getErrorMessage(), validator.getErrorMessage().contains(error));
         }
     }
 }

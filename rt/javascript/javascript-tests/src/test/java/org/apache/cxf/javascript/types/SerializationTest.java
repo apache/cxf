@@ -49,9 +49,14 @@ import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.test.AbstractCXFSpringTest;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
+import org.springframework.context.support.GenericApplicationContext;
 
 import org.junit.Test;
-import org.springframework.context.support.GenericApplicationContext;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class SerializationTest extends AbstractCXFSpringTest {
     private JavascriptTestUtilities testUtilities;

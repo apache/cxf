@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.w3c.dom.Document;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.helpers.DOMUtils;
@@ -35,10 +36,10 @@ import org.apache.cxf.rt.security.saml.claims.SAMLSecurityContext;
 import org.apache.cxf.rt.security.saml.utils.SAMLUtils;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.security.SecurityContext;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.validate.Credential;
@@ -48,7 +49,7 @@ import org.apache.wss4j.dom.validate.Validator;
 /**
  * An abstract class containing some functionality to validate a username + password received
  * via HTTP Basic Authentication via a WSS4J Validator (and hence JAAS, the STS, etc.). It can
- * be subclasses and used as a CXF interceptor or else via a JAX-RS ContainerRequestFilter.
+ * be subclassed and used as a CXF interceptor or else via a JAX-RS ContainerRequestFilter.
  */
 public abstract class WSS4JBasicAuthValidator {
 
@@ -96,9 +97,9 @@ public abstract class WSS4JBasicAuthValidator {
 
     protected UsernameToken convertPolicyToToken(AuthorizationPolicy policy) {
 
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         UsernameToken token = new UsernameToken(false, doc,
-                                                WSConstants.PASSWORD_TEXT);
+                                                WSS4JConstants.PASSWORD_TEXT);
         token.setName(policy.getUserName());
         token.setPassword(policy.getPassword());
         return token;
@@ -130,7 +131,7 @@ public abstract class WSS4JBasicAuthValidator {
             }
 
             ClaimCollection claims =
-                SAMLUtils.getClaims((SamlAssertionWrapper)samlAssertion);
+                SAMLUtils.getClaims(samlAssertion);
             Set<Principal> roles =
                 SAMLUtils.parseRolesFromClaims(claims, roleAttributeName, null);
 
@@ -139,9 +140,8 @@ public abstract class WSS4JBasicAuthValidator {
             context.setIssuer(SAMLUtils.getIssuer(samlAssertion));
             context.setAssertionElement(SAMLUtils.getAssertionElement(samlAssertion));
             return context;
-        } else {
-            return createSecurityContext(credential.getPrincipal());
         }
+        return createSecurityContext(credential.getPrincipal());
     }
 
     public Validator getValidator() {

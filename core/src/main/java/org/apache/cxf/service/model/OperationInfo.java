@@ -159,7 +159,7 @@ public class OperationInfo extends AbstractPropertiesHolder implements NamedItem
      */
     public synchronized void addFault(FaultInfo fault) {
         if (faults == null) {
-            faults = new ConcurrentHashMap<QName, FaultInfo>(4, 0.75f, 2);
+            faults = new ConcurrentHashMap<>(4, 0.75f, 2);
         }
         faults.put(fault.getFaultName(), fault);
     }
@@ -216,7 +216,7 @@ public class OperationInfo extends AbstractPropertiesHolder implements NamedItem
     public String toString() {
         return new StringBuilder().append("[OperationInfo: ")
             .append(opName)
-            .append("]").toString();
+            .append(']').toString();
     }
 
     public int hashCode() {

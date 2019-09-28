@@ -102,7 +102,7 @@ public class CommandDocument {
                 result.add(def);
             }
         }
-        return result.toArray(new String[result.size()]);
+        return result.toArray(new String[0]);
     }
 
     public String[] getParameterNames() {
@@ -113,7 +113,7 @@ public class CommandDocument {
                 result.add(el.getAttribute("name"));
             }
         }
-        return result.toArray(new String[result.size()]);
+        return result.toArray(new String[0]);
     }
 
 }

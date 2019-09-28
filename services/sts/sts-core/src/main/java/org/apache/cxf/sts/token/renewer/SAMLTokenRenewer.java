@@ -34,6 +34,7 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -51,6 +52,7 @@ import org.apache.cxf.sts.token.realm.RealmProperties;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
@@ -110,7 +112,7 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
             Element tokenElement = (Element)token;
             String namespace = tokenElement.getNamespaceURI();
             String localname = tokenElement.getLocalName();
-            if ((WSConstants.SAML_NS.equals(namespace) || WSConstants.SAML2_NS.equals(namespace))
+            if ((WSS4JConstants.SAML_NS.equals(namespace) || WSS4JConstants.SAML2_NS.equals(namespace))
                 && "Assertion".equals(localname)) {
                 return true;
             }
@@ -500,13 +502,12 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
             saml1Assertion.setID(IDGenerator.generateID("_"));
 
             return oldId;
-        } else {
-            org.opensaml.saml.saml2.core.Assertion saml2Assertion = assertion.getSaml2();
-            String oldId = saml2Assertion.getID();
-            saml2Assertion.setID(IDGenerator.generateID("_"));
-
-            return oldId;
         }
+        org.opensaml.saml.saml2.core.Assertion saml2Assertion = assertion.getSaml2();
+        String oldId = saml2Assertion.getID();
+        saml2Assertion.setID(IDGenerator.generateID("_"));
+
+        return oldId;
     }
 
     private void storeTokenInCache(
@@ -532,9 +533,8 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
     private DateTime getExpiryDate(SamlAssertionWrapper assertion) {
         if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
             return assertion.getSaml2().getConditions().getNotOnOrAfter();
-        } else {
-            return assertion.getSaml1().getConditions().getNotOnOrAfter();
         }
+        return assertion.getSaml1().getConditions().getNotOnOrAfter();
     }
 
     private static class ProofOfPossessionValidator {

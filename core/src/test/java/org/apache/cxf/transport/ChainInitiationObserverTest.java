@@ -25,14 +25,16 @@ import java.util.TreeSet;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ChainInitiationObserverTest extends Assert {
+import static org.junit.Assert.assertTrue;
+
+public class ChainInitiationObserverTest {
 
     private IMocksControl control;
     private TestChain chain;
@@ -46,7 +48,7 @@ public class ChainInitiationObserverTest extends Assert {
         message = control.createMock(Message.class);
 
         Phase phase1 = new Phase("phase1", 1);
-        SortedSet<Phase> phases = new TreeSet<Phase>();
+        SortedSet<Phase> phases = new TreeSet<>();
         phases.add(phase1);
         chain = new TestChain(phases);
         observer = new ChainInitiationObserver(null, null);

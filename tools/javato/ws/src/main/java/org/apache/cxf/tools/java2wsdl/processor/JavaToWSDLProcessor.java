@@ -55,7 +55,7 @@ public class JavaToWSDLProcessor implements Processor {
     private static final String DEFAULT_ADDRESS = "http://localhost:9090/hello";
     private static final String JAVA_CLASS_PATH = "java.class.path";
     private ToolContext context;
-    private final List<AbstractGenerator<?>> generators = new ArrayList<AbstractGenerator<?>>();
+    private final List<AbstractGenerator<?>> generators = new ArrayList<>();
 
     private void customize(ServiceInfo service) {
         if (context.containsKey(ToolConstants.CFG_TNS)) {
@@ -168,7 +168,7 @@ public class JavaToWSDLProcessor implements Processor {
                 // is there a better way to avoid the warning?
                 beanDefinitions.addAll((List<String>)beanFilesParameter);
             } else {
-                String list[] = (String[]) beanFilesParameter;
+                String[] list = (String[]) beanFilesParameter;
                 for (String b : list) {
                     beanDefinitions.add(b);
                 }
@@ -188,8 +188,6 @@ public class JavaToWSDLProcessor implements Processor {
             if (clz.getInterfaces().length == 1) {
                 context.put(ToolConstants.SEI_CLASS, clz.getInterfaces()[0].getName());
             }
-            //TODO: if it is simple frontend, and the impl class implments
-            //multiple interfaces
             context.put(ToolConstants.GEN_FROM_SEI, Boolean.FALSE);
         }
         builderFactory.setServiceClass(clz);
@@ -222,9 +220,8 @@ public class JavaToWSDLProcessor implements Processor {
     protected String getBindingId() {
         if (isSOAP12()) {
             return WSDLConstants.NS_SOAP12;
-        } else {
-            return WSDLConstants.NS_SOAP11;
         }
+        return WSDLConstants.NS_SOAP11;
     }
 
     protected boolean isSOAP12() {

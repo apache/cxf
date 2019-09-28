@@ -30,19 +30,28 @@ import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
+import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.WSConstants;
 import org.example.contract.doubleit.DoubleItFault;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Some tests for modified requests
@@ -55,7 +64,7 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     private static boolean unrestrictedPoliciesInstalled =
-        SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
+        TestUtilities.checkUnrestrictedPoliciesInstalled();
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -84,8 +93,8 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         URL busFile = ModifiedRequestTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = ModifiedRequestTest.class.getResource("DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -126,8 +135,8 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         URL busFile = ModifiedRequestTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = ModifiedRequestTest.class.getResource("DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -168,8 +177,8 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         URL busFile = ModifiedRequestTest.class.getResource("client-untrusted.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = ModifiedRequestTest.class.getResource("DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -201,8 +210,8 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         URL busFile = ModifiedRequestTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = ModifiedRequestTest.class.getResource("DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -243,8 +252,8 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         URL busFile = ModifiedRequestTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = ModifiedRequestTest.class.getResource("DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -306,10 +315,10 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
                 // Find the Timestamp + change it.
 
                 Element timestampElement =
-                    XMLUtils.findElement(securityHeader, "Timestamp", WSConstants.WSU_NS);
+                    XMLUtils.findElement(securityHeader, "Timestamp", WSS4JConstants.WSU_NS);
                 Element createdValue =
-                    XMLUtils.findElement(timestampElement, "Created", WSConstants.WSU_NS);
-                
+                    XMLUtils.findElement(timestampElement, "Created", WSS4JConstants.WSU_NS);
+
                 ZonedDateTime created = ZonedDateTime.parse(createdValue.getTextContent());
                 // Add 5 seconds
                 createdValue.setTextContent(DateUtil.getDateTimeFormatter(true).format(created.plusSeconds(5L)));
@@ -327,7 +336,7 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         public void modifySecurityHeader(Element securityHeader) {
             if (securityHeader != null) {
                 Element signatureElement =
-                    XMLUtils.findElement(securityHeader, "Signature", WSConstants.SIG_NS);
+                    XMLUtils.findElement(securityHeader, "Signature", WSS4JConstants.SIG_NS);
 
                 Node firstChild = signatureElement.getFirstChild();
                 while (!(firstChild instanceof Element) && firstChild != null) {
@@ -348,9 +357,9 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         public void modifySecurityHeader(Element securityHeader) {
             if (securityHeader != null) {
                 Element encryptedKey =
-                    XMLUtils.findElement(securityHeader, "EncryptedKey", WSConstants.ENC_NS);
+                    XMLUtils.findElement(securityHeader, "EncryptedKey", WSS4JConstants.ENC_NS);
                 Element cipherValue =
-                    XMLUtils.findElement(encryptedKey, "CipherValue", WSConstants.ENC_NS);
+                    XMLUtils.findElement(encryptedKey, "CipherValue", WSS4JConstants.ENC_NS);
                 String cipherText = cipherValue.getTextContent();
 
                 StringBuilder stringBuilder = new StringBuilder(cipherText);
@@ -382,7 +391,7 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         public void modifySOAPBody(Element soapBody) {
             if (soapBody != null) {
                 Element cipherValue =
-                    XMLUtils.findElement(soapBody, "CipherValue", WSConstants.ENC_NS);
+                    XMLUtils.findElement(soapBody, "CipherValue", WSS4JConstants.ENC_NS);
                 String cipherText = cipherValue.getTextContent();
 
                 StringBuilder stringBuilder = new StringBuilder(cipherText);

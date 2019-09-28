@@ -22,7 +22,6 @@ package org.apache.cxf.js.rhino;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
@@ -46,7 +45,7 @@ public class ProviderFactory {
 
     private String epAddress;
     private boolean isBaseAddr;
-    private List<AbstractDOMProvider> providers = new CopyOnWriteArrayList<AbstractDOMProvider>();
+    private List<AbstractDOMProvider> providers = new CopyOnWriteArrayList<>();
 
     static {
         ContextFactory.initGlobal(new RhinoContextFactory());
@@ -82,7 +81,7 @@ public class ProviderFactory {
                 if (line == null) {
                     break;
                 }
-                sb.append(line).append("\n");
+                sb.append(line).append('\n');
             }
         }
 
@@ -161,7 +160,7 @@ public class ProviderFactory {
             String base = isBase ? "base " : "";
             StringBuilder msg = new StringBuilder("creating a ");
             msg.append(modestr)
-                .append(" ")
+                .append(' ')
                 .append(type)
                 .append(" provider for ")
                 .append(base)

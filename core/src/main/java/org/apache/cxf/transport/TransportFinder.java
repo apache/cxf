@@ -72,7 +72,7 @@ public class TransportFinder<T> {
             return null;
         }
         //If the uri is related path or has no protocol prefix , we will set it to be http
-        if (uri.startsWith("/") || uri.indexOf(":") < 0) {
+        if (uri.startsWith("/") || uri.indexOf(':') < 0) {
             uri = "http://" + uri;
         }
         T factory = checkForURI(uri);
@@ -150,7 +150,7 @@ public class TransportFinder<T> {
             }
         } else {
             try {
-                Method m = bean.getClass().getMethod("getActivationNamespaces", new Class[0]);
+                Method m = bean.getClass().getMethod("getActivationNamespaces");
                 Collection<String> c = CastUtils.cast((Collection<?>)m.invoke(bean));
                 for (String s : c) {
                     if (!map.containsKey(s)) {

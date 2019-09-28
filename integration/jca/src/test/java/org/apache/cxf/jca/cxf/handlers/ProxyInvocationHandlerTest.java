@@ -22,8 +22,11 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jca.cxf.CXFInvocationHandler;
 import org.apache.cxf.jca.cxf.CXFInvocationHandlerData;
+
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertSame;
 
 
 public class  ProxyInvocationHandlerTest extends AbstractInvocationHandlerTest {
@@ -64,7 +67,6 @@ public class  ProxyInvocationHandlerTest extends AbstractInvocationHandlerTest {
     }
 
 }
-
 
 
 

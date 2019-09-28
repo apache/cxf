@@ -32,7 +32,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.binding.soap.SoapHeader;
@@ -60,7 +60,7 @@ public final class EncoderDecoder11Impl extends EncoderDecoder {
 
     public static final EncoderDecoder11Impl INSTANCE = new EncoderDecoder11Impl();
 
-    private static AtomicReference<JAXBContext> jaxbContextReference = new AtomicReference<JAXBContext>();
+    private static AtomicReference<JAXBContext> jaxbContextReference = new AtomicReference<>();
 
     private static final Logger LOG = LogUtils.getL7dLogger(EncoderDecoder11Impl.class);
 
@@ -160,14 +160,14 @@ public final class EncoderDecoder11Impl extends EncoderDecoder {
     }
 
     public Element encodeSequenceAcknowledgement(SequenceAcknowledgement ack) throws JAXBException {
-        Document doc = DOMUtils.createDocument();
+        DocumentFragment doc = DOMUtils.getEmptyDocument().createDocumentFragment();
         Marshaller marshaller = getContext().createMarshaller();
         marshaller.marshal(ack, doc);
         return (Element)doc.getFirstChild();
     }
 
     public Element encodeIdentifier(Identifier id) throws JAXBException {
-        Document doc = DOMUtils.createDocument();
+        DocumentFragment doc = DOMUtils.getEmptyDocument().createDocumentFragment();
         Marshaller marshaller = getContext().createMarshaller();
         marshaller.marshal(id, doc);
         return (Element)doc.getFirstChild();

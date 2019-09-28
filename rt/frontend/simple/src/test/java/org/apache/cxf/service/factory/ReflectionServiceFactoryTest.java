@@ -44,7 +44,13 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.wsdl.service.factory.AbstractServiceConfiguration;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import org.apache.ws.commons.schema.XmlSchemaElement;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class ReflectionServiceFactoryTest extends AbstractSimpleFrontendTest {
     private ReflectionServiceFactoryBean serviceFactory;

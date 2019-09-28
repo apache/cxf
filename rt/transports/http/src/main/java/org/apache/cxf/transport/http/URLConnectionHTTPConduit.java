@@ -25,7 +25,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.Proxy;
-import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -56,11 +55,15 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
  */
 public class URLConnectionHTTPConduit extends HTTPConduit {
     public static final String HTTPURL_CONNECTION_METHOD_REFLECTION = "use.httpurlconnection.method.reflection";
+    public static final String SET_REASON_PHRASE_NOT_NULL = "set.reason.phrase.not.null";
 
     private static final boolean DEFAULT_USE_REFLECTION;
+    private static final boolean SET_REASON_PHRASE;
     static {
         DEFAULT_USE_REFLECTION =
             Boolean.valueOf(SystemPropertyAction.getProperty(HTTPURL_CONNECTION_METHOD_REFLECTION, "false"));
+        SET_REASON_PHRASE = 
+            Boolean.valueOf(SystemPropertyAction.getProperty(SET_REASON_PHRASE_NOT_NULL, "false"));
     }
 
     /**
@@ -144,11 +147,9 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
         try {
             connection.setRequestMethod(httpRequestMethod);
         } catch (java.net.ProtocolException ex) {
-            Object o = message.getContextualProperty(HTTPURL_CONNECTION_METHOD_REFLECTION);
-            boolean b = DEFAULT_USE_REFLECTION;
-            if (o != null) {
-                b = MessageUtils.isTrue(o);
-            }
+            boolean b = MessageUtils.getContextualBoolean(message,
+                                                          HTTPURL_CONNECTION_METHOD_REFLECTION,
+                                                          DEFAULT_USE_REFLECTION);
             if (b) {
                 try {
                     java.lang.reflect.Field f = ReflectionUtil.getDeclaredField(HttpURLConnection.class, "method");
@@ -276,8 +277,9 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
                     Boolean b = (Boolean)outMessage.get(HTTPURL_CONNECTION_METHOD_REFLECTION);
                     cout = connectAndGetOutputStream(b);
                 }
-            } catch (SocketException e) {
-                if ("Socket Closed".equals(e.getMessage())) {
+            } catch (Exception e) {
+                if ("Socket Closed".equals(e.getMessage())
+                    || "HostnameVerifier, socket reset for TTL".equals(e.getMessage())) {
                     connection.connect();
                     cout = connectAndGetOutputStream((Boolean)outMessage.get(HTTPURL_CONNECTION_METHOD_REFLECTION));
                 } else {
@@ -367,9 +369,31 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
             }
         }
         protected int getResponseCode() throws IOException {
-            return connection.getResponseCode();
+            try {
+                return AccessController.doPrivileged(new PrivilegedExceptionAction<Integer>() {
+
+                    @Override
+                    public Integer run() throws IOException {
+                        return connection.getResponseCode();
+                    } });
+            } catch (PrivilegedActionException e) {
+                Throwable t = e.getCause();
+                if (t instanceof IOException) {
+                    throw (IOException) t;
+                }
+                throw new RuntimeException(t);
+            }
         }
         protected String getResponseMessage() throws IOException {
+            boolean b = MessageUtils.getContextualBoolean(this.outMessage,
+                                                          SET_REASON_PHRASE_NOT_NULL,
+                                                          SET_REASON_PHRASE);
+            if (connection.getResponseMessage() == null && b) {
+                //some http server like tomcat 8.5+ won't return the
+                //reason phrase in response, return a informative value
+                //to tell user no reason phrase in the response instead of null
+                return "no reason phrase in the response";
+            }
             return connection.getResponseMessage();
         }
         protected InputStream getPartialResponse() throws IOException {

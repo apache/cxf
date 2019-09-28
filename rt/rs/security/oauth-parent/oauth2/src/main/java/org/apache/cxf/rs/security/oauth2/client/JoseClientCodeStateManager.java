@@ -57,7 +57,7 @@ public class JoseClientCodeStateManager implements ClientCodeStateManager {
         if (theEncryptionProvider == null && theSigProvider == null) {
             throw new OAuthServiceException("The state can not be protected");
         }
-        MultivaluedMap<String, String> redirectMap = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> redirectMap = new MetadataMap<>();
 
         if (generateNonce && theSigProvider != null) {
             JwsCompactProducer nonceProducer = new JwsCompactProducer(OAuthUtils.generateRandomTokenKey());

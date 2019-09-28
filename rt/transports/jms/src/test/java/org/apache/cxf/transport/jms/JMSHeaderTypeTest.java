@@ -26,7 +26,7 @@ import javax.jms.Message;
 import javax.jms.Session;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.junit.Assert;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -42,8 +42,8 @@ public class JMSHeaderTypeTest {
         message.setStringProperty(CONVERTED_RESPONSE_KEY, TEST_VALUE);
         JMSMessageHeadersType messageHeaders = JMSMessageHeadersType.from(message);
         Set<String> keys = messageHeaders.getPropertyKeys();
-        Assert.assertEquals(1, keys.size());
-        assertEquals(TEST_VALUE, (String)messageHeaders.getProperty(org.apache.cxf.message.Message.RESPONSE_CODE));
+        assertEquals(1, keys.size());
+        assertEquals(TEST_VALUE, messageHeaders.getProperty(org.apache.cxf.message.Message.RESPONSE_CODE));
     }
     
     @Test
@@ -53,7 +53,7 @@ public class JMSHeaderTypeTest {
         messageHeaders.putProperty(org.apache.cxf.message.Message.RESPONSE_CODE, TEST_VALUE);
         messageHeaders.writeTo(message);
         
-        Assert.assertEquals(CONVERTED_RESPONSE_KEY, message.getPropertyNames().nextElement());
+        assertEquals(CONVERTED_RESPONSE_KEY, message.getPropertyNames().nextElement());
         
     }
 

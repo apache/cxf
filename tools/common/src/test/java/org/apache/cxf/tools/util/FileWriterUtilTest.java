@@ -21,10 +21,11 @@ package org.apache.cxf.tools.util;
 import java.io.File;
 import java.io.IOException;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class FileWriterUtilTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+
+public class FileWriterUtilTest {
 
     private void cleanDir(File dir) {
         try {
@@ -54,7 +55,6 @@ public class FileWriterUtilTest extends Assert {
             String path = targetDir.getAbsolutePath() + packPath;
             assertNotNull(new File(path).getName());
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } finally {
             cleanDir(targetDir);
@@ -73,7 +73,6 @@ public class FileWriterUtilTest extends Assert {
             fileWriter = new FileWriterUtil(targetDir.getAbsolutePath(), null);
             assertNotNull(fileWriter.getWriter("com.iona.test.SAMPLE", "A.java"));
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } finally {
             cleanDir(targetDir);

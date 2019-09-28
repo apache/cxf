@@ -23,18 +23,22 @@
     <packaging>bundle</packaging>
     <name>Apache CXF Runtime WS Reliable Messaging</name>
     <description>Apache CXF Runtime WS Reliable Messaging</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.ws.rm</cxf.module.name>
         <cxf.bundle.activator>org.apache.cxf.ws.rm.blueprint.Activator</cxf.bundle.activator>
         <cxf.osgi.import>
+            javax.xml.soap;version="${cxf.osgi.saaj.version}",
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
-            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
+            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
+            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
+            javax.annotation*;version="${cxf.osgi.javax.annotation.version}"
         </cxf.osgi.import>
         <!-- keep in sync with services exported in activator -->
         <cxf.export.service>
@@ -93,10 +97,6 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-management</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.wss4j</groupId>
-            <artifactId>wss4j-policy</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -167,6 +167,7 @@
                                     </deleteDirs>
                                     <extensionArgs>
                                         <extensionArg>-npa</extensionArg>
+                                        <extensionArg>-Xdv</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
@@ -178,6 +179,7 @@
                                     </deleteDirs>
                                     <extensionArgs>
                                         <extensionArg>-npa</extensionArg>
+                                        <extensionArg>-Xdv</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
@@ -189,6 +191,7 @@
                                     </deleteDirs>
                                     <extensionArgs>
                                         <extensionArg>-npa</extensionArg>
+                                        <extensionArg>-Xdv</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
@@ -200,6 +203,7 @@
                                     </deleteDirs>
                                     <extensionArgs>
                                         <extensionArg>-npa</extensionArg>
+                                        <extensionArg>-Xdv</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>

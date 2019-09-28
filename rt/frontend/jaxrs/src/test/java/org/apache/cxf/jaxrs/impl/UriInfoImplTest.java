@@ -19,28 +19,40 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.lang.reflect.Method;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.model.MethodInvocationInfo;
+import org.apache.cxf.jaxrs.model.OperationResourceInfo;
+import org.apache.cxf.jaxrs.model.OperationResourceInfoStack;
 import org.apache.cxf.jaxrs.model.URITemplate;
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.servlet.ServletDestination;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class UriInfoImplTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class UriInfoImplTest {
 
     private IMocksControl control;
 
@@ -71,7 +83,7 @@ public class UriInfoImplTest extends Assert {
     @Test
     public void testRelativize() {
         UriInfoImpl u = new UriInfoImpl(
-            mockMessage("http://localhost:8080/app/root", "/a/b/c"), null);
+                                        mockMessage("http://localhost:8080/app/root", "/a/b/c"), null);
         assertEquals("Wrong Request Uri", "http://localhost:8080/app/root/a/b/c",
                      u.getRequestUri().toString());
         URI relativized = u.relativize(URI.create("http://localhost:8080/app/root/a/d/e"));
@@ -81,23 +93,23 @@ public class UriInfoImplTest extends Assert {
     @Test
     public void testRelativizeAlreadyRelative() throws Exception {
         Message mockMessage = mockMessage("http://localhost:8080/app/root/",
-                "/soup/");
+            "/soup/");
         UriInfoImpl u = new UriInfoImpl(mockMessage, null);
         assertEquals("http://localhost:8080/app/root/soup/", u.getRequestUri()
-                .toString());
+                     .toString());
         URI x = URI.create("x/");
         assertEquals("http://localhost:8080/app/root/x/", u.resolve(x)
-                .toString());
+                     .toString());
         assertEquals("../x/", u.relativize(x).toString());
     }
 
     @Test
     public void testRelativizeNoCommonPrefix() throws Exception {
         Message mockMessage = mockMessage("http://localhost:8080/app/root/",
-                "/soup");
+            "/soup");
         UriInfoImpl u = new UriInfoImpl(mockMessage, null);
         assertEquals("http://localhost:8080/app/root/soup", u.getRequestUri()
-                .toString());
+                     .toString());
         URI otherHost = URI.create("http://localhost:8081/app/root/x");
         assertEquals(otherHost, u.resolve(otherHost));
 
@@ -108,25 +120,25 @@ public class UriInfoImplTest extends Assert {
     @Test
     public void testRelativizeChild() throws Exception {
         /** From UriInfo.relativize() javadoc (2013-04-21):
-*
-* <br/><b>Request URI:</b> <tt>http://host:port/app/root/a/b/c</tt>
-* <br/><b>Supplied URI:</b> <tt>a/b/c/d/e</tt>
-* <br/><b>Returned URI:</b> <tt>d/e</tt>
-*
-* NOTE: Although the above is correct JAX-RS API-wise (as of 2013-04-21),
-* it is WRONG URI-wise (but correct API wise)
-* as the request URI is missing the trailing / -- if the request returned HTML at
-* that location, then resolving "d/e" would end up instead at /app/root/a/b/d/e
-* -- see URI.create("/app/root/a/b/c").resolve("d/e"). Therefore the below tests
-* use the slightly modified request URI http://example.com/app/root/a/b/c/ with a trailing /
-*
-* See the test testRelativizeSibling for a non-slash-ending request URI
-*/
+         *
+         * <br/><b>Request URI:</b> <tt>http://host:port/app/root/a/b/c</tt>
+         * <br/><b>Supplied URI:</b> <tt>a/b/c/d/e</tt>
+         * <br/><b>Returned URI:</b> <tt>d/e</tt>
+         *
+         * NOTE: Although the above is correct JAX-RS API-wise (as of 2013-04-21),
+         * it is WRONG URI-wise (but correct API wise)
+         * as the request URI is missing the trailing / -- if the request returned HTML at
+         * that location, then resolving "d/e" would end up instead at /app/root/a/b/d/e
+         * -- see URI.create("/app/root/a/b/c").resolve("d/e"). Therefore the below tests
+         * use the slightly modified request URI http://example.com/app/root/a/b/c/ with a trailing /
+         *
+         * See the test testRelativizeSibling for a non-slash-ending request URI
+         */
         Message mockMessage = mockMessage("http://example.com/app/root/",
-                "/a/b/c/");
+            "/a/b/c/");
         UriInfoImpl u = new UriInfoImpl(mockMessage, null);
         assertEquals("http://example.com/app/root/a/b/c/", u.getRequestUri()
-                .toString());
+                     .toString());
         URI absolute = URI.create("http://example.com/app/root/a/b/c/d/e");
         assertEquals("d/e", u.relativize(absolute).toString());
 
@@ -137,11 +149,11 @@ public class UriInfoImplTest extends Assert {
     @Test
     public void testRelativizeSibling() throws Exception {
         Message mockMessage = mockMessage("http://example.com/app/root/",
-                "/a/b/c.html");
+            "/a/b/c.html");
         UriInfoImpl u = new UriInfoImpl(mockMessage, null);
         // NOTE: No slash in the end!
         assertEquals("http://example.com/app/root/a/b/c.html", u
-                .getRequestUri().toString());
+                     .getRequestUri().toString());
         URI absolute = URI.create("http://example.com/app/root/a/b/c.pdf");
         assertEquals("c.pdf", u.relativize(absolute).toString());
 
@@ -152,11 +164,11 @@ public class UriInfoImplTest extends Assert {
     @Test
     public void testRelativizeGrandParent() throws Exception {
         Message mockMessage = mockMessage("http://example.com/app/root/",
-                "/a/b/c/");
+            "/a/b/c/");
         UriInfoImpl u = new UriInfoImpl(mockMessage, null);
         // NOTE: All end with slashes (imagine they are folders)
         assertEquals("http://example.com/app/root/a/b/c/", u.getRequestUri()
-                .toString());
+                     .toString());
         URI absolute = URI.create("http://example.com/app/root/a/");
         // Need to go two levels up from /a/b/c/ to /a/
         assertEquals("../../", u.relativize(absolute).toString());
@@ -168,11 +180,11 @@ public class UriInfoImplTest extends Assert {
     @Test
     public void testRelativizeCousin() throws Exception {
         Message mockMessage = mockMessage("http://example.com/app/root/",
-                "/a/b/c/");
+            "/a/b/c/");
         UriInfoImpl u = new UriInfoImpl(mockMessage, null);
         // NOTE: All end with slashes (imagine they are folders)
         assertEquals("http://example.com/app/root/a/b/c/", u.getRequestUri()
-                .toString());
+                     .toString());
         URI absolute = URI.create("http://example.com/app/root/a/b2/c2/");
         // Need to go two levels up from /a/b/c/ to /a/
         assertEquals("../../b2/c2/", u.relativize(absolute).toString());
@@ -184,19 +196,19 @@ public class UriInfoImplTest extends Assert {
     @Test
     public void testRelativizeOutsideBase() throws Exception {
         Message mockMessage = mockMessage("http://example.com/app/root/",
-                "/a/b/c/");
+            "/a/b/c/");
         UriInfoImpl u = new UriInfoImpl(mockMessage, null);
         // NOTE: All end with slashes (imagine they are folders)
         assertEquals("http://example.com/app/root/a/b/c/", u.getRequestUri()
-                .toString());
+                     .toString());
         URI absolute = URI.create("http://example.com/otherapp/fred.txt");
 
         assertEquals("../../../../../otherapp/fred.txt", u.relativize(absolute)
-                .toString());
+                     .toString());
 
         URI relativeToBase = URI.create("../../otherapp/fred.txt");
         assertEquals("../../../../../otherapp/fred.txt",
-                u.relativize(relativeToBase).toString());
+                     u.relativize(relativeToBase).toString());
     }
 
     @Test
@@ -217,7 +229,7 @@ public class UriInfoImplTest extends Assert {
                      u.getAbsolutePath().toString());
 
         u = new UriInfoImpl(mockMessage("http://localhost:8080/baz/", "/bar"),
-                                        null);
+                            null);
         assertEquals("Wrong absolute path", "http://localhost:8080/baz/bar",
                      u.getAbsolutePath().toString());
 
@@ -259,7 +271,7 @@ public class UriInfoImplTest extends Assert {
         assertEquals("Wrong absolute path", "http://localhost:8080/baz%20foo/bar",
                      u.getAbsolutePath().toString());
         u = new UriInfoImpl(mockMessage("http://localhost:8080/baz/%20foo", "/bar%20foo"),
-                                        null);
+                            null);
         assertEquals("Wrong absolute path", "http://localhost:8080/baz/%20foo/bar%20foo",
                      u.getAbsolutePath().toString());
 
@@ -279,7 +291,7 @@ public class UriInfoImplTest extends Assert {
         assertEquals("Wrong query value", qps.getFirst("n"), "1%202");
 
         u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", "/bar",
-                                        "N=0&n=1%202&n=3&b=2&a%2Eb=ab"),
+            "N=0&n=1%202&n=3&b=2&a%2Eb=ab"),
                             null);
 
         qps = u.getQueryParameters();
@@ -298,7 +310,7 @@ public class UriInfoImplTest extends Assert {
         assertEquals("unexpected queries", 0, u.getQueryParameters().size());
 
         Message m = mockMessage("http://localhost:8080/baz", "/bar",
-                                "N=1%202&n=3&b=2&a%2Eb=ab");
+            "N=1%202&n=3&b=2&a%2Eb=ab");
         m.put("org.apache.cxf.http.case_insensitive_queries", "true");
 
         u = new UriInfoImpl(m, null);
@@ -315,7 +327,7 @@ public class UriInfoImplTest extends Assert {
     public void testGetRequestURI() {
 
         UriInfo u = new UriInfoImpl(mockMessage("http://localhost:8080/baz/bar", "/foo", "n=1%202"),
-                            null);
+                                    null);
 
         assertEquals("Wrong request uri", "http://localhost:8080/baz/bar/foo?n=1%202",
                      u.getRequestUri().toString());
@@ -325,7 +337,7 @@ public class UriInfoImplTest extends Assert {
     public void testGetRequestURIWithEncodedChars() {
 
         UriInfo u = new UriInfoImpl(mockMessage("http://localhost:8080/baz/bar", "/foo/%20bar", "n=1%202"),
-                            null);
+                                    null);
 
         assertEquals("Wrong request uri", "http://localhost:8080/baz/bar/foo/%20bar?n=1%202",
                      u.getRequestUri().toString());
@@ -334,7 +346,7 @@ public class UriInfoImplTest extends Assert {
     @Test
     public void testGetTemplateParameters() {
 
-        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> values = new MetadataMap<>();
         new URITemplate("/bar").match("/baz", values);
 
         UriInfoImpl u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", "/bar"),
@@ -344,7 +356,7 @@ public class UriInfoImplTest extends Assert {
         values.clear();
         new URITemplate("/{id}").match("/bar%201", values);
         u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", "/bar%201"),
-                                        values);
+                            values);
 
         MultivaluedMap<String, String> tps = u.getPathParameters(false);
         assertEquals("Number of templates is wrong", 1, tps.size());
@@ -365,7 +377,7 @@ public class UriInfoImplTest extends Assert {
         new URITemplate("/bar").match("/bar", values);
 
         u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", "/bar"),
-                                        values);
+                            values);
         assertEquals("unexpected templates", 0, u.getPathParameters().size());
     }
 
@@ -376,7 +388,7 @@ public class UriInfoImplTest extends Assert {
         assertEquals("Wrong base path", "http://localhost:8080/baz",
                      u.getBaseUri().toString());
         u = new UriInfoImpl(mockMessage("http://localhost:8080/baz/", null),
-                                        null);
+                            null);
         assertEquals("Wrong base path", "http://localhost:8080/baz/",
                      u.getBaseUri().toString());
     }
@@ -385,20 +397,20 @@ public class UriInfoImplTest extends Assert {
     public void testGetPath() {
 
         UriInfoImpl u = new UriInfoImpl(mockMessage("http://localhost:8080/bar/baz",
-                                                    "/baz"),
+            "/baz"),
                                         null);
         assertEquals("Wrong path", "baz", u.getPath());
 
         u = new UriInfoImpl(mockMessage("http://localhost:8080/bar/baz",
-                            "/bar/baz"), null);
+            "/bar/baz"), null);
         assertEquals("Wrong path", "/", u.getPath());
 
         u = new UriInfoImpl(mockMessage("http://localhost:8080/bar/baz/",
-                "/bar/baz/"), null);
+            "/bar/baz/"), null);
         assertEquals("Wrong path", "/", u.getPath());
 
         u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", "/baz/bar%201"),
-                                        null);
+                            null);
         assertEquals("Wrong path", "bar 1", u.getPath());
 
         u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", "/baz/bar%201"),
@@ -406,6 +418,147 @@ public class UriInfoImplTest extends Assert {
         assertEquals("Wrong path", "bar%201", u.getPath(false));
 
 
+    }
+
+    @Path("foo")
+    public static class RootResource {
+
+        @GET
+        public Response get() {
+            return null;
+        }
+
+        @GET
+        @Path("bar")
+        public Response getSubMethod() {
+            return null;
+        }
+
+        @Path("sub")
+        public SubResource getSubResourceLocator() {
+            return new SubResource();
+        }
+    }
+
+    public static class SubResource {
+        @GET
+        public Response getFromSub() {
+            return null;
+        }
+
+        @GET
+        @Path("subSub")
+        public Response getFromSubSub() {
+            return null;
+        }
+    }
+
+    private static ClassResourceInfo getCri(Class<?> clazz, boolean setUriTemplate) {
+        ClassResourceInfo cri = new ClassResourceInfo(clazz);
+        Path path = AnnotationUtils.getClassAnnotation(clazz, Path.class);
+        if (setUriTemplate) {
+            cri.setURITemplate(URITemplate.createTemplate(path));
+        }
+        return cri;
+    }
+
+    private static OperationResourceInfo getOri(ClassResourceInfo cri, String methodName) throws Exception {
+        Method method = cri.getResourceClass().getMethod(methodName);
+        OperationResourceInfo ori = new OperationResourceInfo(method, cri);
+        ori.setURITemplate(URITemplate.createTemplate(AnnotationUtils.getMethodAnnotation(method, Path.class)));
+        return ori;
+    }
+
+    private static List<String> getMatchedURIs(UriInfo u) {
+        return u.getMatchedURIs();
+    }
+
+    @Test
+    public void testGetMatchedURIsRoot() throws Exception {
+        System.out.println("testGetMatchedURIsRoot");
+        Message m = mockMessage("http://localhost:8080/app", "/foo");
+        OperationResourceInfoStack oriStack = new OperationResourceInfoStack();
+        ClassResourceInfo cri = getCri(RootResource.class, true);
+        OperationResourceInfo ori = getOri(cri, "get");
+
+        MethodInvocationInfo miInfo = new MethodInvocationInfo(ori, RootResource.class, new ArrayList<String>());
+        oriStack.push(miInfo);
+        m.put(OperationResourceInfoStack.class, oriStack);
+
+        UriInfoImpl u = new UriInfoImpl(m);
+        List<String> matchedUris = getMatchedURIs(u);
+        assertEquals(1, matchedUris.size());
+        assertTrue(matchedUris.contains("foo"));
+    }
+
+    @Test
+    public void testGetMatchedURIsRootSub() throws Exception {
+        System.out.println("testGetMatchedURIsRootSub");
+        Message m = mockMessage("http://localhost:8080/app", "/foo/bar");
+        OperationResourceInfoStack oriStack = new OperationResourceInfoStack();
+        ClassResourceInfo cri = getCri(RootResource.class, true);
+        OperationResourceInfo ori = getOri(cri, "getSubMethod");
+
+        MethodInvocationInfo miInfo = new MethodInvocationInfo(ori, RootResource.class, new ArrayList<String>());
+        oriStack.push(miInfo);
+        m.put(OperationResourceInfoStack.class, oriStack);
+
+        UriInfoImpl u = new UriInfoImpl(m);
+        List<String> matchedUris = getMatchedURIs(u);
+        assertEquals(2, matchedUris.size());
+        assertEquals("foo/bar", matchedUris.get(0));
+        assertEquals("foo", matchedUris.get(1));
+    }
+
+    @Test
+    public void testGetMatchedURIsSubResourceLocator() throws Exception {
+        System.out.println("testGetMatchedURIsSubResourceLocator");
+        Message m = mockMessage("http://localhost:8080/app", "/foo/sub");
+        OperationResourceInfoStack oriStack = new OperationResourceInfoStack();
+        ClassResourceInfo rootCri = getCri(RootResource.class, true);
+        OperationResourceInfo rootOri = getOri(rootCri, "getSubResourceLocator");
+
+        MethodInvocationInfo miInfo = new MethodInvocationInfo(rootOri, RootResource.class, new ArrayList<String>());
+        oriStack.push(miInfo);
+
+        ClassResourceInfo subCri = getCri(SubResource.class, false);
+        OperationResourceInfo subOri = getOri(subCri, "getFromSub");
+
+        miInfo = new MethodInvocationInfo(subOri, SubResource.class, new ArrayList<String>());
+        oriStack.push(miInfo);
+        m.put(OperationResourceInfoStack.class, oriStack);
+
+        UriInfoImpl u = new UriInfoImpl(m);
+        List<String> matchedUris = getMatchedURIs(u);
+        assertEquals(2, matchedUris.size());
+        assertEquals("foo/sub", matchedUris.get(0));
+        assertEquals("foo", matchedUris.get(1));
+    }
+
+    @Test
+    public void testGetMatchedURIsSubResourceLocatorSubPath() throws Exception {
+        System.out.println("testGetMatchedURIsSubResourceLocatorSubPath");
+        Message m = mockMessage("http://localhost:8080/app", "/foo/sub/subSub");
+        OperationResourceInfoStack oriStack = new OperationResourceInfoStack();
+        ClassResourceInfo rootCri = getCri(RootResource.class, true);
+        OperationResourceInfo rootOri = getOri(rootCri, "getSubResourceLocator");
+
+        MethodInvocationInfo miInfo = new MethodInvocationInfo(rootOri, RootResource.class, new ArrayList<String>());
+        oriStack.push(miInfo);
+
+        ClassResourceInfo subCri = getCri(SubResource.class, false);
+        OperationResourceInfo subOri = getOri(subCri, "getFromSubSub");
+
+        miInfo = new MethodInvocationInfo(subOri, SubResource.class, new ArrayList<String>());
+        oriStack.push(miInfo);
+        m.put(OperationResourceInfoStack.class, oriStack);
+
+        UriInfoImpl u = new UriInfoImpl(m);
+        List<String> matchedUris = getMatchedURIs(u);
+        assertEquals(3, matchedUris.size());
+        assertEquals("foo/sub/subSub", matchedUris.get(0));
+        assertEquals("foo/sub", matchedUris.get(1));
+        assertEquals("foo", matchedUris.get(2));
     }
 
     private Message mockMessage(String baseAddress, String pathInfo) {

@@ -137,7 +137,7 @@ public class NettyHttpSession implements HttpSession {
     @Override
     public void setAttribute(String name, Object value) {
         if (attributes == null) {
-            attributes = new ConcurrentHashMap<String, Object>();
+            attributes = new ConcurrentHashMap<>();
         }
         attributes.put(name, value);
 

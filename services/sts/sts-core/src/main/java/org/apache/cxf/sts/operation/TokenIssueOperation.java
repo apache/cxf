@@ -89,6 +89,7 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
         return responseCollection;
     }
 
+
     public RequestSecurityTokenResponseCollectionType issue(
             RequestSecurityTokenCollectionType requestCollection,
             Principal principal,
@@ -197,6 +198,8 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
                 STSIssueSuccessEvent event = new STSIssueSuccessEvent(providerParameters,
                         System.currentTimeMillis() - start);
                 publishEvent(event);
+
+                cleanRequest(requestRequirements);
                 return response;
             } catch (Throwable ex) {
                 LOG.log(Level.WARNING, "", ex);
@@ -354,10 +357,13 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
         }
 
         // Lifetime
-        LifetimeType lifetime =
-            createLifetime(tokenResponse.getCreated(), tokenResponse.getExpires());
-        JAXBElement<LifetimeType> lifetimeType = QNameConstants.WS_TRUST_FACTORY.createLifetime(lifetime);
-        response.getAny().add(lifetimeType);
+        if (includeLifetimeElement) {
+            LifetimeType lifetime =
+                createLifetime(tokenResponse.getCreated(), tokenResponse.getExpires());
+            JAXBElement<LifetimeType> lifetimeType =
+                QNameConstants.WS_TRUST_FACTORY.createLifetime(lifetime);
+            response.getAny().add(lifetimeType);
+        }
 
         // KeySize
         long keySize = tokenResponse.getKeySize();

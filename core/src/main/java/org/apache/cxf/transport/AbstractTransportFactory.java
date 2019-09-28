@@ -26,6 +26,8 @@ import java.util.Set;
  * Helper methods for {@link DestinationFactory}s and {@link ConduitInitiator}s.
  */
 public abstract class AbstractTransportFactory {
+    public static final String PREFERRED_TRANSPORT_ID = "org.apache.cxf.preferred.transport.id";
+    
     private List<String> transportIds;
 
     public AbstractTransportFactory() {

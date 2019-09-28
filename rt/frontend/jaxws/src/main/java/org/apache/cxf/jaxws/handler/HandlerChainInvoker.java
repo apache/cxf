@@ -59,11 +59,11 @@ public class HandlerChainInvoker {
 
     private static final Logger LOG = LogUtils.getL7dLogger(HandlerChainInvoker.class);
 
-    private final List<Handler<?>> protocolHandlers = new ArrayList<Handler<?>>();
-    private List<LogicalHandler<?>> logicalHandlers = new ArrayList<LogicalHandler<?>>();
+    private final List<Handler<?>> protocolHandlers = new ArrayList<>();
+    private List<LogicalHandler<?>> logicalHandlers = new ArrayList<>();
 
-    private final List<Handler<?>> invokedHandlers = new ArrayList<Handler<?>>();
-    private final List<Handler<?>> closeHandlers = new ArrayList<Handler<?>>();
+    private final List<Handler<?>> invokedHandlers = new ArrayList<>();
+    private final List<Handler<?>> closeHandlers = new ArrayList<>();
 
     private boolean outbound;
     private boolean isRequestor;

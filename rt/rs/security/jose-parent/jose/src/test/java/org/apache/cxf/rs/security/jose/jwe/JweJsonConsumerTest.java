@@ -35,11 +35,13 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class JweJsonConsumerTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+public class JweJsonConsumerTest {
 
     static final String SINGLE_RECIPIENT_ALL_HEADERS_AAD_MODIFIED_OUTPUT =
         "{"
@@ -147,7 +149,7 @@ public class JweJsonConsumerTest extends Assert {
         sharedUnprotectedHeaders.setJsonWebKeysUrl("https://server.example.com/keys.jwks");
         sharedUnprotectedHeaders.setKeyEncryptionAlgorithm(KeyAlgorithm.A128KW);
 
-        List<JweEncryptionProvider> jweProviders = new LinkedList<JweEncryptionProvider>();
+        List<JweEncryptionProvider> jweProviders = new LinkedList<>();
 
         KeyEncryptionProvider keyEncryption1 =
             JweUtils.getSecretKeyEncryptionAlgorithm(wrapperKey1, KeyAlgorithm.A128KW);
@@ -161,7 +163,7 @@ public class JweJsonConsumerTest extends Assert {
         jweProviders.add(jwe1);
         jweProviders.add(jwe2);
 
-        List<JweHeaders> perRecipientHeaders = new LinkedList<JweHeaders>();
+        List<JweHeaders> perRecipientHeaders = new LinkedList<>();
         perRecipientHeaders.add(new JweHeaders("key1"));
         perRecipientHeaders.add(new JweHeaders("key2"));
 
@@ -237,4 +239,3 @@ public class JweJsonConsumerTest extends Assert {
     }
 
 }
-

@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -52,7 +53,7 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
     public void handleFault(Message message) {
         message.put(MAPAggregator.class.getName(), true);
         if (RMContextUtils.getProtocolVariation(message) != null) {
-            if (MessageUtils.isTrue(message.get(RMMessageConstants.DELIVERING_ROBUST_ONEWAY))) {
+            if (PropertyUtils.isTrue(message.get(RMMessageConstants.DELIVERING_ROBUST_ONEWAY))) {
                 // revert the delivering entry from the destination sequence
                 try {
                     Destination destination = getManager().getDestination(message);
@@ -70,7 +71,7 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
         // make sure the fault is returned for an ws-rm related fault or an invalid ws-rm message
         // note that OneWayProcessingInterceptor handles the robust case, hence not handled here.
         if (isProtocolFault(message)
-            && !MessageUtils.isTrue(message.get(RMMessageConstants.DELIVERING_ROBUST_ONEWAY))) {
+            && !PropertyUtils.isTrue(message.get(RMMessageConstants.DELIVERING_ROBUST_ONEWAY))) {
             Exchange exchange = message.getExchange();
             exchange.setOneWay(false);
 
@@ -116,7 +117,7 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
 
     private boolean isRedeliveryEnabled(Message message) {
         // deprecated redelivery mode check
-        if (MessageUtils.isTrue(message.getContextualProperty("org.apache.cxf.ws.rm.destination.redeliver"))) {
+        if (MessageUtils.getContextualBoolean(message, "org.apache.cxf.ws.rm.destination.redeliver", false)) {
             LOG.warning("Use RetryPolicy to enable the redelivery mode");
             return true;
         }
@@ -141,9 +142,8 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
                     "WSA_REQUIRED_EXC", LOG);
                 LOG.log(Level.INFO, msg.toString());
                 throw new RMException(msg);
-            } else {
-                return;
             }
+            return;
         }
 
         String action = null;
@@ -256,7 +256,7 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
     void processSequence(Destination destination, Message message)
         throws SequenceFault, RMException {
         final boolean robust =
-            MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY));
+            MessageUtils.getContextualBoolean(message, Message.ROBUST_ONEWAY, false);
         if (robust) {
             // set this property to change the acknowledging behavior
             message.put(RMMessageConstants.DELIVERING_ROBUST_ONEWAY, Boolean.TRUE);

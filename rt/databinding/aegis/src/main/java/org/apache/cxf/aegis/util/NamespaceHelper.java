@@ -141,7 +141,7 @@ public final class NamespaceHelper {
      * @return the namespace
      */
     public static String makeNamespaceFromClassName(String className, String protocol) {
-        int index = className.lastIndexOf(".");
+        int index = className.lastIndexOf('.');
 
         if (index == -1) {
             return protocol + "://" + "DefaultNamespace";
@@ -190,11 +190,11 @@ public final class NamespaceHelper {
             hostname = u.getHost();
             path = u.getPath();
         } catch (MalformedURLException e) {
-            if (namespace.indexOf(":") > -1) {
-                hostname = namespace.substring(namespace.indexOf(":") + 1);
+            if (namespace.indexOf(':') > -1) {
+                hostname = namespace.substring(namespace.indexOf(':') + 1);
 
-                if (hostname.indexOf("/") > -1) {
-                    hostname = hostname.substring(0, hostname.indexOf("/"));
+                if (hostname.indexOf('/') > -1) {
+                    hostname = hostname.substring(0, hostname.indexOf('/'));
                 }
             } else {
                 hostname = namespace;
@@ -294,7 +294,7 @@ public final class NamespaceHelper {
             return null;
         }
 
-        int index = value.indexOf(":");
+        int index = value.indexOf(':');
 
         if (index == -1) {
             return new QName(value);
@@ -318,12 +318,11 @@ public final class NamespaceHelper {
         int index = value.indexOf(':');
         if (index == -1) {
             return new QName(nc.getNamespaceURI(""), value, "");
-        } else {
-            String prefix = value.substring(0, index);
-            String localName = value.substring(index + 1);
-            String ns = nc.getNamespaceURI(prefix);
-            return new QName(ns, localName, prefix);
         }
+        String prefix = value.substring(0, index);
+        String localName = value.substring(index + 1);
+        String ns = nc.getNamespaceURI(prefix);
+        return new QName(ns, localName, prefix);
     }
 
     public static QName createQName(Element e, String value, String defaultNamespace) {
@@ -331,7 +330,7 @@ public final class NamespaceHelper {
             return null;
         }
 
-        int index = value.indexOf(":");
+        int index = value.indexOf(':');
 
         if (index == -1) {
             return new QName(defaultNamespace, value);

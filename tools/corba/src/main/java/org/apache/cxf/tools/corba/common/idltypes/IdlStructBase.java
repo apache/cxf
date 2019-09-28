@@ -55,7 +55,7 @@ public abstract class IdlStructBase extends IdlScopeBase implements IdlType {
         if (isCircular()) {
             return false;
         }
-        if (definitions().size() == 0) {
+        if (definitions().isEmpty()) {
             return true;
         }
         boolean hasNonEmptyMembers = false;

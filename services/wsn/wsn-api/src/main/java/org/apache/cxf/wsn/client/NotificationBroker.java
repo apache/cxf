@@ -76,7 +76,7 @@ public class NotificationBroker implements Referencable {
 
     private org.oasis_open.docs.wsn.brw_2.NotificationBroker broker;
     private final W3CEndpointReference epr;
-    private Class<?> extraClasses[];
+    private Class<?>[] extraClasses;
     private JAXBContext context;
 
     public NotificationBroker(String address, Class<?> ... cls) {

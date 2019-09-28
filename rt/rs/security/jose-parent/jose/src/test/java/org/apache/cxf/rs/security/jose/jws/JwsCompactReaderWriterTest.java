@@ -41,10 +41,12 @@ import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JwsCompactReaderWriterTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class JwsCompactReaderWriterTest {
 
     public static final String TOKEN_WITH_DETACHED_UNENCODED_PAYLOAD =
         "eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..A5dxf2s96_n5FLueVuW1Z_vh161FwXZC4YLPff6dmDY";
@@ -181,7 +183,7 @@ public class JwsCompactReaderWriterTest extends Assert {
 
     @Test
     public void testWriteJwsWithJwkAsMapSignedByMac() throws Exception {
-        Map<String, Object> map = new LinkedHashMap<String, Object>();
+        Map<String, Object> map = new LinkedHashMap<>();
         map.put(JsonWebKey.KEY_TYPE, JsonWebKey.KEY_TYPE_OCTET);
         map.put(JsonWebKey.KEY_OPERATIONS,
                 new KeyOperation[]{KeyOperation.SIGN, KeyOperation.VERIFY});
@@ -229,7 +231,7 @@ public class JwsCompactReaderWriterTest extends Assert {
     private void validateSpecClaim(JwtClaims claims) {
         assertEquals("joe", claims.getIssuer());
         assertEquals(Long.valueOf(1300819380), claims.getExpiryTime());
-        assertEquals(Boolean.TRUE, claims.getClaim("http://example.com/is_root"));
+        assertTrue((Boolean)claims.getClaim("http://example.com/is_root"));
     }
 
     @Test

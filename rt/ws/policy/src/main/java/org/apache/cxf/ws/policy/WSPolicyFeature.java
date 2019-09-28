@@ -91,8 +91,49 @@ public class WSPolicyFeature extends AbstractFeature {
 
     @Override
     public void initialize(Bus bus) {
+        initializePolicyEngine(bus);
+        Collection<Policy> loadedPolicies = null;
+        if (policyElements != null || policyReferenceElements != null) {
+            loadedPolicies = new ArrayList<>();
+            PolicyBuilder builder = bus.getExtension(PolicyBuilder.class);
+            if (null != policyElements) {
+                for (Element e : policyElements) {
+                    loadedPolicies.add(builder.getPolicy(e));
+                }
+            }
+            if (null != policyReferenceElements) {
+                for (Element e : policyReferenceElements) {
+                    PolicyReference pr = builder.getPolicyReference(e);
+                    Policy resolved = resolveReference(pr, builder, bus, null);
+                    if (null != resolved) {
+                        loadedPolicies.add(resolved);
+                    }
+                }
+            }
+        }
 
-        // this should never be null as features are initialised only
+        Policy thePolicy = new Policy();
+        if (policies != null) {
+            for (Policy p : policies) {
+                thePolicy = thePolicy.merge(p);
+            }
+        }
+
+        if (loadedPolicies != null) {
+            for (Policy p : loadedPolicies) {
+                thePolicy = thePolicy.merge(p);
+            }
+        }
+        if (!thePolicy.isEmpty()) {
+            PolicyEngine pe = bus.getExtension(PolicyEngine.class);
+
+            synchronized (pe) {
+                pe.addPolicy(thePolicy);
+            }
+        }
+    }
+    public void initializePolicyEngine(Bus bus) {
+        // this should never be null as features are initialized only
         // after the bus and all its extensions have been created
 
         PolicyEngine pe = bus.getExtension(PolicyEngine.class);
@@ -149,8 +190,7 @@ public class WSPolicyFeature extends AbstractFeature {
     }
 
     private Policy initializeEndpointPolicy(Endpoint endpoint, Bus bus) {
-
-        initialize(bus);
+        initializePolicyEngine(bus);
         DescriptionInfo i = endpoint.getEndpointInfo().getDescription();
         Collection<Policy> loadedPolicies = null;
         if (policyElements != null || policyReferenceElements != null) {

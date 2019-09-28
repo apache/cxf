@@ -26,7 +26,6 @@ import java.util.Properties;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
@@ -58,10 +57,15 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests for the validate operation to validate SecurityContextTokens.
  */
-public class ValidateSCTUnitTest extends org.junit.Assert {
+public class ValidateSCTUnitTest {
 
     public static final QName REQUESTED_SECURITY_TOKEN =
         QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(null).getName();
@@ -105,8 +109,6 @@ public class ValidateSCTUnitTest extends org.junit.Assert {
         // Get a SecurityContextToken via the SCTProvider
         TokenProviderResponse providerResponse = createSCT();
         Element sct = (Element)providerResponse.getToken();
-        Document doc = sct.getOwnerDocument();
-        sct = (Element)doc.appendChild(sct);
         ValidateTargetType validateTarget = new ValidateTargetType();
         validateTarget.setAny(sct);
 
@@ -190,7 +192,7 @@ public class ValidateSCTUnitTest extends org.junit.Assert {
 
         assertTrue(sctTokenProvider.canHandleToken(STSUtils.TOKEN_TYPE_SCT_05_12));
         TokenProviderResponse providerResponse = sctTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         return providerResponse;

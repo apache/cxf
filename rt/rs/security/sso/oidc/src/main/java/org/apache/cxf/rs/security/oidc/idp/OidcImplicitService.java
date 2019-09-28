@@ -133,7 +133,7 @@ public class OidcImplicitService extends ImplicitGrantService {
         String idToken = getProcessedIdToken(state, userSubject,
                                              getApprovedScope(requestedScope, approvedScope));
         if (idToken != null) {
-            sb.append(OidcUtils.ID_TOKEN).append("=").append(idToken);
+            sb.append(OidcUtils.ID_TOKEN).append('=').append(idToken);
         }
         finalizeResponse(sb, state);
         return sb;

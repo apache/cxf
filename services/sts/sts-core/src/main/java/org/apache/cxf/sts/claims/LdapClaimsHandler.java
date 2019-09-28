@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.sts.claims;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -124,17 +122,8 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
     }
 
 
-    public List<URI> getSupportedClaimTypes() {
-        List<URI> uriList = new ArrayList<>();
-        for (String uri : getClaimsLdapAttributeMapping().keySet()) {
-            try {
-                uriList.add(new URI(uri));
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return uriList;
+    public List<String> getSupportedClaimTypes() {
+        return new ArrayList<>(getClaimsLdapAttributeMapping().keySet());
     }
 
     public ProcessedClaimCollection retrieveClaimValues(
@@ -199,13 +188,13 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
                 }
             }
 
-            String[] searchAttributes = searchAttributeList.toArray(new String[searchAttributeList.size()]);
+            String[] searchAttributes = searchAttributeList.toArray(new String[0]);
 
             if (this.userBaseDn != null) {
                 ldapAttributes = LdapUtils.getAttributesOfEntry(ldap, this.userBaseDn, this.getObjectClass(), this
                     .getUserNameAttribute(), user, searchAttributes);
             }
-            if (this.userBaseDNs != null && (ldapAttributes == null || ldapAttributes.size() == 0)) {
+            if (this.userBaseDNs != null && (ldapAttributes == null || ldapAttributes.isEmpty())) {
                 for (String userBase : userBaseDNs) {
                     ldapAttributes = LdapUtils.getAttributesOfEntry(ldap, userBase, this.getObjectClass(), this
                         .getUserNameAttribute(), user, searchAttributes);
@@ -216,7 +205,7 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
             }
         }
 
-        if (ldapAttributes == null || ldapAttributes.size() == 0) {
+        if (ldapAttributes == null || ldapAttributes.isEmpty()) {
             //No result
             if (LOG.isLoggable(Level.INFO)) {
                 LOG.info("User '" + user + "' not found");
@@ -239,8 +228,8 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
     }
 
     protected ProcessedClaim processClaim(Claim claim, Map<String, Attribute> ldapAttributes, Principal principal) {
-        URI claimType = claim.getClaimType();
-        String ldapAttribute = getClaimsLdapAttributeMapping().get(claimType.toString());
+        String claimType = claim.getClaimType();
+        String ldapAttribute = getClaimsLdapAttributeMapping().get(claimType);
         Attribute attr = ldapAttributes.get(ldapAttribute);
         if (attr == null) {
             if (LOG.isLoggable(Level.FINEST)) {
@@ -254,7 +243,7 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
         c.setPrincipal(principal);
 
         try {
-            NamingEnumeration<?> list = (NamingEnumeration<?>)attr.getAll();
+            NamingEnumeration<?> list = attr.getAll();
             while (list.hasMore()) {
                 Object obj = list.next();
                 if (obj instanceof String) {

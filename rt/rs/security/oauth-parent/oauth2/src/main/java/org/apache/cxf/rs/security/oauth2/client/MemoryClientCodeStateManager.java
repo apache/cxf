@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.client;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -31,17 +32,19 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 
 public class MemoryClientCodeStateManager implements ClientCodeStateManager {
-    private ConcurrentHashMap<String, MultivaluedMap<String, String>> map =
-            new ConcurrentHashMap<String, MultivaluedMap<String, String>>();
+    private Map<String, MultivaluedMap<String, String>> map =
+            new ConcurrentHashMap<>();
+
     private boolean generateNonce;
+
     @Override
     public MultivaluedMap<String, String> toRedirectState(MessageContext mc,
                                                           MultivaluedMap<String, String> requestState) {
         String stateParam = OAuthUtils.generateRandomTokenKey();
-        MultivaluedMap<String, String> redirectMap = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> redirectMap = new MetadataMap<>();
 
         if (generateNonce) {
-            String nonceParam = MessageDigestUtils.generate(CryptoUtils.generateSecureRandomBytes(16));
+            String nonceParam = MessageDigestUtils.generate(CryptoUtils.generateSecureRandomBytes(32));
             requestState.putSingle(OAuthConstants.NONCE, nonceParam);
             redirectMap.putSingle(OAuthConstants.NONCE, nonceParam);
         }
@@ -61,6 +64,7 @@ public class MemoryClientCodeStateManager implements ClientCodeStateManager {
         }
         return map.remove(stateParam);
     }
+
     public void setGenerateNonce(boolean generateNonce) {
         this.generateNonce = generateNonce;
     }

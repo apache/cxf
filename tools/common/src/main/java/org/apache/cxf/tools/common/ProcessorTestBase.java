@@ -47,14 +47,17 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.tools.util.ToolsStaxUtils;
 import org.apache.ws.commons.schema.constants.Constants;
+
 import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.ComparisonFailure;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 
-public class ProcessorTestBase extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class ProcessorTestBase {
 
     public static final List<String> DEFAULT_IGNORE_ATTR = Arrays.asList(new String[]{"attributeFormDefault",
                                                                                       "elementFormDefault",
@@ -89,13 +92,6 @@ public class ProcessorTestBase extends Assert {
             a = qnameAtts.get(element);
         }
         a.add(local);
-    }
-
-    @Before
-    public void setUp() throws Exception {
-        if (System.getProperty("java.version").startsWith("9")) {
-            System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
-        }
     }
 
     @After
@@ -192,16 +188,15 @@ public class ProcessorTestBase extends Assert {
 
                 if (tok1.equals(tok2)) {
                     break;
-                } else {
-                    unmatched.add(tok2);
                 }
+                unmatched.add(tok2);
             }
             assertEquals("Compare failed " + location1.getAbsolutePath()
                          + " != " + location2.getAbsolutePath(), tok1, tok2);
         }
 
-        assertTrue(!st1.hasMoreTokens());
-        assertTrue(!st2.hasMoreTokens());
+        assertFalse(st1.hasMoreTokens());
+        assertFalse(st2.hasMoreTokens());
         assertTrue("Files did not match: " + unmatched, unmatched.isEmpty());
     }
 

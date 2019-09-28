@@ -18,10 +18,11 @@
  */
 package org.apache.cxf.rs.security.oauth2.grants.jwt;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JwtUserSubjectTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+
+public class JwtUserSubjectTest {
 
     @Test
     public void testJwtUserSubject() {

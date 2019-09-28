@@ -71,7 +71,7 @@ public class EndpointReferenceBuilder {
                          */
                         addressElements.get(0).setTextContent(this.endpoint.getEndpointInfo().getAddress());
                     }
-                    return W3CEndpointReference.readFrom(new DOMSource(eprEle));
+                    return EndpointReference.readFrom(new DOMSource(eprEle));
                 }
 
             }

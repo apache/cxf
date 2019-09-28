@@ -21,16 +21,17 @@
     <parent>
         <groupId>org.apache.cxf.systests</groupId>
         <artifactId>cxf-systests-rs-sse</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-systests-rs-sse-jetty</artifactId>
     <name>Apache CXF SSE Integration System Tests for Jetty</name>
     <description>Apache CXF SSE Integration System Tests for Jetty</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <properties>
         <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
+        <cxf.module.name>org.apache.cxf.systests.rs.sse.jetty</cxf.module.name>
     </properties>
     <dependencies>
         <dependency>

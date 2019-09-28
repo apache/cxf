@@ -22,6 +22,8 @@ package org.apache.cxf.systest.jaxrs.security;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class JAXRSSpringSecurityNoAnnotationsTest extends AbstractSpringSecurityTest {
     public static final int PORT = BookServerSecuritySpringNoAnnotations.PORT;
 

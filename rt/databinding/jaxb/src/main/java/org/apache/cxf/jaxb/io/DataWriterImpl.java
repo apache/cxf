@@ -59,11 +59,16 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
 
     ValidationEventHandler veventHandler;
     boolean setEventHandler = true;
+    boolean noEscape;
     private JAXBDataBinding databinding;
 
     public DataWriterImpl(JAXBDataBinding binding) {
+        this(binding, false);
+    }
+    public DataWriterImpl(JAXBDataBinding binding, boolean noEsc) {
         super(binding.getContext());
         databinding = binding;
+        noEscape = noEsc;
     }
 
     public void write(Object obj, T output) {
@@ -92,9 +97,10 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
         }
 
         public boolean handleEvent(ValidationEvent event) {
-            // CXF-1194 this hack is specific to MTOM, so pretty safe to leave in here before calling the origHandler.
+            // CXF-1194/CXF-7438 this hack is specific to MTOM, so pretty safe to leave in
+            // here before calling the origHandler.
             String msg = event.getMessage();
-            if (msg.startsWith("cvc-type.3.1.2")
+            if ((msg.startsWith("cvc-type.3.1.2") || msg.startsWith("cvc-complex-type.2.2"))
                 && msg.contains(marshaller.getLastMTOMElementName().getLocalPart())) {
                 return true;
             }
@@ -129,6 +135,8 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
             marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.FALSE);
             marshaller.setListener(databinding.getMarshallerListener());
+            databinding.applyEscapeHandler(!noEscape, eh -> JAXBUtils.setEscapeHandler(marshaller, eh));
+
             if (setEventHandler) {
                 ValidationEventHandler h = veventHandler;
                 if (veventHandler == null) {
@@ -172,15 +180,12 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
                 marshaller.setEventHandler(new MtomValidationHandler(marshaller.getEventHandler(),
                                                             (JAXBAttachmentMarshaller)atmarsh));
             }
+        } catch (javax.xml.bind.MarshalException ex) {
+            Message faultMessage = new Message("MARSHAL_ERROR", LOG, ex.getLinkedException()
+                .getMessage());
+            throw new Fault(faultMessage, ex);
         } catch (JAXBException ex) {
-            if (ex instanceof javax.xml.bind.MarshalException) {
-                javax.xml.bind.MarshalException marshalEx = (javax.xml.bind.MarshalException)ex;
-                Message faultMessage = new Message("MARSHAL_ERROR", LOG, marshalEx.getLinkedException()
-                    .getMessage());
-                throw new Fault(faultMessage, ex);
-            } else {
-                throw new Fault(new Message("MARSHAL_ERROR", LOG, ex.getMessage()), ex);
-            }
+            throw new Fault(new Message("MARSHAL_ERROR", LOG, ex.getMessage()), ex);
         }
         for (XmlAdapter<?, ?> adapter : databinding.getConfiguredXmlAdapters()) {
             marshaller.setAdapter(adapter);
@@ -306,9 +311,8 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
                 if (e.getLinkedException() != null) {
                     throw new Fault(new Message("MARSHAL_ERROR", LOG,
                             e.getLinkedException().getMessage()), e);
-                } else {
-                    throw new Fault(new Message("MARSHAL_ERROR", LOG, e.getMessage()), e);
                 }
+                throw new Fault(new Message("MARSHAL_ERROR", LOG, e.getMessage()), e);
             }
         }
     }

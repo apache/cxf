@@ -39,11 +39,14 @@ import org.apache.cxf.jaxrs.ext.search.SearchConditionParser;
 import org.apache.cxf.jaxrs.ext.search.SearchConditionVisitor;
 import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 import org.apache.cxf.jaxrs.ext.search.jpa.BookReview.Review;
+
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 
-public abstract class AbstractJPATypedQueryVisitorTest extends Assert {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public abstract class AbstractJPATypedQueryVisitorTest {
 
     private EntityManagerFactory emFactory;
 
@@ -65,7 +68,7 @@ public abstract class AbstractJPATypedQueryVisitorTest extends Assert {
             fail("Exception during HSQL database init.");
         }
         try {
-            emFactory = Persistence.createEntityManagerFactory("testUnitHibernate");
+            emFactory = Persistence.createEntityManagerFactory("test-hibernate-cxf-rt-rs-extension-search");
             em = emFactory.createEntityManager();
 
             em.getTransaction().begin();
@@ -207,8 +210,7 @@ public abstract class AbstractJPATypedQueryVisitorTest extends Assert {
             new JPACriteriaQueryVisitor<Book, Tuple>(em, Book.class, Tuple.class);
         filter.accept(jpa);
 
-        List<SingularAttribute<Book, ?>> selections =
-            new ArrayList<SingularAttribute<Book, ?>>();
+        List<SingularAttribute<Book, ?>> selections = new ArrayList<>();
         selections.add(Book_.id);
 
         jpa.selectTuple(selections);
@@ -231,8 +233,7 @@ public abstract class AbstractJPATypedQueryVisitorTest extends Assert {
             new JPACriteriaQueryVisitor<Book, Book>(em, Book.class, Book.class);
         filter.accept(jpa);
 
-        List<SingularAttribute<Book, ?>> selections =
-            new ArrayList<SingularAttribute<Book, ?>>();
+        List<SingularAttribute<Book, ?>> selections = new ArrayList<>();
         selections.add(Book_.id);
 
         return jpa.getOrderedTypedQuery(selections, asc).getResultList();
@@ -244,8 +245,7 @@ public abstract class AbstractJPATypedQueryVisitorTest extends Assert {
             new JPACriteriaQueryVisitor<Book, BookInfo>(em, Book.class, BookInfo.class);
         filter.accept(jpa);
 
-        List<SingularAttribute<Book, ?>> selections =
-            new ArrayList<SingularAttribute<Book, ?>>();
+        List<SingularAttribute<Book, ?>> selections = new ArrayList<>();
         selections.add(Book_.id);
         selections.add(Book_.bookTitle);
 
@@ -261,8 +261,7 @@ public abstract class AbstractJPATypedQueryVisitorTest extends Assert {
             new JPACriteriaQueryVisitor<Book, Object[]>(em, Book.class, Object[].class);
         filter.accept(jpa);
 
-        List<SingularAttribute<Book, ?>> selections =
-            new ArrayList<SingularAttribute<Book, ?>>();
+        List<SingularAttribute<Book, ?>> selections = new ArrayList<>();
         selections.add(Book_.id);
         selections.add(Book_.bookTitle);
 

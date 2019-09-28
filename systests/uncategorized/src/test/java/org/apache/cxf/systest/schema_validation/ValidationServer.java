@@ -47,7 +47,7 @@ import org.apache.schema_validation.types.ComplexStruct;
 public class ValidationServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(ValidationServer.class);
 
-    List<Endpoint> eps = new LinkedList<Endpoint>();
+    List<Endpoint> eps = new LinkedList<>();
 
     public ValidationServer() {
     }

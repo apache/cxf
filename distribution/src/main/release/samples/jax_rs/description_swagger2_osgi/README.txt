@@ -38,12 +38,17 @@ In order to install CXF's features, you need to add the CXF's features repo usin
 
   feature:repo-add cxf 3.n.m
 
- where 3.n.m corresponds to a valid CXF version number (e.g., 3.1.4).
+ where 3.n.m corresponds to a valid CXF version number (e.g., 3.3.0).
 
 Install CXF's cxf-rs-description-swagger2 feature that installs all the required bundles
 for this demo bundle.
 
   feature:install cxf-rs-description-swagger2
+  feature:install aries-blueprint
+
+Optionally, you could install Swagger UI into Karaf OSGi container:
+
+  install -s mvn:org.webjars/swagger-ui/3.23.0
 
 Install this demo bundle (using the appropriate bundle version number)
   
@@ -55,7 +60,7 @@ You can verify if the CXF JAX-RS Swagger2 Blueprint Demo is installed and starte
   START LEVEL 100 , List Threshold: 50
    ID | State  | Lvl | Version | Name                              
   -----------------------------------------------------------------
-  122 | Active |  80 | 3.1.4   | CXF JAX-RS Swagger2 Blueprint Demo
+  122 | Active |  80 | 3.3.0   | CXF JAX-RS Swagger2 Blueprint Demo
   karaf@root()>
 
 Now, you will be able to access this CXF JAXRS demo service on your Karaf instance at
@@ -67,8 +72,13 @@ And its Swagger API documents in either json or yaml are available at
   http://localhost:8181/cxf/swaggerSample/swagger.json
   http://localhost:8181/cxf/swaggerSample/swagger.yaml
 
+If you have installed Swagger UI into the Karaf container, it is available
+at:
 
-If you do not have your swagger-ui on your local system, you can download 
+  http://localhost:8181/cxf/swaggerSample/api-docs/?url=/cxf/swaggerSample/swagger.json
+  http://localhost:8181/cxf/swaggerSample/api-docs/?url=/cxf/swaggerSample/swagger.yaml
+
+Otherwise, if you do not have your swagger-ui on your local system, you can download 
 a copy from its download site.
 
 At the console, type

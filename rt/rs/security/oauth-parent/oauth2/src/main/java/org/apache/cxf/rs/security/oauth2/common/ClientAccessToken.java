@@ -63,8 +63,7 @@ public class ClientAccessToken extends AccessToken {
     public String toString() {
         if (OAuthConstants.BEARER_AUTHORIZATION_SCHEME.equalsIgnoreCase(super.getTokenType())) {
             return OAuthConstants.BEARER_AUTHORIZATION_SCHEME + " " + super.getTokenKey();
-        } else {
-            return super.toString();
         }
+        return super.toString();
     }
 }

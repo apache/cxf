@@ -20,23 +20,21 @@
 package org.apache.cxf.tools.corba.common.idltypes;
 
 import java.io.PrintWriter;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Stack;
-import java.util.Vector;
 
 
 public abstract class IdlScopeBase extends IdlDefnImplBase {
-    private List<IdlDefn> defns;
-    private Stack<IdlDefn> hold;
-    private List<IdlDefn> park;
+    private final List<IdlDefn> defns = new ArrayList<>();
+    private final Deque<IdlDefn> hold = new ArrayDeque<>();
+    private final List<IdlDefn> park = new ArrayList<>();
 
     protected IdlScopeBase(IdlScopeBase parent, String name) {
         super(parent, name);
-        defns = new Vector<IdlDefn>();
-        hold = new Stack<IdlDefn>();
-        park = new Vector<IdlDefn>();
     }
 
     public IdlDefn addToScope(IdlDefn def) {
@@ -116,7 +114,7 @@ public abstract class IdlScopeBase extends IdlDefnImplBase {
 
     public IdlDefn lookup(IdlScopedName name, boolean undefined) {
         IdlScopeBase scope = this;
-        String parents[] = name.parentNames();
+        String[] parents = name.parentNames();
 
         if (parents != null) {
             IdlDefn defn = lookup(parents, undefined);
@@ -133,11 +131,11 @@ public abstract class IdlScopeBase extends IdlDefnImplBase {
     }
 
 
-    public IdlDefn lookup(String scopedName[]) {
+    public IdlDefn lookup(String[] scopedName) {
         return lookup(scopedName, false);
     }
 
-    public IdlDefn lookup(String scopedName[], boolean undefined) {
+    public IdlDefn lookup(String[] scopedName, boolean undefined) {
         IdlScopeBase scope = this;
 
         for (;;) {

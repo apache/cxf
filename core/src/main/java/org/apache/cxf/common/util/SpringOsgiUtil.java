@@ -30,10 +30,10 @@ final class SpringOsgiUtil {
     }
 
     public static ResourcePatternResolver getResolver(ClassLoader loader) {
-        Bundle bundle = null;
         if (loader == null) {
             loader = Thread.currentThread().getContextClassLoader();
         }
+        final Bundle bundle;
         if (loader instanceof BundleDelegatingClassLoader) {
             bundle = ((BundleDelegatingClassLoader)loader).getBundle();
         } else {

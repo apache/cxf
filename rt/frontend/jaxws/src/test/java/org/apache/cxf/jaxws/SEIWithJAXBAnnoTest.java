@@ -25,13 +25,16 @@ import java.util.List;
 
 import javax.xml.ws.Endpoint;
 
-import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.service.AddNumbers;
 import org.apache.cxf.jaxws.service.AddNumbersImpl;
+
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class SEIWithJAXBAnnoTest extends AbstractJaxWsTest {
     String address = "local://localhost:9000/Hello";
@@ -44,7 +47,7 @@ public class SEIWithJAXBAnnoTest extends AbstractJaxWsTest {
         Endpoint.publish("local://localhost:9000/Hello", serviceImpl);
 
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
-        factory.setBus(SpringBusFactory.getDefaultBus());
+        factory.setBus(BusFactory.getDefaultBus());
         factory.setServiceClass(AddNumbers.class);
 
         factory.setAddress(address);

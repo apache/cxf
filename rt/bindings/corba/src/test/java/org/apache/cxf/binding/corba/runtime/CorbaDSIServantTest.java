@@ -31,16 +31,15 @@ import org.apache.cxf.binding.corba.CorbaDestination;
 import org.apache.cxf.binding.corba.TestUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.MessageObserver;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.omg.CORBA.Context;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.ServerRequest;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class CorbaDSIServantTest extends Assert {
+public class CorbaDSIServantTest {
     protected static ORB orb;
     protected static Bus bus;
 
@@ -137,6 +136,5 @@ public class CorbaDSIServantTest extends Assert {
         }
     }
 }
-
 
 

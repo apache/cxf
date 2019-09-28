@@ -29,19 +29,28 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
 
+import org.w3c.dom.Document;
+
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.jaxws.DispatchImpl;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * A test for CXF-5679.
@@ -83,10 +92,10 @@ public class SignatureWhitespaceTest extends AbstractBusClientServerTestBase {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
+    public static Collection<TestParam> data() {
 
-        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
-                                                {new TestParam(STAX_PORT, false)},
+        return Arrays.asList(new TestParam[] {new TestParam(PORT, false),
+                                              new TestParam(STAX_PORT, false),
         });
     }
 
@@ -97,8 +106,8 @@ public class SignatureWhitespaceTest extends AbstractBusClientServerTestBase {
         URL busFile = SignatureWhitespaceTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SignatureWhitespaceTest.class.getResource("DoubleItAction.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -107,7 +116,7 @@ public class SignatureWhitespaceTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -120,8 +129,8 @@ public class SignatureWhitespaceTest extends AbstractBusClientServerTestBase {
         URL busFile = SignatureWhitespaceTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SignatureWhitespaceTest.class.getResource("DoubleItAction.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -152,6 +161,11 @@ public class SignatureWhitespaceTest extends AbstractBusClientServerTestBase {
         // Make a successful request
         StreamSource response = dispatch.invoke(request);
         assertNotNull(response);
+
+        Document doc = StaxUtils.read(response.getInputStream());
+        assertEquals("50", doc.getElementsByTagNameNS(null, "doubledNumber").item(0).getTextContent());
+
+        ((java.io.Closeable)dispatch).close();
     }
 
     @org.junit.Test
@@ -161,8 +175,8 @@ public class SignatureWhitespaceTest extends AbstractBusClientServerTestBase {
         URL busFile = SignatureWhitespaceTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SignatureWhitespaceTest.class.getResource("DoubleItAction.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -183,6 +197,11 @@ public class SignatureWhitespaceTest extends AbstractBusClientServerTestBase {
         // Make a successful request
         StreamSource response = dispatch.invoke(request);
         assertNotNull(response);
+
+        Document doc = StaxUtils.read(response.getInputStream());
+        assertEquals("50", doc.getElementsByTagNameNS(null, "doubledNumber").item(0).getTextContent());
+
+        ((java.io.Closeable)dispatch).close();
     }
 
 }

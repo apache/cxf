@@ -24,20 +24,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.tracing.AbstractTracingProvider;
-import org.apache.cxf.tracing.brave.internal.HttpAdapterFactory;
-import org.apache.cxf.tracing.brave.internal.HttpAdapterFactory.Request;
-import org.apache.cxf.tracing.brave.internal.HttpAdapterFactory.Response;
-import org.apache.cxf.tracing.brave.internal.HttpClientAdapterFactory;
-
 import brave.Span;
 import brave.Tracer.SpanInScope;
 import brave.http.HttpClientAdapter;
 import brave.http.HttpClientHandler;
 import brave.http.HttpTracing;
 import brave.propagation.Propagation.Setter;
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.tracing.AbstractTracingProvider;
+import org.apache.cxf.tracing.brave.internal.HttpAdapterFactory;
+import org.apache.cxf.tracing.brave.internal.HttpAdapterFactory.Request;
+import org.apache.cxf.tracing.brave.internal.HttpAdapterFactory.Response;
+import org.apache.cxf.tracing.brave.internal.HttpClientAdapterFactory;
 
 public abstract class AbstractBraveClientProvider extends AbstractTracingProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractBraveClientProvider.class);
@@ -55,7 +54,6 @@ public abstract class AbstractBraveClientProvider extends AbstractTracingProvide
         final Request request = HttpAdapterFactory.request(requestHeaders, uri, method);
         final HttpClientAdapter<Request, ?> adapter = HttpClientAdapterFactory.create(request);
         
-        @SuppressWarnings("unchecked")
         final HttpClientHandler<Request, ?> handler = HttpClientHandler.create(brave, adapter);
         final Span span = handler.handleSend(
             brave
@@ -67,7 +65,7 @@ public abstract class AbstractBraveClientProvider extends AbstractTracingProvide
         // In case of asynchronous client invocation, the span should be detached as JAX-RS
         // client request / response filters are going to be executed in different threads.
         SpanInScope scope = null;
-        if (!isAsyncInvocation() && span != null && !span.isNoop()) {
+        if (!isAsyncInvocation() && span != null) {
             scope = brave.tracing().tracer().withSpanInScope(span);
         }
 
@@ -83,7 +81,7 @@ public abstract class AbstractBraveClientProvider extends AbstractTracingProvide
     }
 
     private boolean isAsyncInvocation() {
-        return !JAXRSUtils.getCurrentMessage().getExchange().isSynchronous();
+        return !PhaseInterceptorChain.getCurrentMessage().getExchange().isSynchronous();
     }
 
     protected void stopTraceSpan(final TraceScopeHolder<TraceScope> holder, final int responseStatus) {
@@ -103,7 +101,6 @@ public abstract class AbstractBraveClientProvider extends AbstractTracingProvide
                 final Response response = HttpAdapterFactory.response(responseStatus);
                 final HttpClientAdapter<?, Response> adapter = HttpClientAdapterFactory.create(response);
                 
-                @SuppressWarnings("unchecked")
                 final HttpClientHandler<?, Response> handler = HttpClientHandler.create(brave, adapter);
                 handler.handleReceive(response, null, scope.getSpan());
             } finally {

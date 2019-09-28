@@ -21,12 +21,15 @@ package org.apache.cxf.staxutils;
 
 import java.io.StringReader;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class FragmentStreamReaderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class FragmentStreamReaderTest {
 
     @Test
     public void testReader() throws Exception {
@@ -37,18 +40,18 @@ public class FragmentStreamReaderTest extends Assert {
 
         StaxUtils.toNextElement(dr);
         assertEquals("ItemLookup", dr.getLocalName());
-        assertEquals(XMLStreamReader.START_ELEMENT, reader.getEventType());
+        assertEquals(XMLStreamConstants.START_ELEMENT, reader.getEventType());
 
         FragmentStreamReader fsr = new FragmentStreamReader(dr);
         assertTrue(fsr.hasNext());
 
-        assertEquals(XMLStreamReader.START_DOCUMENT, fsr.getEventType());
+        assertEquals(XMLStreamConstants.START_DOCUMENT, fsr.getEventType());
 
         fsr.next();
 
         assertEquals("ItemLookup", fsr.getLocalName());
         assertEquals("ItemLookup", dr.getLocalName());
-        assertEquals(XMLStreamReader.START_ELEMENT, reader.getEventType());
+        assertEquals(XMLStreamConstants.START_ELEMENT, reader.getEventType());
 
         fsr.close();
     }

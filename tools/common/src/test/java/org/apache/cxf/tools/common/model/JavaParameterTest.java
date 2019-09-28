@@ -19,10 +19,11 @@
 
 package org.apache.cxf.tools.common.model;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JavaParameterTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class JavaParameterTest {
 
     @Test
     public void testGetHolderDefaultTypeValue() throws Exception {

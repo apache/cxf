@@ -27,18 +27,22 @@ import java.io.OutputStream;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
-
 import org.apache.cxf.transport.MessageObserver;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class LocalTransportFactoryTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+public class LocalTransportFactoryTest {
     @Test
     public void testLocalTransportWithSeparateThread() throws Exception {
         testInvocation(false);
@@ -99,7 +103,7 @@ public class LocalTransportFactoryTest extends Assert {
                 backChannel.prepare(message);
                 OutputStream out = message.getContent(OutputStream.class);
                 assertNotNull(out);
-                copy(in, out, 1024);
+                IOUtils.copy(in, out, 1024);
                 out.close();
                 in.close();
                 backChannel.close(message);
@@ -109,23 +113,6 @@ public class LocalTransportFactoryTest extends Assert {
             }
         }
     }
-
-    private static void copy(final InputStream input, final OutputStream output, final int bufferSize)
-        throws IOException {
-        try {
-            final byte[] buffer = new byte[bufferSize];
-
-            int n = input.read(buffer);
-            while (-1 != n) {
-                output.write(buffer, 0, n);
-                n = input.read(buffer);
-            }
-        } finally {
-            input.close();
-            output.close();
-        }
-    }
-
 
     class TestMessageObserver implements MessageObserver {
         ByteArrayOutputStream response = new ByteArrayOutputStream();
@@ -143,7 +130,9 @@ public class LocalTransportFactoryTest extends Assert {
         public synchronized void onMessage(Message message) {
             try {
                 message.remove(LocalConduit.DIRECT_DISPATCH);
-                copy(message.getContent(InputStream.class), response, 1024);
+                IOUtils.copy(message.getContent(InputStream.class), response, 1024);
+                message.getContent(InputStream.class).close();
+                response.close();
                 inMessage = message;
             } catch (IOException e) {
                 e.printStackTrace();

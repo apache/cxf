@@ -20,6 +20,7 @@
 package org.apache.cxf.interceptor;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.ResourceBundle;
 
 import org.apache.cxf.common.i18n.BundleUtils;
@@ -57,16 +58,18 @@ public class MessageSenderInterceptor extends AbstractPhaseInterceptor<Message> 
             super(Phase.PREPARE_SEND_ENDING);
         }
 
-        public void handleMessage(Message message) throws Fault {
+        public void handleMessage(Message message) {
             try {
                 getConduit(message).close(message);
+            } catch (SocketTimeoutException e) {
+                throw new Fault(new org.apache.cxf.common.i18n.Message("COULD_NOT_RECEIVE", BUNDLE), e);
             } catch (IOException e) {
                 throw new Fault(new org.apache.cxf.common.i18n.Message("COULD_NOT_SEND", BUNDLE), e);
             }
         }
     }
 
-    public static Conduit getConduit(Message message) {
+    public static Conduit getConduit(Message message) throws IOException {
         Exchange exchange = message.getExchange();
         Conduit conduit = exchange.getConduit(message);
         if (conduit == null

@@ -34,8 +34,9 @@ function deserializeTestBean3_1(xmlString)
 {
 	var dom = parseXml(xmlString);
 	var bean = org_apache_cxf_javascript_testns_testBean1_deserialize(jsutils, dom);
-	if(bean.getStringItem() != "bean1>stringItem")
-		assertionFailed("deserializeTestBean3_1 stringItem " + bean.getStringItem());
+ 	//since jdk1.8_161 and jdk9 escape '>' character
+ 	if(bean.getStringItem() != "bean1>stringItem") // && bean.getStringItem() != "bean1&gt;stringItem")
+  		assertionFailed("deserializeTestBean3_1 stringItem " + bean.getStringItem());
 	if(bean.getIntItem() != 43)
 		assertionFailed("deserializeTestBean3_1 intItem " + bean.getIntItem());
 	if(bean.getLongItem() != 0)

@@ -112,7 +112,7 @@ public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
                                       fault,
                                       XPathConstants.NODE);
             if (el != null) {
-                subCodes = new LinkedList<QName>();
+                subCodes = new LinkedList<>();
                 NodeList vlist = el.getElementsByTagNameNS(Soap12.SOAP_NAMESPACE, "Value");
                 for (int i = 0; i < vlist.getLength(); i++) {
                     Node v = vlist.item(i);

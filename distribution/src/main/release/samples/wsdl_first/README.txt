@@ -29,7 +29,8 @@ One other common use of the binding file is to also generate asynchronous
 stubs. The line jaxws:enableAsyncMapping has to be uncommented to use this.
 
 More info about the binding file can be found here:
-http://jax-ws.java.net/jax-ws-20-fcs/docs/customizations.html
+
+https://docs.oracle.com/cd/E17802_01/webservices/webservices/docs/2.0/jaxws/customizations.html
 
 Server implementation
 ---------------------
@@ -82,8 +83,9 @@ Using either UNIX or Windows:
   mvn -Pserver  (from one command line window -- only if using embedded Jetty)
   mvn -Pclient  (from a second command line window)
 
-There is no special Maven profile for the Spring client and server but you can
-easily set it up yourself.
+Alteratively there is a profile available for the server when configured via spring:
+
+  mvn -Pserver-spring
 
 If you want to run the client and server with netty transport, you can use below command to  
 start up the server and client:

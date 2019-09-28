@@ -71,7 +71,7 @@ public class ConstVisitor extends VisitorBase {
             if (ch >= 0 && ch <= 31) {
                 // ascii code between 0 and 31 is invisible control code
                 constValue.deleteCharAt(0);
-                constValue.append("\\" + Integer.toOctalString(ch));
+                constValue.append('\\').append(Integer.toOctalString(ch));
             }
         }
         while (constValueNode != null) {

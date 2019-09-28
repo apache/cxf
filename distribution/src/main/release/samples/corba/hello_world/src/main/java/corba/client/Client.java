@@ -62,7 +62,7 @@ public final class Client {
     }
 
     // Standalone program initialization
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         int status = 0;
         ORB orb = null;
 

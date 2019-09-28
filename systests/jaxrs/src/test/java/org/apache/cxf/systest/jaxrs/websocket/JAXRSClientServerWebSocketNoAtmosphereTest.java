@@ -24,12 +24,12 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-
+import static org.junit.Assert.assertTrue;
 
 /**
  * JAXRSClientServerWebSocketTest without atmosphere
  */
-public class JAXRSClientServerWebSocketNoAtmosphereTest extends JAXRSClientServerWebSocketTest {
+public class JAXRSClientServerWebSocketNoAtmosphereTest extends AbstractJAXRSClientServerWebSocketTest {
     private static final String PORT = BookServerWebSocket.PORT2;
 
     @BeforeClass

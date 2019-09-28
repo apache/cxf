@@ -29,13 +29,19 @@ import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.claims.ClaimsParameters;
 import org.apache.cxf.sts.claims.ProcessedClaim;
 import org.apache.cxf.sts.claims.ProcessedClaimCollection;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 @RunWith(Parameterized.class)
-public class JexlClaimsMapperTest extends org.junit.Assert {
+public class JexlClaimsMapperTest {
 
     JexlClaimsMapper jcm;
 
@@ -68,7 +74,7 @@ public class JexlClaimsMapperTest extends org.junit.Assert {
         assertEquals("Jan Bernhardt", result.get(1).getValues().get(0));
 
         for (ProcessedClaim c : result) {
-            if ("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname".equals(c.getClaimType())) {
+            if ("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname".equals(c.getClaimType().toString())) {
                 fail("Only merged claim should be in result set, but not the individual claims");
             }
         }
@@ -90,9 +96,8 @@ public class JexlClaimsMapperTest extends org.junit.Assert {
         ProcessedClaimCollection result = jcm.mapClaims("A", createClaimCollection(), "B", createProperties());
 
         for (ProcessedClaim c : result) {
-            URI claimType = c.getClaimType();
-            if (claimType != null
-                && "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/unused".equals(claimType.toString())) {
+            String claimType = c.getClaimType();
+            if ("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/unused".equals(claimType)) {
                 fail("Claims not handled within the script should not be copied to the target token");
             }
         }

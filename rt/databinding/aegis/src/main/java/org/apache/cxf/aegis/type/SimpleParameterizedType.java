@@ -66,7 +66,7 @@ class SimpleParameterizedType implements ParameterizedType {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
+        if (!(obj instanceof ParameterizedType)) {
             return false;
         }
 

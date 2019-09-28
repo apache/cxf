@@ -128,8 +128,7 @@ final class JDKBugHacks {
                         Long l = (Long)method.invoke(null);
                         if (l != null && l.longValue() == 0) {
                             //something already set it, move on
-                            method = clazz.getDeclaredMethod("requestLatency",
-                                new Class[] {Long.TYPE});
+                            method = clazz.getDeclaredMethod("requestLatency", Long.TYPE);
                             method.invoke(null, Long.valueOf(36000000));
                         }
                     }

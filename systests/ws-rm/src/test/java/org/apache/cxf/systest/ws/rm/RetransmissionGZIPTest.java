@@ -38,6 +38,10 @@ import org.apache.cxf.ws.rm.RMManager;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Tests the gzip feature does not interfere with the ws-rm retransmission.
  * Note that the current retransmission logic isn't optimal (in some sense, wrong)
@@ -107,7 +111,7 @@ public class RetransmissionGZIPTest extends AbstractBusClientServerTestBase {
         bus.getInFaultInterceptors().add(in);
         LoggingOutInterceptor out = new LoggingOutInterceptor();
         bus.getOutInterceptors().add(out);
-        bus.getExtension(RMManager.class).getConfiguration().setBaseRetransmissionInterval(new Long(4000));
+        bus.getExtension(RMManager.class).getConfiguration().setBaseRetransmissionInterval(Long.valueOf(4000));
 
         // an interceptor to simulate a transmission error
         MessageLossSimulator loser = new MessageLossSimulator();

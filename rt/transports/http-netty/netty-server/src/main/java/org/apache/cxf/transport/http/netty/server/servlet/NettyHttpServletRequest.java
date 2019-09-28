@@ -43,16 +43,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.cxf.transport.http.netty.server.util.Utils;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpContent;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpHeaders.Names;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import io.netty.handler.ssl.SslHandler;
 
-import static io.netty.handler.codec.http.HttpHeaders.Names.COOKIE;
+import static io.netty.handler.codec.http.HttpHeaderNames.COOKIE;
 
 public class NettyHttpServletRequest implements HttpServletRequest {
 
@@ -71,7 +72,7 @@ public class NettyHttpServletRequest implements HttpServletRequest {
 
     private QueryStringDecoder queryStringDecoder;
 
-    private Map<String, Object> attributes = new ConcurrentHashMap<String, Object>();
+    private Map<String, Object> attributes = new ConcurrentHashMap<>();
 
     private String characterEncoding;
 
@@ -83,10 +84,10 @@ public class NettyHttpServletRequest implements HttpServletRequest {
         this.originalRequest = request;
         this.contextPath = contextPath;
         this.uriParser = new URIParser(contextPath);
-        uriParser.parse(request.getUri());
+        uriParser.parse(request.uri());
         this.inputStream = new NettyServletInputStream((HttpContent)request);
         this.reader = new BufferedReader(new InputStreamReader(inputStream));
-        this.queryStringDecoder = new QueryStringDecoder(request.getUri());
+        this.queryStringDecoder = new QueryStringDecoder(request.uri());
         // setup the SSL security attributes
         this.channelHandlerContext = ctx;
         SslHandler sslHandler = channelHandlerContext.pipeline().get(SslHandler.class);
@@ -148,7 +149,7 @@ public class NettyHttpServletRequest implements HttpServletRequest {
 
     @Override
     public String getHeader(String name) {
-        return HttpHeaders.getHeader(this.originalRequest, name);
+        return this.originalRequest.headers().get(name);
     }
 
     @SuppressWarnings("rawtypes")
@@ -165,12 +166,12 @@ public class NettyHttpServletRequest implements HttpServletRequest {
 
     @Override
     public int getIntHeader(String name) {
-        return HttpHeaders.getIntHeader(this.originalRequest, name, -1);
+        return this.originalRequest.headers().getInt(name, -1);
     }
 
     @Override
     public String getMethod() {
-        return this.originalRequest.getMethod().name();
+        return this.originalRequest.method().name();
     }
 
     @Override
@@ -206,13 +207,12 @@ public class NettyHttpServletRequest implements HttpServletRequest {
 
     @Override
     public int getContentLength() {
-        return (int) HttpHeaders.getContentLength(this.originalRequest, -1);
+        return HttpUtil.getContentLength(this.originalRequest, -1);
     }
 
     @Override
     public String getContentType() {
-        return HttpHeaders.getHeader(this.originalRequest,
-                HttpHeaders.Names.CONTENT_TYPE);
+        return this.originalRequest.headers().get(HttpHeaderNames.CONTENT_TYPE);
     }
 
     @Override
@@ -252,12 +252,12 @@ public class NettyHttpServletRequest implements HttpServletRequest {
         if (values == null || values.isEmpty()) {
             return null;
         }
-        return values.toArray(new String[values.size()]);
+        return values.toArray(new String[0]);
     }
 
     @Override
     public String getProtocol() {
-        return this.originalRequest.getProtocolVersion().toString();
+        return this.originalRequest.protocolVersion().toString();
     }
 
     @Override
@@ -316,8 +316,8 @@ public class NettyHttpServletRequest implements HttpServletRequest {
 
     @Override
     public Locale getLocale() {
-        String locale = HttpHeaders.getHeader(this.originalRequest,
-                Names.ACCEPT_LANGUAGE, DEFAULT_LOCALE.toString());
+        String locale = this.originalRequest.headers().get(
+                HttpHeaderNames.ACCEPT_LANGUAGE, DEFAULT_LOCALE.toString());
         return new Locale(locale);
     }
 
@@ -401,9 +401,8 @@ public class NettyHttpServletRequest implements HttpServletRequest {
     @Override
     public Enumeration getLocales() {
         Collection<Locale> locales = Utils
-                .parseAcceptLanguageHeader(HttpHeaders
-                        .getHeader(this.originalRequest,
-                                HttpHeaders.Names.ACCEPT_LANGUAGE));
+                .parseAcceptLanguageHeader(this.originalRequest.headers().get(
+                                HttpHeaderNames.ACCEPT_LANGUAGE));
 
         if (locales == null || locales.isEmpty()) {
             locales = new ArrayList<>();

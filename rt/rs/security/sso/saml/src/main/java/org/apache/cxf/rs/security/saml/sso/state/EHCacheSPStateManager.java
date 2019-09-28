@@ -30,7 +30,6 @@ import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
 import net.sf.ehcache.config.DiskStoreConfiguration;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
@@ -152,7 +151,7 @@ public class EHCacheSPStateManager implements SPStateManager {
         }
 
         int parsedTTL = (int)ttl;
-        if (ttl != (long)parsedTTL) {
+        if (ttl != parsedTTL) {
             // Fall back to 5 minutes if the default TTL is set incorrectly
             parsedTTL = 60 * 5;
         }
@@ -169,7 +168,7 @@ public class EHCacheSPStateManager implements SPStateManager {
         }
 
         int parsedTTL = (int)ttl;
-        if (ttl != (long)parsedTTL) {
+        if (ttl != parsedTTL) {
             // Fall back to 60 minutes if the default TTL is set incorrectly
             parsedTTL = 3600;
         }

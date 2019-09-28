@@ -50,7 +50,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 @Priority(Priorities.JWS_WRITE_PRIORITY)
 public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements WriterInterceptor {
     private static final Set<String> DEFAULT_PROTECTED_HTTP_HEADERS = 
-        new HashSet<String>(Arrays.asList(HttpHeaders.CONTENT_TYPE, HttpHeaders.ACCEPT));
+        new HashSet<>(Arrays.asList(HttpHeaders.CONTENT_TYPE, HttpHeaders.ACCEPT));
     private Set<String> protectedHttpHeaders = DEFAULT_PROTECTED_HTTP_HEADERS;
     private boolean protectHttpHeaders;
     

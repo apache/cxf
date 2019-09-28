@@ -29,9 +29,13 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class IdlPreprocessorReaderTest extends TestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class IdlPreprocessorReaderTest {
 
     private URL findTestResource(String spec) {
         String location = "/idlpreprocessor/" + spec;
@@ -48,6 +52,7 @@ public class IdlPreprocessorReaderTest extends TestCase {
         }
     }
 
+    @Test
     public void testResolvedInA() throws Exception {
         final String location = "A.idl";
         final IdlPreprocessorReader includeReader = createPreprocessorReader(location);
@@ -55,6 +60,7 @@ public class IdlPreprocessorReaderTest extends TestCase {
         assertExpectedPreprocessingResult(expectedResultLocation, includeReader);
     }
 
+    @Test
     public void testMultiFileResolve() throws Exception {
         final String location = "B.idl";
         final IdlPreprocessorReader includeReader = createPreprocessorReader(location);
@@ -62,6 +68,7 @@ public class IdlPreprocessorReaderTest extends TestCase {
         assertExpectedPreprocessingResult(expectedResultLocation, includeReader);
     }
 
+    @Test
     public void testIfElseHandling() throws Exception {
         final String location = "C.idl";
         final IdlPreprocessorReader includeReader = createPreprocessorReader(location);
@@ -69,6 +76,7 @@ public class IdlPreprocessorReaderTest extends TestCase {
         assertExpectedPreprocessingResult(expectedResultLocation, includeReader);
     }
 
+    @Test
     public void testMaximumIncludeDepthIsDetected() throws IOException {
         final String location = "MaximumIncludeDepthExceeded.idl";
         try {
@@ -81,6 +89,7 @@ public class IdlPreprocessorReaderTest extends TestCase {
         }
     }
 
+    @Test
     public void testUnresolvableInclude() throws IOException {
         final String location = "UnresolvableInclude.idl";
         try {
@@ -94,6 +103,7 @@ public class IdlPreprocessorReaderTest extends TestCase {
         }
     }
 
+    @Test
     public void testDefaultIncludeResolver() throws Exception {
         final String location = "B.idl";
         // uses <> notation for include
@@ -124,8 +134,8 @@ public class IdlPreprocessorReaderTest extends TestCase {
         throws UnsupportedEncodingException, IOException {
         LineNumberReader oReader = new LineNumberReader(includeReader);
         InputStream resolved = findTestResource(expectedResultLocation).openStream();
-        LineNumberReader rReader = new LineNumberReader(new InputStreamReader(resolved, "ISO-8859-1"));
-        try {
+        try (LineNumberReader rReader
+            = new LineNumberReader(new InputStreamReader(resolved, "ISO-8859-1"))) {
             boolean eof = false;
             do {
                 int line = rReader.getLineNumber() + 1;
@@ -134,8 +144,6 @@ public class IdlPreprocessorReaderTest extends TestCase {
                 assertEquals("difference in line " + line, expectedLine, actualLine);
                 eof = actualLine == null || expectedLine == null;
             } while (!eof);
-        } finally {
-            rReader.close();
         }
     }
 

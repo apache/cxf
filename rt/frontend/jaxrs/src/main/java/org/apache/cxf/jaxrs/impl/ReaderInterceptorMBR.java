@@ -43,6 +43,9 @@ public class ReaderInterceptorMBR implements ReaderInterceptor {
 
     public ReaderInterceptorMBR(MessageBodyReader<?> reader,
                                 Message m) {
+        if (null == m) {
+            throw new IllegalArgumentException("Message not allowed to be null");
+        }
         this.reader = reader;
         this.m = m;
     }
@@ -56,7 +59,7 @@ public class ReaderInterceptorMBR implements ReaderInterceptor {
     })
     @Override
     public Object aroundReadFrom(ReaderInterceptorContext c) throws IOException, WebApplicationException {
-        Class entityCls = (Class)c.getType();
+        Class entityCls = c.getType();
         Type entityType = c.getGenericType();
         MediaType entityMt = c.getMediaType();
         Annotation[] entityAnns = c.getAnnotations();

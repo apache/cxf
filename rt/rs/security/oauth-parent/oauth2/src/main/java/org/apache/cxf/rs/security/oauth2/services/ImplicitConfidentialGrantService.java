@@ -38,7 +38,7 @@ public class ImplicitConfidentialGrantService extends AbstractImplicitGrantServi
 
     @Override
     protected void processRefreshToken(StringBuilder sb, String refreshToken) {
-        sb.append("&").append(OAuthConstants.REFRESH_TOKEN).append("=").append(refreshToken);
+        sb.append('&').append(OAuthConstants.REFRESH_TOKEN).append('=').append(refreshToken);
     }
     @Override
     protected boolean canSupportPublicClient(Client c) {

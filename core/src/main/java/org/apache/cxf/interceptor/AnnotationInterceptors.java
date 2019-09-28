@@ -34,7 +34,7 @@ public class AnnotationInterceptors {
 
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AnnotationInterceptors.class);
 
-    private Class<?> clazzes[];
+    private Class<?>[] clazzes;
 
     public AnnotationInterceptors(Class<?> ... clz) {
         clazzes = clz;
@@ -124,7 +124,7 @@ public class AnnotationInterceptors {
         if (i == null) {
             return null;
         }
-        List<Interceptor<? extends Message>> m = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> m = new ArrayList<>();
         for (Interceptor<?> i2 : i) {
             m.add(i2);
         }

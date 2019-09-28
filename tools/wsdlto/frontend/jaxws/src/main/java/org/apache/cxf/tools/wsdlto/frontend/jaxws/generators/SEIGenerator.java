@@ -24,9 +24,9 @@ import java.util.Map;
 import javax.jws.HandlerChain;
 import javax.xml.namespace.QName;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.annotations.DataBinding;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ToolConstants;
@@ -58,7 +58,6 @@ public class SEIGenerator extends AbstractJAXWSGenerator {
     }
 
     private boolean hasHandlerConfig(JavaInterface intf) {
-        // TODO : enbale handler chain
         return intf.getHandlerChains() != null;
 
     }
@@ -74,7 +73,7 @@ public class SEIGenerator extends AbstractJAXWSGenerator {
 
             Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
 
-            if (interfaces.size() == 0) {
+            if (interfaces.isEmpty()) {
                 ServiceInfo serviceInfo = env.get(ServiceInfo.class);
                 String wsdl = serviceInfo.getDescription().getBaseURI();
                 Message msg = new Message("CAN_NOT_GEN_SEI", LOG, wsdl);
@@ -129,7 +128,7 @@ public class SEIGenerator extends AbstractJAXWSGenerator {
                 if (!StringUtils.isEmpty(seiSc)) {
                     seiSc += " ";
                 }
-                setAttributes("sei-superinterface-string", seiSc);
+                setAttributes("seiSuperinterfaceString", seiSc);
                 setCommonAttributes();
 
                 doWrite(SEI_TEMPLATE, parseOutputName(intf.getPackageName(), intf.getName()));

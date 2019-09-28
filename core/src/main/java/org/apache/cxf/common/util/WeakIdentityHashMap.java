@@ -45,7 +45,7 @@ import java.util.Set;
  * </b>
  */
 public class WeakIdentityHashMap<K, V> implements Map<K, V> {
-    private final ReferenceQueue<K> queue = new ReferenceQueue<K>();
+    private final ReferenceQueue<K> queue = new ReferenceQueue<>();
     private Map<IdentityWeakReference, V> backingStore = new HashMap<>();
 
 
@@ -70,22 +70,26 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
 
     public Set<Map.Entry<K, V>> entrySet() {
         reap();
-        Set<Map.Entry<K, V>> ret = new HashSet<Map.Entry<K, V>>();
+        Set<Map.Entry<K, V>> ret = new HashSet<>();
         for (Map.Entry<IdentityWeakReference, V> ref : backingStore.entrySet()) {
             final K key = ref.getKey().get();
-            final V value = ref.getValue();
-            Map.Entry<K, V> entry = new Map.Entry<K, V>() {
-                public K getKey() {
-                    return key;
-                }
-                public V getValue() {
-                    return value;
-                }
-                public V setValue(V value) {
-                    throw new UnsupportedOperationException();
-                }
-            };
-            ret.add(entry);
+            if (key != null) {
+                final V value = ref.getValue();
+                Map.Entry<K, V> entry = new Map.Entry<K, V>() {
+                    public K getKey() {
+                        return key;
+                    }
+
+                    public V getValue() {
+                        return value;
+                    }
+
+                    public V setValue(V value) {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+                ret.add(entry);
+            }
         }
         return Collections.unmodifiableSet(ret);
     }
@@ -93,7 +97,10 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
         reap();
         Set<K> ret = new HashSet<>();
         for (IdentityWeakReference ref : backingStore.keySet()) {
-            ret.add(ref.get());
+            K key = ref.get();
+            if (key != null) {
+                ret.add(key);
+            }
         }
         return Collections.unmodifiableSet(ret);
     }

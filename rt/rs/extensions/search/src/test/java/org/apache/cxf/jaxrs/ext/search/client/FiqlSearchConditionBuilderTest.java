@@ -33,11 +33,12 @@ import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class FiqlSearchConditionBuilderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class FiqlSearchConditionBuilderTest {
     private static FiqlSearchConditionBuilder b = new FiqlSearchConditionBuilder();
     private static TimeZone tz;
 

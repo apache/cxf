@@ -21,16 +21,24 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.xml.stream.XMLStreamException;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
+
+import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.MessageUtils;
@@ -42,6 +50,8 @@ import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.PolicyValidatorParameters;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SecurityPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.ValidatorUtils;
+import org.apache.wss4j.common.ConfigurationConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -49,9 +59,9 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.Timestamp;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.SPConstants;
@@ -64,6 +74,9 @@ import org.apache.wss4j.policy.model.Wss11;
  *
  */
 public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
+
+    private static final Logger LOG = LogUtils.getL7dLogger(PolicyBasedWSS4JInInterceptor.class);
+
     /**
      *
      */
@@ -74,22 +87,84 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     public void handleMessage(SoapMessage msg) throws Fault {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         boolean enableStax =
-            MessageUtils.isTrue(msg.getContextualProperty(SecurityConstants.ENABLE_STREAMING_SECURITY));
-        if (aim != null && !enableStax) {
+            MessageUtils.getContextualBoolean(msg, SecurityConstants.ENABLE_STREAMING_SECURITY);
+        if (aim != null && !enableStax && !msg.containsKey(SECURITY_PROCESSED)
+            && !isGET(msg) && msg.getExchange() != null) {
+            try {
+                // First check to see if we have a security header before we apply the SAAJInInterceptor
+                // If there is no security header then we can just assert the policies and proceed
+                String actor = (String)getOption(ConfigurationConstants.ACTOR);
+                if (actor == null) {
+                    actor = (String)msg.getContextualProperty(SecurityConstants.ACTOR);
+                }
+                if (!containsSecurityHeader(msg, actor, msg.getVersion().getVersion() != 1.1)) {
+                    LOG.fine("The request contains no security header, so the SAAJInInterceptor is not applied");
+                    computeAction(msg, new RequestData());
+
+                    boolean utWithCallbacks =
+                        MessageUtils.getContextualBoolean(msg, SecurityConstants.VALIDATE_TOKEN, true);
+                    doResults(msg, actor,
+                              null,
+                              null,
+                              new WSHandlerResult(actor, Collections.emptyList(), Collections.emptyMap()),
+                              utWithCallbacks);
+                    msg.put(SECURITY_PROCESSED, Boolean.TRUE);
+                    return;
+                }
+            } catch (WSSecurityException e) {
+                throw WSS4JUtils.createSoapFault(msg, msg.getVersion(), e);
+            } catch (XMLStreamException e) {
+                throw new SoapFault(new Message("STAX_EX", LOG), e, msg.getVersion().getSender());
+            } catch (SOAPException e) {
+                throw new SoapFault(new Message("SAAJ_EX", LOG), e, msg.getVersion().getSender());
+            }
+
+
             super.handleMessage(msg);
         }
     }
 
+    private boolean containsSecurityHeader(SoapMessage message, String actor, boolean soap12)
+        throws WSSecurityException {
+        String actorLocal = WSConstants.ATTR_ACTOR;
+        String soapNamespace = WSConstants.URI_SOAP11_ENV;
+        if (soap12) {
+            actorLocal = WSConstants.ATTR_ROLE;
+            soapNamespace = WSConstants.URI_SOAP12_ENV;
+        }
+
+        //
+        // Iterate through the security headers
+        //
+        for (Header h : message.getHeaders()) {
+            QName n = h.getName();
+            if (WSConstants.WSSE_LN.equals(n.getLocalPart())
+                && (n.getNamespaceURI().equals(WSS4JConstants.WSSE_NS)
+                    || n.getNamespaceURI().equals(WSS4JConstants.OLD_WSSE_NS))) {
+
+                Element elem = (Element)h.getObject();
+                Attr attr = elem.getAttributeNodeNS(soapNamespace, actorLocal);
+                String hActor = (attr != null) ? attr.getValue() : null;
+
+                if (WSSecurityUtil.isActorEqual(actor, hActor)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     private void handleWSS11(AssertionInfoMap aim, SoapMessage message) {
         if (isRequestor(message)) {
-            message.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "false");
+            message.put(ConfigurationConstants.ENABLE_SIGNATURE_CONFIRMATION, "false");
             Collection<AssertionInfo> ais =
                 PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.WSS11);
             if (!ais.isEmpty()) {
                 for (AssertionInfo ai : ais) {
                     Wss11 wss11 = (Wss11)ai.getAssertion();
                     if (wss11.isRequireSignatureConfirmation()) {
-                        message.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
+                        message.put(ConfigurationConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
                         break;
                     }
                 }
@@ -137,24 +212,24 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         final String signCryptoRefId = signCrypto != null ? "RefId-" + signCrypto.hashCode() : null;
 
         if (signCrypto != null) {
-            message.put(WSHandlerConstants.DEC_PROP_REF_ID, signCryptoRefId);
+            message.put(ConfigurationConstants.DEC_PROP_REF_ID, signCryptoRefId);
             message.put(signCryptoRefId, signCrypto);
         }
 
         if (encrCrypto != null) {
             final String encCryptoRefId = "RefId-" + encrCrypto.hashCode();
-            message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, encCryptoRefId);
-            message.put(encCryptoRefId, (Crypto)encrCrypto);
+            message.put(ConfigurationConstants.SIG_VER_PROP_REF_ID, encCryptoRefId);
+            message.put(encCryptoRefId, encrCrypto);
         } else if (signCrypto != null) {
-            message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, signCryptoRefId);
-            message.put(signCryptoRefId, (Crypto)signCrypto);
+            message.put(ConfigurationConstants.SIG_VER_PROP_REF_ID, signCryptoRefId);
+            message.put(signCryptoRefId, signCrypto);
         }
 
         return action;
     }
 
     private String checkDefaultBinding(
-        AssertionInfoMap aim, String action, SoapMessage message, RequestData data
+        String action, SoapMessage message, RequestData data
     ) throws WSSecurityException {
         action = addToAction(action, "Signature", true);
         action = addToAction(action, "Encrypt", true);
@@ -177,17 +252,17 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
 
         final String signCryptoRefId = signCrypto != null ? "RefId-" + signCrypto.hashCode() : null;
         if (signCrypto != null) {
-            message.put(WSHandlerConstants.DEC_PROP_REF_ID, signCryptoRefId);
+            message.put(ConfigurationConstants.DEC_PROP_REF_ID, signCryptoRefId);
             message.put(signCryptoRefId, signCrypto);
         }
 
         if (encrCrypto != null) {
             final String encCryptoRefId = "RefId-" + encrCrypto.hashCode();
-            message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, encCryptoRefId);
-            message.put(encCryptoRefId, (Crypto)encrCrypto);
+            message.put(ConfigurationConstants.SIG_VER_PROP_REF_ID, encCryptoRefId);
+            message.put(encCryptoRefId, encrCrypto);
         } else if (signCrypto != null) {
-            message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, signCryptoRefId);
-            message.put(signCryptoRefId, (Crypto)signCrypto);
+            message.put(ConfigurationConstants.SIG_VER_PROP_REF_ID, signCryptoRefId);
+            message.put(signCryptoRefId, signCrypto);
         }
 
         return action;
@@ -251,7 +326,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             for (AssertionInfo ai : ais) {
                 UsernameToken policy = (UsernameToken)ai.getAssertion();
                 if (policy.getPasswordType() == PasswordType.NoPassword) {
-                    message.put(WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD, "true");
+                    message.put(ConfigurationConstants.ALLOW_USERNAMETOKEN_NOPASSWORD, "true");
                 }
             }
         }
@@ -291,7 +366,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             }
             if (crypto != null) {
                 final String refId = "RefId-" + crypto.hashCode();
-                message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, refId);
+                message.put(ConfigurationConstants.SIG_VER_PROP_REF_ID, refId);
                 message.put(refId, crypto);
             }
 
@@ -301,7 +376,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             }
             if (crypto != null) {
                 final String refId = "RefId-" + crypto.hashCode();
-                message.put(WSHandlerConstants.DEC_PROP_REF_ID, refId);
+                message.put(ConfigurationConstants.DEC_PROP_REF_ID, refId);
                 message.put(refId, crypto);
             }
         } else {
@@ -311,7 +386,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             }
             if (crypto != null) {
                 final String refId = "RefId-" + crypto.hashCode();
-                message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, refId);
+                message.put(ConfigurationConstants.SIG_VER_PROP_REF_ID, refId);
                 message.put(refId, crypto);
             }
 
@@ -321,7 +396,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             }
             if (crypto != null) {
                 final String refId = "RefId-" + crypto.hashCode();
-                message.put(WSHandlerConstants.DEC_PROP_REF_ID, refId);
+                message.put(ConfigurationConstants.DEC_PROP_REF_ID, refId);
                 message.put(refId, crypto);
             }
         }
@@ -382,8 +457,9 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         }
     }
 
+    @Override
     protected void computeAction(SoapMessage message, RequestData data) throws WSSecurityException {
-        String action = getString(WSHandlerConstants.ACTION, message);
+        String action = getString(ConfigurationConstants.ACTION, message);
         if (action == null) {
             action = "";
         }
@@ -395,7 +471,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             action = checkSymmetricBinding(aim, action, message, data);
             Collection<AssertionInfo> ais = aim.get(SP12Constants.TRANSPORT_BINDING);
             if ("".equals(action) || (ais != null && !ais.isEmpty())) {
-                action = checkDefaultBinding(aim, action, message, data);
+                action = checkDefaultBinding(action, message, data);
             }
 
             // Allow for setting non-standard asymmetric signature algorithms
@@ -406,14 +482,14 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             if (asymSignatureAlgorithm != null || symSignatureAlgorithm != null) {
                 Collection<AssertionInfo> algorithmSuites =
                     PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ALGORITHM_SUITE);
-                if (algorithmSuites != null && !algorithmSuites.isEmpty()) {
+                if (!algorithmSuites.isEmpty()) {
                     for (AssertionInfo algorithmSuite : algorithmSuites) {
                         AlgorithmSuite algSuite = (AlgorithmSuite)algorithmSuite.getAssertion();
                         if (asymSignatureAlgorithm != null) {
-                            algSuite.setAsymmetricSignature(asymSignatureAlgorithm);
+                            algSuite.getAlgorithmSuiteType().setAsymmetricSignature(asymSignatureAlgorithm);
                         }
                         if (symSignatureAlgorithm != null) {
-                            algSuite.setSymmetricSignature(symSignatureAlgorithm);
+                            algSuite.getAlgorithmSuiteType().setSymmetricSignature(symSignatureAlgorithm);
                         }
                     }
                 }
@@ -472,7 +548,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 }
             }
 
-            message.put(WSHandlerConstants.ACTION, action.trim());
+            message.put(ConfigurationConstants.ACTION, action.trim());
         }
     }
 

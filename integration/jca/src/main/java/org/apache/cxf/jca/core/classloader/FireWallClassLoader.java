@@ -132,7 +132,7 @@ public class FireWallClassLoader extends SecureClassLoader {
             javaCovered = true;
         } else {
             for (int i = 0; i < this.filters.length; i++) {
-                if (this.filters[i].equals("java.")) {
+                if ("java.".equals(this.filters[i])) {
                     javaCovered = true;
                 }
             }

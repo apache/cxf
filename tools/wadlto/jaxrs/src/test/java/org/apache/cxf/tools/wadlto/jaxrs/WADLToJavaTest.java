@@ -23,7 +23,7 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.cxf.helpers.FileUtils;
@@ -33,127 +33,109 @@ import org.apache.cxf.tools.wadlto.WADLToJava;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class WADLToJavaTest extends ProcessorTestBase {
 
     @Test
-    public void testCodeGenInterfaces() {
-        try {
-            String[] args = new String[] {
-                "-d",
-                output.getCanonicalPath(),
-                "-p",
-                "custom.service",
-                "-tMap",
-                "{http://www.w3.org/2001/XMLSchema}date=java.util.List..String",
-                "-async getName,delete",
-                "-inheritResourceParams first",
-                "-compile",
-                getLocation("/wadl/bookstore.xml"),
-            };
-            WADLToJava tool = new WADLToJava(args);
-            tool.run(new ToolContext());
-            assertNotNull(output.list());
+    public void testCodeGenInterfaces() throws Exception {
+        String[] args = new String[] {
+            "-d",
+            output.getCanonicalPath(),
+            "-p",
+            "custom.service",
+            "-tMap",
+            "{http://www.w3.org/2001/XMLSchema}date=java.util.List..String",
+            "-async getName,delete",
+            "-inheritResourceParams first",
+            "-compile",
+            getLocation("/wadl/bookstore.xml"),
+        };
+        WADLToJava tool = new WADLToJava(args);
+        tool.run(new ToolContext());
+        assertNotNull(output.list());
 
-            verifyFiles("java", true, false, "superbooks", "custom.service");
-            verifyFiles("class", true, false, "superbooks", "custom.service");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
+        verifyFiles("java", true, false, "superbooks", "custom.service");
+        verifyFiles("class", true, false, "superbooks", "custom.service");
     }
 
     @Test
     public void testGenerateJAXBToString() throws Exception {
+        String[] args = new String[] {
+            "-d",
+            output.getCanonicalPath(),
+            "-p",
+            "custom.service",
+            "-async getName,delete",
+            "-compile",
+            "-xjc-episode " + output.getAbsolutePath() + "/test.episode",
+            "-xjc-XtoString",
+            getLocation("/wadl/bookstore.xml"),
+        };
 
-        try {
-            String[] args = new String[] {
-                "-d",
-                output.getCanonicalPath(),
-                "-p",
-                "custom.service",
-                "-async getName,delete",
-                "-compile",
-                "-xjc-episode " + output.getAbsolutePath() + "/test.episode",
-                "-xjc-XtoString",
-                getLocation("/wadl/bookstore.xml"),
-            };
+        WADLToJava tool = new WADLToJava(args);
+        tool.run(new ToolContext());
+        assertNotNull(output.list());
 
-            WADLToJava tool = new WADLToJava(args);
-            tool.run(new ToolContext());
-            assertNotNull(output.list());
+        verifyFiles("java", true, false, "superbooks", "custom.service");
+        verifyFiles("class", true, false, "superbooks", "custom.service");
+        assertTrue(new File(output.getAbsolutePath() + "/test.episode").exists());
 
-            verifyFiles("java", true, false, "superbooks", "custom.service");
-            verifyFiles("class", true, false, "superbooks", "custom.service");
-            assertTrue(new File(output.getAbsolutePath() + "/test.episode").exists());
-
-            List<Class<?>> schemaClassFiles = getSchemaClassFiles();
-            assertEquals(4, schemaClassFiles.size());
-            for (Class<?> c : schemaClassFiles) {
-                c.getMethod("toString");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
+        List<Class<?>> schemaClassFiles = getSchemaClassFiles();
+        assertEquals(4, schemaClassFiles.size());
+        for (Class<?> c : schemaClassFiles) {
+            c.getMethod("toString");
         }
     }
 
     private List<Class<?>> getSchemaClassFiles() throws Exception {
-        URLClassLoader cl = new URLClassLoader(new URL[] {output.toURI().toURL()},
-                                            Thread.currentThread().getContextClassLoader());
-
-        List<Class<?>> files = new ArrayList<Class<?>>(4);
-        files.add(cl.loadClass("superbooks.EnumType"));
-        files.add(cl.loadClass("superbooks.Book"));
-        files.add(cl.loadClass("superbooks.TheBook2"));
-        files.add(cl.loadClass("superbooks.Chapter"));
-        cl.close();
-        return files;
+        try (URLClassLoader cl = new URLClassLoader(new URL[] {output.toURI().toURL()},
+                                            Thread.currentThread().getContextClassLoader())) {
+            return Arrays.asList(
+                    cl.loadClass("superbooks.EnumType"),
+                    cl.loadClass("superbooks.Book"),
+                    cl.loadClass("superbooks.TheBook2"),
+                    cl.loadClass("superbooks.Chapter"));
+        }
     }
 
     @Test
     public void testGenerateJAXBToStringAndEqualsAndHashCode() throws Exception {
+        String[] args = new String[] {
+            "-d",
+            output.getCanonicalPath(),
+            "-p",
+            "custom.service",
+            "-async getName,delete",
+            "-compile",
+            "-xjc-XtoString",
+            "-xjc-Xequals",
+            "-xjc-XhashCode",
+            getLocation("/wadl/bookstore.xml"),
+        };
 
-        try {
-            String[] args = new String[] {
-                "-d",
-                output.getCanonicalPath(),
-                "-p",
-                "custom.service",
-                "-async getName,delete",
-                "-compile",
-                "-xjc-XtoString",
-                "-xjc-Xequals",
-                "-xjc-XhashCode",
-                getLocation("/wadl/bookstore.xml"),
-            };
+        WADLToJava tool = new WADLToJava(args);
+        tool.run(new ToolContext());
+        assertNotNull(output.list());
 
-            WADLToJava tool = new WADLToJava(args);
-            tool.run(new ToolContext());
-            assertNotNull(output.list());
+        verifyFiles("java", true, false, "superbooks", "custom.service");
+        verifyFiles("class", true, false, "superbooks", "custom.service");
 
-            verifyFiles("java", true, false, "superbooks", "custom.service");
-            verifyFiles("class", true, false, "superbooks", "custom.service");
-
-            List<Class<?>> schemaClassFiles = getSchemaClassFiles();
-            assertEquals(4, schemaClassFiles.size());
-            for (Class<?> c : schemaClassFiles) {
-                c.getMethod("toString");
-                c.getMethod("hashCode");
-                c.getMethod("equals", Object.class);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
+        List<Class<?>> schemaClassFiles = getSchemaClassFiles();
+        assertEquals(4, schemaClassFiles.size());
+        for (Class<?> c : schemaClassFiles) {
+            c.getMethod("toString");
+            c.getMethod("hashCode");
+            c.getMethod("equals", Object.class);
         }
     }
 
 
-
     private void verifyFiles(String ext, boolean subresourceExpected, boolean interfacesAndImpl,
                              String schemaPackage, String resourcePackage) {
-        List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + ext + "$");
+        List<File> files = FileUtils.getFilesRecurseUsingSuffix(output, "." + ext);
         int size = interfacesAndImpl ? 11 : 10;
         if (!subresourceExpected) {
             size--;
@@ -172,7 +154,7 @@ public class WADLToJavaTest extends ProcessorTestBase {
         }
     }
 
-    private void doVerifyTypes(List<File> files, String schemaPackage, String ext) {
+    private static void doVerifyTypes(List<File> files, String schemaPackage, String ext) {
         assertTrue(checkContains(files, schemaPackage + ".EnumType." + ext));
         assertTrue(checkContains(files, schemaPackage + ".Book." + ext));
         assertTrue(checkContains(files, schemaPackage + ".TheBook2." + ext));
@@ -181,7 +163,7 @@ public class WADLToJavaTest extends ProcessorTestBase {
         assertTrue(checkContains(files, schemaPackage + ".package-info." + ext));
     }
 
-    private boolean checkContains(List<File> clsFiles, String name) {
+    private static boolean checkContains(List<File> clsFiles, String name) {
         for (File f : clsFiles) {
             if (checkFileContains(f, name)) {
                 return true;
@@ -190,7 +172,7 @@ public class WADLToJavaTest extends ProcessorTestBase {
         return false;
     }
 
-    private boolean checkFileContains(File f, String name) {
+    private static boolean checkFileContains(File f, String name) {
         return f.getAbsolutePath().replace(File.separatorChar, '.').endsWith(name);
     }
 

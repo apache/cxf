@@ -26,17 +26,14 @@ import org.springframework.transaction.TransactionStatus;
 public class DummyPlatformTransactionManager implements PlatformTransactionManager {
 
     public void commit(TransactionStatus arg0) throws TransactionException {
-        // TODO Auto-generated method stub
 
     }
 
     public TransactionStatus getTransaction(TransactionDefinition arg0) throws TransactionException {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public void rollback(TransactionStatus arg0) throws TransactionException {
-        // TODO Auto-generated method stub
 
     }
 

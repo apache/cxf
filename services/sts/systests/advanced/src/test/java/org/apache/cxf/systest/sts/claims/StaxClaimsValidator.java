@@ -21,6 +21,7 @@ package org.apache.cxf.systest.sts.claims;
 import java.util.List;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.sts.claims.ClaimTypes;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;

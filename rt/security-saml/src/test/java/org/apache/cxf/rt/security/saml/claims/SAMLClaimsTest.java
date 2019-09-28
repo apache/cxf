@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.rt.security.saml.claims;
 
-import java.net.URI;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,18 +25,23 @@ import java.util.List;
 import java.util.Set;
 
 import org.w3c.dom.Document;
+
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
+import org.apache.cxf.rt.security.claims.SAMLClaim;
 import org.apache.cxf.rt.security.saml.utils.SAMLUtils;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.junit.Assert;
 
-public class SAMLClaimsTest extends Assert {
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class SAMLClaimsTest {
 
     @org.junit.Test
     public void testSAML2Claims() throws Exception {
@@ -64,7 +68,7 @@ public class SAMLClaimsTest extends Assert {
 
         // Check Claim values
         Claim claim = claims.get(0);
-        assertEquals(claim.getClaimType(), URI.create(SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT));
+        assertEquals(claim.getClaimType(), SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT);
         assertEquals(1, claim.getValues().size());
         assertTrue(claim.getValues().contains("employee"));
 
@@ -109,7 +113,7 @@ public class SAMLClaimsTest extends Assert {
 
         // Check Claim values
         Claim claim = claims.get(0);
-        assertEquals(claim.getClaimType(), URI.create(SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT));
+        assertEquals(claim.getClaimType(), SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT);
         assertEquals(2, claim.getValues().size());
         assertTrue(claim.getValues().contains("employee"));
         assertTrue(claim.getValues().contains("boss"));
@@ -194,7 +198,7 @@ public class SAMLClaimsTest extends Assert {
 
         // Check Claim values
         Claim claim = claims.get(0);
-        assertEquals(claim.getClaimType(), URI.create(SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT));
+        assertEquals(claim.getClaimType(), SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT);
         assertEquals(1, claim.getValues().size());
         assertTrue(claim.getValues().contains("employee"));
 

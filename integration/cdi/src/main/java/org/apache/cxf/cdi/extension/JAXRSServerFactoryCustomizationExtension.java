@@ -18,17 +18,14 @@
  */
 package org.apache.cxf.cdi.extension;
 
-import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-
 /**
  * Serves as an extension point in order to allow to customize JAX-RS server
  * factory bean creation (f.e. add features, providers, assign transport, ...)
  * during the CDI beans discovery and initialization.
+ *
+ * This class is now deprecated, in favor of {@link org.apache.cxf.jaxrs.ext.JAXRSServerFactoryCustomizationExtension}
  */
-public interface JAXRSServerFactoryCustomizationExtension {
-    /**
-     * Customize JAX-RS server factory bean before it is being initialized
-     * @param bean JAX-RS server factory bean
-     */
-    void customize(JAXRSServerFactoryBean bean);
+@Deprecated
+public interface JAXRSServerFactoryCustomizationExtension extends
+        org.apache.cxf.jaxrs.ext.JAXRSServerFactoryCustomizationExtension {
 }

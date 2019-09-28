@@ -25,7 +25,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +43,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
+import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.oauth2.client.OAuthClientUtils;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
@@ -77,70 +78,74 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
 
     private void writeTokenIntrospection(TokenIntrospection obj, OutputStream os) throws IOException {
         StringBuilder sb = new StringBuilder();
-        sb.append("{");
+        sb.append('{');
         appendJsonPair(sb, "active", obj.isActive(), false);
         if (obj.isActive()) {
             if (obj.getClientId() != null) {
-                sb.append(",");
+                sb.append(',');
                 appendJsonPair(sb, OAuthConstants.CLIENT_ID, obj.getClientId());
             }
             if (obj.getUsername() != null) {
-                sb.append(",");
+                sb.append(',');
                 appendJsonPair(sb, "username", obj.getUsername());
             }
             if (obj.getTokenType() != null) {
-                sb.append(",");
+                sb.append(',');
                 appendJsonPair(sb, OAuthConstants.ACCESS_TOKEN_TYPE, obj.getTokenType());
             }
             if (obj.getScope() != null) {
-                sb.append(",");
+                sb.append(',');
                 appendJsonPair(sb, OAuthConstants.SCOPE, obj.getScope());
             }
             if (!StringUtils.isEmpty(obj.getAud())) {
-                sb.append(",");
+                sb.append(',');
                 if (obj.getAud().size() == 1) {
                     appendJsonPair(sb, "aud", obj.getAud().get(0));
                 } else {
                     StringBuilder arr = new StringBuilder();
-                    arr.append("[");
+                    arr.append('[');
                     List<String> auds = obj.getAud();
                     for (int i = 0; i < auds.size(); i++) {
                         if (i > 0) {
-                            arr.append(",");
+                            arr.append(',');
                         }
-                        arr.append("\"").append(auds.get(i)).append("\"");
+                        arr.append('"').append(auds.get(i)).append('"');
                     }
-                    arr.append("]");
+                    arr.append(']');
                     appendJsonPair(sb, "aud", arr.toString(), false);
 
                 }
             }
             if (obj.getIss() != null) {
-                sb.append(",");
+                sb.append(',');
                 appendJsonPair(sb, "iss", obj.getIss());
             }
-            sb.append(",");
+            sb.append(',');
             appendJsonPair(sb, "iat", obj.getIat(), false);
             if (obj.getExp() != null) {
-                sb.append(",");
+                sb.append(',');
                 appendJsonPair(sb, "exp", obj.getExp(), false);
+            }
+            if (obj.getNbf() != null) {
+                sb.append(',');
+                appendJsonPair(sb, "nbf", obj.getNbf(), false);
             }
             if (!obj.getExtensions().isEmpty()) {
                 for (Map.Entry<String, String> entry : obj.getExtensions().entrySet()) {
-                    sb.append(",");
+                    sb.append(',');
                     if (JoseConstants.HEADER_X509_THUMBPRINT_SHA256.equals(entry.getKey())) {
                         StringBuilder cnfObj = new StringBuilder();
-                        cnfObj.append("{");
+                        cnfObj.append('{');
                         appendJsonPair(cnfObj, entry.getKey(), entry.getValue());
-                        cnfObj.append("}");
-                        appendJsonPair(sb, "cnf", cnfObj.toString(), false);
+                        cnfObj.append('}');
+                        appendJsonPair(sb, JwtConstants.CLAIM_CONFIRMATION, cnfObj.toString(), false);
                     } else {
                         appendJsonPair(sb, entry.getKey(), entry.getValue());
                     }
                 }
             }
         }
-        sb.append("}");
+        sb.append('}');
         String result = sb.toString();
         os.write(result.getBytes(StandardCharsets.UTF_8));
         os.flush();
@@ -149,18 +154,18 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
 
     private void writeOAuthError(OAuthError obj, OutputStream os) throws IOException {
         StringBuilder sb = new StringBuilder();
-        sb.append("{");
+        sb.append('{');
         appendJsonPair(sb, OAuthConstants.ERROR_KEY, obj.getError());
         if (obj.getErrorDescription() != null) {
-            sb.append(",");
+            sb.append(',');
             appendJsonPair(sb, OAuthConstants.ERROR_DESCRIPTION_KEY, obj.getErrorDescription());
         }
         if (obj.getErrorUri() != null) {
-            sb.append(",");
+            sb.append(',');
             appendJsonPair(sb, OAuthConstants.ERROR_URI_KEY, obj.getErrorUri());
         }
 
-        sb.append("}");
+        sb.append('}');
         String result = sb.toString();
         os.write(result.getBytes(StandardCharsets.UTF_8));
         os.flush();
@@ -168,28 +173,28 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
 
     private void writeAccessToken(ClientAccessToken obj, OutputStream os) throws IOException {
         StringBuilder sb = new StringBuilder();
-        sb.append("{");
+        sb.append('{');
         appendJsonPair(sb, OAuthConstants.ACCESS_TOKEN, obj.getTokenKey());
-        sb.append(",");
+        sb.append(',');
         appendJsonPair(sb, OAuthConstants.ACCESS_TOKEN_TYPE, obj.getTokenType());
         if (obj.getExpiresIn() != -1) {
-            sb.append(",");
+            sb.append(',');
             appendJsonPair(sb, OAuthConstants.ACCESS_TOKEN_EXPIRES_IN, obj.getExpiresIn(), false);
         }
         if (obj.getApprovedScope() != null) {
-            sb.append(",");
+            sb.append(',');
             appendJsonPair(sb, OAuthConstants.SCOPE, obj.getApprovedScope());
         }
         if (obj.getRefreshToken() != null) {
-            sb.append(",");
+            sb.append(',');
             appendJsonPair(sb, OAuthConstants.REFRESH_TOKEN, obj.getRefreshToken());
         }
         Map<String, String> parameters = obj.getParameters();
         for (Map.Entry<String, String> entry : parameters.entrySet()) {
-            sb.append(",");
+            sb.append(',');
             appendJsonPair(sb, entry.getKey(), entry.getValue());
         }
-        sb.append("}");
+        sb.append('}');
         String result = sb.toString();
         os.write(result.getBytes(StandardCharsets.UTF_8));
         os.flush();
@@ -201,14 +206,14 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
 
     private void appendJsonPair(StringBuilder sb, String key, Object value,
                                 boolean valueQuote) {
-        sb.append("\"").append(key).append("\"");
-        sb.append(":");
+        sb.append('"').append(key).append('"');
+        sb.append(':');
         if (valueQuote) {
-            sb.append("\"");
+            sb.append('"');
         }
         sb.append(value);
         if (valueQuote) {
-            sb.append("\"");
+            sb.append('"');
         }
     }
 
@@ -227,14 +232,12 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
         Map<String, String> params = readJSONResponse(is);
         if (Map.class.isAssignableFrom(cls)) {
             return params;
-        } else {
-            ClientAccessToken token = OAuthClientUtils.fromMapToClientToken(params);
-            if (token == null) {
-                throw new WebApplicationException(500);
-            } else {
-                return token;
-            }
         }
+        ClientAccessToken token = OAuthClientUtils.fromMapToClientToken(params);
+        if (token == null) {
+            throw new WebApplicationException(500);
+        }
+        return token;
 
     }
 
@@ -280,7 +283,11 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
         if (exp != null) {
             resp.setExp(exp);
         }
-        Map<String, Object> cnf = CastUtils.cast((Map<?, ?>)params.get("cnf"));
+        Long nbf = (Long)params.get("nbf");
+        if (nbf != null) {
+            resp.setNbf(nbf);
+        }
+        Map<String, Object> cnf = CastUtils.cast((Map<?, ?>)params.get(JwtConstants.CLAIM_CONFIRMATION));
         if (cnf != null) {
             String thumbprint = (String)cnf.get(JoseConstants.HEADER_X509_THUMBPRINT_SHA256);
             if (thumbprint != null) {
@@ -296,31 +303,16 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
         if (str.length() == 0) {
             return Collections.emptyMap();
         }
-        if (!str.startsWith("{") || !str.endsWith("}")) {
-            throw new IOException("JSON Sequence is broken");
-        }
-        Map<String, String> map = new LinkedHashMap<String, String>();
 
-        str = str.substring(1, str.length() - 1).trim();
-        String[] jsonPairs = str.split(",");
-        for (int i = 0; i < jsonPairs.length; i++) {
-            String pair = jsonPairs[i].trim();
-            if (pair.length() == 0) {
-                continue;
-            }
-            int index = pair.indexOf(":");
-            String key = pair.substring(0, index).trim();
-            if (key.startsWith("\"") && key.endsWith("\"")) {
-                key = key.substring(1, key.length() - 1);
-            }
-            String value = pair.substring(index + 1).trim();
-            if (value.startsWith("\"") && value.endsWith("\"")) {
-                value = value.substring(1, value.length() - 1);
-            }
-            map.put(key, value);
+        Map<String, Object> response = new JsonMapObjectReaderWriter().fromJson(str);
+
+        // Here we're going to assume the values are all Strings
+        Map<String, String> forcedStringResponse = new HashMap<>(response.size());
+        for (Map.Entry<String, Object> entry : response.entrySet()) {
+            forcedStringResponse.put(entry.getKey(), entry.getValue().toString());
         }
 
-        return map;
+        return forcedStringResponse;
     }
 
 }

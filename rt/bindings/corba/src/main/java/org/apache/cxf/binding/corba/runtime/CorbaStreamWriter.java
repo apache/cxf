@@ -19,13 +19,14 @@
 
 package org.apache.cxf.binding.corba.runtime;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
@@ -55,7 +56,7 @@ public class CorbaStreamWriter implements XMLStreamWriter {
     private List<ArgType> params;
     private int paramCounter;
 
-    private Stack<QName> elements = new Stack<QName>();
+    private final Deque<QName> elements = new ArrayDeque<>();
     private QName paramElement;
     private QName wrapElementName;
 
@@ -100,7 +101,7 @@ public class CorbaStreamWriter implements XMLStreamWriter {
     }
 
     public void writeEndElement() throws XMLStreamException {
-        if (elements.empty()) {
+        if (elements.isEmpty()) {
             currentTypeListener = null;
         } else {
             QName name = elements.pop();

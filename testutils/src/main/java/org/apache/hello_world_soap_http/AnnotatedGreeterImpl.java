@@ -23,6 +23,7 @@ package org.apache.hello_world_soap_http;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
 import javax.annotation.Resource;
 import javax.jws.HandlerChain;
 import javax.jws.WebMethod;
@@ -56,10 +57,9 @@ public class AnnotatedGreeterImpl {
     public int getInvocationCount(String method) {
         if (invocationCount.containsKey(method)) {
             return invocationCount.get(method).intValue();
-        } else {
-            System.out.println("No invocation count for method: " + method);
-            return 0;
         }
+        System.out.println("No invocation count for method: " + method);
+        return 0;
     }
 
     /**
