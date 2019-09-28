@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.io.AbstractWrappedOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -84,12 +85,21 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
                     xwriter = StaxUtils.createXMLStreamWriter(writer);
                 }
             } else {
-                synchronized (factory) {
+                if (PropertyUtils.isTrue(message.getContextualProperty(Message.THREAD_SAFE_STAX_FACTORIES))) {
                     if (writer == null) {
                         os = setupOutputStream(os);
                         xwriter = factory.createXMLStreamWriter(os, encoding);
                     } else {
                         xwriter = factory.createXMLStreamWriter(writer);
+                    }
+                } else {
+                    synchronized (factory) {
+                        if (writer == null) {
+                            os = setupOutputStream(os);
+                            xwriter = factory.createXMLStreamWriter(os, encoding);
+                        } else {
+                            xwriter = factory.createXMLStreamWriter(writer);
+                        }
                     }
                 }
             }
