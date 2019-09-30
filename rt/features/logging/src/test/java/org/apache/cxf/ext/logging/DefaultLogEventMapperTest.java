@@ -57,5 +57,20 @@ public class DefaultLogEventMapperTest {
         Assert.assertEquals("", event.getOperationName());
     }
 
+    /**
+     * Test for address concatenation in CXF-8127
+     */
+    @Test
+    public void testUriValue() {
+        DefaultLogEventMapper mapper = new DefaultLogEventMapper();
+        Message message = new MessageImpl();
+        message.put(Message.ENDPOINT_ADDRESS, "http://localhost:9001/");
+        message.put(Message.REQUEST_URI, "/api");
+        Exchange exchange = new ExchangeImpl();
+        message.setExchange(exchange);
+        LogEvent event = mapper.map(message);
+        Assert.assertEquals("http://localhost:9001/api", event.getAddress());
+    }
+
 
 }
