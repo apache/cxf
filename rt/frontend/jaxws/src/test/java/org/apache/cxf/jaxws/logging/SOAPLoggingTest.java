@@ -137,7 +137,7 @@ public class SOAPLoggingTest extends AbstractJaxWsTest {
 
     private void checkResponseOut(LogEvent responseOut) {
         // Not yet available
-        Assert.assertNull(responseOut.getAddress());
+        Assert.assertEquals(SERVICE_URI, responseOut.getAddress());
         Assert.assertEquals("text/xml", responseOut.getContentType());
         Assert.assertEquals(EventType.RESP_OUT, responseOut.getType());
         Assert.assertEquals(StandardCharsets.UTF_8.name(), responseOut.getEncoding());
@@ -153,7 +153,7 @@ public class SOAPLoggingTest extends AbstractJaxWsTest {
     }
 
     private void checkResponseIn(LogEvent responseIn) {
-        Assert.assertNull(responseIn.getAddress());
+        Assert.assertEquals(SERVICE_URI, responseIn.getAddress());
         Assert.assertTrue(responseIn.getContentType(), responseIn.getContentType().contains("text/xml"));
         Assert.assertEquals(EventType.RESP_IN, responseIn.getType());
         Assert.assertEquals(StandardCharsets.UTF_8.name(), responseIn.getEncoding());
