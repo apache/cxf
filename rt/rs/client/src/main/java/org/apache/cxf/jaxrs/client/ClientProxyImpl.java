@@ -476,17 +476,19 @@ public class ClientProxyImpl extends AbstractClient implements
 
         List<MediaType> accepts = getAccept(headers);
         if (accepts == null) {
-            List<MediaType> produceTypes = ori.getProduceTypes();
-            boolean produceWildcard = produceTypes.isEmpty()
-                || produceTypes.get(0).equals(MediaType.WILDCARD_TYPE);
-            if (produceWildcard) {
-                accepts = InjectionUtils.isPrimitive(responseClass)
-                    ? Collections.singletonList(MediaType.TEXT_PLAIN_TYPE)
-                    : Collections.singletonList(MediaType.APPLICATION_XML_TYPE);
-            } else if (responseClass == Void.class || responseClass == Void.TYPE) {
+            if (responseClass == Void.class || responseClass == Void.TYPE) {
                 accepts = Collections.singletonList(MediaType.WILDCARD_TYPE);
             } else {
-                accepts = produceTypes;
+                List<MediaType> produceTypes = ori.getProduceTypes();
+                boolean produceWildcard = produceTypes.isEmpty()
+                    || produceTypes.get(0).equals(MediaType.WILDCARD_TYPE);
+                if (produceWildcard) {
+                    accepts = InjectionUtils.isPrimitive(responseClass)
+                        ? Collections.singletonList(MediaType.TEXT_PLAIN_TYPE)
+                        : Collections.singletonList(MediaType.APPLICATION_XML_TYPE);
+                } else {
+                    accepts = produceTypes;
+                }
             }
 
             for (MediaType mt : accepts) {
