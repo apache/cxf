@@ -357,8 +357,6 @@ public final class ProcessorUtil {
     }
 
     public static List<WrapperElement> getWrappedElement(ToolContext context, QName partElement) {
-        List<WrapperElement> qnames = new ArrayList<>();
-
         ServiceInfo serviceInfo = context.get(ServiceInfo.class);
         SchemaCollection schema = serviceInfo.getXmlSchemaCollection();
 
@@ -368,32 +366,46 @@ public final class ProcessorUtil {
 
         XmlSchemaSequence seq = (XmlSchemaSequence)type.getParticle();
 
-        qnames.addAll(createWrappedElements(seq));
+        List<WrapperElement> qnames = createWrappedElements(seq);
 
         //If it's extension
         if (seq == null && type.getContentModel() != null) {
-
-            XmlSchemaContent xmlSchemaConent = type.getContentModel().getContent();
-            if (xmlSchemaConent instanceof XmlSchemaComplexContentExtension) {
-                XmlSchemaComplexContentExtension extension = (XmlSchemaComplexContentExtension)type
-                    .getContentModel().getContent();
-                QName baseTypeName = extension.getBaseTypeName();
-                XmlSchemaType schemaType = schema.getTypeByQName(baseTypeName);
-                if (schemaType instanceof XmlSchemaComplexType) {
-                    XmlSchemaComplexType complexType = (XmlSchemaComplexType)schemaType;
-                    if (complexType.getParticle() instanceof XmlSchemaSequence) {
-                        seq = (XmlSchemaSequence)complexType.getParticle();
-                        qnames.addAll(createWrappedElements(seq));
-                    }
-                }
-
-                if (extension.getParticle() instanceof XmlSchemaSequence) {
-                    XmlSchemaSequence xmlSchemaSeq = (XmlSchemaSequence)extension.getParticle();
-                    qnames.addAll(createWrappedElements(xmlSchemaSeq));
-                }
-            }
-
+            qnames.addAll(createWrappedElementsFromExtension(schema, type));
         }
+
+        return qnames;
+    }
+
+    private static List<WrapperElement> createWrappedElementsFromExtension(SchemaCollection schema,
+                                                                           XmlSchemaComplexType type) {
+        List<WrapperElement> qnames = new ArrayList<>();
+
+        XmlSchemaContent schemaContent = type.getContentModel().getContent();
+        if (!(schemaContent instanceof XmlSchemaComplexContentExtension)) {
+            return qnames;
+        }
+
+        XmlSchemaComplexContentExtension extension = (XmlSchemaComplexContentExtension)schemaContent;
+        QName baseTypeName = extension.getBaseTypeName();
+        XmlSchemaType baseType = schema.getTypeByQName(baseTypeName);
+
+        if (baseType instanceof XmlSchemaComplexType) {
+            XmlSchemaComplexType complexBaseType = (XmlSchemaComplexType)baseType;
+
+            if (complexBaseType.getParticle() == null && complexBaseType.getContentModel() != null) {
+                // continue up the extension ladder
+                qnames.addAll(createWrappedElementsFromExtension(schema, complexBaseType));
+            } else if (complexBaseType.getParticle() instanceof XmlSchemaSequence) {
+                XmlSchemaSequence seq = (XmlSchemaSequence)complexBaseType.getParticle();
+                qnames.addAll(createWrappedElements(seq));
+            }
+        }
+
+        if (extension.getParticle() instanceof XmlSchemaSequence) {
+            XmlSchemaSequence xmlSchemaSeq = (XmlSchemaSequence)extension.getParticle();
+            qnames.addAll(createWrappedElements(xmlSchemaSeq));
+        }
+
         return qnames;
     }
 
