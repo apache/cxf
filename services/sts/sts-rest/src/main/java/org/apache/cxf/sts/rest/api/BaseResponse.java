@@ -52,8 +52,8 @@ public class BaseResponse implements Serializable {
         this.status = StatusType.SUCCESS.name();
     }
 
-    public BaseResponse(final String message) {
-        this.status = StatusType.ERROR.name();
+    public BaseResponse(final StatusType status, final String message) {
+        this.status = status.name();
         this.message = message;
     }
 

@@ -38,7 +38,7 @@ public class RestExceptionMapper implements ExceptionMapper<Exception> {
     public Response toResponse(Exception exception) {
         return Response
                 .status(Status.INTERNAL_SERVER_ERROR)
-                .entity(new BaseResponse(exception.getMessage()))
+                .entity(new BaseResponse(BaseResponse.StatusType.ERROR, exception.getMessage()))
                 .type(getResponseType())
                 .build();
     }

@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.sts.custom;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.w3c.dom.Element;
@@ -31,15 +31,17 @@ import org.apache.cxf.sts.claims.ProcessedClaim;
 import org.apache.cxf.sts.claims.ProcessedClaimCollection;
 import org.apache.wss4j.common.util.XMLUtils;
 
+import static org.apache.cxf.sts.STSConstants.IDT_NS_05_05;
+
 /**
  * A custom ClaimsHandler implementation for use in the tests.
  */
 public class CustomClaimsHandler implements ClaimsHandler {
 
     public static final String ROLE =
-            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
+        IDT_NS_05_05 + "/claims/role";
     public static final String GIVEN_NAME =
-        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname";
+        IDT_NS_05_05 + "/claims/givenname";
     public static final String LANGUAGE =
         "http://schemas.mycompany.com/claims/language";
 
@@ -47,7 +49,6 @@ public class CustomClaimsHandler implements ClaimsHandler {
             ClaimCollection claims, ClaimsParameters parameters) {
 
         if (claims != null && !claims.isEmpty()) {
-            ProcessedClaimCollection claimCollection = new ProcessedClaimCollection();
             List<Object> customContent = parameters.getTokenRequirements().getCustomContent();
             boolean foundContent = false;
             if (customContent != null) {
@@ -66,12 +67,13 @@ public class CustomClaimsHandler implements ClaimsHandler {
                 }
             }
 
+            ProcessedClaimCollection claimCollection = new ProcessedClaimCollection();
             for (Claim requestClaim : claims) {
                 ProcessedClaim claim = new ProcessedClaim();
                 claim.setClaimType(requestClaim.getClaimType());
                 claim.setIssuer("Test Issuer");
                 claim.setOriginalIssuer("Original Issuer");
-                if (foundContent) {
+                if (foundContent || "custom-realm".equals(parameters.getRealm())) {
                     if (ROLE.equals(requestClaim.getClaimType())) {
                         claim.addValue("admin-user");
                     } else if (GIVEN_NAME.equals(requestClaim.getClaimType())) {
@@ -88,11 +90,10 @@ public class CustomClaimsHandler implements ClaimsHandler {
     }
 
     public List<String> getSupportedClaimTypes() {
-        List<String> list = new ArrayList<>();
-        list.add(ROLE);
-        list.add(GIVEN_NAME);
-        list.add(LANGUAGE);
-        return list;
+        return Arrays.asList(
+            ROLE,
+            GIVEN_NAME,
+            LANGUAGE);
     }
 
 }

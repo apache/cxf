@@ -83,7 +83,7 @@ import static org.junit.Assert.fail;
  */
 public class STSRealmRestTest extends AbstractBusClientServerTestBase {
 
-    static final String STSPORT = allocatePort(STSRealmRestServer.class);
+    private static final String STSPORT = allocatePort(STSRealmRestServer.class);
 
     private static final String REALM = "realmA";
 
@@ -310,9 +310,7 @@ public class STSRealmRestTest extends AbstractBusClientServerTestBase {
         GetTokenRequest getTokenRequest = new GetTokenRequest();
         getTokenRequest.setTokenType(SAML2_TOKEN_TYPE);
 
-        RealmSecurityTokenService client = client();
-        WebClient.client(client).accept(MediaType.APPLICATION_XML);
-        Document assertionDoc = client.getToken(REALM, getTokenRequest)
+        Document assertionDoc = client().getToken(REALM, getTokenRequest)
             .readEntity(Document.class);
 
         SamlAssertionWrapper assertion = validateSAMLToken(assertionDoc);
@@ -325,9 +323,7 @@ public class STSRealmRestTest extends AbstractBusClientServerTestBase {
         GetTokenRequest getTokenRequest = new GetTokenRequest();
         getTokenRequest.setTokenType(SAML1_TOKEN_TYPE);
 
-        RealmSecurityTokenService client = client();
-        WebClient.client(client).accept(MediaType.APPLICATION_XML);
-        Document assertionDoc = client.getToken(REALM, getTokenRequest)
+        Document assertionDoc = client().getToken(REALM, getTokenRequest)
             .readEntity(Document.class);
 
         SamlAssertionWrapper assertion = validateSAMLToken(assertionDoc);
@@ -424,9 +420,7 @@ public class STSRealmRestTest extends AbstractBusClientServerTestBase {
         GetTokenRequest getTokenRequest = new GetTokenRequest();
         getTokenRequest.setTokenType(JWT_TOKEN_TYPE);
 
-        RealmSecurityTokenService client = client();
-        WebClient.client(client).accept(MediaType.APPLICATION_XML);
-        Document assertionDoc = client.getToken(REALM, getTokenRequest)
+        Document assertionDoc = client().getToken(REALM, getTokenRequest)
             .readEntity(Document.class);
 
         // Process the token

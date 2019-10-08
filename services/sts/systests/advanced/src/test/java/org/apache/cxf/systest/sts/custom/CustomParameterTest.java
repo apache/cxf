@@ -19,33 +19,39 @@
 package org.apache.cxf.systest.sts.custom;
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.callback.CallbackHandler;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-import javax.xml.transform.dom.DOMSource;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rt.security.SecurityConstants;
-import org.apache.cxf.staxutils.W3CDOMStreamWriter;
+import org.apache.cxf.sts.rest.api.GetTokenRequest;
+import org.apache.cxf.sts.rest.api.RealmSecurityTokenService;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.ws.security.sts.provider.model.ClaimsType;
+import org.apache.cxf.ws.security.sts.provider.model.ObjectFactory;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
+import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.trust.STSClient;
-import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
@@ -59,6 +65,8 @@ import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.BeforeClass;
 
+import static org.apache.cxf.sts.STSConstants.IDT_NS_05_05;
+import static org.apache.cxf.sts.STSConstants.WST_NS_05_12;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -296,66 +304,69 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testCustomParameterToRESTInterface() throws Exception {
 
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CustomParameterTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
         String address = "https://localhost:" + STSPORT + "/SecurityTokenServiceREST/token";
-        WebClient client = WebClient.create(address, busFile.toString());
+        WebClient client = WebClient.create(address, getClass().getResource("cxf-client.xml").toString())
+            .type(MediaType.APPLICATION_XML)
+            .accept(MediaType.APPLICATION_XML);
 
-        client.type("application/xml").accept("application/xml");
+        ObjectFactory of = new ObjectFactory();
+        RequestSecurityTokenType request = of.createRequestSecurityTokenType();
+        request.getAny().add(of.createRequestType(WST_NS_05_12 + "/Issue"));
+        request.getAny().add(of.createTokenType(SAML2_TOKEN_TYPE));
 
-        // Create RequestSecurityToken
-        W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
-        String namespace = STSUtils.WST_NS_05_12;
-        writer.writeStartElement("wst", "RequestSecurityToken", namespace);
-        writer.writeNamespace("wst", namespace);
-
-        writer.writeStartElement("wst", "RequestType", namespace);
-        writer.writeCharacters(namespace + "/Issue");
-        writer.writeEndElement();
-
-        writer.writeStartElement("wst", "TokenType", namespace);
-        writer.writeCharacters(SAML2_TOKEN_TYPE);
-        writer.writeEndElement();
-
-        writer.writeStartElement("wst", "Claims", namespace);
-        writer.writeAttribute("Dialect", "http://schemas.xmlsoap.org/ws/2005/05/identity");
-        writer.writeStartElement("ic", "ClaimType", "http://schemas.xmlsoap.org/ws/2005/05/identity");
-        writer.writeAttribute("Uri", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");
-        writer.writeEndElement();
-        writer.writeEndElement();
+        ClaimsType claims = of.createClaimsType();
+        claims.setDialect(IDT_NS_05_05);
+        Element claimsType = DOMUtils.getEmptyDocument().createElementNS(IDT_NS_05_05, "ClaimType");
+        claimsType.setAttribute("Uri", IDT_NS_05_05 + "/claims/role");
+        claims.getAny().add(claimsType);
+        request.getAny().add(of.createClaims(claims));
 
         // Add custom content to the RST
-        writer.writeStartElement("", "realm", "http://cxf.apache.org/custom");
-        writer.writeCharacters("custom-realm");
-        writer.writeEndElement();
-
-        writer.writeEndElement();
-
-        Response response = client.post(new DOMSource(writer.getDocument().getDocumentElement()));
+        Element realm = DOMUtils.getEmptyDocument().createElementNS("http://cxf.apache.org/custom", "realm");
+        realm.setTextContent("custom-realm");
+        request.getAny().add(realm);
 
         RequestSecurityTokenResponseType securityResponse =
-            response.readEntity(RequestSecurityTokenResponseType.class);
+            client.post(
+                of.createRequestSecurityToken(request),
+                RequestSecurityTokenResponseType.class);
 
         Element assertion = validateSAMLSecurityTokenResponse(securityResponse, true);
         assertTrue(DOM2Writer.nodeToString(assertion).contains("admin-user"));
 
-        bus.shutdown(true);
+        client.close();
     }
 
-    private Element validateSAMLSecurityTokenResponse(
+    @org.junit.Test
+    public void testCustomParameterToRealmRestInterface() throws Exception {
+
+        GetTokenRequest getTokenRequest = new GetTokenRequest();
+        getTokenRequest.setTokenType(SAML2_TOKEN_TYPE);
+        getTokenRequest.setClaims(Collections.singletonList("role"));
+
+        final RealmSecurityTokenService client = JAXRSClientFactory.create(
+            "https://localhost:" + STSPORT + "/RealmSecurityTokenService",
+            RealmSecurityTokenService.class,
+            getClass().getResource("cxf-client.xml").toString());
+        Document assertionDoc =
+            client.getToken("custom-realm", getTokenRequest)
+                .readEntity(Document.class);
+
+        Element assertion = validateSAMLToken(assertionDoc.getDocumentElement(), true);
+        assertTrue(DOM2Writer.nodeToString(assertion).contains("admin-user"));
+    }
+
+    private static Element validateSAMLSecurityTokenResponse(
          RequestSecurityTokenResponseType securityResponse, boolean saml2
     ) throws Exception {
         RequestedSecurityTokenType requestedSecurityToken = getRequestedSecurityToken(securityResponse);
         assertNotNull(requestedSecurityToken);
 
-        // Process the token
-        List<WSSecurityEngineResult> results =
-            processToken((Element)requestedSecurityToken.getAny());
+        return validateSAMLToken((Element)requestedSecurityToken.getAny(), saml2);
+    }
+
+    private static Element validateSAMLToken(Element assertionElement, boolean saml2) throws Exception {
+        List<WSSecurityEngineResult> results = processToken(assertionElement);
 
         assertTrue(results != null && results.size() == 1);
         SamlAssertionWrapper assertion =
@@ -371,7 +382,8 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         return (Element)results.get(0).get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
     }
 
-    private RequestedSecurityTokenType getRequestedSecurityToken(RequestSecurityTokenResponseType securityResponse) {
+    private static RequestedSecurityTokenType getRequestedSecurityToken(
+        RequestSecurityTokenResponseType securityResponse) {
         for (Object obj : securityResponse.getAny()) {
             if (obj instanceof JAXBElement<?>) {
                 JAXBElement<?> jaxbElement = (JAXBElement<?>)obj;
@@ -383,7 +395,7 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         return null;
     }
 
-    private List<WSSecurityEngineResult> processToken(Element assertionElement)
+    private static List<WSSecurityEngineResult> processToken(Element assertionElement)
         throws Exception {
         RequestData requestData = new RequestData();
         requestData.setDisableBSPEnforcement(true);
