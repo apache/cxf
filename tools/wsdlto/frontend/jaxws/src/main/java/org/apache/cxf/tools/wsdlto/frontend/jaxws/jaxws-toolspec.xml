@@ -375,6 +375,15 @@ Examples:
                 </annotation>
                 <switch>suppress-generated-date</switch>
             </option>
+            <option id="maxExtensionStackDepth" maxOccurs="1">
+                <annotation>
+                    The maximum stack depth allowed when parsing schema extensions. The default is 5.
+                </annotation>
+                <switch>maxExtensionStackDepth</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>maxExtensionStackDepth</annotation>
+                </associatedArgument>
+            </option>
         </optionGroup>
         <optionGroup id="common_options">
             <option id="help" maxOccurs="1">

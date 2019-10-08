@@ -41,6 +41,7 @@ import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.model.DefaultValueWriter;
 import org.apache.cxf.tools.util.ClassCollector;
@@ -370,18 +371,27 @@ public final class ProcessorUtil {
 
         //If it's extension
         if (seq == null && type.getContentModel() != null) {
-            qnames.addAll(createWrappedElementsFromExtension(schema, type));
+            Object configuredMaxStackDepth = context.get(ToolConstants.CFG_MAX_EXTENSION_STACK_DEPTH);
+            Integer maxStackDepth = Integer.valueOf(5);
+            if (configuredMaxStackDepth instanceof Integer) {
+                maxStackDepth = (Integer)configuredMaxStackDepth;
+            } else if (configuredMaxStackDepth instanceof String) {
+                maxStackDepth = Integer.valueOf((String)configuredMaxStackDepth);
+            }
+            qnames.addAll(createWrappedElementsFromExtension(schema, type, maxStackDepth));
+
         }
 
         return qnames;
     }
 
     private static List<WrapperElement> createWrappedElementsFromExtension(SchemaCollection schema,
-                                                                           XmlSchemaComplexType type) {
+                                                                           XmlSchemaComplexType type,
+                                                                           int maxStackDepth) {
         List<WrapperElement> qnames = new ArrayList<>();
 
         XmlSchemaContent schemaContent = type.getContentModel().getContent();
-        if (!(schemaContent instanceof XmlSchemaComplexContentExtension)) {
+        if (!(schemaContent instanceof XmlSchemaComplexContentExtension) || maxStackDepth == 0) {
             return qnames;
         }
 
@@ -394,7 +404,7 @@ public final class ProcessorUtil {
 
             if (complexBaseType.getParticle() == null && complexBaseType.getContentModel() != null) {
                 // continue up the extension ladder
-                qnames.addAll(createWrappedElementsFromExtension(schema, complexBaseType));
+                qnames.addAll(createWrappedElementsFromExtension(schema, complexBaseType, maxStackDepth - 1));
             } else if (complexBaseType.getParticle() instanceof XmlSchemaSequence) {
                 XmlSchemaSequence seq = (XmlSchemaSequence)complexBaseType.getParticle();
                 qnames.addAll(createWrappedElements(seq));

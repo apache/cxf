@@ -1667,6 +1667,25 @@ public class CodeGenTest extends AbstractCodeGenTest {
     }
 
     @Test
+    public void testMultilevelExtensionWrapperStackDepth() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL,
+                getLocation("/wsdl2java_wsdl/cxf8025/hello_world_multilevel_extension_wrapped.wsdl"));
+        env.put(ToolConstants.CFG_MAX_EXTENSION_STACK_DEPTH, Integer.valueOf(3));
+        processor.setContext(env);
+        processor.execute();
+
+        File infFile = new File(output, "org/apache/cxf/w2j/multilevel_extension_wrapped/Greeter.java");
+        assertTrue(infFile.exists());
+
+        Class<?> interfaceClass = classLoader.loadClass("org.apache.cxf.w2j.multilevel_extension_wrapped.Greeter");
+
+        Method method = interfaceClass.getMethod("greetMeMultilevelExtension", new Class[] {
+            String.class, String.class, String.class
+        });
+        assertNotNull("greetMeMultilevelExtension operation is NOT generated correctly as excepted", method);
+    }
+
+    @Test
     public void testJavaDoc() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
         processor.setContext(env);
