@@ -47,7 +47,7 @@ public class BasicSTSIntegrationTest {
         String port = TestUtil.getPortNumber(BasicSTSIntegrationTest.class);
         System.setProperty("BasicSTSIntegrationTest.PORT", port);
 
-        String karafVersion = System.getProperty("karaf.version", "4.2.5");
+        String karafVersion = System.getProperty("karaf.version", "4.2.7");
         String localRepository = System.getProperty("localRepository");
 
         MavenArtifactUrlReference karafUrl = maven() //
@@ -71,7 +71,6 @@ public class BasicSTSIntegrationTest {
                                  systemProperty("BasicSTSIntegrationTest.PORT").value(port),
 
                 copy("clientKeystore.properties"), copy("clientstore.jks"),
-                                 copy("etc/org.ops4j.pax.logging.cfg"),
                                  editConfigurationFilePut("etc/org.ops4j.pax.web.cfg",
                                                           "org.osgi.service.http.port", port),
                                  when(localRepository != null)
@@ -115,7 +114,6 @@ public class BasicSTSIntegrationTest {
                                  systemProperty("BasicSTSIntegrationTest.PORT").value(port),
 
                 copy("clientKeystore.properties"), copy("clientstore.jks"),
-                                 copy("etc/org.ops4j.pax.logging.cfg"),
                                  editConfigurationFilePut("etc/org.ops4j.pax.web.cfg",
                                                           "org.osgi.service.http.port", port),
                                  when(localRepository != null)

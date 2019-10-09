@@ -22,7 +22,6 @@ package org.apache.cxf.osgi.itests;
 
 
 import java.io.File;
-import java.net.URISyntaxException;
 
 import javax.inject.Inject;
 
@@ -45,7 +44,6 @@ import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.CoreOptions.when;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.replaceConfigurationFile;
 
 /**
  *
@@ -80,12 +78,6 @@ public class CXFOSGiTestSupport {
                 .version(karafVersion).type("xml").classifier("features");
         String localRepo = System.getProperty("localRepository");
         Object urp = System.getProperty("cxf.useRandomFirstPort");
-        final File loggingCfg;
-        try {
-            loggingCfg = new File(getClass().getResource("/etc/org.ops4j.pax.logging.cfg").toURI());
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
         if (JavaVersionUtil.getMajorVersion() >= 9) {
             return composite(karafDistributionConfiguration()
                              .frameworkUrl(karafUrl)
@@ -98,7 +90,6 @@ public class CXFOSGiTestSupport {
                          //debugConfiguration(), // nor this
                          systemProperty("pax.exam.osgi.unresolved.fail").value("true"),
                          systemProperty("java.awt.headless").value("true"),
-                         replaceConfigurationFile("etc/org.ops4j.pax.logging.cfg", loggingCfg),
                          when(localRepo != null)
                              .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
                                                                   "org.ops4j.pax.url.mvn.localRepository",
@@ -143,7 +134,6 @@ public class CXFOSGiTestSupport {
                          //debugConfiguration(), // nor this
                          systemProperty("pax.exam.osgi.unresolved.fail").value("true"),
                          systemProperty("java.awt.headless").value("true"),
-                         replaceConfigurationFile("etc/org.ops4j.pax.logging.cfg", loggingCfg),
                          when(localRepo != null)
                              .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
                                                                   "org.ops4j.pax.url.mvn.localRepository",

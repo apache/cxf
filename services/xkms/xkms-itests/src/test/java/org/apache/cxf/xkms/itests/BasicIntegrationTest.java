@@ -65,7 +65,7 @@ public class BasicIntegrationTest {
         System.setProperty("BasicIntegrationTest.PORT", port);
         String xkmsEndpoint = "http://localhost:" + port + "/cxf/XKMS";
 
-        String karafVersion = System.getProperty("karaf.version", "4.2.5");
+        String karafVersion = System.getProperty("karaf.version", "4.2.7");
         String localRepository = System.getProperty("localRepository");
         MavenArtifactUrlReference karafUrl = maven() //
             .groupId("org.apache.karaf") //
@@ -91,7 +91,6 @@ public class BasicIntegrationTest {
                                  copy("data/xkms/certificates/cas/alice.cer"),
                                  copy("data/xkms/certificates/dave.cer"),
                                  copy("data/xkms/certificates/http___localhost_8080_services_TestService.cer"),
-                                 copy("etc/org.ops4j.pax.logging.cfg"),
                                  // editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
                                  // "org.ops4j.pax.url.mvn.repositories", REPOS),
                                  editConfigurationFilePut("etc/org.ops4j.pax.web.cfg",
@@ -151,7 +150,6 @@ public class BasicIntegrationTest {
                                  copy("data/xkms/certificates/cas/alice.cer"),
                                  copy("data/xkms/certificates/dave.cer"),
                                  copy("data/xkms/certificates/http___localhost_8080_services_TestService.cer"),
-                                 copy("etc/org.ops4j.pax.logging.cfg"),
                                  // editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
                                  // "org.ops4j.pax.url.mvn.repositories", REPOS),
                                  editConfigurationFilePut("etc/org.ops4j.pax.web.cfg",
