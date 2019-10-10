@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.systest.jaxws.tracing.brave;
 
-import java.net.MalformedURLException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +33,7 @@ import brave.Tracing;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -41,14 +42,13 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.systest.brave.BraveTestSupport.SpanId;
 import org.apache.cxf.systest.brave.TestSpanReporter;
 import org.apache.cxf.systest.jaxws.tracing.BookStoreService;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractTestServerBase;
 import org.apache.cxf.tracing.brave.BraveClientFeature;
 import org.apache.cxf.tracing.brave.BraveFeature;
 
-import org.junit.Before;
+import org.junit.After;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.apache.cxf.systest.brave.BraveTestSupport.PARENT_SPAN_ID_NAME;
@@ -60,16 +60,19 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-
-public class BraveTracingTest extends AbstractBusClientServerTestBase {
+public class BraveTracingTest extends AbstractClientServerTestBase {
     public static final String PORT = allocatePort(BraveTracingTest.class);
 
-    @Ignore
-    public static class Server extends AbstractBusTestServerBase {
+    public static class Server extends AbstractTestServerBase {
+
+        private org.apache.cxf.endpoint.Server server;
+
+        @Override
         protected void run() {
             final Tracing brave = Tracing.newBuilder()
                 .localServiceName("book-store")
@@ -80,28 +83,28 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
             sf.setServiceClass(BookStore.class);
             sf.setAddress("http://localhost:" + PORT);
             sf.getFeatures().add(new BraveFeature(brave));
-            sf.create();
+            server = sf.create();
         }
-    }
 
-    private interface Configurator {
-        void configure(JaxWsProxyFactoryBean factory);
+        @Override
+        public void tearDown() throws Exception {
+            server.destroy();
+        }
     }
 
     @BeforeClass
     public static void startServers() throws Exception {
         //keep out of process due to stack traces testing failures
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
-        createStaticBus();
     }
 
-    @Before
-    public void setUp() {
+    @After
+    public void tearDown() {
         TestSpanReporter.clear();
     }
 
     @Test
-    public void testThatNewSpanIsCreatedWhenNotProvided() throws MalformedURLException {
+    public void testThatNewSpanIsCreatedWhenNotProvided() throws Exception {
         final BookStoreService service = createJaxWsService();
         assertThat(service.getBooks().size(), equalTo(2));
 
@@ -117,7 +120,7 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testThatNewInnerSpanIsCreated() throws MalformedURLException {
+    public void testThatNewInnerSpanIsCreated() throws Exception {
         final Random random = new Random();
 
         final SpanId spanId = new SpanId()
@@ -144,18 +147,13 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testThatNewChildSpanIsCreatedWhenParentIsProvided() throws MalformedURLException {
+    public void testThatNewChildSpanIsCreatedWhenParentIsProvided() throws Exception {
         final Tracing brave = Tracing.newBuilder()
             .localServiceName("book-store")
             .spanReporter(new TestSpanReporter())
             .build();
 
-        final BookStoreService service = createJaxWsService(new Configurator() {
-            @Override
-            public void configure(final JaxWsProxyFactoryBean factory) {
-                factory.getFeatures().add(new BraveClientFeature(brave));
-            }
-        });
+        final BookStoreService service = createJaxWsService(new BraveClientFeature(brave));
         assertThat(service.getBooks().size(), equalTo(2));
 
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(3));
@@ -170,18 +168,13 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testThatProvidedSpanIsNotClosedWhenActive() throws MalformedURLException {
+    public void testThatProvidedSpanIsNotClosedWhenActive() throws Exception {
         final Tracing brave = Tracing.newBuilder()
             .localServiceName("book-store")
             .spanReporter(new TestSpanReporter())
             .build();
 
-        final BookStoreService service = createJaxWsService(new Configurator() {
-            @Override
-            public void configure(final JaxWsProxyFactoryBean factory) {
-                factory.getFeatures().add(new BraveClientFeature(brave));
-            }
-        });
+        final BookStoreService service = createJaxWsService(new BraveClientFeature(brave));
 
         final Span span = brave.tracer().nextSpan().name("test span").start();
         try {
@@ -210,7 +203,7 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testThatNewSpanIsCreatedInCaseOfFault() throws MalformedURLException {
+    public void testThatNewSpanIsCreatedInCaseOfFault() throws Exception {
         final BookStoreService service = createJaxWsService();
 
         try {
@@ -231,20 +224,13 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testThatNewChildSpanIsCreatedWhenParentIsProvidedInCaseOfFault() throws MalformedURLException {
+    public void testThatNewChildSpanIsCreatedWhenParentIsProvidedInCaseOfFault() throws Exception {
         final Tracing brave = Tracing.newBuilder()
             .localServiceName("book-store")
             .spanReporter(new TestSpanReporter())
             .build();
 
-        final BookStoreService service = createJaxWsService(new Configurator() {
-            @Override
-            public void configure(final JaxWsProxyFactoryBean factory) {
-                factory.getFeatures().add(new BraveClientFeature(brave));
-                factory.getOutInterceptors().add(new LoggingOutInterceptor());
-                factory.getInInterceptors().add(new LoggingInInterceptor());
-            }
-        });
+        final BookStoreService service = createJaxWsService(new BraveClientFeature(brave));
 
         try {
             service.removeBooks();
@@ -262,20 +248,19 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
         assertThatTraceHeadersArePresent(response, false);
     }
 
-    private BookStoreService createJaxWsService() throws MalformedURLException {
-        return createJaxWsService(new HashMap<String, List<String>>());
+    private BookStoreService createJaxWsService() {
+        return createJaxWsService(Collections.emptyMap());
     }
 
-    private BookStoreService createJaxWsService(final Map<String, List<String>> headers) throws MalformedURLException {
+    private BookStoreService createJaxWsService(final Map<String, List<String>> headers) {
         return createJaxWsService(headers, null);
     }
 
-    private BookStoreService createJaxWsService(final Configurator configurator) throws MalformedURLException {
-        return createJaxWsService(new HashMap<String, List<String>>(), configurator);
+    private BookStoreService createJaxWsService(final Feature feature) {
+        return createJaxWsService(Collections.emptyMap(), feature);
     }
 
-    private BookStoreService createJaxWsService(final Map<String, List<String>> headers,
-            final Configurator configurator) throws MalformedURLException {
+    private BookStoreService createJaxWsService(final Map<String, List<String>> headers, final Feature feature) {
 
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.getOutInterceptors().add(new LoggingOutInterceptor());
@@ -283,8 +268,8 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
         factory.setServiceClass(BookStoreService.class);
         factory.setAddress("http://localhost:" + PORT + "/BookStore");
 
-        if (configurator != null) {
-            configurator.configure(factory);
+        if (feature != null) {
+            factory.getFeatures().add(feature);
         }
 
         final BookStoreService service = (BookStoreService) factory.create();
@@ -294,12 +279,12 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
         return service;
     }
 
-    private Map<String, List<String>> getResponseHeaders(final BookStoreService service) {
+    private static Map<String, List<String>> getResponseHeaders(final BookStoreService service) {
         final Client proxy = ClientProxy.getClient(service);
         return CastUtils.cast((Map<?, ?>)proxy.getResponseContext().get(Message.PROTOCOL_HEADERS));
     }
 
-    private void assertThatTraceIsPresent(Map<String, List<String>> headers, SpanId spanId) {
+    private static void assertThatTraceIsPresent(Map<String, List<String>> headers, SpanId spanId) {
         assertThat(headers.get(SPAN_ID_NAME),
             hasItem(Long.toString(spanId.spanId())));
         assertThat(headers.get(TRACE_ID_NAME),
@@ -310,15 +295,11 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
             hasItem(Long.toString(spanId.parentId())));
     }
 
-    private void assertThatTraceHeadersArePresent(Map<String, List<String>> headers, boolean expectParent) {
+    private static void assertThatTraceHeadersArePresent(Map<String, List<String>> headers, boolean expectParent) {
         assertTrue(headers.containsKey(SPAN_ID_NAME));
         assertTrue(headers.containsKey(TRACE_ID_NAME));
         assertTrue(headers.containsKey(SAMPLED_NAME));
 
-        if (expectParent) {
-            assertTrue(headers.containsKey(PARENT_SPAN_ID_NAME));
-        } else {
-            assertFalse(headers.containsKey(PARENT_SPAN_ID_NAME));
-        }
+        assertEquals(expectParent, headers.containsKey(PARENT_SPAN_ID_NAME));
     }
 }

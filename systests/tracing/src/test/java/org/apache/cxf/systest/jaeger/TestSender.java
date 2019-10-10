@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.systest.jaeger;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 
 import io.jaegertracing.internal.JaegerSpan;
@@ -28,7 +28,7 @@ import io.jaegertracing.spi.Sender;
 
 public class TestSender implements Sender {
 
-    private static final List<JaegerSpan> SPANS = new CopyOnWriteArrayList<>();
+    private static final List<JaegerSpan> SPANS = new ArrayList<>(12);
 
     private static CountDownLatch synchro;
 
@@ -57,6 +57,7 @@ public class TestSender implements Sender {
 
     public static void clear() {
         SPANS.clear();
+        setSynchro(null);
     }
 
     public static void setSynchro(CountDownLatch newSynchro) {

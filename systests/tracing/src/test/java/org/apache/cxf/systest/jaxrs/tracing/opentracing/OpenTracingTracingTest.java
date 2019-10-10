@@ -20,16 +20,14 @@ package org.apache.cxf.systest.jaxrs.tracing.opentracing;
 
 import java.net.MalformedURLException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.IntStream;
 
 import javax.ws.rs.core.MediaType;
@@ -44,8 +42,8 @@ import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systest.jaeger.TestSender;
 import org.apache.cxf.systest.jaxrs.tracing.BookStore;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractTestServerBase;
 import org.apache.cxf.tracing.opentracing.jaxrs.OpenTracingClientProvider;
 import org.apache.cxf.tracing.opentracing.jaxrs.OpenTracingFeature;
 import org.awaitility.Duration;
@@ -64,9 +62,7 @@ import io.opentracing.propagation.Format.Builtin;
 import io.opentracing.propagation.TextMap;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.apache.cxf.systest.jaxrs.tracing.opentracing.HasSpan.hasSpan;
@@ -80,15 +76,28 @@ import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
+public class OpenTracingTracingTest extends AbstractClientServerTestBase {
     public static final String PORT = allocatePort(OpenTracingTracingTest.class);
 
-    private Tracer tracer;
-    private OpenTracingClientProvider openTracingClientProvider;
-    private final Random random = new Random();
+    private static final AtomicLong RANDOM = new AtomicLong();
 
-    @Ignore
-    public static class Server extends AbstractBusTestServerBase {
+    private final Tracer tracer = new Configuration("tracer-test-client")
+        .withSampler(new SamplerConfiguration().withType(ConstSampler.TYPE).withParam(1))
+        .withReporter(new ReporterConfiguration().withSender(
+            new SenderConfiguration() {
+                @Override
+                public Sender getSender() {
+                    return new TestSender();
+                }
+            }
+        ))
+        .getTracer();
+
+    public static class BraveServer extends AbstractTestServerBase {
+
+        private org.apache.cxf.endpoint.Server server;
+
+        @Override
         protected void run() {
             final Tracer tracer = new Configuration("tracer-test-server")
                 .withSampler(new SamplerConfiguration().withType(ConstSampler.TYPE).withParam(1))
@@ -108,7 +117,12 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
             sf.setAddress("http://localhost:" + PORT);
             sf.setProvider(new JacksonJsonProvider());
             sf.setProvider(new OpenTracingFeature(tracer));
-            sf.create();
+            server = sf.create();
+        }
+
+        @Override
+        public void tearDown() throws Exception {
+            server.destroy();
         }
     }
 
@@ -116,32 +130,12 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
-        createStaticBus();
-    }
-
-    @Before
-    public void setUp() {
-        TestSender.clear();
-
-        tracer = new Configuration("tracer-test-client")
-            .withSampler(new SamplerConfiguration().withType(ConstSampler.TYPE).withParam(1))
-            .withReporter(new ReporterConfiguration().withSender(
-                new SenderConfiguration() {
-                    @Override
-                    public Sender getSender() {
-                        return new TestSender();
-                    }
-                }
-            ))
-            .getTracer();
-
-        openTracingClientProvider = new OpenTracingClientProvider(tracer);
+        assertTrue("server did not launch correctly", launchServer(BraveServer.class, true));
     }
 
     @After
     public void tearDown() {
-        TestSender.setSynchro(null);
+        TestSender.clear();
     }
 
     @Test
@@ -192,10 +186,10 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testThatNewChildSpanIsCreatedWhenParentIsProvided() {
-        final Response r = createWebClient("/bookstore/books", openTracingClientProvider).get();
+        final Response r = createWebClient("/bookstore/books", new OpenTracingClientProvider(tracer)).get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
-        assertThat(TestSender.getAllSpans().size(), equalTo(3));
+        assertThat(TestSender.getAllSpans().toString(), TestSender.getAllSpans().size(), equalTo(3));
         assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Get Books"));
         assertThat(TestSender.getAllSpans().get(0).getReferences(), not(empty()));
     }
@@ -210,7 +204,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
         final Response r = withTrace(createWebClient("/bookstore/books/async"), spanId).get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
-        synchro.await(1, TimeUnit.MINUTES);
+        synchro.await(1L, TimeUnit.MINUTES);
         assertThat(TestSender.getAllSpans().size(), equalTo(2));
         assertEquals("Processing books", TestSender.getAllSpans().get(0).getOperationName());
         assertEquals("GET /bookstore/books/async", TestSender.getAllSpans().get(1).getOperationName());
@@ -238,7 +232,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
         final Response r = createWebClient("/bookstore/books/async").get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
-        synchro.await(1, TimeUnit.MINUTES);
+        synchro.await(1L, TimeUnit.MINUTES);
         assertThat(TestSender.getAllSpans().size(), equalTo(2));
         assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Processing books"));
         assertThat(TestSender.getAllSpans().get(1).getOperationName(), equalTo("GET /bookstore/books/async"));
@@ -249,13 +243,12 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
         final CountDownLatch synchro = new CountDownLatch(3);
         TestSender.setSynchro(synchro);
 
-        final WebClient client = createWebClient("/bookstore/books", openTracingClientProvider);
-        final Future<Response> f = client.async().get();
+        final WebClient client = createWebClient("/bookstore/books", new OpenTracingClientProvider(tracer));
 
-        final Response r = f.get(1, TimeUnit.SECONDS);
+        final Response r = client.async().get().get(1L, TimeUnit.SECONDS);
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
-        synchro.await(1, TimeUnit.MINUTES);
+        synchro.await(1L, TimeUnit.MINUTES);
         assertThat(TestSender.getAllSpans().size(), equalTo(3));
         assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Get Books"));
         assertThat(TestSender.getAllSpans().get(1).getOperationName(), equalTo("GET /bookstore/books"));
@@ -264,19 +257,15 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testThatNewSpansAreCreatedWhenNotProvidedUsingMultipleAsyncClients() throws Exception {
-        final WebClient client = createWebClient("/bookstore/books", openTracingClientProvider);
+        final WebClient client = createWebClient("/bookstore/books", new OpenTracingClientProvider(tracer));
 
         // The intention is to make a calls one after another, not in parallel, to ensure the
         // thread have trace contexts cleared out.
-        final Collection<Response> responses = IntStream
+        IntStream
             .range(0, 4)
             .mapToObj(index -> client.async().get())
             .map(this::get)
-            .collect(Collectors.toList());
-
-        for (final Response r: responses) {
-            assertEquals(Status.OK.getStatusCode(), r.getStatus());
-        }
+            .forEach(r -> assertEquals(Status.OK.getStatusCode(), r.getStatus()));
 
         assertThat(TestSender.getAllSpans().size(), equalTo(12));
 
@@ -295,18 +284,14 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testThatNewSpansAreCreatedWhenNotProvidedUsingMultipleClients() throws Exception {
-        final WebClient client = createWebClient("/bookstore/books", openTracingClientProvider);
+        final WebClient client = createWebClient("/bookstore/books", new OpenTracingClientProvider(tracer));
 
         // The intention is to make a calls one after another, not in parallel, to ensure the
         // thread have trace contexts cleared out.
-        final Collection<Response> responses = IntStream
+        IntStream
             .range(0, 4)
             .mapToObj(index -> client.get())
-            .collect(Collectors.toList());
-
-        for (final Response r: responses) {
-            assertEquals(Status.OK.getStatusCode(), r.getStatus());
-        }
+            .forEach(r -> assertEquals(Status.OK.getStatusCode(), r.getStatus()));
 
         assertEquals(TestSender.getAllSpans().toString(), 12, TestSender.getAllSpans().size());
 
@@ -325,7 +310,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testThatProvidedSpanIsNotClosedWhenActive() throws MalformedURLException {
-        final WebClient client = createWebClient("/bookstore/books", openTracingClientProvider);
+        final WebClient client = createWebClient("/bookstore/books", new OpenTracingClientProvider(tracer));
 
         final Span span = tracer.buildSpan("test span").start();
         try (Scope scope = tracer.scopeManager().activate(span)) {
@@ -353,20 +338,18 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testThatProvidedSpanIsNotDetachedWhenActiveUsingAsyncClient() throws Exception {
-        final WebClient client = createWebClient("/bookstore/books", openTracingClientProvider);
+        final WebClient client = createWebClient("/bookstore/books", new OpenTracingClientProvider(tracer));
 
         final Span span = tracer.buildSpan("test span").start();
         try (Scope scope = tracer.scopeManager().activate(span)) {
             final CountDownLatch synchro = new CountDownLatch(3);
             TestSender.setSynchro(synchro);
 
-            final Future<Response> f = client.async().get();
-
-            final Response r = f.get(1, TimeUnit.HOURS);
+            final Response r = client.async().get().get(1L, TimeUnit.MINUTES);
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
             assertThat(tracer.activeSpan().context(), equalTo(span.context()));
 
-            synchro.await(1, TimeUnit.MINUTES);
+            synchro.await(1L, TimeUnit.MINUTES);
             assertThat(TestSender.getAllSpans().size(), equalTo(3));
             assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Get Books"));
             assertThat(TestSender.getAllSpans().get(0).getReferences(), not(empty()));
@@ -398,13 +381,13 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Processing books"));
     }
 
-    protected WebClient createWebClient(final String url, final Object ... providers) {
+    private static WebClient createWebClient(final String path, final Object ... providers) {
         return WebClient
-            .create("http://localhost:" + PORT + url, Arrays.asList(providers))
+            .create("http://localhost:" + PORT + path, Arrays.asList(providers))
             .accept(MediaType.APPLICATION_JSON);
     }
 
-    protected WebClient withTrace(final WebClient client, final JaegerSpanContext spanContext) {
+    private WebClient withTrace(final WebClient client, final JaegerSpanContext spanContext) {
         tracer.inject(spanContext, Builtin.HTTP_HEADERS, new TextMap() {
 
             @Override
@@ -423,14 +406,15 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
 
     private<T> T get(final Future<T> future) {
         try {
-            return future.get(1L, TimeUnit.HOURS);
+            return future.get(1L, TimeUnit.MINUTES);
         } catch (InterruptedException | TimeoutException | ExecutionException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    private JaegerSpanContext fromRandom() {
-        return new JaegerSpanContext(random.nextLong() /* traceId hi */, random.nextLong() /* traceId lo */, 
-            random.nextLong() /* spanId */, random.nextLong() /* parentId */, (byte)1 /* sampled */);
+    private static JaegerSpanContext fromRandom() {
+        return new JaegerSpanContext(RANDOM.getAndIncrement() /* traceId hi */,
+            RANDOM.getAndIncrement() /* traceId lo */, RANDOM.getAndIncrement() /* spanId */,
+            RANDOM.getAndIncrement() /* parentId */, (byte) 1 /* sampled */);
     }
 }

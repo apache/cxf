@@ -20,13 +20,11 @@ package org.apache.cxf.systest.jaxrs.tracing.brave;
 
 import java.net.MalformedURLException;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.IntStream;
 
 import javax.ws.rs.core.MediaType;
@@ -46,16 +44,15 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systest.brave.BraveTestSupport.SpanId;
 import org.apache.cxf.systest.brave.TestSpanReporter;
 import org.apache.cxf.systest.jaxrs.tracing.BookStore;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractTestServerBase;
 import org.apache.cxf.tracing.brave.TraceScope;
 import org.apache.cxf.tracing.brave.jaxrs.BraveClientProvider;
 import org.apache.cxf.tracing.brave.jaxrs.BraveFeature;
 import org.awaitility.Duration;
 
-import org.junit.Before;
+import org.junit.After;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.apache.cxf.systest.brave.BraveTestSupport.PARENT_SPAN_ID_NAME;
@@ -74,20 +71,24 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class BraveTracingTest extends AbstractBusClientServerTestBase {
+public class BraveTracingTest extends AbstractClientServerTestBase {
     public static final String PORT = allocatePort(BraveTracingTest.class);
 
-    private Tracing brave;
-    private BraveClientProvider braveClientProvider;
-    private Random random;
+    private static final AtomicLong RANDOM = new AtomicLong();
 
-    @Ignore
-    public static class Server extends AbstractBusTestServerBase {
+    private final Tracing brave = Tracing.newBuilder()
+        .spanReporter(new TestSpanReporter())
+        .build();
+
+    public static class BraveServer extends AbstractTestServerBase {
+
+        private org.apache.cxf.endpoint.Server server;
+
+        @Override
         protected void run() {
             final Tracing brave = Tracing
                     .newBuilder()
                     .spanReporter(new TestSpanReporter())
-                    .sampler(Sampler.ALWAYS_SAMPLE)
                     .build();
 
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
@@ -96,7 +97,12 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
             sf.setAddress("http://localhost:" + PORT);
             sf.setProvider(new JacksonJsonProvider());
             sf.setProvider(new BraveFeature(brave));
-            sf.create();
+            server = sf.create();
+        }
+
+        @Override
+        public void tearDown() throws Exception {
+            server.destroy();
         }
     }
 
@@ -104,22 +110,12 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
-        createStaticBus();
+        assertTrue("server did not launch correctly", launchServer(BraveServer.class, true));
     }
 
-    @Before
-    public void setUp() {
+    @After
+    public void tearDown() {
         TestSpanReporter.clear();
-
-        brave = Tracing
-                .newBuilder()
-                .spanReporter(new TestSpanReporter())
-                .sampler(Sampler.ALWAYS_SAMPLE)
-                .build();
-
-        braveClientProvider = new BraveClientProvider(brave);
-        random = new Random();
     }
 
     @Test
@@ -181,7 +177,7 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testThatNewChildSpanIsCreatedWhenParentIsProvided() {
-        final Response r = createWebClient("/bookstore/books", braveClientProvider).get();
+        final Response r = createWebClient("/bookstore/books", new BraveClientProvider(brave)).get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(3));
@@ -233,7 +229,7 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testThatNewSpanIsCreatedWhenNotProvidedUsingAsyncClient() throws Exception {
-        final WebClient client = createWebClient("/bookstore/books", braveClientProvider);
+        final WebClient client = createWebClient("/bookstore/books", new BraveClientProvider(brave));
         final Future<Response> f = client.async().get();
 
         final Response r = f.get(1, TimeUnit.SECONDS);
@@ -249,22 +245,20 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testThatNewSpansAreCreatedWhenNotProvidedUsingMultipleAsyncClients() throws Exception {
-        final WebClient client = createWebClient("/bookstore/books", braveClientProvider);
+        final WebClient client = createWebClient("/bookstore/books", new BraveClientProvider(brave));
 
         // The intention is to make a calls one after another, not in parallel, to ensure the
         // thread have trace contexts cleared out.
-        final Collection<Response> responses = IntStream
+        IntStream
             .range(0, 4)
             .mapToObj(index -> client.async().get())
             .map(this::get)
-            .collect(Collectors.toList());
+            .forEach(r -> {
+                assertEquals(Status.OK.getStatusCode(), r.getStatus());
+                assertThatTraceHeadersArePresent(r, false);
+            });
 
-        for (final Response r: responses) {
-            assertEquals(Status.OK.getStatusCode(), r.getStatus());
-            assertThatTraceHeadersArePresent(r, false);
-        }
-
-        assertThat(TestSpanReporter.getAllSpans().size(), equalTo(12));
+        assertThat(TestSpanReporter.getAllSpans().toString(), TestSpanReporter.getAllSpans().size(), equalTo(12));
 
         IntStream
             .range(0, 4)
@@ -281,19 +275,17 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testThatNewSpansAreCreatedWhenNotProvidedUsingMultipleClients() throws Exception {
-        final WebClient client = createWebClient("/bookstore/books", braveClientProvider);
+        final WebClient client = createWebClient("/bookstore/books", new BraveClientProvider(brave));
 
         // The intention is to make a calls one after another, not in parallel, to ensure the
         // thread have trace contexts cleared out.
-        final Collection<Response> responses = IntStream
+        IntStream
             .range(0, 4)
             .mapToObj(index -> client.get())
-            .collect(Collectors.toList());
-
-        for (final Response r: responses) {
-            assertEquals(Status.OK.getStatusCode(), r.getStatus());
-            assertThatTraceHeadersArePresent(r, false);
-        }
+            .forEach(r -> {
+                assertEquals(Status.OK.getStatusCode(), r.getStatus());
+                assertThatTraceHeadersArePresent(r, false);
+            });
 
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(12));
 
@@ -312,22 +304,20 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testThatProvidedSpanIsNotClosedWhenActive() throws MalformedURLException {
-        final WebClient client = createWebClient("/bookstore/books", braveClientProvider);
+        final WebClient client = createWebClient("/bookstore/books", new BraveClientProvider(brave));
         final Span span = brave.tracer().nextSpan().name("test span").start();
 
-        try {
-            try (SpanInScope scope = brave.tracer().withSpanInScope(span)) {
-                final Response r = client.get();
-                assertEquals(Status.OK.getStatusCode(), r.getStatus());
+        try (SpanInScope scope = brave.tracer().withSpanInScope(span)) {
+            final Response r = client.get();
+            assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
-                assertThat(TestSpanReporter.getAllSpans().size(), equalTo(3));
-                assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get books"));
-                assertThat(TestSpanReporter.getAllSpans().get(0).parentId(), not(nullValue()));
-                assertThat(TestSpanReporter.getAllSpans().get(1).name(), equalTo("get /bookstore/books"));
-                assertThat(TestSpanReporter.getAllSpans().get(2).name(), equalTo("get " + client.getCurrentURI()));
+            assertThat(TestSpanReporter.getAllSpans().size(), equalTo(3));
+            assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get books"));
+            assertThat(TestSpanReporter.getAllSpans().get(0).parentId(), not(nullValue()));
+            assertThat(TestSpanReporter.getAllSpans().get(1).name(), equalTo("get /bookstore/books"));
+            assertThat(TestSpanReporter.getAllSpans().get(2).name(), equalTo("get " + client.getCurrentURI()));
 
-                assertThatTraceHeadersArePresent(r, true);
-            }
+            assertThatTraceHeadersArePresent(r, true);
         } finally {
             span.finish();
         }
@@ -341,24 +331,22 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testThatProvidedSpanIsNotDetachedWhenActiveUsingAsyncClient() throws Exception {
-        final WebClient client = createWebClient("/bookstore/books", braveClientProvider);
+        final WebClient client = createWebClient("/bookstore/books", new BraveClientProvider(brave));
         final Span span = brave.tracer().nextSpan().name("test span").start();
 
-        try {
-            try (SpanInScope scope = brave.tracer().withSpanInScope(span)) {
-                final Future<Response> f = client.async().get();
+        try (SpanInScope scope = brave.tracer().withSpanInScope(span)) {
+            final Future<Response> f = client.async().get();
 
-                final Response r = f.get(1, TimeUnit.SECONDS);
-                assertEquals(Status.OK.getStatusCode(), r.getStatus());
-                assertThat(brave.tracer().currentSpan().context().spanId(), equalTo(span.context().spanId()));
+            final Response r = f.get(1, TimeUnit.SECONDS);
+            assertEquals(Status.OK.getStatusCode(), r.getStatus());
+            assertThat(brave.tracer().currentSpan().context().spanId(), equalTo(span.context().spanId()));
 
-                assertThat(TestSpanReporter.getAllSpans().size(), equalTo(3));
-                assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get books"));
-                assertThat(TestSpanReporter.getAllSpans().get(1).name(), equalTo("get /bookstore/books"));
-                assertThat(TestSpanReporter.getAllSpans().get(2).name(), equalTo("get " + client.getCurrentURI()));
+            assertThat(TestSpanReporter.getAllSpans().size(), equalTo(3));
+            assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get books"));
+            assertThat(TestSpanReporter.getAllSpans().get(1).name(), equalTo("get /bookstore/books"));
+            assertThat(TestSpanReporter.getAllSpans().get(2).name(), equalTo("get " + client.getCurrentURI()));
 
-                assertThatTraceHeadersArePresent(r, true);
-            }
+            assertThatTraceHeadersArePresent(r, true);
         } finally {
             span.finish();
         }
@@ -399,13 +387,13 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
         assertThatTraceHeadersArePresent(r, false);
     }
 
-    protected WebClient createWebClient(final String url, final Object ... providers) {
+    private static WebClient createWebClient(final String path, final Object ... providers) {
         return WebClient
-            .create("http://localhost:" + PORT + url, Arrays.asList(providers))
+            .create("http://localhost:" + PORT + path, Arrays.asList(providers))
             .accept(MediaType.APPLICATION_JSON);
     }
 
-    protected WebClient withTrace(final WebClient client, final SpanId spanId) {
+    private static WebClient withTrace(final WebClient client, final SpanId spanId) {
         return client
             .header(SPAN_ID_NAME, spanId.spanId())
             .header(TRACE_ID_NAME, spanId.traceId())
@@ -413,42 +401,38 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
             .header(PARENT_SPAN_ID_NAME, spanId.parentId());
     }
 
-    private void assertThatTraceIsPresent(final Response r, final SpanId spanId) {
-        assertThat((String)r.getHeaders().getFirst(SPAN_ID_NAME),
-            equalTo(Long.toString(spanId.spanId())));
-        assertThat((String)r.getHeaders().getFirst(TRACE_ID_NAME),
-            equalTo(Long.toString(spanId.traceId())));
-        assertThat((String)r.getHeaders().getFirst(SAMPLED_NAME),
-            equalTo(Boolean.toString(spanId.sampled())));
-        assertThat((String)r.getHeaders().getFirst(PARENT_SPAN_ID_NAME),
-            equalTo(Long.toString(spanId.parentId())));
+    private static void assertThatTraceIsPresent(final Response r, final SpanId spanId) {
+        assertEquals(spanId.spanId(),
+            Long.parseLong(r.getHeaders().getFirst(SPAN_ID_NAME).toString()));
+        assertEquals(spanId.traceId(),
+            Long.parseLong(r.getHeaders().getFirst(TRACE_ID_NAME).toString()));
+        assertEquals(spanId.sampled(),
+            Boolean.parseBoolean(r.getHeaders().getFirst(SAMPLED_NAME).toString()));
+        assertEquals(spanId.parentId(),
+            Long.valueOf(r.getHeaders().getFirst(PARENT_SPAN_ID_NAME).toString()));
     }
 
-    private void assertThatTraceHeadersArePresent(final Response r, final boolean expectParent) {
+    private static void assertThatTraceHeadersArePresent(final Response r, final boolean expectParent) {
         assertTrue(r.getHeaders().containsKey(SPAN_ID_NAME));
         assertTrue(r.getHeaders().containsKey(TRACE_ID_NAME));
         assertTrue(r.getHeaders().containsKey(SAMPLED_NAME));
 
-        if (expectParent) {
-            assertTrue(r.getHeaders().containsKey(PARENT_SPAN_ID_NAME));
-        } else {
-            assertFalse(r.getHeaders().containsKey(PARENT_SPAN_ID_NAME));
-        }
+        assertEquals(expectParent, r.getHeaders().containsKey(PARENT_SPAN_ID_NAME));
     }
 
     private<T> T get(final Future<T> future) {
         try {
-            return future.get(1, TimeUnit.HOURS);
+            return future.get(1L, TimeUnit.MINUTES);
         } catch (InterruptedException | TimeoutException | ExecutionException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    private SpanId fromRandom() {
+    private static SpanId fromRandom() {
         return new SpanId()
-            .traceId(random.nextLong())
-            .parentId(random.nextLong())
-            .spanId(random.nextLong())
+            .traceId(RANDOM.getAndIncrement())
+            .parentId(RANDOM.getAndIncrement())
+            .spanId(RANDOM.getAndIncrement())
             .sampled(true);
     }
 }
