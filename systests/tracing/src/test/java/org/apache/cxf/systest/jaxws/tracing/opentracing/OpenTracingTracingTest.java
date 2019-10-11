@@ -34,7 +34,6 @@ import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.systest.jaeger.TestSender;
 import org.apache.cxf.systest.jaxws.tracing.BookStoreService;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractTestServerBase;
@@ -43,13 +42,10 @@ import org.apache.cxf.tracing.opentracing.OpenTracingFeature;
 import org.apache.cxf.tracing.opentracing.internal.TextMapInjectAdapter;
 import org.awaitility.Duration;
 
-import io.jaegertracing.Configuration;
-import io.jaegertracing.Configuration.ReporterConfiguration;
-import io.jaegertracing.Configuration.SamplerConfiguration;
-import io.jaegertracing.Configuration.SenderConfiguration;
 import io.jaegertracing.internal.JaegerSpanContext;
+import io.jaegertracing.internal.JaegerTracer;
+import io.jaegertracing.internal.reporters.InMemoryReporter;
 import io.jaegertracing.internal.samplers.ConstSampler;
-import io.jaegertracing.spi.Sender;
 import io.opentracing.Scope;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
@@ -75,17 +71,12 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
 
     private static final AtomicLong RANDOM = new AtomicLong();
 
-    private final Tracer tracer = new Configuration("tracer")
-        .withSampler(new SamplerConfiguration().withType(ConstSampler.TYPE).withParam(1))
-        .withReporter(new ReporterConfiguration().withSender(
-            new SenderConfiguration() {
-                @Override
-                public Sender getSender() {
-                    return new TestSender();
-                }
-            }
-        ))
-        .getTracer();
+    private static final InMemoryReporter REPORTER = new InMemoryReporter();
+
+    private final Tracer tracer = new JaegerTracer.Builder("tracer-jaxws")
+        .withSampler(new ConstSampler(true))
+        .withReporter(REPORTER)
+        .build();
 
     public static class BraveServer extends AbstractTestServerBase {
 
@@ -93,17 +84,10 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
 
         @Override
         protected void run() {
-            final Tracer tracer = new Configuration("book-store")
-                .withSampler(new SamplerConfiguration().withType(ConstSampler.TYPE).withParam(1))
-                .withReporter(new ReporterConfiguration().withSender(
-                    new SenderConfiguration() {
-                        @Override
-                        public Sender getSender() {
-                            return new TestSender();
-                        }
-                    }
-                ))
-                .getTracer();
+            final Tracer tracer = new JaegerTracer.Builder("tracer-jaxws")
+                .withSampler(new ConstSampler(true))
+                .withReporter(REPORTER)
+                .build();
             GlobalTracer.registerIfAbsent(tracer);
 
             final JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
@@ -128,7 +112,7 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
 
     @After
     public void tearDown() {
-        TestSender.clear();
+        REPORTER.clear();
     }
 
     @Test
@@ -136,9 +120,9 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
         final BookStoreService service = createJaxWsService();
         assertThat(service.getBooks().size(), equalTo(2));
 
-        assertThat(TestSender.getAllSpans().size(), equalTo(2));
-        assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Get Books"));
-        assertThat(TestSender.getAllSpans().get(1).getOperationName(), equalTo("POST /BookStore"));
+        assertThat(REPORTER.getSpans().size(), equalTo(2));
+        assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("Get Books"));
+        assertThat(REPORTER.getSpans().get(1).getOperationName(), equalTo("POST /BookStore"));
     }
 
     @Test
@@ -151,9 +135,9 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
         final BookStoreService service = createJaxWsService(headers);
         assertThat(service.getBooks().size(), equalTo(2));
 
-        assertThat(TestSender.getAllSpans().size(), equalTo(2));
-        assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Get Books"));
-        assertThat(TestSender.getAllSpans().get(1).getOperationName(), equalTo("POST /BookStore"));
+        assertThat(REPORTER.getSpans().size(), equalTo(2));
+        assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("Get Books"));
+        assertThat(REPORTER.getSpans().get(1).getOperationName(), equalTo("POST /BookStore"));
     }
 
     @Test
@@ -161,11 +145,11 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
         final BookStoreService service = createJaxWsService(new OpenTracingClientFeature(tracer));
         assertThat(service.getBooks().size(), equalTo(2));
 
-        assertThat(TestSender.getAllSpans().size(), equalTo(3));
-        assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Get Books"));
-        assertThat(TestSender.getAllSpans().get(0).getReferences(), not(empty()));
-        assertThat(TestSender.getAllSpans().get(1).getOperationName(), equalTo("POST /BookStore"));
-        assertThat(TestSender.getAllSpans().get(2).getOperationName(),
+        assertThat(REPORTER.getSpans().size(), equalTo(3));
+        assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("Get Books"));
+        assertThat(REPORTER.getSpans().get(0).getReferences(), not(empty()));
+        assertThat(REPORTER.getSpans().get(1).getOperationName(), equalTo("POST /BookStore"));
+        assertThat(REPORTER.getSpans().get(2).getOperationName(),
             equalTo("POST http://localhost:" + PORT + "/BookStore"));
     }
 
@@ -178,24 +162,24 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
             assertThat(service.getBooks().size(), equalTo(2));
             assertThat(tracer.activeSpan(), not(nullValue()));
 
-            assertThat(TestSender.getAllSpans().size(), equalTo(3));
-            assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Get Books"));
-            assertThat(TestSender.getAllSpans().get(0).getReferences(), not(empty()));
-            assertThat(TestSender.getAllSpans().get(1).getOperationName(), equalTo("POST /BookStore"));
-            assertThat(TestSender.getAllSpans().get(1).getReferences(), not(empty()));
-            assertThat(TestSender.getAllSpans().get(2).getOperationName(),
+            assertThat(REPORTER.getSpans().size(), equalTo(3));
+            assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("Get Books"));
+            assertThat(REPORTER.getSpans().get(0).getReferences(), not(empty()));
+            assertThat(REPORTER.getSpans().get(1).getOperationName(), equalTo("POST /BookStore"));
+            assertThat(REPORTER.getSpans().get(1).getReferences(), not(empty()));
+            assertThat(REPORTER.getSpans().get(2).getOperationName(),
                 equalTo("POST http://localhost:" + PORT + "/BookStore"));
-            assertThat(TestSender.getAllSpans().get(2).getReferences(), not(empty()));
+            assertThat(REPORTER.getSpans().get(2).getReferences(), not(empty()));
         } finally {
             span.finish();
         }
 
         // Await till flush happens, usually every second
-        await().atMost(Duration.ONE_SECOND).until(()-> TestSender.getAllSpans().size() == 4);
+        await().atMost(Duration.ONE_SECOND).until(()-> REPORTER.getSpans().size() == 4);
 
-        assertThat(TestSender.getAllSpans().size(), equalTo(4));
-        assertThat(TestSender.getAllSpans().get(3).getOperationName(), equalTo("test span"));
-        assertThat(TestSender.getAllSpans().get(3).getReferences(), empty());
+        assertThat(REPORTER.getSpans().size(), equalTo(4));
+        assertThat(REPORTER.getSpans().get(3).getOperationName(), equalTo("test span"));
+        assertThat(REPORTER.getSpans().get(3).getReferences(), empty());
     }
 
     @Test
@@ -209,8 +193,8 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
             /* expected exception */
         }
 
-        assertThat(TestSender.getAllSpans().size(), equalTo(1));
-        assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("POST /BookStore"));
+        assertThat(REPORTER.getSpans().size(), equalTo(1));
+        assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("POST /BookStore"));
     }
 
     @Test
@@ -224,9 +208,9 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
             /* expected exception */
         }
 
-        assertThat(TestSender.getAllSpans().size(), equalTo(2));
-        assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("POST /BookStore"));
-        assertThat(TestSender.getAllSpans().get(1).getOperationName(),
+        assertThat(REPORTER.getSpans().size(), equalTo(2));
+        assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("POST /BookStore"));
+        assertThat(REPORTER.getSpans().get(1).getOperationName(),
             equalTo("POST http://localhost:" + PORT + "/BookStore"));
     }
 
