@@ -16,23 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.metrics.interceptors;
 
-import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.metrics.MetricsProvider;
-import org.apache.cxf.phase.Phase;
+package org.apache.cxf.systest.jaxrs.metrics;
 
-public class MetricsMessageInPostInvokeInterceptor extends AbstractMetricsInterceptor {
-
-    public MetricsMessageInPostInvokeInterceptor(MetricsProvider[] p) {
-        super(Phase.POST_INVOKE, p);
+public class Book {
+    private int id;
+    private String name;
+    
+    public Book() {
     }
 
-    public void handleMessage(Message message) throws Fault {
-        if (isRequestor(message) && !MessageUtils.isOutbound(message)) {
-            stop(message);
-        }
+    public Book(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
+    
+    public void setId(int id) {
+        this.id = id;
+    }
+    
+    public String getName() {
+        return name;
+    }
+    
+    public void setName(String name) {
+        this.name = name;
     }
 }
