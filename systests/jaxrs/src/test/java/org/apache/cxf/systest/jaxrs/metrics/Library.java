@@ -16,23 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.metrics.interceptors;
 
-import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.metrics.MetricsProvider;
-import org.apache.cxf.phase.Phase;
+package org.apache.cxf.systest.jaxrs.metrics;
 
-public class MetricsMessageInPostInvokeInterceptor extends AbstractMetricsInterceptor {
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
-    public MetricsMessageInPostInvokeInterceptor(MetricsProvider p[]) {
-        super(Phase.POST_INVOKE, p);
-    }
-
-    public void handleMessage(Message message) throws Fault {
-        if (isRequestor(message) && !MessageUtils.isOutbound(message)) {
-            stop(message);
-        }
-    }
+@Path("/")
+public interface Library {
+    @GET
+    @Path("books/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    Book getBook(@PathParam("id") int id);
 }

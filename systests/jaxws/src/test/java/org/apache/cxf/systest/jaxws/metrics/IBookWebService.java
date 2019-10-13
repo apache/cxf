@@ -16,23 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.metrics.interceptors;
 
-import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.metrics.MetricsProvider;
-import org.apache.cxf.phase.Phase;
+package org.apache.cxf.systest.jaxws.metrics;
 
-public class MetricsMessageInPostInvokeInterceptor extends AbstractMetricsInterceptor {
+import javax.jws.WebMethod;
+import javax.jws.WebService;
 
-    public MetricsMessageInPostInvokeInterceptor(MetricsProvider p[]) {
-        super(Phase.POST_INVOKE, p);
-    }
-
-    public void handleMessage(Message message) throws Fault {
-        if (isRequestor(message) && !MessageUtils.isOutbound(message)) {
-            stop(message);
-        }
-    }
+@WebService
+public interface IBookWebService {
+    @WebMethod
+    String getBook(int id);
 }
