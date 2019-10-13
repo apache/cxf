@@ -344,6 +344,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-features-metrics</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>jsr250-api</artifactId>
             <version>${cxf.jsr250.api.version}</version>
@@ -543,6 +549,25 @@
             <version>${cxf.ehcache3.version}</version>
             <scope>test</scope>
        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${cxf.mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.tomakehurst</groupId>
+            <artifactId>wiremock</artifactId>
+            <version>${cxf.wiremock.version}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.xmlunit</groupId>
+                    <artifactId>xmlunit-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        
     </dependencies>
     <build>
         <plugins>
