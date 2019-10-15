@@ -207,7 +207,7 @@ public class JMSEndpoint {
 
     public String getRequestURI() {
         StringBuilder requestUri = new StringBuilder("jms:");
-        if (jmsVariant == JNDI_TOPIC) {
+        if (JNDI_TOPIC.equals(jmsVariant)) {
             requestUri.append("jndi");
         } else {
             requestUri.append(jmsVariant);
