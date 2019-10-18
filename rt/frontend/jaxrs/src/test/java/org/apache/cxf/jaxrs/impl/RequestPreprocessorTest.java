@@ -56,6 +56,13 @@ public class RequestPreprocessorTest extends Assert {
     public void testMethodQuery() {
         Message m = mockMessage("http://localhost:8080", "/bar", "_method=GET", "POST");
         RequestPreprocessor sqh = new RequestPreprocessor();
+
+        // By default it should ignore _method
+        sqh.preprocess(m, new UriInfoImpl(m, null));
+        assertEquals("POST", m.get(Message.HTTP_REQUEST_METHOD));
+
+        // Now allow HTTP method overriding
+        m.put("org.apache.cxf.jaxrs.allow.http.method.override", true);
         sqh.preprocess(m, new UriInfoImpl(m, null));
         assertEquals("GET", m.get(Message.HTTP_REQUEST_METHOD));
     }
@@ -64,6 +71,13 @@ public class RequestPreprocessorTest extends Assert {
     public void testMethodOverride() {
         Message m = mockMessage("http://localhost:8080", "/bar", "bar", "POST", "GET");
         RequestPreprocessor sqh = new RequestPreprocessor();
+
+        // By default it should ignore the HTTP header
+        sqh.preprocess(m, new UriInfoImpl(m, null));
+        assertEquals("POST", m.get(Message.HTTP_REQUEST_METHOD));
+
+        // Now allow HTTP method overriding
+        m.put("org.apache.cxf.jaxrs.allow.http.method.override", true);
         sqh.preprocess(m, new UriInfoImpl(m, null));
         assertEquals("GET", m.get(Message.HTTP_REQUEST_METHOD));
     }

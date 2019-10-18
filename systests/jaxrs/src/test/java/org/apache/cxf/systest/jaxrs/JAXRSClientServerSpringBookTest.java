@@ -761,15 +761,8 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     }
 
     private void getBookAegis(String endpointAddress, String type) throws Exception {
-        getBookAegis(endpointAddress, type, null);
-    }
-
-    private void getBookAegis(String endpointAddress, String type, String mHeader) throws Exception {
         WebClient client = WebClient.create(endpointAddress,
             Collections.singletonList(new AegisElementProvider<Object>()));
-        if (mHeader != null) {
-            client = client.header("X-HTTP-Method-Override", mHeader);
-        }
         Book book = client.accept(type).get(Book.class);
 
         assertEquals(124L, book.getId());
@@ -833,22 +826,6 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         String endpointAddress =
             "http://localhost:" + PORT + "/the/thebooks4/bookstore/books/aegis";
         getBookAegis(endpointAddress, "application/xml");
-    }
-
-    @Test
-    public void testRetrieveBookAegis1() throws Exception {
-
-        String endpointAddress =
-            "http://localhost:" + PORT + "/the/thebooks4/bookstore/books/aegis/retrieve?_method=RETRIEVE";
-        getBookAegis(endpointAddress, "application/xml");
-    }
-
-    @Test
-    public void testRetrieveBookAegis2() throws Exception {
-
-        String endpointAddress =
-            "http://localhost:" + PORT + "/the/thebooks4/bookstore/books/aegis/retrieve";
-        getBookAegis(endpointAddress, "application/xml", "RETRIEVE");
     }
 
     @Test

@@ -33,8 +33,15 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 
 public class RequestPreprocessor {
+
+    /**
+     * Whether to allow the client to override the HTTP method via either METHOD_QUERY or METHOD_HEADER.
+     * The default is false.
+     */
+    private static final String ALLOW_HTTP_METHOD_OVERRIDE = "org.apache.cxf.jaxrs.allow.http.method.override";
 
     private static final String ACCEPT_QUERY = "_type";
     private static final String CTYPE_QUERY = "_ctype";
@@ -156,15 +163,17 @@ public class RequestPreprocessor {
     private void handleMethod(Message m,
                               MultivaluedMap<String, String> queries,
                               HttpHeaders headers) {
-        String method = queries.getFirst(METHOD_QUERY);
-        if (method == null) {
-            List<String> list = headers.getRequestHeader(METHOD_HEADER);
-            if (list != null && list.size() == 1) {
-                method = list.get(0);
+        if (MessageUtils.getContextualBoolean(m, ALLOW_HTTP_METHOD_OVERRIDE, false)) {
+            String method = queries.getFirst(METHOD_QUERY);
+            if (method == null) {
+                List<String> list = headers.getRequestHeader(METHOD_HEADER);
+                if (list != null && list.size() == 1) {
+                    method = list.get(0);
+                }
             }
-        }
-        if (method != null) {
-            m.put(Message.HTTP_REQUEST_METHOD, method);
+            if (method != null) {
+                m.put(Message.HTTP_REQUEST_METHOD, method);
+            }
         }
     }
 
