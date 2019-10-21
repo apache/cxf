@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>3.3.4</version>
+        <version>3.3.5-SNAPSHOT</version>
         <relativePath>../../..</relativePath>
     </parent>
     <artifactId>spring-boot-sample-rs-scan-app</artifactId>

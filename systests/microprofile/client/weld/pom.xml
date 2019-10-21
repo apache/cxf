@@ -22,7 +22,7 @@
     <parent>
         <artifactId>cxf-microprofile-tck</artifactId>
         <groupId>org.apache.cxf.systests</groupId>
-        <version>3.3.4</version>
+        <version>3.3.5-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     

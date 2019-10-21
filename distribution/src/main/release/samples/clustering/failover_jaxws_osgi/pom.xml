@@ -26,7 +26,7 @@ under the License.
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>3.3.4</version>
+        <version>3.3.5-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
 
@@ -59,19 +59,19 @@ under the License.
     	<dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-client</artifactId>
-            <version>3.3.4</version>
+            <version>3.3.5-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf.samples</groupId>
             <artifactId>failover_server</artifactId>
-            <version>3.3.4</version>
+            <version>3.3.5-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-features-clustering</artifactId>
-            <version>3.3.4</version>
+            <version>3.3.5-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
