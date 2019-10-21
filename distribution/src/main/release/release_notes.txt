@@ -1,4 +1,4 @@
-Apache CXF 3.3.3 Release Notes
+Apache CXF 3.3.4 Release Notes
 
 1. Overview
 
@@ -23,7 +23,7 @@ http://cxf.apache.org/docs/33-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
-3.3.3 fixes over 30 JIRA issues reported by users and the community.
+3.3.4 fixes over 20 JIRA issues reported by users and the community.
 
 
 
@@ -67,40 +67,32 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-* [CXF-8032] - Adding LoggingFeature enables chunking response
-* [CXF-8041] - Error resolving relative XSD Schema on Tomcat
-* [CXF-8042] - doPrivileged block doesn't totally work in ProxyClassLoaderCache
-* [CXF-8043] - XKMS LdapCertificateRepo searching using DN doesn't work
-* [CXF-8044] - Setting compiler-fork to true is causing problems with Dynamic client
-* [CXF-8046] - Resource Listing in CXF 3.3.x does not recognize OpenAPI endpoints
-* [CXF-8049] - org.apache.cxf.common.util.Compiler fails to compile if a classpath entry contains spaces
-* [CXF-8051] - Request gets corrupted when calling a stateful streamed secure conversation
-* [CXF-8052] - Cannot set JAXB schema compiler options
-* [CXF-8055] - AsyncHTTPConduit should also consider jaxws spec timeout properties
-* [CXF-8059] - @FormParam inside @BeanParam not working
-* [CXF-8060] - Automatic ssl configuration using javax.net.ssl.. broken
-* [CXF-8062] - MessageContext.HTTP_RESPONSE_CODE cannot be obtained if response code is not 4xx
-* [CXF-8071] - XKMS LdapCertificateRepo searching using Service UID doesn't work
-* [CXF-8072] - Loggers logs request twice in case of Fault (CXF-7518 again)
-* [CXF-8073] - oauth2.provider.OAuthServiceException error message doesn't includes "error" field
-* [CXF-8077] - WSS4JInInterceptor is not thread safe
-* [CXF-8080] - MP Rest Client CompletionStages from async methods are never completed
-* [CXF-8088] - ensure jaxrs endpoint can work correctly when using a shared bus exposed from another bundle
+    * [CXF-8025] - wsdl2java using wrapper style cannot handle multiple levels of xsd:extension elements
+    * [CXF-8089] - Build Comma Separated Values in url from Array/List Query Param
+    * [CXF-8090] - Warnings when using cxf-codegen-plugin
+    * [CXF-8095] - When the workqueue is full for more than asyncExecuteTimeout milliseconds the work is never added
+    * [CXF-8101] - Build fails behind maven proxy repository
+    * [CXF-8108] - Strip file path from Content-Disposition filename
+    * [CXF-8118] - CXF LoggingInInterceptor: CachedWriter leaks
+    * [CXF-8123] - FIQL parser throws a StringIndexOutOfBoundsException on a wildcard character
+    * [CXF-8124] - CXF metrics - MetricsContext#stop called twice or without Fault in certain error cases
+    * [CXF-8127] - LoggingFeature - Wrong address concatenation
+    * [CXF-8128] - Fill address field in case of responses
 
 ** Improvement
-* [CXF-7966] - Beanspector throws IllegalArgumentException when dealing with overridden methods
-* [CXF-8021] - Upgrade to OpenTracing 0.33
-* [CXF-8045] - Disable HTTP TRACE method on CXF http-undertow transport
-* [CXF-8056] - Update to latest Brave 5.6.5
-* [CXF-8063] - Support lower logging level in Slf4jEventSender
-* [CXF-8064] - OpenApiFeature(OpenAPI V3) should be able to work with camel-cxfrs endpoint
-* [CXF-8066] - Support Doclet API (JDK13+)
-* [CXF-8068] - Log any error in the SAML SSO component under warning
-* [CXF-8076] - Check for recursive calls when invoking on an STS using its own IssuedToken policy
-* [CXF-8083] - ensure java2swagger-plugin|java2ws-plugin m2e compatible
+    * [CXF-8094] - Add a way to register additional classes in WadlGenerator
+    * [CXF-8105] - introduce a property for JMS transport client to decide reset JMS connection or not when client timeout
+    * [CXF-8125] - Support for using thread-safe application-defined StAX-factories
+    * [CXF-8133] - Disable JAX-RS HTTP method overriding by default
 
 ** Test
-* [CXF-8081] - should cache reactor OutputStream
+    * [CXF-8086] - Override test fixture of super tests may lead to flaky test
+    * [CXF-8087] - unstable test environment caused by accessing system property without cleanup
+    * [CXF-8092] - duplicate test run due to test inheritance
+
+** Task
+    * [CXF-8106] - Update to Swagger Core 1.5.23 and 2.0.9
+    * [CXF-8107] - Update to Swagger Core 2.0.10/1.5.24 and SwaggerUI 3.24.0
 
 
 
