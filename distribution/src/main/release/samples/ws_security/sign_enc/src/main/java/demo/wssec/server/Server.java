@@ -56,9 +56,9 @@ public class Server {
         outProps.put("passwordCallbackClass", "demo.wssec.server.UTPasswordCallback");
 
         outProps.put("user", "Alice");
-        outProps.put("signatureUser", "serverx509v1");
+        outProps.put("signatureUser", "morpit");
 
-        outProps.put("encryptionUser", "clientx509v1");
+        outProps.put("encryptionUser", "bethal");
         outProps.put("encryptionPropFile", "etc/Server_SignVerf.properties");
         outProps.put("encryptionKeyIdentifier", "IssuerSerial");
         outProps.put("encryptionParts", "{Element}{" + WSSE_NS + "}UsernameToken;"

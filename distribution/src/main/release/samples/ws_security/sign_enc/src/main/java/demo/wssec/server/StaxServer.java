@@ -69,8 +69,8 @@ public class StaxServer {
 
         properties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
         properties.setTokenUser("Alice");
-        properties.setSignatureUser("serverx509v1");
-        properties.setEncryptionUser("clientx509v1");
+        properties.setSignatureUser("morpit");
+        properties.setEncryptionUser("bethal");
 
         properties.setEncryptionCryptoProperties(sigVerCryptoProperties);
         properties.setEncryptionKeyIdentifier(
