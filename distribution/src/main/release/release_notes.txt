@@ -1,4 +1,4 @@
-Apache CXF 3.2.10 Release Notes
+Apache CXF 3.2.11 Release Notes
 
 1. Overview
 
@@ -17,7 +17,7 @@ New features include:
 * Preliminary support for running on Java 9  (no module support yet)
 * New http-undertow transport
 
-3.2.10 fixes over 19 JIRA issues reported by users and the community since 3.2.9.
+3.2.11 fixes over 11 JIRA issues reported by users and the community since 3.2.10.
 
 
 Important notes:
@@ -70,27 +70,22 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-* [CXF-8041] - Error resolving relative XSD Schema on Tomcat
-* [CXF-8043] - XKMS LdapCertificateRepo searching using DN doesn't work
-* [CXF-8046] - Resource Listing in CXF 3.3.x does not recognize OpenAPI endpoints
-* [CXF-8049] - org.apache.cxf.common.util.Compiler fails to compile if a classpath entry contains spaces
-* [CXF-8052] - Cannot set JAXB schema compiler options
-* [CXF-8055] - AsyncHTTPConduit should also consider jaxws spec timeout properties
-* [CXF-8059] - @FormParam inside @BeanParam not working
-* [CXF-8062] - MessageContext.HTTP_RESPONSE_CODE cannot be obtained if response code is not 4xx
-* [CXF-8071] - XKMS LdapCertificateRepo searching using Service UID doesn't work
-* [CXF-8072] - Loggers logs request twice in case of Fault (CXF-7518 again)
-* [CXF-8077] - WSS4JInInterceptor is not thread safe
-* [CXF-8088] - ensure jaxrs endpoint can work correctly when using a shared bus exposed from another bundle
+    * [CXF-8089] - Build Comma Separated Values in url from Array/List Query Param
+    * [CXF-8118] - CXF LoggingInInterceptor: CachedWriter leaks
+    * [CXF-8123] - FIQL parser throws a StringIndexOutOfBoundsException on a wildcard character
+    * [CXF-8124] - CXF metrics - MetricsContext#stop called twice or without Fault in certain error cases
+    * [CXF-8127] - LoggingFeature - Wrong address concatenation
+    * [CXF-8128] - Fill address field in case of responses
 
 ** Improvement
-* [CXF-7966] - Beanspector throws IllegalArgumentException when dealing with overridden methods
-* [CXF-8045] - Disable HTTP TRACE method on CXF http-undertow transport
-* [CXF-8056] - Update to latest Brave 5.6.5
-* [CXF-8064] - OpenApiFeature(OpenAPI V3) should be able to work with camel-cxfrs endpoint
-* [CXF-8076] - Check for recursive calls when invoking on an STS using its own IssuedToken policy
-* [CXF-8083] - ensure java2swagger-plugin|java2ws-plugin m2e compatible
+    * [CXF-8094] - Add a way to register additional classes in WadlGenerator
+    * [CXF-8105] - introduce a property for JMS transport client to decide reset JMS connection or not when client timeout
+    * [CXF-8125] - Support for using thread-safe application-defined StAX-factories
+    * [CXF-8133] - Disable JAX-RS HTTP method overriding by default
 
-** Test
-* [CXF-8081] - should cache reactor OutputStream
+** Task
+    * [CXF-8107] - Update to Swagger Core 2.0.10/1.5.24 and SwaggerUI 3.24.0
+
+
+
 
