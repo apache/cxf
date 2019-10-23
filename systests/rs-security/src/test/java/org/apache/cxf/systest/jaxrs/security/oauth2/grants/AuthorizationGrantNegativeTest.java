@@ -678,6 +678,48 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
         }
     }
 
+    // Here we get a code for "consumer-id" but specify "consumer-id-aud" as the clientId in the
+    // token request (but authenticate as "consumer-id").
+    @org.junit.Test
+    public void testNonMatchingClientIdIgnored() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + port + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code
+        String code = OAuth2TestUtils.getAuthorizationCode(client);
+        assertNotNull(code);
+
+        // Now get the access token using a different client id
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                  "consumer-id", "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        client.type("application/x-www-form-urlencoded").accept("application/json");
+        client.path("token");
+
+        Form form = new Form();
+        form.param("grant_type", "authorization_code");
+        form.param("code", code);
+        form.param("client_id", "consumer-id-aud");
+
+        // Now try to get a token
+        Response response = client.post(form);
+        try {
+            response.readEntity(ClientAccessToken.class);
+            fail("Failure expected on trying to get a token");
+        } catch (ResponseProcessingException ex) {
+            //expected
+        }
+    }
+
     //
     // SAML Authorization grants
     //
