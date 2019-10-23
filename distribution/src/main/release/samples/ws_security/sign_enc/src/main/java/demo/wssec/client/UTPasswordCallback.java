@@ -38,8 +38,7 @@ public class UTPasswordCallback implements CallbackHandler {
     public UTPasswordCallback() {
         passwords.put("Alice", "ecilA");
         passwords.put("abcd", "dcba");
-        passwords.put("clientx509v1", "storepassword");
-        passwords.put("serverx509v1", "storepassword");
+        passwords.put("bethal", "password");
     }
 
     /**

@@ -62,11 +62,11 @@ public final class Client {
             outProps.put("passwordType", "PasswordDigest");
 
             outProps.put("user", "abcd");
-            outProps.put("signatureUser", "clientx509v1");
+            outProps.put("signatureUser", "bethal");
 
             outProps.put("passwordCallbackClass", "demo.wssec.client.UTPasswordCallback");
 
-            outProps.put("encryptionUser", "serverx509v1");
+            outProps.put("encryptionUser", "morpit");
             outProps.put("encryptionPropFile", "etc/Client_Encrypt.properties");
             outProps.put("encryptionKeyIdentifier", "IssuerSerial");
             outProps.put("encryptionParts",
