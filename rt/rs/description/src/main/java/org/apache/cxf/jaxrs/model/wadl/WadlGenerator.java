@@ -69,6 +69,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
@@ -217,7 +218,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         if (extraClasses != null) {
             this.extraClasses = extraClasses;
         }
-    }    
+    }
 
     @Override
     public void filter(ContainerRequestContext context) {
@@ -1299,14 +1300,29 @@ public class WadlGenerator implements ContainerRequestFilter {
         StringWriter stringWriter = new StringWriter();
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        try {
+            transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+        } catch (IllegalArgumentException ex) {
+            // ignore
+        }
+
         Transformer transformer = transformerFactory.newTransformer();
         transformer.transform(domSource, new StreamResult(stringWriter));
         return stringWriter.toString();
     }
+
     private String transformLocally(Message m, UriInfo ui, Source source) throws Exception {
         InputStream is = ResourceUtils.getResourceStream(stylesheetReference, m.getExchange().getBus());
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        try {
+            transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+        } catch (IllegalArgumentException ex) {
+            // ignore
+        }
+
         Transformer t = transformerFactory.newTemplates(new StreamSource(is)).newTransformer();
         t.setParameter("base.path", m.get("http.base.path"));
         StringWriter stringWriter = new StringWriter();
