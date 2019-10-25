@@ -205,4 +205,23 @@
             <ref bean="authzInterceptor"/>
         </jaxws:inInterceptors>
     </jaxws:endpoint>
+    
+    <bean id="simpleUTInterceptor" class="org.apache.cxf.systest.ws.wssec10.server.SimpleUsernameTokenInterceptor"/>
+    <bean id="authzInterceptor2" class="org.apache.cxf.interceptor.security.SimpleAuthorizingInterceptor">
+        <property name="methodRolesMap">
+            <map>
+                <entry key="doubleIt" value="developers"/>
+            </map>
+        </property>
+    </bean>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="PlaintextPrincipal2" address="https://localhost:${testutil.ports.ut.StaxServer}/DoubleItUTPlaintextPrincipal2" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextPrincipalPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+        <jaxws:properties>
+            <entry key="ws-security.validate.token" value="false"/>
+            <entry key="ws-security.enable.streaming" value="true"/>
+        </jaxws:properties>
+        <jaxws:inInterceptors>
+            <ref bean="simpleUTInterceptor"/>
+            <ref bean="authzInterceptor2"/>
+        </jaxws:inInterceptors>
+    </jaxws:endpoint>
 </beans>
