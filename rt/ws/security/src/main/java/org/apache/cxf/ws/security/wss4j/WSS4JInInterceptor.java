@@ -698,18 +698,16 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
      * @return      the WSSecurityEngine in use by this interceptor.
      */
     protected WSSecurityEngine getSecurityEngine(boolean utWithCallbacks) {
-        if (defaultConfig != null) {
-            WSSecurityEngine engine = new WSSecurityEngine();
-            engine.setWssConfig(defaultConfig);
-            return engine;
-        }
-
         if (!utWithCallbacks) {
             WSSConfig config = WSSConfig.getNewInstance();
             config.setValidator(WSConstants.USERNAME_TOKEN, new NoOpValidator());
             WSSecurityEngine ret = new WSSecurityEngine();
             ret.setWssConfig(config);
             return ret;
+        } else if (defaultConfig != null) {
+            WSSecurityEngine engine = new WSSecurityEngine();
+            engine.setWssConfig(defaultConfig);
+            return engine;
         }
 
         return null;

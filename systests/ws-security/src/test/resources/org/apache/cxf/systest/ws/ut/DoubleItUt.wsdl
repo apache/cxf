@@ -244,6 +244,9 @@
         <wsdl:port name="DoubleItPlaintextPrincipalPort" binding="tns:DoubleItPlaintextBinding">
             <soap:address location="https://localhost:9009/DoubleItUTPlaintextPrincipal"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItPlaintextPrincipalPort2" binding="tns:DoubleItPlaintextBinding">
+            <soap:address location="https://localhost:9009/DoubleItUTPlaintextPrincipal2"/>
+        </wsdl:port>
     </wsdl:service>
     <wsp:Policy wsu:Id="DoubleItPlaintextPolicy">
         <wsp:ExactlyOne>
