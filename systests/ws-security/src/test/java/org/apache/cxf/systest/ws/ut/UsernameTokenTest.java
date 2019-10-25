@@ -590,4 +590,44 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
+    @org.junit.Test
+    public void testPlaintextPrincipal2() throws Exception {
+        if (STAX_PORT.equals(test.getPort())) {
+            // SecurityConstants.VALIDATE_TOKEN does not apply to the streaming layer
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = UsernameTokenTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItPlaintextPrincipalPort2");
+        DoubleItPortType utPort =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, test.getPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
+        }
+
+        ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "Alice");
+        assertEquals(50, utPort.doubleIt(25));
+
+        try {
+            ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "Frank");
+            utPort.doubleIt(30);
+            fail("Failure expected on a user with the wrong role");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "Unauthorized";
+            assertTrue(ex.getMessage().contains(error));
+        }
+
+        ((java.io.Closeable)utPort).close();
+        bus.shutdown(true);
+    }
 }

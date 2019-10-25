@@ -195,6 +195,30 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.Test
+    public void testUsernameTokenNoValidation() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = ActionTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItUsernameTokenNoValPort");
+        DoubleItPortType port =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+
+        // Successful call
+        assertEquals(50, port.doubleIt(25));
+
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
     public void testEncryptedPassword() throws Exception {
 
         if (!unrestrictedPoliciesInstalled) {
