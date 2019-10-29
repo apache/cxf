@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.transport.jms.util;
 
+import java.util.Enumeration;
+
 import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.ExceptionListener;
@@ -26,6 +28,7 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
+import javax.jms.QueueBrowser;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.transaction.TransactionManager;
@@ -197,19 +200,24 @@ public class MessageListenerTest {
     }
 
     private static void assertNumMessagesInQueue(String message, Connection connection, Queue queue,
-                                          int expectedNum, long timeout) throws JMSException,
-        InterruptedException {
-        long startTime = System.currentTimeMillis();
-        int actualNum;
-        do {
-            actualNum = JMSUtil.getNumMessages(connection, queue);
+                                          int expectedNum, long timeout) throws JMSException, InterruptedException {
+        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        QueueBrowser browser = session.createBrowser(queue);
+        int actualNum = 0;
+        for (long startTime = System.currentTimeMillis(); System.currentTimeMillis() - startTime < timeout;
+            Thread.sleep(100L)) {
+            actualNum = 0;
+            for (Enumeration<?> messages = browser.getEnumeration(); messages.hasMoreElements(); actualNum++) {
+                messages.nextElement();
+            }
             if (actualNum == expectedNum) {
                 break;
             }
             //System.out.println("Messages in queue " + queue.getQueueName() + ": " + actualNum
             //                   + ", expecting: " + expectedNum);
-            Thread.sleep(100L);
-        } while ((System.currentTimeMillis() - startTime < timeout) && expectedNum != actualNum);
+        }
+        browser.close();
+        session.close();
         assertEquals(message + " -> number of messages on queue", expectedNum, actualNum);
     }
 
