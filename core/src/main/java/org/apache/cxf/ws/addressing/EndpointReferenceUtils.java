@@ -42,7 +42,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
@@ -50,7 +49,6 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.ls.LSInput;
@@ -60,7 +58,6 @@ import org.xml.sax.InputSource;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.xmlschema.LSInputImpl;
@@ -485,66 +482,6 @@ public final class EndpointReferenceUtils {
         }
         return wsdlLocation;
     }
-
-    /**
-     * Sets the metadata on the provided endpoint reference.
-     * @param ref the endpoint reference.
-     * @param metadata the list of metadata source.
-     */
-    public static void setMetadata(EndpointReferenceType ref, List<Source> metadata)
-        throws EndpointUtilsException {
-
-        if (null != ref) {
-            MetadataType mt = getSetMetadata(ref);
-            List<Object> anyList = mt.getAny();
-            try {
-                for (Source source : metadata) {
-                    Node node = null;
-                    boolean doTransform = true;
-                    if (source instanceof StreamSource) {
-                        StreamSource ss = (StreamSource)source;
-                        if (null == ss.getInputStream()
-                            && null == ss.getReader()) {
-                            setWSDLLocation(ref, ss.getSystemId());
-                            doTransform = false;
-                        }
-                    } else if (source instanceof DOMSource) {
-                        node = ((DOMSource)source).getNode();
-                        doTransform = false;
-                    }
-
-                    if (doTransform) {
-//                        DOMResult domResult = new DOMResult();
-//                        domResult.setSystemId(source.getSystemId());
-                        node = StaxUtils.read(source);
-
-//                        node = domResult.getNode();
-                    }
-
-                    if (null != node) {
-                        if (node instanceof Document) {
-                            try {
-                                ((Document)node).setDocumentURI(source.getSystemId());
-                            } catch (Exception ex) {
-                                //ignore - not DOM level 3
-                            }
-                            node = node.getFirstChild();
-                        }
-
-                        while (node.getNodeType() != Node.ELEMENT_NODE) {
-                            node = node.getNextSibling();
-                        }
-
-                        anyList.add(node);
-                    }
-                }
-            } catch (XMLStreamException te) {
-                throw new EndpointUtilsException(new Message("COULD_NOT_POPULATE_EPR", LOG),
-                                                 te);
-            }
-        }
-    }
-
 
     private static Schema createSchema(ServiceInfo serviceInfo, Bus b) {
         Schema schema = serviceInfo.getProperty(Schema.class.getName(), Schema.class);
