@@ -56,22 +56,19 @@ under the License.
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>swagger-ui</artifactId>
-            <version>3.23.0</version>
+            <version>3.24.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>3.4.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>3.4.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-service-description-swagger</artifactId>
-            <version>3.4.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>jakarta.ws.rs</groupId>

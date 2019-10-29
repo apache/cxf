@@ -29,7 +29,7 @@
         <version>3.4.0-SNAPSHOT</version>
     </parent>
     <properties>
-        <cxf.tomcat.version>8.5.41</cxf.tomcat.version>
+        <cxf.tomcat.version>8.5.47</cxf.tomcat.version>
     </properties>
     <build>
         <plugins>

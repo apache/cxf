@@ -20,16 +20,16 @@ Building and running the demo using maven
 ---------------------------------------
 
 From the base directory of this sample (i.e., where this README file is
-located), the maven pom.xml file can be used to build and run the demo. 
+located), the maven pom.xml file can be used to build and run the demo.
 
 Using either UNIX or Windows:
 
   mvn install
   mvn -Pserver
 
-To remove the target dir, run mvn clean".  
+To remove the target dir, run mvn clean".
 
 Connecting to the SSE stream
 ---------------------------------------
 
-Open a web browser at: http://localhost:8686/static/index.html 
+Open a web browser at: http://localhost:8686/static/index.html
