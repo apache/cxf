@@ -230,13 +230,20 @@ public class SecurityToken implements Serializable {
                 DOMUtils.getFirstChildWithName(lifetimeElem,
                                                 WSS4JConstants.WSU_NS,
                                                 WSS4JConstants.CREATED_LN);
-            this.created = ZonedDateTime.parse(DOMUtils.getContent(createdElem)).toInstant();
+            if (createdElem == null) {
+                // The spec says that if there is no Created Element in the Lifetime, then take the current time
+                this.created = Instant.now();
+            } else {
+                this.created = ZonedDateTime.parse(DOMUtils.getContent(createdElem)).toInstant();
+            }
 
             Element expiresElem =
                 DOMUtils.getFirstChildWithName(lifetimeElem,
                                                 WSS4JConstants.WSU_NS,
                                                 WSS4JConstants.EXPIRES_LN);
-            this.expires = ZonedDateTime.parse(DOMUtils.getContent(expiresElem)).toInstant();
+            if (expiresElem != null) {
+                this.expires = ZonedDateTime.parse(DOMUtils.getContent(expiresElem)).toInstant();
+            }
         } catch (DateTimeParseException e) {
             //shouldn't happen
         }
