@@ -55,7 +55,6 @@ import javax.activation.URLDataSource;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.FileUtils;
-import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Attachment;
@@ -236,21 +235,6 @@ public final class AttachmentUtil {
         UUID result = new UUID(mostSigBits, leastSigBits);
 
         return "uuid:" + result.toString();
-    }
-
-    public static String getAttachmentPartHeader(Attachment att) {
-        StringBuilder buffer = new StringBuilder(200);
-        buffer.append(HttpHeaderHelper.getHeaderKey(HttpHeaderHelper.CONTENT_TYPE) + ": "
-                + att.getDataHandler().getContentType() + ";\r\n");
-        if (att.isXOP()) {
-            buffer.append("Content-Transfer-Encoding: binary\r\n");
-        }
-        String id = att.getId();
-        if (id.charAt(0) == '<') {
-            id = id.substring(1, id.length() - 1);
-        }
-        buffer.append("Content-ID: <" + id + ">\r\n\r\n");
-        return buffer.toString();
     }
 
     public static Map<String, DataHandler> getDHMap(final Collection<Attachment> attachments) {
