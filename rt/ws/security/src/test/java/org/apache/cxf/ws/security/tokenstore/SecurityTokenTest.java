@@ -20,15 +20,16 @@ package org.apache.cxf.ws.security.tokenstore;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
-import org.apache.cxf.ws.security.trust.STSUtils;
-import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.util.DateUtil;
 
+import static org.apache.wss4j.common.WSS4JConstants.WST_NS_05_12;
+import static org.apache.wss4j.common.WSS4JConstants.WSU_NS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -38,7 +39,7 @@ public class SecurityTokenTest {
     @org.junit.Test
     public void testCreateSecurityToken() throws Exception {
         String key = "key";
-        Instant created = Instant.now();
+        Instant created = Instant.now().truncatedTo(ChronoUnit.MILLIS);
         Instant expires = created.plusSeconds(20L);
 
         SecurityToken token = new SecurityToken(key, created, expires);
@@ -54,18 +55,15 @@ public class SecurityTokenTest {
 
         // Create Lifetime
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
-        Instant created = Instant.now();
+        Instant created = Instant.now().truncatedTo(ChronoUnit.MILLIS);
         Instant expires = created.plusSeconds(20L);
 
-        String namespace = STSUtils.WST_NS_05_12;
-        writer.writeStartElement("wst", "Lifetime", namespace);
-        writer.writeNamespace("wst", namespace);
-        writer.writeNamespace("wsu", WSS4JConstants.WSU_NS);
-        writer.writeStartElement("wsu", "Created", WSS4JConstants.WSU_NS);
+        writer.writeStartElement("wst", "Lifetime", WST_NS_05_12);
+        writer.writeStartElement("wsu", "Created", WSU_NS);
         writer.writeCharacters(created.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         writer.writeEndElement();
 
-        writer.writeStartElement("wsu", "Expires", WSS4JConstants.WSU_NS);
+        writer.writeStartElement("wsu", "Expires", WSU_NS);
         writer.writeCharacters(expires.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         writer.writeEndElement();
         writer.writeEndElement();
@@ -83,15 +81,12 @@ public class SecurityTokenTest {
 
         // Create Lifetime
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
-        Instant created = Instant.now();
+        Instant created = Instant.now().truncatedTo(ChronoUnit.MILLIS);
         Instant expires = created.plusSeconds(20L);
 
-        String namespace = STSUtils.WST_NS_05_12;
-        writer.writeStartElement("wst", "Lifetime", namespace);
-        writer.writeNamespace("wst", namespace);
-        writer.writeNamespace("wsu", WSS4JConstants.WSU_NS);
+        writer.writeStartElement("wst", "Lifetime", WST_NS_05_12);
 
-        writer.writeStartElement("wsu", "Expires", WSS4JConstants.WSU_NS);
+        writer.writeStartElement("wsu", "Expires", WSU_NS);
         writer.writeCharacters(expires.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         writer.writeEndElement();
         writer.writeEndElement();
@@ -110,13 +105,10 @@ public class SecurityTokenTest {
 
         // Create Lifetime
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
-        Instant created = Instant.now();
+        Instant created = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
-        String namespace = STSUtils.WST_NS_05_12;
-        writer.writeStartElement("wst", "Lifetime", namespace);
-        writer.writeNamespace("wst", namespace);
-        writer.writeNamespace("wsu", WSS4JConstants.WSU_NS);
-        writer.writeStartElement("wsu", "Created", WSS4JConstants.WSU_NS);
+        writer.writeStartElement("wst", "Lifetime", WST_NS_05_12);
+        writer.writeStartElement("wsu", "Created", WSU_NS);
         writer.writeCharacters(created.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         writer.writeEndElement();
 
