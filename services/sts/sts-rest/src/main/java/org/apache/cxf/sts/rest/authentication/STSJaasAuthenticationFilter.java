@@ -19,6 +19,7 @@
 package org.apache.cxf.sts.rest.authentication;
 
 import java.util.Map;
+import java.util.Optional;
 
 import javax.annotation.Priority;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -38,14 +39,14 @@ import static org.apache.cxf.sts.rest.impl.RealmSecurityConfigurationFilter.REAL
 
 @PreMatching
 @Priority(AUTHENTICATION)
-public class JaasAuthenticationFilter extends JAASAuthenticationFilter {
-    private static final Logger LOG = LoggerFactory.getLogger(JaasAuthenticationFilter.class);
+public class STSJaasAuthenticationFilter extends JAASAuthenticationFilter {
+    private static final Logger LOG = LoggerFactory.getLogger(STSJaasAuthenticationFilter.class);
     private static final String JAAS_CONTEXT_NAME_PARAM = "rs.security.auth.jaas.context.name";
     private Map<String, Object> realmMap;
 
     @Override
     public void filter(final ContainerRequestContext context) {
-        SecurityContext securityContext = context.getSecurityContext();
+        final SecurityContext securityContext = context.getSecurityContext();
         if (securityContext.getUserPrincipal() != null) {
             LOG.debug("User principal is already set, pass filter without authentication processing");
             return;
@@ -57,13 +58,12 @@ public class JaasAuthenticationFilter extends JAASAuthenticationFilter {
         }
 
         final String realmName = (String)getCurrentMessage().get(REALM_NAME_PARAM.toUpperCase());
-        final String contextName = ofNullable(realmName)
+        final Optional<String> contextName = ofNullable(realmName)
                 .map(n -> realmMap.get(n.toUpperCase()))
                 .map(o -> (ExtRealmProperties) o)
-                .map(extRealmProperties -> (String)extRealmProperties.getRsSecurityProperty(JAAS_CONTEXT_NAME_PARAM))
-                .orElse(null);
+                .map(extRealmProperties -> (String)extRealmProperties.getRsSecurityProperty(JAAS_CONTEXT_NAME_PARAM));
 
-        if (ofNullable(contextName).isPresent()) {
+        if (contextName.isPresent()) {
             setRealmName(realmName);
             setContextName(contextName);
             super.filter(context);

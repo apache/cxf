@@ -27,6 +27,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+/**
+ * Class describes request model for remove, renew and validate token endpoints
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "TokenRequest", propOrder = {
         "tokenType",

@@ -26,6 +26,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+/**
+ * Base class for STS REST interface responses
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "BaseResponse", propOrder = {
         "status",

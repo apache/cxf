@@ -58,7 +58,9 @@ public final class JwkOperation {
     private static JsonWebKeys loadPublicJwk(final Message message, final Properties properties) {
         final JsonWebKey jsonWebKey = JwkUtils.loadJsonWebKey(message, properties, KeyOperation.VERIFY,
             (String) message.get(RealmSecurityConfigurationFilter.REALM_NAME_PARAM));
-        final String keyType = ofNullable(jsonWebKey).map(jwk -> jwk.getKeyType().name()).orElse(null);
+        final String keyType = ofNullable(jsonWebKey)
+                .map(jwk -> jwk.getKeyType().name())
+                .orElse(null);
         PublicKey publicKey = null;
         if (JsonWebKey.KEY_TYPE_RSA.equalsIgnoreCase(keyType)) {
             publicKey = JwkUtils.toRSAPublicKey(jsonWebKey);
@@ -68,7 +70,8 @@ public final class JwkOperation {
 
         return ofNullable(publicKey)
             .map(pk -> new JsonWebKeys(fromPublicKey(pk, properties, RSSecurityConstants.RSSEC_SIGNATURE_ALGORITHM)))
-            .orElseThrow(() -> new RuntimeException("There is no public key configured"));
+                .orElse(new JsonWebKeys());
+            //.orElseThrow(() -> new RuntimeException("There is no public key configured"));
     }
 
     private static Properties getRsProperties(final Message message) {

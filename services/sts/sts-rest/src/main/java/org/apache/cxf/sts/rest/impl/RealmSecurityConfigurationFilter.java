@@ -67,14 +67,12 @@ public class RealmSecurityConfigurationFilter implements ContainerRequestFilter 
                 .map(n -> realmMap.get(n.toUpperCase()))
                 .map(o -> (ExtRealmProperties) o)
                 .map(extRealmProperties -> extRealmProperties.getRsSecurityProperties())
-                .ifPresent(map -> {
-                    setRsSecurityProperties(message, map);
-                    JAXRSUtils.getCurrentMessage().put(REALM_NAME_PARAM.toUpperCase(), realmName);
-                });
+                .ifPresent(map -> setRsSecurityProperties(message, map, realmName));
     }
 
-    private void setRsSecurityProperties(final Message message, final Map<String, String> properties) {
+    private void setRsSecurityProperties(final Message message, final Map<String, String> properties, final String realmName) {
         properties.entrySet().forEach(entry -> message.put(entry.getKey(), entry.getValue()));
+        JAXRSUtils.getCurrentMessage().put(REALM_NAME_PARAM.toUpperCase(), realmName);
     }
 
     private MultivaluedMap<String, String> getPathParams(final Message message) {

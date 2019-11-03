@@ -28,6 +28,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+/**
+ * Class describes request model for getTokenExchange and getToken endpoints
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "TokenRequest")
 @XmlRootElement(name = "TokenRequest")
@@ -41,7 +44,7 @@ public class GetTokenRequest implements Serializable {
     private String keyType;
 
     @XmlElement(required = true)
-    private List<String> claims;
+    private List<String> claims = new ArrayList();
 
     @XmlElement
     private String audience;
@@ -55,9 +58,6 @@ public class GetTokenRequest implements Serializable {
     }
 
     public List<String> getClaims() {
-        if (claims == null) {
-            claims = new ArrayList<>();
-        }
         return claims;
     }
 

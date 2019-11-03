@@ -20,6 +20,7 @@ package org.apache.cxf.sts.rest.authentication;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Priority;
@@ -128,16 +129,22 @@ public class JwtAuthenticationFilter implements ContainerRequestFilter {
         final SecurityContext newSecurityContext = new SecurityContext() {
 
             public Principal getUserPrincipal() {
-                return ofNullable(jwt.getClaims().getSubject())
+                return ofNullable(jwt)
+                        .map(j -> j.getClaims())
+                        .map(c -> c.getSubject())
                         .map(SimplePrincipal::new)
                         .orElse(null);
             }
 
             public boolean isUserInRole(String role) {
-                List<String> roles = (List<String>) jwt.getClaims().getClaim("roles");
+                List<String> roles = (List<String>) ofNullable(jwt)
+                        .map(j -> j.getClaims())
+                        .map(c -> c.getClaim("roles"))
+                        .orElse(null);
                 return ofNullable(roles)
-                        .map(list -> list.contains(role))
-                        .orElse(false);
+                        .orElse(Collections.emptyList())
+                        .stream()
+                        .anyMatch(r -> r.equals(role));
             }
 
             @Override
