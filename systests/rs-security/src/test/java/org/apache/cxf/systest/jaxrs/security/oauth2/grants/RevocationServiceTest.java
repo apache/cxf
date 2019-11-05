@@ -201,6 +201,66 @@ public class RevocationServiceTest extends AbstractBusClientServerTestBase {
         assertEquals(400, response.getStatus());
     }
 
+    @org.junit.Test
+    public void testAccessTokenRevocationWrongClient() throws Exception {
+        URL busFile = RevocationServiceTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + port + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code
+        String code = OAuth2TestUtils.getAuthorizationCode(client);
+        assertNotNull(code);
+
+        // Now get the access token
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                  "consumer-id", "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        ClientAccessToken accessToken = OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
+        assertNotNull(accessToken.getTokenKey());
+
+        // Now query the token introspection service to make sure the token is valid
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                  "consumer-id", "this-is-a-secret", busFile.toString());
+        client.accept("application/json").type("application/x-www-form-urlencoded");
+        Form form = new Form();
+        form.param("token", accessToken.getTokenKey());
+        client.path("introspect/");
+        Response response = client.post(form);
+
+        TokenIntrospection tokenIntrospection = response.readEntity(TokenIntrospection.class);
+        assertTrue(tokenIntrospection.isActive());
+
+        // Now try to revoke the token as a different client (this should fail, but no exception is thrown)
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                  "consumer-id-aud", "this-is-a-secret", busFile.toString());
+        client.accept("application/json").type("application/x-www-form-urlencoded");
+        form = new Form();
+        form.param("token", accessToken.getTokenKey());
+        client.path("revoke/");
+        response = client.post(form);
+
+        // Now check the token introspection service again to make sure the token is still valid
+        // (the token revocation call failed)
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                  "consumer-id", "this-is-a-secret", busFile.toString());
+        client.accept("application/json").type("application/x-www-form-urlencoded");
+        form = new Form();
+        form.param("token", accessToken.getTokenKey());
+        client.path("introspect/");
+        response = client.post(form);
+
+        tokenIntrospection = response.readEntity(TokenIntrospection.class);
+        assertTrue(tokenIntrospection.isActive());
+    }
+
     //
     // Server implementations
     //
