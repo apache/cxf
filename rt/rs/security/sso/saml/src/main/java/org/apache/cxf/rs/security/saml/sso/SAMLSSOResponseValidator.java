@@ -124,6 +124,8 @@ public class SAMLSSOResponseValidator {
                 if (subjectConf != null) {
                     validateAudienceRestrictionCondition(assertion.getConditions());
                     validAssertion = assertion;
+                    sessionNotOnOrAfter = null;
+
                     // Store Session NotOnOrAfter
                     for (AuthnStatement authnStatment : assertion.getAuthnStatements()) {
                         if (authnStatment.getSessionNotOnOrAfter() != null) {
