@@ -100,7 +100,6 @@ public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
         delegate.addBinaryContentMediaTypes(mediaTypes);
     }
 
-    @Provider(value = Type.Feature)
     public static class Portable implements AbstractPortableFeature {
         private LoggingInInterceptor in;
         private LoggingOutInterceptor out;

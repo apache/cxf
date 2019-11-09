@@ -44,7 +44,6 @@ public class ClientBeanValidationFeature extends DelegatingFeature<ClientBeanVal
         delegate.setProvider(provider);
     }
 
-    @Provider(value = Type.Feature, scope = Scope.Client)
     public static class Portable implements AbstractPortableFeature {
         private BeanValidationProvider validationProvider;
 

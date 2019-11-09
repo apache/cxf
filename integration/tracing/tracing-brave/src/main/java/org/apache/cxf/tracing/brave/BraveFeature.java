@@ -50,7 +50,6 @@ public class BraveFeature extends DelegatingFeature<BraveFeature.Portable> {
         super(new Portable(brave));
     }
 
-    @Provider(value = Type.Feature, scope = Scope.Server)
     public static class Portable implements AbstractPortableFeature {
         private BraveStartInterceptor in;
         private BraveStopInterceptor out;

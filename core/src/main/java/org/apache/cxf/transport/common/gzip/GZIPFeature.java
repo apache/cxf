@@ -77,7 +77,6 @@ public class GZIPFeature extends DelegatingFeature<GZIPFeature.Portable> {
         return delegate.getForce();
     }
 
-    @Provider(value = Provider.Type.Feature)
     public static class Portable implements AbstractPortableFeature {
         private static final GZIPInInterceptor IN = new GZIPInInterceptor();
         private static final GZIPOutInterceptor OUT = new GZIPOutInterceptor();
