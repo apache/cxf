@@ -91,7 +91,6 @@ public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
         delegate.setPrettyLogging(prettyLogging);
     }
 
-    @Provider(Type.Feature)
     public static class Portable implements AbstractPortableFeature {
         private static final int DEFAULT_LIMIT = AbstractLoggingInterceptor.DEFAULT_LIMIT;
         private static final LoggingInInterceptor IN = new LoggingInInterceptor(DEFAULT_LIMIT);

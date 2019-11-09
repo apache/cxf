@@ -377,7 +377,6 @@ public class OpenApiFeature extends DelegatingFeature<OpenApiFeature.Portable>
         return delegate.createOpenApiResource();
     }
 
-    @Provider(value = Type.Feature, scope = Scope.Server)
     public static class Portable implements AbstractPortableFeature, SwaggerUiSupport, SwaggerProperties {
         private String version;
         private String title;

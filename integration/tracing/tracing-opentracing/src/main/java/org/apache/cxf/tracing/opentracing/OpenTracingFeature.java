@@ -41,7 +41,6 @@ public class OpenTracingFeature extends DelegatingFeature<OpenTracingFeature.Por
         super(new Portable(tracer));
     }
 
-    @Provider(value = Type.Feature, scope = Scope.Server)
     public static class Portable implements AbstractPortableFeature {
         private OpenTracingStartInterceptor in;
         private OpenTracingStopInterceptor out;

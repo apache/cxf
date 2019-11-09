@@ -36,7 +36,6 @@ public class OpenTracingClientFeature extends DelegatingFeature<OpenTracingClien
         super(new Portable(tracer));
     }
 
-    @Provider(value = Type.Feature, scope = Scope.Client)
     public static class Portable implements AbstractPortableFeature {
         private OpenTracingClientStartInterceptor out;
         private OpenTracingClientStopInterceptor in;
