@@ -32,6 +32,7 @@
     </parent>
     <modules>
         <module>sts-core</module>
+        <module>sts-rest</module>
         <module>systests</module>
     </modules>
 </project>

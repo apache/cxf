@@ -65,7 +65,7 @@ public class STSJaasAuthenticationFilter extends JAASAuthenticationFilter {
 
         if (contextName.isPresent()) {
             setRealmName(realmName);
-            setContextName(contextName);
+            setContextName(contextName.get());
             super.filter(context);
         } else {
             LOG.debug("There is not JAAS context configured, pass filter without authentication processing");

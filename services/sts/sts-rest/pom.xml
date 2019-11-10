@@ -31,7 +31,16 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
-        <cxf.module.name>org.apache.cxf.sts.core</cxf.module.name>
+        <cxf.module.name>org.apache.cxf.sts.rest</cxf.module.name>
+        <cxf.osgi.import>
+            javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
+            !org.apache.cxf.sts.*,
+            org.apache.cxf.*,
+            org.springframework.ldap*;resolution:=optional,
+            net.sf.ehcache*;resolution:=optional;version="[2.5, 3.0.0)",
+            org.opensaml*;version="${cxf.opensaml.osgi.version.range}",
+            javax.xml.bind;version="${cxf.osgi.javax.bind.version}"
+        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>
@@ -60,38 +69,4 @@
             <artifactId>cxf-rt-rs-security-jose-jaxrs</artifactId>
         </dependency>
     </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <_nouses>true</_nouses>
-                        <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
-                        <Implementation-Title>${project.name}</Implementation-Title>
-                        <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
-                        <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>
-                        <Specification-Title>${project.name}</Specification-Title>
-                        <Specification-Vendor>The Apache Software Foundation</Specification-Vendor>
-                        <Export-Package>
-                            org.apache.cxf.sts.*;version=${cxf.osgi.version.clean}
-                        </Export-Package>
-                        <Import-Package>
-                            javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
-                            !org.apache.cxf.sts.*,
-                            org.apache.cxf.*,
-                            org.springframework.ldap*;resolution:=optional,
-                            net.sf.ehcache*;resolution:=optional;version="[2.5, 3.0.0)",
-                            org.opensaml*;version="${cxf.opensaml.osgi.version.range}",
-                            javax.xml.bind;version="${cxf.osgi.javax.bind.version}",
-                            *
-                        </Import-Package>
-                        <Bundle-SymbolicName>org.apache.cxf.services.sts.rest</Bundle-SymbolicName>
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>
