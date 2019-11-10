@@ -32,12 +32,12 @@ import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -98,7 +98,6 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         new HashSet<Class<?>>(Arrays.asList(InputStream.class,
                                             OutputStream.class,
                                             StreamingOutput.class));
-    protected Set<Class<?>> collectionContextClasses = new HashSet<>();
 
     protected Map<String, String> jaxbElementClassMap = Collections.emptyMap();
     protected boolean unmarshalAsJaxbElement;
@@ -111,8 +110,9 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     protected List<String> inDropElements;
     protected Map<String, String> inElementsMap;
     protected Map<String, String> inAppendMap;
-    protected Map<String, JAXBContext> packageContexts = new HashMap<>();
-    protected Map<Class<?>, JAXBContext> classContexts = new HashMap<>();
+    protected Map<String, JAXBContext> packageContexts = new ConcurrentHashMap<>();
+    protected Map<Class<?>, JAXBContext> classContexts = new ConcurrentHashMap<>();
+    protected Set<Class<?>> collectionContextClasses = ((ConcurrentHashMap) classContexts).newKeySet();
     private boolean attributesToElements;
 
     private MessageContext mc;
@@ -366,14 +366,17 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     }
 
     protected JAXBContext getCollectionContext(Class<?> type) throws JAXBException {
-        synchronized (collectionContextClasses) {
-            if (!collectionContextClasses.contains(type)) {
-                collectionContextClasses.add(CollectionWrapper.class);
-                collectionContextClasses.add(type);
+        if (!collectionContextClasses.contains(type)) {
+            synchronized (collectionContextClasses) {
+                if (!collectionContextClasses.contains(type)) {
+                    collectionContextClasses.add(CollectionWrapper.class);
+                    collectionContextClasses.add(type);
+                }
             }
-            return newJAXBContextInstance(
-                collectionContextClasses.toArray(new Class[0]), cProperties);
         }
+
+        return newJAXBContextInstance(
+            collectionContextClasses.toArray(new Class[0]), cProperties);
     }
 
     protected QName getCollectionWrapperQName(Class<?> cls, Type type, Object object, boolean pluralName)
@@ -506,14 +509,14 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
             }
         }
 
-        synchronized (classContexts) {
-            JAXBContext context = classContexts.get(type);
-            if (context != null) {
-                return context;
-            }
+
+        JAXBContext context = classContexts.get(type);
+        if (context != null) {
+            return context;
         }
 
-        JAXBContext context = getPackageContext(type, genericType);
+
+        context = getPackageContext(type, genericType);
 
         return context != null ? context : getClassContext(type, genericType);
     }
@@ -521,23 +524,27 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         return getClassContext(type, type);
     }
     protected JAXBContext getClassContext(Class<?> type, Type genericType) throws JAXBException {
-        synchronized (classContexts) {
-            JAXBContext context = classContexts.get(type);
-            if (context == null) {
-                Class<?>[] classes;
-                if (extraClass != null) {
-                    classes = new Class[extraClass.length + 1];
-                    classes[0] = type;
-                    System.arraycopy(extraClass, 0, classes, 1, extraClass.length);
-                } else {
-                    classes = new Class[] {type};
-                }
+        JAXBContext context = classContexts.get(type);
+        if (context == null) {
+            synchronized (classContexts) {
+                context = classContexts.get(type);
+                if (context == null) {
+                    Class<?>[] classes;
+                    if (extraClass != null) {
+                        classes = new Class[extraClass.length + 1];
+                        classes[0] = type;
+                        System.arraycopy(extraClass, 0, classes, 1, extraClass.length);
+                    } else {
+                        classes = new Class[]{type};
+                    }
 
-                context = newJAXBContextInstance(classes, cProperties);
-                classContexts.put(type, context);
+                    context = newJAXBContextInstance(classes, cProperties);
+                    classContexts.put(type, context);
+                }
             }
-            return context;
         }
+
+        return context;
     }
     public JAXBContext getPackageContext(Class<?> type) {
         return getPackageContext(type, type);
@@ -546,9 +553,14 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         if (type == null || type == JAXBElement.class) {
             return null;
         }
+        String packageName = PackageUtils.getPackageName(type);
+        JAXBContext context = packageContexts.get(packageName);
+        if (context != null) {
+            return context;
+        }
+
         synchronized (packageContexts) {
-            String packageName = PackageUtils.getPackageName(type);
-            JAXBContext context = packageContexts.get(packageName);
+            context = packageContexts.get(packageName);
             if (context == null) {
                 try {
                     final ClassLoader loader = AccessController.doPrivileged((PrivilegedAction<ClassLoader>) 
