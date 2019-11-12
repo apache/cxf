@@ -34,6 +34,7 @@
         <maven.test.skip>true</maven.test.skip>
         <cxf.version>${project.version}</cxf.version>
         <cxf.checkstyle.extension>-corba</cxf.checkstyle.extension>
+        <tar.long.file.mode>gnu</tar.long.file.mode>
     </properties>
     <modules>
         <module>manifest</module>
@@ -492,7 +493,7 @@
                                 <descriptor>src/main/assembly/bin.xml</descriptor>
                             </descriptors>
                             <appendAssemblyId>false</appendAssemblyId>
-                            <tarLongFileMode>gnu</tarLongFileMode>
+                            <tarLongFileMode>${tar.long.file.mode}</tarLongFileMode>
                         </configuration>
                     </execution>
                     <execution>
@@ -505,7 +506,7 @@
                             <descriptors>
                                 <descriptor>src/main/assembly/src.xml</descriptor>
                             </descriptors>
-                            <tarLongFileMode>gnu</tarLongFileMode>
+                            <tarLongFileMode>${tar.long.file.mode}</tarLongFileMode>
                         </configuration>
                     </execution>
                 </executions>
