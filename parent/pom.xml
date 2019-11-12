@@ -105,7 +105,7 @@
         <cxf.dom4j.version>2.1.1</cxf.dom4j.version>
         <cxf.dropwizard.version>3.2.6</cxf.dropwizard.version>
         <cxf.ehcache.version>2.10.6</cxf.ehcache.version>
-        <cxf.ehcache3.version>3.7.1</cxf.ehcache3.version>
+        <cxf.ehcache3.version>3.8.1</cxf.ehcache3.version>
         <cxf.findbugs.version>3.0.2</cxf.findbugs.version>
         <cxf.geronimo.inject.version>1.1</cxf.geronimo.inject.version>
         <cxf.geronimo.j2ee.management.version>1.0.1</cxf.geronimo.j2ee.management.version>
