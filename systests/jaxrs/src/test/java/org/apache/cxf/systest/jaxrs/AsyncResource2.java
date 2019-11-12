@@ -37,9 +37,8 @@ public class AsyncResource2 {
 
     @GET
     @Path("/setTimeOut")
-    public String setTimeOut() {
-        boolean setTimeout = asyncResponse.setTimeout(2, TimeUnit.SECONDS);
-        return String.valueOf(setTimeout);
+    public boolean setTimeOut() {
+        return asyncResponse.setTimeout(2L, TimeUnit.SECONDS);
     }
 
 }
