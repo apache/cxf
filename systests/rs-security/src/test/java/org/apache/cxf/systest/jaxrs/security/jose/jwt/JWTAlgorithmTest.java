@@ -48,7 +48,6 @@ import org.junit.BeforeClass;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
-
 /**
  * Some tests for JWT tokens.
  */
@@ -666,6 +665,45 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         Book returnedBook = response.readEntity(Book.class);
         assertEquals(returnedBook.getName(), "book");
         assertEquals(returnedBook.getId(), 123L);
+    }
+
+    // Include the cert in the "x5c" header
+    @org.junit.Test
+    public void testBadSignatureCertificateTest() throws Exception {
+
+        URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
+
+        List<Object> providers = new ArrayList<>();
+        providers.add(new JacksonJsonProvider());
+        providers.add(new JwtAuthenticationClientFilter());
+
+        String address = "https://localhost:" + PORT + "/signedjwtincludecert/bookstore/books";
+        WebClient client =
+            WebClient.create(address, providers, busFile.toString());
+        client.type("application/json").accept("application/json");
+
+        // Create the JWT Token
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+        claims.setIssuedAt(Instant.now().getEpochSecond());
+        claims.setAudiences(toList(address));
+
+        JwtToken token = new JwtToken(claims);
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("rs.security.keystore.type", "jks");
+        properties.put("rs.security.keystore.password", "password");
+        properties.put("rs.security.key.password", "password");
+        properties.put("rs.security.keystore.alias", "bethal");
+        properties.put("rs.security.keystore.file", "keys/Bethal.jks");
+        properties.put("rs.security.signature.algorithm", "RS256");
+        properties.put("rs.security.signature.include.cert", "true");
+        properties.put(JwtConstants.JWT_TOKEN, token);
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        Response response = client.post(new Book("book", 123L));
+        assertNotEquals(response.getStatus(), 200);
     }
 
     @org.junit.Test
