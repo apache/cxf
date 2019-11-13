@@ -20,9 +20,8 @@ package org.apache.cxf.systest.sts.stsclient;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.systest.sts.TLSClientParametersUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.interceptors.STSTokenOutInterceptor;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -79,9 +78,7 @@ public class STSTokenOutInterceptorTest extends AbstractSTSTokenTest {
                     "https://localhost:" + STSPORT + STS_TRANSPORT_WSDL_LOCATION_RELATIVE,
                     bus);
 
-        TLSClientParameters tlsParams = prepareTLSParams();
-        STSClient stsClient = interceptor.getSTSClient();
-        ((HTTPConduit)stsClient.getClient().getConduit()).setTlsClientParameters(tlsParams);
+        interceptor.getSTSClient().setTlsClientParameters(TLSClientParametersUtils.getTLSClientParameters());
 
         MessageImpl message = prepareMessage(bus, null, SERVICE_ENDPOINT_TRANSPORT);
 
@@ -113,11 +110,9 @@ public class STSTokenOutInterceptorTest extends AbstractSTSTokenTest {
 
         Bus bus = BusFactory.getThreadDefaultBus();
         STSClient stsClient = initStsClientTransportBinding(bus);
+        stsClient.setTlsClientParameters(TLSClientParametersUtils.getTLSClientParameters());
 
         STSTokenOutInterceptor interceptor = new STSTokenOutInterceptor(stsClient);
-
-        TLSClientParameters tlsParams = prepareTLSParams();
-        ((HTTPConduit)stsClient.getClient().getConduit()).setTlsClientParameters(tlsParams);
 
         MessageImpl message = prepareMessage(bus, null, SERVICE_ENDPOINT_TRANSPORT);
 

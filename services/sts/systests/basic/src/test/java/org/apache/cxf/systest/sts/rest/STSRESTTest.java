@@ -21,12 +21,9 @@ package org.apache.cxf.systest.sts.rest;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.TrustManagerFactory;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
@@ -39,18 +36,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.CompressionUtils;
-import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
-import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.cxf.rt.security.saml.utils.SAMLUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.sts.STSConstants;
+import org.apache.cxf.systest.sts.TLSClientParametersUtils;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
@@ -66,7 +62,6 @@ import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.processor.SAMLTokenProcessor;
-import org.apache.xml.security.utils.ClassLoaderUtils;
 
 import static org.apache.cxf.ws.security.trust.STSUtils.WST_NS_05_12;
 import static org.junit.Assert.assertEquals;
@@ -91,7 +86,6 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
     private static final String DEFAULT_ADDRESS =
         "https://localhost:8081/doubleit/services/doubleittransportsaml1";
 
-    private static TLSClientParameters tlsClientParameters = new TLSClientParameters();
     private static Crypto serviceCrypto;
 
     private WebClient webClient;
@@ -105,7 +99,6 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
                    launchServer(STSRESTServer.class, true)
         );
 
-        tlsClientParameters = getTLSClientParameters();
         serviceCrypto = CryptoFactory.getInstance("serviceKeystore.properties");
     }
 
@@ -114,7 +107,6 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         SecurityTestUtil.cleanup();
         stopAllServers();
 
-        tlsClientParameters = null;
         serviceCrypto = null;
     }
 
@@ -881,28 +873,9 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         closeClient();
 
         webClient = WebClient.create("https://localhost:" + STSPORT + "/SecurityTokenService/token");
-        webClient.getConfiguration().getHttpConduit().setTlsClientParameters(tlsClientParameters);
+        webClient.getConfiguration().getHttpConduit()
+            .setTlsClientParameters(TLSClientParametersUtils.getTLSClientParameters());
         return webClient;
-    }
-
-    private static TLSClientParameters getTLSClientParameters() throws Exception {
-        final TLSClientParameters tlsCP = new TLSClientParameters();
-        tlsCP.setDisableCNCheck(true);
-
-        final KeyStore keyStore;
-        try (InputStream is = ClassLoaderUtils.getResourceAsStream("keys/clientstore.jks", STSRESTTest.class)) {
-            keyStore = CryptoUtils.loadKeyStore(is, "cspass".toCharArray(), null);
-        }
-
-        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        kmf.init(keyStore, "ckpass".toCharArray());
-        tlsCP.setKeyManagers(kmf.getKeyManagers());
-
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        tmf.init(keyStore);
-        tlsCP.setTrustManagers(tmf.getTrustManagers());
-
-        return tlsCP;
     }
 
 }
