@@ -27,7 +27,6 @@ import javax.security.auth.Subject;
 import org.apache.cxf.common.security.GroupPrincipal;
 import org.apache.cxf.common.security.SimpleGroup;
 import org.apache.cxf.common.security.SimplePrincipal;
-import org.apache.cxf.interceptor.security.test.GroupWrapper;
 import org.apache.cxf.security.LoginSecurityContext;
 
 import org.junit.Test;
@@ -118,18 +117,4 @@ public class DefaultSecurityContextTest {
         assertFalse(context.isUserInRole("family"));
         assertFalse(context.isUserInRole("Barry"));
     }
-    
-    @Test
-    public void testPrivateStaticGroup() {
-        Subject s = new Subject();
-        Principal p = new SimplePrincipal("Barry");
-        s.getPrincipals().add(p);
-        //create a friend group and add Barry to this group
-        GroupWrapper test = new GroupWrapper("friend", "Barry");
-        s.getPrincipals().add(test.getGroup());
-        LoginSecurityContext context = new DefaultSecurityContext(p, s);
-        assertTrue(context.isUserInRole("Barry"));
-    }
-    
-
 }
