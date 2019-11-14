@@ -45,7 +45,7 @@
         <cxf.jdk.version>1.8</cxf.jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <site.deploy.url>scp://people.apache.org/www/cxf.apache.org/maven-site</site.deploy.url>
-        <maven-owasp-plugin-version>5.2.2</maven-owasp-plugin-version>
+        <maven-owasp-plugin-version>5.2.4</maven-owasp-plugin-version>
     </properties>
     <distributionManagement>
         <repository>
