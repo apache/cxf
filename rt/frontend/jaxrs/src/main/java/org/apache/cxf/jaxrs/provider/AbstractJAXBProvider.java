@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -64,6 +63,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.validation.Schema;
+import javax.xml.ws.Holder;
 
 import org.w3c.dom.Element;
 
@@ -367,9 +367,8 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     }
 
     protected JAXBContext getCollectionContext(Class<?> type) throws JAXBException {
-        if (!collectionContextClasses.contains(type)) {
+        if (collectionContextClasses.add(type)) {
             collectionContextClasses.add(CollectionWrapper.class);
-            collectionContextClasses.add(type);
         }
         return newJAXBContextInstance(
             collectionContextClasses.toArray(new Class[0]), cProperties);
@@ -518,7 +517,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         return getClassContext(type, type);
     }
     protected JAXBContext getClassContext(Class<?> type, Type genericType) throws JAXBException {
-        final AtomicReference<JAXBException> jaxbException = new AtomicReference<>();
+        final Holder<JAXBException> jaxbException = new Holder<>();
         final JAXBContext context = classContexts.computeIfAbsent(type, t -> {
             final Class<?>[] classes;
             if (extraClass != null) {
@@ -532,12 +531,12 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
             try {
                 return newJAXBContextInstance(classes, cProperties);
             } catch (JAXBException e) {
-                jaxbException.set(e);
+                jaxbException.value = e;
                 return null;
             }
         });
-        if (null != jaxbException.get()) {
-            throw jaxbException.get();
+        if (null != jaxbException.value) {
+            throw jaxbException.value;
         }
         return context;
     }
