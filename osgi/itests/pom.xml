@@ -28,8 +28,7 @@
     <artifactId>org.apache.cxf.osgi.itests</artifactId>
     <name>Apache CXF :: OSGi :: Integration Tests</name>
     <packaging>jar</packaging>
-    <properties>
-    </properties>
+    
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -50,7 +49,7 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-client</artifactId>
             <version>${project.version}</version>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-testutils</artifactId>
@@ -142,8 +141,23 @@
             <artifactId>pax-exam-junit4</artifactId>
             <version>${cxf.pax.exam.version}</version>
             <scope>test</scope>
+            <!-- 
+                Excluding bndlib in favor of biz.aQute.bndlib since
+                it is old and fails to process the recent JAR files (fe Jackson 
+                Databind 2.9.10.1, ...)
+            -->
+            <exclusions>
+                <exclusion>
+                    <groupId>biz.aQute.bnd</groupId>
+                    <artifactId>bndlib</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-
+        <dependency>
+            <groupId>biz.aQute.bnd</groupId>
+            <artifactId>biz.aQute.bndlib</artifactId>
+            <version>3.5.0</version>
+        </dependency>
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam</artifactId>
