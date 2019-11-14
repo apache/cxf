@@ -35,11 +35,13 @@ public class JsonWebKeys extends JsonMapObject {
 
     }
     public JsonWebKeys(JsonWebKey key) {
-        setInitKey(key);
-    }
-    private void setInitKey(JsonWebKey key) {
         setKey(key);
     }
+
+    public JsonWebKeys(List<JsonWebKey> keys) {
+        setKeys(keys);
+    }
+
     public List<JsonWebKey> getKeys() {
         List<?> list = (List<?>)super.getProperty(KEYS_PROPERTY);
         if (list != null && !list.isEmpty()) {
