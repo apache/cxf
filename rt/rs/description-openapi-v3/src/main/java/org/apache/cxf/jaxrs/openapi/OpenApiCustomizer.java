@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.ws.rs.ApplicationPath;
 
@@ -47,7 +48,6 @@ import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
-import java.util.Optional;
 
 public class OpenApiCustomizer {
 
@@ -106,9 +106,9 @@ public class OpenApiCustomizer {
                     ClassResourceInfo cri = operations.get(pathKey);
 
                     tag = Optional.of(new Tag());
-                    tag.setName(cri.getURITemplate().getValue().replaceAll("/", "_"));
+                    tag.get().setName(cri.getURITemplate().getValue().replaceAll("/", "_"));
                     if (javadocProvider != null) {
-                        tag.setDescription(javadocProvider.getClassDoc(cri));
+                        tag.get().setDescription(javadocProvider.getClassDoc(cri));
                     }
 
                     if (!tags.contains(tag.get())) {
@@ -135,15 +135,15 @@ public class OpenApiCustomizer {
                             List<Parameter> parameters = new ArrayList<>();
                             addParameters(parameters);
                             operation.setParameters(parameters);
-                        } else {
+                        } else if (operation.getParameters().size() == ori.getParameters().size()) {
                             for (int i = 0; i < operation.getParameters().size(); i++) {
                                 if (StringUtils.isBlank(operation.getParameters().get(i).getDescription())) {
                                     operation.getParameters().get(i).
                                             setDescription(javadocProvider.getMethodParameterDoc(ori, i));
                                 }
                             }
-                            addParameters(operation.getParameters());
                         }
+                        addParameters(operation.getParameters());
 
                         customizeResponses(operation, ori);
                     }
