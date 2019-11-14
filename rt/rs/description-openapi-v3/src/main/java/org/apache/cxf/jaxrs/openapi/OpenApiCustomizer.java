@@ -48,6 +48,7 @@ import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
+import java.util.Objects;
 
 public class OpenApiCustomizer {
 
@@ -135,11 +136,23 @@ public class OpenApiCustomizer {
                             List<Parameter> parameters = new ArrayList<>();
                             addParameters(parameters);
                             operation.setParameters(parameters);
-                        } else if (operation.getParameters().size() == ori.getParameters().size()) {
+                        } else {
                             for (int i = 0; i < operation.getParameters().size(); i++) {
                                 if (StringUtils.isBlank(operation.getParameters().get(i).getDescription())) {
-                                    operation.getParameters().get(i).
-                                            setDescription(javadocProvider.getMethodParameterDoc(ori, i));
+                                    String javadoc = null;
+                                    if (operation.getParameters().size() == ori.getParameters().size()) {
+                                        javadoc = javadocProvider.getMethodParameterDoc(ori, i);
+                                    } else {
+                                        for (int j = 0; j < ori.getParameters().size(); j++) {
+                                            if (Objects.equals(
+                                                    operation.getParameters().get(i).getName(),
+                                                    ori.getParameters().get(j).getName())) {
+
+                                                javadoc = javadocProvider.getMethodParameterDoc(ori, j);
+                                            }
+                                        }
+                                    }
+                                    operation.getParameters().get(i).setDescription(javadoc);
                                 }
                             }
                         }
