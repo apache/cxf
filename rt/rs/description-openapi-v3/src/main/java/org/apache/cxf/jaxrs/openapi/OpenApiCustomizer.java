@@ -86,6 +86,23 @@ public class OpenApiCustomizer {
         return configuration;
     }
 
+    protected String extractJavadoc(final Operation operation, final OperationResourceInfo ori, final int paramIdx) {
+        String javadoc = null;
+        if (operation.getParameters().size() == ori.getParameters().size()) {
+            javadoc = javadocProvider.getMethodParameterDoc(ori, paramIdx);
+        } else {
+            for (int j = 0; j < ori.getParameters().size(); j++) {
+                if (Objects.equals(
+                        operation.getParameters().get(paramIdx).getName(),
+                        ori.getParameters().get(j).getName())) {
+
+                    javadoc = javadocProvider.getMethodParameterDoc(ori, j);
+                }
+            }
+        }
+        return javadoc;
+    }
+
     public void customize(final OpenAPI oas) {
         if (replaceTags || javadocProvider != null) {
             Map<String, ClassResourceInfo> operations = new HashMap<>();
@@ -140,20 +157,7 @@ public class OpenApiCustomizer {
 
                         for (int i = 0; i < operation.getParameters().size(); i++) {
                             if (StringUtils.isBlank(operation.getParameters().get(i).getDescription())) {
-                                String javadoc = null;
-                                if (operation.getParameters().size() == ori.getParameters().size()) {
-                                    javadoc = javadocProvider.getMethodParameterDoc(ori, i);
-                                } else {
-                                    for (int j = 0; j < ori.getParameters().size(); j++) {
-                                        if (Objects.equals(
-                                                operation.getParameters().get(i).getName(),
-                                                ori.getParameters().get(j).getName())) {
-
-                                            javadoc = javadocProvider.getMethodParameterDoc(ori, j);
-                                        }
-                                    }
-                                }
-                                operation.getParameters().get(i).setDescription(javadoc);
+                                operation.getParameters().get(i).setDescription(extractJavadoc(operation, ori, i));
                             }
                         }
 
