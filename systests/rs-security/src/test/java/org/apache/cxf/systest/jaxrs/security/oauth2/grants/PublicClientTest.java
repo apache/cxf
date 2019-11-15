@@ -90,6 +90,26 @@ public class PublicClientTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.Test
+    public void testAuthorizationCodeGrantNoRedirectURI() throws Exception {
+        URL busFile = PublicClientTest.class.getResource("publicclient.xml");
+
+        String address = "https://localhost:" + JCACHE_PORT + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code
+        try {
+            OAuth2TestUtils.getAuthorizationCode(client, null, "fredPublic");
+            fail("Failure expected on a missing (registered) redirectURI");
+        } catch (Exception ex) {
+            // expected
+        }
+    }
+
+    @org.junit.Test
     public void testPKCEPlain() throws Exception {
         URL busFile = PublicClientTest.class.getResource("publicclient.xml");
 
