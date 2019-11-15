@@ -67,7 +67,7 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
         String expectedRedirectUri = grant.getRedirectUri();
         String providedRedirectUri = params.getFirst(OAuthConstants.REDIRECT_URI);
         if (providedRedirectUri != null) {
-            if (expectedRedirectUri == null || !providedRedirectUri.equals(expectedRedirectUri)) {
+            if (!providedRedirectUri.equals(expectedRedirectUri)) {
                 throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
             }
         } else if (expectedRedirectUri == null && !isCanSupportPublicClients()
