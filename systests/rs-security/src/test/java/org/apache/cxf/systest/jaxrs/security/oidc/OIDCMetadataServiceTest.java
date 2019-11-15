@@ -23,11 +23,16 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -40,11 +45,11 @@ import static org.junit.Assert.assertTrue;
  */
 public class OIDCMetadataServiceTest extends AbstractBusClientServerTestBase {
 
-    private static final SpringBusTestServer JCACHE_SERVER = new SpringBusTestServer("metadata-server-jcache");
+    static final String PORT = TestUtil.getPortNumber("metadata-server-jcache");
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("Server failed to launch", launchServer(JCACHE_SERVER));
+        assertTrue("Server failed to launch", launchServer(OIDCServer.class, true));
     }
 
     @AfterClass
@@ -56,7 +61,7 @@ public class OIDCMetadataServiceTest extends AbstractBusClientServerTestBase {
     public void testOIDCMetadataService() throws Exception {
         URL busFile = OIDCMetadataServiceTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + JCACHE_SERVER.getPort() + "/services/.well-known/openid-configuration";
+        String address = "https://localhost:" + PORT + "/services/.well-known/openid-configuration";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
 
@@ -68,6 +73,29 @@ public class OIDCMetadataServiceTest extends AbstractBusClientServerTestBase {
         Map<String, Object> json = reader.fromJson(responseStr);
         assertTrue(json.containsKey("issuer"));
         assertTrue(json.containsKey("response_types_supported"));
+    }
+
+    //
+    // Server implementations
+    //
+
+    public static class OIDCServer extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            OIDCServer.class.getResource("metadata-server-jcache.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new OIDCServer();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
     }
 
 }

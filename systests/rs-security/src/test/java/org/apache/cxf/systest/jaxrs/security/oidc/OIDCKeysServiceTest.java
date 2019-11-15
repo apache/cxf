@@ -22,6 +22,9 @@ import java.net.URL;
 
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
@@ -29,6 +32,8 @@ import org.apache.cxf.rs.security.jose.jwk.KeyType;
 import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -43,12 +48,12 @@ import static org.junit.Assert.assertTrue;
  */
 public class OIDCKeysServiceTest extends AbstractBusClientServerTestBase {
 
-    private static final SpringBusTestServer JCACHE_SERVER = new SpringBusTestServer("oidc-keys-jcache");
+    static final String PORT = TestUtil.getPortNumber("oidc-keys-jcache");
 
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("Server failed to launch", launchServer(JCACHE_SERVER));
+        assertTrue("Server failed to launch", launchServer(OIDCServer.class, true));
     }
 
     @AfterClass
@@ -60,7 +65,7 @@ public class OIDCKeysServiceTest extends AbstractBusClientServerTestBase {
     public void testGetRSAPublicKey() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + JCACHE_SERVER.getPort() + "/services/";
+        String address = "https://localhost:" + PORT + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         client.accept("application/json");
@@ -84,7 +89,7 @@ public class OIDCKeysServiceTest extends AbstractBusClientServerTestBase {
     public void testGetJWKRSAPublicKey() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + JCACHE_SERVER.getPort() + "/services2/";
+        String address = "https://localhost:" + PORT + "/services2/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         client.accept("application/json");
@@ -108,7 +113,7 @@ public class OIDCKeysServiceTest extends AbstractBusClientServerTestBase {
     public void testGetJWKECPublicKey() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + JCACHE_SERVER.getPort() + "/services3/";
+        String address = "https://localhost:" + PORT + "/services3/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         client.accept("application/json");
@@ -132,7 +137,7 @@ public class OIDCKeysServiceTest extends AbstractBusClientServerTestBase {
     public void testGetJWKHMAC() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + JCACHE_SERVER.getPort() + "/services4/";
+        String address = "https://localhost:" + PORT + "/services4/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         client.accept("application/json");
@@ -149,7 +154,7 @@ public class OIDCKeysServiceTest extends AbstractBusClientServerTestBase {
     public void testGetJWKHMACExplicitlyAllowed() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + JCACHE_SERVER.getPort() + "/services5/";
+        String address = "https://localhost:" + PORT + "/services5/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         client.accept("application/json");
@@ -166,7 +171,7 @@ public class OIDCKeysServiceTest extends AbstractBusClientServerTestBase {
     public void testGetJWKMultipleKeys() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + JCACHE_SERVER.getPort() + "/services6/";
+        String address = "https://localhost:" + PORT + "/services6/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         client.accept("application/json");
@@ -192,5 +197,26 @@ public class OIDCKeysServiceTest extends AbstractBusClientServerTestBase {
         }
     }
 
+    //
+    // Server implementations
+    //
 
+    public static class OIDCServer extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            OIDCServer.class.getResource("oidc-keys-jcache.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new OIDCServer();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
 }
