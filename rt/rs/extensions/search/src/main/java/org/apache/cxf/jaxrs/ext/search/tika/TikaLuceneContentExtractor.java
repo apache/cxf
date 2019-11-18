@@ -98,8 +98,7 @@ public class TikaLuceneContentExtractor {
      * optional media type validation. If validation is enabled, the implementation
      * will try to detect the media type of the input and validate it against media types
      * supported by the parser.
-     * @param parser parser instancethis.contentFieldName
-     * @param validateMediaType enabled or disable media type validation
+     * @param parsers parsers instancethis.contentFieldName
      * @param documentMetadata documentMetadata
      */
     public TikaLuceneContentExtractor(final List<Parser> parsers,

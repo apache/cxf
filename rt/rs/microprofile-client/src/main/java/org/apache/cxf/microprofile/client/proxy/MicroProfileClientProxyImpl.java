@@ -102,7 +102,8 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
                                        boolean isRoot, boolean inheritHeaders, ExecutorService executorService,
                                        Configuration configuration, CDIInterceptorWrapper interceptorWrapper, 
                                        Object... varValues) {
-        super(new LocalClientState(baseURI, configuration.getProperties()), loader, cri, isRoot, inheritHeaders, varValues);
+        super(new LocalClientState(baseURI, configuration.getProperties()), loader, cri,
+            isRoot, inheritHeaders, varValues);
         this.interceptorWrapper = interceptorWrapper;
         init(executorService, configuration);
     }
