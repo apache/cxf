@@ -92,7 +92,7 @@
         <cxf.brave.version>5.6.9</cxf.brave.version>
         <cxf.brave.zipkin.version>2.14.2</cxf.brave.zipkin.version>
         <cxf.cda.api.osgi.range>[1.1,2)</cxf.cda.api.osgi.range>
-        <cxf.cdi.api.version>1.2</cxf.cdi.api.version>
+        <cxf.cdi.api.version>2.0</cxf.cdi.api.version>
         <cxf.classgraph.version>4.6.32</cxf.classgraph.version>
         <cxf.classmate.version>1.1.0</cxf.classmate.version>
         <cxf.commons-codec.version>1.13</cxf.commons-codec.version>
@@ -142,7 +142,7 @@
         <cxf.jaxb.version>2.3.2</cxf.jaxb.version>
         <cxf.jaxb.xjc.version>${cxf.jaxb.version}</cxf.jaxb.xjc.version>
         <cxf.jboss.logging.version>3.3.0.Final</cxf.jboss.logging.version>
-        <cxf.jboss.weld.version>2.4.8.Final</cxf.jboss.weld.version>
+        <cxf.jboss.weld.version>3.1.2.Final</cxf.jboss.weld.version>
         <cxf.jcache.version>1.1.1</cxf.jcache.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
         <cxf.jettison.version>1.4.0</cxf.jettison.version>

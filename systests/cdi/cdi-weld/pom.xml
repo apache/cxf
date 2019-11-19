@@ -48,14 +48,9 @@
         </dependency>
         <dependency>
             <groupId>org.jboss.weld.servlet</groupId>
-            <artifactId>weld-servlet</artifactId>
+            <artifactId>weld-servlet-core</artifactId>
             <version>${cxf.jboss.weld.version}</version>
         </dependency>        
-        <dependency>
-            <groupId>org.jboss.weld</groupId>
-            <artifactId>weld-core</artifactId>
-            <version>${cxf.jboss.weld.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>javax.el</artifactId>
