@@ -284,12 +284,8 @@
         <bundle start-level="35">mvn:com.fasterxml.jackson.core/jackson-annotations/${cxf.jackson.version}</bundle>
         <bundle start-level="35">mvn:com.fasterxml.jackson.core/jackson-databind/${cxf.jackson.databind.version}</bundle>
         <bundle start-level="35">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/${cxf.jackson.version}</bundle>
-        <bundle start-level="35">mvn:com.fasterxml.jackson.module/jackson-module-jaxb-annotations/${cxf.jackson.version}</bundle>
-        <!-- <bundle start-level="35">mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-base/${cxf.jackson.version}</bundle> -->
-        <!-- <bundle start-level="35">mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-json-provider/${cxf.jackson.version}</bundle> -->
-        <feature prerequisite="true">wrap</feature>
-        <bundle>wrap:mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-base/${cxf.jackson.version}$overwrite=merge&amp;Import-Package=javax.ws.rs*;version="[2.0,3)",com.fasterxml.jackson*;version="[2.8,3)"</bundle>
-        <bundle>wrap:mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-json-provider/${cxf.jackson.version}$overwrite=merge&amp;Import-Package=javax.ws.rs*;version="[2.0,3)",com.fasterxml.jackson.module.jaxb;resolution:=optional;version="[2.8,3)",com.fasterxml.jackson*;version="[2.8,3)"</bundle>
+        <bundle start-level="35">mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-base/${cxf.jackson.version}</bundle>
+        <bundle start-level="35">mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-json-provider/${cxf.jackson.version}</bundle>
     </feature>
     <feature name="cxf-jsr-json" version="${project.version}">
         <bundle dependency="true" start-level="30">mvn:org.apache.aries.spifly/org.apache.aries.spifly.dynamic.bundle/${cxf.aries.fly.version}</bundle>
