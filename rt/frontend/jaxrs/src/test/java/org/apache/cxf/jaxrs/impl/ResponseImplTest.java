@@ -279,6 +279,21 @@ public class ResponseImplTest {
     }
 
     @Test
+    public void testGetCookiesWithEmptyValues() {
+        ResponseImpl ri = new ResponseImpl(200);
+        MetadataMap<String, Object> meta = new MetadataMap<>();
+        meta.add("Set-Cookie", NewCookie.valueOf("a="));
+        meta.add("Set-Cookie", NewCookie.valueOf("c=\"\""));
+        ri.addMetadata(meta);
+        Map<String, NewCookie> cookies = ri.getCookies();
+        assertEquals(2, cookies.size());
+        assertEquals("a=\"\";Version=1", cookies.get("a").toString());
+        assertEquals("c=\"\";Version=1", cookies.get("c").toString());
+        assertEquals("", cookies.get("a").getValue());
+        assertEquals("", cookies.get("c").getValue());
+    }
+    
+    @Test
     public void testGetCookies() {
         ResponseImpl ri = new ResponseImpl(200);
         MetadataMap<String, Object> meta = new MetadataMap<>();
