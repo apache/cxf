@@ -104,7 +104,7 @@
         <dependency>
             <groupId>org.ops4j.pax.url</groupId>
             <artifactId>pax-url-aether</artifactId>
-            <version>1.6.0</version>
+            <version>5.6.2</version>
             <scope>test</scope>
         </dependency>
        
