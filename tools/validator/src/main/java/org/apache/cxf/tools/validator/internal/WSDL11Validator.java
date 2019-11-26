@@ -61,7 +61,7 @@ import org.apache.cxf.tools.validator.AbstractValidator;
 import org.apache.cxf.wsdl.WSDLManager;
 
 public class WSDL11Validator extends AbstractDefinitionValidator {
-    protected static final Logger LOG = LogUtils.getL7dLogger(SchemaValidator.class);
+    protected static final Logger LOG = LogUtils.getL7dLogger(WSDL11Validator.class);
     private final List<AbstractValidator> validators = new ArrayList<>();
 
     public WSDL11Validator(final Definition definition) {
