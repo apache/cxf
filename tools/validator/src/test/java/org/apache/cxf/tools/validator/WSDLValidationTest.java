@@ -213,6 +213,24 @@ public class WSDLValidationTest extends ToolTestBase {
         }
     }
 
+    @Test
+    public void testIllegalWSDLImportProtocol() throws Exception {
+        String[] args = new String[] {"-verbose",
+                                      getLocation("/validator_wsdl/ftp_import.wsdl")};
+        WSDLValidator.main(args);
+
+        assertTrue(getStdErr().indexOf("The ftp URI scheme is not allowed") != -1);
+    }
+
+    @Test
+    public void testIllegalXSDImportProtocol() throws Exception {
+        String[] args = new String[] {"-verbose",
+                                      getLocation("/validator_wsdl/ftp_import2.wsdl")};
+        WSDLValidator.main(args);
+
+        assertTrue(getStdErr().indexOf("The ftp URI scheme is not allowed") != -1);
+    }
+
     @Override
     protected String getLocation(String wsdlFile) throws Exception {
         Enumeration<URL> e = WSDLValidationTest.class.getClassLoader().getResources(wsdlFile);
