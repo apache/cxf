@@ -31,7 +31,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -48,7 +48,7 @@
                 <wsp:PolicyReference URI="#SignEncryptBodyPolicy"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
                 <wsp:PolicyReference URI="#SignEncryptBodyPolicy"/>
             </wsdl:fault>
         </wsdl:operation>
