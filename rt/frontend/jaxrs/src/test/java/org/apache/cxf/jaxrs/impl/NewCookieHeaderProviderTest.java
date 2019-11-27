@@ -52,6 +52,12 @@ public class NewCookieHeaderProviderTest {
                    && "foo".equals(c.getName()));
     }
 
+    @Test
+    public void testNoValue() {
+        NewCookie c = NewCookie.valueOf("foo=");
+        assertTrue("".equals(c.getValue())
+                   && "foo".equals(c.getName()));
+    }
 
     @Test
     public void testFromComplexString() {
