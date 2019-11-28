@@ -267,6 +267,9 @@ public final class JweUtils {
         if (AlgorithmUtils.isAesGcm(algorithm.getJwaName())) {
             return new AesGcmContentEncryptionAlgorithm(key, null, algorithm);
         }
+        if (AlgorithmUtils.isAesCbcHmac(algorithm.getJwaName())) {
+            return new AesCbcContentEncryptionAlgorithm(key, null, algorithm);
+        }
         return null;
     }
     public static ContentEncryptionProvider getContentEncryptionProvider(ContentAlgorithm algorithm) {
