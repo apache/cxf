@@ -21,6 +21,7 @@ package org.apache.cxf.systest.jaxrs.tracing.brave;
 import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -29,6 +30,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -48,15 +50,19 @@ import org.apache.cxf.systest.brave.TestSpanReporter;
 import org.apache.cxf.systest.jaxrs.tracing.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.tracing.brave.BraveClientFeature;
 import org.apache.cxf.tracing.brave.TraceScope;
 import org.apache.cxf.tracing.brave.jaxrs.BraveClientProvider;
 import org.apache.cxf.tracing.brave.jaxrs.BraveFeature;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.awaitility.Duration;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import static org.apache.cxf.systest.brave.BraveTestSupport.PARENT_SPAN_ID_NAME;
 import static org.apache.cxf.systest.brave.BraveTestSupport.SAMPLED_NAME;
@@ -70,12 +76,16 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
+import static org.hamcrest.collection.IsMapContaining.hasKey;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class BraveTracingTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(BraveTracingTest.class);
+
+    @Rule 
+    public ExpectedException expectedException = ExpectedException.none();
 
     private Tracing brave;
     private BraveClientProvider braveClientProvider;
@@ -397,6 +407,30 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
 
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(0));
         assertThatTraceHeadersArePresent(r, false);
+    }
+
+    @Test
+    public void testThatNewSpanIsCreatedOnClientTimeout() {
+        final WebClient client = WebClient
+            .create("http://localhost:" + PORT + "/bookstore/books/long", Collections.emptyList(),
+                Arrays.asList(new BraveClientFeature(brave)), null)
+            .accept(MediaType.APPLICATION_JSON);
+        
+        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+        httpClientPolicy.setConnectionTimeout(100);
+        httpClientPolicy.setReceiveTimeout(100);
+        WebClient.getConfig(client).getHttpConduit().setClient(httpClientPolicy);
+
+        expectedException.expect(ProcessingException.class);
+        try {
+            client.get();
+        } finally {
+            await().atMost(Duration.ONE_SECOND).until(()-> TestSpanReporter.getAllSpans().size() == 2);
+            assertThat(TestSpanReporter.getAllSpans().size(), equalTo(2));
+            assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get " + client.getCurrentURI()));
+            assertThat(TestSpanReporter.getAllSpans().get(0).tags(), hasKey("error"));
+            assertThat(TestSpanReporter.getAllSpans().get(1).name(), equalTo("get /bookstore/books/long"));
+        }
     }
 
     protected WebClient createWebClient(final String url, final Object ... providers) {

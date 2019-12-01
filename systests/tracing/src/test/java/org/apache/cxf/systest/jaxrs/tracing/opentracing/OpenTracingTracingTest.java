@@ -21,6 +21,7 @@ package org.apache.cxf.systest.jaxrs.tracing.opentracing;
 import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -32,6 +33,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -46,8 +48,10 @@ import org.apache.cxf.systest.jaeger.TestSender;
 import org.apache.cxf.systest.jaxrs.tracing.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.tracing.opentracing.OpenTracingClientFeature;
 import org.apache.cxf.tracing.opentracing.jaxrs.OpenTracingClientProvider;
 import org.apache.cxf.tracing.opentracing.jaxrs.OpenTracingFeature;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.awaitility.Duration;
 
 import io.jaegertracing.Configuration;
@@ -62,12 +66,15 @@ import io.opentracing.Span;
 import io.opentracing.Tracer;
 import io.opentracing.propagation.Format.Builtin;
 import io.opentracing.propagation.TextMap;
+import io.opentracing.tag.Tags;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import static org.apache.cxf.systest.jaxrs.tracing.opentracing.HasSpan.hasSpan;
 import static org.apache.cxf.systest.jaxrs.tracing.opentracing.IsLogContaining.hasItem;
@@ -82,6 +89,9 @@ import static org.junit.Assert.assertTrue;
 
 public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(OpenTracingTracingTest.class);
+
+    @Rule 
+    public ExpectedException expectedException = ExpectedException.none();
 
     private Tracer tracer;
     private OpenTracingClientProvider openTracingClientProvider;
@@ -111,7 +121,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
             sf.create();
         }
     }
-
+    
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
@@ -398,6 +408,30 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Processing books"));
     }
 
+    @Test
+    public void testThatNewSpanIsCreatedOnClientTimeout() {
+        final WebClient client = WebClient
+            .create("http://localhost:" + PORT + "/bookstore/books/long", Collections.emptyList(),
+                Arrays.asList(new OpenTracingClientFeature(tracer)), null)
+            .accept(MediaType.APPLICATION_JSON);
+        
+        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+        httpClientPolicy.setConnectionTimeout(100);
+        httpClientPolicy.setReceiveTimeout(100);
+        WebClient.getConfig(client).getHttpConduit().setClient(httpClientPolicy);
+
+        expectedException.expect(ProcessingException.class);
+        try {
+            client.get();
+        } finally {
+            await().atMost(Duration.ONE_SECOND).until(()-> TestSender.getAllSpans().size() == 2);
+            assertThat(TestSender.getAllSpans().toString(), TestSender.getAllSpans().size(), equalTo(2));
+            assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("GET " + client.getCurrentURI()));
+            assertThat(TestSender.getAllSpans().get(0).getTags(), hasItem(Tags.ERROR.getKey(), Boolean.TRUE));
+            assertThat(TestSender.getAllSpans().get(1).getOperationName(), equalTo("GET /bookstore/books/long"));
+        }
+    }
+    
     protected WebClient createWebClient(final String url, final Object ... providers) {
         return WebClient
             .create("http://localhost:" + PORT + url, Arrays.asList(providers))

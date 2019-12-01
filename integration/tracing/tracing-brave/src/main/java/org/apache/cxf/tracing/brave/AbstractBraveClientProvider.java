@@ -108,4 +108,26 @@ public abstract class AbstractBraveClientProvider extends AbstractTracingProvide
             }
         }
     }
+    
+    protected void stopTraceSpan(final TraceScopeHolder<TraceScope> holder, final Throwable ex) {
+        if (holder == null) {
+            return;
+        }
+
+        final TraceScope scope = holder.getScope();
+        if (scope != null) {
+            try {
+                // If the client invocation was asynchronous , the trace span has been created
+                // in another thread and should be re-attached to the current one.
+                if (holder.isDetached()) {
+                    brave.tracing().tracer().joinSpan(scope.getSpan().context());
+                }
+    
+                final HttpClientHandler<?, Response> handler = HttpClientHandler.create(brave, null);
+                handler.handleReceive(null, ex, scope.getSpan());
+            } finally {
+                scope.close();
+            }
+        }
+    }
 }
