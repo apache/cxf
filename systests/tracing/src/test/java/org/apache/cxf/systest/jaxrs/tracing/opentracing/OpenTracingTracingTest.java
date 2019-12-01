@@ -20,6 +20,7 @@ package org.apache.cxf.systest.jaxrs.tracing.opentracing;
 
 import java.net.MalformedURLException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
@@ -29,6 +30,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.IntStream;
 
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -42,8 +44,10 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systest.jaxrs.tracing.BookStore;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractTestServerBase;
+import org.apache.cxf.tracing.opentracing.OpenTracingClientFeature;
 import org.apache.cxf.tracing.opentracing.jaxrs.OpenTracingClientProvider;
 import org.apache.cxf.tracing.opentracing.jaxrs.OpenTracingFeature;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.awaitility.Duration;
 
 import io.jaegertracing.internal.JaegerSpanContext;
@@ -55,10 +59,13 @@ import io.opentracing.Span;
 import io.opentracing.Tracer;
 import io.opentracing.propagation.Format.Builtin;
 import io.opentracing.propagation.TextMap;
+import io.opentracing.tag.Tags;
 
 import org.junit.After;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import static org.apache.cxf.systest.jaxrs.tracing.opentracing.HasSpan.hasSpan;
 import static org.apache.cxf.systest.jaxrs.tracing.opentracing.IsLogContaining.hasItem;
@@ -78,11 +85,14 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
 
     private static final InMemoryReporter REPORTER = new InMemoryReporter();
 
+    @Rule 
+    public ExpectedException expectedException = ExpectedException.none();
+
     private final Tracer tracer = new JaegerTracer.Builder("tracer-jaxrs")
         .withSampler(new ConstSampler(true))
         .withReporter(REPORTER)
         .build();
-
+    
     public static class BraveServer extends AbstractTestServerBase {
 
         private org.apache.cxf.endpoint.Server server;
@@ -108,7 +118,7 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
             server.destroy();
         }
     }
-
+    
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
@@ -356,6 +366,30 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
         assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("Processing books"));
     }
 
+    @Test
+    public void testThatNewSpanIsCreatedOnClientTimeout() {
+        final WebClient client = WebClient
+            .create("http://localhost:" + PORT + "/bookstore/books/long", Collections.emptyList(),
+                Arrays.asList(new OpenTracingClientFeature(tracer)), null)
+            .accept(MediaType.APPLICATION_JSON);
+        
+        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+        httpClientPolicy.setConnectionTimeout(100);
+        httpClientPolicy.setReceiveTimeout(100);
+        WebClient.getConfig(client).getHttpConduit().setClient(httpClientPolicy);
+
+        expectedException.expect(ProcessingException.class);
+        try {
+            client.get();
+        } finally {
+            await().atMost(Duration.ONE_SECOND).until(()-> REPORTER.getSpans().size() == 2);
+            assertThat(REPORTER.getSpans().toString(), REPORTER.getSpans().size(), equalTo(2));
+            assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("GET " + client.getCurrentURI()));
+            assertThat(REPORTER.getSpans().get(0).getTags(), hasItem(Tags.ERROR.getKey(), Boolean.TRUE));
+            assertThat(REPORTER.getSpans().get(1).getOperationName(), equalTo("GET /bookstore/books/long"));
+        }
+    }
+    
     private static WebClient createWebClient(final String path, final Object ... providers) {
         return WebClient
             .create("http://localhost:" + PORT + path, Arrays.asList(providers))
