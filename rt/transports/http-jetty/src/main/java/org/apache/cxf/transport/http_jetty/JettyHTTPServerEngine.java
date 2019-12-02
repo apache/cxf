@@ -37,6 +37,7 @@ import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -355,7 +356,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
         // back to the client.
         ErrorHandler eh = new ErrorHandler() {
             public void handle(String target, Request baseRequest, HttpServletRequest request,
-                               HttpServletResponse response) throws IOException {
+                               HttpServletResponse response) throws IOException, ServletException {
                 String msg = (String)request.getAttribute(RequestDispatcher.ERROR_MESSAGE);
                 if (StringUtils.isEmpty(msg) || msg.contains("org.apache.cxf.interceptor.Fault")) {
                     msg = HttpStatus.getMessage(response.getStatus());
