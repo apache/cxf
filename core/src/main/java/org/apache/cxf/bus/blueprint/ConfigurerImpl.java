@@ -21,12 +21,11 @@ package org.apache.cxf.bus.blueprint;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.aries.blueprint.services.ExtendedBlueprintContainer;
@@ -45,22 +44,14 @@ public class ConfigurerImpl implements Configurer {
     private static final Logger LOG = LogUtils.getL7dLogger(ConfigurerImpl.class);
     BlueprintContainer container;
 
-    private final Map<String, List<MatcherHolder>> wildCardBeanDefinitions
-        = new TreeMap<>();
+    private final Map<String, Collection<PatternHolder>> wildCardBeanDefinitions = new HashMap<>();
 
-    static class MatcherHolder implements Comparable<MatcherHolder> {
-        Matcher matcher;
-        String wildCardId;
-        MatcherHolder(String orig, Matcher matcher) {
+    static class PatternHolder {
+        final String wildCardId;
+        final Pattern pattern;
+        PatternHolder(String orig, Pattern pattern) {
             wildCardId = orig;
-            this.matcher = matcher;
-        }
-        @Override
-        public int compareTo(MatcherHolder mh) {
-            int literalCharsLen1 = this.wildCardId.replace("*", "").length();
-            int literalCharsLen2 = mh.wildCardId.replace("*", "").length();
-            // The expression with more literal characters should end up on the top of the list
-            return Integer.compare(literalCharsLen1, literalCharsLen2) * -1;
+            this.pattern = pattern;
         }
     }
 
@@ -68,7 +59,7 @@ public class ConfigurerImpl implements Configurer {
         container = con;
         initializeWildcardMap();
     }
-    private boolean isWildcardBeanName(String bn) {
+    private static boolean isWildcardBeanName(String bn) {
         return bn.indexOf('*') != -1 || bn.indexOf('?') != -1
             || (bn.indexOf('(') != -1 && bn.indexOf(')') != -1);
     }
@@ -79,16 +70,9 @@ public class ConfigurerImpl implements Configurer {
                 ComponentMetadata cmd = container.getComponentMetadata(s);
                 Class<?> cls = BlueprintBeanLocator.getClassForMetaData(container, cmd);
                 if (cls != null) {
-                    final String cid = s.charAt(0) != '*' ? s
-                            : "." + s.replaceAll("\\.", "\\."); //old wildcard
-                    Matcher matcher = Pattern.compile(cid).matcher("");
-                    List<MatcherHolder> m = wildCardBeanDefinitions.get(cls.getName());
-                    if (m == null) {
-                        m = new ArrayList<>();
-                        wildCardBeanDefinitions.put(cls.getName(), m);
-                    }
-                    MatcherHolder holder = new MatcherHolder(s, matcher);
-                    m.add(holder);
+                    final String cid = s.charAt(0) != '*' ? s : "." + s; //old wildcard
+                    wildCardBeanDefinitions.computeIfAbsent(cls.getName(), c -> new ArrayList<>())
+                        .add(new PatternHolder(s, Pattern.compile(cid)));
                 }
             }
         }
@@ -131,15 +115,12 @@ public class ConfigurerImpl implements Configurer {
             Class<?> clazz = beanInstance.getClass();
             while (!Object.class.equals(clazz)) {
                 String className = clazz.getName();
-                List<MatcherHolder> matchers = wildCardBeanDefinitions.get(className);
-                if (matchers != null) {
-                    for (MatcherHolder m : matchers) {
-                        synchronized (m.matcher) {
-                            m.matcher.reset(bn);
-                            if (m.matcher.matches()) {
-                                configureBean(m.wildCardId, beanInstance, false);
-                                return;
-                            }
+                Collection<PatternHolder> patterns = wildCardBeanDefinitions.get(className);
+                if (patterns != null) {
+                    for (PatternHolder p : patterns) {
+                        if (p.pattern.matcher(bn).matches()) {
+                            configureBean(p.wildCardId, beanInstance, false);
+                            return;
                         }
                     }
                 }
