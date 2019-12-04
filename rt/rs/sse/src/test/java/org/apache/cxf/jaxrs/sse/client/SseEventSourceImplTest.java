@@ -59,8 +59,8 @@ public class SseEventSourceImplTest {
 
     enum Type {
         NO_CONTENT, NO_SERVER, BUSY,
-        EVENT, EVENT_JUST_DATA, EVENT_JUST_NAME, EVENT_NO_RETRY, EVENT_BAD_RETRY, EVENT_MIXED, EVENT_BAD_NEW_LINES,
-        EVENT_NOT_AUTHORIZED;
+        EVENT, EVENT_JUST_DATA, EVENT_JUST_NAME, EVENT_MULTILINE_DATA, EVENT_NO_RETRY, EVENT_BAD_RETRY, EVENT_MIXED,
+        EVENT_BAD_NEW_LINES, EVENT_NOT_AUTHORIZED;
     }
 
     private static final String EVENT = "event: event\n"
@@ -73,6 +73,11 @@ public class SseEventSourceImplTest {
     private static final String EVENT_JUST_DATA = "\n"
         + "data: just test data\n"
         + "\n";
+
+    private static final String EVENT_MULTILINE_DATA = "\n"
+            + "data: just test data\n"
+            + "data: in multiple lines\n"
+            + "\n";
 
     private static final String EVENT_JUST_NAME = "\n"
         + "event: just name\n";
@@ -207,6 +212,22 @@ public class SseEventSourceImplTest {
         assertThat(events.size(), equalTo(1));
         assertThat(events.get(0).getName(), nullValue());
         assertThat(events.get(0).readData(), equalTo("just test data"));
+    }
+
+    @Test
+    public void testNoReconnectAndMultilineDataEventIsReceived() throws InterruptedException, IOException {
+        try (SseEventSource eventSource = withNoReconnect(Type.EVENT_MULTILINE_DATA)) {
+            eventSource.open();
+
+            assertThat(eventSource.isOpen(), equalTo(true));
+
+            // Allow the event processor to pull for events (150ms)
+            Thread.sleep(150L);
+        }
+
+        assertThat(events.size(), equalTo(1));
+        assertThat(events.get(0).getName(), nullValue());
+        assertThat(events.get(0).readData(), equalTo("just test data\nin multiple lines"));
     }
 
     @Test
@@ -382,6 +403,7 @@ public class SseEventSourceImplTest {
         startServer(Type.EVENT, EVENT);
         startServer(Type.EVENT_JUST_DATA, EVENT_JUST_DATA);
         startServer(Type.EVENT_JUST_NAME, EVENT_JUST_NAME);
+        startServer(Type.EVENT_MULTILINE_DATA, EVENT_MULTILINE_DATA);
         startServer(Type.EVENT_NO_RETRY, EVENT_NO_RETRY);
         startServer(Type.EVENT_BAD_RETRY, EVENT_BAD_RETRY);
         startServer(Type.EVENT_MIXED, EVENT_MIXED);
