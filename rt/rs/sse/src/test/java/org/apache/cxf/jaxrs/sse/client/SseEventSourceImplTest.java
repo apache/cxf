@@ -76,7 +76,12 @@ public class SseEventSourceImplTest extends Assert {
     private static final String EVENT_JUST_DATA = "\n"
         + "data: just test data\n"
         + "\n";
-    
+
+    private static final String EVENT_MULTILINE_DATA = "\n"
+            + "data: just test data\n"
+            + "data: in multiple lines\n"
+            + "\n";
+
     private static final String EVENT_JUST_NAME = "\n"
         + "event: just name\n";
     
@@ -277,6 +282,30 @@ public class SseEventSourceImplTest extends Assert {
         }
     }
     
+    @Test
+    public void testNoReconnectAndMultilineDataEventIsReceived() throws InterruptedException, IOException {
+        try (InputStream is = new ByteArrayInputStream(EVENT_MULTILINE_DATA.getBytes(StandardCharsets.UTF_8))) {
+            when(response.getStatus()).thenReturn(200);
+            when(response.readEntity(InputStream.class)).thenReturn(is);
+            
+            final List<InboundSseEvent> events = new ArrayList<>();
+            try (SseEventSource eventSource = withNoReconnect()) {
+                eventSource.register(events::add);
+                eventSource.open();
+                
+                assertThat(eventSource.isOpen(), equalTo(true));
+                verify(response, times(1)).getStatus();
+                
+                // Allow the event processor to pull for events (150ms)
+                Thread.sleep(150);
+            }
+            
+            assertThat(events.size(), equalTo(1));
+            assertThat(events.get(0).getName(), nullValue());
+            assertThat(events.get(0).readData(), equalTo("just test data\nin multiple lines"));
+        }
+    }
+
     @Test
     public void testNoReconnectAndJustEventNameIsReceived() throws InterruptedException, IOException {
         try (InputStream is = new ByteArrayInputStream(EVENT_JUST_NAME.getBytes(StandardCharsets.UTF_8))) {
