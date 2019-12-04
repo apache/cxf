@@ -102,7 +102,7 @@ public class InboundSseEventProcessor {
                         } else if (line.startsWith(RETRY)) {
                             builder = getOrCreate(builder).reconnectDelay(line.substring(RETRY.length()));
                         } else if (line.startsWith(DATA)) {
-                            builder = getOrCreate(builder).data(line.substring(DATA.length()));
+                            builder = getOrCreate(builder).appendData(line.substring(DATA.length()));
                         }
                     }
                     line = reader.readLine();
