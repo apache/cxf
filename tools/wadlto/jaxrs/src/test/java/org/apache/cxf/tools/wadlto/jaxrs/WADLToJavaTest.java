@@ -48,6 +48,8 @@ public class WADLToJavaTest extends ProcessorTestBase {
             "custom.service",
             "-tMap",
             "{http://www.w3.org/2001/XMLSchema}date=java.util.List..String",
+            "-tMap",
+            "{http://www.w3.org/2001/XMLSchema}base64Binary=byte[]",
             "-async getName,delete",
             "-inheritResourceParams first",
             "-compile",
