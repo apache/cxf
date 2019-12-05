@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
@@ -559,12 +560,12 @@ public final class ResourceUtils {
         return null;
     }
 
-    public static InputStream getResourceStream(String loc, Bus bus) throws Exception {
+    public static InputStream getResourceStream(String loc, Bus bus) throws IOException {
         URL url = getResourceURL(loc, bus);
         return url == null ? null : url.openStream();
     }
 
-    public static URL getResourceURL(String loc, Bus bus) throws Exception {
+    public static URL getResourceURL(String loc, Bus bus) throws IOException {
         URL url = null;
         if (loc.startsWith(CLASSPATH_PREFIX)) {
             String path = loc.substring(CLASSPATH_PREFIX.length());
@@ -609,7 +610,7 @@ public final class ResourceUtils {
         return null;
     }
 
-    public static Properties loadProperties(String propertiesLocation, Bus bus) throws Exception {
+    public static Properties loadProperties(String propertiesLocation, Bus bus) throws IOException {
         Properties props = new Properties();
         try (InputStream is = getResourceStream(propertiesLocation, bus)) {
             props.load(is);
