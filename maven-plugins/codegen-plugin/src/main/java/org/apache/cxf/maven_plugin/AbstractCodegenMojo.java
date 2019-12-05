@@ -69,7 +69,7 @@ import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.StreamConsumer;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
-public abstract class AbstractCodegenMoho extends AbstractMojo {
+public abstract class AbstractCodegenMojo extends AbstractMojo {
 
     /**
      * JVM/System property name holding the hostname of the http proxy.
@@ -202,7 +202,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
     private RepositorySystem repositorySystem;
 
 
-    public AbstractCodegenMoho() {
+    public AbstractCodegenMojo() {
         super();
     }
 
@@ -617,12 +617,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         Commandline cmd = new Commandline();
         cmd.getShell().setQuotedArgumentsEnabled(true); // for JVM args
         cmd.setWorkingDirectory(project.getBuild().getDirectory());
-        try {
-            cmd.setExecutable(getJavaExecutable().getAbsolutePath());
-        } catch (IOException e) {
-            getLog().debug(e);
-            throw new MojoExecutionException(e.getMessage(), e);
-        }
+        cmd.setExecutable(getJavaExecutable().getAbsolutePath());
 
         cmd.createArg().setLine(additionalJvmArgs);
 
@@ -811,7 +806,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         }
     }
 
-    private File getJavaExecutable() throws IOException {
+    private File getJavaExecutable() throws MojoExecutionException {
         if (javaExecutable != null) {
             getLog().debug("Plugin configuration set the 'javaExecutable' parameter to " + javaExecutable);
         } else {
@@ -827,11 +822,8 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         String exe = SystemUtils.IS_OS_WINDOWS && !javaExecutable.endsWith(".exe") ? ".exe" : "";
         File javaExe = new File(javaExecutable + exe);
         if (!javaExe.isFile()) {
-            throw new IOException(
-                                  "The java executable '"
-                                      + javaExe
-                                      + "' doesn't exist or is not a file."
-                                      + "Verify the <javaExecutable/> parameter or toolchain configuration.");
+            throw new MojoExecutionException("The java executable '" + javaExe + "' doesn't exist or is not a file."
+                + " Verify the <javaExecutable/> parameter or toolchain configuration.");
         }
         getLog().info("The java executable is " + javaExe.getAbsolutePath());
         return javaExe;

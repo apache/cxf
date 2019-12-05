@@ -38,7 +38,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.maven_plugin.AbstractCodegenMoho;
+import org.apache.cxf.maven_plugin.AbstractCodegenMojo;
 import org.apache.cxf.maven_plugin.GenericWsdlOption;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolErrorListener;
@@ -54,7 +54,7 @@ import org.sonatype.plexus.build.incremental.BuildContext;
 
 @Mojo(name = "wsdl2java", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true,
       requiresDependencyResolution = ResolutionScope.TEST)
-public class WSDL2JavaMojo extends AbstractCodegenMoho {
+public class WSDL2JavaMojo extends AbstractCodegenMojo {
 
     final class MavenToolErrorListener extends ToolErrorListener {
         private final List<File> errorfiles;
