@@ -444,6 +444,30 @@ public class ResponseImplTest {
         }
     }
 
+    @Test
+    public void testGetLinksMultiple() {
+        try (ResponseImpl ri = new ResponseImpl(200)) {
+            MetadataMap<String, Object> meta = new MetadataMap<>();
+            ri.addMetadata(meta);
+
+            Set<Link> links = ri.getLinks();
+            assertTrue(links.isEmpty());
+
+            meta.add(HttpHeaders.LINK, "<http://next>;rel=\"next\",<http://prev>;rel=\"prev\"");
+
+            assertTrue(ri.hasLink("next"));
+            Link next = ri.getLink("next");
+            assertNotNull(next);
+            assertTrue(ri.hasLink("prev"));
+            Link prev = ri.getLink("prev");
+            assertNotNull(prev);
+
+            links = ri.getLinks();
+            assertTrue(links.contains(Link.fromUri("http://next").rel("next").build()));
+            assertTrue(links.contains(Link.fromUri("http://prev").rel("prev").build()));
+        }
+    }
+
     public static class StringBean {
         private String header;
 
