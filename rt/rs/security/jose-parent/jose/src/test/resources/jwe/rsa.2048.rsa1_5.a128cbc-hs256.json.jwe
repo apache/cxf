@@ -1,0 +1,16 @@
+{
+  "protected": "eyJlbmMiOiJBMTI4Q0JDLUhTMjU2In0",
+  "unprotected": {},
+  "recipients": [
+    {
+      "header": {
+        "alg": "RSA1_5",
+        "kid": "rsae001"
+      },
+      "encrypted_key": "XG0e3jjeLjGrE-Be-BIWZ6wG_lP9WMif22sIt17n6-Skoxd-yoSetpiQNzlOC9H4PJnzgzasYE0M68IacK79fvt9EwNflEGbvpqW4m62Bmt9tA9itagOycflbZesz8VnvYAxiacSJi2qigJLPwNZGrE_B_UGHReglcQsvTOy6k9MkaqDlhiGgJbsJLVh-vSFVqlxHk61X21Nu3mQVm8jFkMt8xgZIpSnXxJwLlMkFkuZ5RZJcu1YRz_c_ZobarcmxTEtTZj81rkgVDmpH5RC7GVrmSsMaCUCnrmkxL-a4iF_smZ0KVj9BNfPpUSBtbv6hG1RyVeHsbFxPG_lZmtliw"
+    }
+  ],
+  "iv": "rwvdXFCel0weTNFp94fgrw",
+  "ciphertext": "DdWrZrCYXukjxiTwtLE9aV6YhMpaf1nyWDoB-D9CPhI",
+  "tag": "yfWO0dbyVEFwREo3U9fKZA"
+}

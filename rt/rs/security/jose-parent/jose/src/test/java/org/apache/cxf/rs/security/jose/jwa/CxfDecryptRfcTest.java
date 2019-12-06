@@ -16,16 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.jose.jwe;
+package org.apache.cxf.rs.security.jose.jwa;
 
-import java.security.interfaces.ECPrivateKey;
+import org.apache.cxf.rs.security.jose.support.ApacheCXFConsumer;
 
-import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
+public class CxfDecryptRfcTest extends JwaDecryptRfcConformanceTest {
 
+    private ApacheCXFConsumer consumer = new ApacheCXFConsumer();
 
-public class EcdhDirectKeyJweDecryption extends JweDecryption {
-    public EcdhDirectKeyJweDecryption(ECPrivateKey privateKey, ContentAlgorithm supportedCtAlgo) {
-        super(new EcdhDirectKeyDecryptionAlgorithm(privateKey),
-              new AesGcmContentDecryptionAlgorithm(supportedCtAlgo));
+    @Override
+    protected void decrypt(String encryptedData, String plainText, String jwksJson) {
+        consumer.consumeJWE(encryptedData, plainText, jwksJson);
+
     }
+
 }

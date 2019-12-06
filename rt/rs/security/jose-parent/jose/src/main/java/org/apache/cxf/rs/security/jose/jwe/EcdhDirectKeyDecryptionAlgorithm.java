@@ -21,46 +21,34 @@ package org.apache.cxf.rs.security.jose.jwe;
 import java.security.interfaces.ECPrivateKey;
 
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
-import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
-import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
+import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 
-public class EcdhAesWrapKeyDecryptionAlgorithm implements KeyDecryptionProvider {
-    private ECPrivateKey key;
-    private KeyAlgorithm algo;
-    public EcdhAesWrapKeyDecryptionAlgorithm(ECPrivateKey key) {
-        this(key, KeyAlgorithm.ECDH_ES_A128KW);
-    }
-    public EcdhAesWrapKeyDecryptionAlgorithm(ECPrivateKey key, KeyAlgorithm algo) {
-        this.key = key;
-        this.algo = algo;
-    }
-    @Override
-    public byte[] getDecryptedContentEncryptionKey(JweDecryptionInput jweDecryptionInput) {
-        byte[] derivedKey = getDecryptedContentEncryptionKeyFromHeaders(
-                jweDecryptionInput.getJweHeaders(), key);
-        KeyDecryptionProvider aesWrap = new AesWrapKeyDecryptionAlgorithm(derivedKey, KeyAlgorithm.ECDH_ES_A128KW) {
-            protected boolean isValidAlgorithmFamily(String wrapAlgo) {
-                return AlgorithmUtils.isEcdhEsWrap(wrapAlgo);
-            }
-        };
-        return aesWrap.getDecryptedContentEncryptionKey(jweDecryptionInput);
+public class EcdhDirectKeyDecryptionAlgorithm extends DirectKeyDecryptionAlgorithm {
+
+    private ECPrivateKey privateKey;
+
+    public EcdhDirectKeyDecryptionAlgorithm(ECPrivateKey privateKey) {
+        super((byte[]) null);
+        this.privateKey = privateKey;
     }
 
     @Override
-    public KeyAlgorithm getAlgorithm() {
-        return algo;
+    public byte[] getDecryptedContentEncryptionKey(JweDecryptionInput jweDecryptionInput) {
+        super.validateKeyEncryptionKey(jweDecryptionInput);
+
+        return getDecryptedContentEncryptionKeyFromHeaders(jweDecryptionInput.getJweHeaders(), privateKey);
     }
-    
-    protected byte[] getDecryptedContentEncryptionKeyFromHeaders(JweHeaders headers, ECPrivateKey privateKey) {
-        KeyAlgorithm jwtAlgo = headers.getKeyEncryptionAlgorithm();
+
+    protected byte[] getDecryptedContentEncryptionKeyFromHeaders(JweHeaders headers, ECPrivateKey key) {
+        ContentAlgorithm jwtAlgo = headers.getContentEncryptionAlgorithm();
         JsonWebKey publicJwk = headers.getJsonWebKey("epk");
         String apuHeader = (String) headers.getHeader("apu");
         byte[] apuBytes = apuHeader == null ? null : JoseUtils.decode(apuHeader);
         String apvHeader = (String) headers.getHeader("apv");
         byte[] apvBytes = apvHeader == null ? null : JoseUtils.decode(apvHeader);
-        return JweUtils.getECDHKey(privateKey, JwkUtils.toECPublicKey(publicJwk), apuBytes, apvBytes,
+        return JweUtils.getECDHKey(key, JwkUtils.toECPublicKey(publicJwk), apuBytes, apvBytes,
             jwtAlgo.getJwaName(), jwtAlgo.getKeySizeBits());
     }
 

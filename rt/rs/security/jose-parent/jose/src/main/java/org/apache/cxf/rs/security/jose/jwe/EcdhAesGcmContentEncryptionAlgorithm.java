@@ -18,14 +18,22 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
-import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
 
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 
-
-public class EcdhDirectKeyJweDecryption extends JweDecryption {
-    public EcdhDirectKeyJweDecryption(ECPrivateKey privateKey, ContentAlgorithm supportedCtAlgo) {
-        super(new EcdhDirectKeyDecryptionAlgorithm(privateKey),
-              new AesGcmContentDecryptionAlgorithm(supportedCtAlgo));
+public class EcdhAesGcmContentEncryptionAlgorithm extends AesGcmContentEncryptionAlgorithm {
+    private EcdhHelper helper;
+    public EcdhAesGcmContentEncryptionAlgorithm(ECPublicKey peerPublicKey,
+                                                String curve,
+                                                String apuString,
+                                                String apvString,
+                                                ContentAlgorithm ctAlgo) {
+        super(ctAlgo);
+        helper = new EcdhHelper(peerPublicKey, curve, apuString, apvString, ctAlgo.getJwaName());
     }
+    public byte[] getContentEncryptionKey(JweHeaders headers) {
+        return helper.getDerivedKey(headers);
+    }
+
 }

@@ -16,16 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.jose.jwe;
-
-import java.security.interfaces.ECPrivateKey;
-
-import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
+package org.apache.cxf.rs.security.jose.support;
 
 
-public class EcdhDirectKeyJweDecryption extends JweDecryption {
-    public EcdhDirectKeyJweDecryption(ECPrivateKey privateKey, ContentAlgorithm supportedCtAlgo) {
-        super(new EcdhDirectKeyDecryptionAlgorithm(privateKey),
-              new AesGcmContentDecryptionAlgorithm(supportedCtAlgo));
-    }
+public enum Serialization {
+
+    COMPACT, FLATTENED, JSON;
+
 }

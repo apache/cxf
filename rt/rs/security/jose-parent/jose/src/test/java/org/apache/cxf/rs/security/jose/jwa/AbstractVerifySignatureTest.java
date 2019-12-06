@@ -16,16 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.jose.jwe;
+package org.apache.cxf.rs.security.jose.jwa;
 
-import java.security.interfaces.ECPrivateKey;
+public abstract class AbstractVerifySignatureTest extends AbstractJwaTest {
 
-import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
-
-
-public class EcdhDirectKeyJweDecryption extends JweDecryption {
-    public EcdhDirectKeyJweDecryption(ECPrivateKey privateKey, ContentAlgorithm supportedCtAlgo) {
-        super(new EcdhDirectKeyDecryptionAlgorithm(privateKey),
-              new AesGcmContentDecryptionAlgorithm(supportedCtAlgo));
+    protected final void test(String signedDataFile) {
+        test(signedDataFile, "Live long and prosper.");
     }
+
+    protected final void test(String signedDataFile, String plainText) {
+        test(signedDataFile, plainText, "/jwk/pubKeys.jwks");
+    }
+
+    protected final void test(String signedDataFile, String plainText, String jwksURI) {
+        validateSignature(loadResource(signedDataFile), plainText, loadResource(jwksURI));
+    }
+
+    protected abstract void validateSignature(String encryptedData, String plainText, String jwksJson);
+
 }
