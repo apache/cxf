@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
-import java.io.StringReader;
 import java.io.Writer;
 import java.net.URI;
 import java.net.URL;
@@ -37,7 +36,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -297,8 +295,8 @@ public class SourceGenerator {
         return value == null ? SystemPropertyAction.getProperty(FILE_SEP_PROPERTY) : value;
     }
 
-    public void generateSource(String wadl, File srcDir, String codeType) {
-        Application app = readWadl(wadl, wadlPath);
+    public void generateSource(File srcDir, String codeType) {
+        Application app = readWadl();
         Set<String> typeClassNames = new HashSet<>();
         GrammarInfo gInfo = generateSchemaCodeAndInfo(app, typeClassNames, srcDir);
         if (!CODE_TYPE_GRAMMAR.equals(codeType)) {
@@ -369,8 +367,7 @@ public class SourceGenerator {
                 URI wadlRef = URI.create(type);
                 String wadlRefPath = app.getWadlPath() != null
                     ? getBaseWadlPath(app.getWadlPath()) + wadlRef.getPath() : wadlRef.getPath();
-                Application refApp = new Application(readIncludedDocument(wadlRefPath),
-                                                     wadlRefPath);
+                Application refApp = new Application(readDocument(wadlRefPath), wadlRefPath);
                 GrammarInfo gInfoBase = generateSchemaCodeAndInfo(refApp, typeClassNames, srcDir);
                 if (gInfoBase != null) {
                     gInfo.getElementTypeMap().putAll(gInfoBase.getElementTypeMap());
@@ -445,7 +442,7 @@ public class SourceGenerator {
             int ind = systemId.lastIndexOf('/');
             if (ind != -1) {
                 String schemaURI = systemId.substring(0, ind + 1) + includeEl.getAttribute("schemaLocation");
-                populateElementTypeMap(app, readIncludedDocument(schemaURI), schemaURI, elementTypeMap);
+                populateElementTypeMap(app, readDocument(schemaURI), schemaURI, elementTypeMap);
             }
         }
     }
@@ -625,7 +622,7 @@ public class SourceGenerator {
         List<Element> methodEls = getWadlElements(rElement, "method");
 
         List<Element> currentInheritedParams = inheritResourceParams
-            ? new LinkedList<Element>(info.getInheritedParams()) : Collections.<Element>emptyList();
+            ? new ArrayList<Element>(info.getInheritedParams()) : Collections.emptyList();
         for (Element methodEl : methodEls) {
             writeResourceMethod(methodEl, classPackage, imports, sbCode, info, isRoot, currentPath, methodNameMap);
         }
@@ -716,7 +713,7 @@ public class SourceGenerator {
         List<Element> requestEls = getWadlElements(methodEl, "request");
         Element firstRequestEl = !requestEls.isEmpty() ? requestEls.get(0) : null;
         List<Element> allRequestReps = getWadlElements(firstRequestEl, "representation");
-        List<Element> requestRepsWithElements = new LinkedList<>();
+        List<Element> requestRepsWithElements = new ArrayList<>();
         boolean duplicatesAvailable =
             getRepsWithElements(allRequestReps, requestRepsWithElements, info.getGrammarInfo());
 
@@ -1047,10 +1044,9 @@ public class SourceGenerator {
 
     private List<Element> getParameters(Element resourceEl, List<Element> inheritedParams,
                                         boolean isSubresourceMethod) {
-        List<Element> inParamElements = new LinkedList<>();
+        List<Element> inParamElements = new ArrayList<>();
         List<Element> allParamElements = getWadlElements(resourceEl, "param");
-        List<Element> newInheritedParams = inheritResourceParams ? new LinkedList<Element>()
-            : Collections.<Element>emptyList();
+        List<Element> newInheritedParams = inheritResourceParams ? new ArrayList<>() : Collections.emptyList();
         for (Element el : allParamElements) {
             boolean isResourceLevelParam = RESOURCE_LEVEL_PARAMS.contains(el.getAttribute("style"));
             if (isSubresourceMethod && isResourceLevelParam) {
@@ -1157,7 +1153,7 @@ public class SourceGenerator {
         }
         if (!suspendedAsync && !responseRequired && responseEls.size() == 1 && generateResponseIfHeadersSet) {
             List<Element> outResponseParamElements =
-                getParameters(responseEls.get(0), Collections.<Element>emptyList(), false);
+                getParameters(responseEls.get(0), Collections.emptyList(), false);
             if (!outResponseParamElements.isEmpty()) {
                 writeJaxrResponse(sbCode, imports);
                 return true;
@@ -1173,7 +1169,7 @@ public class SourceGenerator {
         }
         String elementType = null;
         if (!responseRequired) {
-            List<Element> responseRepWithElements = new LinkedList<>();
+            List<Element> responseRepWithElements = new ArrayList<>();
             getRepsWithElements(repElements, responseRepWithElements, info.getGrammarInfo());
 
             Element responseRepWithElement = null;
@@ -1792,8 +1788,8 @@ public class SourceGenerator {
         }
     }
 
-    private Application readWadl(String wadl, String docPath) {
-        Element wadlElement = readXmlDocument(new StringReader(wadl));
+    private Application readWadl() {
+        Element wadlElement = readDocument(wadlPath);
         if (validateWadl) {
             final WadlValidationErrorHandler errorHandler = new WadlValidationErrorHandler();
             try {
@@ -1810,15 +1806,7 @@ public class SourceGenerator {
                 throw new ValidationException("WADL document is not valid.");
             }
         }
-        return new Application(wadlElement, docPath);
-    }
-
-    private Element readXmlDocument(Reader reader) {
-        try {
-            return StaxUtils.read(new InputSource(reader)).getDocumentElement();
-        } catch (Exception ex) {
-            throw new IllegalStateException("Unable to read wadl", ex);
-        }
+        return new Application(wadlElement, wadlPath);
     }
 
     private void generateClassesFromSchema(JCodeModel codeModel, File src) {
@@ -1870,8 +1858,7 @@ public class SourceGenerator {
                     schemaURI = href;
                 }
             }
-            schemas.add(createSchemaInfo(readIncludedDocument(schemaURI),
-                                            schemaURI));
+            schemas.add(createSchemaInfo(readDocument(schemaURI), schemaURI));
         }
         return schemas;
     }
@@ -1913,22 +1900,23 @@ public class SourceGenerator {
         return null;
     }
 
-    private Element readIncludedDocument(String href) {
-
+    private Element readDocument(String href) {
         try {
             InputStream is = null;
             if (!href.startsWith("http")) {
                 is = ResourceUtils.getResourceStream(href, bus);
             }
             if (is == null) {
-                URL url = URI.create(href).toURL();
+                URL url = new URL(href);
                 if (href.startsWith("https") && authentication != null) {
                     is = SecureConnectionHelper.getStreamFromSecureConnection(url, authentication);
                 } else {
                     is = url.openStream();
                 }
             }
-            return readXmlDocument(new InputStreamReader(is, StandardCharsets.UTF_8));
+            try (Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+                return StaxUtils.read(new InputSource(reader)).getDocumentElement();
+            }
         } catch (Exception ex) {
             throw new RuntimeException("Resource " + href + " can not be read");
         }
@@ -2004,8 +1992,7 @@ public class SourceGenerator {
     }
 
     private Set<String> createImports() {
-        return importsComparator == null ? new TreeSet<String>(new DefaultImportsComparator())
-            : new TreeSet<String>(importsComparator);
+        return new TreeSet<String>(importsComparator == null ? new DefaultImportsComparator() : importsComparator);
     }
 
     public void setGenerateInterfaces(boolean generateInterfaces) {
@@ -2166,7 +2153,7 @@ public class SourceGenerator {
         }
     }
 
-    private class Application {
+    private static class Application {
         private Element appElement;
         private String wadlPath;
         Application(Element appElement, String wadlPath) {
@@ -2190,7 +2177,7 @@ public class SourceGenerator {
         private Set<String> resourceClassNames = new HashSet<>();
         private Application rootApp;
         private File srcDir;
-        private List<Element> inheritedParams = new LinkedList<>();
+        private List<Element> inheritedParams = new ArrayList<>();
 
         ContextInfo(Application rootApp,
                     File srcDir,
