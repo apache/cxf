@@ -36,6 +36,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.ws.rs.core.Application;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PrimitiveUtils;
@@ -55,6 +56,7 @@ import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.invoker.Invoker;
+import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 
 public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
@@ -105,6 +107,11 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     }
     public CXFNonSpringJaxrsServlet(Set<Object> applicationSingletons) {
         this(new ApplicationImpl(applicationSingletons));
+    }
+
+    public CXFNonSpringJaxrsServlet(Application app, DestinationRegistry destinationRegistry, Bus bus) {
+        super(destinationRegistry, bus);
+        this.application = app;
     }
 
     @Override
