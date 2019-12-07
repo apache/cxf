@@ -65,7 +65,7 @@ import org.apache.cxf.message.MessageUtils;
 
 public final class ResponseImpl extends Response {
 
-    private static final Pattern LINK_DELIMITER = Pattern.compile(",(?=\\<|$)");
+    private static final Pattern LINK_DELIMITER = Pattern.compile(",\\s*(?=\\<|$)");
 
     private StatusType status;
     private Object entity;

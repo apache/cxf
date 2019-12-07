@@ -467,6 +467,38 @@ public class ResponseImplTest {
             assertTrue(links.contains(Link.fromUri("http://prev").rel("prev").build()));
         }
     }
+    
+    @Test
+    public void testGetLinksMultipleMultiline() {
+        try (ResponseImpl ri = new ResponseImpl(200)) {
+            MetadataMap<String, Object> meta = new MetadataMap<>();
+            ri.addMetadata(meta);
+            
+            final Message outMessage = createMessage();
+            outMessage.put(Message.REQUEST_URI, "http://localhost");
+            ri.setOutMessage(outMessage);
+
+            Set<Link> links = ri.getLinks();
+            assertTrue(links.isEmpty());
+
+            meta.add(HttpHeaders.LINK, 
+                "</TheBook/chapter2>;\n"
+                + "         rel=\"prev\", \n"
+                + "         </TheBook/chapter4>;\n"
+                + "         rel=\"next\";");
+
+            assertTrue(ri.hasLink("next"));
+            Link next = ri.getLink("next");
+            assertNotNull(next);
+            assertTrue(ri.hasLink("prev"));
+            Link prev = ri.getLink("prev");
+            assertNotNull(prev);
+
+            links = ri.getLinks();
+            assertTrue(links.contains(Link.fromUri("http://localhost/TheBook/chapter4").rel("next").build()));
+            assertTrue(links.contains(Link.fromUri("http://localhost/TheBook/chapter2").rel("prev").build()));
+        }
+    }
 
     public static class StringBean {
         private String header;
