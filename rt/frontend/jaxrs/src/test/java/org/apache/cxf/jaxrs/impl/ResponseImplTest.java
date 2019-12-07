@@ -468,6 +468,47 @@ public class ResponseImplTest {
         }
     }
     
+
+    @Test
+    public void testGetMultipleWithSingleLink() {
+        try (ResponseImpl ri = new ResponseImpl(200)) {
+            MetadataMap<String, Object> meta = new MetadataMap<>();
+            ri.addMetadata(meta);
+
+            Set<Link> links = ri.getLinks();
+            assertTrue(links.isEmpty());
+
+            meta.add(HttpHeaders.LINK, "<http://next>;rel=\"next\",");
+
+            assertTrue(ri.hasLink("next"));
+            Link next = ri.getLink("next");
+            assertNotNull(next);
+
+            links = ri.getLinks();
+            assertTrue(links.contains(Link.fromUri("http://next").rel("next").build()));
+        }
+    }
+
+    @Test
+    public void testGetLink() {
+        try (ResponseImpl ri = new ResponseImpl(200)) {
+            MetadataMap<String, Object> meta = new MetadataMap<>();
+            ri.addMetadata(meta);
+
+            Set<Link> links = ri.getLinks();
+            assertTrue(links.isEmpty());
+
+            meta.add(HttpHeaders.LINK, "<http://next>;rel=\"next\"");
+
+            assertTrue(ri.hasLink("next"));
+            Link next = ri.getLink("next");
+            assertNotNull(next);
+
+            links = ri.getLinks();
+            assertTrue(links.contains(Link.fromUri("http://next").rel("next").build()));
+        }
+    }
+
     @Test
     public void testGetLinksMultipleMultiline() {
         try (ResponseImpl ri = new ResponseImpl(200)) {
