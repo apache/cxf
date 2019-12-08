@@ -26,6 +26,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
 import java.net.URL;
+import java.util.function.Function;
 
 import javax.jms.ConnectionFactory;
 import javax.xml.namespace.QName;
@@ -163,6 +164,7 @@ public abstract class AbstractJMSTester extends Assert {
         return new JMSConduit(target, jmsConfig, bus);
     }
 
+
     protected JMSConduit setupJMSConduitWithObserver(EndpointInfo ei) throws IOException {
         JMSConduit jmsConduit = setupJMSConduit(ei);
         MessageObserver observer = new MessageObserver() {
@@ -174,6 +176,13 @@ public abstract class AbstractJMSTester extends Assert {
         return jmsConduit;
     }
 
+    protected JMSDestination setupJMSDestination(EndpointInfo ei, 
+            Function<ConnectionFactory, ConnectionFactory> wrapper) throws IOException {
+        JMSConfiguration jmsConfig = JMSConfigFactory.createFromEndpointInfo(bus, ei, null);
+        jmsConfig.setConnectionFactory(wrapper.apply(cf));
+        return new JMSDestination(bus, ei, jmsConfig);
+    }
+    
     protected JMSDestination setupJMSDestination(EndpointInfo ei) throws IOException {
         JMSConfiguration jmsConfig = JMSConfigFactory.createFromEndpointInfo(bus, ei, null);
         jmsConfig.setConnectionFactory(cf);

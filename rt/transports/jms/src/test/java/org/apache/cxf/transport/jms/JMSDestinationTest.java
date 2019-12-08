@@ -24,8 +24,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.InvalidClientIDException;
@@ -33,6 +38,7 @@ import javax.jms.JMSException;
 import javax.jms.Queue;
 import javax.jms.Topic;
 
+import org.apache.activemq.util.ServiceStopper;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -49,6 +55,34 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class JMSDestinationTest extends AbstractJMSTester {
+    private static final class FaultyConnectionFactory implements ConnectionFactory {
+        private final ConnectionFactory delegate;
+        private final AtomicInteger latch;
+        
+        private FaultyConnectionFactory(ConnectionFactory delegate, int faults) {
+            this.delegate = delegate;
+            this.latch = new AtomicInteger(faults);
+        }
+        
+        @Override
+        public Connection createConnection() throws JMSException {
+            if (latch.getAndDecrement() == 0) {
+                return delegate.createConnection();
+            } else {
+                throw new JMSException("createConnection() failed (simulated)");
+            }
+        }
+
+        @Override
+        public Connection createConnection(String userName, String password) throws JMSException {
+            if (latch.decrementAndGet() == 0) {
+                return delegate.createConnection(userName, password);
+            } else {
+                throw new JMSException("createConnection(userName, password) failed (simulated)");
+            }
+        }
+        
+    }
 
     @Test
     public void testGetConfigurationFromWSDL() throws Exception {
@@ -444,6 +478,96 @@ public class JMSDestinationTest extends AbstractJMSTester {
         exName = getQueueName(conduit.getJmsConfig().getReplyDestination());
         verifyReplyToSet(destMessage, Queue.class, exName);
         destMessage = null;
+
+        conduit.close();
+        destination.shutdown();
+    }
+
+    @Test
+    public void testMessageObserverExceptionHandling() throws Exception {
+        final CountDownLatch latch = new CountDownLatch(1); 
+        EndpointInfo ei = setupServiceInfo("HelloWorldPubSubService", "HelloWorldPubSubPort");
+        JMSConduit conduit = setupJMSConduitWithObserver(ei);
+
+        JMSDestination destination = setupJMSDestination(ei);
+        destination.setMessageObserver(new MessageObserver() {
+            @Override
+            public void onMessage(Message message) {
+                try {
+                    throw new RuntimeException("Error!");
+                } finally {
+                    latch.countDown();
+                }
+            }
+        });
+        
+        Message outMessage = new MessageImpl();
+        setupMessageHeader(outMessage);
+        Thread.sleep(500L);
+
+        sendOneWayMessage(conduit, outMessage);
+        latch.await(5, TimeUnit.SECONDS);
+
+        conduit.close();
+        destination.shutdown();
+    }
+    
+    @Test
+    public void testConnectionFactoryExceptionHandling() throws Exception {
+        EndpointInfo ei = setupServiceInfo("HelloWorldPubSubService", "HelloWorldPubSubPort");
+        final Function<ConnectionFactory, ConnectionFactory> wrapper = 
+            new Function<ConnectionFactory, ConnectionFactory>() {
+                @Override
+                public ConnectionFactory apply(ConnectionFactory cf) {
+                    return new FaultyConnectionFactory(cf, 3);
+                }
+            };
+        JMSConduit conduit = setupJMSConduitWithObserver(ei);
+        JMSDestination destination = setupJMSDestination(ei, wrapper);
+        destination.getJmsConfig().setRetryInterval(1000);
+        destination.setMessageObserver(createMessageObserver());
+        
+        Message outMessage = new MessageImpl();
+        setupMessageHeader(outMessage);
+        Thread.sleep(4000L);
+        
+        sendOneWayMessage(conduit, outMessage);
+        
+        // wait for the message to be got from the destination,
+        // create the thread to handler the Destination incoming message
+        waitForReceiveDestMessage();
+        
+        verifyReceivedMessage(destMessage);
+        verifyHeaders(destMessage, outMessage);
+
+        conduit.close();
+        destination.shutdown();
+    }
+
+    @Test
+    public void testBrokerExceptionHandling() throws Exception {
+        EndpointInfo ei = setupServiceInfo("HelloWorldPubSubService", "HelloWorldPubSubPort");
+        JMSConduit conduit = setupJMSConduitWithObserver(ei);
+        JMSDestination destination = setupJMSDestination(ei);
+        destination.getJmsConfig().setRetryInterval(1000);
+        destination.setMessageObserver(createMessageObserver());
+        
+        Thread.sleep(500L);
+        broker.stopAllConnectors(new ServiceStopper());
+        
+        broker.startAllConnectors();
+        Thread.sleep(2000L);
+        
+        Message outMessage = new MessageImpl();
+        setupMessageHeader(outMessage);
+        sendOneWayMessage(conduit, outMessage);
+        
+        // wait for the message to be got from the destination,
+        // create the thread to handler the Destination incoming message
+        waitForReceiveDestMessage();
+        
+        verifyReceivedMessage(destMessage);
+        verifyHeaders(destMessage, outMessage);
 
         conduit.close();
         destination.shutdown();
