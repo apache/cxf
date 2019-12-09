@@ -34,7 +34,7 @@
         <spring.cloud.eureka.version>2.0.2.RELEASE</spring.cloud.eureka.version>
         <cxf.jetty9.version>9.4.24.v20191120</cxf.jetty9.version>
         <cxf.httpcomponents.client.version>4.5.8</cxf.httpcomponents.client.version>
-        <cxf.tika.version>1.22</cxf.tika.version>
+        <cxf.tika.version>1.23</cxf.tika.version>
     </properties>
     <dependencies>
         <dependency>
