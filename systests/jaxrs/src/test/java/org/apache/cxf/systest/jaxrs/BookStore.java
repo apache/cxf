@@ -188,10 +188,10 @@ public class BookStore {
         } else if ("".equalsIgnoreCase(lStr)) {
             lStr = "0";
         }
-        
+
         return new Book("cxf", Long.parseLong(lStr));
     }
-    
+
     @GET
     @Path("/")
     public Book getBookRoot() {
@@ -352,6 +352,14 @@ public class BookStore {
         return book;
     }
 
+    // Only books with id consisting of 3 or 4 digits of the numbers between 5 and 9 are accepted
+    @POST
+    @Path("/echoxmlbookregex/{id : [5-9]{3,4}}")
+    @Produces("application/xml")
+    public Book echoXmlBookregex(Book book, @PathParam("id") String id) {
+        return book;
+    }
+
     @POST
     @Path("/emptyform")
     @Produces("text/plain")
@@ -395,7 +403,7 @@ public class BookStore {
     public BookStoreSub getBeanParamBookSub() {
         return new BookStoreSub(this);
     }
-    
+
     @Path("/querysub")
     public BookStoreQuerySub getQuerySub() {
         return new BookStoreQuerySub();
@@ -1987,7 +1995,7 @@ public class BookStore {
         public long getId4() {
             return id4;
         }
-        
+
         @QueryParam("id4")
         public void setId4(long id4) {
             this.id4 = id4;
@@ -2012,7 +2020,7 @@ public class BookStore {
         public void setId2(long id2) {
             this.id2 = id2;
         }
-        
+
         public long getId2() {
             return id2;
         }
@@ -2021,7 +2029,7 @@ public class BookStore {
         public void setId3(long id3) {
             this.id3 = id3;
         }
-        
+
         public long getId3() {
             return id3;
         }
@@ -2234,22 +2242,22 @@ public class BookStore {
             return bookStore.getBeanParamBook(bean);
         }
     }
-    
+
     public static class BookStoreQuerySub {
         @GET
         @Path("/listofstrings")
         @Produces("text/xml")
         public Book getBookFromListStrings(@QueryParam("value") List<String> value) {
             final StringBuilder builder = new StringBuilder();
-            
+
             for (String v : value) {
                 if (builder.length() > 0) {
                     builder.append(' ');
                 }
-                
+
                 builder.append(v);
             }
-            
+
             return new Book(builder.toString(), 0L);
         }
     }
