@@ -19,10 +19,15 @@
 
 package org.apache.cxf.systest.microprofile.rest.client.mock;
 
+import java.util.Collection;
 import java.util.concurrent.CompletionStage;
 
+import javax.json.JsonObject;
+import javax.json.JsonStructure;
+import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 public interface AsyncClientWithCompletionStage {
@@ -30,4 +35,14 @@ public interface AsyncClientWithCompletionStage {
     @PUT
     @Path("/test")
     CompletionStage<Response> put(String text);
+    
+    @GET
+    @Path("/test2")
+    @Produces("application/json")
+    CompletionStage<JsonStructure> get();
+    
+    @GET
+    @Path("/test3")
+    @Produces("application/json")
+    CompletionStage<Collection<JsonObject>> getAll();
 }

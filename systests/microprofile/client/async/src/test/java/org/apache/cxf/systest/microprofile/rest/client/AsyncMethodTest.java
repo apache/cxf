@@ -19,17 +19,22 @@
 package org.apache.cxf.systest.microprofile.rest.client;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
+import javax.json.JsonObject;
+import javax.json.JsonString;
+import javax.json.JsonStructure;
 import javax.ws.rs.core.Response;
 
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
+import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
 import org.apache.cxf.systest.microprofile.rest.client.mock.AsyncClientWithCompletionStage;
 import org.apache.cxf.systest.microprofile.rest.client.mock.AsyncInvocationInterceptorFactoryTestImpl;
 import org.apache.cxf.systest.microprofile.rest.client.mock.AsyncInvocationInterceptorFactoryTestImpl2;
@@ -48,7 +53,10 @@ import org.junit.Test;
 
 //CHECKSTYLE:OFF
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 //CHECKSTYLE:ON
 
 public class AsyncMethodTest {
@@ -140,6 +148,72 @@ public class AsyncMethodTest {
             AsyncInvocationInterceptorFactoryTestImpl.INBOUND.remove();
             AsyncInvocationInterceptorFactoryTestImpl.OUTBOUND.remove();
         }
+    }
+
+    @Test
+    public void testInvokesGetOperationWithRegisteredProvidersAsyncCompletionStage() throws Exception {
+        wireMockRule.stubFor(get(urlEqualTo("/echo/test2"))
+                                .willReturn(aResponse()
+                                .withBody("{\"name\": \"test\"}")));
+
+        AsyncClientWithCompletionStage api = RestClientBuilder.newBuilder()
+                .register(TestClientRequestFilter.class)
+                .register(TestClientResponseFilter.class)
+                .register(TestMessageBodyReader.class, 3)
+                .register(TestMessageBodyWriter.class)
+                .register(TestParamConverterProvider.class)
+                .register(TestReaderInterceptor.class)
+                .register(TestWriterInterceptor.class)
+                .register(JsrJsonpProvider.class)
+                .baseUri(getBaseUri())
+                .build(AsyncClientWithCompletionStage.class);
+
+        CompletionStage<JsonStructure> cs = api.get();
+
+        // should need <1 second, but 20s timeout in case something goes wrong
+        JsonStructure response = cs.toCompletableFuture().get(20, TimeUnit.SECONDS);
+        assertThat(response, instanceOf(JsonObject.class));
+        
+        final JsonObject jsonObject = (JsonObject)response;
+        assertThat(jsonObject.get("name"), instanceOf(JsonString.class));
+        assertThat(((JsonString)jsonObject.get("name")).getString(), equalTo("test"));
+
+        assertEquals(TestClientResponseFilter.getAndResetValue(), 1);
+        assertEquals(TestClientRequestFilter.getAndResetValue(), 1);
+        assertEquals(TestReaderInterceptor.getAndResetValue(), 1);
+    }
+
+    @Test
+    public void testInvokesGetAllOperationWithRegisteredProvidersAsyncCompletionStage() throws Exception {
+        wireMockRule.stubFor(get(urlEqualTo("/echo/test3"))
+                                .willReturn(aResponse()
+                                .withBody("[{\"name\": \"test\"}]")));
+
+        AsyncClientWithCompletionStage api = RestClientBuilder.newBuilder()
+                .register(TestClientRequestFilter.class)
+                .register(TestClientResponseFilter.class)
+                .register(TestMessageBodyReader.class, 3)
+                .register(TestMessageBodyWriter.class)
+                .register(TestParamConverterProvider.class)
+                .register(TestReaderInterceptor.class)
+                .register(TestWriterInterceptor.class)
+                .register(JsrJsonpProvider.class)
+                .baseUri(getBaseUri())
+                .build(AsyncClientWithCompletionStage.class);
+
+        CompletionStage<Collection<JsonObject>> cs = api.getAll();
+
+        // should need <1 second, but 20s timeout in case something goes wrong
+        Collection<JsonObject> response = cs.toCompletableFuture().get(20, TimeUnit.SECONDS);
+        assertEquals(1, response.size());
+        
+        final JsonObject jsonObject = response.iterator().next();
+        assertThat(jsonObject.get("name"), instanceOf(JsonString.class));
+        assertThat(((JsonString)jsonObject.get("name")).getString(), equalTo("test"));
+
+        assertEquals(TestClientResponseFilter.getAndResetValue(), 1);
+        assertEquals(TestClientRequestFilter.getAndResetValue(), 1);
+        assertEquals(TestReaderInterceptor.getAndResetValue(), 1);
     }
 
     private URI getBaseUri() {

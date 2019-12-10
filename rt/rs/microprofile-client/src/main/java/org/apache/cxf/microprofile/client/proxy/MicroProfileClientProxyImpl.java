@@ -20,6 +20,7 @@ package org.apache.cxf.microprofile.client.proxy;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Arrays;
@@ -203,6 +204,26 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
             returnType = InjectionUtils.getActualType(t);
         }
         return returnType;
+    }
+    
+    @Override
+    protected Type getGenericReturnType(Class<?> serviceCls, Method method, Class<?> returnType) {
+        final Type genericReturnType = super.getGenericReturnType(serviceCls, method, returnType);
+        
+        if (genericReturnType instanceof ParameterizedType) {
+            final ParameterizedType pt = (ParameterizedType)genericReturnType;
+            if (CompletionStage.class.isAssignableFrom(InjectionUtils.getRawType(pt))) {
+                final Type[] actualTypeArguments = pt.getActualTypeArguments();
+                if (actualTypeArguments.length > 0 && actualTypeArguments[0] instanceof ParameterizedType) {
+                    return InjectionUtils.processGenericTypeIfNeeded(serviceCls, returnType, 
+                        (ParameterizedType)actualTypeArguments[0]);
+                } else {
+                    return returnType;
+                }
+            }
+        }
+        
+        return genericReturnType;
     }
 
     @Override
