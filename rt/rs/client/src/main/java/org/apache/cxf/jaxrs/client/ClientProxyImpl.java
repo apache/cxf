@@ -972,10 +972,8 @@ public class ClientProxyImpl extends AbstractClient implements
             }
 
             Class<?> returnType = getReturnType(method, outMessage);
-            Type genericType =
-                InjectionUtils.processGenericTypeIfNeeded(serviceCls,
-                                                          returnType,
-                                                          method.getGenericReturnType());
+            Type genericType = getGenericReturnType(serviceCls, method, returnType);
+            
             returnType = InjectionUtils.updateParamClassToTypeIfNeeded(returnType, genericType);
             return readBody(r,
                             outMessage,
@@ -985,6 +983,10 @@ public class ClientProxyImpl extends AbstractClient implements
         } finally {
             ClientProviderFactory.getInstance(outMessage).clearThreadLocalProxies();
         }
+    }
+
+    protected Type getGenericReturnType(Class<?> serviceCls, Method method, Class<?> returnType) {
+        return InjectionUtils.processGenericTypeIfNeeded(serviceCls, returnType, method.getGenericReturnType());
     }
 
     protected Class<?> getReturnType(Method method, Message outMessage) {
