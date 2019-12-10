@@ -19,6 +19,8 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import javax.ws.rs.core.Response;
+
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -34,23 +36,44 @@ import static org.junit.Assert.assertTrue;
  */
 public class JAXRSNonSpringJaxrsServletTest extends AbstractBusClientServerTestBase {
     public static final String PORT = NonSpringJaxrsServletBookServer.PORT;
-    public static final String PORT2 = allocatePort(JAXRSNonSpringJaxrsServletTest.class);
+    public static final String PORT2 = NonSpringJaxrsServletBookServer2.PORT;
 
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly",
                    launchServer(NonSpringJaxrsServletBookServer.class, true));
+        assertTrue("server did not launch correctly",
+                   launchServer(NonSpringJaxrsServletBookServer2.class, true));
         createStaticBus();
     }
 
     @Test
-    public void testGetBookRoot() throws Exception {
+    public void testFeatureOnResourceClass() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/;JSESSIONID=xxx";
         WebClient wc = WebClient.create(address);
         Book book = wc.get(Book.class);
         assertEquals(124L, book.getId());
         assertEquals("root", book.getName());
+
+        // Check OpenAPI feature is working correctly
+        wc = WebClient.create("http://localhost:" + PORT + "/openapi.json");
+        Response openAPIResponse = wc.get();
+        assertEquals(200, openAPIResponse.getStatus());
+    }
+
+    @Test
+    public void testFeatureOnResourceClassUsingApplication() throws Exception {
+        String address = "http://localhost:" + PORT2 + "/bookstore/;JSESSIONID=xxx";
+        WebClient wc = WebClient.create(address);
+        Book book = wc.get(Book.class);
+        assertEquals(124L, book.getId());
+        assertEquals("root", book.getName());
+
+        // Check OpenAPI feature is working correctly
+        wc = WebClient.create("http://localhost:" + PORT2 + "/openapi.json");
+        Response openAPIResponse = wc.get();
+        assertEquals(200, openAPIResponse.getStatus());
     }
 
 }
