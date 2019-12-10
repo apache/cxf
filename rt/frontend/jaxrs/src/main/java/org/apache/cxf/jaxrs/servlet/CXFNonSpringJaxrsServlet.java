@@ -158,7 +158,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         setExtensions(bean, servletConfig);
 
         List<? extends Feature> features = getFeatures(servletConfig, splitChar);
-        bean.setFeatures(features);
+        bean.getFeatures().addAll(features);
 
         bean.create();
     }
@@ -183,9 +183,12 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
              CastUtils.cast((Map<?, ?>)parseMapSequence(servletConfig.getInitParameter(EXTENSIONS_PARAM))));
         bean.setLanguageMappings(
              CastUtils.cast((Map<?, ?>)parseMapSequence(servletConfig.getInitParameter(LANGUAGES_PARAM))));
-        bean.setProperties(CastUtils.cast(
+        Map<String, Object> properties = CastUtils.cast(
                 parseMapSequence(servletConfig.getInitParameter(PROPERTIES_PARAM)),
-                String.class, Object.class));
+                String.class, Object.class);
+        if (properties != null) {
+            bean.getProperties(true).putAll(properties);
+        }
     }
 
     protected void setAllInterceptors(JAXRSServerFactoryBean bean, ServletConfig servletConfig,
@@ -521,7 +524,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             List<?> providers = getProviders(servletConfig, splitChar);
             bean.setProviders(providers);
             List<? extends Feature> features = getFeatures(servletConfig, splitChar);
-            bean.setFeatures(features);
+            bean.getFeatures().addAll(features);
 
             bean.setBus(getBus());
             bean.setApplicationInfo(providerApp);
@@ -554,7 +557,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         List<?> providers = getProviders(servletConfig, splitChar);
         bean.setProviders(providers);
         List<? extends Feature> features = getFeatures(servletConfig, splitChar);
-        bean.setFeatures(features);
+        bean.getFeatures().addAll(features);
 
         bean.setBus(getBus());
         bean.setApplication(getApplication());
