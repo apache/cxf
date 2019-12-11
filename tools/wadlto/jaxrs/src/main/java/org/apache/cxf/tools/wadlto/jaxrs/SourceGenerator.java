@@ -51,6 +51,7 @@ import javax.ws.rs.HEAD;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.OPTIONS;
+import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -138,6 +139,7 @@ public class SourceGenerator {
         HTTP_METHOD_ANNOTATIONS.put("delete", DELETE.class);
         HTTP_METHOD_ANNOTATIONS.put("head", HEAD.class);
         HTTP_METHOD_ANNOTATIONS.put("options", OPTIONS.class);
+        HTTP_METHOD_ANNOTATIONS.put("patch", PATCH.class);
 
         PARAM_ANNOTATIONS.put("template", PathParam.class);
         PARAM_ANNOTATIONS.put("header", HeaderParam.class);
@@ -458,7 +460,6 @@ public class SourceGenerator {
             return;
         }
 
-
         final String className = getClassName(qname.getLocalPart(),
                 info.isInterfaceGenerated(), info.getTypeClassNames());
         if (info.getResourceClassNames().contains(className)) {
@@ -467,22 +468,18 @@ public class SourceGenerator {
         info.getResourceClassNames().add(className);
         final String classPackage = getClassPackageName(namespaceURI);
 
-        StringBuilder sbImports = new StringBuilder();
         StringBuilder sbCode = new StringBuilder();
         Set<String> imports = createImports();
 
 
-        sbImports.append(getClassComment()).append(lineSeparator);
-        sbImports.append("package ").append(classPackage)
-            .append(';').append(lineSeparator).append(lineSeparator);
         boolean doCreateJavaDocs = isJavaDocNeeded(info);
         if (doCreateJavaDocs) {
             writeClassDocs(rElement, sbCode);
         }
         if (isRoot && writeAnnotations(info.isInterfaceGenerated())) {
             String path = rElement.getAttribute("path");
-            writeAnnotation(sbCode, imports, Path.class, path);
-            sbCode.append(lineSeparator);
+            writeAnnotation(sbCode, imports, Path.class, path)
+                .append(lineSeparator);
         }
 
         sbCode.append("public ").append(getClassType(info.interfaceIsGenerated)).append(' ').append(className);
@@ -495,9 +492,8 @@ public class SourceGenerator {
                      methodNameMap);
 
         sbCode.append('}');
-        writeImports(sbImports, imports, classPackage);
 
-        createJavaSourceFile(info.getSrcDir(), new QName(classPackage, className), sbCode, sbImports, true);
+        createJavaSourceFile(info.getSrcDir(), classPackage, className, sbCode, imports, true);
 
         writeSubresourceClasses(rElement, info, isRoot, resourceId);
     }
@@ -626,34 +622,22 @@ public class SourceGenerator {
         info.getInheritedParams().addAll(currentInheritedParams);
     }
 
-    private void writeAnnotation(StringBuilder sbCode, Set<String> imports, Class<?> cls, String value) {
-        if (value != null && value.isEmpty()) {
-            return;
+    private StringBuilder writeAnnotation(StringBuilder sbCode, Set<String> imports, Class<?> cls, String value) {
+        if (value == null || !value.isEmpty()) {
+            addImport(imports, cls.getName());
+            sbCode.append('@').append(cls.getSimpleName());
+            if (value != null) {
+                sbCode.append("(\"").append(value).append("\")");
+            }
         }
-        addImport(imports, cls.getName());
-        sbCode.append('@').append(cls.getSimpleName());
-        if (value != null) {
-            sbCode.append("(\"").append(value).append("\")");
-        }
+        return sbCode;
     }
 
     private void addImport(Set<String> imports, String clsName) {
         if (imports == null || clsName.startsWith("java.lang") || !clsName.contains(".")) {
             return;
         }
-        if (!imports.contains(clsName)) {
-            imports.add(clsName);
-        }
-    }
-
-    private void writeImports(StringBuilder sbImports, Set<String> imports, String classPackage) {
-        for (String clsName : imports) {
-            int index = clsName.lastIndexOf('.');
-            if (index != -1 && clsName.substring(0, index).equals(classPackage)) {
-                continue;
-            }
-            sbImports.append("import ").append(clsName).append(';').append(lineSeparator);
-        }
+        imports.add(clsName);
     }
 
     //CHECKSTYLE:OFF: ParameterNumber
@@ -731,9 +715,8 @@ public class SourceGenerator {
 
                 if (!methodNameLowerCase.isEmpty()) {
                     if (HTTP_METHOD_ANNOTATIONS.containsKey(methodNameLowerCase)) {
-                        writeAnnotation(sbMethodCode, imports,
-                                        HTTP_METHOD_ANNOTATIONS.get(methodNameLowerCase), null);
-                        sbMethodCode.append(lineSeparator).append(TAB);
+                        writeAnnotation(sbMethodCode, imports, HTTP_METHOD_ANNOTATIONS.get(methodNameLowerCase), null)
+                            .append(lineSeparator).append(TAB);
                     } else {
                         writeCustomHttpMethod(info, classPackage, methodName, sbMethodCode, imports);
                     }
@@ -747,13 +730,13 @@ public class SourceGenerator {
                         sbMethodCode.append('@').append(BEAN_VALID_SIMPLE_NAME).append(lineSeparator).append(TAB);
                     }
                     if (oneway) {
-                        addImport(imports, Oneway.class.getName());
-                        sbMethodCode.append('@').append(Oneway.class.getSimpleName()).append(lineSeparator).append(TAB);
+                        writeAnnotation(sbMethodCode, imports, Oneway.class, null)
+                            .append(lineSeparator).append(TAB);
                     }
                 }
                 if (!isRoot && !"/".equals(currentPath)) {
-                    writeAnnotation(sbMethodCode, imports, Path.class, currentPath);
-                    sbMethodCode.append(lineSeparator).append(TAB);
+                    writeAnnotation(sbMethodCode, imports, Path.class, currentPath)
+                        .append(lineSeparator).append(TAB);
                 }
             } else {
                 sbMethodCode.append(lineSeparator).append(TAB);
@@ -922,27 +905,16 @@ public class SourceGenerator {
         }
         info.getResourceClassNames().add(className);
 
-
-        StringBuilder sbMethodClassImports = new StringBuilder(256);
-        sbMethodClassImports.append(getClassComment()).append(lineSeparator);
-        sbMethodClassImports.append("package ").append(classPackage)
-            .append(';').append(lineSeparator).append(lineSeparator);
-
-        sbMethodClassImports.append("import java.lang.annotation.ElementType;").append(lineSeparator);
-        sbMethodClassImports.append("import java.lang.annotation.Retention;").append(lineSeparator);
-        sbMethodClassImports.append("import java.lang.annotation.RetentionPolicy;").append(lineSeparator);
-        sbMethodClassImports.append("import java.lang.annotation.Target;").append(lineSeparator);
-        sbMethodClassImports.append("import javax.ws.rs.HttpMethod;").append(lineSeparator);
-
-        StringBuilder sbMethodClassCode = new StringBuilder(256);
-        sbMethodClassCode.append("@Target({ElementType.METHOD })").append(lineSeparator);
-        sbMethodClassCode.append("@Retention(RetentionPolicy.RUNTIME)").append(lineSeparator);
-        sbMethodClassCode.append("@HttpMethod(\"").append(methodName).append("\")").append(lineSeparator);
-        sbMethodClassCode.append("public @interface ").append(methodName);
-        sbMethodClassCode.append(" {").append(lineSeparator).append(lineSeparator);
-        sbMethodClassCode.append('}');
-        createJavaSourceFile(info.getSrcDir(), new QName(classPackage, className),
-                             sbMethodClassCode, sbMethodClassImports, true);
+        StringBuilder sbMethodClassCode = new StringBuilder(256)
+            .append("@java.lang.annotation.Target({java.lang.annotation.ElementType.METHOD})").append(lineSeparator)
+            .append("@java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy.RUNTIME)")
+            .append(lineSeparator)
+            .append("@javax.ws.rs.HttpMethod(\"").append(methodName).append("\")").append(lineSeparator)
+            .append("public @interface ").append(methodName)
+            .append(" {").append(lineSeparator).append(lineSeparator)
+            .append('}');
+        createJavaSourceFile(info.getSrcDir(), classPackage, className,
+                             sbMethodClassCode, Collections.emptySet(), true);
     }
 
     private void writeSubresourceMethod(Element resourceEl,
@@ -1268,16 +1240,16 @@ public class SourceGenerator {
             if (writeAnnotations) {
                 String required = paramEl.getAttribute("required");
                 if (Multipart.class.equals(paramAnn) && "false".equals(required)) {
-                    writeAnnotation(sbCode, imports, paramAnn, null);
-                    sbCode.append("(value = \"").append(name).append("\", required = false").append(')');
+                    writeAnnotation(sbCode, imports, paramAnn, null)
+                        .append("(value = \"").append(name).append("\", required = false").append(')');
                 } else {
                     writeAnnotation(sbCode, imports, paramAnn, name);
                 }
                 sbCode.append(' ');
                 String defaultVal = paramEl.getAttribute("default");
                 if (!defaultVal.isEmpty()) {
-                    writeAnnotation(sbCode, imports, DefaultValue.class, defaultVal);
-                    sbCode.append(' ');
+                    writeAnnotation(sbCode, imports, DefaultValue.class, defaultVal)
+                        .append(' ');
                 }
             }
             boolean isRepeating = isRepeatingParam(paramEl);
@@ -1363,8 +1335,8 @@ public class SourceGenerator {
                 sbCode.append(", ");
             }
             if (writeAnnotations) {
-                addImport(imports, Suspended.class.getName());
-                sbCode.append('@').append(Suspended.class.getSimpleName()).append(' ');
+                writeAnnotation(sbCode, imports, Suspended.class, null)
+                    .append(' ');
             }
             addImport(imports, AsyncResponse.class.getName());
             sbCode.append(AsyncResponse.class.getSimpleName()).append(' ').append("async");
@@ -1396,12 +1368,7 @@ public class SourceGenerator {
     }
 
     private void generateEnumClass(String clsName, List<Element> options, File src, String classPackage) {
-        StringBuilder sbImports = new StringBuilder(64);
         StringBuilder sbCode = new StringBuilder(512);
-        sbImports.append(getClassComment()).append(lineSeparator);
-        sbImports.append("package ").append(classPackage)
-            .append(';').append(lineSeparator).append(lineSeparator);
-
         sbCode.append("public enum ").append(clsName);
         openBlock(sbCode);
 
@@ -1445,7 +1412,7 @@ public class SourceGenerator {
         sbCode.append("throw new IllegalArgumentException();").append(lineSeparator);
         tabCloseBlock(sbCode, 1);
         sbCode.append('}');
-        createJavaSourceFile(src, new QName(classPackage, clsName), sbCode, sbImports, false);
+        createJavaSourceFile(src, classPackage, clsName, sbCode, Collections.emptySet(), false);
     }
 
     private static StringBuilder tab(StringBuilder sb, int count) {
@@ -1663,8 +1630,6 @@ public class SourceGenerator {
         return null;
     }
 
-
-
     private void writeFormatAnnotations(List<Element> repElements, StringBuilder sbCode,
                                         Set<String> imports,
                                         boolean inRep,
@@ -1732,21 +1697,39 @@ public class SourceGenerator {
         }
     }
 
-    private void createJavaSourceFile(File src, QName qname, StringBuilder sbCode, StringBuilder sbImports,
-                                      boolean serviceClass) {
-        String namespace = qname.getNamespaceURI();
+    private void createJavaSourceFile(File src, String classPackage, String className, StringBuilder sbCode,
+        Set<String> imports, boolean serviceClass) {
         if (serviceClass) {
-            generatedServiceClasses.add(namespace + '.' + qname.getLocalPart());
+            generatedServiceClasses.add(classPackage + '.' + className);
         }
 
-        java.nio.file.Path currentDir = src.toPath().resolve(namespace.replace('.', File.separatorChar));
+        java.nio.file.Path currentDir = src.toPath().resolve(classPackage.replace('.', File.separatorChar));
         try (Writer writer = Files.newBufferedWriter(
-            Files.createDirectories(currentDir).resolve(qname.getLocalPart() + ".java"),
+            Files.createDirectories(currentDir).resolve(className + ".java"),
             encoding == null ? StandardCharsets.UTF_8 : Charset.forName(encoding))) {
-            writer.write(sbImports.toString());
+
+            writer.write(getClassComment());
             writer.write(lineSeparator);
+
+            writer.write("package ");
+            writer.write(classPackage);
+            writer.write(';');
+            writer.write(lineSeparator);
+            writer.write(lineSeparator);
+
+            for (String clsName : imports) {
+                int index = clsName.lastIndexOf('.');
+                if (index != -1 && clsName.substring(0, index).equals(classPackage)) {
+                    continue;
+                }
+                writer.write("import ");
+                writer.write(clsName);
+                writer.write(';');
+                writer.write(lineSeparator);
+            }
+            writer.write(lineSeparator);
+
             writer.write(sbCode.toString());
-            writer.flush();
         } catch (java.nio.file.NoSuchFileException ex) {
             LOG.warning(ex.getMessage() + " is not found");
         } catch (IOException ex) {
