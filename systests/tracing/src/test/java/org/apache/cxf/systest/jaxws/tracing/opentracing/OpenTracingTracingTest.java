@@ -19,6 +19,7 @@
 package org.apache.cxf.systest.jaxws.tracing.opentracing;
 
 import java.net.MalformedURLException;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,6 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.tracing.opentracing.OpenTracingClientFeature;
 import org.apache.cxf.tracing.opentracing.OpenTracingFeature;
 import org.apache.cxf.tracing.opentracing.internal.TextMapInjectAdapter;
-import org.awaitility.Duration;
 
 import io.jaegertracing.Configuration;
 import io.jaegertracing.Configuration.ReporterConfiguration;
@@ -199,7 +199,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
         }
 
         // Await till flush happens, usually every second
-        await().atMost(Duration.ONE_SECOND).until(()-> TestSender.getAllSpans().size() == 4);
+        await().atMost(Duration.ofSeconds(1L)).until(()-> TestSender.getAllSpans().size() == 4);
 
         assertThat(TestSender.getAllSpans().size(), equalTo(4));
         assertThat(TestSender.getAllSpans().get(3).getOperationName(), equalTo("test span"));

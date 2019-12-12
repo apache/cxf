@@ -19,6 +19,7 @@
 package org.apache.cxf.systest.jaxrs.tracing.brave;
 
 import java.net.MalformedURLException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -55,7 +56,6 @@ import org.apache.cxf.tracing.brave.TraceScope;
 import org.apache.cxf.tracing.brave.jaxrs.BraveClientProvider;
 import org.apache.cxf.tracing.brave.jaxrs.BraveFeature;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
-import org.awaitility.Duration;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -343,7 +343,7 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
         }
 
         // Await till flush happens, usually a second is enough
-        await().atMost(Duration.ONE_SECOND).until(()-> TestSpanReporter.getAllSpans().size() == 4);
+        await().atMost(Duration.ofSeconds(1L)).until(()-> TestSpanReporter.getAllSpans().size() == 4);
 
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(4));
         assertThat(TestSpanReporter.getAllSpans().get(3).name(), equalTo("test span"));
@@ -374,7 +374,7 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
         }
 
         // Await till flush happens, usually a second is enough
-        await().atMost(Duration.ONE_SECOND).until(()-> TestSpanReporter.getAllSpans().size() == 4);
+        await().atMost(Duration.ofSeconds(1L)).until(()-> TestSpanReporter.getAllSpans().size() == 4);
 
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(4));
         assertThat(TestSpanReporter.getAllSpans().get(3).name(), equalTo("test span"));
@@ -415,7 +415,7 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
             .create("http://localhost:" + PORT + "/bookstore/books/long", Collections.emptyList(),
                 Arrays.asList(new BraveClientFeature(brave)), null)
             .accept(MediaType.APPLICATION_JSON);
-        
+
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
         httpClientPolicy.setConnectionTimeout(100);
         httpClientPolicy.setReceiveTimeout(100);
@@ -425,7 +425,7 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
         try {
             client.get();
         } finally {
-            await().atMost(Duration.ONE_SECOND).until(()-> TestSpanReporter.getAllSpans().size() == 2);
+            await().atMost(Duration.ofSeconds(1L)).until(()-> TestSpanReporter.getAllSpans().size() == 2);
             assertThat(TestSpanReporter.getAllSpans().size(), equalTo(2));
             assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get " + client.getCurrentURI()));
             assertThat(TestSpanReporter.getAllSpans().get(0).tags(), hasKey("error"));

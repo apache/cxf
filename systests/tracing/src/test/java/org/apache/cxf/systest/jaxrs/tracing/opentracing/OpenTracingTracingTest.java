@@ -19,6 +19,7 @@
 package org.apache.cxf.systest.jaxrs.tracing.opentracing;
 
 import java.net.MalformedURLException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,7 +53,6 @@ import org.apache.cxf.tracing.opentracing.OpenTracingClientFeature;
 import org.apache.cxf.tracing.opentracing.jaxrs.OpenTracingClientProvider;
 import org.apache.cxf.tracing.opentracing.jaxrs.OpenTracingFeature;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
-import org.awaitility.Duration;
 
 import io.jaegertracing.Configuration;
 import io.jaegertracing.Configuration.ReporterConfiguration;
@@ -121,7 +121,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
             sf.create();
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
@@ -220,12 +220,22 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
         final Response r = withTrace(createWebClient("/bookstore/books/async"), spanId).get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
+<<<<<<< HEAD
         synchro.await(1, TimeUnit.MINUTES);
         assertThat(TestSender.getAllSpans().size(), equalTo(2));
         assertEquals("Processing books", TestSender.getAllSpans().get(0).getOperationName());
         assertEquals("GET /bookstore/books/async", TestSender.getAllSpans().get(1).getOperationName());
         assertThat(TestSender.getAllSpans().get(1).getReferences(), not(empty()));
         assertThat(TestSender.getAllSpans().get(1).getReferences().get(0).getSpanContext().getSpanId(),
+=======
+        await().atMost(Duration.ofSeconds(1L)).until(()-> REPORTER.getSpans().size() == 2);
+
+        assertThat(REPORTER.getSpans().size(), equalTo(2));
+        assertEquals("Processing books", REPORTER.getSpans().get(0).getOperationName());
+        assertEquals("GET /bookstore/books/async", REPORTER.getSpans().get(1).getOperationName());
+        assertThat(REPORTER.getSpans().get(1).getReferences(), not(empty()));
+        assertThat(REPORTER.getSpans().get(1).getReferences().get(0).getSpanContext().getSpanId(),
+>>>>>>> 55abc6f841... Updating some dependencies
             equalTo(spanId.getSpanId()));
     }
 
@@ -248,10 +258,18 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
         final Response r = createWebClient("/bookstore/books/async").get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
+<<<<<<< HEAD
         synchro.await(1, TimeUnit.MINUTES);
         assertThat(TestSender.getAllSpans().size(), equalTo(2));
         assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Processing books"));
         assertThat(TestSender.getAllSpans().get(1).getOperationName(), equalTo("GET /bookstore/books/async"));
+=======
+        await().atMost(Duration.ofSeconds(1L)).until(()-> REPORTER.getSpans().size() == 2);
+
+        assertThat(REPORTER.getSpans().size(), equalTo(2));
+        assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("Processing books"));
+        assertThat(REPORTER.getSpans().get(1).getOperationName(), equalTo("GET /bookstore/books/async"));
+>>>>>>> 55abc6f841... Updating some dependencies
     }
 
     @Test
@@ -262,8 +280,12 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
         final WebClient client = createWebClient("/bookstore/books", openTracingClientProvider);
         final Future<Response> f = client.async().get();
 
+<<<<<<< HEAD
         final Response r = f.get(1, TimeUnit.SECONDS);
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
+=======
+        await().atMost(Duration.ofSeconds(1L)).until(()-> REPORTER.getSpans().size() == 3);
+>>>>>>> 55abc6f841... Updating some dependencies
 
         synchro.await(1, TimeUnit.MINUTES);
         assertThat(TestSender.getAllSpans().size(), equalTo(3));
@@ -354,7 +376,11 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
         }
 
         // Await till flush happens, usually every second
+<<<<<<< HEAD
         await().atMost(Duration.ONE_SECOND).until(()-> TestSender.getAllSpans().size() == 4);
+=======
+        await().atMost(Duration.ofSeconds(1L)).until(()-> REPORTER.getSpans().size() == 4);
+>>>>>>> 55abc6f841... Updating some dependencies
 
         assertThat(TestSender.getAllSpans().size(), equalTo(4));
         assertThat(TestSender.getAllSpans().get(3).getOperationName(), equalTo("test span"));
@@ -376,6 +402,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
             assertThat(tracer.activeSpan().context(), equalTo(span.context()));
 
+<<<<<<< HEAD
             synchro.await(1, TimeUnit.MINUTES);
             assertThat(TestSender.getAllSpans().size(), equalTo(3));
             assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Get Books"));
@@ -384,12 +411,27 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
             assertThat(TestSender.getAllSpans().get(1).getReferences(), not(empty()));
             assertThat(TestSender.getAllSpans().get(2).getOperationName(), equalTo("GET " + client.getCurrentURI()));
             assertThat(TestSender.getAllSpans().get(2).getReferences(), not(empty()));
+=======
+            await().atMost(Duration.ofSeconds(1L)).until(()-> REPORTER.getSpans().size() == 3);
+
+            assertThat(REPORTER.getSpans().size(), equalTo(3));
+            assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("Get Books"));
+            assertThat(REPORTER.getSpans().get(0).getReferences(), not(empty()));
+            assertThat(REPORTER.getSpans().get(1).getOperationName(), equalTo("GET /bookstore/books"));
+            assertThat(REPORTER.getSpans().get(1).getReferences(), not(empty()));
+            assertThat(REPORTER.getSpans().get(2).getOperationName(), equalTo("GET " + client.getCurrentURI()));
+            assertThat(REPORTER.getSpans().get(2).getReferences(), not(empty()));
+>>>>>>> 55abc6f841... Updating some dependencies
         } finally {
             span.finish();
         }
 
         // Await till flush happens, usually every second
+<<<<<<< HEAD
         await().atMost(Duration.ONE_SECOND).until(()-> TestSender.getAllSpans().size() == 4);
+=======
+        await().atMost(Duration.ofSeconds(1L)).until(()-> REPORTER.getSpans().size() == 4);
+>>>>>>> 55abc6f841... Updating some dependencies
 
         assertThat(TestSender.getAllSpans().size(), equalTo(4));
         assertThat(TestSender.getAllSpans().get(3).getOperationName(), equalTo("test span"));
@@ -414,7 +456,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
             .create("http://localhost:" + PORT + "/bookstore/books/long", Collections.emptyList(),
                 Arrays.asList(new OpenTracingClientFeature(tracer)), null)
             .accept(MediaType.APPLICATION_JSON);
-        
+
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
         httpClientPolicy.setConnectionTimeout(100);
         httpClientPolicy.setReceiveTimeout(100);
@@ -424,6 +466,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
         try {
             client.get();
         } finally {
+<<<<<<< HEAD
             await().atMost(Duration.ONE_SECOND).until(()-> TestSender.getAllSpans().size() == 2);
             assertThat(TestSender.getAllSpans().toString(), TestSender.getAllSpans().size(), equalTo(2));
             assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("GET " + client.getCurrentURI()));
@@ -433,6 +476,17 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
     }
     
     protected WebClient createWebClient(final String url, final Object ... providers) {
+=======
+            await().atMost(Duration.ofSeconds(1L)).until(()-> REPORTER.getSpans().size() == 2);
+            assertThat(REPORTER.getSpans().toString(), REPORTER.getSpans().size(), equalTo(2));
+            assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("GET " + client.getCurrentURI()));
+            assertThat(REPORTER.getSpans().get(0).getTags(), hasItem(Tags.ERROR.getKey(), Boolean.TRUE));
+            assertThat(REPORTER.getSpans().get(1).getOperationName(), equalTo("GET /bookstore/books/long"));
+        }
+    }
+
+    private static WebClient createWebClient(final String path, final Object ... providers) {
+>>>>>>> 55abc6f841... Updating some dependencies
         return WebClient
             .create("http://localhost:" + PORT + url, Arrays.asList(providers))
             .accept(MediaType.APPLICATION_JSON);
