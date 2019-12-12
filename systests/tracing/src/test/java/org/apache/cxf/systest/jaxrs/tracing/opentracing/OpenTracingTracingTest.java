@@ -19,6 +19,7 @@
 package org.apache.cxf.systest.jaxrs.tracing.opentracing;
 
 import java.net.MalformedURLException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -48,7 +49,6 @@ import org.apache.cxf.tracing.opentracing.OpenTracingClientFeature;
 import org.apache.cxf.tracing.opentracing.jaxrs.OpenTracingClientProvider;
 import org.apache.cxf.tracing.opentracing.jaxrs.OpenTracingFeature;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
-import org.awaitility.Duration;
 
 import io.jaegertracing.internal.JaegerSpanContext;
 import io.jaegertracing.internal.JaegerTracer;
@@ -85,14 +85,14 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
 
     private static final InMemoryReporter REPORTER = new InMemoryReporter();
 
-    @Rule 
+    @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
     private final Tracer tracer = new JaegerTracer.Builder("tracer-jaxrs")
         .withSampler(new ConstSampler(true))
         .withReporter(REPORTER)
         .build();
-    
+
     public static class BraveServer extends AbstractTestServerBase {
 
         private org.apache.cxf.endpoint.Server server;
@@ -118,7 +118,7 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
             server.destroy();
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
@@ -194,7 +194,7 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
         final Response r = withTrace(createWebClient("/bookstore/books/async"), spanId).get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
-        await().atMost(Duration.ONE_SECOND).until(()-> REPORTER.getSpans().size() == 2);
+        await().atMost(Duration.ofSeconds(1L)).until(()-> REPORTER.getSpans().size() == 2);
 
         assertThat(REPORTER.getSpans().size(), equalTo(2));
         assertEquals("Processing books", REPORTER.getSpans().get(0).getOperationName());
@@ -220,7 +220,7 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
         final Response r = createWebClient("/bookstore/books/async").get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
-        await().atMost(Duration.ONE_SECOND).until(()-> REPORTER.getSpans().size() == 2);
+        await().atMost(Duration.ofSeconds(1L)).until(()-> REPORTER.getSpans().size() == 2);
 
         assertThat(REPORTER.getSpans().size(), equalTo(2));
         assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("Processing books"));
@@ -234,7 +234,7 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
         final Response r = client.async().get().get(1L, TimeUnit.SECONDS);
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
-        await().atMost(Duration.ONE_SECOND).until(()-> REPORTER.getSpans().size() == 3);
+        await().atMost(Duration.ofSeconds(1L)).until(()-> REPORTER.getSpans().size() == 3);
 
         assertThat(REPORTER.getSpans().size(), equalTo(3));
         assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("Get Books"));
@@ -316,7 +316,7 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
         }
 
         // Await till flush happens, usually every second
-        await().atMost(Duration.ONE_SECOND).until(()-> REPORTER.getSpans().size() == 4);
+        await().atMost(Duration.ofSeconds(1L)).until(()-> REPORTER.getSpans().size() == 4);
 
         assertThat(REPORTER.getSpans().size(), equalTo(4));
         assertThat(REPORTER.getSpans().get(3).getOperationName(), equalTo("test span"));
@@ -333,7 +333,7 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
             assertThat(tracer.activeSpan().context(), equalTo(span.context()));
 
-            await().atMost(Duration.ONE_SECOND).until(()-> REPORTER.getSpans().size() == 3);
+            await().atMost(Duration.ofSeconds(1L)).until(()-> REPORTER.getSpans().size() == 3);
 
             assertThat(REPORTER.getSpans().size(), equalTo(3));
             assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("Get Books"));
@@ -347,7 +347,7 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
         }
 
         // Await till flush happens, usually every second
-        await().atMost(Duration.ONE_SECOND).until(()-> REPORTER.getSpans().size() == 4);
+        await().atMost(Duration.ofSeconds(1L)).until(()-> REPORTER.getSpans().size() == 4);
 
         assertThat(REPORTER.getSpans().size(), equalTo(4));
         assertThat(REPORTER.getSpans().get(3).getOperationName(), equalTo("test span"));
@@ -372,7 +372,7 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
             .create("http://localhost:" + PORT + "/bookstore/books/long", Collections.emptyList(),
                 Arrays.asList(new OpenTracingClientFeature(tracer)), null)
             .accept(MediaType.APPLICATION_JSON);
-        
+
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
         httpClientPolicy.setConnectionTimeout(100);
         httpClientPolicy.setReceiveTimeout(100);
@@ -382,14 +382,14 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
         try {
             client.get();
         } finally {
-            await().atMost(Duration.ONE_SECOND).until(()-> REPORTER.getSpans().size() == 2);
+            await().atMost(Duration.ofSeconds(1L)).until(()-> REPORTER.getSpans().size() == 2);
             assertThat(REPORTER.getSpans().toString(), REPORTER.getSpans().size(), equalTo(2));
             assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("GET " + client.getCurrentURI()));
             assertThat(REPORTER.getSpans().get(0).getTags(), hasItem(Tags.ERROR.getKey(), Boolean.TRUE));
             assertThat(REPORTER.getSpans().get(1).getOperationName(), equalTo("GET /bookstore/books/long"));
         }
     }
-    
+
     private static WebClient createWebClient(final String path, final Object ... providers) {
         return WebClient
             .create("http://localhost:" + PORT + path, Arrays.asList(providers))

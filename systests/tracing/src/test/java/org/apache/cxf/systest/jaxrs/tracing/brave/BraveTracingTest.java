@@ -19,6 +19,7 @@
 package org.apache.cxf.systest.jaxrs.tracing.brave;
 
 import java.net.MalformedURLException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.ExecutionException;
@@ -53,7 +54,6 @@ import org.apache.cxf.tracing.brave.TraceScope;
 import org.apache.cxf.tracing.brave.jaxrs.BraveClientProvider;
 import org.apache.cxf.tracing.brave.jaxrs.BraveFeature;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
-import org.awaitility.Duration;
 
 import org.junit.After;
 import org.junit.BeforeClass;
@@ -83,7 +83,7 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
 
     private static final AtomicLong RANDOM = new AtomicLong();
 
-    @Rule 
+    @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
     private final Tracing brave = Tracing.newBuilder()
@@ -333,7 +333,7 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
         }
 
         // Await till flush happens, usually a second is enough
-        await().atMost(Duration.ONE_SECOND).until(()-> TestSpanReporter.getAllSpans().size() == 4);
+        await().atMost(Duration.ofSeconds(1L)).until(()-> TestSpanReporter.getAllSpans().size() == 4);
 
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(4));
         assertThat(TestSpanReporter.getAllSpans().get(3).name(), equalTo("test span"));
@@ -362,7 +362,7 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
         }
 
         // Await till flush happens, usually a second is enough
-        await().atMost(Duration.ONE_SECOND).until(()-> TestSpanReporter.getAllSpans().size() == 4);
+        await().atMost(Duration.ofSeconds(1L)).until(()-> TestSpanReporter.getAllSpans().size() == 4);
 
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(4));
         assertThat(TestSpanReporter.getAllSpans().get(3).name(), equalTo("test span"));
@@ -403,7 +403,7 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
             .create("http://localhost:" + PORT + "/bookstore/books/long", Collections.emptyList(),
                 Arrays.asList(new BraveClientFeature(brave)), null)
             .accept(MediaType.APPLICATION_JSON);
-        
+
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
         httpClientPolicy.setConnectionTimeout(100);
         httpClientPolicy.setReceiveTimeout(100);
@@ -413,7 +413,7 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
         try {
             client.get();
         } finally {
-            await().atMost(Duration.ONE_SECOND).until(()-> TestSpanReporter.getAllSpans().size() == 2);
+            await().atMost(Duration.ofSeconds(1L)).until(()-> TestSpanReporter.getAllSpans().size() == 2);
             assertThat(TestSpanReporter.getAllSpans().size(), equalTo(2));
             assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get " + client.getCurrentURI()));
             assertThat(TestSpanReporter.getAllSpans().get(0).tags(), hasKey("error"));

@@ -56,7 +56,7 @@
         <cxf.asm.artifactId>asm</cxf.asm.artifactId>
         <cxf.asm.version>7.1</cxf.asm.version>
         <cxf.osgi.asm.version>[3.0,8)</cxf.osgi.asm.version>
-        <cxf.easymock.version>4.0.2</cxf.easymock.version>
+        <cxf.easymock.version>4.1</cxf.easymock.version>
         <!-- OSGi related properties -->
         <cxf.fragment.host />
         <cxf.bundle.activator />
@@ -83,7 +83,7 @@
         <cxf.apacheds.version>2.0.0.AM25</cxf.apacheds.version>
         <cxf.arquillian.version>1.1.14.Final</cxf.arquillian.version>
         <cxf.arquillian.weld.container.version>2.0.1.Final</cxf.arquillian.weld.container.version>
-        <cxf.artemis.version>2.9.0</cxf.artemis.version>
+        <cxf.artemis.version>2.10.1</cxf.artemis.version>
         <cxf.aspectj.version>1.9.1</cxf.aspectj.version>
         <cxf.atmosphere.version.range>[2.4,3.0)</cxf.atmosphere.version.range>
         <cxf.atmosphere.version>2.5.2</cxf.atmosphere.version>
@@ -132,6 +132,7 @@
         <cxf.httpcomponents.core.version>4.4.12</cxf.httpcomponents.core.version>
         <cxf.jackson.version>2.10.1</cxf.jackson.version>
         <cxf.jackson.databind.version>2.10.1</cxf.jackson.databind.version>
+        <cxf.jacorb.version>3.9</cxf.jacorb.version>
         <cxf.jaeger.version>1.0.0</cxf.jaeger.version>
         <cxf.james.mim4j.version>0.7.2</cxf.james.mim4j.version>
         <cxf.javassist.version>3.25.0-GA</cxf.javassist.version>
@@ -189,7 +190,7 @@
         <cxf.servlet-api.group>javax.servlet</cxf.servlet-api.group>
         <cxf.servlet-api.version>3.1.0</cxf.servlet-api.version>
         <cxf.slf4j.version>1.7.29</cxf.slf4j.version>
-        <cxf.snakeyaml.version>1.24</cxf.snakeyaml.version>
+        <cxf.snakeyaml.version>1.25</cxf.snakeyaml.version>
         <cxf.specs.jaxws.api.version>1.2</cxf.specs.jaxws.api.version>
         <cxf.spring.boot.version>2.1.11.RELEASE</cxf.spring.boot.version>
         <cxf.spring.ldap.version>2.3.2.RELEASE</cxf.spring.ldap.version>
@@ -206,7 +207,7 @@
         <cxf.tomcat.version>8.5.47</cxf.tomcat.version>
         <cxf.tomitribe.http.signature.version>1.3</cxf.tomitribe.http.signature.version>
         <cxf.undertow.osgi.version>[1.4,3.0)</cxf.undertow.osgi.version>
-        <cxf.undertow.version>2.0.23.Final</cxf.undertow.version>
+        <cxf.undertow.version>2.0.28.Final</cxf.undertow.version>
         <!-- the Export-Package is the same as the Maven artifact
              version (with the Final), but we don't want an import package with a version
              with a qualifier. We do want a range. -->
@@ -219,7 +220,7 @@
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
         <cxf.wss4j.version>2.3.0-SNAPSHOT</cxf.wss4j.version>
         <cxf.xalan.version>2.7.2</cxf.xalan.version>
-        <cxf.xbean.version>4.14</cxf.xbean.version>
+        <cxf.xbean.version>4.15</cxf.xbean.version>
         <cxf.xerces.version>2.12.0</cxf.xerces.version>
         <cxf.xmlschema.version>2.2.4</cxf.xmlschema.version>
         <cxf.zest.version>2.1</cxf.zest.version>
@@ -1386,7 +1387,7 @@
             <dependency>
                 <groupId>org.awaitility</groupId>
                 <artifactId>awaitility</artifactId>
-                <version>3.1.6</version>
+                <version>4.0.1</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -2855,7 +2856,7 @@
                 <dependency>
                     <groupId>javax.xml.ws</groupId>
                     <artifactId>jaxws-api</artifactId>
-                    <version>2.3.0</version>
+                    <version>2.3.1</version>
                     <exclusions>
                         <exclusion>
                             <groupId>javax.xml.bind</groupId>
@@ -2887,14 +2888,14 @@
                 <dependency>
                     <groupId>org.jacorb</groupId>
                     <artifactId>jacorb</artifactId>
-                    <version>3.7</version>
+                    <version>${cxf.jacorb.version}</version>
                     <scope>test</scope>
                 </dependency>
 		<!-- This artifact needs to be included in compile scope since the corba module has been removed from jdk 11 -->
                 <dependency>
                     <groupId>org.jacorb</groupId>
                     <artifactId>jacorb-omgapi</artifactId>
-                    <version>3.7</version>
+                    <version>${cxf.jacorb.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.apache.geronimo.specs</groupId>
