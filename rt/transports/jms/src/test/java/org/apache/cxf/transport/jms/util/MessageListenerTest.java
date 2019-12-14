@@ -61,7 +61,7 @@ public class MessageListenerTest {
             new PollingMessageListenerContainer(connection, dest, listenerHandler, exListener);
         connection.close(); // Simulate connection problem
         container.start();
-        Awaitility.await().until(() -> !container.isRunning());
+        Awaitility.await().until(() -> exListener.exception != null);
         JMSException ex = exListener.exception;
         assertNotNull(ex);
         assertEquals("The connection is already closed", ex.getMessage());
@@ -84,7 +84,7 @@ public class MessageListenerTest {
 
         connection.close(); // Simulate connection problem
         container.start();
-        Awaitility.await().until(() -> !container.isRunning());
+        Awaitility.await().until(() -> exListener.exception != null);
         JMSException ex = exListener.exception;
         assertNotNull(ex);
         // Closing the pooled connection will result in a NPE when using it
