@@ -202,6 +202,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
     }
     
     protected void handleException(Throwable e) {
+        running = false;
         JMSException wrapped;
         if (e  instanceof JMSException) {
             wrapped = (JMSException) e;
@@ -209,7 +210,9 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
             wrapped = new JMSException("Wrapped exception. " + e.getMessage());
             wrapped.addSuppressed(e);
         }
-        this.exceptionListener.onException(wrapped);
+        if (this.exceptionListener != null) {
+            this.exceptionListener.onException(wrapped);
+        }
     }
 
     private boolean isReply() {
