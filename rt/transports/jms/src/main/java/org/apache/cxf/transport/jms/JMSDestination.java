@@ -128,14 +128,22 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         Session session = null;
         try {
             ExceptionListener exListener = new ExceptionListener() {
-                public void onException(JMSException exception) {
-                    if (!shutdown) {
+                private boolean restartTriggered;
+
+                public synchronized void onException(JMSException exception) {
+                    if (!shutdown && !restartTriggered) {
                         LOG.log(Level.WARNING, "Exception on JMS connection. Trying to reconnect", exception);
-                        restartConnection();
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                restartConnection();
+                            }
+                        }).start();
+                        restartTriggered = true;
                     }
                 }
             };
-            
+
             PollingMessageListenerContainer container;
             if (!jmsConfig.isOneSessionPerConnection()) {
                 connection = JMSFactory.createConnection(jmsConfig);
@@ -174,7 +182,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         }
     }
 
-    protected void restartConnection() {
+    protected synchronized void restartConnection() {
         int tries = 0;
         do {
             tries++;
@@ -215,14 +223,11 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
     }
 
 
-
     /**
      * Convert JMS message received by ListenerThread to CXF message and inform incomingObserver that a
      * message was received. The observer will call the service and then send the response CXF message by
      * using the BackChannelConduit
      *
-     * @param message
-     * @throws IOException
      */
     public void onMessage(javax.jms.Message message) {
         ClassLoaderHolder origLoader = null;

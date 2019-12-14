@@ -36,6 +36,7 @@ import javax.jms.Destination;
 import javax.jms.InvalidClientIDException;
 import javax.jms.JMSException;
 import javax.jms.Queue;
+import javax.jms.Session;
 import javax.jms.Topic;
 
 import org.apache.activemq.util.ServiceStopper;
@@ -50,20 +51,29 @@ import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.MultiplexDestination;
 import org.apache.cxf.transport.jms.util.ResourceCloser;
+import org.awaitility.Awaitility;
 
 import org.junit.Ignore;
 import org.junit.Test;
+
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.niceMock;
+import static org.easymock.EasyMock.replay;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class JMSDestinationTest extends AbstractJMSTester {
     private static final class FaultyConnectionFactory implements ConnectionFactory {
         private final ConnectionFactory delegate;
         private final AtomicInteger latch;
-        
+
         private FaultyConnectionFactory(ConnectionFactory delegate, int faults) {
             this.delegate = delegate;
             this.latch = new AtomicInteger(faults);
         }
-        
+
         @Override
         public Connection createConnection() throws JMSException {
             if (latch.getAndDecrement() == 0) {
@@ -81,7 +91,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
                 throw new JMSException("createConnection(userName, password) failed (simulated)");
             }
         }
-        
+
     }
 
     @Test
@@ -485,7 +495,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
 
     @Test
     public void testMessageObserverExceptionHandling() throws Exception {
-        final CountDownLatch latch = new CountDownLatch(1); 
+        final CountDownLatch latch = new CountDownLatch(1);
         EndpointInfo ei = setupServiceInfo("HelloWorldPubSubService", "HelloWorldPubSubPort");
         JMSConduit conduit = setupJMSConduitWithObserver(ei);
 
@@ -511,11 +521,11 @@ public class JMSDestinationTest extends AbstractJMSTester {
         conduit.close();
         destination.shutdown();
     }
-    
+
     @Test
     public void testConnectionFactoryExceptionHandling() throws Exception {
         EndpointInfo ei = setupServiceInfo("HelloWorldPubSubService", "HelloWorldPubSubPort");
-        final Function<ConnectionFactory, ConnectionFactory> wrapper = 
+        final Function<ConnectionFactory, ConnectionFactory> wrapper =
             new Function<ConnectionFactory, ConnectionFactory>() {
                 @Override
                 public ConnectionFactory apply(ConnectionFactory cf) {
@@ -530,9 +540,9 @@ public class JMSDestinationTest extends AbstractJMSTester {
         Message outMessage = new MessageImpl();
         setupMessageHeader(outMessage);
         Thread.sleep(4000L);
-        
+
         sendOneWayMessage(conduit, outMessage);
-        
+
         // wait for the message to be got from the destination,
         // create the thread to handler the Destination incoming message
         waitForReceiveDestMessage();
@@ -551,17 +561,17 @@ public class JMSDestinationTest extends AbstractJMSTester {
         JMSDestination destination = setupJMSDestination(ei);
         destination.getJmsConfig().setRetryInterval(1000);
         destination.setMessageObserver(createMessageObserver());
-        
+
         Thread.sleep(500L);
         broker.stopAllConnectors(new ServiceStopper());
-        
+
         broker.startAllConnectors();
         Thread.sleep(2000L);
         
         Message outMessage = new MessageImpl();
         setupMessageHeader(outMessage);
         sendOneWayMessage(conduit, outMessage);
-        
+
         // wait for the message to be got from the destination,
         // create the thread to handler the Destination incoming message
         waitForReceiveDestMessage();
@@ -607,7 +617,47 @@ public class JMSDestinationTest extends AbstractJMSTester {
         String receivedName = getDestinationName(jmsMsg.getJMSReplyTo());
         assertTrue("JMS Messsage's replyTo must be named " + expectedName + " but was " + receivedName,
                    expectedName == receivedName || receivedName.equals(expectedName));
-
     }
 
+    @Test
+    public void testRestartConnectionAfterExceptionIsOnlyCalledOnce() throws Exception {
+        final AtomicInteger failedPollerThreads = new AtomicInteger();
+        final AtomicInteger restartConnectionCalls = new AtomicInteger();
+
+        final ConnectionFactory connectionFactoryMock = niceMock(ConnectionFactory.class);
+        final Connection connectionMock = niceMock(Connection.class);
+        final Session sessionMock = niceMock(Session.class);
+        final Queue queueMock = niceMock(Queue.class);
+
+        expect(connectionFactoryMock.createConnection()).andReturn(connectionMock);
+        expect(connectionMock.createSession(false, Session.AUTO_ACKNOWLEDGE))
+                .andReturn(sessionMock)
+                .andAnswer(() -> {
+                    failedPollerThreads.incrementAndGet();
+                    throw new JMSException("session terminated for test");
+                }).anyTimes();
+        expect(sessionMock.createQueue("test.jmstransport.binary")).andReturn(queueMock);
+
+        replay(connectionFactoryMock, connectionMock, sessionMock, queueMock);
+
+        EndpointInfo ei = setupServiceInfo("HWStaticReplyQBinMsgService", "HWStaticReplyQBinMsgPort");
+        JMSConfiguration jmsConfig = JMSConfigFactory.createFromEndpointInfo(bus, ei, null);
+        jmsConfig.setConnectionFactory(connectionFactoryMock);
+
+        JMSDestination destination = new JMSDestination(bus, ei, jmsConfig) {
+            @Override
+            protected synchronized void restartConnection() {
+                restartConnectionCalls.incrementAndGet();
+                // don't call to super.restartConnection().
+                // it will stop the thread pool and cause race conditions in this test.
+            }
+        };
+        destination.activate();
+
+        Awaitility.await().until(() -> failedPollerThreads.get() > 5);
+        Awaitility.await().until(() -> restartConnectionCalls.get() > 0);
+        assertEquals("only one call to restartConnection() for all poller-threads allowed!",
+                     1, restartConnectionCalls.get());
+        destination.shutdown();
+    }
 }

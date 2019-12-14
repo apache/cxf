@@ -49,7 +49,6 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.newCapture;
 import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 
 public class MessageListenerTest {
 
@@ -74,9 +73,9 @@ public class MessageListenerTest {
             new PollingMessageListenerContainer(connection, dest, listenerHandler, exListener);
         connection.close(); // Simulate connection problem
         container.start();
-        Awaitility.await().until(() -> !container.isRunning());
-        verify(exListener);
+        Awaitility.await().until(() -> captured.getValue() != null);
         JMSException ex = captured.getValue();
+        Assert.assertNotNull(ex);
         Assert.assertEquals("The connection is already closed", ex.getMessage());
     }
     
@@ -102,9 +101,9 @@ public class MessageListenerTest {
 
         connection.close(); // Simulate connection problem
         container.start();
-        Awaitility.await().until(() -> !container.isRunning());
-        verify(exListener);
+        Awaitility.await().until(() -> captured.getValue() != null);
         JMSException ex = captured.getValue();
+        Assert.assertNotNull(ex);
         // Closing the pooled connection will result in a NPE when using it
         Assert.assertEquals("Wrapped exception. null", ex.getMessage());
     }
