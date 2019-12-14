@@ -152,6 +152,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                         safeRollBack();
                     }
                 } catch (Throwable e) {
+                    safeRollBack();
                     handleException(e);
                 }
             }
@@ -201,7 +202,6 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
     }
     
     protected void handleException(Throwable e) {
-        running = false;
         JMSException wrapped;
         if (e  instanceof JMSException) {
             wrapped = (JMSException) e;
@@ -239,10 +239,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
 
     @Override
     public void stop() {
-        LOG.fine("Shuttting down " + this.getClass().getSimpleName());
-        if (!running) {
-            return;
-        }
+        LOG.fine("Shutting down " + this.getClass().getSimpleName());
         running = false;
         super.stop();
     }
