@@ -19,6 +19,7 @@
 package org.apache.cxf.transport.servlet.servicelist;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -181,7 +182,9 @@ public class ServiceListGeneratorServlet extends HttpServlet {
         response.setContentType("text/css; charset=UTF-8");
         URL url = this.getClass().getResource("servicelist.css");
         if (url != null) {
-            IOUtils.copy(url.openStream(), response.getOutputStream());
+            try (InputStream inputStream = url.openStream()) {
+                IOUtils.copy(inputStream, response.getOutputStream());
+            }
         }
     }
 
