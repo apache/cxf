@@ -20,6 +20,8 @@
 package org.apache.cxf.microprofile.client;
 
 import java.lang.reflect.Type;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -42,7 +44,12 @@ public class MPRestClientCallback<T> extends JaxrsClientCallback<T> {
                                 Type outGenericType) {
         super(handler, responseClass, outGenericType);
         ExecutorService es = outMessage.get(ExecutorService.class);
-        executor = es != null ? es : ForkJoinPool.commonPool();
+        if (es == null) {
+            es = AccessController.doPrivileged((PrivilegedAction<ExecutorService>)() -> {
+                return ForkJoinPool.commonPool();
+            });
+        }
+        executor = es;
     }
 
     @SuppressWarnings("unchecked")
