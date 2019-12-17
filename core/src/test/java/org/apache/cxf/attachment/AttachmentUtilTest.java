@@ -18,13 +18,10 @@
  */
 package org.apache.cxf.attachment;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotEquals;
 
 public class AttachmentUtilTest {
 
@@ -122,8 +119,7 @@ public class AttachmentUtilTest {
 
     @Test
     public void testCreateContentID() throws Exception {
-        final String contentID = AttachmentUtil.createContentID(null);
-        assertTrue(URLDecoder.decode(contentID, StandardCharsets.UTF_8.name()).indexOf('@') > -1);
+        assertNotEquals(AttachmentUtil.createContentID(null), AttachmentUtil.createContentID(null));
     }
 
 }

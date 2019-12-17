@@ -209,7 +209,7 @@ public final class AttachmentUtil {
                 cid = ns;
             }
         }
-        return ATT_UUID + '-' + Integer.toString(COUNTER.incrementAndGet()) + "%40" // '@'
+        return ATT_UUID + '-' + Integer.toString(COUNTER.incrementAndGet()) + '@'
             + URLEncoder.encode(cid, StandardCharsets.UTF_8.name());
     }
 
