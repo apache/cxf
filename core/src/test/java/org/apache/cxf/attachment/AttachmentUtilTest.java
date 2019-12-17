@@ -18,9 +18,13 @@
  */
 package org.apache.cxf.attachment;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class AttachmentUtilTest {
 
@@ -115,4 +119,11 @@ public class AttachmentUtilTest {
         assertEquals("a=b.txt",
             AttachmentUtil.getContentDispositionFileName("filename=\"a=b.txt\""));
     }
+
+    @Test
+    public void testCreateContentID() throws Exception {
+        final String contentID = AttachmentUtil.createContentID(null);
+        assertTrue(URLDecoder.decode(contentID, StandardCharsets.UTF_8.name()).indexOf('@') > -1);
+    }
+
 }

@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.activation.CommandInfo;
 import javax.activation.CommandMap;
@@ -65,7 +66,7 @@ import org.apache.cxf.message.MessageUtils;
 public final class AttachmentUtil {
     public static final String BODY_ATTACHMENT_ID = "root.message@cxf.apache.org";
 
-    private static volatile int counter;
+    private static final AtomicInteger COUNTER = new AtomicInteger();
     private static final String ATT_UUID = UUID.randomUUID().toString();
 
     private static final Random BOUND_RANDOM = new Random();
@@ -196,9 +197,7 @@ public final class AttachmentUtil {
     public static String createContentID(String ns) throws UnsupportedEncodingException {
         // tend to change
         String cid = "cxf.apache.org";
-
-        String name = ATT_UUID + "-" + String.valueOf(++counter);
-        if (ns != null && (ns.length() > 0)) {
+        if (ns != null && !ns.isEmpty()) {
             try {
                 URI uri = new URI(ns);
                 String host = uri.getHost();
@@ -211,7 +210,7 @@ public final class AttachmentUtil {
                 cid = ns;
             }
         }
-        return URLEncoder.encode(name, StandardCharsets.UTF_8.name()) + "@"
+        return ATT_UUID + '-' + Integer.toString(COUNTER.incrementAndGet()) + "%40" // '@'
             + URLEncoder.encode(cid, StandardCharsets.UTF_8.name());
     }
 
