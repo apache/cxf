@@ -28,6 +28,7 @@ import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.transport.AbstractDestination;
+import org.apache.cxf.transport.commons_text.StringEscapeUtils;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 public class FormattedServiceListWriter implements ServiceListWriter {
@@ -118,7 +119,7 @@ public class FormattedServiceListWriter implements ServiceListWriter {
         writer.write("</ul>");
         writer.write("</td><td>");
 
-
+        absoluteURL = StringEscapeUtils.escapeHtml4(absoluteURL);
         writer.write("<span class=\"field\">Endpoint address:</span> " + "<span class=\"value\">"
                      + absoluteURL + "</span>");
         writer.write("<br/><span class=\"field\">WSDL :</span> " + "<a href=\"" + absoluteURL
@@ -169,16 +170,17 @@ public class FormattedServiceListWriter implements ServiceListWriter {
         if (absoluteURL == null) {
             return;
         }
+        absoluteURL = StringEscapeUtils.escapeHtml4(absoluteURL);
 
         writer.write("<tr><td>");
         writer.write("<span class=\"field\">Endpoint address:</span> " + "<span class=\"value\">"
                      + absoluteURL + "</span>");
-        
+
         Bus sb = bus;
         if (sd instanceof AbstractHTTPDestination) {
             sb = ((AbstractHTTPDestination)sd).getBus();
-        }        
-        
+        }
+
         addWadlIfNeeded(absoluteURL, sb, writer);
         addOpenApiIfNeeded(absoluteURL, sb, writer);
         addSwaggerIfNeeded(absoluteURL, sb, writer);
@@ -205,7 +207,7 @@ public class FormattedServiceListWriter implements ServiceListWriter {
         }
     }
 
-    private static void writeApiSpec(String absoluteURL, Bus sb, PrintWriter writer, 
+    private static void writeApiSpec(String absoluteURL, Bus sb, PrintWriter writer,
             String specPath, String specName) {
         if (PropertyUtils.isTrue(sb.getProperty("swagger.service.ui.available"))) {
             URI uri = URI.create(absoluteURL);
@@ -220,6 +222,7 @@ public class FormattedServiceListWriter implements ServiceListWriter {
         if (!absoluteURL.endsWith("/")) {
             specPath = "/" + specPath;
         }
+        specPath = StringEscapeUtils.escapeHtml4(specPath);
         writer.write("<br/><span class=\"field\">" + specName + " :</span> " + "<a href=\"" + absoluteURL
                  + specPath + "\">" + absoluteURL + specPath + "</a>");
     }
@@ -227,6 +230,7 @@ public class FormattedServiceListWriter implements ServiceListWriter {
     private static void addAtomLinkIfNeeded(String address, Map<String, String> extMap, PrintWriter pw) {
         String atomAddress = getExtensionEndpointAddress(address, extMap);
         if (atomAddress != null) {
+            atomAddress = StringEscapeUtils.escapeHtml4(atomAddress);
             pw.write("<br/><span class=\"field\">Atom Log Feed :</span> " + "<a href=\"" + atomAddress
                      + "\">" + atomAddress + "</a>");
         }
