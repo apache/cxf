@@ -129,6 +129,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         private final AtomicInteger latch;
         private final ConnectionFactory delegate;
         private final Function<Connection, Connection> wrapper;
+        private final AtomicInteger connectionsCreated = new AtomicInteger(0);
 
         private FaultyConnectionFactory(ConnectionFactory delegate, int faults) {
             this(delegate, FaultyConnection::new, faults);
@@ -144,6 +145,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         @Override
         public Connection createConnection() throws JMSException {
             if (latch.getAndDecrement() <= 0) {
+                connectionsCreated.incrementAndGet();
                 return wrapper.apply(delegate.createConnection());
             } else {
                 throw new JMSException("createConnection() failed (simulated)");
@@ -571,16 +573,17 @@ public class JMSDestinationTest extends AbstractJMSTester {
         destination.shutdown();
     }
 
+    @SuppressWarnings("unused")
     @Test
     public void testSessionsExceptionHandling() throws Exception {
-        EndpointInfo ei = setupServiceInfo("HelloWorldPubSubService", "HelloWorldPubSubPort");
-        final AtomicInteger latch = new AtomicInteger(5);
+        final EndpointInfo ei = setupServiceInfo("HelloWorldPubSubService", "HelloWorldPubSubPort");
+        final AtomicInteger sessionsToFail = new AtomicInteger(5);
 
         final Function<Connection, Connection> connection = c -> new FaultyConnection(c) {
             @Override
             public Session createSession(boolean transacted, int acknowledgeMode) throws JMSException {
                 // Fail five times, starting with on successful call
-                final int value = latch.getAndDecrement();
+                final int value = sessionsToFail.getAndDecrement();
                 if (value >= 0 && value < 5) {
                     throw new JMSException("createSession() failed (simulated)");
                 } else {
@@ -619,7 +622,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         destination.shutdown();
         
         assertEquals("Only two createConnection() calls allowed because restartConnection() should be "
-            + "called only once.", -2, faultyConnectionFactory.latch.get());
+            + "called only once.", 2, faultyConnectionFactory.connectionsCreated.get());
     }
 
 
