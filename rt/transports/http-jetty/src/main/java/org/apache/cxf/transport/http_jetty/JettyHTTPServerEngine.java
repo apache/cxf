@@ -1036,8 +1036,6 @@ public class JettyHTTPServerEngine implements ServerEngine {
                     connector.stop();
                     if (connector instanceof Closeable) {
                         ((Closeable)connector).close();
-                    } else {
-                        ((ServerConnector)connector).close();
                     }
                 }
             } finally {

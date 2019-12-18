@@ -86,8 +86,7 @@ public class CommandLineParser {
         }
 
         if (toolspec == null) {
-            throw new IllegalStateException("No schema known- call to acceptSc"
-                                            + "hema() must be made and must succeed");
+            throw new IllegalStateException("No schema known- call to acceptSchema() must be made and must succeed");
         }
 
         // Create a result document
