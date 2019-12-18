@@ -126,7 +126,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
     }
 
     private static final class FaultyConnectionFactory implements ConnectionFactory {
-        final AtomicInteger latch;
+        private final AtomicInteger latch;
         private final ConnectionFactory delegate;
         private final Function<Connection, Connection> wrapper;
 
@@ -580,8 +580,8 @@ public class JMSDestinationTest extends AbstractJMSTester {
             @Override
             public Session createSession(boolean transacted, int acknowledgeMode) throws JMSException {
                 // Fail five times, starting with on successful call
-                final int latchValue = latch.getAndDecrement();
-                if (latchValue >= 0 && latchValue < 5) {
+                final int value = latch.getAndDecrement();
+                if (value >= 0 && value < 5) {
                     throw new JMSException("createSession() failed (simulated)");
                 } else {
                     return super.createSession(transacted, acknowledgeMode);
@@ -617,9 +617,9 @@ public class JMSDestinationTest extends AbstractJMSTester {
 
         conduit.close();
         destination.shutdown();
-        assertEquals("Only two createConnection() calls allowed because "
-                     + "restartConnection() should be called only once.",
-                -2, faultyConnectionFactory.latch.get());
+        
+        assertEquals("Only two createConnection() calls allowed because restartConnection() should be "
+            + "called only once.", -2, faultyConnectionFactory.latch.get());
     }
 
 
