@@ -19,7 +19,9 @@
 
 package org.apache.cxf.jaxws.context;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.activation.DataHandler;
@@ -38,6 +40,7 @@ import static org.junit.Assert.assertTrue;
  *
  */
 public class WrappedAttachmentsTest {
+
     @Test
     public void testCreateAndModify() {
         Map<String, DataHandler> content = new HashMap<>();
@@ -49,6 +52,11 @@ public class WrappedAttachmentsTest {
 
         assertEquals(2, attachments.size());
         assertFalse(attachments.isEmpty());
+
+        assertTrue(attachments.containsAll(attachments));
+        List<String> testCollection = new ArrayList<>();
+        testCollection.add("Some value");
+        assertFalse(attachments.containsAll(testCollection));
 
         attachments.add(att3);
         assertEquals(3, attachments.size());
@@ -73,13 +81,13 @@ public class WrappedAttachmentsTest {
         atts = attachments.toArray(new Attachment[attachments.size()]); //NOPMD - explicitly test this
         assertEquals(1, atts.length);
         assertEquals("att-1".equals(attx.getId()) ? "att-2" : "att-1", atts[0].getId());
-        
+
         Object[] o = attachments.toArray(); //NOPMD - explicitly test this
         assertEquals(1, o.length);
         Attachment a = (Attachment)o[0];
         assertEquals("att-1".equals(attx.getId()) ? "att-2" : "att-1", a.getId());
 
-        
+
         attachments.clear();
         assertTrue(attachments.isEmpty());
         assertTrue(content.isEmpty());
