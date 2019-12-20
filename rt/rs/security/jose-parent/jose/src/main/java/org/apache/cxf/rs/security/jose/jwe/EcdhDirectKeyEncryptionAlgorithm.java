@@ -18,14 +18,17 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
-import java.security.interfaces.ECPrivateKey;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
-import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
-
-
-public class EcdhDirectKeyJweDecryption extends JweDecryption {
-    public EcdhDirectKeyJweDecryption(ECPrivateKey privateKey, ContentAlgorithm supportedCtAlgo) {
-        super(new EcdhDirectKeyDecryptionAlgorithm(privateKey),
-              new AesGcmContentDecryptionAlgorithm(supportedCtAlgo));
+public class EcdhDirectKeyEncryptionAlgorithm extends DirectKeyEncryptionAlgorithm {
+    
+    protected void checkKeyEncryptionAlgorithm(JweHeaders headers) {
+        headers.setKeyEncryptionAlgorithm(KeyAlgorithm.ECDH_ES_DIRECT);
     }
+
+    @Override
+    public KeyAlgorithm getAlgorithm() {
+        return KeyAlgorithm.ECDH_ES_DIRECT;
+    }
+
 }

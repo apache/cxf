@@ -16,16 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.jose.jwe;
+package org.apache.cxf.rs.security.jose.jwa;
 
-import java.security.interfaces.ECPrivateKey;
+public abstract class AbstractDecryptTest extends AbstractJwaTest {
 
-import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
+    protected static final String JWKS_PRIVATE_KEYS = "/jwk/priKeys.jwks";
+    
+    protected static final String PLAIN_TEXT = "Live long and prosper.";
 
-
-public class EcdhDirectKeyJweDecryption extends JweDecryption {
-    public EcdhDirectKeyJweDecryption(ECPrivateKey privateKey, ContentAlgorithm supportedCtAlgo) {
-        super(new EcdhDirectKeyDecryptionAlgorithm(privateKey),
-              new AesGcmContentDecryptionAlgorithm(supportedCtAlgo));
+    protected final void test(String encryptedDataFile) {
+        test(encryptedDataFile, PLAIN_TEXT);
     }
+
+    protected final void test(String encryptedDataFile, String plainText) {
+        test(encryptedDataFile, plainText, JWKS_PRIVATE_KEYS);
+    }
+
+    protected final void test(String encryptedDataFile, String plainText, String jwksURI) {
+        decrypt(loadResource(encryptedDataFile), plainText, loadResource(jwksURI));
+    }
+
+    protected abstract void decrypt(String encryptedData, String plainText, String jwksJson);
+
 }

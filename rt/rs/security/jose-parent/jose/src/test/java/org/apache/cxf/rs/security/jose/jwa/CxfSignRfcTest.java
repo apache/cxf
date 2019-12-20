@@ -16,16 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.jose.jwe;
+package org.apache.cxf.rs.security.jose.jwa;
 
-import java.security.interfaces.ECPrivateKey;
+import org.apache.cxf.rs.security.jose.support.ApacheCXFProducer;
+import org.apache.cxf.rs.security.jose.support.Serialization;
 
-import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
+public class CxfSignRfcTest extends JwaSignRfcConformanceTest {
 
-
-public class EcdhDirectKeyJweDecryption extends JweDecryption {
-    public EcdhDirectKeyJweDecryption(ECPrivateKey privateKey, ContentAlgorithm supportedCtAlgo) {
-        super(new EcdhDirectKeyDecryptionAlgorithm(privateKey),
-              new AesGcmContentDecryptionAlgorithm(supportedCtAlgo));
+    private ApacheCXFProducer producer = new ApacheCXFProducer();
+    
+    @Override
+    protected void sign(String keyType, String signatureAlgorithm, Serialization serialization, String plainText,
+        String jwksJson) {
+        producer.produceJWS(keyType, signatureAlgorithm, serialization, plainText, jwksJson);
     }
+
+
 }

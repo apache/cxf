@@ -1,0 +1,12 @@
+{
+  "payload": "TGl2ZSBsb25nIGFuZCBwcm9zcGVyLg",
+  "signatures": [
+    {
+      "protected": "eyJhbGciOiJFUzI1NiJ9",
+      "header": {
+        "kid": "ecs001"
+      },
+      "signature": "eQVi-GzBCMtCZH8mp6-tr7ftmYlJ3PIj01ARWnxYTBH1dz8ePxnsGlTFrQTlZH82fPHdAyXtO6NnqK_WftPkIw"
+    }
+  ]
+}

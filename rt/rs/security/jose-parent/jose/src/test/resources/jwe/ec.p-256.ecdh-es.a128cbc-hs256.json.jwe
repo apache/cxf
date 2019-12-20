@@ -1,0 +1,14 @@
+{
+  "protected": "eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiZXBrIjp7Imt0eSI6IkVDIiwiY3J2IjoiUC0yNTYiLCJ4Ijoic0N1SVFkVEhlZjNtVklKOVkwOEVoMXE0WTdJU1pnaEthVUM5TXZZaEItVSIsInkiOiJTUGNac015cE5FNnRsM1hlWm1mbHd1OE8yY3dMU3dMXzRpQXgzYjBiOE9vIn19",
+  "recipients": [
+    {
+      "header": {
+        "alg": "ECDH-ES",
+        "kid": "ece001"
+      }
+    }
+  ],
+  "iv": "D607QFPXIuxwC_UAXZNn0g",
+  "ciphertext": "bqBaOLGRISgQxgqbraEOWZGkPJlsQW0Z7fDpRVH3ov0",
+  "tag": "alb_2BcOzf93gOHBIGa-cg"
+}

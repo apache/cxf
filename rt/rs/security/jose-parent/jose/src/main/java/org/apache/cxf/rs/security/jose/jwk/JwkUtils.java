@@ -492,6 +492,10 @@ public final class JwkUtils {
         return CryptoUtils.createSecretKeySpec((String)jwk.getProperty(JsonWebKey.OCTET_KEY_VALUE),
                                                AlgorithmUtils.toJavaName(jwk.getAlgorithm()));
     }
+    public static SecretKey toSecretKey(JsonWebKey jwk, KeyAlgorithm algorithm) {
+        return CryptoUtils.createSecretKeySpec((String)jwk.getProperty(JsonWebKey.OCTET_KEY_VALUE),
+                                               algorithm.getJavaName());
+    }
     public static JsonWebKey fromSecretKey(SecretKey secretKey, String algo) {
         return fromSecretKey(secretKey, algo, null);
     }
