@@ -53,15 +53,21 @@ class EcdhHelper {
         KeyPair pair = CryptoUtils.generateECKeyPair(ecurve);
         ECPublicKey publicKey = (ECPublicKey)pair.getPublic();
         ECPrivateKey privateKey = (ECPrivateKey)pair.getPrivate();
-        ContentAlgorithm jwtAlgo = ContentAlgorithm.valueOf(ctAlgo);
-
-        headers.setHeader("apu", Base64UrlUtility.encode(apuBytes));
-        headers.setHeader("apv", Base64UrlUtility.encode(apvBytes));
+        KeyAlgorithm keyAlgo = headers.getKeyEncryptionAlgorithm();
+        ContentAlgorithm contentAlgo = ContentAlgorithm.valueOf(ctAlgo);
+        String algorithm = (KeyAlgorithm.isDirect(keyAlgo)) ? contentAlgo.getJwaName() : keyAlgo.getJwaName();
+        int keySizeBits = (KeyAlgorithm.isDirect(keyAlgo)) ? contentAlgo.getKeySizeBits() : keyAlgo.getKeySizeBits();
+        
+        if (apuBytes != null) {
+            headers.setHeader("apu", Base64UrlUtility.encode(apuBytes));
+        }
+        if (apvBytes != null) {
+            headers.setHeader("apv", Base64UrlUtility.encode(apvBytes));
+        }
         headers.setJsonWebKey("epk", JwkUtils.fromECPublicKey(publicKey, ecurve));
 
         return JweUtils.getECDHKey(privateKey, peerPublicKey, apuBytes, apvBytes,
-                                   jwtAlgo.getJwaName(), jwtAlgo.getKeySizeBits());
-
+                                   algorithm, keySizeBits);
     }
     private byte[] toApuBytes(String apuString) {
         if (apuString != null) {
