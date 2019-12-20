@@ -35,12 +35,13 @@ import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 public class JweJsonProducer {
     protected static final Logger LOG = LogUtils.getL7dLogger(JweJsonProducer.class);
-    private JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
-    private JweHeaders protectedHeader;
-    private JweHeaders unprotectedHeader;
-    private byte[] content;
-    private byte[] aad;
-    private boolean canBeFlat;
+    private final JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
+    private final JweHeaders protectedHeader;
+    private final JweHeaders unprotectedHeader;
+    private final byte[] content;
+    private final byte[] aad;
+    private final boolean canBeFlat;
+
     public JweJsonProducer(JweHeaders protectedHeader, byte[] content) {
         this(protectedHeader, content, false);
     }
@@ -48,17 +49,17 @@ public class JweJsonProducer {
         this(protectedHeader, content, null, canBeFlat);
     }
     public JweJsonProducer(JweHeaders protectedHeader, byte[] content, byte[] aad, boolean canBeFlat) {
-        this.protectedHeader = protectedHeader;
-        this.content = content;
-        this.aad = aad;
-        this.canBeFlat = canBeFlat;
+        this(protectedHeader, null, content, aad, canBeFlat);
     }
     public JweJsonProducer(JweHeaders protectedHeader,
                            JweHeaders unprotectedHeader,
                            byte[] content,
                            byte[] aad,
                            boolean canBeFlat) {
-        this(protectedHeader, content, aad, canBeFlat);
+        this.protectedHeader = protectedHeader;
+        this.content = content;
+        this.aad = aad;
+        this.canBeFlat = canBeFlat;
         this.unprotectedHeader = unprotectedHeader;
     }
     public JweJsonProducer(JweHeaders protectedHeader,

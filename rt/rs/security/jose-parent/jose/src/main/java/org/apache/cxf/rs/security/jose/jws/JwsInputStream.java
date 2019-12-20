@@ -24,10 +24,11 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 public class JwsInputStream extends FilterInputStream {
-    private JwsVerificationSignature signature;
-    private byte[] signatureBytes;
-    private boolean verifyOnLastRead;
-    public JwsInputStream(InputStream out, 
+    private final JwsVerificationSignature signature;
+    private final byte[] signatureBytes;
+    private final boolean verifyOnLastRead;
+
+    public JwsInputStream(InputStream out,
                           JwsVerificationSignature signature,
                           byte[] signatureBytes,
                           boolean verifyOnLastRead) {
@@ -48,7 +49,7 @@ public class JwsInputStream extends FilterInputStream {
         }
         return value;
     }
- 
+
     public int read(byte[] b, int off, int len) throws IOException {
         int num = in.read(b, off, len);
         if (num != -1) {
@@ -58,10 +59,10 @@ public class JwsInputStream extends FilterInputStream {
         }
         return num;
     }
-    
+
     private void verify() {
         if (verifyOnLastRead && !signature.verify(signatureBytes)) {
-            throw new JwsException(JwsException.Error.INVALID_SIGNATURE);    
+            throw new JwsException(JwsException.Error.INVALID_SIGNATURE);
         }
     }
 }

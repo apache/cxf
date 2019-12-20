@@ -27,7 +27,7 @@ import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 
 public class EcdhDirectKeyDecryptionAlgorithm extends DirectKeyDecryptionAlgorithm {
 
-    private ECPrivateKey privateKey;
+    private final ECPrivateKey privateKey;
 
     public EcdhDirectKeyDecryptionAlgorithm(ECPrivateKey privateKey) {
         super((byte[]) null);

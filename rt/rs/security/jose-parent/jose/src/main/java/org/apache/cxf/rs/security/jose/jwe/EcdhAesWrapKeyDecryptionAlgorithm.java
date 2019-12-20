@@ -27,8 +27,9 @@ import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 
 public class EcdhAesWrapKeyDecryptionAlgorithm implements KeyDecryptionProvider {
-    private ECPrivateKey key;
-    private KeyAlgorithm algo;
+    private final ECPrivateKey key;
+    private final KeyAlgorithm algo;
+
     public EcdhAesWrapKeyDecryptionAlgorithm(ECPrivateKey key) {
         this(key, KeyAlgorithm.ECDH_ES_A128KW);
     }
@@ -52,7 +53,7 @@ public class EcdhAesWrapKeyDecryptionAlgorithm implements KeyDecryptionProvider 
     public KeyAlgorithm getAlgorithm() {
         return algo;
     }
-    
+
     protected byte[] getDecryptedContentEncryptionKeyFromHeaders(JweHeaders headers, ECPrivateKey privateKey) {
         KeyAlgorithm jwtAlgo = headers.getKeyEncryptionAlgorithm();
         JsonWebKey publicJwk = headers.getJsonWebKey("epk");
