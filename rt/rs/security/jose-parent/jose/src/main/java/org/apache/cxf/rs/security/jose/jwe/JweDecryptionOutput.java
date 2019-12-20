@@ -21,8 +21,9 @@ package org.apache.cxf.rs.security.jose.jwe;
 import java.nio.charset.StandardCharsets;
 
 public class JweDecryptionOutput {
-    private JweHeaders headers;
-    private byte[] content;
+    private final JweHeaders headers;
+    private final byte[] content;
+
     public JweDecryptionOutput(JweHeaders headers, byte[] content) {
         this.headers = headers;
         this.content = content;

@@ -20,13 +20,13 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 
 public class JweDecryptionInput {
-    private String headersJson;
-    private byte[] encryptedCEK;
-    private byte[] initVector;
-    private byte[] encryptedContent;
-    private byte[] authTag;
-    private byte[] aad;
-    private JweHeaders jweHeaders;
+    private final String headersJson;
+    private final byte[] encryptedCEK;
+    private final byte[] initVector;
+    private final byte[] encryptedContent;
+    private final byte[] authTag;
+    private final byte[] aad;
+    private final JweHeaders jweHeaders;
 
     public JweDecryptionInput(byte[] encryptedCEK,
                               byte[] initVector,

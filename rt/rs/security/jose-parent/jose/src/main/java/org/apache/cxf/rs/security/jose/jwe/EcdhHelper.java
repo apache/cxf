@@ -31,11 +31,12 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 class EcdhHelper {
 
-    private ECPublicKey peerPublicKey;
-    private String ecurve;
-    private byte[] apuBytes;
-    private byte[] apvBytes;
-    private String ctAlgo;
+    private final ECPublicKey peerPublicKey;
+    private final String ecurve;
+    private final byte[] apuBytes;
+    private final byte[] apvBytes;
+    private final String ctAlgo;
+
     EcdhHelper(ECPublicKey peerPublicKey,
                                                 String curve,
                                                 String apuString,
@@ -57,7 +58,7 @@ class EcdhHelper {
         ContentAlgorithm contentAlgo = ContentAlgorithm.valueOf(ctAlgo);
         String algorithm = (KeyAlgorithm.isDirect(keyAlgo)) ? contentAlgo.getJwaName() : keyAlgo.getJwaName();
         int keySizeBits = (KeyAlgorithm.isDirect(keyAlgo)) ? contentAlgo.getKeySizeBits() : keyAlgo.getKeySizeBits();
-        
+
         if (apuBytes != null) {
             headers.setHeader("apu", Base64UrlUtility.encode(apuBytes));
         }
@@ -79,5 +80,5 @@ class EcdhHelper {
     private byte[] toBytes(String str) {
         return str == null ? null : StringUtils.toBytesUTF8(str);
     }
-    
+
 }

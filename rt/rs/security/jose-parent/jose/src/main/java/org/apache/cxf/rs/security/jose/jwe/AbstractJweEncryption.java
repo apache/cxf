@@ -38,9 +38,10 @@ import org.apache.cxf.rt.security.crypto.KeyProperties;
 public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractJweEncryption.class);
     protected static final int DEFAULT_AUTH_TAG_LENGTH = 128;
-    private ContentEncryptionProvider contentEncryptionAlgo;
-    private KeyEncryptionProvider keyEncryptionAlgo;
-    private JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
+    private final ContentEncryptionProvider contentEncryptionAlgo;
+    private final KeyEncryptionProvider keyEncryptionAlgo;
+    private final JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
+
     protected AbstractJweEncryption(ContentEncryptionProvider contentEncryptionAlgo,
                                     KeyEncryptionProvider keyEncryptionAlgo) {
         this.keyEncryptionAlgo = keyEncryptionAlgo;

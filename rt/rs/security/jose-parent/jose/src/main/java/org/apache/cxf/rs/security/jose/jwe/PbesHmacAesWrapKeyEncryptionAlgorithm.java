@@ -61,10 +61,10 @@ public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvi
         DERIVED_KEY_SIZE_MAP.put(KeyAlgorithm.PBES2_HS512_A256KW.getJwaName(), 32);
     }
 
+    private final byte[] password;
+    private final int pbesCount;
+    private final KeyAlgorithm keyAlgoJwt;
 
-    private byte[] password;
-    private int pbesCount;
-    private KeyAlgorithm keyAlgoJwt;
     public PbesHmacAesWrapKeyEncryptionAlgorithm(String password, KeyAlgorithm keyAlgoJwt) {
         this(stringToBytes(password), keyAlgoJwt);
     }

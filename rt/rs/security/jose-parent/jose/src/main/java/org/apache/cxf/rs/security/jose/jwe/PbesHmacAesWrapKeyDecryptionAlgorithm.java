@@ -24,8 +24,9 @@ import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 public class PbesHmacAesWrapKeyDecryptionAlgorithm implements KeyDecryptionProvider {
-    private byte[] password;
-    private KeyAlgorithm algo;
+    private final byte[] password;
+    private final KeyAlgorithm algo;
+
     public PbesHmacAesWrapKeyDecryptionAlgorithm(String password) {
         this(password, KeyAlgorithm.PBES2_HS256_A128KW, false);
     }

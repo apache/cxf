@@ -32,9 +32,9 @@ import org.apache.cxf.rt.security.crypto.HmacUtils;
 
 public class HmacJwsSignatureVerifier implements JwsSignatureVerifier {
     protected static final Logger LOG = LogUtils.getL7dLogger(HmacJwsSignatureVerifier.class);
-    private byte[] key;
-    private AlgorithmParameterSpec hmacSpec;
-    private SignatureAlgorithm supportedAlgo;
+    private final byte[] key;
+    private final AlgorithmParameterSpec hmacSpec;
+    private final SignatureAlgorithm supportedAlgo;
 
     public HmacJwsSignatureVerifier(String encodedKey) {
         this(JoseUtils.decode(encodedKey), SignatureAlgorithm.HS256);
@@ -92,11 +92,11 @@ public class HmacJwsSignatureVerifier implements JwsSignatureVerifier {
                                      hmacSpec);
         return new HmacJwsVerificationSignature(mac);
     }
-    
+
     private static class HmacJwsVerificationSignature implements JwsVerificationSignature {
 
         private Mac mac;
-        
+
         HmacJwsVerificationSignature(Mac mac) {
             this.mac = mac;
         }
@@ -111,6 +111,6 @@ public class HmacJwsSignatureVerifier implements JwsSignatureVerifier {
             byte[] macBytes = mac.doFinal();
             return MessageDigest.isEqual(macBytes, signature);
         }
-        
+
     }
 }

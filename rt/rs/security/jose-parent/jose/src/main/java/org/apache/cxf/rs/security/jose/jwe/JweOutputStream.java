@@ -31,12 +31,13 @@ import org.apache.cxf.common.util.Base64UrlUtility;
 
 public class JweOutputStream extends FilterOutputStream {
     protected static final Logger LOG = LogUtils.getL7dLogger(JweOutputStream.class);
-    private Cipher encryptingCipher;
-    private int blockSize;
-    private AuthenticationTagProducer authTagProducer;
+    private final Cipher encryptingCipher;
+    private final int blockSize;
+    private final AuthenticationTagProducer authTagProducer;
     private byte[] lastRawDataChunk;
     private byte[] lastEncryptedDataChunk;
     private boolean flushed;
+
     public JweOutputStream(OutputStream out,
                            Cipher encryptingCipher,
                            AuthenticationTagProducer authTagProducer) {

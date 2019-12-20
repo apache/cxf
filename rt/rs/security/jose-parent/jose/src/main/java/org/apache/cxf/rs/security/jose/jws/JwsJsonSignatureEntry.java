@@ -33,13 +33,13 @@ import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 public class JwsJsonSignatureEntry implements JsonObject {
     protected static final Logger LOG = LogUtils.getL7dLogger(JwsJsonSignatureEntry.class);
-    private String jwsPayload;
-    private String encodedProtectedHeader;
-    private String encodedSignature;
-    private JwsHeaders protectedHeader;
-    private JwsHeaders unprotectedHeader;
+    private final String jwsPayload;
+    private final String encodedProtectedHeader;
+    private final String encodedSignature;
+    private final JwsHeaders protectedHeader;
+    private final JwsHeaders unprotectedHeader;
     private JwsHeaders unionHeaders;
-    private JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
+    private final JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
 
     public JwsJsonSignatureEntry(String jwsPayload,
                                  String encodedProtectedHeader,
@@ -56,6 +56,8 @@ public class JwsJsonSignatureEntry implements JsonObject {
         this.unprotectedHeader = unprotectedHeader;
         if (encodedProtectedHeader != null) {
             this.protectedHeader = new JwsHeaders(writer.fromJson(JoseUtils.decodeToString(encodedProtectedHeader)));
+        } else {
+            this.protectedHeader = null;
         }
         prepare();
     }

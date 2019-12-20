@@ -23,7 +23,8 @@ import java.security.interfaces.ECPublicKey;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 
 public class EcdhAesGcmContentEncryptionAlgorithm extends AesGcmContentEncryptionAlgorithm {
-    private EcdhHelper helper;
+    private final EcdhHelper helper;
+
     public EcdhAesGcmContentEncryptionAlgorithm(ECPublicKey peerPublicKey,
                                                 String curve,
                                                 String apuString,
