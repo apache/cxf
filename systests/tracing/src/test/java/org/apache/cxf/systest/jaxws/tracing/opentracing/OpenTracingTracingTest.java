@@ -18,46 +18,43 @@
  */
 package org.apache.cxf.systest.jaxws.tracing.opentracing;
 
-import java.net.MalformedURLException;
+import java.time.Duration;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.systest.jaeger.TestSender;
 import org.apache.cxf.systest.jaxws.tracing.BookStoreService;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractTestServerBase;
 import org.apache.cxf.tracing.opentracing.OpenTracingClientFeature;
 import org.apache.cxf.tracing.opentracing.OpenTracingFeature;
 import org.apache.cxf.tracing.opentracing.internal.TextMapInjectAdapter;
-import org.awaitility.Duration;
 
-import io.jaegertracing.Configuration;
-import io.jaegertracing.Configuration.ReporterConfiguration;
-import io.jaegertracing.Configuration.SamplerConfiguration;
-import io.jaegertracing.Configuration.SenderConfiguration;
 import io.jaegertracing.internal.JaegerSpanContext;
+import io.jaegertracing.internal.JaegerTracer;
+import io.jaegertracing.internal.reporters.InMemoryReporter;
 import io.jaegertracing.internal.samplers.ConstSampler;
-import io.jaegertracing.spi.Sender;
 import io.opentracing.Scope;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
+import io.opentracing.noop.NoopTracerFactory;
 import io.opentracing.propagation.Format.Builtin;
 import io.opentracing.util.GlobalTracer;
 
-import org.junit.Before;
+import org.junit.After;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.awaitility.Awaitility.await;
@@ -69,78 +66,67 @@ import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
+public class OpenTracingTracingTest extends AbstractClientServerTestBase {
     public static final String PORT = allocatePort(OpenTracingTracingTest.class);
 
-    private Tracer tracer;
-    private Random random;
+    private static final AtomicLong RANDOM = new AtomicLong();
 
-    @Ignore
-    public static class Server extends AbstractBusTestServerBase {
+    private static final InMemoryReporter REPORTER = new InMemoryReporter();
+
+    private final Tracer tracer = new JaegerTracer.Builder("tracer-jaxws")
+        .withSampler(new ConstSampler(true))
+        .withReporter(REPORTER)
+        .build();
+
+    public static class BraveServer extends AbstractTestServerBase {
+
+        private org.apache.cxf.endpoint.Server server;
+
+        @Override
         protected void run() {
-            final Tracer tracer = new Configuration("book-store")
-                .withSampler(new SamplerConfiguration().withType(ConstSampler.TYPE).withParam(1))
-                .withReporter(new ReporterConfiguration().withSender(
-                    new SenderConfiguration() {
-                        @Override
-                        public Sender getSender() {
-                            return new TestSender();
-                        }
-                    }
-                ))
-                .getTracer();
+            final Tracer tracer = new JaegerTracer.Builder("tracer-jaxws")
+                .withSampler(new ConstSampler(true))
+                .withReporter(REPORTER)
+                .build();
             GlobalTracer.registerIfAbsent(tracer);
 
             final JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
             sf.setServiceClass(BookStore.class);
             sf.setAddress("http://localhost:" + PORT);
             sf.getFeatures().add(new OpenTracingFeature(tracer));
-            sf.create();
+            server = sf.create();
         }
-    }
 
-    private interface Configurator {
-        void configure(JaxWsProxyFactoryBean factory);
+        @Override
+        public void tearDown() throws Exception {
+            server.destroy();
+            GlobalTracer.registerIfAbsent(NoopTracerFactory.create());
+        }
     }
 
     @BeforeClass
     public static void startServers() throws Exception {
         //keep out of process due to stack traces testing failures
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
-        createStaticBus();
+        assertTrue("server did not launch correctly", launchServer(BraveServer.class, true));
     }
 
-    @Before
-    public void setUp() {
-        random = new Random();
-
-        tracer = new Configuration("tracer")
-            .withSampler(new SamplerConfiguration().withType(ConstSampler.TYPE).withParam(1))
-            .withReporter(new ReporterConfiguration().withSender(
-                new SenderConfiguration() {
-                    @Override
-                    public Sender getSender() {
-                        return new TestSender();
-                    }
-                }
-            ))
-            .getTracer();
-
-        TestSender.clear();
+    @After
+    public void tearDown() {
+        REPORTER.clear();
     }
 
     @Test
-    public void testThatNewSpanIsCreatedWhenNotProvided() throws MalformedURLException {
+    public void testThatNewSpanIsCreatedWhenNotProvided() throws Exception {
         final BookStoreService service = createJaxWsService();
         assertThat(service.getBooks().size(), equalTo(2));
 
-        assertThat(TestSender.getAllSpans().size(), equalTo(2));
-        assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Get Books"));
-        assertThat(TestSender.getAllSpans().get(1).getOperationName(), equalTo("POST /BookStore"));
+        assertThat(REPORTER.getSpans().size(), equalTo(2));
+        assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("Get Books"));
+        assertThat(REPORTER.getSpans().get(1).getOperationName(), equalTo("POST /BookStore"));
     }
 
     @Test
-    public void testThatNewInnerSpanIsCreated() throws MalformedURLException {
+    public void testThatNewInnerSpanIsCreated() throws Exception {
         final JaegerSpanContext spanId = fromRandom();
 
         final Map<String, List<String>> headers = new HashMap<>();
@@ -149,65 +135,55 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
         final BookStoreService service = createJaxWsService(headers);
         assertThat(service.getBooks().size(), equalTo(2));
 
-        assertThat(TestSender.getAllSpans().size(), equalTo(2));
-        assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Get Books"));
-        assertThat(TestSender.getAllSpans().get(1).getOperationName(), equalTo("POST /BookStore"));
+        assertThat(REPORTER.getSpans().size(), equalTo(2));
+        assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("Get Books"));
+        assertThat(REPORTER.getSpans().get(1).getOperationName(), equalTo("POST /BookStore"));
     }
 
     @Test
-    public void testThatNewChildSpanIsCreatedWhenParentIsProvided() throws MalformedURLException {
-        final BookStoreService service = createJaxWsService(new Configurator() {
-            @Override
-            public void configure(final JaxWsProxyFactoryBean factory) {
-                factory.getFeatures().add(new OpenTracingClientFeature(tracer));
-            }
-        });
+    public void testThatNewChildSpanIsCreatedWhenParentIsProvided() throws Exception {
+        final BookStoreService service = createJaxWsService(new OpenTracingClientFeature(tracer));
         assertThat(service.getBooks().size(), equalTo(2));
 
-        assertThat(TestSender.getAllSpans().size(), equalTo(3));
-        assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Get Books"));
-        assertThat(TestSender.getAllSpans().get(0).getReferences(), not(empty()));
-        assertThat(TestSender.getAllSpans().get(1).getOperationName(), equalTo("POST /BookStore"));
-        assertThat(TestSender.getAllSpans().get(2).getOperationName(),
+        assertThat(REPORTER.getSpans().size(), equalTo(3));
+        assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("Get Books"));
+        assertThat(REPORTER.getSpans().get(0).getReferences(), not(empty()));
+        assertThat(REPORTER.getSpans().get(1).getOperationName(), equalTo("POST /BookStore"));
+        assertThat(REPORTER.getSpans().get(2).getOperationName(),
             equalTo("POST http://localhost:" + PORT + "/BookStore"));
     }
 
     @Test
-    public void testThatProvidedSpanIsNotClosedWhenActive() throws MalformedURLException {
-        final BookStoreService service = createJaxWsService(new Configurator() {
-            @Override
-            public void configure(final JaxWsProxyFactoryBean factory) {
-                factory.getFeatures().add(new OpenTracingClientFeature(tracer));
-            }
-        });
+    public void testThatProvidedSpanIsNotClosedWhenActive() throws Exception {
+        final BookStoreService service = createJaxWsService(new OpenTracingClientFeature(tracer));
 
         final Span span = tracer.buildSpan("test span").start();
         try (Scope scope = tracer.activateSpan(span)) {
             assertThat(service.getBooks().size(), equalTo(2));
             assertThat(tracer.activeSpan(), not(nullValue()));
 
-            assertThat(TestSender.getAllSpans().size(), equalTo(3));
-            assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Get Books"));
-            assertThat(TestSender.getAllSpans().get(0).getReferences(), not(empty()));
-            assertThat(TestSender.getAllSpans().get(1).getOperationName(), equalTo("POST /BookStore"));
-            assertThat(TestSender.getAllSpans().get(1).getReferences(), not(empty()));
-            assertThat(TestSender.getAllSpans().get(2).getOperationName(),
+            assertThat(REPORTER.getSpans().size(), equalTo(3));
+            assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("Get Books"));
+            assertThat(REPORTER.getSpans().get(0).getReferences(), not(empty()));
+            assertThat(REPORTER.getSpans().get(1).getOperationName(), equalTo("POST /BookStore"));
+            assertThat(REPORTER.getSpans().get(1).getReferences(), not(empty()));
+            assertThat(REPORTER.getSpans().get(2).getOperationName(),
                 equalTo("POST http://localhost:" + PORT + "/BookStore"));
-            assertThat(TestSender.getAllSpans().get(2).getReferences(), not(empty()));
+            assertThat(REPORTER.getSpans().get(2).getReferences(), not(empty()));
         } finally {
             span.finish();
         }
 
         // Await till flush happens, usually every second
-        await().atMost(Duration.ONE_SECOND).until(()-> TestSender.getAllSpans().size() == 4);
+        await().atMost(Duration.ofSeconds(1L)).until(()-> REPORTER.getSpans().size() == 4);
 
-        assertThat(TestSender.getAllSpans().size(), equalTo(4));
-        assertThat(TestSender.getAllSpans().get(3).getOperationName(), equalTo("test span"));
-        assertThat(TestSender.getAllSpans().get(3).getReferences(), empty());
+        assertThat(REPORTER.getSpans().size(), equalTo(4));
+        assertThat(REPORTER.getSpans().get(3).getOperationName(), equalTo("test span"));
+        assertThat(REPORTER.getSpans().get(3).getReferences(), empty());
     }
 
     @Test
-    public void testThatNewSpanIsCreatedInCaseOfFault() throws MalformedURLException {
+    public void testThatNewSpanIsCreatedInCaseOfFault() throws Exception {
         final BookStoreService service = createJaxWsService();
 
         try {
@@ -217,20 +193,13 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
             /* expected exception */
         }
 
-        assertThat(TestSender.getAllSpans().size(), equalTo(1));
-        assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("POST /BookStore"));
+        assertThat(REPORTER.getSpans().size(), equalTo(1));
+        assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("POST /BookStore"));
     }
 
     @Test
-    public void testThatNewChildSpanIsCreatedWhenParentIsProvidedInCaseOfFault() throws MalformedURLException {
-        final BookStoreService service = createJaxWsService(new Configurator() {
-            @Override
-            public void configure(final JaxWsProxyFactoryBean factory) {
-                factory.getFeatures().add(new OpenTracingClientFeature(tracer));
-                factory.getOutInterceptors().add(new LoggingOutInterceptor());
-                factory.getInInterceptors().add(new LoggingInInterceptor());
-            }
-        });
+    public void testThatNewChildSpanIsCreatedWhenParentIsProvidedInCaseOfFault() throws Exception {
+        final BookStoreService service = createJaxWsService(new OpenTracingClientFeature(tracer));
 
         try {
             service.removeBooks();
@@ -239,26 +208,26 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
             /* expected exception */
         }
 
-        assertThat(TestSender.getAllSpans().size(), equalTo(2));
-        assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("POST /BookStore"));
-        assertThat(TestSender.getAllSpans().get(1).getOperationName(),
+        assertThat(REPORTER.getSpans().size(), equalTo(2));
+        assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("POST /BookStore"));
+        assertThat(REPORTER.getSpans().get(1).getOperationName(),
             equalTo("POST http://localhost:" + PORT + "/BookStore"));
     }
 
-    private BookStoreService createJaxWsService() throws MalformedURLException {
-        return createJaxWsService(new HashMap<String, List<String>>());
+    private static BookStoreService createJaxWsService() {
+        return createJaxWsService(Collections.emptyMap());
     }
 
-    private BookStoreService createJaxWsService(final Map<String, List<String>> headers) throws MalformedURLException {
+    private static BookStoreService createJaxWsService(final Map<String, List<String>> headers) {
         return createJaxWsService(headers, null);
     }
 
-    private BookStoreService createJaxWsService(final Configurator configurator) throws MalformedURLException {
-        return createJaxWsService(new HashMap<String, List<String>>(), configurator);
+    private BookStoreService createJaxWsService(final Feature feature) {
+        return createJaxWsService(Collections.emptyMap(), feature);
     }
 
-    private BookStoreService createJaxWsService(final Map<String, List<String>> headers,
-            final Configurator configurator) throws MalformedURLException {
+    private static BookStoreService createJaxWsService(final Map<String, List<String>> headers,
+            final Feature feature) {
 
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.getOutInterceptors().add(new LoggingOutInterceptor());
@@ -266,8 +235,8 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
         factory.setServiceClass(BookStoreService.class);
         factory.setAddress("http://localhost:" + PORT + "/BookStore");
 
-        if (configurator != null) {
-            configurator.configure(factory);
+        if (feature != null) {
+            factory.getFeatures().add(feature);
         }
 
         final BookStoreService service = (BookStoreService) factory.create();
@@ -277,8 +246,9 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
         return service;
     }
 
-    private JaegerSpanContext fromRandom() {
-        return new JaegerSpanContext(random.nextLong() /* traceId hi */, random.nextLong() /* traceId lo */, 
-            random.nextLong() /* spanId */, random.nextLong() /* parentId */, (byte)1 /* sampled */);
+    private static JaegerSpanContext fromRandom() {
+        return new JaegerSpanContext(RANDOM.getAndIncrement() /* traceId hi */,
+            RANDOM.getAndIncrement() /* traceId lo */, RANDOM.getAndIncrement() /* spanId */,
+            RANDOM.getAndIncrement() /* parentId */, (byte) 1 /* sampled */);
     }
 }

@@ -112,12 +112,12 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         String asymSignatureAlgorithm =
             (String)getMessage().getContextualProperty(SecurityConstants.ASYMMETRIC_SIGNATURE_ALGORITHM);
         if (asymSignatureAlgorithm != null && sbinding.getAlgorithmSuite() != null) {
-            sbinding.getAlgorithmSuite().setAsymmetricSignature(asymSignatureAlgorithm);
+            sbinding.getAlgorithmSuite().getAlgorithmSuiteType().setAsymmetricSignature(asymSignatureAlgorithm);
         }
         String symSignatureAlgorithm =
             (String)getMessage().getContextualProperty(SecurityConstants.SYMMETRIC_SIGNATURE_ALGORITHM);
         if (symSignatureAlgorithm != null && sbinding.getAlgorithmSuite() != null) {
-            sbinding.getAlgorithmSuite().setSymmetricSignature(symSignatureAlgorithm);
+            sbinding.getAlgorithmSuite().getAlgorithmSuiteType().setSymmetricSignature(symSignatureAlgorithm);
         }
 
         // Set up CallbackHandler which wraps the configured Handler
@@ -493,8 +493,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             }
 
             if (encrToken instanceof KerberosToken || encrToken instanceof IssuedToken
-                || encrToken instanceof SpnegoContextToken || encrToken instanceof SecurityContextToken
-                || encrToken instanceof SecureConversationToken) {
+                || encrToken instanceof SpnegoContextToken || encrToken instanceof SecurityContextToken) {
                 properties.setEncryptSymmetricEncryptionKey(false);
             }
         }
@@ -581,7 +580,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                     WSSecurityTokenConstants.KEYIDENTIFIER_KERBEROS_SHA1_IDENTIFIER);
             }
         } else if (policyToken instanceof IssuedToken || policyToken instanceof SecurityContextToken
-            || policyToken instanceof SecureConversationToken || policyToken instanceof SpnegoContextToken) {
+            || policyToken instanceof SpnegoContextToken) {
             if (!isRequestor()) {
                 properties.setIncludeSignatureToken(false);
             } else {
@@ -593,7 +592,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
 
         if (sigToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
             properties.setSignatureAlgorithm(
-                   sbinding.getAlgorithmSuite().getSymmetricSignature());
+                   sbinding.getAlgorithmSuite().getAlgorithmSuiteType().getSymmetricSignature());
         }
     }
 

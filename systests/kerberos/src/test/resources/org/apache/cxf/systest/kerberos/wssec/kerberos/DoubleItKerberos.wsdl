@@ -33,7 +33,7 @@
                 <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -51,7 +51,7 @@
                 <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -69,7 +69,7 @@
                 <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -85,7 +85,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -103,7 +103,7 @@
                 <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -121,7 +121,7 @@
                 <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -139,7 +139,7 @@
                 <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -157,7 +157,7 @@
                 <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -175,7 +175,7 @@
                 <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -193,7 +193,7 @@
                 <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -211,7 +211,7 @@
                 <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -229,7 +229,7 @@
                 <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -247,7 +247,7 @@
                 <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -265,7 +265,7 @@
                 <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -295,7 +295,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>

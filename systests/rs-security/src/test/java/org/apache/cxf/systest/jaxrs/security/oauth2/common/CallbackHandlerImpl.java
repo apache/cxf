@@ -24,9 +24,13 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
+import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 
 public class CallbackHandlerImpl implements CallbackHandler {
+
+    private OAuthDataProvider dataProvider;
 
     public void handle(Callback[] callbacks) throws IOException,
             UnsupportedCallbackException {
@@ -46,8 +50,20 @@ public class CallbackHandlerImpl implements CallbackHandler {
                 } else if ("service".equals(pc.getIdentifier())) {
                     pc.setPassword("service-pass");
                     break;
+                } else if (dataProvider != null) {
+                    Client client = dataProvider.getClient(pc.getIdentifier());
+                    pc.setPassword(client.getClientSecret());
+                    break;
                 }
             }
         }
+    }
+
+    public OAuthDataProvider getDataProvider() {
+        return dataProvider;
+    }
+
+    public void setDataProvider(OAuthDataProvider dataProvider) {
+        this.dataProvider = dataProvider;
     }
 }

@@ -26,6 +26,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
@@ -70,6 +72,7 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSConfig;
@@ -839,9 +842,12 @@ public class IssueSamlUnitTest {
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setKeyEncAlgo(WSS4JConstants.KEYTRANSPORT_RSAOAEP);
 
-        builder.prepare(stsProperties.getSignatureCrypto());
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+
+        builder.prepare(stsProperties.getSignatureCrypto(), symmetricKey);
         Element encryptedKeyElement = builder.getEncryptedKeyElement();
-        byte[] secret = builder.getEphemeralKey();
+        byte[] secret = symmetricKey.getEncoded();
 
         EntropyType entropyType = new EntropyType();
         entropyType.getAny().add(encryptedKeyElement);

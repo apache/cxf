@@ -32,9 +32,10 @@ import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 public class JwsCompactProducer {
     private JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
     private JwsHeaders headers;
-    private String plainJwsPayload;
     private String signature;
-    private boolean detached;
+    private final String plainJwsPayload;
+    private final boolean detached;
+
     public JwsCompactProducer(String plainJwsPayload) {
         this(plainJwsPayload, false);
     }

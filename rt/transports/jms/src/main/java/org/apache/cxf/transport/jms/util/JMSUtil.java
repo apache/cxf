@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.transport.jms.util;
 
-import java.util.Enumeration;
-
 import javax.jms.BytesMessage;
 import javax.jms.Connection;
 import javax.jms.Destination;
@@ -28,7 +26,6 @@ import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.ObjectMessage;
 import javax.jms.Queue;
-import javax.jms.QueueBrowser;
 import javax.jms.Session;
 
 import org.apache.cxf.message.Exchange;
@@ -36,7 +33,8 @@ import org.apache.cxf.transport.jms.JMSConstants;
 
 public final class JMSUtil {
     
-    public static final String JMS_MESSAGE_CONSUMER = "jms_message_consumer"; 
+    public static final String JMS_MESSAGE_CONSUMER = "jms_message_consumer";
+    public static final String JMS_IGNORE_TIMEOUT = "jms_ignore_timeout";
     private static final char[] CORRELATTION_ID_PADDING = {
         '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'
     };
@@ -79,8 +77,13 @@ public final class JMSUtil {
             }
             javax.jms.Message replyMessage = consumer.receive(receiveTimeout);
             if (replyMessage == null) {
-                throw new RuntimeException("Timeout receiving message with correlationId "
+                if ((boolean)exchange.get(JMSUtil.JMS_IGNORE_TIMEOUT)) {
+                    throw new RuntimeException("Timeout receiving message with correlationId "
                                            + correlationId);
+                } else {
+                    throw new JMSException("Timeout receiving message with correlationId "
+                        + correlationId);
+                }
             }
             return replyMessage;
         } catch (JMSException e) {
@@ -136,17 +139,4 @@ public final class JMSUtil {
         }
     }
 
-    public static int getNumMessages(Connection connection, Queue queue) throws JMSException {
-        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        QueueBrowser browser = session.createBrowser(queue);
-        @SuppressWarnings("unchecked")
-        Enumeration<Message> messages = browser.getEnumeration();
-        int actualNum = 0;
-        while (messages.hasMoreElements()) {
-            actualNum++;
-            messages.nextElement();
-        }
-        browser.close();
-        return actualNum;
-    }
 }

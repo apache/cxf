@@ -33,12 +33,13 @@ import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 public class JwsCompactConsumer {
     protected static final Logger LOG = LogUtils.getL7dLogger(JwsCompactConsumer.class);
     private JsonMapObjectReaderWriter reader = new JsonMapObjectReaderWriter();
-    private String encodedSequence;
-    private String encodedSignature;
-    private String headersJson;
+    private final String encodedSequence;
+    private final String encodedSignature;
+    private final String headersJson;
     private String jwsPayload;
     private String decodedJwsPayload;
     private JwsHeaders jwsHeaders;
+
     public JwsCompactConsumer(String encodedJws) {
         this(encodedJws, null);
     }

@@ -107,7 +107,7 @@ public class RequestTokenHandler {
             LOG.log(Level.WARNING, "An OAuth-related problem: {0}", new Object[] {e.fillInStackTrace()});
             int code = e.getHttpStatusCode();
             if (code == HttpServletResponse.SC_OK) {
-                code = e.getProblem() == OAuth.Problems.CONSUMER_KEY_UNKNOWN
+                code = OAuth.Problems.CONSUMER_KEY_UNKNOWN.equals(e.getProblem())
                     ? 401 : 400;
             }
             return OAuthUtils.handleException(mc, e, code);

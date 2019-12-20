@@ -117,9 +117,6 @@ public class CacheControlClientReaderInterceptor implements ReaderInterceptor {
             byte[] bytes = IOUtils.readBytesFromStream((InputStream)responseEntity);
             ser = new BytesEntity(bytes, true);
             responseEntity = new ByteArrayInputStream(bytes);
-        } else if (responseEntity instanceof byte[]) {
-            // the cached bytes will be returned immediately when a client cache will return them
-            ser = new BytesEntity((byte[])responseEntity, false);
         }
 
         if (ser != null) {

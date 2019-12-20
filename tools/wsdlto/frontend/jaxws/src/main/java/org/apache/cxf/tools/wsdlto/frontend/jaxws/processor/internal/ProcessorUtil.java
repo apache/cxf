@@ -41,6 +41,7 @@ import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.model.DefaultValueWriter;
 import org.apache.cxf.tools.util.ClassCollector;
@@ -357,8 +358,6 @@ public final class ProcessorUtil {
     }
 
     public static List<WrapperElement> getWrappedElement(ToolContext context, QName partElement) {
-        List<WrapperElement> qnames = new ArrayList<>();
-
         ServiceInfo serviceInfo = context.get(ServiceInfo.class);
         SchemaCollection schema = serviceInfo.getXmlSchemaCollection();
 
@@ -368,32 +367,55 @@ public final class ProcessorUtil {
 
         XmlSchemaSequence seq = (XmlSchemaSequence)type.getParticle();
 
-        qnames.addAll(createWrappedElements(seq));
+        List<WrapperElement> qnames = createWrappedElements(seq);
 
         //If it's extension
         if (seq == null && type.getContentModel() != null) {
-
-            XmlSchemaContent xmlSchemaConent = type.getContentModel().getContent();
-            if (xmlSchemaConent instanceof XmlSchemaComplexContentExtension) {
-                XmlSchemaComplexContentExtension extension = (XmlSchemaComplexContentExtension)type
-                    .getContentModel().getContent();
-                QName baseTypeName = extension.getBaseTypeName();
-                XmlSchemaType schemaType = schema.getTypeByQName(baseTypeName);
-                if (schemaType instanceof XmlSchemaComplexType) {
-                    XmlSchemaComplexType complexType = (XmlSchemaComplexType)schemaType;
-                    if (complexType.getParticle() instanceof XmlSchemaSequence) {
-                        seq = (XmlSchemaSequence)complexType.getParticle();
-                        qnames.addAll(createWrappedElements(seq));
-                    }
-                }
-
-                if (extension.getParticle() instanceof XmlSchemaSequence) {
-                    XmlSchemaSequence xmlSchemaSeq = (XmlSchemaSequence)extension.getParticle();
-                    qnames.addAll(createWrappedElements(xmlSchemaSeq));
-                }
+            Object configuredMaxStackDepth = context.get(ToolConstants.CFG_MAX_EXTENSION_STACK_DEPTH);
+            Integer maxStackDepth = Integer.valueOf(5);
+            if (configuredMaxStackDepth instanceof Integer) {
+                maxStackDepth = (Integer)configuredMaxStackDepth;
+            } else if (configuredMaxStackDepth instanceof String) {
+                maxStackDepth = Integer.valueOf((String)configuredMaxStackDepth);
             }
+            qnames.addAll(createWrappedElementsFromExtension(schema, type, maxStackDepth));
 
         }
+
+        return qnames;
+    }
+
+    private static List<WrapperElement> createWrappedElementsFromExtension(SchemaCollection schema,
+                                                                           XmlSchemaComplexType type,
+                                                                           int maxStackDepth) {
+        List<WrapperElement> qnames = new ArrayList<>();
+
+        XmlSchemaContent schemaContent = type.getContentModel().getContent();
+        if (!(schemaContent instanceof XmlSchemaComplexContentExtension) || maxStackDepth == 0) {
+            return qnames;
+        }
+
+        XmlSchemaComplexContentExtension extension = (XmlSchemaComplexContentExtension)schemaContent;
+        QName baseTypeName = extension.getBaseTypeName();
+        XmlSchemaType baseType = schema.getTypeByQName(baseTypeName);
+
+        if (baseType instanceof XmlSchemaComplexType) {
+            XmlSchemaComplexType complexBaseType = (XmlSchemaComplexType)baseType;
+
+            if (complexBaseType.getParticle() == null && complexBaseType.getContentModel() != null) {
+                // continue up the extension ladder
+                qnames.addAll(createWrappedElementsFromExtension(schema, complexBaseType, maxStackDepth - 1));
+            } else if (complexBaseType.getParticle() instanceof XmlSchemaSequence) {
+                XmlSchemaSequence seq = (XmlSchemaSequence)complexBaseType.getParticle();
+                qnames.addAll(createWrappedElements(seq));
+            }
+        }
+
+        if (extension.getParticle() instanceof XmlSchemaSequence) {
+            XmlSchemaSequence xmlSchemaSeq = (XmlSchemaSequence)extension.getParticle();
+            qnames.addAll(createWrappedElements(xmlSchemaSeq));
+        }
+
         return qnames;
     }
 

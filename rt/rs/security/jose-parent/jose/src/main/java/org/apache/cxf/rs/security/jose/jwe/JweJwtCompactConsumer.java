@@ -29,8 +29,9 @@ import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 
 
 public class JweJwtCompactConsumer  {
-    private JweCompactConsumer jweConsumer;
-    private JweHeaders headers;
+    private final JweCompactConsumer jweConsumer;
+    private final JweHeaders headers;
+
     public JweJwtCompactConsumer(String content) {
         jweConsumer = new JweCompactConsumer(content);
         headers = jweConsumer.getJweHeaders();

@@ -89,6 +89,7 @@ public class JMSEndpoint {
     private String messageSelector;
     private int retryInterval = 5000;
     private boolean oneSessionPerConnection;
+    private boolean ignoreTimeoutException;
 
     /**
      * @param uri
@@ -206,7 +207,7 @@ public class JMSEndpoint {
 
     public String getRequestURI() {
         StringBuilder requestUri = new StringBuilder("jms:");
-        if (jmsVariant == JNDI_TOPIC) {
+        if (JNDI_TOPIC.equals(jmsVariant)) {
             requestUri.append("jndi");
         } else {
             requestUri.append(jmsVariant);
@@ -510,6 +511,14 @@ public class JMSEndpoint {
 
     public void setOneSessionPerConnection(boolean oneSessionPerConnection) {
         this.oneSessionPerConnection = oneSessionPerConnection;
+    }
+
+    public boolean isIgnoreTimeoutException() {
+        return ignoreTimeoutException;
+    }
+
+    public void setIgnoreTimeoutException(boolean ignoreTimeoutException) {
+        this.ignoreTimeoutException = ignoreTimeoutException;
     }
 
 }

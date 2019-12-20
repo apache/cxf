@@ -701,7 +701,7 @@ public class ParameterProcessor extends AbstractProcessor {
 
             if (outputUnlistedParts.size() == 1) {
                 processReturn(method, outputUnlistedParts.get(0));
-                outputPartsMap.remove(outputUnlistedParts.get(0));
+                outputParts.remove(outputUnlistedParts.get(0));
                 outputUnlistedParts.clear();
             } else {
                 processReturn(method, null);

@@ -40,7 +40,7 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.ext.SecurePart;
 
-import demo.wssec.server.UTPasswordCallback;
+import demo.wssec.client.UTPasswordCallback;
 
 /**
  * A StAX-based client
@@ -72,8 +72,8 @@ public final class StaxClient {
 
             properties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
             properties.setTokenUser("abcd");
-            properties.setSignatureUser("clientx509v1");
-            properties.setEncryptionUser("serverx509v1");
+            properties.setSignatureUser("bethal");
+            properties.setEncryptionUser("morpit");
 
             properties.setEncryptionCryptoProperties(encCryptoProperties);
             properties.setEncryptionKeyIdentifier(

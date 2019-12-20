@@ -1424,10 +1424,6 @@ public class WSDLToCorbaHelper {
                 for (int i = 0; i < fields.size(); i++) {
                     caselist.add(Integer.toString(i));
                 }
-            } else if ("char".equals(disctype.getQName().getLocalPart())) {
-                for (int i = 0; i < fields.size(); i++) {
-                    caselist.add(Integer.toString(i));
-                }
             } else if ("boolean".equals(disctype.getQName().getLocalPart())) {
                 if (fields.size() == 2) {
                     caselist.add("TRUE");

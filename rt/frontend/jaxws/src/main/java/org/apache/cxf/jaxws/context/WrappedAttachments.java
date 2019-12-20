@@ -105,7 +105,7 @@ class WrappedAttachments implements Set<Attachment> {
         boolean b = true;
         for (Iterator<?> it = c.iterator(); it.hasNext();) {
             Object o = it.next();
-            if (!(o instanceof Attachment) && attachments.containsKey(((Attachment) o).getId())) {
+            if (!(o instanceof Attachment && attachments.containsKey(((Attachment) o).getId()))) {
                 b = false;
                 break;
             }

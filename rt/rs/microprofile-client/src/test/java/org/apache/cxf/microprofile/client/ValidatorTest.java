@@ -123,7 +123,7 @@ public class ValidatorTest {
     }
 
     public interface ClientHeaderParamInaccessibleComputeMethod {
-        @ClientHeaderParam(name = "SomeHeader", 
+        @ClientHeaderParam(name = "SomeHeader",
             value = "{org.apache.cxf.microprofile.client.mock.HeaderGenerator.generateHeaderPrivate}")
         @GET
         Response get();
@@ -150,6 +150,14 @@ public class ValidatorTest {
         default String computeMethod(String headerName, ClientRequestContext context, int extra) {
             return "too many arguments";
         }
+    }
+
+    public interface PathRegexTestClient {
+
+        // Only books with id consisting of 3 or 4 digits of the numbers between 5 and 9 are accepted
+        @POST
+        @Path("/echoxmlbookregex/{id : [5-9]{3,4}}")
+        void testRegex(@PathParam("id") String id);
     }
 
     private static RestClientBuilder newBuilder() {
@@ -197,7 +205,7 @@ public class ValidatorTest {
 
     @Test
     public void testClientHeaderParamNoComputeMethod() {
-        test(ClientHeaderParamNoComputeMethod.class, ClientHeaderParamNoComputeMethod.class.getName(), 
+        test(ClientHeaderParamNoComputeMethod.class, ClientHeaderParamNoComputeMethod.class.getName(),
              "value attribute specifies a method", "that does not exist");
     }
 
@@ -222,6 +230,11 @@ public class ValidatorTest {
              " contains an incorrect signature");
     }
 
+    @Test
+    public void testPathRegularExpression() {
+        assertNotNull(newBuilder().build(PathRegexTestClient.class));
+    }
+
     private void test(Class<?> clientInterface, String...expectedMessageTexts) {
         try {
             newBuilder().build(clientInterface);
@@ -230,7 +243,7 @@ public class ValidatorTest {
             String msgText = ex.getMessage();
             assertNotNull("No message text in RestClientDefinitionException", msgText);
             for (String expectedMessageText : expectedMessageTexts) {
-                assertTrue("Exception text does not contain expected message: " + expectedMessageText, 
+                assertTrue("Exception text does not contain expected message: " + expectedMessageText,
                            msgText.contains(expectedMessageText));
             }
         }

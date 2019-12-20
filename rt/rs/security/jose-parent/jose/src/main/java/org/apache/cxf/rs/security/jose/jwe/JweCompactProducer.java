@@ -26,8 +26,9 @@ import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 
 public class JweCompactProducer  {
-    private JweHeaders headers;
-    private String data;
+    private final JweHeaders headers;
+    private final String data;
+
     public JweCompactProducer(String data) {
         this(new JweHeaders(), data);
     }

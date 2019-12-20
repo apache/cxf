@@ -36,8 +36,8 @@ import org.apache.cxf.no_body_parts.wsdl.NoBodyPartsSEI;
 @WebService(targetNamespace = "urn:org:apache:cxf:no_body_parts/wsdl")
 public class NoBodyPartsImpl implements NoBodyPartsSEI {
 
-    private String md5(byte[] bytes) throws NoSuchAlgorithmException {
-        MessageDigest algorithm = MessageDigest.getInstance("MD5");
+    private String digest(byte[] bytes) throws NoSuchAlgorithmException {
+        MessageDigest algorithm = MessageDigest.getInstance("SHA-256");
         algorithm.reset();
         algorithm.update(bytes);
         byte[] messageDigest = algorithm.digest();
@@ -53,7 +53,7 @@ public class NoBodyPartsImpl implements NoBodyPartsSEI {
     public Operation1Response operation1(Operation1 parameters, Holder<byte[]> mimeAttachment) {
         Operation1Response r = new Operation1Response();
         try {
-            r.setStatus(md5(mimeAttachment.value));
+            r.setStatus(digest(mimeAttachment.value));
         } catch (NoSuchAlgorithmException e) {
             throw new WebServiceException(e);
         }

@@ -46,10 +46,10 @@ public class JaxWsDynamicClientTest extends AbstractBusClientServerTestBase {
     static final String PORT = TestUtil.getPortNumber(ServerNoBodyParts.class);
     static final String PORT1 = TestUtil.getPortNumber(ArrayServiceServer.class);
 
-    private String md5(byte[] bytes) {
+    private String digest(byte[] bytes) {
         MessageDigest algorithm;
         try {
-            algorithm = MessageDigest.getInstance("MD5");
+            algorithm = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
@@ -85,13 +85,13 @@ public class JaxWsDynamicClientTest extends AbstractBusClientServerTestBase {
         parameters.setTargetType("tar-get");
         Object[] rparts = client.invoke("operation1", parameters, bucketOfBytes);
         Operation1Response r = (Operation1Response)rparts[0];
-        assertEquals(md5(bucketOfBytes), r.getStatus());
+        assertEquals(digest(bucketOfBytes), r.getStatus());
 
         ClientCallback callback = new ClientCallback();
         client.invoke(callback, "operation1", parameters, bucketOfBytes);
         rparts = callback.get();
         r = (Operation1Response)rparts[0];
-        assertEquals(md5(bucketOfBytes), r.getStatus());
+        assertEquals(digest(bucketOfBytes), r.getStatus());
     }
 
     @Test

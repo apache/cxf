@@ -84,6 +84,21 @@
             </bean>
         </jaxws:outInterceptors>
     </jaxws:client>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItUsernameTokenNoValPort" createdFromAPI="true">
+        <jaxws:outInterceptors>
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+                <constructor-arg>
+                    <map>
+                        <entry key="action" value="UsernameToken"/>
+                        <entry key="addUsernameTokenNonce" value="true"/>
+                        <entry key="addUsernameTokenCreated" value="true"/>
+                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+                        <entry key="user" value="Alice"/>
+                    </map>
+                </constructor-arg>
+            </bean>
+        </jaxws:outInterceptors>
+    </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItEncryptedPasswordPort" createdFromAPI="true">
         <jaxws:outInterceptors>
             <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">

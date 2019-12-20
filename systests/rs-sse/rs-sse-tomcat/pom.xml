@@ -51,11 +51,5 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty.websocket</groupId>
-            <artifactId>websocket-server</artifactId>
-            <version>${cxf.jetty.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 </project>

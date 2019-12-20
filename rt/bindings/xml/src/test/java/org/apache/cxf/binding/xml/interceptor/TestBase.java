@@ -19,25 +19,17 @@
 
 package org.apache.cxf.binding.xml.interceptor;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Method;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.binding.Binding;
-import org.apache.cxf.binding.BindingFactoryManager;
-import org.apache.cxf.binding.xml.XMLBindingFactory;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.xml.wsdl11.XMLWSDLExtensionLoader;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointImpl;
-import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -47,15 +39,10 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
-import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLManagerImpl;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.After;
 import org.junit.Before;
 
 import static org.junit.Assert.assertNotNull;
@@ -65,10 +52,6 @@ public class TestBase {
     protected PhaseInterceptorChain chain;
 
     protected Message xmlMessage;
-
-    protected Bus bus;
-
-    protected IMocksControl control;
 
     protected ServiceInfo serviceInfo;
 
@@ -88,53 +71,13 @@ public class TestBase {
         messageImpl.setInterceptorChain(chain);
         messageImpl.setExchange(exchange);
         xmlMessage = messageImpl;
-        if (JavaUtils.isJava11Compatible()) {
-            //we need this property with JDK11 and easymock4
-            System.setProperty("org.easymock.cglib.experimental_asm7", "true");
-        }
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
-
-    public InputStream getTestStream(Class<?> clz, String file) {
-        return clz.getResourceAsStream(file);
-    }
-
-    public XMLStreamReader getXMLStreamReader(InputStream is) {
-        return StaxUtils.createXMLStreamReader(is);
-    }
-
-    public XMLStreamWriter getXMLStreamWriter(OutputStream os) {
-        return StaxUtils.createXMLStreamWriter(os);
-    }
-
-    public Method getTestMethod(Class<?> sei, String methodName) {
-        Method[] iMethods = sei.getMethods();
-        for (Method m : iMethods) {
-            if (methodName.equals(m.getName())) {
-                return m;
-            }
-        }
-        return null;
     }
 
     protected void common(String wsdl, QName portName, Class<?>... jaxbClasses) throws Exception {
-        control = EasyMock.createNiceControl();
-
-        bus = control.createMock(Bus.class);
+        Bus bus = BusFactory.getDefaultBus();
 
         WSDLManagerImpl manager = new WSDLManagerImpl();
         XMLWSDLExtensionLoader.registerExtensors(manager);
-        EasyMock.expect(bus.getExtension(WSDLManager.class)).andStubReturn(manager);
-
-        BindingFactoryManager bindingFactoryManager = control.createMock(BindingFactoryManager.class);
-        EasyMock.expect(bus.getExtension(BindingFactoryManager.class)).andStubReturn(bindingFactoryManager);
-        DestinationFactoryManager dfm = control.createMock(DestinationFactoryManager.class);
-        EasyMock.expect(bus.getExtension(DestinationFactoryManager.class)).andStubReturn(dfm);
-
-        control.replay();
 
         assertNotNull(bus.getExtension(WSDLManager.class));
 
@@ -145,28 +88,17 @@ public class TestBase {
         org.apache.cxf.service.Service service = factory.create();
 
         EndpointInfo epi = service.getEndpointInfo(portName);
-        serviceInfo = epi.getService();
         assertNotNull(epi);
-        Binding xmlBinding = new XMLBindingFactory().createBinding(epi.getBinding());
+        serviceInfo = epi.getService();
 
-        control.reset();
         JAXBDataBinding db = new JAXBDataBinding();
         db.initialize(service);
         db.setContext(JAXBContext.newInstance(jaxbClasses));
         service.setDataBinding(db);
 
-        Endpoint endpoint = control.createMock(EndpointImpl.class);
-        EasyMock.expect(endpoint.getEndpointInfo()).andStubReturn(epi);
-        EasyMock.expect(endpoint.getBinding()).andStubReturn(xmlBinding);
-        EasyMock.expect(endpoint.getService()).andStubReturn(service);
-        EasyMock.expect(endpoint.isEmpty()).andReturn(true).anyTimes();
-
-
-        control.replay();
+        Endpoint endpoint = new EndpointImpl(bus, service, epi);
 
         xmlMessage.getExchange().put(Endpoint.class, endpoint);
         xmlMessage.getExchange().put(org.apache.cxf.service.Service.class, service);
-
-
     }
 }

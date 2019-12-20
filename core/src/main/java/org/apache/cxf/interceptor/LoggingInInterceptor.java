@@ -129,7 +129,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
             if (uri != null && uri.startsWith("/")) {
                 if (address != null && !address.startsWith(uri)) {
                     if (address.endsWith("/") && address.length() > 1) {
-                        address = address.substring(0, address.length());
+                        address = address.substring(0, address.length() - 1);
                     }
                     uri = address + uri;
                 }
@@ -183,6 +183,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
                 buffer.getMessage().append("(message truncated to " + limit + " bytes)\n");
             }
             writer.writeCacheTo(buffer.getPayload(), limit);
+            writer.close();
         } catch (Exception e) {
             throw new Fault(e);
         }

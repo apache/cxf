@@ -82,7 +82,6 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
-import org.apache.lucene.util.Version;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.parser.odf.OpenDocumentParser;
 import org.apache.tika.parser.pdf.PDFParser;
@@ -93,7 +92,7 @@ public class Catalog {
         Arrays.< Parser >asList(new PDFParser(), new OpenDocumentParser()),
         new LuceneDocumentMetadata());
     private final Directory directory = new RAMDirectory();
-    private final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_4_9);
+    private final Analyzer analyzer = new StandardAnalyzer();
     private final Storage storage;
     private final LuceneQueryVisitor<SearchBean> visitor;
     private final ExecutorService executor = Executors.newFixedThreadPool(
@@ -270,7 +269,7 @@ public class Catalog {
     }
 
     private IndexWriter getIndexWriter() throws IOException {
-        return new IndexWriter(directory, new IndexWriterConfig(Version.LUCENE_4_9, analyzer));
+        return new IndexWriter(directory, new IndexWriterConfig(analyzer));
     }
 
     private LuceneQueryVisitor< SearchBean > createVisitor() {
@@ -290,7 +289,7 @@ public class Catalog {
 
         try {
             return searcher.search(new TermQuery(
-                new Term(LuceneDocumentMetadata.SOURCE_FIELD, source)), 1).totalHits > 0;
+                new Term(LuceneDocumentMetadata.SOURCE_FIELD, source)), 1).totalHits.value > 0;
         } finally {
             reader.close();
         }

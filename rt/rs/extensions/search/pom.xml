@@ -34,7 +34,8 @@
         <cxf.module.name>org.apache.cxf.rs.search</cxf.module.name>
         <cxf.osgi.import>
             javax.persistence*;resolution:=optional,
-            org.apache.tika.*;resolution:=optional
+            org.apache.tika.*;resolution:=optional,
+            org.apache.lucene.*;resolution:=optional
         </cxf.osgi.import>
     </properties>
     <dependencies>

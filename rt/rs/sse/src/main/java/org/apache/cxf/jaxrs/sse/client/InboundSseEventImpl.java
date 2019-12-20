@@ -84,8 +84,8 @@ public final class InboundSseEventImpl implements InboundSseEvent {
             return this;
         }
         
-        Builder data(String d) {
-            this.data = d;
+        Builder appendData(String d) {
+            this.data = this.data == null ? d : this.data + '\n' + d;
             return this;
         }
 

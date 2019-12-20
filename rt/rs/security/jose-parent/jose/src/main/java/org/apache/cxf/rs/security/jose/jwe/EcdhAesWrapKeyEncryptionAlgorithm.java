@@ -25,7 +25,6 @@ import java.util.Map;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
-import org.apache.cxf.rs.security.jose.jwe.EcdhDirectKeyJweEncryption.EcdhHelper;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 public class EcdhAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvider {
@@ -37,8 +36,8 @@ public class EcdhAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvider 
         ECDH_AES_MAP.put(KeyAlgorithm.ECDH_ES_A192KW.getJwaName(), KeyAlgorithm.A192KW.getJwaName());
         ECDH_AES_MAP.put(KeyAlgorithm.ECDH_ES_A256KW.getJwaName(), KeyAlgorithm.A256KW.getJwaName());
     }
-    private KeyAlgorithm keyAlgo;
-    private EcdhHelper helper;
+    private final KeyAlgorithm keyAlgo;
+    private final EcdhHelper helper;
 
     public EcdhAesWrapKeyEncryptionAlgorithm(ECPublicKey peerPublicKey,
                                              KeyAlgorithm keyAlgo) {

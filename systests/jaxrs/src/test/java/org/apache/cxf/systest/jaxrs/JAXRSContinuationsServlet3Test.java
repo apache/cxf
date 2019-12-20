@@ -87,30 +87,21 @@ public class JAXRSContinuationsServlet3Test extends AbstractJAXRSContinuationsTe
     }
 
     @Test
-    public void testSuspendSetTimeoutt() throws Exception {
+    // FIXME: standalone test run failed, eg -Dtest=JAXRSContinuationsServlet3Test#testSuspendSetTimeout
+    public void testSuspendSetTimeout() throws Exception {
         final String base = "http://localhost:" + getPort() + "/async/resource2/";
         Future<Response> suspend = invokeRequest(base + "suspend");
-        Thread t = new Thread(new Runnable() {
-            public void run() {
-                Future<Response> timeout = invokeRequest(base + "setTimeOut");
-                try {
-                    assertString(timeout, "true");
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-        });
-        t.start();
-        t.join();
+
+        Future<Response> timeout = invokeRequest(base + "setTimeOut");
+        assertString(timeout, "true");
 
         assertEquals(503, suspend.get().getStatus());
-
     }
 
     private static void assertString(Future<Response> future, String check) throws Exception {
         Response response = future.get();
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String content = response.readEntity(String.class);
+        assertEquals(content, Status.OK.getStatusCode(), response.getStatus());
         assertEquals(check, content);
     }
 

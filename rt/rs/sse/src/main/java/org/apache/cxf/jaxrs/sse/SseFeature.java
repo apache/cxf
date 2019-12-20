@@ -37,7 +37,6 @@ public class SseFeature extends DelegatingFeature<SseFeature.Portable> {
         super(new Portable());
     }
 
-    @Provider(value = Type.Feature, scope = Scope.Server)
     public static class Portable implements AbstractPortableFeature {
 
         @Override

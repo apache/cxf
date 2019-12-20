@@ -162,7 +162,7 @@ public class RESTLoggingTest {
 
     private void checkResponseOut(LogEvent responseOut) {
         // Not yet available
-        Assert.assertNull(responseOut.getAddress());
+        Assert.assertEquals(SERVICE_URI + "/test1", responseOut.getAddress());
         Assert.assertEquals("application/octet-stream", responseOut.getContentType());
         Assert.assertEquals(EventType.RESP_OUT, responseOut.getType());
         Assert.assertNull(responseOut.getEncoding());
@@ -176,7 +176,7 @@ public class RESTLoggingTest {
 
     private void checkResponseIn(LogEvent responseIn) {
         // Not yet available
-        Assert.assertNull(responseIn.getAddress());
+        Assert.assertEquals(SERVICE_URI + "/test1", responseIn.getAddress());
         Assert.assertEquals("application/octet-stream", responseIn.getContentType());
         Assert.assertEquals(EventType.RESP_IN, responseIn.getType());
         Assert.assertNotNull(responseIn.getExchangeId());

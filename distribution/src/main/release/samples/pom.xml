@@ -32,9 +32,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.boot.version>2.1.3.RELEASE</spring.boot.version>
         <spring.cloud.eureka.version>2.0.2.RELEASE</spring.cloud.eureka.version>
-        <cxf.jetty9.version>9.4.18.v20190429</cxf.jetty9.version>
+        <cxf.jetty9.version>9.4.24.v20191120</cxf.jetty9.version>
         <cxf.httpcomponents.client.version>4.5.8</cxf.httpcomponents.client.version>
-        <cxf.tika.version>1.22</cxf.tika.version>
+        <cxf.tika.version>1.23</cxf.tika.version>
     </properties>
     <dependencies>
         <dependency>
@@ -135,6 +135,7 @@
         <module>ws_security/sign_enc_policy</module>
         <module>ws_security/ut</module>
         <module>ws_security/ut_policy</module>
+        <module>ws_transaction</module>
         <module>wsdl_first</module>
         <module>wsdl_first_dynamic_client</module>
         <module>wsdl_first_https</module>
@@ -142,6 +143,7 @@
         <module>wsdl_first_rpclit</module>
         <module>wsdl_first_soap12</module>
         <module>wsdl_first_xml_wrapped</module>
+        <module>jax_rs/description_openapi_microprofile_spring</module>
     </modules>
     <dependencyManagement>
         <dependencies>

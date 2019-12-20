@@ -216,7 +216,6 @@ public class Swagger2Feature extends AbstractSwaggerFeature<Swagger2Feature.Port
         return delegate.findSwaggerUiRoot();
     }
 
-    @Provider(value = Type.Feature, scope = Scope.Server)
     public static class Portable extends AbstractSwaggerFeature.Portable
             implements SwaggerUiSupport, SwaggerProperties {
         private static final String SCHEMES_PROPERTY = "schemes";

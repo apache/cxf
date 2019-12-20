@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.tools.wsdlto.jaxws;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.lang.reflect.Method;
@@ -42,6 +41,7 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.tools.common.CommandInterfaceUtils;
+import org.apache.cxf.tools.common.TestFileUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
@@ -262,8 +262,8 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         assertFalse("Generated file has been excluded", iona.exists());
 
         File implFile = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/Greeter.java");
-        String str = FileUtils.getStringFromFile(implFile);
-        assertTrue(str.indexOf("com.iona.BareDocumentResponse") > 0);
+        String str = TestFileUtils.getStringFromFile(implFile);
+        assertTrue(str.contains("com.iona.BareDocumentResponse"));
 
         File org = new File(output, "org");
         File apache = new File(org, "apache");
@@ -289,8 +289,8 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         assertFalse("Generated file has been excluded", iona.exists());
 
         File implFile = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/Greeter.java");
-        String str = FileUtils.getStringFromFile(implFile);
-        assertTrue(str.indexOf("com.iona.BareDocumentResponse") > 0);
+        String str = TestFileUtils.getStringFromFile(implFile);
+        assertTrue(str.contains("com.iona.BareDocumentResponse"));
 
         File org = new File(output, "org");
         File apache = new File(org, "apache");
@@ -464,25 +464,10 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
             .getPrivClassAnnotation(clz, WebServiceClient.class);
         assertEquals("http://cxf.apache.org/w2j/hello_world_soap_http/service",
                      webServiceClient.targetNamespace());
-        File file = new File(output,
-                             "org/apache/cxf/w2j/hello_world_soap_http/Greeter_SoapPortTest1_Client.java");
-        FileInputStream fin = new FileInputStream(file);
-        byte[] buffer = new byte[30000];
-        int index = -1;
-        int size = fin.read(buffer);
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        while (size != -1) {
-            bout.write(buffer, 0, size);
-            index = bout.toString()
-                .indexOf("new QName(\"http://cxf.apache.org/w2j/hello_world_soap_http/service\","
-                             + " \"SOAPService_Test1\")");
-            if (index > 0) {
-                break;
-            }
-            size = fin.read(buffer);
-        }
-        fin.close();
-        assertTrue("Service QName in client is not correct", index > -1);
+        String file = TestFileUtils.getStringFromFile(new File(output, 
+                "org/apache/cxf/w2j/hello_world_soap_http/Greeter_SoapPortTest1_Client.java"));
+        assertTrue("Service QName in client is not correct", file.contains(
+                "new QName(\"http://cxf.apache.org/w2j/hello_world_soap_http/service\", \"SOAPService_Test1\")"));
     }
 
     @Test
@@ -607,7 +592,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         String str3 = "org.apache.cxf.mime.Address";
         String str4 = "http://cxf.apache.org/w2j/hello_world_mime/types";
 
-        String file = getStringFromFile(new File(output.getCanonicalPath()
+        String file = TestFileUtils.getStringFromFile(new File(output.getCanonicalPath()
                                                  + "/org/apache/cxf/w2j/hello_world_mime/Hello.java"));
 
         assertTrue(file.contains(str1));
@@ -623,13 +608,12 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         processor.setContext(env);
         processor.execute();
 
-        String results = FileUtils.getStringFromFile(new File(output.getCanonicalPath(),
+        String results = TestFileUtils.getStringFromFile(new File(output.getCanonicalPath(),
                                                               "org/apache/sayhi/SayHi.java"));
-        assertTrue(results.trim().length() > 0);
 
-        assertTrue(results.indexOf("@WebResult(name  =  \"return\",  "
-                                   + "targetNamespace  =  \"http://apache.org/sayHi\")") != -1);
-        assertTrue(results.indexOf("@WebResult(name  =  \"return\",  targetNamespace  =  \"\")") != -1);
+        assertTrue(results.contains("@WebResult(name = \"return\", "
+                                   + "targetNamespace = \"http://apache.org/sayHi\")"));
+        assertTrue(results.contains("@WebResult(name = \"return\", targetNamespace = \"\")"));
     }
 
     @Test
@@ -741,11 +725,11 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
 
         processor.execute();
         File file = new File(output.getCanonicalPath() + "/build.xml");
-        String str = FileUtils.getStringFromFile(file);
-        assertTrue(str.indexOf("org.apache.cxf.w2j.hello_world_soap_http.Greeter_SoapPortTest1_Client") > -1);
-        assertTrue(str.indexOf("org.apache.cxf.w2j.hello_world_soap_http.Greeter_SoapPortTest2_Client") > -1);
-        assertTrue(str.indexOf("org.apache.cxf.w2j.hello_world_soap_http.Greeter_SoapPortTest1_Server") > -1);
-        assertTrue(str.indexOf("org.apache.cxf.w2j.hello_world_soap_http.Greeter_SoapPortTest2_Server") > -1);
+        String str = TestFileUtils.getStringFromFile(file);
+        assertTrue(str.contains("org.apache.cxf.w2j.hello_world_soap_http.Greeter_SoapPortTest1_Client"));
+        assertTrue(str.contains("org.apache.cxf.w2j.hello_world_soap_http.Greeter_SoapPortTest2_Client"));
+        assertTrue(str.contains("org.apache.cxf.w2j.hello_world_soap_http.Greeter_SoapPortTest1_Server"));
+        assertTrue(str.contains("org.apache.cxf.w2j.hello_world_soap_http.Greeter_SoapPortTest2_Server"));
     }
 
     @Test
@@ -816,10 +800,10 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         processor.setContext(env);
         processor.execute();
 
-        String results = FileUtils.getStringFromFile(new File(output,
+        String results = TestFileUtils.getStringFromFile(new File(output,
                                                               "org/tempuri/GreeterRPCLit.java"));
-        assertTrue(results.indexOf("@WebParam(partName  =  \"inInt\",  name  =  \"inInt\")") != -1);
-        assertTrue(results.indexOf("Style.RPC") != -1);
+        assertTrue(results.contains("@WebParam(partName = \"inInt\", name = \"inInt\")"));
+        assertTrue(results.contains("Style.RPC"));
     }
 
     @Test
@@ -847,12 +831,12 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         processor.setContext(env);
         processor.execute();
 
-        String results = FileUtils
+        String results = TestFileUtils
             .getStringFromFile(new File(output.getCanonicalPath(),
                                         "soapinterface/ems/esendex/com/AccountServiceSoap.java"));
-        assertTrue(results.indexOf("public  int  getMessageLimit") != -1);
-        assertTrue(results.indexOf("name  =  \"MessengerHeader") != -1);
-        assertTrue(results.indexOf("header  =  true") != -1);
+        assertTrue(results.contains("public int getMessageLimit"));
+        assertTrue(results.contains("name = \"MessengerHeader"));
+        assertTrue(results.contains("header = true"));
     }
 
     @Test
@@ -1018,14 +1002,14 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         processor.setContext(env);
         processor.execute();
 
-        List<String> results1 = FileUtils.readLines(new File(output.getCanonicalPath(),
+        List<String> results1 = FileUtils.readLines(new File(output,
                                                              "org/mypkg/MyGreeter.java"));
 
         assertTrue(results1.contains(" * this is package javadoc"));
         assertTrue(results1.contains(" * this is class javadoc"));
         assertTrue(results1.contains("     * this is method javadoc"));
 
-        List<String> results2 = FileUtils.readLines(new File(output.getCanonicalPath(),
+        List<String> results2 = FileUtils.readLines(new File(output,
                                                              "org/mypkg/SOAPServiceTest1.java"));
 
         boolean match1 = false;
@@ -1131,7 +1115,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         assertNotNull(output);
         File file = new File(output, "org/cxf/package-info.java");
         assertTrue(file.exists());
-        String str = FileUtils.getStringFromFile(file);
+        String str = TestFileUtils.getStringFromFile(file);
         assertTrue(str.contains("http://child/xsd"));
     }
 
@@ -1146,7 +1130,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         File file = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/types/SayHi.java");
 
         assertTrue(file.exists());
-        String str = FileUtils.getStringFromFile(file);
+        String str = TestFileUtils.getStringFromFile(file);
         assertTrue(str.contains("@XmlLocation"));
         assertTrue(str.contains("synchronized"));
     }

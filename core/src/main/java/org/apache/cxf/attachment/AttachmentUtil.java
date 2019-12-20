@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.activation.CommandInfo;
 import javax.activation.CommandMap;
@@ -54,7 +55,7 @@ import javax.activation.MailcapCommandMap;
 import javax.activation.URLDataSource;
 
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.helpers.HttpHeaderHelper;
+import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Attachment;
@@ -64,7 +65,7 @@ import org.apache.cxf.message.MessageUtils;
 public final class AttachmentUtil {
     public static final String BODY_ATTACHMENT_ID = "root.message@cxf.apache.org";
 
-    private static volatile int counter;
+    private static final AtomicInteger COUNTER = new AtomicInteger();
     private static final String ATT_UUID = UUID.randomUUID().toString();
 
     private static final Random BOUND_RANDOM = new Random();
@@ -195,9 +196,7 @@ public final class AttachmentUtil {
     public static String createContentID(String ns) throws UnsupportedEncodingException {
         // tend to change
         String cid = "cxf.apache.org";
-
-        String name = ATT_UUID + "-" + String.valueOf(++counter);
-        if (ns != null && (ns.length() > 0)) {
+        if (ns != null && !ns.isEmpty()) {
             try {
                 URI uri = new URI(ns);
                 String host = uri.getHost();
@@ -210,7 +209,7 @@ public final class AttachmentUtil {
                 cid = ns;
             }
         }
-        return URLEncoder.encode(name, StandardCharsets.UTF_8.name()) + "@"
+        return ATT_UUID + '-' + Integer.toString(COUNTER.incrementAndGet()) + '@'
             + URLEncoder.encode(cid, StandardCharsets.UTF_8.name());
     }
 
@@ -235,21 +234,6 @@ public final class AttachmentUtil {
         UUID result = new UUID(mostSigBits, leastSigBits);
 
         return "uuid:" + result.toString();
-    }
-
-    public static String getAttachmentPartHeader(Attachment att) {
-        StringBuilder buffer = new StringBuilder(200);
-        buffer.append(HttpHeaderHelper.getHeaderKey(HttpHeaderHelper.CONTENT_TYPE) + ": "
-                + att.getDataHandler().getContentType() + ";\r\n");
-        if (att.isXOP()) {
-            buffer.append("Content-Transfer-Encoding: binary\r\n");
-        }
-        String id = att.getId();
-        if (id.charAt(0) == '<') {
-            id = id.substring(1, id.length() - 1);
-        }
-        buffer.append("Content-ID: <" + id + ">\r\n\r\n");
-        return buffer.toString();
     }
 
     public static Map<String, DataHandler> getDHMap(final Collection<Attachment> attachments) {
@@ -393,13 +377,13 @@ public final class AttachmentUtil {
         if (encoding == null) {
             encoding = "binary";
         }
-        InputStream ins =  decode(stream, encoding);
+        InputStream ins = decode(stream, encoding);
         if (ins != stream) {
             headers.remove("Content-Transfer-Encoding");
         }
         DataSource source = new AttachmentDataSource(ct, ins);
         if (!StringUtils.isEmpty(fileName)) {
-            ((AttachmentDataSource)source).setName(fileName);
+            ((AttachmentDataSource)source).setName(FileUtils.stripPath(fileName));
         }
         att.setDataHandler(new DataHandler(source));
         return att;

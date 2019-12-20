@@ -158,7 +158,7 @@ public class TikaContentExtractor {
      * type of content.
      * @param in input stream to extract the metadata from
      * @param handler custom ContentHandler
-     * @param mt JAX-RS MediaType of the stream content
+     * @param mtHint JAX-RS MediaType of the stream content
      * @param context custom context
      * @return the extracted content and metadata or null if extraction is not possible
      *         or was unsuccessful

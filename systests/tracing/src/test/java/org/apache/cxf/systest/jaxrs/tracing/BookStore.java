@@ -124,6 +124,14 @@ public class BookStore<T extends Closeable> {
         return Response.ok().build();
     }
 
+    @GET
+    @Path("/books/long")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Collection<Book> getBooksLong() throws InterruptedException {
+        Thread.sleep(500);
+        return books();
+    }
+    
     private static Collection<Book> books() {
         return Arrays.asList(
                 new Book("Apache CXF in Action", UUID.randomUUID().toString()),

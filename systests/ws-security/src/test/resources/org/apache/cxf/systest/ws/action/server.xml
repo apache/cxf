@@ -83,6 +83,20 @@
             </bean>
         </jaxws:inInterceptors>
     </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="UsernameTokenNoVal" address="http://localhost:${testutil.ports.action.Server}/DoubleItUsernameTokenNoVal" serviceName="s:DoubleItService" endpointName="s:DoubleItUsernameTokenNoValPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
+        <jaxws:inInterceptors>
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+                <constructor-arg>
+                    <map>
+                        <entry key="action" value="UsernameToken"/>
+                    </map>
+                </constructor-arg>
+            </bean>
+        </jaxws:inInterceptors>
+        <jaxws:properties>
+            <entry key="ws-security.validate.token" value="false"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptedPassword" address="http://localhost:${testutil.ports.action.Server}/DoubleItEncryptedPassword" serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptedPasswordPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
         <jaxws:outInterceptors>
             <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">

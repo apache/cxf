@@ -279,6 +279,21 @@ public class ResponseImplTest {
     }
 
     @Test
+    public void testGetCookiesWithEmptyValues() {
+        ResponseImpl ri = new ResponseImpl(200);
+        MetadataMap<String, Object> meta = new MetadataMap<>();
+        meta.add("Set-Cookie", NewCookie.valueOf("a="));
+        meta.add("Set-Cookie", NewCookie.valueOf("c=\"\""));
+        ri.addMetadata(meta);
+        Map<String, NewCookie> cookies = ri.getCookies();
+        assertEquals(2, cookies.size());
+        assertEquals("a=\"\";Version=1", cookies.get("a").toString());
+        assertEquals("c=\"\";Version=1", cookies.get("c").toString());
+        assertEquals("", cookies.get("a").getValue());
+        assertEquals("", cookies.get("c").getValue());
+    }
+    
+    @Test
     public void testGetCookies() {
         ResponseImpl ri = new ResponseImpl(200);
         MetadataMap<String, Object> meta = new MetadataMap<>();
@@ -426,6 +441,103 @@ public class ResponseImplTest {
             links = ri.getLinks();
             assertTrue(links.contains(Link.fromUri("http://next").build()));
             assertTrue(links.contains(Link.fromUri("http://prev").build()));
+        }
+    }
+
+    @Test
+    public void testGetLinksMultiple() {
+        try (ResponseImpl ri = new ResponseImpl(200)) {
+            MetadataMap<String, Object> meta = new MetadataMap<>();
+            ri.addMetadata(meta);
+
+            Set<Link> links = ri.getLinks();
+            assertTrue(links.isEmpty());
+
+            meta.add(HttpHeaders.LINK, "<http://next>;rel=\"next\",<http://prev>;rel=\"prev\"");
+
+            assertTrue(ri.hasLink("next"));
+            Link next = ri.getLink("next");
+            assertNotNull(next);
+            assertTrue(ri.hasLink("prev"));
+            Link prev = ri.getLink("prev");
+            assertNotNull(prev);
+
+            links = ri.getLinks();
+            assertTrue(links.contains(Link.fromUri("http://next").rel("next").build()));
+            assertTrue(links.contains(Link.fromUri("http://prev").rel("prev").build()));
+        }
+    }
+    
+
+    @Test
+    public void testGetMultipleWithSingleLink() {
+        try (ResponseImpl ri = new ResponseImpl(200)) {
+            MetadataMap<String, Object> meta = new MetadataMap<>();
+            ri.addMetadata(meta);
+
+            Set<Link> links = ri.getLinks();
+            assertTrue(links.isEmpty());
+
+            meta.add(HttpHeaders.LINK, "<http://next>;rel=\"next\",");
+
+            assertTrue(ri.hasLink("next"));
+            Link next = ri.getLink("next");
+            assertNotNull(next);
+
+            links = ri.getLinks();
+            assertTrue(links.contains(Link.fromUri("http://next").rel("next").build()));
+        }
+    }
+
+    @Test
+    public void testGetLink() {
+        try (ResponseImpl ri = new ResponseImpl(200)) {
+            MetadataMap<String, Object> meta = new MetadataMap<>();
+            ri.addMetadata(meta);
+
+            Set<Link> links = ri.getLinks();
+            assertTrue(links.isEmpty());
+
+            meta.add(HttpHeaders.LINK, "<http://next>;rel=\"next\"");
+
+            assertTrue(ri.hasLink("next"));
+            Link next = ri.getLink("next");
+            assertNotNull(next);
+
+            links = ri.getLinks();
+            assertTrue(links.contains(Link.fromUri("http://next").rel("next").build()));
+        }
+    }
+
+    @Test
+    public void testGetLinksMultipleMultiline() {
+        try (ResponseImpl ri = new ResponseImpl(200)) {
+            MetadataMap<String, Object> meta = new MetadataMap<>();
+            ri.addMetadata(meta);
+            
+            final Message outMessage = createMessage();
+            outMessage.put(Message.REQUEST_URI, "http://localhost");
+            ri.setOutMessage(outMessage);
+
+            Set<Link> links = ri.getLinks();
+            assertTrue(links.isEmpty());
+
+            meta.add(HttpHeaders.LINK, 
+                "</TheBook/chapter2>;\n"
+                + "         rel=\"prev\", \n"
+                + "         </TheBook/chapter4>;\n"
+                + "         rel=\"next\";");
+
+            assertTrue(ri.hasLink("next"));
+            Link next = ri.getLink("next");
+            assertNotNull(next);
+            assertTrue(ri.hasLink("prev"));
+            Link prev = ri.getLink("prev");
+            assertNotNull(prev);
+
+            links = ri.getLinks();
+            assertTrue(links.contains(Link.fromUri("http://localhost/TheBook/chapter4").rel("next").build()));
+            assertTrue(links.contains(Link.fromUri("http://localhost/TheBook/chapter2").rel("prev").build()));
         }
     }
 

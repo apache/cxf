@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.ResponseProcessingException;
@@ -63,6 +64,8 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 
 public final class ResponseImpl extends Response {
+
+    private static final Pattern LINK_DELIMITER = Pattern.compile(",\\s*(?=\\<|$)");
 
     private StatusType status;
     private Object entity;
@@ -255,9 +258,16 @@ public final class ResponseImpl extends Response {
         List<Object> linkValues = metadata.get(HttpHeaders.LINK);
         if (linkValues != null) {
             for (Object o : linkValues) {
-                Link link = o instanceof Link ? (Link)o : Link.valueOf(o.toString());
-                if (relation.equals(link.getRel())) {
+                if (o instanceof Link && relation.equals(((Link)o).getRel())) {
                     return true;
+                }
+
+                String[] links = LINK_DELIMITER.split(o.toString());
+                for (String splitLink : links) {
+                    Link link = Link.valueOf(splitLink);
+                    if (relation.equals(link.getRel())) {
+                        return true;
+                    }
                 }
             }
         }
@@ -290,14 +300,36 @@ public final class ResponseImpl extends Response {
         }
         Set<Link> links = new LinkedHashSet<>();
         for (Object o : linkValues) {
-            Link link = o instanceof Link ? (Link)o : Link.valueOf(o.toString());
-            if (!link.getUri().isAbsolute()) {
-                URI requestURI = URI.create((String)outMessage.get(Message.REQUEST_URI));
-                link = Link.fromLink(link).baseUri(requestURI).build();
-            }
-            links.add(link);
+            List<Link> parsedLinks = parseLink(o);
+
+            links.addAll(parsedLinks);
         }
         return links;
+    }
+
+    private Link makeAbsoluteLink(Link link) {
+        if (!link.getUri().isAbsolute()) {
+            URI requestURI = URI.create((String)outMessage.get(Message.REQUEST_URI));
+            link = Link.fromLink(link).baseUri(requestURI).build();
+        }
+
+        return link;
+    }
+
+    private List<Link> parseLink(Object o) {
+        if (o instanceof Link) {
+            return Collections.singletonList(makeAbsoluteLink((Link) o));
+        }
+
+        List<Link> links = new ArrayList<>();
+        String[] linkArray = LINK_DELIMITER.split(o.toString());
+
+        for (String textLink : linkArray) {
+            Link link = Link.valueOf(textLink);
+            links.add(makeAbsoluteLink(link));
+        }
+
+        return Collections.unmodifiableList(links);
     }
 
     public <T> T readEntity(Class<T> cls) throws ProcessingException, IllegalStateException {

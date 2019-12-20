@@ -41,6 +41,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
 import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.SamlCallbackHandler;
@@ -58,6 +59,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -168,6 +170,46 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
         assertEquals(400, response.getStatus());
     }
 
+    // The redirect URI if in the authz request, must be in the token request and must match
+    @org.junit.Test
+    public void testNonMatchingRedirectURI() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + port + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code
+        String code = OAuth2TestUtils.getAuthorizationCode(client);
+        assertNotNull(code);
+
+        // Now get the access token
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                  "consumer-id", "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        client.type("application/x-www-form-urlencoded").accept("application/json");
+        client.path("token");
+
+        Form form = new Form();
+        form.param("grant_type", "authorization_code");
+        form.param("code", code);
+        form.param("client_id", "consumer-id");
+        form.param("redirect_uri", "http://www.bad.blah.apache.org");
+        Response response = client.post(form);
+        try {
+            response.readEntity(ClientAccessToken.class);
+            fail("Failure expected on not sending the correct redirect URI");
+        } catch (ResponseProcessingException ex) {
+            //expected
+        }
+    }
+
     @org.junit.Test
     public void testResponseType() throws Exception {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
@@ -212,13 +254,13 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
         client.type("application/json").accept("application/json");
         client.query("client_id", "consumer-id");
         client.query("response_type", "code");
-        client.query("redirect_uri", "http://www.blah.bad.apache.org");
+        client.query("redirect_uri", "http://www.blah.apache.org");
         client.query("scope", "unknown-scope");
         client.path("authorize/");
 
         // No redirect URI
         Response response = client.get();
-        assertEquals(400, response.getStatus());
+        assertEquals(303, response.getStatus());
     }
 
     // Send the authorization code twice to get an access token
@@ -548,6 +590,211 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
         } catch (Exception ex) {
             // expected
         }
+    }
+
+    // Here we are sending a different client Id in both the authz + token requests
+    @org.junit.Test
+    public void testNonMatchingClientId() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + port + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code
+        String code = OAuth2TestUtils.getAuthorizationCode(client);
+        assertNotNull(code);
+
+        // Now get the access token using a different client id
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                  "consumer-id-aud", "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        client.type("application/x-www-form-urlencoded").accept("application/json");
+        client.path("token");
+
+        Form form = new Form();
+        form.param("grant_type", "authorization_code");
+        form.param("code", code);
+        form.param("client_id", "consumer-id-aud");
+
+        // Now try to get a token
+        Response response = client.post(form);
+        try {
+            response.readEntity(ClientAccessToken.class);
+            fail("Failure expected on trying to get a token");
+        } catch (ResponseProcessingException ex) {
+            //expected
+        }
+    }
+
+    // Here we are sending a different client Id in both the authz + token requests
+    @org.junit.Test
+    public void testNonMatchingClientIdBasicAuth() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + port + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code
+        String code = OAuth2TestUtils.getAuthorizationCode(client);
+        assertNotNull(code);
+
+        // Now get the access token using a different client id
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                  "consumer-id-aud", "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        client.type("application/x-www-form-urlencoded").accept("application/json");
+        client.path("token");
+
+        Form form = new Form();
+        form.param("grant_type", "authorization_code");
+        form.param("code", code);
+
+        // Now try to get a token
+        Response response = client.post(form);
+        try {
+            response.readEntity(ClientAccessToken.class);
+            fail("Failure expected on trying to get a token");
+        } catch (ResponseProcessingException ex) {
+            //expected
+        }
+    }
+
+    // Here we are sending a different client Id in both the authz + token requests, where in the
+    // token request we authenticate using a different clientId
+    @org.junit.Test
+    public void testNonMatchingClientDifferentClientIds() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + port + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code
+        String code = OAuth2TestUtils.getAuthorizationCode(client);
+        assertNotNull(code);
+
+        // Now get the access token using a different client id
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                  "consumer-id-aud", "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        client.type("application/x-www-form-urlencoded").accept("application/json");
+        client.path("token");
+
+        Form form = new Form();
+        form.param("grant_type", "authorization_code");
+        form.param("code", code);
+        form.param("client_id", "consumer-id");
+
+        // Now try to get a token
+        Response response = client.post(form);
+        try {
+            response.readEntity(ClientAccessToken.class);
+            fail("Failure expected on trying to get a token");
+        } catch (ResponseProcessingException ex) {
+            //expected
+        }
+    }
+
+    // Here we get a code for "consumer-id" but specify "consumer-id-aud" as the clientId in the
+    // token request (but authenticate as "consumer-id").
+    @org.junit.Test
+    public void testNonMatchingClientIdIgnored() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + port + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code
+        String code = OAuth2TestUtils.getAuthorizationCode(client);
+        assertNotNull(code);
+
+        // Now get the access token using a different client id
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                  "consumer-id", "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        client.type("application/x-www-form-urlencoded").accept("application/json");
+        client.path("token");
+
+        Form form = new Form();
+        form.param("grant_type", "authorization_code");
+        form.param("code", code);
+        form.param("client_id", "consumer-id-aud");
+
+        // Now try to get a token
+        Response response = client.post(form);
+        try {
+            response.readEntity(ClientAccessToken.class);
+            fail("Failure expected on trying to get a token");
+        } catch (ResponseProcessingException ex) {
+            //expected
+        }
+    }
+
+    // We shouldn't be able to get a refresh token using the implicit grant
+    @org.junit.Test
+    public void testRefreshImplicitGrant() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + port + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Access Token
+        client.type("application/json").accept("application/json");
+        client.query("client_id", "consumer-id");
+        client.query("redirect_uri", "http://www.blah.apache.org");
+        client.query("response_type", "token");
+        client.path("authorize-implicit/");
+        Response response = client.get();
+
+        OAuthAuthorizationData authzData = response.readEntity(OAuthAuthorizationData.class);
+
+        // Now call "decision" to get the access token
+        client.path("decision");
+        client.type("application/x-www-form-urlencoded");
+
+        Form form = new Form();
+        form.param("session_authenticity_token", authzData.getAuthenticityToken());
+        form.param("client_id", authzData.getClientId());
+        form.param("redirect_uri", authzData.getRedirectUri());
+        form.param("oauthDecision", "allow");
+
+        response = client.post(form);
+
+        String location = response.getHeaderString("Location");
+        String accessToken = OAuth2TestUtils.getSubstring(location, "access_token");
+        assertNotNull(accessToken);
+        assertFalse(location.contains("refresh"));
     }
 
     //

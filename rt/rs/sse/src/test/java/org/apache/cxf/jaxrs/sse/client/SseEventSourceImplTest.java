@@ -34,6 +34,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.sse.InboundSseEvent;
 import javax.ws.rs.sse.SseEventSource;
 
@@ -57,7 +59,8 @@ public class SseEventSourceImplTest {
 
     enum Type {
         NO_CONTENT, NO_SERVER, BUSY,
-        EVENT, EVENT_JUST_DATA, EVENT_JUST_NAME, EVENT_NO_RETRY, EVENT_BAD_RETRY, EVENT_MIXED, EVENT_BAD_NEW_LINES;
+        EVENT, EVENT_JUST_DATA, EVENT_JUST_NAME, EVENT_MULTILINE_DATA, EVENT_NO_RETRY, EVENT_BAD_RETRY, EVENT_MIXED,
+        EVENT_BAD_NEW_LINES, EVENT_NOT_AUTHORIZED;
     }
 
     private static final String EVENT = "event: event\n"
@@ -70,6 +73,11 @@ public class SseEventSourceImplTest {
     private static final String EVENT_JUST_DATA = "\n"
         + "data: just test data\n"
         + "\n";
+
+    private static final String EVENT_MULTILINE_DATA = "\n"
+            + "data: just test data\n"
+            + "data: in multiple lines\n"
+            + "\n";
 
     private static final String EVENT_JUST_NAME = "\n"
         + "event: just name\n";
@@ -207,6 +215,22 @@ public class SseEventSourceImplTest {
     }
 
     @Test
+    public void testNoReconnectAndMultilineDataEventIsReceived() throws InterruptedException, IOException {
+        try (SseEventSource eventSource = withNoReconnect(Type.EVENT_MULTILINE_DATA)) {
+            eventSource.open();
+
+            assertThat(eventSource.isOpen(), equalTo(true));
+
+            // Allow the event processor to pull for events (150ms)
+            Thread.sleep(150L);
+        }
+
+        assertThat(events.size(), equalTo(1));
+        assertThat(events.get(0).getName(), nullValue());
+        assertThat(events.get(0).readData(), equalTo("just test data\nin multiple lines"));
+    }
+
+    @Test
     public void testNoReconnectAndJustEventNameIsReceived() throws InterruptedException, IOException {
         try (SseEventSource eventSource = withNoReconnect(Type.EVENT_JUST_NAME)) {
             eventSource.open();
@@ -273,6 +297,36 @@ public class SseEventSourceImplTest {
         assertThat(events.get(1).getId(), equalTo("1"));
         assertThat(events.get(1).getComment(), equalTo("test comment"));
         assertThat(events.get(1).readData(), equalTo("test data"));
+    }
+
+    @Test
+    public void testReconnectAndNotAuthorized() throws InterruptedException, IOException {
+        try (SseEventSource eventSource = withReconnect(Type.EVENT_NOT_AUTHORIZED)) {
+            eventSource.open();
+            assertThat(eventSource.isOpen(), equalTo(false));
+            assertThat(errors.size(), equalTo(1));
+
+            // Allow the event processor to pull for events (150ms)
+            Thread.sleep(150L);
+        }
+        
+        assertThat(errors.size(), equalTo(2));
+        assertThat(events.size(), equalTo(0));
+    }
+
+    @Test
+    public void testNoReconnectAndNotAuthorized() throws InterruptedException, IOException {
+        try (SseEventSource eventSource = withNoReconnect(Type.EVENT_NOT_AUTHORIZED)) {
+            eventSource.open();
+            assertThat(eventSource.isOpen(), equalTo(false));
+            assertThat(errors.size(), equalTo(1));
+
+            // Allow the event processor to pull for events (150ms)
+            Thread.sleep(150L);
+        }
+        
+        assertThat(errors.size(), equalTo(1));
+        assertThat(events.size(), equalTo(0));
     }
 
     @Test
@@ -343,19 +397,31 @@ public class SseEventSourceImplTest {
         startServer(Type.NO_CONTENT, null);
         // Type.NO_SERVER
 
-        Type type = Type.BUSY;
-        JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        sf.setAddress(LOCAL_ADDRESS + type.name());
-        sf.setServiceBean(new BusyEventServer());
-        SERVERS.put(type, sf.create());
+        startBusyServer(Type.BUSY);
+        startNotAuthorizedServer(Type.EVENT_NOT_AUTHORIZED);
 
         startServer(Type.EVENT, EVENT);
         startServer(Type.EVENT_JUST_DATA, EVENT_JUST_DATA);
         startServer(Type.EVENT_JUST_NAME, EVENT_JUST_NAME);
+        startServer(Type.EVENT_MULTILINE_DATA, EVENT_MULTILINE_DATA);
         startServer(Type.EVENT_NO_RETRY, EVENT_NO_RETRY);
         startServer(Type.EVENT_BAD_RETRY, EVENT_BAD_RETRY);
         startServer(Type.EVENT_MIXED, EVENT_MIXED);
         startServer(Type.EVENT_BAD_NEW_LINES, EVENT_BAD_NEW_LINES);
+    }
+
+    private static void startNotAuthorizedServer(Type type) {
+        JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
+        sf.setAddress(LOCAL_ADDRESS + type.name());
+        sf.setServiceBean(new ProtectedEventServer());
+        SERVERS.put(type, sf.create());
+    }
+
+    private static void startBusyServer(Type type) {
+        JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
+        sf.setAddress(LOCAL_ADDRESS + type.name());
+        sf.setServiceBean(new BusyEventServer());
+        SERVERS.put(type, sf.create());
     }
 
     private static void startServer(Type type, String payload) {
@@ -398,6 +464,14 @@ public class SseEventSourceImplTest {
             } catch (InterruptedException e) {
             }
             return super.event();
+        }
+    }
+
+    public static class ProtectedEventServer {
+        @GET
+        @Produces(MediaType.SERVER_SENT_EVENTS)
+        public Response event() {
+            return Response.status(Status.UNAUTHORIZED).build();
         }
     }
 

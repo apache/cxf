@@ -32,16 +32,17 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
     protected static final Logger LOG = LogUtils.getL7dLogger(PublicKeyJwsSignatureVerifier.class);
-    private PublicKey key;
-    private AlgorithmParameterSpec signatureSpec;
-    private SignatureAlgorithm supportedAlgo;
-    private X509Certificate cert;
+    private final PublicKey key;
+    private final AlgorithmParameterSpec signatureSpec;
+    private final SignatureAlgorithm supportedAlgo;
+    private final X509Certificate cert;
 
     public PublicKeyJwsSignatureVerifier(PublicKey key, SignatureAlgorithm supportedAlgorithm) {
         this(key, null, supportedAlgorithm);
     }
     public PublicKeyJwsSignatureVerifier(PublicKey key, AlgorithmParameterSpec spec, SignatureAlgorithm supportedAlgo) {
         this.key = key;
+        cert = null;
         this.signatureSpec = spec;
         this.supportedAlgo = supportedAlgo;
         JwsUtils.checkSignatureKeySize(key);
@@ -54,6 +55,8 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
                                          SignatureAlgorithm supportedAlgo) {
         if (cert != null) {
             this.key = cert.getPublicKey();
+        } else {
+            this.key = null;
         }
         this.cert = cert;
         this.signatureSpec = spec;
@@ -106,7 +109,7 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
                                     signatureSpec);
         return new PublicKeyJwsVerificationSignature(sig);
     }
-    
+
     private class PublicKeyJwsVerificationSignature implements JwsVerificationSignature {
         private Signature sig;
         PublicKeyJwsVerificationSignature(Signature sig) {
@@ -130,6 +133,6 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
                 throw new JwsException(JwsException.Error.INVALID_SIGNATURE, ex);
             }
         }
-        
+
     }
 }

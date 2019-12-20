@@ -18,20 +18,13 @@
  */
 package org.apache.cxf.systest.sts.rest;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import javax.security.auth.callback.CallbackHandler;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
 import javax.xml.transform.dom.DOMSource;
@@ -39,41 +32,38 @@ import javax.xml.transform.dom.DOMSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.CompressionUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
-import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.rt.security.saml.utils.SAMLUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
+import org.apache.cxf.sts.STSConstants;
+import org.apache.cxf.systest.sts.TLSClientParametersUtils;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.StatusType;
-import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.processor.Processor;
 import org.apache.wss4j.dom.processor.SAMLTokenProcessor;
 
-import org.junit.BeforeClass;
-
+import static org.apache.cxf.ws.security.trust.STSUtils.WST_NS_05_12;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
@@ -93,16 +83,14 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
     private static final String SAML2_TOKEN_TYPE =
         "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0";
     private static final String JWT_TOKEN_TYPE = "urn:ietf:params:oauth:token-type:jwt";
-    private static final String SYMMETRIC_KEY_KEYTYPE =
-        "http://docs.oasis-open.org/ws-sx/ws-trust/200512/SymmetricKey";
-    private static final String PUBLIC_KEY_KEYTYPE =
-        "http://docs.oasis-open.org/ws-sx/ws-trust/200512/PublicKey";
-    private static final String BEARER_KEYTYPE =
-        "http://docs.oasis-open.org/ws-sx/ws-trust/200512/Bearer";
     private static final String DEFAULT_ADDRESS =
         "https://localhost:8081/doubleit/services/doubleittransportsaml1";
 
-    @BeforeClass
+    private static Crypto serviceCrypto;
+
+    private WebClient webClient;
+
+    @org.junit.BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
                    "Server failed to launch",
@@ -110,107 +98,60 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
                    // set this to false to fork
                    launchServer(STSRESTServer.class, true)
         );
+
+        serviceCrypto = CryptoFactory.getInstance("serviceKeystore.properties");
     }
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
         stopAllServers();
+
+        serviceCrypto = null;
+    }
+
+    @org.junit.After
+    public void closeClient() throws Exception {
+        if (null != webClient) {
+            webClient.close();
+        }
     }
 
     @org.junit.Test
     public void testIssueSAML2Token() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+        WebClient client = webClient()
+            .path("saml2.0")
+            .accept(MediaType.APPLICATION_XML);
 
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        Document assertionDoc = client.get(Document.class);
 
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.accept("application/xml");
-        client.path("saml2.0");
-
-        Response response = client.get();
-        Document assertionDoc = response.readEntity(Document.class);
-        assertNotNull(assertionDoc);
-
-        // Process the token
-        List<WSSecurityEngineResult> results = processToken(assertionDoc.getDocumentElement());
-
-        assertTrue(results != null && results.size() == 1);
-        SamlAssertionWrapper assertion =
-            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertNotNull(assertion);
+        SamlAssertionWrapper assertion = validateSAMLToken(assertionDoc);
         assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
-        assertTrue(assertion.isSigned());
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testIssueSAML1Token() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+        WebClient client = webClient()
+            .path("saml1.1")
+            .accept(MediaType.APPLICATION_XML);
 
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        Document assertionDoc = client.get(Document.class);
 
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.accept("application/xml");
-        client.path("saml1.1");
-
-        Response response = client.get();
-        Document assertionDoc = response.readEntity(Document.class);
-        assertNotNull(assertionDoc);
-
-        // Process the token
-        List<WSSecurityEngineResult> results = processToken(assertionDoc.getDocumentElement());
-
-        assertTrue(results != null && results.size() == 1);
-        SamlAssertionWrapper assertion =
-            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertNotNull(assertion);
+        SamlAssertionWrapper assertion = validateSAMLToken(assertionDoc);
         assertTrue(assertion.getSaml2() == null && assertion.getSaml1() != null);
-        assertTrue(assertion.isSigned());
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testIssueSymmetricKeySaml1() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+        WebClient client = webClient()
+            .path("saml1.1")
+            .query("keyType", STSConstants.SYMMETRIC_KEY_KEYTYPE)
+            .accept(MediaType.APPLICATION_XML);
 
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        Document assertionDoc = client.get(Document.class);
 
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.accept("application/xml");
-        client.path("saml1.1");
-        client.query("keyType", SYMMETRIC_KEY_KEYTYPE);
-
-        Response response = client.get();
-        Document assertionDoc = response.readEntity(Document.class);
-        assertNotNull(assertionDoc);
-
-        // Process the token
-        List<WSSecurityEngineResult> results = processToken(assertionDoc.getDocumentElement());
-
-        assertTrue(results != null && results.size() == 1);
-        SamlAssertionWrapper assertion =
-            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertNotNull(assertion);
+        SamlAssertionWrapper assertion = validateSAMLToken(assertionDoc);
         assertTrue(assertion.getSaml2() == null && assertion.getSaml1() != null);
-        assertTrue(assertion.isSigned());
 
         List<String> methods = assertion.getConfirmationMethods();
         String confirmMethod = null;
@@ -220,39 +161,19 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         assertTrue(OpenSAMLUtil.isMethodHolderOfKey(confirmMethod));
         SAMLKeyInfo subjectKeyInfo = assertion.getSubjectKeyInfo();
         assertNotNull(subjectKeyInfo.getSecret());
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testIssueSymmetricKeySaml1ShortKeyType() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+        WebClient client = webClient()
+            .path("saml1.1")
+            .query("keyType", "SymmetricKey")
+            .accept(MediaType.APPLICATION_XML);
 
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        Document assertionDoc = client.get(Document.class);
 
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.accept("application/xml");
-        client.path("saml1.1");
-        client.query("keyType", "SymmetricKey");
-
-        Response response = client.get();
-        Document assertionDoc = response.readEntity(Document.class);
-        assertNotNull(assertionDoc);
-
-        // Process the token
-        List<WSSecurityEngineResult> results = processToken(assertionDoc.getDocumentElement());
-
-        assertTrue(results != null && results.size() == 1);
-        SamlAssertionWrapper assertion =
-            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertNotNull(assertion);
+        SamlAssertionWrapper assertion = validateSAMLToken(assertionDoc);
         assertTrue(assertion.getSaml2() == null && assertion.getSaml1() != null);
-        assertTrue(assertion.isSigned());
 
         List<String> methods = assertion.getConfirmationMethods();
         String confirmMethod = null;
@@ -262,39 +183,19 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         assertTrue(OpenSAMLUtil.isMethodHolderOfKey(confirmMethod));
         SAMLKeyInfo subjectKeyInfo = assertion.getSubjectKeyInfo();
         assertNotNull(subjectKeyInfo.getSecret());
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testIssuePublicKeySAML2Token() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+        WebClient client = webClient()
+            .path("saml2.0")
+            .query("keyType", STSConstants.PUBLIC_KEY_KEYTYPE)
+            .accept(MediaType.APPLICATION_XML);
 
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        Document assertionDoc = client.get(Document.class);
 
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.accept("application/xml");
-        client.path("saml2.0");
-        client.query("keyType", PUBLIC_KEY_KEYTYPE);
-
-        Response response = client.get();
-        Document assertionDoc = response.readEntity(Document.class);
-        assertNotNull(assertionDoc);
-
-        // Process the token
-        List<WSSecurityEngineResult> results = processToken(assertionDoc.getDocumentElement());
-
-        assertTrue(results != null && results.size() == 1);
-        SamlAssertionWrapper assertion =
-            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertNotNull(assertion);
+        SamlAssertionWrapper assertion = validateSAMLToken(assertionDoc);
         assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
-        assertTrue(assertion.isSigned());
 
         List<String> methods = assertion.getConfirmationMethods();
         String confirmMethod = null;
@@ -304,39 +205,19 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         assertTrue(OpenSAMLUtil.isMethodHolderOfKey(confirmMethod));
         SAMLKeyInfo subjectKeyInfo = assertion.getSubjectKeyInfo();
         assertNotNull(subjectKeyInfo.getCerts());
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testIssuePublicKeySAML2TokenShortKeyType() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+        WebClient client = webClient()
+            .path("saml2.0")
+            .query("keyType", "PublicKey")
+            .accept(MediaType.APPLICATION_XML);
 
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        Document assertionDoc = client.get(Document.class);
 
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.accept("application/xml");
-        client.path("saml2.0");
-        client.query("keyType", "PublicKey");
-
-        Response response = client.get();
-        Document assertionDoc = response.readEntity(Document.class);
-        assertNotNull(assertionDoc);
-
-        // Process the token
-        List<WSSecurityEngineResult> results = processToken(assertionDoc.getDocumentElement());
-
-        assertTrue(results != null && results.size() == 1);
-        SamlAssertionWrapper assertion =
-            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertNotNull(assertion);
+        SamlAssertionWrapper assertion = validateSAMLToken(assertionDoc);
         assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
-        assertTrue(assertion.isSigned());
 
         List<String> methods = assertion.getConfirmationMethods();
         String confirmMethod = null;
@@ -346,39 +227,20 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         assertTrue(OpenSAMLUtil.isMethodHolderOfKey(confirmMethod));
         SAMLKeyInfo subjectKeyInfo = assertion.getSubjectKeyInfo();
         assertNotNull(subjectKeyInfo.getCerts());
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testIssueBearerSAML1Token() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+        WebClient client = webClient()
+            .path("saml1.1")
+            .query("keyType", STSConstants.BEARER_KEY_KEYTYPE)
+            .accept(MediaType.APPLICATION_XML);
 
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        Document assertionDoc = client.get(Document.class);
 
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.accept("application/xml");
-        client.path("saml1.1");
-        client.query("keyType", BEARER_KEYTYPE);
-
-        Response response = client.get();
-        Document assertionDoc = response.readEntity(Document.class);
-        assertNotNull(assertionDoc);
-
-        // Process the token
-        List<WSSecurityEngineResult> results = processToken(assertionDoc.getDocumentElement());
-
-        assertTrue(results != null && results.size() == 1);
-        SamlAssertionWrapper assertion =
-            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        SamlAssertionWrapper assertion = validateSAMLToken(assertionDoc);
         assertNotNull(assertion);
         assertTrue(assertion.getSaml2() == null && assertion.getSaml1() != null);
-        assertTrue(assertion.isSigned());
 
         List<String> methods = assertion.getConfirmationMethods();
         String confirmMethod = null;
@@ -386,39 +248,19 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
             confirmMethod = methods.get(0);
         }
         assertTrue(confirmMethod.contains("bearer"));
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testIssueBearerSAML1TokenShorKeyType() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+        WebClient client = webClient()
+            .path("saml1.1")
+            .query("keyType", "Bearer")
+            .accept(MediaType.APPLICATION_XML);
 
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        Document assertionDoc = client.get(Document.class);
 
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.accept("application/xml");
-        client.path("saml1.1");
-        client.query("keyType", "Bearer");
-
-        Response response = client.get();
-        Document assertionDoc = response.readEntity(Document.class);
-        assertNotNull(assertionDoc);
-
-        // Process the token
-        List<WSSecurityEngineResult> results = processToken(assertionDoc.getDocumentElement());
-
-        assertTrue(results != null && results.size() == 1);
-        SamlAssertionWrapper assertion =
-            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertNotNull(assertion);
+        SamlAssertionWrapper assertion = validateSAMLToken(assertionDoc);
         assertTrue(assertion.getSaml2() == null && assertion.getSaml1() != null);
-        assertTrue(assertion.isSigned());
 
         List<String> methods = assertion.getConfirmationMethods();
         String confirmMethod = null;
@@ -426,58 +268,27 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
             confirmMethod = methods.get(0);
         }
         assertTrue(confirmMethod.contains("bearer"));
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testIssueSAML2TokenAppliesTo() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+        WebClient client = webClient()
+            .path("saml2.0")
+            .query("appliesTo", DEFAULT_ADDRESS)
+            .accept(MediaType.APPLICATION_XML);
 
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        Document assertionDoc = client.get(Document.class);
 
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.accept("application/xml");
-        client.path("saml2.0");
-        client.query("appliesTo", DEFAULT_ADDRESS);
-
-        Response response = client.get();
-        Document assertionDoc = response.readEntity(Document.class);
-        assertNotNull(assertionDoc);
-
-        // Process the token
-        List<WSSecurityEngineResult> results = processToken(assertionDoc.getDocumentElement());
-
-        assertTrue(results != null && results.size() == 1);
-        SamlAssertionWrapper assertion =
-            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertNotNull(assertion);
+        SamlAssertionWrapper assertion = validateSAMLToken(assertionDoc);
         assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
-        assertTrue(assertion.isSigned());
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testIssueSAML2TokenUnknownAppliesTo() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.accept("application/xml");
-        client.path("saml2.0");
-        client.query("appliesTo", "https://localhost:8081/tripleit/");
+        WebClient client = webClient()
+            .path("saml2.0")
+            .query("appliesTo", "https://localhost:8081/tripleit/")
+            .accept(MediaType.APPLICATION_XML);
 
         Response response = client.get();
         try {
@@ -486,376 +297,241 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             // expected
         }
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testIssueSAML2TokenClaims() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.accept("application/xml");
-        client.path("saml2.0");
+        WebClient client = webClient()
+            .path("saml2.0")
+            .accept(MediaType.APPLICATION_XML);
 
         // First check that the role isn't usually in the generated token
+        Document assertionDoc = client.get(Document.class);
 
-        Response response = client.get();
-        Document assertionDoc = response.readEntity(Document.class);
-        assertNotNull(assertionDoc);
-
-        // Process the token
-        List<WSSecurityEngineResult> results = processToken(assertionDoc.getDocumentElement());
-
-        assertTrue(results != null && results.size() == 1);
-        SamlAssertionWrapper assertion =
-            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertNotNull(assertion);
+        SamlAssertionWrapper assertion = validateSAMLToken(assertionDoc);
         assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
-        assertTrue(assertion.isSigned());
 
         ClaimCollection claims = SAMLUtils.getClaims(assertion);
         assertEquals(1, claims.size());
         Claim claim = claims.get(0);
         String role = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
-        assertNotEquals(claim.getClaimType().toString(), role);
+        assertNotEquals(role, claim.getClaimType().toString());
 
         // Now get another token specifying the role
         client.query("claim", role);
-        response = client.get();
-        assertionDoc = response.readEntity(Document.class);
-        assertNotNull(assertionDoc);
+        assertionDoc = client.get(Document.class);
 
-        // Process the token
-        results = processToken(assertionDoc.getDocumentElement());
-
-        assertTrue(results != null && results.size() == 1);
-        assertion =
-            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertNotNull(assertion);
+        assertion = validateSAMLToken(assertionDoc);
         assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
-        assertTrue(assertion.isSigned());
 
         claims = SAMLUtils.getClaims(assertion);
         assertEquals(1, claims.size());
         claim = claims.get(0);
-        assertEquals(claim.getClaimType().toString(), role);
+        assertEquals(role, claim.getClaimType().toString());
         assertEquals("ordinary-user", claim.getValues().get(0));
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testIssueSAML2TokenViaWSTrust() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+        WebClient client = webClient()
+            .path("saml2.0")
+            .query("wstrustResponse", "true")
+            .accept(MediaType.APPLICATION_XML);
 
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.accept("application/xml");
-        client.path("saml2.0");
-        client.query("wstrustResponse", "true");
-
-        Response response = client.get();
         RequestSecurityTokenResponseType securityResponse =
-            response.readEntity(RequestSecurityTokenResponseType.class);
+            client.get(RequestSecurityTokenResponseType.class);
 
         validateSAMLSecurityTokenResponse(securityResponse, true);
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testIssueSAML2TokenViaPOST() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.type("application/xml").accept("application/xml");
+        WebClient client = webClient()
+            .type(MediaType.APPLICATION_XML)
+            .accept(MediaType.APPLICATION_XML);
 
         // Create RequestSecurityToken
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
-        String namespace = STSUtils.WST_NS_05_12;
-        writer.writeStartElement("wst", "RequestSecurityToken", namespace);
-        writer.writeNamespace("wst", namespace);
+        writer.writeStartElement("wst", "RequestSecurityToken", WST_NS_05_12);
 
-        writer.writeStartElement("wst", "RequestType", namespace);
-        writer.writeCharacters(namespace + "/Issue");
+        writer.writeStartElement("wst", "RequestType", WST_NS_05_12);
+        writer.writeCharacters(WST_NS_05_12 + "/Issue");
         writer.writeEndElement();
 
-        writer.writeStartElement("wst", "TokenType", namespace);
+        writer.writeStartElement("wst", "TokenType", WST_NS_05_12);
         writer.writeCharacters(SAML2_TOKEN_TYPE);
         writer.writeEndElement();
 
         writer.writeEndElement();
 
-        Response response = client.post(new DOMSource(writer.getDocument().getDocumentElement()));
-
-        RequestSecurityTokenResponseType securityResponse =
-            response.readEntity(RequestSecurityTokenResponseType.class);
+        RequestSecurityTokenResponseType securityResponse = client.post(
+            new DOMSource(writer.getDocument().getDocumentElement()),
+            RequestSecurityTokenResponseType.class);
 
         validateSAMLSecurityTokenResponse(securityResponse, true);
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testExplicitlyIssueSAML2TokenViaPOST() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.type("application/xml").accept("application/xml");
-        client.query("action", "issue");
+        WebClient client = webClient()
+            .query("action", "issue")
+            .type(MediaType.APPLICATION_XML)
+            .accept(MediaType.APPLICATION_XML);
 
         // Create RequestSecurityToken
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
-        String namespace = STSUtils.WST_NS_05_12;
-        writer.writeStartElement("wst", "RequestSecurityToken", namespace);
-        writer.writeNamespace("wst", namespace);
+        writer.writeStartElement("wst", "RequestSecurityToken", WST_NS_05_12);
 
-        writer.writeStartElement("wst", "RequestType", namespace);
-        writer.writeCharacters(namespace + "/Issue");
+        writer.writeStartElement("wst", "RequestType", WST_NS_05_12);
+        writer.writeCharacters(WST_NS_05_12 + "/Issue");
         writer.writeEndElement();
 
-        writer.writeStartElement("wst", "TokenType", namespace);
+        writer.writeStartElement("wst", "TokenType", WST_NS_05_12);
         writer.writeCharacters(SAML2_TOKEN_TYPE);
         writer.writeEndElement();
 
         writer.writeEndElement();
 
-        Response response = client.post(new DOMSource(writer.getDocument().getDocumentElement()));
-
-        RequestSecurityTokenResponseType securityResponse =
-            response.readEntity(RequestSecurityTokenResponseType.class);
+        RequestSecurityTokenResponseType securityResponse = client.post(
+            new DOMSource(writer.getDocument().getDocumentElement()),
+            RequestSecurityTokenResponseType.class);
 
         validateSAMLSecurityTokenResponse(securityResponse, true);
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testExplicitlyIssueSAML1TokenViaPOST() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.type("application/xml").accept("application/xml");
-        client.query("action", "issue");
+        WebClient client = webClient()
+            .query("action", "issue")
+            .type(MediaType.APPLICATION_XML)
+            .accept(MediaType.APPLICATION_XML);
 
         // Create RequestSecurityToken
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
-        String namespace = STSUtils.WST_NS_05_12;
-        writer.writeStartElement("wst", "RequestSecurityToken", namespace);
-        writer.writeNamespace("wst", namespace);
+        writer.writeStartElement("wst", "RequestSecurityToken", WST_NS_05_12);
 
-        writer.writeStartElement("wst", "RequestType", namespace);
-        writer.writeCharacters(namespace + "/Issue");
+        writer.writeStartElement("wst", "RequestType", WST_NS_05_12);
+        writer.writeCharacters(WST_NS_05_12 + "/Issue");
         writer.writeEndElement();
 
-        writer.writeStartElement("wst", "TokenType", namespace);
+        writer.writeStartElement("wst", "TokenType", WST_NS_05_12);
         writer.writeCharacters(SAML1_TOKEN_TYPE);
         writer.writeEndElement();
 
         writer.writeEndElement();
 
-        Response response = client.post(new DOMSource(writer.getDocument().getDocumentElement()));
-
-        RequestSecurityTokenResponseType securityResponse =
-            response.readEntity(RequestSecurityTokenResponseType.class);
+        RequestSecurityTokenResponseType securityResponse = client.post(
+            new DOMSource(writer.getDocument().getDocumentElement()),
+            RequestSecurityTokenResponseType.class);
 
         validateSAMLSecurityTokenResponse(securityResponse, false);
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testValidateSAML2Token() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.type("application/xml").accept("application/xml");
-        client.path("saml2.0");
+        WebClient client = webClient()
+            .path("saml2.0")
+            .accept(MediaType.APPLICATION_XML);
 
         // 1. Get a token via GET
-        Response response = client.get();
-        Document assertionDoc = response.readEntity(Document.class);
+        Document assertionDoc = client.get(Document.class);
         assertNotNull(assertionDoc);
 
         // 2. Now validate it in the STS using POST
-        client = WebClient.create(address, busFile.toString());
-
-        client.type("application/xml").accept("application/xml");
-        client.query("action", "validate");
+        client = webClient()
+            .query("action", "validate")
+            .type(MediaType.APPLICATION_XML)
+            .accept(MediaType.APPLICATION_XML);
 
         // Create RequestSecurityToken
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
-        String namespace = STSUtils.WST_NS_05_12;
-        writer.writeStartElement("wst", "RequestSecurityToken", namespace);
-        writer.writeNamespace("wst", namespace);
+        writer.writeStartElement("wst", "RequestSecurityToken", WST_NS_05_12);
 
-        writer.writeStartElement("wst", "RequestType", namespace);
-        writer.writeCharacters(namespace + "/Validate");
+        writer.writeStartElement("wst", "RequestType", WST_NS_05_12);
+        writer.writeCharacters(WST_NS_05_12 + "/Validate");
         writer.writeEndElement();
 
-        writer.writeStartElement("wst", "TokenType", namespace);
-        String tokenType = namespace + "/RSTR/Status";
+        writer.writeStartElement("wst", "TokenType", WST_NS_05_12);
+        String tokenType = WST_NS_05_12 + "/RSTR/Status";
         writer.writeCharacters(tokenType);
         writer.writeEndElement();
 
-        writer.writeStartElement("wst", "ValidateTarget", namespace);
+        writer.writeStartElement("wst", "ValidateTarget", WST_NS_05_12);
         StaxUtils.copy(assertionDoc.getDocumentElement(), writer);
         writer.writeEndElement();
 
         writer.writeEndElement();
 
-        response = client.post(new DOMSource(writer.getDocument().getDocumentElement()));
+        RequestSecurityTokenResponseType securityResponse = client.post(
+            new DOMSource(writer.getDocument().getDocumentElement()),
+            RequestSecurityTokenResponseType.class);
 
-        RequestSecurityTokenResponseType securityResponse =
-            response.readEntity(RequestSecurityTokenResponseType.class);
-
-        StatusType status = null;
-        for (Object obj : securityResponse.getAny()) {
-            if (obj instanceof JAXBElement<?>) {
-                JAXBElement<?> jaxbElement = (JAXBElement<?>)obj;
-                if ("Status".equals(jaxbElement.getName().getLocalPart())) {
-                    status = (StatusType)jaxbElement.getValue();
-                    break;
-                }
-            }
-        }
-        assertNotNull(status);
-
-        // Check the token was valid
-        String validCode = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/status/valid";
-        assertEquals(validCode, status.getCode());
-
-        bus.shutdown(true);
+        assertTrue(getValidationStatus(securityResponse));
     }
 
     @org.junit.Test
     public void testRenewSAML2Token() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.type("application/xml").accept("application/xml");
-        client.query("action", "issue");
+        WebClient client = webClient()
+            .query("action", "issue")
+            .type(MediaType.APPLICATION_XML)
+            .accept(MediaType.APPLICATION_XML);
 
         // 1. Get a token via POST
 
         // Create RequestSecurityToken
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
-        String namespace = STSUtils.WST_NS_05_12;
-        writer.writeStartElement("wst", "RequestSecurityToken", namespace);
-        writer.writeNamespace("wst", namespace);
+        writer.writeStartElement("wst", "RequestSecurityToken", WST_NS_05_12);
 
-        writer.writeStartElement("wst", "RequestType", namespace);
-        writer.writeCharacters(namespace + "/Issue");
+        writer.writeStartElement("wst", "RequestType", WST_NS_05_12);
+        writer.writeCharacters(WST_NS_05_12 + "/Issue");
         writer.writeEndElement();
 
-        writer.writeStartElement("wst", "TokenType", namespace);
+        writer.writeStartElement("wst", "TokenType", WST_NS_05_12);
         writer.writeCharacters(SAML2_TOKEN_TYPE);
         writer.writeEndElement();
 
         writer.writeEndElement();
 
-        Response response = client.post(new DOMSource(writer.getDocument().getDocumentElement()));
+        RequestSecurityTokenResponseType securityResponse = client.post(
+            new DOMSource(writer.getDocument().getDocumentElement()),
+            RequestSecurityTokenResponseType.class);
 
-        RequestSecurityTokenResponseType securityResponse =
-            response.readEntity(RequestSecurityTokenResponseType.class);
         Element token = validateSAMLSecurityTokenResponse(securityResponse, true);
 
-        // 2. Now validate it in the STS using POST
-        client = WebClient.create(address, busFile.toString());
-
-        client.type("application/xml").accept("application/xml");
-        client.query("action", "renew");
+        // 2. Now renew it using POST
+        client = webClient()
+            .query("action", "renew")
+            .type(MediaType.APPLICATION_XML)
+            .accept(MediaType.APPLICATION_XML);
 
         // Create RequestSecurityToken
         writer = new W3CDOMStreamWriter();
-        writer.writeStartElement("wst", "RequestSecurityToken", namespace);
-        writer.writeNamespace("wst", namespace);
+        writer.writeStartElement("wst", "RequestSecurityToken", WST_NS_05_12);
 
-        writer.writeStartElement("wst", "RequestType", namespace);
-        writer.writeCharacters(namespace + "/Renew");
+        writer.writeStartElement("wst", "RequestType", WST_NS_05_12);
+        writer.writeCharacters(WST_NS_05_12 + "/Renew");
         writer.writeEndElement();
 
-        writer.writeStartElement("wst", "RenewTarget", namespace);
+        writer.writeStartElement("wst", "RenewTarget", WST_NS_05_12);
         StaxUtils.copy(token, writer);
         writer.writeEndElement();
 
         writer.writeEndElement();
 
-        response = client.post(new DOMSource(writer.getDocument().getDocumentElement()));
-
-        securityResponse = response.readEntity(RequestSecurityTokenResponseType.class);
+        securityResponse = client.post(
+            new DOMSource(writer.getDocument().getDocumentElement()),
+            RequestSecurityTokenResponseType.class);
 
         validateSAMLSecurityTokenResponse(securityResponse, true);
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testIssueSAML2TokenPlain() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+        WebClient client = webClient()
+            .path("saml2.0")
+            .accept(MediaType.TEXT_PLAIN);
 
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.accept("text/plain");
-        client.path("saml2.0");
-
-        Response response = client.get();
-        String encodedAssertion = response.readEntity(String.class);
+        String encodedAssertion = client.get(String.class);
         assertNotNull(encodedAssertion);
 
         byte[] deflatedToken = Base64Utility.decode(encodedAssertion);
@@ -864,403 +540,230 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
             StaxUtils.read(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
 
         // Process the token
-        List<WSSecurityEngineResult> results = processToken(doc.getDocumentElement());
-
-        assertTrue(results != null && results.size() == 1);
-        SamlAssertionWrapper assertion =
-            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertNotNull(assertion);
+        SamlAssertionWrapper assertion = validateSAMLToken(doc);
         assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
-        assertTrue(assertion.isSigned());
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testIssueJWTTokenPlain() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+        WebClient client = webClient()
+            .path("jwt")
+            .accept(MediaType.TEXT_PLAIN);
 
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.accept("text/plain");
-        client.path("jwt");
-
-        Response response = client.get();
-        String token = response.readEntity(String.class);
-        assertNotNull(token);
-
-        validateJWTToken(token, null);
+        String token = client.get(String.class);
+        validateJWTToken(token);
     }
 
     @org.junit.Test
     public void testIssueJWTTokenAppliesTo() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+        WebClient client = webClient()
+            .path("jwt")
+            .query("appliesTo", DEFAULT_ADDRESS)
+            .accept(MediaType.TEXT_PLAIN);
 
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        String token = client.get(String.class);
+        JwtToken jwt = validateJWTToken(token);
 
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.accept("text/plain");
-        client.path("jwt");
-        client.query("appliesTo", DEFAULT_ADDRESS);
-
-        Response response = client.get();
-        String token = response.readEntity(String.class);
-        assertNotNull(token);
-
-        validateJWTToken(token, DEFAULT_ADDRESS);
+        List<String> audiences = jwt.getClaims().getAudiences();
+        assertEquals(1, audiences.size());
+        assertEquals(DEFAULT_ADDRESS, audiences.get(0));
     }
 
     @org.junit.Test
     public void testIssueJWTTokenClaims() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.accept("text/plain");
-        client.path("jwt");
+        WebClient client = webClient()
+            .path("jwt")
+            .accept(MediaType.TEXT_PLAIN);
 
         // First check that the role isn't usually in the generated token
 
-        Response response = client.get();
-        String token = response.readEntity(String.class);
-        assertNotNull(token);
-
-        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
-        JwtToken jwt = jwtConsumer.getJwtToken();
+        String token = client.get(String.class);
+        JwtToken jwt = validateJWTToken(token);
 
         assertNull(jwt.getClaim("roles"));
 
         // Now get another token specifying the role
         client.query("claim", "roles");
 
-        response = client.get();
-        token = response.readEntity(String.class);
-        assertNotNull(token);
+        token = client.get(String.class);
+        jwt = validateJWTToken(token);
 
-        // Process the token
-        validateJWTToken(token, null);
-
-        jwtConsumer = new JwsJwtCompactConsumer(token);
-        jwt = jwtConsumer.getJwtToken();
         assertEquals("ordinary-user", jwt.getClaim("roles"));
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testIssueJWTTokenViaPOST() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.type("application/xml").accept("application/xml");
+        WebClient client = webClient()
+            .type(MediaType.APPLICATION_XML)
+            .accept(MediaType.APPLICATION_XML);
 
         // Create RequestSecurityToken
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
-        String namespace = STSUtils.WST_NS_05_12;
-        writer.writeStartElement("wst", "RequestSecurityToken", namespace);
-        writer.writeNamespace("wst", namespace);
+        writer.writeStartElement("wst", "RequestSecurityToken", WST_NS_05_12);
 
-        writer.writeStartElement("wst", "RequestType", namespace);
-        writer.writeCharacters(namespace + "/Issue");
+        writer.writeStartElement("wst", "RequestType", WST_NS_05_12);
+        writer.writeCharacters(WST_NS_05_12 + "/Issue");
         writer.writeEndElement();
 
-        writer.writeStartElement("wst", "TokenType", namespace);
+        writer.writeStartElement("wst", "TokenType", WST_NS_05_12);
         writer.writeCharacters(JWT_TOKEN_TYPE);
         writer.writeEndElement();
 
         writer.writeEndElement();
 
-        Response response = client.post(new DOMSource(writer.getDocument().getDocumentElement()));
-
-        RequestSecurityTokenResponseType securityResponse =
-            response.readEntity(RequestSecurityTokenResponseType.class);
+        RequestSecurityTokenResponseType securityResponse = client.post(
+            new DOMSource(writer.getDocument().getDocumentElement()),
+            RequestSecurityTokenResponseType.class);
 
         RequestedSecurityTokenType requestedSecurityToken = getRequestedSecurityToken(securityResponse);
-        assertNotNull(requestedSecurityToken);
 
         String token = ((Element)requestedSecurityToken.getAny()).getTextContent();
-        assertNotNull(token);
-
-        validateJWTToken(token, null);
-
-        bus.shutdown(true);
+        validateJWTToken(token);
     }
 
     @org.junit.Test
     public void testValidateSAMLAndIssueJWT() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.accept("application/xml");
-        client.path("saml2.0");
+        WebClient client = webClient()
+            .path("saml2.0")
+            .accept(MediaType.APPLICATION_XML);
 
         // 1. Get a token via GET
-        Response response = client.get();
-        Document assertionDoc = response.readEntity(Document.class);
+        Document assertionDoc = client.get(Document.class);
         assertNotNull(assertionDoc);
 
         // 2. Now validate it in the STS using POST
-        client = WebClient.create(address, busFile.toString());
-
-        client.type("application/xml").accept("application/xml");
-        client.query("action", "validate");
+        client = webClient()
+            .query("action", "validate")
+            .type(MediaType.APPLICATION_XML)
+            .accept(MediaType.APPLICATION_XML);
 
         // Create RequestSecurityToken
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
-        String namespace = STSUtils.WST_NS_05_12;
-        writer.writeStartElement("wst", "RequestSecurityToken", namespace);
-        writer.writeNamespace("wst", namespace);
+        writer.writeStartElement("wst", "RequestSecurityToken", WST_NS_05_12);
 
-        writer.writeStartElement("wst", "RequestType", namespace);
-        writer.writeCharacters(namespace + "/Validate");
+        writer.writeStartElement("wst", "RequestType", WST_NS_05_12);
+        writer.writeCharacters(WST_NS_05_12 + "/Validate");
         writer.writeEndElement();
 
-        writer.writeStartElement("wst", "TokenType", namespace);
+        writer.writeStartElement("wst", "TokenType", WST_NS_05_12);
         writer.writeCharacters(JWT_TOKEN_TYPE);
         writer.writeEndElement();
 
-        writer.writeStartElement("wst", "ValidateTarget", namespace);
+        writer.writeStartElement("wst", "ValidateTarget", WST_NS_05_12);
         StaxUtils.copy(assertionDoc.getDocumentElement(), writer);
         writer.writeEndElement();
 
         writer.writeEndElement();
 
-        response = client.post(new DOMSource(writer.getDocument().getDocumentElement()));
+        RequestSecurityTokenResponseType securityResponse = client.post(
+            new DOMSource(writer.getDocument().getDocumentElement()),
+            RequestSecurityTokenResponseType.class);
 
-        RequestSecurityTokenResponseType securityResponse =
-            response.readEntity(RequestSecurityTokenResponseType.class);
-
-        StatusType status = null;
-        for (Object obj : securityResponse.getAny()) {
-            if (obj instanceof JAXBElement<?>) {
-                JAXBElement<?> jaxbElement = (JAXBElement<?>)obj;
-                if ("Status".equals(jaxbElement.getName().getLocalPart())) {
-                    status = (StatusType)jaxbElement.getValue();
-                    break;
-                }
-            }
-        }
-        assertNotNull(status);
-
-        // Check the token was valid
-        String validCode = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/status/valid";
-        assertEquals(validCode, status.getCode());
+        assertTrue(getValidationStatus(securityResponse));
 
         // Check the token
         RequestedSecurityTokenType requestedSecurityToken = getRequestedSecurityToken(securityResponse);
-        assertNotNull(requestedSecurityToken);
 
         String token = ((Element)requestedSecurityToken.getAny()).getTextContent();
-        assertNotNull(token);
-
-        validateJWTToken(token, null);
-
-        bus.shutdown(true);
+        validateJWTToken(token);
     }
 
     @org.junit.Test
     public void testValidateJWTAndIssueSAML() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.accept("text/plain");
-        client.path("jwt");
+        WebClient client = webClient()
+            .path("jwt")
+            .accept(MediaType.TEXT_PLAIN);
 
         // 1. Get a token via GET
-        Response response = client.get();
-        String token = response.readEntity(String.class);
+        String token = client.get(String.class);
         assertNotNull(token);
 
         // 2. Now validate it in the STS using POST
-        client = WebClient.create(address, busFile.toString());
-
-        client.type("application/xml").accept("application/xml");
-        client.query("action", "validate");
+        client = webClient()
+            .query("action", "validate")
+            .type(MediaType.APPLICATION_XML)
+            .accept(MediaType.APPLICATION_XML);
 
         // Create RequestSecurityToken
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
-        String namespace = STSUtils.WST_NS_05_12;
-        writer.writeStartElement("wst", "RequestSecurityToken", namespace);
-        writer.writeNamespace("wst", namespace);
+        writer.writeStartElement("wst", "RequestSecurityToken", WST_NS_05_12);
 
-        writer.writeStartElement("wst", "RequestType", namespace);
-        writer.writeCharacters(namespace + "/Validate");
+        writer.writeStartElement("wst", "RequestType", WST_NS_05_12);
+        writer.writeCharacters(WST_NS_05_12 + "/Validate");
         writer.writeEndElement();
 
-        writer.writeStartElement("wst", "TokenType", namespace);
+        writer.writeStartElement("wst", "TokenType", WST_NS_05_12);
         writer.writeCharacters(SAML2_TOKEN_TYPE);
         writer.writeEndElement();
 
-        writer.writeStartElement("wst", "ValidateTarget", namespace);
-        writer.writeStartElement(null, "TokenWrapper", null);
+        writer.writeStartElement("wst", "ValidateTarget", WST_NS_05_12);
+        writer.writeStartElement("TokenWrapper");
         writer.writeCharacters(token);
         writer.writeEndElement();
         writer.writeEndElement();
 
         writer.writeEndElement();
 
-        response = client.post(new DOMSource(writer.getDocument().getDocumentElement()));
+        RequestSecurityTokenResponseType securityResponse = client.post(
+            new DOMSource(writer.getDocument().getDocumentElement()),
+            RequestSecurityTokenResponseType.class);
 
-        RequestSecurityTokenResponseType securityResponse =
-            response.readEntity(RequestSecurityTokenResponseType.class);
-
-        StatusType status = null;
-        for (Object obj : securityResponse.getAny()) {
-            if (obj instanceof JAXBElement<?>) {
-                JAXBElement<?> jaxbElement = (JAXBElement<?>)obj;
-                if ("Status".equals(jaxbElement.getName().getLocalPart())) {
-                    status = (StatusType)jaxbElement.getValue();
-                    break;
-                }
-            }
-        }
-        assertNotNull(status);
-
-        // Check the token was valid
-        String validCode = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/status/valid";
-        assertEquals(validCode, status.getCode());
+        assertTrue(getValidationStatus(securityResponse));
 
         // Check the token
         validateSAMLSecurityTokenResponse(securityResponse, true);
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testIssueJWTTokenXMLWrapper() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+        WebClient client = webClient()
+            .path("jwt")
+            .accept(MediaType.APPLICATION_XML);
 
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.accept("application/xml");
-        client.path("jwt");
-
-        Response response = client.get();
-        Document assertionDoc = response.readEntity(Document.class);
+        Document assertionDoc = client.get(Document.class);
         assertNotNull(assertionDoc);
 
         // Discard XML wrapper
-        validateJWTToken(assertionDoc.getDocumentElement().getFirstChild().getTextContent(), null);
+        validateJWTToken(assertionDoc.getDocumentElement().getFirstChild().getTextContent());
     }
 
     @org.junit.Test
     public void testIssueJWTTokenJSONWrapper() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+        WebClient client = webClient()
+            .path("jwt")
+            .accept(MediaType.APPLICATION_JSON);
 
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.accept("application/json");
-        client.path("jwt");
-
-        client.get();
+        String token = new ObjectMapper().readTree(client.get(InputStream.class)).get("token").asText();
+        validateJWTToken(token);
     }
 
     @org.junit.Test
     public void testDefaultSAMLFormat() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+        WebClient client = webClient()
+            .path("saml")
+            .accept(MediaType.WILDCARD);
 
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.accept("*");
-        client.path("saml");
-
-        Response response = client.get();
         // It should be XML
-        Document doc = response.readEntity(Document.class);
+        Document doc = client.get(Document.class);
         assertNotNull(doc);
     }
 
     @org.junit.Test
     public void testDefaultJWTFormat() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+        WebClient client = webClient()
+            .path("jwt")
+            .accept(MediaType.WILDCARD);
 
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.accept("*");
-        client.path("jwt");
-
-        Response response = client.get();
         // It should be XML
-        Document doc = response.readEntity(Document.class);
+        Document doc = client.get(Document.class);
         assertNotNull(doc);
     }
 
     @org.junit.Test
     public void testIssueSAMLTokenWithWrongAcceptType() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.accept("application/json");
-        client.path("saml2.0");
+        WebClient client = webClient()
+            .path("saml2.0")
+            .accept(MediaType.APPLICATION_JSON);
 
         Response response = client.get();
         try {
@@ -1269,19 +772,15 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             // expected
         }
-
-        bus.shutdown(true);
     }
 
-    private Element validateSAMLSecurityTokenResponse(
+    private static Element validateSAMLSecurityTokenResponse(
         RequestSecurityTokenResponseType securityResponse, boolean saml2
     ) throws Exception {
         RequestedSecurityTokenType requestedSecurityToken = getRequestedSecurityToken(securityResponse);
-        assertNotNull(requestedSecurityToken);
 
         // Process the token
-        List<WSSecurityEngineResult> results =
-            processToken((Element)requestedSecurityToken.getAny());
+        List<WSSecurityEngineResult> results = processToken((Element) requestedSecurityToken.getAny());
 
         assertTrue(results != null && results.size() == 1);
         SamlAssertionWrapper assertion =
@@ -1297,7 +796,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         return (Element)results.get(0).get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
     }
 
-    private RequestedSecurityTokenType getRequestedSecurityToken(RequestSecurityTokenResponseType securityResponse) {
+    private static RequestedSecurityTokenType getRequestedSecurityToken(
+        RequestSecurityTokenResponseType securityResponse) {
         for (Object obj : securityResponse.getAny()) {
             if (obj instanceof JAXBElement<?>) {
                 JAXBElement<?> jaxbElement = (JAXBElement<?>)obj;
@@ -1306,47 +806,76 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
                 }
             }
         }
+        fail("RequestedSecurityToken missing");
         return null;
     }
 
-    private List<WSSecurityEngineResult> processToken(Element assertionElement)
+    private static SamlAssertionWrapper validateSAMLToken(Document assertionDoc)
         throws Exception {
-        RequestData requestData = new RequestData();
-        requestData.setDisableBSPEnforcement(true);
-        CallbackHandler callbackHandler = new org.apache.cxf.systest.sts.common.CommonCallbackHandler();
-        requestData.setCallbackHandler(callbackHandler);
-        Crypto crypto = CryptoFactory.getInstance("serviceKeystore.properties");
-        requestData.setDecCrypto(crypto);
-        requestData.setSigVerCrypto(crypto);
-        requestData.setWsDocInfo(new WSDocInfo(assertionElement.getOwnerDocument()));
+        assertNotNull(assertionDoc);
+        List<WSSecurityEngineResult> results = processToken(assertionDoc.getDocumentElement());
+        assertTrue(results != null && results.size() == 1);
 
-        Processor processor = new SAMLTokenProcessor();
-        return processor.handleToken(assertionElement, requestData);
+        SamlAssertionWrapper assertion =
+            (SamlAssertionWrapper) results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertNotNull(assertion);
+        assertTrue(assertion.isSigned());
+
+        return assertion;
     }
 
-    private void validateJWTToken(String token, String audience)
-        throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
+    private static List<WSSecurityEngineResult> processToken(Element assertionElement)
+        throws Exception {
+        RequestData requestData = new RequestData();
+//        requestData.setDisableBSPEnforcement(true);
+        requestData.setCallbackHandler(new org.apache.cxf.systest.sts.common.CommonCallbackHandler());
+        requestData.setDecCrypto(serviceCrypto);
+//        requestData.setSigVerCrypto(serviceCrypto);
+        requestData.setWsDocInfo(new WSDocInfo(assertionElement.getOwnerDocument()));
+
+        return new SAMLTokenProcessor().handleToken(assertionElement, requestData);
+    }
+
+    private static JwtToken validateJWTToken(String token)
+        throws Exception {
+        assertNotNull(token);
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
 
         // Validate claims
-        assertEquals("DoubleItSTSIssuer", jwt.getClaim(JwtConstants.CLAIM_ISSUER));
-        if (audience != null) {
-            @SuppressWarnings("unchecked")
-            List<String> audiences = (List<String>)jwt.getClaim(JwtConstants.CLAIM_AUDIENCE);
-            assertEquals(1, audiences.size());
-            assertEquals(audience, audiences.get(0));
+        assertEquals("DoubleItSTSIssuer", jwt.getClaims().getIssuer());
+        assertNotNull(jwt.getClaims().getExpiryTime());
+        assertNotNull(jwt.getClaims().getIssuedAt());
+
+        CryptoType alias = new CryptoType(CryptoType.TYPE.ALIAS);
+        alias.setAlias("mystskey");
+        X509Certificate stsCertificate = serviceCrypto.getX509Certificates(alias)[0];
+        assertTrue(jwtConsumer.verifySignatureWith(stsCertificate, SignatureAlgorithm.RS256));
+
+        return jwt;
+    }
+
+    private static boolean getValidationStatus(RequestSecurityTokenResponseType securityResponse) {
+        for (Object obj : securityResponse.getAny()) {
+            if (obj instanceof JAXBElement<?>) {
+                JAXBElement<?> jaxbElement = (JAXBElement<?>)obj;
+                if ("Status".equals(jaxbElement.getName().getLocalPart())) {
+                    return (WST_NS_05_12 + "/status/valid").equals(
+                        ((StatusType)jaxbElement.getValue()).getCode());
+                }
+            }
         }
-        assertNotNull(jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
-        assertNotNull(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
+        fail("Status missing");
+        return false;
+    }
 
-        KeyStore keystore = KeyStore.getInstance("JKS");
-        keystore.load(Loader.getResource("keys/servicestore.jks").openStream(), "sspass".toCharArray());
-        Certificate cert = keystore.getCertificate("mystskey");
-        assertNotNull(cert);
+    private WebClient webClient() throws Exception {
+        closeClient();
 
-        assertTrue(jwtConsumer.verifySignatureWith((X509Certificate)cert,
-                                                          SignatureAlgorithm.RS256));
+        webClient = WebClient.create("https://localhost:" + STSPORT + "/SecurityTokenService/token");
+        webClient.getConfiguration().getHttpConduit()
+            .setTlsClientParameters(TLSClientParametersUtils.getTLSClientParameters());
+        return webClient;
     }
 
 }

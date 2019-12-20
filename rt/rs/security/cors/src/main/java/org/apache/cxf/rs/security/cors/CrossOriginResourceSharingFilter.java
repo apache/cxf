@@ -343,7 +343,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
 
         Message m = JAXRSUtils.getCurrentMessage();
         String op = (String)m.getExchange().get(CrossOriginResourceSharingFilter.class.getName());
-        if (op == null || op == PREFLIGHT_FAILED) {
+        if (op == null || PREFLIGHT_FAILED.equals(op)) {
             return;
         }
         if (responseContext.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()

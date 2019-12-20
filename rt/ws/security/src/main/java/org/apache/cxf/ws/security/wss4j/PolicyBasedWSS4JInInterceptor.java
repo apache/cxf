@@ -486,10 +486,10 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                     for (AssertionInfo algorithmSuite : algorithmSuites) {
                         AlgorithmSuite algSuite = (AlgorithmSuite)algorithmSuite.getAssertion();
                         if (asymSignatureAlgorithm != null) {
-                            algSuite.setAsymmetricSignature(asymSignatureAlgorithm);
+                            algSuite.getAlgorithmSuiteType().setAsymmetricSignature(asymSignatureAlgorithm);
                         }
                         if (symSignatureAlgorithm != null) {
-                            algSuite.setSymmetricSignature(symSignatureAlgorithm);
+                            algSuite.getAlgorithmSuiteType().setSymmetricSignature(symSignatureAlgorithm);
                         }
                     }
                 }

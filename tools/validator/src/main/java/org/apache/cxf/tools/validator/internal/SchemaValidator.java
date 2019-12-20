@@ -24,7 +24,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -114,8 +113,7 @@ public class SchemaValidator extends AbstractDefinitionValidator {
             throw new ToolException(e);
         }
 
-        String systemId = null;
-        systemId = URIParserUtil.getAbsoluteURI(wsdlsource);
+        String systemId = URIParserUtil.getAbsoluteURI(wsdlsource);
         InputSource is = new InputSource(systemId);
 
         return validate(is, schemas);
@@ -127,7 +125,7 @@ public class SchemaValidator extends AbstractDefinitionValidator {
 
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         sf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
-        sf.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file");
+        sf.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file,http,https");
         SchemaResourceResolver resourceResolver = new SchemaResourceResolver();
 
         sf.setResourceResolver(resourceResolver);
@@ -392,34 +390,17 @@ class SchemaResourceResolver implements LSResourceResolver {
             resURL = namespaceURI;
         }
 
-        if (resURL != null && resURL.startsWith("http://")) {
-            String filename = NSFILEMAP.get(resURL);
-            if (filename != null) {
-                localFile = ToolConstants.CXF_SCHEMAS_DIR_INJAR + filename;
-            } else {
-                URL url;
-                URLConnection urlCon = null;
-                try {
-                    url = new URL(resURL);
-                    urlCon = url.openConnection();
-                    urlCon.setUseCaches(false);
-                    lsin = new LSInputImpl();
-                    lsin.setSystemId(resURL);
-                    lsin.setByteStream(urlCon.getInputStream());
-                    msg = new Message("RESOLVE_FROM_REMOTE", LOG, url);
-                    LOG.log(Level.FINE, msg.toString());
-                    return lsin;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-        } else if (resURL != null && !resURL.startsWith("http:")) {
-            localFile = resURL;
-        }  else {
+        if (resURL == null) {
             return null;
         }
 
+        localFile = resURL;
+        if (resURL.startsWith("http://")) {
+            String filename = NSFILEMAP.get(resURL);
+            if (filename != null) {
+                localFile = ToolConstants.CXF_SCHEMAS_DIR_INJAR + filename;
+            }
+        }
 
         URIResolver resolver;
         try {

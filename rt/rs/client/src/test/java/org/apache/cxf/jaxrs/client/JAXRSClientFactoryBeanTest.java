@@ -19,20 +19,25 @@
 
 package org.apache.cxf.jaxrs.client;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.ProxyClassLoader;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
-import org.apache.cxf.feature.Feature;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorProvider;
+import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.impl.ResponseImpl;
 import org.apache.cxf.jaxrs.model.UserOperation;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.resources.Book;
@@ -179,9 +184,7 @@ public class JAXRSClientFactoryBeanTest {
         bean.setAddress("http://bar");
         bean.setResourceClass(BookStoreSubresourcesOnly.class);
         TestFeature testFeature = new TestFeature();
-        List<Feature> features = new ArrayList<>();
-        features.add(testFeature);
-        bean.setFeatures(features);
+        bean.setFeatures(Collections.singletonList(testFeature));
 
         BookStoreSubresourcesOnly store = bean.create(BookStoreSubresourcesOnly.class, 1, 2, 3);
         assertTrue("TestFeature wasn't initialized", testFeature.isInitialized());
@@ -199,6 +202,25 @@ public class JAXRSClientFactoryBeanTest {
         assertNotNull(parts);
         IProductResource productResourceElement = parts.elementAt("1");
         assertNotNull(productResourceElement);
+    }
+
+    @Test
+    public void testVoidResponseAcceptWildcard() throws Exception {
+        String address = "local://store";
+        JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
+        sf.setServiceBean(new BookStore());
+        sf.setAddress(address);
+        Server s = sf.create(); 
+
+        BookStore store = JAXRSClientFactory.create(address, BookStore.class);
+        store.addBook(new Book());
+
+        s.stop();
+
+        ResponseImpl response = (ResponseImpl) WebClient.client(store).getResponse();
+        Map<String, List<String>> headers =
+            CastUtils.cast((Map<?, ?>) response.getOutMessage().get(Message.PROTOCOL_HEADERS));
+        assertTrue(headers.get(HttpHeaders.ACCEPT).contains(MediaType.WILDCARD));
     }
 
     @Test(expected = IllegalArgumentException.class)

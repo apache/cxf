@@ -56,7 +56,7 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
     private static final long serialVersionUID = -2437897227486327166L;
     private static final String IGNORE_SERVLET_CONTEXT_RESOLVER = "ignore.servlet.context.resolver";
     private static final String DEFAULT_TRANSPORT_ID = "http://cxf.apache.org/transports/http/configuration";
-    
+
     protected Bus bus;
     private DestinationRegistry destinationRegistry;
     private boolean globalRegistry;
@@ -70,12 +70,21 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
     public CXFNonSpringServlet(DestinationRegistry destinationRegistry) {
         this(destinationRegistry, true);
     }
+
     public CXFNonSpringServlet(DestinationRegistry destinationRegistry,
                                boolean loadBus) {
         this.destinationRegistry = destinationRegistry;
         this.globalRegistry = destinationRegistry != null;
         this.loadBus = loadBus;
     }
+
+    public CXFNonSpringServlet(DestinationRegistry destinationRegistry, Bus bus) {
+        this.destinationRegistry = destinationRegistry;
+        this.globalRegistry = destinationRegistry != null;
+        this.bus = bus;
+        this.loadBus = false;
+    }
+
     @Override
     public void init(ServletConfig sc) throws ServletException {
         super.init(sc);
@@ -93,11 +102,11 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
         this.controller = createServletController(sc);
         finalizeServletInit(sc);
     }
-    
+
     @Override
     protected void finalizeServletInit(ServletConfig servletConfig) throws ServletException {
         super.finalizeServletInit(servletConfig);
-        
+
         if (this.destinationRegistry instanceof ServletConfigAware) {
             ((ServletConfigAware)this.destinationRegistry).onServletConfigAvailable(servletConfig);
         }
@@ -120,17 +129,17 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
         DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
         try {
             String peferredTransportId = transportId;
-            
+
             // Check if the preferred transport is set on a bus level (f.e., from any
             // extension or customization).
             if (StringUtils.isEmpty(peferredTransportId) && getBus() != null) {
                 peferredTransportId = (String)getBus().getProperty(AbstractTransportFactory.PREFERRED_TRANSPORT_ID);
             }
-            
+
             if (StringUtils.isEmpty(peferredTransportId)) {
                 final Set<String> candidates = dfm.getRegisteredDestinationFactoryNames();
-                
-                // If the default transport is present, fall back to it and don't even 
+
+                // If the default transport is present, fall back to it and don't even
                 // consider other candidates
                 if (!candidates.contains(DEFAULT_TRANSPORT_ID)) {
                     peferredTransportId = candidates
@@ -140,7 +149,7 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
                         .orElse(DEFAULT_TRANSPORT_ID);
                 }
             }
-            
+
             DestinationFactory df = StringUtils.isEmpty(peferredTransportId)
                 ? dfm.getDestinationFactory(DEFAULT_TRANSPORT_ID)
                     : dfm.getDestinationFactory(peferredTransportId);

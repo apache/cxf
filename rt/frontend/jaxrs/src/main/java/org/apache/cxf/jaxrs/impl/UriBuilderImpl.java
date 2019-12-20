@@ -39,13 +39,15 @@ import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriBuilderException;
 
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 public class UriBuilderImpl extends UriBuilder implements Cloneable {
-
+    private static final String EXPAND_QUERY_VALUE_AS_COLLECTION = "expand.query.value.as.collection";
+    
     private String scheme;
     private String userInfo;
     private int port = -1;
@@ -61,11 +63,20 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     private Map<String, Object> resolvedTemplates;
     private Map<String, Object> resolvedTemplatesPathEnc;
     private Map<String, Object> resolvedEncodedTemplates;
-
+    
+    private boolean queryValueIsCollection;
+    
     /**
      * Creates builder with empty URI.
      */
     public UriBuilderImpl() {
+    }
+
+    /**
+     * Creates builder with empty URI and properties
+     */
+    public UriBuilderImpl(Map<String, Object> properties) {
+        queryValueIsCollection = PropertyUtils.isTrue(properties, EXPAND_QUERY_VALUE_AS_COLLECTION);
     }
 
     /**
@@ -425,6 +436,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         builder.schemeSpecificPart = schemeSpecificPart;
         builder.leadingSlash = leadingSlash;
         builder.originalPathEmpty = originalPathEmpty;
+        builder.queryValueIsCollection = queryValueIsCollection;
         builder.resolvedEncodedTemplates =
             resolvedEncodedTemplates == null ? null : new HashMap<String, Object>(resolvedEncodedTemplates);
         builder.resolvedTemplates =
@@ -842,26 +854,61 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         StringBuilder b = new StringBuilder();
         for (Iterator<Map.Entry<String, List<String>>> it = map.entrySet().iterator(); it.hasNext();) {
             Map.Entry<String, List<String>> entry = it.next();
-            for (Iterator<String> sit = entry.getValue().iterator(); sit.hasNext();) {
-                String val = sit.next();
-                b.append(entry.getKey());
-                if (val != null) {
-                    boolean templateValue = val.startsWith("{") && val.endsWith("}");
-                    if (!templateValue) {
-                        val = HttpUtils.encodePartiallyEncoded(val, isQuery);
-                        if (!isQuery) {
-                            val = val.replaceAll("/", "%2F");
+            
+            // Expand query parameter as "name=v1,v2,v3" 
+            if (isQuery && queryValueIsCollection) {
+                b.append(entry.getKey()).append('=');
+                
+                for (Iterator<String> sit = entry.getValue().iterator(); sit.hasNext();) {
+                    String val = sit.next();
+                    
+                    if (val != null) {
+                        boolean templateValue = val.startsWith("{") && val.endsWith("}");
+                        if (!templateValue) {
+                            val = HttpUtils.encodePartiallyEncoded(val, isQuery);
+                            if (!isQuery) {
+                                val = val.replaceAll("/", "%2F");
+                            }
+                        } else {
+                            val = URITemplate.createExactTemplate(val).encodeLiteralCharacters(isQuery);
                         }
-                    } else {
-                        val = URITemplate.createExactTemplate(val).encodeLiteralCharacters(isQuery);
+                        
+                        if (!val.isEmpty()) {
+                            b.append(val);
+                        }
                     }
-                    b.append('=');
-                    if (!val.isEmpty()) {
-                        b.append(val);
+                    if (sit.hasNext()) {
+                        b.append(',');
                     }
                 }
-                if (sit.hasNext() || it.hasNext()) {
+                
+                if (it.hasNext()) {
                     b.append(separator);
+                }
+            } else {
+                // Expand query parameter as "name=v1&name=v2&name=v3", or use dedicated 
+                // separator for matrix parameters
+                for (Iterator<String> sit = entry.getValue().iterator(); sit.hasNext();) {
+                    String val = sit.next();
+                    b.append(entry.getKey());
+                    if (val != null) {
+                        boolean templateValue = val.startsWith("{") && val.endsWith("}");
+                        if (!templateValue) {
+                            val = HttpUtils.encodePartiallyEncoded(val, isQuery);
+                            if (!isQuery) {
+                                val = val.replaceAll("/", "%2F");
+                            }
+                        } else {
+                            val = URITemplate.createExactTemplate(val).encodeLiteralCharacters(isQuery);
+                        }
+                        b.append('=');
+                        if (!val.isEmpty()) {
+                            b.append(val);
+                        }
+                    }
+                    if (sit.hasNext() || it.hasNext()) {
+                        b.append(separator);
+                    }
                 }
             }
         }

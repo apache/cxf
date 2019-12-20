@@ -152,6 +152,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                         safeRollBack();
                     }
                 } catch (Throwable e) {
+                    safeRollBack();
                     handleException(e);
                 }
             }
@@ -209,7 +210,9 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
             wrapped = new JMSException("Wrapped exception. " + e.getMessage());
             wrapped.addSuppressed(e);
         }
-        this.exceptionListener.onException(wrapped);
+        if (this.exceptionListener != null) {
+            this.exceptionListener.onException(wrapped);
+        }
     }
 
     private boolean isReply() {
@@ -239,10 +242,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
 
     @Override
     public void stop() {
-        LOG.fine("Shuttting down " + this.getClass().getSimpleName());
-        if (!running) {
-            return;
-        }
+        LOG.fine("Shutting down " + this.getClass().getSimpleName());
         running = false;
         super.stop();
     }

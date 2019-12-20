@@ -86,10 +86,7 @@ public class DefaultLogEventMapper {
         Map<String, String> headerMap = getHeaders(message);
         event.setHeaders(headerMap);
 
-        String uri = getUri(message);
-        if (uri != null) {
-            event.setAddress(uri);
-        }
+        event.setAddress(getAddress(message, event));
 
         event.setPrincipal(getPrincipal(message));
         event.setBinaryContent(isBinaryContent(message));
@@ -155,6 +152,19 @@ public class DefaultLogEventMapper {
         return result;
     }
 
+    private String getAddress(Message message, LogEvent event) {
+        final Message observedMessage;
+        if (event.getType() == EventType.RESP_IN) {
+            observedMessage = message.getExchange().getOutMessage();
+        } else if (event.getType() == EventType.RESP_OUT) {
+            observedMessage = message.getExchange().getInMessage();
+        } else {
+            observedMessage = message;
+        }
+
+        return getUri(observedMessage);
+    }
+
     private String getUri(Message message) {
         String uri = safeGet(message, Message.REQUEST_URL);
         if (uri == null) {
@@ -163,7 +173,7 @@ public class DefaultLogEventMapper {
             if (uri != null && uri.startsWith("/")) {
                 if (address != null && !address.startsWith(uri)) {
                     if (address.endsWith("/") && address.length() > 1) {
-                        address = address.substring(0, address.length());
+                        address = address.substring(0, address.length() - 1);
                     }
                     uri = address + uri;
                 }

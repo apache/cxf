@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs.websocket;
 
+import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -27,10 +28,12 @@ import org.junit.BeforeClass;
 /**
  * JAXRSClientServerWebSocket test with jaxrs:server using the embedded jetty server.
  */
-public class JAXRSClientServerWebSocketSpringTest extends JAXRSClientServerWebSocketTest {
+public class JAXRSClientServerWebSocketSpringTest extends AbstractJAXRSClientServerWebSocketTest {
     private static final String PORT = BookServerWebSocket.PORT_SPRING;
+
     @BeforeClass
     public static void startServers() throws Exception {
+        AbstractResourceInfo.clearAllMaps();
 
         @SuppressWarnings({ "unused", "resource" })
         ApplicationContext appctxt =

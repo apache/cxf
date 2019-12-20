@@ -44,6 +44,7 @@
         <module>security</module>
         <module>sse</module>
         <module>description-openapi-v3</module>
+        <module>description-microprofile-openapi</module>
         <module>description-swagger-ui</module>
         <module>microprofile-client</module>
         <module>description-common-openapi</module>

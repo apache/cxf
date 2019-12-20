@@ -144,6 +144,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
 
         setTransportId(transportId);
 
+        //EndpointInfo ei = new EndpointInfo(service.getServiceInfos().get(0), transportId);
         EndpointInfo ei = new EndpointInfo();
         ei.setTransportId(transportId);
         ei.setName(serviceFactory.getService().getName());

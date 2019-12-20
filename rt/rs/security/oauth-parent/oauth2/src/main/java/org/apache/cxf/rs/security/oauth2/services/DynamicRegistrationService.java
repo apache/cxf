@@ -31,7 +31,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 
@@ -39,7 +41,9 @@ import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.ClientRegistrationProvider;
 import org.apache.cxf.rs.security.oauth2.utils.AuthorizationUtils;
@@ -81,13 +85,13 @@ public class DynamicRegistrationService {
         }
 
     }
-    
+
 
     protected void checkSecurityContext() {
         SecurityContext sc = mc.getSecurityContext();
         if (sc.getUserPrincipal() == null) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
-        }  
+        }
         if (userRole != null && !sc.isUserInRole(userRole)) {
             throw ExceptionUtils.toForbiddenException(null, null);
         }
@@ -198,7 +202,7 @@ public class DynamicRegistrationService {
                 }
             }
         }
-        
+
         return reg;
     }
 
@@ -236,10 +240,10 @@ public class DynamicRegistrationService {
         if (grantTypes == null) {
             grantTypes = Collections.singletonList(OAuthConstants.AUTHORIZATION_CODE_GRANT);
         }
-        
+
         String tokenEndpointAuthMethod = request.getTokenEndpointAuthMethod();
         //TODO: default is expected to be set to OAuthConstants.TOKEN_ENDPOINT_AUTH_BASIC
-        
+
         boolean passwordRequired = isPasswordRequired(grantTypes, tokenEndpointAuthMethod);
 
         // Application Type
@@ -255,7 +259,7 @@ public class DynamicRegistrationService {
 
         // Client Secret
         String clientSecret = passwordRequired ? generateClientSecret(request) : null;
-            
+
         Client newClient = new Client(clientId, clientSecret, isConfidential, clientName);
 
         newClient.setAllowedGrantTypes(grantTypes);
@@ -272,7 +276,7 @@ public class DynamicRegistrationService {
             }
         }
         // Client Registration Time
-        newClient.setRegisteredAt(System.currentTimeMillis() / 1000);
+        newClient.setRegisteredAt(System.currentTimeMillis() / 1000L);
 
         // Client Redirect URIs
         List<String> redirectUris = request.getRedirectUris();
@@ -281,6 +285,15 @@ public class DynamicRegistrationService {
                 validateRequestUri(uri, appType, grantTypes);
             }
             newClient.setRedirectUris(redirectUris);
+        }
+
+        if (newClient.getRedirectUris().isEmpty()
+            && (grantTypes.contains(OAuthConstants.AUTHORIZATION_CODE_GRANT)
+                || grantTypes.contains(OAuthConstants.IMPLICIT_GRANT))) {
+            // Throw an error as we need a redirect URI for these grants.
+            OAuthError error =
+                new OAuthError(OAuthConstants.INVALID_REQUEST, "A Redirection URI is required");
+            reportInvalidRequestError(error);
         }
 
         // Client Resource Audience URIs
@@ -314,7 +327,7 @@ public class DynamicRegistrationService {
             UserSubject subject = new UserSubject(sc.getUserPrincipal().getName());
             newClient.setResourceOwnerSubject(subject);
         }
-        
+
         newClient.setRegisteredDynamically(true);
         return newClient;
     }
@@ -326,7 +339,7 @@ public class DynamicRegistrationService {
         if (tokenEndpointAuthMethod == null) {
             return true;
         }
-        
+
         return !OAuthConstants.TOKEN_ENDPOINT_AUTH_NONE.equals(tokenEndpointAuthMethod)
             && (OAuthConstants.TOKEN_ENDPOINT_AUTH_BASIC.equals(tokenEndpointAuthMethod)
                 || OAuthConstants.TOKEN_ENDPOINT_AUTH_POST.equals(tokenEndpointAuthMethod));
@@ -369,7 +382,7 @@ public class DynamicRegistrationService {
                     Collections.singleton(OAuthConstants.BEARER_AUTHORIZATION_SCHEME))[1];
     }
     protected int getClientSecretSizeInBytes(ClientRegistration request) {
-        return 16;
+        return 32;
     }
 
     @Context
@@ -387,5 +400,17 @@ public class DynamicRegistrationService {
 
     public void setUserRole(String userRole) {
         this.userRole = userRole;
+    }
+
+    private void reportInvalidRequestError(OAuthError entity) {
+        reportInvalidRequestError(entity, MediaType.APPLICATION_JSON_TYPE);
+    }
+
+    private void reportInvalidRequestError(OAuthError entity, MediaType mt) {
+        ResponseBuilder rb = JAXRSUtils.toResponseBuilder(400);
+        if (mt != null) {
+            rb.type(mt);
+        }
+        throw ExceptionUtils.toBadRequestException(null, rb.entity(entity).build());
     }
 }

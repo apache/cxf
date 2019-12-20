@@ -28,8 +28,7 @@
     <artifactId>org.apache.cxf.osgi.itests</artifactId>
     <name>Apache CXF :: OSGi :: Integration Tests</name>
     <packaging>jar</packaging>
-    <properties>
-    </properties>
+    
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -50,7 +49,7 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-client</artifactId>
             <version>${project.version}</version>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-testutils</artifactId>
@@ -143,7 +142,6 @@
             <version>${cxf.pax.exam.version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam</artifactId>

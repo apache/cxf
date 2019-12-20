@@ -315,8 +315,7 @@ public final class KeyManagementUtils {
         if (keyStorePswd == null) {
             throw new JoseException("No keystore password was defined");
         }
-        try {
-            InputStream is = JoseUtils.getResourceStream(keyStoreLoc, bus);
+        try (InputStream is = JoseUtils.getResourceStream(keyStoreLoc, bus)) {
             return CryptoUtils.loadKeyStore(is, keyStorePswd.toCharArray(), keyStoreType);
         } catch (Exception ex) {
             LOG.warning("Key store can not be loaded");

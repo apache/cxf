@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import javax.ws.rs.ApplicationPath;
 
@@ -43,7 +45,6 @@ import io.swagger.v3.jaxrs2.Reader;
 import io.swagger.v3.oas.integration.api.OpenAPIConfiguration;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
-import io.swagger.v3.oas.models.PathItem.HttpMethod;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.servers.Server;
@@ -51,15 +52,15 @@ import io.swagger.v3.oas.models.tags.Tag;
 
 public class OpenApiCustomizer {
 
-    private boolean dynamicBasePath;
+    protected boolean dynamicBasePath;
 
-    private boolean replaceTags;
+    protected boolean replaceTags;
 
-    private DocumentationProvider javadocProvider;
+    protected DocumentationProvider javadocProvider;
 
-    private List<ClassResourceInfo> cris;
+    protected List<ClassResourceInfo> cris;
 
-    private String applicationPath;
+    protected String applicationPath;
 
     public OpenAPIConfiguration customize(final OpenAPIConfiguration configuration) {
         if (configuration == null) {
@@ -85,6 +86,23 @@ public class OpenApiCustomizer {
         return configuration;
     }
 
+    protected String extractJavadoc(final Operation operation, final OperationResourceInfo ori, final int paramIdx) {
+        String javadoc = null;
+        if (operation.getParameters().size() == ori.getParameters().size()) {
+            javadoc = javadocProvider.getMethodParameterDoc(ori, paramIdx);
+        } else {
+            for (int j = 0; j < ori.getParameters().size(); j++) {
+                if (Objects.equals(
+                        operation.getParameters().get(paramIdx).getName(),
+                        ori.getParameters().get(j).getName())) {
+
+                    javadoc = javadocProvider.getMethodParameterDoc(ori, j);
+                }
+            }
+        }
+        return javadoc;
+    }
+
     public void customize(final OpenAPI oas) {
         if (replaceTags || javadocProvider != null) {
             Map<String, ClassResourceInfo> operations = new HashMap<>();
@@ -101,51 +119,53 @@ public class OpenApiCustomizer {
 
             List<Tag> tags = new ArrayList<>();
             oas.getPaths().forEach((pathKey, pathItem) -> {
-                Tag tag = null;
+                Optional<Tag> tag;
                 if (replaceTags && operations.containsKey(pathKey)) {
                     ClassResourceInfo cri = operations.get(pathKey);
 
-                    tag = new Tag();
-                    tag.setName(cri.getURITemplate().getValue().replaceAll("/", "_"));
+                    tag = Optional.of(new Tag());
+                    tag.get().setName(cri.getURITemplate().getValue().replaceAll("/", "_"));
                     if (javadocProvider != null) {
-                        tag.setDescription(javadocProvider.getClassDoc(cri));
+                        tag.get().setDescription(javadocProvider.getClassDoc(cri));
                     }
 
-                    if (!tags.contains(tag)) {
-                        tags.add(tag);
+                    if (!tags.contains(tag.get())) {
+                        tags.add(tag.get());
                     }
+                } else {
+                    tag = Optional.empty();
                 }
 
-                for (Map.Entry<HttpMethod, Operation> subentry : pathItem.readOperationsMap().entrySet()) {
-                    if (replaceTags && tag != null) {
-                        subentry.getValue().setTags(Collections.singletonList(tag.getName()));
+                pathItem.readOperationsMap().forEach((method, operation) -> {
+                    if (replaceTags && tag.isPresent()) {
+                        operation.setTags(Collections.singletonList(tag.get().getName()));
                     }
 
-                    Pair<String, String> key = Pair.of(subentry.getKey().name(), pathKey);
+                    Pair<String, String> key = Pair.of(method.name(), pathKey);
                     if (methods.containsKey(key) && javadocProvider != null) {
                         OperationResourceInfo ori = methods.get(key);
 
-                        if (StringUtils.isBlank(subentry.getValue().getSummary())) {
-                            subentry.getValue().setSummary(javadocProvider.getMethodDoc(ori));
+                        if (StringUtils.isBlank(operation.getSummary())) {
+                            operation.setSummary(javadocProvider.getMethodDoc(ori));
                         }
 
-                        if (subentry.getValue().getParameters() == null) {
+                        if (operation.getParameters() == null) {
                             List<Parameter> parameters = new ArrayList<>();
                             addParameters(parameters);
-                            subentry.getValue().setParameters(parameters);
-                        } else {
-                            for (int i = 0; i < subentry.getValue().getParameters().size(); i++) {
-                                if (StringUtils.isBlank(subentry.getValue().getParameters().get(i).getDescription())) {
-                                    subentry.getValue().getParameters().get(i).
-                                            setDescription(javadocProvider.getMethodParameterDoc(ori, i));
-                                }
-                            }
-                            addParameters(subentry.getValue().getParameters());
+                            operation.setParameters(parameters);
                         }
 
-                        customizeResponses(subentry.getValue(), ori);
+                        for (int i = 0; i < operation.getParameters().size(); i++) {
+                            if (StringUtils.isBlank(operation.getParameters().get(i).getDescription())) {
+                                operation.getParameters().get(i).setDescription(extractJavadoc(operation, ori, i));
+                            }
+                        }
+
+                        addParameters(operation.getParameters());
+
+                        customizeResponses(operation, ori);
                     }
-                }
+                });
             });
             if (replaceTags && oas.getTags() != null) {
                 oas.setTags(tags);
@@ -250,7 +270,7 @@ public class OpenApiCustomizer {
         }
     }
 
-    private MessageContext createMessageContext() {
+    protected MessageContext createMessageContext() {
         return JAXRSUtils.createContextValue(JAXRSUtils.getCurrentMessage(), null, MessageContext.class);
     }
 }

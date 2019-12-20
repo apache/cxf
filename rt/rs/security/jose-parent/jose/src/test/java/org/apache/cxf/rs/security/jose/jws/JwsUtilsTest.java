@@ -92,7 +92,7 @@ public class JwsUtilsTest {
             "org/apache/cxf/rs/security/jose/jws/alice.jks");
         p.put(JoseConstants.RSSEC_KEY_STORE_PSWD, "password");
         p.put(JoseConstants.RSSEC_KEY_STORE_ALIAS, "alice");
-        JsonWebKeys keySet = JwsUtils.loadPublicVerificationKeys(createMessage(), p);
+        JsonWebKeys keySet = JwsUtils.loadPublicVerificationKeys(createMessage(), p, true);
         assertEquals(1, keySet.asMap().size());
         List<JsonWebKey> keys = keySet.getRsaKeys();
         assertEquals(1, keys.size());
@@ -112,7 +112,7 @@ public class JwsUtilsTest {
         p.put(JoseConstants.RSSEC_KEY_STORE_PSWD, "password");
         p.put(JoseConstants.RSSEC_KEY_STORE_ALIAS, "alice");
         p.put(JoseConstants.RSSEC_SIGNATURE_INCLUDE_CERT, true);
-        JsonWebKeys keySet = JwsUtils.loadPublicVerificationKeys(createMessage(), p);
+        JsonWebKeys keySet = JwsUtils.loadPublicVerificationKeys(createMessage(), p, true);
         assertEquals(1, keySet.asMap().size());
         List<JsonWebKey> keys = keySet.getRsaKeys();
         assertEquals(1, keys.size());

@@ -38,7 +38,7 @@ public class Storage {
             throw new IOException("Unable to initialize FS storage:" + folder.getAbsolutePath());
         }
 
-        if (!folder.isDirectory() || !folder.canWrite() || !folder.canWrite()) {
+        if (!folder.isDirectory() || !folder.canWrite()) {
             throw new IOException("Unable to access FS storage:" + folder.getAbsolutePath());
         }
     }

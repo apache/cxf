@@ -27,6 +27,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 import javax.security.auth.kerberos.KerberosPrincipal;
@@ -55,6 +57,7 @@ import org.apache.wss4j.common.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
 
 /**
@@ -331,11 +334,18 @@ public class DefaultSubjectProvider implements SubjectProvider {
         // Create an EncryptedKey
         WSSecEncryptedKey encrKey = new WSSecEncryptedKey(doc);
         encrKey.setKeyIdentifierType(encryptionProperties.getKeyIdentifierType());
-        encrKey.setEphemeralKey(secret);
-        encrKey.setSymmetricEncAlgorithm(encryptionProperties.getEncryptionAlgorithm());
         encrKey.setUseThisCert(certificate);
         encrKey.setKeyEncAlgo(encryptionProperties.getKeyWrapAlgorithm());
-        encrKey.prepare(encryptionCrypto);
+
+        SecretKey symmetricKey = null;
+        if (secret != null) {
+            symmetricKey = KeyUtils.prepareSecretKey(encryptionProperties.getEncryptionAlgorithm(), secret);
+        } else {
+            KeyGenerator keyGen = KeyUtils.getKeyGenerator(encryptionProperties.getEncryptionAlgorithm());
+            symmetricKey = keyGen.generateKey();
+        }
+
+        encrKey.prepare(encryptionCrypto, symmetricKey);
         Element encryptedKeyElement = encrKey.getEncryptedKeyElement();
 
         // Append the EncryptedKey to a KeyInfo element

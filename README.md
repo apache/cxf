@@ -1,3 +1,7 @@
+[![Build Status](https://builds.apache.org/view/A-D/view/CXF/job/CXF-Trunk-JDK18/badge/icon?subject=Build)](https://builds.apache.org/view/A-D/view/CXF/job/CXF-Trunk-JDK18/)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.cxf/cxf/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.apache.cxf/cxf)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/apache/cxf)](https://lgtm.com/projects/g/apache/cxf/alerts/)
+
 Welcome to Apache CXF!
 ======================
 Apache CXF is an open source services framework. CXF helps you build and 

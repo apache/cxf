@@ -18,16 +18,12 @@
  */
 package org.apache.cxf.systest.sts.transport;
 
-import java.io.InputStream;
 import java.net.URL;
-import java.security.KeyStore;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.TrustManagerFactory;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -43,11 +39,11 @@ import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.DispatchImpl;
+import org.apache.cxf.systest.sts.TLSClientParametersUtils;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
@@ -210,22 +206,7 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         }
 
         // TLS configuration
-        TrustManagerFactory tmf =
-            TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        KeyManagerFactory kmf =
-            KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        final KeyStore ts = KeyStore.getInstance("JKS");
-        try (InputStream trustStore =
-            ClassLoaderUtils.getResourceAsStream("keys/clientstore.jks", TransportBindingTest.class)) {
-            ts.load(trustStore, "cspass".toCharArray());
-        }
-        tmf.init(ts);
-        kmf.init(ts, "ckpass".toCharArray());
-
-        TLSClientParameters tlsParams = new TLSClientParameters();
-        tlsParams.setTrustManagers(tmf.getTrustManagers());
-        tlsParams.setKeyManagers(kmf.getKeyManagers());
-        tlsParams.setDisableCNCheck(true);
+        TLSClientParameters tlsParams = TLSClientParametersUtils.getTLSClientParameters();
 
         Client client = ClientProxy.getClient(transportSaml2Port);
         HTTPConduit http = (HTTPConduit) client.getConduit();
@@ -234,6 +215,9 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         // STSClient configuration
         Bus clientBus = BusFactory.newInstance().createBus();
         STSClient stsClient = new STSClient(clientBus);
+
+        // HTTPS configuration for the STSClient
+        stsClient.setTlsClientParameters(tlsParams);
 
         // Use a local WSDL or else we run into problems retrieving the WSDL over HTTPS
         // due to lack of TLS config when creating the client
@@ -252,9 +236,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
 
         ((BindingProvider)transportSaml2Port).getRequestContext().put("security.sts.client", stsClient);
 
-        // Update ports + HTTPS configuration for the STSClient
+        // Update ports
         updateAddressPort(stsClient.getClient(), test.getStsPort());
-        ((HTTPConduit) stsClient.getClient().getConduit()).setTlsClientParameters(tlsParams);
 
         doubleIt(transportSaml2Port, 25);
 

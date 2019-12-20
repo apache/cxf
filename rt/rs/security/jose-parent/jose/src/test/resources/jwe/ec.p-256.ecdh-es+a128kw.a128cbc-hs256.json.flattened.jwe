@@ -1,0 +1,7 @@
+{
+  "protected": "eyJhbGciOiJFQ0RILUVTK0ExMjhLVyIsImVuYyI6IkExMjhDQkMtSFMyNTYiLCJraWQiOiJlY2UwMDEiLCJlcGsiOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJ2Rl9MTnoybWVsbzVDdDRQNTc3Qy1CNzVnNHBGS2hFRFFuSlVKRUhzQlFBIiwieSI6IkFTQTQtNU9Wejd3SGtIRjVLejlWbW1VejdFMVpXeUVoeEpXZTdnMXJPdG8ifX0",
+  "encrypted_key": "nHjSWaGL93xmUMtDeohVVwmVxeAqFwL2g2GcChWtrDfOt2N9pxoNPg",
+  "iv": "0dZUi18gc1ms-3oZLtBAxw",
+  "ciphertext": "sQOnIJctvvW2PM1mHcQNac9RqN5maFfyHp8cZwHvNSE",
+  "tag": "wJWtmLIMX3WMtnMUCbvgog"
+}

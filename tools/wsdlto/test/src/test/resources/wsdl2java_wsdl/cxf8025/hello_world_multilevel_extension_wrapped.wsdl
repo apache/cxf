@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor 
+        license agreements. See the NOTICE file distributed with this work for additional 
+        information regarding copyright ownership. The ASF licenses this file to 
+        you under the Apache License, Version 2.0 (the "License"); you may not use 
+        this file except in compliance with the License. You may obtain a copy of 
+        the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required 
+        by applicable law or agreed to in writing, software distributed under the 
+        License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS 
+        OF ANY KIND, either express or implied. See the License for the specific 
+        language governing permissions and limitations under the License. -->
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/w2j/multilevel_extension_wrapped" xmlns:x1="http://cxf.apache.org/w2j/multilevel_extension_wrapped/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://cxf.apache.org/w2j/multilevel_extension_wrapped" name="HelloWorld">
+    <wsdl:types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://cxf.apache.org/w2j/multilevel_extension_wrapped/types" targetNamespace="http://cxf.apache.org/w2j/multilevel_extension_wrapped/types" elementFormDefault="qualified">
+            <!-- request has multiple extension levels, some with elements and some with nothing -->
+            <element name="greetMeMultilevelExtension" type="x1:greetMeType"/>
+            <complexType name="greetMeType">
+                <complexContent>
+                    <extension base="x1:EmptyComplexContextParentType">
+                        <sequence>
+                            <element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                            <element name="name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                        </sequence>
+                    </extension>
+                </complexContent>
+            </complexType>
+            <complexType name="EmptyComplexContextParentType">
+                <complexContent>
+                    <extension base="x1:ComplexContextParentType"/>
+                </complexContent>
+            </complexType>
+            <complexType name="ComplexContextParentType">
+                <complexContent>
+                    <extension base="x1:EmptyComplexContextGrandParentType1">
+                        <sequence>
+                            <element name="parentId" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                        </sequence>
+                    </extension>
+                </complexContent>
+            </complexType>
+            <complexType name="EmptyComplexContextGrandParentType1">
+                <complexContent>
+                    <extension base="x1:EmptyComplexContextGrandParentType2"/>
+                </complexContent>
+            </complexType>
+            <complexType name="EmptyComplexContextGrandParentType2">
+                <complexContent>
+                    <extension base="x1:ComplexContextGreatGrandParentType"/>
+                </complexContent>
+            </complexType>
+            <complexType name="ComplexContextGreatGrandParentType">
+                <sequence>
+                    <element name="greatGrandParentId" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                </sequence>
+            </complexType>
+
+            <!-- basic response -->
+            <element name="greetMeResponse" type="x1:greetMeResponseType"/>
+            <complexType name="greetMeResponseType">
+                <sequence>
+                    <element name="responseValue" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                </sequence>
+            </complexType>
+        </schema>
+    </wsdl:types>
+    <wsdl:message name="greetMeRequest">
+        <wsdl:part name="in" element="x1:greetMeMultilevelExtension"/>
+    </wsdl:message>
+    <wsdl:message name="greetMeResponse">
+        <wsdl:part name="out" element="x1:greetMeResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="Greeter">
+        <wsdl:operation name="greetMeMultilevelExtension">
+            <wsdl:input name="greetMeRequest" message="tns:greetMeRequest"/>
+            <wsdl:output name="greetMeResponse" message="tns:greetMeResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="Greeter_SOAPBinding" type="tns:Greeter">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="greetMeMultilevelExtension">
+            <soap:operation style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="SOAPService">
+        <wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
+            <soap:address location="http://localhost:9000/SoapContext/SoapPort"/>
+            <wswa:UsingAddressing xmlns:wswa="http://www.w3.org/2005/02/addressing/wsdl"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

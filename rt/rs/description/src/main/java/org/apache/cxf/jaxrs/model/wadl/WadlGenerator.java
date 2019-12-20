@@ -69,6 +69,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
@@ -200,12 +201,23 @@ public class WadlGenerator implements ContainerRequestFilter {
     private ResourceIdGenerator idGenerator;
     private Map<String, Object> jaxbContextProperties;
 
+    private List<Class<?>> extraClasses = Collections.emptyList();
+
     public WadlGenerator() {
     }
 
     public WadlGenerator(Bus bus) {
         this.bus = bus;
         this.bus.setProperty("wadl.service.description.available", "true");
+    }
+
+    /**
+     * The list of classes which should be added to the generated scheme also.
+     */
+    public void setExtraClasses(List<Class<?>> extraClasses) {
+        if (extraClasses != null) {
+            this.extraClasses = extraClasses;
+        }
     }
 
     @Override
@@ -491,7 +503,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         if (!this.useJaxbContextForQnames) {
             return;
         }
-        List<Class<?>> extraClasses = new LinkedList<>();
+        List<Class<?>> extra = new LinkedList<>(extraClasses);
         for (Class<?> cls : resourceTypes.getAllTypes().keySet()) {
             if (!isXmlRoot(cls) || Modifier.isAbstract(cls.getModifiers())) {
                 XmlSeeAlso seeAlsoAnn = cls.getAnnotation(XmlSeeAlso.class);
@@ -502,11 +514,11 @@ public class WadlGenerator implements ContainerRequestFilter {
                             resourceTypes.getSubstitutions().put(seeAlsoCls, cls);
                         }
                     }
-                    extraClasses.addAll(seeAlsoList);
+                    extra.addAll(seeAlsoList);
                 }
             }
         }
-        for (Class<?> cls : extraClasses) {
+        for (Class<?> cls : extra) {
             resourceTypes.getAllTypes().put(cls, cls);
         }
     }
@@ -1288,14 +1300,29 @@ public class WadlGenerator implements ContainerRequestFilter {
         StringWriter stringWriter = new StringWriter();
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        try {
+            transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+        } catch (IllegalArgumentException ex) {
+            // ignore
+        }
+
         Transformer transformer = transformerFactory.newTransformer();
         transformer.transform(domSource, new StreamResult(stringWriter));
         return stringWriter.toString();
     }
+
     private String transformLocally(Message m, UriInfo ui, Source source) throws Exception {
         InputStream is = ResourceUtils.getResourceStream(stylesheetReference, m.getExchange().getBus());
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        try {
+            transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+        } catch (IllegalArgumentException ex) {
+            // ignore
+        }
+
         Transformer t = transformerFactory.newTemplates(new StreamSource(is)).newTransformer();
         t.setParameter("base.path", m.get("http.base.path"));
         StringWriter stringWriter = new StringWriter();

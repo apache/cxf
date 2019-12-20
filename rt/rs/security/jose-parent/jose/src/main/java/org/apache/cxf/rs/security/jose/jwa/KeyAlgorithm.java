@@ -74,10 +74,16 @@ public enum KeyAlgorithm {
         if (KeyAlgorithm.DIRECT.getJwaName().equals(algo)) {
             return KeyAlgorithm.DIRECT;
         }
+        if (KeyAlgorithm.ECDH_ES_DIRECT.getJwaName().equals(algo)) {
+            return KeyAlgorithm.ECDH_ES_DIRECT;
+        }
         return KeyAlgorithm.valueOf(algo.replace('-', '_')
                                     .replace('+', '_'));
 
     }
 
+    public static boolean isDirect(KeyAlgorithm algo) {
+        return algo == DIRECT || algo == ECDH_ES_DIRECT;
+    }
 
 }

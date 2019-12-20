@@ -35,6 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.XMLConstants;
 import javax.xml.crypto.dsig.Reference;
@@ -102,6 +103,7 @@ import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.common.util.Loader;
+import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
@@ -579,7 +581,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         } else {
             sig.setCustomTokenValueType(WSS4JConstants.WSS_SAML_KI_VALUE_TYPE);
         }
-        sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());
+        sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAlgorithmSuiteType().getAsymmetricSignature());
         sig.setSigCanonicalization(binding.getAlgorithmSuite().getC14n().getValue());
 
         Crypto crypto = secToken.getCrypto();
@@ -610,19 +612,20 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     protected void handleUsernameTokenSupportingToken(
         UsernameToken token, boolean endorse, boolean encryptedToken, List<SupportingToken> ret
     ) throws WSSecurityException {
-        if (endorse) {
-            WSSecUsernameToken utBuilder = addDKUsernameToken(token, true);
+        if (endorse && isTokenRequired(token.getIncludeTokenType())) {
+            byte[] salt = UsernameTokenUtil.generateSalt(true);
+            WSSecUsernameToken utBuilder = addDKUsernameToken(token, salt, true);
             if (utBuilder != null) {
-                utBuilder.prepare();
+                utBuilder.prepare(salt);
                 addSupportingElement(utBuilder.getUsernameTokenElement());
-                ret.add(new SupportingToken(token, utBuilder, null));
+                ret.add(new SupportingToken(token, utBuilder, null, salt));
                 if (encryptedToken) {
                     WSEncryptionPart part = new WSEncryptionPart(utBuilder.getId(), "Element");
                     part.setElement(utBuilder.getUsernameTokenElement());
                     encryptedTokensList.add(part);
                 }
             }
-        } else {
+        } else if (!endorse) {
             WSSecUsernameToken utBuilder = addUsernameToken(token);
             if (utBuilder != null) {
                 utBuilder.prepare();
@@ -862,7 +865,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         return null;
     }
 
-    protected WSSecUsernameToken addDKUsernameToken(UsernameToken token, boolean useMac) {
+    protected WSSecUsernameToken addDKUsernameToken(UsernameToken token, byte[] salt, boolean useMac) {
         assertToken(token);
         if (!isTokenRequired(token.getIncludeTokenType())) {
             return null;
@@ -883,8 +886,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             if (!StringUtils.isEmpty(password)) {
                 // If the password is available then build the token
                 utBuilder.setUserInfo(userName, password);
-                utBuilder.addDerivedKey(useMac, null, 1000);
-                utBuilder.prepare();
+                utBuilder.addDerivedKey(useMac,  1000);
+                utBuilder.prepare(salt);
             } else {
                 unassertPolicy(token, "No password available");
                 return null;
@@ -1502,7 +1505,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         return null;
     }
 
-    protected WSSecEncryptedKey getEncryptedKeyBuilder(AbstractToken token) throws WSSecurityException {
+    protected WSSecEncryptedKey getEncryptedKeyBuilder(AbstractToken token,
+                                                       SecretKey symmetricKey) throws WSSecurityException {
         WSSecEncryptedKey encrKey = new WSSecEncryptedKey(secHeader);
         encrKey.setIdAllocator(wssConfig.getIdAllocator());
         encrKey.setCallbackLookup(callbackLookup);
@@ -1523,11 +1527,10 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         String encrUser = setEncryptionUser(encrKey, token, false, crypto);
 
         AlgorithmSuiteType algType = binding.getAlgorithmSuite().getAlgorithmSuiteType();
-        encrKey.setSymmetricEncAlgorithm(algType.getEncryption());
         encrKey.setKeyEncAlgo(algType.getAsymmetricKeyWrap());
         encrKey.setMGFAlgorithm(algType.getMGFAlgo());
 
-        encrKey.prepare(crypto);
+        encrKey.prepare(crypto, symmetricKey);
 
         if (alsoIncludeToken) {
             X509Certificate encCert = getEncryptCert(crypto, encrUser);
@@ -1898,7 +1901,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             password = getPassword(user, token, WSPasswordCallback.SIGNATURE);
         }
         sig.setUserInfo(user, password);
-        sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());
+        sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAlgorithmSuiteType().getAsymmetricSignature());
         AlgorithmSuiteType algType = binding.getAlgorithmSuite().getAlgorithmSuiteType();
         sig.setDigestAlgo(algType.getDigest());
         sig.setSigCanonicalization(binding.getAlgorithmSuite().getC14n().getValue());
@@ -1990,8 +1993,9 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 }
 
                 try {
-                    byte[] secret = utBuilder.getDerivedKey();
+                    byte[] secret = utBuilder.getDerivedKey(supportingToken.getSalt());
                     secToken.setSecret(secret);
+                    Arrays.fill(supportingToken.getSalt(), (byte)0);
 
                     if (supportingToken.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
                         doSymmSignatureDerived(supportingToken.getToken(), secToken, sigParts,
@@ -2040,7 +2044,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
 
         if (ref != null) {
             ref = cloneElement(ref);
-            dkSign.setExternalKey(tok.getSecret(), ref);
+            dkSign.setStrElem(ref);
         } else if (!isRequestor() && policyToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
             // If the Encrypted key used to create the derived key is not
             // attached use key identifier as defined in WSS1.1 section
@@ -2051,14 +2055,14 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 tokenRef.setKeyIdentifierEncKeySHA1(tok.getSHA1());
                 tokenRef.addTokenType(WSS4JConstants.WSS_ENC_KEY_VALUE_TYPE);
             }
-            dkSign.setExternalKey(tok.getSecret(), tokenRef.getElement());
+            dkSign.setStrElem(tokenRef.getElement());
 
         } else {
-            dkSign.setExternalKey(tok.getSecret(), tok.getId());
+            dkSign.setTokenIdentifier(tok.getId());
         }
 
         //Set the algo info
-        dkSign.setSignatureAlgorithm(binding.getAlgorithmSuite().getSymmetricSignature());
+        dkSign.setSignatureAlgorithm(binding.getAlgorithmSuite().getAlgorithmSuiteType().getSymmetricSignature());
         dkSign.setSigCanonicalization(binding.getAlgorithmSuite().getC14n().getValue());
         AlgorithmSuiteType algType = binding.getAlgorithmSuite().getAlgorithmSuiteType();
         dkSign.setDerivedKeyLength(algType.getSignatureDerivedKeyLength() / 8);
@@ -2070,7 +2074,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             dkSign.setCustomValueType(WSS4JConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
         }
 
-        dkSign.prepare();
+        dkSign.prepare(tok.getSecret());
 
         if (isTokenProtection) {
             String sigTokId = XMLUtils.getIDFromReference(tok.getId());
@@ -2093,6 +2097,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         }
 
         addSig(dkSign.getSignatureValue());
+        dkSign.clean();
     }
 
     private void doSymmSignature(AbstractToken policyToken, SecurityToken tok,
@@ -2149,7 +2154,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         sigTokId = XMLUtils.getIDFromReference(sigTokId);
         sig.setCustomTokenId(sigTokId);
         sig.setSecretKey(tok.getSecret());
-        sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getSymmetricSignature());
+        sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAlgorithmSuiteType().getSymmetricSignature());
         AlgorithmSuiteType algType = binding.getAlgorithmSuite().getAlgorithmSuiteType();
         sig.setDigestAlgo(algType.getDigest());
         sig.setSigCanonicalization(binding.getAlgorithmSuite().getC14n().getValue());
@@ -2355,12 +2360,19 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         private final AbstractToken token;
         private final Object tokenImplementation;
         private final List<WSEncryptionPart> signedParts;
+        private final byte[] salt;
 
         SupportingToken(AbstractToken token, Object tokenImplementation,
-                               List<WSEncryptionPart> signedParts) {
+                        List<WSEncryptionPart> signedParts) {
+            this(token, tokenImplementation, signedParts, null);
+        }
+
+        SupportingToken(AbstractToken token, Object tokenImplementation,
+                               List<WSEncryptionPart> signedParts, byte[] salt) {
             this.token = token;
             this.tokenImplementation = tokenImplementation;
             this.signedParts = signedParts;
+            this.salt = salt;
         }
 
         public AbstractToken getToken() {
@@ -2373,6 +2385,10 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
 
         public List<WSEncryptionPart> getSignedParts() {
             return signedParts;
+        }
+
+        public byte[] getSalt() {
+            return salt;
         }
 
     }

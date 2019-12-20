@@ -1,0 +1,15 @@
+{
+  "protected": "eyJlbmMiOiJBMTI4R0NNIn0",
+  "recipients": [
+    {
+      "header": {
+        "alg": "A128KW",
+        "kid": "octe001"
+      },
+      "encrypted_key": "IVbYg91lB_2V_g4t7YTXQVuXBpdZu4B8"
+    }
+  ],
+  "iv": "K5ua_33odSQDJuXe",
+  "ciphertext": "j6dNIYKYkn1EiS3pKwWpIShPhZ7JQw",
+  "tag": "0GoMvhNrrWu3_O3kIAhndA"
+}

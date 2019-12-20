@@ -117,5 +117,4 @@ public class DefaultSecurityContextTest {
         assertFalse(context.isUserInRole("family"));
         assertFalse(context.isUserInRole("Barry"));
     }
-
 }

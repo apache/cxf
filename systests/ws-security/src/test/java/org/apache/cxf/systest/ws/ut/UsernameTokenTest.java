@@ -46,6 +46,7 @@ import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transport.http.HTTPConduitConfigurer;
 import org.apache.cxf.ws.policy.WSPolicyFeature;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -254,6 +255,60 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
 
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
+    }
+
+    @org.junit.Test
+    public void testPlaintextWSDLOverHTTPSViaCode() throws Exception {
+
+        TrustManagerFactory tmf =
+            TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        final KeyStore ts = KeyStore.getInstance("JKS");
+        try (InputStream trustStore =
+            ClassLoaderUtils.getResourceAsStream("keys/Truststore.jks", UsernameTokenTest.class)) {
+            ts.load(trustStore, "password".toCharArray());
+        }
+        tmf.init(ts);
+
+        TLSClientParameters tlsParams = new TLSClientParameters();
+        tlsParams.setTrustManagers(tmf.getTrustManagers());
+        tlsParams.setDisableCNCheck(true);
+
+        HTTPConduitConfigurer myHttpConduitConfig = new HTTPConduitConfigurer() {
+            public void configure(String name, String address, HTTPConduit c) {
+                if ("{http://cxf.apache.org}TransportURIResolver.http-conduit".equals(name)) {
+                    c.setTlsClientParameters(tlsParams);
+                }
+            }
+        };
+
+        BusFactory busFactory = BusFactory.newInstance();
+        bus = busFactory.createBus();
+        bus.setExtension(myHttpConduitConfig, HTTPConduitConfigurer.class);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = new URL("https://localhost:" + PORT + "/DoubleItUTPlaintext?wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItPlaintextPort");
+        DoubleItPortType utPort =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, test.getPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
+        }
+
+        ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "Alice");
+
+        ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER,
+                                                          "org.apache.cxf.systest.ws.common.UTPasswordCallback");
+
+        Client client = ClientProxy.getClient(utPort);
+        HTTPConduit http = (HTTPConduit) client.getConduit();
+        http.setTlsClientParameters(tlsParams);
+
+        assertEquals(50, utPort.doubleIt(25));
+
+        ((java.io.Closeable)utPort).close();
     }
 
     @org.junit.Test
@@ -621,4 +676,44 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
+    @org.junit.Test
+    public void testPlaintextPrincipal2() throws Exception {
+        if (STAX_PORT.equals(test.getPort())) {
+            // SecurityConstants.VALIDATE_TOKEN does not apply to the streaming layer
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = UsernameTokenTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItPlaintextPrincipalPort2");
+        DoubleItPortType utPort =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, test.getPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
+        }
+
+        ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "Alice");
+        assertEquals(50, utPort.doubleIt(25));
+
+        try {
+            ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "Frank");
+            utPort.doubleIt(30);
+            fail("Failure expected on a user with the wrong role");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "Unauthorized";
+            assertTrue(ex.getMessage().contains(error));
+        }
+
+        ((java.io.Closeable)utPort).close();
+        bus.shutdown(true);
+    }
 }

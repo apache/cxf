@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.systest.jaxrs.cdi;
 
-import org.jboss.weld.environment.Container;
-import org.jboss.weld.environment.ContainerContext;
 import org.jboss.weld.environment.jetty.JettyContainer;
+import org.jboss.weld.environment.servlet.Container;
+import org.jboss.weld.environment.servlet.ContainerContext;
 import org.jboss.weld.environment.tomcat.TomcatContainer;
 import org.jboss.weld.resources.spi.ResourceLoader;
 

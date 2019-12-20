@@ -29,7 +29,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * JAXRSClientServerWebSocketTest without atmosphere
  */
-public class JAXRSClientServerWebSocketNoAtmosphereTest extends JAXRSClientServerWebSocketTest {
+public class JAXRSClientServerWebSocketNoAtmosphereTest extends AbstractJAXRSClientServerWebSocketTest {
     private static final String PORT = BookServerWebSocket.PORT2;
 
     @BeforeClass
@@ -42,7 +42,7 @@ public class JAXRSClientServerWebSocketNoAtmosphereTest extends JAXRSClientServe
 
     @AfterClass
     public static void cleanup() {
-        //System.clearProperty("org.apache.cxf.transport.websocket.atmosphere.disabled");
+        System.clearProperty("org.apache.cxf.transport.websocket.atmosphere.disabled");
     }
 
     protected String getPort() {

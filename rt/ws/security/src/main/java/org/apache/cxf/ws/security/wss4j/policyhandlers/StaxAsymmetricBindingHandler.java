@@ -48,7 +48,6 @@ import org.apache.wss4j.policy.model.AlgorithmSuite;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
 import org.apache.wss4j.policy.model.IssuedToken;
 import org.apache.wss4j.policy.model.SamlToken;
-import org.apache.wss4j.policy.model.SecureConversationToken;
 import org.apache.wss4j.policy.model.SecurityContextToken;
 import org.apache.wss4j.policy.model.SpnegoContextToken;
 import org.apache.wss4j.policy.model.X509Token;
@@ -89,12 +88,12 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
         String asymSignatureAlgorithm =
             (String)getMessage().getContextualProperty(SecurityConstants.ASYMMETRIC_SIGNATURE_ALGORITHM);
         if (asymSignatureAlgorithm != null && abinding.getAlgorithmSuite() != null) {
-            abinding.getAlgorithmSuite().setAsymmetricSignature(asymSignatureAlgorithm);
+            abinding.getAlgorithmSuite().getAlgorithmSuiteType().setAsymmetricSignature(asymSignatureAlgorithm);
         }
         String symSignatureAlgorithm =
             (String)getMessage().getContextualProperty(SecurityConstants.SYMMETRIC_SIGNATURE_ALGORITHM);
         if (symSignatureAlgorithm != null && abinding.getAlgorithmSuite() != null) {
-            abinding.getAlgorithmSuite().setSymmetricSignature(symSignatureAlgorithm);
+            abinding.getAlgorithmSuite().getAlgorithmSuiteType().setSymmetricSignature(symSignatureAlgorithm);
         }
 
         if (abinding.getProtectionOrder()
@@ -444,14 +443,13 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 new SecurePart(new QName(WSSConstants.NS_WSSE10, "BinarySecurityToken"), Modifier.Element);
             properties.addSignaturePart(securePart);
         } else if (sigToken instanceof IssuedToken || sigToken instanceof SecurityContextToken
-            || sigToken instanceof SecureConversationToken || sigToken instanceof SpnegoContextToken
-            || sigToken instanceof SamlToken) {
+            || sigToken instanceof SpnegoContextToken || sigToken instanceof SamlToken) {
             properties.setIncludeSignatureToken(false);
         }
 
         if (sigToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
             properties.setSignatureAlgorithm(
-                   abinding.getAlgorithmSuite().getSymmetricSignature());
+                   abinding.getAlgorithmSuite().getAlgorithmSuiteType().getSymmetricSignature());
         }
     }
 

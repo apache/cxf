@@ -33,7 +33,7 @@
                 <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -51,7 +51,7 @@
                 <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -67,7 +67,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -83,7 +83,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -101,7 +101,7 @@
                 <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -119,7 +119,7 @@
                 <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -137,7 +137,7 @@
                 <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -155,7 +155,7 @@
                 <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -173,7 +173,7 @@
                 <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -188,7 +188,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -203,7 +203,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault"/>
+                <soap:body use="literal" />
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -243,6 +243,9 @@
         </wsdl:port>
         <wsdl:port name="DoubleItPlaintextPrincipalPort" binding="tns:DoubleItPlaintextBinding">
             <soap:address location="https://localhost:9009/DoubleItUTPlaintextPrincipal"/>
+        </wsdl:port>
+        <wsdl:port name="DoubleItPlaintextPrincipalPort2" binding="tns:DoubleItPlaintextBinding">
+            <soap:address location="https://localhost:9009/DoubleItUTPlaintextPrincipal2"/>
         </wsdl:port>
     </wsdl:service>
     <wsp:Policy wsu:Id="DoubleItPlaintextPolicy">

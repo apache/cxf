@@ -39,6 +39,7 @@
 
     <!-- CXF OpenApiFeature -->  
     <bean id="openApiFeature" class="org.apache.cxf.jaxrs.openapi.OpenApiFeature">
+        <property name="scan" value="false" />
     </bean>
 
     <cxf:bus>

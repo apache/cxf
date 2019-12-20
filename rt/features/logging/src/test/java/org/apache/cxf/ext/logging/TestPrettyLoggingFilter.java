@@ -70,6 +70,18 @@ public class TestPrettyLoggingFilter {
         filter(message, expected, true);
     }
 
+    /**
+     * If truncation happens in the middle of an html entity, com.ctc.wstx.exc.WstxLazyException can be thrown.
+     * This test ensures that WstxLazyException is properly handled (ignored) just like the XMLStreamException.
+     * See CXF-8008.
+     */
+    @Test
+    public void testHtmlEntityTruncated() {
+        String message = "<element>a&n";
+        String expected = "<element";
+        filter(message, expected, true);
+    }
+
     private void filter(String payload, String expected, boolean truncated) {
         LogEvent logEvent  = new LogEvent();
         logEvent.setPayload(payload);

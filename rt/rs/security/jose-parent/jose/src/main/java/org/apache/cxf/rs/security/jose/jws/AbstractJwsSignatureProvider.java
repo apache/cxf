@@ -26,7 +26,7 @@ import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractJwsSignatureProvider.class);
-    private SignatureAlgorithm algorithm;
+    private final SignatureAlgorithm algorithm;
 
     protected AbstractJwsSignatureProvider(SignatureAlgorithm algo) {
         this.algorithm = algo;
