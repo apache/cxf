@@ -25,7 +25,6 @@ import java.util.Map;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
-import org.apache.cxf.rs.security.jose.jwe.EcdhDirectKeyJweEncryption.EcdhHelper;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 public class EcdhAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvider {

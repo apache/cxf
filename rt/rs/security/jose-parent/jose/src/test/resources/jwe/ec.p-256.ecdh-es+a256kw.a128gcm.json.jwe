@@ -1,0 +1,15 @@
+{
+  "protected": "eyJlbmMiOiJBMTI4R0NNIiwiZXBrIjp7Imt0eSI6IkVDIiwiY3J2IjoiUC0yNTYiLCJ4IjoiaXZ2NGw4N1d1dXdQU1doWVRQRVZHSmFMVlF0MmZYOG9WWC1RMGI3MEN1cyIsInkiOiJFbEN3Ymtwem1iWk82WDZ1LUhWMi04eS1Ha0ZNZTlKQktiMml2TXRUeGg0In19",
+  "recipients": [
+    {
+      "header": {
+        "alg": "ECDH-ES+A256KW",
+        "kid": "ece001"
+      },
+      "encrypted_key": "lyKrA48aD6pFlx_sxwEkxU8-XMXTThXG"
+    }
+  ],
+  "iv": "7HWe_pwp83qz2Bpb",
+  "ciphertext": "9yt2-bdhstTIY4v_3WYWODCpcdZOQg",
+  "tag": "h2EHJmMSp6N26F32KiDWIQ"
+}
