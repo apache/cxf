@@ -196,8 +196,8 @@
         <cxf.spring.ldap.version>2.3.2.RELEASE</cxf.spring.ldap.version>
         <cxf.spring.mock>spring-test</cxf.spring.mock>
         <cxf.spring.osgi.version>1.2.1</cxf.spring.osgi.version>
-        <cxf.spring.security.version>5.2.1.RELEASE</cxf.spring.security.version>
-        <cxf.spring.version>5.2.2.RELEASE</cxf.spring.version>
+        <cxf.spring.security.version>5.1.7.RELEASE</cxf.spring.security.version>
+        <cxf.spring.version>5.1.12.RELEASE</cxf.spring.version>
         <cxf.stax-ex.version>1.7.6</cxf.stax-ex.version>
         <cxf.swagger.ui.version>3.24.3</cxf.swagger.ui.version>
         <cxf.swagger.v3.version>2.0.10</cxf.swagger.v3.version>
