@@ -21,19 +21,23 @@ package org.apache.cxf.jaxrs;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletConfig;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.fortest.BookEntity;
@@ -166,6 +170,65 @@ public class SelectMethodCandidatesTest extends Assert {
         ConcreteRestResource book = (ConcreteRestResource)params.get(0);
         assertNotNull(book);
         assertEquals("The Book", book.getName());
+    }
+    
+    @Test
+    public void testFindFromAbstractGenericImpl6() throws Exception {
+        JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
+        sf.setResourceClasses(CustomerServiceResource.class);
+
+        sf.create();
+        List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
+        Message m = createMessage();
+        m.put(Message.CONTENT_TYPE, "text/xml");
+
+        MetadataMap<String, String> values = new MetadataMap<>();
+        OperationResourceInfo ori = findTargetResourceClass(resources, m,
+                                                            "/process",
+                                                            "POST",
+                                                            values, "text/xml",
+                                                            sortMediaTypes("*/*"));
+        assertNotNull(ori);
+        assertEquals("resourceMethod needs to be selected", "process",
+                     ori.getMethodToInvoke().getName());
+
+        String value = "<CustomerRequest><customerId>1</customerId><requestId>100</requestId></CustomerRequest>";
+        m.setContent(InputStream.class, new ByteArrayInputStream(value.getBytes()));
+        List<Object> params = JAXRSUtils.processParameters(ori, values, m);
+        assertEquals(1, params.size());
+        CustomerServiceRequest request = (CustomerServiceRequest)params.get(0);
+        assertNotNull(request);
+        assertEquals(1, request.getCustomerId());
+        assertEquals(100, request.getRequestId());
+        
+        final Method notSynthetic = CustomerServiceResource.class.getMethod("process", 
+            new Class[]{CustomerServiceRequest.class});
+        assertEquals(notSynthetic, ori.getMethodToInvoke());
+    }
+
+    @Test
+    public void testFindOverridesDifferentArguments() throws Exception {
+        JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
+        sf.setResourceClasses(CustomizedApi.class);
+
+        sf.create();
+        List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
+        Message m = createMessage();
+        m.put(Message.CONTENT_TYPE, "application/json");
+
+        MetadataMap<String, String> values = new MetadataMap<>();
+        OperationResourceInfo ori = findTargetResourceClass(resources, m,
+                                                            "/api",
+                                                            "GET",
+                                                            values, "application/json",
+                                                            sortMediaTypes("*/*"));
+        assertNotNull(ori);
+        assertEquals("resourceMethod needs to be selected", "getApi",
+                     ori.getMethodToInvoke().getName());
+        
+        final Method expected = CustomizedApi.class.getMethod("getApi", 
+            new Class[]{ServletConfig.class, HttpHeaders.class, UriInfo.class, String.class});
+        assertEquals(expected, ori.getMethodToInvoke());
     }
 
     @Test

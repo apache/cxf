@@ -562,7 +562,7 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
         return hasComponents ? Optional.of(components) : Optional.empty();
     }
     
-    private OpenApiResource createOpenApiResource() {
+    private BaseOpenApiResource createOpenApiResource() {
         return (customizer == null) ? new OpenApiResource() : new OpenApiCustomizedResource(customizer);
     }
     
