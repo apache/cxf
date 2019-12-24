@@ -22,8 +22,10 @@ import java.util.Objects;
 
 import javax.servlet.ServletConfig;
 import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -31,7 +33,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import io.swagger.v3.jaxrs2.integration.ServletConfigContextUtils;
-import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
+import io.swagger.v3.jaxrs2.integration.resources.BaseOpenApiResource;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.integration.GenericOpenApiContext;
 import io.swagger.v3.oas.integration.OpenApiContextLocator;
@@ -39,7 +41,8 @@ import io.swagger.v3.oas.integration.api.OpenAPIConfiguration;
 import io.swagger.v3.oas.integration.api.OpenApiContext;
 import io.swagger.v3.oas.models.OpenAPI;
 
-public class OpenApiCustomizedResource extends OpenApiResource {
+@Path("/openapi.{type:json|yaml}")
+public class OpenApiCustomizedResource extends BaseOpenApiResource {
 
     private final OpenApiCustomizer customizer;
 
@@ -50,8 +53,8 @@ public class OpenApiCustomizedResource extends OpenApiResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, "application/yaml" })
     @Operation(hidden = true)
-    public Response getOpenApi(@Context ServletConfig config, @Context HttpHeaders headers,
-            @Context UriInfo uriInfo, @PathParam("type") String type) throws Exception {
+    public Response getOpenApi(@Context Application app, @Context ServletConfig config, 
+            @Context HttpHeaders headers, @Context UriInfo uriInfo, @PathParam("type") String type) throws Exception {
 
         if (customizer != null) {
             final OpenAPIConfiguration configuration = customizer.customize(getOpenApiConfiguration());
@@ -100,7 +103,7 @@ public class OpenApiCustomizedResource extends OpenApiResource {
             }
         }
 
-        return super.getOpenApi(headers, uriInfo, type);
+        return super.getOpenApi(headers, config, app, uriInfo, type);
     }
 
     private OpenApiContext getOpenApiContext(ServletConfig config) {
