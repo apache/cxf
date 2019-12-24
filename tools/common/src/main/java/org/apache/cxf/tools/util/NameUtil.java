@@ -22,6 +22,7 @@ package org.apache.cxf.tools.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.JavaUtils;
 
 public final class NameUtil {
@@ -58,16 +59,6 @@ public final class NameUtil {
 
     protected static boolean isLower(char c) {
         return c >= 'a' && c <= 'z' || Character.isLowerCase(c);
-    }
-
-    public static String capitalize(String s) {
-        if (!isLower(s.charAt(0))) {
-            return s;
-        }
-        StringBuilder sb = new StringBuilder(s.length());
-        sb.append(Character.toUpperCase(s.charAt(0)));
-        sb.append(s.substring(1).toLowerCase());
-        return sb.toString();
     }
 
     private static int nextBreak(String s, int start, boolean allowUnderscore) {
@@ -165,7 +156,7 @@ public final class NameUtil {
 
             int b = nextBreak(s, i, allowUnderscore);
             String w = (b == -1) ? s.substring(i) : s.substring(i, b);
-            ss.add(escape(capitalize(w)));
+            ss.add(escape(StringUtils.capitalize(w)));
             if (b == -1) {
                 break;
             }
@@ -191,7 +182,7 @@ public final class NameUtil {
                                              boolean cdrUpper) {
         if (cdrUpper) {
             for (int i = 1; i < ss.length; i++) {
-                ss[i] = capitalize(ss[i]);
+                ss[i] = StringUtils.capitalize(ss[i]);
             }
         }
         StringBuilder sb = new StringBuilder();

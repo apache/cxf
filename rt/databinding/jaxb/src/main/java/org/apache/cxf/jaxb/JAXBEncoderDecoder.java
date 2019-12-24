@@ -578,8 +578,7 @@ public final class JAXBEncoderDecoder {
                         Utils.setFieldValue(f, obj, o);
                     }
                 } else {
-                    String s = Character.toUpperCase(q.getLocalPart().charAt(0))
-                               + q.getLocalPart().substring(1);
+                    String s = StringUtils.capitalize(q.getLocalPart());
                     Method m = Utils.getMethod(cls, accessType, "get" + s);
                     if (m == null) {
                         m = Utils.getMethod(cls, accessType, "is" + s);

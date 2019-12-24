@@ -42,6 +42,7 @@ import org.apache.cxf.common.annotation.AnnotationProcessor;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.common.util.ReflectionUtil;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.resource.ResourceResolver;
 
@@ -277,12 +278,9 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
         return setterMethod;
     }
 
-
-    private String resourceNameToSetter(String resName) {
-
-        return "set" + Character.toUpperCase(resName.charAt(0)) + resName.substring(1);
+    private static String resourceNameToSetter(String resName) {
+        return "set" + StringUtils.capitalize(resName);
     }
-
 
     private void invokeSetter(Method method, Object resource) {
         try {

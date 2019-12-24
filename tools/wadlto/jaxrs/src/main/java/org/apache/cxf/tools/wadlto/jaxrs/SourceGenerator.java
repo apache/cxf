@@ -443,7 +443,7 @@ public class SourceGenerator {
                 StringBuilder builder = new StringBuilder(resourceId);
                 for (int i = 0; i < split.length; i++) {
                     if (!split[i].isEmpty()) {
-                        builder.append(split[i].toUpperCase().charAt(0)).append(split[i].substring(1));
+                        builder.append(StringUtils.capitalize(split[i]));
                     }
                 }
                 resourceId = builder.toString();
@@ -538,27 +538,12 @@ public class SourceGenerator {
         } else {
             name = generateInterfaces ? clsName + "Impl" : clsName;
         }
-        name = firstCharToUpperCase(name);
+        name = StringUtils.capitalize(name);
         for (String typeName : typeClassNames) {
-            String localName = typeName.contains(".")
-                ? typeName.substring(typeName.lastIndexOf('.') + 1) : typeName;
+            String localName = typeName.substring(typeName.lastIndexOf('.') + 1);
             if (name.equalsIgnoreCase(localName)) {
                 name += "Resource";
             }
-        }
-        return name;
-    }
-
-    private String firstCharToUpperCase(String name) {
-        if (!name.isEmpty() && Character.isLowerCase(name.charAt(0))) {
-            return StringUtils.capitalize(name);
-        }
-        return name;
-    }
-
-    private String firstCharToLowerCase(String name) {
-        if (!name.isEmpty() && Character.isUpperCase(name.charAt(0))) {
-            return StringUtils.uncapitalize(name);
         }
         return name;
     }
@@ -769,7 +754,7 @@ public class SourceGenerator {
                         }
                         sb.append(pathSeg);
                     }
-                    genMethodName += firstCharToUpperCase(sb.toString());
+                    genMethodName += StringUtils.capitalize(sb.toString());
                 }
                 genMethodName = genMethodName.replace("-", "");
 
@@ -1267,7 +1252,7 @@ public class SourceGenerator {
             } else {
                 paramName = name.replaceAll("[:\\.\\-]", "_");
             }
-            String javaParamName = firstCharToLowerCase(paramName);
+            String javaParamName = StringUtils.uncapitalize(paramName);
             sbCode.append(type).append(' ').append(javaParamName);
             if (i + 1 < inParamEls.size()) {
                 sbCode.append(", ");
@@ -1432,7 +1417,7 @@ public class SourceGenerator {
         return sb;
     }
 
-    private String getTypicalClassName(String name) {
+    private static String getTypicalClassName(String name) {
         String theName = name.toUpperCase();
         if (theName.length() == 1) {
             return theName;

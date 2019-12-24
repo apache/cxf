@@ -35,6 +35,7 @@ import org.apache.cxf.aegis.type.collection.CollectionType;
 import org.apache.cxf.aegis.type.collection.MapType;
 import org.apache.cxf.aegis.util.NamespaceHelper;
 import org.apache.cxf.aegis.util.ServiceUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.ws.commons.schema.constants.Constants;
 
@@ -349,9 +350,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
             ns = HTTP_CXF_APACHE_ORG_ARRAYS;
         }
 
-        String first = type.getSchemaType().getLocalPart().substring(0, 1);
-        String last = type.getSchemaType().getLocalPart().substring(1);
-        String localName = "ArrayOf" + first.toUpperCase() + last;
+        String localName = "ArrayOf" + StringUtils.capitalize(type.getSchemaType().getLocalPart());
         if (info.nonDefaultAttributes()) {
             localName += "-";
             if (info.getMinOccurs() >= 0) {

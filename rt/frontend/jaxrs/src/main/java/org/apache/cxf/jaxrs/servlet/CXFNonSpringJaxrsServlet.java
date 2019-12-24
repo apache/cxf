@@ -479,8 +479,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             methodsMap.put(m.getName(), m);
         }
         for (Map.Entry<String, List<String>> entry : props.entrySet()) {
-            Method m = methodsMap.get("set" + Character.toUpperCase(entry.getKey().charAt(0))
-                           + entry.getKey().substring(1));
+            Method m = methodsMap.get("set" + StringUtils.capitalize(entry.getKey()));
             if (m != null) {
                 Class<?> type = m.getParameterTypes()[0];
                 Object value;

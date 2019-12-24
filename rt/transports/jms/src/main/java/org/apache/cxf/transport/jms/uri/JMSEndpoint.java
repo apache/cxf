@@ -161,10 +161,8 @@ public class JMSEndpoint {
         }
     }
 
-    private String getPropSetterName(String name) {
-        String first = name.substring(0, 1);
-        String rest = name.substring(1);
-        return "set" + first.toUpperCase() + rest;
+    private static String getPropSetterName(String name) {
+        return "set" + StringUtils.capitalize(name);
     }
 
     /**
