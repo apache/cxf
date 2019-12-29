@@ -22,6 +22,7 @@ package org.apache.cxf.systest.transform.feature;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 import javax.xml.ws.soap.SOAPBinding;
@@ -32,6 +33,7 @@ import org.apache.cxf.feature.transform.XSLTOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
