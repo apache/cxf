@@ -160,7 +160,7 @@ public class XSLTOutInterceptor extends AbstractXSLTInterceptor {
         @Override
         public void onClose(CachedOutputStream wrapper) {
             InputStream transformedStream;
-            IOException exceptionOnClose = null;
+            Exception exceptionOnClose = null;
             try {
                 transformedStream = XSLTUtils.transform(xsltTemplate, wrapper.getInputStream());
                 IOUtils.copyAndCloseInput(transformedStream, origStream);
@@ -169,7 +169,7 @@ public class XSLTOutInterceptor extends AbstractXSLTInterceptor {
             } finally {
                 try {
                     origStream.close();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     exceptionOnClose = e;
                 }
             }
