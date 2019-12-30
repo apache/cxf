@@ -108,13 +108,13 @@ public class CXFConnectionParam {
     }
 
     public String toString() {
-        StringBuilder buf = new StringBuilder(256);
-        buf.append("Interface [" + getInterface() + "] ");
-        buf.append("PortName [" + getPortName() + "] ");
-        buf.append("ServiceName [" + getServiceName() + "] ");
-        buf.append("WsdlLocation [" + getWsdlLocation() + "] ");
-        buf.append("Address [" + getAddress() + "] ");
-        return buf.toString();
+        return new StringBuilder(256)
+            .append("Interface [").append(getInterface()).append("] ")
+            .append("PortName [").append(getPortName()).append("] ")
+            .append("ServiceName [").append(getServiceName()).append("] ")
+            .append("WsdlLocation [").append(getWsdlLocation()).append("] ")
+            .append("Address [").append(getAddress()).append("] ")
+            .toString();
     }
 
 

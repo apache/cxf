@@ -214,7 +214,7 @@ public class OperationInfo extends AbstractPropertiesHolder implements NamedItem
 
     @Override
     public String toString() {
-        return new StringBuilder().append("[OperationInfo: ")
+        return new StringBuilder("[OperationInfo: ")
             .append(opName)
             .append(']').toString();
     }

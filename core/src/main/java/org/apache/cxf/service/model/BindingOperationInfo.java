@@ -135,7 +135,7 @@ public class BindingOperationInfo extends AbstractPropertiesHolder {
 
     @Override
     public String toString() {
-        return new StringBuilder().append("[BindingOperationInfo: ")
+        return new StringBuilder("[BindingOperationInfo: ")
             .append(getName() == null ? "" : getName())
             .append(']').toString();
     }

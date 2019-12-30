@@ -34,6 +34,6 @@ public class BookStoreVersioned {
     @Path("/version")
     @Produces(MediaType.TEXT_PLAIN)
     public String getVersion() {
-        return version + "." + this.hashCode();
+        return version + '.' + this.hashCode();
     }
 }

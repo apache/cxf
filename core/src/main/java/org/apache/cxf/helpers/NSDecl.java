@@ -43,7 +43,7 @@ public final class NSDecl {
     }
 
     public String toString() {
-        return prefix + ":" + uri;
+        return prefix + ':' + uri;
     }
 
     public int hashCode() {

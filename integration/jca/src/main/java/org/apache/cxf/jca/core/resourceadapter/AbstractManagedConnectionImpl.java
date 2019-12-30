@@ -168,7 +168,7 @@ public abstract class AbstractManagedConnectionImpl implements ManagedConnection
     }
 
     public String toString() {
-        return "[" + getClass().getName() + ":" + hashCode() + ":ManagedConnection[" + crinfo + "]";
+        return "[" + getClass().getName() + ':' + hashCode() + ":ManagedConnection[" + crinfo + "]";
     }
 
     public void error(Exception ex) {
