@@ -22,6 +22,8 @@ package org.apache.cxf.systest.jaxrs;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.core.MediaType;
+
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -31,6 +33,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase {
@@ -65,8 +68,10 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
         namespaces.put("books", "http://www.w3.org/books");
         String value = source.getValue("xhtml:html/xhtml:body/xhtml:ul/books:bookTag", namespaces);
         assertEquals("CXF Rocks", value);
-        String ct = client.getResponse().getMetadata().getFirst("Content-Type").toString();
-        assertEquals("text/html", ct);
+        Object contentType = client.getResponse().getMetadata().getFirst("Content-Type");
+        assertNotNull("Content-Type should be present", contentType);
+        assertEquals("text/html", contentType.toString());
+        assertEquals(MediaType.TEXT_HTML_TYPE, client.getResponse().getMediaType());
     }
 
     @Test
