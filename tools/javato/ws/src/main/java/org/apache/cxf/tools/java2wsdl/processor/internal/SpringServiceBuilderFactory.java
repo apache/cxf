@@ -64,8 +64,8 @@ public final class SpringServiceBuilderFactory extends ServiceBuilderFactory {
      * @param databindingName
      * @return
      */
-    public static String databindingNameToBeanName(String dbName) {
-        return NameUtil.capitalize(dbName.toLowerCase()) + ToolConstants.DATABIND_BEAN_NAME_SUFFIX;
+    public static String databindingNameToBeanName(String databindingName) {
+        return NameUtil.capitalize(databindingName.toLowerCase()) + ToolConstants.DATABIND_BEAN_NAME_SUFFIX;
     }
 
     @Override
@@ -110,7 +110,7 @@ public final class SpringServiceBuilderFactory extends ServiceBuilderFactory {
     /**
      * This is factored out to permit use in a unit test.
      *
-     * @param bus
+     * @param additionalFilePathnames
      * @return
      */
     public static ApplicationContext getApplicationContext(List<String> additionalFilePathnames) {

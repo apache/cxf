@@ -35,7 +35,7 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.transport.jms.JMSConstants;
 
 public final class JMSUtil {
-    
+
     public static final String JMS_MESSAGE_CONSUMER = "jms_message_consumer";
     public static final String JMS_IGNORE_TIMEOUT = "jms_ignore_timeout";
     private static final char[] CORRELATTION_ID_PADDING = {
@@ -64,7 +64,7 @@ public final class JMSUtil {
             throw convertJmsException(e);
         }
     }
-    
+
     public static Message receive(Session session,
                                   Destination replyToDestination,
                                   String correlationId,
@@ -112,7 +112,7 @@ public final class JMSUtil {
      * @param payload the message payload, expected to be either of type String or byte[] depending on payload
      *            type
      * @param session the JMS session
-     * @param replyTo the ReplyTo destination if any
+     * @param messageType the JMS message type
      * @return a JMS of the appropriate type populated with the given payload
      */
     public static Message createAndSetPayload(Object payload, Session session, String messageType)

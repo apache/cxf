@@ -181,12 +181,12 @@ public final class JAXRSUtils {
 
     public static List<PathSegment> getPathSegments(String thePath, boolean decode,
                                                     boolean ignoreLastSlash) {
-        List<PathSegment> theList = 
+        List<PathSegment> theList =
             Arrays.asList(thePath.split("/")).stream()
             .filter(StringUtils.notEmpty())
             .map(p -> new PathSegmentImpl(p, decode))
             .collect(Collectors.toList());
-        
+
         int len = thePath.length();
         if (len > 0 && thePath.charAt(len - 1) == '/') {
             String value = ignoreLastSlash ? "" : "/";
@@ -401,7 +401,7 @@ public final class JAXRSUtils {
             LOG.fine(() -> new org.apache.cxf.common.i18n.Message("START_OPER_MATCH",
                                                                   BUNDLE,
                                                                   resource.getServiceClass().getName()).toString());
-            
+
             for (OperationResourceInfo ori : resource.getMethodDispatcher().getOperationResourceInfos()) {
                 boolean added = false;
 
@@ -515,8 +515,8 @@ public final class JAXRSUtils {
 
     }
 
-    
-    
+
+
     public static Level getExceptionLogLevel(Message message, Class<? extends WebApplicationException> exClass) {
         Level logLevel = null;
         Object logLevelProp = message.get(exClass.getName() + ".log.level");
@@ -585,7 +585,7 @@ public final class JAXRSUtils {
     private static Supplier<String> matchMessageLogSupplier(OperationResourceInfo ori,
         String path, String httpMethod, MediaType requestType, List<MediaType> acceptContentTypes,
         boolean added) {
-        org.apache.cxf.common.i18n.Message errorMsg = added 
+        org.apache.cxf.common.i18n.Message errorMsg = added
             ? new org.apache.cxf.common.i18n.Message("OPER_SELECTED_POSSIBLY",
                                                    BUNDLE, ori.getMethodToInvoke().getName())
             : new org.apache.cxf.common.i18n.Message("OPER_NO_MATCH",
@@ -649,7 +649,7 @@ public final class JAXRSUtils {
     public static List<MediaType> getConsumeTypes(Consumes cm) {
         return getConsumeTypes(cm, Collections.singletonList(ALL_TYPES));
     }
- 
+
     public static List<MediaType> getConsumeTypes(Consumes cm, List<MediaType> defaultTypes) {
         return cm == null ? defaultTypes
                           : getMediaTypes(cm.value());
@@ -658,7 +658,7 @@ public final class JAXRSUtils {
     public static List<MediaType> getProduceTypes(Produces pm) {
         return getProduceTypes(pm, Collections.singletonList(ALL_TYPES));
     }
- 
+
     public static List<MediaType> getProduceTypes(Produces pm, List<MediaType> defaultTypes) {
         return pm == null ? defaultTypes
                           : getMediaTypes(pm.value());
@@ -714,13 +714,13 @@ public final class JAXRSUtils {
         }
         return size1 == size2 ? 0 : size1 < size2 ? -1 : 1;
     }
-    
+
     public static int compareMethodParameters(Class<?>[] paraList1, Class<?>[] paraList2) {
         int size1 = paraList1.length;
         int size2 = paraList2.length;
         for (int i = 0; i < size1 && i < size2; i++) {
             if (!paraList1[i].equals(paraList2[i])) {
-                // Handling the case when bridge / synthetic methods may be taken 
+                // Handling the case when bridge / synthetic methods may be taken
                 // into account (f.e. when service implements generic interfaces or
                 // extends the generic classes).
                 if (paraList1[i].isAssignableFrom(paraList2[i])) {
@@ -818,7 +818,7 @@ public final class JAXRSUtils {
                 tuple[i].param = parameterTypes[i];
                 tuple[i].genericParam = InjectionUtils.processGenericTypeIfNeeded(
                     ori.getClassResourceInfo().getServiceClass(), tuple[i].param, genericParameterTypes[i]);
-                tuple[i].param = InjectionUtils.updateParamClassToTypeIfNeeded(tuple[i].param, 
+                tuple[i].param = InjectionUtils.updateParamClassToTypeIfNeeded(tuple[i].param,
                                                                                tuple[i].genericParam);
                 tuple[i].paramAnns = anns == null ? EMPTY_ANNOTATIONS : anns[i];
             } else {
@@ -827,8 +827,8 @@ public final class JAXRSUtils {
                 tuple[i].paramAnns = EMPTY_ANNOTATIONS;
             }
             if (paramsInfo.get(i).getType() == ParameterType.REQUEST_BODY) {
-                params[i] = processRequestBodyParameter(tuple[i].param, 
-                                                        tuple[i].genericParam, 
+                params[i] = processRequestBodyParameter(tuple[i].param,
+                                                        tuple[i].genericParam,
                                                         tuple[i].paramAnns,
                                                         message,
                                                         ori);
@@ -1219,7 +1219,7 @@ public final class JAXRSUtils {
         return createContextValue(m, genericType, clazz);
     }
 
-    
+
     //CHECKSTYLE:OFF
     private static Object readFromUriParam(Message m,
                                            String parameterName,
@@ -1436,7 +1436,7 @@ public final class JAXRSUtils {
             //cache the OutputStream when it's reactive response
             entityStream = new CacheAndWriteOutputStream(entityStream);
         }
-            
+
         if (writers.size() > 1) {
             WriterInterceptor first = writers.remove(0);
             WriterInterceptorContext context = new WriterInterceptorContextImpl(entity,
@@ -1520,8 +1520,9 @@ public final class JAXRSUtils {
     /**
      * intersect two mime types
      *
-     * @param mimeTypesA
-     * @param mimeTypesB
+     * @param requiredMediaTypes
+     * @param userMediaTypes
+     * @param addRequiredParamsIfPossible
      * @return return a list of intersected mime types
      */
     public static List<MediaType> intersectMimeTypes(List<MediaType> requiredMediaTypes,
@@ -1573,7 +1574,7 @@ public final class JAXRSUtils {
     }
 
     private static String stripDoubleQuotesIfNeeded(String value) {
-        if (value != null && value.startsWith("\"") 
+        if (value != null && value.startsWith("\"")
             && value.endsWith("\"") && value.length() > 1) {
             value = value.substring(1,  value.length() - 1);
         }
@@ -1789,7 +1790,7 @@ public final class JAXRSUtils {
     public static ResponseBuilder fromResponse(Response response) {
         return fromResponse(response, true);
     }
-    
+
     public static ResponseBuilder fromResponse(Response response, boolean copyEntity) {
         ResponseBuilder rb = toResponseBuilder(response.getStatus());
         if (copyEntity) {
@@ -1856,7 +1857,7 @@ public final class JAXRSUtils {
         stack.push(new MethodInvocationInfo(ori, realClass, values));
     }
 
-    private static void addTemplateVarValues(List<String> values, 
+    private static void addTemplateVarValues(List<String> values,
                                              MultivaluedMap<String, String> params,
                                              URITemplate template) {
         if (template != null) {

@@ -92,8 +92,7 @@ public class JMSEndpoint {
     private boolean ignoreTimeoutException;
 
     /**
-     * @param uri
-     * @param subject
+     * @param endpointUri
      */
     public JMSEndpoint(String endpointUri) {
         this(null, endpointUri);
@@ -102,6 +101,7 @@ public class JMSEndpoint {
     /**
      * Get the extensors from the wsdl and/or configuration that will
      * then be used to configure the JMSConfiguration object
+     * @param endpointUri
      * @param target
      */
     public JMSEndpoint(EndpointInfo endpointInfo, EndpointReferenceType target) {
@@ -109,8 +109,8 @@ public class JMSEndpoint {
     }
 
     /**
-     * @param uri
-     * @param subject
+     * @param ei
+     * @param endpointUri
      */
     public JMSEndpoint(EndpointInfo ei, String endpointUri) {
         this.jmsVariant = JMSEndpoint.QUEUE;
@@ -174,7 +174,6 @@ public class JMSEndpoint {
      * depending on the prefix of the key. If it matches JNDI_PARAMETER_NAME_PREFIX it is stored in the
      * jndiParameters else in the parameters
      *
-     * @param endpoint
      * @param params
      */
     private void configureProperties(Map<String, Object> params) {
@@ -239,7 +238,7 @@ public class JMSEndpoint {
     }
 
     /**
-     * @param targetserviceParameterName
+     * @param key
      * @return
      */
     public String getParameter(String key) {
