@@ -269,7 +269,8 @@ public class AttachmentDeserializer {
      * @param boundary
      * @throws IOException
      */
-    private static boolean readTillFirstBoundary(PushbackInputStream pushbackInStream, byte[] boundary) throws IOException {
+    private static boolean readTillFirstBoundary(PushbackInputStream pushbackInStream,
+        byte[] boundary) throws IOException {
 
         // work around a bug in PushBackInputStream where the buffer isn't
         // initialized

@@ -128,19 +128,19 @@ public class JweJsonProducer {
                 input.setContentEncryptionRequired(false);
             }
             JweEncryptionOutput state = encryptor.getEncryptionOutput(input);
-            
+
             if (state.getHeaders() != null && state.getHeaders().asMap().size() != jsonHeaders.asMap().size()) {
                 // New headers were generated during encryption for recipient
-                Map<String, Object> newHeaders = new LinkedHashMap<String, Object>();
+                Map<String, Object> newHeaders = new LinkedHashMap<>();
                 state.getHeaders().asMap().forEach((name, value) -> {
                     if (!unionHeaders.containsHeader(name)) {
                         // store recipient header
                         newHeaders.put(name, value);
                     }
                 });
-                Map<String, Object> perRecipientUnprotectedHeaders = (perRecipientUnprotected != null) 
-                    ? new LinkedHashMap<String, Object>(perRecipientUnprotected.asMap()) 
-                        : new LinkedHashMap<String, Object>();
+                Map<String, Object> perRecipientUnprotectedHeaders = (perRecipientUnprotected != null)
+                    ? new LinkedHashMap<>(perRecipientUnprotected.asMap())
+                        : new LinkedHashMap<>();
                 perRecipientUnprotectedHeaders.putAll(newHeaders);
                 perRecipientUnprotected = new JweHeaders(perRecipientUnprotectedHeaders);
             }
