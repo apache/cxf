@@ -128,6 +128,22 @@ public class JweJsonProducer {
                 input.setContentEncryptionRequired(false);
             }
             JweEncryptionOutput state = encryptor.getEncryptionOutput(input);
+            
+            if (state.getHeaders() != null && state.getHeaders().asMap().size() != jsonHeaders.asMap().size()) {
+                // New headers were generated during encryption for recipient
+                Map<String, Object> newHeaders = new LinkedHashMap<String, Object>();
+                state.getHeaders().asMap().forEach((name, value) -> {
+                    if (!unionHeaders.containsHeader(name)) {
+                        // store recipient header
+                        newHeaders.put(name, value);
+                    }
+                });
+                Map<String, Object> perRecipientUnprotectedHeaders = (perRecipientUnprotected != null) 
+                    ? new LinkedHashMap<String, Object>(perRecipientUnprotected.asMap()) 
+                        : new LinkedHashMap<String, Object>();
+                perRecipientUnprotectedHeaders.putAll(newHeaders);
+                perRecipientUnprotected = new JweHeaders(perRecipientUnprotectedHeaders);
+            }
             byte[] currentCipherText = state.getEncryptedContent();
             byte[] currentAuthTag = state.getAuthTag();
             byte[] currentIv = state.getIv();
@@ -152,11 +168,11 @@ public class JweJsonProducer {
             entries.add(new JweJsonEncryptionEntry(perRecipientUnprotected, encodedCek));
 
         }
-        if (protectedHeader != null) {
+        if (protectedHeader != null && !protectedHeader.asMap().isEmpty()) {
             jweJsonMap.put("protected",
                         Base64UrlUtility.encode(writer.toJson(protectedHeader)));
         }
-        if (unprotectedHeader != null) {
+        if (unprotectedHeader != null && !unprotectedHeader.asMap().isEmpty()) {
             jweJsonMap.put("unprotected", unprotectedHeader);
         }
         if (entries.size() == 1 && canBeFlat) {
