@@ -20,55 +20,34 @@
 package org.apache.cxf.jaxrs.model;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Logger;
 
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.cxf.jaxrs.ext.ResourceComparator;
-import org.apache.cxf.message.Message;
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxrs.ext.DefaultMethod;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
-public class OperationResourceInfoComparator extends OperationResourceInfoComparatorBase {
-    private String httpMethod;
-    private boolean getMethod;
-    private Message message;
-    private ResourceComparator rc;
-    private MediaType contentType = MediaType.WILDCARD_TYPE;
-    private List<MediaType> acceptTypes = Collections.singletonList(MediaType.WILDCARD_TYPE);
-
-    public OperationResourceInfoComparator(Message m, String method) {
-        this.message = m;
-        if (message != null) {
-            Object o = m.getExchange().getEndpoint().get("org.apache.cxf.jaxrs.comparator");
-            if (o != null) {
-                rc = (ResourceComparator)o;
-            }
-        }
-        this.httpMethod = method;
+public abstract class OperationResourceInfoComparatorBase implements Comparator<OperationResourceInfo> {
+    private static final Logger LOG = LogUtils.getL7dLogger(JAXRSUtils.class);
+    
+    protected static int compare(OperationResourceInfo e1, OperationResourceInfo e2, String httpMethod) {
+        return compare(e1, e2, httpMethod, MediaType.WILDCARD_TYPE, 
+            Collections.singletonList(MediaType.WILDCARD_TYPE));
     }
 
-    public OperationResourceInfoComparator(Message m,
-                                           String httpMethod,
-                                           boolean getMethod,
-                                           MediaType contentType,
-                                           List<MediaType> acceptTypes) {
-        this(m, httpMethod);
-        this.contentType = contentType;
-        this.acceptTypes = acceptTypes;
-        this.getMethod = getMethod;
+    protected static int compare(OperationResourceInfo e1, OperationResourceInfo e2, String httpMethod, 
+            final MediaType contentType, final List<MediaType> acceptTypes) {
+        return compare(e1, e2, HttpMethod.GET.equals(httpMethod), 
+            httpMethod, contentType, acceptTypes);
     }
 
-    @Override
-    public int compare(OperationResourceInfo e1, OperationResourceInfo e2) {
-        if (e1 == e2) {
-            return 0;
-        }
-        if (rc != null) {
-            int result = rc.compare(e1, e2, message);
-            if (result != 0) {
-                return result;
-            }
-        }
-<<<<<<< HEAD
+    protected static int compare(OperationResourceInfo e1, OperationResourceInfo e2, boolean getMethod, 
+            String httpMethod, final MediaType contentType, final List<MediaType> acceptTypes) {
+
         String e1HttpMethod = e1.getHttpMethod();
         String e2HttpMethod = e2.getHttpMethod();
 
@@ -126,7 +105,7 @@ public class OperationResourceInfoComparator extends OperationResourceInfoCompar
         }
         return result;
     }
-
+    
     private static int compareWithHead(String e1HttpMethod, String e2HttpMethod) {
         if (HttpMethod.HEAD.equals(e1HttpMethod)) {
             return -1;
@@ -134,9 +113,5 @@ public class OperationResourceInfoComparator extends OperationResourceInfoCompar
             return 1;
         }
         return 0;
-=======
-        
-        return compare(e1, e2, getMethod, httpMethod, contentType, acceptTypes);
->>>>>>> 23f9204... CXF-8097: Equal candidates for handling the current request (HEAD / GET). Extracting base comparator and updating documentation.
     }
 }
