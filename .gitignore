@@ -19,3 +19,5 @@ node_modules/
 derby.log
 .pmdruleset.xml
 .sts4-cache/
+**/.factorypath
+.vscode/
