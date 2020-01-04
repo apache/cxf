@@ -20,7 +20,6 @@
 package org.apache.cxf.jaxrs.model;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -31,21 +30,21 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.DefaultMethod;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
-public abstract class OperationResourceInfoComparatorBase implements Comparator<OperationResourceInfo> {
+public abstract class OperationResourceInfoComparatorBase {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSUtils.class);
     
-    protected static int compare(OperationResourceInfo e1, OperationResourceInfo e2, String httpMethod) {
+    protected int compare(OperationResourceInfo e1, OperationResourceInfo e2, String httpMethod) {
         return compare(e1, e2, httpMethod, MediaType.WILDCARD_TYPE, 
             Collections.singletonList(MediaType.WILDCARD_TYPE));
     }
 
-    protected static int compare(OperationResourceInfo e1, OperationResourceInfo e2, String httpMethod, 
+    protected int compare(OperationResourceInfo e1, OperationResourceInfo e2, String httpMethod, 
             final MediaType contentType, final List<MediaType> acceptTypes) {
         return compare(e1, e2, HttpMethod.GET.equals(httpMethod), 
             httpMethod, contentType, acceptTypes);
     }
 
-    protected static int compare(OperationResourceInfo e1, OperationResourceInfo e2, boolean getMethod, 
+    protected int compare(OperationResourceInfo e1, OperationResourceInfo e2, boolean getMethod, 
             String httpMethod, final MediaType contentType, final List<MediaType> acceptTypes) {
 
         String e1HttpMethod = e1.getHttpMethod();

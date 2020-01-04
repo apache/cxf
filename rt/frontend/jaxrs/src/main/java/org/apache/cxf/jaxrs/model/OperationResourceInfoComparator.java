@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.model;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -27,7 +28,9 @@ import javax.ws.rs.core.MediaType;
 import org.apache.cxf.jaxrs.ext.ResourceComparator;
 import org.apache.cxf.message.Message;
 
-public class OperationResourceInfoComparator extends OperationResourceInfoComparatorBase {
+public class OperationResourceInfoComparator extends OperationResourceInfoComparatorBase 
+        implements Comparator<OperationResourceInfo> {
+    
     private String httpMethod;
     private boolean getMethod;
     private Message message;
@@ -68,75 +71,7 @@ public class OperationResourceInfoComparator extends OperationResourceInfoCompar
                 return result;
             }
         }
-<<<<<<< HEAD
-        String e1HttpMethod = e1.getHttpMethod();
-        String e2HttpMethod = e2.getHttpMethod();
-
-        int result = 0;
-        if (!getMethod && HttpMethod.HEAD.equals(httpMethod)) {
-            result = compareWithHead(e1HttpMethod, e2HttpMethod);
-            if (result != 0) {
-                return result;
-            }
-        }
-
-        result = URITemplate.compareTemplates(
-                          e1.getURITemplate(),
-                          e2.getURITemplate());
-
-        if (result == 0 && (e1HttpMethod != null && e2HttpMethod == null
-                || e1HttpMethod == null && e2HttpMethod != null)) {
-            // resource method takes precedence over a subresource locator
-            return e1.getHttpMethod() != null ? -1 : 1;
-        }
-
-        if (result == 0 && !getMethod) {
-            result = JAXRSUtils.compareSortedConsumesMediaTypes(
-                          e1.getConsumeTypes(),
-                          e2.getConsumeTypes(),
-                          contentType);
-        }
-
-        if (result == 0) {
-            //use the media type of output data as the secondary key.
-            result = JAXRSUtils.compareSortedAcceptMediaTypes(e1.getProduceTypes(),
-                                                              e2.getProduceTypes(),
-                                                              acceptTypes);
-        }
-
-        if (result == 0 && e1HttpMethod != null && e2HttpMethod != null) {
-            boolean e1IsDefault = DefaultMethod.class.getSimpleName().equals(e1HttpMethod);
-            boolean e2IsDefault = DefaultMethod.class.getSimpleName().equals(e2HttpMethod);
-            if (e1IsDefault && !e2IsDefault) {
-                result = 1;
-            } else if (!e1IsDefault && e2IsDefault) {
-                result = -1;
-            }
-        } 
-        if (result == 0) {
-            result = JAXRSUtils.compareMethodParameters(e1.getInParameterTypes(), e2.getInParameterTypes());
-        }
-        if (result == 0) {
-            String m1Name =
-                e1.getClassResourceInfo().getServiceClass().getName() + "#" + e1.getMethodToInvoke().getName();
-            String m2Name =
-                e2.getClassResourceInfo().getServiceClass().getName() + "#" + e2.getMethodToInvoke().getName();
-            LOG.warning("Both " + m1Name + " and " + m2Name + " are equal candidates for handling the current request"
-                        + " which can lead to unpredictable results");
-        }
-        return result;
-    }
-
-    private static int compareWithHead(String e1HttpMethod, String e2HttpMethod) {
-        if (HttpMethod.HEAD.equals(e1HttpMethod)) {
-            return -1;
-        } else if (HttpMethod.HEAD.equals(e2HttpMethod)) {
-            return 1;
-        }
-        return 0;
-=======
         
         return compare(e1, e2, getMethod, httpMethod, contentType, acceptTypes);
->>>>>>> 23f9204... CXF-8097: Equal candidates for handling the current request (HEAD / GET). Extracting base comparator and updating documentation.
     }
 }
