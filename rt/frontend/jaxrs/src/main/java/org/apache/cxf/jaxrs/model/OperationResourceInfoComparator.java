@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.model;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -27,7 +28,9 @@ import javax.ws.rs.core.MediaType;
 import org.apache.cxf.jaxrs.ext.ResourceComparator;
 import org.apache.cxf.message.Message;
 
-public class OperationResourceInfoComparator extends OperationResourceInfoComparatorBase {
+public class OperationResourceInfoComparator extends OperationResourceInfoComparatorBase
+        implements Comparator<OperationResourceInfo> {
+    
     private String httpMethod;
     private boolean getMethod;
     private Message message;
