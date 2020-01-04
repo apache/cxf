@@ -20,21 +20,14 @@
 package org.apache.cxf.jaxrs.model;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.logging.Logger;
 
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.jaxrs.ext.DefaultMethod;
 import org.apache.cxf.jaxrs.ext.ResourceComparator;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
-public class OperationResourceInfoComparator implements Comparator<OperationResourceInfo> {
-    private static final Logger LOG = LogUtils.getL7dLogger(JAXRSUtils.class);
+public class OperationResourceInfoComparator extends OperationResourceInfoComparatorBase {
     private String httpMethod;
     private boolean getMethod;
     private Message message;
@@ -64,6 +57,7 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
         this.getMethod = getMethod;
     }
 
+    @Override
     public int compare(OperationResourceInfo e1, OperationResourceInfo e2) {
         if (e1 == e2) {
             return 0;
@@ -74,70 +68,7 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
                 return result;
             }
         }
-        String e1HttpMethod = e1.getHttpMethod();
-        String e2HttpMethod = e2.getHttpMethod();
-
-        int result;
-        if (!getMethod && HttpMethod.HEAD.equals(httpMethod)) {
-            result = compareWithHead(e1HttpMethod, e2HttpMethod);
-            if (result != 0) {
-                return result;
-            }
-        }
-
-        result = URITemplate.compareTemplates(
-                          e1.getURITemplate(),
-                          e2.getURITemplate());
-
-        if (result == 0 && (e1HttpMethod != null && e2HttpMethod == null
-                || e1HttpMethod == null && e2HttpMethod != null)) {
-            // resource method takes precedence over a subresource locator
-            return e1.getHttpMethod() != null ? -1 : 1;
-        }
-
-        if (result == 0 && !getMethod) {
-            result = JAXRSUtils.compareSortedConsumesMediaTypes(
-                          e1.getConsumeTypes(),
-                          e2.getConsumeTypes(),
-                          contentType);
-        }
-
-        if (result == 0) {
-            //use the media type of output data as the secondary key.
-            result = JAXRSUtils.compareSortedAcceptMediaTypes(e1.getProduceTypes(),
-                                                              e2.getProduceTypes(),
-                                                              acceptTypes);
-        }
-
-        if (result == 0 && e1HttpMethod != null && e2HttpMethod != null) {
-            boolean e1IsDefault = DefaultMethod.class.getSimpleName().equals(e1HttpMethod);
-            boolean e2IsDefault = DefaultMethod.class.getSimpleName().equals(e2HttpMethod);
-            if (e1IsDefault && !e2IsDefault) {
-                result = 1;
-            } else if (!e1IsDefault && e2IsDefault) {
-                result = -1;
-            }
-        } 
-        if (result == 0) {
-            result = JAXRSUtils.compareMethodParameters(e1.getInParameterTypes(), e2.getInParameterTypes());
-        }
-        if (result == 0) {
-            String m1Name =
-                e1.getClassResourceInfo().getServiceClass().getName() + "#" + e1.getMethodToInvoke().getName();
-            String m2Name =
-                e2.getClassResourceInfo().getServiceClass().getName() + "#" + e2.getMethodToInvoke().getName();
-            LOG.warning("Both " + m1Name + " and " + m2Name + " are equal candidates for handling the current request"
-                        + " which can lead to unpredictable results");
-        }
-        return result;
-    }
-
-    private static int compareWithHead(String e1HttpMethod, String e2HttpMethod) {
-        if (HttpMethod.HEAD.equals(e1HttpMethod)) {
-            return -1;
-        } else if (HttpMethod.HEAD.equals(e2HttpMethod)) {
-            return 1;
-        }
-        return 0;
+        
+        return compare(e1, e2, getMethod, httpMethod, contentType, acceptTypes);
     }
 }
