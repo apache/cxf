@@ -209,14 +209,6 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
     public void execute() throws MojoExecutionException {
         if (JavaUtils.isJava9Compatible()) {
             fork = "true";
-            additionalJvmArgs = "--add-exports=jdk.xml.dom/org.w3c.dom.html=ALL-UNNAMED "
-                    + "--add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs=ALL-UNNAMED "
-                    + "--add-opens java.base/java.security=ALL-UNNAMED "
-                    + "--add-opens java.base/java.net=ALL-UNNAMED "
-                    + "--add-opens java.base/java.lang=ALL-UNNAMED "
-                    + "--add-opens java.base/java.util=ALL-UNNAMED "
-                    + "--add-opens java.base/java.util.concurrent=ALL-UNNAMED "
-                    + (additionalJvmArgs == null ? "" : additionalJvmArgs);
         }
         System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
 
@@ -617,13 +609,16 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         Commandline cmd = new Commandline();
         cmd.getShell().setQuotedArgumentsEnabled(true); // for JVM args
         cmd.setWorkingDirectory(project.getBuild().getDirectory());
+
+        String javaPath = getJavaExecutable().getAbsolutePath();
         try {
-            cmd.setExecutable(getJavaExecutable().getAbsolutePath());
+            cmd.setExecutable(javaPath);
         } catch (IOException e) {
             getLog().debug(e);
             throw new MojoExecutionException(e.getMessage(), e);
         }
 
+        setJvmForkArgs(javaPath);
         cmd.createArg().setLine(additionalJvmArgs);
 
         File file = null;
@@ -708,6 +703,72 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             throw new MojoExecutionException(msg.toString());
         }
 
+    }
+
+    /**
+     * Run the JDK version (could be set via the toolchain) and see if we need to configure the JvmArgs
+     * accordingly. Once we remove JDK8 support we can just add the additional args by default and remove
+     * this method.
+     */
+    private void setJvmForkArgs(String javaExecutablePath) {
+        Commandline cmd = new Commandline();
+        cmd.getShell().setQuotedArgumentsEnabled(true); // for JVM args
+        cmd.setWorkingDirectory(project.getBuild().getDirectory());
+        cmd.setExecutable(javaExecutablePath);
+        Java9StreamConsumer consumer = new Java9StreamConsumer();
+        try {
+            cmd.createArg().setValue("-XshowSettings:properties -version");
+            CommandLineUtils.executeCommandLine(cmd, null, consumer);
+        } catch (Exception e2) {
+            e2.printStackTrace();
+        }
+
+        if (additionalJvmArgs == null) {
+            additionalJvmArgs = "";
+        }
+        if (consumer.isJava9Plus()) {
+            additionalJvmArgs = "--add-exports=jdk.xml.dom/org.w3c.dom.html=ALL-UNNAMED "
+                                + "--add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs=ALL-UNNAMED "
+                                + "--add-opens java.base/java.security=ALL-UNNAMED "
+                                + "--add-opens java.base/java.net=ALL-UNNAMED "
+                                + "--add-opens java.base/java.lang=ALL-UNNAMED "
+                                + "--add-opens java.base/java.util=ALL-UNNAMED "
+                                + "--add-opens java.base/java.util.concurrent=ALL-UNNAMED "
+                                + additionalJvmArgs;
+        }
+    }
+
+    /**
+     * Parse each line of the output for "java.version" and see if the version is >= 9
+     */
+    private static class Java9StreamConsumer implements StreamConsumer {
+        boolean java9;
+
+        public void consumeLine(String line) {
+            if (!java9 && line.contains("java.version")) {
+                String version = line.trim().substring("java.version = ".length());
+                if (version != null) {
+                    if (version.indexOf('.') > 0) {
+                        version = version.substring(0, version.indexOf('.'));
+                    }
+                    if (version.indexOf('-') > 0) {
+                        version = version.substring(0, version.indexOf('-'));
+                    }
+
+                    try {
+                        if (Integer.valueOf(version) >= 9) {
+                            java9 = true;
+                        }
+                    } catch (NumberFormatException ex) {
+                        // ignore
+                    }
+                }
+            }
+        }
+
+        public boolean isJava9Plus() {
+            return java9;
+        }
     }
 
     /**
