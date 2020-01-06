@@ -330,7 +330,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
     /**
      * Accepts a new resend candidate.
      *
-     * @param ctx the message context.
+     * @param message the message object.
      * @return ResendCandidate
      */
     protected ResendCandidate cacheUnacknowledged(Message message) {
@@ -420,7 +420,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         private boolean includeAckRequested;
 
         /**
-         * @param ctx message context for the unacked message
+         * @param m the unacked message
          */
         protected ResendCandidate(Message m) {
             message = m;
@@ -664,7 +664,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
          * Resend mechanics.
          *
          * @param message
-         * @param if a AckRequest should be included
+         * @param requestAcknowledge if a AckRequest should be included
          */
         void resend(Message message, boolean requestAcknowledge);
     }

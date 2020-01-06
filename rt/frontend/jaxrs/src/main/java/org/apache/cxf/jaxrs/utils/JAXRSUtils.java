@@ -1273,7 +1273,6 @@ public final class JAXRSUtils {
 
     /**
      * Retrieve map of query parameters from the passed in message
-     * @param message
      * @return a Map of query parameters.
      */
     public static MultivaluedMap<String, String> getStructuredParams(String query,

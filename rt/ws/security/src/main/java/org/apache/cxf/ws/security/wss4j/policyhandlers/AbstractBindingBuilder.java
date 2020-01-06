@@ -1062,26 +1062,26 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
      *
      * @return the generated or discovered wsu:Id attribute value
      */
-    public String addWsuIdToElement(Element elem) {
+    public String addWsuIdToElement(Element element) {
         String id;
 
         //first try to get the Id attr
-        Attr idAttr = elem.getAttributeNodeNS(null, "Id");
+        Attr idAttr = element.getAttributeNodeNS(null, "Id");
         if (idAttr == null) {
             //then try the wsu:Id value
-            idAttr = elem.getAttributeNodeNS(PolicyConstants.WSU_NAMESPACE_URI, "Id");
+            idAttr = element.getAttributeNodeNS(PolicyConstants.WSU_NAMESPACE_URI, "Id");
         }
 
         if (idAttr != null) {
             id = idAttr.getValue();
         } else {
             //Add an id
-            id = wssConfig.getIdAllocator().createId("_", elem);
+            id = wssConfig.getIdAllocator().createId("_", element);
             String pfx = null;
             try {
-                pfx = elem.lookupPrefix(PolicyConstants.WSU_NAMESPACE_URI);
+                pfx = element.lookupPrefix(PolicyConstants.WSU_NAMESPACE_URI);
             } catch (Throwable t) {
-                pfx = DOMUtils.getPrefixRecursive(elem, PolicyConstants.WSU_NAMESPACE_URI);
+                pfx = DOMUtils.getPrefixRecursive(element, PolicyConstants.WSU_NAMESPACE_URI);
             }
             boolean found = !StringUtils.isEmpty(pfx);
             int cnt = 0;
@@ -1090,9 +1090,9 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
 
                 String ns;
                 try {
-                    ns = elem.lookupNamespaceURI(pfx);
+                    ns = element.lookupNamespaceURI(pfx);
                 } catch (Throwable t) {
-                    ns = DOMUtils.getNamespace(elem, pfx);
+                    ns = DOMUtils.getNamespace(element, pfx);
                 }
 
                 if (!StringUtils.isEmpty(ns)) {
@@ -1101,14 +1101,14 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 }
             }
             if (!found) {
-                idAttr = elem.getOwnerDocument().createAttributeNS(WSDLConstants.NS_XMLNS, "xmlns:" + pfx);
+                idAttr = element.getOwnerDocument().createAttributeNS(WSDLConstants.NS_XMLNS, "xmlns:" + pfx);
                 idAttr.setValue(PolicyConstants.WSU_NAMESPACE_URI);
-                elem.setAttributeNodeNS(idAttr);
+                element.setAttributeNodeNS(idAttr);
             }
-            idAttr = elem.getOwnerDocument().createAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
+            idAttr = element.getOwnerDocument().createAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
                                                                pfx + ":Id");
             idAttr.setValue(id);
-            elem.setAttributeNodeNS(idAttr);
+            element.setAttributeNodeNS(idAttr);
         }
 
         return id;

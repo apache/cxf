@@ -101,7 +101,7 @@ public class JMSEndpoint {
     /**
      * Get the extensors from the wsdl and/or configuration that will
      * then be used to configure the JMSConfiguration object
-     * @param endpointUri
+     * @param endpointInfo
      * @param target
      */
     public JMSEndpoint(EndpointInfo endpointInfo, EndpointReferenceType target) {
@@ -109,14 +109,14 @@ public class JMSEndpoint {
     }
 
     /**
-     * @param ei
+     * @param endpointInfo
      * @param endpointUri
      */
-    public JMSEndpoint(EndpointInfo ei, String endpointUri) {
+    public JMSEndpoint(EndpointInfo endpointInfo, String endpointUri) {
         this.jmsVariant = JMSEndpoint.QUEUE;
 
-        if (ei != null) {
-            JMSEndpointWSDLUtil.retrieveWSDLInformation(this, ei);
+        if (endpointInfo != null) {
+            JMSEndpointWSDLUtil.retrieveWSDLInformation(this, endpointInfo);
         }
         if (!(StringUtils.isEmpty(endpointUri) || "jms://".equals(endpointUri) || !endpointUri.startsWith("jms"))) {
             this.endpointUri = endpointUri;
@@ -128,11 +128,11 @@ public class JMSEndpoint {
 
             // Use the properties like e.g. from JAXWS properties with "jms." prefix
             Map<String, Object> jmsProps = new HashMap<>();
-            if (ei != null) {
-                getJaxWsJmsProps(ei.getProperties(), jmsProps);
+            if (endpointInfo != null) {
+                getJaxWsJmsProps(endpointInfo.getProperties(), jmsProps);
             }
-            if (ei != null && ei.getBinding() != null) {
-                getJaxWsJmsProps(ei.getBinding().getProperties(), jmsProps);
+            if (endpointInfo != null && endpointInfo.getBinding() != null) {
+                getJaxWsJmsProps(endpointInfo.getBinding().getProperties(), jmsProps);
             }
             configureProperties(jmsProps);
         }

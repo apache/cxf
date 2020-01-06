@@ -59,10 +59,8 @@ public class LdapCertificateRepo implements CertificateRepo {
     /**
      *
      * @param ldapSearch
+     * @param ldapConfig
      * @param rootDN rootDN of the LDAP tree
-     * @param trustedAuthorityFilter
-     * @param intermediateFilter
-     * @param attrName
      */
     public LdapCertificateRepo(LdapSearch ldapSearch, LdapSchemaConfig ldapConfig, String rootDN) {
         this.ldapSearch = ldapSearch;
