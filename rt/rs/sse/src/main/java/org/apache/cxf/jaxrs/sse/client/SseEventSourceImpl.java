@@ -69,7 +69,7 @@ public class SseEventSourceImpl implements SseEventSource {
     private volatile long delay;
     // Indicates the this SseEventSource has been opened. It will remain true even if this is moved back to the
     // connecting state due to a scheduled reconnect.
-    private volatile boolean isOpened;
+    private volatile boolean opened;
 
     private class InboundSseEventListenerDelegate implements InboundSseEventListener {
         private String lastEventId;
@@ -191,7 +191,7 @@ public class SseEventSourceImpl implements SseEventSource {
         // If a 503 was receieved during connect we might be in the "Connecting" state,  however
         // the isOpened flag will need to be set indicating that the eventsource has been opened
         // and not yet closed.
-        isOpened = true;
+        opened = true;
     }
 
     private void connect(String lastEventId) {
@@ -265,7 +265,6 @@ public class SseEventSourceImpl implements SseEventSource {
                 }
 
                 delegate.onError(t);
-                delegate.onComplete();
                 response.close();
                 return;
             }
@@ -369,12 +368,12 @@ public class SseEventSourceImpl implements SseEventSource {
 
     @Override
     public boolean isOpen() {
-        return isOpened;
+        return opened;
     }
 
     @Override
     public boolean close(long timeout, TimeUnit tunit) {
-        isOpened = false;
+        opened = false;
         if (state.get() == SseSourceState.CLOSED) {
             return true;
         }
