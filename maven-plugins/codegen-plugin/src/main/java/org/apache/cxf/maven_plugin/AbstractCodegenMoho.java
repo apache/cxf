@@ -610,15 +610,15 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         cmd.getShell().setQuotedArgumentsEnabled(true); // for JVM args
         cmd.setWorkingDirectory(project.getBuild().getDirectory());
 
-        String javaPath = getJavaExecutable().getAbsolutePath();
         try {
+            String javaPath = getJavaExecutable().getAbsolutePath();
             cmd.setExecutable(javaPath);
+            setJvmForkArgs(javaPath);
         } catch (IOException e) {
             getLog().debug(e);
             throw new MojoExecutionException(e.getMessage(), e);
         }
 
-        setJvmForkArgs(javaPath);
         cmd.createArg().setLine(additionalJvmArgs);
 
         File file = null;
