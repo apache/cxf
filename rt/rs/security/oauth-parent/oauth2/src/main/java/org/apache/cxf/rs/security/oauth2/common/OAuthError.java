@@ -85,7 +85,6 @@ public class OAuthError {
     /**
      * Gets the optional link to the page
      * describing the error in detail
-     * @param errorUri error page URI
      */
     public String getErrorUri() {
         return errorUri;

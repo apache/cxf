@@ -285,7 +285,7 @@ public class Headers {
                 String key = HttpHeaderHelper.getHeaderKey(entry.getKey());
                 List<String> old = headers.get(key);
                 if (old != null) {
-                    List<String> nl = new ArrayList<>(old.size() + entry.getValue().size()); 
+                    List<String> nl = new ArrayList<>(old.size() + entry.getValue().size());
                     nl.addAll(old);
                     nl.addAll(entry.getValue());
                     headers.put(key, nl);
@@ -306,7 +306,8 @@ public class Headers {
      *
      * @param logger     The Logger to log to.
      * @param level   The Logging Level.
-     * @param headers The Message protocol headers.
+     * @param headersMap The Message protocol headers.
+     * @param logSensitiveHeaders whether to log sensitive headers
      */
     static void logProtocolHeaders(Logger logger, Level level,
                                    Map<String, List<Object>> headersMap,
@@ -422,8 +423,7 @@ public class Headers {
     /**
      * Copy the request headers into the message.
      *
-     * @param message the current message
-     * @param headers the current set of headers
+     * @param req the current servlet request
      */
     protected void copyFromRequest(HttpServletRequest req) {
 
@@ -495,12 +495,11 @@ public class Headers {
     private boolean isSingleHeader(String header) {
         return HTTP_HEADERS_SETCOOKIE.equalsIgnoreCase(header) || HTTP_HEADERS_LINK.equalsIgnoreCase(header);
     }
-    
+
     /**
      * Copy the response headers into the response.
      *
-     * @param message the current message
-     * @param headers the current set of headers
+     * @param response the current ServletResponse
      */
     protected void copyToResponse(HttpServletResponse response) {
         String contentType = getContentTypeFromMessage();

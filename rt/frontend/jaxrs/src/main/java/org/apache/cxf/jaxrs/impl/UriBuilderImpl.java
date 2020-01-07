@@ -47,7 +47,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 public class UriBuilderImpl extends UriBuilder implements Cloneable {
     private static final String EXPAND_QUERY_VALUE_AS_COLLECTION = "expand.query.value.as.collection";
-    
+
     private String scheme;
     private String userInfo;
     private int port = -1;
@@ -63,9 +63,9 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     private Map<String, Object> resolvedTemplates;
     private Map<String, Object> resolvedTemplatesPathEnc;
     private Map<String, Object> resolvedEncodedTemplates;
-    
+
     private boolean queryValueIsCollection;
-    
+
     /**
      * Creates builder with empty URI.
      */
@@ -846,7 +846,6 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
      *
      * @param map query or matrix multivalued map
      * @param separator params separator, '&' for query ';' for matrix
-     * @param fromEncoded if true then values will be decoded
      * @return stringified params.
      */
     private String buildParams(MultivaluedMap<String, String> map, char separator) {
@@ -854,14 +853,14 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         StringBuilder b = new StringBuilder();
         for (Iterator<Map.Entry<String, List<String>>> it = map.entrySet().iterator(); it.hasNext();) {
             Map.Entry<String, List<String>> entry = it.next();
-            
-            // Expand query parameter as "name=v1,v2,v3" 
+
+            // Expand query parameter as "name=v1,v2,v3"
             if (isQuery && queryValueIsCollection) {
                 b.append(entry.getKey()).append('=');
-                
+
                 for (Iterator<String> sit = entry.getValue().iterator(); sit.hasNext();) {
                     String val = sit.next();
-                    
+
                     if (val != null) {
                         boolean templateValue = val.startsWith("{") && val.endsWith("}");
                         if (!templateValue) {
@@ -872,7 +871,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                         } else {
                             val = URITemplate.createExactTemplate(val).encodeLiteralCharacters(isQuery);
                         }
-                        
+
                         if (!val.isEmpty()) {
                             b.append(val);
                         }
@@ -881,12 +880,12 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                         b.append(',');
                     }
                 }
-                
+
                 if (it.hasNext()) {
                     b.append(separator);
                 }
             } else {
-                // Expand query parameter as "name=v1&name=v2&name=v3", or use dedicated 
+                // Expand query parameter as "name=v1&name=v2&name=v3", or use dedicated
                 // separator for matrix parameters
                 for (Iterator<String> sit = entry.getValue().iterator(); sit.hasNext();) {
                     String val = sit.next();

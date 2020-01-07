@@ -28,7 +28,9 @@
     <artifactId>org.apache.cxf.osgi.itests</artifactId>
     <name>Apache CXF :: OSGi :: Integration Tests</name>
     <packaging>jar</packaging>
-    
+    <properties>
+        <cxf.module.name>org.apache.cxf.osgi.itests</cxf.module.name>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>

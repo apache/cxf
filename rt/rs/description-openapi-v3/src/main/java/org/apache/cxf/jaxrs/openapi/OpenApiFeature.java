@@ -373,7 +373,7 @@ public class OpenApiFeature extends DelegatingFeature<OpenApiFeature.Portable>
         return Portable.registerComponents(securityDefinitions);
     }
 
-    public OpenApiResource createOpenApiResource() {
+    public BaseOpenApiResource createOpenApiResource() {
         return delegate.createOpenApiResource();
     }
 
@@ -911,7 +911,7 @@ public class OpenApiFeature extends DelegatingFeature<OpenApiFeature.Portable>
             return hasComponents ? Optional.of(components) : Optional.empty();
         }
 
-        private OpenApiResource createOpenApiResource() {
+        private BaseOpenApiResource createOpenApiResource() {
             return (customizer == null) ? new OpenApiResource() : new OpenApiCustomizedResource(customizer);
         }
     }

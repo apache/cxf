@@ -18,8 +18,10 @@
  */
 
 
-
 package org.apache.cxf.systest.transform.feature;
+
+import java.io.IOException;
+import java.net.ServerSocket;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
@@ -30,6 +32,7 @@ import org.apache.cxf.feature.transform.XSLTInInterceptor;
 import org.apache.cxf.feature.transform.XSLTOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.http.HTTPConduit;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -82,6 +85,32 @@ public class TransformFeatureTest extends AbstractBusClientServerTestBase {
             String exceptionMessage = e.getMessage();
             assertTrue(exceptionMessage.toLowerCase().contains("404: not found")); 
         } 
+    }
+
+    @Test
+    public void testClientOutTransformationOnConnectionRefused() throws IOException {
+        Service service = Service.create(SERVICE_NAME);
+        ServerSocket socket = new ServerSocket(0);
+        String endpoint = "http://127.0.0.1:" + socket.getLocalPort() + "/";
+        socket.close();
+        service.addPort(PORT_NAME, SOAPBinding.SOAP11HTTP_BINDING, endpoint);
+
+        Echo port = service.getPort(PORT_NAME, Echo.class);
+        Client client = ClientProxy.getClient(port);
+        HTTPConduit httpConduit = (HTTPConduit) client.getConduit();
+        // We need to disable chunking to make the client write directly to the connection OutputStream
+        httpConduit.getClient().setAllowChunking(false);
+
+        XSLTOutInterceptor outInterceptor = new XSLTOutInterceptor(XSLT_REQUEST_PATH);
+        client.getOutInterceptors().add(outInterceptor);
+
+        try {
+            port.echo("test");
+            fail("Connection refused expected");
+        } catch (Exception e) {
+            String exceptionMessage = e.getMessage();
+            assertTrue(exceptionMessage.toLowerCase().contains("connection refused"));
+        }
     }
 
     @Test

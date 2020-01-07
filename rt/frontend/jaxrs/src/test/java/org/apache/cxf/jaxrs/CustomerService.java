@@ -16,24 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systests.cdi.base;
 
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-import javax.ws.rs.GET;
+package org.apache.cxf.jaxrs;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-@RequestScoped
-@Path("/bookstore/versioned")
-public class BookStoreVersioned {
-    @Inject private String version;
-
-    @GET
-    @Path("/version")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getVersion() {
-        return version + '.' + this.hashCode();
-    }
+@Consumes(MediaType.TEXT_XML)
+@Produces(MediaType.TEXT_XML)
+public interface CustomerService extends GenericService<CustomerServiceRequest, CustomerServiceResponse> {
+    @Override
+    @POST
+    @Path("process")
+    CustomerServiceResponse process(CustomerServiceRequest request);
 }

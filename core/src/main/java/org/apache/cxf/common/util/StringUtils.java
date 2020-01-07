@@ -111,22 +111,25 @@ public final class StringUtils {
      * @return capitalized form.
      */
     public static String capitalize(String name) {
-        if (name == null || name.isEmpty()) {
-            return name;
-        }
-        char[] chars = name.toCharArray();
-        chars[0] = Character.toUpperCase(chars[0]);
-        return new String(chars);
+        return changeFirstCharacterCase(name, true);
     }
 
     public static String uncapitalize(String str) {
+        return changeFirstCharacterCase(str, false);
+    }
+
+    private static String changeFirstCharacterCase(String str, boolean capitalize) {
         if (str == null || str.isEmpty()) {
             return str;
         }
-        return new StringBuilder(str.length())
-            .append(Character.toLowerCase(str.charAt(0)))
-            .append(str.substring(1))
-            .toString();
+        char baseChar = str.charAt(0);
+        char updatedChar = capitalize ? Character.toUpperCase(baseChar) : Character.toLowerCase(baseChar);
+        if (baseChar == updatedChar) {
+            return str;
+        }
+        char[] chars = str.toCharArray();
+        chars[0] = updatedChar;
+        return new String(chars);
     }
 
     public static byte[] toBytesUTF8(String str) {

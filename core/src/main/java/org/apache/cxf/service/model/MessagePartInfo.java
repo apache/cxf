@@ -131,7 +131,7 @@ public final class MessagePartInfo extends AbstractPropertiesHolder implements N
 
     @Override
     public String toString() {
-        return new StringBuilder().append("[MessagePartInfo name=")
+        return new StringBuilder("[MessagePartInfo name=")
             .append(getName())
             .append(", ConcreteName=")
             .append(getConcreteName()).toString();

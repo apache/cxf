@@ -16,24 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systests.cdi.base;
 
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
+package org.apache.cxf.jaxrs;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
-@RequestScoped
-@Path("/bookstore/versioned")
-public class BookStoreVersioned {
-    @Inject private String version;
-
+@Path("/api")
+public class BaseApi {
     @GET
-    @Path("/version")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getVersion() {
-        return version + '.' + this.hashCode();
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response getApi(@Context HttpHeaders headers, @Context UriInfo uriInfo, @PathParam("type") String type) {
+        return Response.ok().build();
     }
 }

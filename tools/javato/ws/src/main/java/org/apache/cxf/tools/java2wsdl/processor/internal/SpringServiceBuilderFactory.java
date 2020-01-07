@@ -26,13 +26,13 @@ import java.util.List;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.BusApplicationContext;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.frontend.AbstractServiceFactory;
 import org.apache.cxf.service.ServiceBuilder;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.java2wsdl.processor.FrontendFactory;
-import org.apache.cxf.tools.util.NameUtil;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
@@ -64,8 +64,8 @@ public final class SpringServiceBuilderFactory extends ServiceBuilderFactory {
      * @param databindingName
      * @return
      */
-    public static String databindingNameToBeanName(String dbName) {
-        return NameUtil.capitalize(dbName.toLowerCase()) + ToolConstants.DATABIND_BEAN_NAME_SUFFIX;
+    public static String databindingNameToBeanName(String databindingName) {
+        return StringUtils.capitalize(databindingName.toLowerCase()) + ToolConstants.DATABIND_BEAN_NAME_SUFFIX;
     }
 
     @Override
@@ -110,7 +110,7 @@ public final class SpringServiceBuilderFactory extends ServiceBuilderFactory {
     /**
      * This is factored out to permit use in a unit test.
      *
-     * @param bus
+     * @param additionalFilePathnames
      * @return
      */
     public static ApplicationContext getApplicationContext(List<String> additionalFilePathnames) {

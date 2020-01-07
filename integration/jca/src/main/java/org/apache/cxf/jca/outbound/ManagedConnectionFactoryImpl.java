@@ -99,13 +99,7 @@ public class ManagedConnectionFactoryImpl implements ManagedConnectionFactory,
 
     // hashCode method is required by JCA 1.5 because on properties
     public int hashCode() {
-        int retval = 0;
-
-        if (busConfigURL != null) {
-            retval += busConfigURL.hashCode();
-        }
-
-        return retval;
+        return Objects.hashCode(busConfigURL);
     }
 
     // equals method is required by JCA 1.5 because on properties
