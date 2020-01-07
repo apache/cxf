@@ -324,7 +324,7 @@ final class InternalContextUtils {
                                         "Executor queue is full, use the caller thread."
                                         + "  Users can specify a larger executor queue to avoid this.");
                             // only block the thread if the prop is unset or set to false, otherwise let it go
-                            if (!MessageUtils.getContextualBoolean(inMessage, 
+                            if (!MessageUtils.getContextualBoolean(inMessage,
                                     "org.apache.cxf.oneway.rejected_execution_exception")) {
                                 //the executor queue is full, so run the task in the caller thread
                                 inMessage.getInterceptorChain().resume();
@@ -501,7 +501,6 @@ final class InternalContextUtils {
     /**
      * Get action from attributes on MessageInfo
      *
-     * @param bindingOpInfo the current BindingOperationInfo
      * @param msgInfo the current MessageInfo
      * @return the action if set
      */
@@ -539,8 +538,8 @@ final class InternalContextUtils {
 
     /**
      * Get the Executor for this invocation.
-     * @param endpoint
-     * @return
+     * @param message the current Message
+     * @return the executor for this invocation
      */
     private static Executor getExecutor(final Message message) {
         Endpoint endpoint = message.getExchange().getEndpoint();

@@ -71,7 +71,7 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
     /**
      * Select one of the alternate addresses for a retried invocation.
      *
-     * @param a List of alternate addresses if available
+     * @param alternates a List of alternate addresses if available
      * @return the selected address
      */
     public String selectAlternateAddress(List<String> alternates) {
@@ -103,7 +103,7 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
     /**
      * Select one of the alternate endpoints for a retried invocation.
      *
-     * @param a List of alternate endpoints if available
+     * @param alternates a List of alternate endpoints if available
      * @return the selected endpoint
      */
     public Endpoint selectAlternateEndpoint(List<Endpoint> alternates) {

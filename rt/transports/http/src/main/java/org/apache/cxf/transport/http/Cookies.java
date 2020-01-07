@@ -58,8 +58,7 @@ public class Cookies {
     /**
      * Given a list of current cookies and a new Set-Cookie: request, construct
      * a new set of current cookies and return it.
-     * @param current Set of previously set cookies
-     * @param header Text of a Set-Cookie: header
+     * @param headers Text of the Set-Cookie: headers
      * @return New set of cookies
      */
     private void handleSetCookie(List<String> headers) {

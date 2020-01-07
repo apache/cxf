@@ -100,7 +100,7 @@ public class MDBActivationWork implements Work {
     }
 
     /**
-     * @param endpoint
+     * @param invoker
      * @param classLoader
      */
     private void activate(MDBInvoker invoker, ClassLoader classLoader) {
@@ -233,10 +233,6 @@ public class MDBActivationWork implements Work {
         return endpoint.getServer(factory.getAddress());
     }
 
-    /**
-     * @param str
-     * @return
-     */
     private List<String> getListOfString(String str) {
         if (str == null) {
             return null;

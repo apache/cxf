@@ -47,7 +47,8 @@ public final class NamespaceHelper {
     /**
      * Create a unique namespace uri/prefix combination.
      *
-     * @param nsUri
+     * @param element
+     * @param namespaceURI namespace
      * @return The namespace with the specified URI. If one doesn't exist, one
      *         is created.
      */
@@ -74,7 +75,9 @@ public final class NamespaceHelper {
     /**
      * Create a unique namespace uri/prefix combination.
      *
-     * @param nsUri
+     * @param writer target writer.
+     * @param namespaceURI namespace
+     * @param declare whether to declare to the stream.
      * @return The namespace with the specified URI. If one doesn't exist, one
      *         is created.
      * @throws XMLStreamException
