@@ -191,7 +191,7 @@
         <cxf.servlet-api.version>3.1.0</cxf.servlet-api.version>
         <cxf.slf4j.version>1.7.29</cxf.slf4j.version>
         <cxf.snakeyaml.version>1.25</cxf.snakeyaml.version>
-        <cxf.specs.jaxws.api.version>2.3_1</cxf.specs.jaxws.api.version>
+        <cxf.specs.jaxws.api.version>2.3_2</cxf.specs.jaxws.api.version>
         <cxf.spring.boot.version>2.1.11.RELEASE</cxf.spring.boot.version>
         <cxf.spring.ldap.version>2.3.2.RELEASE</cxf.spring.ldap.version>
         <cxf.spring.mock>spring-test</cxf.spring.mock>
@@ -257,7 +257,7 @@
         <cxf.servicemix.jaxrs.specs.version>2.9.1</cxf.servicemix.jaxrs.specs.version>
         <cxf.servicemix.jodatime.version>2.3_1</cxf.servicemix.jodatime.version>
         <cxf.servicemix.jsoup.version>1.5.2_2</cxf.servicemix.jsoup.version>
-        <cxf.servicemix.specs.jaxb.version>2.3_1</cxf.servicemix.specs.jaxb.version>
+        <cxf.servicemix.specs.jaxb.version>2.3_2</cxf.servicemix.specs.jaxb.version>
         <cxf.servicemix.specs.version>2.9.0</cxf.servicemix.specs.version>
         <cxf.wsdl4j.bundle.version>1.6.3_1</cxf.wsdl4j.bundle.version>
         <cxf.xalan.bundle.version>2.7.2_3</cxf.xalan.bundle.version>
