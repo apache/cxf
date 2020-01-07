@@ -222,7 +222,7 @@
         <cxf.xalan.version>2.7.2</cxf.xalan.version>
         <cxf.xbean.version>4.15</cxf.xbean.version>
         <cxf.xerces.version>2.12.0</cxf.xerces.version>
-        <cxf.xmlschema.version>2.2.4</cxf.xmlschema.version>
+        <cxf.xmlschema.version>2.2.5</cxf.xmlschema.version>
         <cxf.zest.version>2.1</cxf.zest.version>
 
         <!-- various OSGi related versions -->
