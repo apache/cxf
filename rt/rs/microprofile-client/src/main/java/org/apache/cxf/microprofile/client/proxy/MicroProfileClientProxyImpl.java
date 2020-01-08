@@ -186,7 +186,7 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
                 } else if (t != null && m.getExceptionTypes() != null) {
                     // its a checked exception, make sure its declared
                     for (Class<?> c : m.getExceptionTypes()) {
-                        if (t.getClass().isAssignableFrom(c)) {
+                        if (c.isAssignableFrom(t.getClass())) {
                             throw t;
                         }
                     }
