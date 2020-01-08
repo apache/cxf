@@ -686,6 +686,10 @@
                                     <exclude>javax.xml.ws:jaxws-api</exclude>
                                     <exclude>javax.jws:javax.jws-api</exclude>
                                     <exclude>javax.xml.soap:javax.xml.soap-api</exclude>
+                                    <exclude>javax.activation:javax.activation-api</exclude>
+                                    <exclude>com.sun.activation:javax.activation</exclude>
+                                    <!--<exclude>javax.validation:validation-api</exclude>
+                                    <exclude>javax.annotation:javax.annotation-api</exclude>-->
                                 </excludes>
                             </bannedDependencies>
                         </rules>
