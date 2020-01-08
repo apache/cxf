@@ -114,7 +114,7 @@ public class TokenProviderResponse {
 
     /**
      * Set the attached TokenReference
-     * @param attachtedReference the attached TokenReference
+     * @param attachedReference the attached TokenReference
      */
     public void setAttachedReference(TokenReference attachedReference) {
         this.attachedReference = attachedReference;
@@ -130,7 +130,7 @@ public class TokenProviderResponse {
 
     /**
      * Set the unattached TokenReference
-     * @param unAttachedReference  Set the unattached TokenReference
+     * @param unattachedReference  Set the unattached TokenReference
      */
     public void setUnattachedReference(TokenReference unattachedReference) {
         this.unAttachedReference = unattachedReference;

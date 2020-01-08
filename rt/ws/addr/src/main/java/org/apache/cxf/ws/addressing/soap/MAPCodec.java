@@ -453,7 +453,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
      * @param value the value to encode
      * @param name the QName for the header
      * @param clz the class
-     * @param JAXBContext the JAXB context to use
+     * @param context the JAXB context to use
      */
     private <T> void encodeAsExposed(AddressingProperties maps,
                                      SoapMessage message,

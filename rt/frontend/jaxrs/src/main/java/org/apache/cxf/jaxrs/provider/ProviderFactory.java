@@ -847,7 +847,7 @@ public abstract class ProviderFactory {
     }
     /**
      * Use for injection of entityProviders
-     * @param entityProviders the entityProviders to set
+     * @param userProviders the userProviders to set
      */
     public void setUserProviders(List<?> userProviders) {
         setProviders(true, false, userProviders.toArray());

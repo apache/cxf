@@ -88,8 +88,8 @@ public final class IdlPreprocessorReader extends Reader {
      *
      * @param startURL
      * @param startLocation
-     * @param includeResolver
-     * @param defineState
+     * @param resolver
+     * @param state
      * @throws IOException
      */
     public IdlPreprocessorReader(URL startURL,
