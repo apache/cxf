@@ -45,6 +45,10 @@
                     <groupId>com.sun.activation</groupId>
                     <artifactId>javax.activation</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>javax.annotation</groupId>
+                    <artifactId>javax.annotation-api</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 

@@ -688,8 +688,8 @@
                                     <exclude>javax.xml.soap:javax.xml.soap-api</exclude>
                                     <exclude>javax.activation:javax.activation-api</exclude>
                                     <exclude>com.sun.activation:javax.activation</exclude>
-                                    <!--<exclude>javax.validation:validation-api</exclude>
-                                    <exclude>javax.annotation:javax.annotation-api</exclude>-->
+                                    <exclude>javax.annotation:javax.annotation-api</exclude>
+                                    <!--<exclude>javax.validation:validation-api</exclude>-->
                                 </excludes>
                             </bannedDependencies>
                         </rules>
