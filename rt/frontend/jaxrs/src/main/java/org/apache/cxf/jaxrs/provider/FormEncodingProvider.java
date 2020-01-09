@@ -154,9 +154,6 @@ public class FormEncodingProvider<T> extends AbstractConfigurableProvider
 
     /**
      * Retrieve map of parameters from the passed in message
-     *
-     * @param message
-     * @return a Map of parameters.
      */
     protected void populateMap(MultivaluedMap<String, String> params,
                                Annotation[] anns,

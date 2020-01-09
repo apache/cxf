@@ -241,10 +241,6 @@ public class MDBActivationWork implements Work {
         return Arrays.asList(str.split(","));
     }
 
-    /**
-     * @param endpoint
-     * @return
-     */
     private MDBInvoker createInvoker() {
         MDBInvoker answer = null;
         if (spec instanceof DispatchMDBActivationSpec) {

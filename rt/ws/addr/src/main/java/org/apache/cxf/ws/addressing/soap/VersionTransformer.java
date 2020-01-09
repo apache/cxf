@@ -137,7 +137,7 @@ public class VersionTransformer extends org.apache.cxf.ws.addressing.VersionTran
      * @param encodedAs specifies the encoded version
      * @param clz the class
      * @param headerElement the SOAP header element
-     * @param marshaller the JAXB marshaller to use
+     * @param unmarshaller the JAXB unmarshaller to use
      * @return the decoded value
      */
     public <T> T decodeAsNative(String encodedAs, Class<T> clz, Element headerElement,

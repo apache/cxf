@@ -34,15 +34,14 @@ import org.apache.cxf.phase.Phase;
 
 public class WireTapIn extends AbstractPhaseInterceptor<Message> {
     private static final String WIRE_TAP_STARTED = WireTapIn.class.getName() + ".Started";
-    
+
     private long threshold = -1;
     private int limit = AbstractLoggingInterceptor.DEFAULT_LIMIT;
 
     /**
      * Instantiates a new WireTapIn
      * @param limit
-     *
-     * @param logMessageContent the log message content
+     * @param threshold the log threshold
      */
     public WireTapIn(int limit, long threshold) {
         super(Phase.RECEIVE);

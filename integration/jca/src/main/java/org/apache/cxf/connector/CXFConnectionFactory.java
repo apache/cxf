@@ -30,7 +30,7 @@ public interface CXFConnectionFactory {
 
     /**
      *  Creates a client proxy based on the connection parameter object.
-     * @param param,
+     * @param param
      * @return A proxy object that implements both the given <code>iface</code>
      *         and the {@link Connection} interface. It represents the Web
      *         service associated with the specified service.
