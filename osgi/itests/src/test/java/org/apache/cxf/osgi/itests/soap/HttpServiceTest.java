@@ -20,6 +20,7 @@ package org.apache.cxf.osgi.itests.soap;
 
 import java.io.InputStream;
 
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.osgi.itests.AbstractServerActivator;
 import org.apache.cxf.osgi.itests.CXFOSGiTestSupport;
@@ -77,13 +78,24 @@ public class HttpServiceTest extends CXFOSGiTestSupport {
     }
 
     private static InputStream serviceBundle() {
-        return TinyBundles.bundle()
+        if (JavaUtils.isJava11Compatible()) {
+            return TinyBundles.bundle()
                   .add(AbstractServerActivator.class)
                   .add(HttpTestActivator.class)
                   .add(Greeter.class)
                   .add(GreeterImpl.class)
                   .set(Constants.BUNDLE_ACTIVATOR, HttpTestActivator.class.getName())
+                  .set("Require-Capability", "osgi.ee;filter:=\"(&(osgi.ee=JavaSE)(version=11))\"")
                   .build(TinyBundles.withBnd());
+        } else {
+            return TinyBundles.bundle()
+                .add(AbstractServerActivator.class)
+                .add(HttpTestActivator.class)
+                .add(Greeter.class)
+                .add(GreeterImpl.class)
+                .set(Constants.BUNDLE_ACTIVATOR, HttpTestActivator.class.getName())
+                .build(TinyBundles.withBnd());
+        }
     }
 
 }

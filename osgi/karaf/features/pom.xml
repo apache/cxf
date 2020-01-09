@@ -179,7 +179,7 @@
                                 <descriptor>file:${project.build.directory}/classes/features.xml</descriptor>
                             </descriptors>
                             <distribution>org.apache.karaf.features:framework</distribution>
-                            <javase>9</javase>
+                            <javase>11</javase>
                             <framework>
                                 <feature>framework</feature>
                             </framework>

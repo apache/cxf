@@ -26,6 +26,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.osgi.itests.AbstractServerActivator;
 import org.apache.cxf.osgi.itests.CXFOSGiTestSupport;
 import org.osgi.framework.Constants;
@@ -112,13 +113,24 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
     }
 
     private static InputStream serviceBundle() {
-        return TinyBundles.bundle()
+        if (JavaUtils.isJava11Compatible()) {
+            return TinyBundles.bundle()
                   .add(AbstractServerActivator.class)
                   .add(JaxRsTestActivator.class)
                   .add(Book.class)
                   .add(BookStore.class)
                   .set(Constants.BUNDLE_ACTIVATOR, JaxRsTestActivator.class.getName())
+                  .set("Require-Capability", "osgi.ee;filter:=\"(&(osgi.ee=JavaSE)(version=11))\"")
                   .build(TinyBundles.withBnd());
+        } else {
+            return TinyBundles.bundle()
+                .add(AbstractServerActivator.class)
+                .add(JaxRsTestActivator.class)
+                .add(Book.class)
+                .add(BookStore.class)
+                .set(Constants.BUNDLE_ACTIVATOR, JaxRsTestActivator.class.getName())
+                .build(TinyBundles.withBnd());
+        }
     }
 
 }
