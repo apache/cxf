@@ -181,13 +181,13 @@ public class MessageListenerTest {
         assertNumMessagesInQueue("At the start the DLQ should be empty", connection, dlq, 0, 0);
 
         sendMessage(connection, dest, OK);
-        assertNumMessagesInQueue("This message should be committed", connection, dest, 0, 1000);
+        assertNumMessagesInQueue("This message should be committed", connection, dest, 0, 3500);
 
         sendMessage(connection, dest, FAILFIRST);
-        assertNumMessagesInQueue("Should succeed on second try", connection, dest, 0, 2000);
+        assertNumMessagesInQueue("Should succeed on second try", connection, dest, 0, 3500);
 
         sendMessage(connection, dest, FAIL);
-        assertNumMessagesInQueue("Should be rolled back", connection, dlq, 1, 2500);
+        assertNumMessagesInQueue("Should be rolled back", connection, dlq, 1, 3500);
     }
 
     private Connection createConnection(String name) throws JMSException {
