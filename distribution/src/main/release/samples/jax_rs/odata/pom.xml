@@ -29,7 +29,7 @@
         <relativePath>../..</relativePath>
     </parent>
     <properties>
-        <olingo.version>4.7.0</olingo.version>
+        <olingo.version>4.7.1</olingo.version>
     </properties>
     <profiles>
         <profile>
