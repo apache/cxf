@@ -24,6 +24,7 @@ import java.util.Collections;
 import javax.jms.ConnectionFactory;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.osgi.itests.CXFOSGiTestSupport;
 import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
@@ -82,12 +83,22 @@ public class JmsServiceTest extends CXFOSGiTestSupport {
     }
 
     private static InputStream serviceBundle() {
-        return TinyBundles.bundle()
+        if (JavaUtils.isJava11Compatible()) {
+            return TinyBundles.bundle()
+                .add(JmsTestActivator.class)
+                .add(Greeter.class)
+                .add(GreeterImpl.class)
+                .set(Constants.BUNDLE_ACTIVATOR, JmsTestActivator.class.getName())
+                .set("Require-Capability", "osgi.ee;filter:=\"(&(osgi.ee=JavaSE)(version=11))\"")
+                .build(TinyBundles.withBnd());
+        } else {
+            return TinyBundles.bundle()
                 .add(JmsTestActivator.class)
                 .add(Greeter.class)
                 .add(GreeterImpl.class)
                 .set(Constants.BUNDLE_ACTIVATOR, JmsTestActivator.class.getName())
                 .build(TinyBundles.withBnd());
+        }
     }
 
 }
