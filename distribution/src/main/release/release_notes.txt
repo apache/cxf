@@ -1,4 +1,4 @@
-Apache CXF 3.2.11 Release Notes
+Apache CXF 3.2.12 Release Notes
 
 1. Overview
 
@@ -17,7 +17,7 @@ New features include:
 * Preliminary support for running on Java 9  (no module support yet)
 * New http-undertow transport
 
-3.2.11 fixes over 11 JIRA issues reported by users and the community since 3.2.10.
+3.2.12 fixes over 15 JIRA issues reported by users and the community since 3.2.11.
 
 
 Important notes:
@@ -70,22 +70,19 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-    * [CXF-8089] - Build Comma Separated Values in url from Array/List Query Param
-    * [CXF-8118] - CXF LoggingInInterceptor: CachedWriter leaks
-    * [CXF-8123] - FIQL parser throws a StringIndexOutOfBoundsException on a wildcard character
-    * [CXF-8124] - CXF metrics - MetricsContext#stop called twice or without Fault in certain error cases
-    * [CXF-8127] - LoggingFeature - Wrong address concatenation
-    * [CXF-8128] - Fill address field in case of responses
-
-** Improvement
-    * [CXF-8094] - Add a way to register additional classes in WadlGenerator
-    * [CXF-8105] - introduce a property for JMS transport client to decide reset JMS connection or not when client timeout
-    * [CXF-8125] - Support for using thread-safe application-defined StAX-factories
-    * [CXF-8133] - Disable JAX-RS HTTP method overriding by default
-
-** Task
-    * [CXF-8107] - Update to Swagger Core 2.0.10/1.5.24 and SwaggerUI 3.24.0
-
-
-
+    * [CXF-8097] - Equal candidates for handling the current request (HEAD / GET)
+    * [CXF-8137] - Using SecurityConstants.VALIDATE_TOKEN with WSS4JInInterceptor no longer allows skipping validation of token
+    * [CXF-8139] - SecurityToken, parsing the lifetime may cause a NullPointerException
+    * [CXF-8143] - ensure java2wadl-plugin m2e compatible
+    * [CXF-8158] - @BeanParam arguments not properly translated to OpenApi
+    * [CXF-8161] - Memory Leak/Thread Leak in JMSDestination & PollingMessageListenerContainer
+    * [CXF-8163] - javax.ws.rs.core.Response#getCookies() fails when cookie has no value
+    * [CXF-8169] - CXF opentracing - Span#finish is never called in case of client timeouts
+    * [CXF-8170] - Failure to parse multiple comma separated links in an HTTP Link header on a Jaxrs Response object
+    * [CXF-8171] - SSE Client does not support multiple data fields
+    * [CXF-8174] - Incorrect service method resolution
+    * [CXF-8179] - JSON Jackson does not handle resource returning CompletionStage<X>
+    * [CXF-8180] - UnsupportedOperationException in AbstractEndpointFactory
+    * [CXF-8181] - CXFNonSpringJaxrsServlet Feature registration fails via javax.ws.rs.Application
+    * [CXF-8186] - On connection refused, XSLTOutInterceptor mangles the error
 
