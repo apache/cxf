@@ -19,8 +19,6 @@
 
 package org.apache.cxf.jaxrs.utils;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -92,6 +90,7 @@ import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.io.ReaderInputStream;
@@ -1892,14 +1891,13 @@ public final class JAXRSUtils {
 
     // copy the input stream so that it is not inadvertently closed
     private static InputStream copyAndGetEntityStream(Message m) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            IOUtils.copy(m.getContent(InputStream.class), baos);
+        LoadingByteArrayOutputStream baos = new LoadingByteArrayOutputStream(); 
+        try (InputStream in = m.getContent(InputStream.class)) {
+            IOUtils.copy(in, baos);
         } catch (IOException e) {
             throw ExceptionUtils.toInternalServerErrorException(e, null);
         }
-        final byte[] copiedBytes = baos.toByteArray();
-        m.setContent(InputStream.class, new ByteArrayInputStream(copiedBytes));
-        return new ByteArrayInputStream(copiedBytes);
+        m.setContent(InputStream.class, baos.createInputStream());
+        return baos.createInputStream();
     }
 }
