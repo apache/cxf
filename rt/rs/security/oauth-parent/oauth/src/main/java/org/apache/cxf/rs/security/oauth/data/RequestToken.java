@@ -41,7 +41,7 @@ public class RequestToken extends Token {
 
     /**
      * Sets the token verifier
-     * @param oauthVerifier
+     * @param verifier
      */
     public void setVerifier(String verifier) {
         this.oauthVerifier = verifier;

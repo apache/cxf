@@ -71,7 +71,7 @@ public interface SessionAuthenticityTokenProvider {
     /**
      * Expand the session token
      *
-     * @param mc the {@link MessageContext} of this request
+     * @param messageContext the {@link MessageContext} of this request
      * @param sessionToken the token
      * @param subject authenticated end user
      * @return the expanded token or null

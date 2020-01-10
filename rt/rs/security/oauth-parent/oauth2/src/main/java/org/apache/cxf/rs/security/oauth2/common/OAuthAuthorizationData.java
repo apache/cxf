@@ -104,7 +104,7 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
 
     /**
      * Set the list of scopes already approved by a user
-     * @param permissions the list of approved scopes
+     * @param perms the list of approved scopes
      */
     public void setAlreadyAuthorizedPermissions(List<OAuthPermission> perms) {
         this.alreadyAuthorizedPermissions = perms;
@@ -283,5 +283,5 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
     public String getPreauthorizedTokenKey() {
         return this.preauthorizedTokenKey;
     }
-    
+
 }

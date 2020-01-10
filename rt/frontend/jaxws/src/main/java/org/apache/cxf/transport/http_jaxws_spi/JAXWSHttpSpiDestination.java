@@ -56,7 +56,6 @@ public class JAXWSHttpSpiDestination extends AbstractHTTPDestination {
     /**
      * This is called by handlers for servicing requests
      *
-     * @param context
      * @param req
      * @param resp
      * @throws IOException

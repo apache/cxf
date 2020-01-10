@@ -321,7 +321,8 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
      * used to verify signatures.
      * Return true on a match
      * @param subjectKeyInfo the SAMLKeyInfo object
-     * @param signedResults a list of all of the signed results
+     * @param message the current Message
+     * @param tlsCerts the TLS client certificates
      * @return true if the credentials of the assertion were used to verify a signature
      */
     private boolean compareCredentials(
