@@ -85,8 +85,8 @@
         </dependency>
         <dependency>
             <groupId>org.apache.servicemix.specs</groupId>
-            <artifactId>org.apache.servicemix.specs.jaxws-api-2.2</artifactId>
-            <version>2.9.0</version>
+            <artifactId>org.apache.servicemix.specs.jaxws-api-2.3</artifactId>
+            <version>2.3_2</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.woodstox</groupId>
