@@ -1,4 +1,4 @@
-Apache CXF 3.3.4 Release Notes
+Apache CXF 3.3.5 Release Notes
 
 1. Overview
 
@@ -23,7 +23,7 @@ http://cxf.apache.org/docs/33-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
-3.3.4 fixes over 20 JIRA issues reported by users and the community.
+3.3.5 fixes over 32 JIRA issues reported by users and the community.
 
 
 
@@ -67,71 +67,44 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-    * [CXF-8025] - wsdl2java using wrapper style cannot handle multiple levels of xsd:extension elements
-    * [CXF-8089] - Build Comma Separated Values in url from Array/List Query Param
-    * [CXF-8090] - Warnings when using cxf-codegen-plugin
-    * [CXF-8095] - When the workqueue is full for more than asyncExecuteTimeout milliseconds the work is never added
-    * [CXF-8101] - Build fails behind maven proxy repository
-    * [CXF-8108] - Strip file path from Content-Disposition filename
-    * [CXF-8118] - CXF LoggingInInterceptor: CachedWriter leaks
-    * [CXF-8123] - FIQL parser throws a StringIndexOutOfBoundsException on a wildcard character
-    * [CXF-8124] - CXF metrics - MetricsContext#stop called twice or without Fault in certain error cases
-    * [CXF-8127] - LoggingFeature - Wrong address concatenation
-    * [CXF-8128] - Fill address field in case of responses
+    * [CXF-8097] - Equal candidates for handling the current request (HEAD / GET)
+    * [CXF-8130] - Since Spring 5.1.5 Release CXFServlet application listener dissapears by context refresh
+    * [CXF-8137] - Using SecurityConstants.VALIDATE_TOKEN with WSS4JInInterceptor no longer allows skipping validation of token
+    * [CXF-8139] - SecurityToken, parsing the lifetime may cause a NullPointerException
+    * [CXF-8143] - ensure java2wadl-plugin m2e compatible
+    * [CXF-8144] - OpenAPI v3 Feature: duplicated "getOpenApi" methods
+    * [CXF-8153] -  @Path with REGEX in path parameter and checkMethodsForInvalidURITemplates(userType, methods);
+    * [CXF-8158] - @BeanParam arguments not properly translated to OpenApi
+    * [CXF-8161] - Memory Leak/Thread Leak in JMSDestination & PollingMessageListenerContainer
+    * [CXF-8162] - JWE with multiple recipients does not work for AES CBC Encryption
+    * [CXF-8163] - javax.ws.rs.core.Response#getCookies() fails when cookie has no value
+    * [CXF-8169] - CXF opentracing - Span#finish is never called in case of client timeouts
+    * [CXF-8170] - Failure to parse multiple comma separated links in an HTTP Link header on a Jaxrs Response object
+    * [CXF-8171] - SSE Client does not support multiple data fields
+    * [CXF-8174] - Incorrect service method resolution
+    * [CXF-8178] - ECDH KeyAgreement with Key Wrapping is not in line with the specification
+    * [CXF-8179] - JSON Jackson does not handle resource returning CompletionStage<X>
+    * [CXF-8180] - UnsupportedOperationException in AbstractEndpointFactory
+    * [CXF-8181] - CXFNonSpringJaxrsServlet Feature registration fails via javax.ws.rs.Application
+    * [CXF-8185] - Generated Ephemeral Public Key missing in JWE Headers when Json Serialization is used
+    * [CXF-8186] - On connection refused, XSLTOutInterceptor mangles the error
+    * [CXF-8187] - Codegen-Plugin failed when maven is executed on jdk9+ with Toolchains specifying jdk 8
 
 ** Improvement
-    * [CXF-8094] - Add a way to register additional classes in WadlGenerator
-    * [CXF-8105] - introduce a property for JMS transport client to decide reset JMS connection or not when client timeout
-    * [CXF-8125] - Support for using thread-safe application-defined StAX-factories
-    * [CXF-8133] - Disable JAX-RS HTTP method overriding by default
+    * [CXF-8140] - setAccessible(true) before reflection method java.security.acl.Group#members invocation in DefaultSecurityContext
+    * [CXF-8145] - Need property for suffix-list data file
+    * [CXF-8152] - Add a property so it's possible to build cxf with posix tarLongFileMode
+    * [CXF-8160] - Workaround in the cxf-jackson feature has to be removed
+    * [CXF-8167] - Restrict the URI schemes allowed when importing schemas or WSDLs
+    * [CXF-8177] - JWE API does not support ECDH Direct Encryption/Decryption
 
-** Test
-    * [CXF-8086] - Override test fixture of super tests may lead to flaky test
-    * [CXF-8087] - unstable test environment caused by accessing system property without cleanup
-    * [CXF-8092] - duplicate test run due to test inheritance
+** Wish
+    * [CXF-8168] - Wadl2java maven plugin not allows mapping to array types
 
 ** Task
-    * [CXF-8106] - Update to Swagger Core 1.5.23 and 2.0.9
-    * [CXF-8107] - Update to Swagger Core 2.0.10/1.5.24 and SwaggerUI 3.24.0
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    * [CXF-8150] - Update to Spring Boot 2.1.10
+    * [CXF-8155] - Update to Jackson 2.10.1
+    * [CXF-8157] - Update to Jackson Databind 2.9.10.1
 
 
 
