@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
@@ -143,6 +144,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         XMLStreamWriter newXMLStreamWriter;
         try {
             WSSSecurityProperties secProps = createSecurityProperties();
+            secProps.setDocumentCreator(() -> DOMUtils.createDocument());
             translateProperties(mc, secProps);
             configureCallbackHandler(mc, secProps);
 
