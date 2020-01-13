@@ -46,6 +46,7 @@ import org.eclipse.microprofile.rest.client.tck.providers.TestMessageBodyWriter;
 import org.eclipse.microprofile.rest.client.tck.providers.TestParamConverterProvider;
 import org.eclipse.microprofile.rest.client.tck.providers.TestReaderInterceptor;
 import org.eclipse.microprofile.rest.client.tck.providers.TestWriterInterceptor;
+import org.eclipse.microprofile.rest.client.tck.providers.Widget;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -146,12 +147,12 @@ public class CxfTypeSafeClientBuilderTest {
             .baseUri(new URI("http://localhost:8080/neverUsed"))
             .build(InterfaceWithoutProvidersDefined.class);
 
-        Response response = client.executePut("foo", "bar");
+        Response response = client.executePut(new Widget("foo", 7), "bar");
         assertEquals(200, response.getStatus());
         assertEquals(Response.class.getName(), response.getHeaderString("ReturnType"));
         assertEquals("PUT", response.getHeaderString("PUT"));
         assertEquals("/{id}", response.getHeaderString("Path"));
-        assertEquals(String.class.getName(), response.getHeaderString("Parm1"));
+        assertEquals(Widget.class.getName(), response.getHeaderString("Parm1"));
         assertEquals(PathParam.class.getName(), response.getHeaderString("Parm1Annotation"));
         assertEquals(String.class.getName(), response.getHeaderString("Parm2"));
     }
