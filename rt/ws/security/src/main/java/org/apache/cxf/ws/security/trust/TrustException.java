@@ -45,8 +45,9 @@ public class TrustException extends UncheckedException {
         super(msg, t);
     }
     /**
+     * @param log
      * @param msg
-     * @param t
+     * @param params
      */
     public TrustException(Logger log, String msg, Object ... params) {
         super(log, msg, params);

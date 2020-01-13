@@ -73,7 +73,7 @@ public abstract class ServiceBuilderFactory {
     /**
      * Return the databinding name.
      *
-     * @return
+     * @return the databinding name.
      */
     public String getDatabindingName() {
         return databindingName;
@@ -84,7 +84,7 @@ public abstract class ServiceBuilderFactory {
      *
      * @param databindingName
      */
-    public void setDatabindingName(String arg) {
-        databindingName = arg;
+    public void setDatabindingName(String databindingName) {
+        this.databindingName = databindingName;
     }
 }

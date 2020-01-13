@@ -126,7 +126,6 @@ public final class RMContextUtils {
      * @param isOutbound true if the message is outbound
      * @param isRequestor true if the current messaging role is that of
      *            requestor
-     * @param handler true if HANDLER scope, APPLICATION scope otherwise
      */
     public static void storeMAPs(AddressingProperties maps, Message message, boolean isOutbound,
                                  boolean isRequestor) {

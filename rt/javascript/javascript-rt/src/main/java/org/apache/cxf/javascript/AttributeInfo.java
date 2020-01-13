@@ -80,7 +80,7 @@ public final class AttributeInfo implements ItemInfo {
     /**
      * Fill in an AttributeInfo for an attribute or anyAttribute from a sequence.
      *
-     * @param sequesequenceObjectnceElement
+     * @param sequenceObject
      * @param currentSchema
      * @param schemaCollection
      * @param prefixAccumulator
