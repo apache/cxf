@@ -30,6 +30,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.nio.charset.StandardCharsets;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -1978,7 +1979,7 @@ public class WadlGenerator implements ContainerRequestFilter {
             this.theSchemas = new LinkedList<>();
             // we'll need to do the proper schema caching eventually
             for (String s : schemas) {
-                XMLSource source = new XMLSource(new ByteArrayInputStream(s.getBytes()));
+                XMLSource source = new XMLSource(new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8)));
                 source.setBuffering();
                 Map<String, String> locs = getLocationsMap(source, "import", links, ui);
                 locs.putAll(getLocationsMap(source, "include", links, ui));
