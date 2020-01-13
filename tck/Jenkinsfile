@@ -1,0 +1,59 @@
+pipeline {
+   agent {
+       label 'ubuntu'
+   }
+   
+    tools { 
+        maven 'Maven 3.6.2' 
+        jdk 'JDK 1.8.0_191' 
+    }
+    
+   stages {
+       stage("Prepare") {
+           steps {
+               cleanWs()
+           }
+       }
+
+       stage ('Check tooling') {
+            steps {
+                sh '''
+                    echo "PATH = ${PATH}"
+                    echo "M2_HOME = ${M2_HOME}"
+                    echo "JAVA_HOME = ${JAVA_HOME}"
+                '''
+            }
+        }
+       
+       stage('Download JakartaEE TCK') {
+           steps {
+               git 'https://github.com/eclipse-ee4j/jakartaee-tck'
+           }
+       }
+       
+       stage('Download Glassfish 5.1.0') { // for display purposes
+           steps {
+               sh 'wget https://repo1.maven.org/maven2/org/glassfish/main/distributions/glassfish/5.1.0/glassfish-5.1.0.zip'
+               sh 'unzip glassfish-5.1.0.zip'
+               sh 'rm glassfish-5.1.0.zip'
+           }
+       }
+       
+       stage('Download Apache CXF bits') {
+           steps {
+               echo "Using Apache CXF version: " + params.Version
+               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-core:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
+               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-rt-frontend-jaxrs:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
+               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-rt-rs-client:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
+               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-rt-rs-sse:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
+               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-rt-transports-http:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
+           }
+       }
+   }
+   
+   post { 
+        always { 
+            cleanWs()
+        }
+    }
+}
