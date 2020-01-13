@@ -26,15 +26,36 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.CDI;
 
+import org.apache.cxf.Bus;
+
+
 public final class CDIUtils {
 
     private CDIUtils() {
     }
 
-    public static <T> T getInstanceFromCDI(Class<T> clazz) {
+    static BeanManager getCurrentBeanManager(Bus bus) {
+        BeanManager bm = bus.getExtension(BeanManager.class);
+        if (bm == null) {
+            bm = getCurrentBeanManager();
+            bus.setExtension(bm, BeanManager.class);
+        }
+        return bm;
+    }
+
+    static BeanManager getCurrentBeanManager() {
+        return CDI.current().getBeanManager();
+    }
+
+
+    static <T> T getInstanceFromCDI(Class<T> clazz) {
+        return getInstanceFromCDI(clazz, null);
+    }
+    
+    static <T> T getInstanceFromCDI(Class<T> clazz, Bus bus) {
         T t;
         try {
-            t = findBean(clazz);
+            t = findBean(clazz, bus);
         } catch (ExceptionInInitializerError | NoClassDefFoundError | IllegalStateException ex) {
             // expected if no CDI implementation is available
             t = null;
@@ -46,8 +67,8 @@ public final class CDIUtils {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> T findBean(Class<T> clazz) {
-        BeanManager beanManager = CDI.current().getBeanManager();
+    private static <T> T findBean(Class<T> clazz, Bus bus) {
+        BeanManager beanManager = bus == null ? getCurrentBeanManager() : getCurrentBeanManager(bus);
         Bean<?> bean = beanManager.getBeans(clazz).iterator().next();
         CreationalContext<?> ctx = beanManager.createCreationalContext(bean);
         T instance = (T) beanManager.getReference(bean, clazz, ctx);

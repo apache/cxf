@@ -428,23 +428,23 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
     private void mergeHeaders(Class<ClientHeadersFactory> factoryCls, MultivaluedMap<String, String> existingHeaders) {
 
         try {
-            ClientHeadersFactory factory = CDIFacade.getInstanceFromCDI(factoryCls).orElse(factoryCls.newInstance());
+            ClientHeadersFactory factory;
 
-            MultivaluedMap<String, String> jaxrsHeaders;
-            if (JAXRS_UTILS_GET_CURRENT_MESSAGE_METHOD != null) {
-                Message m = (Message) JAXRS_UTILS_GET_CURRENT_MESSAGE_METHOD.invoke(null);
-                if (m != null) {
-                    ProviderInfo<ClientHeadersFactory> pi = clientHeaderFactories.computeIfAbsent(factoryCls, k -> {
-                        return new ProviderInfo<ClientHeadersFactory>(factory, m.getExchange().getBus(), true);
-                    });
-                    InjectionUtils.injectContexts(factory, pi, m);
-                }
-                jaxrsHeaders = getJaxrsHeaders(m);
+            Message m = JAXRS_UTILS_GET_CURRENT_MESSAGE_METHOD == null ? null
+                : (Message) JAXRS_UTILS_GET_CURRENT_MESSAGE_METHOD.invoke(null);
+
+            if (m != null) {
+                factory = CDIFacade.getInstanceFromCDI(factoryCls, m.getExchange().getBus())
+                        .orElse(factoryCls.newInstance());
+                ProviderInfo<ClientHeadersFactory> pi = clientHeaderFactories.computeIfAbsent(factoryCls, k -> {
+                    return new ProviderInfo<ClientHeadersFactory>(factory, m.getExchange().getBus(), true);
+                });
+                InjectionUtils.injectContexts(factory, pi, m);
             } else {
-                jaxrsHeaders = new MultivaluedHashMap<>();
+                factory = CDIFacade.getInstanceFromCDI(factoryCls).orElse(factoryCls.newInstance());
             }
 
-            MultivaluedMap<String, String> updatedHeaders = factory.update(jaxrsHeaders, existingHeaders);
+            MultivaluedMap<String, String> updatedHeaders = factory.update(getJaxrsHeaders(m), existingHeaders);
             existingHeaders.putAll(updatedHeaders);
         } catch (Throwable t) {
             // expected if not running in a JAX-RS server environment.
