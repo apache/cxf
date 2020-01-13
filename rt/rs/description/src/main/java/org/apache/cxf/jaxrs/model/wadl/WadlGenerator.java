@@ -2027,17 +2027,16 @@ public class WadlGenerator implements ContainerRequestFilter {
         }
 
         private String transformSchema(String schema, Map<String, String> locs) {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            SchemaConverter sc = new SchemaConverter(StaxUtils.createXMLStreamWriter(bos), locs);
+            StringWriter sw = new StringWriter();
+            SchemaConverter sc = new SchemaConverter(StaxUtils.createXMLStreamWriter(sw), locs);
             try {
                 StaxUtils.copy(new StreamSource(new StringReader(schema)), sc);
                 sc.flush();
                 sc.close();
-                return bos.toString();
+                return sw.toString();
             } catch (Exception ex) {
                 return schema;
             }
-
         }
 
         @Override
