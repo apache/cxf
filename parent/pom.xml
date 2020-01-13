@@ -233,7 +233,7 @@
         <cxf.aries.version.range>[1.0,2)</cxf.aries.version.range>
         <cxf.bcel.bundle.version>5.2_4</cxf.bcel.bundle.version>
         <cxf.cglib.osgi.version>[2.2.2,3.3)</cxf.cglib.osgi.version>
-        <cxf.dom4j.bundle.version>1.6.1_5</cxf.dom4j.bundle.version>
+        <cxf.dom4j.bundle.version>2.1.1_1</cxf.dom4j.bundle.version>
         <cxf.fastinfoset.bundle.version>1.2.16_1</cxf.fastinfoset.bundle.version>
         <cxf.felix.configadmin.version>1.2.4</cxf.felix.configadmin.version>
         <cxf.istack.bundle.version>3.0.7</cxf.istack.bundle.version>
