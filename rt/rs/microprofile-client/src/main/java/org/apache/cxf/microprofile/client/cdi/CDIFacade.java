@@ -20,18 +20,60 @@
 package org.apache.cxf.microprofile.client.cdi;
 
 import java.util.Optional;
+import java.util.concurrent.Callable;
+
+import org.apache.cxf.Bus;
+
 
 public final class CDIFacade {
+
+    private static final boolean CDI_AVAILABLE;
 
     private CDIFacade() {
     }
 
+    static {
+        boolean b;
+        try {
+            Class.forName("javax.enterprise.inject.spi.BeanManager");
+            b = true;
+        } catch (Throwable t) {
+            b = false;
+        }
+        CDI_AVAILABLE = b;
+    }
+
+    public static Optional<Object> getBeanManager(Bus b) {
+        return nullableOptional(() -> CDIUtils.getCurrentBeanManager(b));
+    }
+
+    public static Optional<Object> getBeanManager() {
+        try {
+            return nullableOptional(() -> CDIUtils.getCurrentBeanManager());
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return Optional.ofNullable(null);
+        }
+    }
+
+    public static <T> Optional<T> getInstanceFromCDI(Class<T> clazz, Bus b) {
+        return nullableOptional(() -> CDIUtils.getInstanceFromCDI(clazz, b));
+    }
+
     public static <T> Optional<T> getInstanceFromCDI(Class<T> clazz) {
+        return nullableOptional(() -> CDIUtils.getInstanceFromCDI(clazz));
+    }
+
+    private static <T> Optional<T> nullableOptional(Callable<T> callable) {
+        if (!CDI_AVAILABLE) {
+            return Optional.ofNullable(null);
+        }
+
         T t;
         try {
-            t = CDIUtils.getInstanceFromCDI(clazz);
-        } catch (ExceptionInInitializerError | NoClassDefFoundError | IllegalStateException ex) {
-            // expected if no MP Config implementation is available
+            t = callable.call();
+        } catch (Throwable ex) {
+            // expected if no CDI implementation is available
             t = null;
         }
         return Optional.ofNullable(t);
