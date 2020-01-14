@@ -56,17 +56,17 @@ public final class CDIFacade {
         }
     }
 
-    public static <T> Optional<T> getInstanceFromCDI(Class<T> clazz, Bus b) {
+    public static <T> Optional<Instance<T>> getInstanceFromCDI(Class<T> clazz, Bus b) {
         return nullableOptional(() -> CDIUtils.getInstanceFromCDI(clazz, b));
     }
 
-    public static <T> Optional<T> getInstanceFromCDI(Class<T> clazz) {
+    public static <T> Optional<Instance<T>> getInstanceFromCDI(Class<T> clazz) {
         return nullableOptional(() -> CDIUtils.getInstanceFromCDI(clazz));
     }
 
     private static <T> Optional<T> nullableOptional(Callable<T> callable) {
         if (!CDI_AVAILABLE) {
-            return Optional.ofNullable(null);
+            return Optional.empty();
         }
 
         T t;

@@ -18,16 +18,24 @@
  */
 package org.apache.cxf.microprofile.client.cdi;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.NormalScope;
+import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.Produces;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.microprofile.client.mock.HighPriorityClientReqFilter;
 import org.apache.cxf.microprofile.client.mock.InvokedMethodClientRequestFilter;
 import org.apache.cxf.microprofile.client.mock.LowPriorityClientReqFilter;
@@ -77,5 +85,71 @@ public class RestClientCdiTest {
         assertEquals(3, (int) priorities.get(LowPriorityClientReqFilter.class));
         assertEquals(10, (int) priorities.get(HighPriorityClientReqFilter.class));
         assertEquals(Priorities.USER, (int) priorities.get(InvokedMethodClientRequestFilter.class));
+
+        control.verify();
+    }
+
+    @Test
+    @SuppressWarnings({"unchecked", "rawTypes"})
+    public void testCreationalContextsReleasedOnClientClose() throws Exception {
+        IMocksControl control = EasyMock.createStrictControl();
+        BeanManager mockedBeanMgr = control.createMock(BeanManager.class);
+        CreationalContext<?> mockedCreationalCtx = control.createMock(CreationalContext.class);
+        Bean<?> mockedBean = control.createMock(Bean.class);
+        List<String> stringList = new ArrayList<>(Collections.singleton("abc"));
+
+        EasyMock.expect(mockedBeanMgr.getBeans(List.class))
+                .andReturn(Collections.singleton(mockedBean));
+        EasyMock.expect(mockedBeanMgr.createCreationalContext(mockedBean))
+                .andReturn((CreationalContext) mockedCreationalCtx);
+        EasyMock.expect(mockedBeanMgr.getReference(mockedBean, List.class, mockedCreationalCtx))
+                .andReturn(stringList);
+        EasyMock.expect(mockedBean.getScope())
+                .andReturn((Class) ApplicationScoped.class);
+        EasyMock.expect(mockedBeanMgr.isNormalScope(ApplicationScoped.class))
+                .andReturn(false);
+        mockedCreationalCtx.release();
+        EasyMock.expectLastCall().once();
+        control.replay();
+
+        Bus bus = new ExtensionManagerBus();
+        bus.setExtension(mockedBeanMgr, BeanManager.class);
+
+        Instance<List> i = CDIUtils.getInstanceFromCDI(List.class, bus);
+        assertEquals(stringList, i.getValue());
+        i.release();
+
+        control.verify();
+    }
+
+    @Test
+    @SuppressWarnings({"unchecked", "rawTypes"})
+    public void testCreationalContextsNotReleasedOnClientCloseUsingNormalScope() throws Exception {
+        IMocksControl control = EasyMock.createStrictControl();
+        BeanManager mockedBeanMgr = control.createMock(BeanManager.class);
+        CreationalContext<?> mockedCreationalCtx = control.createMock(CreationalContext.class);
+        Bean<?> mockedBean = control.createMock(Bean.class);
+        List<String> stringList = new ArrayList<>(Collections.singleton("xyz"));
+
+        EasyMock.expect(mockedBeanMgr.getBeans(List.class))
+                .andReturn(Collections.singleton(mockedBean));
+        EasyMock.expect(mockedBeanMgr.createCreationalContext(mockedBean))
+                .andReturn((CreationalContext) mockedCreationalCtx);
+        EasyMock.expect(mockedBeanMgr.getReference(mockedBean, List.class, mockedCreationalCtx))
+                .andReturn(stringList);
+        EasyMock.expect(mockedBean.getScope())
+                .andReturn((Class) NormalScope.class);
+        EasyMock.expect(mockedBeanMgr.isNormalScope(NormalScope.class))
+                .andReturn(true);
+        control.replay();
+
+        Bus bus = new ExtensionManagerBus();
+        bus.setExtension(mockedBeanMgr, BeanManager.class);
+
+        Instance<List> i = CDIUtils.getInstanceFromCDI(List.class, bus);
+
+        i.release();
+
+        control.verify();
     }
 }
