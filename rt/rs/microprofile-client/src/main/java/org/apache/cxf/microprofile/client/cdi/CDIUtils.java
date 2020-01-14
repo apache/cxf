@@ -48,30 +48,31 @@ public final class CDIUtils {
     }
 
 
-    static <T> T getInstanceFromCDI(Class<T> clazz) {
+    static <T> Instance<T> getInstanceFromCDI(Class<T> clazz) {
         return getInstanceFromCDI(clazz, null);
     }
-    
-    static <T> T getInstanceFromCDI(Class<T> clazz, Bus bus) {
-        T t;
+
+    static <T> Instance<T> getInstanceFromCDI(Class<T> clazz, Bus bus) {
+        Instance<T> instance;
         try {
-            t = findBean(clazz, bus);
+            instance = findBean(clazz, bus);
         } catch (ExceptionInInitializerError | NoClassDefFoundError | IllegalStateException ex) {
             // expected if no CDI implementation is available
-            t = null;
+            instance = null;
         } catch (NoSuchElementException ex) {
             // expected if ClientHeadersFactory is not managed by CDI
-            t = null;
+            instance = null;
         }
-        return t;
+        return instance;
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> T findBean(Class<T> clazz, Bus bus) {
+    private static <T> Instance<T> findBean(Class<T> clazz, Bus bus) {
         BeanManager beanManager = bus == null ? getCurrentBeanManager() : getCurrentBeanManager(bus);
         Bean<?> bean = beanManager.getBeans(clazz).iterator().next();
         CreationalContext<?> ctx = beanManager.createCreationalContext(bean);
-        T instance = (T) beanManager.getReference(bean, clazz, ctx);
+        Instance<T> instance = new Instance<>((T) beanManager.getReference(bean, clazz, ctx), 
+            beanManager.isNormalScope(bean.getScope()) ? () -> { } : ctx::release);
         return instance;
     }
 }

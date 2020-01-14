@@ -25,6 +25,7 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -62,6 +63,7 @@ import org.apache.cxf.microprofile.client.MPRestClientCallback;
 import org.apache.cxf.microprofile.client.MicroProfileClientProviderFactory;
 import org.apache.cxf.microprofile.client.cdi.CDIFacade;
 import org.apache.cxf.microprofile.client.cdi.CDIInterceptorWrapper;
+import org.apache.cxf.microprofile.client.cdi.Instance;
 import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
 import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 import org.eclipse.microprofile.rest.client.ext.ClientHeadersFactory;
@@ -102,6 +104,7 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
     private Object objectInstance;
     private Map<Class<ClientHeadersFactory>, ProviderInfo<ClientHeadersFactory>> clientHeaderFactories = 
         new WeakHashMap<>();
+    private List<Instance<?>> cdiInstances = new LinkedList<>();
 
     //CHECKSTYLE:OFF
     public MicroProfileClientProxyImpl(URI baseURI, ClassLoader loader, ClassResourceInfo cri,
@@ -425,6 +428,11 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
         }
     }
 
+    private ClientHeadersFactory mapClientHeadersInstance(Instance<ClientHeadersFactory> instance) {
+        cdiInstances.add(instance);
+        return instance.getValue();
+    }
+
     private void mergeHeaders(Class<ClientHeadersFactory> factoryCls, MultivaluedMap<String, String> existingHeaders) {
 
         try {
@@ -435,13 +443,16 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
 
             if (m != null) {
                 factory = CDIFacade.getInstanceFromCDI(factoryCls, m.getExchange().getBus())
-                        .orElse(factoryCls.newInstance());
+                                   .map(this::mapClientHeadersInstance)
+                                   .orElse(factoryCls.newInstance());
                 ProviderInfo<ClientHeadersFactory> pi = clientHeaderFactories.computeIfAbsent(factoryCls, k -> {
                     return new ProviderInfo<ClientHeadersFactory>(factory, m.getExchange().getBus(), true);
                 });
                 InjectionUtils.injectContexts(factory, pi, m);
             } else {
-                factory = CDIFacade.getInstanceFromCDI(factoryCls).orElse(factoryCls.newInstance());
+                factory = CDIFacade.getInstanceFromCDI(factoryCls)
+                                   .map(this::mapClientHeadersInstance)
+                                   .orElse(factoryCls.newInstance());
             }
 
             MultivaluedMap<String, String> updatedHeaders = factory.update(getJaxrsHeaders(m), existingHeaders);
@@ -511,5 +522,11 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
             headers.putAll(CastUtils.cast((Map<?, ?>) m.get(Message.PROTOCOL_HEADERS)));
         }
         return headers;
+    }
+
+    @Override
+    public void close() {
+        cdiInstances.forEach(Instance::release);
+        super.close();
     }
 }
