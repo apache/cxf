@@ -1267,12 +1267,6 @@
                 <groupId>org.apache.cxf.xjc-utils</groupId>
                 <artifactId>cxf-xjc-runtime</artifactId>
                 <version>${cxf.xjc-utils.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>javax.xml.bind</groupId>
-                        <artifactId>jaxb-api</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             
             <dependency>
