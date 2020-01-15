@@ -396,7 +396,7 @@ s1as.admin.port=${glassfish.admin.port}
 #                             with instructions on how to package and deploy
 #                             Default to jersey
 ##########################################################################
-web.home=/home/reta/Workspaces/glassfish5/glassfish
+web.home=${GF_HOME}
 jaxrs_impl.classes=${web.home}/lib/cxf-rt-rs-client-${version}.jar:${web.home}/lib/cxf-core-${version}.jar:${web.home}/lib/cxf-rt-transports-http-${version}.jar:${web.home}/lib/cxf-rt-frontend-jaxrs-${version}.jar:${web.home}/lib/cxf-rt-rs-sse-${version}.jar
 jaxrs.classes=${web.home}/modules/jakarta.ws.rs-api.jar:${web.home}/modules/endorsed/jakarta.annotation-api.jar:${web.home}/modules/bean-validator.jar:${web.home}/modules/jakarta.json.jar:${web.home}/modules/jakarta.interceptor-api.jar:${web.home}/modules/jakarta.ejb-api.jar:${web.home}/modules/jakarta.inject.jar:${web.home}/modules/cdi-api.jar:${web.home}/modules/jakarta.json.bind-api.jar
 
