@@ -1584,23 +1584,19 @@ public final class StaxUtils {
             ((Element)parent).setAttributeNode(attr);
             break;
         case XMLStreamConstants.CHARACTERS:
-            if (parent != null) {
-                Characters characters = ev.asCharacters();
-                context.setRecordLoc(addLocation(doc,
-                                                 parent.appendChild(doc.createTextNode(characters.getData())),
-                                                 characters.getLocation(), context.isRecordLoc()));
-            }
-            break;
-        case XMLStreamConstants.COMMENT:
-            if (parent != null) {
-                parent.appendChild(doc.createComment(((javax.xml.stream.events.Comment)ev).getText()));
-            }
-            break;
-        case XMLStreamConstants.CDATA:
             Characters characters = ev.asCharacters();
             context.setRecordLoc(addLocation(doc,
-                                             parent.appendChild(doc.createCDATASection(characters.getData())),
+                                             parent.appendChild(doc.createTextNode(characters.getData())),
                                              characters.getLocation(), context.isRecordLoc()));
+            break;
+        case XMLStreamConstants.COMMENT:
+            parent.appendChild(doc.createComment(((javax.xml.stream.events.Comment)ev).getText()));
+            break;
+        case XMLStreamConstants.CDATA:
+            Characters cdata = ev.asCharacters();
+            context.setRecordLoc(addLocation(doc,
+                                             parent.appendChild(doc.createCDATASection(cdata.getData())),
+                                             cdata.getLocation(), context.isRecordLoc()));
             break;
         case XMLStreamConstants.PROCESSING_INSTRUCTION:
             parent.appendChild(doc.createProcessingInstruction(((ProcessingInstruction)ev).getTarget(),
