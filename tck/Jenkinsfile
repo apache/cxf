@@ -4,11 +4,22 @@ pipeline {
    }
    
     tools { 
+        ant 'Ant 1.10.6'
         maven 'Maven 3.6.2' 
         jdk 'JDK 1.8.0_191' 
     }
     
-   stages {
+    environment {
+        ANT_OPTS = "-Djavax.xml.accessExternalSchema=all"
+    }
+    
+    stages {
+        stage("Initialization") {
+            steps {
+                buildName "CXF ${params.Version} JAX-RS 2.1 TCK"
+            }
+        }
+
        stage("Prepare") {
            steps {
                cleanWs()
@@ -21,13 +32,19 @@ pipeline {
                     echo "PATH = ${PATH}"
                     echo "M2_HOME = ${M2_HOME}"
                     echo "JAVA_HOME = ${JAVA_HOME}"
+                    echo "ANT_HOME = ${ANT_HOME}"
+                    echo "WORKSPACE = ${PWD}"
                 '''
             }
         }
        
        stage('Download JakartaEE TCK') {
            steps {
-               git 'https://github.com/eclipse-ee4j/jakartaee-tck'
+               checkout([$class: 'GitSCM',
+	               branches: [[name: '*/master']],
+                   userRemoteConfigs: [[url: 'https://github.com/eclipse-ee4j/jakartaee-tck']],
+                   extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'jakartaee-tck']]
+               ])
            }
        }
        
@@ -49,10 +66,85 @@ pipeline {
                sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-rt-transports-http:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
            }
        }
+       
+       stage('Prepare JAX-RS TCK build configuration') {
+           steps {
+              withEnv(["WORKSPACE = ${PWD}"]) {
+                sh "wget https://raw.githubusercontent.com/apache/cxf/master/tck/ts.jte.template"
+                sh "sed -i '" + 's/${version}/' + params.Version + "/g' ts.jte.template"
+                sh "sed -i '" + 's#${GF_HOME}#' + "${WORKSPACE}/glassfish5/glassfish" + "#g' ts.jte.template"
+                sh "cp jakartaee-tck/bin/xml/impl/glassfish/jersey.xml jakartaee-tck/bin/xml/impl/glassfish/cxf.xml"
+              }
+           }
+       }
+       
+       stage('Build JAX-RS TCK') {
+           steps {
+                withEnv([
+                    "WORKSPACE=${pwd()}",
+                    "TS_HOME=${WORKSPACE}/jakartaee-tck",
+                    "javaee_home=${WORKSPACE}/glassfish5",
+                    "GF_HOME=${WORKSPACE}/glassfish5/glassfish",
+                    "AS_JAVA=$JAVA_HOME",
+                    "deliverabledir=jaxrs"
+                ]) {
+                    sh 'yes | cp -vr ts.jte.template jakartaee-tck/install/jaxrs/bin/ts.jte'
+                    
+                    dir("${TS_HOME}/install/${deliverabledir}/bin") {
+                        sh "ant build.all"
+                        sh "ant update.jaxrs.wars"
+                    }
+                    
+                    dir("${TS_HOME}/release/tools/") {
+                        sh "ant jaxrs"
+                    }
+                }
+           }
+       }
+       
+       stage('Run JAX-RS TCK') {
+           steps {
+                withEnv([
+                    "WORKSPACE=${pwd()}",
+                    "TS_HOME=${WORKSPACE}/restful-ws-tck",
+                    "javaee_home=${WORKSPACE}/glassfish5",
+                    "GF_HOME=${WORKSPACE}/glassfish5/glassfish",
+                    "AS_JAVA=$JAVA_HOME",
+                    "deliverabledir=jaxrs"
+                ]) {
+                    sh "cp -r jakartaee-tck/release/JAXRS_BUILD/latest/restful-ws-tck ${WORKSPACE}"
+                    sh "yes | cp -vr ts.jte.template ${TS_HOME}/bin/ts.jte"
+
+                    dir("${TS_HOME}/bin") {
+                        sh "ant config.vi"
+                        sh "ant deploy.all"
+                        sh "ant run.all"
+                    }
+                }
+           }
+           
+           post {
+               always {
+                   withEnv([
+                    "WORKSPACE=${pwd()}",
+                    "TS_HOME=${WORKSPACE}/restful-ws-tck",
+                   ]) {
+                      dir("${TS_HOME}/bin") {
+                        sh "ant stop-server -f xml/impl/glassfish/config.vi.xml"
+                      }
+                      
+                      sh "mv /tmp/JT* ${WORKSPACE}"
+                   }
+               }
+           }
+       }
    }
    
    post { 
         always { 
+            archiveArtifacts artifacts: 'jakartaee-tck/release/JAXRS_BUILD/latest/restful*.zip', fingerprint: true
+            archiveArtifacts artifacts: 'JTwork/**', fingerprint: true
+            archiveArtifacts artifacts: 'JTreport/**', fingerprint: true
             cleanWs()
         }
     }
