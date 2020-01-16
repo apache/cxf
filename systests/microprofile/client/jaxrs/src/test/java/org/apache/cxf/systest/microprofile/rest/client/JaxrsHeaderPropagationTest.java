@@ -80,6 +80,10 @@ public class JaxrsHeaderPropagationTest extends AbstractBusClientServerTestBase 
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
         createStaticBus();
         System.out.println("Listening on port " + PORT);
+
+        ConfigProviderResolver.setInstance(
+            new MockConfigProviderResolver(Collections.singletonMap(
+                "org.eclipse.microprofile.rest.client.propagateHeaders", "Header1,MultiHeader")));
     }
 
     @Before
@@ -90,9 +94,6 @@ public class JaxrsHeaderPropagationTest extends AbstractBusClientServerTestBase 
 
     @Test
     public void testHeadersArePropagated() throws Exception {
-        ConfigProviderResolver.setInstance(
-            new MockConfigProviderResolver(Collections.singletonMap(
-                "org.eclipse.microprofile.rest.client.propagateHeaders", "Header1,MultiHeader")));
         Logger logger = 
             Logger.getLogger("org.eclipse.microprofile.rest.client.ext.DefaultClientHeadersFactoryImpl"); //NOPMD
         logger.setLevel(Level.ALL);
@@ -108,6 +109,15 @@ public class JaxrsHeaderPropagationTest extends AbstractBusClientServerTestBase 
         System.out.println("propagatedHeaderContent: " + propagatedHeaderContent);
         assertTrue(propagatedHeaderContent.contains("Header1=Single"));
         assertTrue(propagatedHeaderContent.contains("MultiHeader=value1,value2,value3"));
+    }
+
+    @Test
+    public void testInjectionOccursInClientHeadersFactory() throws Exception {
+        final Response r = createWebClient("/jaxrs/inject").delete();
+        assertEquals(Status.OK.getStatusCode(), r.getStatus());
+        String returnedHeaderContent = r.readEntity(String.class);
+        System.out.println("returnedHeaderContent: " + returnedHeaderContent);
+        assertTrue(returnedHeaderContent.contains("REQUEST_METHOD=DELETE"));
     }
 
     private static WebClient createWebClient(final String url) {

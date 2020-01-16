@@ -47,14 +47,8 @@ public interface CDIInterceptorWrapper {
     static CDIInterceptorWrapper createWrapper(Class<?> restClient) {
         try {
             return AccessController.doPrivileged((PrivilegedExceptionAction<CDIInterceptorWrapper>) () -> {
-                Class<?> cdiClass = Class.forName("javax.enterprise.inject.spi.CDI", false,
-                                                  restClient.getClassLoader());
-                Method currentMethod = cdiClass.getMethod("current");
-                Object cdiCurrent = currentMethod.invoke(null);
-
-                Method getBeanMgrMethod = cdiClass.getMethod("getBeanManager");
-
-                return new CDIInterceptorWrapperImpl(restClient, getBeanMgrMethod.invoke(cdiCurrent));
+                Object beanManager = CDIFacade.getBeanManager().orElseThrow(() -> new Exception("CDI not available"));
+                return new CDIInterceptorWrapperImpl(restClient, beanManager);
             });
         } catch (PrivilegedActionException pae) {
             // expected for environments where CDI is not supported

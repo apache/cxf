@@ -25,8 +25,10 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutorService;
@@ -52,13 +54,16 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
+import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.microprofile.client.MPRestClientCallback;
 import org.apache.cxf.microprofile.client.MicroProfileClientProviderFactory;
+import org.apache.cxf.microprofile.client.cdi.CDIFacade;
 import org.apache.cxf.microprofile.client.cdi.CDIInterceptorWrapper;
+import org.apache.cxf.microprofile.client.cdi.Instance;
 import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
 import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 import org.eclipse.microprofile.rest.client.ext.ClientHeadersFactory;
@@ -97,6 +102,9 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
 
     private final CDIInterceptorWrapper interceptorWrapper;
     private Object objectInstance;
+    private Map<Class<ClientHeadersFactory>, ProviderInfo<ClientHeadersFactory>> clientHeaderFactories = 
+        new WeakHashMap<>();
+    private List<Instance<?>> cdiInstances = new LinkedList<>();
 
     //CHECKSTYLE:OFF
     public MicroProfileClientProxyImpl(URI baseURI, ClassLoader loader, ClassResourceInfo cri,
@@ -372,6 +380,7 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void handleHeaders(Method m,
                                  Object[] params,
                                  MultivaluedMap<String, String> headers,
@@ -409,25 +418,53 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
                 }
             }
 
-            ClientHeadersFactory headersFactory = null;
-            
             if (headersFactoryAnno != null) {
-                Class<?> headersFactoryClass = headersFactoryAnno.value();
-                headersFactory = (ClientHeadersFactory) headersFactoryClass.newInstance();
-                mergeHeaders(headersFactory, headers);
+                Class<ClientHeadersFactory> headersFactoryClass = (Class<ClientHeadersFactory>)
+                                                                  headersFactoryAnno.value();
+                mergeHeaders(headersFactoryClass, headers);
             }
         } catch (Throwable t) {
             throwException(t);
         }
     }
 
-    private void mergeHeaders(ClientHeadersFactory factory,
-                              MultivaluedMap<String, String> existingHeaders) {
-
-        MultivaluedMap<String, String> jaxrsHeaders = getJaxrsHeaders();
-        MultivaluedMap<String, String> updatedHeaders = factory.update(jaxrsHeaders, existingHeaders);
-        existingHeaders.putAll(updatedHeaders);
+    private ClientHeadersFactory mapClientHeadersInstance(Instance<ClientHeadersFactory> instance) {
+        cdiInstances.add(instance);
+        return instance.getValue();
     }
+
+    private void mergeHeaders(Class<ClientHeadersFactory> factoryCls, MultivaluedMap<String, String> existingHeaders) {
+
+        try {
+            ClientHeadersFactory factory;
+
+            Message m = JAXRS_UTILS_GET_CURRENT_MESSAGE_METHOD == null ? null
+                : (Message) JAXRS_UTILS_GET_CURRENT_MESSAGE_METHOD.invoke(null);
+
+            if (m != null) {
+                factory = CDIFacade.getInstanceFromCDI(factoryCls, m.getExchange().getBus())
+                                   .map(this::mapClientHeadersInstance)
+                                   .orElse(factoryCls.newInstance());
+                ProviderInfo<ClientHeadersFactory> pi = clientHeaderFactories.computeIfAbsent(factoryCls, k -> {
+                    return new ProviderInfo<ClientHeadersFactory>(factory, m.getExchange().getBus(), true);
+                });
+                InjectionUtils.injectContexts(factory, pi, m);
+            } else {
+                factory = CDIFacade.getInstanceFromCDI(factoryCls)
+                                   .map(this::mapClientHeadersInstance)
+                                   .orElse(factoryCls.newInstance());
+            }
+
+            MultivaluedMap<String, String> updatedHeaders = factory.update(getJaxrsHeaders(m), existingHeaders);
+            existingHeaders.putAll(updatedHeaders);
+        } catch (Throwable t) {
+            // expected if not running in a JAX-RS server environment.
+            if (LOG.isLoggable(Level.FINEST)) {
+                LOG.log(Level.FINEST, "Caught exception getting JAX-RS incoming headers", t);
+            }
+        }
+    }
+
     @Override
     public Object invoke(Object o, Method m, Object[] params) throws Throwable {
         checkClosed();
@@ -474,19 +511,22 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
         throw new RuntimeException(t);
     }
 
-    private static MultivaluedMap<String, String> getJaxrsHeaders() {
+    /**
+     * Returns the incoming request headers from the current JAX-RS request, assuming
+     * that this is invoked inside a JAX-RS request. If not, it will return an empty
+     * map.
+     */
+    private static MultivaluedMap<String, String> getJaxrsHeaders(Message m) {
         MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
-        try {
-            if (JAXRS_UTILS_GET_CURRENT_MESSAGE_METHOD != null) {
-                Message m = (Message) JAXRS_UTILS_GET_CURRENT_MESSAGE_METHOD.invoke(null);
-                headers.putAll(CastUtils.cast((Map<?, ?>)m.get(Message.PROTOCOL_HEADERS)));
-            }
-        } catch (Throwable t) {
-            // expected if not running in a JAX-RS server environment.
-            if (LOG.isLoggable(Level.FINEST)) {
-                LOG.log(Level.FINEST, "Caught exception getting JAX-RS incoming headers", t);
-            }
+        if (m != null) {
+            headers.putAll(CastUtils.cast((Map<?, ?>) m.get(Message.PROTOCOL_HEADERS)));
         }
         return headers;
+    }
+
+    @Override
+    public void close() {
+        cdiInstances.forEach(Instance::release);
+        super.close();
     }
 }

@@ -20,6 +20,7 @@ package org.apache.cxf.systest.microprofile.rest.client;
 
 import java.net.URI;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -44,6 +45,16 @@ public class JaxrsResource {
                                              .baseUri(URI.create("http://localhost:8080/ignored"))
                                              .register(ReturnAllOutboundHeadersFilter.class)
                                              .build(RestClient.class);
+        return client.getAllHeadersToBeSent();
+    }
+
+    @Path("/inject")
+    @DELETE
+    public String injectContextsIntoClientHeadersFactory() {
+        InjectRestClient client = RestClientBuilder.newBuilder()
+                                                   .baseUri(URI.create("http://localhost:8080/ignored"))
+                                                   .register(ReturnAllOutboundHeadersFilter.class)
+                                                   .build(InjectRestClient.class);
         return client.getAllHeadersToBeSent();
     }
 }
