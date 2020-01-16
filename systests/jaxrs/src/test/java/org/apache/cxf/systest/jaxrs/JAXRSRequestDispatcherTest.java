@@ -22,6 +22,7 @@ package org.apache.cxf.systest.jaxrs;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -59,18 +60,18 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
     }
 
     private void doTestGetBookHTML(String endpointAddress) throws Exception {
-        WebClient client = WebClient.create(endpointAddress);
-        client.accept("text/html");
-        WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(100000000);
-        XMLSource source = client.accept("text/html").get(XMLSource.class);
+        WebClient client = WebClient.create(endpointAddress)
+            .accept(MediaType.TEXT_HTML);
+
+        XMLSource source = client.get(XMLSource.class);
         Map<String, String> namespaces = new HashMap<>();
         namespaces.put("xhtml", "http://www.w3.org/1999/xhtml");
         namespaces.put("books", "http://www.w3.org/books");
         String value = source.getValue("xhtml:html/xhtml:body/xhtml:ul/books:bookTag", namespaces);
         assertEquals("CXF Rocks", value);
-        Object contentType = client.getResponse().getMetadata().getFirst("Content-Type");
+        Object contentType = client.getResponse().getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
         assertNotNull("Content-Type should be present", contentType);
-        assertEquals("text/html", contentType.toString());
+        assertEquals(MediaType.TEXT_HTML, contentType.toString());
         assertEquals(MediaType.TEXT_HTML_TYPE, client.getResponse().getMediaType());
     }
 
@@ -79,10 +80,10 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
     public void testGetBookJSPRequestScope() throws Exception {
         String endpointAddress =
             "http://localhost:" + PORT + "/the/bookstore2/books/html/123";
-        WebClient client = WebClient.create(endpointAddress);
-        client.accept("text/html");
-        WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(100000000);
-        String data = client.accept("text/html").get(String.class);
+        WebClient client = WebClient.create(endpointAddress)
+            .accept(MediaType.TEXT_HTML);
+
+        String data = client.get(String.class);
         assertTrue(data.contains("<h1>Request Book 123</h1>"));
         assertTrue(data.contains("<books:bookName>CXF in Action</books:bookName>"));
 
@@ -93,10 +94,10 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
     public void testGetBookJSPSessionScope() throws Exception {
         String endpointAddress =
             "http://localhost:" + PORT + "/the/bookstore3/books/html/456";
-        WebClient client = WebClient.create(endpointAddress);
-        client.accept("text/html");
-        WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(100000000);
-        String data = client.accept("text/html").get(String.class);
+        WebClient client = WebClient.create(endpointAddress)
+            .accept(MediaType.TEXT_HTML);
+
+        String data = client.get(String.class);
         assertTrue(data.contains("<h1>Session Book 456</h1>"));
         assertTrue(data.contains("<books:bookName>CXF in Action</books:bookName>"));
     }
@@ -105,10 +106,10 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
     public void testGetBookHTMLFromDefaultServlet() throws Exception {
         String endpointAddress =
             "http://localhost:" + PORT + "/the/bookstore4/books/html/123";
-        WebClient client = WebClient.create(endpointAddress);
-        client.accept("text/html");
-        WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(100000000);
-        XMLSource source = client.accept("text/html").get(XMLSource.class);
+        WebClient client = WebClient.create(endpointAddress)
+            .accept(MediaType.TEXT_HTML);
+
+        XMLSource source = client.get(XMLSource.class);
         Map<String, String> namespaces = new HashMap<>();
         namespaces.put("xhtml", "http://www.w3.org/1999/xhtml");
         namespaces.put("books", "http://www.w3.org/books");
@@ -136,18 +137,17 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
     @Test
     public void testGetTextWelcomeFile() throws Exception {
         String address = "http://localhost:" + PORT + "/welcome2/welcome.txt";
-        WebClient client = WebClient.create(address);
-        client.accept("text/plain");
+        WebClient client = WebClient.create(address)
+            .accept(MediaType.TEXT_PLAIN);
         String welcome = client.get(String.class);
-        System.out.println(welcome);
         assertEquals("Welcome", welcome);
     }
 
     private void doTestGetBookHTMLFromWelcomeList(String address) throws Exception {
-        WebClient client = WebClient.create(address);
-        client.accept("text/html");
-        WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(100000000);
-        XMLSource source = client.accept("text/html").get(XMLSource.class);
+        WebClient client = WebClient.create(address)
+            .accept(MediaType.TEXT_HTML);
+
+        XMLSource source = client.get(XMLSource.class);
         Map<String, String> namespaces = new HashMap<>();
         namespaces.put("xhtml", "http://www.w3.org/1999/xhtml");
         namespaces.put("books", "http://www.w3.org/books");
