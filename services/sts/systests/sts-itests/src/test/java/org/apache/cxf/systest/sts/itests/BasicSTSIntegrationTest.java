@@ -40,6 +40,11 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.replaceCo
 @ExamReactorStrategy(PerClass.class)
 public class BasicSTSIntegrationTest {
 
+    // Adding apache snapshots as cxf trunk may contain snapshot dependencies
+    // https://blog.sonatype.com/central-repository-moving-to-https
+    private static final String REPOS = "https://repo1.maven.org/maven2@id=central,"
+        + "http://repository.apache.org/content/groups/snapshots-group@id=apache@snapshots@noreleases";
+
     @Configuration
     public Option[] getConfig() {
         String port = TestUtil.getPortNumber(BasicSTSIntegrationTest.class);
@@ -69,6 +74,8 @@ public class BasicSTSIntegrationTest {
             copy("clientstore.jks"),
             copy("etc/org.ops4j.pax.logging.cfg"),
             editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", port),
+            editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
+                                     "org.ops4j.pax.url.mvn.repositories", REPOS),
             when(localRepository != null)
                 .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
                             "org.ops4j.pax.url.mvn.localRepository",

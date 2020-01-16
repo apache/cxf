@@ -53,8 +53,9 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.replaceCo
 public class BasicIntegrationTest {
 
     // Adding apache snapshots as cxf trunk may contain snapshot dependencies
-    //private static final String REPOS = "http://repo1.maven.org/maven2@id=central, "
-    //    + "http://repository.apache.org/content/groups/snapshots-group@snapshots@noreleases@id=apache-snapshots ";
+    // https://blog.sonatype.com/central-repository-moving-to-https
+    private static final String REPOS = "https://repo1.maven.org/maven2@id=central,"
+        + "http://repository.apache.org/content/groups/snapshots-group@id=apache@snapshots@noreleases";
 
     @Inject
     protected XKMSPortType xkmsService;
@@ -92,8 +93,8 @@ public class BasicIntegrationTest {
                                  copy("data/xkms/certificates/dave.cer"),
                                  copy("data/xkms/certificates/http___localhost_8080_services_TestService.cer"),
                                  copy("etc/org.ops4j.pax.logging.cfg"),
-                                 // editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
-                                 // "org.ops4j.pax.url.mvn.repositories", REPOS),
+                                 editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
+                                     "org.ops4j.pax.url.mvn.repositories", REPOS),
                                  editConfigurationFilePut("etc/org.ops4j.pax.web.cfg",
                                                           "org.osgi.service.http.port", port),
                                  editConfigurationFilePut("etc/org.apache.cxf.xkms.client.cfg",
@@ -143,8 +144,8 @@ public class BasicIntegrationTest {
                                  copy("data/xkms/certificates/dave.cer"),
                                  copy("data/xkms/certificates/http___localhost_8080_services_TestService.cer"),
                                  copy("etc/org.ops4j.pax.logging.cfg"),
-                                 // editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
-                                 // "org.ops4j.pax.url.mvn.repositories", REPOS),
+                                 editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
+                                     "org.ops4j.pax.url.mvn.repositories", REPOS),
                                  editConfigurationFilePut("etc/org.ops4j.pax.web.cfg",
                                                           "org.osgi.service.http.port", port),
                                  editConfigurationFilePut("etc/org.apache.cxf.xkms.client.cfg",

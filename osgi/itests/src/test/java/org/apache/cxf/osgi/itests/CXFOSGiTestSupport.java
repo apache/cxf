@@ -55,6 +55,11 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.replaceCo
  */
 public class CXFOSGiTestSupport {
 
+    // Adding apache snapshots as cxf trunk may contain snapshot dependencies
+    // https://blog.sonatype.com/central-repository-moving-to-https
+    private static final String REPOS = "https://repo1.maven.org/maven2@id=central,"
+        + "http://repository.apache.org/content/groups/snapshots-group@id=apache@snapshots@noreleases";
+
     @Inject
     protected BundleContext bundleContext;
 
@@ -98,6 +103,8 @@ public class CXFOSGiTestSupport {
                          systemProperty("java.awt.headless").value("true"),
                          replaceConfigurationFile("etc/org.ops4j.pax.logging.cfg",
                                                   new File("src/test/resources/etc/org.ops4j.pax.logging.cfg")),
+                         editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
+                             "org.ops4j.pax.url.mvn.repositories", REPOS),
                          when(localRepo != null)
                              .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
                                                                   "org.ops4j.pax.url.mvn.localRepository",
