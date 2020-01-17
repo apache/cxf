@@ -683,13 +683,13 @@ public final class JAXBEncoderDecoder {
                                     MessagePartInfo part,
                                     boolean unwrap) {
         Class<?> clazz = part != null ? part.getTypeClass() : null;
-        if (clazz != null && Exception.class.isAssignableFrom(clazz) && part != null
+        if (clazz != null && Exception.class.isAssignableFrom(clazz)
             && Boolean.TRUE.equals(part.getProperty(JAXBDataBinding.class.getName() + ".CUSTOM_EXCEPTION"))) {
             return unmarshallException(u, source, part);
         }
 
         QName elName = part != null ? part.getConcreteName() : null;
-        if (clazz != null && clazz.isArray() && part != null
+        if (clazz != null && clazz.isArray()
             && part.getXmlSchema() instanceof XmlSchemaElement) {
             XmlSchemaElement el = (XmlSchemaElement)part.getXmlSchema();
 
@@ -723,7 +723,7 @@ public final class JAXBEncoderDecoder {
                 }
                 return o;
             }
-        } else if (byte[].class == clazz && part != null && part.getTypeQName() != null
+        } else if (byte[].class == clazz && part.getTypeQName() != null
                    && "hexBinary".equals(part.getTypeQName().getLocalPart())) {
 
             String obj = (String)unmarshall(u, source, elName, String.class, unwrap);

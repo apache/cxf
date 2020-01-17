@@ -805,10 +805,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
         try {
             String h = connector.getHost();
             int port = connector.getPort();
-            LOG.finer("connector.host: "
-                + h == null
-                  ? "null"
-                  : "\"" + h + "\"");
+            LOG.finer("connector.host: " + (h == null ? "null" : "\"" + h + "\""));
             LOG.finer("connector.port: " + port);
         } catch (Throwable t) {
             //ignore

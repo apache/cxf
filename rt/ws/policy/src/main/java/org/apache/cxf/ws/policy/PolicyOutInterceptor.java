@@ -122,7 +122,7 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
         }
 
         // insert assertions of endpoint's fault vocabulary into message
-        if (null != assertions && !assertions.isEmpty()) {
+        if (!assertions.isEmpty()) {
             if (LOG.isLoggable(Level.FINEST)) {
                 StringBuilder buf = new StringBuilder();
                 buf.append("Chosen alternative: ");

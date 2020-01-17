@@ -67,7 +67,7 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
 
             int sepIndex = theToken.indexOf('=');
             String paramName = sepIndex != -1 ? theToken.substring(0, sepIndex) : theToken;
-            String paramValue = null; 
+            String paramValue = null;
 
             if (sepIndex == theToken.length() - 1) {
                 paramValue = "";
@@ -160,7 +160,7 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
             buff.append('"');
             return buff.toString();
         }
-        return value == null ? "" : value;
+        return value;
     }
     static String maybeQuoteAll(String value) {
         return maybeQuote(TSPECIALS_ALL, value);

@@ -107,8 +107,7 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
             MessagePartInfo wrapperPart = wrappedMessageInfo.getFirstMessagePart();
             Class<?> wrapperClass = wrapperPart.getTypeClass();
             Object wrappedObject = lst.get(wrapperPart.getIndex());
-            if (wrapperClass == null || wrappedObject == null
-                || (wrapperClass != null && !wrapperClass.isInstance(wrappedObject))) {
+            if (wrapperClass == null || wrappedObject == null || !wrapperClass.isInstance(wrappedObject)) {
                 return;
             }
 

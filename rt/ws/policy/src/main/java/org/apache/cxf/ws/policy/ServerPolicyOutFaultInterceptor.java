@@ -122,7 +122,7 @@ public class ServerPolicyOutFaultInterceptor extends AbstractPolicyInterceptor {
         }
 
         // insert assertions of the chosen alternative into the message
-        if (null != assertions && !assertions.isEmpty()) {
+        if (!assertions.isEmpty()) {
             msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
         }
     }
