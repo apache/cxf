@@ -664,27 +664,5 @@
                 </dependency>
             </dependencies>
         </profile>
-        <profile>
-            <id>jdk13</id>
-            <activation>
-                <jdk>[13,)</jdk>
-            </activation>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-surefire-plugin</artifactId>
-                            <configuration>
-                                <systemPropertyVariables>
-                                     <!-- https://github.com/bcgit/bc-java/issues/589  -->
-                                     <jdk.tls.namedGroups>secp256r1,secp384r1,secp521r1,sect283k1,sect283r1,sect409k1,sect409r1,sect571k1,sect571r1,secp256k1,ffdhe2048,ffdhe3072,ffdhe4096,ffdhe6144,ffdhe8192</jdk.tls.namedGroups>
-                                </systemPropertyVariables>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
     </profiles>
 </project>
