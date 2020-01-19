@@ -269,4 +269,32 @@ public class ThreadLocalServletContext extends AbstractThreadLocalProxy<ServletC
         return get().getVirtualServerName();
     }
 
+    //Servlet 4.0
+    public Dynamic addJspFile(String servletName, String jspFile) {
+        return get().addJspFile(servletName, jspFile);
+    }
+
+    public int getSessionTimeout() {
+        return get().getSessionTimeout();
+    }
+
+    public void setSessionTimeout(int sessionTimeout) {
+        get().setSessionTimeout(sessionTimeout);
+    }
+
+    public String getRequestCharacterEncoding() {
+        return get().getRequestCharacterEncoding();
+    }
+
+    public void setRequestCharacterEncoding(String encoding) {
+        get().setRequestCharacterEncoding(encoding);
+    }
+
+    public String getResponseCharacterEncoding() {
+        return get().getResponseCharacterEncoding();
+    }
+
+    public void setResponseCharacterEncoding(String encoding) {
+        get().setResponseCharacterEncoding(encoding);
+    }
 }

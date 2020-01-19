@@ -72,7 +72,7 @@ public class NoAriesBlueprintTest extends OSGiTestSupport {
             mavenBundle("org.apache.cxf", "cxf-rt-bindings-xml").versionAsInProject(),
             mavenBundle("org.apache.cxf", "cxf-rt-bindings-soap").versionAsInProject(),
             mavenBundle("org.apache.cxf", "cxf-rt-frontend-simple").versionAsInProject(),
-            mavenBundle("javax.servlet", "javax.servlet-api").versionAsInProject(),
+            mavenBundle("jakarta.servlet", "jakarta.servlet-api").versionAsInProject(),
             mavenBundle("org.apache.cxf", "cxf-rt-transports-http").versionAsInProject(),
             mavenBundle("org.apache.cxf", "cxf-rt-frontend-jaxws").versionAsInProject(),
             junitBundles(),

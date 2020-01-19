@@ -188,9 +188,9 @@
         <cxf.rxjava2.version>2.2.19</cxf.rxjava2.version>
         <cxf.servlet-api-2.5.artifact>geronimo-servlet_2.5_spec</cxf.servlet-api-2.5.artifact>
         <cxf.servlet-api-2.5.version>1.2</cxf.servlet-api-2.5.version>
-        <cxf.servlet-api.artifact>javax.servlet-api</cxf.servlet-api.artifact>
-        <cxf.servlet-api.group>javax.servlet</cxf.servlet-api.group>
-        <cxf.servlet-api.version>3.1.0</cxf.servlet-api.version>
+        <cxf.servlet-api.artifact>jakarta.servlet-api</cxf.servlet-api.artifact>
+        <cxf.servlet-api.group>jakarta.servlet</cxf.servlet-api.group>
+        <cxf.servlet-api.version>4.0.3</cxf.servlet-api.version>
         <cxf.slf4j.version>1.7.29</cxf.slf4j.version>
         <cxf.snakeyaml.version>1.25</cxf.snakeyaml.version>
         <cxf.specs.jaxws.api.version>2.3_2</cxf.specs.jaxws.api.version>
