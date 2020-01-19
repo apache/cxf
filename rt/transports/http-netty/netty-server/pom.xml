@@ -65,6 +65,7 @@
             <!-- we don't implement the servlet 3.0 specification here -->
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-servlet_2.5_spec</artifactId>
+            <version>1.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.aries.blueprint</groupId>
