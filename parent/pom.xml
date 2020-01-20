@@ -127,9 +127,9 @@
         <cxf.hsqldb.version>2.4.1</cxf.hsqldb.version>
         <cxf.httpcomponents.asyncclient.version.range>[4.0,4.2)</cxf.httpcomponents.asyncclient.version.range>
         <cxf.httpcomponents.asyncclient.version>4.1.4</cxf.httpcomponents.asyncclient.version>
-        <cxf.httpcomponents.client.version>4.5.10</cxf.httpcomponents.client.version>
+        <cxf.httpcomponents.client.version>4.5.11</cxf.httpcomponents.client.version>
         <cxf.httpcomponents.core.version.range>[4.3,4.5.0)</cxf.httpcomponents.core.version.range>
-        <cxf.httpcomponents.core.version>4.4.12</cxf.httpcomponents.core.version>
+        <cxf.httpcomponents.core.version>4.4.13</cxf.httpcomponents.core.version>
         <cxf.jackson.version>2.10.1</cxf.jackson.version>
         <cxf.jackson.databind.version>2.10.1</cxf.jackson.databind.version>
         <cxf.jacorb.version>3.9</cxf.jacorb.version>
