@@ -19,14 +19,15 @@
 
 package org.apache.cxf.systest.jaxrs.sse.tomcat;
 
-import java.io.File;
-import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.apache.cxf.systest.jaxrs.sse.BookStore;
 import org.apache.cxf.systest.jaxrs.sse.BookStoreResponseFilter;
@@ -36,10 +37,11 @@ import static org.junit.Assert.fail;
 
 public abstract class AbstractTomcatServer extends AbstractBusTestServerBase {
 
-    private Tomcat server;
     private final String resourcePath;
     private final String contextPath;
     private final int port;
+    private Tomcat server;
+    private Path base;
 
     protected AbstractTomcatServer(final String contextPath, int portNumber) {
         this(null, contextPath, portNumber);
@@ -54,13 +56,14 @@ public abstract class AbstractTomcatServer extends AbstractBusTestServerBase {
     protected void run() {
         server = new Tomcat();
         server.setPort(port);
+        server.getConnector();
 
         try {
-            final File base = createTemporaryDirectory();
-            server.setBaseDir(base.getAbsolutePath());
+            base = Files.createTempDirectory("tmp-");
+            server.setBaseDir(base.toString());
 
             if (resourcePath == null) {
-                final Context context = server.addContext("/", base.getAbsolutePath());
+                final Context context = server.addContext("", base.toString());
                 final Wrapper cxfServlet = Tomcat.addServlet(context, "cxfServlet", new CXFNonSpringJaxrsServlet());
                 cxfServlet.addInitParameter("jaxrs.serviceClasses", BookStore.class.getName());
                 cxfServlet.addInitParameter("jaxrs.providers", String.join(",",
@@ -70,7 +73,7 @@ public abstract class AbstractTomcatServer extends AbstractBusTestServerBase {
                 cxfServlet.setAsyncSupported(true);
                 context.addServletMappingDecoded("/rest/*", "cxfServlet");
             } else {
-                server.getHost().setAppBase(base.getAbsolutePath());
+                server.getHost().setAppBase(base.toString());
                 server.getHost().setAutoDeploy(true);
                 server.getHost().setDeployOnStartup(true);
                 server.addWebapp(contextPath, getClass().getResource(resourcePath).toURI().getPath().toString());
@@ -83,25 +86,6 @@ public abstract class AbstractTomcatServer extends AbstractBusTestServerBase {
         }
     }
 
-    protected void configureServer(org.eclipse.jetty.server.Server theserver) throws Exception {
-
-    }
-
-    private static File createTemporaryDirectory() throws IOException {
-        final File base = File.createTempFile("tmp-", "");
-
-        if (!base.delete()) {
-            throw new IOException("Cannot (re)create base folder: " + base.getAbsolutePath());
-        }
-
-        if (!base.mkdir()) {
-            throw new IOException("Cannot create base folder: " + base.getAbsolutePath());
-        }
-
-        base.deleteOnExit();
-        return base;
-    }
-
     public void tearDown() throws Exception {
         super.tearDown();
 
@@ -109,6 +93,7 @@ public abstract class AbstractTomcatServer extends AbstractBusTestServerBase {
             server.stop();
             server.destroy();
             server = null;
+            FileUtils.removeDir(base.toFile());
         }
     }
 }
