@@ -112,7 +112,7 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
             throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
         }
         if (maxAgeOffset != null) {
-            Long authTime = Long.parseLong(state.getFirst(MAX_AGE_PARAMETER));
+            long authTime = Long.parseLong(state.getFirst(MAX_AGE_PARAMETER));
             Long tokenAuthTime = idToken.getAuthenticationTime();
             if (tokenAuthTime > authTime) {
                 throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);

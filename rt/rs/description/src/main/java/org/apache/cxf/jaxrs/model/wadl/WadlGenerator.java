@@ -1194,9 +1194,9 @@ public class WadlGenerator implements ContainerRequestFilter {
                 }
                 if (result == 0 && ignoreOverloadedMethods
                     && op1.getMethodToInvoke().getName().equals(op2.getMethodToInvoke().getName())) {
-                    Integer paramLen1 = op1.getMethodToInvoke().getParameterTypes().length;
-                    Integer paramLen2 = op2.getMethodToInvoke().getParameterTypes().length;
-                    result = paramLen1.compareTo(paramLen2) * -1;
+                    int paramLen1 = op1.getMethodToInvoke().getParameterTypes().length;
+                    int paramLen2 = op2.getMethodToInvoke().getParameterTypes().length;
+                    result = Integer.compare(paramLen1, paramLen2) * -1;
                 }
                 return result;
             }

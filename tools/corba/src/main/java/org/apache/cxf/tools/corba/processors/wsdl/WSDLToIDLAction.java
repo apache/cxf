@@ -501,9 +501,8 @@ public class WSDLToIDLAction {
 
         if (corbaTypeImpl instanceof Anonstring) {
             Anonstring as = (Anonstring)corbaTypeImpl;
-            Long lbound = as.getBound();
-            int bound = lbound.intValue();
-            result = IdlString.create(bound);
+            long lbound = as.getBound();
+            result = IdlString.create((int)lbound);
         }
         return result;
     }
@@ -705,19 +704,18 @@ public class WSDLToIDLAction {
 
     private IdlType createFixed(Fixed f, IdlScopeBase scope, String local) {
         IdlType idlType = null;
-        Long digits = f.getDigits();
-        Long scale = f.getScale();
-        idlType = IdlFixed.create(scope, local, digits.intValue(),
-                                  scale.intValue());
+        long digits = f.getDigits();
+        long scale = f.getScale();
+        idlType = IdlFixed.create(scope, local, (int)digits, (int)scale);
         scope.addToScope(idlType);
         return idlType;
     }
 
     private IdlType createAnonFixed(Anonfixed f, IdlScopeBase scope, String local) {
         IdlType idlType = null;
-        Long digits = f.getDigits();
-        Long scale = f.getScale();
-        idlType = IdlAnonFixed.create(scope, digits.intValue(), scale.intValue());
+        long digits = f.getDigits();
+        long scale = f.getScale();
+        idlType = IdlAnonFixed.create(scope, (int)digits, (int)scale);
         scope.addToScope(idlType);
         return idlType;
     }
