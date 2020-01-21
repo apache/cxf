@@ -192,7 +192,7 @@
         <cxf.slf4j.version>1.7.29</cxf.slf4j.version>
         <cxf.snakeyaml.version>1.25</cxf.snakeyaml.version>
         <cxf.specs.jaxws.api.version>2.3_2</cxf.specs.jaxws.api.version>
-        <cxf.spring.boot.version>2.2.3.RELEASE</cxf.spring.boot.version>
+        <cxf.spring.boot.version>2.2.4.RELEASE</cxf.spring.boot.version>
         <cxf.spring.ldap.version>2.3.2.RELEASE</cxf.spring.ldap.version>
         <cxf.spring.mock>spring-test</cxf.spring.mock>
         <cxf.spring.osgi.version>1.2.1</cxf.spring.osgi.version>
