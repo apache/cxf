@@ -157,32 +157,23 @@ public final class ManagementConsole {
         operationName = "";
         boolean result = false;
 
-        int i;
-        String arg;
         try {
-            for (i = 0; i < args.length; i++) {
-                arg = args[i];
+            for (int i = 0; i < args.length; i++) {
+                String arg = args[i];
                 if ("--port".equals(arg) || "-p".equals(arg)) {
                     portName = args[++i];
-                    continue;
-                }
-                if ("--service".equals(arg) || "-s".equals(arg)) {
+                } else if ("--service".equals(arg) || "-s".equals(arg)) {
                     serviceName = args[++i];
-                    continue;
-                }
-                if ("--jmx".equals(arg) || "-j".equals(arg)) {
+                } else if ("--jmx".equals(arg) || "-j".equals(arg)) {
                     jmxServerURL = args[++i];
-                    continue;
-                }
-                if ("--operation".equals(arg) || "-o".equals(arg)) {
+                } else if ("--operation".equals(arg) || "-o".equals(arg)) {
                     operationName = args[++i];
                     // it is the key option
                     result = true;
-                    continue;
                 }
             }
         } catch (Exception ex) {
-            // can't paraser the argument rightly
+            // can't parse the argument rightly
             return false;
         }
         return result;
