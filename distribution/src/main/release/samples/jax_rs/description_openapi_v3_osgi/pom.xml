@@ -30,10 +30,6 @@ under the License.
         <relativePath>../..</relativePath>
     </parent>
 
-    <properties>
-        <cxf.version>${project.version}</cxf.version>
-    </properties>
-
     <build>
         <plugins>
             <plugin>
@@ -69,22 +65,8 @@ under the License.
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-http</artifactId>
-            <version>3.4.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>3.4.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-service-description-openapi-v3</artifactId>
-            <version>3.4.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.ws.rs</groupId>
-            <artifactId>jakarta.ws.rs-api</artifactId>
         </dependency>
     </dependencies>
+
 </project>

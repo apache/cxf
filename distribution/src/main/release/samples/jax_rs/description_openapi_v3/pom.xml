@@ -29,10 +29,6 @@
         <relativePath>../..</relativePath>
     </parent>
 
-    <properties>
-        <cxf.version>${project.version}</cxf.version>
-    </properties>
-
     <profiles>
         <profile>
             <id>server</id>
@@ -68,17 +64,10 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>3.4.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>3.4.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-service-description-openapi-v3</artifactId>
-            <version>3.4.0-SNAPSHOT</version>
         </dependency>
         <dependency>
           <groupId>com.fasterxml.jackson.jaxrs</groupId>
