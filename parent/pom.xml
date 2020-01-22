@@ -103,7 +103,8 @@
         <cxf.commons-text.version>1.8</cxf.commons-text.version>
         <cxf.derby.version>10.14.2.0</cxf.derby.version>
         <cxf.dom4j.version>2.1.1</cxf.dom4j.version>
-        <cxf.dropwizard.version>3.2.6</cxf.dropwizard.version>
+        <cxf.dropwizard3.version>3.2.6</cxf.dropwizard3.version>
+        <cxf.dropwizard4.version>4.1.2</cxf.dropwizard4.version>
         <cxf.ehcache.version>2.10.6</cxf.ehcache.version>
         <cxf.ehcache3.version>3.8.1</cxf.ehcache3.version>
         <cxf.findbugs.version>3.0.2</cxf.findbugs.version>
@@ -2450,7 +2451,12 @@
             <dependency>
                 <groupId>io.dropwizard.metrics</groupId>
                 <artifactId>metrics-core</artifactId>
-                <version>${cxf.dropwizard.version}</version>
+                <version>${cxf.dropwizard4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics</groupId>
+                <artifactId>metrics-jmx</artifactId>
+                <version>${cxf.dropwizard4.version}</version>
             </dependency>
             <dependency>
                  <groupId>io.zipkin.brave</groupId>
