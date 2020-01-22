@@ -56,6 +56,7 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
 import org.junit.BeforeClass;
@@ -64,6 +65,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(ClientMtomXopTest.class);
@@ -87,6 +89,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
                 jaxep.getInInterceptors().add(new LoggingInInterceptor());
                 jaxep.getOutInterceptors().add(new LoggingOutInterceptor());
                 SOAPBinding jaxWsSoapBinding = (SOAPBinding) jaxep.getBinding();
+                jaxep.getProperties().put("schema-validation-enabled", "true");
                 jaxWsSoapBinding.setMTOMEnabled(true);
                 EndpointImpl endpoint =
                     (EndpointImpl)javax.xml.ws.Endpoint.publish(addressProvider, new TestMtomProviderImpl());
@@ -212,6 +215,45 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
         }
     }
 
+    
+    @Test
+    public void testMtomWithValidationErrorOnServer() throws Exception {
+        TestMtom mtomPort = createPort(MTOM_SERVICE, MTOM_PORT, TestMtom.class, true, true);
+        try {
+            Holder<DataHandler> param = new Holder<>();
+            Holder<String> name;
+
+            InputStream pre = this.getClass().getResourceAsStream("/wsdl/mtom_xop.wsdl");
+            int fileSize = 0;
+            for (int i = pre.read(); i != -1; i = pre.read()) {
+                fileSize++;
+            }
+
+            int count = 1;
+            byte[] data = new byte[fileSize *  count];
+            for (int x = 0; x < count; x++) {
+                this.getClass().getResourceAsStream("/wsdl/mtom_xop.wsdl").read(data,
+                                                                                fileSize * x,
+                                                                                fileSize);
+            }
+
+            
+            param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
+            //name length > 80 to break the schema 
+            //will throw exception on server side
+            name = new Holder<>("break schema");
+            ClientProxy.getClient(mtomPort).getInInterceptors().add(new LoggingInInterceptor());
+            ClientProxy.getClient(mtomPort).getOutInterceptors().add(new LoggingOutInterceptor());
+            ((HTTPConduit)ClientProxy.getClient(mtomPort).getConduit()).getClient().setReceiveTimeout(60000);
+            mtomPort.testXop(name, param);
+            fail("should throw javax.xml.ws.soap.SOAPFaultException");
+            
+        } catch (javax.xml.ws.soap.SOAPFaultException  ex) {
+            assertTrue(ex.getMessage().contains("cvc-maxLength-valid"));
+        } catch (Exception ex) {
+            fail("should throw javax.xml.ws.soap.SOAPFaultException");
+        }
+    }
 
     @Test
     public void testMtomXopProvider() throws Exception {

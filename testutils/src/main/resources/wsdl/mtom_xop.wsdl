@@ -33,7 +33,14 @@
         <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xmime="http://www.w3.org/2005/05/xmlmime" targetNamespace="http://cxf.apache.org/mime/types" elementFormDefault="qualified">
             <complexType name="XopType">
                 <sequence>
-                    <element name="name" type="xsd:string"/>
+                    <element name="name">
+                        <simpleType>
+                            <restriction base="xsd:string">
+                                <minLength value="1"/>
+                                <maxLength value="80"/>
+                            </restriction>
+                        </simpleType>
+                    </element>
                     <element name="attachinfo" type="xsd:base64Binary" xmime:expectedContentTypes="application/octet-stream"/>
                 </sequence>
             </complexType>
