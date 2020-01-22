@@ -90,11 +90,9 @@ final class Validator {
 
         Path classPathAnno = userType.getAnnotation(Path.class);
 
-        final Set<String> classLevelVariables = new HashSet<>();
         URITemplate classTemplate = null;
         if (classPathAnno != null) {
             classTemplate = new URITemplate(classPathAnno.value());
-            classLevelVariables.addAll(classTemplate.getVariables());
         }
         URITemplate template;
         for (Method method : methods) {

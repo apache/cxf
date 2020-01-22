@@ -42,18 +42,12 @@ import org.bouncycastle.crypto.params.KeyParameter;
 public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(PbesHmacAesWrapKeyEncryptionAlgorithm.class);
     private static final Map<String, Integer> PBES_HMAC_MAP;
-    private static final Map<String, String> PBES_AES_MAP;
     private static final Map<String, Integer> DERIVED_KEY_SIZE_MAP;
     static {
         PBES_HMAC_MAP = new HashMap<>();
         PBES_HMAC_MAP.put(KeyAlgorithm.PBES2_HS256_A128KW.getJwaName(), 256);
         PBES_HMAC_MAP.put(KeyAlgorithm.PBES2_HS384_A192KW.getJwaName(), 384);
         PBES_HMAC_MAP.put(KeyAlgorithm.PBES2_HS512_A256KW.getJwaName(), 512);
-
-        PBES_AES_MAP = new HashMap<>();
-        PBES_AES_MAP.put(KeyAlgorithm.PBES2_HS256_A128KW.getJwaName(), KeyAlgorithm.A128KW.getJwaName());
-        PBES_AES_MAP.put(KeyAlgorithm.PBES2_HS384_A192KW.getJwaName(), KeyAlgorithm.A192KW.getJwaName());
-        PBES_AES_MAP.put(KeyAlgorithm.PBES2_HS512_A256KW.getJwaName(), KeyAlgorithm.A256KW.getJwaName());
 
         DERIVED_KEY_SIZE_MAP = new HashMap<>();
         DERIVED_KEY_SIZE_MAP.put(KeyAlgorithm.PBES2_HS256_A128KW.getJwaName(), 16);

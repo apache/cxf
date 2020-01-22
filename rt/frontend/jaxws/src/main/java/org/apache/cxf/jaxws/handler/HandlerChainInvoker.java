@@ -63,7 +63,6 @@ public class HandlerChainInvoker {
     private List<LogicalHandler<?>> logicalHandlers = new ArrayList<>();
 
     private final List<Handler<?>> invokedHandlers = new ArrayList<>();
-    private final List<Handler<?>> closeHandlers = new ArrayList<>();
 
     private boolean outbound;
     private boolean isRequestor;
@@ -329,7 +328,6 @@ public class HandlerChainInvoker {
         try {
             for (Handler<?> h : handlerChain) {
                 if (invokeThisHandler(h)) {
-                    closeHandlers.add(h);
                     markHandlerInvoked(h);
                     Handler<MessageContext> lh = (Handler<MessageContext>)h;
                     continueProcessing = lh.handleFault(ctx);
@@ -353,7 +351,6 @@ public class HandlerChainInvoker {
         try {
             for (Handler<?> h : handlerChain) {
                 if (invokeThisHandler(h)) {
-                    closeHandlers.add(h);
                     markHandlerInvoked(h);
                     Handler<MessageContext> lh = (Handler<MessageContext>)h;
                     continueProcessing = lh.handleMessage(ctx);
