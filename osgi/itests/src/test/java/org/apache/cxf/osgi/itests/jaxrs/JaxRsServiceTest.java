@@ -35,6 +35,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.OptionUtils;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption.LogLevel;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
@@ -104,12 +105,12 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
 
     @Configuration
     public Option[] config() {
-        return new Option[] {
+        return OptionUtils.combine(
             cxfBaseConfig(),
             features(cxfUrl, "cxf-core", "cxf-wsdl", "cxf-jaxrs", "cxf-bean-validation-core", "cxf-bean-validation"),
             logLevel(LogLevel.INFO),
             provision(serviceBundle())
-        };
+        );
     }
 
     private static InputStream serviceBundle() {
