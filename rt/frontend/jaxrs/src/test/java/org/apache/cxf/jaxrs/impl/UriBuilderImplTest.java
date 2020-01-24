@@ -1669,6 +1669,15 @@ public class UriBuilderImplTest {
 
         assertEquals("http://127.0.0.1/index.html/extra",
                 UriBuilder.fromUri("http://127.0.0.1/index.html").path("extra").build().toString());
+
+        assertEquals("myscheme://a.host:7575/extra",
+                UriBuilder.fromUri("myscheme://a.host:7575/").path("extra").build().toString());
+
+        // note that this will use the scheme specific part of the URI, as opposed to host, port and path,
+        // and therefore the extra path will not be appended. URI uses an int for the port, and therefore
+        // will not parse the "fakePort" part of this URI as a port.
+        assertEquals("myscheme://not.really.a.host:fakePort/",
+                UriBuilder.fromUri("myscheme://not.really.a.host:fakePort/").path("extra").build().toString());
     }
 
     @Test

@@ -651,8 +651,8 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         } else {
             schemeSpecificPart = uri.getSchemeSpecificPart();
         }
-        if (scheme != null && host == null && (query == null || query.isEmpty()) && userInfo == null
-            && uri.getSchemeSpecificPart() != null) {
+        if (scheme != null && !"file".equalsIgnoreCase(scheme) && host == null && (query == null || query.isEmpty())
+            && userInfo == null  && uri.getSchemeSpecificPart() != null) {
             schemeSpecificPart = uri.getSchemeSpecificPart();
         }
         String theFragment = uri.getFragment();
