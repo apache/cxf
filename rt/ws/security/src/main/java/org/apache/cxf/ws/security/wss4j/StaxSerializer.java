@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.SequenceInputStream;
-import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -129,10 +128,11 @@ public class StaxSerializer extends AbstractSerializer {
     /**
      * @param source
      * @param ctx
+     * @param secureValidation
      * @return the Node resulting from the parse of the source
      * @throws XMLEncryptionException
      */
-    public Node deserialize(byte[] source, Node ctx) throws XMLEncryptionException {
+    public Node deserialize(byte[] source, Node ctx, boolean secureValidation) throws XMLEncryptionException {
         XMLStreamReader reader = createWstxReader(source, ctx);
         if (reader != null) {
             return deserialize(ctx, reader, false);
@@ -183,17 +183,6 @@ public class StaxSerializer extends AbstractSerializer {
             throw new XMLEncryptionException(e);
         }
         return new SequenceInputStream(v.elements());
-    }
-
-    /**
-     * @param source
-     * @param ctx
-     * @return the Node resulting from the parse of the source
-     * @throws XMLEncryptionException
-     */
-    public Node deserialize(String source, Node ctx) throws XMLEncryptionException {
-        String fragment = createContext(source, ctx);
-        return deserialize(ctx, new InputSource(new StringReader(fragment)));
     }
 
     @Override
