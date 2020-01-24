@@ -34,6 +34,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.OptionUtils;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
@@ -73,13 +74,12 @@ public class JmsServiceTest extends CXFOSGiTestSupport {
 
     @Configuration
     public Option[] config() {
-        return new Option[] {
+        return OptionUtils.combine(
             cxfBaseConfig(),
             features(cxfUrl, "cxf-core", "cxf-jaxws", "cxf-transports-jms"),
-            features(springLegacyUrl, "spring/4.3.18.RELEASE_1"),
             features(amqUrl, "shell-compat", "activemq-broker-noweb"),
             provision(serviceBundle())
-        };
+        );
     }
 
     private static InputStream serviceBundle() {

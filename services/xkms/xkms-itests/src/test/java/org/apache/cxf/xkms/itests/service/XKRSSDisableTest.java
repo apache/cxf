@@ -32,8 +32,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
-import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.OptionUtils;
 import org.ops4j.pax.exam.junit.PaxExam;
 
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
@@ -43,10 +43,10 @@ public class XKRSSDisableTest extends BasicIntegrationTest {
 
     @Configuration
     public Option[] getConfig() {
-        return new Option[] {
-            CoreOptions.composite(super.getConfig()),
+        return OptionUtils.combine(
+            super.getConfig(),
             editConfigurationFilePut("etc/org.apache.cxf.xkms.cfg", "xkms.enableXKRSS", "false")
-        };
+        );
     }
 
     @Test

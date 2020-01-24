@@ -112,7 +112,7 @@ public class JAXRSClientMetricsTest {
             Mockito.verify(resourceContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
             Mockito.verify(endpointContext, times(1)).start(any(Exchange.class));
             Mockito.verify(endpointContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
-            Mockito.verifyZeroInteractions(operationContext);
+            Mockito.verifyNoInteractions(operationContext);
         }
     }
    
@@ -138,7 +138,7 @@ public class JAXRSClientMetricsTest {
             Mockito.verify(resourceContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
             Mockito.verify(endpointContext, times(1)).start(any(Exchange.class));
             Mockito.verify(endpointContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
-            Mockito.verifyZeroInteractions(operationContext);
+            Mockito.verifyNoInteractions(operationContext);
         }
     }
 
@@ -163,7 +163,7 @@ public class JAXRSClientMetricsTest {
             Mockito.verify(resourceContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
             Mockito.verify(endpointContext, times(1)).start(any(Exchange.class));
             Mockito.verify(endpointContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
-            Mockito.verifyZeroInteractions(operationContext);
+            Mockito.verifyNoInteractions(operationContext);
         }
     }
 
@@ -192,7 +192,7 @@ public class JAXRSClientMetricsTest {
             Mockito.verify(resourceContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
             Mockito.verify(endpointContext, times(1)).start(any(Exchange.class));
             Mockito.verify(endpointContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
-            Mockito.verifyZeroInteractions(operationContext);
+            Mockito.verifyNoInteractions(operationContext);
         }
     }
     
@@ -213,7 +213,7 @@ public class JAXRSClientMetricsTest {
             Mockito.verify(resourceContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
             Mockito.verify(endpointContext, times(1)).start(any(Exchange.class));
             Mockito.verify(endpointContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
-            Mockito.verifyZeroInteractions(operationContext);
+            Mockito.verifyNoInteractions(operationContext);
         }
     }
 }

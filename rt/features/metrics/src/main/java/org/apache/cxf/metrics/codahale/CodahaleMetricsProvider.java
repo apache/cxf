@@ -22,9 +22,9 @@ package org.apache.cxf.metrics.codahale;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
-import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.ObjectNameFactory;
+import com.codahale.metrics.jmx.JmxReporter;
+import com.codahale.metrics.jmx.ObjectNameFactory;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;

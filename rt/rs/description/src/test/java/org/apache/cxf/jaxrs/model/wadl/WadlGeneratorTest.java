@@ -568,11 +568,13 @@ public class WadlGeneratorTest {
 
         checkDocs(requestEls.get(0), "", "Request", "");
 
-        verifyParameters(requestEls.get(0), 4,
+        verifyParameters(requestEls.get(0), 5,
                          new Param("hid", "header", "xs:int"),
                          new Param("provider.bar", "query", "xs:int"),
                          new Param("bookstate", "query", "xs:string",
                                  new HashSet<>(Arrays.asList("NEW", "USED", "OLD"))),
+                         new Param("orderstatus", "query", "xs:string",
+                                 new HashSet<>(Arrays.asList("INVOICED", "NOT_INVOICED"))),
                          new Param("a", "query", "xs:string", true));
 
         verifyXmlJsonRepresentations(requestEls.get(0), book2El, "InputBook");

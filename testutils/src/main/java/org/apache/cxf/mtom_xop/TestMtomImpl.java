@@ -37,6 +37,9 @@ public class TestMtomImpl implements TestMtom {
     public void testXop(Holder<String> name, Holder<DataHandler> attachinfo) {
         if ("have name".equals(name.value) && attachinfo.value.getName() != null) {
             name.value = "return detail + " + attachinfo.value.getName();
+        } else if ("break schema".equals(name.value)) {
+            name.value = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+                + "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz";
         } else {
             name.value = "return detail + " + name.value;
         }

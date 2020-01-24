@@ -156,7 +156,7 @@ public class JAXRSServerMetricsTest extends AbstractBusClientServerTestBase {
             Mockito.verify(resourceContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
             Mockito.verify(endpointContext, times(1)).start(any(Exchange.class));
             Mockito.verify(endpointContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
-            Mockito.verifyZeroInteractions(operationContext);
+            Mockito.verifyNoInteractions(operationContext);
         }
     }
    
@@ -177,7 +177,7 @@ public class JAXRSServerMetricsTest extends AbstractBusClientServerTestBase {
             Mockito.verify(resourceContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
             Mockito.verify(endpointContext, times(1)).start(any(Exchange.class));
             Mockito.verify(endpointContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
-            Mockito.verifyZeroInteractions(operationContext);
+            Mockito.verifyNoInteractions(operationContext);
         }
     }
 
@@ -198,7 +198,7 @@ public class JAXRSServerMetricsTest extends AbstractBusClientServerTestBase {
             Mockito.verify(resourceContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
             Mockito.verify(endpointContext, times(1)).start(any(Exchange.class));
             Mockito.verify(endpointContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
-            Mockito.verifyZeroInteractions(operationContext);
+            Mockito.verifyNoInteractions(operationContext);
         }
     }
     
@@ -215,7 +215,7 @@ public class JAXRSServerMetricsTest extends AbstractBusClientServerTestBase {
             Mockito.verify(resourceContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
             Mockito.verify(endpointContext, times(1)).start(any(Exchange.class));
             Mockito.verify(endpointContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
-            Mockito.verifyZeroInteractions(operationContext);
+            Mockito.verifyNoInteractions(operationContext);
         }
     }
     
@@ -230,8 +230,8 @@ public class JAXRSServerMetricsTest extends AbstractBusClientServerTestBase {
         } finally {
             Mockito.verify(endpointContext, times(1)).start(any(Exchange.class));
             Mockito.verify(endpointContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
-            Mockito.verifyZeroInteractions(resourceContext);
-            Mockito.verifyZeroInteractions(operationContext);
+            Mockito.verifyNoInteractions(resourceContext);
+            Mockito.verifyNoInteractions(operationContext);
         }
     }
 }
