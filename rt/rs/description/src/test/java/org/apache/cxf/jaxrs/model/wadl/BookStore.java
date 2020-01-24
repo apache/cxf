@@ -125,6 +125,7 @@ public class BookStore extends AbstractStore<Book> implements BookDescription {
                         @CookieParam("cid") int cookieId,
                         @QueryParam("provider.bar") int queryParam,
                         @QueryParam("bookstate") BookEnum state,
+                        @QueryParam("orderstatus") BookOrderEnum status,
                         @QueryParam("a") List<String> queryList,
                         @Context HttpHeaders headers,
                         @Description("InputBook")

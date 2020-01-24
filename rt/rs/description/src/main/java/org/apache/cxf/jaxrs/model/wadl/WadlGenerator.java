@@ -1011,7 +1011,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         try {
             Method m = enumClass.getMethod("values", new Class<?>[] {});
             Object[] values = (Object[])m.invoke(null, new Object[] {});
-            m = enumClass.getMethod("toString", new Class<?>[] {});
+            m = enumClass.getMethod("name", new Class<?>[] {});
             for (Object o : values) {
                 String str = (String)m.invoke(o, new Object[] {});
                 sb.append("<option value=\"").append(str).append("\"/>");
