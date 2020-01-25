@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -994,27 +993,19 @@ public class JettyHTTPServerEngine implements ServerEngine {
      * This method is called after configure on this object.
      */
     @PostConstruct
-    public void finalizeConfig()
-        throws GeneralSecurityException,
-               IOException {
+    public void finalizeConfig() {
         retrieveListenerFactory();
         checkConnectorPort();
         this.configFinalized = true;
     }
 
-    private void checkConnectorPort() throws IOException {
-        try {
-            if (null != connector) {
-                int cp = ((ServerConnector)connector).getPort();
-                if (port != cp) {
-                    throw new IOException("Error: Connector port " + cp + " does not match"
-                                + " with the server engine port " + port);
-                }
+    private void checkConnectorPort() {
+        if (null != connector) {
+            int cp = ((ServerConnector)connector).getPort();
+            if (port != cp) {
+                throw new IllegalStateException("Error: Connector port " + cp + " does not match"
+                            + " with the server engine port " + port);
             }
-        } catch (IOException ioe) {
-            throw ioe;
-        } catch (Throwable t) {
-            //ignore...
         }
     }
 
