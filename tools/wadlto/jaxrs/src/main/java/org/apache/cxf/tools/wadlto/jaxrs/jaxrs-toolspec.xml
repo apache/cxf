@@ -289,6 +289,16 @@ Examples:
                 </associatedArgument>
                 <switch>oneway</switch>
             </option>
+            <option id="rx" maxOccurs="1">
+                <annotation>
+                    Specifies the use of the JAX-RS 2.1 reactive extensions for generating 
+                    method signatures. The supported values are: java8
+                </annotation>
+                <switch>rx</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>library</annotation>
+                </associatedArgument>
+            </option>
         </optionGroup>
         <optionGroup id="common_options">
             <option id="help" maxOccurs="1">
