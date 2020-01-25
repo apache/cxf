@@ -411,6 +411,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
                     BusFactory.setThreadDefaultBus(bus);
                 }
                 try {
+                    System.out.print(java.util.Arrays.toString(args));
                     new WADLToJava(args).run(new ToolContext());
                 } catch (Throwable e) {
                     getLog().debug(e);

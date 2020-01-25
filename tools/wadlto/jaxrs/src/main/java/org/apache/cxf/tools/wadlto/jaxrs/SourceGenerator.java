@@ -228,6 +228,8 @@ public class SourceGenerator {
     private String authentication;
     private boolean createJavaDocs;
     private String jaxbClassNameSuffix;
+    private String rx;
+    private ResponseWrapper responseWrapper;
 
     public SourceGenerator() {
         this(Collections.<String, String>emptyMap());
@@ -235,6 +237,7 @@ public class SourceGenerator {
 
     public SourceGenerator(Map<String, String> properties) {
         this.properties = properties;
+        responseWrapper = ResponseWrapper.create(rx);
     }
 
     public void setSupportMultipleXmlReps(boolean support) {
@@ -1199,7 +1202,7 @@ public class SourceGenerator {
                                info, imports, true);
         }
         if (elementType != null) {
-            sbCode.append(elementType).append(' ');
+            sbCode.append(responseWrapper.wrap(elementType, imports)).append(' ');
         } else {
             writeJaxrResponse(sbCode, imports);
         }
@@ -1208,7 +1211,7 @@ public class SourceGenerator {
 
     private void writeJaxrResponse(StringBuilder sbCode, Set<String> imports) {
         addImport(imports, Response.class.getName());
-        sbCode.append(Response.class.getSimpleName()).append(' ');
+        sbCode.append(responseWrapper.wrap(Response.class, imports)).append(' ');
     }
 
     private static Element getOKResponse(List<Element> responseEls) {
@@ -2098,6 +2101,11 @@ public class SourceGenerator {
 
     public void setJaxbClassNameSuffix(String jaxbClassNameSuffix) {
         this.jaxbClassNameSuffix = jaxbClassNameSuffix;
+    }
+
+    public void setRx(String rx) {
+        this.rx = rx;
+        this.responseWrapper = ResponseWrapper.create(rx);
     }
 
     private static class GrammarInfo {
