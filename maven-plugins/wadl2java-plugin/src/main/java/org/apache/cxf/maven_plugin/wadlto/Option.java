@@ -89,6 +89,12 @@ public class Option {
      *
      */
     private List<String> schemaPackagenames = new ArrayList<>();
+    
+    /**
+     * Specifies the library to use for JAX-RS 2.1 reactive extensions
+     */
+    private String rx;
+
 
     public Option() {
         super();
@@ -188,6 +194,14 @@ public class Option {
         this.extraargs.addAll(ea);
     }
 
+    public String getRx() {
+        return rx;
+    }
+
+    public void setRx(String rx) {
+        this.rx = rx;
+    }
+    
     public void copyOptions(Option destination) {
         destination.setBindingFiles(getBindingFiles());
         destination.setCatalog(getCatalog());
@@ -197,9 +211,8 @@ public class Option {
         destination.setDependencies(getDependencies());
         destination.setOutputDir(getOutputDir());
         destination.setExtraargs(getExtraargs());
+        destination.setRx(getRx());
     }
-
-
 
     private <T> T setIfNull(T dest, T source) {
         if (dest == null) {
@@ -218,6 +231,7 @@ public class Option {
         dependencies = mergeList(dependencies, defaultOptions.dependencies, File.class);
         redundantDirs = mergeList(redundantDirs, defaultOptions.redundantDirs, File.class);
         schemaPackagenames.addAll(defaultOptions.schemaPackagenames);
+        rx = setIfNull(rx, defaultOptions.rx);
         extraargs.addAll(defaultOptions.extraargs);
     }
 
