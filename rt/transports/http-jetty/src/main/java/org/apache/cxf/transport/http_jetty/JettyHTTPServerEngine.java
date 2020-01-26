@@ -21,6 +21,7 @@ package org.apache.cxf.transport.http_jetty;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -1003,8 +1004,8 @@ public class JettyHTTPServerEngine implements ServerEngine {
         if (null != connector) {
             int cp = ((ServerConnector)connector).getPort();
             if (port != cp) {
-                throw new IllegalStateException("Error: Connector port " + cp + " does not match"
-                            + " with the server engine port " + port);
+                throw new UncheckedIOException(new IOException("Error: Connector port " + cp + " does not match"
+                            + " with the server engine port " + port));
             }
         }
     }
