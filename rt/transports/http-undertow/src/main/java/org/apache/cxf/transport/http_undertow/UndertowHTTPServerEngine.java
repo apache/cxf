@@ -21,7 +21,6 @@ package org.apache.cxf.transport.http_undertow;
 
 import java.io.IOException;
 import java.net.URL;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -371,8 +370,7 @@ public class UndertowHTTPServerEngine implements ServerEngine {
         this.host = host;
     }
 
-    public void finalizeConfig() throws GeneralSecurityException,
-        IOException {
+    public void finalizeConfig() {
         retrieveListenerFactory();
         this.configFinalized = true;
     }
