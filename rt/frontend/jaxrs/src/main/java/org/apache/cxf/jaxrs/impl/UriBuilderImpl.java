@@ -636,7 +636,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         }
         String rawPath = uri.getRawPath();
         if (!uri.isOpaque() && schemeSpecificPart == null
-            && (theScheme != null || rawPath != null)) {
+                && (theScheme != null || rawPath != null)) {
             port = uri.getPort();
             host = uri.getHost();
             if (rawPath != null) {
@@ -651,14 +651,23 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         } else {
             schemeSpecificPart = uri.getSchemeSpecificPart();
         }
-        if (scheme != null && !"file".equalsIgnoreCase(scheme) && host == null && (query == null || query.isEmpty())
-            && userInfo == null  && uri.getSchemeSpecificPart() != null) {
+        if (scheme != null && host == null && port == -1
+                && queryIsEmpty() && !sspMatchessPath(uri) && userInfo == null
+                && uri.getSchemeSpecificPart() != null) {
             schemeSpecificPart = uri.getSchemeSpecificPart();
         }
         String theFragment = uri.getFragment();
         if (theFragment != null) {
             fragment = theFragment;
         }
+    }
+
+    private boolean queryIsEmpty() {
+        return query == null || query.isEmpty();
+    }
+
+    private boolean sspMatchessPath(final URI uri) {
+        return uri.getRawSchemeSpecificPart() != null && uri.getRawSchemeSpecificPart().equals("//" + uri.getPath());
     }
 
     private void setPathAndMatrix(String path) {
