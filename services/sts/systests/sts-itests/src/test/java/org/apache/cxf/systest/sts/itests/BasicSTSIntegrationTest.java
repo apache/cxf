@@ -72,7 +72,8 @@ public class BasicSTSIntegrationTest {
 //             editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
 //                 "org.ops4j.pax.url.mvn.repositories", REPOS),
 
-             copy("clientKeystore.properties"), copy("clientstore.jks"),
+             copy("clientKeystore.properties"),
+             copy("clientstore.jks"),
              editConfigurationFilePut("etc/org.ops4j.pax.web.cfg",
                                       "org.osgi.service.http.port", port),
              when(localRepository != null)
@@ -81,7 +82,6 @@ public class BasicSTSIntegrationTest {
                                                       localRepository)),
              features(stsFeatures, "cxf-sts-service"),
              configureConsole().ignoreLocalConsole().ignoreRemoteShell(),
-
         };
         if (JavaVersionUtil.getMajorVersion() >= 9) {
             final String karafVersion = MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf");

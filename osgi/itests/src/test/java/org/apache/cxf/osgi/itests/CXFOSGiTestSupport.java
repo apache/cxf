@@ -76,11 +76,11 @@ public class CXFOSGiTestSupport {
 
         final Option[] basicOptions = new Option[] {
             karafDistributionConfiguration()
-            .frameworkUrl(
-                maven().groupId("org.apache.karaf").artifactId("apache-karaf").versionAsInProject().type("tar.gz"))
+                .frameworkUrl(
+                    maven().groupId("org.apache.karaf").artifactId("apache-karaf").versionAsInProject().type("tar.gz"))
                 .name("Apache Karaf")
-            .useDeployFolder(false)
-            .unpackDirectory(new File("target/paxexam/")),
+                .useDeployFolder(false)
+                .unpackDirectory(new File("target/paxexam/")),
             //DO NOT COMMIT WITH THIS LINE ENABLED!!!
             //KarafDistributionOption.keepRuntimeFolder(),
             //debugConfiguration(), // nor this

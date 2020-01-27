@@ -66,6 +66,9 @@ public final class WadlToolConstants {
     // JAX-RS 2.0 @Suspended AsyncResponse
     public static final String CFG_SUSPENDED_ASYNC = "async";
 
+    // JAX-RS 2.1 Reactive Extensions
+    public static final String CFG_RX = "rx";
+
     public static final String CFG_WADLURL = "wadl";
 
 
