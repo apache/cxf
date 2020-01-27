@@ -165,6 +165,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
             try {
                 WSSConfig config = WSSConfig.getNewInstance();
                 reqData.setWssConfig(config);
+                reqData.setEncryptionSerializer(new StaxSerializer());
 
                 /*
                  * Setup any custom actions first by processing the input properties
