@@ -22,13 +22,13 @@ package org.apache.cxf.osgi.itests;
 
 import javax.inject.Inject;
 
-import org.junit.Assert;
-import org.ops4j.pax.exam.CoreOptions;
-import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 
+import org.junit.Assert;
+import org.ops4j.pax.exam.CoreOptions;
+import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
 /**
  *
  */

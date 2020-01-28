@@ -248,7 +248,6 @@
         <cxf.oro.bundle.version>2.0.8_6</cxf.oro.bundle.version>
         <cxf.osgi.saaj.version>[1.4,2)</cxf.osgi.saaj.version>
         <cxf.osgi.version>6.0.0</cxf.osgi.version>
-        <cxf.osgi.compendium.version>5.0.0</cxf.osgi.compendium.version>
         <cxf.pax.exam.version>4.13.1</cxf.pax.exam.version>
         <cxf.reflections.bundle.version>0.9.11_2</cxf.reflections.bundle.version>
         <cxf.rhino.bundle.version>1.7R2_3</cxf.rhino.bundle.version>
@@ -1320,8 +1319,8 @@
             </dependency>
             <dependency>
                 <groupId>org.osgi</groupId>
-                <artifactId>org.osgi.compendium</artifactId>
-                <version>${cxf.osgi.compendium.version}</version>
+                <artifactId>osgi.cmpn</artifactId>
+                <version>${cxf.osgi.version}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
