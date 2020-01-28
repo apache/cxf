@@ -41,6 +41,7 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.ops4j.pax.tinybundles.core.TinyBundles;
 
 import static org.junit.Assert.assertEquals;
+import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.provision;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 
@@ -76,8 +77,10 @@ public class JmsServiceTest extends CXFOSGiTestSupport {
     public Option[] config() {
         return OptionUtils.combine(
             cxfBaseConfig(),
-            features(cxfUrl, "cxf-core", "cxf-jaxws", "cxf-transports-jms"),
-            features(amqUrl, "shell-compat", "activemq-broker-noweb"),
+            features(cxfUrl, "cxf-jaxws", "cxf-transports-jms"),
+            features(maven().groupId("org.apache.activemq").artifactId("activemq-karaf").versionAsInProject()
+                    .type("xml").classifier("features-core"),
+                "cxf-jackson", "activemq-client"),
             provision(serviceBundle())
         );
     }
