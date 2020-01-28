@@ -233,7 +233,7 @@
         <cxf.aries.parser.version>1.6.0</cxf.aries.parser.version>
         <cxf.aries.version.range>[1.0,2)</cxf.aries.version.range>
         <cxf.bcel.bundle.version>5.2_4</cxf.bcel.bundle.version>
-        <cxf.cglib.osgi.version>[2.2.2,3.3)</cxf.cglib.osgi.version>
+        <cxf.cglib.osgi.version>[2.2.2,3.4)</cxf.cglib.osgi.version>
         <cxf.dom4j.bundle.version>2.1.1_1</cxf.dom4j.bundle.version>
         <cxf.fastinfoset.bundle.version>1.2.16_1</cxf.fastinfoset.bundle.version>
         <cxf.felix.configadmin.version>1.2.4</cxf.felix.configadmin.version>
@@ -253,7 +253,7 @@
         <cxf.rhino.bundle.version>1.7R2_3</cxf.rhino.bundle.version>
         <cxf.saaj-impl.bundle.version>1.3.23_2</cxf.saaj-impl.bundle.version>
         <cxf.servicemix.aspectj.version>1.9.1_1</cxf.servicemix.aspectj.version>
-        <cxf.servicemix.cglib.version>3.2.12_1</cxf.servicemix.cglib.version>
+        <cxf.servicemix.cglib.version>3.3.0_1</cxf.servicemix.cglib.version>
         <cxf.servicemix.javax.el.version>3.0.0_1</cxf.servicemix.javax.el.version>
         <cxf.servicemix.jaxrs.specs.version>2.9.1</cxf.servicemix.jaxrs.specs.version>
         <cxf.servicemix.jodatime.version>2.3_1</cxf.servicemix.jodatime.version>
@@ -1326,7 +1326,7 @@
             <dependency>
                 <groupId>cglib</groupId>
                 <artifactId>cglib-nodep</artifactId>
-                <version>3.2.12</version>
+                <version>3.3.0</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.xml.fastinfoset</groupId>
