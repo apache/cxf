@@ -77,8 +77,9 @@ public class BasicIntegrationTest {
         final Option[] basicOptions = new Option[] {
              karafDistributionConfiguration()
                  .frameworkUrl(
-                     maven().groupId("org.apache.karaf").artifactId("apache-karaf").versionAsInProject().type("tar.gz"))
-                 .unpackDirectory(new File("target/paxexam/unpack/"))
+                     maven().groupId("org.apache.karaf").artifactId("apache-karaf-minimal").versionAsInProject()
+                         .type("tar.gz"))
+                 .unpackDirectory(new File("target/paxexam/"))
                  .useDeployFolder(false),
              systemProperty("java.awt.headless").value("true"),
              systemProperty("BasicIntegrationTest.PORT").value(port),
@@ -106,7 +107,7 @@ public class BasicIntegrationTest {
             // CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
         };
         if (JavaVersionUtil.getMajorVersion() >= 9) {
-            final String karafVersion = MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf");
+            final String karafVersion = MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf-minimal");
             return OptionUtils.combine(basicOptions,
                 new VMOption("--add-reads=java.xml=java.logging"),
                 new VMOption("--add-exports=java.base/"
