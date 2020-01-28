@@ -50,6 +50,8 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 import org.apache.cxf.staxutils.OverlayW3CDOMStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.xml.security.c14n.Canonicalizer;
+import org.apache.xml.security.c14n.InvalidCanonicalizerException;
 import org.apache.xml.security.encryption.AbstractSerializer;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 
@@ -62,15 +64,18 @@ public class StaxSerializer extends AbstractSerializer {
     private XMLInputFactory factory;
     private boolean validFactory;
 
+    public StaxSerializer() throws InvalidCanonicalizerException {
+        super(Canonicalizer.ALGO_ID_C14N_PHYSICAL, true);
+    }
+
     /**
      * @param source
      * @param ctx
-     * @param secureValidation
      * @return the Node resulting from the parse of the source
      * @throws XMLEncryptionException
      */
     @Override
-    public Node deserialize(byte[] source, Node ctx, boolean secureValidation) throws XMLEncryptionException {
+    public Node deserialize(byte[] source, Node ctx) throws XMLEncryptionException {
         XMLStreamReader reader = createWstxReader(source, ctx);
         if (reader != null) {
             return deserialize(ctx, reader, false);
