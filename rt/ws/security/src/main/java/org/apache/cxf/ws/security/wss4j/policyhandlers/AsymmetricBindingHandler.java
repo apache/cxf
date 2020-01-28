@@ -80,6 +80,7 @@ import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
 import org.apache.wss4j.policy.model.IssuedToken;
 import org.apache.wss4j.policy.model.SamlToken;
+import org.apache.xml.security.c14n.InvalidCanonicalizerException;
 import org.opensaml.saml.common.SAMLVersion;
 
 /**
@@ -572,7 +573,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             }
 
             return encr;
-        } catch (WSSecurityException e) {
+        } catch (InvalidCanonicalizerException | WSSecurityException e) {
             LOG.log(Level.FINE, e.getMessage(), e);
             unassertPolicy(recToken, e);
         }
