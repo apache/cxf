@@ -64,8 +64,9 @@ public class BasicSTSIntegrationTest {
         final Option[] basicOptions = new Option[] {
              karafDistributionConfiguration()
                  .frameworkUrl(
-                     maven().groupId("org.apache.karaf").artifactId("apache-karaf").versionAsInProject().type("tar.gz"))
-                 .unpackDirectory(new File("target/paxexam/unpack/"))
+                     maven().groupId("org.apache.karaf").artifactId("apache-karaf-minimal").versionAsInProject()
+                         .type("tar.gz"))
+                 .unpackDirectory(new File("target/paxexam/"))
                  .useDeployFolder(false),
              systemProperty("java.awt.headless").value("true"),
              systemProperty("BasicSTSIntegrationTest.PORT").value(port),
@@ -84,7 +85,7 @@ public class BasicSTSIntegrationTest {
              configureConsole().ignoreLocalConsole().ignoreRemoteShell(),
         };
         if (JavaVersionUtil.getMajorVersion() >= 9) {
-            final String karafVersion = MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf");
+            final String karafVersion = MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf-minimal");
             return OptionUtils.combine(basicOptions,
                 new VMOption("--add-reads=java.xml=java.logging"),
                 new VMOption("--add-exports=java.base/"

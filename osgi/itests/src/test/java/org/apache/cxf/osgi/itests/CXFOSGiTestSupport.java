@@ -58,7 +58,6 @@ public class CXFOSGiTestSupport {
     protected BundleContext bundleContext;
 
     protected MavenUrlReference cxfUrl;
-    protected MavenUrlReference amqUrl;
 
     /**
      * Create an {@link org.ops4j.pax.exam.Option} for using a .
@@ -67,9 +66,7 @@ public class CXFOSGiTestSupport {
      */
     protected Option[] cxfBaseConfig() {
         cxfUrl = maven().groupId("org.apache.cxf.karaf").artifactId("apache-cxf").versionAsInProject()
-                .type("xml").classifier("features");
-        amqUrl = maven().groupId("org.apache.activemq")
-                .artifactId("activemq-karaf").type("xml").classifier("features").versionAsInProject();
+            .type("xml").classifier("features");
 
         String localRepo = System.getProperty("localRepository");
         Object urp = System.getProperty("cxf.useRandomFirstPort");
@@ -77,8 +74,8 @@ public class CXFOSGiTestSupport {
         final Option[] basicOptions = new Option[] {
             karafDistributionConfiguration()
                 .frameworkUrl(
-                    maven().groupId("org.apache.karaf").artifactId("apache-karaf").versionAsInProject().type("tar.gz"))
-                .name("Apache Karaf")
+                    maven().groupId("org.apache.karaf").artifactId("apache-karaf-minimal").versionAsInProject()
+                        .type("tar.gz"))
                 .useDeployFolder(false)
                 .unpackDirectory(new File("target/paxexam/")),
             //DO NOT COMMIT WITH THIS LINE ENABLED!!!
@@ -96,7 +93,7 @@ public class CXFOSGiTestSupport {
             when(urp != null).useOptions(systemProperty("cxf.useRandomFirstPort").value("true"))
         };
         if (JavaVersionUtil.getMajorVersion() >= 9) {
-            final String karafVersion = MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf");
+            final String karafVersion = MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf-minimal");
             return OptionUtils.combine(basicOptions,
                 new VMOption("--add-reads=java.xml=java.logging"),
                 new VMOption("--add-exports=java.base/"

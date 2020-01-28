@@ -63,7 +63,7 @@
 
         <dependency>
             <groupId>org.apache.karaf</groupId>
-            <artifactId>apache-karaf</artifactId>
+            <artifactId>apache-karaf-minimal</artifactId>
             <version>${cxf.karaf.version}</version>
             <scope>test</scope>
             <type>tar.gz</type>
@@ -94,7 +94,7 @@
             <artifactId>activemq-karaf</artifactId>
             <type>xml</type>
             <version>${cxf.activemq.version}</version>
-            <classifier>features</classifier>
+            <classifier>features-core</classifier>
             <exclusions>
                 <exclusion>
                     <groupId>*</groupId>
@@ -202,7 +202,6 @@
                         <org.ops4j.pax.logging.DefaultServiceLog.level>WARN</org.ops4j.pax.logging.DefaultServiceLog.level>
                         <localRepository>${maven.repo.local}</localRepository>
                     </systemPropertyVariables>
-                    <reuseForks>true</reuseForks>
                 </configuration>
             </plugin>
         </plugins>
