@@ -45,7 +45,7 @@ public abstract class AbstractMessageListenerContainer implements JMSListenerCon
     protected boolean transacted;
     protected int acknowledgeMode = Session.AUTO_ACKNOWLEDGE;
     protected String messageSelector;
-    protected boolean running;
+    protected volatile boolean running;
     protected String durableSubscriptionName;
     protected boolean pubSubNoLocal;
     protected TransactionManager transactionManager;
