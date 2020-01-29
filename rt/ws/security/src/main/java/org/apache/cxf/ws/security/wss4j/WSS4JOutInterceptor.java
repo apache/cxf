@@ -53,6 +53,7 @@ import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.xml.security.c14n.InvalidCanonicalizerException;
 
 public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
 
@@ -165,6 +166,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
             try {
                 WSSConfig config = WSSConfig.getNewInstance();
                 reqData.setWssConfig(config);
+                reqData.setEncryptionSerializer(new StaxSerializer());
 
                 /*
                  * Setup any custom actions first by processing the input properties
@@ -267,7 +269,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                 if (doDebug) {
                     LOG.fine("WSS4JOutInterceptor: exit handleMessage()");
                 }
-            } catch (WSSecurityException e) {
+            } catch (InvalidCanonicalizerException | WSSecurityException e) {
                 throw new SoapFault(new Message("SECURITY_FAILED", LOG), e, version
                         .getSender());
             } finally {

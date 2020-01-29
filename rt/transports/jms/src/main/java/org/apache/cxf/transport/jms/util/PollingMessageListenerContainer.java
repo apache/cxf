@@ -82,9 +82,10 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                         try {
                             if (message != null) {
                                 listenerHandler.onMessage(message);
-                            }
-                            if (session.getTransacted()) {
-                                session.commit();
+
+                                if (session.getTransacted()) {
+                                    session.commit();
+                                }
                             }
                         } catch (Throwable e) {
                             LOG.log(Level.WARNING, "Exception while processing jms message in cxf. Rolling back", e);
@@ -172,7 +173,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
     private MessageConsumer createConsumer(final Connection connection, final Session session)
             throws JMSException {
         final MessageConsumer consumer;
-        
+
         if (jmsConfig != null && jmsConfig.isOneSessionPerConnection()) {
             Destination destination;
             if (!isReply()) {
@@ -185,7 +186,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
         } else {
             consumer = createConsumer(session);
         }
-        
+
         return consumer;
     }
 
@@ -200,7 +201,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
         }
         return session.createConsumer(destination, messageSelector);
     }
-    
+
     protected void handleException(Throwable e) {
         running = false;
         JMSException wrapped;
