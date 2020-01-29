@@ -19,15 +19,20 @@
 package org.apache.cxf.osgi.itests;
 
 
+import org.apache.cxf.helpers.JavaUtils;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.OptionUtils;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
 import static org.ops4j.pax.exam.CoreOptions.junitBundles;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.systemPackages;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.CoreOptions.when;
 
@@ -54,22 +59,38 @@ public class NoAriesBlueprintTest extends OSGiTestSupport {
             localRepo = "";
         }
 
-        return new Option[]{
-                systemProperty("java.awt.headless").value("true"),
-                when(!"".equals(localRepo))
-                    .useOptions(systemProperty("org.ops4j.pax.url.mvn.localRepository").value(localRepo)),
-                mvnBundle("org.apache.ws.xmlschema", "xmlschema-core"),
-                mvnBundle("org.apache.servicemix.bundles", "org.apache.servicemix.bundles.wsdl4j"),
-                mvnBundle("org.apache.cxf", "cxf-core"),
-                mvnBundle("org.apache.cxf", "cxf-rt-wsdl"),
-                mvnBundle("org.apache.cxf", "cxf-rt-databinding-jaxb"),
-                mvnBundle("org.apache.cxf", "cxf-rt-bindings-xml"),
-                mvnBundle("org.apache.cxf", "cxf-rt-bindings-soap"),
-                mvnBundle("org.apache.cxf", "cxf-rt-frontend-simple"),
-                mvnBundle("javax.servlet", "javax.servlet-api"),
-                mvnBundle("org.apache.cxf", "cxf-rt-transports-http"),
-                mvnBundle("org.apache.cxf", "cxf-rt-frontend-jaxws"),
-                junitBundles()
+        final Option[] basicOptions = new Option[] {
+            systemProperty("java.awt.headless").value("true"),
+            when(!"".equals(localRepo))
+                .useOptions(systemProperty("org.ops4j.pax.url.mvn.localRepository").value(localRepo)),
+            mavenBundle("org.apache.ws.xmlschema", "xmlschema-core").versionAsInProject(),
+            mavenBundle("org.apache.servicemix.bundles", "org.apache.servicemix.bundles.wsdl4j").versionAsInProject(),
+            mavenBundle("org.apache.felix", "org.apache.felix.configadmin").versionAsInProject(),
+            mavenBundle("org.apache.cxf", "cxf-core").versionAsInProject(),
+            mavenBundle("org.apache.cxf", "cxf-rt-wsdl").versionAsInProject(),
+            mavenBundle("org.apache.cxf", "cxf-rt-databinding-jaxb").versionAsInProject(),
+            mavenBundle("org.apache.cxf", "cxf-rt-bindings-xml").versionAsInProject(),
+            mavenBundle("org.apache.cxf", "cxf-rt-bindings-soap").versionAsInProject(),
+            mavenBundle("org.apache.cxf", "cxf-rt-frontend-simple").versionAsInProject(),
+            mavenBundle("javax.servlet", "javax.servlet-api").versionAsInProject(),
+            mavenBundle("org.apache.cxf", "cxf-rt-transports-http").versionAsInProject(),
+            mavenBundle("org.apache.cxf", "cxf-rt-frontend-jaxws").versionAsInProject(),
+            junitBundles(),
+            systemPackages(
+                "javax.annotation;version=\"1.3\"",
+                "javax.xml.soap;version=\"1.5\""
+            )
         };
+        if (JavaUtils.isJava9Compatible()) {
+            return OptionUtils.combine(basicOptions,
+                mavenBundle("jakarta.annotation", "jakarta.annotation-api").versionAsInProject(),
+                mavenBundle("com.sun.activation", "jakarta.activation").versionAsInProject(),
+                mavenBundle("jakarta.xml.ws", "jakarta.xml.ws-api").versionAsInProject(),
+                mavenBundle("jakarta.xml.bind", "jakarta.xml.bind-api").versionAsInProject(),
+                mavenBundle("jakarta.xml.soap", "jakarta.xml.soap-api").versionAsInProject(),
+                mavenBundle("jakarta.jws", "jakarta.jws-api").versionAsInProject()
+            );
+        }
+        return basicOptions;
     }
 }
