@@ -24,9 +24,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
@@ -584,9 +583,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         if (nd instanceof Document) {
             nd = ((Document)nd).getDocumentElement();
         }
-        Map<String, String> ns = new HashMap<>();
-        ns.put("ns2", "http://www.example.org/schema/DoubleIt");
-        XPathUtils xp = new XPathUtils(ns);
+        XPathUtils xp = new XPathUtils(Collections.singletonMap("ns2", "http://www.example.org/schema/DoubleIt"));
         Object o = xp.getValue("//ns2:DoubleItResponse/doubledNumber", nd, XPathConstants.STRING);
         assertEquals(StaxUtils.toString(nd), "50", o);
 
@@ -616,10 +613,10 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
 
         Document xmlDocument = DOMUtils.newDocument();
 
-        Element requestElement = xmlDocument.createElementNS("http://www.example.org/schema/DoubleIt", "tns:DoubleIt");
-        requestElement.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:tns",
-                                      "http://www.example.org/schema/DoubleIt");
-        Element dataElement = xmlDocument.createElement("numberToDouble");
+        final String ns = "http://www.example.org/schema/DoubleIt";
+        Element requestElement = xmlDocument.createElementNS(ns, "tns:DoubleIt");
+        requestElement.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:tns", ns);
+        Element dataElement = xmlDocument.createElementNS(null, "numberToDouble");
         dataElement.appendChild(xmlDocument.createTextNode("25"));
         requestElement.appendChild(dataElement);
         xmlDocument.appendChild(requestElement);
@@ -642,9 +639,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         SOAPMessage resp = disp.invoke(request);
         Node nd = resp.getSOAPBody().getFirstChild();
 
-        Map<String, String> ns = new HashMap<>();
-        ns.put("ns2", "http://www.example.org/schema/DoubleIt");
-        XPathUtils xp = new XPathUtils(ns);
+        XPathUtils xp = new XPathUtils(Collections.singletonMap("ns2", ns));
         Object o = xp.getValue("//ns2:DoubleItResponse/doubledNumber", 
                                DOMUtils.getDomElement(nd), XPathConstants.STRING);
         assertEquals(StaxUtils.toString(nd), "50", o);

@@ -2816,13 +2816,13 @@
             </build>
         </profile>
         <profile>
-	    <id>java9-plus</id>
-	    <properties>
+            <id>java9-plus</id>
+            <properties>
                 <org.apache.cxf.transport.websocket.atmosphere.disabled>true</org.apache.cxf.transport.websocket.atmosphere.disabled>
                 <cxf.jdk.version>11</cxf.jdk.version>
-	    </properties>
-	    <activation>
-        	<jdk>[9,)</jdk>
+            </properties>
+            <activation>
+                <jdk>[9,)</jdk>
             </activation>
             <build>
                 <plugins>
@@ -2877,17 +2877,8 @@
                 <dependency>
                     <groupId>com.sun.xml.messaging.saaj</groupId>
                     <artifactId>saaj-impl</artifactId>
-                    <version>1.3.23</version>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>javax.xml.stream</groupId>
-                            <artifactId>stax-api</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>javax.xml.soap</groupId>
-                            <artifactId>javax.xml.soap-api</artifactId>
-                        </exclusion>
-                    </exclusions>
+                    <version>1.5.1</version>
+                    <scope>runtime</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.jacorb</groupId>
