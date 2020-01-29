@@ -275,7 +275,8 @@
                 <dependency>
                     <groupId>com.sun.xml.messaging.saaj</groupId>
                     <artifactId>saaj-impl</artifactId>
-                    <version>1.3.23</version>
+                    <version>1.5.2</version>
+                    <scope>runtime</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.apache.geronimo.specs</groupId>
