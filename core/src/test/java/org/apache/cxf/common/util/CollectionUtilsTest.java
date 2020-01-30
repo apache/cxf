@@ -22,7 +22,6 @@ package org.apache.cxf.common.util;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Dictionary;
 import java.util.Map;
 
 
