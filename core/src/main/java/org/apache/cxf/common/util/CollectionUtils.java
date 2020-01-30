@@ -56,6 +56,10 @@ public final class CollectionUtils {
         return true;
     }
 
+    public static <K, V> boolean isEmpty(Map<K, V> m) {
+        return m == null || m.isEmpty();
+    }
+
     public static <S, T> Dictionary<S, T> singletonDictionary(S s, T t) {
         return toDictionary(Collections.singletonMap(s, t));
     }
