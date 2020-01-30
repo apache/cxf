@@ -22,6 +22,8 @@ package org.apache.cxf.common.util;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Dictionary;
+import java.util.Map;
 
 
 import org.junit.Assert;
@@ -53,5 +55,8 @@ public class CollectionUtilsTest extends Assert {
         List<String> l = Arrays.asList(new String[]{null, null});
         assertNotNull(l);
         assertTrue(CollectionUtils.isEmpty(l));
+
+        assertTrue(CollectionUtils.isEmpty((Collection) null));
+        assertTrue(CollectionUtils.isEmpty((Map) null));
     }
 }
