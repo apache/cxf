@@ -130,20 +130,6 @@
             </plugin>
         </plugins>
     </build>
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.jacorb</groupId>
-                <artifactId>jacorb</artifactId>
-                <version>3.7</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jacorb</groupId>
-                <artifactId>jacorb-omgapi</artifactId>
-                <version>3.7</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -406,6 +392,7 @@
         <dependency>
             <groupId>org.jacorb</groupId>
             <artifactId>jacorb</artifactId>
+            <version>${cxf.jacorb.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
