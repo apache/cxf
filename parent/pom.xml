@@ -156,7 +156,7 @@
         <cxf.johnzon.version>1.1.13</cxf.johnzon.version>
         <cxf.json.api.version>1.1.4</cxf.json.api.version>
         <cxf.jsr250.api.version>1.0</cxf.jsr250.api.version>
-        <cxf.junit.version>4.12</cxf.junit.version>
+        <cxf.junit.version>4.13</cxf.junit.version>
         <cxf.kerby.version>2.0.0</cxf.kerby.version>
         <cxf.littleproxy.version>1.1.2</cxf.littleproxy.version>
         <cxf.log4j.version>1.2.17</cxf.log4j.version>
