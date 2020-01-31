@@ -39,6 +39,7 @@ import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriBuilderException;
 
+import org.apache.cxf.common.util.CollectionUtils;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.model.URITemplate;
@@ -636,7 +637,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         }
         String rawPath = uri.getRawPath();
         if (!uri.isOpaque() && schemeSpecificPart == null
-            && (theScheme != null || rawPath != null)) {
+                && (theScheme != null || rawPath != null)) {
             port = uri.getPort();
             host = uri.getHost();
             if (rawPath != null) {
@@ -651,14 +652,22 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         } else {
             schemeSpecificPart = uri.getSchemeSpecificPart();
         }
-        if (scheme != null && host == null && (query == null || query.isEmpty()) && userInfo == null
-            && uri.getSchemeSpecificPart() != null) {
+        if (scheme != null && host == null && port == -1 && userInfo == null
+                && CollectionUtils.isEmpty(query)
+                && uri.getSchemeSpecificPart() != null
+                && !schemeSpecificPartMatchesUriPath(uri)) {
             schemeSpecificPart = uri.getSchemeSpecificPart();
         }
         String theFragment = uri.getFragment();
         if (theFragment != null) {
             fragment = theFragment;
         }
+    }
+
+    private boolean schemeSpecificPartMatchesUriPath(final URI uri) {
+        return uri.getRawSchemeSpecificPart() != null
+                && uri.getPath() != null
+                && uri.getRawSchemeSpecificPart().equals("//" + uri.getPath());
     }
 
     private void setPathAndMatrix(String path) {
