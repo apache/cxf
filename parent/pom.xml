@@ -1175,11 +1175,6 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf.services.sts.systests</groupId>
-                <artifactId>cxf-services-sts-systests-features</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf.services.sts.systests</groupId>
                 <artifactId>cxf-services-sts-systests-osgi</artifactId>
                 <version>${project.version}</version>
             </dependency>

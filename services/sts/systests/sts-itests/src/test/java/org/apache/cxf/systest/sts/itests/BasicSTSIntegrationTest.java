@@ -27,12 +27,12 @@ import org.ops4j.pax.exam.MavenUtils;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.OptionUtils;
 import org.ops4j.pax.exam.karaf.container.internal.JavaVersionUtil;
-import org.ops4j.pax.exam.options.MavenArtifactUrlReference;
 import org.ops4j.pax.exam.options.extra.VMOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
 import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.CoreOptions.when;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
@@ -44,45 +44,34 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.replaceCo
 @ExamReactorStrategy(PerClass.class)
 public class BasicSTSIntegrationTest {
 
-    // Adding apache snapshots as cxf trunk may contain snapshot dependencies
-//    private static final String REPOS = "https://repo1.maven.org/maven2@id=central,"
-//        + "https://repository.apache.org/content/groups/snapshots-group@id=apache@snapshots@noreleases";
-
     @Configuration
     public Option[] getConfig() {
-        String port = TestUtil.getPortNumber(BasicSTSIntegrationTest.class);
-        System.setProperty("BasicSTSIntegrationTest.PORT", port);
-
-        String localRepository = System.getProperty("localRepository");
-
-        MavenArtifactUrlReference stsFeatures = maven() //
-            .groupId("org.apache.cxf.services.sts.systests") //
-            .artifactId("cxf-services-sts-systests-features") //
-            .versionAsInProject() //
-            .type("xml");
+        final String port = TestUtil.getPortNumber(BasicSTSIntegrationTest.class);
+        final String localRepository = System.getProperty("maven.repo.local", "");
 
         final Option[] basicOptions = new Option[] {
-             karafDistributionConfiguration()
-                 .frameworkUrl(
-                     maven().groupId("org.apache.karaf").artifactId("apache-karaf-minimal").versionAsInProject()
-                         .type("tar.gz"))
-                 .unpackDirectory(new File("target/paxexam/"))
-                 .useDeployFolder(false),
-             systemProperty("java.awt.headless").value("true"),
-             systemProperty("BasicSTSIntegrationTest.PORT").value(port),
-//             editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
-//                 "org.ops4j.pax.url.mvn.repositories", REPOS),
+            karafDistributionConfiguration()
+                .frameworkUrl(maven("org.apache.karaf", "apache-karaf-minimal").versionAsInProject().type("tar.gz"))
+                .unpackDirectory(new File("target/paxexam/"))
+                .useDeployFolder(false),
+            configureConsole().ignoreLocalConsole().ignoreRemoteShell(),
+            systemProperty("java.awt.headless").value("true"),
+            systemProperty("BasicSTSIntegrationTest.PORT").value(port),
+            editConfigurationFilePut("etc/org.ops4j.pax.web.cfg",
+                                    "org.osgi.service.http.port", port),
+            when(!localRepository.isEmpty())
+                .useOptions(systemProperty("org.ops4j.pax.url.mvn.localRepository").value(localRepository)),
+            //DO NOT COMMIT WITH THIS LINE ENABLED!!!
+            //KarafDistributionOption.keepRuntimeFolder(),
+            //KarafDistributionOption.debugConfiguration(), // nor this
+            //KarafDistributionOption.logLevel(LogLevelOption.LogLevel.INFO),
 
-             copy("clientKeystore.properties"),
-             copy("clientstore.jks"),
-             editConfigurationFilePut("etc/org.ops4j.pax.web.cfg",
-                                      "org.osgi.service.http.port", port),
-             when(localRepository != null)
-                 .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
-                                                      "org.ops4j.pax.url.mvn.localRepository",
-                                                      localRepository)),
-             features(stsFeatures, "cxf-sts-service"),
-             configureConsole().ignoreLocalConsole().ignoreRemoteShell(),
+            features(
+                maven("org.apache.cxf.karaf", "apache-cxf").versionAsInProject().type("xml").classifier("features"),
+                "aries-blueprint", "cxf-jaxws", "cxf-sts"),
+            mavenBundle("org.apache.cxf.services.sts.systests", "cxf-services-sts-systests-osgi").versionAsInProject(),
+            copy("clientKeystore.properties"),
+            copy("clientstore.jks")
         };
         if (JavaVersionUtil.getMajorVersion() >= 9) {
             final String karafVersion = MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf-minimal");
@@ -114,7 +103,7 @@ public class BasicSTSIntegrationTest {
         return basicOptions;
     }
 
-    protected static Option copy(String path) {
+    private static Option copy(String path) {
         return replaceConfigurationFile(path, new File("src/test/resources/" + path));
     }
 

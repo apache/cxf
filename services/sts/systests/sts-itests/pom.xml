@@ -45,9 +45,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf.services.sts.systests</groupId>
-            <artifactId>cxf-services-sts-systests-features</artifactId>
-            <version>${project.version}</version>
-            <type>xml</type>
+            <artifactId>cxf-services-sts-systests-osgi</artifactId>
         </dependency>
 
         <dependency>
@@ -157,8 +155,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <systemPropertyVariables>
-                        <org.ops4j.pax.logging.DefaultServiceLog.level>WARN</org.ops4j.pax.logging.DefaultServiceLog.level>
-                        <localRepository>${maven.repo.local}</localRepository>
+                        <maven.repo.local>${maven.repo.local}</maven.repo.local>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
