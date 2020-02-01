@@ -28,11 +28,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -60,7 +64,7 @@ public class SseEventSourceImplTest {
     enum Type {
         NO_CONTENT, NO_SERVER, BUSY,
         EVENT, EVENT_JUST_DATA, EVENT_JUST_NAME, EVENT_MULTILINE_DATA, EVENT_NO_RETRY, EVENT_BAD_RETRY, EVENT_MIXED,
-        EVENT_BAD_NEW_LINES, EVENT_NOT_AUTHORIZED;
+        EVENT_BAD_NEW_LINES, EVENT_NOT_AUTHORIZED, EVENT_LAST_EVENT_ID, EVENT_RETRY_LAST_EVENT_ID;
     }
 
     private static final String EVENT = "event: event\n"
@@ -375,21 +379,69 @@ public class SseEventSourceImplTest {
         }
     }
 
+    @Test
+    public void testConnectWithLastEventId() throws InterruptedException, IOException {
+        try (SseEventSource eventSource = withNoReconnect(Type.EVENT_LAST_EVENT_ID, "10")) {
+            eventSource.open();
+            assertThat(eventSource.isOpen(), equalTo(true));
+
+            // Allow the event processor to pull for events (150ms)
+            Thread.sleep(150L);
+        }
+
+        assertThat(events.size(), equalTo(1));
+        assertThat(events.get(0).getId(), equalTo("10"));
+        assertThat(events.get(0).getReconnectDelay(), equalTo(10000L));
+        assertThat(events.get(0).getComment(), equalTo("test comment"));
+        assertThat(events.get(0).readData(), equalTo("test data"));
+    }
+    
+    @Test
+    public void testReconnectWithLastEventId() throws InterruptedException, IOException {
+        try (SseEventSource eventSource = withReconnect(Type.EVENT_RETRY_LAST_EVENT_ID, "10")) {
+            eventSource.open();
+            assertThat(eventSource.isOpen(), equalTo(false));
+            assertThat(errors.size(), equalTo(1));
+
+            // Allow the event processor to pull for events (150ms)
+            Thread.sleep(150L);
+        }
+
+        assertThat(events.size(), equalTo(1));
+        assertThat(events.get(0).getId(), equalTo("10"));
+        assertThat(events.get(0).getReconnectDelay(), equalTo(10000L));
+        assertThat(events.get(0).getComment(), equalTo("test comment"));
+        assertThat(events.get(0).readData(), equalTo("test data"));
+    }
+    
     private SseEventSource withNoReconnect(Type type) {
-        SseEventSource eventSource = SseEventSource.target(target(type)).build();
+        return withNoReconnect(type, null);
+    }
+    
+    private SseEventSource withNoReconnect(Type type, String lastEventId) {
+        SseEventSource eventSource = SseEventSource.target(target(type, lastEventId)).build();
         eventSource.register(events::add, errors::add);
         return eventSource;
     }
-
+    
     private SseEventSource withReconnect(Type type) {
-        SseEventSource eventSource = SseEventSource.target(target(type)).reconnectingEvery(100L, TimeUnit.MILLISECONDS)
+        return withReconnect(type, null);
+    }
+
+    private SseEventSource withReconnect(Type type, String lastEventId) {
+        SseEventSource eventSource = SseEventSource.target(target(type, lastEventId))
+                .reconnectingEvery(100L, TimeUnit.MILLISECONDS)
                 .build();
         eventSource.register(events::add, errors::add);
         return eventSource;
     }
 
-    private static WebTarget target(Type type) {
-        return ClientBuilder.newClient().target(LOCAL_ADDRESS + type.name());
+    private static WebTarget target(Type type, String lastEventId) {
+        final WebTarget target = ClientBuilder.newClient().target(LOCAL_ADDRESS + type.name());
+        if (lastEventId != null) {
+            target.property(HttpHeaders.LAST_EVENT_ID_HEADER, lastEventId);
+        }
+        return target;
     }
 
     @BeforeClass
@@ -408,6 +460,18 @@ public class SseEventSourceImplTest {
         startServer(Type.EVENT_BAD_RETRY, EVENT_BAD_RETRY);
         startServer(Type.EVENT_MIXED, EVENT_MIXED);
         startServer(Type.EVENT_BAD_NEW_LINES, EVENT_BAD_NEW_LINES);
+        
+        final Function<HttpHeaders, String> function = headers -> {
+            final String lastEventId = headers.getHeaderString(HttpHeaders.LAST_EVENT_ID_HEADER);
+            if (lastEventId != null) {
+                return EVENT.replaceAll("id: 1", "id: " + lastEventId); 
+            } else {
+                return EVENT;
+            }
+        };
+        
+        startDynamicServer(Type.EVENT_RETRY_LAST_EVENT_ID, function);
+        startDynamicServer(Type.EVENT_LAST_EVENT_ID, function);
     }
 
     private static void startNotAuthorizedServer(Type type) {
@@ -428,6 +492,13 @@ public class SseEventSourceImplTest {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setAddress(LOCAL_ADDRESS + type.name());
         sf.setServiceBean(new EventServer(payload));
+        SERVERS.put(type, sf.create());
+    }
+    
+    private static void startDynamicServer(Type type, Function<HttpHeaders, String> function) {
+        JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
+        sf.setAddress(LOCAL_ADDRESS + type.name());
+        sf.setServiceBean(new DynamicServer(function, type == Type.EVENT_RETRY_LAST_EVENT_ID));
         SERVERS.put(type, sf.create());
     }
 
@@ -472,6 +543,27 @@ public class SseEventSourceImplTest {
         @Produces(MediaType.SERVER_SENT_EVENTS)
         public Response event() {
             return Response.status(Status.UNAUTHORIZED).build();
+        }
+    }
+
+    public static class DynamicServer {
+        private final Function<HttpHeaders, String> function;
+        private volatile boolean fail = true; 
+
+        public DynamicServer(Function<HttpHeaders, String> function, boolean fail) {
+            this.function = function;
+            this.fail = fail;
+        }
+
+        @GET
+        @Produces(MediaType.SERVER_SENT_EVENTS)
+        public String event(@Context HttpHeaders headers) {
+            if (fail) {
+                fail = false;
+                throw new BadRequestException();
+            } else {
+                return function.apply(headers);
+            }
         }
     }
 
