@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.Configuration;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.sse.InboundSseEvent;
@@ -517,6 +518,39 @@ public class SseEventSourceImplTest extends Assert {
             assertThat(eventSource.isOpen(), equalTo(false));
         }
     }
+    
+    @Test
+    public void testConnectWithLastEventId() throws InterruptedException, IOException {
+        final String payload = EVENT_NO_RETRY.replaceAll("id: 1", "id: 11");
+        
+        when(configuration.getProperty(HttpHeaders.LAST_EVENT_ID_HEADER)).thenReturn("10");
+        when(builder.header(HttpHeaders.LAST_EVENT_ID_HEADER, "10")).thenAnswer(invocation -> {
+            try (InputStream is = new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8))) {
+                when(response.getStatus()).thenReturn(200);
+                when(response.readEntity(InputStream.class)).thenReturn(is);
+                return builder;
+            }
+        });
+
+        final List<InboundSseEvent> events = new ArrayList<>();
+        try (SseEventSource eventSource = withReconnect()) {
+            eventSource.register(events::add);
+            eventSource.open();
+           
+            assertThat(eventSource.isOpen(), equalTo(true));
+            verify(response, times(1)).getStatus();
+           
+            // Allow the event processor to pull for events (150ms)
+            Thread.sleep(150L);
+        }
+   
+        assertThat(events.size(), equalTo(1));
+        assertThat(events.get(0).getId(), equalTo("11"));
+        assertThat(events.get(0).getReconnectDelay(), equalTo(-1L));
+        assertThat(events.get(0).getComment(), equalTo("test comment"));
+        assertThat(events.get(0).readData(), equalTo("test data"));
+    }
+
     
     private SseEventSource withNoReconnect() {
         return SseEventSource.target(target).build();
