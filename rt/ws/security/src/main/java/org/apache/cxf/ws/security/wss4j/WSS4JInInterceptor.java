@@ -19,7 +19,6 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.security.Provider;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
@@ -407,15 +406,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             if (document != null && node != null) {
                 Node newNode = null;
                 try {
-                    newNode = document.importNode(node, true);
-                    if (newNode != null) {
-                        try {
-                            Method method = newNode.getClass().getMethod("getDomElement");
-                            newNode = (Element)method.invoke(newNode);
-                        } catch (java.lang.NoSuchMethodException ex) {
-                            // do nothing;
-                        }
-                    }
+                    newNode = DOMUtils.getDomElement(document.importNode(node, true));
                     elem.getOwnerDocument().getDocumentElement().getFirstChild().
                         getNextSibling().replaceChild(newNode, node);
                     List<WSSecurityEngineResult> encryptResults = wsResult.getActionResults().get(WSConstants.ENCR);
