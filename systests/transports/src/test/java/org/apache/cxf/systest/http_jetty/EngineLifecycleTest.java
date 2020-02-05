@@ -25,7 +25,6 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.Properties;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.ServerImpl;
@@ -36,7 +35,6 @@ import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngine;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
@@ -104,6 +102,8 @@ public class EngineLifecycleTest {
 
         applicationContext = new GenericApplicationContext();
 
+        System.setProperty("jetty.staticResourceURL", getClass().getPackage().getName().replace('.', '/'));
+
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(applicationContext);
         reader.loadBeanDefinitions(
                 new ClassPathResource("META-INF/cxf/cxf.xml"),
@@ -111,13 +111,6 @@ public class EngineLifecycleTest {
                 new ClassPathResource("jetty-engine.xml", getClass()),
                 new ClassPathResource("server-lifecycle-beans.xml", getClass()));
 
-        // bring in some property values from a Properties file
-        PropertyPlaceholderConfigurer cfg = new PropertyPlaceholderConfigurer();
-        Properties properties = new Properties();
-        properties.setProperty("staticResourceURL", getClass().getPackage().getName().replace('.', '/'));
-        cfg.setProperties(properties);
-        // now actually do the replacement
-        cfg.postProcessBeanFactory(applicationContext.getBeanFactory());
         applicationContext.refresh();
     }
 
