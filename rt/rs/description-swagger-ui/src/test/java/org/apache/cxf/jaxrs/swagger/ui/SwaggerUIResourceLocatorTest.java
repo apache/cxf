@@ -27,7 +27,7 @@ import org.junit.Test;
 
 public class SwaggerUIResourceLocatorTest {
 
-    @Test
+    @Test(expected = MalformedURLException.class)
     public void testLocateWithBadCharactersInUrl() {
         String url =
                 "jar:file:/Volumes/bigdrive/test157/jetty/base/webapps/"
@@ -37,10 +37,7 @@ public class SwaggerUIResourceLocatorTest {
 
         SwaggerUiResourceLocator locator = new SwaggerUiResourceLocator("/");
 
-        try {
-            locator.locate(url);
-        } catch (MalformedURLException e) {
-            // expected.
-        }
+        locator.locate(url);
+        
     }
 }
