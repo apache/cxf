@@ -1,4 +1,3 @@
-package org.apache.cxf.interceptor.security;
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -17,25 +16,18 @@ package org.apache.cxf.interceptor.security;
  * specific language governing permissions and limitations
  * under the License.
  */
-
+package org.apache.cxf.interceptor.security;
 
 import java.security.Principal;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.security.auth.Subject;
 
-import org.apache.cxf.common.security.GroupPrincipal;
-import org.apache.cxf.common.security.SimpleGroup;
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.interceptor.security.test.GroupWrapper;
 import org.apache.cxf.security.LoginSecurityContext;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 public class DeprecatedSecurityContextTest {
