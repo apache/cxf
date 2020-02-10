@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.swagger.ui;
 
 import java.io.IOException;
+import java.lang.IllegalArgumentException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -54,7 +55,7 @@ public class SwaggerUiResourceLocator {
 
         try {
             ret = URI.create(swaggerUiRoot + resourcePath).toURL();
-        } catch (Exception ex) {
+        } catch (IllegalArgumentException ex) {
             throw new MalformedURLException(ex.getMessage());
         }
         return ret;
