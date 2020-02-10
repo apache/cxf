@@ -88,9 +88,9 @@
         <cxf.atmosphere.version.range>[2.4,3.0)</cxf.atmosphere.version.range>
         <cxf.atmosphere.version>2.5.2</cxf.atmosphere.version>
         <cxf.bcprov.version>1.64</cxf.bcprov.version>
-        <cxf.brave.reporter.version>2.10.0</cxf.brave.reporter.version>
-        <cxf.brave.version>5.6.9</cxf.brave.version>
-        <cxf.brave.zipkin.version>2.14.2</cxf.brave.zipkin.version>
+        <cxf.brave.reporter.version>2.12.1</cxf.brave.reporter.version>
+        <cxf.brave.version>5.9.4</cxf.brave.version>
+        <cxf.brave.zipkin.version>2.19.3</cxf.brave.zipkin.version>
         <cxf.cda.api.osgi.range>[1.1,2)</cxf.cda.api.osgi.range>
         <cxf.cdi.api.version>2.0</cxf.cdi.api.version>
         <cxf.classgraph.version>4.6.32</cxf.classgraph.version>
