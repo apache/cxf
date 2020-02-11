@@ -18,10 +18,14 @@
  */
 package org.apache.cxf.rs.security.oauth2.utils;
 
+import java.util.Collections;
 import java.util.List;
+
+import org.apache.cxf.rs.security.oauth2.common.Client;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -53,4 +57,20 @@ public class OAuthUtilsTest {
         List<String> registeredScopes = OAuthUtils.parseScope("a b");
         assertFalse(OAuthUtils.validateScopes(requestScopes, registeredScopes, true));
     }
+
+    @Test
+    public void testGetRequestedScopesRegistered() {
+        Client c = new Client();
+        List<String> scopes = Collections.singletonList("a");
+        c.setRegisteredScopes(scopes);
+        assertEquals(scopes, OAuthUtils.getRequestedScopes(c, "", false, false));
+    }
+
+    @Test
+    public void testParseScopeEmpty() {
+        assertTrue(OAuthUtils.parseScope(null).isEmpty());
+        assertTrue(OAuthUtils.parseScope("").isEmpty());
+        assertTrue(OAuthUtils.parseScope(" ").isEmpty());
+    }
+
 }

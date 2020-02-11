@@ -38,7 +38,7 @@
       javax.annotation*;version="${cxf.osgi.javax.annotation.version}",
       javax.persistence*;resolution:=optional
     </cxf.osgi.import>
-    <compilerArguments>-Aopenjpa.source=7 -Aopenjpa.metamodel=true</compilerArguments>
+    <compilerArguments>-Aopenjpa.source=8 -Aopenjpa.metamodel=true</compilerArguments>
   </properties>
   <dependencies>
     <dependency>
@@ -246,40 +246,29 @@
           </execution>
         </executions>
       </plugin>
+        <!-- this tells maven to set a property pointing to the openjpa agent jar -->
+        <!-- where surefire can see it -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+                <execution>
+                    <phase>generate-test-resources</phase>
+                    <goals>
+                        <goal>properties</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
       <!-- this configures the surefire plugin to run your tests with the javaagent enabled -->
       <!-- (openJPA loadtime weaving) -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <argLine>-javaagent:${project.basedir}/target/openjpa-${cxf.openjpa.version}.jar ${cxf.surefire.fork.vmargs}</argLine>
-          <workingDirectory>${project.basedir}/target</workingDirectory>
+          <argLine>-javaagent:${org.apache.openjpa:openjpa:jar} ${cxf.surefire.fork.vmargs}</argLine>
+          <workingDirectory>${project.build.directory}</workingDirectory>
         </configuration>
-      </plugin>
-      <!-- this tells maven to copy the openjpa agent jar into your target/ directory -->
-      <!-- where surefire can see it -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.apache.openjpa</groupId>
-                  <artifactId>openjpa</artifactId>
-                  <version>${cxf.openjpa.version}</version>
-                  <outputDirectory>${project.build.directory}</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
