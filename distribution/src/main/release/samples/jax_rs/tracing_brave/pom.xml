@@ -30,7 +30,7 @@
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <cxf.brave.version>5.4.2</cxf.brave.version>
+        <cxf.brave.version>5.9.4</cxf.brave.version>
     </properties>
     <profiles>
         <profile>
