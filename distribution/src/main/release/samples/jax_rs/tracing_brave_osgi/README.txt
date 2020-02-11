@@ -63,7 +63,7 @@ Install this demo bundle (using the appropriate bundle version number)
   
   install -s mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.okio/1.15.0_1
   install -s mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.okhttp/3.11.0_1
-  install -s mvn:io.zipkin.reporter2/zipkin-sender-okhttp3/2.7.9
+  install -s mvn:io.zipkin.reporter2/zipkin-sender-okhttp3/2.12.1
   install -s mvn:org.apache.cxf.samples/jax_rs_tracing_brave_osgi/3.n.m
 
 You can verify if the CXF JAX-RS OpenZipkin Brave Blueprint Demo is installed and started.
