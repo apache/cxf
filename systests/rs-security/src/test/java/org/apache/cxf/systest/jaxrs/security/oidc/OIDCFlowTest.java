@@ -124,11 +124,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         assertNotNull(code);
 
         // Now get the access token
-        client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
-                                  "consumer-id", "this-is-a-secret", busFile.toString());
-        // Save the Cookie for the second request...
-        WebClient.getConfig(client).getRequestContext().put(
-            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+        client = WebClient.create(address, "consumer-id", "this-is-a-secret", busFile.toString());
 
         ClientAccessToken accessToken =
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
@@ -176,11 +172,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         assertNotNull(code);
 
         // Now get the access token
-        client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
-                                  "consumer-id", "this-is-a-secret", busFile.toString());
-        // Save the Cookie for the second request...
-        WebClient.getConfig(client).getRequestContext().put(
-            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+        client = WebClient.create(address, "consumer-id", "this-is-a-secret", busFile.toString());
 
         ClientAccessToken accessToken =
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
@@ -213,11 +205,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         assertNotNull(code);
 
         // Now get the access token
-        client = WebClient.create(address,  OAuth2TestUtils.setupProviders(),
-                                  "consumer-id", "this-is-a-secret", busFile.toString());
-        // Save the Cookie for the second request...
-        WebClient.getConfig(client).getRequestContext().put(
-            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+        client = WebClient.create(address, "consumer-id", "this-is-a-secret", busFile.toString());
 
         ClientAccessToken accessToken =
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
@@ -249,11 +237,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         assertNotNull(code);
 
         // Now get the access token
-        client = WebClient.create(address,  OAuth2TestUtils.setupProviders(),
-                                  "consumer-id", "this-is-a-secret", busFile.toString());
-        // Save the Cookie for the second request...
-        WebClient.getConfig(client).getRequestContext().put(
-            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+        client = WebClient.create(address, "consumer-id", "this-is-a-secret", busFile.toString());
 
         ClientAccessToken accessToken =
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
@@ -285,11 +269,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         assertNotNull(code);
 
         // Now get the access token
-        client = WebClient.create(address,  OAuth2TestUtils.setupProviders(),
-                                  "consumer-id", "this-is-a-secret", busFile.toString());
-        // Save the Cookie for the second request...
-        WebClient.getConfig(client).getRequestContext().put(
-            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+        client = WebClient.create(address, "consumer-id", "this-is-a-secret", busFile.toString());
 
         ClientAccessToken accessToken =
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
@@ -311,7 +291,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
         String address = "https://localhost:" + port + "/services/";
-        WebClient client = WebClient.create(address,  OAuth2TestUtils.setupProviders(),
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
         WebClient.getConfig(client).getRequestContext().put(
@@ -322,11 +302,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         assertNotNull(code);
 
         // Now get the access token
-        client = WebClient.create(address,  OAuth2TestUtils.setupProviders(),
-                                  "consumer-id", "this-is-a-secret", busFile.toString());
-        // Save the Cookie for the second request...
-        WebClient.getConfig(client).getRequestContext().put(
-            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+        client = WebClient.create(address, "consumer-id", "this-is-a-secret", busFile.toString());
 
         ClientAccessToken accessToken =
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
@@ -339,6 +315,9 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         validateIdToken(idToken, null);
 
         // Refresh the access token
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+            "consumer-id", "this-is-a-secret", busFile.toString());
+        client.path("token");
         client.type("application/x-www-form-urlencoded").accept("application/json");
 
         Form form = new Form();
@@ -376,11 +355,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         assertNotNull(code);
 
         // Now get the access token
-        client = WebClient.create(address,  OAuth2TestUtils.setupProviders(),
-                                  "consumer-id", "this-is-a-secret", busFile.toString());
-        // Save the Cookie for the second request...
-        WebClient.getConfig(client).getRequestContext().put(
-            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+        client = WebClient.create(address, "consumer-id", "this-is-a-secret", busFile.toString());
 
         ClientAccessToken accessToken =
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
@@ -413,11 +388,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         assertNotNull(code);
 
         // Now get the access token
-        client = WebClient.create(address,  OAuth2TestUtils.setupProviders(),
-                                  "consumer-id-aud", "this-is-a-secret", busFile.toString());
-        // Save the Cookie for the second request...
-        WebClient.getConfig(client).getRequestContext().put(
-            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+        client = WebClient.create(address, "consumer-id-aud", "this-is-a-secret", busFile.toString());
 
         String audience = "https://localhost:" + port + "/secured/bookstore/books";
         ClientAccessToken accessToken =
@@ -658,11 +629,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         assertNotNull(jwt.getClaims().getClaim(IdToken.AUTH_CODE_HASH_CLAIM));
 
         // Now get the access token
-        client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
-                                  "consumer-id", "this-is-a-secret", busFile.toString());
-        // Save the Cookie for the second request...
-        WebClient.getConfig(client).getRequestContext().put(
-            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+        client = WebClient.create(address, "consumer-id", "this-is-a-secret", busFile.toString());
 
         ClientAccessToken accessToken =
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
@@ -721,11 +688,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         assertNull(idToken);
 
         // Now get the access token with the code
-        client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
-                                  "consumer-id", "this-is-a-secret", busFile.toString());
-        // Save the Cookie for the second request...
-        WebClient.getConfig(client).getRequestContext().put(
-            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+        client = WebClient.create(address, "consumer-id", "this-is-a-secret", busFile.toString());
 
         ClientAccessToken accessToken =
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
@@ -906,11 +869,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         assertNotNull(code);
 
         // Now get the access token
-        client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
-                                  "consumer-id", "this-is-a-secret", busFile.toString());
-        // Save the Cookie for the second request...
-        WebClient.getConfig(client).getRequestContext().put(
-            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+        client = WebClient.create(address, "consumer-id", "this-is-a-secret", busFile.toString());
 
         ClientAccessToken accessToken =
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
