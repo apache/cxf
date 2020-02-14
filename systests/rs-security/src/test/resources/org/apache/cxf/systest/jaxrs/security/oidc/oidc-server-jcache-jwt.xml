@@ -76,11 +76,17 @@ under the License.
       <property name="responseFilter" ref="idTokenFilter"/>
       <property name="idTokenProvider" ref="idTokenProviderImpl"/>
    </bean>
-   
+
    <bean id="refreshGrantHandler" class="org.apache.cxf.rs.security.oauth2.grants.refresh.RefreshTokenGrantHandler">
       <property name="dataProvider" ref="oauthProvider"/>
    </bean>
-   
+
+   <bean id="digestVerifier" class="org.apache.cxf.rs.security.oauth2.grants.code.DigestCodeVerifier" />
+   <bean id="codeGrantHandler" class="org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrantHandler">
+      <property name="dataProvider" ref="oauthProvider"/>
+      <property name="codeVerifierTransformer" ref="digestVerifier"/>
+   </bean>
+
    <bean id="idTokenProviderImpl" class="org.apache.cxf.systest.jaxrs.security.oidc.IdTokenProviderImpl"/>
 
    <bean id="idTokenFilter" class="org.apache.cxf.rs.security.oidc.idp.IdTokenResponseFilter">
@@ -92,6 +98,7 @@ under the License.
       <property name="grantHandlers">
          <list>
              <ref bean="refreshGrantHandler"/>
+             <ref bean="codeGrantHandler"/>
          </list>
       </property>
       <property name="responseFilter" ref="idTokenFilter"/>
