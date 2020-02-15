@@ -20,7 +20,6 @@
 package org.apache.cxf.jaxrs.swagger.ui;
 
 import java.io.IOException;
-import java.lang.IllegalArgumentException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
