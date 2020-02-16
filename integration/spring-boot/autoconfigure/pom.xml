@@ -131,9 +131,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>javax.el</groupId>
-            <artifactId>javax.el-api</artifactId>
-            <version>${cxf.javax.el.version}</version>
+            <groupId>jakarta.el</groupId>
+            <artifactId>jakarta.el-api</artifactId>
+            <version>${cxf.el-api.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
