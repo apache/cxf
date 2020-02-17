@@ -87,12 +87,6 @@
             <version>${cxf.mockito.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>javax.el</groupId>
-            <artifactId>javax.el-api</artifactId>
-            <version>${cxf.javax.el.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
     
     <build>
