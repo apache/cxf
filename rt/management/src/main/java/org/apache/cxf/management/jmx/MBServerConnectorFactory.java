@@ -20,7 +20,11 @@
 package org.apache.cxf.management.jmx;
 
 import java.io.IOException;
-import java.rmi.registry.LocateRegistry;
+import java.rmi.AccessException;
+import java.rmi.AlreadyBoundException;
+import java.rmi.NotBoundException;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,8 +32,9 @@ import java.util.logging.Logger;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.remote.JMXConnectorServer;
-import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
+import javax.management.remote.rmi.RMIConnectorServer;
+import javax.management.remote.rmi.RMIJRMPServerImpl;
 
 import org.apache.cxf.common.logging.LogUtils;
 
@@ -56,6 +61,10 @@ public final class MBServerConnectorFactory {
     private static boolean daemon;
 
     private static JMXConnectorServer connectorServer;
+
+    private static Remote remoteServerStub;
+
+    private static RMIJRMPServerImpl rmiServer;
 
     private static class MBServerConnectorFactoryHolder {
         private static final MBServerConnectorFactory INSTANCE =
@@ -127,29 +136,24 @@ public final class MBServerConnectorFactory {
         }
 
         // Create the JMX service URL.
-        JMXServiceURL url = new JMXServiceURL(serviceUrl);
+        final JMXServiceURL url = new JMXServiceURL(serviceUrl);
 
         // if the URL is localhost, start up an Registry
         if (serviceUrl.indexOf("localhost") > -1
             && url.getProtocol().compareToIgnoreCase("rmi") == 0) {
             try {
                 int port = getURLLocalHostPort(serviceUrl);
-                try {
-                    LocateRegistry.createRegistry(port);
-                } catch (Exception ex) {
-                    // the registry may had been created
-                    LocateRegistry.getRegistry(port);
-                }
+                new JmxRegistry(port);
 
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "CREATE_REGISTRY_FAULT_MSG", new Object[]{ex});
             }
         }
 
-        // Create the connector server now.
-        connectorServer =
-            JMXConnectorServerFactory.newJMXConnectorServer(url, environment, server);
+        rmiServer = new RMIJRMPServerImpl(getURLLocalHostPort(serviceUrl), null, null, environment);
 
+        // Create the connector server now.
+        connectorServer = new RMIConnectorServer(url, environment, rmiServer, server);
 
         if (threaded) {
              // Start the connector server asynchronously (in a separate thread).
@@ -157,6 +161,7 @@ public final class MBServerConnectorFactory {
                 public void run() {
                     try {
                         connectorServer.start();
+                        remoteServerStub = rmiServer.toStub();
                     } catch (IOException ex) {
                         LOG.log(Level.SEVERE, "START_CONNECTOR_FAILURE_MSG", new Object[]{ex});
                     }
@@ -182,5 +187,41 @@ public final class MBServerConnectorFactory {
             LOG.info("JMX connector server stopped: " + connectorServer);
         }
     }
+
+    /*
+     * Better to use the internal API than re-invent the wheel.
+     */
+    @SuppressWarnings("restriction")
+    private class JmxRegistry extends sun.rmi.registry.RegistryImpl {
+        static final String LOOKUP_NAME = "jmxrmi";
+
+        JmxRegistry(int port) throws RemoteException {
+            super(port);
+        }
+
+        @Override
+
+        public Remote lookup(String s) throws RemoteException, NotBoundException {
+            return LOOKUP_NAME.equals(s) ? remoteServerStub : null;
+        }
+
+        @Override
+        public void bind(String s, Remote remote) throws RemoteException, AlreadyBoundException, AccessException {
+        }
+
+        @Override
+        public void unbind(String s) throws RemoteException, NotBoundException, AccessException {
+        }
+
+        @Override
+        public void rebind(String s, Remote remote) throws RemoteException, AccessException {
+        }
+
+        @Override
+        public String[] list() throws RemoteException {
+            return new String[] {LOOKUP_NAME};
+        }
+    }
+
 
 }
