@@ -28,7 +28,7 @@ import org.junit.Test;
 public class SwaggerUIResourceLocatorTest {
 
     @Test(expected = MalformedURLException.class)
-    public void testLocateWithBadCharactersInUrl() {
+    public void testLocateWithBadCharactersInUrl() throws MalformedURLException {
         String url =
                 "jar:file:/Volumes/bigdrive/test157/jetty/base/webapps/"
                 + "Rhythmyx/WEB-INF/lib/swagger-ui-2.2.10-1.jar!/META-INF/resources/"
