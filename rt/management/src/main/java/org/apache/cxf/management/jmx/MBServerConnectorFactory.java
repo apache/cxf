@@ -174,6 +174,7 @@ public final class MBServerConnectorFactory {
         } else {
              // Start the connector server in the same thread.
             connectorServer.start();
+            remoteServerStub = rmiServer.toStub();
         }
 
         if (LOG.isLoggable(Level.INFO)) {
