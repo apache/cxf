@@ -218,7 +218,6 @@ public final class MBServerConnectorFactory {
         }
 
         @Override
-
         public Remote lookup(String s) throws RemoteException, NotBoundException {
             return LOOKUP_NAME.equals(s) ? remoteServerStub : null;
         }
