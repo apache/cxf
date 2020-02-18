@@ -20,6 +20,8 @@
 package org.apache.cxf.management.jmx;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.rmi.AccessException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
@@ -143,7 +145,7 @@ public final class MBServerConnectorFactory {
             && url.getProtocol().compareToIgnoreCase("rmi") == 0) {
             try {
                 int port = getRegistryPort(serviceUrl);
-                new JmxRegistry(port);
+                new JmxRegistry(port, getBindingName(url));
 
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "CREATE_REGISTRY_FAULT_MSG", new Object[]{ex});
@@ -199,6 +201,21 @@ public final class MBServerConnectorFactory {
         return port;
     }
 
+    public static String getBindingName(final JMXServiceURL jmxServiceURL) {
+        final String urlPath = jmxServiceURL.getURLPath();
+
+        try {
+            if (urlPath.startsWith("/jndi/")) {
+                return new URI(urlPath.substring(6)).getPath()
+                        .replaceAll("^/+", "").replaceAll("/+$", "");
+            }
+        } catch (URISyntaxException e) {
+            // ignore
+        }
+
+        return "jmxrmi"; // use the default
+    }
+
     public void destroy() throws IOException {
         connectorServer.stop();
         if (LOG.isLoggable(Level.INFO)) {
@@ -211,15 +228,16 @@ public final class MBServerConnectorFactory {
      */
     @SuppressWarnings("restriction")
     private class JmxRegistry extends sun.rmi.registry.RegistryImpl {
-        static final String LOOKUP_NAME = "jmxrmi";
+        private final String lookupName;
 
-        JmxRegistry(int port) throws RemoteException {
+        JmxRegistry(final int port, final String lookupName) throws RemoteException {
             super(port);
+            this.lookupName = lookupName;
         }
 
         @Override
         public Remote lookup(String s) throws RemoteException, NotBoundException {
-            return LOOKUP_NAME.equals(s) ? remoteServerStub : null;
+            return lookupName.equals(s) ? remoteServerStub : null;
         }
 
         @Override
@@ -236,9 +254,7 @@ public final class MBServerConnectorFactory {
 
         @Override
         public String[] list() throws RemoteException {
-            return new String[] {LOOKUP_NAME};
+            return new String[] {lookupName};
         }
     }
-
-
 }
