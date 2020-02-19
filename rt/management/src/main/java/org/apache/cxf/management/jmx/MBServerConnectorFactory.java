@@ -201,7 +201,7 @@ public final class MBServerConnectorFactory {
         return port;
     }
 
-    public static String getBindingName(final JMXServiceURL jmxServiceURL) {
+    protected static String getBindingName(final JMXServiceURL jmxServiceURL) {
         final String urlPath = jmxServiceURL.getURLPath();
 
         try {
