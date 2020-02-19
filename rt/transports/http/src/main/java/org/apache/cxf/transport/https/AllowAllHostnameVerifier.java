@@ -21,14 +21,20 @@ package org.apache.cxf.transport.https;
 
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
+
+import org.apache.cxf.common.logging.LogUtils;
 
 /**
  * Allow all hostnames. This is only suitable for use in testing, and NOT in production!
  */
 class AllowAllHostnameVerifier implements javax.net.ssl.HostnameVerifier {
+
+    private static final Logger LOG = LogUtils.getL7dLogger(AllowAllHostnameVerifier.class);
 
     @Override
     public boolean verify(String host, SSLSession session) {
@@ -36,6 +42,9 @@ class AllowAllHostnameVerifier implements javax.net.ssl.HostnameVerifier {
             Certificate[] certs = session.getPeerCertificates();
             return certs != null && certs[0] instanceof X509Certificate;
         } catch (SSLException e) {
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.FINE, e.getMessage(), e);
+            }
             throw new RuntimeException("HostnameVerifier, socket reset for TTL");
         }
     }
