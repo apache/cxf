@@ -27,6 +27,24 @@ import org.junit.Test;
 public class MBServerConnectorFactoryTest {
 
     @Test
+    public void testGetServerPort() throws Exception {
+        Assert.assertEquals(9914, MBServerConnectorFactory.getServerPort(
+                "service:jmx:rmi:///jndi/rmi://localhost:9914/jmxrmi"));
+
+        Assert.assertEquals(10002, MBServerConnectorFactory.getServerPort(
+                "service:jmx:rmi://localhost:10002/jndi/rmi://localhost:10001/jmxrmi"));
+    }
+
+    @Test
+    public void testGetRegistryPort() throws Exception {
+        Assert.assertEquals(9914, MBServerConnectorFactory.getRegistryPort(
+                "service:jmx:rmi:///jndi/rmi://localhost:9914/jmxrmi"));
+
+        Assert.assertEquals(10001, MBServerConnectorFactory.getRegistryPort(
+                        "service:jmx:rmi://localhost:10002/jndi/rmi://localhost:10001/jmxrmi"));
+    }
+
+    @Test
     public void testGetBindingName() throws Exception {
         Assert.assertEquals("jmxrmi", MBServerConnectorFactory.getBindingName(
                 new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:9913/jmxrmi")));
