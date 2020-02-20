@@ -32,6 +32,9 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.management</cxf.module.name>
+        <cxf.osgi.import>
+            sun.rmi*;resolution:=optional
+        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>
