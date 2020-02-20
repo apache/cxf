@@ -63,7 +63,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.validation.Schema;
-import javax.xml.ws.Holder;
 
 import org.w3c.dom.Element;
 
@@ -517,7 +516,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         return getClassContext(type, type);
     }
     protected JAXBContext getClassContext(Class<?> type, Type genericType) throws JAXBException {
-        final Holder<JAXBException> jaxbException = new Holder<>();
+        final JAXBException[] jaxbException = new JAXBException[] {null};
         final JAXBContext context = classContexts.computeIfAbsent(type, t -> {
             final Class<?>[] classes;
             if (extraClass != null) {
@@ -531,12 +530,12 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
             try {
                 return newJAXBContextInstance(classes, cProperties);
             } catch (JAXBException e) {
-                jaxbException.value = e;
+                jaxbException[0] = e;
                 return null;
             }
         });
-        if (null != jaxbException.value) {
-            throw jaxbException.value;
+        if (null != jaxbException[0]) {
+            throw jaxbException[0];
         }
         return context;
     }
