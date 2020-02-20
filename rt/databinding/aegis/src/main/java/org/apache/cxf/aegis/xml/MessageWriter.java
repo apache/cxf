@@ -81,7 +81,7 @@ public interface MessageWriter {
      * however, explicitly assert its type using the attribute
      * <code>xsi:type</code>."
      *
-     * @param type the QName of the type being referenced.
+     * @param qn the QName of the type being referenced.
      */
     void writeXsiType(QName qn);
 

@@ -31,11 +31,7 @@ import org.w3c.dom.Node;
 
 import org.apache.aries.blueprint.Namespaces;
 import org.apache.aries.blueprint.ParserContext;
-import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.BaseNamespaceHandler;
-import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.staxutils.transform.OutTransformWriter;
@@ -102,39 +98,5 @@ public class JAXRSBPNamespaceHandler extends BaseNamespaceHandler {
     public void setBlueprintContainer(BlueprintContainer blueprintContainer) {
         this.blueprintContainer = blueprintContainer;
     }
-    
-    @NoJSR250Annotations
-    public static class BPJAXRSServerFactoryBean extends JAXRSServerFactoryBean {
-
-        private Server server;
-
-        public BPJAXRSServerFactoryBean() {
-            super();
-        }
-        public BPJAXRSServerFactoryBean(JAXRSServiceFactoryBean fact) {
-            super(fact);
-        }
-        public Server getServer() {
-            return server;
-        }
-
-        public void init() {
-            create();
-        }
-        @Override
-        public Server create() {
-            if (server == null) {
-                server = super.create();
-            }
-            return server;
-        }
-        public void destroy() {
-            if (server != null) {
-                server.destroy();
-                server = null;
-            }
-        }
-    }
-
 
 }

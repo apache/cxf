@@ -23,11 +23,11 @@ import org.hamcrest.collection.IsMapContaining;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 public class IsTagContaining extends IsMapContaining<String, Object> {
-    public IsTagContaining(final String key, final String value) {
+    public IsTagContaining(final String key, final Object value) {
         super(equalTo(key), equalTo(value));
     }
 
-    public static IsTagContaining hasItem(final String key, final String value) {
+    public static IsTagContaining hasItem(final String key, final Object value) {
         return new IsTagContaining(key, value);
     }
 }

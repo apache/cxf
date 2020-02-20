@@ -57,7 +57,7 @@ public interface HttpAuthSupplier {
      */
     String getAuthorization(
             AuthorizationPolicy  authPolicy,
-            URI     url,
+            URI     uri,
             Message message,
             String  fullHeader);
 }

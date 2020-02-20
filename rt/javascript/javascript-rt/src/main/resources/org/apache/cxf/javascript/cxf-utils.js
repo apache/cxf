@@ -75,10 +75,8 @@ function org_apache_cxf_findNamespace(elementNode, namespacePrefix) {
 	if ((attributes != null) && (attributes.length > 0)) {
 		for (var x = 0;x < attributes.length; x++) {
 			var attributeNodeName = attributes.item(x).nodeName;
-			var attributeNamespacePrefix = org_apache_cxf_getPrefix(attributes
-					.item(x).nodeName);
-			var attributeNamespaceSuffix = org_apache_cxf_getLocalName(attributes
-					.item(x).nodeName);
+			var attributeNamespacePrefix = org_apache_cxf_getPrefix(attributeNodeName);
+			var attributeNamespaceSuffix = org_apache_cxf_getLocalName(attributeNodeName);
 
 			if ((namespacePrefix == null) && (attributeNamespacePrefix == null)
 					&& (attributeNamespaceSuffix == "xmlns"))
@@ -163,8 +161,6 @@ function org_apache_cxf_getLocalName(tagName) {
 function org_apache_cxf_element_name_for_trace(node) {
 	if (node == null)
 		return "Null";
-	else if (node == undefined)
-		return "Undefined";
 	else {
 		var n = '';
 		if (node.namespaceURI != null && node.namespaceURI != '') {
@@ -177,7 +173,7 @@ function org_apache_cxf_element_name_for_trace(node) {
 CxfApacheOrgUtil.prototype.traceElementName = org_apache_cxf_element_name_for_trace;
 
 function org_apache_cxf_escapeXmlEntities(val) {
-	if (val == null || val == undefined)
+	if (val == null)
 		return "";
 	else {
 		val = String(val);
@@ -221,8 +217,6 @@ function org_apache_cxf_getFirstElementChild(node) {
 CxfApacheOrgUtil.prototype.getFirstElementChild = org_apache_cxf_getFirstElementChild;
 
 function org_apache_cxf_getNextElementSibling(node) {
-	if (node == undefined)
-		throw "undefined node to getNextElementSibling";
 	if (node == null)
 		throw "null node to getNextElementSibling";
 	var n;
@@ -446,7 +440,6 @@ function org_apache_cxf_base64_decode64Unicode(input) {
 function org_apache_cxf_base64_decode64UTF8(input) {
 	var utftext = org_apache_cxf_base64_decode64array(input);
 	var plaintext = "";
-	var cRay = new Array();
 	var i = 0;
 	var c;
 	var c2;
@@ -1001,10 +994,8 @@ function org_apache_cxf_get_xsi_type(elementNode) {
 	if ((attributes != null) && (attributes.length > 0)) {
 		for (var x = 0;x < attributes.length; x++) {
 			var attributeNodeName = attributes.item(x).nodeName;
-			var attributeNamespacePrefix = org_apache_cxf_getPrefix(attributes
-					.item(x).nodeName);
-			var attributeNamespaceSuffix = org_apache_cxf_getLocalName(attributes
-					.item(x).nodeName);
+			var attributeNamespacePrefix = org_apache_cxf_getPrefix(attributeNodeName);
+			var attributeNamespaceSuffix = org_apache_cxf_getLocalName(attributeNodeName);
 			if (attributeNamespaceSuffix == 'type') {
 				// perhaps this is ours
 				var ns = org_apache_cxf_getNamespaceURI(elementNode,

@@ -127,7 +127,7 @@ public abstract class JAXBDataBase {
         if (mi == null || !isOutputMessage(mi)) {
             return null;
         }
-        OperationInfo oi = mi != null ? mi.getOperation() : null;
+        OperationInfo oi = mi.getOperation();
         return oi != null ? (Annotation[])oi.getProperty("method.return.annotations") : null;
     }
 
@@ -159,7 +159,7 @@ public abstract class JAXBDataBase {
         Boolean b = (Boolean)part.getProperty("honor.jaxb.annotations");
         return b != null && b;
     }
-    
+
     protected ValidationEventHandler getValidationEventHandler(String cn) {
         try {
             return (ValidationEventHandler)ClassLoaderUtils.loadClass(cn, getClass()).newInstance();
@@ -168,7 +168,7 @@ public abstract class JAXBDataBase {
         }
         return null;
     }
-    
+
     protected ValidationEventHandler getValidationEventHandler(Message m, String property) {
         Object value = m.getContextualProperty(property);
         ValidationEventHandler veventHandler = null;

@@ -23,14 +23,14 @@ import javax.crypto.Cipher;
 import org.apache.cxf.rt.security.crypto.KeyProperties;
 
 public class JweEncryptionOutput {
-    private Cipher cipher;
-    private JweHeaders headers;
-    private byte[] encryptedContentEncryptionKey;
-    private byte[] iv;
-    private AuthenticationTagProducer authTagProducer;
-    private byte[] encryptedContent;
-    private byte[] authTag;
-    private KeyProperties keyProps;
+    private final Cipher cipher;
+    private final JweHeaders headers;
+    private final byte[] encryptedContentEncryptionKey;
+    private final byte[] iv;
+    private final AuthenticationTagProducer authTagProducer;
+    private final byte[] encryptedContent;
+    private final byte[] authTag;
+    private final KeyProperties keyProps;
 
     //CHECKSTYLE:OFF
     public JweEncryptionOutput(Cipher cipher,

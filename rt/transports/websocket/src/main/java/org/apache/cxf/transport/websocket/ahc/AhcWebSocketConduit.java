@@ -138,7 +138,7 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
 
     public class AhcWebSocketWrappedOutputStream extends WrappedOutputStream {
         private AhcWebSocketConduitRequest entity;
-        private Response response;
+        private volatile Response response;
 
         protected AhcWebSocketWrappedOutputStream(Message message, boolean possibleRetransmit,
                                                   boolean isChunking, int chunkThreshold, String conduitName, URI url) {

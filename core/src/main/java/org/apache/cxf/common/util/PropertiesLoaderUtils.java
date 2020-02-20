@@ -73,8 +73,8 @@ public final class PropertiesLoaderUtils {
                 logger.log(level, msg, url.toString());
             }
 
-            try (InputStream is = url.openStream()) {
-                properties.loadFromXML(new BufferedInputStream(is));
+            try (InputStream is = new BufferedInputStream(url.openStream())) {
+                properties.loadFromXML(is);
             }
         }
         return properties;

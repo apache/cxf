@@ -63,6 +63,10 @@ public class SseEventSourceImpl implements SseEventSource {
     private class InboundSseEventListenerDelegate implements InboundSseEventListener {
         private String lastEventId;
         
+        InboundSseEventListenerDelegate(String lastEventId) {
+            this.lastEventId = lastEventId;
+        }
+        
         @Override
         public void onNext(InboundSseEvent event) {
             lastEventId = event.getId();
@@ -180,7 +184,7 @@ public class SseEventSourceImpl implements SseEventSource {
     }
 
     private void connect(String lastEventId) {
-        final InboundSseEventListenerDelegate delegate = new InboundSseEventListenerDelegate();
+        final InboundSseEventListenerDelegate delegate = new InboundSseEventListenerDelegate(lastEventId);
         Response response = null;
         
         try {

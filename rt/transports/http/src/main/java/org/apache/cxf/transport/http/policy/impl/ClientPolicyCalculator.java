@@ -32,7 +32,7 @@ public class ClientPolicyCalculator implements PolicyCalculator<HTTPClientPolicy
     /**
      * Determines if two HTTPClientPolicy objects are equal. REVISIT: Check if
      * this can be replaced by a generated equals method.
-     * 
+     *
      * @param p1 one client policy
      * @param p2 another client policy
      * @return true iff the two policies are equal
@@ -64,7 +64,7 @@ public class ClientPolicyCalculator implements PolicyCalculator<HTTPClientPolicy
         }
 
         result &= StringUtils.equals(p1.getProxyServer(), p2.getProxyServer())
-                  && (p1.isSetProxyServerPort() ? p1.getProxyServerPort() == p2.getProxyServerPort() : !p2
+                  && (p1.isSetProxyServerPort() ? p1.getProxyServerPort().equals(p2.getProxyServerPort()) : !p2
                       .isSetProxyServerPort())
                   && p1.getProxyServerType().value().equals(p2.getProxyServerType().value())
                   && (p1.getConnectionRequestTimeout() == p2.getConnectionRequestTimeout())
@@ -77,7 +77,7 @@ public class ClientPolicyCalculator implements PolicyCalculator<HTTPClientPolicy
     /**
      * Returns a new HTTPClientPolicy that is compatible with the two specified
      * policies or null if no compatible policy can be determined.
-     * 
+     *
      * @param p1 one policy
      * @param p2 another policy
      * @return the compatible policy
@@ -158,7 +158,7 @@ public class ClientPolicyCalculator implements PolicyCalculator<HTTPClientPolicy
 
     /**
      * Checks if two HTTPClientPolicy objects are compatible.
-     * 
+     *
      * @param p1 one client policy
      * @param p2 another client policy
      * @return true iff policies are compatible
@@ -222,7 +222,7 @@ public class ClientPolicyCalculator implements PolicyCalculator<HTTPClientPolicy
 
         if (compatible) {
             compatible &= !p1.isSetProxyServerPort() || !p2.isSetProxyServerPort()
-                          || p1.getProxyServerPort() == p2.getProxyServerPort();
+                          || p1.getProxyServerPort().equals(p2.getProxyServerPort());
         }
 
         if (compatible) {
@@ -235,20 +235,20 @@ public class ClientPolicyCalculator implements PolicyCalculator<HTTPClientPolicy
         }
 
         if (compatible) {
-            compatible &= !p1.isSetAllowChunking() 
-                || !p2.isSetAllowChunking() 
+            compatible &= !p1.isSetAllowChunking()
+                || !p2.isSetAllowChunking()
                 || p1.isAllowChunking() == p2.isAllowChunking();
         }
 
         if (compatible) {
-            compatible &= !p1.isSetAutoRedirect() 
-                || !p2.isSetAutoRedirect() 
+            compatible &= !p1.isSetAutoRedirect()
+                || !p2.isSetAutoRedirect()
                 || p1.isAutoRedirect() == p2.isAutoRedirect();
         }
 
         return compatible;
     }
-    
+
     public boolean isAsserted(Message message, HTTPClientPolicy policy, HTTPClientPolicy refPolicy) {
         boolean outbound = MessageUtils.isOutbound(message);
         boolean compatible = compatible(policy, refPolicy);
@@ -262,7 +262,7 @@ public class ClientPolicyCalculator implements PolicyCalculator<HTTPClientPolicy
     public QName getDataClassName() {
         return new ObjectFactory().createClient(null).getName();
     }
-    
+
     public static String toString(HTTPClientPolicy p) {
         StringBuilder buf = new StringBuilder(64);
         buf.append(p);

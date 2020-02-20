@@ -493,8 +493,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             }
 
             if (encrToken instanceof KerberosToken || encrToken instanceof IssuedToken
-                || encrToken instanceof SpnegoContextToken || encrToken instanceof SecurityContextToken
-                || encrToken instanceof SecureConversationToken) {
+                || encrToken instanceof SpnegoContextToken || encrToken instanceof SecurityContextToken) {
                 properties.setEncryptSymmetricEncryptionKey(false);
             }
         }
@@ -581,7 +580,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                     WSSecurityTokenConstants.KEYIDENTIFIER_KERBEROS_SHA1_IDENTIFIER);
             }
         } else if (policyToken instanceof IssuedToken || policyToken instanceof SecurityContextToken
-            || policyToken instanceof SecureConversationToken || policyToken instanceof SpnegoContextToken) {
+            || policyToken instanceof SpnegoContextToken) {
             if (!isRequestor()) {
                 properties.setIncludeSignatureToken(false);
             } else {

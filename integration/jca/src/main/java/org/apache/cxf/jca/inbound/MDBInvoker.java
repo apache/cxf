@@ -47,7 +47,7 @@ public class MDBInvoker extends AbstractInvoker {
     private final MessageEndpointFactory endpointFactory;
 
     /**
-     * @param messageEndpoint
+     * @param factory
      */
     public MDBInvoker(MessageEndpointFactory factory) {
         endpointFactory = factory;

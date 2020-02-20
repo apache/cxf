@@ -29,8 +29,8 @@ import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rt.security.crypto.HmacUtils;
 
 public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider {
-    private byte[] key;
-    private AlgorithmParameterSpec hmacSpec;
+    private final byte[] key;
+    private final AlgorithmParameterSpec hmacSpec;
 
     public HmacJwsSignatureProvider(byte[] key, SignatureAlgorithm algo) {
         this(key, null, algo);
@@ -42,6 +42,7 @@ public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider {
     }
     public HmacJwsSignatureProvider(String encodedKey, SignatureAlgorithm algo) {
         super(algo);
+        hmacSpec = null;
         try {
             this.key = Base64UrlUtility.decode(encodedKey);
         } catch (Base64Exception ex) {

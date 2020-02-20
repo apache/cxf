@@ -140,7 +140,6 @@ public final class HttpAuthHeader {
      * Extracts the authorization realm from the
      * "WWW-Authenticate" Http response header.
      *
-     * @param authenticate content of the WWW-Authenticate header
      * @return The realm, or null if it is non-existent.
      */
     public String getRealm() {

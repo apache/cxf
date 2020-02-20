@@ -77,7 +77,7 @@ public final class Rfc5987Util {
         while (matcher.find()) {
             String matched = matcher.group();
             if (matched.startsWith("%")) {
-                Integer value = Integer.parseInt(matched.substring(1), 16);
+                int value = Integer.parseInt(matched.substring(1), 16);
                 bos.write(value);
             } else {
                 bos.write(matched.charAt(0));

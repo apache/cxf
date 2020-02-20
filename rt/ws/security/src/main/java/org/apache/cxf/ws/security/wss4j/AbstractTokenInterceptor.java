@@ -64,9 +64,6 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
     private static final Set<QName> HEADERS =
         Collections.singleton(new QName(WSConstants.WSSE_NS, "Security"));
 
-    /**
-     * @param p
-     */
     public AbstractTokenInterceptor() {
         super(Phase.PRE_PROTOCOL);
         addAfter(PolicyBasedWSS4JOutInterceptor.class.getName());

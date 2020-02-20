@@ -42,29 +42,56 @@
         <dependency>
             <groupId>org.apache.cxf.services.sts</groupId>
             <artifactId>cxf-services-sts-core</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf.services.sts.systests</groupId>
-            <artifactId>cxf-services-sts-systests-features</artifactId>
-            <version>${project.version}</version>
-            <type>xml</type>
+            <artifactId>cxf-services-sts-systests-osgi</artifactId>
         </dependency>
-        
+
+        <dependency>
+            <groupId>org.apache.karaf</groupId>
+            <artifactId>apache-karaf-minimal</artifactId>
+            <version>${cxf.karaf.version}</version>
+            <scope>test</scope>
+            <type>tar.gz</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>*</artifactId>
+                    <groupId>*</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
         <!-- to force the karaf cxf feature to be available before testing -->
         <dependency>
             <groupId>org.apache.cxf.karaf</groupId>
             <artifactId>apache-cxf</artifactId>
             <version>${project.version}</version>
-            <type>pom</type>
-            <scope>test</scope>
+            <type>xml</type>
+            <classifier>features</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+               </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf.karaf</groupId>
             <artifactId>cxf-karaf-commands</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.karaf.features</groupId>
+            <artifactId>org.apache.karaf.features.core</artifactId>
+            <version>${cxf.karaf.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -105,7 +132,6 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-testutils</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -117,7 +143,6 @@
                 <artifactId>depends-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>generate-resources</phase>
                         <id>generate-depends-file</id>
                         <goals>
                             <goal>generate-depends-file</goal>
@@ -130,9 +155,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <systemPropertyVariables>
-                        <org.ops4j.pax.logging.DefaultServiceLog.level>WARN</org.ops4j.pax.logging.DefaultServiceLog.level>
-                        <karaf.version>${cxf.karaf.version}</karaf.version>
-                        <localRepository>${maven.repo.local}</localRepository>
+                        <maven.repo.local>${maven.repo.local}</maven.repo.local>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

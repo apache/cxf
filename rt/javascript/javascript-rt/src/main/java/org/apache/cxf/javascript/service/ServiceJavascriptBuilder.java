@@ -686,7 +686,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
 
     /**
      * Collect information about the parts of an unwrapped message.
-     * @param parts
+     * @param message
      * @param elements
      */
     private void getElementsForParts(MessageInfo message, List<ParticleInfo> elements) {

@@ -149,45 +149,18 @@ public class CXFConnectionSpec implements ConnectionRequestInfo {
 
     // Required by JCA Spec
     public int hashCode() {
-        int retval = 0;
-
-        if (wsdlURL != null) {
-            retval += wsdlURL.hashCode(); //NOSONAR
-        }
-
-        if (busConfigURL != null) {
-            retval += busConfigURL.hashCode();  //NOSONAR
-        }
-
-        if (serviceClass != null) {
-            retval += serviceClass.hashCode();
-        }
-
-        if (serviceName != null) {
-            retval += serviceName.hashCode();
-        }
-
-        if (endpointName != null) {
-            retval += endpointName.hashCode();
-        }
-
-        if (address != null) {
-            retval += address.hashCode();
-        }
-
-        return retval;
-
+        return Objects.hash(wsdlURL, busConfigURL, serviceClass, serviceName, endpointName, address);
     }
 
     public String toString() {
-        StringBuilder buf = new StringBuilder(128);
-        buf.append("serviceName=").append(serviceName);
-        buf.append(",endpointName=").append(endpointName);
-        buf.append(",wsdlURL=").append(wsdlURL);
-        buf.append(",busConfigURL=").append(busConfigURL);
-        buf.append(",serviceClass=").append(serviceClass);
-        buf.append(",address=").append(address);
-        return buf.toString();
+        return new StringBuilder(128)
+            .append("serviceName=").append(serviceName)
+            .append(",endpointName=").append(endpointName)
+            .append(",wsdlURL=").append(wsdlURL)
+            .append(",busConfigURL=").append(busConfigURL)
+            .append(",serviceClass=").append(serviceClass)
+            .append(",address=").append(address)
+            .toString();
     }
 
 }

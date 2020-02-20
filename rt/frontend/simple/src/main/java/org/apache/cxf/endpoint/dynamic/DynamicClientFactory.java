@@ -185,12 +185,13 @@ public class DynamicClientFactory {
      * Create a new <code>Client</code> instance using the WSDL to be loaded
      * from the specified URL and using the current classloading context.
      *
-     * @param wsdlURL the URL to load
-     * @return
+     * @param wsdlUrl the URL to load
+     * @return a new Client loaded using the wsdlUrl parameter
      */
     public Client createClient(String wsdlUrl) {
         return createClient(wsdlUrl, (QName)null, (QName)null);
     }
+
     public Client createClient(String wsdlUrl, List<String> bindingFiles) {
         return createClient(wsdlUrl, (QName)null, (QName)null, bindingFiles);
     }
@@ -200,8 +201,8 @@ public class DynamicClientFactory {
      * Create a new <code>Client</code> instance using the WSDL to be loaded
      * from the specified URL and using the current classloading context.
      *
-     * @param wsdlURL the URL to load
-     * @return
+     * @param wsdlUrl the URL to load
+     * @return a new Client loaded using the wsdlUrl parameter
      */
     public Client createClient(URL wsdlUrl) {
         return createClient(wsdlUrl, (QName)null, (QName)null);
@@ -443,7 +444,7 @@ public class DynamicClientFactory {
     }
 
     protected SchemaCompiler createSchemaCompiler() {
-        return JAXBUtils.createSchemaCompilerWithDefaultAllocator(new HashSet<>());    
+        return JAXBUtils.createSchemaCompilerWithDefaultAllocator(new HashSet<>());
     }
 
     protected void applySchemaCompilerOptions(SchemaCompiler compiler) {

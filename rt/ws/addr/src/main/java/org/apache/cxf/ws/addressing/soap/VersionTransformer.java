@@ -74,12 +74,13 @@ public class VersionTransformer extends org.apache.cxf.ws.addressing.VersionTran
     /**
      * Encode message in exposed version.
      *
+     * @param message The message to be encoded
      * @param exposeAs specifies the WS-Addressing version to expose
      * @param value the value to encode
      * @param localName the localName for the header
      * @param clz the class
-     * @param header the SOAP header element
      * @param marshaller the JAXB context to use
+     * @param mustUnderstand whether mustUnderstand is true
      */
     public <T> void encodeAsExposed(SoapMessage message,
                                     String exposeAs, T value,
@@ -136,7 +137,7 @@ public class VersionTransformer extends org.apache.cxf.ws.addressing.VersionTran
      * @param encodedAs specifies the encoded version
      * @param clz the class
      * @param headerElement the SOAP header element
-     * @param marshaller the JAXB marshaller to use
+     * @param unmarshaller the JAXB unmarshaller to use
      * @return the decoded value
      */
     public <T> T decodeAsNative(String encodedAs, Class<T> clz, Element headerElement,
@@ -181,7 +182,7 @@ public class VersionTransformer extends org.apache.cxf.ws.addressing.VersionTran
     static {
         Set<QName> headers = new HashSet<>();
         headers.addAll(Names.HEADERS);
-        
+
         headers.add(new QName(Names200408.WSA_NAMESPACE_NAME, Names.WSA_FROM_NAME));
         headers.add(new QName(Names200408.WSA_NAMESPACE_NAME, Names.WSA_TO_NAME));
         headers.add(new QName(Names200408.WSA_NAMESPACE_NAME, Names.WSA_REPLYTO_NAME));

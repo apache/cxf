@@ -342,11 +342,9 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
 
         File clientJarFile = new File((String)context.get(ToolConstants.CFG_OUTPUTDIR),
                                       (String)context.get(ToolConstants.CFG_CLIENT_JAR));
-        JarOutputStream jarout = null;
-        try {
-            jarout = new JarOutputStream(Files.newOutputStream(clientJarFile.toPath()), new Manifest());
+        try (JarOutputStream jarout = new JarOutputStream(
+            Files.newOutputStream(clientJarFile.toPath()), new Manifest())) {
             createClientJar(tmpDir, jarout);
-            jarout.close();
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "FAILED_TO_CREAT_CLIENTJAR", e);
             Message msg = new Message("FAILED_TO_CREAT_CLIENTJAR", LOG);
@@ -822,41 +820,40 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                 }
             }
 
-            //change the import location in wsdl file
-            OutputStream wsdloutput = new BufferedOutputStream(Files.newOutputStream(wsdlFile.toPath()));
             WSDLWriter wsdlWriter = WSDLFactory.newInstance().newWSDLWriter();
-            LoadingByteArrayOutputStream bout = new LoadingByteArrayOutputStream();
-            wsdlWriter.writeWSDL(def, bout);
-            Element defEle = StaxUtils.read(bout.createInputStream()).getDocumentElement();
-            List<Element> xsdElements = DOMUtils.findAllElementsByTagNameNS(defEle,
-                                                                            WSDLConstants.NS_SCHEMA_XSD,
-                                                                            "schema");
-            for (Element xsdEle : xsdElements) {
-                updateImports(xsdEle, sourceMap);
-                updateIncludes(xsdEle, sourceMap);
-            }
-            updateWSDLImports(defEle, importWSDLMap);
-            StaxUtils.writeTo(defEle, wsdloutput);
-            wsdloutput.close();
 
-
-            for (Definition importDef : defs) {
-                File importWsdlFile = new File(outputdir, importWSDLMap.get(importDef.getTargetNamespace()));
-                OutputStream wsdlOs = new BufferedOutputStream(Files.newOutputStream(importWsdlFile.toPath()));
-                bout = new LoadingByteArrayOutputStream();
-                wsdlWriter.writeWSDL(importDef, bout);
-                Element importEle = StaxUtils.read(bout.createInputStream()).getDocumentElement();
-
-                xsdElements = DOMUtils.findAllElementsByTagNameNS(importEle, WSDLConstants.NS_SCHEMA_XSD,
-                                                                  "schema");
+            //change the import location in wsdl file
+            try (OutputStream wsdloutput = new BufferedOutputStream(Files.newOutputStream(wsdlFile.toPath()))) {
+                LoadingByteArrayOutputStream bout = new LoadingByteArrayOutputStream();
+                wsdlWriter.writeWSDL(def, bout);
+                Element defEle = StaxUtils.read(bout.createInputStream()).getDocumentElement();
+                List<Element> xsdElements = DOMUtils.findAllElementsByTagNameNS(defEle,
+                                                                                WSDLConstants.NS_SCHEMA_XSD,
+                                                                                "schema");
                 for (Element xsdEle : xsdElements) {
                     updateImports(xsdEle, sourceMap);
                     updateIncludes(xsdEle, sourceMap);
                 }
-                updateWSDLImports(importEle, importWSDLMap);
-                StaxUtils.writeTo(importEle, wsdlOs);
-                wsdlOs.close();
+                updateWSDLImports(defEle, importWSDLMap);
+                StaxUtils.writeTo(defEle, wsdloutput);
+            }
 
+            for (Definition importDef : defs) {
+                File importWsdlFile = new File(outputdir, importWSDLMap.get(importDef.getTargetNamespace()));
+                try (OutputStream wsdlOs = new BufferedOutputStream(Files.newOutputStream(importWsdlFile.toPath()))) {
+                    LoadingByteArrayOutputStream bout = new LoadingByteArrayOutputStream();
+                    wsdlWriter.writeWSDL(importDef, bout);
+                    Element importEle = StaxUtils.read(bout.createInputStream()).getDocumentElement();
+
+                    List<Element> xsdElements = DOMUtils.findAllElementsByTagNameNS(importEle,
+                        WSDLConstants.NS_SCHEMA_XSD, "schema");
+                    for (Element xsdEle : xsdElements) {
+                        updateImports(xsdEle, sourceMap);
+                        updateIncludes(xsdEle, sourceMap);
+                    }
+                    updateWSDLImports(importEle, importWSDLMap);
+                    StaxUtils.writeTo(importEle, wsdlOs);
+                }
             }
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "FAILED_TO_GEN_LOCAL_WSDL", ex);

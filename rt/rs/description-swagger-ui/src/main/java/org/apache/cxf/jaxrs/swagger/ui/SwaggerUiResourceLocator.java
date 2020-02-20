@@ -50,8 +50,14 @@ public class SwaggerUiResourceLocator {
         if (resourcePath.startsWith("/")) {
             resourcePath = resourcePath.substring(1);
         }
+        URL ret;
 
-        return URI.create(swaggerUiRoot + resourcePath).toURL();
+        try {
+            ret = URI.create(swaggerUiRoot + resourcePath).toURL();
+        } catch (IllegalArgumentException ex) {
+            throw new MalformedURLException(ex.getMessage());
+        }
+        return ret;
     }
 
     /**

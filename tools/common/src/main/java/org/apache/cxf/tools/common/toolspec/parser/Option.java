@@ -37,7 +37,6 @@ public class Option implements TokenConsumer {
     protected Element argument;
     protected Element annotation;
     private final Element element;
-    private Element valueType;
 
     private int numMatches;
 
@@ -163,14 +162,12 @@ public class Option implements TokenConsumer {
         List<Element> list =
             DOMUtils.findAllElementsByTagNameNS(argument, Tool.TOOL_SPEC_PUBLIC_ID, "valuetype");
         //NodeList list = argument.getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "valuetype");
-        String valuetypeStr = null;
 
         if (list != null && !list.isEmpty()) {
-            valueType = list.get(0);
-            valuetypeStr = valueType.getFirstChild().getNodeValue();
+            String valuetypeStr = list.get(0).getFirstChild().getNodeValue();
 
             if ("IdentifyString".equals(valuetypeStr)) {
-                return !isIdentifyString(argValue);
+                return !isIdentifyString(argValue, false);
             } else if ("NamingSpacePackageString".equals(valuetypeStr)) {
                 return !isNamingSpacePackageString(argValue);
             } else if ("Digital".equals(valuetypeStr)) {
@@ -207,9 +204,10 @@ public class Option implements TokenConsumer {
         return result;
     }
 
-    private boolean isIdentifyString(String value) {
+    private static boolean isIdentifyString(String value, boolean allowBrackets) {
         for (int i = 0; i < value.length(); i++) {
-            if (value.charAt(i) == '.') {
+            if (value.charAt(i) == '.'
+                || (allowBrackets && (value.charAt(i) == '[' || value.charAt(i) == ']'))) {
                 continue;
             }
             if (!Character.isJavaIdentifierPart(value.charAt(i))) {
@@ -219,12 +217,13 @@ public class Option implements TokenConsumer {
         return true;
     }
 
-    private boolean isNamingSpacePackageString(String value) {
-        if (value.indexOf('=') < 0) {
-            return isIdentifyString(value);
+    private static boolean isNamingSpacePackageString(String value) {
+        int idx = value.indexOf('=');
+        if (idx == -1) {
+            return isIdentifyString(value, true);
         }
-        String packageName = value.substring(value.indexOf('=') + 1, value.length());
-        return isIdentifyString(packageName);
+        String packageName = value.substring(idx + 1, value.length());
+        return isIdentifyString(packageName, true);
     }
 
 

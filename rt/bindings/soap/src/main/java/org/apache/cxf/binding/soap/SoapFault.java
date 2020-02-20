@@ -178,7 +178,7 @@ public class SoapFault extends Fault {
     /**
      * Sets the SubCode list for the Fault Code.
      *
-     * @param subCode The SubCode element list as detailed by the SOAP 1.2 spec.
+     * @param subCodes The SubCode element list as detailed by the SOAP 1.2 spec.
      */
     public void setSubCodes(List<QName> subCodes) {
         this.subCodes = subCodes;

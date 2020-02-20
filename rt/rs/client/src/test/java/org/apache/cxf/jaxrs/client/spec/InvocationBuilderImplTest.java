@@ -68,6 +68,15 @@ public class InvocationBuilderImplTest {
         String sentHeaders = response.readEntity(String.class);
         assertTrue(sentHeaders.contains("Header1=b"));
         assertFalse(sentHeaders.contains("UnexpectedHeader"));
+
+        // If value is null then all current headers of the same name 
+        // should be removed.
+        builder.header("Header1", null);
+        builder.header("Header2", "b");
+        response = builder.get();
+        sentHeaders = response.readEntity(String.class);
+        assertTrue(sentHeaders.contains("Header2=b"));
+        assertFalse(sentHeaders.contains("Header1"));
         
         // null headers map should clear all headers
         builder.headers(null);

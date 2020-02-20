@@ -277,7 +277,7 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
     /**
      * Accepts a new resend candidate.
      *
-     * @param ctx the message context.
+     * @param message the message.
      * @return ResendCandidate
      */
     protected RedeliverCandidate cacheUndelivered(Message message) {

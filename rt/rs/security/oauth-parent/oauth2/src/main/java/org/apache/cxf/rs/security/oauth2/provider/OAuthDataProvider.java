@@ -106,7 +106,8 @@ public interface OAuthDataProvider {
 
     /**
      * Revokes a refresh or access token
-     * @param token token identifier
+     * @param client the client
+     * @param tokenId token identifier
      * @param tokenTypeHint can be access_token or refresh_token or null
      * @throws OAuthServiceException
      */

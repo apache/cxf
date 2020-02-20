@@ -199,13 +199,13 @@ public final class ValidatorUtil {
 
     private static String getImportedUrl(String theImportPath, String baseURI) throws IOException {
         File file = new File(theImportPath);
-        if (file != null && file.exists()) {
+        if (file.exists()) {
             return file.toURI().toURL().toString();
         }
         // Import may have a relative path
         File baseFile = new File(baseURI);
         file = new File(baseFile.getParent(), theImportPath);
-        if (file != null && file.exists()) {
+        if (file.exists()) {
             return file.toURI().toURL().toString();
         }
         return null;

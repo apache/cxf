@@ -24,7 +24,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -54,7 +53,7 @@ final class Validator {
     private Validator() {
     }
 
-    
+
     public static void checkValid(Class<?> userType) throws RestClientDefinitionException {
         if (!userType.isInterface()) {
             throwException("VALIDATION_NOT_AN_INTERFACE", userType);
@@ -86,23 +85,21 @@ final class Validator {
 
     }
 
-    private static void checkMethodsForInvalidURITemplates(Class<?> userType, Method[] methods) 
+    private static void checkMethodsForInvalidURITemplates(Class<?> userType, Method[] methods)
         throws RestClientDefinitionException {
 
         Path classPathAnno = userType.getAnnotation(Path.class);
-        
-        final Set<String> classLevelVariables = new HashSet<>();
+
         URITemplate classTemplate = null;
         if (classPathAnno != null) {
             classTemplate = new URITemplate(classPathAnno.value());
-            classLevelVariables.addAll(classTemplate.getVariables());
         }
         URITemplate template;
         for (Method method : methods) {
-            
+
             Path methodPathAnno = method.getAnnotation(Path.class);
             if (methodPathAnno != null) {
-                template = classPathAnno == null ? new URITemplate(methodPathAnno.value()) 
+                template = classPathAnno == null ? new URITemplate(methodPathAnno.value())
                     : new URITemplate(classPathAnno.value() + "/" + methodPathAnno.value());
             } else {
                 template = classTemplate;
@@ -110,31 +107,24 @@ final class Validator {
             if (template == null) {
                 continue;
             }
+
+            List<String> foundParams = new ArrayList<>();
+            for (Parameter p : method.getParameters()) {
+                PathParam pathParam = p.getAnnotation(PathParam.class);
+                if (pathParam != null) {
+                    foundParams.add(pathParam.value());
+                }
+            }
+
             Set<String> allVariables = new HashSet<>(template.getVariables());
             if (!allVariables.isEmpty()) {
-                Map<String, String> paramMap = new HashMap<>();
-                for (Parameter p : method.getParameters()) {
-                    PathParam pathParam = p.getAnnotation(PathParam.class);
-                    if (pathParam != null) {
-                        paramMap.put(pathParam.value(), "x");
+                for (String variable : template.getVariables()) {
+                    if (!foundParams.contains(variable)) {
+                        throwException("VALIDATION_UNRESOLVED_PATH_PARAMS", userType, method);
                     }
                 }
-                try {
-                    template.substitute(paramMap, Collections.<String>emptySet(), false);
-                } catch (IllegalArgumentException ex) {
-                    throwException("VALIDATION_UNRESOLVED_PATH_PARAMS", userType, method);
-                }
-            } else {
-                List<String> foundParams = new ArrayList<>();
-                for (Parameter p : method.getParameters()) {
-                    PathParam pathParam = p.getAnnotation(PathParam.class);
-                    if (pathParam != null) {
-                        foundParams.add(pathParam.value());
-                    }
-                }
-                if (!foundParams.isEmpty()) {
-                    throwException("VALIDATION_EXTRA_PATH_PARAMS", userType, method);
-                }
+            } else if (!foundParams.isEmpty()) {
+                throwException("VALIDATION_EXTRA_PATH_PARAMS", userType, method);
             }
         }
     }
@@ -184,7 +174,7 @@ final class Validator {
                             methods = Arrays.stream(computeClass.getDeclaredMethods())
                                                                 .filter(m -> {
                                                                     int i = m.getModifiers();
-                                                                    return Modifier.isPublic(i) 
+                                                                    return Modifier.isPublic(i)
                                                                         && Modifier.isStatic(i);
                                                                 })
                                                                 .toArray(Method[]::new);
@@ -194,7 +184,7 @@ final class Validator {
                             }
                             throwException("CLIENT_HEADER_COMPUTE_CLASS_NOT_FOUND", userType.getName(), ex);
                         }
-                       
+
                     }
                     boolean foundMatchingMethod = false;
                     for (Method method : methods) {

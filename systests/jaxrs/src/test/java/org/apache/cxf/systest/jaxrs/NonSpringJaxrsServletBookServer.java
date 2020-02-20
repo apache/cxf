@@ -33,7 +33,8 @@ public class NonSpringJaxrsServletBookServer extends AbstractBusTestServerBase {
     protected void run() {
         server = new org.eclipse.jetty.server.Server(Integer.parseInt(PORT));
 
-        final ServletHolder servletHolder = new ServletHolder(new CXFNonSpringJaxrsServlet(new BookStore()));
+        final ServletHolder servletHolder =
+            new ServletHolder(new CXFNonSpringJaxrsServlet(new BookStoreOpenAPI()));
         final ServletContextHandler context = new ServletContextHandler();
         context.setContextPath("/");
         context.addServlet(servletHolder, "/*");

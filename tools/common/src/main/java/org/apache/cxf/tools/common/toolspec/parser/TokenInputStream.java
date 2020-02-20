@@ -80,7 +80,7 @@ public class TokenInputStream {
         if (position < 0) {
             return tokens[0];
         }
-        if (position > tokens.length) {
+        if (position >= tokens.length) {
             return tokens[tokens.length - 1];
         }
         return tokens[position];

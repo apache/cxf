@@ -836,10 +836,8 @@ public class MAPAggregatorImpl extends MAPAggregator {
             if (ContextUtils.isGenericAddress(replyTo)) {
                 replyTo = getReplyTo(message, replyTo);
                 if (replyTo == null || (isOneway
-                    && (replyTo == null
-                        || replyTo.getAddress() == null
-                        || !Names.WSA_NONE_ADDRESS.equals(
-                                replyTo.getAddress().getValue())))) {
+                    && (replyTo.getAddress() == null
+                        || !Names.WSA_NONE_ADDRESS.equals(replyTo.getAddress().getValue())))) {
                     AttributedURIType address =
                         ContextUtils.getAttributedURI(isOneway
                                                       ? Names.WSA_NONE_ADDRESS

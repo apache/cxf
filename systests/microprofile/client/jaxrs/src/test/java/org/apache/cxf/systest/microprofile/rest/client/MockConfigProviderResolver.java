@@ -36,6 +36,7 @@ public class MockConfigProviderResolver extends ConfigProviderResolver {
         @Override
         public <T> T getValue(String propertyName, Class<T> propertyType) {
             String value = configValues.get(propertyName);
+            System.out.println("getValue(" + propertyName + ") = " + value);
             if (value != null) {
                 if (propertyType == String.class) {
                     return propertyType.cast(value);

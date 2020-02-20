@@ -21,7 +21,9 @@ package org.apache.cxf.systest.jaxrs.security.oauth2.common;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.ws.rs.core.Form;
@@ -37,9 +39,13 @@ import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
+import org.apache.cxf.rs.security.oauth2.client.Consumer;
+import org.apache.cxf.rs.security.oauth2.client.OAuthClientUtils;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
+import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrant;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
@@ -164,23 +170,20 @@ public final class OAuth2TestUtils {
                                                                         String consumerId,
                                                                         String audience,
                                                                         String codeVerifier) {
-        client.type("application/x-www-form-urlencoded").accept("application/json");
-        client.path("token");
-
-        Form form = new Form();
-        form.param("grant_type", "authorization_code");
-        form.param("code", code);
-        form.param("client_id", consumerId);
+        Map<String, String> extraParams = new HashMap<>(3);
+        extraParams.put(OAuthConstants.REDIRECT_URI, "http://www.blah.apache.org");
         if (audience != null) {
-            form.param("audience", audience);
+            extraParams.put(OAuthConstants.CLIENT_AUDIENCE, audience);
         }
         if (codeVerifier != null) {
-            form.param("code_verifier", codeVerifier);
+            extraParams.put(OAuthConstants.AUTHORIZATION_CODE_VERIFIER, codeVerifier);
         }
-        form.param("redirect_uri", "http://www.blah.apache.org");
-        Response response = client.post(form);
-
-        return response.readEntity(ClientAccessToken.class);
+        return OAuthClientUtils.getAccessToken(
+            client.path("token"),
+            new Consumer(consumerId),
+            new AuthorizationCodeGrant(code),
+            extraParams,
+            false);
     }
 
     public static List<Object> setupProviders() {

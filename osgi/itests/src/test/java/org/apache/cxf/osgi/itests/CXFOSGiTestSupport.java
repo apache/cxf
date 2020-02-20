@@ -20,7 +20,6 @@
 package org.apache.cxf.osgi.itests;
 
 
-
 import java.io.File;
 
 import javax.inject.Inject;
@@ -31,17 +30,18 @@ import org.osgi.framework.InvalidSyntaxException;
 
 import org.ops4j.pax.exam.MavenUtils;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.OptionUtils;
 import org.ops4j.pax.exam.karaf.container.internal.JavaVersionUtil;
 import org.ops4j.pax.exam.options.MavenUrlReference;
 import org.ops4j.pax.exam.options.extra.VMOption;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.ops4j.pax.exam.CoreOptions.composite;
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.CoreOptions.when;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
 
@@ -50,96 +50,79 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDist
  */
 public class CXFOSGiTestSupport {
 
+    // Adding apache snapshots as cxf trunk may contain snapshot dependencies
+//    private static final String REPOS = "https://repo1.maven.org/maven2@id=central,"
+//        + "https://repository.apache.org/content/groups/snapshots-group@id=apache@snapshots@noreleases";
+
     @Inject
     protected BundleContext bundleContext;
 
     protected MavenUrlReference cxfUrl;
-    protected MavenUrlReference amqUrl;
-    protected MavenUrlReference springLegacyUrl;
-
-    private static String getKarafVersion() {
-        return MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf");
-    }
 
     /**
      * Create an {@link org.ops4j.pax.exam.Option} for using a .
      *
      * @return
      */
-    protected Option cxfBaseConfig() {
-        final String karafVersion = getKarafVersion();
-        final MavenUrlReference karafUrl = maven().groupId("org.apache.karaf").artifactId("apache-karaf")
-                .version(karafVersion).type("tar.gz");
+    protected Option[] cxfBaseConfig() {
         cxfUrl = maven().groupId("org.apache.cxf.karaf").artifactId("apache-cxf").versionAsInProject()
-                .type("xml").classifier("features");
-        amqUrl = maven().groupId("org.apache.activemq")
-                .artifactId("activemq-karaf").type("xml").classifier("features").versionAsInProject();
-        springLegacyUrl = maven().groupId("org.apache.karaf.features").artifactId("spring-legacy")
-                .version(karafVersion).type("xml").classifier("features");
+            .type("xml").classifier("features");
+
         String localRepo = System.getProperty("localRepository");
         Object urp = System.getProperty("cxf.useRandomFirstPort");
+
+        final Option[] basicOptions = new Option[] {
+            karafDistributionConfiguration()
+                .frameworkUrl(
+                    maven().groupId("org.apache.karaf").artifactId("apache-karaf-minimal").versionAsInProject()
+                        .type("tar.gz"))
+                .useDeployFolder(false)
+                .unpackDirectory(new File("target/paxexam/")),
+            //DO NOT COMMIT WITH THIS LINE ENABLED!!!
+            //KarafDistributionOption.keepRuntimeFolder(),
+            //debugConfiguration(), // nor this
+            systemProperty("pax.exam.osgi.unresolved.fail").value("true"),
+            systemProperty("java.awt.headless").value("true"),
+//            editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
+//                "org.ops4j.pax.url.mvn.repositories", REPOS),
+            configureConsole().ignoreLocalConsole().ignoreRemoteShell(),
+            when(localRepo != null)
+                .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
+                                                     "org.ops4j.pax.url.mvn.localRepository",
+                                                     localRepo)),
+            when(urp != null).useOptions(systemProperty("cxf.useRandomFirstPort").value("true"))
+        };
         if (JavaVersionUtil.getMajorVersion() >= 9) {
-            return composite(karafDistributionConfiguration()
-                             .frameworkUrl(karafUrl)
-                             .karafVersion(karafVersion)
-                             .name("Apache Karaf")
-                             .useDeployFolder(false)
-                             .unpackDirectory(new File("target/paxexam/")),
-                         //DO NOT COMMIT WITH THIS LINE ENABLED!!!
-                         //KarafDistributionOption.keepRuntimeFolder(),
-                         //debugConfiguration(), // nor this
-                         systemProperty("pax.exam.osgi.unresolved.fail").value("true"),
-                         systemProperty("java.awt.headless").value("true"),
-                         when(localRepo != null)
-                             .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
-                                                                  "org.ops4j.pax.url.mvn.localRepository",
-                                                                  localRepo)),
-                             new VMOption("--add-reads=java.xml=java.logging"),
-                             new VMOption("--add-exports=java.base/"
-                                 + "org.apache.karaf.specs.locator=java.xml,ALL-UNNAMED"),
-                             new VMOption("--patch-module"),
-                             new VMOption("java.base=lib/endorsed/org.apache.karaf.specs.locator-"
-                                 + karafVersion + ".jar"),
-                             new VMOption("--patch-module"),
-                             new VMOption("java.xml=lib/endorsed/org.apache.karaf.specs.java.xml-"
-                                 + karafVersion + ".jar"),
-                             new VMOption("--add-opens"),
-                             new VMOption("java.base/java.security=ALL-UNNAMED"),
-                             new VMOption("--add-opens"),
-                             new VMOption("java.base/java.net=ALL-UNNAMED"),
-                             new VMOption("--add-opens"),
-                             new VMOption("java.base/java.lang=ALL-UNNAMED"),
-                             new VMOption("--add-opens"),
-                             new VMOption("java.base/java.util=ALL-UNNAMED"),
-                             new VMOption("--add-opens"),
-                             new VMOption("java.naming/javax.naming.spi=ALL-UNNAMED"),
-                             new VMOption("--add-opens"),
-                             new VMOption("java.rmi/sun.rmi.transport.tcp=ALL-UNNAMED"),
-                             new VMOption("--add-exports=java.base/sun.net.www.protocol.http=ALL-UNNAMED"),
-                             new VMOption("--add-exports=java.base/sun.net.www.protocol.https=ALL-UNNAMED"),
-                             new VMOption("--add-exports=java.base/sun.net.www.protocol.jar=ALL-UNNAMED"),
-                             new VMOption("--add-exports=jdk.naming.rmi/com.sun.jndi.url.rmi=ALL-UNNAMED"),
-                             new VMOption("-classpath"),
-                             new VMOption("lib/jdk9plus/*" + File.pathSeparator + "lib/boot/*"),
-                         when(urp != null).useOptions(systemProperty("cxf.useRandomFirstPort").value("true")));
-        } else {
-            return composite(karafDistributionConfiguration()
-                             .frameworkUrl(karafUrl)
-                             .karafVersion(karafVersion)
-                             .name("Apache Karaf")
-                             .useDeployFolder(false)
-                             .unpackDirectory(new File("target/paxexam/")),
-                         //DO NOT COMMIT WITH THIS LINE ENABLED!!!
-                         //KarafDistributionOption.keepRuntimeFolder(),
-                         //debugConfiguration(), // nor this
-                         systemProperty("pax.exam.osgi.unresolved.fail").value("true"),
-                         systemProperty("java.awt.headless").value("true"),
-                         when(localRepo != null)
-                             .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
-                                                                  "org.ops4j.pax.url.mvn.localRepository",
-                                                                  localRepo)),
-                         when(urp != null).useOptions(systemProperty("cxf.useRandomFirstPort").value("true")));
+            final String karafVersion = MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf-minimal");
+            return OptionUtils.combine(basicOptions,
+                new VMOption("--add-reads=java.xml=java.logging"),
+                new VMOption("--add-exports=java.base/"
+                    + "org.apache.karaf.specs.locator=java.xml,ALL-UNNAMED"),
+                new VMOption("--patch-module"),
+                new VMOption("java.base=lib/endorsed/org.apache.karaf.specs.locator-" + karafVersion + ".jar"),
+                new VMOption("--patch-module"),
+                new VMOption("java.xml=lib/endorsed/org.apache.karaf.specs.java.xml-" + karafVersion + ".jar"),
+                new VMOption("--add-opens"),
+                new VMOption("java.base/java.security=ALL-UNNAMED"),
+                new VMOption("--add-opens"),
+                new VMOption("java.base/java.net=ALL-UNNAMED"),
+                new VMOption("--add-opens"),
+                new VMOption("java.base/java.lang=ALL-UNNAMED"),
+                new VMOption("--add-opens"),
+                new VMOption("java.base/java.util=ALL-UNNAMED"),
+                new VMOption("--add-opens"),
+                new VMOption("java.naming/javax.naming.spi=ALL-UNNAMED"),
+                new VMOption("--add-opens"),
+                new VMOption("java.rmi/sun.rmi.transport.tcp=ALL-UNNAMED"),
+                new VMOption("--add-exports=java.base/sun.net.www.protocol.http=ALL-UNNAMED"),
+                new VMOption("--add-exports=java.base/sun.net.www.protocol.https=ALL-UNNAMED"),
+                new VMOption("--add-exports=java.base/sun.net.www.protocol.jar=ALL-UNNAMED"),
+                new VMOption("--add-exports=jdk.naming.rmi/com.sun.jndi.url.rmi=ALL-UNNAMED"),
+                new VMOption("-classpath"),
+                new VMOption("lib/jdk9plus/*" + File.pathSeparator + "lib/boot/*")
+            );
         }
+        return basicOptions;
     }
 
     protected static Option testUtils() {

@@ -38,9 +38,9 @@ public class ServletDestination extends AbstractHTTPDestination implements Servl
      * Constructor, allowing subsititution of configuration.
      *
      * @param b the associated Bus
-     * @param ci the associated conduit initiator
+     * @param registry the destination registry
      * @param ei the endpoint info of the destination
-     * @param cfg the configuration
+     * @param path the path
      * @throws IOException
      */
     public ServletDestination(Bus b,

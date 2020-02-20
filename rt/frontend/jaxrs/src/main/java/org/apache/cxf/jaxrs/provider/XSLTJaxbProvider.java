@@ -340,7 +340,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
     protected Result getStreamResult(OutputStream os, Annotation[] anns, MediaType mt) throws Exception {
         return new StreamResult(os);
     }
-    
+
     @Override
     protected void marshalToOutputStream(Marshaller ms, Object obj, OutputStream os,
                                          Annotation[] anns, MediaType mt)
@@ -513,13 +513,12 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
     }
 
     protected Templates createTemplates(URL urlStream) {
-        try {
-            if (urlStream == null) {
-                return null;
-            }
+        if (urlStream == null) {
+            return null;
+        }
 
-            Reader r = new BufferedReader(
-                           new InputStreamReader(urlStream.openStream(), StandardCharsets.UTF_8));
+        try (Reader r = new BufferedReader(
+                           new InputStreamReader(urlStream.openStream(), StandardCharsets.UTF_8))) {
             Source source = new StreamSource(r);
             source.setSystemId(urlStream.toExternalForm());
             if (factory == null) {

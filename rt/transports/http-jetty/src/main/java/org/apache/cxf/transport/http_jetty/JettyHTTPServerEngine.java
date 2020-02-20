@@ -21,10 +21,10 @@ package org.apache.cxf.transport.http_jetty;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -37,6 +37,7 @@ import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -355,7 +356,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
         // back to the client.
         ErrorHandler eh = new ErrorHandler() {
             public void handle(String target, Request baseRequest, HttpServletRequest request,
-                               HttpServletResponse response) throws IOException {
+                               HttpServletResponse response) throws IOException, ServletException {
                 String msg = (String)request.getAttribute(RequestDispatcher.ERROR_MESSAGE);
                 if (StringUtils.isEmpty(msg) || msg.contains("org.apache.cxf.interceptor.Fault")) {
                     msg = HttpStatus.getMessage(response.getStatus());
@@ -804,10 +805,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
         try {
             String h = connector.getHost();
             int port = connector.getPort();
-            LOG.finer("connector.host: "
-                + h == null
-                  ? "null"
-                  : "\"" + h + "\"");
+            LOG.finer("connector.host: " + (h == null ? "null" : "\"" + h + "\""));
             LOG.finer("connector.port: " + port);
         } catch (Throwable t) {
             //ignore
@@ -996,27 +994,19 @@ public class JettyHTTPServerEngine implements ServerEngine {
      * This method is called after configure on this object.
      */
     @PostConstruct
-    public void finalizeConfig()
-        throws GeneralSecurityException,
-               IOException {
+    public void finalizeConfig() {
         retrieveListenerFactory();
         checkConnectorPort();
         this.configFinalized = true;
     }
 
-    private void checkConnectorPort() throws IOException {
-        try {
-            if (null != connector) {
-                int cp = ((ServerConnector)connector).getPort();
-                if (port != cp) {
-                    throw new IOException("Error: Connector port " + cp + " does not match"
-                                + " with the server engine port " + port);
-                }
+    private void checkConnectorPort() {
+        if (null != connector) {
+            int cp = ((ServerConnector)connector).getPort();
+            if (port != cp) {
+                throw new UncheckedIOException(new IOException("Error: Connector port " + cp + " does not match"
+                            + " with the server engine port " + port));
             }
-        } catch (IOException ioe) {
-            throw ioe;
-        } catch (Throwable t) {
-            //ignore...
         }
     }
 
@@ -1035,8 +1025,6 @@ public class JettyHTTPServerEngine implements ServerEngine {
                     connector.stop();
                     if (connector instanceof Closeable) {
                         ((Closeable)connector).close();
-                    } else {
-                        ((ServerConnector)connector).close();
                     }
                 }
             } finally {

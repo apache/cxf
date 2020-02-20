@@ -62,7 +62,7 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     implements InstrumentationManager, BusLifeCycleListener {
     private static final Logger LOG = LogUtils.getL7dLogger(InstrumentationManagerImpl.class);
 
-    private static Map<String, String>mbeanServerIDMap = new HashMap<>();
+    private static Map<String, String> mbeanServerIDMap = new HashMap<>();
 
     private Bus bus;
     private MBServerConnectorFactory mcf;
@@ -70,6 +70,7 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     private Set<ObjectName> busMBeans = new HashSet<>();
     private boolean connectFailed;
     private String persistentBusId;
+    private Map<String, ?> environment;
 
     /**
      * For backward compatibility, {@link #createMBServerConnectorFactory} is <code>true</code> by default.
@@ -126,6 +127,10 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
         usePlatformMBeanServer = flag;
     }
 
+    public void setEnvironment(Map<String, ?> env) {
+        environment = env;
+    }
+
     @Deprecated
     public void register() {
     }
@@ -169,6 +174,7 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
                 mcf.setThreaded(isThreaded());
                 mcf.setDaemon(isDaemon());
                 mcf.setServiceUrl(getJMXServiceURL());
+                mcf.setEnvironment(environment);
                 try {
                     mcf.createConnector();
                 } catch (IOException ex) {

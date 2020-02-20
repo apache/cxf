@@ -385,8 +385,8 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         final Map<String, Object> theProperties = super.getProperties();
         final boolean encodeClientParameters = PropertyUtils.isTrue(theProperties, "url.encode.client.parameters");
         if (encodeClientParameters) {
-            final String encodeClientParametersList = theProperties == null ? null
-                : (String)getProperties().get("url.encode.client.parameters.list");
+            final String encodeClientParametersList =
+                (String)getProperties().get("url.encode.client.parameters.list");
             factory.registerUserProvider(new ParamConverterProvider() {
 
                 @SuppressWarnings("unchecked")

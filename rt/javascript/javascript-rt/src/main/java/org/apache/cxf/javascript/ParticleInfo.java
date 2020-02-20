@@ -131,10 +131,11 @@ public final class ParticleInfo implements ItemInfo {
     /**
      * Fill in an ElementInfo for an element or xs:any from a sequence.
      *
-     * @param sequenceElement
+     * @param sequenceObject
      * @param currentSchema
      * @param schemaCollection
      * @param prefixAccumulator
+     * @param contextName
      * @return
      */
     public static ParticleInfo forLocalItem(XmlSchemaObject sequenceObject, XmlSchema currentSchema,

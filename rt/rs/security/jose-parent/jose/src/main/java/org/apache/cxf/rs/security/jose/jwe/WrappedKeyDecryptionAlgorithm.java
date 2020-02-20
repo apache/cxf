@@ -30,9 +30,10 @@ import org.apache.cxf.rt.security.crypto.KeyProperties;
 
 public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(WrappedKeyDecryptionAlgorithm.class);
-    private Key cekDecryptionKey;
-    private boolean unwrap;
-    private KeyAlgorithm supportedAlgo;
+    private final Key cekDecryptionKey;
+    private final boolean unwrap;
+    private final KeyAlgorithm supportedAlgo;
+
     public WrappedKeyDecryptionAlgorithm(Key cekDecryptionKey, KeyAlgorithm supportedAlgo) {
         this(cekDecryptionKey, supportedAlgo, true);
     }

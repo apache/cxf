@@ -141,7 +141,7 @@ public class OAuthPermission implements Serializable {
      * 'read' scope is always allocated. This can be presented at the UI level as follows:
      * the read-only check-box control will represent a 'read' scope and a user will be able to
      * optionally select 'add' and/or 'update' scopes, in addition to the default 'read' one.
-     * @param isDefault true if the permission has been allocated by default
+     * @param value true if the permission has been allocated by default
      */
     public void setDefaultPermission(boolean value) {
         this.isDefaultPermission = value;

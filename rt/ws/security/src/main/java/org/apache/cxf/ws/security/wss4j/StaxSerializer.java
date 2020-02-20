@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.SequenceInputStream;
-import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -51,6 +50,8 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 import org.apache.cxf.staxutils.OverlayW3CDOMStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.xml.security.c14n.Canonicalizer;
+import org.apache.xml.security.c14n.InvalidCanonicalizerException;
 import org.apache.xml.security.encryption.AbstractSerializer;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 
@@ -60,10 +61,39 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * Converts <code>String</code>s into <code>Node</code>s and visa versa using CXF's StaxUtils
  */
 public class StaxSerializer extends AbstractSerializer {
-    XMLInputFactory factory;
-    boolean validFactory;
+    private XMLInputFactory factory;
+    private boolean validFactory;
 
-    boolean addNamespaces(XMLStreamReader reader, Node ctx) {
+    public StaxSerializer() throws InvalidCanonicalizerException {
+        super(Canonicalizer.ALGO_ID_C14N_PHYSICAL, true);
+    }
+
+    /**
+     * @param source
+     * @param ctx
+     * @return the Node resulting from the parse of the source
+     * @throws XMLEncryptionException
+     */
+    @Override
+    public Node deserialize(byte[] source, Node ctx) throws XMLEncryptionException {
+        XMLStreamReader reader = createWstxReader(source, ctx);
+        if (reader != null) {
+            return deserialize(ctx, reader, false);
+        }
+        return deserialize(ctx, new InputSource(createStreamContext(source, ctx)));
+    }
+
+    @Override
+    public byte[] serializeToByteArray(Element element) throws Exception {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(baos);
+            StaxUtils.copy(element, writer);
+            writer.close();
+            return baos.toByteArray();
+        }
+    }
+
+    private boolean addNamespaces(XMLStreamReader reader, Node ctx) {
         try {
             NamespaceContext nsctx = reader.getNamespaceContext();
             if (nsctx instanceof com.ctc.wstx.sr.InputElementStack) {
@@ -126,21 +156,8 @@ public class StaxSerializer extends AbstractSerializer {
         }
         return null;
     }
-    /**
-     * @param source
-     * @param ctx
-     * @return the Node resulting from the parse of the source
-     * @throws XMLEncryptionException
-     */
-    public Node deserialize(byte[] source, Node ctx) throws XMLEncryptionException {
-        XMLStreamReader reader = createWstxReader(source, ctx);
-        if (reader != null) {
-            return deserialize(ctx, reader, false);
-        }
-        return deserialize(ctx, new InputSource(createStreamContext(source, ctx)));
-    }
 
-    InputStream createStreamContext(byte[] source, Node ctx) throws XMLEncryptionException {
+    private InputStream createStreamContext(byte[] source, Node ctx) throws XMLEncryptionException {
         Vector<InputStream> v = new Vector<>(2); //NOPMD
 
         LoadingByteArrayOutputStream byteArrayOutputStream = new LoadingByteArrayOutputStream();
@@ -186,27 +203,6 @@ public class StaxSerializer extends AbstractSerializer {
     }
 
     /**
-     * @param source
-     * @param ctx
-     * @return the Node resulting from the parse of the source
-     * @throws XMLEncryptionException
-     */
-    public Node deserialize(String source, Node ctx) throws XMLEncryptionException {
-        String fragment = createContext(source, ctx);
-        return deserialize(ctx, new InputSource(new StringReader(fragment)));
-    }
-
-    @Override
-    public byte[] serializeToByteArray(Element element) throws Exception {
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(baos);
-            StaxUtils.copy(element, writer);
-            writer.close();
-            return baos.toByteArray();
-        }
-    }
-
-    /**
      * @param ctx
      * @param inputSource
      * @return the Node resulting from the parse of the source
@@ -216,6 +212,7 @@ public class StaxSerializer extends AbstractSerializer {
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(inputSource);
         return deserialize(ctx, reader, true);
     }
+
     private Node deserialize(Node ctx, XMLStreamReader reader, boolean wrapped) throws XMLEncryptionException {
         Document contextDocument = null;
         if (Node.DOCUMENT_NODE == ctx.getNodeType()) {

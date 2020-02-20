@@ -186,7 +186,7 @@ public final class CryptoCoverageUtil {
      *            the SOAP header element
      * @param refs
      *            the refs to the data extracted from the signature/encryption
-     * @param namespaces
+     * @param namespace
      *            the namespace of the header(s) to check for coverage
      * @param name
      *            the local part of the header name to check for coverage, may be null

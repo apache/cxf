@@ -19,7 +19,6 @@
 package org.apache.cxf.jaxrs.model.wadl;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -32,6 +31,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1013,7 +1013,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         try {
             Method m = enumClass.getMethod("values", new Class<?>[] {});
             Object[] values = (Object[])m.invoke(null, new Object[] {});
-            m = enumClass.getMethod("toString", new Class<?>[] {});
+            m = enumClass.getMethod("name", new Class<?>[] {});
             for (Object o : values) {
                 String str = (String)m.invoke(o, new Object[] {});
                 sb.append("<option value=\"").append(str).append("\"/>");
@@ -1194,9 +1194,9 @@ public class WadlGenerator implements ContainerRequestFilter {
                 }
                 if (result == 0 && ignoreOverloadedMethods
                     && op1.getMethodToInvoke().getName().equals(op2.getMethodToInvoke().getName())) {
-                    Integer paramLen1 = op1.getMethodToInvoke().getParameterTypes().length;
-                    Integer paramLen2 = op2.getMethodToInvoke().getParameterTypes().length;
-                    result = paramLen1.compareTo(paramLen2) * -1;
+                    int paramLen1 = op1.getMethodToInvoke().getParameterTypes().length;
+                    int paramLen2 = op2.getMethodToInvoke().getParameterTypes().length;
+                    result = Integer.compare(paramLen1, paramLen2) * -1;
                 }
                 return result;
             }
@@ -1978,7 +1978,7 @@ public class WadlGenerator implements ContainerRequestFilter {
             this.theSchemas = new LinkedList<>();
             // we'll need to do the proper schema caching eventually
             for (String s : schemas) {
-                XMLSource source = new XMLSource(new ByteArrayInputStream(s.getBytes()));
+                XMLSource source = new XMLSource(new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8)));
                 source.setBuffering();
                 Map<String, String> locs = getLocationsMap(source, "import", links, ui);
                 locs.putAll(getLocationsMap(source, "include", links, ui));
@@ -2026,17 +2026,16 @@ public class WadlGenerator implements ContainerRequestFilter {
         }
 
         private String transformSchema(String schema, Map<String, String> locs) {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            SchemaConverter sc = new SchemaConverter(StaxUtils.createXMLStreamWriter(bos), locs);
+            StringWriter sw = new StringWriter();
+            SchemaConverter sc = new SchemaConverter(StaxUtils.createXMLStreamWriter(sw), locs);
             try {
                 StaxUtils.copy(new StreamSource(new StringReader(schema)), sc);
                 sc.flush();
                 sc.close();
-                return bos.toString();
+                return sw.toString();
             } catch (Exception ex) {
                 return schema;
             }
-
         }
 
         @Override

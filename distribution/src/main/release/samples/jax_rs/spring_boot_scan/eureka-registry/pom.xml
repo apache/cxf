@@ -32,10 +32,10 @@
         </dependencies>
     </dependencyManagement>
     <dependencies>
-
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+            <version>${spring.cloud.eureka.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

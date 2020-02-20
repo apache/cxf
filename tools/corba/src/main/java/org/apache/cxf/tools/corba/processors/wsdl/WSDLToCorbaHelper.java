@@ -461,7 +461,7 @@ public class WSDLToCorbaHelper {
             }
         }
 
-        if ((struct != null) && (struct.getMember().isEmpty())) {
+        if (struct.getMember().isEmpty()) {
             String msgStr = "Cannot create CORBA Struct" + struct.getName()
                             + "from container with no members";
             org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(
@@ -1417,10 +1417,6 @@ public class WSDLToCorbaHelper {
         } else if (SUPPORTEDDISTYPES.contains(disctype.getQName().getLocalPart())) {
             if ("long".equals(disctype.getQName().getLocalPart())
                 || "short".equals(disctype.getQName().getLocalPart())) {
-                for (int i = 0; i < fields.size(); i++) {
-                    caselist.add(Integer.toString(i));
-                }
-            } else if ("char".equals(disctype.getQName().getLocalPart())) {
                 for (int i = 0; i < fields.size(); i++) {
                     caselist.add(Integer.toString(i));
                 }

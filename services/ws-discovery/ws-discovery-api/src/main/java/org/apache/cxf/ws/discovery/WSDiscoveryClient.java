@@ -146,7 +146,6 @@ public class WSDiscoveryClient implements Closeable {
 
     /**
      * WS-Discovery will use SOAP 1.2 by default.  This allows forcing the use of SOAP 1.1.
-     * @param do11
      */
     public void setSoapVersion11() {
         setSoapVersion(true);

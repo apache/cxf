@@ -19,6 +19,7 @@
 package org.apache.cxf.systest.jaxrs.jms;
 
 import org.apache.activemq.broker.BrokerService;
+import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -32,6 +33,7 @@ public class JMSServer extends AbstractBusTestServerBase {
     }
 
     public void tearDown() {
+        context.getBean(JAXRSServerFactoryBean.class).getServer().destroy();
         context.close();
     }
 

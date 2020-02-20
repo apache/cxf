@@ -79,7 +79,7 @@ public class JettyHTTPDestination extends ServletDestination {
     /**
      * Constructor
      *
-     * @param b  the associated Bus
+     * @param bus  the associated Bus
      * @param registry the associated destinationRegistry
      * @param ei the endpoint info of the destination
      * @param serverEngineFactory the serverEngineFactory which could be used to create ServerEngine

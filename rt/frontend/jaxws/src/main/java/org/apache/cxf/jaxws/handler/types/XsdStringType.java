@@ -85,10 +85,10 @@ public class XsdStringType {
     /**
      * Sets the value of the id property.
      *
-     * @param value allowed object is {@link java.lang.String }
+     * @param id allowed object is {@link java.lang.String }
      */
-    public void setId(java.lang.String v) {
-        this.id = v;
+    public void setId(java.lang.String id) {
+        this.id = id;
     }
 
 }

@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -319,10 +320,18 @@ public final class JwkUtils {
         }
         return null;
     }
+
     public static List<JsonWebKey> loadJsonWebKeys(Message m,
                                                    Properties props,
                                                    KeyOperation keyOper) {
         PrivateKeyPasswordProvider cb = KeyManagementUtils.loadPasswordProvider(m, props, keyOper);
+        return loadJsonWebKeys(m, props, keyOper, cb);
+    }
+
+    public static List<JsonWebKey> loadJsonWebKeys(Message m,
+                                                   Properties props,
+                                                   KeyOperation keyOper,
+                                                   PrivateKeyPasswordProvider cb) {
         JsonWebKeys jwkSet = loadJwkSet(m, props, cb);
         String kid = KeyManagementUtils.getKeyId(m, props, JoseConstants.RSSEC_KEY_STORE_ALIAS, keyOper);
         if (kid != null) {
@@ -480,6 +489,10 @@ public final class JwkUtils {
         return CryptoUtils.createSecretKeySpec((String)jwk.getProperty(JsonWebKey.OCTET_KEY_VALUE),
                                                AlgorithmUtils.toJavaName(jwk.getAlgorithm()));
     }
+    public static SecretKey toSecretKey(JsonWebKey jwk, KeyAlgorithm algorithm) {
+        return CryptoUtils.createSecretKeySpec((String)jwk.getProperty(JsonWebKey.OCTET_KEY_VALUE),
+                                               algorithm.getJavaName());
+    }
     public static JsonWebKey fromSecretKey(SecretKey secretKey, String algo) {
         return fromSecretKey(secretKey, algo, null);
     }
@@ -566,5 +579,28 @@ public final class JwkUtils {
             }
             headers.setJsonWebKey(jwkPublic);
         }
+    }
+
+    public static List<JsonWebKey> stripPrivateParameters(List<JsonWebKey> keys) {
+        if (keys == null) {
+            return Collections.emptyList();
+        }
+
+        List<JsonWebKey> parsedKeys = new ArrayList<>(keys.size());
+        Iterator<JsonWebKey> iter = keys.iterator();
+        while (iter.hasNext()) {
+            JsonWebKey key = iter.next();
+            if (!(key.containsProperty("k") || key.getKeyType() == KeyType.OCTET)) {
+                // We don't allow secret keys in a public keyset
+                key.removeProperty(JsonWebKey.RSA_PRIVATE_EXP);
+                key.removeProperty(JsonWebKey.RSA_FIRST_PRIME_FACTOR);
+                key.removeProperty(JsonWebKey.RSA_SECOND_PRIME_FACTOR);
+                key.removeProperty(JsonWebKey.RSA_FIRST_PRIME_CRT);
+                key.removeProperty(JsonWebKey.RSA_SECOND_PRIME_CRT);
+                key.removeProperty(JsonWebKey.RSA_FIRST_CRT_COEFFICIENT);
+                parsedKeys.add(key);
+            }
+        }
+        return parsedKeys;
     }
 }

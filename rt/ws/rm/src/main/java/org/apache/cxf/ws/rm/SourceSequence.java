@@ -109,7 +109,7 @@ public class SourceSequence extends AbstractSequence {
      * inbound sequence includes in the CreateSequenceRequest in response to
      * which the sequence with the specified identifier was created.
      *
-     * @param id the sequence identifier
+     * @param sid the sequence identifier
      * @return true if the sequence was constructed from an offer.
      */
     public boolean offeredBy(Identifier sid) {
@@ -158,10 +158,10 @@ public class SourceSequence extends AbstractSequence {
      * Used by the RM source to cache received acknowledgements for this
      * sequence.
      *
-     * @param acknowledgement an acknowledgement for this sequence
+     * @param ack an acknowledgement for this sequence
      */
-    public void setAcknowledged(SequenceAcknowledgement a) throws RMException {
-        acknowledgement = a;
+    public void setAcknowledged(SequenceAcknowledgement ack) throws RMException {
+        acknowledgement = ack;
         source.getManager().getRetransmissionQueue().purgeAcknowledged(this);
         if (allAcknowledged()) {
             if (null == target || RMUtils.getAddressingConstants().getAnonymousURI().equals(

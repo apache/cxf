@@ -80,10 +80,11 @@ public final class AttributeInfo implements ItemInfo {
     /**
      * Fill in an AttributeInfo for an attribute or anyAttribute from a sequence.
      *
-     * @param sequenceElement
+     * @param sequenceObject
      * @param currentSchema
      * @param schemaCollection
      * @param prefixAccumulator
+     * @param contextName
      * @return
      */
     public static AttributeInfo forLocalItem(XmlSchemaObject sequenceObject,

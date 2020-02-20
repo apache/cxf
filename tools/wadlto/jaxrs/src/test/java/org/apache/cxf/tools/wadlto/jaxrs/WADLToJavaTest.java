@@ -48,6 +48,8 @@ public class WADLToJavaTest extends ProcessorTestBase {
             "custom.service",
             "-tMap",
             "{http://www.w3.org/2001/XMLSchema}date=java.util.List..String",
+            "-tMap",
+            "{http://www.w3.org/2001/XMLSchema}base64Binary=byte[]",
             "-async getName,delete",
             "-inheritResourceParams first",
             "-compile",
@@ -69,6 +71,36 @@ public class WADLToJavaTest extends ProcessorTestBase {
             "-p",
             "custom.service",
             "-async getName,delete",
+            "-compile",
+            "-xjc-episode " + output.getAbsolutePath() + "/test.episode",
+            "-xjc-XtoString",
+            getLocation("/wadl/bookstore.xml"),
+        };
+
+        WADLToJava tool = new WADLToJava(args);
+        tool.run(new ToolContext());
+        assertNotNull(output.list());
+
+        verifyFiles("java", true, false, "superbooks", "custom.service");
+        verifyFiles("class", true, false, "superbooks", "custom.service");
+        assertTrue(new File(output.getAbsolutePath() + "/test.episode").exists());
+
+        List<Class<?>> schemaClassFiles = getSchemaClassFiles();
+        assertEquals(4, schemaClassFiles.size());
+        for (Class<?> c : schemaClassFiles) {
+            c.getMethod("toString");
+        }
+    }
+
+    @Test
+    public void testGenerateRxJava8() throws Exception {
+        String[] args = new String[] {
+            "-d",
+            output.getCanonicalPath(),
+            "-p",
+            "custom.service",
+            "-rx",
+            "java8",
             "-compile",
             "-xjc-episode " + output.getAbsolutePath() + "/test.episode",
             "-xjc-XtoString",

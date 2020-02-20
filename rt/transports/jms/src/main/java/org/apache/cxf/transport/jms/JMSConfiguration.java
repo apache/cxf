@@ -79,7 +79,7 @@ public class JMSConfiguration {
      */
     private String replyToDestination;
     private volatile Destination replyToDestinationDest;
-    
+
     private String messageType = JMSConstants.TEXT_MESSAGE_TYPE;
     private boolean pubSubDomain;
     private boolean replyPubSubDomain;
@@ -380,9 +380,7 @@ public class JMSConfiguration {
     /**
      * Retrieve connection factory from JNDI
      *
-     * @param jmsConfig
-     * @param jndiConfig
-     * @return
+     * @return the connection factory from JNDI
      */
     private ConnectionFactory getConnectionFactoryFromJndi() {
         if (getJndiEnvironment() == null || getConnectionFactoryName() == null) {
@@ -488,7 +486,7 @@ public class JMSConfiguration {
             ? session.createTemporaryQueue()
             : destinationResolver.resolveDestinationName(session, replyDestination, replyPubSubDomain);
     }
-    
+
     public void resetCachedReplyDestination() {
         synchronized (this) {
             this.replyDestinationDest = null;
@@ -518,7 +516,7 @@ public class JMSConfiguration {
     public int getRetryInterval() {
         return this.retryInterval;
     }
-    
+
     public void setRetryInterval(int retryInterval) {
         this.retryInterval = retryInterval;
     }

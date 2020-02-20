@@ -77,7 +77,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
                   System.getProperty("java.util.logging.config.file"));
 
         assertTrue("server did not launch correctly",
-                   launchServer(EmbeddedJMSBrokerLauncher.class, props, null));
+                   launchServer(EmbeddedJMSBrokerLauncher.class, props, null, false));
         assertTrue("server did not launch correctly",
                    launchServer(JMSServer.class, true));
         serversStarted = true;

@@ -21,6 +21,7 @@ package org.apache.cxf.attachment;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class AttachmentUtilTest {
 
@@ -115,4 +116,10 @@ public class AttachmentUtilTest {
         assertEquals("a=b.txt",
             AttachmentUtil.getContentDispositionFileName("filename=\"a=b.txt\""));
     }
+
+    @Test
+    public void testCreateContentID() throws Exception {
+        assertNotEquals(AttachmentUtil.createContentID(null), AttachmentUtil.createContentID(null));
+    }
+
 }

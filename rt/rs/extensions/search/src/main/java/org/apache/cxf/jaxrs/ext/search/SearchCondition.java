@@ -21,18 +21,16 @@ package org.apache.cxf.jaxrs.ext.search;
 import java.util.Collection;
 import java.util.List;
 
-//CHECKSTYLE:OFF
 /**
  * Can be used to build plain or complex/composite search conditions.
  * <p>
- * Google Collections <a href="http://google-collections.googlecode.com/svn/trunk/javadoc/com/google/common/base/Predicate.html">Predicate</a>
- * might've been used instead, but it is a too generic and its apply method is not quite needed here
+ * Google Collections Predicate might've been used instead, but it is too
+ * generic and its apply method is not quite needed here
  * </p>
  *
  * @param <T> Type of the object which will be checked by SearchCondition instance
  *
  */
-//CHECKSTYLE:ON
 public interface SearchCondition<T> {
 
     /**

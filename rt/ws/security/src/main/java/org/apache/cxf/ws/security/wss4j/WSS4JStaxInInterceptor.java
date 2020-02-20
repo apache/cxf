@@ -38,6 +38,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.message.MessageUtils;
@@ -116,6 +117,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
                 (List<SecurityEvent>) soapMessage.getExchange().get(SecurityEvent.class.getName() + ".out");
 
             WSSSecurityProperties secProps = createSecurityProperties();
+            secProps.setDocumentCreator(() -> DOMUtils.createDocument());
             translateProperties(soapMessage, secProps);
             configureCallbackHandler(soapMessage, secProps);
             configureProperties(soapMessage, secProps);

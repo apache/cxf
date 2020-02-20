@@ -75,7 +75,7 @@ Note that when you run the sample this way, your input to the OSGI console will 
 If you want to run it manually, do the following
 
   1) mvn package
-  2) cd target/deliver/jax_rs_minimal_osgi-<version>-equinox/jax_rs_minimal_osgi-<version>/
+  2) cd target/delivery/jax_rs_minimal_osgi-<version>-equinox/jax_rs_minimal_osgi-<version>/
   3) java -jar  org.eclipse.osgi-3.13.0.v20180226-1711.jar
 
 If all goes well, the Eclipse Equinox environment will start up and File Install will install all the necessary bundles.

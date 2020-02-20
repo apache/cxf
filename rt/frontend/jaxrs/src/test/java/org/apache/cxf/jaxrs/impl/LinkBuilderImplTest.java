@@ -26,7 +26,9 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilderException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -98,6 +100,18 @@ public class LinkBuilderImplTest {
         linkBuilder.baseUri("http://localhost:8080/base/path");
         Link link = linkBuilder.rel("next").build();
         assertEquals("<http://localhost:8080/relative>;rel=\"next\"", link.toString());
+    }
+
+    @Test
+    @Ignore("to be fixed for TCK")
+    public void testNoArgsThrowsUriBuilderExceptionTest() {
+        Link.Builder builder = Link.fromUri("http://:@");
+        try {
+            Link link = builder.build();
+            fail("No exception has been thrown for link " + link);
+        } catch (UriBuilderException e) {
+            //expected
+        }
     }
 
     @Test

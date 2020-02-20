@@ -28,9 +28,10 @@ import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 
 
 public class JweCompactBuilder {
-    private StringBuilder jweContentBuilder;
-    private String encodedEncryptedContent;
-    private String encodedAuthTag;
+    private final StringBuilder jweContentBuilder;
+    private final String encodedEncryptedContent;
+    private final String encodedAuthTag;
+
     public JweCompactBuilder(JweHeaders headers,
                        byte[] encryptedContentEncryptionKey,
                        byte[] cipherInitVector,

@@ -35,6 +35,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 
 import org.apache.cxf.common.util.PropertyUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.search.Beanspector.TypeInfo;
 import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheck;
 import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheckInfo;
@@ -332,11 +333,8 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
         return df.parse(dateValue);
     }
 
-    private String getMethodNameSuffix(String name) {
-        if (name.length() == 1) {
-            return name.toUpperCase();
-        }
-        return Character.toUpperCase(name.charAt(0)) + name.substring(1);
+    private static String getMethodNameSuffix(String name) {
+        return StringUtils.capitalize(name);
     }
 
     private int getDotIndex(String setter) {

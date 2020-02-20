@@ -122,7 +122,6 @@ public class RMEndpoint {
      *
      * @param m
      * @param ae
-     * @param pv
      */
     public RMEndpoint(RMManager m, Endpoint ae) {
         manager = m;

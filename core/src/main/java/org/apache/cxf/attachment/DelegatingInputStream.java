@@ -32,9 +32,6 @@ public class DelegatingInputStream extends InputStream implements Transferable {
     private AttachmentDeserializer deserializer;
     private boolean isClosed;
 
-    /**
-     * @param source
-     */
     DelegatingInputStream(InputStream is, AttachmentDeserializer ads) {
         this.is = is;
         deserializer = ads;

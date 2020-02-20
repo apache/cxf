@@ -24,6 +24,7 @@ import java.util.Collections;
 import javax.jms.ConnectionFactory;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.osgi.itests.CXFOSGiTestSupport;
 import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
@@ -33,12 +34,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.OptionUtils;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.ops4j.pax.tinybundles.core.TinyBundles;
 
 import static org.junit.Assert.assertEquals;
+import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.provision;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 
@@ -72,22 +75,33 @@ public class JmsServiceTest extends CXFOSGiTestSupport {
 
     @Configuration
     public Option[] config() {
-        return new Option[] {
+        return OptionUtils.combine(
             cxfBaseConfig(),
-            features(cxfUrl, "cxf-core", "cxf-jaxws", "cxf-transports-jms"),
-            features(springLegacyUrl, "spring/4.3.18.RELEASE_1"),
-            features(amqUrl, "shell-compat", "activemq-broker-noweb"),
+            features(cxfUrl, "cxf-jaxws", "cxf-transports-jms"),
+            features(maven().groupId("org.apache.activemq").artifactId("activemq-karaf").versionAsInProject()
+                    .type("xml").classifier("features-core"),
+                "cxf-jackson", "activemq-client"),
             provision(serviceBundle())
-        };
+        );
     }
 
     private static InputStream serviceBundle() {
-        return TinyBundles.bundle()
+        if (JavaUtils.isJava11Compatible()) {
+            return TinyBundles.bundle()
+                .add(JmsTestActivator.class)
+                .add(Greeter.class)
+                .add(GreeterImpl.class)
+                .set(Constants.BUNDLE_ACTIVATOR, JmsTestActivator.class.getName())
+                .set("Require-Capability", "osgi.ee;filter:=\"(&(osgi.ee=JavaSE)(version=11))\"")
+                .build(TinyBundles.withBnd());
+        } else {
+            return TinyBundles.bundle()
                 .add(JmsTestActivator.class)
                 .add(Greeter.class)
                 .add(GreeterImpl.class)
                 .set(Constants.BUNDLE_ACTIVATOR, JmsTestActivator.class.getName())
                 .build(TinyBundles.withBnd());
+        }
     }
 
 }

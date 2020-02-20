@@ -80,7 +80,7 @@ public class BeanTypeInfo {
      *
      * @param typeClass
      * @param defaultNamespace
-     * @param initiallize If true attempt default property/xml mappings.
+     * @param initialize If true attempt default property/xml mappings.
      */
     public BeanTypeInfo(Class<?> typeClass, String defaultNamespace, boolean initialize) {
         this.beanClass = typeClass;

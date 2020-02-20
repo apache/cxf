@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
 public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
@@ -220,12 +221,7 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
             name = name.substring(index + 1);
             if (value != null && !InjectionUtils.isPrimitive(value.getClass())) {
                 try {
-                    String nextPart = names[1];
-                    if (nextPart.length() == 1) {
-                        nextPart = nextPart.toUpperCase();
-                    } else {
-                        nextPart = Character.toUpperCase(nextPart.charAt(0)) + nextPart.substring(1);
-                    }
+                    String nextPart = StringUtils.capitalize(names[1]);
                     Method m = value.getClass().getMethod("get" + nextPart, new Class[]{});
                     value = m.invoke(value, new Object[]{});
                 } catch (Throwable ex) {

@@ -19,7 +19,6 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.security.Provider;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
@@ -85,6 +84,7 @@ import org.apache.wss4j.dom.processor.Processor;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.NoOpValidator;
 import org.apache.wss4j.dom.validate.Validator;
+import org.apache.xml.security.c14n.InvalidCanonicalizerException;
 
 /**
  * Performs WS-Security inbound actions.
@@ -238,7 +238,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             config = engine.getWssConfig();
         }
         reqData.setWssConfig(config);
-        reqData.setEncryptionSerializer(new StaxSerializer());
 
         // Add Audience Restrictions for SAML
         reqData.setAudienceRestrictions(SAMLUtils.getAudienceRestrictions(msg, true));
@@ -248,6 +247,12 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         boolean doDebug = LOG.isLoggable(Level.FINE);
 
         SoapVersion version = msg.getVersion();
+        try {
+            reqData.setEncryptionSerializer(new StaxSerializer());
+        } catch (InvalidCanonicalizerException e) {
+            throw new SoapFault(new Message("SECURITY_FAILED", LOG), e, version.getReceiver());
+        }
+
         if (doDebug) {
             LOG.fine("WSS4JInInterceptor: enter handleMessage()");
         }
@@ -401,15 +406,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             if (document != null && node != null) {
                 Node newNode = null;
                 try {
-                    newNode = document.importNode(node, true);
-                    if (newNode != null) {
-                        try {
-                            Method method = newNode.getClass().getMethod("getDomElement");
-                            newNode = (Element)method.invoke(newNode);
-                        } catch (java.lang.NoSuchMethodException ex) {
-                            // do nothing;
-                        }
-                    }
+                    newNode = DOMUtils.getDomElement(document.importNode(node, true));
                     elem.getOwnerDocument().getDocumentElement().getFirstChild().
                         getNextSibling().replaceChild(newNode, node);
                     List<WSSecurityEngineResult> encryptResults = wsResult.getActionResults().get(WSConstants.ENCR);

@@ -67,7 +67,7 @@ public class DefaultConditionsProvider implements ConditionsProvider {
 
     /**
      * Set the default lifetime in seconds for issued SAML tokens
-     * @param default lifetime in seconds
+     * @param lifetime default lifetime in seconds
      */
     public void setLifetime(long lifetime) {
         this.lifetime = lifetime;
@@ -85,7 +85,7 @@ public class DefaultConditionsProvider implements ConditionsProvider {
 
     /**
      * Set the maximum lifetime in seconds for issued SAML tokens
-     * @param maximum lifetime in seconds
+     * @param maxLifetime maximum lifetime in seconds
      */
     public void setMaxLifetime(long maxLifetime) {
         this.maxLifetime = maxLifetime;

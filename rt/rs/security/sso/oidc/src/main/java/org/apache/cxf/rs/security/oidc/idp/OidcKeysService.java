@@ -34,13 +34,14 @@ public class OidcKeysService {
 
     private volatile JsonWebKeys keySet;
     private WebClient keyServiceClient;
+    private boolean stripPrivateParameters = true;
 
     @GET
     @Produces("application/json")
     public JsonWebKeys getPublicVerificationKeys() {
         if (keySet == null) {
             if (keyServiceClient == null) {
-                keySet = getFromLocalStore();
+                keySet = getFromLocalStore(stripPrivateParameters);
             } else {
                 keySet = keyServiceClient.get(JsonWebKeys.class);
             }
@@ -49,13 +50,24 @@ public class OidcKeysService {
         return keySet;
     }
 
-    private static JsonWebKeys getFromLocalStore() {
+    private static JsonWebKeys getFromLocalStore(boolean stripPrivateParameters) {
         Properties props = JwsUtils.loadSignatureInProperties(true);
-        return JwsUtils.loadPublicVerificationKeys(JAXRSUtils.getCurrentMessage(), props);
+        return JwsUtils.loadPublicVerificationKeys(JAXRSUtils.getCurrentMessage(), props, stripPrivateParameters);
     }
 
     public void setKeyServiceClient(WebClient keyServiceClient) {
         this.keyServiceClient = keyServiceClient;
+    }
+
+    public boolean isStripPrivateParameters() {
+        return stripPrivateParameters;
+    }
+
+    /**
+     * Whether to strip private parameters from the keys that are returned. The default is true.
+     */
+    public void setStripPrivateParameters(boolean stripPrivateParameters) {
+        this.stripPrivateParameters = stripPrivateParameters;
     }
 
 }

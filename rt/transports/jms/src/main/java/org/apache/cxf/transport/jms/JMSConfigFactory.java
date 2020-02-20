@@ -53,11 +53,6 @@ public final class JMSConfigFactory {
         return createFromEndpoint(bus, jmsEndpoint);
     }
 
-    /**
-     * @param bus
-     * @param endpointInfo
-     * @return
-     */
     public static JMSConfiguration createFromEndpoint(Bus bus, JMSEndpoint endpoint) {
         JMSConfiguration jmsConfig = new JMSConfiguration();
 

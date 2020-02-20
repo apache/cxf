@@ -407,10 +407,6 @@ public class JMSMessageHeadersType {
         }
     }
 
-    /**
-     * @param jmsMessage
-     * @param messageProperties
-     */
     public void writeTo(Message jmsMessage)
         throws JMSException {
 

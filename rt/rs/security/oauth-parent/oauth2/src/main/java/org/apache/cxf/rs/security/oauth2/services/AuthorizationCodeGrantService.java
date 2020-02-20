@@ -209,8 +209,7 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
     protected boolean canRedirectUriBeEmpty(Client c) {
         // If a redirect URI is empty then the code will be returned out of band,
         // typically will be returned directly to a human user
-        return (c.isConfidential() && canSupportEmptyRedirectForPrivateClients || canSupportPublicClient(c))
-                && c.getRedirectUris().isEmpty();
+        return c.isConfidential() && canSupportEmptyRedirectForPrivateClients;
     }
 
     public void setCanSupportPublicClients(boolean support) {

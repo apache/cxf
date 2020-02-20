@@ -266,14 +266,14 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         Integer min = getMin(type, intValue);
         if (min == null) {
             min = Integer.MIN_VALUE;
-        } else if (min != null && !minInclusive) {
+        } else if (!minInclusive) {
             min = Math.addExact(min, 1);
         }
 
         Integer max = getMax(type, intValue);
         if (max == null) {
             max = Integer.MAX_VALUE;
-        } else if (max != null && !maxInclusive) {
+        } else if (!maxInclusive) {
             max = Math.addExact(max, -1);
         }
 
@@ -286,15 +286,15 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         Long min = getMin(type, longValue);
         if (min == null) {
             min = Long.MIN_VALUE;
-        } else if (min != null && !minInclusive) {
-            min = Math.addExact(min, 1);
+        } else if (!minInclusive) {
+            min = Math.addExact(min, 1L);
         }
 
         Long max = getMax(type, longValue);
         if (max == null) {
             max = Long.MAX_VALUE;
-        } else if (max != null && !maxInclusive) {
-            max = Math.addExact(max, -1);
+        } else if (!maxInclusive) {
+            max = Math.addExact(max, -1L);
         }
         return LongPoint.newRangeQuery(name, min, max);
     }
@@ -305,14 +305,14 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         Double min = getMin(type, doubleValue);
         if (min == null) {
             min = Double.NEGATIVE_INFINITY;
-        } else if (min != null && !minInclusive) {
+        } else if (!minInclusive) {
             min = Math.nextUp(min);
         }
 
         Double max = getMax(type, doubleValue);
         if (max == null) {
             max = Double.POSITIVE_INFINITY;
-        } else if (max != null && !maxInclusive) {
+        } else if (!maxInclusive) {
             max = Math.nextDown(max);
         }
         return DoublePoint.newRangeQuery(name, min, max);
@@ -324,14 +324,14 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         Float min = getMin(type, floatValue);
         if (min == null) {
             min = Float.NEGATIVE_INFINITY;
-        } else if (min != null && !minInclusive) {
+        } else if (!minInclusive) {
             min = Math.nextUp(min);
         }
 
         Float max = getMax(type, floatValue);
         if (max == null) {
             max = Float.POSITIVE_INFINITY;
-        } else if (max != null && !maxInclusive) {
+        } else if (!maxInclusive) {
             max = Math.nextDown(max);
         }
 

@@ -86,6 +86,7 @@ import org.apache.wss4j.policy.model.SpnegoContextToken;
 import org.apache.wss4j.policy.model.SymmetricBinding;
 import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.wss4j.policy.model.X509Token;
+import org.apache.xml.security.c14n.InvalidCanonicalizerException;
 import org.apache.xml.security.utils.XMLUtils;
 
 /**
@@ -643,7 +644,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             addAttachmentsForEncryption(atEnd, refList, attachments);
 
             return encr;
-        } catch (WSSecurityException e) {
+        } catch (InvalidCanonicalizerException | WSSecurityException e) {
             LOG.log(Level.FINE, e.getMessage(), e);
             unassertPolicy(recToken, e);
         }

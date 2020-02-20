@@ -34,7 +34,8 @@
         <cxf.module.name>org.apache.cxf.management</cxf.module.name>
         <cxf.osgi.import>
             javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
-            javax.annotation*;version="${cxf.osgi.javax.annotation.version}"
+            javax.annotation*;version="${cxf.osgi.javax.annotation.version}",
+            sun.rmi*;resolution:=optional
         </cxf.osgi.import>
     </properties>
     <dependencies>

@@ -569,7 +569,7 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
     /**
      * Check that a WSSecurityEngineResult corresponding to a signature or encryption uses the same
      * signing/encrypting credential as one of the tokens.
-     * @param signatureResult a WSSecurityEngineResult corresponding to a signature or encryption
+     * @param result a WSSecurityEngineResult corresponding to a signature or encryption
      * @param tokenResult A list of WSSecurityEngineResults corresponding to tokens
      * @return
      */

@@ -44,7 +44,7 @@ public class RMMessage {
 
     /**
      * Sets the message number of the message within its sequence.
-     * @param messageNumber the message number
+     * @param mn the message number
      */
     public void setMessageNumber(long mn) {
         messageNumber = mn;
@@ -52,7 +52,7 @@ public class RMMessage {
 
     /**
      * Sets the message content using the CachedOutputStream.class.
-     * @param in
+     * @param cos
      */
     public void setContent(CachedOutputStream cos) {
         content = cos;

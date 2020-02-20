@@ -26,6 +26,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.osgi.itests.AbstractServerActivator;
 import org.apache.cxf.osgi.itests.CXFOSGiTestSupport;
 import org.osgi.framework.Constants;
@@ -34,6 +35,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.OptionUtils;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption.LogLevel;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
@@ -103,22 +105,33 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
 
     @Configuration
     public Option[] config() {
-        return new Option[] {
+        return OptionUtils.combine(
             cxfBaseConfig(),
             features(cxfUrl, "cxf-core", "cxf-wsdl", "cxf-jaxrs", "cxf-bean-validation-core", "cxf-bean-validation"),
             logLevel(LogLevel.INFO),
             provision(serviceBundle())
-        };
+        );
     }
 
     private static InputStream serviceBundle() {
-        return TinyBundles.bundle()
+        if (JavaUtils.isJava11Compatible()) {
+            return TinyBundles.bundle()
                   .add(AbstractServerActivator.class)
                   .add(JaxRsTestActivator.class)
                   .add(Book.class)
                   .add(BookStore.class)
                   .set(Constants.BUNDLE_ACTIVATOR, JaxRsTestActivator.class.getName())
+                  .set("Require-Capability", "osgi.ee;filter:=\"(&(osgi.ee=JavaSE)(version=11))\"")
                   .build(TinyBundles.withBnd());
+        } else {
+            return TinyBundles.bundle()
+                .add(AbstractServerActivator.class)
+                .add(JaxRsTestActivator.class)
+                .add(Book.class)
+                .add(BookStore.class)
+                .set(Constants.BUNDLE_ACTIVATOR, JaxRsTestActivator.class.getName())
+                .build(TinyBundles.withBnd());
+        }
     }
 
 }

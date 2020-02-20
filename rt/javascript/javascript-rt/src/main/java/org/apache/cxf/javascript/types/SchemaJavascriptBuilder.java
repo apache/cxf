@@ -344,7 +344,7 @@ public class SchemaJavascriptBuilder {
      *
      * @param type
      * @param elementPrefix
-     * @param bodyNamespaceURIs
+     * @param bodyUtils
      * @return
      */
     protected void complexTypeSerializerBody(XmlSchemaComplexType type, String elementPrefix,

@@ -64,7 +64,7 @@
                     <param name="enumType" style="query" type="prefix1:enumType"/>
                     <param name="a" style="query" type="xs:int"/>
                     <param name="c.a" style="query" type="xs:int"/>
-                    <param name="c.b" style="query" type="xs:int"/>
+                    <param name="c.b" style="query" type="xs:base64Binary"/>
                     <param name="c.d.a" style="query" type="xs:dateTime"/>
                     <param name="option" default="A" style="query" required="true">
                         <option value="A"/>

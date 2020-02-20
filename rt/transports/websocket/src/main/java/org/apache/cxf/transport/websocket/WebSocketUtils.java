@@ -184,7 +184,6 @@ public final class WebSocketUtils {
     /**
      * Build response bytes without status and type information.
      *
-     * @param headers
      * @param data
      * @param offset
      * @param length

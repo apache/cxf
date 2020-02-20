@@ -1268,7 +1268,8 @@ public final class JAXBUtils {
             mv.visitVarInsn(Opcodes.ALOAD, 1);
             mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/util/Arrays", "asList",
                                "([Ljava/lang/Object;)Ljava/util/List;", false);
-            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/util/ArrayList", "<init>", "(Ljava/util/Collection;)V", false);
+            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/util/ArrayList", "<init>",
+                               "(Ljava/util/Collection;)V", false);
             mv.visitVarInsn(Opcodes.ASTORE, 2);
             Label l4 = helper.createLabel();
             mv.visitLabel(l4);

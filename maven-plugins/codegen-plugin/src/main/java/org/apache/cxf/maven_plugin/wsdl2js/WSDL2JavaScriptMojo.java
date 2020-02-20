@@ -32,7 +32,7 @@ import java.util.Set;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.maven_plugin.AbstractCodegenMoho;
+import org.apache.cxf.maven_plugin.AbstractCodegenMojo;
 import org.apache.cxf.maven_plugin.GenericWsdlOption;
 import org.apache.cxf.maven_plugin.WsdlUtilities;
 import org.apache.cxf.tools.common.ToolContext;
@@ -47,7 +47,7 @@ import org.apache.maven.project.MavenProject;
 
 @Mojo(name = "wsdl2js", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true,
       requiresDependencyResolution = ResolutionScope.TEST)
-public class WSDL2JavaScriptMojo extends AbstractCodegenMoho {
+public class WSDL2JavaScriptMojo extends AbstractCodegenMojo {
 
     @Parameter(property = "cxf.testJavascriptRoot")
     File testSourceRoot;

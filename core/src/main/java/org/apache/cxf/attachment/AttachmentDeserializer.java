@@ -269,29 +269,30 @@ public class AttachmentDeserializer {
      * @param boundary
      * @throws IOException
      */
-    private static boolean readTillFirstBoundary(PushbackInputStream pbs, byte[] bp) throws IOException {
+    private static boolean readTillFirstBoundary(PushbackInputStream pushbackInStream,
+        byte[] boundary) throws IOException {
 
         // work around a bug in PushBackInputStream where the buffer isn't
         // initialized
         // and available always returns 0.
-        int value = pbs.read();
-        pbs.unread(value);
+        int value = pushbackInStream.read();
+        pushbackInStream.unread(value);
         while (value != -1) {
-            value = pbs.read();
-            if ((byte) value == bp[0]) {
+            value = pushbackInStream.read();
+            if ((byte) value == boundary[0]) {
                 int boundaryIndex = 0;
-                while (value != -1 && (boundaryIndex < bp.length) && ((byte) value == bp[boundaryIndex])) {
+                while (value != -1 && (boundaryIndex < boundary.length) && ((byte) value == boundary[boundaryIndex])) {
 
-                    value = pbs.read();
+                    value = pushbackInStream.read();
                     if (value == -1) {
                         throw new IOException("Unexpected End while searching for first Mime Boundary");
                     }
                     boundaryIndex++;
                 }
-                if (boundaryIndex == bp.length) {
+                if (boundaryIndex == boundary.length) {
                     // boundary found, read the newline
                     if (value == 13) {
-                        pbs.read();
+                        pushbackInStream.read();
                     }
                     return true;
                 }

@@ -88,16 +88,16 @@ public class CXFServlet extends CXFNonSpringServlet
 
     protected void addListener(AbstractApplicationContext wac) {
         /**
-         * The change in the way application listeners are maintained during the context refresh 
+         * The change in the way application listeners are maintained during the context refresh
          * since Spring Framework 5.1.5 (https://github.com/spring-projects/spring-framework/issues/22325). The
          * CXF adds listener **after** the context has been refreshed, not much control we have over it, but
-         * it does matter now: the listeners registered after the context refresh disappear when 
+         * it does matter now: the listeners registered after the context refresh disappear when
          * context is refreshed. The ugly hack here, to stay in the loop, is to add CXF servlet
          * to "earlyApplicationListeners" set, only than it will be kept between refreshes.
          */
         try {
             final Field f = ReflectionUtils.findField(wac.getClass(), "earlyApplicationListeners");
-            
+
             if (f != null) {
                 Collection<Object> c = CastUtils.cast((Collection<?>)ReflectionUtil.setAccessible(f).get(wac));
                 if (c != null) {
@@ -107,7 +107,7 @@ public class CXFServlet extends CXFNonSpringServlet
         } catch (SecurityException | IllegalAccessException e) {
             //ignore.
         }
-        
+
         try {
             //spring 2 vs spring 3 return type is different
             Method m = wac.getClass().getMethod("getApplicationListeners");
@@ -125,8 +125,8 @@ public class CXFServlet extends CXFNonSpringServlet
      * If that does not work then the location is given as is to spring
      *
      * @param ctx
-     * @param sc
-     * @param configLocation
+     * @param servletConfig
+     * @param location
      * @return
      */
     private ApplicationContext createSpringContext(ApplicationContext ctx,

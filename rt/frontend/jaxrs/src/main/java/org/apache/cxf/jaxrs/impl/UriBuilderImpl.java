@@ -39,6 +39,7 @@ import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriBuilderException;
 
+import org.apache.cxf.common.util.CollectionUtils;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.model.URITemplate;
@@ -47,7 +48,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 public class UriBuilderImpl extends UriBuilder implements Cloneable {
     private static final String EXPAND_QUERY_VALUE_AS_COLLECTION = "expand.query.value.as.collection";
-    
+
     private String scheme;
     private String userInfo;
     private int port = -1;
@@ -63,9 +64,9 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     private Map<String, Object> resolvedTemplates;
     private Map<String, Object> resolvedTemplatesPathEnc;
     private Map<String, Object> resolvedEncodedTemplates;
-    
+
     private boolean queryValueIsCollection;
-    
+
     /**
      * Creates builder with empty URI.
      */
@@ -636,7 +637,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         }
         String rawPath = uri.getRawPath();
         if (!uri.isOpaque() && schemeSpecificPart == null
-            && (theScheme != null || rawPath != null)) {
+                && (theScheme != null || rawPath != null)) {
             port = uri.getPort();
             host = uri.getHost();
             if (rawPath != null) {
@@ -651,14 +652,22 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         } else {
             schemeSpecificPart = uri.getSchemeSpecificPart();
         }
-        if (scheme != null && host == null && (query == null || query.isEmpty()) && userInfo == null
-            && uri.getSchemeSpecificPart() != null) {
+        if (scheme != null && host == null && port == -1 && userInfo == null
+                && CollectionUtils.isEmpty(query)
+                && uri.getSchemeSpecificPart() != null
+                && !schemeSpecificPartMatchesUriPath(uri)) {
             schemeSpecificPart = uri.getSchemeSpecificPart();
         }
         String theFragment = uri.getFragment();
         if (theFragment != null) {
             fragment = theFragment;
         }
+    }
+
+    private boolean schemeSpecificPartMatchesUriPath(final URI uri) {
+        return uri.getRawSchemeSpecificPart() != null
+                && uri.getPath() != null
+                && uri.getRawSchemeSpecificPart().equals("//" + uri.getPath());
     }
 
     private void setPathAndMatrix(String path) {
@@ -846,7 +855,6 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
      *
      * @param map query or matrix multivalued map
      * @param separator params separator, '&' for query ';' for matrix
-     * @param fromEncoded if true then values will be decoded
      * @return stringified params.
      */
     private String buildParams(MultivaluedMap<String, String> map, char separator) {
@@ -854,14 +862,14 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         StringBuilder b = new StringBuilder();
         for (Iterator<Map.Entry<String, List<String>>> it = map.entrySet().iterator(); it.hasNext();) {
             Map.Entry<String, List<String>> entry = it.next();
-            
-            // Expand query parameter as "name=v1,v2,v3" 
+
+            // Expand query parameter as "name=v1,v2,v3"
             if (isQuery && queryValueIsCollection) {
                 b.append(entry.getKey()).append('=');
-                
+
                 for (Iterator<String> sit = entry.getValue().iterator(); sit.hasNext();) {
                     String val = sit.next();
-                    
+
                     if (val != null) {
                         boolean templateValue = val.startsWith("{") && val.endsWith("}");
                         if (!templateValue) {
@@ -872,7 +880,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                         } else {
                             val = URITemplate.createExactTemplate(val).encodeLiteralCharacters(isQuery);
                         }
-                        
+
                         if (!val.isEmpty()) {
                             b.append(val);
                         }
@@ -881,12 +889,12 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                         b.append(',');
                     }
                 }
-                
+
                 if (it.hasNext()) {
                     b.append(separator);
                 }
             } else {
-                // Expand query parameter as "name=v1&name=v2&name=v3", or use dedicated 
+                // Expand query parameter as "name=v1&name=v2&name=v3", or use dedicated
                 // separator for matrix parameters
                 for (Iterator<String> sit = entry.getValue().iterator(); sit.hasNext();) {
                     String val = sit.next();

@@ -39,7 +39,7 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
 
     /**
      * Initializes a new instance of the <code>MessagePartContainer</code>.
-     * @param operation the operation.
+     * @param op the operation.
      * @param nm
      */
     AbstractMessageContainer(OperationInfo op, QName nm) {

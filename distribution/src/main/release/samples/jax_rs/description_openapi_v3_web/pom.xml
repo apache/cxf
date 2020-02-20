@@ -30,10 +30,6 @@ under the License.
         <relativePath>../..</relativePath>
     </parent>
 
-    <properties>
-        <cxf.version>${project.version}</cxf.version>
-    </properties>
-
     <build>
         <plugins>
             <plugin>
@@ -56,23 +52,11 @@ under the License.
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>swagger-ui</artifactId>
-            <version>3.24.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-http</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+            <version>${cxf.swagger.ui.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-service-description-openapi-v3</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.ws.rs</groupId>
-            <artifactId>jakarta.ws.rs-api</artifactId>
         </dependency>
         <dependency>
           <groupId>com.fasterxml.jackson.jaxrs</groupId>

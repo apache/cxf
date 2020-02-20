@@ -25,8 +25,8 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.tools.common.ToolException;
-import org.apache.cxf.tools.util.NameUtil;
 
 public final class AddressFactory {
     private static final Logger LOG = LogUtils.getL7dLogger(AddressFactory.class);
@@ -52,7 +52,7 @@ public final class AddressFactory {
         StringBuilder sb = new StringBuilder();
         sb.append(PREFIX);
         sb.append('.');
-        sb.append(NameUtil.capitalize(name));
+        sb.append(StringUtils.capitalize(name));
         sb.append("Address");
         try {
             address = (Address) Class.forName(sb.toString()).newInstance();

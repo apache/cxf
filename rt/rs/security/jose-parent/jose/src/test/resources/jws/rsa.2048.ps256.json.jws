@@ -1,0 +1,12 @@
+{
+  "payload": "TGl2ZSBsb25nIGFuZCBwcm9zcGVyLg",
+  "signatures": [
+    {
+      "protected": "eyJhbGciOiJQUzI1NiJ9",
+      "header": {
+        "kid": "rsas001"
+      },
+      "signature": "rCbEmCZFS06PJBkwu1F5z7BfzhchcXvoqhYDld5zXbHnBhbB8uy91abg1gVSRoCfj6-EwThkkT8vMHoveQ6OPz-COLhXS3QUR8QNohEPrV4gIc7ZA6LiEDTbsW5AgT2wR8a_9zRFmvTK_U9LjlrJRpbh2UZRhWnpVh77KnQ-9tAkbevc8Ogx1UqvElBZKIdbAZQvrySUgBk3owVdi--k_dlwsBQLuMO4ReDPtFIXcOna7DxFzKys4PtMLWEz-3BMa5WmNzzfDVPlan1gFEzBg570M6rSDR3UneVmwo9HxsqHfqcIKaVt51FbZrI2zq-ff9BwiNnAp4oxpumzs03-_w"
+    }
+  ]
+}

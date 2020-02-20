@@ -28,6 +28,8 @@ import brave.Span;
 import brave.Tracer.SpanInScope;
 import brave.http.HttpClientAdapter;
 import brave.http.HttpClientHandler;
+import brave.http.HttpClientRequest;
+import brave.http.HttpClientResponse;
 import brave.http.HttpTracing;
 import brave.propagation.Propagation.Setter;
 import org.apache.cxf.common.logging.LogUtils;
@@ -103,6 +105,29 @@ public abstract class AbstractBraveClientProvider extends AbstractTracingProvide
                 
                 final HttpClientHandler<?, Response> handler = HttpClientHandler.create(brave, adapter);
                 handler.handleReceive(response, null, scope.getSpan());
+            } finally {
+                scope.close();
+            }
+        }
+    }
+    
+    protected void stopTraceSpan(final TraceScopeHolder<TraceScope> holder, final Throwable ex) {
+        if (holder == null) {
+            return;
+        }
+
+        final TraceScope scope = holder.getScope();
+        if (scope != null) {
+            try {
+                // If the client invocation was asynchronous , the trace span has been created
+                // in another thread and should be re-attached to the current one.
+                if (holder.isDetached()) {
+                    brave.tracing().tracer().joinSpan(scope.getSpan().context());
+                }
+    
+                final HttpClientHandler<HttpClientRequest, HttpClientResponse> handler = 
+                        HttpClientHandler.create(brave);
+                handler.handleReceive(null, ex, scope.getSpan());
             } finally {
                 scope.close();
             }

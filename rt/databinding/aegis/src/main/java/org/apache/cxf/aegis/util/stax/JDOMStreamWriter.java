@@ -20,8 +20,6 @@ package org.apache.cxf.aegis.util.stax;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLStreamException;
@@ -43,8 +41,6 @@ public class JDOMStreamWriter implements XMLStreamWriter {
     private Element currentNode;
 
     private NamespaceContext context;
-
-    private Map<String, Object> properties = new HashMap<>();
 
     public JDOMStreamWriter() {
     }
@@ -201,7 +197,7 @@ public class JDOMStreamWriter implements XMLStreamWriter {
     }
 
     public Object getProperty(String prop) throws IllegalArgumentException {
-        return properties.get(prop);
+        return null;
     }
 
     public Document getDocument() {

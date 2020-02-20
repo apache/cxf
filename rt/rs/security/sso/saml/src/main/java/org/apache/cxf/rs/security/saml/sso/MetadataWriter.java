@@ -221,10 +221,11 @@ public class MetadataWriter {
         // Create the SignedInfo.
         SignedInfo si =
             XML_SIGNATURE_FACTORY.newSignedInfo(
-                XML_SIGNATURE_FACTORY.newCanonicalizationMethod(CanonicalizationMethod.EXCLUSIVE,
-                                                                (C14NMethodParameterSpec)null),
-                                                                XML_SIGNATURE_FACTORY.newSignatureMethod(signatureMethod, null),
-                                                                Collections.singletonList(ref));
+                XML_SIGNATURE_FACTORY.newCanonicalizationMethod(
+                    CanonicalizationMethod.EXCLUSIVE,
+                    (C14NMethodParameterSpec)null),
+                    XML_SIGNATURE_FACTORY.newSignatureMethod(signatureMethod, null),
+                     Collections.singletonList(ref));
 
         // Create the KeyInfo containing the X509Data.
         KeyInfoFactory kif = XML_SIGNATURE_FACTORY.getKeyInfoFactory();

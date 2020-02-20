@@ -88,7 +88,7 @@ public interface ClientState {
      * Sets the map containing template name and value pairs
      * @param templates
      */
-    void setTemplates(MultivaluedMap<String, String> map);
+    void setTemplates(MultivaluedMap<String, String> templates);
 
     /**
      * Gets the templates map
@@ -116,7 +116,7 @@ public interface ClientState {
     ClientState newState(URI baseURI,
                          MultivaluedMap<String, String> headers,
                          MultivaluedMap<String, String> templates);
-    
+
     /**
      * The factory method for creating a new state.
      * Example, proxy and WebClient.fromClient will use this method when creating
@@ -125,7 +125,7 @@ public interface ClientState {
      * @param baseURI baseURI
      * @param headers request headers, can be null
      * @param templates initial templates map, can be null
-     * @param additional properties, could be null
+     * @param properties additional properties, could be null
      * @return client state
      */
     default ClientState newState(URI baseURI,

@@ -258,7 +258,7 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
 
     /**
      * get all parameters in a map
-     * @param stringArrayKeys, contains keys, whose value should be string array
+     * @param stringArrayKeys contains keys, whose value should be string array
      */
     protected Map<String, Object> getParametersMap(Set<String> stringArrayKeys) {
         Map<String, Object> map = new HashMap<>();

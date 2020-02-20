@@ -84,7 +84,7 @@ public class TokenRequestCollectionOperation extends AbstractOperation
                         if (val == null || (requestType != null && !requestType.equals(val))) {
                             LOG.log(
                                 Level.WARNING,
-                                "All RequestSecurityTokenCollection elements do not share the same"
+                                "All RequestSecurityTokenCollection elements do not share the same "
                                 + "RequestType"
                             );
                             throw new STSException(

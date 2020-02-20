@@ -59,6 +59,32 @@
         <url-pattern>/the/*</url-pattern>
     </servlet-mapping>
     <servlet>
+        <servlet-name>RedirectIncludeCXFServlet</servlet-name>
+        <display-name>Redirect CXF Servlet</display-name>
+        <servlet-class>
+                        org.apache.cxf.transport.servlet.CXFServlet
+                </servlet-class>
+        <init-param>
+            <param-name>redirects-list</param-name>
+            <param-value>
+                  /(\w)+.html
+                </param-value>
+        </init-param>
+        <init-param>
+            <param-name>redirect-with-include</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>redirect-servlet-path</param-name>
+            <param-value>/static</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RedirectIncludeCXFServlet</servlet-name>
+        <url-pattern>/book_include.html</url-pattern>
+    </servlet-mapping>
+    <servlet>
         <servlet-name>RedirectCXFServlet</servlet-name>
         <display-name>Redirect CXF Servlet</display-name>
         <servlet-class>

@@ -30,11 +30,12 @@
         <!-- don't deploy the samples, kind of pointless -->
         <maven.deploy.skip>true</maven.deploy.skip>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.boot.version>2.1.3.RELEASE</spring.boot.version>
-        <spring.cloud.eureka.version>2.0.2.RELEASE</spring.cloud.eureka.version>
-        <cxf.jetty9.version>9.4.22.v20191022</cxf.jetty9.version>
+        <spring.boot.version>2.2.3.RELEASE</spring.boot.version>
+        <spring.cloud.eureka.version>2.2.1.RELEASE</spring.cloud.eureka.version>
+        <cxf.jetty9.version>9.4.26.v20200117</cxf.jetty9.version>
         <cxf.httpcomponents.client.version>4.5.8</cxf.httpcomponents.client.version>
-        <cxf.tika.version>1.22</cxf.tika.version>
+        <cxf.swagger.ui.version>3.24.3</cxf.swagger.ui.version>
+        <cxf.tika.version>1.23</cxf.tika.version>
     </properties>
     <dependencies>
         <dependency>
@@ -183,6 +184,11 @@
                     </configuration>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.2.0</version>
+                </plugin>
+                <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
                     <version>1.2</version>
@@ -250,29 +256,29 @@
                     <version>${cxf.jaxb.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>javax.annotation</groupId>
-                    <artifactId>javax.annotation-api</artifactId>
-                    <version>1.3.1</version>
+                    <groupId>jakarta.annotation</groupId>
+                    <artifactId>jakarta.annotation-api</artifactId>
+                    <version>1.3.5</version>
                 </dependency>
                 <dependency>
-                    <groupId>javax.xml.ws</groupId>
-                    <artifactId>jaxws-api</artifactId>
-                    <version>2.3.0</version>
+                    <groupId>jakarta.xml.ws</groupId>
+                    <artifactId>jakarta.xml.ws-api</artifactId>
+                    <version>2.3.2</version>
                 </dependency>
                 <dependency>
-                    <groupId>javax.activation</groupId>
-                    <artifactId>javax.activation-api</artifactId>
-                    <version>1.2.0</version>
+                    <groupId>jakarta.activation</groupId>
+                    <artifactId>jakarta.activation-api</artifactId>
+                    <version>1.2.1</version>
                 </dependency>
                 <dependency>
-                    <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
-                    <version>1.1.3</version>
+                    <groupId>jakarta.jws</groupId>
+                    <artifactId>jakarta.jws-api</artifactId>
+                    <version>1.1.1</version>
                 </dependency>
                 <dependency>
                     <groupId>com.sun.xml.messaging.saaj</groupId>
                     <artifactId>saaj-impl</artifactId>
-                    <version>1.4.0-b03</version>
+                    <version>1.3.23</version>
                 </dependency>
                 <dependency>
                     <groupId>org.apache.geronimo.specs</groupId>

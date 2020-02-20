@@ -62,5 +62,5 @@ public interface AuthorizationCodeDataProvider extends OAuthDataProvider {
      * @throws OAuthServiceException
      * @see ServerAuthorizationCodeGrant
      */
-    List<ServerAuthorizationCodeGrant> getCodeGrants(Client c, UserSubject subject) throws OAuthServiceException;
+    List<ServerAuthorizationCodeGrant> getCodeGrants(Client client, UserSubject subject) throws OAuthServiceException;
 }

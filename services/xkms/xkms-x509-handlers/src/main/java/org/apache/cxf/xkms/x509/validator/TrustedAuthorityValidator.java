@@ -60,9 +60,9 @@ public class TrustedAuthorityValidator implements Validator {
     }
 
     /**
-     * Checks if a certificate is signed by a trusted authority.
+     * Checks if a certificate chain is signed by a trusted authority.
      *
-     * @param x509Certificate to check
+     * @param certificates to check
      * @return the validity state of the certificate
      */
     boolean isCertificateChainValid(List<X509Certificate> certificates) {
