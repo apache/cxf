@@ -54,7 +54,7 @@
         <!-- stuff related to ASM -->
         <cxf.asm.groupId>org.ow2.asm</cxf.asm.groupId>
         <cxf.asm.artifactId>asm</cxf.asm.artifactId>
-        <cxf.asm.version>7.1</cxf.asm.version>
+        <cxf.asm.version>7.3.1</cxf.asm.version>
         <cxf.osgi.asm.version>[3.0,8)</cxf.osgi.asm.version>
         <cxf.easymock.version>4.1</cxf.easymock.version>
         <!-- OSGi related properties -->
