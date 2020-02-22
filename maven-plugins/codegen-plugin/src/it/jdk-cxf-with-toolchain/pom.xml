@@ -83,9 +83,6 @@
       <id>toolchain</id>
       <activation>
         <jdk>[9,)</jdk>
-        <property><!-- Jenkins -->
-          <name>env.BUILD_NUMBER</name>
-        </property>
       </activation>
       <build>
         <plugins>

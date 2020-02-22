@@ -289,7 +289,7 @@
     </feature>
     <feature name="cxf-jsr-json" version="${project.version}">
         <bundle dependency="true" start-level="30">mvn:org.apache.aries.spifly/org.apache.aries.spifly.dynamic.bundle/${cxf.aries.fly.version}</bundle>
-        <bundle dependency="true" start-level="35">mvn:javax.json/javax.json-api/${cxf.json.api.version}</bundle>
+        <bundle dependency="true" start-level="35">mvn:jakarta.json/jakarta.json-api/${cxf.json.api.version}</bundle>
         <bundle dependency="true" start-level="35">mvn:org.apache.geronimo.specs/geronimo-json_1.1_spec/${cxf.geronimo.json.version}</bundle>
         <bundle start-level="35">mvn:org.apache.johnzon/johnzon-core/${cxf.johnzon.version}</bundle>
     </feature>
