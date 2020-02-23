@@ -2806,13 +2806,13 @@
             </build>
         </profile>
         <profile>
-	    <id>java9-plus</id>
-	    <properties>
+            <id>java9-plus</id>
+            <properties>
                 <org.apache.cxf.transport.websocket.atmosphere.disabled>true</org.apache.cxf.transport.websocket.atmosphere.disabled>
                 <cxf.jdk.version>11</cxf.jdk.version>
-	    </properties>
-	    <activation>
-        	<jdk>[9,)</jdk>
+            </properties>
+            <activation>
+                <jdk>[9,)</jdk>
             </activation>
             <build>
                 <plugins>

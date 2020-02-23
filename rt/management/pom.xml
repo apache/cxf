@@ -85,18 +85,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <showDeprecation>${cxf.compile.show.deprecation}</showDeprecation>
-                    <showWarnings>true</showWarnings>
-                    <compilerArgs>
-                        <arg>${cxf.compile.flags}</arg>
-                        <arg>--add-exports</arg><arg>java.rmi/sun.rmi.registry=ALL-UNNAMED</arg>
-                    </compilerArgs>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-xjc-plugin</artifactId>
                 <version>${cxf.xjc-utils.version}</version>
@@ -132,4 +120,28 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>java9-plus</id>
+            <activation>
+                <jdk>[9,)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <showDeprecation>${cxf.compile.show.deprecation}</showDeprecation>
+                            <showWarnings>true</showWarnings>
+                            <compilerArgs>
+                                <arg>${cxf.compile.flags}</arg>
+                                <arg>--add-exports</arg><arg>java.rmi/sun.rmi.registry=ALL-UNNAMED</arg>
+                            </compilerArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
