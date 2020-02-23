@@ -2828,7 +2828,6 @@
                             <showWarnings>true</showWarnings>
                             <compilerArgs>
                                 <arg>${cxf.compile.flags}</arg>
-                                <arg>--add-exports</arg><arg>java.rmi/sun.rmi.registry=ALL-UNNAMED</arg>
                             </compilerArgs>
                         </configuration>
                     </plugin>
