@@ -121,6 +121,7 @@
                     <pomIncludes>
                         <pomInclude>*/pom.xml</pomInclude>
                     </pomIncludes>
+                    <skipInvocation>${maven.test.skip.exec}</skipInvocation>
                 </configuration>
                 <executions>
                     <execution>
