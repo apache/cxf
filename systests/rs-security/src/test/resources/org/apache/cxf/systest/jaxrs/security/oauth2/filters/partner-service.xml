@@ -83,15 +83,18 @@ under the License.
         </jaxrs:providers>
         
    </jaxrs:server>
-   
-   <http:conduit name="https://localhost.*">
+
+    <http:conduit name="https://localhost.*">
         <http:tlsClientParameters disableCNCheck="true">
+            <sec:keyManagers keyPassword="password">
+                <sec:keyStore type="JKS" password="password" resource="keys/Morpit.jks"/>
+            </sec:keyManagers>
             <sec:trustManagers>
                 <sec:keyStore type="JKS" password="password" resource="keys/Truststore.jks"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
     </http:conduit>
-    
+
     <httpj:engine-factory id="tls-config">
         <httpj:engine port="${testutil.ports.jaxrs-oauth2-filters-partner}">
             <httpj:tlsServerParameters>

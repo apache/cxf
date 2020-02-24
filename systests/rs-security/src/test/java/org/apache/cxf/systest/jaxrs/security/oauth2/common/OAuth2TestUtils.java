@@ -18,6 +18,10 @@
  */
 package org.apache.cxf.systest.jaxrs.security.oauth2.common;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,9 +30,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.TrustManagerFactory;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.provider.json.JSONProvider;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObjectProvider;
@@ -46,6 +53,9 @@ import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrant;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.apache.cxf.rt.security.crypto.CryptoUtils;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transport.http.HTTPConduitConfigurer;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
@@ -277,6 +287,31 @@ public final class OAuth2TestUtils {
             ampersandIndex = foundString.length();
         }
         return foundString.substring(0, ampersandIndex);
+    }
+
+    public static HTTPConduitConfigurer clientHTTPConduitConfigurer() throws IOException, GeneralSecurityException {
+        final TLSClientParameters tlsCP = new TLSClientParameters();
+        tlsCP.setDisableCNCheck(true);
+
+        try (InputStream is = OAuth2TestUtils.class.getResourceAsStream("/keys/Morpit.jks")) {
+            final KeyStore keyStore = CryptoUtils.loadKeyStore(is, "password".toCharArray(), null);
+            final KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            kmf.init(keyStore, "password".toCharArray());
+            tlsCP.setKeyManagers(kmf.getKeyManagers());
+        }
+
+        try (InputStream is = OAuth2TestUtils.class.getResourceAsStream("/keys/Truststore.jks")) {
+            final KeyStore keyStore = CryptoUtils.loadKeyStore(is, "password".toCharArray(), null);
+            final TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(keyStore);
+            tlsCP.setTrustManagers(tmf.getTrustManagers());
+        }
+
+        return new HTTPConduitConfigurer() {
+            public void configure(String name, String address, HTTPConduit c) {
+                c.setTlsClientParameters(tlsCP);
+            }
+        };
     }
 
     public static class AuthorizationCodeParameters {

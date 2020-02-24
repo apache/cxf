@@ -20,19 +20,20 @@
 package org.apache.cxf.systest.jaxrs.security.oauth2.filters;
 
 
-import java.net.URL;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.oauth2.client.ClientTokenContext;
+import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.systest.jaxrs.security.Book;
+import org.apache.cxf.systest.jaxrs.security.oauth2.filters.OAuth2FiltersTest.BookServerOAuth2Filters;
+
+import static org.apache.cxf.rs.security.oauth2.utils.OAuthConstants.BEARER_AUTHORIZATION_SCHEME;
 
 /**
  * A "Partner" service that delegates an "echoBook" call to the BookStore, first getting an OAuth token using the
@@ -44,30 +45,19 @@ public class PartnerService {
     @Context
     private ClientTokenContext context;
 
-
     @POST
     @Path("/books")
-    @Produces("application/xml")
-    @Consumes("application/xml")
+    @Produces(MediaType.APPLICATION_XML)
+    @Consumes(MediaType.APPLICATION_XML)
     public Book echoBookXml(Book book) {
 
-        URL busFile = PartnerService.class.getResource("client.xml");
-
-        String address = "https://localhost:" + OAuth2FiltersTest.PORT + "/secured/bookstore/books";
-        WebClient client = WebClient.create(address, busFile.toString());
-
-        client.type("application/xml").accept("application/xml");
-
-        client.header("Authorization", "Bearer " + context.getToken().getTokenKey());
+        String address = "https://localhost:" + BookServerOAuth2Filters.PORT + "/secured/bookstore/books";
+        WebClient client = WebClient.create(address)
+            .type(MediaType.APPLICATION_XML).accept(MediaType.APPLICATION_XML)
+            .authorization(new ClientAccessToken(BEARER_AUTHORIZATION_SCHEME, context.getToken().getTokenKey()));
 
         // Now make a service invocation with the access token
-        Response serviceResponse = client.post(book);
-        if (serviceResponse.getStatus() == 200) {
-            return serviceResponse.readEntity(Book.class);
-        }
-
-        throw new WebApplicationException(Response.Status.FORBIDDEN);
+        return client.post(book, Book.class);
     }
 
 }
-

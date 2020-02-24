@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.oidc.idp;
 
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
@@ -50,11 +50,7 @@ public class OidcDynamicRegistrationService extends DynamicRegistrationService {
         ClientRegistration resp = super.fromClientToClientRegistration(client);
         String logoutUris = client.getProperties().get(POST_LOGOUT_LOGOUT_URIS);
         if (logoutUris != null) {
-            List<String> list = new LinkedList<>();
-            for (String s : logoutUris.split(" ")) {
-                list.add(s);
-            }
-            resp.setProperty(POST_LOGOUT_LOGOUT_URIS, list);
+            resp.setProperty(POST_LOGOUT_LOGOUT_URIS, Arrays.asList(logoutUris.split(" ")));
         }
         return resp;
     }
