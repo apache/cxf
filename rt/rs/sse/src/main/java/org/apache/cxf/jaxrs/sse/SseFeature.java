@@ -28,7 +28,9 @@ import org.apache.cxf.annotations.Provider.Type;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractPortableFeature;
 import org.apache.cxf.feature.DelegatingFeature;
+import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
+import org.apache.cxf.jaxrs.sse.interceptor.SseInterceptor;
 
 @Provider(value = Type.Feature, scope = Scope.Server)
 public class SseFeature extends DelegatingFeature<SseFeature.Portable> {
@@ -48,6 +50,11 @@ public class SseFeature extends DelegatingFeature<SseFeature.Portable> {
 
             ((ServerProviderFactory) server.getEndpoint().get(
                     ServerProviderFactory.class.getName())).setUserProviders(providers);
+        }
+        
+        @Override
+        public void doInitializeProvider(InterceptorProvider provider, Bus bus) {
+            provider.getInInterceptors().add(new SseInterceptor());
         }
     }
 }

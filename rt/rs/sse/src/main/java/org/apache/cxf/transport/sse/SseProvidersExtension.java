@@ -27,6 +27,7 @@ import org.apache.cxf.buslifecycle.BusCreationListener;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.sse.SseContextProvider;
 import org.apache.cxf.jaxrs.sse.SseEventSinkContextProvider;
+import org.apache.cxf.jaxrs.sse.interceptor.SseInterceptor;
 
 public class SseProvidersExtension implements BusCreationListener {
 
@@ -49,6 +50,8 @@ public class SseProvidersExtension implements BusCreationListener {
         } else {
             bus.setProperty(BUS_PROVIDERS, sseProviders);
         }
+        
+        bus.getInInterceptors().add(new SseInterceptor());
     }
     
 }
