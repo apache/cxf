@@ -90,6 +90,14 @@ public class OidcConfigurationService extends AuthorizationMetadataService {
         this.userInfoEndpointNotAvailable = userInfoEndpointNotAvailable;
     }
 
+    public String getUserInfoEndpointAddress() {
+        return userInfoEndpointAddress;
+    }
+
+    public void setUserInfoEndpointAddress(String userInfoEndpointAddress) {
+        this.userInfoEndpointAddress = userInfoEndpointAddress;
+    }
+
     public boolean isEndSessionEndpointNotAvailable() {
         return endSessionEndpointNotAvailable;
     }
