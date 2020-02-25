@@ -1636,8 +1636,10 @@ public abstract class HTTPConduit
             }
             propagateConduit(exchange, inMessage);
 
-            if (!doProcessResponse(outMessage, responseCode)
-                || HttpURLConnection.HTTP_ACCEPTED == responseCode) {
+            if ((!doProcessResponse(outMessage, responseCode)
+                || HttpURLConnection.HTTP_ACCEPTED == responseCode)
+                && MessageUtils.getContextualBoolean(outMessage, 
+                    Message.PROCESS_202_RESPONSE_ONEWAY_OR_PARTIAL, true)) {
                 in = getPartialResponse();
                 if (in == null
                     || !MessageUtils.getContextualBoolean(outMessage, Message.PROCESS_ONEWAY_RESPONSE, false)) {
@@ -1658,6 +1660,7 @@ public abstract class HTTPConduit
                         }
                     }
                     exchange.put("IN_CHAIN_COMPLETE", Boolean.TRUE);
+                    
                     exchange.setInMessage(inMessage);
                     return;
                 }

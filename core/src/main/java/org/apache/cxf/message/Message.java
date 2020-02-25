@@ -86,6 +86,13 @@ public interface Message extends StringMap {
      */
     String PROCESS_ONEWAY_RESPONSE = "org.apache.cxf.transport.processOneWayResponse";
 
+    
+    /**
+     * Boolean property specifying if 202 response is partial/oneway response.
+     * Default value is true
+     */
+    String PROCESS_202_RESPONSE_ONEWAY_OR_PARTIAL = "org.apache.cxf.transport.process202Response";
+
     /**
      * Boolean property specifying if the thread which runs a request is
      * different to the thread which created this Message.

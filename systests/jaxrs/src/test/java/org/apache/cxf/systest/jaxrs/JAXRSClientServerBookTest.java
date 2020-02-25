@@ -70,6 +70,7 @@ import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.provider.XSLTJaxbProvider;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.systest.jaxrs.BookStore.BookInfo;
 import org.apache.cxf.systest.jaxrs.BookStore.BookInfoInterface;
 import org.apache.cxf.systest.jaxrs.BookStore.BookNotReturnedException;
@@ -2015,38 +2016,41 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertEquals(202, r.getStatus());
         assertEquals("book", r.readEntity(String.class));
     }
-
+    @Test
+    public void testEmpty202() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/empty202");
+        WebClient.getConfig(wc).getRequestContext().put(Message.PROCESS_202_RESPONSE_ONEWAY_OR_PARTIAL, false);
+        wc.type("text/plain").accept("text/plain");
+        Response r = wc.post("book");
+        assertEquals(202, r.getStatus());
+        assertEquals("", r.readEntity(String.class));
+    }
     @Test
     public void testGetBookSimple() throws Exception {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/simplebooks/simple");
         Book book = wc.get(Book.class);
         assertEquals(444L, book.getId());
     }
-
     @Test(expected = ResponseProcessingException.class)
     public void testEmptyJSON() {
         doTestEmptyResponse("application/json");
     }
-
     @Test(expected = ResponseProcessingException.class)
     public void testEmptyJAXB() {
         doTestEmptyResponse("application/xml");
     }
-
     private void doTestEmptyResponse(String mt) {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/emptybook");
         WebClient.getConfig(wc).getInInterceptors().add(new BookServer.ReplaceStatusInterceptor());
         wc.accept(mt);
         wc.get(Book.class);
     }
-
     @Test(expected = ResponseProcessingException.class)
     public void testEmptyResponseProxy() {
         BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
         WebClient.getConfig(store).getInInterceptors().add(new BookServer.ReplaceStatusInterceptor());
         store.getEmptyBook();
     }
-
     @Test
     public void testEmptyResponseProxyNullable() {
         BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
