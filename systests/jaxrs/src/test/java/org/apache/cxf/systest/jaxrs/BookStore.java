@@ -1704,6 +1704,15 @@ public class BookStore {
         return Response.accepted(name).build();
     }
 
+    
+    @POST
+    @Path("/empty202")
+    @Consumes("text/plain")
+    @Produces("text/plain")
+    public Response empty202(String name) {
+        return Response.accepted().build();
+    }
+
 
     @GET
     @Path("/cd/{CDId}/")
