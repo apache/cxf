@@ -79,4 +79,10 @@ public class StringUtilsTest {
         assertEquals("aA", StringUtils.uncapitalize("AA"));
     }
 
+    @Test
+    public void testToHexString() {
+        byte[] bytes = new byte[] {Byte.MIN_VALUE, 0x20, Byte.MAX_VALUE, 0x00, (byte) 0xFF};
+        String hexString = StringUtils.toHexString(bytes);
+        assertEquals(bytes.length * 2, hexString.length());
+    }
 }

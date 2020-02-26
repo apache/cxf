@@ -32,6 +32,8 @@ public final class StringUtils {
 
     private static final Predicate<String> NOT_EMPTY = (String s) -> !s.isEmpty();
 
+    private static final char[] HEX = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+
     private StringUtils() {
     }
 
@@ -147,10 +149,15 @@ public final class StringUtils {
     }
 
     public static String toHexString(byte[] bytes) {
-        StringBuilder hexString = new StringBuilder();
-        for (int i = 0; i < bytes.length; i++) {
-            hexString.append(Integer.toHexString(0xFF & bytes[i]));
+        final StringBuilder sb = new StringBuilder(bytes.length * 2);
+        for (byte b : bytes) {
+            byteToHex(b, sb);
         }
-        return hexString.toString();
+        return sb.toString();
+    }
+
+    static void byteToHex(byte b, StringBuilder sb) {
+        sb.append(HEX[(0xF0 & b) >> 4]);
+        sb.append(HEX[0x0F & b]);
     }
 }

@@ -31,7 +31,6 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 
 public final class URIParserUtil {
     private static final String EXCLUDED_CHARS = "<>\"{}|\\^`";
-    private static final String HEX_DIGITS = "0123456789abcdef";
 
     private URIParserUtil() {
         // complete
@@ -66,29 +65,28 @@ public final class URIParserUtil {
     }
 
     public static String escapeChars(String s) {
-        StringBuilder b = new StringBuilder(s.length());
+        StringBuilder sb = new StringBuilder(s.length());
 
         for (int x = 0; x < s.length(); x++) {
             char ch = s.charAt(x);
             if (isExcluded(ch)) {
                 byte[] bytes = Character.toString(ch).getBytes(StandardCharsets.UTF_8);
-                for (int y = 0; y < bytes.length; y++) {
-                    b.append('%');
-                    b.append(HEX_DIGITS.charAt((bytes[y] & 0xFF) >> 4));
-                    b.append(HEX_DIGITS.charAt(bytes[y] & 0x0F));
+                for (byte b : bytes) {
+                    sb.append('%');
+                    StringUtils.byteToHex(b, sb);
                 }
             } else {
-                b.append(ch);
+                sb.append(ch);
             }
         }
-        return b.toString();
+        return sb.toString();
     }
     public static String normalize(final String uri) {
         URL url = null;
         String result = null;
         try {
             url = new URL(uri);
-            result = escapeChars(url.toURI().normalize().toString().replace("\\", "/"));
+            result = escapeChars(url.toURI().normalize().toString().replace('\\', '/'));
         } catch (MalformedURLException e1) {
             try {
                 if (uri.startsWith("classpath:")) {
