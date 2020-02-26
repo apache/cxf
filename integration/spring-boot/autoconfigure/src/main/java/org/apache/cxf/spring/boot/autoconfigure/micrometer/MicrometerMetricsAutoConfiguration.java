@@ -19,7 +19,7 @@
 
 package org.apache.cxf.spring.boot.autoconfigure.micrometer;
 
-import org.apache.cxf.metrics.MetricsFeature;
+import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.metrics.MetricsProvider;
 import org.apache.cxf.metrics.micrometer.MicrometerMetricsProperties;
 import org.apache.cxf.metrics.micrometer.MicrometerMetricsProvider;
@@ -45,7 +45,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.web.servlet.DispatcherServlet;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.config.MeterFilter;
@@ -53,7 +52,7 @@ import io.micrometer.core.instrument.config.MeterFilter;
 @Configuration
 @AutoConfigureAfter({MetricsAutoConfiguration.class, SimpleMetricsExportAutoConfiguration.class})
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-@ConditionalOnClass({DispatcherServlet.class, MetricsFeature.class})
+@ConditionalOnClass({JaxWsServerFactoryBean.class, MetricsProvider.class})
 @ConditionalOnBean({MeterRegistry.class})
 @EnableConfigurationProperties(MetricsProperties.class)
 public class MicrometerMetricsAutoConfiguration {
