@@ -28,6 +28,7 @@ import javax.jms.ObjectMessage;
 import javax.jms.Queue;
 import javax.jms.Session;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.transport.jms.JMSConstants;
 
@@ -35,9 +36,6 @@ public final class JMSUtil {
 
     public static final String JMS_MESSAGE_CONSUMER = "jms_message_consumer";
     public static final String JMS_IGNORE_TIMEOUT = "jms_ignore_timeout";
-    private static final char[] CORRELATTION_ID_PADDING = {
-        '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'
-    };
 
     private JMSUtil() {
     }
@@ -95,12 +93,8 @@ public final class JMSUtil {
         return new RuntimeException(e.getMessage(), e);
     }
 
-    public static String createCorrelationId(final String prefix, long sequenceNUm) {
-        String index = Long.toHexString(sequenceNUm);
-        StringBuilder id = new StringBuilder(prefix);
-        id.append(CORRELATTION_ID_PADDING, 0, 16 - index.length());
-        id.append(index);
-        return id.toString();
+    public static String createCorrelationId(final String prefix, long sequenceNum) {
+        return prefix + StringUtils.toHexString(java.nio.ByteBuffer.allocate(Long.BYTES).putLong(sequenceNum).array());
     }
 
     /**
