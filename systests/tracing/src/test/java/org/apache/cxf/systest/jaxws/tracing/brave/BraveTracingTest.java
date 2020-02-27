@@ -56,11 +56,10 @@ import static org.apache.cxf.systest.brave.BraveTestSupport.SAMPLED_NAME;
 import static org.apache.cxf.systest.brave.BraveTestSupport.SPAN_ID_NAME;
 import static org.apache.cxf.systest.brave.BraveTestSupport.TRACE_ID_NAME;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -141,65 +140,50 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(2));
         assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get books"));
         assertThat(TestSpanReporter.getAllSpans().get(1).name(), equalTo("post /bookstore"));
-
-        final Map<String, List<String>> response = getResponseHeaders(service);
-        assertThatTraceIsPresent(response, spanId);
     }
 
     @Test
     public void testThatNewChildSpanIsCreatedWhenParentIsProvided() throws Exception {
-        final Tracing brave = Tracing.newBuilder()
-            .localServiceName("book-store")
-            .spanReporter(new TestSpanReporter())
-            .build();
-
-        final BookStoreService service = createJaxWsService(new BraveClientFeature(brave));
-        assertThat(service.getBooks().size(), equalTo(2));
-
-        assertThat(TestSpanReporter.getAllSpans().size(), equalTo(3));
-        assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get books"));
-        assertThat(TestSpanReporter.getAllSpans().get(0).parentId(), not(nullValue()));
-        assertThat(TestSpanReporter.getAllSpans().get(1).name(), equalTo("post /bookstore"));
-        assertThat(TestSpanReporter.getAllSpans().get(2).name(),
-            equalTo("post http://localhost:" + PORT + "/bookstore"));
-
-        final Map<String, List<String>> response = getResponseHeaders(service);
-        assertThatTraceHeadersArePresent(response, false);
+        try (Tracing brave = createTracer()) {
+            final BookStoreService service = createJaxWsService(new BraveClientFeature(brave));
+            assertThat(service.getBooks().size(), equalTo(2));
+    
+            assertThat(TestSpanReporter.getAllSpans().size(), equalTo(3));
+            assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get books"));
+            assertThat(TestSpanReporter.getAllSpans().get(0).parentId(), not(nullValue()));
+            assertThat(TestSpanReporter.getAllSpans().get(1).name(), equalTo("post /bookstore"));
+            assertThat(TestSpanReporter.getAllSpans().get(2).name(),
+                equalTo("post http://localhost:" + PORT + "/bookstore"));
+        }
     }
 
     @Test
     public void testThatProvidedSpanIsNotClosedWhenActive() throws Exception {
-        final Tracing brave = Tracing.newBuilder()
-            .localServiceName("book-store")
-            .spanReporter(new TestSpanReporter())
-            .build();
-
-        final BookStoreService service = createJaxWsService(new BraveClientFeature(brave));
-
-        final Span span = brave.tracer().nextSpan().name("test span").start();
-        try {
-            try (SpanInScope scope = brave.tracer().withSpanInScope(span)) {
-                assertThat(service.getBooks().size(), equalTo(2));
-                assertThat(brave.tracer().currentSpan(), not(nullValue()));
-
-                assertThat(TestSpanReporter.getAllSpans().size(), equalTo(3));
-                assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get books"));
-                assertThat(TestSpanReporter.getAllSpans().get(0).parentId(), not(nullValue()));
-                assertThat(TestSpanReporter.getAllSpans().get(1).name(), equalTo("post /bookstore"));
-                assertThat(TestSpanReporter.getAllSpans().get(2).name(),
-                    equalTo("post http://localhost:" + PORT + "/bookstore"));
-
-                final Map<String, List<String>> response = getResponseHeaders(service);
-                assertThatTraceHeadersArePresent(response, true);
+        try (Tracing brave = createTracer()) {
+            final BookStoreService service = createJaxWsService(new BraveClientFeature(brave));
+    
+            final Span span = brave.tracer().nextSpan().name("test span").start();
+            try {
+                try (SpanInScope scope = brave.tracer().withSpanInScope(span)) {
+                    assertThat(service.getBooks().size(), equalTo(2));
+                    assertThat(brave.tracer().currentSpan(), not(nullValue()));
+    
+                    assertThat(TestSpanReporter.getAllSpans().size(), equalTo(3));
+                    assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get books"));
+                    assertThat(TestSpanReporter.getAllSpans().get(0).parentId(), not(nullValue()));
+                    assertThat(TestSpanReporter.getAllSpans().get(1).name(), equalTo("post /bookstore"));
+                    assertThat(TestSpanReporter.getAllSpans().get(2).name(),
+                        equalTo("post http://localhost:" + PORT + "/bookstore"));
+                }
+            } finally {
+                if (span != null) {
+                    span.finish();
+                }
             }
-        } finally {
-            if (span != null) {
-                span.finish();
-            }
+    
+            assertThat(TestSpanReporter.getAllSpans().size(), equalTo(4));
+            assertThat(TestSpanReporter.getAllSpans().get(3).name(), equalTo("test span"));
         }
-
-        assertThat(TestSpanReporter.getAllSpans().size(), equalTo(4));
-        assertThat(TestSpanReporter.getAllSpans().get(3).name(), equalTo("test span"));
     }
 
     @Test
@@ -225,27 +209,36 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
 
     @Test
     public void testThatNewChildSpanIsCreatedWhenParentIsProvidedInCaseOfFault() throws Exception {
-        final Tracing brave = Tracing.newBuilder()
-            .localServiceName("book-store")
-            .spanReporter(new TestSpanReporter())
-            .build();
-
-        final BookStoreService service = createJaxWsService(new BraveClientFeature(brave));
-
-        try {
-            service.removeBooks();
-            fail("Expected SOAPFaultException to be raised");
-        } catch (final SOAPFaultException ex) {
-            /* expected exception */
+        try (Tracing brave = createTracer()) {
+            final BookStoreService service = createJaxWsService(new BraveClientFeature(brave));
+    
+            try {
+                service.removeBooks();
+                fail("Expected SOAPFaultException to be raised");
+            } catch (final SOAPFaultException ex) {
+                /* expected exception */
+            }
+    
+            assertThat(TestSpanReporter.getAllSpans().size(), equalTo(2));
+            assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("post /bookstore"));
+            assertThat(TestSpanReporter.getAllSpans().get(1).name(),
+                equalTo("post http://localhost:" + PORT + "/bookstore"));
         }
-
-        assertThat(TestSpanReporter.getAllSpans().size(), equalTo(2));
-        assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("post /bookstore"));
-        assertThat(TestSpanReporter.getAllSpans().get(1).name(),
-            equalTo("post http://localhost:" + PORT + "/bookstore"));
-
-        final Map<String, List<String>> response = getResponseHeaders(service);
-        assertThatTraceHeadersArePresent(response, false);
+    }
+    
+    @Test
+    public void testThatNewChildSpanIsCreatedWhenParentIsProvidedAndCustomStatusCodeReturned() throws Exception {
+        try (Tracing brave = createTracer()) {
+            final BookStoreService service = createJaxWsService(new BraveClientFeature(brave));
+            service.addBooks();
+    
+            assertThat(TestSpanReporter.getAllSpans().size(), equalTo(2));
+            assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("post /bookstore"));
+            assertThat(TestSpanReporter.getAllSpans().get(0).parentId(), nullValue());
+            assertThat(TestSpanReporter.getAllSpans().get(0).tags(), hasEntry("http.status_code", "305"));
+            assertThat(TestSpanReporter.getAllSpans().get(1).name(),
+                    equalTo("post http://localhost:" + PORT + "/bookstore"));
+        }
     }
 
     private BookStoreService createJaxWsService() {
@@ -261,7 +254,6 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
     }
 
     private BookStoreService createJaxWsService(final Map<String, List<String>> headers, final Feature feature) {
-
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.getOutInterceptors().add(new LoggingOutInterceptor());
         factory.getInInterceptors().add(new LoggingInInterceptor());
@@ -283,23 +275,11 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
         final Client proxy = ClientProxy.getClient(service);
         return CastUtils.cast((Map<?, ?>)proxy.getResponseContext().get(Message.PROTOCOL_HEADERS));
     }
-
-    private static void assertThatTraceIsPresent(Map<String, List<String>> headers, SpanId spanId) {
-        assertThat(headers.get(SPAN_ID_NAME),
-            hasItem(Long.toString(spanId.spanId())));
-        assertThat(headers.get(TRACE_ID_NAME),
-            hasItem(Long.toString(spanId.traceId())));
-        assertThat(headers.get(SAMPLED_NAME),
-            hasItem(Boolean.toString(spanId.sampled())));
-        assertThat(headers.get(PARENT_SPAN_ID_NAME),
-            hasItem(Long.toString(spanId.parentId())));
-    }
-
-    private static void assertThatTraceHeadersArePresent(Map<String, List<String>> headers, boolean expectParent) {
-        assertTrue(headers.containsKey(SPAN_ID_NAME));
-        assertTrue(headers.containsKey(TRACE_ID_NAME));
-        assertTrue(headers.containsKey(SAMPLED_NAME));
-
-        assertEquals(expectParent, headers.containsKey(PARENT_SPAN_ID_NAME));
+    
+    private static Tracing createTracer() {
+        return Tracing.newBuilder()
+            .localServiceName("book-store")
+            .spanReporter(new TestSpanReporter())
+            .build();
     }
 }

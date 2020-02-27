@@ -43,6 +43,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systest.jaxrs.tracing.BookStore;
+import org.apache.cxf.systest.jaxrs.tracing.NullPointerExceptionMapper;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractTestServerBase;
 import org.apache.cxf.tracing.opentracing.OpenTracingClientFeature;
@@ -93,7 +94,7 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
         .withReporter(REPORTER)
         .build();
 
-    public static class BraveServer extends AbstractTestServerBase {
+    public static class OpenTracingServer extends AbstractTestServerBase {
 
         private org.apache.cxf.endpoint.Server server;
 
@@ -110,6 +111,7 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
             sf.setAddress("http://localhost:" + PORT);
             sf.setProvider(new JacksonJsonProvider());
             sf.setProvider(new OpenTracingFeature(tracer));
+            sf.setProvider(new NullPointerExceptionMapper());
             server = sf.create();
         }
 
@@ -123,7 +125,7 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
-        assertTrue("server did not launch correctly", launchServer(BraveServer.class, true));
+        assertTrue("server did not launch correctly", launchServer(OpenTracingServer.class, true));
     }
 
     @After
@@ -388,6 +390,36 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
             assertThat(REPORTER.getSpans().get(0).getTags(), hasItem(Tags.ERROR.getKey(), Boolean.TRUE));
             assertThat(REPORTER.getSpans().get(1).getOperationName(), equalTo("GET /bookstore/books/long"));
         }
+    }
+
+    @Test
+    public void testThatErrorSpanIsCreatedOnExceptionWhenNotProvided() {
+        final Response r = createWebClient("/bookstore/books/exception").get();
+        assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), r.getStatus());
+
+        assertThat(REPORTER.getSpans().toString(), REPORTER.getSpans().size(), equalTo(1));
+        assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("GET /bookstore/books/exception"));
+        assertThat(REPORTER.getSpans().get(0).getTags(), hasItem(Tags.HTTP_STATUS.getKey(), 500));
+    }
+    
+    @Test
+    public void testThatErrorSpanIsCreatedOnErrorWhenNotProvided() {
+        final Response r = createWebClient("/bookstore/books/error").get();
+        assertEquals(Status.SERVICE_UNAVAILABLE.getStatusCode(), r.getStatus());
+
+        assertThat(REPORTER.getSpans().toString(), REPORTER.getSpans().size(), equalTo(1));
+        assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("GET /bookstore/books/error"));
+        assertThat(REPORTER.getSpans().get(0).getTags(), hasItem(Tags.HTTP_STATUS.getKey(), 503));
+    }
+
+    @Test
+    public void testThatErrorSpanIsCreatedOnMappedExceptionWhenNotProvided() {
+        final Response r = createWebClient("/bookstore/books/mapper").get();
+        assertEquals(Status.NOT_FOUND.getStatusCode(), r.getStatus());
+
+        assertThat(REPORTER.getSpans().toString(), REPORTER.getSpans().size(), equalTo(1));
+        assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("GET /bookstore/books/mapper"));
+        assertThat(REPORTER.getSpans().get(0).getTags(), hasItem(Tags.HTTP_STATUS.getKey(), 404));
     }
 
     private static WebClient createWebClient(final String path, final Object ... providers) {

@@ -47,6 +47,7 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systest.brave.BraveTestSupport.SpanId;
 import org.apache.cxf.systest.brave.TestSpanReporter;
 import org.apache.cxf.systest.jaxrs.tracing.BookStore;
+import org.apache.cxf.systest.jaxrs.tracing.NullPointerExceptionMapper;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractTestServerBase;
 import org.apache.cxf.tracing.brave.BraveClientFeature;
@@ -107,6 +108,7 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
             sf.setAddress("http://localhost:" + PORT);
             sf.setProvider(new JacksonJsonProvider());
             sf.setProvider(new BraveFeature(brave));
+            sf.setProvider(new NullPointerExceptionMapper());
             server = sf.create();
         }
 
@@ -153,8 +155,6 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(2));
         assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get books"));
         assertThat(TestSpanReporter.getAllSpans().get(1).name(), equalTo("get /bookstore/books"));
-
-        assertThatTraceIsPresent(r, spanId);
     }
 
     @Test
@@ -167,8 +167,6 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(1));
         assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get /bookstore/book/1"));
         assertThat(TestSpanReporter.getAllSpans().get(0).tags(), hasEntry("book-id", "1"));
-
-        assertThatTraceIsPresent(r, spanId);
     }
 
     @Test
@@ -181,8 +179,6 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(2));
         assertThat(TestSpanReporter.getAllSpans(), hasSpan("processing books", hasItem("Processing started")));
         assertThat(TestSpanReporter.getAllSpans(), hasSpan("put /bookstore/process"));
-
-        assertThatTraceIsPresent(r, spanId);
     }
 
     @Test
@@ -193,8 +189,6 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(3));
         assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get books"));
         assertThat(TestSpanReporter.getAllSpans().get(0).parentId(), not(nullValue()));
-
-        assertThatTraceHeadersArePresent(r, false);
     }
 
     @Test
@@ -210,8 +204,6 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
         assertThat(TestSpanReporter.getAllSpans().get(0).parentId(), not(nullValue()));
         assertThat(TestSpanReporter.getAllSpans().get(0).parentId(),
             equalTo(TestSpanReporter.getAllSpans().get(1).id()));
-
-        assertThatTraceIsPresent(r, spanId);
     }
 
     @Test
@@ -223,8 +215,6 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
 
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(1));
         assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get /bookstore/books/async/notrace"));
-
-        assertThatTraceIsPresent(r, spanId);
     }
 
     @Test
@@ -249,8 +239,6 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
         assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get books"));
         assertThat(TestSpanReporter.getAllSpans().get(1).name(), equalTo("get /bookstore/books"));
         assertThat(TestSpanReporter.getAllSpans().get(2).name(), equalTo("get " + client.getCurrentURI()));
-
-        assertThatTraceHeadersArePresent(r, false);
     }
 
     @Test
@@ -263,10 +251,7 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
             .range(0, 4)
             .mapToObj(index -> client.async().get())
             .map(this::get)
-            .forEach(r -> {
-                assertEquals(Status.OK.getStatusCode(), r.getStatus());
-                assertThatTraceHeadersArePresent(r, false);
-            });
+            .forEach(r -> assertEquals(Status.OK.getStatusCode(), r.getStatus()));
 
         assertThat(TestSpanReporter.getAllSpans().toString(), TestSpanReporter.getAllSpans().size(), equalTo(12));
 
@@ -292,10 +277,7 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
         IntStream
             .range(0, 4)
             .mapToObj(index -> client.get())
-            .forEach(r -> {
-                assertEquals(Status.OK.getStatusCode(), r.getStatus());
-                assertThatTraceHeadersArePresent(r, false);
-            });
+            .forEach(r -> assertEquals(Status.OK.getStatusCode(), r.getStatus()));
 
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(12));
 
@@ -326,8 +308,6 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
             assertThat(TestSpanReporter.getAllSpans().get(0).parentId(), not(nullValue()));
             assertThat(TestSpanReporter.getAllSpans().get(1).name(), equalTo("get /bookstore/books"));
             assertThat(TestSpanReporter.getAllSpans().get(2).name(), equalTo("get " + client.getCurrentURI()));
-
-            assertThatTraceHeadersArePresent(r, true);
         } finally {
             span.finish();
         }
@@ -355,8 +335,6 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
             assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get books"));
             assertThat(TestSpanReporter.getAllSpans().get(1).name(), equalTo("get /bookstore/books"));
             assertThat(TestSpanReporter.getAllSpans().get(2).name(), equalTo("get " + client.getCurrentURI()));
-
-            assertThatTraceHeadersArePresent(r, true);
         } finally {
             span.finish();
         }
@@ -378,8 +356,6 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(2));
         assertThat(TestSpanReporter.getAllSpans().get(1).name(), equalTo("get /bookstore/books/pseudo-async"));
         assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("processing books"));
-
-        assertThatTraceIsPresent(r, spanId);
     }
 
     @Test
@@ -394,7 +370,6 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(0));
-        assertThatTraceHeadersArePresent(r, false);
     }
 
     @Test
@@ -421,6 +396,51 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
         }
     }
 
+    @Test
+    public void testThatErrorSpanIsCreatedOnExceptionWhenNotProvided() {
+        final Response r = createWebClient("/bookstore/books/exception").get();
+        assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), r.getStatus());
+
+        assertThat(TestSpanReporter.getAllSpans().size(), equalTo(1));
+        assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get /bookstore/books/exception"));
+        assertThat(TestSpanReporter.getAllSpans().get(0).tags(), hasEntry("http.status_code", "500"));
+
+        assertFalse(r.getHeaders().containsKey(SPAN_ID_NAME));
+        assertFalse(r.getHeaders().containsKey(TRACE_ID_NAME));
+        assertFalse(r.getHeaders().containsKey(SAMPLED_NAME));
+        assertFalse(r.getHeaders().containsKey(PARENT_SPAN_ID_NAME));
+    }
+    
+    @Test
+    public void testThatErrorSpanIsCreatedOnErrorWhenNotProvided() {
+        final Response r = createWebClient("/bookstore/books/error").get();
+        assertEquals(Status.SERVICE_UNAVAILABLE.getStatusCode(), r.getStatus());
+
+        assertThat(TestSpanReporter.getAllSpans().size(), equalTo(1));
+        assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get /bookstore/books/error"));
+        assertThat(TestSpanReporter.getAllSpans().get(0).tags(), hasEntry("http.status_code", "503"));
+
+        assertFalse(r.getHeaders().containsKey(SPAN_ID_NAME));
+        assertFalse(r.getHeaders().containsKey(TRACE_ID_NAME));
+        assertFalse(r.getHeaders().containsKey(SAMPLED_NAME));
+        assertFalse(r.getHeaders().containsKey(PARENT_SPAN_ID_NAME));
+    }
+
+    @Test
+    public void testThatErrorSpanIsCreatedOnMappedExceptionWhenNotProvided() {
+        final Response r = createWebClient("/bookstore/books/mapper").get();
+        assertEquals(Status.NOT_FOUND.getStatusCode(), r.getStatus());
+
+        assertThat(TestSpanReporter.getAllSpans().size(), equalTo(1));
+        assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get /bookstore/books/mapper"));
+        assertThat(TestSpanReporter.getAllSpans().get(0).tags(), hasEntry("http.status_code", "404"));
+
+        assertFalse(r.getHeaders().containsKey(SPAN_ID_NAME));
+        assertFalse(r.getHeaders().containsKey(TRACE_ID_NAME));
+        assertFalse(r.getHeaders().containsKey(SAMPLED_NAME));
+        assertFalse(r.getHeaders().containsKey(PARENT_SPAN_ID_NAME));
+    }
+
     private static WebClient createWebClient(final String path, final Object ... providers) {
         return WebClient
             .create("http://localhost:" + PORT + path, Arrays.asList(providers))
@@ -433,25 +453,6 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
             .header(TRACE_ID_NAME, spanId.traceId())
             .header(SAMPLED_NAME, spanId.sampled())
             .header(PARENT_SPAN_ID_NAME, spanId.parentId());
-    }
-
-    private static void assertThatTraceIsPresent(final Response r, final SpanId spanId) {
-        assertEquals(spanId.spanId(),
-            Long.parseLong(r.getHeaders().getFirst(SPAN_ID_NAME).toString()));
-        assertEquals(spanId.traceId(),
-            Long.parseLong(r.getHeaders().getFirst(TRACE_ID_NAME).toString()));
-        assertEquals(spanId.sampled(),
-            Boolean.parseBoolean(r.getHeaders().getFirst(SAMPLED_NAME).toString()));
-        assertEquals(spanId.parentId(),
-            Long.valueOf(r.getHeaders().getFirst(PARENT_SPAN_ID_NAME).toString()));
-    }
-
-    private static void assertThatTraceHeadersArePresent(final Response r, final boolean expectParent) {
-        assertTrue(r.getHeaders().containsKey(SPAN_ID_NAME));
-        assertTrue(r.getHeaders().containsKey(TRACE_ID_NAME));
-        assertTrue(r.getHeaders().containsKey(SAMPLED_NAME));
-
-        assertEquals(expectParent, r.getHeaders().containsKey(PARENT_SPAN_ID_NAME));
     }
 
     private<T> T get(final Future<T> future) {

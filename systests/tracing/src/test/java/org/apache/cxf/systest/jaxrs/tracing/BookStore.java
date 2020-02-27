@@ -28,6 +28,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -131,7 +132,28 @@ public class BookStore<T extends Closeable> {
         Thread.sleep(500);
         return books();
     }
-    
+
+    @GET
+    @Path("/books/exception")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Collection<Book> getBooksException() {
+        throw new InternalServerErrorException("Simulated failure");
+    }
+
+    @GET
+    @Path("/books/error")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getBooksError() {
+        return Response.status(503).build();
+    }
+
+    @GET
+    @Path("/books/mapper")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getNpe() {
+        throw new NullPointerException("Simulated failure");
+    }
+
     private static Collection<Book> books() {
         return Arrays.asList(
                 new Book("Apache CXF in Action", UUID.randomUUID().toString()),
