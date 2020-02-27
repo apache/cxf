@@ -49,6 +49,7 @@ import org.awaitility.Duration;
 import io.opentracing.ActiveSpan;
 import io.opentracing.Tracer;
 import io.opentracing.propagation.Format.Builtin;
+import io.opentracing.tag.Tags;
 import io.opentracing.util.GlobalTracer;
 
 import org.junit.Before;
@@ -56,6 +57,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.apache.cxf.systest.jaxrs.tracing.opentracing.IsTagContaining.hasItem;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
@@ -217,8 +219,26 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
 
         assertThat(TestSender.getAllSpans().size(), equalTo(2));
         assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("POST /BookStore"));
+        assertThat(TestSender.getAllSpans().get(0).getTags(), hasItem(Tags.HTTP_STATUS.getKey(), 500));
         assertThat(TestSender.getAllSpans().get(1).getOperationName(),
             equalTo("POST http://localhost:" + PORT + "/BookStore"));
+    }
+    
+    @Test
+    public void testThatNewChildSpanIsCreatedWhenParentIsProvidedAndCustomStatusCodeReturned() throws Exception {
+        final BookStoreService service = createJaxWsService(new Configurator() {
+            @Override
+            public void configure(final JaxWsProxyFactoryBean factory) {
+                factory.getFeatures().add(new OpenTracingClientFeature(tracer));
+                factory.getOutInterceptors().add(new LoggingOutInterceptor());
+                factory.getInInterceptors().add(new LoggingInInterceptor());
+            }
+        });
+        service.addBooks();
+        
+        assertThat(TestSender.getAllSpans().size(), equalTo(1));
+        assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("POST /BookStore"));
+        assertThat(TestSender.getAllSpans().get(0).getTags(), hasItem(Tags.HTTP_STATUS.getKey(), 202));
     }
 
     private BookStoreService createJaxWsService() throws MalformedURLException {

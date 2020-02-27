@@ -118,8 +118,6 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
         assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("GET bookstore/books"));
-
-        assertFalse(r.getHeaders().containsKey(TracerHeaders.DEFAULT_HEADER_SPAN_ID));
     }
 
     @Test
@@ -134,8 +132,6 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
         assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("GET bookstore/books"));
-
-        assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_SPAN_ID), equalTo(spanId.toString()));
     }
 
     @Test
@@ -150,8 +146,6 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(1));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("GET bookstore/book/1"));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getKVAnnotations().size(), equalTo(1));
-
-        assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_SPAN_ID), equalTo(spanId.toString()));
     }
 
     @Test
@@ -166,8 +160,6 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
         assertThat(TestSpanReceiver.getAllSpans(), hasSpan("Processing books", hasItem("Processing started")));
         assertThat(TestSpanReceiver.getAllSpans(), hasSpan("PUT bookstore/process", empty()));
-
-        assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_SPAN_ID), equalTo(spanId.toString()));
     }
 
     @Test
@@ -178,8 +170,6 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(3));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getParents().length, equalTo(1));
-
-        assertTrue(r.getHeaders().containsKey(TracerHeaders.DEFAULT_HEADER_SPAN_ID));
     }
 
     @Test
@@ -194,8 +184,6 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
         assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("GET bookstore/books/async"));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Processing books"));
-
-        assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_SPAN_ID), equalTo(spanId.toString()));
     }
 
     @Test
@@ -210,8 +198,6 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(1));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(),
             equalTo("GET bookstore/books/async/notrace"));
-
-        assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_SPAN_ID), equalTo(spanId.toString()));
     }
 
     @Test
@@ -236,8 +222,6 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
         assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("GET bookstore/books"));
         assertThat(TestSpanReceiver.getAllSpans().get(2).getDescription(), equalTo("GET " + client.getCurrentURI()));
-
-        assertTrue(r.getHeaders().containsKey(TracerHeaders.DEFAULT_HEADER_SPAN_ID));
     }
 
     @Test
@@ -250,8 +234,6 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
             assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
             assertThat(TestSpanReceiver.getAllSpans().get(0).getParents().length, equalTo(1));
             assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("GET bookstore/books"));
-
-            assertTrue(r.getHeaders().containsKey(TracerHeaders.DEFAULT_HEADER_SPAN_ID));
         }
 
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(3));
@@ -271,8 +253,6 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
             assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
             assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
             assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("GET bookstore/books"));
-
-            assertTrue(r.getHeaders().containsKey(TracerHeaders.DEFAULT_HEADER_SPAN_ID));
         }
 
         assertThat(TestSpanReceiver.getAllSpans().get(2).getDescription(), equalTo("test span"));
@@ -290,8 +270,6 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
         assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("GET bookstore/books/pseudo-async"));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Processing books"));
-
-        assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_SPAN_ID), equalTo(spanId.toString()));
     }
 
     @Test
@@ -308,7 +286,6 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
 
         for (final Response r: responses) {
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
-            assertTrue(r.getHeaders().containsKey(TracerHeaders.DEFAULT_HEADER_SPAN_ID));
         }
 
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(12));
@@ -339,7 +316,6 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
 
         for (final Response r: responses) {
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
-            assertTrue(r.getHeaders().containsKey(TracerHeaders.DEFAULT_HEADER_SPAN_ID));
         }
 
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(12));

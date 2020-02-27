@@ -24,7 +24,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.tracing.AbstractTracingProvider;
 import org.apache.htrace.core.SpanId;
@@ -69,13 +68,6 @@ public abstract class AbstractHTraceProvider extends AbstractTracingProvider {
     protected void stopTraceSpan(final Map<String, List<String>> requestHeaders,
                                  final Map<String, List<Object>> responseHeaders,
                                  final TraceScopeHolder<TraceScope> holder) {
-        final String spanIdHeader = getSpanIdHeader();
-
-        // Transfer tracing headers into the response headers
-        if (requestHeaders.containsKey(spanIdHeader)) {
-            responseHeaders.put(spanIdHeader, CastUtils.cast(requestHeaders.get(spanIdHeader)));
-        }
-
         if (holder == null) {
             return;
         }

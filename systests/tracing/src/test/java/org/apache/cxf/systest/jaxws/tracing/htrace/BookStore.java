@@ -22,8 +22,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;
 
+import javax.annotation.Resource;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
+import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.handler.MessageContext;
 
 import org.apache.cxf.systest.Book;
 import org.apache.cxf.systest.jaxws.tracing.BookStoreService;
@@ -32,6 +35,9 @@ import org.apache.htrace.core.Tracer;
 
 @WebService(endpointInterface = "org.apache.cxf.systest.jaxws.tracing.BookStoreService", serviceName = "BookStore")
 public class BookStore implements BookStoreService {
+    @Resource
+    private WebServiceContext context;
+
     @WebMethod
     public Collection< Book > getBooks() {
         try (TraceScope span = Tracer.curThreadTracer().newScope("Get Books")) {
@@ -45,5 +51,11 @@ public class BookStore implements BookStoreService {
     @WebMethod
     public int removeBooks() {
         throw new RuntimeException("Unable to remove books");
+    }
+    
+    @WebMethod
+    public void addBooks() {
+        final MessageContext ctx = context.getMessageContext();
+        ctx.put(MessageContext.HTTP_RESPONSE_CODE, 305);
     }
 }

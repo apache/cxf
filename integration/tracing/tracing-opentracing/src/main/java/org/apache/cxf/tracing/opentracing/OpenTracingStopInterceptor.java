@@ -32,7 +32,7 @@ import io.opentracing.Tracer;
 
 public class OpenTracingStopInterceptor extends AbstractOpenTracingInterceptor {
     public OpenTracingStopInterceptor(final Tracer tracer) {
-        super(Phase.PRE_MARSHAL, tracer);
+        super(Phase.POST_MARSHAL, tracer);
     }
 
     @Override

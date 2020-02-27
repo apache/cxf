@@ -33,7 +33,7 @@ import org.apache.cxf.phase.Phase;
 @NoJSR250Annotations
 public class BraveStopInterceptor extends AbstractBraveInterceptor {
     public BraveStopInterceptor(final HttpTracing brave) {
-        super(Phase.PRE_MARSHAL, brave);
+        super(Phase.POST_MARSHAL, brave);
     }
 
     @Override

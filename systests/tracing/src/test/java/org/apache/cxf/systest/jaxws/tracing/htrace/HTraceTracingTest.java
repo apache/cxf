@@ -28,7 +28,6 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.message.Message;
@@ -54,7 +53,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 
@@ -69,7 +67,7 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
             sf.setServiceClass(BookStore.class);
             sf.setAddress("http://localhost:" + PORT);
             sf.getInInterceptors().add(new HTraceStartInterceptor(Phase.PRE_INVOKE, tracer));
-            sf.getOutInterceptors().add(new HTraceStopInterceptor(Phase.PRE_MARSHAL));
+            sf.getOutInterceptors().add(new HTraceStopInterceptor(Phase.POST_MARSHAL));
             sf.create();
         }
     }
@@ -98,9 +96,6 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
         assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("POST /BookStore"));
-
-        final Map<String, List<String>> response = getResponseHeaders(service);
-        assertThat(response.get(TracerHeaders.DEFAULT_HEADER_SPAN_ID), nullValue());
     }
 
     @Test
@@ -115,9 +110,6 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
         assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("POST /BookStore"));
-
-        final Map<String, List<String>> response = getResponseHeaders(service);
-        assertThat(response.get(TracerHeaders.DEFAULT_HEADER_SPAN_ID), hasItems(spanId.toString()));
     }
 
     @Test
@@ -139,9 +131,6 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("POST /BookStore"));
         assertThat(TestSpanReceiver.getAllSpans().get(2).getDescription(),
             equalTo("POST http://localhost:" + PORT + "/BookStore"));
-
-        final Map<String, List<String>> response = getResponseHeaders(service);
-        assertThat(response.get(TracerHeaders.DEFAULT_HEADER_SPAN_ID), not(nullValue()));
     }
 
     @Test
@@ -168,9 +157,26 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
 
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(3));
         assertThat(TestSpanReceiver.getAllSpans().get(2).getDescription(), equalTo("test span"));
+    }
 
-        final Map<String, List<String>> response = getResponseHeaders(service);
-        assertThat(response.get(TracerHeaders.DEFAULT_HEADER_SPAN_ID), not(nullValue()));
+    @Test
+    public void testThatNewChildSpanIsCreatedWhenParentIsProvidedAndCustomStatusCodeReturned() throws Exception {
+        final Tracer tracer = createTracer();
+
+        final BookStoreService service = createJaxWsService(new Configurator() {
+            @Override
+            public void configure(final JaxWsProxyFactoryBean factory) {
+                factory.getOutInterceptors().add(new HTraceClientStartInterceptor(tracer));
+                factory.getInInterceptors().add(new HTraceClientStopInterceptor());
+            }
+        });
+        service.addBooks();
+
+        assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
+        assertThat(TestSpanReceiver.getAllSpans().get(0).getParents().length, equalTo(1));
+        assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("POST /BookStore"));
+        assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(),
+            equalTo("POST http://localhost:" + PORT + "/BookStore"));
     }
 
 
@@ -204,11 +210,6 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         proxy.getRequestContext().put(Message.PROTOCOL_HEADERS, headers);
 
         return service;
-    }
-
-    private Map<String, List<String>> getResponseHeaders(final BookStoreService service) {
-        final Client proxy = ClientProxy.getClient(service);
-        return CastUtils.cast((Map<?, ?>)proxy.getResponseContext().get(Message.PROTOCOL_HEADERS));
     }
 
     private static Tracer createTracer() {

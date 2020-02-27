@@ -51,9 +51,6 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.notNullValue;
-
 public class HTraceTracingCustomHeadersTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(HTraceTracingCustomHeadersTest.class);
 
@@ -112,16 +109,12 @@ public class HTraceTracingCustomHeadersTest extends AbstractBusClientServerTestB
             .header(CUSTOM_HEADER_SPAN_ID, spanId.toString())
             .get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
-
-        assertThat((String)r.getHeaders().getFirst(CUSTOM_HEADER_SPAN_ID), equalTo(spanId.toString()));
     }
 
     @Test
     public void testThatNewChildSpanIsCreated() {
         final Response r = createWebClient("/bookstore/books", htraceClientProvider).get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
-
-        assertThat((String)r.getHeaders().getFirst(CUSTOM_HEADER_SPAN_ID), notNullValue());
     }
 
     protected WebClient createWebClient(final String url, final Object ... providers) {
