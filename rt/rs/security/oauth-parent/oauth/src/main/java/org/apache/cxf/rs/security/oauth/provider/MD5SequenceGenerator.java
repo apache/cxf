@@ -18,10 +18,8 @@
  */
 package org.apache.cxf.rs.security.oauth.provider;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 import net.oauth.OAuthException;
+import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 
 /**
  * The utility MD5 sequence generator which can be used for generating
@@ -33,20 +31,6 @@ public class MD5SequenceGenerator {
         if (input == null) {
             throw new OAuthException("You have to pass input to Token Generator");
         }
-
-        try {
-            MessageDigest algorithm = MessageDigest.getInstance("MD5");
-            algorithm.reset();
-            algorithm.update(input);
-            byte[] messageDigest = algorithm.digest();
-            StringBuilder hexString = new StringBuilder();
-            for (int i = 0; i < messageDigest.length; i++) {
-                hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
-            }
-
-            return hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new OAuthException(e);
-        }
+        return MessageDigestUtils.generate(input, MessageDigestUtils.ALGO_MD5);
     }
 }
