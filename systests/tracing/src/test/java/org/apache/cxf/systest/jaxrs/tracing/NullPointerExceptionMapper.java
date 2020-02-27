@@ -16,17 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxws.tracing;
 
-import java.util.Collection;
+package org.apache.cxf.systest.jaxrs.tracing;
 
-import javax.jws.WebService;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
-import org.apache.cxf.systest.Book;
-
-@WebService
-public interface BookStoreService {
-    Collection< Book > getBooks();
-    int removeBooks();
-    void addBooks();
+@Provider
+public class NullPointerExceptionMapper implements ExceptionMapper<NullPointerException> {
+    public Response toResponse(NullPointerException exception) {
+        return Response.status(Status.NOT_FOUND).build();
+    }
 }
