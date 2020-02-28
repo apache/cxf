@@ -136,7 +136,7 @@ public class JPACMTCodeDataProvider extends JPACodeDataProvider {
 
                 @Override
                 public Void execute(EntityManager em) {
-                    Map<String, Object> options = null;
+                    final Map<String, Object> options;
                     if (pessimisticLockTimeout > 0) {
                         options = Collections.singletonMap("javax.persistence.lock.timeout", pessimisticLockTimeout);
                     } else {

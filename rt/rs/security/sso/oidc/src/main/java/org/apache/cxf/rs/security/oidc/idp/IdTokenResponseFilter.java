@@ -98,7 +98,7 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
         Message m = JAXRSUtils.getCurrentMessage();
         if (atHashRequired || cHashRequired) {
             Properties props = JwsUtils.loadSignatureOutProperties(false);
-            SignatureAlgorithm sigAlgo = null;
+            final SignatureAlgorithm sigAlgo;
             if (super.isSignWithClientSecret()) {
                 sigAlgo = OAuthUtils.getClientSecretSignatureAlgorithm(props);
             } else {

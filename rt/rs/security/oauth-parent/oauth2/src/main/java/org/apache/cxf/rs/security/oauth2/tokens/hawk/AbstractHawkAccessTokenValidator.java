@@ -62,7 +62,7 @@ public abstract class AbstractHawkAccessTokenValidator implements AccessTokenVal
         String macAlgo = atv.getExtraProps().get(OAuthConstants.HAWK_TOKEN_ALGORITHM);
 
 
-        HttpRequestProperties httpProps = null;
+        final HttpRequestProperties httpProps;
         if (extraProps != null && extraProps.containsKey(HTTP_VERB) && extraProps.containsKey(HTTP_URI)) {
             httpProps = new HttpRequestProperties(URI.create(extraProps.getFirst(HTTP_URI)),
                                                   extraProps.getFirst(HTTP_VERB));

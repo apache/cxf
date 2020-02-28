@@ -119,7 +119,7 @@ public class AccessTokenService extends AbstractTokenService {
         }
 
         // Create the access token
-        ServerAccessToken serverToken = null;
+        final ServerAccessToken serverToken;
         try {
             serverToken = handler.createAccessToken(client, params);
         } catch (WebApplicationException ex) {

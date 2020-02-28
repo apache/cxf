@@ -101,11 +101,11 @@ public abstract class AbstractAccessTokenValidator {
      */
     protected AccessTokenValidation getAccessTokenValidation(String authScheme, String authSchemeData,
                                                              MultivaluedMap<String, String> extraProps) {
-        AccessTokenValidation accessTokenV = null;
         if (dataProvider == null && tokenHandlers.isEmpty()) {
             throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
 
+        AccessTokenValidation accessTokenV = null;
         if (maxValidationDataCacheSize > 0) {
             accessTokenV = accessTokenValidations.get(authSchemeData);
         }

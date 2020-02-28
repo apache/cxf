@@ -321,14 +321,13 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
                 && at.getGrantType().equals(grantType)
                 && (sub == null && at.getSubject() == null
                 || sub != null && at.getSubject().getLogin().equals(sub.getLogin()))) {
-                token = at;
+                if (!OAuthUtils.isExpired(at.getIssuedAt(), at.getExpiresIn())) {
+                    token = at;
+                } else {
+                    revokeToken(client, at.getTokenKey(), OAuthConstants.ACCESS_TOKEN);
+                }
                 break;
             }
-        }
-        if (token != null
-            && OAuthUtils.isExpired(token.getIssuedAt(), token.getExpiresIn())) {
-            revokeToken(client, token.getTokenKey(), OAuthConstants.ACCESS_TOKEN);
-            token = null;
         }
         return token;
 

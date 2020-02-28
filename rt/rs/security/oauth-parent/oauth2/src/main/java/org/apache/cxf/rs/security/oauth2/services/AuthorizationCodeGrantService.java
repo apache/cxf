@@ -92,7 +92,7 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
                                    ServerAccessToken preauthorizedToken) {
         // in this flow the code is still created, the preauthorized token
         // will be retrieved by the authorization code grant handler
-        ServerAuthorizationCodeGrant grant = null;
+        final ServerAuthorizationCodeGrant grant;
         try {
             grant = getGrantRepresentation(state,
                                            client,

@@ -78,7 +78,7 @@ public class UserInfoService extends OAuthServerJoseJwtProducer {
             return Response.serverError().build();
         }
 
-        Object responseEntity = null;
+        final Object responseEntity;
         // UserInfo may be returned in a clear form as JSON
         if (super.isJwsRequired() || super.isJweRequired()) {
             Client client = null;
