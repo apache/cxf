@@ -29,6 +29,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.apache.cxf.systest.jaxrs.sse.BookStore;
+import org.apache.cxf.systest.jaxrs.sse.BookStoreResponseFilter;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public abstract class AbstractTomcatServer extends AbstractBusTestServerBase {
@@ -60,7 +61,10 @@ public abstract class AbstractTomcatServer extends AbstractBusTestServerBase {
                 final Context context = server.addContext("/", base.getAbsolutePath());
                 final Wrapper cxfServlet = Tomcat.addServlet(context, "cxfServlet", new CXFNonSpringJaxrsServlet());
                 cxfServlet.addInitParameter("jaxrs.serviceClasses", BookStore.class.getName());
-                cxfServlet.addInitParameter("jaxrs.providers", JacksonJsonProvider.class.getName());
+                cxfServlet.addInitParameter("jaxrs.providers", String.join(",",
+                    JacksonJsonProvider.class.getName(),
+                    BookStoreResponseFilter.class.getName()
+                ));
                 cxfServlet.setAsyncSupported(true);
                 context.addServletMappingDecoded("/rest/*", "cxfServlet");
             } else {
