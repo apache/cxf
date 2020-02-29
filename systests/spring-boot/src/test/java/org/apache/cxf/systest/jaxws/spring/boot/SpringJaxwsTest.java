@@ -69,7 +69,7 @@ import static org.assertj.core.api.Assertions.entry;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT,
         classes = SpringJaxwsTest.TestConfig.class)
 @ActiveProfiles("jaxws")
-@TestPropertySource(properties = {"management.metrics.soap.server.max-uri-tags=2"})
+@TestPropertySource(properties = {"management.metrics.cxf.server.max-uri-tags=2"})
 public class SpringJaxwsTest {
 
     private static final String DUMMY_REQUEST_BODY = "<q0:sayHello xmlns:q0=\"http://service.ws.sample/\">"
@@ -143,7 +143,7 @@ public class SpringJaxwsTest {
                         + "<return>Hello, Elan</return>"
                         + "</ns2:sayHelloResponse>");
 
-        RequiredSearch requestMetrics = registry.get("soap.server.requests");
+        RequiredSearch requestMetrics = registry.get("cxf.server.requests");
 
         Map<Object, Object> tags = requestMetrics.timer().getId().getTags().stream()
                 .collect(toMap(Tag::getKey, Tag::getValue));
@@ -173,7 +173,7 @@ public class SpringJaxwsTest {
                 .hasMessageContaining("Fault occurred while processing");
 
 
-        RequiredSearch requestMetrics = registry.get("soap.server.requests");
+        RequiredSearch requestMetrics = registry.get("cxf.server.requests");
 
         Map<Object, Object> tags = requestMetrics.timer().getId().getTags().stream()
                 .collect(toMap(Tag::getKey, Tag::getValue));
@@ -199,9 +199,9 @@ public class SpringJaxwsTest {
         sendSoapRequest(DUMMY_REQUEST_BODY, HELLO_SERVICE_NAME_V3);
 
         // then
-        assertThat(registry.get("soap.server.requests").meters()).hasSize(2);
+        assertThat(registry.get("cxf.server.requests").meters()).hasSize(2);
         assertThat(this.output.toString())
-                .contains("Reached the maximum number of URI tags " + "for 'soap.server.requests'");
+                .contains("Reached the maximum number of URI tags " + "for 'cxf.server.requests'");
     }
 
     @Test
@@ -212,9 +212,9 @@ public class SpringJaxwsTest {
         sendSoapRequest(DUMMY_REQUEST_BODY, HELLO_SERVICE_NAME_V1);
 
         // then
-        assertThat(registry.get("soap.server.requests").meters()).hasSize(1);
+        assertThat(registry.get("cxf.server.requests").meters()).hasSize(1);
         assertThat(this.output.toString())
-                .doesNotContain("Reached the maximum number of URI tags " + "for 'soap.server.requests'");
+                .doesNotContain("Reached the maximum number of URI tags " + "for 'cxf.server.requests'");
 
     }
 

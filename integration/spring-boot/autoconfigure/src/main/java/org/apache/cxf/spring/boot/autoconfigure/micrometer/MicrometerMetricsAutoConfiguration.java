@@ -100,7 +100,7 @@ public class MicrometerMetricsAutoConfiguration {
                                            MeterRegistry registry) {
         MicrometerMetricsProperties micrometerMetricsProperties = new MicrometerMetricsProperties();
 
-        MetricsProperties.Soap.Server server = this.properties.getSoap().getServer();
+        MetricsProperties.Cxf.Server server = this.properties.getCxf().getServer();
         micrometerMetricsProperties.setAutoTimeRequests(server.isAutoTimeRequests());
         micrometerMetricsProperties.setRequestsMetricName(server.getRequestsMetricName());
 
@@ -111,10 +111,10 @@ public class MicrometerMetricsAutoConfiguration {
     @Bean
     @Order(0)
     public MeterFilter metricsSoapServerUriTagFilter() {
-        String metricName = this.properties.getSoap().getServer().getRequestsMetricName();
+        String metricName = this.properties.getCxf().getServer().getRequestsMetricName();
         MeterFilter filter = new OnlyOnceLoggingDenyMeterFilter(
         () -> String.format("Reached the maximum number of URI tags for '%s'.", metricName));
         return MeterFilter.maximumAllowableTags(
-                metricName, "uri", this.properties.getSoap().getServer().getMaxUriTags(), filter);
+                metricName, "uri", this.properties.getCxf().getServer().getMaxUriTags(), filter);
     }
 }

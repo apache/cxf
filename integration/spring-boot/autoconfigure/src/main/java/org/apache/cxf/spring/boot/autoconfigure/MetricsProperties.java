@@ -24,13 +24,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("management.metrics")
 public class MetricsProperties {
 
-    private final Soap soap = new Soap();
+    private final Cxf cxf = new Cxf();
 
-    public Soap getSoap() {
-        return this.soap;
+    public Cxf getCxf() {
+        return this.cxf;
     }
 
-    public static class Soap {
+    public static class Cxf {
 
         private final Server server = new Server();
 
@@ -50,7 +50,7 @@ public class MetricsProperties {
             /**
              * Name of the metric for received requests.
              */
-            private String requestsMetricName = "soap.server.requests";
+            private String requestsMetricName = "cxf.server.requests";
 
             /**
              * Maximum number of unique URI tag values allowed. After the max number of tag values is
