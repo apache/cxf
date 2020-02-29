@@ -23,6 +23,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.apache.cxf.systest.jaxrs.sse.BookStore;
+import org.apache.cxf.systest.jaxrs.sse.BookStoreResponseFilter;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 import io.undertow.Handlers;
@@ -54,7 +55,9 @@ public abstract class AbstractUndertowServer extends AbstractBusTestServerBase {
                 .setDeploymentName("sse-test")
                 .addServlets(
                     servlet("MessageServlet", CXFNonSpringJaxrsServlet.class)
-                        .addInitParam("jaxrs.providers", JacksonJsonProvider.class.getName())
+                        .addInitParam("jaxrs.providers", String.join(",",
+                            JacksonJsonProvider.class.getName(),
+                            BookStoreResponseFilter.class.getName()))
                         .addInitParam("jaxrs.serviceClasses", BookStore.class.getName())
                         .setAsyncSupported(true)
                         .setLoadOnStartup(1)

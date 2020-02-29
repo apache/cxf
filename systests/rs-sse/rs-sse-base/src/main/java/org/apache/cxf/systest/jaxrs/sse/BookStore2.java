@@ -148,7 +148,30 @@ public class BookStore2 extends BookStoreClientCloseable {
             LOG.error("Wait has been interrupted", ex);
         }
     }
+
+    @GET
+    @Path("/filtered/sse")
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    public void filtered(@Context SseEventSink sink) {
+        new Thread() {
+            public void run() {
+                try {
+                    Thread.sleep(200);
+                    sink.close();
+                } catch (final InterruptedException ex) {
+                    LOG.error("Communication error", ex);
+                }
+            }
+        }.start();
+    }
     
+    @GET
+    @Path("/filtered/stats")
+    @Produces(MediaType.TEXT_PLAIN)
+    public int filteredStats() {
+        return BookStoreResponseFilter.getInvocations();
+    }
+
     @Override
     protected Sse getSse() {
         return sse;

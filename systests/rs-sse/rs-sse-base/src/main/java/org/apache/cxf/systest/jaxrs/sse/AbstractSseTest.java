@@ -107,6 +107,29 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
         // Easing the test verification here, it does not work well for Atm + Jetty
         assertTrue(books.isEmpty());
     }
+    
+    @Test
+    public void testContainerResponseFilterIsCalled() throws InterruptedException {
+        final WebTarget target = createWebTarget("/rest/api/bookstore/filtered/sse");
+        final Collection<Book> books = new ArrayList<>();
+
+        assertThat(createWebTarget("/rest/api/bookstore/filtered/stats")
+            .request()
+            .get(Integer.class), equalTo(0));
+    
+        try (SseEventSource eventSource = SseEventSource.target(target).build()) {
+            eventSource.register(collect(books), System.out::println);
+            eventSource.open();
+            // Give the SSE stream some time to collect all events
+            Thread.sleep(1000);
+        }
+        // Easing the test verification here, it does not work well for Atm + Jetty
+        assertTrue(books.isEmpty());
+
+        assertThat(createWebTarget("/rest/api/bookstore/filtered/stats")
+            .request()
+            .get(Integer.class), equalTo(1));
+    }
 
     @Test
     public void testBooksStreamIsReconnectedFromInboundSseEvents() throws InterruptedException {
