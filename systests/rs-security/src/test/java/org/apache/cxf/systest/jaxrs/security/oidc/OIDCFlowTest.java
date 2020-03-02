@@ -116,8 +116,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
                 JCACHE_SERVER.getPort(),
                 JWT_JCACHE_SERVER.getPort(),
                 JPA_SERVER.getPort(),
-                JWT_NON_PERSIST_JCACHE_SERVER.getPort()
-        };
+                JWT_NON_PERSIST_JCACHE_SERVER.getPort()};
     }
 
     @org.junit.Test
