@@ -6,7 +6,7 @@ pipeline {
     tools { 
         ant 'Ant 1.10.6'
         maven 'Maven 3.6.2' 
-        jdk 'JDK 1.8.0_191' 
+        jdk 'JDK 1.8.0_241' 
     }
     
     environment {
@@ -118,7 +118,15 @@ pipeline {
                     dir("${TS_HOME}/bin") {
                         sh "ant config.vi"
                         sh "ant deploy.all"
-                        sh "ant run.all"
+                        script {
+                            try {
+                                echo 'Running all TCK tests ...'
+                                sh "ant run.all"
+                            } catch (exc) {
+                                echo 'Some TCK tests have failed, marking build as unstable'
+                                currentBuild.result = 'UNSTABLE'
+                            }
+                        }
                     }
                 }
            }
