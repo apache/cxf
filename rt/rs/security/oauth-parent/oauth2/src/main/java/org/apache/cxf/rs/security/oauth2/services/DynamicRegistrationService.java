@@ -121,7 +121,6 @@ public class DynamicRegistrationService {
     @Path("{clientId}")
     @Produces("application/json")
     public ClientRegistration readClientRegistrationWithPath(@PathParam("clientId") String clientId) {
-
         return doReadClientRegistration(clientId);
     }
 
@@ -151,6 +150,7 @@ public class DynamicRegistrationService {
             response.setClientSecretExpiresAt(Long.valueOf(0));
         }
         response.setClientIdIssuedAt(client.getRegisteredAt());
+        response.setGrantTypes(client.getAllowedGrantTypes());
         UriBuilder ub = getMessageContext().getUriInfo().getAbsolutePathBuilder();
 
         if (supportRegistrationAccessTokens) {
