@@ -31,7 +31,8 @@ import org.apache.cxf.metrics.micrometer.provider.jaxws.DefaultJaxwsFaultCodePro
 import org.apache.cxf.metrics.micrometer.provider.jaxws.JaxwsFaultCodeProvider;
 import org.apache.cxf.metrics.micrometer.provider.jaxws.JaxwsTags;
 import org.apache.cxf.metrics.micrometer.provider.jaxws.JaxwsTagsProvider;
-import org.apache.cxf.spring.boot.autoconfigure.MetricsProperties;
+import org.apache.cxf.spring.boot.autoconfigure.CxfProperties;
+import org.apache.cxf.spring.boot.autoconfigure.CxfProperties.Metrics.Server;
 import org.apache.cxf.spring.boot.autoconfigure.micrometer.provider.jaxws.SpringBasedTimedAnnotationProvider;
 import org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration;
 import org.springframework.boot.actuate.autoconfigure.metrics.OnlyOnceLoggingDenyMeterFilter;
@@ -54,12 +55,12 @@ import io.micrometer.core.instrument.config.MeterFilter;
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @ConditionalOnClass({JaxWsServerFactoryBean.class, MetricsProvider.class})
 @ConditionalOnBean({MeterRegistry.class})
-@EnableConfigurationProperties(MetricsProperties.class)
+@EnableConfigurationProperties(CxfProperties.class)
 public class MicrometerMetricsAutoConfiguration {
 
-    private final MetricsProperties properties;
+    private final CxfProperties properties;
 
-    public MicrometerMetricsAutoConfiguration(MetricsProperties properties) {
+    public MicrometerMetricsAutoConfiguration(CxfProperties properties) {
         this.properties = properties;
     }
 
@@ -100,7 +101,7 @@ public class MicrometerMetricsAutoConfiguration {
                                            MeterRegistry registry) {
         MicrometerMetricsProperties micrometerMetricsProperties = new MicrometerMetricsProperties();
 
-        MetricsProperties.Cxf.Server server = this.properties.getCxf().getServer();
+        Server server = this.properties.getMetrics().getServer();
         micrometerMetricsProperties.setAutoTimeRequests(server.isAutoTimeRequests());
         micrometerMetricsProperties.setRequestsMetricName(server.getRequestsMetricName());
 
@@ -111,10 +112,10 @@ public class MicrometerMetricsAutoConfiguration {
     @Bean
     @Order(0)
     public MeterFilter metricsSoapServerUriTagFilter() {
-        String metricName = this.properties.getCxf().getServer().getRequestsMetricName();
+        String metricName = this.properties.getMetrics().getServer().getRequestsMetricName();
         MeterFilter filter = new OnlyOnceLoggingDenyMeterFilter(
         () -> String.format("Reached the maximum number of URI tags for '%s'.", metricName));
         return MeterFilter.maximumAllowableTags(
-                metricName, "uri", this.properties.getCxf().getServer().getMaxUriTags(), filter);
+                metricName, "uri", this.properties.getMetrics().getServer().getMaxUriTags(), filter);
     }
 }

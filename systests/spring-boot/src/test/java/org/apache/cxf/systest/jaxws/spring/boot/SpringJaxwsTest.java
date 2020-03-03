@@ -69,7 +69,7 @@ import static org.assertj.core.api.Assertions.entry;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT,
         classes = SpringJaxwsTest.TestConfig.class)
 @ActiveProfiles("jaxws")
-@TestPropertySource(properties = {"management.metrics.cxf.server.max-uri-tags=2"})
+@TestPropertySource(properties = {"cxf.metrics.server.max-uri-tags=2"})
 public class SpringJaxwsTest {
 
     private static final String DUMMY_REQUEST_BODY = "<q0:sayHello xmlns:q0=\"http://service.ws.sample/\">"

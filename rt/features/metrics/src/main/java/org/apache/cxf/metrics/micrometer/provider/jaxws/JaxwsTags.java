@@ -134,7 +134,7 @@ public class JaxwsTags {
 
     public Tag faultCode(String faultCode) {
         return ofNullable(faultCode)
-            .map(operation -> Tag.of("faultCode", faultCode))
+            .map(local -> Tag.of("faultCode", local))
             .orElse(FAULTCODE_NONE);
     }
 }

@@ -43,6 +43,8 @@ public class CxfProperties {
 
     private final Servlet servlet = new Servlet();
 
+    private final Metrics metrics = new Metrics();
+
     @NotNull
     @Pattern(regexp = "/[^?#]*", message = "Path must start with /")
     public String getPath() {
@@ -55,6 +57,10 @@ public class CxfProperties {
 
     public Servlet getServlet() {
         return this.servlet;
+    }
+
+    public Metrics getMetrics() {
+        return this.metrics;
     }
 
     public static class Servlet {
@@ -85,6 +91,60 @@ public class CxfProperties {
             this.loadOnStartup = loadOnStartup;
         }
 
+    }
+
+    public static class Metrics {
+
+        private final Server server = new Server();
+
+        public Server getServer() {
+            return this.server;
+        }
+
+        public static class Server {
+
+            /**
+             * Whether requests handled by Cxf should be automatically timed. If the number of time series
+             * emitted grows too large on account of request mapping timings, disable this and use 'Timed'
+             * on a per request mapping basis as needed.
+             */
+            private boolean autoTimeRequests = true;
+
+            /**
+             * Name of the metric for received requests.
+             */
+            private String requestsMetricName = "cxf.server.requests";
+
+            /**
+             * Maximum number of unique URI tag values allowed. After the max number of tag values is
+             * reached, metrics with additional tag values are denied by filter.
+             */
+            private int maxUriTags = 100;
+
+            public boolean isAutoTimeRequests() {
+                return this.autoTimeRequests;
+            }
+
+            public void setAutoTimeRequests(boolean autoTimeRequests) {
+                this.autoTimeRequests = autoTimeRequests;
+            }
+
+            public String getRequestsMetricName() {
+                return this.requestsMetricName;
+            }
+
+            public void setRequestsMetricName(String requestsMetricName) {
+                this.requestsMetricName = requestsMetricName;
+            }
+
+            public int getMaxUriTags() {
+                return this.maxUriTags;
+            }
+
+            public void setMaxUriTags(int maxUriTags) {
+                this.maxUriTags = maxUriTags;
+            }
+        }
     }
 
 }
