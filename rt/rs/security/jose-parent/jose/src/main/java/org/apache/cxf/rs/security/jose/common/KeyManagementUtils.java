@@ -19,6 +19,7 @@
 
 package org.apache.cxf.rs.security.jose.common;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -399,13 +400,13 @@ public final class KeyManagementUtils {
             }
             return null;
         }
-        Properties props = null;
+        final Properties props;
         String propLoc =
             (String)MessageUtils.getContextualProperty(m, storeProp1, storeProp2);
         if (propLoc != null) {
             try {
                 props = JoseUtils.loadProperties(propLoc, m.getExchange().getBus());
-            } catch (Exception ex) {
+            } catch (IOException ex) {
                 LOG.warning("Properties resource is not identified");
                 throw new JoseException(ex);
             }
@@ -431,14 +432,17 @@ public final class KeyManagementUtils {
                 if (keyPassword != null) {
                     props.setProperty(JoseConstants.RSSEC_KEY_PSWD, keyPassword);
                 }
+                String signatureAlgorithm = (String)m.getContextualProperty(JoseConstants.RSSEC_SIGNATURE_ALGORITHM);
+                if (signatureAlgorithm != null) {
+                    props.setProperty(JoseConstants.RSSEC_SIGNATURE_ALGORITHM, signatureAlgorithm);
+                }
+            } else {
+                if (required) {
+                    LOG.warning("Properties resource is not identified");
+                    throw new JoseException("Properties resource is not identified");
+                }
+                props = new Properties();
             }
-        }
-        if (props == null) {
-            if (required) {
-                LOG.warning("Properties resource is not identified");
-                throw new JoseException("Properties resource is not identified");
-            }
-            props = new Properties();
         }
         return props;
     }
