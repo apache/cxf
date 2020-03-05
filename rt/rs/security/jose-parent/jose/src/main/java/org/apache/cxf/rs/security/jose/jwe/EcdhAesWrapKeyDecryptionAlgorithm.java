@@ -35,13 +35,13 @@ public class EcdhAesWrapKeyDecryptionAlgorithm implements KeyDecryptionProvider 
     }
     public EcdhAesWrapKeyDecryptionAlgorithm(ECPrivateKey key, KeyAlgorithm algo) {
         this.key = key;
-        this.algo = algo;
+        this.algo = algo != null ? algo : KeyAlgorithm.ECDH_ES_A128KW;
     }
     @Override
     public byte[] getDecryptedContentEncryptionKey(JweDecryptionInput jweDecryptionInput) {
         byte[] derivedKey = getDecryptedContentEncryptionKeyFromHeaders(
                 jweDecryptionInput.getJweHeaders(), key);
-        KeyDecryptionProvider aesWrap = new AesWrapKeyDecryptionAlgorithm(derivedKey, KeyAlgorithm.ECDH_ES_A128KW) {
+        KeyDecryptionProvider aesWrap = new AesWrapKeyDecryptionAlgorithm(derivedKey, algo) {
             protected boolean isValidAlgorithmFamily(String wrapAlgo) {
                 return AlgorithmUtils.isEcdhEsWrap(wrapAlgo);
             }
