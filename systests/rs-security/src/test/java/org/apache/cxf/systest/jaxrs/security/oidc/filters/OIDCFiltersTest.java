@@ -18,16 +18,26 @@
  */
 package org.apache.cxf.systest.jaxrs.security.oidc.filters;
 
-import java.net.URL;
+import java.net.URI;
+import java.util.Collections;
 
-import javax.ws.rs.core.Form;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
+import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.rs.security.oauth2.client.AccessTokenClientFilter;
+import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
+import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
+import org.apache.cxf.systest.jaxrs.security.oidc.SpringBusTestServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.TestUtil;
+import org.apache.cxf.transport.http.HTTPConduitConfigurer;
 
 import org.junit.BeforeClass;
 
@@ -40,44 +50,49 @@ import static org.junit.Assert.assertTrue;
  */
 public class OIDCFiltersTest extends AbstractBusClientServerTestBase {
 
-    public static final String PORT = BookServerOIDCFilters.PORT;
-    public static final String OIDC_PORT = BookServerOIDCService.PORT;
+    private static final String PORT = BookServerOIDCFilters.PORT;
+    private static final String OIDC_PORT = BookServerOIDCService.PORT;
+    private static final SpringBusTestServer BOOK_JWK_SERVER = new SpringBusTestServer("filters-jwks-server") {
+    };
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly",
-                   launchServer(BookServerOIDCFilters.class, true));
-        assertTrue("server did not launch correctly",
-                   launchServer(BookServerOIDCService.class, true));
+        createStaticBus().setExtension(OAuth2TestUtils.clientHTTPConduitConfigurer(), HTTPConduitConfigurer.class);
+
+        assertTrue("server did not launch correctly", launchServer(BookServerOIDCFilters.class));
+        assertTrue("server did not launch correctly", launchServer(BookServerOIDCService.class));
+        assertTrue("server did not launch correctly", launchServer(BOOK_JWK_SERVER));
     }
 
     @org.junit.Test
     public void testClientCodeRequestFilter() throws Exception {
-        URL busFile = OIDCFiltersTest.class.getResource("client.xml");
-
         // Make an invocation + get back the redirection to the OIDC IdP
         String address = "https://localhost:" + PORT + "/secured/bookstore/books";
-        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), busFile.toString());
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), null);
 
         WebClient.getConfig(client).getRequestContext().put(
                 org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
 
         Response response = client.get();
 
-        String location = response.getHeaderString("Location");
+        URI location = response.getLocation();
         // Now make an invocation on the OIDC IdP using another WebClient instance
 
-        WebClient idpClient = WebClient.create(location, OAuth2TestUtils.setupProviders(),
-                                               "bob", "security", busFile.toString());
+        WebClient idpClient = WebClient.create(location.toString(), OAuth2TestUtils.setupProviders(),
+                                               "bob", "security", null)
+            .type("application/json").accept("application/json");
         // Save the Cookie for the second request...
         WebClient.getConfig(idpClient).getRequestContext().put(
             org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
 
+        // Make initial authorization request
+        final OAuthAuthorizationData authzData = idpClient.get(OAuthAuthorizationData.class);
+
         // Get Authorization Code + State
-        String authzCodeLocation = makeAuthorizationCodeInvocation(idpClient);
-        String state = getSubstring(authzCodeLocation, "state");
+        String authzCodeLocation = OAuth2TestUtils.getLocation(idpClient, authzData, null);
+        String state = OAuth2TestUtils.getSubstring(authzCodeLocation, "state");
         assertNotNull(state);
-        String code = getSubstring(authzCodeLocation, "code");
+        String code = OAuth2TestUtils.getSubstring(authzCodeLocation, "code");
         assertNotNull(code);
 
         // Add Referer
@@ -96,39 +111,64 @@ public class OIDCFiltersTest extends AbstractBusClientServerTestBase {
         assertEquals(returnedBook.getId(), 123L);
     }
 
-    private String makeAuthorizationCodeInvocation(WebClient client) {
-        // Make initial authorization request
-        client.type("application/json").accept("application/json");
-        Response response = client.get();
+    @org.junit.Test
+    public void testJwsVerifierRequestFilter() throws Exception {
+        final String request = "echo";
+        final Response response = WebClient.create(
+            "https://localhost:" + BOOK_JWK_SERVER.getPort() + "/secured/bookstore/books")
+            .type(MediaType.TEXT_PLAIN).accept(MediaType.TEXT_PLAIN)
+            .post(request);
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
 
-        OAuthAuthorizationData authzData = response.readEntity(OAuthAuthorizationData.class);
+        String address = "https://localhost:" + OIDC_PORT + "/services/";
+        WebClient idpClient = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                            "bob", "security", null);
 
-        // Now call "decision" to get the authorization code grant
-        client.path("decision");
-        client.type("application/x-www-form-urlencoded");
+        // Save the Cookie for the second request...
+        WebClient.getConfig(idpClient).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
 
-        Form form = new Form();
-        form.param("session_authenticity_token", authzData.getAuthenticityToken());
-        form.param("client_id", authzData.getClientId());
-        form.param("redirect_uri", authzData.getRedirectUri());
-        if (authzData.getProposedScope() != null) {
-            form.param("scope", authzData.getProposedScope());
-        }
-        form.param("state", authzData.getState());
-        form.param("oauthDecision", "allow");
+        // Get Authorization Code
+        String code = OAuth2TestUtils.getAuthorizationCode(idpClient, OidcUtils.getOpenIdScope());
+        assertNotNull(code);
 
-        response = client.post(form);
-        return response.getHeaderString("Location");
+        // Now get the access token
+        idpClient = WebClient.create(address, "consumer-id", "this-is-a-secret", null);
+
+        ClientAccessToken accessToken =
+            OAuth2TestUtils.getAccessTokenWithAuthorizationCode(idpClient, code);
+
+        // Make an invocation
+        final AccessTokenClientFilter accessTokenClientFilter = new AccessTokenClientFilter();
+        accessTokenClientFilter.setAccessToken(accessToken.getTokenKey());
+        final String echo = WebClient.create(
+            "https://localhost:" + BOOK_JWK_SERVER.getPort() + "/secured/bookstore/books",
+            Collections.singletonList(accessTokenClientFilter))
+            .type(MediaType.TEXT_PLAIN).accept(MediaType.TEXT_PLAIN)
+            .post(request, String.class);
+
+        assertEquals(request, echo);
     }
 
-    private String getSubstring(String parentString, String substringName) {
-        String foundString =
-            parentString.substring(parentString.indexOf(substringName + "=") + (substringName + "=").length());
-        int ampersandIndex = foundString.indexOf('&');
-        if (ampersandIndex < 1) {
-            ampersandIndex = foundString.length();
+    //
+    // Server implementations
+    //
+    public static class BookServerOIDCFilters extends AbstractBusTestServerBase {
+        public static final String PORT = TestUtil.getPortNumber("jaxrs-oidc-filters");
+
+        @Override
+        protected void run() {
+            setBus(new SpringBusFactory().createBus(getClass().getResource("filters-server.xml")));
         }
-        return foundString.substring(0, ampersandIndex);
+    }
+
+    public static class BookServerOIDCService extends AbstractBusTestServerBase {
+        public static final String PORT = TestUtil.getPortNumber("jaxrs-filters-oidc-service");
+
+        @Override
+        protected void run() {
+            setBus(new SpringBusFactory().createBus(getClass().getResource("oidc-server.xml")));
+        }
     }
 
 }

@@ -142,4 +142,14 @@ public abstract class JwaDecryptRfcConformanceTest extends AbstractDecryptTest {
         test("/jwe/oct.128.a128kw.a128cbc-hs256.json.jwe");
     }
 
+    @Test
+    public void testEcdhA256wA128GcmJweJson() throws Exception {
+        test("/jwe/ec.p-256.ecdh-es+a256kw.a128gcm.json.jwe");
+    }
+
+    @Test
+    public void testEcdhA256KwA128CbcJweHs256() throws Exception {
+        test("/jwe/ec.p-256.ecdh-es+a256kw.a128cbc-hs256.json.jwe");
+    }
+
 }
