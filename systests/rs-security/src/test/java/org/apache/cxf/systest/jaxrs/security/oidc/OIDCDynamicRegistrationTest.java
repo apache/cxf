@@ -23,6 +23,7 @@ import java.net.URL;
 import java.util.Collections;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObjectProvider;
@@ -221,24 +222,33 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
             .accept("application/json").type("application/json")
             .authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, ACCESS_TOKEN));
 
-        ClientRegistration reg = newClientRegistrationCodeGrant();
-        ClientRegistrationResponse resp = wc.post(reg, ClientRegistrationResponse.class);
+        final ClientRegistration reg = newClientRegistrationCodeGrant();
+        final ClientRegistrationResponse clientRegistrationResponse = wc
+            .post(reg, ClientRegistrationResponse.class);
 
-        String regAccessToken = resp.getRegistrationAccessToken();
+        final String regAccessToken = clientRegistrationResponse.getRegistrationAccessToken();
         assertNotNull(regAccessToken);
 
         reg.setScope(OidcUtils.getEmailScope());
-        ClientRegistration clientRegResp = wc.path(resp.getClientId())
+        final ClientRegistration updatedClientRegistration = wc.path(clientRegistrationResponse.getClientId())
             .authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, regAccessToken))
             .put(reg, ClientRegistration.class);
 
-        assertEquals(OidcUtils.getEmailScope(), clientRegResp.getScope());
+        assertEquals(OidcUtils.getEmailScope(), updatedClientRegistration.getScope());
         // https://tools.ietf.org/html/rfc7592#section-2.2
-        assertNull(clientRegResp.getProperty("registration_access_token"));
-        assertNull(clientRegResp.getProperty("registration_client_uri"));
-        assertNull(clientRegResp.getProperty("client_secret_expires_at"));
-        assertNull(clientRegResp.getProperty("client_id_issued_at"));
+        assertNull(updatedClientRegistration.getProperty("registration_access_token"));
+        assertNull(updatedClientRegistration.getProperty("registration_client_uri"));
+        assertNull(updatedClientRegistration.getProperty("client_secret_expires_at"));
+        assertNull(updatedClientRegistration.getProperty("client_id_issued_at"));
 
+        wc.authorization(null);
+
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(),
+            wc.put(reg).getStatus());
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(),
+            wc.delete().getStatus());
+
+        wc.authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, regAccessToken));
         assertEquals(200, wc.delete().getStatus());
     }
 
