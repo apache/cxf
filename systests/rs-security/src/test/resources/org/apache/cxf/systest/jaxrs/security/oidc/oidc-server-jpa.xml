@@ -81,12 +81,14 @@ under the License.
    
    <bean id="authorizationService" class="org.apache.cxf.rs.security.oidc.idp.OidcAuthorizationCodeService">
       <property name="dataProvider" ref="oauthProvider"/>
+      <property name="subjectCreator" ref="subjectCreator"/>
    </bean>
    
    <bean id="implicitService" class="org.apache.cxf.rs.security.oidc.idp.OidcImplicitService">
       <property name="dataProvider" ref="oauthProvider"/>
       <property name="responseFilter" ref="idTokenFilter"/>
-      <property name="idTokenProvider" ref="idTokenProviderImpl"/>
+      <!-- <property name="idTokenProvider" ref="idTokenProviderImpl"/> -->
+      <property name="subjectCreator" ref="subjectCreator"/>
    </bean>
 
    <bean id="refreshGrantHandler" class="org.apache.cxf.rs.security.oauth2.grants.refresh.RefreshTokenGrantHandler">
@@ -99,10 +101,11 @@ under the License.
       <property name="codeVerifierTransformer" ref="digestVerifier"/>
    </bean>
 
-   <bean id="idTokenProviderImpl" class="org.apache.cxf.systest.jaxrs.security.oidc.IdTokenProviderImpl"/>
+   <!-- <bean id="idTokenProviderImpl" class="org.apache.cxf.systest.jaxrs.security.oidc.IdTokenProviderImpl"/> -->
+    <bean id="subjectCreator" class="org.apache.cxf.systest.jaxrs.security.oidc.SubjectCreatorImpl" />
 
    <bean id="idTokenFilter" class="org.apache.cxf.rs.security.oidc.idp.IdTokenResponseFilter">
-       <property name="idTokenProvider" ref="idTokenProviderImpl"/>
+       <!-- <property name="idTokenProvider" ref="idTokenProviderImpl"/> -->
    </bean>
    
    <bean id="tokenService" class="org.apache.cxf.rs.security.oauth2.services.AccessTokenService">
@@ -119,7 +122,8 @@ under the License.
    <bean id="hybridService" class="org.apache.cxf.rs.security.oidc.idp.OidcHybridService">
       <property name="dataProvider" ref="oauthProvider"/>
       <property name="responseFilter" ref="idTokenFilter"/>
-      <property name="idTokenProvider" ref="idTokenProviderImpl"/>
+      <!-- <property name="idTokenProvider" ref="idTokenProviderImpl"/> -->
+      <property name="subjectCreator" ref="subjectCreator"/>
       <property name="codeService" ref="authorizationService"/>
    </bean>
    

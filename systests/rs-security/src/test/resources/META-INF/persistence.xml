@@ -14,6 +14,7 @@
         <class>org.apache.cxf.rs.security.oauth2.common.AccessToken</class>
         <class>org.apache.cxf.rs.security.oauth2.common.OAuthPermission</class>
         <class>org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken</class>
+        <class>org.apache.cxf.rs.security.oidc.idp.OidcUserSubject</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
         <properties>
