@@ -1536,6 +1536,12 @@ public class BookStore {
     }
 
     @POST
+    @Path("/oneway/propogateExceptionVar/{i}")
+    @Oneway
+    public void onewayRequestPropogateExceptionWithVar() {
+    }
+
+    @POST
     @Path("/books/customstatus")
     @Produces("application/xml")
     @Consumes("text/xml")
