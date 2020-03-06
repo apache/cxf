@@ -443,6 +443,6 @@ public final class OAuthUtils {
     }
 
     public static String convertListOfScopesToString(List<String> registeredScopes) {
-        return String.join(", ", registeredScopes);
+        return String.join(" ", registeredScopes);
     }
 }
