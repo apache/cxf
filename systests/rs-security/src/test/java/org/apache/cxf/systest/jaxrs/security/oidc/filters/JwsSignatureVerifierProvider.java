@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.systest.jaxrs.security.oidc.filters;
 
+import java.util.Objects;
+
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
@@ -34,6 +36,7 @@ public class JwsSignatureVerifierProvider {
 
     public JwsSignatureVerifier getJwsSignatureVerifier() {
         for (JsonWebKey jwk : jwksClient.get(JsonWebKeys.class).getKeys()) {
+            Objects.requireNonNull(jwk.getKeyId());
             return JwsUtils.getSignatureVerifier(jwk);
         }
         return null;

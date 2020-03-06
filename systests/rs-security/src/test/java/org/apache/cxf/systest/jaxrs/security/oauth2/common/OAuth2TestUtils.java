@@ -309,6 +309,12 @@ public final class OAuth2TestUtils {
         return new HTTPConduitConfigurer() {
             public void configure(String name, String address, HTTPConduit c) {
                 c.setTlsClientParameters(tlsCP);
+                // 5 mins for long debug session
+//                org.apache.cxf.transports.http.configuration.HTTPClientPolicy httpClientPolicy =
+//                    new org.apache.cxf.transports.http.configuration.HTTPClientPolicy();
+//                httpClientPolicy.setConnectionTimeout(300000L);
+//                httpClientPolicy.setReceiveTimeout(300000L);
+//                c.setClient(httpClientPolicy);
             }
         };
     }
