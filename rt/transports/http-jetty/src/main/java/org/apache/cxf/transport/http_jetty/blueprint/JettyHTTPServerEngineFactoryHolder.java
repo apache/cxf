@@ -146,7 +146,9 @@ public class JettyHTTPServerEngineFactoryHolder {
                 if (engine.isContinuationsEnabled() != null) {
                     eng.setContinuationsEnabled(engine.isContinuationsEnabled());
                 }
-
+                if (engine.isSendServerVersion() != null) {
+                    eng.setSendServerVersion(engine.isSendServerVersion());
+                }
                 if (engine.getHost() != null && !StringUtils.isEmpty(engine.getHost())) {
                     eng.setHost(engine.getHost());
                 }
