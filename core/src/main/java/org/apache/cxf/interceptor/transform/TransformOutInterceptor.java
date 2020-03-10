@@ -26,7 +26,6 @@ import java.util.Map;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.StaxOutEndingInterceptor;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.message.Message;
@@ -35,6 +34,7 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.transform.TransformUtils;
 
+import static org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor.DISABLE_OUTPUTSTREAM_OPTIMIZATION;
 
 /**
  * Creates an XMLStreamReader from the InputStream on the Message.
@@ -98,9 +98,8 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
         XMLStreamWriter transformWriter = createTransformWriterIfNeeded(writer, out);
         if (transformWriter != null) {
             message.setContent(XMLStreamWriter.class, transformWriter);
-            if (message.getContextualProperty(AbstractOutDatabindingInterceptor.DISABLE_OUTPUTSTREAM_OPTIMIZATION) == null) {
-                message.put(AbstractOutDatabindingInterceptor.DISABLE_OUTPUTSTREAM_OPTIMIZATION,
-                            Boolean.TRUE);
+            if (message.getContextualProperty(DISABLE_OUTPUTSTREAM_OPTIMIZATION) == null) {
+                message.put(DISABLE_OUTPUTSTREAM_OPTIMIZATION, Boolean.TRUE);
             }
             if (MessageUtils.isRequestor(message)) {
                 message.removeContent(OutputStream.class);
