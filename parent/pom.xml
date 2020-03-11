@@ -165,7 +165,7 @@
         <cxf.lucene.version>8.2.0</cxf.lucene.version>
         <cxf.maven.core.version>3.6.2</cxf.maven.core.version>
         <cxf.microprofile.config.version>1.2</cxf.microprofile.config.version>
-        <cxf.microprofile.rest.client.version>1.4.0</cxf.microprofile.rest.client.version>
+        <cxf.microprofile.rest.client.version>1.4.1</cxf.microprofile.rest.client.version>
         <cxf.microprofile.openapi.version>1.1.2</cxf.microprofile.openapi.version>        
         <cxf.mina.version>2.0.21</cxf.mina.version>
         <cxf.mockito.version>3.1.0</cxf.mockito.version>
