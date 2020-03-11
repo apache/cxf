@@ -53,6 +53,7 @@ import org.apache.cxf.rs.security.oauth2.grants.code.CodeVerifierTransformer;
 import org.apache.cxf.rs.security.oauth2.grants.code.DigestCodeVerifier;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
+import org.apache.cxf.rs.security.oidc.idp.OidcProviderMetadata;
 import org.apache.cxf.rs.security.oidc.rp.IdTokenReader;
 import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
@@ -60,6 +61,7 @@ import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils.AuthorizationCodeParameters;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.http.HTTPConduitConfigurer;
 import org.apache.xml.security.utils.ClassLoaderUtils;
 
 import org.junit.AfterClass;
@@ -99,6 +101,8 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
+        createStaticBus().setExtension(OAuth2TestUtils.clientHTTPConduitConfigurer(), HTTPConduitConfigurer.class);
+
         assertTrue("Server failed to launch", launchServer(JCACHE_SERVER));
         assertTrue("Server failed to launch", launchServer(JWT_JCACHE_SERVER));
         assertTrue("Server failed to launch", launchServer(JPA_SERVER));
@@ -983,6 +987,15 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         idToken = getIdToken(accessToken, address + "keys/", "consumer-id-oidc");
 
         assertNotEquals(issuedAt, idToken.getIssuedAt());
+    }
+
+    @org.junit.Test
+    public void testOIDCProviderMetadata() throws Exception {
+        final String issuerURL = "https://localhost:" + port + "/services/";
+        final OidcProviderMetadata oidcProviderMetadata = OidcUtils.getOidcProviderMetadata(issuerURL);
+
+        assertEquals(issuerURL, oidcProviderMetadata.getIssuer().toString());
+        assertNotNull(oidcProviderMetadata.getResponseTypesSupported());
     }
 
     private void validateIdToken(String idToken, String nonce)
