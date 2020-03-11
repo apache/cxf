@@ -92,10 +92,34 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>reserve-network-port</id>
+                        <goals>
+                            <goal>reserve-network-port</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                        <configuration>
+                            <portNames>
+                                <portName>wiremock.server.port</portName>
+                            </portNames>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>uk.co.automatictester</groupId>
                 <artifactId>wiremock-maven-plugin</artifactId>
-                <!-- Note, updating to 4.4.1 causes a weird Xalan error when building the distribution -->
-                <version>4.4.0</version>
+                <version>6.0.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.github.tomakehurst</groupId>
+                        <artifactId>wiremock</artifactId>
+                        <version>2.26.3</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <phase>generate-test-sources</phase>
@@ -104,7 +128,7 @@
                         </goals>
                         <configuration>
                             <dir>${project.build.outputDirectory}</dir>
-                            <params>${cxf.wiremock.params}</params>
+                            <params>--port ${wiremock.server.port}</params>
                         </configuration>
                     </execution>
                 </executions>
@@ -118,6 +142,9 @@
                     <suiteXmlFiles>
                         <suiteXmlFile>testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
+                    <systemPropertyVariables>
+                        <wiremock.server.port>${wiremock.server.port}</wiremock.server.port>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
         </plugins>
