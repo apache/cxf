@@ -20,9 +20,6 @@
 
 package org.apache.cxf.jaxrs.sse;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.ext.MessageBodyWriter;
@@ -30,12 +27,9 @@ import javax.ws.rs.sse.OutboundSseEvent;
 import javax.ws.rs.sse.SseEventSink;
 
 import org.apache.cxf.common.util.PropertyUtils;
-import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.ext.ContextProvider;
 import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
-import org.apache.cxf.jaxrs.sse.interceptor.SseInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
@@ -53,17 +47,15 @@ public class SseEventSinkContextProvider implements ContextProvider<SseEventSink
         final AsyncResponse async = new AsyncResponseImpl(message);
         final Integer bufferSize = PropertyUtils.getInteger(message, SseEventSinkImpl.BUFFER_SIZE_PROPERTY);
         
-        final Collection<Interceptor<? extends Message>> interceptors = 
-            CastUtils.cast((Collection<?>)message.get(Message.IN_INTERCEPTORS));
+        final SseEventSink sink = createSseEventSink(request, writer, async, bufferSize);
+        message.put(SseEventSink.class, sink);
         
-        final Collection<Interceptor<? extends Message>> chain = new ArrayList<>();
-        if (interceptors != null) {
-            chain.addAll(interceptors);
-        }
-        
-        chain.add(new SseInterceptor());
-        message.put(Message.IN_INTERCEPTORS, chain);
-        
+        return sink;
+    }
+
+    protected SseEventSink createSseEventSink(final HttpServletRequest request,
+            final MessageBodyWriter<OutboundSseEvent> writer,
+            final AsyncResponse async, final Integer bufferSize) {
         if (bufferSize != null) {
             return new SseEventSinkImpl(writer, async, request.getAsyncContext(), bufferSize);
         } else {        

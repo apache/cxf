@@ -53,5 +53,4 @@ public class SseProvidersExtension implements BusCreationListener {
         
         bus.getInInterceptors().add(new SseInterceptor());
     }
-    
 }
