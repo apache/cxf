@@ -78,19 +78,6 @@ public final class TransformUtils {
                                                                 Map<String, String> outAppendMap,
                                                                 Map<String, String> outAttributesMap,
                                                                 boolean attributesToElements,
-                                                                String defaultNamespace) {
-        return createTransformWriterIfNeeded(writer, os, outElementsMap, outDropElements,
-                                             outAppendMap, outAttributesMap, attributesToElements,
-                                             defaultNamespace, null);
-    }
-
-    public static XMLStreamWriter createTransformWriterIfNeeded(XMLStreamWriter writer,
-                                                                OutputStream os,
-                                                                Map<String, String> outElementsMap,
-                                                                List<String> outDropElements,
-                                                                Map<String, String> outAppendMap,
-                                                                Map<String, String> outAttributesMap,
-                                                                boolean attributesToElements,
                                                                 String defaultNamespace,
                                                                 String encoding) {
         if (outElementsMap != null || outDropElements != null
