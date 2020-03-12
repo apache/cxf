@@ -100,14 +100,17 @@ under the License.
            <ref bean="tokenService"/>
            <ref bean="tokenValidateService"/>
            <ref bean="wellKnownService"/>
+           <bean class="org.apache.cxf.rs.security.oauth2.services.JwksService"/>
        </jaxrs:serviceBeans>
        <jaxrs:providers>
            <ref bean="basicAuthFilter"/>
            <bean class="org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider"/>
+           <bean class="org.apache.cxf.rs.security.jose.jaxrs.JsonWebKeysProvider"/>
        </jaxrs:providers>
        <jaxrs:properties>
-            <entry key="rs.security.signature.out.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
+            <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
             <entry key="rs.security.signature.key.password.provider" value-ref="keyPasswordProvider"/>
+            <entry key="rs.security.signature.include.key.id" value="true" />
        </jaxrs:properties>
    </jaxrs:server>
    <jaxrs:server id="oauthServer2" staticSubresourceResolution="true"

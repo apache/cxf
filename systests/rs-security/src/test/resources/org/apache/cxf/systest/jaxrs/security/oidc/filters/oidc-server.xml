@@ -108,9 +108,7 @@ under the License.
    <bean id="basicAuthFilter" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.WSS4JBasicAuthFilter">
        <property name="callbackHandler" ref="callbackHandler"/>
    </bean>
-   
-   <bean id="oidcKeysService" class="org.apache.cxf.rs.security.oidc.idp.OidcKeysService"/>
-   
+
    <jaxrs:server 
        depends-on="tls-config" 
        address="https://localhost:${testutil.ports.jaxrs-filters-oidc-service}/services">
@@ -119,11 +117,9 @@ under the License.
            <ref bean="hybridService"/>
            <ref bean="implicitService"/>
            <ref bean="tokenService"/>
-           <ref bean="oidcKeysService"/>
        </jaxrs:serviceBeans>
        <jaxrs:providers>
            <ref bean="basicAuthFilter"/>
-           <bean class="org.apache.cxf.rs.security.jose.jaxrs.JsonWebKeysProvider"/>
        </jaxrs:providers>
        <jaxrs:properties>
            <entry key="rs.security.keystore.type" value="jks" />
@@ -132,7 +128,6 @@ under the License.
            <entry key="rs.security.key.password" value="password"/>
            <entry key="rs.security.keystore.file" value="keys/alice.jks" />
            <entry key="rs.security.signature.algorithm" value="RS256" />
-           <entry key="rs.security.signature.include.key.id" value="true" />
        </jaxrs:properties>
    </jaxrs:server>
    

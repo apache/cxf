@@ -70,24 +70,35 @@ public class OAuth2JwtFiltersTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly",
                    launchServer(BookServerOAuth2ServiceJwt.class));
     }
+
     @org.junit.Test
     public void testServiceWithJwtToken() throws Exception {
         String oauthServiceAddress = "https://localhost:" + OAUTH_PORT + "/services/";
         String rsAddress = "https://localhost:" + PORT + "/secured/bookstore/books";
         doTestServiceWithJwtTokenAndScope(oauthServiceAddress, rsAddress);
     }
+
     @org.junit.Test
     public void testServiceWithJwtTokenStoredAsJoseKey() throws Exception {
         String oauthServiceAddress = "https://localhost:" + OAUTH_PORT + "/services2/";
         String rsAddress = "https://localhost:" + PORT + "/secured2/bookstore/books";
         doTestServiceWithJwtTokenAndScope(oauthServiceAddress, rsAddress);
     }
+
     @org.junit.Test
     public void testServiceWithJwtTokenAndLocalValidation() throws Exception {
         String oauthServiceAddress = "https://localhost:" + OAUTH_PORT + "/services/";
         String rsAddress = "https://localhost:" + PORT + "/securedLocalValidation/bookstore/books";
         doTestServiceWithJwtTokenAndScope(oauthServiceAddress, rsAddress);
     }
+
+    @org.junit.Test
+    public void testServiceWithJwtTokenAndJwsJwksValidation() throws Exception {
+        String oauthServiceAddress = "https://localhost:" + OAUTH_PORT + "/services/";
+        String rsAddress = "https://localhost:" + PORT + "/securedJwsJwksValidation/bookstore/books";
+        doTestServiceWithJwtTokenAndScope(oauthServiceAddress, rsAddress);
+    }
+
     private void doTestServiceWithJwtTokenAndScope(String oauthService, String rsAddress) throws Exception {
         final AuthorizationMetadata authorizationMetadata = OAuthClientUtils.getAuthorizationMetadata(oauthService);
 
