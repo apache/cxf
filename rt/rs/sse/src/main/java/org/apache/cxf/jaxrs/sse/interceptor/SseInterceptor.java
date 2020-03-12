@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.sse.SseEventSink;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.impl.ResponseImpl;
@@ -52,6 +53,11 @@ public class SseInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     public void handleMessage(Message message) {
+        // Not an SSE invocation, skipping it in favor of normal processing
+        if (message.get(SseEventSink.class) == null) {
+            return;
+        }
+
         if (!isRequestor(message) && message.get(SseInterceptor.class) == null) {
             message.put(SseInterceptor.class, this);
 
