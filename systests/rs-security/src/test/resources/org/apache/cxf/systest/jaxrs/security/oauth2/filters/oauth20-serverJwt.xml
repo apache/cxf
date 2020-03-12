@@ -19,34 +19,15 @@ under the License.
 -->
 <beans xmlns="http://www.springframework.org/schema/beans" 
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-    xmlns:http="http://cxf.apache.org/transports/http/configuration" 
     xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" 
     xmlns:sec="http://cxf.apache.org/configuration/security" 
-    xmlns:cxf="http://cxf.apache.org/core" 
     xmlns:jaxrs="http://cxf.apache.org/jaxrs" 
-    xmlns:util="http://www.springframework.org/schema/util"
     xsi:schemaLocation="http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
-             http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
              http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-             http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util-4.2.xsd
-             http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd
              http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd 
              http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-    <cxf:bus>
-        <cxf:features>
-            <cxf:logging/>
-        </cxf:features>
-        <cxf:properties> 
-          <entry key="org.apache.cxf.jaxrs.bus.providers" value-ref="busProviders"/> 
-        </cxf:properties>
-    </cxf:bus>
-    <!-- providers -->
-    <util:list id="busProviders"> 
-        <ref bean="oauthJson"/> 
-    </util:list> 
-    <bean id="oauthJson" class="org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider"/>
-    
+
     <httpj:engine-factory id="tls-config">
         <httpj:engine port="${testutil.ports.jaxrs-oauth2-serviceJwt}">
             <httpj:tlsServerParameters>
@@ -102,33 +83,45 @@ under the License.
    <bean id="basicAuthFilter" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.WSS4JBasicAuthFilter">
        <property name="callbackHandler" ref="callbackHandler"/>
    </bean>
-   
-   <jaxrs:server id="oauthServer1"
+
+    <bean id="authorizationMetadataService" class="org.apache.cxf.rs.security.oauth2.services.AuthorizationMetadataService">
+        <property name="authorizationEndpointAddress" value="/authorize" />
+        <property name="tokenEndpointAddress" value="/token" />
+    </bean>
+    <bean id="wellKnownService" class="org.apache.cxf.rs.security.oauth2.services.WellKnownService">
+        <property name="service" ref="authorizationMetadataService" />
+    </bean>
+
+   <jaxrs:server id="oauthServer1" staticSubresourceResolution="true"
        depends-on="tls-config" 
        address="https://localhost:${testutil.ports.jaxrs-oauth2-serviceJwt}/services">
        <jaxrs:serviceBeans>
            <ref bean="authorizationService"/>
            <ref bean="tokenService"/>
            <ref bean="tokenValidateService"/>
+           <ref bean="wellKnownService"/>
        </jaxrs:serviceBeans>
        <jaxrs:providers>
            <ref bean="basicAuthFilter"/>
+           <bean class="org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider"/>
        </jaxrs:providers>
        <jaxrs:properties>
             <entry key="rs.security.signature.out.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
             <entry key="rs.security.signature.key.password.provider" value-ref="keyPasswordProvider"/>
        </jaxrs:properties>
    </jaxrs:server>
-   <jaxrs:server id="oauthServer2"
+   <jaxrs:server id="oauthServer2" staticSubresourceResolution="true"
        depends-on="tls-config" 
        address="https://localhost:${testutil.ports.jaxrs-oauth2-serviceJwt}/services2">
        <jaxrs:serviceBeans>
            <ref bean="authorizationService2"/>
            <ref bean="tokenService2"/>
            <ref bean="tokenValidateService2"/>
+           <ref bean="wellKnownService"/>
        </jaxrs:serviceBeans>
        <jaxrs:providers>
            <ref bean="basicAuthFilter"/>
+           <bean class="org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider"/>
        </jaxrs:providers>
        <jaxrs:properties>
             <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>

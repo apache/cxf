@@ -19,6 +19,10 @@
 
 package org.apache.cxf.systest.jaxrs.security.oauth2.filters;
 
+import java.net.URI;
+import java.util.Collections;
+
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -27,7 +31,12 @@ import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
+import org.apache.cxf.rs.security.oauth2.client.Consumer;
+import org.apache.cxf.rs.security.oauth2.client.OAuthClientUtils;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
+import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrant;
+import org.apache.cxf.rs.security.oauth2.services.AuthorizationMetadata;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
@@ -54,6 +63,7 @@ public class OAuth2JwtFiltersTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         createStaticBus().setExtension(OAuth2TestUtils.clientHTTPConduitConfigurer(), HTTPConduitConfigurer.class);
+        getStaticBus().setFeatures(Collections.singletonList(new org.apache.cxf.ext.logging.LoggingFeature()));
 
         assertTrue("server did not launch correctly",
                    launchServer(BookServerOAuth2FiltersJwt.class));
@@ -79,21 +89,33 @@ public class OAuth2JwtFiltersTest extends AbstractBusClientServerTestBase {
         doTestServiceWithJwtTokenAndScope(oauthServiceAddress, rsAddress);
     }
     private void doTestServiceWithJwtTokenAndScope(String oauthService, String rsAddress) throws Exception {
+        final AuthorizationMetadata authorizationMetadata = OAuthClientUtils.getAuthorizationMetadata(oauthService);
+
+        final String scope = "create_book";
+
+        final URI authorizationURI = OAuthClientUtils.getAuthorizationURI(
+            authorizationMetadata.getAuthorizationEndpoint().toString(),
+            "consumer-id", null, null, scope);
+
         // Get Authorization Code
-        WebClient oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(),
+        WebClient oauthClient = WebClient.create(authorizationURI.toString(), OAuth2TestUtils.setupProviders(),
                                                  "alice", "security", null);
         // Save the Cookie for the second request...
         WebClient.getConfig(oauthClient).getRequestContext().put(
             org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
 
-        String code = OAuth2TestUtils.getAuthorizationCode(oauthClient, "create_book");
+        final String location = OAuth2TestUtils.getLocation(oauthClient,
+            oauthClient.accept(MediaType.APPLICATION_JSON).get(OAuthAuthorizationData.class),
+            null);
+        final String code = OAuth2TestUtils.getSubstring(location, "code");
         assertNotNull(code);
 
         // Now get the access token
-        oauthClient = WebClient.create(oauthService, "consumer-id", "this-is-a-secret", null);
-
-        ClientAccessToken accessToken =
-            OAuth2TestUtils.getAccessTokenWithAuthorizationCode(oauthClient, code);
+        final ClientAccessToken accessToken = OAuthClientUtils.getAccessToken(
+            authorizationMetadata.getTokenEndpoint().toString(),
+            new Consumer("consumer-id", "this-is-a-secret"),
+            new AuthorizationCodeGrant(code),
+            true);
         assertNotNull(accessToken.getTokenKey());
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(accessToken.getTokenKey());
@@ -103,14 +125,12 @@ public class OAuth2JwtFiltersTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = jwtConsumer.getJwtClaims();
         assertEquals("consumer-id", claims.getStringProperty(OAuthConstants.CLIENT_ID));
         assertEquals("alice", claims.getStringProperty("username"));
+        assertTrue(claims.getListStringProperty(OAuthConstants.SCOPE).contains(scope));
         // Now invoke on the service with the access token
         WebClient client = WebClient.create(rsAddress, OAuth2TestUtils.setupProviders())
             .authorization(new ClientAccessToken(BEARER_AUTHORIZATION_SCHEME, accessToken.getTokenKey()));
 
-        Response response = client.type("application/xml").post(new Book("book", 123L));
-        assertEquals(200, response.getStatus());
-
-        Book returnedBook = response.readEntity(Book.class);
+        Book returnedBook = client.type("application/xml").post(new Book("book", 123L), Book.class);
         assertEquals(returnedBook.getName(), "book");
         assertEquals(returnedBook.getId(), 123L);
     }
