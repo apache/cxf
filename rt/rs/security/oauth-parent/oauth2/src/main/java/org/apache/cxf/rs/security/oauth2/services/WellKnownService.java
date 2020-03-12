@@ -26,7 +26,7 @@ public class WellKnownService {
 
     private AuthorizationMetadataService service;
 
-    @Path(".well-known")
+    @Path(WELL_KNOWN_PATH)
     public AuthorizationMetadataService getService() {
         return service;
     }
