@@ -1491,6 +1491,16 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                     tt = DOMUtils.getContent(el);
                 } else if ("KeySize".equals(ln)) {
                     retKeySize = DOMUtils.getContent(el);
+                } else if ("SignChallenge".equals(ln)) {
+                    el = DOMUtils.getFirstElement(el);
+                    if ("Challenge".equals(el.getLocalName())) {
+                        // maybe another implementation of the return object is more useful. 
+                        // We need to transport only two values: 
+                        // challengeValue and a marker for the kind of response (SignChallenge response)
+                        SecurityToken token = new SecurityToken(DOMUtils.getContent(el));
+                        token.setTokenType("SignChallenge");
+                        return token;
+                    }
                 }
             }
             el = DOMUtils.getNextElement(el);
