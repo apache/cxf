@@ -807,6 +807,10 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
             sendKeyType = false;
         }
 
+        if (sptt == null) {
+            addTokenType(writer);
+        }
+
         addRequestType(requestType, writer);
         if (enableAppliesTo) {
             addAppliesTo(writer, appliesTo);
@@ -814,18 +818,20 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
 
         addClaims(writer);
 
+        if (isSecureConv || enableLifetime) {
+            addLifetime(writer);
+        }
+
+        // Write out renewal semantics
+        writeRenewalSemantics(writer);
+
         Element onBehalfOfToken = getOnBehalfOfToken();
         if (onBehalfOfToken != null) {
             writer.writeStartElement("wst", "OnBehalfOf", namespace);
             StaxUtils.copy(onBehalfOfToken, writer);
             writer.writeEndElement();
         }
-        if (sptt == null) {
-            addTokenType(writer);
-        }
-        if (isSecureConv || enableLifetime) {
-            addLifetime(writer);
-        }
+
         if (keyTypeTemplate == null) {
             keyTypeTemplate = writeKeyType(writer, keyType);
         }
@@ -862,9 +868,6 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
             StaxUtils.copy(actAsSecurityToken, writer);
             writer.writeEndElement();
         }
-
-        // Write out renewal semantics
-        writeRenewalSemantics(writer);
 
         Element customElement = getCustomContent();
         if (customElement != null) {
@@ -1075,14 +1078,15 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
             tokenType = STSUtils.getTokenTypeSCT(namespace);
         }
 
+        if (sptt == null) {
+            addTokenType(writer);
+        }
+
         addRequestType("/Renew", writer);
         if (enableAppliesTo) {
             addAppliesTo(writer, tok.getIssuerAddress());
         }
 
-        if (sptt == null) {
-            addTokenType(writer);
-        }
         if (isSecureConv || enableLifetime) {
             addLifetime(writer);
         }
@@ -1151,12 +1155,13 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
         writer.writeStartElement("wst", "RequestSecurityToken", namespace);
         writer.writeNamespace("wst", namespace);
-        writer.writeStartElement("wst", "RequestType", namespace);
-        writer.writeCharacters(namespace + "/Validate");
-        writer.writeEndElement();
 
         writer.writeStartElement("wst", "TokenType", namespace);
         writer.writeCharacters(tokentype);
+        writer.writeEndElement();
+
+        writer.writeStartElement("wst", "RequestType", namespace);
+        writer.writeCharacters(namespace + "/Validate");
         writer.writeEndElement();
 
         if (tokentype.endsWith("/RSTR/Status")) {
