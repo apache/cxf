@@ -64,6 +64,8 @@ pipeline {
                sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-rt-rs-client:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
                sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-rt-rs-sse:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
                sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-rt-transports-http:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
+               echo "Including additional dependencies (woodstox, ...)"
+               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=com.fasterxml.woodstox:woodstox-core:5.2.1:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
            }
        }
        
