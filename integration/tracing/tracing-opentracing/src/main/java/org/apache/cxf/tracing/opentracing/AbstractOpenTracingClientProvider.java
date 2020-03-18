@@ -94,6 +94,7 @@ public abstract class AbstractOpenTracingClientProvider extends AbstractTracingP
             }
 
             span.setTag(Tags.HTTP_STATUS.getKey(), responseStatus);
+            span.setTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_CLIENT);
             span.close();
         }
     }

@@ -136,6 +136,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSender.getAllSpans().size(), equalTo(2));
         assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Get Books"));
         assertThat(TestSender.getAllSpans().get(1).getOperationName(), equalTo("GET /bookstore/books"));
+        assertThat(TestSender.getAllSpans().get(1).getTags(), hasItem(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER));
     }
 
     @Test
@@ -231,7 +232,9 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSender.getAllSpans().size(), equalTo(3));
         assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Get Books"));
         assertThat(TestSender.getAllSpans().get(1).getOperationName(), equalTo("GET /bookstore/books"));
+        assertThat(TestSender.getAllSpans().get(1).getTags(), hasItem(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER));
         assertThat(TestSender.getAllSpans().get(2).getOperationName(), equalTo("GET " + client.getCurrentURI()));
+        assertThat(TestSender.getAllSpans().get(2).getTags(), hasItem(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_CLIENT));
     }
 
     @Test
