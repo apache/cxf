@@ -92,6 +92,9 @@ public class ServiceListGeneratorServlet extends HttpServlet {
             return;
         }
         List<String> privateEndpoints;
+        if (bus == null) {
+            bus = BusFactory.getDefaultBus(false);
+        }
         if (bus != null) {
             privateEndpoints = (List<String>)bus.getProperty("org.apache.cxf.private.endpoints");
         } else {
