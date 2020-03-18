@@ -98,4 +98,19 @@ public class JAXRSServicesListingTest extends AbstractBusClientServerTestBase {
             assertFalse(result.contains("<script>"));
         }
     }
+
+    @Test
+    public void testServiceListingPrivate() throws Exception {
+
+        String endpointAddress =
+            "http://localhost:" + PORT + "/service_listing/services";
+        String expectedResult =
+            "http://localhost:" + PORT + "/service_listing/services/resourcesprivate";
+
+        URL url = new URL(endpointAddress);
+        try (InputStream input = url.openStream()) {
+            String result = IOUtils.readStringFromStream(input);
+            assertFalse(result.contains(expectedResult));
+        }
+    }
 }
