@@ -35,7 +35,7 @@
         <cxf.jetty9.version>9.4.26.v20200117</cxf.jetty9.version>
         <cxf.httpcomponents.client.version>4.5.8</cxf.httpcomponents.client.version>
         <cxf.swagger.ui.version>3.24.3</cxf.swagger.ui.version>
-        <cxf.tika.version>1.23</cxf.tika.version>
+        <cxf.tika.version>1.24</cxf.tika.version>
     </properties>
     <dependencies>
         <dependency>
