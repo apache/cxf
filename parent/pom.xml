@@ -217,7 +217,7 @@
         <cxf.validation.api.version>1.1.0.Final</cxf.validation.api.version>
         <cxf.velocity.version>2.2</cxf.velocity.version>
         <cxf.wiremock.version>2.23.2</cxf.wiremock.version>
-        <cxf.woodstox.core.version>5.2.1</cxf.woodstox.core.version>
+        <cxf.woodstox.core.version>5.3.0</cxf.woodstox.core.version>
         <cxf.woodstox.stax2-api.version>4.2</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
         <cxf.wss4j.version>2.3.0-SNAPSHOT</cxf.wss4j.version>
