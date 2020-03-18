@@ -38,9 +38,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -79,9 +77,6 @@ public class Stax2ValidationUtilsTest {
     private static final String LOG_SCHEMA = "schemas/logSchema.xsd";
 
     private static final String MULTI_IMPORT_SCHEMA = "schemas/schemaWithImports.xsd";
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     private Stax2ValidationUtils utils = new Stax2ValidationUtils();
     private XMLStreamReader xmlReader;
