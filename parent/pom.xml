@@ -209,7 +209,7 @@
         <cxf.tomcat.version>8.5.53</cxf.tomcat.version>
         <cxf.tomitribe.http.signature.version>1.3</cxf.tomitribe.http.signature.version>
         <cxf.undertow.osgi.version>[1.4,3.0)</cxf.undertow.osgi.version>
-        <cxf.undertow.version>2.0.28.Final</cxf.undertow.version>
+        <cxf.undertow.version>2.0.30.Final</cxf.undertow.version>
         <!-- the Export-Package is the same as the Maven artifact
              version (with the Final), but we don't want an import package with a version
              with a qualifier. We do want a range. -->
