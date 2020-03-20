@@ -37,6 +37,11 @@ import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 
+/**
+ * Validate Access Token signature using JWK Set from
+ * {@link org.apache.cxf.rs.security.oauth2.services.AuthorizationMetadata#getJwksURL()} according to
+ * {@link JwsHeaders#getKeyId()} 
+ */
 public class JwsJwksJwtAccessTokenValidator extends JwtAccessTokenValidator {
 
     final Map<String, JwkHolder> jsonWebKeys = new ConcurrentHashMap<>();
