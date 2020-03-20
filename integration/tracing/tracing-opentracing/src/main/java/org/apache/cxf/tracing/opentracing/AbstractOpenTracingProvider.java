@@ -106,6 +106,7 @@ public abstract class AbstractOpenTracingProvider extends AbstractTracingProvide
             }
 
             span.setTag(Tags.HTTP_STATUS.getKey(), responseStatus);
+            span.setTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER);
             span.finish();
             
             scope.close();

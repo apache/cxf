@@ -27,5 +27,13 @@
             <ref bean="servletconfigstore"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
+    <jaxrs:server id="bookserviceprivate" address="/resourcesprivate">
+        <jaxrs:serviceBeans>
+            <ref bean="servletconfigstore"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:properties>
+            <entry key="org.apache.cxf.endpoint.private" value="true"/>
+        </jaxrs:properties>
+    </jaxrs:server>
     <bean id="servletconfigstore" class="org.apache.cxf.systest.jaxrs.SpringServletConfigStore"/>
 </beans>
