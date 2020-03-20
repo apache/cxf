@@ -51,7 +51,8 @@ public class JwsJwksJwtAccessTokenValidator extends JwtAccessTokenValidator {
     @Override
     protected JwsSignatureVerifier getInitializedSignatureVerifier(JwsHeaders jwsHeaders) {
         Objects.requireNonNull(jwsHeaders.getKeyId());
-        return jsonWebKeys.computeIfAbsent(jwsHeaders.getKeyId(), keyId -> updateJwk(keyId)).getJwsSignatureVerifier();
+        final JwkHolder jwkHolder = jsonWebKeys.computeIfAbsent(jwsHeaders.getKeyId(), keyId -> updateJwk(keyId));
+        return jwkHolder != null ? jwkHolder.getJwsSignatureVerifier() : null;
     }
 
     public void setJwksURL(String jwksURL) {
