@@ -54,5 +54,6 @@
         <module>ws-transfer</module>
         <module>rs-sse</module>
         <module>microprofile</module>
+        <module>spring-boot</module>
     </modules>
 </project>

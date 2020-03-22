@@ -77,13 +77,13 @@ public class BookStore2 extends BookStoreClientCloseable {
                     final Integer id = Integer.valueOf(lastEventId);
                     final Builder builder = sse.newEventBuilder();
 
-                    sink.send(createStatsEvent(builder.name("book"), id + 1));
+                    sink.send(createEvent(builder.name("book"), id + 1));
                     Thread.sleep(200);
-                    sink.send(createStatsEvent(builder.name("book"), id + 2));
+                    sink.send(createEvent(builder.name("book"), id + 2));
                     Thread.sleep(200);
-                    sink.send(createStatsEvent(builder.name("book"), id + 3));
+                    sink.send(createEvent(builder.name("book"), id + 3));
                     Thread.sleep(200);
-                    sink.send(createStatsEvent(builder.name("book"), id + 4));
+                    sink.send(createEvent(builder.name("book"), id + 4));
                     Thread.sleep(200);
                     sink.close();
                 } catch (final InterruptedException ex) {
@@ -101,11 +101,28 @@ public class BookStore2 extends BookStoreClientCloseable {
         
         CompletableFuture
             .runAsync(() -> {
-                sink.send(createStatsEvent(builder.name("book"), 1));
-                sink.send(createStatsEvent(builder.name("book"), 2));
-                sink.send(createStatsEvent(builder.name("book"), 3));
-                sink.send(createStatsEvent(builder.name("book"), 4));
-                sink.send(createStatsEvent(builder.name("book"), 5));
+                sink.send(createEvent(builder.name("book"), 1));
+                sink.send(createEvent(builder.name("book"), 2));
+                sink.send(createEvent(builder.name("book"), 3));
+                sink.send(createEvent(builder.name("book"), 4));
+                sink.send(createEvent(builder.name("book"), 5));
+            })
+            .whenComplete((r, ex) -> sink.close());
+    }
+
+    @GET
+    @Path("/titles/sse")
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    public void forBookTitlesOnly(@Context SseEventSink sink) {
+        final Builder builder = sse.newEventBuilder();
+        
+        CompletableFuture
+            .runAsync(() -> {
+                sink.send(createRawEvent(builder.name("book"), 1));
+                sink.send(createRawEvent(builder.name("book"), 2));
+                sink.send(createRawEvent(builder.name("book"), 3));
+                sink.send(createRawEvent(builder.name("book"), 4));
+                sink.send(createRawEvent(builder.name("book"), 5));
             })
             .whenComplete((r, ex) -> sink.close());
     }
@@ -138,8 +155,8 @@ public class BookStore2 extends BookStoreClientCloseable {
             }
 
             final Builder builder = sse.newEventBuilder();
-            broadcaster.broadcast(createStatsEvent(builder.name("book"), 1000))
-                .thenAcceptBoth(broadcaster.broadcast(createStatsEvent(builder.name("book"), 2000)), (a, b) -> { })
+            broadcaster.broadcast(createEvent(builder.name("book"), 1000))
+                .thenAcceptBoth(broadcaster.broadcast(createEvent(builder.name("book"), 2000)), (a, b) -> { })
                 .whenComplete((r, ex) -> { 
                     if (broadcaster != null) {
                         broadcaster.close();
