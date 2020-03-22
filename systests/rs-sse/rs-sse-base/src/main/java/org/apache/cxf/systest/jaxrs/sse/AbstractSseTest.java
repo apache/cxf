@@ -104,6 +104,28 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
     }
 
     @Test
+    public void testBookTitlesStreamIsReturnedFromInboundSseEvents() throws InterruptedException {
+        final WebTarget target = createWebTarget("/rest/api/bookstore/titles/sse");
+        final Collection<String> titles = new ArrayList<>();
+
+        try (SseEventSource eventSource = SseEventSource.target(target).build()) {
+            eventSource.register(collectRaw(titles), System.out::println);
+            eventSource.open();
+            // Give the SSE stream some time to collect all events
+            awaitEvents(5000, titles, 4);
+        }
+        // Easing the test verification here, it does not work well for Atm + Jetty
+        assertThat(titles,
+            hasItems(
+                "New Book #1",
+                "New Book #2",
+                "New Book #3",
+                "New Book #4"
+            )
+        );
+    }
+
+    @Test
     public void testNoDataIsReturnedFromInboundSseEvents() throws InterruptedException {
         final WebTarget target = createWebTarget("/rest/api/bookstore/nodata");
         final Collection<Book> books = new ArrayList<>();
@@ -313,7 +335,11 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
         return false;
     }
 
-    private static Consumer<InboundSseEvent> collect(final Collection< Book > books) {
+    private static Consumer<InboundSseEvent> collect(final Collection<Book> books) {
         return event -> books.add(event.readData(Book.class, MediaType.APPLICATION_JSON_TYPE));
+    }
+    
+    private static Consumer<InboundSseEvent> collectRaw(final Collection<String> titles) {
+        return event -> titles.add(event.readData(String.class, MediaType.TEXT_PLAIN_TYPE));
     }
 }
