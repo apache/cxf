@@ -341,7 +341,6 @@ public class SoapActionTest extends Assert {
     }
 
     @Test
-    @org.junit.Ignore  // TODO
     public void testRPCLitSoapActionSpoofing() throws Exception {
         JaxWsProxyFactoryBean pf = new JaxWsProxyFactoryBean();
         pf.setServiceClass(RPCGreeter.class);

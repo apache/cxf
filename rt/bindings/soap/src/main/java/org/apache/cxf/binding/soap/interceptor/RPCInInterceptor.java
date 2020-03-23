@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapBody;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataReader;
@@ -112,6 +113,10 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
             setMessage(message, operation);
         } else {
             operation = message.getExchange().getBindingOperationInfo();
+            if (!operation.getName().getLocalPart().equals(opName)) {
+                String sa = (String)message.get(SoapBindingConstants.SOAP_ACTION);
+                throw new Fault("SOAP_ACTION_MISMATCH_OP", LOG, null, sa, opName);
+            }
         }
         MessageInfo msg;
         DataReader<XMLStreamReader> dr = getDataReader(message, XMLStreamReader.class);

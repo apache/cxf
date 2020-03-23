@@ -43,7 +43,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
-
+import static org.junit.Assert.fail;
 
 /**
  * Some tests for sending a SOAP Action with JMS
@@ -108,6 +108,8 @@ public class JMSSoapActionTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)greeter).close();
     }
 
+    
+    
     @Test
     public void testSayHi2() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldServiceSoapAction");
@@ -126,10 +128,13 @@ public class JMSSoapActionTest extends AbstractBusClientServerTestBase {
             BindingProvider.SOAPACTION_URI_PROPERTY, "SAY_HI_2"
         );
 
-        String reply = greeter.sayHi();
-        assertNotNull("no response received from service", reply);
-        assertEquals(response, reply);
-
+        try {
+            greeter.sayHi();
+            fail("Failure expected on spoofing attack");
+        } catch (Exception ex) {
+            // expected
+        }
+            
         ((java.io.Closeable)greeter).close();
     }
 
