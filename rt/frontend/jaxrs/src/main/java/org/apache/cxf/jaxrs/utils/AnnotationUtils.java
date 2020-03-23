@@ -189,19 +189,24 @@ public final class AnnotationUtils {
     private static Method doGetAnnotatedMethod(Class<?> serviceClass, Method m) {
 
         if (m != null) {
-            for (Annotation a : m.getAnnotations()) {
-                if (AnnotationUtils.isMethodAnnotation(a)) {
-                    return m;
+            if (!m.isBridge() && !m.isSynthetic()) {
+                //the bridge/synthetic methods may not have the parameter annotations
+                //thus we will need to search the super classes/interfaces to make 
+                //sure we get the proper method that would also have the parameters annotated
+                //properly
+                for (Annotation a : m.getAnnotations()) {
+                    if (AnnotationUtils.isMethodAnnotation(a)) {
+                        return m;
+                    }
+                }
+                for (Annotation[] paramAnnotations : m.getParameterAnnotations()) {
+                    if (isValidParamAnnotations(paramAnnotations)) {
+                        LOG.warning("Method " + m.getName() + " in " + m.getDeclaringClass().getName()
+                                     + " has no JAX-RS Path or HTTP Method annotations");
+                        return m;
+                    }
                 }
             }
-            for (Annotation[] paramAnnotations : m.getParameterAnnotations()) {
-                if (isValidParamAnnotations(paramAnnotations)) {
-                    LOG.warning("Method " + m.getName() + " in " + m.getDeclaringClass().getName()
-                                 + " has no JAX-RS Path or HTTP Method annotations");
-                    return m;
-                }
-            }
-
             Class<?> declaringClass = m.getDeclaringClass();
             Class<?> superC = declaringClass.getSuperclass();
             if (superC != null && Object.class != superC) {
