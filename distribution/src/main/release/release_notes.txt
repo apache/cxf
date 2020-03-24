@@ -1,4 +1,4 @@
-Apache CXF 3.3.5 Release Notes
+Apache CXF 3.3.6 Release Notes
 
 1. Overview
 
@@ -23,7 +23,7 @@ http://cxf.apache.org/docs/33-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
-3.3.5 fixes over 32 JIRA issues reported by users and the community.
+3.3.6 fixes over 31 JIRA issues reported by users and the community.
 
 
 
@@ -67,44 +67,43 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-    * [CXF-8097] - Equal candidates for handling the current request (HEAD / GET)
-    * [CXF-8130] - Since Spring 5.1.5 Release CXFServlet application listener dissapears by context refresh
-    * [CXF-8137] - Using SecurityConstants.VALIDATE_TOKEN with WSS4JInInterceptor no longer allows skipping validation of token
-    * [CXF-8139] - SecurityToken, parsing the lifetime may cause a NullPointerException
-    * [CXF-8143] - ensure java2wadl-plugin m2e compatible
-    * [CXF-8144] - OpenAPI v3 Feature: duplicated "getOpenApi" methods
-    * [CXF-8153] -  @Path with REGEX in path parameter and checkMethodsForInvalidURITemplates(userType, methods);
-    * [CXF-8158] - @BeanParam arguments not properly translated to OpenApi
-    * [CXF-8161] - Memory Leak/Thread Leak in JMSDestination & PollingMessageListenerContainer
-    * [CXF-8162] - JWE with multiple recipients does not work for AES CBC Encryption
-    * [CXF-8163] - javax.ws.rs.core.Response#getCookies() fails when cookie has no value
-    * [CXF-8169] - CXF opentracing - Span#finish is never called in case of client timeouts
-    * [CXF-8170] - Failure to parse multiple comma separated links in an HTTP Link header on a Jaxrs Response object
-    * [CXF-8171] - SSE Client does not support multiple data fields
-    * [CXF-8174] - Incorrect service method resolution
-    * [CXF-8178] - ECDH KeyAgreement with Key Wrapping is not in line with the specification
-    * [CXF-8179] - JSON Jackson does not handle resource returning CompletionStage<X>
-    * [CXF-8180] - UnsupportedOperationException in AbstractEndpointFactory
-    * [CXF-8181] - CXFNonSpringJaxrsServlet Feature registration fails via javax.ws.rs.Application
-    * [CXF-8185] - Generated Ephemeral Public Key missing in JWE Headers when Json Serialization is used
-    * [CXF-8186] - On connection refused, XSLTOutInterceptor mangles the error
-    * [CXF-8187] - Codegen-Plugin failed when maven is executed on jdk9+ with Toolchains specifying jdk 8
+    * [CXF-7952] - MTOM + schema validation creates invalid SOAP FAULT response
+    * [CXF-7959] - WebClient invocation builder header(name, value) method is not implemented according to interface
+    * [CXF-8200] - Use name() instead of toString() for enums when generating WADL
+    * [CXF-8201] - Path not appended when using UriBuilder.fromUri().path() with file scheme
+    * [CXF-8204] - Dependency convergence issues with jaxws-api
+    * [CXF-8207] - SseEventSource loses lastEventId on the 2nd reconnect attempt
+    * [CXF-8208] - Requests with encoded special characters fail with IllegalArgument exception in SwaggerUiResourceLocator
+    * [CXF-8210] - Incompatibility with recent Brave versions causes NullPointerException and hides root cause
+    * [CXF-8215] - SSE breaks Pipeline Processing
+    * [CXF-8220] - The tag "http.status_code" is always 200 in server side tracing span, no matter what situation
+    * [CXF-8222] - OIDC Refresh Response: ID Token iat Claim MUST represent the time that the new ID Token is issued
+    * [CXF-8231] - JAX-RS JOSE can't decrypt ECDHAESKeywrap
+    * [CXF-8234] - Response Content-Type is missing 'charset' when Transformation feature is enabled
+    * [CXF-8235] - AsyncResponseImpl.initContinuation() throws NPE when Continuation is null
+    * [CXF-8240] - STSClient produces wrong element order for TokenType (issue, renew)
+    * [CXF-8241] - cxf-codegen-plugin not using the proxy port configured in settings.xml
+    * [CXF-8249] - SSE client refuses to accept valid stream
+
+** New Feature
+    * [CXF-7814] - wadl2java: support the JAX-RS 2.1 reactive results
+    * [CXF-8188] - MP Rest Client 1.4: Inject into ClientHeadersFactory
+    * [CXF-8194] - MicroProfile Rest Client 1.4 Implementation
 
 ** Improvement
-    * [CXF-8140] - setAccessible(true) before reflection method java.security.acl.Group#members invocation in DefaultSecurityContext
-    * [CXF-8145] - Need property for suffix-list data file
-    * [CXF-8152] - Add a property so it's possible to build cxf with posix tarLongFileMode
-    * [CXF-8160] - Workaround in the cxf-jackson feature has to be removed
-    * [CXF-8167] - Restrict the URI schemes allowed when importing schemas or WSDLs
-    * [CXF-8177] - JWE API does not support ECDH Direct Encryption/Decryption
-
-** Wish
-    * [CXF-8168] - Wadl2java maven plugin not allows mapping to array types
+    * [CXF-8149] - Reduce synchronization in AbstractJAXBProvider
+    * [CXF-8193] - upgrade to jetty 9.4.27
+    * [CXF-8205] - Fix PollingMessageListenerContainer shutdown warnings
+    * [CXF-8209] - Add a way of configuring the RMI environment in InstrumentationManagerImpl
+    * [CXF-8219] - upgrade to netty 4.1.45.Final
+    * [CXF-8223] - Be able to read empty entity from a Response with 202
+    * [CXF-8225] - Make Slf4jEventSender extendable/better configurable
+    * [CXF-8229] - OAuth 2.0 Dynamic Client Registration: Client Update Request
+    * [CXF-8238] - Tracing spans need more tag to make it clearer
+    * [CXF-8246] - The bus may be null on instantiating ServiceListGeneratorServlet in OSGi
 
 ** Task
-    * [CXF-8150] - Update to Spring Boot 2.1.10
-    * [CXF-8155] - Update to Jackson 2.10.1
-    * [CXF-8157] - Update to Jackson Databind 2.9.10.1
+    * [CXF-8196] - Update to Spring Boot 2.1.12 / Spring Framework 5.1.13
 
 
 
