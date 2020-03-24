@@ -51,6 +51,20 @@
             <type>xml</type>
         </dependency>
         
+        
+        <dependency>
+            <groupId>org.apache.karaf</groupId>
+            <artifactId>apache-karaf</artifactId>
+            <version>${cxf.karaf.version}</version>
+            <scope>test</scope>
+            <type>tar.gz</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>*</artifactId>
+                    <groupId>*</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <!-- to force the karaf cxf feature to be available before testing -->
         <dependency>
             <groupId>org.apache.cxf.karaf</groupId>
