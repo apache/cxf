@@ -1,4 +1,4 @@
-Apache CXF 3.2.12 Release Notes
+Apache CXF 3.2.13 Release Notes
 
 1. Overview
 
@@ -17,7 +17,7 @@ New features include:
 * Preliminary support for running on Java 9  (no module support yet)
 * New http-undertow transport
 
-3.2.12 fixes over 15 JIRA issues reported by users and the community since 3.2.11.
+3.2.13 fixes over 15 JIRA issues reported by users and the community since 3.2.12.
 
 
 Important notes:
@@ -70,19 +70,58 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-    * [CXF-8097] - Equal candidates for handling the current request (HEAD / GET)
-    * [CXF-8137] - Using SecurityConstants.VALIDATE_TOKEN with WSS4JInInterceptor no longer allows skipping validation of token
-    * [CXF-8139] - SecurityToken, parsing the lifetime may cause a NullPointerException
-    * [CXF-8143] - ensure java2wadl-plugin m2e compatible
-    * [CXF-8158] - @BeanParam arguments not properly translated to OpenApi
-    * [CXF-8161] - Memory Leak/Thread Leak in JMSDestination & PollingMessageListenerContainer
-    * [CXF-8163] - javax.ws.rs.core.Response#getCookies() fails when cookie has no value
-    * [CXF-8169] - CXF opentracing - Span#finish is never called in case of client timeouts
-    * [CXF-8170] - Failure to parse multiple comma separated links in an HTTP Link header on a Jaxrs Response object
-    * [CXF-8171] - SSE Client does not support multiple data fields
-    * [CXF-8174] - Incorrect service method resolution
-    * [CXF-8179] - JSON Jackson does not handle resource returning CompletionStage<X>
-    * [CXF-8180] - UnsupportedOperationException in AbstractEndpointFactory
-    * [CXF-8181] - CXFNonSpringJaxrsServlet Feature registration fails via javax.ws.rs.Application
-    * [CXF-8186] - On connection refused, XSLTOutInterceptor mangles the error
+    * [CXF-7959] - WebClient invocation builder header(name, value) method is not implemented according to interface
+    * [CXF-8200] - Use name() instead of toString() for enums when generating WADL
+    * [CXF-8201] - Path not appended when using UriBuilder.fromUri().path() with file scheme
+    * [CXF-8207] - SseEventSource loses lastEventId on the 2nd reconnect attempt
+    * [CXF-8208] - Requests with encoded special characters fail with IllegalArgument exception in SwaggerUiResourceLocator
+    * [CXF-8210] - Incompatibility with recent Brave versions causes NullPointerException and hides root cause
+    * [CXF-8215] - SSE breaks Pipeline Processing
+    * [CXF-8220] - The tag "http.status_code" is always 200 in server side tracing span, no matter what situation
+    * [CXF-8234] - Response Content-Type is missing 'charset' when Transformation feature is enabled
+    * [CXF-8235] - AsyncResponseImpl.initContinuation() throws NPE when Continuation is null
+    * [CXF-8241] - cxf-codegen-plugin not using the proxy port configured in settings.xml
+    * [CXF-8249] - SSE client refuses to accept valid stream
+
+** Improvement
+    * [CXF-8193] - upgrade to jetty 9.4.27
+    * [CXF-8238] - Tracing spans need more tag to make it clearer
+
+** Task
+    * [CXF-8197] - Update to Spring Framework 4.3.26
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
