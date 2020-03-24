@@ -117,7 +117,6 @@ public class JMSSoapActionTest extends AbstractBusClientServerTestBase {
         URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
         HelloWorldService service = new HelloWorldService(wsdl, serviceName);
 
-        String response = new String("Bonjour2");
         HelloWorldPortType greeter = service.getPort(portName, HelloWorldPortType.class);
 
         ClientProxy.getClient(greeter).getOutInterceptors().add(new LoggingOutInterceptor());
