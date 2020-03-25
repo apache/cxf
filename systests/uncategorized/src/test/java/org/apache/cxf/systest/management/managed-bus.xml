@@ -24,7 +24,6 @@
     <bean id="org.apache.cxf.management.InstrumentationManager" class="org.apache.cxf.management.jmx.InstrumentationManagerImpl">
         <property name="bus" ref="cxf"/>
         <property name="enabled" value="true"/>
-        <property name="JMXServiceURL" value="service:jmx:rmi:///jndi/rmi://localhost:${testutil.ports.ManagedBusTest.1}/jmxrmi"/>
     </bean>
     <bean id="wq" class="org.apache.cxf.workqueue.AutomaticWorkQueueImpl">
         <property name="name" value="testQueue"/>

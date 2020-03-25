@@ -28,7 +28,6 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.apache.cxf.management.jmx.export.AnnotationTestInstrumentation;
-import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.After;
 import org.junit.Before;
@@ -38,17 +37,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class JMXManagedComponentManagerTest {
-    private static final String PORT = TestUtil.getPortNumber(JMXManagedComponentManagerTest.class);
     private static final String NAME_ATTRIBUTE = "Name";
     private InstrumentationManagerImpl manager;
 
     @Before
     public void setUp() throws Exception {
         manager = new InstrumentationManagerImpl();
-        manager.setDaemon(false);
-        manager.setThreaded(true);
         manager.setEnabled(true);
-        manager.setJMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:" + PORT + "/jmxrmi");
         manager.init();
         //Wait for MBeanServer connector to be initialized on separate thread.
         Thread.sleep(2000);
@@ -61,10 +56,6 @@ public class JMXManagedComponentManagerTest {
 
     @Test
     public void testRegisterInstrumentation() throws Exception {
-        //manager.setDaemon(false);
-        //manager.setThreaded(false);
-        //manager.setJMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:9913/jmxrmi");
-        //manager.init();
 
         AnnotationTestInstrumentation im = new AnnotationTestInstrumentation();
         ObjectName name = new ObjectName("org.apache.cxf:type=foo,name=bar");
@@ -128,13 +119,7 @@ public class JMXManagedComponentManagerTest {
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
 
         this.manager = new InstrumentationManagerImpl();
-        this.manager.setDaemon(false);
-        // Turn threading off so that we get the exception in this thread
-        // and the manager is set into a failed state if the connector
-        // cannot be created.
-        this.manager.setThreaded(false);
         this.manager.setEnabled(true);
-        this.manager.setJMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:" + PORT + "/jmxrmi");
         this.manager.setServer(server);
         this.manager.init();
 
@@ -161,13 +146,7 @@ public class JMXManagedComponentManagerTest {
         }
 
         this.manager = new InstrumentationManagerImpl();
-        this.manager.setDaemon(false);
-        // Turn threading off so that we get the exception in this thread
-        // and the manager is set into a failed state if the connector
-        // cannot be created.
-        this.manager.setThreaded(false);
         this.manager.setEnabled(true);
-        this.manager.setJMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:" + PORT + "/jmxrmi");
         this.manager.setServer(server);
         this.manager.init();
 

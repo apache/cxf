@@ -42,7 +42,7 @@ import org.apache.cxf.management.ManagementConstants;
 public final class ManagementConsole {
     private static MBeanServerConnection mbsc;
     private static final String DEFAULT_JMXSERVICE_URL =
-        "service:jmx:rmi:///jndi/rmi://localhost:1099/jmxrmi";
+        "service:jmx:rmi:///jndi/rmi://localhost:9913/jmxrmi";
     private static final Logger LOG = LogUtils.getL7dLogger(ManagementConsole.class);
 
     String jmxServerURL;
