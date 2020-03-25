@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>3.3.6</version>
+        <version>3.3.7-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
 
