@@ -68,6 +68,8 @@ import io.undertow.util.CopyOnWriteMap;
 public class UndertowHTTPServerEngine implements ServerEngine {
 
     public static final String DO_NOT_CHECK_URL_PROP = "org.apache.cxf.transports.http_undertow.DontCheckUrl";
+    
+    public static final String ENABLE_HTTP2_PROP = "org.apache.cxf.transports.http_undertow.EnableHttp2";
 
     private static final Logger LOG = LogUtils.getL7dLogger(UndertowHTTPServerEngine.class);
 
@@ -199,6 +201,9 @@ public class UndertowHTTPServerEngine implements ServerEngine {
     private Undertow createServer(URL url, UndertowHTTPHandler undertowHTTPHandler) throws Exception {
         Undertow.Builder result = Undertow.builder();
         result.setServerOption(UndertowOptions.IDLE_TIMEOUT, getMaxIdleTime());
+        if (this.shouldEnableHttp2(undertowHTTPHandler.getBus())) {
+            result.setServerOption(UndertowOptions.ENABLE_HTTP2, Boolean.TRUE);
+        }
         if (tlsServerParameters != null) {
             if (this.sslContext == null) {
                 this.sslContext = createSSLContext();
@@ -296,6 +301,18 @@ public class UndertowHTTPServerEngine implements ServerEngine {
             prop = SystemPropertyAction.getPropertyOrNull(DO_NOT_CHECK_URL_PROP);
         }
         return !PropertyUtils.isTrue(prop);
+    }
+    
+    private boolean shouldEnableHttp2(Bus bus) {
+
+        Object prop = null;
+        if (bus != null) {
+            prop = bus.getProperty(ENABLE_HTTP2_PROP);
+        }
+        if (prop == null) {
+            prop = SystemPropertyAction.getPropertyOrNull(ENABLE_HTTP2_PROP);
+        }
+        return PropertyUtils.isTrue(prop);
     }
 
     protected void checkRegistedContext(URL url) {
