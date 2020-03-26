@@ -40,6 +40,7 @@ import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.MethodDispatcher;
@@ -125,7 +126,7 @@ public class JAXRSDataBinding extends AbstractDataBinding {
         public void write(Object obj, MessagePartInfo part, XMLStreamWriter output) {
             try {
                 Message message = PhaseInterceptorChain.getCurrentMessage();
-                Method method = getTargetMethod(message);
+                Method method = MessageUtils.getTargetMethod(message, null);
                 MultivaluedMap<String, Object> headers = getWriteHeaders(message);
                 xmlWriter.writeTo(obj,
                                  method.getReturnType(),
@@ -171,7 +172,7 @@ public class JAXRSDataBinding extends AbstractDataBinding {
         @SuppressWarnings("unchecked")
         private <T> T read(Class<T> cls) throws WebApplicationException, IOException {
             Message message = PhaseInterceptorChain.getCurrentMessage();
-            Method method = getTargetMethod(message);
+            Method method = MessageUtils.getTargetMethod(message, null);
             MessageBodyReader<T> reader = (MessageBodyReader<T>)xmlReader;
 
             return reader.readFrom(cls,
