@@ -40,10 +40,9 @@ import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.Service;
-import org.apache.cxf.service.invoker.MethodDispatcher;
-import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 
 /**
@@ -99,10 +98,7 @@ public class JAXRSDataBinding extends AbstractDataBinding {
 
     // TODO: The method containing the actual annotations have to retrieved
     protected Method getTargetMethod(Message m) {
-        BindingOperationInfo bop = m.getExchange().getBindingOperationInfo();
-        MethodDispatcher md = (MethodDispatcher)
-            m.getExchange().getService().get(MethodDispatcher.class.getName());
-        return md.getMethod(bop);
+        return MessageUtils.getTargetMethod(m).orElse(null);
     }
 
     @SuppressWarnings("unchecked")

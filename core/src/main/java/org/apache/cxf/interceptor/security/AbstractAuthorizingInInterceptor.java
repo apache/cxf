@@ -26,11 +26,10 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.security.SecurityContext;
-import org.apache.cxf.service.invoker.MethodDispatcher;
-import org.apache.cxf.service.model.BindingOperationInfo;
 
 public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInterceptor<Message> {
 
@@ -60,17 +59,8 @@ public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInte
     }
 
     protected Method getTargetMethod(Message m) {
-        BindingOperationInfo bop = m.getExchange().getBindingOperationInfo();
-        if (bop != null) {
-            MethodDispatcher md = (MethodDispatcher)
-                m.getExchange().getService().get(MethodDispatcher.class.getName());
-            return md.getMethod(bop);
-        }
-        Method method = (Method)m.get("org.apache.cxf.resource.method");
-        if (method != null) {
-            return method;
-        }
-        throw new AccessDeniedException("Method is not available : Unauthorized");
+        return MessageUtils.getTargetMethod(m).orElseThrow(() -> 
+            new AccessDeniedException("Method is not available : Unauthorized"));
     }
 
     protected boolean authorize(SecurityContext sc, Method method) {
