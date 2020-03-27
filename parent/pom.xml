@@ -2887,18 +2887,6 @@
                     </exclusions>
                 </dependency>
                 <dependency>
-                    <groupId>org.jacorb</groupId>
-                    <artifactId>jacorb</artifactId>
-                    <version>${cxf.jacorb.version}</version>
-                    <scope>test</scope>
-                </dependency>
-		<!-- This artifact needs to be included in compile scope since the corba module has been removed from jdk 11 -->
-                <dependency>
-                    <groupId>org.jacorb</groupId>
-                    <artifactId>jacorb-omgapi</artifactId>
-                    <version>${cxf.jacorb.version}</version>
-                </dependency>
-                <dependency>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-jta_1.1_spec</artifactId>
                 </dependency>
@@ -2906,6 +2894,12 @@
                     <groupId>org.jboss.spec.javax.rmi</groupId>
                     <artifactId>jboss-rmi-api_1.0_spec</artifactId>
                     <version>1.0.6.Final</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.jacorb</groupId>
+                    <artifactId>jacorb</artifactId>
+                    <version>${cxf.jacorb.version}</version>
+                    <scope>test</scope>
                 </dependency>
             </dependencies>
         </profile>
