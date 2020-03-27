@@ -243,9 +243,6 @@
         </profile>
         <profile>
             <id>java9-plus</id>
-            <properties>
-                    <cxf.jaxb.version>2.3.2</cxf.jaxb.version>
-            </properties>
             <activation>
                 <jdk>[9,)</jdk>
             </activation>
@@ -253,7 +250,6 @@
                 <dependency>
                     <groupId>jakarta.xml.bind</groupId>
                     <artifactId>jakarta.xml.bind-api</artifactId>
-                    <version>${cxf.jaxb.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>jakarta.annotation</groupId>
@@ -288,12 +284,10 @@
                 <dependency>
                     <groupId>org.glassfish.jaxb</groupId>
                     <artifactId>jaxb-runtime</artifactId>
-                    <version>${cxf.jaxb.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.glassfish.jaxb</groupId>
                     <artifactId>jaxb-xjc</artifactId>
-                    <version>${cxf.jaxb.version}</version>
                 </dependency>
             </dependencies>
         </profile>
