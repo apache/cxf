@@ -19,6 +19,7 @@
 package org.apache.cxf.message;
 
 import java.lang.reflect.Method;
+import java.util.Optional;
 
 import javax.xml.namespace.QName;
 
@@ -32,7 +33,8 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class MessageUtilsTest {
 
@@ -54,7 +56,9 @@ public class MessageUtilsTest {
         exchange.put(Service.class, serviceImpl);
         exchange.put(BindingOperationInfo.class, boi);
 
-        assertEquals(method, MessageUtils.getTargetMethod(message, null));
+        Optional<Method> optMethod = MessageUtils.getTargetMethod(message);
+        assertTrue(optMethod.isPresent());
+        assertEquals(method, optMethod.get());
     }
 
     @Test
@@ -64,7 +68,9 @@ public class MessageUtilsTest {
         message.setExchange(new ExchangeImpl());
         message.put("org.apache.cxf.resource.method", method);
 
-        assertEquals(method, MessageUtils.getTargetMethod(message, null));
+        Optional<Method> optMethod = MessageUtils.getTargetMethod(message);
+        assertTrue(optMethod.isPresent());
+        assertEquals(method, optMethod.get());
     }
 
     @Test
@@ -72,14 +78,6 @@ public class MessageUtilsTest {
         Message message = new MessageImpl();
         message.setExchange(new ExchangeImpl());
 
-        assertNull(MessageUtils.getTargetMethod(message, null));
-    }
-
-    @Test(expected = NumberFormatException.class)
-    public void getTargetMethodThrowsException() throws Exception {
-        Message message = new MessageImpl();
-        message.setExchange(new ExchangeImpl());
-
-        MessageUtils.getTargetMethod(message, () -> new NumberFormatException());
+        assertFalse(MessageUtils.getTargetMethod(message).isPresent());
     }
 }

@@ -44,7 +44,7 @@ public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInte
         super(null, Phase.PRE_INVOKE, uniqueId);
     }
     public void handleMessage(Message message) {
-        Method method = MessageUtils.getTargetMethod(message, () -> 
+        Method method = MessageUtils.getTargetMethod(message).orElseThrow(() -> 
             new AccessDeniedException("Method is not available : Unauthorized"));
         SecurityContext sc = message.get(SecurityContext.class);
         if (sc != null && sc.getUserPrincipal() != null) {

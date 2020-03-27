@@ -107,7 +107,7 @@ public abstract class AbstractValidationInterceptor extends AbstractPhaseInterce
         Message inMessage = message.getExchange().getInMessage();
         Method method = null;
         if (inMessage != null) {
-            method = MessageUtils.getTargetMethod(inMessage, null);
+            method = MessageUtils.getTargetMethod(inMessage).orElse(null);
         }
         if (method == null) {
             method = message.getExchange().get(Method.class);

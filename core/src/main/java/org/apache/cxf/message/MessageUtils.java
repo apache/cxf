@@ -20,7 +20,7 @@
 package org.apache.cxf.message;
 
 import java.lang.reflect.Method;
-import java.util.function.Supplier;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Node;
@@ -194,16 +194,15 @@ public final class MessageUtils {
         */
     }
 
-    public static Method getTargetMethod(Message m, Supplier<RuntimeException> exceptionSupplier) {
+    public static Optional<Method> getTargetMethod(Message m) {
+        Method method;
         BindingOperationInfo bop = m.getExchange().getBindingOperationInfo();
         if (bop != null) {
             MethodDispatcher md = (MethodDispatcher) m.getExchange().getService().get(MethodDispatcher.class.getName());
-            return md.getMethod(bop);
+            method = md.getMethod(bop);
+        } else {
+            method = (Method) m.get("org.apache.cxf.resource.method");
         }
-        Method method = (Method) m.get("org.apache.cxf.resource.method");
-        if (method != null || exceptionSupplier == null) {
-            return method;
-        }
-        throw exceptionSupplier.get();
+        return Optional.ofNullable(method);
     }
 }

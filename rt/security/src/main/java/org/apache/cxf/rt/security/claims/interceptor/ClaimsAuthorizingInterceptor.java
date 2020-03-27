@@ -67,8 +67,8 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
             throw new AccessDeniedException("Security Context is unavailable or unrecognized");
         }
 
-        Method method = MessageUtils.getTargetMethod(message, () -> new AccessDeniedException(
-                "Method is not available : Unauthorized"));
+        Method method = MessageUtils.getTargetMethod(message).orElseThrow(() ->
+            new AccessDeniedException("Method is not available : Unauthorized"));
 
         if (authorize((ClaimsSecurityContext)sc, method)) {
             return;
