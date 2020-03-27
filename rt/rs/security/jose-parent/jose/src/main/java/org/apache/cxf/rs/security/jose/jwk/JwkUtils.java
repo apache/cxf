@@ -402,7 +402,7 @@ public final class JwkUtils {
         return jwk;
     }
     public static JsonWebKey fromPublicKey(PublicKey key, Properties props, String algoProp) {
-        JsonWebKey jwk = null;
+        final JsonWebKey jwk;
         if (key instanceof RSAPublicKey) {
             String algo = props.getProperty(algoProp);
             jwk = JwkUtils.fromRSAPublicKey((RSAPublicKey)key, algo);

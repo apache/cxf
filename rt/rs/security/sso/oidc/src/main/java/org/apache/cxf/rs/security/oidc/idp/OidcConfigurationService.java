@@ -24,13 +24,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.oauth2.services.AuthorizationMetadataService;
 
-@Path("openid-configuration")
 public class OidcConfigurationService extends AuthorizationMetadataService {
     // Response types supported with the combination of 
     // AuthorizationCode, Implicit and Hybrid services
@@ -47,6 +51,14 @@ public class OidcConfigurationService extends AuthorizationMetadataService {
     private boolean endSessionEndpointNotAvailable;
     private String endSessionEndpointAddress;
     private boolean backChannelLogoutSupported;
+
+    @GET
+    @Path("openid-configuration")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Override
+    public String getConfiguration(@Context UriInfo ui) {
+        return super.getConfiguration(ui);
+    }
 
     @Override
     protected void prepareConfigurationData(Map<String, Object> cfg, String baseUri) {

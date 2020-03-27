@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.json.basic;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -339,12 +340,9 @@ public class JsonMapObjectReaderWriter {
         @Override
         public Output append(String str) {
             try {
-                if (str == null) {
-                    str = "null";
-                }
-                os.write(StringUtils.toBytesUTF8(str));
+                os.write(StringUtils.toBytesUTF8(str != null ? str : NULL_VALUE));
             } catch (IOException ex) {
-                throw new RuntimeException(ex);
+                throw new UncheckedIOException(ex);
             }
             return this;
         }
@@ -353,7 +351,7 @@ public class JsonMapObjectReaderWriter {
             try {
                 os.write(ch);
             } catch (IOException ex) {
-                throw new RuntimeException(ex);
+                throw new UncheckedIOException(ex);
             }
             return this;
         }

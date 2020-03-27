@@ -21,20 +21,23 @@ package org.apache.cxf.interceptor.transform;
 
 
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.StaxOutEndingInterceptor;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.staxutils.transform.TransformUtils;
 
+import static org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor.DISABLE_OUTPUTSTREAM_OPTIMIZATION;
 
 /**
  * Creates an XMLStreamReader from the InputStream on the Message.
@@ -98,8 +101,9 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
         XMLStreamWriter transformWriter = createTransformWriterIfNeeded(writer, out);
         if (transformWriter != null) {
             message.setContent(XMLStreamWriter.class, transformWriter);
-            message.put(AbstractOutDatabindingInterceptor.DISABLE_OUTPUTSTREAM_OPTIMIZATION,
-                        Boolean.TRUE);
+            if (message.getContextualProperty(DISABLE_OUTPUTSTREAM_OPTIMIZATION) == null) {
+                message.put(DISABLE_OUTPUTSTREAM_OPTIMIZATION, Boolean.TRUE);
+            }
             if (MessageUtils.isRequestor(message)) {
                 message.removeContent(OutputStream.class);
                 message.put(OUTPUT_STREAM_HOLDER, out);
@@ -108,14 +112,32 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
         }
     }
 
+    private String getEncoding(Message message) {
+        Exchange ex = message.getExchange();
+        String encoding = (String)message.get(Message.ENCODING);
+        if (encoding == null && ex.getInMessage() != null) {
+            encoding = (String) ex.getInMessage().get(Message.ENCODING);
+            message.put(Message.ENCODING, encoding);
+        }
+
+        if (encoding == null) {
+            encoding = StandardCharsets.UTF_8.name();
+            message.put(Message.ENCODING, encoding);
+        }
+        return encoding;
+    }
+
     protected XMLStreamWriter createTransformWriterIfNeeded(XMLStreamWriter writer, OutputStream os) {
+        Message m = PhaseInterceptorChain.getCurrentMessage();
+        String encoding = getEncoding(m);
         return TransformUtils.createTransformWriterIfNeeded(writer, os,
                                                       outElementsMap,
                                                       outDropElements,
                                                       outAppendMap,
                                                       outAttributesMap,
                                                       attributesToElements,
-                                                      defaultNamespace);
+                                                      defaultNamespace,
+                                                      encoding);
     }
 
     public void setOutTransformElements(Map<String, String> outElements) {

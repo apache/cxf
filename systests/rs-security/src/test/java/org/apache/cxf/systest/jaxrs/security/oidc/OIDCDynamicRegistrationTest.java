@@ -23,6 +23,7 @@ import java.net.URL;
 import java.util.Collections;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObjectProvider;
@@ -76,16 +77,13 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
     public void testRegisterClientInitialAccessTokenCodeGrant() throws Exception {
         URL busFile = OIDCDynamicRegistrationTest.class.getResource("client.xml");
         String address = "https://localhost:" + DYNREG_SERVER.getPort() + "/services/dynamicWithAt/register";
-        WebClient wc = WebClient.create(address, Collections.singletonList(new JsonMapObjectProvider()),
-                         busFile.toString());
+        WebClient wc =
+            WebClient.create(address, Collections.singletonList(new JsonMapObjectProvider()), busFile.toString())
+            .accept("application/json").type("application/json")
+            .authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, ACCESS_TOKEN));
 
-        wc.accept("application/json").type("application/json");
         ClientRegistration reg = newClientRegistrationCodeGrant();
-        ClientRegistrationResponse resp = null;
-        assertEquals(401, wc.post(reg).getStatus());
-
-        wc.authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, ACCESS_TOKEN));
-        resp = wc.post(reg, ClientRegistrationResponse.class);
+        ClientRegistrationResponse resp = wc.post(reg, ClientRegistrationResponse.class);
 
         assertNotNull(resp.getClientId());
         assertNotNull(resp.getClientSecret());
@@ -94,12 +92,12 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
         String regAccessToken = resp.getRegistrationAccessToken();
         assertNotNull(regAccessToken);
 
-        wc.reset();
         wc.path(resp.getClientId());
         assertEquals(401, wc.get().getStatus());
 
-        wc.authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, regAccessToken));
-        ClientRegistration clientRegResp = wc.get(ClientRegistration.class);
+        ClientRegistration clientRegResp = wc
+            .authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, regAccessToken))
+            .get(ClientRegistration.class);
         testCommonRegCodeGrantProperties(clientRegResp);
 
         assertNull(clientRegResp.getTokenEndpointAuthMethod());
@@ -111,16 +109,15 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
     public void testRegisterClientPasswordGrant() throws Exception {
         URL busFile = OIDCDynamicRegistrationTest.class.getResource("client.xml");
         String address = "https://localhost:" + DYNREG_SERVER.getPort() + "/services/dynamicWithAt/register";
-        WebClient wc = WebClient.create(address, Collections.singletonList(new JsonMapObjectProvider()),
-                         busFile.toString());
-
-        wc.accept("application/json").type("application/json");
+        WebClient wc =
+            WebClient.create(address, Collections.singletonList(new JsonMapObjectProvider()), busFile.toString())
+            .accept("application/json").type("application/json")
+            .authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, ACCESS_TOKEN));
 
         ClientRegistration reg = new ClientRegistration();
         reg.setClientName("dynamic_client");
         reg.setGrantTypes(Collections.singletonList(OAuthConstants.RESOURCE_OWNER_GRANT));
 
-        wc.authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, ACCESS_TOKEN));
         ClientRegistrationResponse resp = wc.post(reg, ClientRegistrationResponse.class);
 
         assertNotNull(resp.getClientId());
@@ -130,11 +127,10 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
         String regAccessToken = resp.getRegistrationAccessToken();
         assertNotNull(regAccessToken);
 
-        wc.reset();
-        wc.path(resp.getClientId());
+        ClientRegistration clientRegResp = wc.path(resp.getClientId())
+            .authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, regAccessToken))
+            .get(ClientRegistration.class);
 
-        wc.authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, regAccessToken));
-        ClientRegistration clientRegResp = wc.get(ClientRegistration.class);
         assertEquals("web", clientRegResp.getApplicationType());
         assertEquals("dynamic_client", clientRegResp.getClientName());
         assertEquals(Collections.singletonList(OAuthConstants.RESOURCE_OWNER_GRANT),
@@ -150,16 +146,15 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
     public void testRegisterClientPasswordGrantPublic() throws Exception {
         URL busFile = OIDCDynamicRegistrationTest.class.getResource("client.xml");
         String address = "https://localhost:" + DYNREG_SERVER.getPort() + "/services/dynamicWithAt/register";
-        WebClient wc = WebClient.create(address, Collections.singletonList(new JsonMapObjectProvider()),
-                         busFile.toString());
-
-        wc.accept("application/json").type("application/json");
+        WebClient wc =
+            WebClient.create(address, Collections.singletonList(new JsonMapObjectProvider()), busFile.toString())
+            .accept("application/json").type("application/json")
+            .authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, ACCESS_TOKEN));
 
         ClientRegistration reg = new ClientRegistration();
         reg.setClientName("dynamic_client");
         reg.setGrantTypes(Collections.singletonList(OAuthConstants.RESOURCE_OWNER_GRANT));
         reg.setTokenEndpointAuthMethod(OAuthConstants.TOKEN_ENDPOINT_AUTH_NONE);
-        wc.authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, ACCESS_TOKEN));
         ClientRegistrationResponse resp = wc.post(reg, ClientRegistrationResponse.class);
 
         assertNotNull(resp.getClientId());
@@ -168,11 +163,10 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
         String regAccessToken = resp.getRegistrationAccessToken();
         assertNotNull(regAccessToken);
 
-        wc.reset();
-        wc.path(resp.getClientId());
+        ClientRegistration clientRegResp = wc.path(resp.getClientId())
+            .authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, regAccessToken))
+            .get(ClientRegistration.class);
 
-        wc.authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, regAccessToken));
-        ClientRegistration clientRegResp = wc.get(ClientRegistration.class);
         assertEquals("native", clientRegResp.getApplicationType());
         assertEquals("dynamic_client", clientRegResp.getClientName());
         assertEquals(Collections.singletonList(OAuthConstants.RESOURCE_OWNER_GRANT),
@@ -184,37 +178,21 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
         assertEquals(200, wc.delete().getStatus());
     }
 
-    private void testCommonRegCodeGrantProperties(ClientRegistration clientRegResp) {
-        assertNotNull(clientRegResp);
-        assertEquals("web", clientRegResp.getApplicationType());
-        assertEquals("dynamic_client", clientRegResp.getClientName());
-        assertEquals("openid", clientRegResp.getScope());
-        assertEquals(Collections.singletonList(OAuthConstants.AUTHORIZATION_CODE_GRANT),
-                     clientRegResp.getGrantTypes());
-        assertEquals(Collections.singletonList("https://a/b/c"),
-                     clientRegResp.getRedirectUris());
-        assertEquals(Collections.singletonList("https://rp/logout"),
-                     clientRegResp.getListStringProperty("post_logout_redirect_uris"));
-    }
-
     @org.junit.Test
     public void testRegisterClientInitialAccessTokenCodeGrantTls() throws Exception {
         URL busFile = OIDCDynamicRegistrationTest.class.getResource("client.xml");
         String address = "https://localhost:" + DYNREG_SERVER.getPort() + "/services/dynamicWithAt/register";
-        WebClient wc = WebClient.create(address, Collections.singletonList(new JsonMapObjectProvider()),
-                         busFile.toString());
+        WebClient wc =
+            WebClient.create(address, Collections.singletonList(new JsonMapObjectProvider()), busFile.toString())
+            .accept("application/json").type("application/json")
+            .authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, ACCESS_TOKEN));
 
-        wc.accept("application/json").type("application/json");
         ClientRegistration reg = newClientRegistrationCodeGrant();
         reg.setTokenEndpointAuthMethod(OAuthConstants.TOKEN_ENDPOINT_AUTH_TLS);
         reg.setProperty(OAuthConstants.TLS_CLIENT_AUTH_SUBJECT_DN,
                         "CN=whateverhost.com,OU=Morpit,O=ApacheTest,L=Syracuse,C=US");
 
-        ClientRegistrationResponse resp = null;
-        assertEquals(401, wc.post(reg).getStatus());
-
-        wc.authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, ACCESS_TOKEN));
-        resp = wc.post(reg, ClientRegistrationResponse.class);
+        ClientRegistrationResponse resp = wc.post(reg, ClientRegistrationResponse.class);
 
         assertNotNull(resp.getClientId());
         assertNull(resp.getClientSecret());
@@ -223,17 +201,54 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
         String regAccessToken = resp.getRegistrationAccessToken();
         assertNotNull(regAccessToken);
 
-        wc.reset();
-        wc.path(resp.getClientId());
-        assertEquals(401, wc.get().getStatus());
+        ClientRegistration clientRegResp = wc.path(resp.getClientId())
+            .authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, regAccessToken))
+            .get(ClientRegistration.class);
 
-        wc.authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, regAccessToken));
-        ClientRegistration clientRegResp = wc.get(ClientRegistration.class);
         testCommonRegCodeGrantProperties(clientRegResp);
         assertEquals(OAuthConstants.TOKEN_ENDPOINT_AUTH_TLS, clientRegResp.getTokenEndpointAuthMethod());
         assertEquals("CN=whateverhost.com,OU=Morpit,O=ApacheTest,L=Syracuse,C=US",
                      clientRegResp.getProperty(OAuthConstants.TLS_CLIENT_AUTH_SUBJECT_DN));
 
+        assertEquals(200, wc.delete().getStatus());
+    }
+
+    @org.junit.Test
+    public void testUpdateClient() throws Exception {
+        URL busFile = OIDCDynamicRegistrationTest.class.getResource("client.xml");
+        String address = "https://localhost:" + DYNREG_SERVER.getPort() + "/services/dynamicWithAt/register";
+        WebClient wc =
+            WebClient.create(address, Collections.singletonList(new JsonMapObjectProvider()), busFile.toString())
+            .accept("application/json").type("application/json")
+            .authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, ACCESS_TOKEN));
+
+        final ClientRegistration reg = newClientRegistrationCodeGrant();
+        final ClientRegistrationResponse clientRegistrationResponse = wc
+            .post(reg, ClientRegistrationResponse.class);
+
+        final String regAccessToken = clientRegistrationResponse.getRegistrationAccessToken();
+        assertNotNull(regAccessToken);
+
+        reg.setScope(OidcUtils.getEmailScope());
+        final ClientRegistration updatedClientRegistration = wc.path(clientRegistrationResponse.getClientId())
+            .authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, regAccessToken))
+            .put(reg, ClientRegistration.class);
+
+        assertEquals(OidcUtils.getEmailScope(), updatedClientRegistration.getScope());
+        // https://tools.ietf.org/html/rfc7592#section-2.2
+        assertNull(updatedClientRegistration.getProperty("registration_access_token"));
+        assertNull(updatedClientRegistration.getProperty("registration_client_uri"));
+        assertNull(updatedClientRegistration.getProperty("client_secret_expires_at"));
+        assertNull(updatedClientRegistration.getProperty("client_id_issued_at"));
+
+        wc.authorization(null);
+
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(),
+            wc.put(reg).getStatus());
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(),
+            wc.delete().getStatus());
+
+        wc.authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, regAccessToken));
         assertEquals(200, wc.delete().getStatus());
     }
 
@@ -243,11 +258,27 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
         reg.setScope(OidcUtils.getOpenIdScope());
         reg.setClientName("dynamic_client");
         reg.setGrantTypes(Collections.singletonList(OAuthConstants.AUTHORIZATION_CODE_GRANT));
+//        reg.setResponseTypes(Collections.singletonList(OAuthConstants.CODE_RESPONSE_TYPE));
         reg.setRedirectUris(Collections.singletonList("https://a/b/c"));
 
         reg.setProperty("post_logout_redirect_uris",
                         Collections.singletonList("https://rp/logout"));
         return reg;
+    }
+
+    private static void testCommonRegCodeGrantProperties(ClientRegistration clientRegResp) {
+        assertNotNull(clientRegResp);
+        assertEquals("web", clientRegResp.getApplicationType());
+        assertEquals("openid", clientRegResp.getScope());
+        assertEquals("dynamic_client", clientRegResp.getClientName());
+        assertEquals(Collections.singletonList(OAuthConstants.AUTHORIZATION_CODE_GRANT),
+                     clientRegResp.getGrantTypes());
+//        assertEquals(Collections.singletonList(OAuthConstants.CODE_RESPONSE_TYPE),
+//                     clientRegResp.getResponseTypes());
+        assertEquals(Collections.singletonList("https://a/b/c"),
+                     clientRegResp.getRedirectUris());
+        assertEquals(Collections.singletonList("https://rp/logout"),
+                     clientRegResp.getListStringProperty("post_logout_redirect_uris"));
     }
 
 }

@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -53,6 +52,7 @@ import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrant;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.HTTPConduitConfigurer;
@@ -243,10 +243,9 @@ public final class OAuth2TestUtils {
         if (issuer != null) {
             claims.setIssuer(issuer);
         }
-        Instant now = Instant.now();
-        claims.setIssuedAt(now.getEpochSecond());
+        claims.setIssuedAt(OAuthUtils.getIssuedAt());
         if (expiry) {
-            claims.setExpiryTime(now.plusSeconds(60L).getEpochSecond());
+            claims.setExpiryTime(claims.getIssuedAt() + 60L);
         }
         if (audience != null) {
             claims.setAudiences(Collections.singletonList(audience));
@@ -310,6 +309,12 @@ public final class OAuth2TestUtils {
         return new HTTPConduitConfigurer() {
             public void configure(String name, String address, HTTPConduit c) {
                 c.setTlsClientParameters(tlsCP);
+                // 5 mins for long debug session
+//                org.apache.cxf.transports.http.configuration.HTTPClientPolicy httpClientPolicy =
+//                    new org.apache.cxf.transports.http.configuration.HTTPClientPolicy();
+//                httpClientPolicy.setConnectionTimeout(300000L);
+//                httpClientPolicy.setReceiveTimeout(300000L);
+//                c.setClient(httpClientPolicy);
             }
         };
     }

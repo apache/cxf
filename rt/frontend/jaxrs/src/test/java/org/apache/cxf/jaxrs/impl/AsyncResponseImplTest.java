@@ -33,6 +33,7 @@ import org.apache.cxf.transport.http.Servlet3ContinuationProvider;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -160,5 +161,32 @@ public class AsyncResponseImplTest {
                      isDone, impl.isDone());
         assertEquals("AsynchResponse.isSuspended() returned a different response after canceling a second time",
                      isSuspended, impl.isSuspended());
+    }
+    
+    /**
+     * Test that creatinging an AsyncResponse with a null continuation throws
+     * an IllegalArgumentException instead of a NullPointer Exception.
+     */
+    @Test
+    public void testNullContinutaion() {
+        HttpServletRequest req = control.createMock(HttpServletRequest.class);
+        AsyncContext asyncCtx = control.createMock(AsyncContext.class);
+        Message msg = new MessageImpl();
+        msg.setExchange(new ExchangeImpl());
+
+        req.startAsync();
+        EasyMock.expectLastCall().andReturn(asyncCtx);
+        control.replay();
+
+        AsyncResponse impl;
+        try {
+            impl = new AsyncResponseImpl(msg);
+        } catch (IllegalArgumentException e) {
+            assertEquals("Continuation not supported. " 
+                             + "Please ensure that all servlets and servlet filters support async operations",
+                         e.getMessage());
+            return;
+        }
+        Assert.fail("Expected IllegalArgumentException, but instead got valid AsyncResponse, " + impl);
     }
 }

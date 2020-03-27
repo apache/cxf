@@ -26,9 +26,6 @@
     <bean id="org.apache.cxf.management.InstrumentationManager" class="org.apache.cxf.management.jmx.InstrumentationManagerImpl">
         <property name="bus" ref="cxf"/>
         <property name="enabled" value="true"/>
-        <property name="threaded" value="false"/>
-        <property name="daemon" value="false"/>
-        <property name="JMXServiceURL" value="service:jmx:rmi:///jndi/rmi://localhost:9914/jmxrmi"/>
     </bean>
     <cxf:bus>
         <cxf:features>

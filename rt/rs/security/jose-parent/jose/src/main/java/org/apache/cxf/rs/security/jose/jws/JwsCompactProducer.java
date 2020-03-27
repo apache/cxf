@@ -30,11 +30,11 @@ import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 public class JwsCompactProducer {
-    private JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
     private JwsHeaders headers;
     private String signature;
     private final String plainJwsPayload;
     private final boolean detached;
+    private final JsonMapObjectReaderWriter writer;
 
     public JwsCompactProducer(String plainJwsPayload) {
         this(plainJwsPayload, false);
@@ -54,11 +54,9 @@ public class JwsCompactProducer {
     protected JwsCompactProducer(JwsHeaders headers, JsonMapObjectReaderWriter w, String plainJwsPayload,
                                  boolean detached) {
         this.headers = headers;
-        if (w != null) {
-            this.writer = w;
-        }
         this.plainJwsPayload = plainJwsPayload;
         this.detached = detached;
+        this.writer = w != null ? w : new JsonMapObjectReaderWriter();
     }
     public JwsHeaders getJwsHeaders() {
         if (headers == null) {
@@ -69,14 +67,14 @@ public class JwsCompactProducer {
     public String getUnsignedEncodedJws() {
         checkAlgorithm();
         return Base64UrlUtility.encode(writer.toJson(getJwsHeaders()))
-               + "."
+               + '.'
                + (detached ? "" : Base64UrlUtility.encode(plainJwsPayload));
     }
     private String getSigningInput() {
         checkAlgorithm();
         boolean unencoded = JwsUtils.isPayloadUnencoded(getJwsHeaders());
         return Base64UrlUtility.encode(writer.toJson(getJwsHeaders()))
-               + "."
+               + '.'
                + (unencoded ? plainJwsPayload : Base64UrlUtility.encode(plainJwsPayload));
     }
     public String getEncodedSignature() {
@@ -88,7 +86,7 @@ public class JwsCompactProducer {
         if (noSignature && !isPlainText()) {
             throw new IllegalStateException("Signature is not available");
         }
-        return getUnsignedEncodedJws() + "." + (noSignature ? "" : signature);
+        return getUnsignedEncodedJws() + '.' + (noSignature ? "" : signature);
     }
     public String signWith(JsonWebKey jwk) {
         return signWith(JwsUtils.getSignatureProvider(jwk,

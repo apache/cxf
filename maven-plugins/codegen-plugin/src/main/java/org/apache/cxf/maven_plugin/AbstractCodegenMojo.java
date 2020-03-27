@@ -464,7 +464,7 @@ public abstract class AbstractCodegenMojo extends AbstractMojo {
                 });
 
                 System.setProperty(HTTP_PROXY_USER, authUser);
-                System.setProperty(HTTP_PROXY_PORT, authPassword);
+                System.setProperty(HTTP_PROXY_PASSWORD, authPassword);
             }
 
         }

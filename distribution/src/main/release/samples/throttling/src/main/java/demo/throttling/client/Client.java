@@ -112,7 +112,6 @@ public final class Client implements Runnable {
         Map<String, Object> properties = new HashMap<>();
         properties.put("bus.jmx.usePlatformMBeanServer", Boolean.TRUE);
         properties.put("bus.jmx.enabled", Boolean.TRUE);
-        properties.put("bus.jmx.createMBServerConnectorFactory", Boolean.FALSE);
         Bus b = new CXFBusFactory().createBus(null, properties);
         MetricRegistry registry = new MetricRegistry();
         CodahaleMetricsProvider.setupJMXReporter(b, registry);

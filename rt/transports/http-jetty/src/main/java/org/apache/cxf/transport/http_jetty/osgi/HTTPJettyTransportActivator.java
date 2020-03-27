@@ -137,6 +137,8 @@ public class HTTPJettyTransportActivator
                 e.setSessionSupport(Boolean.parseBoolean((String)properties.get(k)));
             } else if ("continuationsEnabled".equals(k)) {
                 e.setContinuationsEnabled(Boolean.parseBoolean((String)properties.get(k)));
+            } else if ("sendServerVersion".equals(k)) {
+                e.setSendServerVersion(Boolean.parseBoolean((String)properties.get(k)));
             } else if ("reuseAddress".equals(k)) {
                 e.setReuseAddress(Boolean.parseBoolean((String)properties.get(k)));
             } else if ("maxIdleTime".equals(k)) {

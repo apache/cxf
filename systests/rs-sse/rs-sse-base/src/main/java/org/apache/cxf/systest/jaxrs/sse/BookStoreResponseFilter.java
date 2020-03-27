@@ -40,12 +40,16 @@ public class BookStoreResponseFilter implements ContainerResponseFilter {
 
     @Override
     public void filter(ContainerRequestContext reqContext, ContainerResponseContext rspContext) throws IOException {
-        if (uriInfo.getRequestUri().getPath().endsWith("/filtered/sse")) {
+        if (!uriInfo.getRequestUri().getPath().endsWith("/filtered/stats")) {
             counter.incrementAndGet();
         }
     }
     
     public static int getInvocations() {
         return counter.get();
+    }
+
+    public static void reset() {
+        counter.set(0);
     }
 }

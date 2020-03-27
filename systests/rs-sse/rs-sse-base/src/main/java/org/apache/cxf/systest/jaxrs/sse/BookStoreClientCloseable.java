@@ -64,14 +64,14 @@ abstract class BookStoreClientCloseable {
                 localBroadcaster.onClose(sseEventSink -> stats.closed());
                 localBroadcaster.register(sink);
 
-                localBroadcaster.broadcast(createStatsEvent(builder.name("book"), id + 1))
+                localBroadcaster.broadcast(createEvent(builder.name("book"), id + 1))
                     .whenComplete((r, ex) -> stats.inc());
                 
                 // Await client to confirm the it got the event (PUT /client-closes-connection/received)
                 phaser.arriveAndAwaitAdvance();
                 
                 Thread.sleep(500);
-                localBroadcaster.broadcast(createStatsEvent(builder.name("book"), id + 2))
+                localBroadcaster.broadcast(createEvent(builder.name("book"), id + 2))
                     .whenComplete((r, ex) -> { 
                         // we expect exception here
                         if (ex == null && !sink.isClosed()) {
@@ -85,7 +85,7 @@ abstract class BookStoreClientCloseable {
                 // This event should complete exceptionally since SseEventSource should be 
                 // closed already.
                 Thread.sleep(500);
-                localBroadcaster.broadcast(createStatsEvent(builder.name("book"), id + 3))
+                localBroadcaster.broadcast(createEvent(builder.name("book"), id + 3))
                     .whenComplete((r, ex) -> { 
                         // we expect exception here
                         if (ex == null && !sink.isClosed()) {
@@ -96,7 +96,7 @@ abstract class BookStoreClientCloseable {
                 // This event should complete immediately since the sink has been removed
                 // from the broadcaster (closed).
                 Thread.sleep(500);
-                localBroadcaster.broadcast(createStatsEvent(builder.name("book"), id + 4))
+                localBroadcaster.broadcast(createEvent(builder.name("book"), id + 4))
                     .whenComplete((r, ex) -> {
                         // we expect the sink to be closed at this point
                         if (ex != null || !sink.isClosed()) {
@@ -136,11 +136,19 @@ abstract class BookStoreClientCloseable {
         return stats;
     }
     
-    protected static OutboundSseEvent createStatsEvent(final OutboundSseEvent.Builder builder, final int eventId) {
+    protected static OutboundSseEvent createEvent(final OutboundSseEvent.Builder builder, final int eventId) {
         return builder
             .id(Integer.toString(eventId))
             .data(Book.class, new Book("New Book #" + eventId, eventId))
             .mediaType(MediaType.APPLICATION_JSON_TYPE)
+            .build();
+    }
+    
+    protected static OutboundSseEvent createRawEvent(final OutboundSseEvent.Builder builder, final int eventId) {
+        return builder
+            .id(Integer.toString(eventId))
+            .data("New Book #" + eventId)
+            .mediaType(MediaType.TEXT_PLAIN_TYPE)
             .build();
     }
 }

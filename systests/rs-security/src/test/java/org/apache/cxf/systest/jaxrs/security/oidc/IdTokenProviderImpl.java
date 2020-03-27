@@ -18,26 +18,21 @@
  */
 package org.apache.cxf.systest.jaxrs.security.oidc;
 
-import java.time.Instant;
 import java.util.List;
 
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.idp.IdTokenProvider;
 
 public class IdTokenProviderImpl implements IdTokenProvider {
 
-    public IdTokenProviderImpl() {
-
-    }
-
     @Override
     public IdToken getIdToken(String clientId, UserSubject authenticatedUser, List<String> scopes) {
         IdToken token = new IdToken();
 
-        Instant now = Instant.now();
-        token.setIssuedAt(now.getEpochSecond());
-        token.setExpiryTime(now.plusSeconds(60L).getEpochSecond());
+        token.setIssuedAt(OAuthUtils.getIssuedAt());
+        token.setExpiryTime(token.getIssuedAt() + 60L);
         token.setAudience(clientId);
         token.setSubject(authenticatedUser.getLogin());
         token.setIssuer("OIDC IdP");

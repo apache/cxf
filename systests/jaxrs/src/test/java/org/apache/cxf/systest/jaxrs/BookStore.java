@@ -1509,7 +1509,8 @@ public class BookStore {
         String ct1 = httpHeaders.getMediaType().toString();
         String ct2 = httpHeaders.getRequestHeader("Content-Type").get(0);
         String ct3 = httpHeaders.getRequestHeaders().getFirst("Content-Type");
-        if (!("application/xml".equals(ct1) && ct1.equals(ct2) && ct1.equals(ct3))) {
+        if (!(ct1.startsWith("application/xml") && ct2.startsWith("application/xml")
+            && ct3.startsWith("application/xml"))) {
             throw new RuntimeException("Unexpected content type");
         }
 
@@ -1704,7 +1705,7 @@ public class BookStore {
         return Response.accepted(name).build();
     }
 
-    
+
     @POST
     @Path("/empty202")
     @Consumes("text/plain")

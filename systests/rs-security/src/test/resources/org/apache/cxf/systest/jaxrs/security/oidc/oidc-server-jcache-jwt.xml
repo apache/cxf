@@ -117,8 +117,15 @@ under the License.
    </bean>
    
    <bean id="oidcKeysService" class="org.apache.cxf.rs.security.oidc.idp.OidcKeysService"/>
-   
-   <jaxrs:server 
+
+    <bean id="oidcConfigurationService" class="org.apache.cxf.rs.security.oidc.idp.OidcConfigurationService">
+        <property name="stripPathFromIssuerUri" value="false" />
+    </bean>
+    <bean id="wellKnownService" class="org.apache.cxf.rs.security.oauth2.services.WellKnownService">
+        <property name="service" ref="oidcConfigurationService" />
+    </bean>
+
+   <jaxrs:server
        depends-on="tls-config" 
        address="https://localhost:${testutil.ports.oidc-server-jcache-jwt}/services">
        <jaxrs:serviceBeans>
@@ -127,6 +134,7 @@ under the License.
            <ref bean="implicitService"/>
            <ref bean="tokenService"/>
            <ref bean="oidcKeysService"/>
+           <ref bean="wellKnownService"/>
        </jaxrs:serviceBeans>
        <jaxrs:providers>
            <ref bean="basicAuthFilter"/>

@@ -27,12 +27,12 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 
-@Path("oauth-authorization-server")
 public class AuthorizationMetadataService {
     private String issuer;
     private boolean stripPathFromIssuerUri = true;
@@ -52,7 +52,8 @@ public class AuthorizationMetadataService {
     private String dynamicRegistrationEndpointAddress;
 
     @GET
-    @Produces("application/json")
+    @Path("oauth-authorization-server")
+    @Produces(MediaType.APPLICATION_JSON)
     public String getConfiguration(@Context UriInfo ui) {
         Map<String, Object> cfg = new LinkedHashMap<>();
         String baseUri = getBaseUri(ui);

@@ -6,7 +6,7 @@ pipeline {
     tools { 
         ant 'Ant 1.10.6'
         maven 'Maven 3.6.2' 
-        jdk 'JDK 1.8.0_191' 
+        jdk 'JDK 1.8.0_241' 
     }
     
     environment {
@@ -64,6 +64,8 @@ pipeline {
                sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-rt-rs-client:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
                sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-rt-rs-sse:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
                sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-rt-transports-http:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
+               echo "Including additional dependencies (woodstox, ...)"
+               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=com.fasterxml.woodstox:woodstox-core:5.2.1:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
            }
        }
        
@@ -118,7 +120,15 @@ pipeline {
                     dir("${TS_HOME}/bin") {
                         sh "ant config.vi"
                         sh "ant deploy.all"
-                        sh "ant run.all"
+                        script {
+                            try {
+                                echo 'Running all TCK tests ...'
+                                sh "ant run.all"
+                            } catch (exc) {
+                                echo 'Some TCK tests have failed, marking build as unstable'
+                                currentBuild.result = 'UNSTABLE'
+                            }
+                        }
                     }
                 }
            }

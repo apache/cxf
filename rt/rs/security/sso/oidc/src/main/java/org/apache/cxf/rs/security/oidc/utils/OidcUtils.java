@@ -26,10 +26,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.JwsException;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
@@ -38,6 +44,7 @@ import org.apache.cxf.rs.security.oauth2.common.OAuthRedirectionState;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oidc.common.AbstractUserInfo;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
+import org.apache.cxf.rs.security.oidc.idp.OidcProviderMetadata;
 import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 
 public final class OidcUtils {
@@ -210,4 +217,14 @@ public final class OidcUtils {
             state.getExtraProperties().put(OidcUtils.CLAIMS_PARAM, claims);
         }
     }
+
+    public static OidcProviderMetadata getOidcProviderMetadata(String issuerURL) {
+        Response response = WebClient.create(issuerURL).path("/.well-known/openid-configuration")
+            .accept(MediaType.APPLICATION_JSON).get();
+        if (Status.OK.getStatusCode() != response.getStatus()) {
+            throw ExceptionUtils.toWebApplicationException(response);
+        }
+        return new OidcProviderMetadata(new JsonMapObjectReaderWriter().fromJson(response.readEntity(String.class)));
+    }
+
 }

@@ -121,15 +121,19 @@ public class DynamicRegistrationService {
     @Path("{clientId}")
     @Produces("application/json")
     public ClientRegistration readClientRegistrationWithPath(@PathParam("clientId") String clientId) {
-
         return doReadClientRegistration(clientId);
     }
 
     @PUT
     @Path("{clientId}")
     @Consumes("application/json")
-    public Response updateClientRegistration(@PathParam("clientId") String clientId) {
-        return Response.ok().build();
+    @Produces("application/json")
+    public ClientRegistration updateClientRegistration(@PathParam("clientId") String clientId,
+        ClientRegistration request) {
+        Client client = readClient(clientId);
+        fromClientRegistrationToClient(request, client);
+        clientProvider.setClient(client);
+        return fromClientToClientRegistration(client);
     }
 
     @DELETE
@@ -151,6 +155,7 @@ public class DynamicRegistrationService {
             response.setClientSecretExpiresAt(Long.valueOf(0));
         }
         response.setClientIdIssuedAt(client.getRegisteredAt());
+        response.setGrantTypes(client.getAllowedGrantTypes());
         UriBuilder ub = getMessageContext().getUriInfo().getAbsolutePathBuilder();
 
         if (supportRegistrationAccessTokens) {
@@ -278,16 +283,35 @@ public class DynamicRegistrationService {
         // Client Registration Time
         newClient.setRegisteredAt(System.currentTimeMillis() / 1000L);
 
+        fromClientRegistrationToClient(request, newClient);
+
+        SecurityContext sc = mc.getSecurityContext();
+        if (sc != null && sc.getUserPrincipal() != null && sc.getUserPrincipal().getName() != null) {
+            UserSubject subject = new UserSubject(sc.getUserPrincipal().getName());
+            newClient.setResourceOwnerSubject(subject);
+        }
+
+        newClient.setRegisteredDynamically(true);
+        return newClient;
+    }
+
+    protected void fromClientRegistrationToClient(ClientRegistration request, Client client) {
+        final List<String> grantTypes = client.getAllowedGrantTypes();
+
         // Client Redirect URIs
         List<String> redirectUris = request.getRedirectUris();
         if (redirectUris != null) {
+            String appType = request.getApplicationType();
+            if (appType == null) {
+                appType = DEFAULT_APPLICATION_TYPE;
+            }
             for (String uri : redirectUris) {
                 validateRequestUri(uri, appType, grantTypes);
             }
-            newClient.setRedirectUris(redirectUris);
+            client.setRedirectUris(redirectUris);
         }
 
-        if (newClient.getRedirectUris().isEmpty()
+        if (client.getRedirectUris().isEmpty()
             && (grantTypes.contains(OAuthConstants.AUTHORIZATION_CODE_GRANT)
                 || grantTypes.contains(OAuthConstants.IMPLICIT_GRANT))) {
             // Throw an error as we need a redirect URI for these grants.
@@ -299,38 +323,30 @@ public class DynamicRegistrationService {
         // Client Resource Audience URIs
         List<String> resourceUris = request.getResourceUris();
         if (resourceUris != null) {
-            newClient.setRegisteredAudiences(resourceUris);
+            client.setRegisteredAudiences(resourceUris);
         }
 
         // Client Scopes
         String scope = request.getScope();
         if (!StringUtils.isEmpty(scope)) {
-            newClient.setRegisteredScopes(OAuthUtils.parseScope(scope));
+            client.setRegisteredScopes(OAuthUtils.parseScope(scope));
         }
         // Client Application URI
         String clientUri = request.getClientUri();
         if (clientUri != null) {
-            newClient.setApplicationWebUri(clientUri);
+            client.setApplicationWebUri(clientUri);
         }
         // Client Logo URI
         String clientLogoUri = request.getLogoUri();
         if (clientLogoUri != null) {
-            newClient.setApplicationLogoUri(clientLogoUri);
+            client.setApplicationLogoUri(clientLogoUri);
         }
 
         //TODO: check other properties
         // Add more typed properties like tosUri, policyUri, etc to Client
         // or set them as Client extra properties
-
-        SecurityContext sc = mc.getSecurityContext();
-        if (sc != null && sc.getUserPrincipal() != null && sc.getUserPrincipal().getName() != null) {
-            UserSubject subject = new UserSubject(sc.getUserPrincipal().getName());
-            newClient.setResourceOwnerSubject(subject);
-        }
-
-        newClient.setRegisteredDynamically(true);
-        return newClient;
     }
+
 
     protected boolean isPasswordRequired(List<String> grantTypes, String tokenEndpointAuthMethod) {
         if (grantTypes.contains(OAuthConstants.IMPLICIT_GRANT)) {

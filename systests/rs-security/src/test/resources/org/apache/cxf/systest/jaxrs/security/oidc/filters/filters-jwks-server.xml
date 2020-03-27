@@ -24,31 +24,63 @@ under the License.
     xmlns:sec="http://cxf.apache.org/configuration/security" 
     xmlns:cxf="http://cxf.apache.org/core" 
     xmlns:jaxrs="http://cxf.apache.org/jaxrs" 
-    xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:jaxrs-client="http://cxf.apache.org/jaxrs-client"
     xsi:schemaLocation="http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
              http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
              http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-             http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util-4.2.xsd
              http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd
              http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd 
-             http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd">
+             http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd
+             http://cxf.apache.org/jaxrs-client http://cxf.apache.org/schemas/jaxrs-client.xsd">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
             <cxf:logging/>
         </cxf:features>
-        <cxf:properties> 
-          <entry key="org.apache.cxf.jaxrs.bus.providers" value-ref="busProviders"/> 
-        </cxf:properties>
     </cxf:bus>
-    <!-- providers -->
-    <util:list id="busProviders"> 
-        <ref bean="oauthJson"/> 
-    </util:list> 
-    <bean id="oauthJson" class="org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider"/>
-    
+
+   <jaxrs-client:client id="jwksClient" serviceClass="org.apache.cxf.jaxrs.client.WebClient"
+        address="https://localhost:${testutil.ports.jaxrs-filters-oidc-service}/services/keys"
+        username="bob" password="security" >
+        <jaxrs-client:headers>
+           <entry key="Accept" value="application/json"/>
+        </jaxrs-client:headers>
+        <jaxrs-client:providers>
+            <bean class="org.apache.cxf.rs.security.jose.jaxrs.JsonWebKeysProvider" />
+        </jaxrs-client:providers>
+   </jaxrs-client:client>
+
+    <bean id="jwsSignatureVerifierProvider"
+        class="org.apache.cxf.systest.jaxrs.security.oidc.filters.JwsSignatureVerifierProvider" >
+        <property name="jwksClient" ref="jwksClient"/>
+    </bean>
+
+    <bean id="jwsVerifier"
+        factory-bean="jwsSignatureVerifierProvider" 
+        factory-method="getJwsSignatureVerifier" >
+    </bean>
+
+   <bean id="jwtAccessTokenValidator" class="org.apache.cxf.rs.security.oauth2.filters.JwtAccessTokenValidator">
+       <property name="jwsVerifier" ref="jwsVerifier"/>
+   </bean>
+
+   <bean id="authFilter" class="org.apache.cxf.rs.security.oauth2.filters.OAuthRequestFilter">
+       <property name="tokenValidator" ref="jwtAccessTokenValidator"/>
+   </bean>
+
+   <jaxrs:server
+       depends-on="tls-config" 
+       address="https://localhost:${testutil.ports.filters-jwks-server}/secured">
+       <jaxrs:serviceBeans>
+           <bean class="org.apache.cxf.systest.jaxrs.security.jose.BookStore"/>
+       </jaxrs:serviceBeans>
+       <jaxrs:providers>
+           <ref bean="authFilter"/>
+       </jaxrs:providers>
+   </jaxrs:server>
+
     <httpj:engine-factory id="tls-config">
-        <httpj:engine port="${testutil.ports.metadata-server-jcache}">
+        <httpj:engine port="${testutil.ports.filters-jwks-server}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="JKS" password="password" resource="keys/Bethal.jks"/>
@@ -56,29 +88,19 @@ under the License.
                 <sec:trustManagers>
                     <sec:keyStore type="JKS" password="password" resource="keys/Truststore.jks"/>
                 </sec:trustManagers>
-                <sec:clientAuthentication want="false" required="false"/>
+                <sec:clientAuthentication want="true" required="true"/>
             </httpj:tlsServerParameters>
             <httpj:sessionSupport>true</httpj:sessionSupport>
         </httpj:engine>
     </httpj:engine-factory>
-    
-   <bean id="metadataService" class="org.apache.cxf.rs.security.oidc.idp.OidcConfigurationService"/>
-   
-   <jaxrs:server 
-       depends-on="tls-config" 
-       address="https://localhost:${testutil.ports.metadata-server-jcache}/services/.well-known">
-        <jaxrs:serviceBeans>
-            <ref bean="metadataService"/>
-        </jaxrs:serviceBeans>
-        <jaxrs:properties>
-           <entry key="rs.security.keystore.type" value="jks" />
-           <entry key="rs.security.keystore.alias" value="alice"/>
-           <entry key="rs.security.keystore.password" value="password"/>
-           <entry key="rs.security.key.password" value="password"/>
-           <entry key="rs.security.keystore.file" value="keys/alice.jks" />
-           <entry key="rs.security.signature.algorithm" value="RS256" />
-       </jaxrs:properties>
-    </jaxrs:server>
-   
+
+   <http:conduit name="https://localhost.*">
+        <http:client ConnectionTimeout="3000000" ReceiveTimeout="3000000"/>
+        <http:tlsClientParameters disableCNCheck="true">
+            <sec:trustManagers>
+                <sec:keyStore type="JKS" password="password" resource="keys/Truststore.jks"/>
+            </sec:trustManagers>
+        </http:tlsClientParameters>
+    </http:conduit>
 
 </beans>

@@ -48,7 +48,7 @@ under the License.
     <bean id="oauthJson" class="org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider"/>
     
     <httpj:engine-factory id="tls-config">
-        <httpj:engine port="${testutil.ports.jaxrs-oauth2-grants-jcache}">
+        <httpj:engine port="${testutil.ports.grants-server-jcache}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="JKS" password="password" resource="keys/Bethal.jks"/>
@@ -63,7 +63,7 @@ under the License.
     </httpj:engine-factory>
     
    <bean id="oauthProvider" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.JCacheOAuthDataProviderImpl">
-       <constructor-arg><value>${testutil.ports.jaxrs-oauth2-grants2-jcache}</value></constructor-arg>
+       <constructor-arg><value>${testutil.ports.grants-server-jcache.2}</value></constructor-arg>
    </bean>
    
    <bean id="authorizationService" class="org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService">
@@ -119,7 +119,7 @@ under the License.
    
    <jaxrs:server 
        depends-on="tls-config" 
-       address="https://localhost:${testutil.ports.jaxrs-oauth2-grants-jcache}/services">
+       address="https://localhost:${testutil.ports.grants-server-jcache}/services">
        <jaxrs:serviceBeans>
            <ref bean="authorizationService"/>
            <ref bean="implicitService"/>
