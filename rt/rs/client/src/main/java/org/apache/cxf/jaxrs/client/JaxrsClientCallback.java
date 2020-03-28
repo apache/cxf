@@ -71,11 +71,11 @@ public class JaxrsClientCallback<T> extends ClientCallback {
     @SuppressWarnings("unchecked")
     public void handleResponse(Map<String, Object> ctx, Object[] res) {
         context = ctx;
-        result = res;
+        delegate.complete(res);
         if (handler != null) {
             handler.completed((T)res[0]);
         }
-        done = true;
+        
         synchronized (this) {
             notifyAll();
         }
@@ -84,11 +84,11 @@ public class JaxrsClientCallback<T> extends ClientCallback {
     @Override
     public void handleException(Map<String, Object> ctx, final Throwable ex) {
         context = ctx;
-        exception = ex;
+        delegate.completeExceptionally(ex);
         if (handler != null) {
-            handler.failed(exception);
+            handler.failed(ex);
         }
-        done = true;
+        
         synchronized (this) {
             notifyAll();
         }
