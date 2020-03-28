@@ -111,9 +111,10 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
 
     @Override
     protected JaxrsClientCallback<?> newJaxrsClientCallback(InvocationCallback<Object> asyncCallback,
+                                                            Message outMessage,
                                                             Class<?> responseClass,
                                                             Type outGenericType) {
-        return new MPRestClientCallback<Object>(asyncCallback, responseClass, outGenericType);
+        return new MPRestClientCallback<Object>(asyncCallback, outMessage, responseClass, outGenericType);
     }
 
     @Override

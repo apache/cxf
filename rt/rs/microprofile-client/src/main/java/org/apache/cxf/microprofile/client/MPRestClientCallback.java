@@ -20,81 +20,37 @@
 package org.apache.cxf.microprofile.client;
 
 import java.lang.reflect.Type;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import javax.ws.rs.client.InvocationCallback;
 
 import org.apache.cxf.jaxrs.client.JaxrsClientCallback;
+import org.apache.cxf.message.Message;
 
 public class MPRestClientCallback<T> extends JaxrsClientCallback<T> {
+    private final ExecutorService executor;
 
     public MPRestClientCallback(InvocationCallback<T> handler,
+                                Message outMessage,
                                 Class<?> responseClass,
                                 Type outGenericType) {
         super(handler, responseClass, outGenericType);
+        ExecutorService es = outMessage.get(ExecutorService.class);
+        if (es == null) {
+            es = AccessController.doPrivileged((PrivilegedAction<ExecutorService>)() -> {
+                return ForkJoinPool.commonPool();
+            });
+        }
+        executor = es;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Future<T> createFuture() {
-        return new MPRestClientResponseFuture<T>(this);
-    }
-
-    static class MPRestClientResponseFuture<T> extends CompletableFuture<T> implements Future<T> {
-        MPRestClientCallback<T> callback;
-        MPRestClientResponseFuture(MPRestClientCallback<T> cb) {
-            callback = cb;
-        }
-
-        public Map<String, Object> getContext() {
-            try {
-                return callback.getResponseContext();
-            } catch (Exception ex) {
-                return null;
-            }
-        }
-        public boolean cancel(boolean mayInterruptIfRunning) {
-            return callback.cancel(mayInterruptIfRunning);
-        }
-
-        public T get() throws InterruptedException, ExecutionException {
-            try {
-                return getObject(callback.get()[0]);
-            } catch (InterruptedException ex) {
-                InvocationCallback<T> handler = callback.getHandler();
-                if (handler != null) {
-                    handler.failed(ex);
-                }
-                throw ex;
-            }
-        }
-        public T get(long timeout, TimeUnit unit) throws InterruptedException,
-            ExecutionException, TimeoutException {
-            try {
-                return getObject(callback.get(timeout, unit)[0]);
-            } catch (InterruptedException ex) {
-                InvocationCallback<T> handler = callback.getHandler();
-                if (handler != null) {
-                    handler.failed(ex);
-                }
-                throw ex;
-            }
-        }
-
-        @SuppressWarnings("unchecked")
-        private T getObject(Object object) {
-            return (T)object;
-        }
-
-        public boolean isCancelled() {
-            return callback.isCancelled();
-        }
-        public boolean isDone() {
-            return callback.isDone();
-        }
+        return delegate.thenApplyAsync(res -> (T)res[0], executor);
     }
 }

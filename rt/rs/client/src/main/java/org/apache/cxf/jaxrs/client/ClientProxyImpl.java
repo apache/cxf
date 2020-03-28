@@ -921,7 +921,7 @@ public class ClientProxyImpl extends AbstractClient implements
                                    InvocationCallback<Object> asyncCallback) {
         outMessage.getExchange().setSynchronous(false);
         setAsyncMessageObserverIfNeeded(outMessage.getExchange());
-        JaxrsClientCallback<?> cb = newJaxrsClientCallback(asyncCallback,
+        JaxrsClientCallback<?> cb = newJaxrsClientCallback(asyncCallback, outMessage,
             ori.getMethodToInvoke().getReturnType(), ori.getMethodToInvoke().getGenericReturnType());
         outMessage.getExchange().put(JaxrsClientCallback.class, cb);
         doRunInterceptorChain(outMessage);
@@ -930,6 +930,7 @@ public class ClientProxyImpl extends AbstractClient implements
     }
 
     protected JaxrsClientCallback<?> newJaxrsClientCallback(InvocationCallback<Object> asyncCallback,
+                                                            Message outMessage,
                                                             Class<?> responseClass,
                                                             Type outGenericType) {
         return new JaxrsClientCallback<>(asyncCallback, responseClass, outGenericType);
