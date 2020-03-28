@@ -22,10 +22,6 @@ package org.apache.cxf.microprofile.client;
 import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
@@ -55,31 +51,6 @@ public class MPRestClientCallback<T> extends JaxrsClientCallback<T> {
     @SuppressWarnings("unchecked")
     @Override
     public Future<T> createFuture() {
-        return (Future<T>)CompletableFuture.supplyAsync(() -> {
-            synchronized (this) {
-                if (!isDone()) {
-                    try {
-                        this.wait();
-                    } catch (InterruptedException e) {
-                        throw new CompletionException(e);
-                    }
-                }
-            }
-            if (exception != null) {
-                throw new CompletionException(exception);
-            }
-            if (isCancelled()) {
-                throw new CancellationException();
-            }
-            if (!isDone()) {
-                throw new IllegalStateException(
-                    "CompletionStage has been notified, indicating completion, but is not completed.");
-            }
-            try {
-                return get()[0];
-            } catch (InterruptedException | ExecutionException e) {
-                throw new CompletionException(e);
-            }
-        }, executor);
+        return delegate.thenApplyAsync(res -> (T)res[0], executor);
     }
 }
