@@ -18,56 +18,7 @@
  */
 package org.apache.cxf.rs.security.oidc.idp;
 
-import java.util.Properties;
+import org.apache.cxf.rs.security.oauth2.services.JwksService;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-
-import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
-import org.apache.cxf.rs.security.jose.jws.JwsUtils;
-
-@Path("keys")
-public class OidcKeysService {
-
-    private volatile JsonWebKeys keySet;
-    private WebClient keyServiceClient;
-    private boolean stripPrivateParameters = true;
-
-    @GET
-    @Produces("application/json")
-    public JsonWebKeys getPublicVerificationKeys() {
-        if (keySet == null) {
-            if (keyServiceClient == null) {
-                keySet = getFromLocalStore(stripPrivateParameters);
-            } else {
-                keySet = keyServiceClient.get(JsonWebKeys.class);
-            }
-
-        }
-        return keySet;
-    }
-
-    private static JsonWebKeys getFromLocalStore(boolean stripPrivateParameters) {
-        Properties props = JwsUtils.loadSignatureInProperties(true);
-        return JwsUtils.loadPublicVerificationKeys(JAXRSUtils.getCurrentMessage(), props, stripPrivateParameters);
-    }
-
-    public void setKeyServiceClient(WebClient keyServiceClient) {
-        this.keyServiceClient = keyServiceClient;
-    }
-
-    public boolean isStripPrivateParameters() {
-        return stripPrivateParameters;
-    }
-
-    /**
-     * Whether to strip private parameters from the keys that are returned. The default is true.
-     */
-    public void setStripPrivateParameters(boolean stripPrivateParameters) {
-        this.stripPrivateParameters = stripPrivateParameters;
-    }
-
+public class OidcKeysService extends JwksService {
 }
