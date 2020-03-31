@@ -2,14 +2,14 @@
   <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.apache.cxf</groupId>
-    <artifactId>cxf7067-codegen</artifactId>
+    <artifactId>cxf7998-codegen</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>cxf7067-codegen</name>
+    <name>cxf7998-codegen</name>
 
     <properties>
-        <wsdl.groupid>org.apache.cxf.cxf7067</wsdl.groupid>
-        <wsdl.artifactid>Cxf7067Service</wsdl.artifactid>
+        <wsdl.groupid>org.apache.cxf.cxf7998</wsdl.groupid>
+        <wsdl.artifactid>Cxf7998Service</wsdl.artifactid>
         <wsdl.version>1.0.0</wsdl.version>
     </properties>
 
@@ -46,6 +46,19 @@
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
                 <version>@project.version@</version>
+                <!-- TODO: remove this deps when released version will be available -->
+                <dependencies>
+                    <dependency>
+                        <groupId>org.glassfish.jaxb</groupId>
+                        <artifactId>jaxb-runtime</artifactId>
+                        <version>2.3.3-b02</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.glassfish.jaxb</groupId>
+                        <artifactId>jaxb-xjc</artifactId>
+                        <version>2.3.3-b02</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <id>generate-sources</id>

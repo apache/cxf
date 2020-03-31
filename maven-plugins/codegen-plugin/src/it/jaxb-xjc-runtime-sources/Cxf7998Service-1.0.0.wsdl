@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:me="urn:me" xmlns:me2="http://service.com/wsdl" targetNamespace="http://service.com/wsdl">
+	<types>
+		<xs:schema targetNamespace="urn:me" elementFormDefault="qualified" attributeFormDefault="unqualified">
+			<xs:element name="Request"/>
+			<xs:element name="Response" type="me:boolean"/>
+			<xs:simpleType name="boolean">
+				<xs:restriction base="xs:boolean">
+					<xs:pattern value="0|1"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:schema>
+	</types>
+	<message name="RequestMsg">
+		<part name="request" element="me:Request"/>
+	</message>
+	<message name="ResponseMsg">
+		<part name="response" element="me:Response"/>
+	</message>
+	<portType name="MyPortType">
+		<operation name="MyOperation">
+			<input message="me2:RequestMsg"/>
+			<output message="me2:ResponseMsg"/>
+		</operation>
+	</portType>
+	<binding name="MyPortTypeBinding" type="me2:MyPortType">
+		<soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="MyOperation">
+			<soap12:operation soapAction="urn:meAction"/>
+			<input>
+				<soap12:body use="literal"/>
+			</input>
+			<output>
+				<soap12:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="MyService">
+		<port name="MyPort" binding="me2:MyPortTypeBinding">
+			<soap12:address location="http://example.com"/>
+		</port>
+	</service>
+</definitions>
