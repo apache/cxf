@@ -23,8 +23,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.KeyStore;
 import java.security.Security;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -36,7 +34,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
 import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
@@ -49,6 +46,7 @@ import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transport.https.InsecureTrustManager;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -414,9 +412,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         assertNotNull("Service is null", service);
 
         // Set up (shared) KeyManagers/TrustManagers
-        X509TrustManager trustManager = new NoOpX509TrustManager();
-        TrustManager[] trustManagers = new TrustManager[1];
-        trustManagers[0] = trustManager;
+        TrustManager[] trustManagers = InsecureTrustManager.getNoOpX509TrustManagers();
 
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 
@@ -490,9 +486,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
             assertNotNull("Service is null", service);
 
             // Set up (shared) KeyManagers/TrustManagers
-            X509TrustManager trustManager = new NoOpX509TrustManager();
-            TrustManager[] trustManagers = new TrustManager[1];
-            trustManagers[0] = trustManager;
+            TrustManager[] trustManagers = InsecureTrustManager.getNoOpX509TrustManagers();
 
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 
@@ -650,20 +644,4 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
     };
 
-    private static class NoOpX509TrustManager implements X509TrustManager {
-
-        @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-        }
-
-        @Override
-        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-        }
-
-        @Override
-        public X509Certificate[] getAcceptedIssuers() {
-            return null;
-        }
-
-    }
 }

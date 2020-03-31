@@ -45,6 +45,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transport.https.InsecureTrustManager;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
 
@@ -124,10 +125,7 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
         }
 
         TLSClientParameters tlsParams = new TLSClientParameters();
-        X509TrustManager trustManager = new NoOpX509TrustManager();
-        TrustManager[] trustManagers = new TrustManager[1];
-        trustManagers[0] = trustManager;
-        tlsParams.setTrustManagers(trustManagers);
+        tlsParams.setTrustManagers(InsecureTrustManager.getNoOpX509TrustManagers());
         tlsParams.setDisableCNCheck(true);
 
         Client client = ClientProxy.getClient(port);
@@ -439,31 +437,6 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
-    }
-
-    public static TrustManager[] getNoOpX509TrustManagers() {
-        return new TrustManager[] {new NoOpX509TrustManager()};
-    }
-
-    public static class NoOpX509TrustManager implements X509TrustManager {
-
-        public NoOpX509TrustManager() {
-
-        }
-
-        @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-        }
-
-        @Override
-        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-        }
-
-        @Override
-        public X509Certificate[] getAcceptedIssuers() {
-            return null;
-        }
-
     }
 
     public static class ServerCertX509TrustManager implements X509TrustManager {

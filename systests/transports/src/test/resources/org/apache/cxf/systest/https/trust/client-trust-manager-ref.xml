@@ -31,7 +31,7 @@
         </cxf:features>
     </cxf:bus>
 
-    <bean id="trustManagers" class="org.apache.cxf.systest.https.trust.TrustManagerTest" factory-method="getNoOpX509TrustManagers"/>
+    <bean id="trustManagers" class="org.apache.cxf.transport.https.InsecureTrustManager" factory-method="getNoOpX509TrustManagers"/>
 
     <http:conduit name="https://localhost:.*">
         <http:tlsClientParameters disableCNCheck="true">
