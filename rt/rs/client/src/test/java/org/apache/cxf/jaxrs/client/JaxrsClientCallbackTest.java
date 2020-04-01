@@ -21,12 +21,14 @@ package org.apache.cxf.jaxrs.client;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.ws.rs.client.InvocationCallback;
 
@@ -38,6 +40,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
@@ -48,17 +51,22 @@ public class JaxrsClientCallbackTest {
     private InvocationCallback<String> handler;
     private ScheduledExecutorService executor;
     private JaxrsResponseFuture<String> future;
+    private AtomicReference<Object> state;
     
     @Before
     public void setUp() {
+        state = new AtomicReference<>();
+        
         executor = Executors.newSingleThreadScheduledExecutor();
         handler = new InvocationCallback<String>() {
             @Override
             public void failed(Throwable throwable) {
+                state.set(throwable);
             }
             
             @Override
             public void completed(String response) {
+                state.set(response);
             }
         };
         
@@ -85,8 +93,9 @@ public class JaxrsClientCallbackTest {
         assertThat(future.get(10, TimeUnit.MILLISECONDS), equalTo("results"));
         assertThat(future.isCancelled(), equalTo(false));
         assertThat(future.isDone(), equalTo(true));
+        assertThat(state.get(), equalTo("results"));
     }
-    
+
     @Test
     public void testGetResponseContextOnSuccessCallback() throws Exception {
         final CyclicBarrier barrier = new CyclicBarrier(2);
@@ -100,6 +109,7 @@ public class JaxrsClientCallbackTest {
         assertThat(future.get(10, TimeUnit.MILLISECONDS), equalTo("results"));
         assertThat(future.isCancelled(), equalTo(false));
         assertThat(future.isDone(), equalTo(true));
+        assertThat(state.get(), equalTo("results"));
     }
     
     @Test
@@ -111,6 +121,7 @@ public class JaxrsClientCallbackTest {
         assertThrows(ExecutionException.class, () -> future.get(10, TimeUnit.MILLISECONDS));
         assertThat(future.isCancelled(), equalTo(false));
         assertThat(future.isDone(), equalTo(true));
+        assertThat(state.get(), instanceOf(RuntimeException.class));
     }
 
     @Test
@@ -124,7 +135,7 @@ public class JaxrsClientCallbackTest {
     }
 
     @Test
-    public void testHandleCancellationCallback() throws Exception {
+    public void testHandleCancellationCallbackWithFuture() throws Exception {
         final CyclicBarrier barrier = new CyclicBarrier(2);
         schedule(barrier, () -> future.cancel(true));
         barrier.await(5, TimeUnit.SECONDS);
@@ -133,8 +144,21 @@ public class JaxrsClientCallbackTest {
         assertThrows(InterruptedException.class, () -> future.get(10, TimeUnit.MILLISECONDS));
         assertThat(future.isCancelled(), equalTo(true));
         assertThat(future.isDone(), equalTo(true));
+        assertThat(state.get(), instanceOf(InterruptedException.class));
     }
-    
+
+    @Test
+    public void testHandleCancellationCallback() throws Exception {
+        final CyclicBarrier barrier = new CyclicBarrier(2);
+        schedule(barrier, () -> callback.cancel(true));
+        barrier.await(5, TimeUnit.SECONDS);
+
+        assertThrows(InterruptedException.class, () -> callback.get());
+        assertThrows(InterruptedException.class, () -> callback.get(10, TimeUnit.MILLISECONDS));
+        assertThat(callback.isCancelled(), equalTo(true));
+        assertThat(callback.isDone(), equalTo(true));
+        assertThat(state.get(), instanceOf(CancellationException.class));
+    }
 
     @Test
     public void testHandleCancellationCallbackWhenStarted() throws Exception {
