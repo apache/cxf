@@ -39,8 +39,8 @@ class JaxwsClientCallback<T> extends ClientCallback {
     }
     public void handleResponse(Map<String, Object> ctx, Object[] res) {
         context = ctx;
-        delegate.complete(res);
         
+        // The handler has to be called *before* future completes
         if (handler != null) {
             handler.handleResponse(new Response<T>() {
                 protected boolean cancelled;
@@ -76,6 +76,8 @@ class JaxwsClientCallback<T> extends ClientCallback {
             });
         }
         
+        delegate.complete(res);
+        
         synchronized (this) {
             notifyAll();
         }
@@ -84,7 +86,7 @@ class JaxwsClientCallback<T> extends ClientCallback {
     @Override
     public void handleException(Map<String, Object> ctx, final Throwable ex) {
         context = ctx;
-        delegate.completeExceptionally(mapThrowable(ex));
+        
         if (handler != null) {
             handler.handleResponse(new Response<T>() {
                 protected boolean cancelled;
@@ -119,6 +121,9 @@ class JaxwsClientCallback<T> extends ClientCallback {
             });
         }
 
+        // The handler has to be called *before* future completes
+        delegate.completeExceptionally(mapThrowable(ex));
+        
         synchronized (this) {
             notifyAll();
         }
