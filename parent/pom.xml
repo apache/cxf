@@ -93,7 +93,7 @@
         <cxf.brave.zipkin.version>2.19.3</cxf.brave.zipkin.version>
         <cxf.cda.api.osgi.range>[1.1,2)</cxf.cda.api.osgi.range>
         <cxf.cdi.api.version>2.0</cxf.cdi.api.version>
-        <cxf.classgraph.version>4.8.65</cxf.classgraph.version>
+        <cxf.classgraph.version>4.8.25</cxf.classgraph.version>
         <cxf.classmate.version>1.1.0</cxf.classmate.version>
         <cxf.commons-codec.version>1.13</cxf.commons-codec.version>
         <cxf.commons-collections.version>3.2.2</cxf.commons-collections.version>
