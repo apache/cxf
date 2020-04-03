@@ -200,7 +200,7 @@
         <cxf.stax-ex.version>1.7.6</cxf.stax-ex.version>
         <cxf.swagger.ui.version>3.25.0</cxf.swagger.ui.version>
         <cxf.swagger.v3.version>2.1.2</cxf.swagger.v3.version>
-        <cxf.swagger2.version>1.6.0</cxf.swagger2.version>
+        <cxf.swagger2.version>1.6.1</cxf.swagger2.version>
         <cxf.swagger2.guava.version>27.0-jre</cxf.swagger2.guava.version>
         <cxf.tika.version>1.24</cxf.tika.version>
         <cxf.tomcat.version>9.0.33</cxf.tomcat.version>
