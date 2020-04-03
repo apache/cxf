@@ -20,18 +20,15 @@
 package org.apache.cxf.sts.cache;
 
 import java.security.Principal;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.cxf.sts.IdentityMapper;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
-public class CacheIdentityMapper implements IdentityMapper {
+class CacheIdentityMapper implements IdentityMapper {
 
-    Map<String, Map<String, String>> mappingTable =
-            Collections.synchronizedMap(new HashMap<String, Map<String, String>>());
-
+    private final Map<String, Map<String, String>> mappingTable = new HashMap<>();
 
     CacheIdentityMapper() {
         Map<String, String> identities = new HashMap<>();
@@ -48,19 +45,15 @@ public class CacheIdentityMapper implements IdentityMapper {
     }
 
     @Override
-    public Principal mapPrincipal(String sourceRealm,
-            Principal sourcePrincipal, String targetRealm) {
-
-        Map<String, String> identities = mappingTable.get(sourcePrincipal.getName() + "@" + sourceRealm);
-        if (identities == null) {
-            return null;
+    public Principal mapPrincipal(String sourceRealm, Principal sourcePrincipal, String targetRealm) {
+        Map<String, String> identities = mappingTable.get(sourcePrincipal.getName() + '@' + sourceRealm);
+        if (identities != null) {
+            String targetUser = identities.get(targetRealm);
+            if (targetUser != null) {
+                return new CustomTokenPrincipal(targetUser);
+            }
         }
-        String targetUser = identities.get(targetRealm);
-        if (targetUser == null) {
-            return null;
-        }
-        return new CustomTokenPrincipal(targetUser);
-
+        return null;
     }
 
 }
