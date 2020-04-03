@@ -33,7 +33,7 @@
     <url>https://cxf.apache.org</url>
     <properties>
         <cxf.glassfish.el.version>3.0.1-b11</cxf.glassfish.el.version>
-        <cxf.openwebbeans.version>2.0.8</cxf.openwebbeans.version>
+        <cxf.openwebbeans.version>2.0.14</cxf.openwebbeans.version>
     </properties>
     <modules>
         <module>base</module>
@@ -54,11 +54,6 @@
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-plus</artifactId>
-                <version>${cxf.jetty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
                 <artifactId>apache-jsp</artifactId>
                 <version>${cxf.jetty.version}</version>
                 <exclusions>
@@ -67,37 +62,6 @@
                         <artifactId>apache-jsp</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-transports-http-jetty</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-rs-client</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-integration-cdi</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-testutils</artifactId>
-                <version>${project.version}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>javax.annotation</groupId>

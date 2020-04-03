@@ -56,7 +56,7 @@
                     <artifactId>jboss-el-api_3.0_spec</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>javax.el</artifactId>
