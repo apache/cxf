@@ -380,7 +380,7 @@ public abstract class AbstractOperation {
         builder.setKeyIdentifierType(encryptionProperties.getKeyIdentifierType());
         builder.setKeyEncAlgo(keyWrapAlgorithm);
 
-        SecretKey symmetricKey = null;
+        final SecretKey symmetricKey;
         if (secret != null) {
             symmetricKey = KeyUtils.prepareSecretKey(encryptionProperties.getEncryptionAlgorithm(), secret);
         } else {
@@ -531,7 +531,7 @@ public abstract class AbstractOperation {
 
         TokenValidatorResponse tokenResponse = null;
         for (TokenValidator tokenValidator : tokenValidators) {
-            boolean canHandle = false;
+            final boolean canHandle;
             if (realm == null) {
                 canHandle = tokenValidator.canHandleToken(token);
             } else {
@@ -625,7 +625,7 @@ public abstract class AbstractOperation {
                 }
                 if (relationship == null || relationship.getType().equals(Relationship.FED_TYPE_IDENTITY)) {
                     // federate identity
-                    IdentityMapper identityMapper = null;
+                    final IdentityMapper identityMapper;
                     if (relationship == null) {
                         identityMapper = stsProperties.getIdentityMapper();
                     } else {
