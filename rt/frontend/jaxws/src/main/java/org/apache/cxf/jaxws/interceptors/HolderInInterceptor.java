@@ -66,8 +66,15 @@ public class HolderInInterceptor extends AbstractPhaseInterceptor<Message> {
                     @SuppressWarnings("unchecked")
                     Holder<Object> holder = (Holder<Object>)outHolders.get(part.getIndex() - 1);
                     if (holder != null) {
-                        holder.value = inObjects.get(part);
-                        inObjects.put(part, holder);
+                        if (part.getIndex() >= inObjects.size()) {
+                            // Even though the message part is mandatory and it must be sent
+                            // some servers (e.g. Windows 2008 WinRM) are not sending all the parts.
+                            // Tolerate this behavior.
+                            holder.value = null;
+                        } else {
+                            holder.value = inObjects.get(part);
+                            inObjects.put(part, holder);
+                        }
                     }
                 }
             }
