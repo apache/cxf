@@ -122,7 +122,7 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
             <version>${cxf.hibernate.validator.version}</version>
             <scope>provided</scope>
