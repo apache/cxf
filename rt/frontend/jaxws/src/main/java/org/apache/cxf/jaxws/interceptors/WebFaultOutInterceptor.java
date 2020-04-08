@@ -65,7 +65,7 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
 
     private QName getFaultName(WebFault wf, Class<?> cls, OperationInfo op) {
         String ns = wf.targetNamespace();
-        if (StringUtils.isEmpty(ns)) {
+        if (StringUtils.isEmpty(ns) && op != null) {
             ns = op.getName().getNamespaceURI();
         }
         String name = wf.name();
@@ -160,9 +160,14 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                     writer.setSchema(schema);
                 }
 
-                OperationInfo op = message.getExchange().getBindingOperationInfo().getOperationInfo();
+                OperationInfo op = null;
+                // Prevent a NPE if we can't match the operation
+                if (message.getExchange().getBindingOperationInfo() != null) {
+                    op = message.getExchange().getBindingOperationInfo().getOperationInfo();
+                }
                 QName faultName = getFaultName(fault, cause.getClass(), op);
-                MessagePartInfo part = getFaultMessagePart(faultName, op);
+                MessagePartInfo part = op != null ? getFaultMessagePart(faultName, op) : null;
+
                 if (f.hasDetails()) {
                     writer.write(faultInfo, part, new W3CDOMStreamWriter(f.getDetail()));
                 } else {
