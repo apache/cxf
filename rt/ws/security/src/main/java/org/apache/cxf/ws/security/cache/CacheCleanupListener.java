@@ -65,6 +65,10 @@ public class CacheCleanupListener implements ServerLifeCycleListener, ClientLife
         if (rc != null) {
             close(rc);
         }
+        rc = (ReplayCache)info.getProperty(SecurityConstants.SAML_ONE_TIME_USE_CACHE_INSTANCE);
+        if (rc != null) {
+            close(rc);
+        }
     }
 
     private void close(Closeable ts) {
