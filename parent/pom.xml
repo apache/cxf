@@ -211,7 +211,7 @@
              version (with the Final), but we don't want an import package with a version
              with a qualifier. We do want a range. -->
         <cxf.validation.api.package.version>[1.0.0,3)</cxf.validation.api.package.version>
-        <cxf.validation.api.version>2.0.1</cxf.validation.api.version>
+        <cxf.validation.api.version>2.0.2</cxf.validation.api.version>
         <cxf.velocity.version>2.2</cxf.velocity.version>
         <cxf.wiremock.version>2.23.2</cxf.wiremock.version>
         <cxf.woodstox.core.version>5.3.0</cxf.woodstox.core.version>
