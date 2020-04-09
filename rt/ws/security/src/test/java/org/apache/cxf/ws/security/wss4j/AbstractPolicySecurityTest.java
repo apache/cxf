@@ -260,8 +260,7 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
     protected void runInInterceptorAndValidateWss(Document document, AssertionInfoMap aim,
             List<CoverageType> types) throws Exception {
 
-        PolicyBasedWSS4JInInterceptor inHandler =
-            this.getInInterceptor(types);
+        PolicyBasedWSS4JInInterceptor inHandler = this.getInInterceptor(types);
 
         SoapMessage inmsg = this.getSoapMessageForDom(document, aim);
 
@@ -273,6 +272,10 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
             inmsg.getHeaders().add(securityHeader);
         }
 
+        final Endpoint endpoint = inmsg.getExchange().getEndpoint();
+        if (endpoint != null && endpoint.getEndpointInfo().getProperty(TokenStore.class.getName()) == null) {
+            inmsg.put(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, new MemoryTokenStore());
+        }
         inHandler.handleMessage(inmsg);
 
         for (CoverageType type : types) {
@@ -308,6 +311,10 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
             List<QName> assertedOutAssertions,
             List<QName> notAssertedOutAssertions) throws Exception {
 
+        if (msg.getExchange().getEndpoint() != null
+                && msg.getExchange().getEndpoint().getEndpointInfo().getProperty(TokenStore.class.getName()) == null) {
+            msg.put(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, new MemoryTokenStore());
+        }
         this.getOutInterceptor().handleMessage(msg);
 
         try {

@@ -35,6 +35,7 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.cxf.ws.security.wss4j.TokenStoreCallbackHandler;
 import org.apache.wss4j.policy.SP11Constants;
@@ -104,12 +105,17 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
 
                 TransportToken token = tbinding.getTransportToken();
                 if (token.getToken() instanceof IssuedToken) {
-                    SecurityToken secToken = getSecurityToken();
-                    if (secToken == null) {
-                        unassertPolicy(token.getToken(), "No transport token id");
-                        return;
+                    try {
+                        SecurityToken secToken = getSecurityToken();
+                        if (secToken == null) {
+                            unassertPolicy(token.getToken(), "No transport token id");
+                            return;
+                        }
+                        addIssuedToken(token.getToken(), secToken, false, false);
+                    } catch (TokenStoreException e) {
+                        LOG.log(Level.FINE, e.getMessage(), e);
+                        throw new Fault(e);
                     }
-                    addIssuedToken(token.getToken(), secToken, false, false);
                 }
                 assertToken(token.getToken());
                 assertTokenWrapper(token);

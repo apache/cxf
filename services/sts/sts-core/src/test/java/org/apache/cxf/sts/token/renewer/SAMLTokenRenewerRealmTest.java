@@ -55,6 +55,7 @@ import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -76,7 +77,7 @@ public class SAMLTokenRenewerRealmTest {
     private static TokenStore tokenStore;
 
     @BeforeClass
-    public static void init() {
+    public static void init() throws TokenStoreException {
         tokenStore = new DefaultInMemoryTokenStore();
     }
 

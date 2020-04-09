@@ -118,9 +118,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>net.sf.ehcache</groupId>
+            <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
-            <version>${cxf.ehcache.version}</version>
+            <version>${cxf.ehcache3.version}</version>
         </dependency>
         <dependency>
             <groupId>com.hazelcast</groupId>

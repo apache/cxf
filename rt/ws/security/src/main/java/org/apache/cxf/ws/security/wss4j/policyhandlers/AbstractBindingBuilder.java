@@ -78,6 +78,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.cxf.ws.security.wss4j.AttachmentCallbackHandler;
 import org.apache.cxf.ws.security.wss4j.CXFCallbackLookup;
@@ -340,7 +341,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         }
     }
 
-    protected final TokenStore getTokenStore() {
+    protected final TokenStore getTokenStore() throws TokenStoreException {
         return TokenStoreUtils.getTokenStore(message);
     }
 
@@ -445,7 +446,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                     assertionInfo.setAsserted(true);
                     try {
                         handleSupportingTokens((SupportingTokens)assertionInfo.getAssertion(), endorse, ret);
-                    } catch (SOAPException ex) {
+                    } catch (SOAPException | TokenStoreException ex) {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
                     }
                 }
@@ -458,7 +459,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         SupportingTokens suppTokens,
         boolean endorse,
         List<SupportingToken> ret
-    ) throws WSSecurityException, SOAPException {
+    ) throws WSSecurityException, SOAPException, TokenStoreException {
         if (suppTokens == null) {
             return ret;
         }
@@ -899,7 +900,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         return null;
     }
 
-    protected SamlAssertionWrapper addSamlToken(SamlToken token) throws WSSecurityException {
+    protected SamlAssertionWrapper addSamlToken(SamlToken token) throws WSSecurityException, TokenStoreException {
         assertToken(token);
         if (!isTokenRequired(token.getIncludeTokenType())) {
             return null;
@@ -982,7 +983,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     /**
      * Store a SAML Assertion as a SecurityToken
      */
-    protected void storeAssertionAsSecurityToken(SamlAssertionWrapper assertion) {
+    protected void storeAssertionAsSecurityToken(SamlAssertionWrapper assertion) throws TokenStoreException {
         String id = findIDFromSamlToken(assertion.getElement());
         if (id == null) {
             return;
@@ -1785,7 +1786,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
 
     protected WSSecSignature getSignatureBuilder(
         AbstractToken token, boolean attached, boolean endorse
-    ) throws WSSecurityException {
+    ) throws WSSecurityException, TokenStoreException {
         WSSecSignature sig = new WSSecSignature(secHeader);
         sig.setIdAllocator(wssConfig.getIdAllocator());
         sig.setCallbackLookup(callbackLookup);

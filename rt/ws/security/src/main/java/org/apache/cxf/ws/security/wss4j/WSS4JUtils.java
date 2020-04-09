@@ -46,6 +46,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.cache.CXFEHCacheReplayCache;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.cache.ReplayCacheFactory;
@@ -104,7 +105,7 @@ public final class WSS4JUtils {
      */
     public static ReplayCache getReplayCache(
         SoapMessage message, String booleanKey, String instanceKey
-    ) {
+    ) throws WSSecurityException {
         boolean specified = false;
         Object o = message.getContextualProperty(booleanKey);
         if (o != null) {
@@ -162,7 +163,7 @@ public final class WSS4JUtils {
     public static String parseAndStoreStreamingSecurityToken(
         org.apache.xml.security.stax.securityToken.SecurityToken securityToken,
         Message message
-    ) throws XMLSecurityException {
+    ) throws XMLSecurityException, TokenStoreException {
         if (securityToken == null) {
             return null;
         }

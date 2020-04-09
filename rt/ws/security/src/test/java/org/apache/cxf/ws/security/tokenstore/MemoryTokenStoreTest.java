@@ -36,7 +36,7 @@ public class MemoryTokenStoreTest {
     private static TokenStore store;
 
     @BeforeClass
-    public static void init() {
+    public static void init() throws TokenStoreException {
         TokenStoreFactory tokenStoreFactory = new MemoryTokenStoreFactory();
         Message message = new MessageImpl();
         store = tokenStoreFactory.newTokenStore(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, message);

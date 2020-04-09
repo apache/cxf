@@ -19,14 +19,23 @@
 
 package org.apache.cxf.sts.cache;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public interface IdentityCache {
+/**
+ * A cache value for EHCache. It's just a wrapper for Map<String, String>.
+ */
+public class EHCacheIdentityValue implements Serializable {
 
-    void add(String user, String realm, Map<String, String> identities);
+    private final Map<String, String> value;
 
-    Map<String, String> get(String user, String realm);
+    public EHCacheIdentityValue(Map<String, String> value) {
+        this.value = value;
+    }
 
-    void remove(String user, String realm);
+    public Map<String, String>  getValue() {
+        return value;
+    }
+
 
 }

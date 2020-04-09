@@ -65,6 +65,7 @@ import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.cache.ReplayCache;
@@ -504,7 +505,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     }
 
     protected void configureReplayCaches(RequestData reqData, List<Integer> actions, SoapMessage msg)
-        throws WSSecurityException {
+            throws WSSecurityException {
         if (isNonceCacheRequired(actions, msg)) {
             ReplayCache nonceCache =
                 getReplayCache(
@@ -626,10 +627,14 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             }
             return new DelegatingCallbackHandler(pwdCallback);
         }
-        return getCallback(reqData);
+        try {
+            return getCallback(reqData);
+        } catch (TokenStoreException ex) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
+        }
     }
 
-    protected CallbackHandler getCallback(RequestData reqData) throws WSSecurityException {
+    protected CallbackHandler getCallback(RequestData reqData) throws WSSecurityException, TokenStoreException {
         Object o =
             SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER,
                                                    (SoapMessage)reqData.getMsgContext());
@@ -723,7 +728,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
      */
     protected ReplayCache getReplayCache(
         SoapMessage message, String booleanKey, String instanceKey
-    ) {
+    ) throws WSSecurityException {
         return WSS4JUtils.getReplayCache(message, booleanKey, instanceKey);
     }
 

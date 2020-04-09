@@ -59,6 +59,7 @@ import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.EHCacheTokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.cxf.ws.security.trust.claims.RoleClaimsCallbackHandler;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
@@ -331,7 +332,7 @@ public class STSLoginModule implements LoginModule {
         return c;
     }
 
-    private TokenStore configureTokenStore() throws MalformedURLException {
+    private TokenStore configureTokenStore() throws MalformedURLException, TokenStoreException {
         if (TokenStoreFactory.isEhCacheInstalled()) {
             String cfg = "cxf-ehcache.xml";
             URL url = ClassLoaderUtils.getResource(cfg, STSLoginModule.class);

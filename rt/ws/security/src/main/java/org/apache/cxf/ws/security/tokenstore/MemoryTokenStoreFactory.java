@@ -27,6 +27,7 @@ import org.apache.cxf.message.Message;
  */
 public class MemoryTokenStoreFactory extends TokenStoreFactory {
 
+    @Override
     public TokenStore newTokenStore(String key, Message message) {
         return new MemoryTokenStore();
     }

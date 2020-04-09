@@ -33,6 +33,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.cxf.ws.security.trust.delegation.DelegationCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -170,7 +171,7 @@ public class STSTokenValidator implements Validator {
         }
     }
 
-    static final TokenStore getTokenStore(Message message) {
+    static final TokenStore getTokenStore(Message message) throws TokenStoreException {
         if (message == null) {
             return null;
         }

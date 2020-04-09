@@ -42,6 +42,7 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -207,7 +208,11 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
                 if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.SAML_TOKEN) {
                     // Store SAML keys in case we need them on the inbound side
                     TokenSecurityEvent<?> tokenSecurityEvent = (TokenSecurityEvent<?>)securityEvent;
-                    WSS4JUtils.parseAndStoreStreamingSecurityToken(tokenSecurityEvent.getSecurityToken(), msg);
+                    try {
+                        WSS4JUtils.parseAndStoreStreamingSecurityToken(tokenSecurityEvent.getSecurityToken(), msg);
+                    } catch (TokenStoreException e) {
+                        throw new XMLSecurityException(e);
+                    }
                 } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.SignatureValue) {
                     // Required for Signature Confirmation
                     outgoingSecurityEventList.add(securityEvent);

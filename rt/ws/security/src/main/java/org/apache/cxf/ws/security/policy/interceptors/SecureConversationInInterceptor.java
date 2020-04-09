@@ -52,6 +52,7 @@ import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.policy.interceptors.HttpsTokenInterceptorProvider.HttpsTokenInInterceptor;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.cxf.ws.security.trust.DefaultSymmetricBinding;
 import org.apache.cxf.ws.security.trust.STSClient;
@@ -426,7 +427,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             }
         }
 
-        private SecurityToken getBootstrapToken(Message message) {
+        private SecurityToken getBootstrapToken(Message message) throws TokenStoreException {
             SecurityToken st = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
             if (st == null) {
                 String id = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
@@ -454,26 +455,30 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
         }
 
         public void handleMessage(SoapMessage message) throws Fault {
-            boolean foundSCT = NegotiationUtils.parseSCTResult(message);
+            try {
+                boolean foundSCT = NegotiationUtils.parseSCTResult(message);
 
-            AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-            // extract Assertion information
-            if (aim != null) {
-                Collection<AssertionInfo> ais =
-                    PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURE_CONVERSATION_TOKEN);
-                if (ais.isEmpty()) {
-                    return;
-                }
-                for (AssertionInfo inf : ais) {
-                    SecureConversationToken token = (SecureConversationToken)inf.getAssertion();
-                    IncludeTokenType inclusion = token.getIncludeTokenType();
-                    if (foundSCT || token.isOptional()
-                        || (!foundSCT && inclusion == IncludeTokenType.INCLUDE_TOKEN_NEVER)) {
-                        inf.setAsserted(true);
-                    } else {
-                        inf.setNotAsserted("No SecureConversation token found in message.");
+                AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+                // extract Assertion information
+                if (aim != null) {
+                    Collection<AssertionInfo> ais =
+                            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURE_CONVERSATION_TOKEN);
+                    if (ais.isEmpty()) {
+                        return;
+                    }
+                    for (AssertionInfo inf : ais) {
+                        SecureConversationToken token = (SecureConversationToken) inf.getAssertion();
+                        IncludeTokenType inclusion = token.getIncludeTokenType();
+                        if (foundSCT || token.isOptional()
+                                || (!foundSCT && inclusion == IncludeTokenType.INCLUDE_TOKEN_NEVER)) {
+                            inf.setAsserted(true);
+                        } else {
+                            inf.setNotAsserted("No SecureConversation token found in message.");
+                        }
                     }
                 }
+            } catch (TokenStoreException ex) {
+                throw new Fault(ex);
             }
         }
     }
@@ -498,10 +503,15 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             }
 
             SecureConversationToken tok = (SecureConversationToken)ai.getAssertion();
-            doCancel(message, aim, tok);
+            try {
+                doCancel(message, aim, tok);
+            } catch (TokenStoreException ex) {
+                throw new Fault(ex);
+            }
         }
 
-        private void doCancel(SoapMessage message, AssertionInfoMap aim, SecureConversationToken itok) {
+        private void doCancel(SoapMessage message, AssertionInfoMap aim, SecureConversationToken itok)
+                throws TokenStoreException {
             Message m2 = message.getExchange().getOutMessage();
 
             SecurityToken tok = (SecurityToken)m2.getContextualProperty(SecurityConstants.TOKEN);

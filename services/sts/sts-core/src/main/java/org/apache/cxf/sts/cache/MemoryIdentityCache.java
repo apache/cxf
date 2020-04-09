@@ -100,18 +100,6 @@ public class MemoryIdentityCache extends AbstractIdentityCache {
     }
 
     @ManagedOperation()
-    @Override
-    public void clear() {
-        cache.clear();
-    }
-
-    @ManagedOperation()
-    @Override
-    public int size() {
-        return cache.size();
-    }
-
-    @ManagedOperation()
     public String getContent() {
         return this.cache.toString();
     }

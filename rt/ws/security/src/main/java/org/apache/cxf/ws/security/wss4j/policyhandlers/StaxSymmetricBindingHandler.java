@@ -22,6 +22,8 @@ package org.apache.cxf.ws.security.wss4j.policyhandlers;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -29,6 +31,7 @@ import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.MessageUtils;
@@ -36,6 +39,7 @@ import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.cxf.ws.security.wss4j.TokenStoreCallbackHandler;
 import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
@@ -75,6 +79,8 @@ import org.apache.xml.security.stax.securityEvent.SecurityEvent;
  *
  */
 public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
+
+    private static final Logger LOG = LogUtils.getL7dLogger(StaxSymmetricBindingHandler.class);
 
     private SymmetricBinding sbinding;
     private SoapMessage message;
@@ -122,11 +128,16 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
 
         // Set up CallbackHandler which wraps the configured Handler
         WSSSecurityProperties properties = getProperties();
-        TokenStoreCallbackHandler callbackHandler =
-            new TokenStoreCallbackHandler(
-                properties.getCallbackHandler(), TokenStoreUtils.getTokenStore(message)
-            );
-        properties.setCallbackHandler(callbackHandler);
+        try {
+            TokenStoreCallbackHandler callbackHandler =
+                new TokenStoreCallbackHandler(
+                    properties.getCallbackHandler(), TokenStoreUtils.getTokenStore(message)
+                );
+            properties.setCallbackHandler(callbackHandler);
+        } catch (TokenStoreException e) {
+            LOG.log(Level.FINE, e.getMessage(), e);
+            throw new Fault(e);
+        }
 
         if (sbinding.getProtectionOrder()
             == AbstractSymmetricAsymmetricBinding.ProtectionOrder.EncryptBeforeSigning) {
@@ -596,7 +607,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         }
     }
 
-    private String setupEncryptedKey() throws WSSecurityException {
+    private String setupEncryptedKey() throws WSSecurityException, TokenStoreException {
 
         Instant created = Instant.now();
         Instant expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);

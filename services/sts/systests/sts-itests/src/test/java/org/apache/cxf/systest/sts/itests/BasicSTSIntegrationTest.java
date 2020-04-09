@@ -27,6 +27,8 @@ import org.ops4j.pax.exam.MavenUtils;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.OptionUtils;
 import org.ops4j.pax.exam.karaf.container.internal.JavaVersionUtil;
+import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
+import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.options.extra.VMOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
@@ -62,9 +64,9 @@ public class BasicSTSIntegrationTest {
             when(!localRepository.isEmpty())
                 .useOptions(systemProperty("org.ops4j.pax.url.mvn.localRepository").value(localRepository)),
             //DO NOT COMMIT WITH THIS LINE ENABLED!!!
-            //KarafDistributionOption.keepRuntimeFolder(),
-            //KarafDistributionOption.debugConfiguration(), // nor this
-            //KarafDistributionOption.logLevel(LogLevelOption.LogLevel.INFO),
+            KarafDistributionOption.keepRuntimeFolder(),
+            KarafDistributionOption.debugConfiguration(), // nor this
+            KarafDistributionOption.logLevel(LogLevelOption.LogLevel.INFO),
 
             features(
                 maven("org.apache.cxf.karaf", "apache-cxf").versionAsInProject().type("xml").classifier("features"),

@@ -31,7 +31,7 @@ public final class TokenStoreUtils {
         // complete
     }
 
-    public static TokenStore getTokenStore(Message message) {
+    public static TokenStore getTokenStore(Message message) throws TokenStoreException {
         EndpointInfo info = message.getExchange().getEndpoint().getEndpointInfo();
         synchronized (info) {
             TokenStore tokenStore =
@@ -53,6 +53,7 @@ public final class TokenStoreUtils {
                     }
                     cacheKey.append(hashcode);
                 }
+
                 tokenStore = tokenStoreFactory.newTokenStore(cacheKey.toString(), message);
                 info.setProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, tokenStore);
             }

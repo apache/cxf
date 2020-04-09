@@ -35,7 +35,7 @@ public class EHCacheTokenStoreTest {
     private static TokenStore store;
 
     @BeforeClass
-    public static void init() {
+    public static void init() throws TokenStoreException {
         TokenStoreFactory tokenStoreFactory = new EHCacheTokenStoreFactory();
         Message message = new MessageImpl();
         message.put(
