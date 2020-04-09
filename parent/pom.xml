@@ -93,8 +93,8 @@
         <cxf.brave.zipkin.version>2.19.3</cxf.brave.zipkin.version>
         <cxf.cda.api.osgi.range>[1.1,2)</cxf.cda.api.osgi.range>
         <cxf.cdi.api.version>2.0</cxf.cdi.api.version>
-        <cxf.classgraph.version>4.6.32</cxf.classgraph.version>
-        <cxf.classmate.version>1.1.0</cxf.classmate.version>
+        <cxf.classgraph.version>4.8.25</cxf.classgraph.version>
+        <cxf.classmate.version>1.5.1</cxf.classmate.version>
         <cxf.commons-codec.version>1.13</cxf.commons-codec.version>
         <cxf.commons-collections.version>3.2.2</cxf.commons-collections.version>
         <cxf.commons-jcs-jcache.version>2.1</cxf.commons-jcs-jcache.version>
@@ -124,7 +124,7 @@
         <cxf.hazelcast.version>3.12.3</cxf.hazelcast.version>
         <cxf.hibernate.em.version>5.4.12.Final</cxf.hibernate.em.version>
         <cxf.hibernate.jpa.version>1.0.2.Final</cxf.hibernate.jpa.version>
-        <cxf.hibernate.validator.version>5.2.5.Final</cxf.hibernate.validator.version>
+        <cxf.hibernate.validator.version>6.1.2.Final</cxf.hibernate.validator.version>
         <cxf.hsqldb.version>2.4.1</cxf.hsqldb.version>
         <cxf.httpcomponents.asyncclient.version.range>[4.0,4.2)</cxf.httpcomponents.asyncclient.version.range>
         <cxf.httpcomponents.asyncclient.version>4.1.4</cxf.httpcomponents.asyncclient.version>
@@ -199,8 +199,8 @@
         <cxf.spring.version>5.2.5.RELEASE</cxf.spring.version>
         <cxf.stax-ex.version>1.7.6</cxf.stax-ex.version>
         <cxf.swagger.ui.version>3.25.0</cxf.swagger.ui.version>
-        <cxf.swagger.v3.version>2.1.1</cxf.swagger.v3.version>
-        <cxf.swagger2.version>1.6.0</cxf.swagger2.version>
+        <cxf.swagger.v3.version>2.1.2</cxf.swagger.v3.version>
+        <cxf.swagger2.version>1.6.1</cxf.swagger2.version>
         <cxf.swagger2.guava.version>27.0-jre</cxf.swagger2.guava.version>
         <cxf.tika.version>1.24</cxf.tika.version>
         <cxf.tomcat.version>9.0.33</cxf.tomcat.version>
@@ -210,8 +210,8 @@
         <!-- the Export-Package is the same as the Maven artifact
              version (with the Final), but we don't want an import package with a version
              with a qualifier. We do want a range. -->
-        <cxf.validation.api.package.version>[1.0.0,2)</cxf.validation.api.package.version>
-        <cxf.validation.api.version>1.1.0.Final</cxf.validation.api.version>
+        <cxf.validation.api.package.version>[1.0.0,3)</cxf.validation.api.package.version>
+        <cxf.validation.api.version>2.0.2</cxf.validation.api.version>
         <cxf.velocity.version>2.2</cxf.velocity.version>
         <cxf.wiremock.version>2.23.2</cxf.wiremock.version>
         <cxf.woodstox.core.version>5.3.0</cxf.woodstox.core.version>
@@ -1557,8 +1557,8 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>javax.validation</groupId>
-                <artifactId>validation-api</artifactId>
+                <groupId>jakarta.validation</groupId>
+                <artifactId>jakarta.validation-api</artifactId>
                 <version>${cxf.validation.api.version}</version>
                 <optional>true</optional>
             </dependency>
