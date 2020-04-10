@@ -58,6 +58,7 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
         try {
             XmlConfiguration xmlConfig = new XmlConfiguration(configFileURL);
 
+            // Exclude the endpoint info bit added in TokenStoreUtils when getting the template name
             String template = key;
             if (template.contains("-")) {
                 template = key.substring(0, key.lastIndexOf('-'));

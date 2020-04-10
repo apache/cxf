@@ -84,9 +84,7 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         stopAllServers();
     }
 
-    // @Ignore'd because failing too often on slow Jenkins machines
     @org.junit.Test
-    @org.junit.Ignore
     public void testSTSClientCaching() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();

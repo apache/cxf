@@ -46,7 +46,8 @@ public final class TokenStoreUtils {
                     (String)message.getContextualProperty(SecurityConstants.CACHE_IDENTIFIER);
                 if (cacheIdentifier != null) {
                     cacheKey.append('-').append(cacheIdentifier);
-                } else if (info.getName() != null) {
+                }
+                if (info.getName() != null) {
                     int hashcode = info.getName().toString().hashCode();
                     if (hashcode >= 0) {
                         cacheKey.append('-');
