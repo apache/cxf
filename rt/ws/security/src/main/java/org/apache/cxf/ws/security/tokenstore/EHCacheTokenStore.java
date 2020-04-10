@@ -20,11 +20,9 @@
 package org.apache.cxf.ws.security.tokenstore;
 
 import java.io.Closeable;
-import java.io.File;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 
 import org.apache.cxf.Bus;
@@ -68,12 +66,7 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
                     xmlConfig.newCacheConfigurationBuilderFromTemplate(template,
                             String.class, SecurityToken.class);
 
-            // Note, we don't require strong random values here, as the key should already end with the
-            // hashcode of the endpoint info.
-            String diskKey = key + "-" + Math.abs(new Random().nextInt());
-            cacheManager = CacheManagerBuilder.newCacheManagerBuilder().withCache(key, configurationBuilder)
-                    .with(CacheManagerBuilder.persistence(
-                            new File(System.getProperty("java.io.tmpdir"), diskKey))).build();
+            cacheManager = CacheManagerBuilder.newCacheManagerBuilder().withCache(key, configurationBuilder).build();
 
             cacheManager.init();
             cache = cacheManager.getCache(key, String.class, SecurityToken.class);
