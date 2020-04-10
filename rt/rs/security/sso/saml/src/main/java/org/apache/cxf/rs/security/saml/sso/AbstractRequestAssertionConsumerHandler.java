@@ -92,7 +92,7 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
         this.replayCache = replayCache;
     }
 
-    public TokenReplayCache<String> getReplayCache() {
+    public TokenReplayCache<String> getReplayCache() throws Exception {
         if (replayCache == null) {
             Bus bus = (Bus)messageContext.getContextualProperty(Bus.class.getName());
             replayCache = new EHCacheTokenReplayCache(bus);
@@ -359,7 +359,7 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
             }
 
             return ssoResponseValidator.validateSamlResponse(samlResponse, postBinding);
-        } catch (WSSecurityException ex) {
+        } catch (Exception ex) {
             reportError("INVALID_SAML_RESPONSE");
             throw ExceptionUtils.toBadRequestException(ex, null);
         }
