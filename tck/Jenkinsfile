@@ -16,7 +16,7 @@ pipeline {
     stages {
         stage("Initialization") {
             steps {
-                buildName "CXF ${params.Version} JAX-RS 2.1 TCK"
+                buildName "#${BUILD_NUMBER} CXF ${params.Version} JAX-RS 2.1 TCK"
             }
         }
 

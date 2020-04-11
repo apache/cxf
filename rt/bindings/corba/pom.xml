@@ -122,4 +122,21 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>java9-plus</id>
+            <activation>
+                <jdk>[9,)</jdk>
+            </activation>
+            <dependencies>
+                <!-- This artifact needs to be included in compile scope since the corba module has been removed from jdk 11 -->
+                <dependency>
+                    <groupId>org.jacorb</groupId>
+                    <artifactId>jacorb-omgapi</artifactId>
+                    <version>${cxf.jacorb.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>

@@ -19,12 +19,16 @@
 
 package org.apache.cxf.message;
 
+import java.lang.reflect.Method;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Node;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
+import org.apache.cxf.service.invoker.MethodDispatcher;
+import org.apache.cxf.service.model.BindingOperationInfo;
 
 
 /**
@@ -190,4 +194,15 @@ public final class MessageUtils {
         */
     }
 
+    public static Optional<Method> getTargetMethod(Message m) {
+        Method method;
+        BindingOperationInfo bop = m.getExchange().getBindingOperationInfo();
+        if (bop != null) {
+            MethodDispatcher md = (MethodDispatcher) m.getExchange().getService().get(MethodDispatcher.class.getName());
+            method = md.getMethod(bop);
+        } else {
+            method = (Method) m.get("org.apache.cxf.resource.method");
+        }
+        return Optional.ofNullable(method);
+    }
 }

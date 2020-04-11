@@ -54,8 +54,8 @@
     </properties>
     <dependencies>
         <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -120,8 +120,8 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
             <version>${cxf.servlet-api.version}</version>
             <scope>provided</scope>
             <optional>true</optional>

@@ -57,11 +57,21 @@ public class JaxrsClientCallback<T> extends ClientCallback {
 
     @Override
     public boolean cancel(boolean mayInterruptIfRunning) {
-        boolean result = super.cancel(mayInterruptIfRunning);
-        if (result && handler != null) {
-            handler.failed(new CancellationException());
+        if (!started) {
+            // The handler has to be called *before* future completes
+            if (handler != null) {
+                handler.failed(new CancellationException());
+            }
+            
+            delegate.cancel(mayInterruptIfRunning);
+            synchronized (this) {
+                notifyAll();
+            }
+            
+            return true;
         }
-        return result;
+
+        return false;
     }
 
     public Future<T> createFuture() {
@@ -71,11 +81,13 @@ public class JaxrsClientCallback<T> extends ClientCallback {
     @SuppressWarnings("unchecked")
     public void handleResponse(Map<String, Object> ctx, Object[] res) {
         context = ctx;
-        result = res;
+        
+        // The handler has to be called *before* future completes
         if (handler != null) {
             handler.completed((T)res[0]);
         }
-        done = true;
+        
+        delegate.complete(res);
         synchronized (this) {
             notifyAll();
         }
@@ -84,11 +96,13 @@ public class JaxrsClientCallback<T> extends ClientCallback {
     @Override
     public void handleException(Map<String, Object> ctx, final Throwable ex) {
         context = ctx;
-        exception = ex;
+
+        // The handler has to be called *before* future completes
         if (handler != null) {
-            handler.failed(exception);
+            handler.failed(ex);
         }
-        done = true;
+
+        delegate.completeExceptionally(ex);
         synchronized (this) {
             notifyAll();
         }

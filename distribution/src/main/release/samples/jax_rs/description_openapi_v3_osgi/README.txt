@@ -48,7 +48,7 @@ for this demo bundle.
 
 Optionally, you could install Swagger UI into Karaf OSGi container:
 
-  install -s mvn:org.webjars/swagger-ui/3.24.3
+  install -s mvn:org.webjars/swagger-ui/3.25.0
 
 Install this demo bundle (using the appropriate bundle version number)
   

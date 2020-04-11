@@ -45,6 +45,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transport.https.InsecureTrustManager;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
 
@@ -124,15 +125,41 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
         }
 
         TLSClientParameters tlsParams = new TLSClientParameters();
-        X509TrustManager trustManager = new NoOpX509TrustManager();
-        TrustManager[] trustManagers = new TrustManager[1];
-        trustManagers[0] = trustManager;
-        tlsParams.setTrustManagers(trustManagers);
+        tlsParams.setTrustManagers(InsecureTrustManager.getNoOpX509TrustManagers());
         tlsParams.setDisableCNCheck(true);
 
         Client client = ClientProxy.getClient(port);
         HTTPConduit http = (HTTPConduit) client.getConduit();
         http.setTlsClientParameters(tlsParams);
+
+        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+
+    // The X509TrustManager is effectively empty here so trust verification should work
+    @org.junit.Test
+    public void testNoOpX509TrustManagerTrustManagersRef() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = TrustManagerTest.class.getResource("client-trust-manager-ref.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);
+        final Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
+
+        updateAddressPort(port, PORT);
+
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
@@ -410,27 +437,6 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
-    }
-
-    public static class NoOpX509TrustManager implements X509TrustManager {
-
-        public NoOpX509TrustManager() {
-
-        }
-
-        @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-        }
-
-        @Override
-        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-        }
-
-        @Override
-        public X509Certificate[] getAcceptedIssuers() {
-            return null;
-        }
-
     }
 
     public static class ServerCertX509TrustManager implements X509TrustManager {

@@ -30,7 +30,7 @@
         <bundle start-level="10" dependency="true">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxrs-api-2.1/${cxf.servicemix.jaxrs.specs.version}</bundle>
         <bundle start-level="10" dependency="true">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.saaj-api-1.4/1.4_1</bundle>
         <bundle start-level="10" dependency="true">mvn:jakarta.jws/jakarta.jws-api/1.1.1</bundle>
-        <bundle start-level="10" dependency="true">mvn:javax.mail/mail/${cxf.javax.mail.version}</bundle>
+        <bundle start-level="10" dependency="true">mvn:jakarta.mail/jakarta.mail-api/${cxf.jakarta.mail.version}</bundle>
         <bundle start-level="20">mvn:org.codehaus.woodstox/stax2-api/${cxf.woodstox.stax2-api.version}</bundle>
         <bundle start-level="20">mvn:com.fasterxml.woodstox/woodstox-core/${cxf.woodstox.core.version}</bundle>
         <bundle start-level="20">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-runtime/${cxf.jaxb.bundle.version}</bundle>
@@ -314,14 +314,15 @@
         <bundle start-level="35">mvn:org.apache.cxf/cxf-rt-rs-service-description-swagger-ui/${project.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-rs-service-description-swagger/${project.version}</bundle>
         <bundle start-level="35" dependency="true">mvn:com.fasterxml.jackson.datatype/jackson-datatype-jsr310/${cxf.jackson.version}</bundle>
-        <bundle start-level="10" dependency="true">mvn:javax.validation/validation-api/${cxf.validation.api.version}</bundle>
+        <bundle start-level="10" dependency="true">mvn:jakarta.validation/jakarta.validation-api/${cxf.validation.api.version}</bundle>
         <bundle start-level="35" dependency="true">mvn:org.apache.commons/commons-lang3/${cxf.commons-lang3.version}</bundle>
         <bundle start-level="30" dependency="true">mvn:org.javassist/javassist/${cxf.javassist.version}</bundle>
         <bundle start-level="30" dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.reflections/${cxf.reflections.bundle.version}</bundle>
         <bundle start-level="25" dependency="true">mvn:com.google.guava/guava/${cxf.swagger2.guava.version}</bundle>
         <bundle start-level="35" dependency="true">mvn:io.swagger/swagger-annotations/${cxf.swagger2.version}</bundle>
         <bundle start-level="35" dependency="true">mvn:io.swagger/swagger-models/${cxf.swagger2.version}</bundle>
-        <bundle start-level="35" dependency="true">mvn:io.swagger/swagger-core/${cxf.swagger2.version}</bundle>
+        <!-- TODO: update after https://github.com/swagger-api/swagger-core/pull/3497 will done -->
+        <bundle start-level="35" dependency="true">wrap:mvn:io.swagger/swagger-core/${cxf.swagger2.version}$overwrite=merge&amp;Import-Package=javax.validation*;version="[1.1,3)"</bundle>
         <bundle start-level="35" dependency="true">mvn:io.swagger/swagger-jaxrs/${cxf.swagger2.version}</bundle>
     </feature>
     <feature name="cxf-rs-description-openapi-v3" version="${project.version}">
@@ -332,7 +333,7 @@
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-rs-service-description-openapi-v3/${project.version}</bundle>
         <bundle start-level="35" dependency="true">mvn:com.fasterxml.jackson.datatype/jackson-datatype-jsr310/${cxf.jackson.version}</bundle>
         <bundle start-level="35" dependency="true">mvn:${cxf.servlet-api.group}/${cxf.servlet-api.artifact}/${cxf.servlet-api.version}</bundle>
-        <bundle start-level="10" dependency="true">mvn:javax.validation/validation-api/${cxf.validation.api.version}</bundle>
+        <bundle start-level="10" dependency="true">mvn:jakarta.validation/jakarta.validation-api/${cxf.validation.api.version}</bundle>
         <bundle start-level="35" dependency="true">mvn:org.apache.commons/commons-lang3/${cxf.commons-lang3.version}</bundle>
         <bundle start-level="30" dependency="true">mvn:io.github.classgraph/classgraph/${cxf.classgraph.version}</bundle>
         <bundle start-level="30" dependency="true">mvn:org.javassist/javassist/${cxf.javassist.version}</bundle>
@@ -542,8 +543,8 @@
     <feature name="cxf-bean-validation-core" version="${project.version}">
         <!-- This feature has the wrong name; it's hibernate-only. Fix up in 3.2.0? Move all this to the
         hibernate-bean-validation-helper feature -->
-        <bundle start-level="30" dependency="true">mvn:org.hibernate/hibernate-validator/${cxf.hibernate.validator.version}</bundle>
-        <bundle start-level="30" dependency="true">mvn:javax.validation/validation-api/${cxf.validation.api.version}</bundle>
+        <bundle start-level="30" dependency="true">mvn:org.hibernate.validator/hibernate-validator/${cxf.hibernate.validator.version}</bundle>
+        <bundle start-level="30" dependency="true">mvn:jakarta.validation/jakarta.validation-api/${cxf.validation.api.version}</bundle>
         <!-- The servicemix bundle for hibernate demands joda-time -->
         <bundle start-level="30" dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.joda-time/${cxf.servicemix.jodatime.version}</bundle>
         <!-- The servicemix bundle for hibernate demands jsoup -->

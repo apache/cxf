@@ -31,11 +31,10 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.service.invoker.FactoryInvoker;
 import org.apache.cxf.service.invoker.Invoker;
-import org.apache.cxf.service.invoker.MethodDispatcher;
-import org.apache.cxf.service.model.BindingOperationInfo;
 
 public abstract class AbstractValidationInterceptor extends AbstractPhaseInterceptor< Message > {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractValidationInterceptor.class);
@@ -108,15 +107,7 @@ public abstract class AbstractValidationInterceptor extends AbstractPhaseInterce
         Message inMessage = message.getExchange().getInMessage();
         Method method = null;
         if (inMessage != null) {
-            method = (Method)inMessage.get("org.apache.cxf.resource.method");
-            if (method == null) {
-                BindingOperationInfo bop = inMessage.getExchange().getBindingOperationInfo();
-                if (bop != null) {
-                    MethodDispatcher md = (MethodDispatcher)
-                        inMessage.getExchange().getService().get(MethodDispatcher.class.getName());
-                    method = md.getMethod(bop);
-                }
-            }
+            method = MessageUtils.getTargetMethod(inMessage).orElse(null);
         }
         if (method == null) {
             method = message.getExchange().get(Method.class);

@@ -19,21 +19,14 @@
 package org.apache.cxf.systest.jaxrs.security.oidc.filters;
 
 import java.net.URI;
-import java.util.Collections;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.rs.security.oauth2.client.AccessTokenClientFilter;
-import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
-import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
-import org.apache.cxf.systest.jaxrs.security.oidc.SpringBusTestServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
@@ -52,8 +45,6 @@ public class OIDCFiltersTest extends AbstractBusClientServerTestBase {
 
     private static final String PORT = BookServerOIDCFilters.PORT;
     private static final String OIDC_PORT = BookServerOIDCService.PORT;
-    private static final SpringBusTestServer BOOK_JWK_SERVER = new SpringBusTestServer("filters-jwks-server") {
-    };
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -61,7 +52,6 @@ public class OIDCFiltersTest extends AbstractBusClientServerTestBase {
 
         assertTrue("server did not launch correctly", launchServer(BookServerOIDCFilters.class));
         assertTrue("server did not launch correctly", launchServer(BookServerOIDCService.class));
-        assertTrue("server did not launch correctly", launchServer(BOOK_JWK_SERVER));
     }
 
     @org.junit.Test
@@ -109,45 +99,6 @@ public class OIDCFiltersTest extends AbstractBusClientServerTestBase {
         Book returnedBook = serviceResponse.readEntity(Book.class);
         assertEquals(returnedBook.getName(), "book");
         assertEquals(returnedBook.getId(), 123L);
-    }
-
-    @org.junit.Test
-    public void testJwsVerifierRequestFilter() throws Exception {
-        final String request = "echo";
-        final Response response = WebClient.create(
-            "https://localhost:" + BOOK_JWK_SERVER.getPort() + "/secured/bookstore/books")
-            .type(MediaType.TEXT_PLAIN).accept(MediaType.TEXT_PLAIN)
-            .post(request);
-        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
-
-        String address = "https://localhost:" + OIDC_PORT + "/services/";
-        WebClient idpClient = WebClient.create(address, OAuth2TestUtils.setupProviders(),
-                                            "bob", "security", null);
-
-        // Save the Cookie for the second request...
-        WebClient.getConfig(idpClient).getRequestContext().put(
-            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
-
-        // Get Authorization Code
-        String code = OAuth2TestUtils.getAuthorizationCode(idpClient, OidcUtils.getOpenIdScope());
-        assertNotNull(code);
-
-        // Now get the access token
-        idpClient = WebClient.create(address, "consumer-id", "this-is-a-secret", null);
-
-        ClientAccessToken accessToken =
-            OAuth2TestUtils.getAccessTokenWithAuthorizationCode(idpClient, code);
-
-        // Make an invocation
-        final AccessTokenClientFilter accessTokenClientFilter = new AccessTokenClientFilter();
-        accessTokenClientFilter.setAccessToken(accessToken.getTokenKey());
-        final String echo = WebClient.create(
-            "https://localhost:" + BOOK_JWK_SERVER.getPort() + "/secured/bookstore/books",
-            Collections.singletonList(accessTokenClientFilter))
-            .type(MediaType.TEXT_PLAIN).accept(MediaType.TEXT_PLAIN)
-            .post(request, String.class);
-
-        assertEquals(request, echo);
     }
 
     //

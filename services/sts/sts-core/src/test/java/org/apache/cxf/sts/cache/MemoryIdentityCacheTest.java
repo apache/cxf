@@ -19,6 +19,9 @@
 package org.apache.cxf.sts.cache;
 
 //import java.security.Principal;
+import java.io.Closeable;
+import java.io.IOException;
+
 import org.apache.cxf.sts.IdentityMapper;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
@@ -38,19 +41,22 @@ public class MemoryIdentityCacheTest {
     @org.junit.Test
     public void testOneMapping() throws Exception {
         IdentityMapper mapper = new CacheIdentityMapper();
-        MemoryIdentityCache cache = new MemoryIdentityCache(mapper);
+        AbstractIdentityCache cache = getIdentityCache(mapper);
 
         cache.mapPrincipal("REALM_A", new CustomTokenPrincipal("user_aaa"), "REALM_B");
         assertEquals(2, cache.size());
         assertNotNull(cache.get("user_aaa", "REALM_A"));
         assertNotNull(cache.get("user_bbb", "REALM_B"));
+
+        if (cache instanceof Closeable) {
+            ((Closeable)cache).close();
+        }
     }
 
-
     @org.junit.Test
-    public void testTwoDistinctMappings() {
+    public void testTwoDistinctMappings() throws IOException {
         IdentityMapper mapper = new CacheIdentityMapper();
-        MemoryIdentityCache cache = new MemoryIdentityCache(mapper);
+        AbstractIdentityCache cache = getIdentityCache(mapper);
 
         cache.mapPrincipal("REALM_A", new CustomTokenPrincipal("user_aaa"), "REALM_B");
         cache.mapPrincipal("REALM_C", new CustomTokenPrincipal("user_ccc"), "REALM_D");
@@ -60,12 +66,15 @@ public class MemoryIdentityCacheTest {
         assertNotNull(cache.get("user_ccc", "REALM_C"));
         assertNotNull(cache.get("user_ddd", "REALM_D"));
 
+        if (cache instanceof Closeable) {
+            ((Closeable)cache).close();
+        }
     }
 
     @org.junit.Test
-    public void testTwoDistinctAndOneRelatedMapping() {
+    public void testTwoDistinctAndOneRelatedMapping() throws IOException {
         IdentityMapper mapper = new CacheIdentityMapper();
-        MemoryIdentityCache cache = new MemoryIdentityCache(mapper);
+        AbstractIdentityCache cache = getIdentityCache(mapper);
 
         cache.mapPrincipal("REALM_A", new CustomTokenPrincipal("user_aaa"), "REALM_B");
         cache.mapPrincipal("REALM_C", new CustomTokenPrincipal("user_ccc"), "REALM_D");
@@ -80,12 +89,16 @@ public class MemoryIdentityCacheTest {
         assertEquals(4, cache.get("user_bbb", "REALM_B").size());
         assertEquals(4, cache.get("user_ccc", "REALM_C").size());
         assertEquals(4, cache.get("user_ddd", "REALM_D").size());
+
+        if (cache instanceof Closeable) {
+            ((Closeable)cache).close();
+        }
     }
 
     @org.junit.Test
-    public void testTwoDistinctAndTwoRelatedMapping() {
+    public void testTwoDistinctAndTwoRelatedMapping() throws IOException {
         IdentityMapper mapper = new CacheIdentityMapper();
-        MemoryIdentityCache cache = new MemoryIdentityCache(mapper);
+        AbstractIdentityCache cache = getIdentityCache(mapper);
 
         cache.mapPrincipal("REALM_A", new CustomTokenPrincipal("user_aaa"), "REALM_B");
         cache.mapPrincipal("REALM_D", new CustomTokenPrincipal("user_ddd"), "REALM_E");
@@ -123,6 +136,13 @@ public class MemoryIdentityCacheTest {
         assertEquals(5, cache.get("user_ccc", "REALM_C").size());
         assertEquals(5, cache.get("user_ddd", "REALM_D").size());
         assertEquals(5, cache.get("user_eee", "REALM_E").size());
+
+        if (cache instanceof Closeable) {
+            ((Closeable)cache).close();
+        }
     }
 
+    protected AbstractIdentityCache getIdentityCache(IdentityMapper mapper) {
+        return new MemoryIdentityCache(mapper);
+    }
 }

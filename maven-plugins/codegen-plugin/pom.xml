@@ -185,6 +185,7 @@
                                 <pomInclude>jdk-cxf-with-toolchain</pomInclude>
                                 <pomInclude>wsdl-artifact-resolution/pom.xml</pomInclude>
                                 <pomInclude>mark-generated/pom.xml</pomInclude>
+                                <pomInclude>jaxb-xjc-runtime-sources/pom.xml</pomInclude>
                             </pomIncludes>
                             <settingsFile>src/it/settings.xml</settingsFile>
                             <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>

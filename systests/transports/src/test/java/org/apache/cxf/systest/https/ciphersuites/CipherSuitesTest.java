@@ -20,8 +20,6 @@
 package org.apache.cxf.systest.https.ciphersuites;
 
 import java.net.URL;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,7 +28,6 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
@@ -42,6 +39,7 @@ import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transport.https.InsecureTrustManager;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
 
@@ -346,9 +344,7 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         HTTPConduit conduit = (HTTPConduit) client.getConduit();
 
         TLSClientParameters tlsParams = new TLSClientParameters();
-        X509TrustManager trustManager = new NoOpX509TrustManager();
-        TrustManager[] trustManagers = new TrustManager[1];
-        trustManagers[0] = trustManager;
+        TrustManager[] trustManagers = InsecureTrustManager.getNoOpX509TrustManagers();
         tlsParams.setTrustManagers(trustManagers);
         tlsParams.setDisableCNCheck(true);
 
@@ -431,9 +427,7 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         HTTPConduit conduit = (HTTPConduit) client.getConduit();
 
         TLSClientParameters tlsParams = new TLSClientParameters();
-        X509TrustManager trustManager = new NoOpX509TrustManager();
-        TrustManager[] trustManagers = new TrustManager[1];
-        trustManagers[0] = trustManager;
+        TrustManager[] trustManagers = InsecureTrustManager.getNoOpX509TrustManagers();
         tlsParams.setTrustManagers(trustManagers);
         tlsParams.setDisableCNCheck(true);
 
@@ -480,9 +474,7 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         HTTPConduit conduit = (HTTPConduit) client.getConduit();
 
         TLSClientParameters tlsParams = new TLSClientParameters();
-        X509TrustManager trustManager = new NoOpX509TrustManager();
-        TrustManager[] trustManagers = new TrustManager[1];
-        trustManagers[0] = trustManager;
+        TrustManager[] trustManagers = InsecureTrustManager.getNoOpX509TrustManagers();
         tlsParams.setTrustManagers(trustManagers);
         tlsParams.setDisableCNCheck(true);
 
@@ -523,9 +515,7 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         HTTPConduit conduit = (HTTPConduit) client.getConduit();
 
         TLSClientParameters tlsParams = new TLSClientParameters();
-        X509TrustManager trustManager = new NoOpX509TrustManager();
-        TrustManager[] trustManagers = new TrustManager[1];
-        trustManagers[0] = trustManager;
+        TrustManager[] trustManagers = InsecureTrustManager.getNoOpX509TrustManagers();
         tlsParams.setTrustManagers(trustManagers);
         tlsParams.setDisableCNCheck(true);
 
@@ -574,23 +564,4 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
-    private static class NoOpX509TrustManager implements X509TrustManager {
-
-        NoOpX509TrustManager() {
-        }
-
-        @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-        }
-
-        @Override
-        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-        }
-
-        @Override
-        public X509Certificate[] getAcceptedIssuers() {
-            return null;
-        }
-
-    }
 }
