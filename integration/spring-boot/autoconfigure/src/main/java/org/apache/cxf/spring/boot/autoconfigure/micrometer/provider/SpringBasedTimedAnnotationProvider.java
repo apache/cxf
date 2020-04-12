@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.spring.boot.autoconfigure.micrometer.provider.jaxws;
+package org.apache.cxf.spring.boot.autoconfigure.micrometer.provider;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;

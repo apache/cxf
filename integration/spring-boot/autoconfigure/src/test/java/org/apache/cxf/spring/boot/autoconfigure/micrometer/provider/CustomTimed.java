@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.spring.boot.autoconfigure.micrometer.provider.jaxws;
+package org.apache.cxf.spring.boot.autoconfigure.micrometer.provider;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
