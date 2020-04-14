@@ -70,6 +70,8 @@ public final class WSS4JUtils {
 
     private static final Logger LOG = LogUtils.getL7dLogger(WSS4JUtils.class);
 
+    private static final String DEFAULT_CONFIG_FILE = "cxf-ehcache.xml";
+
     private WSS4JUtils() {
         // complete
     }
@@ -135,7 +137,11 @@ public final class WSS4JUtils {
                         }
                     }
                     URL configFile = SecurityUtils.getConfigFileURL(message, SecurityConstants.CACHE_CONFIG_FILE,
-                                                                    "cxf-ehcache.xml");
+                            DEFAULT_CONFIG_FILE);
+                    if (configFile == null) {
+                        configFile = Loader.getResource(WSS4JUtils.class.getClassLoader(),
+                                DEFAULT_CONFIG_FILE);
+                    }
 
                     if (ReplayCacheFactory.isEhCacheInstalled()) {
                         Bus bus = message.getExchange().getBus();
