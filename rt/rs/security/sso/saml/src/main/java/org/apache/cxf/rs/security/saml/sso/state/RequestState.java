@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.saml.sso.state;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -93,5 +94,30 @@ public class RequestState implements Serializable {
 
     public String getWebAppDomain() {
         return webAppDomain;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        RequestState that = (RequestState) o;
+        return createdAt == that.createdAt
+                && timeToLive == that.timeToLive
+                && Objects.equals(targetAddress, that.targetAddress)
+                && Objects.equals(idpServiceAddress, that.idpServiceAddress)
+                && Objects.equals(samlRequestId, that.samlRequestId)
+                && Objects.equals(issuerId, that.issuerId)
+                && Objects.equals(webAppContext, that.webAppContext)
+                && Objects.equals(webAppDomain, that.webAppDomain);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(targetAddress, idpServiceAddress, samlRequestId, issuerId,
+                webAppContext, webAppDomain, createdAt, timeToLive);
     }
 }

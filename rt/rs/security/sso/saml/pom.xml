@@ -66,12 +66,6 @@
             <artifactId>${cxf.servlet-api.artifact}</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.sf.ehcache</groupId>
-            <artifactId>ehcache</artifactId>
-            <version>${cxf.ehcache.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
             <version>${cxf.ehcache3.version}</version>

@@ -16,5 +16,29 @@
         </resources>
     </cache-template>
 
+    <cache-template name="cxf.samlp.request.state.cache">
+        <key-type>java.lang.String</key-type>
+        <value-type>org.apache.cxf.rs.security.saml.sso.state.RequestState</value-type>
+        <expiry>
+            <ttl unit="seconds">300</ttl>
+        </expiry>
+        <resources>
+            <heap unit="entries">5000</heap>
+            <disk unit="MB" persistent="false">10</disk>
+        </resources>
+    </cache-template>
+
+    <cache-template name="cxf.samlp.response.state.cache">
+        <key-type>java.lang.String</key-type>
+        <value-type>org.apache.cxf.rs.security.saml.sso.state.ResponseState</value-type>
+        <expiry>
+            <ttl unit="seconds">300</ttl>
+        </expiry>
+        <resources>
+            <heap unit="entries">5000</heap>
+            <disk unit="MB" persistent="false">10</disk>
+        </resources>
+    </cache-template>
+
 </config>
 
