@@ -60,10 +60,17 @@
         <dependency>
           <groupId>io.reactivex</groupId>
           <artifactId>rxjava</artifactId>
+          <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>io.reactivex.rxjava2</groupId>
           <artifactId>rxjava</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>io.reactivex.rxjava3</groupId>
+          <artifactId>rxjava</artifactId>
+          <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -328,6 +335,11 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-extension-rx2</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-extension-rx3</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
