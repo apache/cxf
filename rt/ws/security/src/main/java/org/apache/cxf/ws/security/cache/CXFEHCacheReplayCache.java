@@ -31,7 +31,7 @@ import org.apache.wss4j.common.cache.EHCacheReplayCache;
  * the cache is shutdown correctly.
  */
 public class CXFEHCacheReplayCache extends EHCacheReplayCache implements BusLifeCycleListener {
-    private Bus bus;
+    private final Bus bus;
 
     public CXFEHCacheReplayCache(String key, Bus bus, URL configFileURL) {
         super(key, EHCacheUtils.getCacheManager(bus, configFileURL));
