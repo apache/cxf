@@ -20,12 +20,12 @@
 package org.apache.cxf.systest.http_undertow.websocket;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -36,8 +36,7 @@ import org.apache.cxf.transport.websocket.WebSocketConstants;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.DefaultAsyncHttpClient;
 import org.asynchttpclient.ws.WebSocket;
-import org.asynchttpclient.ws.WebSocketByteListener;
-import org.asynchttpclient.ws.WebSocketTextListener;
+import org.asynchttpclient.ws.WebSocketListener;
 import org.asynchttpclient.ws.WebSocketUpgradeHandler;
 
 /**
@@ -47,38 +46,26 @@ import org.asynchttpclient.ws.WebSocketUpgradeHandler;
  * we may put this in test-tools so that other systests can use this code.
  * for now keep it here to experiment jaxrs websocket scenarios.
  */
-class WebSocketTestClient {
+class WebSocketTestClient implements Closeable {
     private static final Logger LOG = LogUtils.getL7dLogger(WebSocketTestClient.class);
 
-    private List<Object> received;
-    private List<Object> fragments;
+    private final List<Object> received = new ArrayList<>();
     private CountDownLatch latch;
-    private AsyncHttpClient client;
-    private WebSocket websocket;
-    private String url;
+    private final AsyncHttpClient client = new DefaultAsyncHttpClient();
+    private final WebSocket websocket;
 
-    WebSocketTestClient(String url) {
-        this.received = Collections.synchronizedList(new ArrayList<>());
-        this.fragments = Collections.synchronizedList(new ArrayList<>());
-        this.latch = new CountDownLatch(1);
-        this.client = new DefaultAsyncHttpClient();
-        this.url = url;
-    }
-
-    public void connect() throws InterruptedException, ExecutionException, IOException {
-        websocket = client.prepareGet(url).execute(
-            new WebSocketUpgradeHandler.Builder().addWebSocketListener(new WsSocketListener()).build()).get();
-        if (websocket == null) {
-            throw new NullPointerException("websocket is null");
-        }
+    WebSocketTestClient(String url) throws InterruptedException, ExecutionException {
+        websocket = Objects.requireNonNull(client.prepareGet(url).execute(
+            new WebSocketUpgradeHandler.Builder().addWebSocketListener(new WsSocketListener()).build()).get());
+        reset(1);
     }
 
     public void sendTextMessage(String message) {
-        websocket.sendMessage(message);
+        websocket.sendTextFrame(message);
     }
 
     public void sendMessage(byte[] message) {
-        websocket.sendMessage(message);
+        websocket.sendBinaryFrame(message);
     }
 
     public boolean await(int secs) throws InterruptedException {
@@ -95,30 +82,28 @@ class WebSocketTestClient {
     }
 
     public List<Response> getReceivedResponses() {
-        Object[] objs = received.toArray();
-        List<Response> responses = new ArrayList<>(objs.length);
-        for (Object o : objs) {
+        List<Response> responses = new ArrayList<>(received.size());
+        for (Object o : received) {
             responses.add(new Response(o));
         }
         return responses;
     }
 
     public void close() throws IOException {
-        if (websocket != null) {
-            websocket.close();
-        }
         if (client != null) {
             client.close();
         }
     }
 
-    class WsSocketListener implements WebSocketTextListener, WebSocketByteListener {
+    class WsSocketListener implements WebSocketListener {
+
+        private final List<Object> fragments = new ArrayList<>();
 
         public void onOpen(WebSocket ws) {
             LOG.info("[ws] opened");
         }
 
-        public void onClose(WebSocket ws) {
+        public void onClose(WebSocket ws, int code, String reason) {
             LOG.info("[ws] closed");
         }
 
@@ -126,94 +111,51 @@ class WebSocketTestClient {
             LOG.info("[ws] error: " + t);
         }
 
-        public void onMessage(byte[] message) {
-            received.add(message);
-            LOG.info("[ws] received bytes --> " + makeString(message));
-            latch.countDown();
-        }
-
-        public void onFragment(byte[] fragment, boolean last) {
-            LOG.info("[ws] received fragment bytes (last?" + last + ") --> " + Arrays.toString(fragment));
-            processFragments(fragment, last);
-        }
-
-        public void onMessage(String message) {
-            received.add(message);
-            LOG.info("[ws] received --> " + message);
-            latch.countDown();
-        }
-
-        public void onFragment(String fragment, boolean last) {
-            LOG.info("[ws] received fragment (last?" + last + ") --> " + fragment);
-            processFragments(fragment, last);
-        }
-
-        private void processFragments(Object f, boolean last) {
-            synchronized (fragments) {
-                fragments.add(f);
-                if (last) {
-                    if (f instanceof String) {
-                        // string
-                        StringBuilder sb = new StringBuilder();
-                        for (Iterator<Object> it = fragments.iterator(); it.hasNext();) {
-                            Object o = it.next();
-                            if (o instanceof String) {
-                                sb.append((String)o);
-                                it.remove();
-                            }
+        @Override
+        public void onBinaryFrame(byte[] payload, boolean finalFragment, int rsv) {
+            LOG.info("[ws] received binary frame (last?" + finalFragment + ") --> " + new String(payload));
+            if (!finalFragment) {
+                fragments.add(payload);
+            } else {
+                if (fragments.isEmpty()) {
+                    received.add(payload);
+                } else {
+                    ByteArrayOutputStream bao = new ByteArrayOutputStream();
+                    for (Iterator<Object> it = fragments.iterator(); it.hasNext();) {
+                        Object o = it.next();
+                        if (o instanceof byte[]) {
+                            bao.write((byte[])o, 0, ((byte[])o).length);
+                            it.remove();
                         }
-                        received.add(sb.toString());
-                    } else {
-                        // byte[]
-                        ByteArrayOutputStream bao = new ByteArrayOutputStream();
-                        for (Iterator<Object> it = fragments.iterator(); it.hasNext();) {
-                            Object o = it.next();
-                            if (o instanceof byte[]) {
-                                bao.write((byte[])o, 0, ((byte[])o).length);
-                                it.remove();
-                            }
-                        }
-                        received.add(bao.toByteArray());
                     }
+                    received.add(bao.toByteArray());
                 }
+                latch.countDown();
             }
         }
-    }
 
-    private static String makeString(byte[] data) {
-        return data == null ? null : makeString(data, 0, data.length).toString();
-    }
-
-    private static StringBuilder makeString(byte[] data, int offset, int length) {
-        if (data .length > 256) {
-            return makeString(data, offset, 256).append("...");
+        @Override
+        public void onTextFrame(String payload, boolean finalFragment, int rsv) {
+            LOG.info("[ws] received text frame (last?" + finalFragment + ") --> " + payload);
+            if (!finalFragment) {
+                fragments.add(payload);
+            } else {
+                if (fragments.isEmpty()) {
+                    received.add(payload);
+                } else {
+                    StringBuilder sb = new StringBuilder();
+                    for (Iterator<Object> it = fragments.iterator(); it.hasNext();) {
+                        Object o = it.next();
+                        if (o instanceof String) {
+                            sb.append((String)o);
+                            it.remove();
+                        }
+                    }
+                    received.add(sb.toString());
+                }
+                latch.countDown();
+            }
         }
-        StringBuilder xbuf = new StringBuilder().append("\nHEX: ");
-        StringBuilder cbuf = new StringBuilder().append("\nASC: ");
-        for (byte b : data) {
-            writeHex(xbuf, 0xff & b);
-            writePrintable(cbuf, 0xff & b);
-        }
-        return xbuf.append(cbuf);
-    }
-
-    private static void writeHex(StringBuilder buf, int b) {
-        buf.append(Integer.toHexString(0x100 | (0xff & b)).substring(1)).append(' ');
-    }
-
-    private static void writePrintable(StringBuilder buf, int b) {
-        if (b == 0x0d) {
-            buf.append("\\r");
-        } else if (b == 0x0a) {
-            buf.append("\\n");
-        } else if (b == 0x09) {
-            buf.append("\\t");
-        } else if ((0x80 & b) != 0) {
-            buf.append('.').append(' ');
-        } else {
-            buf.append((char)b).append(' ');
-        }
-        buf.append(' ');
     }
 
     //TODO this is a temporary way to verify the response; we should come up with something better.
@@ -279,11 +221,11 @@ class WebSocketTestClient {
         }
 
         public String toString() {
-            StringBuilder sb = new StringBuilder(128);
-            sb.append("Status: ").append(statusCode).append("\r\n");
-            sb.append("Type: ").append(contentType).append("\r\n");
-            sb.append("Entity: ").append(gettext(entity)).append("\r\n");
-            return sb.toString();
+            return new StringBuilder(128)
+                .append("Status: ").append(statusCode).append("\r\n")
+                .append("Type: ").append(contentType).append("\r\n")
+                .append("Entity: ").append(gettext(entity)).append("\r\n")
+                .toString();
         }
 
         private String readLine() {

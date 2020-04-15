@@ -201,7 +201,6 @@
         <dependency>
             <groupId>org.asynchttpclient</groupId>
             <artifactId>async-http-client</artifactId>
-            <version>${cxf.ahc.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>

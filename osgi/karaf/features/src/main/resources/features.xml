@@ -400,8 +400,7 @@
     </feature>
     <feature name="cxf-transports-websocket-client" version="${project.version}">
         <feature version="${project.version}">cxf-http</feature>
-        <feature prerequisite="true">wrap</feature>
-        <bundle dependency='true'>wrap:mvn:org.asynchttpclient/async-http-client/${cxf.ahc.version}</bundle>
+        <bundle dependency='true'>mvn:org.asynchttpclient/async-http-client/${cxf.ahc.version}</bundle>
         <bundle dependency='true'>mvn:io.netty/netty-common/${cxf.netty.version}</bundle>
         <bundle dependency='true'>mvn:io.netty/netty-handler/${cxf.netty.version}</bundle>
         <bundle dependency='true'>mvn:io.netty/netty-buffer/${cxf.netty.version}</bundle>

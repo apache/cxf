@@ -128,7 +128,6 @@
         <dependency>
             <groupId>org.asynchttpclient</groupId>
             <artifactId>async-http-client</artifactId>
-            <version>${cxf.ahc.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

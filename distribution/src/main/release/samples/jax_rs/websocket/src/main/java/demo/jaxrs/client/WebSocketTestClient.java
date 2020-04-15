@@ -20,21 +20,23 @@
 package demo.jaxrs.client;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.transport.websocket.WebSocketConstants;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.DefaultAsyncHttpClient;
 import org.asynchttpclient.ws.WebSocket;
-import org.asynchttpclient.ws.WebSocketByteListener;
-import org.asynchttpclient.ws.WebSocketTextListener;
+import org.asynchttpclient.ws.WebSocketListener;
 import org.asynchttpclient.ws.WebSocketUpgradeHandler;
 
 /**
@@ -44,35 +46,26 @@ import org.asynchttpclient.ws.WebSocketUpgradeHandler;
  * we may put this in test-tools so that other systests can use this code.
  * for now keep it here to experiment jaxrs websocket scenarios.
  */
-class WebSocketTestClient {
+class WebSocketTestClient implements Closeable {
     private static final Logger LOG = LogUtils.getL7dLogger(WebSocketTestClient.class);
 
-    private List<Object> received;
-    private List<Object> fragments;
+    private final List<Object> received = new ArrayList<>();
     private CountDownLatch latch;
-    private AsyncHttpClient client;
-    private WebSocket websocket;
-    private String url;
+    private final AsyncHttpClient client = new DefaultAsyncHttpClient();
+    private final WebSocket websocket;
 
-    WebSocketTestClient(String url) {
-        this.received = new ArrayList<>();
-        this.fragments = new ArrayList<>();
-        this.latch = new CountDownLatch(1);
-        this.client = new DefaultAsyncHttpClient();
-        this.url = url;
-    }
-
-    public void connect() throws InterruptedException, ExecutionException, IOException {
-        websocket = client.prepareGet(url).execute(
-            new WebSocketUpgradeHandler.Builder().addWebSocketListener(new WsSocketListener()).build()).get();
+    WebSocketTestClient(String url) throws InterruptedException, ExecutionException {
+        websocket = Objects.requireNonNull(client.prepareGet(url).execute(
+            new WebSocketUpgradeHandler.Builder().addWebSocketListener(new WsSocketListener()).build()).get());
+        reset(1);
     }
 
     public void sendTextMessage(String message) {
-        websocket.sendMessage(message);
+        websocket.sendTextFrame(message);
     }
 
     public void sendMessage(byte[] message) {
-        websocket.sendMessage(message);
+        websocket.sendBinaryFrame(message);
     }
 
     public boolean await(int secs) throws InterruptedException {
@@ -89,26 +82,28 @@ class WebSocketTestClient {
     }
 
     public List<Response> getReceivedResponses() {
-        Object[] objs = received.toArray();
-        List<Response> responses = new ArrayList<>(objs.length);
-        for (Object o : objs) {
+        List<Response> responses = new ArrayList<>(received.size());
+        for (Object o : received) {
             responses.add(new Response(o));
         }
         return responses;
     }
 
     public void close() throws IOException {
-        websocket.close();
-        client.close();
+        if (client != null) {
+            client.close();
+        }
     }
 
-    class WsSocketListener implements WebSocketTextListener, WebSocketByteListener {
+    class WsSocketListener implements WebSocketListener {
+
+        private final List<Object> fragments = new ArrayList<>();
 
         public void onOpen(WebSocket ws) {
             LOG.info("[ws] opened");
         }
 
-        public void onClose(WebSocket ws) {
+        public void onClose(WebSocket ws, int code, String reason) {
             LOG.info("[ws] closed");
         }
 
@@ -116,92 +111,51 @@ class WebSocketTestClient {
             LOG.info("[ws] error: " + t);
         }
 
-        public void onMessage(byte[] message) {
-            received.add(message);
-            LOG.info("[ws] received bytes --> " + makeString(message));
-            latch.countDown();
-        }
-
-        public void onFragment(byte[] fragment, boolean last) {
-            processFragments(fragment, last);
-        }
-
-        public void onMessage(String message) {
-            received.add(message);
-            LOG.info("[ws] received --> " + message);
-            latch.countDown();
-        }
-
-        public void onFragment(String fragment, boolean last) {
-            processFragments(fragment, last);
-        }
-
-        private void processFragments(Object f, boolean last) {
-            synchronized (fragments) {
-                fragments.add(f);
-                if (last) {
-                    if (f instanceof String) {
-                        // string
-                        StringBuilder sb = new StringBuilder();
-                        for (Iterator<Object> it = fragments.iterator(); it.hasNext();) {
-                            Object o = it.next();
-                            if (o instanceof String) {
-                                sb.append((String)o);
-                                it.remove();
-                            }
+        @Override
+        public void onBinaryFrame(byte[] payload, boolean finalFragment, int rsv) {
+            LOG.info("[ws] received binary frame (last?" + finalFragment + ") --> " + new String(payload));
+            if (!finalFragment) {
+                fragments.add(payload);
+            } else {
+                if (fragments.isEmpty()) {
+                    received.add(payload);
+                } else {
+                    ByteArrayOutputStream bao = new ByteArrayOutputStream();
+                    for (Iterator<Object> it = fragments.iterator(); it.hasNext();) {
+                        Object o = it.next();
+                        if (o instanceof byte[]) {
+                            bao.write((byte[])o, 0, ((byte[])o).length);
+                            it.remove();
                         }
-                        received.add(sb.toString());
-                    } else {
-                        // byte[]
-                        ByteArrayOutputStream bao = new ByteArrayOutputStream();
-                        for (Iterator<Object> it = fragments.iterator(); it.hasNext();) {
-                            Object o = it.next();
-                            if (o instanceof byte[]) {
-                                bao.write((byte[])o, 0, ((byte[])o).length);
-                                it.remove();
-                            }
-                        }
-                        received.add(bao.toByteArray());
                     }
+                    received.add(bao.toByteArray());
                 }
+                latch.countDown();
             }
         }
-    }
 
-    private static String makeString(byte[] data) {
-        return data == null ? null : makeString(data, 0, data.length).toString();
-    }
-
-    private static StringBuilder makeString(byte[] data, int offset, int length) {
-        if (data .length > 256) {
-            return makeString(data, offset, 256).append("...");
+        @Override
+        public void onTextFrame(String payload, boolean finalFragment, int rsv) {
+            LOG.info("[ws] received text frame (last?" + finalFragment + ") --> " + payload);
+            if (!finalFragment) {
+                fragments.add(payload);
+            } else {
+                if (fragments.isEmpty()) {
+                    received.add(payload);
+                } else {
+                    StringBuilder sb = new StringBuilder();
+                    for (Iterator<Object> it = fragments.iterator(); it.hasNext();) {
+                        Object o = it.next();
+                        if (o instanceof String) {
+                            sb.append((String)o);
+                            it.remove();
+                        }
+                    }
+                    received.add(sb.toString());
+                }
+                latch.countDown();
+            }
         }
-        StringBuilder xbuf = new StringBuilder().append("\nHEX: ");
-        StringBuilder cbuf = new StringBuilder().append("\nASC: ");
-        for (byte b : data) {
-            writeHex(xbuf, 0xff & b);
-            writePrintable(cbuf, 0xff & b);
-        }
-        return xbuf.append(cbuf);
-    }
-
-    private static void writeHex(StringBuilder buf, int b) {
-        buf.append(Integer.toHexString(0x100 | (0xff & b)).substring(1)).append(' ');
-    }
-
-    private static void writePrintable(StringBuilder buf, int b) {
-        if (b == 0x0d) {
-            buf.append("\\r");
-        } else if (b == 0x0a) {
-            buf.append("\\n");
-        } else if (b == 0x09) {
-            buf.append("\\t");
-        } else if ((0x80 & b) != 0) {
-            buf.append('.').append(' ');
-        } else {
-            buf.append((char)b).append(' ');
-        }
-        buf.append(' ');
     }
 
     //TODO this is a temporary way to verify the response; we should come up with something better.
@@ -210,6 +164,7 @@ class WebSocketTestClient {
         private int pos;
         private int statusCode;
         private String contentType;
+        private String id;
         private Object entity;
 
         Response(Object data) {
@@ -220,22 +175,23 @@ class WebSocketTestClient {
                 if (first && isStatusCode(line)) {
                     statusCode = Integer.parseInt(line);
                     continue;
-                } else {
-                    first = false;
                 }
+                first = false;
 
                 int del = line.indexOf(':');
                 String h = line.substring(0, del).trim();
                 String v = line.substring(del + 1).trim();
                 if ("Content-Type".equalsIgnoreCase(h)) {
                     contentType = v;
+                } else if (WebSocketConstants.DEFAULT_RESPONSE_ID_KEY.equals(h)) {
+                    id = v;
                 }
             }
             if (data instanceof String) {
                 entity = ((String)data).substring(pos);
             } else if (data instanceof byte[]) {
                 entity = new byte[((byte[])data).length - pos];
-                System.arraycopy((byte[])data, pos, (byte[])entity, 0, ((byte[])entity).length);
+                System.arraycopy(data, pos, entity, 0, ((byte[])entity).length);
             }
         }
 
@@ -252,7 +208,6 @@ class WebSocketTestClient {
             return contentType;
         }
 
-        @SuppressWarnings("unused")
         public Object getEntity() {
             return entity;
         }
@@ -261,12 +216,16 @@ class WebSocketTestClient {
             return gettext(entity);
         }
 
+        public String getId() {
+            return id;
+        }
+
         public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Status: ").append(statusCode).append("\r\n");
-            sb.append("Type: ").append(contentType).append("\r\n");
-            sb.append("Entity: ").append(gettext(entity)).append("\r\n");
-            return sb.toString();
+            return new StringBuilder(128)
+                .append("Status: ").append(statusCode).append("\r\n")
+                .append("Type: ").append(contentType).append("\r\n")
+                .append("Entity: ").append(gettext(entity)).append("\r\n")
+                .toString();
         }
 
         private String readLine() {
@@ -288,13 +247,19 @@ class WebSocketTestClient {
         }
 
         private int length(Object o) {
-            return o instanceof char[] ? ((String)o).length()
-                : (o instanceof byte[] ? ((byte[])o).length : 0);
+            if (o instanceof String) {
+                return ((String)o).length();
+            } else if (o instanceof char[]) {
+                return ((char[])o).length;
+            } else if (o instanceof byte[]) {
+                return ((byte[])o).length;
+            } else {
+                return 0;
+            }
         }
 
         private int getchar(Object o, int p) {
-            return 0xff & (o instanceof String ? ((String)o).charAt(p)
-                           : (o instanceof byte[] ? ((byte[])o)[p] : -1));
+            return 0xff & (o instanceof String ? ((String)o).charAt(p) : (o instanceof byte[] ? ((byte[])o)[p] : -1));
         }
 
         private String gettext(Object o) {
