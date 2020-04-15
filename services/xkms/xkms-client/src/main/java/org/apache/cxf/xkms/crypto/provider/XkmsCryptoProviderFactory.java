@@ -47,7 +47,7 @@ public class XkmsCryptoProviderFactory implements CryptoProviderFactory {
         Object crypto = SecurityUtils
             .getSecurityPropertyValue(org.apache.cxf.rt.security.SecurityConstants.SIGNATURE_CRYPTO, message);
         if (crypto instanceof Crypto) {
-            new XkmsCryptoProvider(xkmsConsumer, (Crypto)crypto);
+            return new XkmsCryptoProvider(xkmsConsumer, (Crypto)crypto);
         }
 
         Properties keystoreProps = CryptoProviderUtils
