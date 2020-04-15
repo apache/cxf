@@ -24,7 +24,6 @@ import org.apache.cxf.sts.IdentityMapper;
 
 import org.junit.BeforeClass;
 
-@org.junit.Ignore
 public class EhCacheIdentityCacheTest extends MemoryIdentityCacheTest {
 
     @BeforeClass
