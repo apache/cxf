@@ -21,57 +21,55 @@ package org.apache.cxf.xkms.cache;
 
 import java.io.File;
 import java.net.URL;
+import java.util.UUID;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.config.CacheConfiguration;
-import net.sf.ehcache.config.Configuration;
-import net.sf.ehcache.config.ConfigurationFactory;
-import net.sf.ehcache.config.DiskStoreConfiguration;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.wss4j.common.util.Loader;
+import org.ehcache.Cache;
+import org.ehcache.CacheManager;
+import org.ehcache.Status;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.xml.XmlConfiguration;
 
 /**
  * An in-memory EHCache implementation of the XKMSClientCache interface.
  */
 public class EHCacheXKMSClientCache implements XKMSClientCache, BusLifeCycleListener {
 
-    public static final String CACHE_KEY = "cxf.xkms.client.cache";
+    public static final String TEMPLATE_KEY = "cxf.xkms.client.cache";
     private static final String DEFAULT_CONFIG_URL = "cxf-xkms-client-ehcache.xml";
 
-    private Ehcache cache;
-    private CacheManager cacheManager;
-    private Bus bus;
+    private final Cache<String, XKMSCacheToken> cache;
+    private final CacheManager cacheManager;
+    private final Bus bus;
+    private final String cacheKey;
 
-    public EHCacheXKMSClientCache() {
+    public EHCacheXKMSClientCache() throws XKMSClientCacheException {
         this(DEFAULT_CONFIG_URL, null);
     }
 
-    public EHCacheXKMSClientCache(Bus cxfBus) {
+    public EHCacheXKMSClientCache(Bus cxfBus) throws XKMSClientCacheException {
         this(DEFAULT_CONFIG_URL, cxfBus);
     }
 
-    public EHCacheXKMSClientCache(String configFileURL) {
+    public EHCacheXKMSClientCache(String configFileURL) throws XKMSClientCacheException {
         this(configFileURL, null);
     }
 
-    public EHCacheXKMSClientCache(String configFileURL, Bus cxfBus) {
-        createCache(configFileURL, cxfBus);
+    public EHCacheXKMSClientCache(String configFile, Bus cxfBus) throws XKMSClientCacheException {
+        if (cxfBus == null) {
+            cxfBus = BusFactory.getThreadDefaultBus(true);
+        }
         this.bus = cxfBus;
         if (bus != null) {
             bus.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);
         }
-    }
-
-    private void createCache(String configFile, Bus cxfBus) {
-        if (cxfBus == null) {
-            cxfBus = BusFactory.getThreadDefaultBus(true);
-        }
+        
         URL configFileURL = null;
         try {
             configFileURL =
@@ -80,56 +78,49 @@ public class EHCacheXKMSClientCache implements XKMSClientCache, BusLifeCycleList
             // ignore
         }
         if (configFileURL == null) {
-            cacheManager = EHCacheUtil.createCacheManager();
-        } else {
-            Configuration conf = ConfigurationFactory.parseConfiguration(configFileURL);
-
-            if (cxfBus != null) {
-                conf.setName(cxfBus.getId());
-                DiskStoreConfiguration dsc = conf.getDiskStoreConfiguration();
-                if (dsc != null && "java.io.tmpdir".equals(dsc.getOriginalPath())) {
-                    String path = conf.getDiskStoreConfiguration().getPath() + File.separator
-                        + cxfBus.getId();
-                    conf.getDiskStoreConfiguration().setPath(path);
-                }
-            }
-
-            cacheManager = EHCacheUtil.createCacheManager(conf);
+            configFileURL = Loader.getResource(this.getClass().getClassLoader(), configFile);
         }
 
-        CacheConfiguration cc = EHCacheUtil.getCacheConfiguration(CACHE_KEY, cacheManager);
+        XmlConfiguration xmlConfig = new XmlConfiguration(configFileURL);
 
-        Ehcache newCache = new Cache(cc);
-        cache = cacheManager.addCacheIfAbsent(newCache);
+        try {
+            CacheConfigurationBuilder<String, XKMSCacheToken> configurationBuilder =
+                    xmlConfig.newCacheConfigurationBuilderFromTemplate(TEMPLATE_KEY,
+                            String.class, XKMSCacheToken.class);
+
+            cacheKey = UUID.randomUUID().toString();
+
+            cacheManager = CacheManagerBuilder.newCacheManagerBuilder().withCache(cacheKey,
+                    configurationBuilder)
+                    .with(CacheManagerBuilder.persistence(new File(System.getProperty("java.io.tmpdir"), cacheKey)))
+                    .build();
+
+            cacheManager.init();
+            cache = cacheManager.getCache(cacheKey, String.class, XKMSCacheToken.class);
+        } catch (IllegalAccessException | InstantiationException | ClassNotFoundException e) {
+            throw new XKMSClientCacheException(e);
+        }
     }
 
     /**
      * Store an XKMSCacheToken in the Cache using the given key
      */
     public void put(String key, XKMSCacheToken cacheToken) {
-        cache.put(new Element(key, cacheToken, false));
+        cache.put(key, cacheToken);
     }
 
     /**
      * Get an XKMSCacheToken from the cache matching the given key. Returns null if there
-     * is no such XKMSCacheToken in the cache, or if the certificate has expired in the cache
+     * is no such XKMSCacheToken in the cache.
      */
     public XKMSCacheToken get(String key) {
-        Element element = cache.get(key);
-        if (element != null && !element.isExpired()) {
-            return (XKMSCacheToken)element.getObjectValue();
-        }
-        return null;
+        return cache.get(key);
     }
 
     public void close() {
-        if (cacheManager != null) {
-            if (cache != null) {
-                cache.removeAll();
-            }
-            cacheManager.shutdown();
-            cacheManager = null;
-            cache = null;
+        if (cacheManager.getStatus() == Status.AVAILABLE) {
+            cacheManager.removeCache(cacheKey);
+            cacheManager.close();
 
             if (bus != null) {
                 bus.getExtension(BusLifeCycleManager.class).unregisterLifeCycleListener(this);

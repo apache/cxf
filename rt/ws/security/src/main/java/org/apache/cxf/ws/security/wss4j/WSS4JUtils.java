@@ -118,15 +118,14 @@ public final class WSS4JUtils {
         if (!specified && MessageUtils.isRequestor(message)) {
             return null;
         }
+        
+        ReplayCache replayCache = (ReplayCache)message.getContextualProperty(instanceKey);
         Endpoint ep = message.getExchange().getEndpoint();
-        if (ep != null && ep.getEndpointInfo() != null) {
+        if (replayCache == null && ep != null && ep.getEndpointInfo() != null) {
             EndpointInfo info = ep.getEndpointInfo();
             synchronized (info) {
-                ReplayCache replayCache =
-                        (ReplayCache)message.getContextualProperty(instanceKey);
-                if (replayCache == null) {
-                    replayCache = (ReplayCache)info.getProperty(instanceKey);
-                }
+                replayCache = (ReplayCache)info.getProperty(instanceKey);
+
                 if (replayCache == null) {
                     String cacheKey = instanceKey;
                     if (info.getName() != null) {
@@ -154,10 +153,9 @@ public final class WSS4JUtils {
 
                     info.setProperty(instanceKey, replayCache);
                 }
-                return replayCache;
             }
         }
-        return null;
+        return replayCache;
     }
 
     public static String parseAndStoreStreamingSecurityToken(

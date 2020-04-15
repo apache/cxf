@@ -23,6 +23,7 @@ import java.util.Properties;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
+import org.apache.cxf.xkms.cache.XKMSClientCacheException;
 import org.apache.cxf.xkms.crypto.CryptoProviderException;
 import org.apache.cxf.xkms.crypto.CryptoProviderFactory;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -47,7 +48,12 @@ public class XkmsCryptoProviderFactory implements CryptoProviderFactory {
         Object crypto = SecurityUtils
             .getSecurityPropertyValue(org.apache.cxf.rt.security.SecurityConstants.SIGNATURE_CRYPTO, message);
         if (crypto instanceof Crypto) {
-            new XkmsCryptoProvider(xkmsConsumer, (Crypto)crypto);
+            try {
+                return new XkmsCryptoProvider(xkmsConsumer, (Crypto)crypto);
+            } catch (XKMSClientCacheException e) {
+                throw new CryptoProviderException("Cannot instantiate crypto factory: "
+                        + e.getMessage(), e);
+            }
         }
 
         Properties keystoreProps = CryptoProviderUtils
@@ -56,7 +62,7 @@ public class XkmsCryptoProviderFactory implements CryptoProviderFactory {
         try {
             Crypto defaultCrypto = CryptoFactory.getInstance(keystoreProps);
             return new XkmsCryptoProvider(xkmsConsumer, defaultCrypto);
-        } catch (WSSecurityException e) {
+        } catch (WSSecurityException | XKMSClientCacheException e) {
             throw new CryptoProviderException("Cannot instantiate crypto factory: "
                                               + e.getMessage(), e);
         }
@@ -64,22 +70,42 @@ public class XkmsCryptoProviderFactory implements CryptoProviderFactory {
 
     @Override
     public Crypto create() {
-        return new XkmsCryptoProvider(xkmsConsumer);
+        try {
+            return new XkmsCryptoProvider(xkmsConsumer);
+        } catch (XKMSClientCacheException e) {
+            throw new CryptoProviderException("Cannot instantiate crypto factory: "
+                    + e.getMessage(), e);
+        }
     }
 
     @Override
     public Crypto create(Crypto fallbackCrypto) {
-        return new XkmsCryptoProvider(xkmsConsumer, fallbackCrypto);
+        try {
+            return new XkmsCryptoProvider(xkmsConsumer, fallbackCrypto);
+        } catch (XKMSClientCacheException e) {
+            throw new CryptoProviderException("Cannot instantiate crypto factory: "
+                    + e.getMessage(), e);
+        }
     }
 
     @Override
     public Crypto create(XKMSPortType xkmsClient, Crypto fallbackCrypto) {
-        return new XkmsCryptoProvider(xkmsClient, fallbackCrypto);
+        try {
+            return new XkmsCryptoProvider(xkmsClient, fallbackCrypto);
+        } catch (XKMSClientCacheException e) {
+            throw new CryptoProviderException("Cannot instantiate crypto factory: "
+                    + e.getMessage(), e);
+        }
     }
 
     @Override
     public Crypto create(XKMSPortType xkmsClient, Crypto fallbackCrypto, boolean allowX509FromJKS) {
-        return new XkmsCryptoProvider(xkmsClient, fallbackCrypto, allowX509FromJKS);
+        try {
+            return new XkmsCryptoProvider(xkmsClient, fallbackCrypto, allowX509FromJKS);
+        } catch (XKMSClientCacheException e) {
+            throw new CryptoProviderException("Cannot instantiate crypto factory: "
+                    + e.getMessage(), e);
+        }
     }
 
     @Override
@@ -92,7 +118,7 @@ public class XkmsCryptoProviderFactory implements CryptoProviderFactory {
             }
             Crypto defaultCrypto = CryptoFactory.getInstance(keystoreProps);
             return new XkmsCryptoProvider(xkmsConsumer, defaultCrypto);
-        } catch (WSSecurityException e) {
+        } catch (WSSecurityException | XKMSClientCacheException e) {
             throw new CryptoProviderException("Cannot instantiate crypto factory: "
                 + e.getMessage(), e);
         }
