@@ -78,7 +78,7 @@ public class JAXRSRxJava3FlowableTest extends AbstractBusClientServerTestBase {
         obs.subscribe(subscriber);
 
         subscriber.await(3, TimeUnit.SECONDS);
-        subscriber.assertResult(new HelloWorldBean("Hello", "World"));
+        subscriber.assertResult(new HelloWorldBean("Hello"));
     }
 
     @Test
