@@ -2425,6 +2425,12 @@
                 <groupId>net.java.dev.msv</groupId>
                 <artifactId>msv-core</artifactId>
                 <version>${cxf.msv.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>net.java.dev.msv</groupId>
+                        <artifactId>msv-testharness</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>io.swagger</groupId>
