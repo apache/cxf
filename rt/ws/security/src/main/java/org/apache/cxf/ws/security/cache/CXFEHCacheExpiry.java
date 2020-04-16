@@ -17,16 +17,18 @@
  * under the License.
  */
 
-package org.apache.cxf.sts.cache;
+package org.apache.cxf.ws.security.cache;
 
-import java.util.Map;
+import org.apache.wss4j.common.cache.EHCacheExpiry;
 
-public interface IdentityCache {
+/**
+ * This class doesn't do anything, but it's needed as otherwise the WSS4J EHCacheExpiry doesn't load in an OSGi
+ * container.
+ */
+public class CXFEHCacheExpiry extends EHCacheExpiry {
 
-    void add(String user, String realm, Map<String, String> identities);
-
-    Map<String, String> get(String user, String realm);
-
-    void remove(String user, String realm);
+    public CXFEHCacheExpiry() {
+        super();
+    }
 
 }

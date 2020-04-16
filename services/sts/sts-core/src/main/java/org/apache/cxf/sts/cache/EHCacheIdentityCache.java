@@ -29,11 +29,6 @@ import java.util.logging.Logger;
 import javax.management.JMException;
 import javax.management.ObjectName;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.config.CacheConfiguration;
 import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
@@ -45,9 +40,13 @@ import org.apache.cxf.management.annotation.ManagedOperation;
 import org.apache.cxf.management.annotation.ManagedResource;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.sts.IdentityMapper;
-import org.apache.cxf.ws.security.cache.EHCacheUtils;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
-import org.apache.wss4j.common.cache.EHCacheManagerHolder;
+import org.ehcache.Cache;
+import org.ehcache.CacheManager;
+import org.ehcache.Status;
+import org.ehcache.config.Configuration;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.xml.XmlConfiguration;
 
 /**
  * A EH-Cache based cache to cache identities in different realms where
@@ -58,9 +57,9 @@ public class EHCacheIdentityCache extends AbstractIdentityCache
     implements Closeable, BusLifeCycleListener {
 
     private static final Logger LOG = LogUtils.getL7dLogger(EHCacheIdentityCache.class);
-
-    private Ehcache cache;
-    private CacheManager cacheManager;
+    private static final String KEY = "org.apache.cxf.sts.cache.EHCacheIdentityCache";
+    private Cache<String, EHCacheIdentityValue> cache;
+    private final CacheManager cacheManager;
 
 
     public EHCacheIdentityCache(
@@ -85,30 +84,27 @@ public class EHCacheIdentityCache extends AbstractIdentityCache
             }
         }
 
-        if (configFileURL != null) {
-            cacheManager = EHCacheUtils.getCacheManager(b, configFileURL);
-        } else {
-            cacheManager = EHCacheUtils.getCacheManager(b, getDefaultConfigFileURL());
-        }
-        CacheConfiguration cc = EHCacheManagerHolder.getCacheConfiguration(key, cacheManager);
+        URL xmlConfigURL = configFileURL != null ? configFileURL : getDefaultConfigFileURL();
+        Configuration xmlConfig = new XmlConfiguration(xmlConfigURL);
+        cacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);
 
-        Ehcache newCache = new Cache(cc);
-        cache = cacheManager.addCacheIfAbsent(newCache);
+        cacheManager.init();
+        cache = cacheManager.getCache(KEY, String.class, EHCacheIdentityValue.class);
     }
 
     @Override
     public void add(String user, String realm, Map<String, String> identities) {
-        cache.put(new Element(user + "@" + realm, identities));
+        cache.put(user + "@" + realm, new EHCacheIdentityValue(identities));
     }
 
-    @SuppressWarnings("unchecked")
     @ManagedOperation()
     @Override
     public Map<String, String> get(String user, String realm) {
-        Element element = cache.get(user + "@" + realm);
-        if (element != null && !cache.isExpired(element)) {
-            return (Map<String, String>)element.getObjectValue();
+        EHCacheIdentityValue value = cache.get(user + "@" + realm);
+        if (value != null) {
+            return value.getValue();
         }
+
         return null;
     }
 
@@ -118,32 +114,15 @@ public class EHCacheIdentityCache extends AbstractIdentityCache
     }
 
     @ManagedOperation()
-    @Override
-    public void clear() {
-        cache.removeAll();
-    }
-
-    @ManagedOperation()
-    @Override
-    public int size() {
-        return cache.getSize();
-    }
-
-    @ManagedOperation()
     public String getContent() {
         return this.cache.toString();
     }
 
     public void close() {
-        if (cacheManager != null) {
-            // this step is especially important for global shared cache manager
-            if (cache != null) {
-                cacheManager.removeCache(cache.getName());
-            }
+        if (cacheManager.getStatus() == Status.AVAILABLE) {
+            cacheManager.removeCache(KEY);
+            cacheManager.close();
 
-            EHCacheManagerHolder.releaseCacheManger(cacheManager);
-            cacheManager = null;
-            cache = null;
             if (super.getBus() != null) {
                 super.getBus().getExtension(BusLifeCycleManager.class).unregisterLifeCycleListener(this);
             }

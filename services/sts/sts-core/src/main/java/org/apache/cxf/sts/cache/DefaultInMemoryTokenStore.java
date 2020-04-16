@@ -23,14 +23,17 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.ws.security.tokenstore.EHCacheTokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 
 public class DefaultInMemoryTokenStore extends EHCacheTokenStore {
 
-    public DefaultInMemoryTokenStore(Bus b) {
-        super("STS", b, ClassLoaderUtils.getResource("cxf-ehcache.xml", DefaultInMemoryTokenStore.class));
+    public DefaultInMemoryTokenStore(Bus b) throws TokenStoreException {
+        super(TokenStore.class.getName() + "-STS", b,
+                ClassLoaderUtils.getResource("cxf-ehcache.xml", DefaultInMemoryTokenStore.class));
     }
-    public DefaultInMemoryTokenStore() {
-        super("STS", BusFactory.getDefaultBus(),
+    public DefaultInMemoryTokenStore() throws TokenStoreException {
+        super(TokenStore.class.getName() + "-STS", BusFactory.getDefaultBus(),
               ClassLoaderUtils.getResource("cxf-ehcache.xml", DefaultInMemoryTokenStore.class));
     }
 

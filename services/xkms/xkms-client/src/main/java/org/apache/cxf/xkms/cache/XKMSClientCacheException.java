@@ -17,16 +17,12 @@
  * under the License.
  */
 
-package org.apache.cxf.sts.cache;
+package org.apache.cxf.xkms.cache;
 
-import java.util.Map;
+public class XKMSClientCacheException extends Exception {
 
-public interface IdentityCache {
-
-    void add(String user, String realm, Map<String, String> identities);
-
-    Map<String, String> get(String user, String realm);
-
-    void remove(String user, String realm);
+    public XKMSClientCacheException(Throwable cause) {
+        super(cause);
+    }
 
 }

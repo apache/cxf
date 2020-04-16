@@ -53,11 +53,14 @@ import org.apache.cxf.sts.token.provider.jwt.JWTTokenProvider;
 import org.apache.cxf.sts.token.validator.jwt.DefaultJWTRoleParser;
 import org.apache.cxf.sts.token.validator.jwt.JWTTokenValidator;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
+
+import org.junit.BeforeClass;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -67,7 +70,12 @@ import static org.junit.Assert.assertTrue;
  * Some unit tests for validating JWTTokens.
  */
 public class JWTTokenValidatorTest {
-    private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
+    private static TokenStore tokenStore;
+
+    @BeforeClass
+    public static void init() throws TokenStoreException {
+        tokenStore = new DefaultInMemoryTokenStore();
+    }
 
     @org.junit.Test
     public void testCreateAndValidateSignedJWT() throws Exception {

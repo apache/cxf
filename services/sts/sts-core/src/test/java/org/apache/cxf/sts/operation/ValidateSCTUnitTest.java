@@ -51,11 +51,14 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.StatusType;
 import org.apache.cxf.ws.security.sts.provider.model.ValidateTargetType;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
+
+import org.junit.BeforeClass;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -72,7 +75,12 @@ public class ValidateSCTUnitTest {
     private static final QName QNAME_WST_STATUS =
         QNameConstants.WS_TRUST_FACTORY.createStatus(null).getName();
 
-    private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
+    private static TokenStore tokenStore;
+
+    @BeforeClass
+    public static void init() throws TokenStoreException {
+        tokenStore = new DefaultInMemoryTokenStore();
+    }
 
     /**
      * Test to successfully validate a SecurityContextToken

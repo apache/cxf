@@ -45,6 +45,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.cxf.ws.security.wss4j.AttachmentCallbackHandler;
 import org.apache.cxf.ws.security.wss4j.StaxSerializer;
 import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
@@ -101,7 +102,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                                     SOAPMessage saaj,
                                     WSSecHeader secHeader,
                                     AssertionInfoMap aim,
-                                    SoapMessage message) throws SOAPException {
+                                    SoapMessage message) throws SOAPException, TokenStoreException {
         super(config, binding, saaj, secHeader, aim, message);
         this.sbinding = binding;
         tokenStore = getTokenStore();

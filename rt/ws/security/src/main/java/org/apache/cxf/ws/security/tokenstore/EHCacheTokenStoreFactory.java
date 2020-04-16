@@ -34,7 +34,8 @@ public class EHCacheTokenStoreFactory extends TokenStoreFactory {
 
     private static final String DEFAULT_CONFIG_FILE = "cxf-ehcache.xml";
 
-    public TokenStore newTokenStore(String key, Message message) {
+    @Override
+    public TokenStore newTokenStore(String key, Message message) throws TokenStoreException {
         URL configFileURL = SecurityUtils.getConfigFileURL(message, SecurityConstants.CACHE_CONFIG_FILE,
                 DEFAULT_CONFIG_FILE);
         if (configFileURL == null) {

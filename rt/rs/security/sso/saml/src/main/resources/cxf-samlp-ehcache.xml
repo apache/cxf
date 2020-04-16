@@ -1,5 +1,44 @@
 <?xml version="1.0"?>
-<ehcache xsi:noNamespaceSchemaLocation="ehcache.xsd" updateCheck="false" monitoring="autodetect" dynamicConfig="true">
-    <diskStore path="java.io.tmpdir"/>
-    <defaultCache maxEntriesLocalHeap="5000" eternal="false" timeToIdleSeconds="3600" timeToLiveSeconds="3600" overflowToDisk="true" maxElementsOnDisk="10000000" diskPersistent="false" diskExpiryThreadIntervalSeconds="120" memoryStoreEvictionPolicy="LRU"/>
-</ehcache>
+<config
+        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+        xmlns='http://www.ehcache.org/v3'
+        xsi:schemaLocation="http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core-3.8.xsd">
+
+    <cache-template name="cxf.samlp.replay.cache">
+        <key-type>java.lang.String</key-type>
+        <value-type>org.apache.wss4j.common.cache.EHCacheValue</value-type>
+        <expiry>
+            <class>org.apache.wss4j.common.cache.EHCacheExpiry</class>
+        </expiry>
+        <resources>
+            <heap unit="entries">5000</heap>
+            <disk unit="MB" persistent="false">10</disk>
+        </resources>
+    </cache-template>
+
+    <cache-template name="cxf.samlp.request.state.cache">
+        <key-type>java.lang.String</key-type>
+        <value-type>org.apache.cxf.rs.security.saml.sso.state.RequestState</value-type>
+        <expiry>
+            <ttl unit="seconds">300</ttl>
+        </expiry>
+        <resources>
+            <heap unit="entries">5000</heap>
+            <disk unit="MB" persistent="false">10</disk>
+        </resources>
+    </cache-template>
+
+    <cache-template name="cxf.samlp.response.state.cache">
+        <key-type>java.lang.String</key-type>
+        <value-type>org.apache.cxf.rs.security.saml.sso.state.ResponseState</value-type>
+        <expiry>
+            <ttl unit="seconds">300</ttl>
+        </expiry>
+        <resources>
+            <heap unit="entries">5000</heap>
+            <disk unit="MB" persistent="false">10</disk>
+        </resources>
+    </cache-template>
+
+</config>
+

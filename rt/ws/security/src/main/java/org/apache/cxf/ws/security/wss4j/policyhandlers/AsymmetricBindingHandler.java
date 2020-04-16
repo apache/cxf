@@ -47,6 +47,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.cxf.ws.security.wss4j.AttachmentCallbackHandler;
 import org.apache.cxf.ws.security.wss4j.StaxSerializer;
 import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
@@ -114,9 +115,13 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
 
         if (abinding.getProtectionOrder()
             == AbstractSymmetricAsymmetricBinding.ProtectionOrder.EncryptBeforeSigning) {
-            doEncryptBeforeSign();
-            assertPolicy(
-                new QName(abinding.getName().getNamespaceURI(), SPConstants.ENCRYPT_BEFORE_SIGNING));
+            try {
+                doEncryptBeforeSign();
+                assertPolicy(
+                        new QName(abinding.getName().getNamespaceURI(), SPConstants.ENCRYPT_BEFORE_SIGNING));
+            } catch (TokenStoreException ex) {
+                throw new Fault(ex);
+            }
         } else {
             doSignBeforeEncrypt();
             assertPolicy(
@@ -272,7 +277,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         return wrapper;
     }
 
-    private void doEncryptBeforeSign() {
+    private void doEncryptBeforeSign() throws TokenStoreException {
         AbstractTokenWrapper wrapper = getEncryptBeforeSignWrapper();
         AbstractToken encryptionToken = null;
         if (wrapper != null) {
@@ -387,7 +392,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     }
                 }
             }
-        } catch (WSSecurityException | SOAPException ex) {
+        } catch (WSSecurityException | SOAPException | TokenStoreException ex) {
             LOG.log(Level.FINE, ex.getMessage(), ex);
             throw new Fault(ex);
         }
@@ -487,25 +492,31 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
 
             Crypto crypto = getEncryptionCrypto();
 
-            SecurityToken securityToken = getSecurityToken();
-            if (!isRequestor() && securityToken != null
-                && recToken.getToken() instanceof SamlToken) {
-                String tokenType = securityToken.getTokenType();
-                if (WSS4JConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
-                    || WSS4JConstants.SAML_NS.equals(tokenType)) {
-                    encr.setCustomEKTokenValueType(WSS4JConstants.WSS_SAML_KI_VALUE_TYPE);
-                    encr.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
-                    encr.setCustomEKTokenId(securityToken.getId());
-                } else if (WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
-                    || WSS4JConstants.SAML2_NS.equals(tokenType)) {
-                    encr.setCustomEKTokenValueType(WSS4JConstants.WSS_SAML2_KI_VALUE_TYPE);
-                    encr.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
-                    encr.setCustomEKTokenId(securityToken.getId());
+            SecurityToken securityToken = null;
+            try {
+                securityToken = getSecurityToken();
+                if (!isRequestor() && securityToken != null
+                    && recToken.getToken() instanceof SamlToken) {
+                    String tokenType = securityToken.getTokenType();
+                    if (WSS4JConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+                        || WSS4JConstants.SAML_NS.equals(tokenType)) {
+                        encr.setCustomEKTokenValueType(WSS4JConstants.WSS_SAML_KI_VALUE_TYPE);
+                        encr.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+                        encr.setCustomEKTokenId(securityToken.getId());
+                    } else if (WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+                        || WSS4JConstants.SAML2_NS.equals(tokenType)) {
+                        encr.setCustomEKTokenValueType(WSS4JConstants.WSS_SAML2_KI_VALUE_TYPE);
+                        encr.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+                        encr.setCustomEKTokenId(securityToken.getId());
+                    } else {
+                        setKeyIdentifierType(encr, encrToken);
+                    }
                 } else {
                     setKeyIdentifierType(encr, encrToken);
                 }
-            } else {
-                setKeyIdentifierType(encr, encrToken);
+            } catch (TokenStoreException ex) {
+                LOG.log(Level.FINE, ex.getMessage(), ex);
+                throw new Fault(ex);
             }
             //
             // Using a stored cert is only suitable for the Issued Token case, where
@@ -650,7 +661,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
     }
 
     private void doSignature(AbstractTokenWrapper wrapper, List<WSEncryptionPart> sigParts, boolean attached)
-        throws WSSecurityException, SOAPException {
+            throws WSSecurityException, SOAPException, TokenStoreException {
 
         if (!isRequestor()) {
             assertUnusedTokens(abinding.getInitiatorToken());

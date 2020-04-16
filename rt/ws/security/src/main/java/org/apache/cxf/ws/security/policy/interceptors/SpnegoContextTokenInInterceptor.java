@@ -47,6 +47,7 @@ import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.policy.interceptors.HttpsTokenInterceptorProvider.HttpsTokenInInterceptor;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor;
@@ -371,23 +372,27 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
         }
 
         public void handleMessage(SoapMessage message) throws Fault {
-            boolean foundSCT = NegotiationUtils.parseSCTResult(message);
+            try {
+                boolean foundSCT = NegotiationUtils.parseSCTResult(message);
 
-            AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-            // extract Assertion information
-            if (aim != null) {
-                Collection<AssertionInfo> ais =
-                    PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SPNEGO_CONTEXT_TOKEN);
-                if (ais.isEmpty()) {
-                    return;
-                }
-                for (AssertionInfo inf : ais) {
-                    if (foundSCT) {
-                        inf.setAsserted(true);
-                    } else {
-                        inf.setNotAsserted("No SecurityContextToken token found in message.");
+                AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+                // extract Assertion information
+                if (aim != null) {
+                    Collection<AssertionInfo> ais =
+                            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SPNEGO_CONTEXT_TOKEN);
+                    if (ais.isEmpty()) {
+                        return;
+                    }
+                    for (AssertionInfo inf : ais) {
+                        if (foundSCT) {
+                            inf.setAsserted(true);
+                        } else {
+                            inf.setNotAsserted("No SecurityContextToken token found in message.");
+                        }
                     }
                 }
+            } catch (TokenStoreException ex) {
+                throw new Fault(ex);
             }
         }
     }

@@ -17,16 +17,12 @@
  * under the License.
  */
 
-package org.apache.cxf.sts.cache;
+package org.apache.cxf.ws.security.tokenstore;
 
-import java.util.Map;
+public class TokenStoreException extends Exception {
 
-public interface IdentityCache {
-
-    void add(String user, String realm, Map<String, String> identities);
-
-    Map<String, String> get(String user, String realm);
-
-    void remove(String user, String realm);
+    public TokenStoreException(Throwable cause) {
+        super(cause);
+    }
 
 }

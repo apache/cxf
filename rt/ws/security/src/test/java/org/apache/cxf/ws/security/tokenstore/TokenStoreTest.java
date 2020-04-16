@@ -18,28 +18,43 @@
  */
 package org.apache.cxf.ws.security.tokenstore;
 
-import java.time.Instant;
+import java.util.Arrays;
+import java.util.Collection;
 
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.xml.security.utils.ClassLoaderUtils;
 
-import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class MemoryTokenStoreTest {
+@RunWith(value = org.junit.runners.Parameterized.class)
+public class TokenStoreTest {
 
-    private static TokenStore store;
+    private TokenStore store;
 
-    @BeforeClass
-    public static void init() {
-        TokenStoreFactory tokenStoreFactory = new MemoryTokenStoreFactory();
+    public TokenStoreTest(TokenStore store) {
+        this.store = store;
+    }
+
+    @Parameterized.Parameters(name = "{0}")
+    public static Collection<TokenStore> data() throws TokenStoreException {
         Message message = new MessageImpl();
-        store = tokenStoreFactory.newTokenStore(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, message);
+        message.put(
+                SecurityConstants.CACHE_CONFIG_FILE,
+                ClassLoaderUtils.getResource("cxf-ehcache.xml", TokenStoreTest.class)
+        );
+        message.setExchange(new ExchangeImpl());
+        return Arrays.asList(
+                new MemoryTokenStoreFactory().newTokenStore(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, message),
+                new EHCacheTokenStoreFactory().newTokenStore(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, message)
+        );
     }
 
     // tests TokenStore apis for storing in the cache.
@@ -77,15 +92,4 @@ public class MemoryTokenStoreTest {
         assertTrue(store.getTokenIdentifiers().isEmpty());
     }
 
-    @org.junit.Test
-    public void testTokenExpiry() {
-        SecurityToken token = new SecurityToken();
-
-        Instant expires = Instant.now().plusSeconds(5L * 60L);
-        token.setExpires(expires);
-
-        assertFalse(token.isExpired());
-        assertFalse(token.isAboutToExpire(100L));
-        assertTrue(token.isAboutToExpire((5L * 60L * 1000L) + 1L));
-    }
 }

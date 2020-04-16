@@ -51,12 +51,15 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenRespons
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.util.DOM2Writer;
+
+import org.junit.BeforeClass;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -74,13 +77,18 @@ public class IssueSCTUnitTest {
     public static final QName UNATTACHED_REFERENCE =
         QNameConstants.WS_TRUST_FACTORY.createRequestedUnattachedReference(null).getName();
 
-    private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
+    private static TokenStore tokenStore;
 
     private static boolean unrestrictedPoliciesInstalled;
 
     static {
         unrestrictedPoliciesInstalled = TestUtilities.checkUnrestrictedPoliciesInstalled();
     };
+
+    @BeforeClass
+    public static void init() throws TokenStoreException {
+        tokenStore = new DefaultInMemoryTokenStore();
+    }
 
     /**
      * Test to successfully issue a SecurityContextToken

@@ -34,7 +34,7 @@
         <cxf.module.name>org.apache.cxf.rs.security.sso.saml</cxf.module.name>
         <cxf.osgi.import>
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
-            net.sf.ehcache*;resolution:=optional;version="[2.5, 3.0.0)",
+            org.ehcache*;resolution:=optional;version="[3.0.0, 4.0.0)",
             org.opensaml*;version="${cxf.opensaml.osgi.version.range}",
             javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
             javax.annotation*;version="${cxf.osgi.javax.annotation.version}"
@@ -66,9 +66,9 @@
             <artifactId>${cxf.servlet-api.artifact}</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.sf.ehcache</groupId>
+            <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
-            <version>${cxf.ehcache.version}</version>
+            <version>${cxf.ehcache3.version}</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
