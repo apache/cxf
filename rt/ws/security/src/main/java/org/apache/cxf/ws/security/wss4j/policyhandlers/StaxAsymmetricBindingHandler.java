@@ -357,7 +357,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             WSSSecurityProperties properties = getProperties();
             WSSConstants.Action actionToPerform = XMLSecurityConstants.ENCRYPTION;
             if (recToken.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
-                actionToPerform = WSSConstants.ENCRYPT_WITH_DERIVED_KEY;
+                actionToPerform = WSSConstants.ENCRYPTION_WITH_DERIVED_KEY;
             }
             properties.addAction(actionToPerform);
 
