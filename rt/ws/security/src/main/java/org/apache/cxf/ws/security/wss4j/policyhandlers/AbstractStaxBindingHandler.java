@@ -278,7 +278,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         */
 
         SecurePart securePart = new SecurePart(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN, Modifier.Element);
-        securePart.setIdToSign(wss4jToken.getId());
+        securePart.setIdToSecure(wss4jToken.getId());
 
         return securePart;
     }
