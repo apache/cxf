@@ -142,7 +142,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
         service.getInInterceptors().remove(inhandler);
         inConfig.put(
             ConfigurationConstants.ACTION,
-            ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.ENCRYPT
+            ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.ENCRYPTION
         );
         inhandler = new WSS4JStaxInInterceptor(inConfig);
         service.getInInterceptors().add(inhandler);
@@ -216,7 +216,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inConfig = new HashMap<>();
-        inConfig.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        inConfig.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
         inConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inConfig.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inConfig);
@@ -231,7 +231,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> outConfig = new HashMap<>();
-        outConfig.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        outConfig.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
         outConfig.put(ConfigurationConstants.ENCRYPTION_USER, "myalias");
         outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         outConfig.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
@@ -244,7 +244,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
         service.getInInterceptors().remove(inhandler);
         inConfig.put(
             ConfigurationConstants.ACTION,
-            ConfigurationConstants.ENCRYPT + " " + ConfigurationConstants.SIGNATURE
+            ConfigurationConstants.ENCRYPTION + " " + ConfigurationConstants.SIGNATURE
         );
         inhandler = new WSS4JStaxInInterceptor(inConfig);
         service.getInInterceptors().add(inhandler);
@@ -313,7 +313,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
         Map<String, Object> inConfig = new HashMap<>();
         inConfig.put(
             ConfigurationConstants.ACTION,
-            ConfigurationConstants.ENCRYPT + " " + ConfigurationConstants.USERNAME_TOKEN
+            ConfigurationConstants.ENCRYPTION + " " + ConfigurationConstants.USERNAME_TOKEN
         );
         inConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inConfig.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
@@ -331,7 +331,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
         Map<String, Object> outConfig = new HashMap<>();
         outConfig.put(
             ConfigurationConstants.ACTION,
-            ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.ENCRYPT
+            ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.ENCRYPTION
         );
         outConfig.put(
             ConfigurationConstants.ENCRYPTION_PARTS,
@@ -440,7 +440,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
         service.getInInterceptors().remove(inhandler);
         inConfig.put(
             ConfigurationConstants.ACTION,
-            ConfigurationConstants.SIGNATURE + " " + ConfigurationConstants.ENCRYPT
+            ConfigurationConstants.SIGNATURE + " " + ConfigurationConstants.ENCRYPTION
         );
         inhandler = new WSS4JStaxInInterceptor(inConfig);
         service.getInInterceptors().add(inhandler);
@@ -656,7 +656,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
         Map<String, Object> inConfig = new HashMap<>();
         inConfig.put(
             ConfigurationConstants.ACTION,
-            ConfigurationConstants.ENCRYPT + " " + ConfigurationConstants.SIGNATURE
+            ConfigurationConstants.ENCRYPTION + " " + ConfigurationConstants.SIGNATURE
         );
         inConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inConfig.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
@@ -675,7 +675,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
         Map<String, Object> outConfig = new HashMap<>();
         outConfig.put(
             ConfigurationConstants.ACTION,
-            ConfigurationConstants.ENCRYPT + " " + ConfigurationConstants.SIGNATURE
+            ConfigurationConstants.ENCRYPTION + " " + ConfigurationConstants.SIGNATURE
         );
         outConfig.put(ConfigurationConstants.SIGNATURE_USER, "myalias");
         outConfig.put(ConfigurationConstants.ENCRYPTION_USER, "myalias");

@@ -122,7 +122,7 @@ public class UserNameTokenAuthorizationTest extends AbstractSecurityTest {
     @Test
     public void testDigestPasswordAuthorized() throws Exception {
         setUpService("developers", true, false);
-        String actions = ConfigurationConstants.ENCRYPT + " " + ConfigurationConstants.SIGNATURE + " "
+        String actions = ConfigurationConstants.ENCRYPTION + " " + ConfigurationConstants.SIGNATURE + " "
                          + ConfigurationConstants.TIMESTAMP + " " + ConfigurationConstants.USERNAME_TOKEN;
 
         wsIn.setProperty(ConfigurationConstants.ACTION, actions);
@@ -135,7 +135,7 @@ public class UserNameTokenAuthorizationTest extends AbstractSecurityTest {
     @Test
     public void testDigestPasswordUnauthorized() throws Exception {
         setUpService("managers", true, false);
-        String actions = ConfigurationConstants.ENCRYPT + " " + ConfigurationConstants.SIGNATURE + " "
+        String actions = ConfigurationConstants.ENCRYPTION + " " + ConfigurationConstants.SIGNATURE + " "
                          + ConfigurationConstants.TIMESTAMP + " " + ConfigurationConstants.USERNAME_TOKEN;
 
         wsIn.setProperty(ConfigurationConstants.ACTION, actions);
@@ -153,7 +153,7 @@ public class UserNameTokenAuthorizationTest extends AbstractSecurityTest {
     @Test
     public void testEncryptedDigestPasswordAuthorized() throws Exception {
         setUpService("developers", true, true);
-        String actions = ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.ENCRYPT;
+        String actions = ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.ENCRYPTION;
 
         wsIn.setProperty(ConfigurationConstants.ACTION, actions);
         wsOut.setProperty(ConfigurationConstants.ACTION, actions);
@@ -175,7 +175,7 @@ public class UserNameTokenAuthorizationTest extends AbstractSecurityTest {
     @Test
     public void testEncyptedClearPasswordAuthorized() throws Exception {
         setUpService("developers", false, true);
-        String actions = ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.ENCRYPT;
+        String actions = ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.ENCRYPTION;
 
         wsIn.setProperty(ConfigurationConstants.ACTION, actions);
         wsOut.setProperty(ConfigurationConstants.ACTION, actions);

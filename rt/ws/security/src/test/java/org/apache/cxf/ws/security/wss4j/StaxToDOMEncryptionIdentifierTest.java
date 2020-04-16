@@ -56,7 +56,7 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
         inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
@@ -95,7 +95,7 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
         inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
@@ -134,7 +134,7 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
         inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
@@ -173,7 +173,7 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
         inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
         inProperties.put(ConfigurationConstants.IS_BSP_COMPLIANT, "false");
@@ -213,7 +213,7 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
         inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);

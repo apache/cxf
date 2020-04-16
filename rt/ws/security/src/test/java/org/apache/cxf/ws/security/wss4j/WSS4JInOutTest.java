@@ -146,13 +146,13 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
     @Test
     public void testEncryption() throws Exception {
         Map<String, Object> outProperties = new HashMap<>();
-        outProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        outProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
         outProperties.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
         outProperties.put(ConfigurationConstants.USER, "myalias");
         outProperties.put("password", "myAliasPassword");
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
         inProperties.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
         inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
 
@@ -196,7 +196,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         Map<String, Object> outProperties = new HashMap<>();
         outProperties.put(
             ConfigurationConstants.ACTION,
-            ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.ENCRYPT
+            ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.ENCRYPTION
         );
         outProperties.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
         outProperties.put(ConfigurationConstants.USER, "alice");
@@ -210,7 +210,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
             ConfigurationConstants.ACTION,
-            ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.ENCRYPT
+            ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.ENCRYPTION
         );
         inProperties.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
         inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());

@@ -413,7 +413,7 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
                 action += " " + ConfigurationConstants.SIGNATURE;
                 break;
             case ENCRYPTED:
-                action += " " + ConfigurationConstants.ENCRYPT;
+                action += " " + ConfigurationConstants.ENCRYPTION;
                 break;
             default:
                 fail("Unsupported coverage type.");

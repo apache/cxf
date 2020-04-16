@@ -66,7 +66,7 @@ public class DOMToStaxEncryptionIdentifierTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
         properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
         properties.put(ConfigurationConstants.USER, "myalias");
@@ -99,7 +99,7 @@ public class DOMToStaxEncryptionIdentifierTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
         properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
         properties.put(ConfigurationConstants.USER, "myalias");
@@ -132,7 +132,7 @@ public class DOMToStaxEncryptionIdentifierTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
         properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
         properties.put(ConfigurationConstants.USER, "myalias");
@@ -165,7 +165,7 @@ public class DOMToStaxEncryptionIdentifierTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
         properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
         properties.put(ConfigurationConstants.USER, "myalias");
@@ -198,7 +198,7 @@ public class DOMToStaxEncryptionIdentifierTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
         properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
         properties.put(ConfigurationConstants.USER, "myalias");
