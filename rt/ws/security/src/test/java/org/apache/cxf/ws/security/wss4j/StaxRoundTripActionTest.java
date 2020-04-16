@@ -92,7 +92,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
 
         actions = new ArrayList<>();
         actions.add(WSSConstants.USERNAMETOKEN);
-        actions.add(XMLSecurityConstants.ENCRYPT);
+        actions.add(XMLSecurityConstants.ENCRYPTION);
         inProperties.setActions(actions);
 
         try {
@@ -164,7 +164,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
         WSSSecurityProperties inProperties = new WSSSecurityProperties();
         inProperties.setCallbackHandler(new TestPwdCallback());
         List<WSSConstants.Action> actions = new ArrayList<>();
-        actions.add(XMLSecurityConstants.ENCRYPT);
+        actions.add(XMLSecurityConstants.ENCRYPTION);
         inProperties.setActions(actions);
         Properties cryptoProperties =
             CryptoFactory.getProperties("insecurity.properties", this.getClass().getClassLoader());
@@ -182,7 +182,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
         actions = new ArrayList<>();
-        actions.add(XMLSecurityConstants.ENCRYPT);
+        actions.add(XMLSecurityConstants.ENCRYPTION);
         properties.setActions(actions);
         properties.setEncryptionUser("myalias");
         properties.setEncryptionSymAlgorithm(XMLSecurityConstants.NS_XENC_AES128);
@@ -197,7 +197,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
         assertEquals("test", echo.echo("test"));
 
         actions = new ArrayList<>();
-        actions.add(XMLSecurityConstants.ENCRYPT);
+        actions.add(XMLSecurityConstants.ENCRYPTION);
         actions.add(XMLSecurityConstants.SIGNATURE);
         inProperties.setActions(actions);
 
@@ -266,7 +266,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
         WSSSecurityProperties inProperties = new WSSSecurityProperties();
         inProperties.setCallbackHandler(new TestPwdCallback());
         List<WSSConstants.Action> actions = new ArrayList<>();
-        actions.add(XMLSecurityConstants.ENCRYPT);
+        actions.add(XMLSecurityConstants.ENCRYPTION);
         actions.add(WSSConstants.USERNAMETOKEN);
         inProperties.setActions(actions);
         Properties cryptoProperties =
@@ -286,7 +286,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
         WSSSecurityProperties properties = new WSSSecurityProperties();
         actions = new ArrayList<>();
         actions.add(WSSConstants.USERNAMETOKEN);
-        actions.add(XMLSecurityConstants.ENCRYPT);
+        actions.add(XMLSecurityConstants.ENCRYPTION);
         properties.setActions(actions);
         properties.addEncryptionPart(
             new SecurePart(new QName(WSSConstants.NS_WSSE10, "UsernameToken"), SecurePart.Modifier.Element)
@@ -392,7 +392,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
 
         actions = new ArrayList<>();
         actions.add(XMLSecurityConstants.SIGNATURE);
-        actions.add(XMLSecurityConstants.ENCRYPT);
+        actions.add(XMLSecurityConstants.ENCRYPTION);
         inProperties.setActions(actions);
 
         try {
@@ -610,7 +610,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
         WSSSecurityProperties inProperties = new WSSSecurityProperties();
         inProperties.setCallbackHandler(new TestPwdCallback());
         List<WSSConstants.Action> actions = new ArrayList<>();
-        actions.add(XMLSecurityConstants.ENCRYPT);
+        actions.add(XMLSecurityConstants.ENCRYPTION);
         actions.add(XMLSecurityConstants.SIGNATURE);
         inProperties.setActions(actions);
         Properties cryptoProperties =
@@ -630,7 +630,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
         actions = new ArrayList<>();
-        actions.add(XMLSecurityConstants.ENCRYPT);
+        actions.add(XMLSecurityConstants.ENCRYPTION);
         actions.add(XMLSecurityConstants.SIGNATURE);
         properties.setActions(actions);
         properties.setEncryptionUser("myalias");

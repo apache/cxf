@@ -106,7 +106,7 @@ public class StaxActionInInterceptor extends AbstractPhaseInterceptor<SoapMessag
                 throw WSS4JUtils.createSoapFault(soapMessage, soapMessage.getVersion(), ex);
             }
 
-            if (XMLSecurityConstants.ENCRYPT.equals(action)) {
+            if (XMLSecurityConstants.ENCRYPTION.equals(action)) {
                 boolean foundEncryptionPart =
                     isEventInResults(WSSecurityEventConstants.ENCRYPTED_PART, incomingSecurityEventList);
                 if (!foundEncryptionPart) {
