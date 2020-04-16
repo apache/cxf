@@ -94,7 +94,7 @@ public class JAXWSClientMetricsTest extends AbstractCXFSpringTest {
             Mockito.verify(operationContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
             Mockito.verify(endpointContext, times(1)).start(any(Exchange.class));
             Mockito.verify(endpointContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
-            Mockito.verifyZeroInteractions(resourceContext);
+            Mockito.verifyNoInteractions(resourceContext);
         }
     }
    
@@ -114,7 +114,7 @@ public class JAXWSClientMetricsTest extends AbstractCXFSpringTest {
             Mockito.verify(operationContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
             Mockito.verify(endpointContext, times(1)).start(any(Exchange.class));
             Mockito.verify(endpointContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
-            Mockito.verifyZeroInteractions(resourceContext);
+            Mockito.verifyNoInteractions(resourceContext);
         }
     }
 
@@ -130,9 +130,9 @@ public class JAXWSClientMetricsTest extends AbstractCXFSpringTest {
             expectedException.expect(UncheckedException.class);
             client.invoke("getBooks");
         } finally {
-            Mockito.verifyZeroInteractions(endpointContext);
-            Mockito.verifyZeroInteractions(operationContext);
-            Mockito.verifyZeroInteractions(resourceContext);
+            Mockito.verifyNoInteractions(endpointContext);
+            Mockito.verifyNoInteractions(operationContext);
+            Mockito.verifyNoInteractions(resourceContext);
         }
     }
 
