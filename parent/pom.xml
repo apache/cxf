@@ -187,7 +187,7 @@
         <cxf.servlet-api.artifact>jakarta.servlet-api</cxf.servlet-api.artifact>
         <cxf.servlet-api.group>jakarta.servlet</cxf.servlet-api.group>
         <cxf.servlet-api.version>4.0.3</cxf.servlet-api.version>
-        <cxf.slf4j.version>1.7.29</cxf.slf4j.version>
+        <cxf.slf4j.version>1.7.30</cxf.slf4j.version>
         <cxf.snakeyaml.version>1.25</cxf.snakeyaml.version>
         <cxf.specs.jaxws.api.version>2.3_2</cxf.specs.jaxws.api.version>
         <cxf.spring.boot.version>2.2.6.RELEASE</cxf.spring.boot.version>
