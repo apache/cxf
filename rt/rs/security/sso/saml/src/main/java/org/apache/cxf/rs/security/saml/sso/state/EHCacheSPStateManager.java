@@ -161,7 +161,7 @@ public class EHCacheSPStateManager implements SPStateManager {
         return state;
     }
 
-    public void close() throws IOException {
+    public synchronized void close() throws IOException {
         if (requestCacheManager.getStatus() == Status.AVAILABLE) {
             requestCacheManager.removeCache(REQUEST_CACHE_KEY);
             requestCacheManager.close();

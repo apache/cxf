@@ -118,7 +118,7 @@ public class EHCacheIdentityCache extends AbstractIdentityCache
         return this.cache.toString();
     }
 
-    public void close() {
+    public synchronized void close() {
         if (cacheManager.getStatus() == Status.AVAILABLE) {
             cacheManager.removeCache(KEY);
             cacheManager.close();

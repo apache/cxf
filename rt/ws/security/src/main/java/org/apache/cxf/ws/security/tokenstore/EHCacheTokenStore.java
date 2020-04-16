@@ -116,7 +116,7 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
         return cache.get(identifier);
     }
 
-    public void close() {
+    public synchronized void close() {
         if (cacheManager.getStatus() == Status.AVAILABLE) {
             cacheManager.removeCache(key);
             cacheManager.close();

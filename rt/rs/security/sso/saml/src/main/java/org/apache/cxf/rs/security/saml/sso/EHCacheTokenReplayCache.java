@@ -147,7 +147,7 @@ public class EHCacheTokenReplayCache implements TokenReplayCache<String> {
         return element != null;
     }
 
-    public void close() {
+    public synchronized void close() {
         if (cacheManager.getStatus() == Status.AVAILABLE) {
             cacheManager.removeCache(CACHE_KEY);
             cacheManager.close();

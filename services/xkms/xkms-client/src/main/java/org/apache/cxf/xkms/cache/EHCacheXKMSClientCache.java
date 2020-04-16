@@ -117,7 +117,7 @@ public class EHCacheXKMSClientCache implements XKMSClientCache, BusLifeCycleList
         return cache.get(key);
     }
 
-    public void close() {
+    public synchronized void close() {
         if (cacheManager.getStatus() == Status.AVAILABLE) {
             cacheManager.removeCache(cacheKey);
             cacheManager.close();
