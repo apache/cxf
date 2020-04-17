@@ -86,18 +86,6 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-           <groupId>org.apache.hbase</groupId>
-           <artifactId>hbase-client</artifactId>
-           <optional>true</optional>
-           <scope>provided</scope>
-           <exclusions>
-               <exclusion>
-                    <groupId>jdk.tools</groupId>
-                    <artifactId>jdk.tools</artifactId>
-               </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parsers</artifactId>
             <scope>test</scope>
