@@ -182,7 +182,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         }
     }
 
-    protected synchronized void restartConnection() {
+    protected void restartConnection() {
         int tries = 0;
         do {
             tries++;
