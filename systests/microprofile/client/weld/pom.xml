@@ -104,6 +104,7 @@
                         <configuration>
                             <portNames>
                                 <portName>wiremock.server.port</portName>
+                                <portName>sse.server.port</portName>
                             </portNames>
                         </configuration>
                     </execution>
@@ -138,6 +139,7 @@
                     </suiteXmlFiles>
                     <systemPropertyVariables>
                         <wiremock.server.port>${wiremock.server.port}</wiremock.server.port>
+                        <sse.server.port>${sse.server.port}</sse.server.port>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
