@@ -34,8 +34,8 @@ import org.apache.maven.plugins.javadoc.JavadocReport;
 import org.apache.maven.plugins.javadoc.options.DocletArtifact;
 import org.apache.maven.plugins.javadoc.resolver.ResourceResolver;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.artifact.resolve.ArtifactResolver;
-import org.apache.maven.shared.dependencies.resolve.DependencyResolver;
+import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
+import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolver;
 import org.apache.maven.toolchain.ToolchainManager;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
 

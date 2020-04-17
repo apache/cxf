@@ -2516,6 +2516,11 @@
                 <artifactId>wss4j-ws-security-policy-stax</artifactId>
                 <version>${cxf.wss4j.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <profiles>
