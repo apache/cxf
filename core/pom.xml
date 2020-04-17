@@ -43,7 +43,6 @@
             org.codehaus.stax2*;resolution:=optional,
             com.sun*;resolution:=optional,
             org.slf4j*;resolution:=optional;version="${cxf.osgi.slf4j.version}",
-            org.apache.log4j*;resolution:=optional,
             net.sf.cglib*;resolution:=optional;version="${cxf.cglib.osgi.version}",
             org.springframework.osgi.io;resolution:=optional;version="${cxf.osgi.spring.osgi.version}",
             org.springframework.osgi.util;resolution:=optional;version="${cxf.osgi.spring.osgi.version}",
@@ -105,12 +104,6 @@
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <optional>true</optional>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

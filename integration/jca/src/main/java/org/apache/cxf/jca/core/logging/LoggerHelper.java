@@ -24,7 +24,6 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.cxf.common.logging.Log4jLogger;
 import org.apache.cxf.common.logging.LogUtils;
 
 
@@ -42,13 +41,6 @@ public final class LoggerHelper {
 
     public static void initializeLoggingOnWriter(final Writer writer) {
         if (writer != null) {
-            if (writer.getClass().getName().startsWith("org.jboss")) {
-                // jboss writer will redirect to log4j which will cause an
-                // infinite loop if we install an appender over this writer.
-                // Continue logging via log4j and ignore this writer.
-                LogUtils.setLoggerClass(Log4jLogger.class);
-                return;
-            }
 
             Logger cxfLogger = getRootCXFLogger();
 

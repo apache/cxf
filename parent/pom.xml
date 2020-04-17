@@ -157,7 +157,6 @@
         <cxf.junit.version>4.13</cxf.junit.version>
         <cxf.kerby.version>2.0.0</cxf.kerby.version>
         <cxf.littleproxy.version>1.1.2</cxf.littleproxy.version>
-        <cxf.log4j.version>1.2.17</cxf.log4j.version>
         <cxf.logback.classic.version>1.2.3</cxf.logback.classic.version>
         <cxf.lucene.version>8.2.0</cxf.lucene.version>
         <cxf.maven.core.version>3.6.2</cxf.maven.core.version>
@@ -1269,11 +1268,6 @@
             </dependency>
             
             <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>${cxf.log4j.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>${cxf.logback.classic.version}</version>
@@ -1499,10 +1493,6 @@
                 <artifactId>neethi</artifactId>
                 <version>${cxf.neethi.version}</version>
                 <exclusions>
-                    <exclusion>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                    </exclusion>
                     <exclusion>
                         <groupId>javax.servlet</groupId>
                         <artifactId>servlet-api</artifactId>
@@ -1746,10 +1736,6 @@
                 <version>${cxf.spring.version}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>javax.servlet</groupId>
                         <artifactId>servlet-api</artifactId>
                     </exclusion>
@@ -1772,10 +1758,6 @@
                 <artifactId>spring-beans</artifactId>
                 <version>${cxf.spring.version}</version>
                 <exclusions>
-                    <exclusion>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                    </exclusion>
                     <exclusion>
                         <groupId>javax.servlet</groupId>
                         <artifactId>servlet-api</artifactId>
@@ -1800,10 +1782,6 @@
                 <version>${cxf.spring.version}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>javax.servlet</groupId>
                         <artifactId>servlet-api</artifactId>
                     </exclusion>
@@ -1826,10 +1804,6 @@
                 <artifactId>spring-web</artifactId>
                 <version>${cxf.spring.version}</version>
                 <exclusions>
-                    <exclusion>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                    </exclusion>
                     <exclusion>
                         <groupId>javax.servlet</groupId>
                         <artifactId>servlet-api</artifactId>
@@ -1854,10 +1828,6 @@
                 <version>${cxf.spring.version}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>javax.servlet</groupId>
                         <artifactId>servlet-api</artifactId>
                     </exclusion>
@@ -1880,10 +1850,6 @@
                 <artifactId>spring-aop</artifactId>
                 <version>${cxf.spring.version}</version>
                 <exclusions>
-                    <exclusion>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                    </exclusion>
                     <exclusion>
                         <groupId>javax.servlet</groupId>
                         <artifactId>servlet-api</artifactId>

@@ -61,7 +61,6 @@
                         <Import-Package>
                             org.apache.cxf.*;resolution:=optional,
                             !org.apache.activemq*,
-                            !org.apache.log4j.*,
                             !org.slf4j.*,
                             javax.xml.bind*;version="[0.0,3)",
                             javax.jws*;version="[0.0,3)",
