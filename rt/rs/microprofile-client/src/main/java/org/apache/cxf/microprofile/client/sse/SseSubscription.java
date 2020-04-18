@@ -19,7 +19,6 @@
 package org.apache.cxf.microprofile.client.sse;
 
 import java.util.LinkedList;
-import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -39,7 +38,9 @@ public class SseSubscription implements Subscription {
     private final AtomicLong requested = new AtomicLong();
     private final AtomicLong delivered = new AtomicLong();
     private final AtomicBoolean completed = new AtomicBoolean();
-    private final Queue<InboundSseEvent> buffer = new LinkedList<>();
+    //CHECKSTYLE:OFF
+    private final LinkedList<InboundSseEvent> buffer = new LinkedList<>(); //NOPMD
+    //CHECKSTYLE:ON
     private final AtomicInteger bufferSize = new AtomicInteger(DEFAULT_BUFFER_SIZE);
 
     SseSubscription(SsePublisher publisher, Subscriber<? super InboundSseEvent> subscriber) {
@@ -50,13 +51,13 @@ public class SseSubscription implements Subscription {
     @Override
     public void request(long n) {
         if (n < 1) {
-            throw new IllegalArgumentException("Only postive values are valid - passed-in " + n);
+            throw new IllegalArgumentException("Only positive values are valid - passed-in " + n);
         }
         requested.addAndGet(n);
         synchronized (buffer) {
             InboundSseEvent bufferedEvent = null;
             while (delivered.get() < requested.get()
-                   && (bufferedEvent = ((LinkedList<InboundSseEvent>) buffer).pollFirst()) != null) {
+                   && (bufferedEvent = buffer.pollFirst()) != null) {
                 InboundSseEvent finalEvent = bufferedEvent;
                 delivered.updateAndGet(l -> {
                     subscriber.onNext(finalEvent);
@@ -69,7 +70,6 @@ public class SseSubscription implements Subscription {
     @Override
     public void cancel() {
         publisher.removeSubscription(this);
-
     }
 
     void fireSubscribe() {
@@ -106,9 +106,9 @@ public class SseSubscription implements Subscription {
 
     private void buffer(InboundSseEvent event) {
         synchronized (buffer) {
-            ((LinkedList<InboundSseEvent>) buffer).addLast(event);
+            buffer.addLast(event);
             if (buffer.size() > bufferSize.get()) {
-                ((LinkedList<InboundSseEvent>) buffer).removeFirst();
+                buffer.removeFirst();
             }
         }
     }

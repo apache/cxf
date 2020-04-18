@@ -39,7 +39,7 @@ public class SsePublisher implements Publisher<InboundSseEvent> {
     final BufferedReader br;
     final Providers providers;
     final List<SseSubscription> subscriptions = new LinkedList<>();
-    AtomicBoolean isStarted = new AtomicBoolean(false);
+    final AtomicBoolean isStarted = new AtomicBoolean(false);
 
     SsePublisher(InputStream is, Executor executor, Providers providers) {
         br = new BufferedReader(new InputStreamReader(is));
@@ -62,14 +62,14 @@ public class SsePublisher implements Publisher<InboundSseEvent> {
                     SseEventBuilder builder = new SseEventBuilder(providers);
                     String line = br.readLine();
                     while (line != null && !subscriptions.isEmpty()) {
-                        if (line.startsWith("data: ")) {
-                            builder.data(line.substring(6));
-                        } else if (line.startsWith("id: ")) {
-                            builder.id(line.substring(4));
-                        } else if (line.startsWith("event: ")) {
-                            builder.name(line.substring(7));
-                        } else if (line.startsWith(": ")) {
-                            builder.comment(line.substring(2));
+                        if (line.startsWith("data:")) {
+                            builder.data(removeSpace(line.substring(5)));
+                        } else if (line.startsWith("id:")) {
+                            builder.id(removeSpace(line.substring(3)));
+                        } else if (line.startsWith("event:")) {
+                            builder.name(removeSpace(line.substring(6)));
+                        } else if (line.startsWith(":")) {
+                            builder.comment(removeSpace(line.substring(1)));
                         } else if ("".equals(line)) {
                             InboundSseEvent event = builder.build();
                             for (SseSubscription subscription : subscriptions) {
@@ -94,5 +94,12 @@ public class SsePublisher implements Publisher<InboundSseEvent> {
     void removeSubscription(SseSubscription subscription) {
         subscriptions.remove(subscription);
         subscription.fireComplete();
+    }
+
+    private String removeSpace(String s) {
+        if (s != null && s.startsWith(" ")) {
+            return s.substring(1);
+        }
+        return s;
     }
 }
