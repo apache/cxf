@@ -401,12 +401,21 @@
     <feature name="cxf-transports-websocket-client" version="${project.version}">
         <feature version="${project.version}">cxf-http</feature>
         <bundle dependency='true'>mvn:org.asynchttpclient/async-http-client/${cxf.ahc.version}</bundle>
+        <bundle dependency='true'>mvn:org.asynchttpclient/async-http-client-netty-utils/${cxf.ahc.version}</bundle>
         <bundle dependency='true'>mvn:io.netty/netty-common/${cxf.netty.version}</bundle>
         <bundle dependency='true'>mvn:io.netty/netty-handler/${cxf.netty.version}</bundle>
         <bundle dependency='true'>mvn:io.netty/netty-buffer/${cxf.netty.version}</bundle>
         <bundle dependency='true'>mvn:io.netty/netty-transport/${cxf.netty.version}</bundle>
+        <bundle dependency='true'>mvn:io.netty/netty-resolver/${cxf.netty.version}</bundle>
         <bundle dependency='true'>mvn:io.netty/netty-codec/${cxf.netty.version}</bundle>
         <bundle dependency='true'>mvn:io.netty/netty-codec-http/${cxf.netty.version}</bundle>
+        <bundle dependency='true'>mvn:io.netty/netty-transport-native-epoll/${cxf.netty.version}</bundle>
+        <bundle dependency='true'>mvn:io.netty/netty-transport-native-unix-common/${cxf.netty.version}</bundle>
+        <bundle dependency='true'>mvn:io.netty/netty-transport-native-kqueue/${cxf.netty.version}</bundle>
+        <bundle dependency='true'>mvn:io.netty/netty-handler-proxy/${cxf.netty.version}</bundle>
+        <bundle dependency='true'>mvn:io.netty/netty-codec-socks/${cxf.netty.version}</bundle>
+        <bundle dependency='true'>mvn:org.reactivestreams/reactive-streams/${cxf.reactivestreams.version}</bundle>
+        <bundle dependency='true'>mvn:com.typesafe.netty/netty-reactive-streams/2.0.4</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-transports-websocket/${project.version}</bundle>
     </feature>
     <feature name="cxf-transports-websocket-server" version="${project.version}">
