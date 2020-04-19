@@ -51,6 +51,7 @@ import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.configuration.jsse.SSLUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.security.ClientAuthentication;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.transport.HttpUriMapper;
 import org.eclipse.jetty.http.HttpStatus;
@@ -724,8 +725,8 @@ public class JettyHTTPServerEngine implements ServerEngine {
         }
 
         SSLContext context = tlsServerParameters.getJsseProvider() == null
-            ? SSLContext.getInstance(proto)
-                : SSLContext.getInstance(proto, tlsServerParameters.getJsseProvider());
+            ? SSLContext.getInstance(detectProto(proto, allowSSLv3))
+                : SSLContext.getInstance(detectProto(proto, allowSSLv3), tlsServerParameters.getJsseProvider());
 
         KeyManager[] keyManagers = tlsServerParameters.getKeyManagers();
         KeyManager[] configuredKeyManagers = org.apache.cxf.transport.https.SSLUtils.configureKeyManagersWithCertAlias(
@@ -758,6 +759,20 @@ public class JettyHTTPServerEngine implements ServerEngine {
         scf.setIncludeCipherSuites(includedCipherSuites);
 
         return context;
+    }
+    
+    protected static String detectProto(String proto, boolean allowSSLv3) {
+        if (allowSSLv3 && JavaUtils.getJavaMajorVersion() >= 14) {
+            // Since Java 14, the SSLv3 aliased to TLSv1 (so SSLv3 effectively is not
+            // supported). To make it work, the custom SSL context has to be created
+            // instead along with specifying server / client properties as needed, for
+            // example:
+            //  -Djdk.tls.server.protocols=SSLv3,TLSv1
+            //  -Djdk.tls.client.protocols=SSLv3,TLSv1
+            return "SSL";
+        } else {
+            return proto;
+        }
     }
 
     @SuppressWarnings("deprecation")
