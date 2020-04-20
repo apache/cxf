@@ -218,7 +218,7 @@
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
         <cxf.wss4j.version>2.3.0-SNAPSHOT</cxf.wss4j.version>
         <cxf.xalan.version>2.7.2</cxf.xalan.version>
-        <cxf.xbean.version>4.15</cxf.xbean.version>
+        <cxf.xbean.version>4.16</cxf.xbean.version>
         <cxf.xerces.version>2.12.0</cxf.xerces.version>
         <cxf.xmlschema.version>2.2.5</cxf.xmlschema.version>
         <cxf.zest.version>2.1</cxf.zest.version>
