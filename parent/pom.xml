@@ -1468,11 +1468,6 @@
                 <version>${cxf.maven.core.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.ant</groupId>
-                <artifactId>ant</artifactId>
-                <version>1.10.7</version>
-            </dependency>
-            <dependency>
                 <groupId>com.sun.xml.parsers</groupId>
                 <artifactId>jaxp-ri</artifactId>
                 <version>1.4.5</version>
@@ -2086,6 +2081,12 @@
                 <groupId>org.glassfish.jaxb</groupId>
                 <artifactId>jaxb-xjc</artifactId>
                 <version>${cxf.jaxb.xjc.version}</version>
+            </dependency>
+            <!--jaxb-xjc transitive dependency update to avoid ant.jar on classpath -->
+            <dependency>
+                <groupId>com.sun.istack</groupId>
+                <artifactId>istack-commons-tools</artifactId>
+                <version>3.0.11</version>
             </dependency>
             <dependency>
                 <groupId>org.glassfish.jaxb</groupId>

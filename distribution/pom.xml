@@ -518,7 +518,7 @@
                         <id>process-sources-xsl</id>
                         <phase>process-sources</phase>
                         <configuration>
-                            <tasks>
+                            <target>
                                 <mkdir dir="${basedir}/target" />
                                 <pathconvert property="cp" refid="maven.runtime.classpath" />
                                 <condition property="output.cp" value="set CXF_CLASSPATH=${cp}">
@@ -533,7 +533,7 @@
                                 <echo file="${basedir}/target/srcbuild_env.ant" message="${cp}" />
                                 <echo file="${basedir}/target/version.properties" message="cxf.version=${project.version}" />
                                 <delete file="build.xml" />
-                            </tasks>
+                            </target>
                         </configuration>
                         <goals>
                             <goal>run</goal>
