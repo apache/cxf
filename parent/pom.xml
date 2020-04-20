@@ -1471,7 +1471,7 @@
             <dependency>
                 <groupId>org.apache.ant</groupId>
                 <artifactId>ant</artifactId>
-                <version>1.10.6</version>
+                <version>1.10.7</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.xml.parsers</groupId>
