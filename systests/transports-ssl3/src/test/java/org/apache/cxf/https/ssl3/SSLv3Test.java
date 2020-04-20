@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.security.KeyStore;
+import java.security.Security;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -36,6 +37,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
@@ -58,19 +60,42 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
     static final String PORT3 = allocatePort(SSLv3Server.class, 3);
     static final String PORT4 = allocatePort(SSLv3Server.class, 4);
 
+    private static String previousDisabledAlgorithms;
+    private static String previousTlsClientProtocols;
+
     @BeforeClass
     public static void startServers() throws Exception {
+        // Remove "SSLv3" from the default disabled algorithm list for the purposes of this test
+        previousDisabledAlgorithms = Security.getProperty("jdk.tls.disabledAlgorithms");
+        Security.setProperty("jdk.tls.disabledAlgorithms", "MD5");
+
+        if (JavaUtils.getJavaMajorVersion() >= 14) {
+            // Since Java 14, the SSLv3 aliased to TLSv1 (so SSLv3 effectively is not
+            // supported). To make it work, the custom SSL context has to be created and
+            // SSLv3 and TLSv1 has to be explicitly enabled:
+            //   -Djdk.tls.client.protocols=SSLv3
+            previousTlsClientProtocols = System.setProperty("jdk.tls.client.protocols", "SSLv3,TLSv1");
+        }
         assertTrue(
-            "Server failed to launch",
-            // run the server in the same process
-            // set this to false to fork
-            launchServer(SSLv3Server.class, true)
+                "Server failed to launch",
+                // run the server in the same process
+                // set this to false to fork
+                launchServer(SSLv3Server.class, true)
         );
     }
 
     @AfterClass
     public static void cleanup() throws Exception {
         stopAllServers();
+
+        if (previousDisabledAlgorithms != null) {
+            Security.setProperty("jdk.tls.disabledAlgorithms", previousDisabledAlgorithms);
+        }
+        if (previousTlsClientProtocols != null) {
+            System.setProperty("jdk.tls.client.protocols", previousTlsClientProtocols);
+        } else {
+            System.clearProperty("jdk.tls.client.protocols");
+        }
     }
 
     @org.junit.Test
@@ -185,7 +210,7 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
             // expected
         }
 
-        ((java.io.Closeable)port).close();
+        ((java.io.Closeable) port).close();
         bus.shutdown(true);
     }
 
@@ -205,7 +230,7 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         assertNotNull("Port is null", port);
 
         // Enable Async
-        ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        ((BindingProvider) port).getRequestContext().put("use.async.http.conduit", true);
 
         updateAddressPort(port, PORT3);
 
@@ -216,7 +241,7 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
             // expected
         }
 
-        ((java.io.Closeable)port).close();
+        ((java.io.Closeable) port).close();
         bus.shutdown(true);
     }
 
@@ -244,7 +269,7 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
 
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
-        ((java.io.Closeable)port).close();
+        ((java.io.Closeable) port).close();
         bus.shutdown(true);
     }
 
@@ -269,13 +294,13 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         assertNotNull("Port is null", port);
 
         // Enable Async
-        ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        ((BindingProvider) port).getRequestContext().put("use.async.http.conduit", true);
 
         updateAddressPort(port, PORT3);
 
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
-        ((java.io.Closeable)port).close();
+        ((java.io.Closeable) port).close();
         bus.shutdown(true);
     }
 
@@ -303,7 +328,7 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
 
         port.greetMe("Kitty");
 
-        ((java.io.Closeable)port).close();
+        ((java.io.Closeable) port).close();
         bus.shutdown(true);
     }
 
@@ -331,7 +356,7 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
 
         port.greetMe("Kitty");
 
-        ((java.io.Closeable)port).close();
+        ((java.io.Closeable) port).close();
         bus.shutdown(true);
     }
 
@@ -342,5 +367,6 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
             return true;
         }
 
-    };
+    }
+
 }
