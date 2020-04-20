@@ -83,7 +83,6 @@
         <cxf.apacheds.version>2.0.0.AM26</cxf.apacheds.version>
         <cxf.arquillian.version>1.1.14.Final</cxf.arquillian.version>
         <cxf.arquillian.weld.container.version>2.0.1.Final</cxf.arquillian.weld.container.version>
-        <cxf.artemis.version>2.10.1</cxf.artemis.version>
         <cxf.aspectj.version>1.9.1</cxf.aspectj.version>
         <cxf.atmosphere.version.range>[2.4,3.0)</cxf.atmosphere.version.range>
         <cxf.atmosphere.version>2.5.2</cxf.atmosphere.version>
@@ -2179,16 +2178,6 @@
                 <groupId>org.apache.activemq</groupId>
                 <artifactId>activemq-kahadb-store</artifactId>
                 <version>${cxf.activemq.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.activemq</groupId>
-                <artifactId>artemis-cli</artifactId>
-                <version>${cxf.artemis.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.activemq</groupId>
-                <artifactId>artemis-openwire-protocol</artifactId>
-                <version>${cxf.artemis.version}</version>
             </dependency>
             <dependency>
                 <groupId>rhino</groupId>
