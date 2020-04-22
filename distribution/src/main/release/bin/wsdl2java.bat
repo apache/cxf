@@ -47,7 +47,7 @@ if "%JAVA_MAX_MEM%" == "" (
     set JAVA_MAX_MEM=512M
 )
 
-f %JAVA_VERSION% GTR 8 (
+if %JAVA_VERSION% GTR 8 (
     "%JAVA_HOME%\bin\java" -Xmx%JAVA_MAX_MEM%  -cp "%CXF_JAR%;%CLASSPATH%" -Djava.util.logging.config.file="%CXF_HOME%\etc\logging.properties" org.apache.cxf.tools.wsdlto.WSDLToJava %*
 ) else (
     "%JAVA_HOME%\bin\java" -Xmx%JAVA_MAX_MEM%  -Djava.endorsed.dirs="%CXF_HOME%\lib\endorsed" -cp "%CXF_JAR%;%TOOLS_JAR%;%CLASSPATH%" -Djava.util.logging.config.file="%CXF_HOME%\etc\logging.properties" org.apache.cxf.tools.wsdlto.WSDLToJava %*
