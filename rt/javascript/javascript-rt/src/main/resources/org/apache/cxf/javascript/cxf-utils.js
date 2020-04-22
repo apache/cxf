@@ -737,10 +737,10 @@ function org_apache_cxf_client_request(url, requestXML, method, sync, headers)
 
 	this.req.onreadystatechange = function() {
 		requester.onReadyState();
-	}
+	};
 	this.req.onerror = function() {
 		requester.onReadyState();
-	}
+	};
 
 	// NOTE: we do not call the onerror callback for a synchronous error
 	// at request time. We let the request object throw as it will.
