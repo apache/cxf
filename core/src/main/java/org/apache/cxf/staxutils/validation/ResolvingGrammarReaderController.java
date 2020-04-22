@@ -39,14 +39,14 @@ import org.apache.cxf.common.logging.LogUtils;
 /**
  * Catch error messages and resolve schema locations.
  */
-public class ResolvingGrammarReaderController implements GrammarReaderController2, LSResourceResolver {
+class ResolvingGrammarReaderController implements GrammarReaderController2, LSResourceResolver {
     private static final Logger LOG = LogUtils.getL7dLogger(ResolvingGrammarReaderController.class);
 
     private Map<String, EmbeddedSchema> sources;
 
     private String baseURI;
 
-    public ResolvingGrammarReaderController(String baseURI, Map<String, EmbeddedSchema> sources) {
+    ResolvingGrammarReaderController(String baseURI, Map<String, EmbeddedSchema> sources) {
         this.baseURI = baseURI;
         this.sources = sources;
     }
