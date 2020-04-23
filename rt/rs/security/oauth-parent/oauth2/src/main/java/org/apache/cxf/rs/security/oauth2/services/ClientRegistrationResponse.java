@@ -73,7 +73,7 @@ public class ClientRegistrationResponse extends JsonMapObject {
         return getLongProperty(CLIENT_ID_ISSUED_AT);
     }
     public void setClientSecretExpiresAt(Long expiresAt) {
-        super.setProperty(CLIENT_ID_ISSUED_AT, expiresAt);
+        super.setProperty(CLIENT_SECRET_EXPIRES_AT, expiresAt);
     }
     public Long getClientSecretExpiresAt() {
         return getLongProperty(CLIENT_SECRET_EXPIRES_AT);
