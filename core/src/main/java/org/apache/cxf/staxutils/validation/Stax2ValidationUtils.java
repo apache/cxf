@@ -19,6 +19,7 @@
 
 package org.apache.cxf.staxutils.validation;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -28,12 +29,15 @@ import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.xml.sax.InputSource;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
@@ -58,23 +62,45 @@ class Stax2ValidationUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(Stax2ValidationUtils.class);
     private static final String KEY = XMLValidationSchema.class.getName();
 
-    private static final boolean HAS_WOODSTOX;
+    private static final boolean HAS_WOODSTOX_5;
+    private static final boolean HAS_WOODSTOX_6_2;
+
+    private final Class<?> multiSchemaFactory;
 
     static {
-        boolean hasw = false;
+        boolean hasWoodstox5 = false;
+        boolean hasWoodstox62 = false;
         try {
-            new W3CMultiSchemaFactory(); // will throw if wrong woodstox / if msv isn't available
-            hasw = true;
+            // Check to see if we have a version of Woodstox < 6 with MSV
+            new W3CMultiSchemaFactory();
+            hasWoodstox5 = true;
         } catch (Throwable t) {
-            // ignore
+            // Otherwise delegate to Woodstox directly if W3CMultiSchemaFactory exists there
+            try {
+                Class<?> multiSchemaFactory =
+                        ClassLoaderUtils.loadClass("com.ctc.wstx.msv.W3CMultiSchemaFactory",
+                                Stax2ValidationUtils.class);
+                if (multiSchemaFactory != null) {
+                    hasWoodstox62 = true;
+                }
+            } catch (Throwable t2) {
+                // ignore
+            }
         }
-        HAS_WOODSTOX = hasw;
+        HAS_WOODSTOX_5 = hasWoodstox5;
+        HAS_WOODSTOX_6_2 = hasWoodstox62;
     }
 
-    Stax2ValidationUtils() {
-        if (!HAS_WOODSTOX) {
+    Stax2ValidationUtils() throws ClassNotFoundException {
+        if (!(HAS_WOODSTOX_5 || HAS_WOODSTOX_6_2)) {
             throw new RuntimeException("Could not load woodstox");
         }
+
+        String className = "com.ctc.wstx.msv.W3CMultiSchemaFactory";
+        if (HAS_WOODSTOX_5) {
+            className = "org.apache.cxf.staxutils.validation.W3CMultiSchemaFactory";
+        }
+        multiSchemaFactory = ClassLoaderUtils.loadClass(className, this.getClass());
     }
 
     /**
@@ -138,7 +164,7 @@ class Stax2ValidationUtils {
                 if (endpoint.containsKey(KEY)) {
                     return null;
                 }
-                Map<String, EmbeddedSchema> sources = new TreeMap<>();
+                Map<String, Source> sources = new TreeMap<>();
 
                 for (SchemaInfo schemaInfo : serviceInfo.getSchemas()) {
                     XmlSchema sch = schemaInfo.getSchema();
@@ -160,12 +186,12 @@ class Stax2ValidationUtils {
                     addSchema(sources, sch, schemaInfo.getElement());
                 }
 
-                W3CMultiSchemaFactory factory = new W3CMultiSchemaFactory();
-                // I don't think that we need the baseURI.
                 try {
-                    ret = factory.loadSchemas(null, sources);
+                    // I don't think that we need the baseURI.
+                    Method method = multiSchemaFactory.getMethod("createSchema", String.class, Map.class);
+                    ret = (XMLValidationSchema) method.invoke(multiSchemaFactory.newInstance(), null, sources);
                     endpoint.put(KEY, ret);
-                } catch (XMLStreamException ex) {
+                } catch (Throwable t) {
                     LOG.log(Level.INFO, "Problem loading schemas. Falling back to slower method.", ret);
                     endpoint.put(KEY, null);
                 }
@@ -174,14 +200,13 @@ class Stax2ValidationUtils {
         }
     }
 
-    private void addSchema(Map<String, EmbeddedSchema> sources, XmlSchema schema, Element element)
+    private void addSchema(Map<String, Source> sources, XmlSchema schema, Element element)
             throws XMLStreamException {
         String schemaSystemId = schema.getSourceURI();
         if (null == schemaSystemId) {
             schemaSystemId = schema.getTargetNamespace();
         }
-        EmbeddedSchema embeddedSchema = new EmbeddedSchema(schemaSystemId, element);
-        sources.put(schema.getTargetNamespace(), embeddedSchema);
+        sources.put(schema.getTargetNamespace(), new DOMSource(element, schemaSystemId));
     }
 
     private Element getElement(String path) throws XMLStreamException {

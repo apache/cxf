@@ -78,7 +78,7 @@ public class Stax2ValidationUtilsTest {
 
     private static final String MULTI_IMPORT_SCHEMA = "schemas/schemaWithImports.xsd";
 
-    private Stax2ValidationUtils utils = new Stax2ValidationUtils();
+    private Stax2ValidationUtils utils;
     private XMLStreamReader xmlReader;
     private final Endpoint endpoint = mock(Endpoint.class);
     private final ServiceInfo serviceInfo = new ServiceInfo();
@@ -93,11 +93,12 @@ public class Stax2ValidationUtilsTest {
     private String schemaPath;
 
     public Stax2ValidationUtilsTest(String validMessage, String invalidMessage, String errorMessage,
-                                    String schemaPath) {
+                                    String schemaPath) throws ClassNotFoundException {
         this.validMessage = validMessage;
         this.invalidMessage = invalidMessage;
         this.errorMessage = errorMessage;
         this.schemaPath = schemaPath;
+        utils = new Stax2ValidationUtils();
     }
 
     @Parameterized.Parameters
