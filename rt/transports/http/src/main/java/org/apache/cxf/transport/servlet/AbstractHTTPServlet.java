@@ -177,7 +177,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
         });
     }
 
-    private static List<Pattern> parseListSequence(String values) {
+    protected static List<Pattern> parseListSequence(String values) {
         if (values != null) {
             List<Pattern> list = new ArrayList<>();
             for (String value : values.split("\\s")) {
@@ -191,7 +191,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
         return null;
     }
 
-    private static Map<String, String> parseMapSequence(String sequence) {
+    protected static Map<String, String> parseMapSequence(String sequence) {
         if (sequence != null) {
             sequence = sequence.trim();
             Map<String, String> map = new HashMap<>();
