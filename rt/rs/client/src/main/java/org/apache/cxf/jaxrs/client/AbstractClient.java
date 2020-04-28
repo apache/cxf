@@ -48,6 +48,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.InvocationCallback;
+import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.Form;
@@ -616,7 +617,9 @@ public abstract class AbstractClient implements Client {
 
         Exchange exchange = outMessage.getExchange();
         Integer responseCode = getResponseCode(exchange);
-        if (responseCode == null
+        if (actualEx instanceof ResponseProcessingException) {
+            throw (ResponseProcessingException)actualEx;
+        } else if (responseCode == null
             || responseCode < 300 && !(actualEx instanceof IOException)
             || actualEx instanceof IOException && exchange.get("client.redirect.exception") != null) {
             if (actualEx instanceof ProcessingException) {
