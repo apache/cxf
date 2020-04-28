@@ -30,7 +30,7 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.xml.security.utils.ClassLoaderUtils;
 
 /**
- * Extend the DefaultEHCacheCodeDataProvider to allow refreshing of tokens
+ * Extend the JCacheCodeDataProvider to allow refreshing of tokens
  */
 public class OAuthDataProviderImpl extends JCacheCodeDataProvider {
     public OAuthDataProviderImpl() throws Exception {
