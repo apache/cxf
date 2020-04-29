@@ -30,10 +30,10 @@ public final class HttpAuthHeader {
     public static final String AUTH_TYPE_DIGEST = "Digest";
     public static final String AUTH_TYPE_NEGOTIATE = "Negotiate";
 
-    private String fullHeader;
-    private String authType;
-    private String fullContent;
-    private Map<String, String> params;
+    private final String fullHeader;
+    private final String authType;
+    private final String fullContent;
+    private final Map<String, String> params;
 
     public HttpAuthHeader(String fullHeader) {
         this.fullHeader = (fullHeader == null) ? "" : fullHeader;
@@ -48,15 +48,7 @@ public final class HttpAuthHeader {
         this.params = parseHeader();
     }
     public HttpAuthHeader(List<String> params) {
-        boolean first = true;
-        for (String s : params) {
-            if (!first) {
-                fullHeader += ", " + s;
-            } else {
-                first = false;
-                fullHeader = s;
-            }
-        }
+        fullHeader = String.join(", ", params);
         int spacePos = this.fullHeader.indexOf(' ');
         if (spacePos == -1) {
             this.authType = this.fullHeader;
