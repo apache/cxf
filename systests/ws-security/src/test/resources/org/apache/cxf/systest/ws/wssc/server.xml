@@ -33,7 +33,7 @@
         </cxf:features>
     </cxf:bus>
     
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     
     <!-- -->
     <!-- Any services listening on port 9009 must use the following -->

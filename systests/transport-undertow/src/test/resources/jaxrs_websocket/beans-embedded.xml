@@ -32,7 +32,7 @@
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
 
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
         
     <bean class="org.apache.cxf.systest.http_undertow.websocket.BookStoreWebSocket" id="serviceBean"/>
 

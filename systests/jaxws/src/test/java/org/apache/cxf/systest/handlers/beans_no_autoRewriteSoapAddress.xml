@@ -23,7 +23,7 @@
     xmlns:cxf="http://cxf.apache.org/core"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <jaxws:endpoint id="cxfHandlerTestEndpoint" implementor="org.apache.cxf.systest.handlers.AddNumbersNoHandlers" address="http://localhost:${testutil.ports.springportNoAutoRewriteSoapAddressTest}/SpringEndpoint">
         <jaxws:handlers>
             <bean class="org.apache.cxf.systest.handlers.ModifyNumberHandler"/>

@@ -30,7 +30,7 @@
         </cxf:features>
     </cxf:bus>
     
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     
     <bean id="stsClient" class="org.apache.cxf.ws.security.trust.STSClient"
         name="default.sts-client"
