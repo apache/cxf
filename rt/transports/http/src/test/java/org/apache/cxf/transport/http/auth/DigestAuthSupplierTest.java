@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.transport.http.auth;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,11 +26,10 @@ import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class DigestAuthSupplierTest {
 
@@ -64,35 +62,33 @@ public class DigestAuthSupplierTest {
         DigestAuthSupplier authSupplier = new DigestAuthSupplier() {
 
             @Override
-            public String createCnonce() throws UnsupportedEncodingException {
+            public String createCnonce() {
                 return "27db039b76362f3d55da10652baee38c";
             }
 
         };
-        IMocksControl control = EasyMock.createControl();
         AuthorizationPolicy authorizationPolicy = new AuthorizationPolicy();
         authorizationPolicy.setUserName("testUser");
         authorizationPolicy.setPassword("testPassword");
         URI uri = new URI("http://myserver");
         Message message = new MessageImpl();
-        control.replay();
 
         String authToken = authSupplier
             .getAuthorization(authorizationPolicy, uri, message, fullHeader);
         HttpAuthHeader authHeader = new HttpAuthHeader(authToken);
-        assertEquals("Digest", authHeader.getAuthType());
+        assertTrue(authHeader.authTypeIsDigest());
+
         Map<String, String> params = authHeader.getParams();
         Map<String, String> expectedParams = new HashMap<>();
         expectedParams.put("response", "28e616b6868f60aaf9b19bb5b172f076");
         expectedParams.put("cnonce", "27db039b76362f3d55da10652baee38c");
         expectedParams.put("username", "testUser");
         expectedParams.put("nc", "00000001");
-        expectedParams.put("nonce", "MTI0ODg3OTc5NzE2OTplZGUyYTg0Yzk2NTFkY2YyNjc1Y2JjZjU2MTUzZmQyYw==");
+        expectedParams.put("nonce", origNonce);
         expectedParams.put("realm", "MyCompany realm.");
         expectedParams.put("qop", "auth");
         expectedParams.put("uri", "");
         expectedParams.put("algorithm", "MD5");
         assertEquals(expectedParams, params);
-        control.verify();
     }
 }
