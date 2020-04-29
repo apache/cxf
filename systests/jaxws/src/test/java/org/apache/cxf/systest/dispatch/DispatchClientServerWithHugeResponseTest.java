@@ -136,6 +136,7 @@ public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientS
         Response<SOAPMessage> response = disp.invokeAsync(soapReqMsg3);
         try {
             response.get(300, TimeUnit.SECONDS);
+            fail("should catch exception");
         } catch (TimeoutException te) {
             fail("We should not have encountered a timeout, "
                 + "should get some exception tell me stackoverflow");
@@ -175,6 +176,7 @@ public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientS
         Response<SOAPMessage> response = disp.invokeAsync(soapReqMsg3);
         try {
             response.get(300, TimeUnit.SECONDS);
+            fail("should catch exception");
         } catch (TimeoutException te) {
             fail("We should not have encountered a timeout, "
                 + "should get some exception tell me stackoverflow");
