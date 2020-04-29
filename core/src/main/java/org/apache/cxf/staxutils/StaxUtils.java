@@ -86,7 +86,6 @@ import org.w3c.dom.UserDataHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -147,6 +146,17 @@ public final class StaxUtils {
     private static long maxXMLCharacters = Long.MAX_VALUE;
 
     private static boolean allowInsecureParser;
+
+    // Variables from Woodstox
+    private static final String P_MAX_ATTRIBUTES_PER_ELEMENT = "com.ctc.wstx.maxAttributesPerElement";
+    private static final String P_MAX_ATTRIBUTE_SIZE = "com.ctc.wstx.maxAttributeSize";
+    private static final String P_MAX_TEXT_LENGTH = "com.ctc.wstx.maxTextLength";
+    private static final String P_MAX_ELEMENT_COUNT = "com.ctc.wstx.maxElementCount";
+    private static final String P_MAX_CHARACTERS = "com.ctc.wstx.maxCharacters";
+    private static final String P_MAX_ELEMENT_DEPTH = "com.ctc.wstx.maxElementDepth";
+    private static final String P_MAX_CHILDREN_PER_ELEMENT = "com.ctc.wstx.maxChildrenPerElement";
+    private static final String P_MIN_TEXT_SEGMENT = "com.ctc.wstx.minTextSegment";
+
 
     static {
         int i = getInteger("org.apache.cxf.staxutils.pool-size", 20);
@@ -234,31 +244,6 @@ public final class StaxUtils {
             //ignore
         }
         return def;
-    }
-
-    public static void setInnerElementLevelThreshold(int i) {
-        innerElementLevelThreshold = i != -1 ? i : 500;
-        setProperty(SAFE_INPUT_FACTORY, "com.ctc.wstx.maxElementDepth", innerElementLevelThreshold);
-    }
-    public static void setInnerElementCountThreshold(int i) {
-        innerElementCountThreshold = i != -1 ? i : 50000;
-        setProperty(SAFE_INPUT_FACTORY, "com.ctc.wstx.maxChildrenPerElement", innerElementCountThreshold);
-    }
-
-    /**
-     * CXF works with multiple STaX parsers. When we can't find any other way to work
-     * against the different parsers, this can be used to condition code. Note: if you've got
-     * Woodstox in the class path without being the default provider, this will return
-     * the wrong answer.
-     * @return true if Woodstox is in the classpath.
-     */
-    public static boolean isWoodstox() {
-        try {
-            ClassLoaderUtils.loadClass("org.codehaus.stax2.XMLStreamReader2", StaxUtils.class);
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-        return true;
     }
 
     /**
@@ -362,15 +347,15 @@ public final class StaxUtils {
     private static boolean setRestrictionProperties(XMLInputFactory factory) {
         //For now, we can only support Woodstox 4.2.x and newer as none of the other
         //stax parsers support these settings
-        final boolean wstxMaxs = setProperty(factory, "com.ctc.wstx.maxAttributesPerElement", maxAttributeCount)
-                    && setProperty(factory, "com.ctc.wstx.maxAttributeSize", maxAttributeSize)
-                    && setProperty(factory, "com.ctc.wstx.maxChildrenPerElement", innerElementCountThreshold)
-                    && setProperty(factory, "com.ctc.wstx.maxElementCount", maxElementCount)
-                    && setProperty(factory, "com.ctc.wstx.maxElementDepth", innerElementLevelThreshold)
-                    && setProperty(factory, "com.ctc.wstx.maxCharacters", maxXMLCharacters)
-                    && setProperty(factory, "com.ctc.wstx.maxTextLength", maxTextLength);
+        final boolean wstxMaxs = setProperty(factory, P_MAX_ATTRIBUTES_PER_ELEMENT, maxAttributeCount)
+                    && setProperty(factory, P_MAX_ATTRIBUTE_SIZE, maxAttributeSize)
+                    && setProperty(factory, P_MAX_CHILDREN_PER_ELEMENT, innerElementCountThreshold)
+                    && setProperty(factory, P_MAX_ELEMENT_COUNT, maxElementCount)
+                    && setProperty(factory, P_MAX_ELEMENT_DEPTH, innerElementLevelThreshold)
+                    && setProperty(factory, P_MAX_CHARACTERS, maxXMLCharacters)
+                    && setProperty(factory, P_MAX_TEXT_LENGTH, maxTextLength);
         return wstxMaxs
-            && setProperty(factory, "com.ctc.wstx.minTextSegment", minTextSegment);
+            && setProperty(factory, P_MIN_TEXT_SEGMENT, minTextSegment);
     }
 
     private static boolean setProperty(XMLInputFactory f, String p, Object o) {
@@ -2115,7 +2100,7 @@ public final class StaxUtils {
             return true;
         }
         try {
-            if (reader.getProperty("com.ctc.wstx.maxChildrenPerElement") != null) {
+            if (reader.getProperty(P_MAX_CHILDREN_PER_ELEMENT) != null) {
                 return true;
             }
         } catch (Exception ex) {
@@ -2151,7 +2136,7 @@ public final class StaxUtils {
             DocumentDepthProperties p = null;
             if (maxChildElements != null) {
                 try {
-                    setProperty(reader, "com.ctc.wstx.maxChildrenPerElement", maxChildElements);
+                    setProperty(reader, P_MAX_CHILDREN_PER_ELEMENT, maxChildElements);
                 } catch (Throwable t) {
                     //we can handle this via a wrapper
                     p = new DocumentDepthProperties();
@@ -2160,7 +2145,7 @@ public final class StaxUtils {
             }
             if (maxElementDepth != null) {
                 try {
-                    setProperty(reader, "com.ctc.wstx.maxElementDepth", maxElementDepth);
+                    setProperty(reader, P_MAX_ELEMENT_DEPTH, maxElementDepth);
                 } catch (Throwable t) {
                     //we can handle this via a wrapper
                     if (p == null) {
@@ -2170,17 +2155,17 @@ public final class StaxUtils {
                 }
             }
             if (maxAttributeCount != null) {
-                setProperty(reader, "com.ctc.wstx.maxAttributesPerElement", maxAttributeCount);
+                setProperty(reader, P_MAX_ATTRIBUTES_PER_ELEMENT, maxAttributeCount);
             }
             if (maxAttributeSize != null) {
-                setProperty(reader, "com.ctc.wstx.maxAttributeSize", maxAttributeSize);
+                setProperty(reader, P_MAX_ATTRIBUTE_SIZE, maxAttributeSize);
             }
             if (maxTextLength != null) {
-                setProperty(reader, "com.ctc.wstx.maxTextLength", maxTextLength);
+                setProperty(reader, P_MAX_TEXT_LENGTH, maxTextLength);
             }
             if (maxElementCount != null) {
                 try {
-                    setProperty(reader, "com.ctc.wstx.maxElementCount", maxElementCount);
+                    setProperty(reader, P_MAX_ELEMENT_COUNT, maxElementCount);
                 } catch (Throwable t) {
                     //we can handle this via a wrapper
                     if (p == null) {
@@ -2190,7 +2175,7 @@ public final class StaxUtils {
                 }
             }
             if (maxXMLCharacters != null) {
-                setProperty(reader, "com.ctc.wstx.maxCharacters", maxXMLCharacters);
+                setProperty(reader, P_MAX_CHARACTERS, maxXMLCharacters);
             }
             if (p != null) {
                 reader = new DepthRestrictingStreamReader(reader, p);
