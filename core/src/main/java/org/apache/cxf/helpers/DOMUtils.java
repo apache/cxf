@@ -149,7 +149,7 @@ public final class DOMUtils {
         return f.newDocumentBuilder();
     }
 
-    private static ClassLoader getContextClassLoader() {
+    public static ClassLoader getContextClassLoader() {
         final SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
@@ -161,7 +161,7 @@ public final class DOMUtils {
         return Thread.currentThread().getContextClassLoader();
     }
 
-    private static ClassLoader getClassLoader(final Class<?> clazz) {
+    public static ClassLoader getClassLoader(final Class<?> clazz) {
         final SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
