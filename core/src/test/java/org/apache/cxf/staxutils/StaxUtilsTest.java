@@ -30,6 +30,7 @@ import java.io.Writer;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
@@ -65,15 +66,17 @@ public class StaxUtilsTest extends Assert {
     private InputStream getTestStream(String resource) {
         return getClass().getResourceAsStream(resource);
     }
+
     @Test
     public void testCommentNode() throws Exception {
         //CXF-3034
         Document document = DocumentBuilderFactory.newInstance()
-            .newDocumentBuilder().newDocument();
+                .newDocumentBuilder().newDocument();
         Element root = document.createElementNS("urn:test", "root");
         root.appendChild(document.createComment("test comment"));
         StaxUtils.copy(StaxUtils.createXMLStreamReader(root), StaxUtils.createXMLStreamWriter(System.out));
     }
+
     @Test
     public void testToNextElement() {
         String soapMessage = "./resources/sayHiRpcLiteralReq.xml";
@@ -479,4 +482,143 @@ public class StaxUtilsTest extends Assert {
         //System.out.println(sw.toString());
         assertEquals(innerXml, sw.toString());
     }
+
+    @Test
+    public void testIsSecureReader() {
+        Document doc = DOMUtils.newDocument();
+        Element documentElement = doc.createElementNS(null, "root");
+        doc.appendChild(documentElement);
+
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new StringReader(StaxUtils.toString(doc)));
+        assertTrue(StaxUtils.isSecureReader(reader, null));
+    }
+
+    @Test
+    public void testDefaultMaxAttributeCount() throws XMLStreamException {
+        Document doc = DOMUtils.newDocument();
+        Element documentElement = doc.createElementNS(null, "root");
+        doc.appendChild(documentElement);
+
+        for (int i = 0; i < 300; i++) {
+            documentElement.setAttributeNS(null, "attr-" + i, Integer.toString(i));
+        }
+
+        // Should be OK
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new StringReader(StaxUtils.toString(doc)));
+        assertNotNull(StaxUtils.read(reader));
+
+        for (int i = 300; i < 800; i++) {
+            documentElement.setAttributeNS(null, "attr-" + i, Integer.toString(i));
+        }
+
+        assertTrue(documentElement.getAttributes().getLength() > 500);
+
+        // Should fail as we are over the max attribute count
+        reader = StaxUtils.createXMLStreamReader(new StringReader(StaxUtils.toString(doc)));
+        try {
+            StaxUtils.read(reader);
+            fail("Failure expected on exceeding the limit");
+        } catch (XMLStreamException ex) {
+            assertTrue(ex.getMessage().contains("Attribute limit"));
+        }
+    }
+
+    @Test
+    public void testDefaultMaxAttributeLength() throws XMLStreamException {
+        Document doc = DOMUtils.newDocument();
+        Element documentElement = doc.createElementNS(null, "root");
+        doc.appendChild(documentElement);
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 1024; i++) {
+            sb.append(i);
+        }
+
+        documentElement.setAttributeNS(null, "attr", sb.toString());
+
+        // Should be OK
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new StringReader(StaxUtils.toString(doc)));
+        assertNotNull(StaxUtils.read(reader));
+
+        for (int i = 0; i < 1024 * 64; i++) {
+            sb.append(i);
+        }
+
+        documentElement.setAttributeNS(null, "attr", sb.toString());
+        assertTrue(documentElement.getAttributeNS(null, "attr").length() > (1024 * 64));
+
+        // Should fail as we are over the max attribute length
+        reader = StaxUtils.createXMLStreamReader(new StringReader(StaxUtils.toString(doc)));
+        try {
+            StaxUtils.read(reader);
+            fail("Failure expected on exceeding the limit");
+        } catch (XMLStreamException ex) {
+            assertTrue(ex.getMessage().contains("Maximum attribute size limit"));
+        }
+
+    }
+
+    @Test
+    public void testDefaultMaxElementDepth() throws XMLStreamException {
+        Document doc = DOMUtils.newDocument();
+        Element documentElement = doc.createElementNS(null, "root");
+        doc.appendChild(documentElement);
+
+        Element currentNode = documentElement;
+        for (int i = 0; i < 50; i++) {
+            Element childElement = doc.createElementNS("null", "root" + i);
+            currentNode.appendChild(childElement);
+            currentNode = childElement;
+        }
+
+        // Should be OK
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new StringReader(StaxUtils.toString(doc)));
+        assertNotNull(StaxUtils.read(reader));
+
+        for (int i = 50; i < 102; i++) {
+            Element childElement = doc.createElementNS("null", "root" + i);
+            currentNode.appendChild(childElement);
+            currentNode = childElement;
+        }
+
+        // Should fail as we are over the max element depth value
+        reader = StaxUtils.createXMLStreamReader(new StringReader(StaxUtils.toString(doc)));
+        try {
+            StaxUtils.read(reader);
+            fail("Failure expected on exceeding the limit");
+        } catch (XMLStreamException ex) {
+            assertTrue(ex.getMessage().contains("Maximum Element Depth limit"));
+        }
+    }
+
+    @Test
+    public void testDefaultMaxChildElements() throws XMLStreamException {
+        Document doc = DOMUtils.newDocument();
+        Element documentElement = doc.createElementNS(null, "root");
+        doc.appendChild(documentElement);
+
+        for (int i = 0; i < 1000; i++) {
+            Element childElement = doc.createElementNS("null", "root" + i);
+            documentElement.appendChild(childElement);
+        }
+
+        // Should be OK
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new StringReader(StaxUtils.toString(doc)));
+        assertNotNull(StaxUtils.read(reader));
+
+        for (int i = 0; i < 49001; i++) {
+            Element childElement = doc.createElementNS("null", "root" + i);
+            documentElement.appendChild(childElement);
+        }
+
+        // Should fail as we are over the max element count value
+        reader = StaxUtils.createXMLStreamReader(new StringReader(StaxUtils.toString(doc)));
+        try {
+            StaxUtils.read(reader);
+            fail("Failure expected on exceeding the limit");
+        } catch (XMLStreamException ex) {
+            assertTrue(ex.getMessage().contains("Maximum Number of Child Elements limit"));
+        }
+    }
+
 }
