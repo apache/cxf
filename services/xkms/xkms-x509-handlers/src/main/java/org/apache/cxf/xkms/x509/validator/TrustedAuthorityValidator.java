@@ -34,11 +34,11 @@ import java.security.cert.TrustAnchor;
 import java.security.cert.X509CRL;
 import java.security.cert.X509CertSelector;
 import java.security.cert.X509Certificate;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.xkms.handlers.Validator;
@@ -52,7 +52,7 @@ public class TrustedAuthorityValidator implements Validator {
 
     private static final Logger LOG = LogUtils.getL7dLogger(TrustedAuthorityValidator.class);
 
-    CertificateRepo certRepo;
+    final CertificateRepo certRepo;
     boolean enableRevocation = true;
 
     public TrustedAuthorityValidator(CertificateRepo certRepo) {
@@ -116,11 +116,9 @@ public class TrustedAuthorityValidator implements Validator {
     }
 
     private Set<TrustAnchor> asTrustAnchors(List<X509Certificate> trustedAuthorityCerts) {
-        Set<TrustAnchor> trustAnchors = new HashSet<>();
-        for (X509Certificate trustedAuthorityCert : trustedAuthorityCerts) {
-            trustAnchors.add(new TrustAnchor(trustedAuthorityCert, null));
-        }
-        return trustAnchors;
+        return trustedAuthorityCerts.stream()
+                .map(cert -> new TrustAnchor(cert, null))
+                .collect(Collectors.toSet());
     }
 
     @Override
