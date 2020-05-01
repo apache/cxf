@@ -19,6 +19,8 @@
 package org.apache.cxf.jaxrs.client.spec;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Priority;
 import javax.ws.rs.DELETE;
@@ -42,6 +44,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -107,8 +112,7 @@ public class ClientResponseFilterTest {
              .target(ADDRESS)
              .request()
              .get()) {
-            assertEquals(200, response.getStatus());
-            assertEquals("hello rabbit", response.readEntity(String.class));
+            fail("Should raise ResponseProcessingException");
         }
     }
     
@@ -163,6 +167,86 @@ public class ClientResponseFilterTest {
             assertEquals(null, ex.getResponse().getHeaderString("X-Done"));
         } catch (Throwable ex) {
             fail("Should be handled by ResponseProcessingException block");
+        }
+    }
+    
+    @Test
+    public void testAsyncClientResponseFilter() throws Exception {
+        try (Response response = ClientBuilder.newClient()
+             .register(AddHeaderClientResponseFilter.class)
+             .target(ADDRESS)
+             .request()
+             .async()
+             .get()
+             .get(10, TimeUnit.SECONDS)) {
+            assertEquals(200, response.getStatus());
+            assertEquals("true", response.getHeaderString("X-Done"));
+        }
+    }
+    
+    @Test
+    public void testExceptionWhenMultipleAsyncClientResponseFilters() {
+        try (Response response = ClientBuilder.newClient()
+             .register(AddHeaderClientResponseFilter.class)
+             .register(FaultyClientResponseFilter.class)
+             .target(ADDRESS)
+             .request()
+             .async()
+             .put(null)
+             .get(10, TimeUnit.SECONDS)) {
+            fail("Should not be invoked");
+        } catch (ExecutionException ex) {
+            assertThat(ex.getCause(), is(instanceOf(ResponseProcessingException.class)));
+        } catch (Throwable ex) {
+            fail("Should be handled by ResponseProcessingException block");
+        }
+    }
+    
+    @Test
+    public void testExceptionInAsyncClientResponseFilter() throws Exception {
+        try (Response response = ClientBuilder.newClient()
+             .register(FaultyClientResponseFilter.class)
+             .target(ADDRESS)
+             .request()
+             .async()
+             .get()
+             .get(10, TimeUnit.SECONDS)) {
+            fail("Should raise ResponseProcessingException");
+        } catch (ExecutionException ex) {
+            assertThat(ex.getCause(), is(instanceOf(ResponseProcessingException.class)));
+        } catch (Throwable ex) {
+            fail("Should be handled by ResponseProcessingException block");
+        }
+    }
+    
+    @Test
+    public void testExceptionInAsyncClientResponseFilterWhenNotFound() throws Exception {
+        try (Response response = ClientBuilder.newClient()
+             .register(FaultyClientResponseFilter.class)
+             .target(ADDRESS)
+             .request()
+             .async()
+             .put(null)
+             .get(10, TimeUnit.SECONDS)) {
+            fail("Should not be invoked");
+        } catch (ExecutionException ex) {
+            assertThat(ex.getCause(), is(instanceOf(ResponseProcessingException.class)));
+        } catch (Throwable ex) {
+            fail("Should be handled by ResponseProcessingException block");
+        }
+    }
+    
+    @Test
+    public void testAsyncClientResponseFilterWhenNotFound() throws Exception {
+        try (Response response = ClientBuilder.newClient()
+             .register(AddHeaderClientResponseFilter.class)
+             .target(ADDRESS)
+             .request()
+             .async()
+             .put(null)
+             .get(10, TimeUnit.SECONDS)) {
+            assertEquals(404, response.getStatus());
+            assertEquals("true", response.getHeaderString("X-Done"));
         }
     }
 }

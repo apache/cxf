@@ -29,7 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Priority;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.ProcessingException;
@@ -62,6 +64,10 @@ import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 
 public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerAsyncClient.PORT;
@@ -385,6 +391,89 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         wc.close();
     }
 
+    @Test
+    public void testClientResponseFilter() throws Exception {
+        final String address = "http://localhost:" + PORT + "/bookstore/books/wildcard";
+        try (Response response = ClientBuilder.newClient()
+             .register(AddHeaderClientResponseFilter.class)
+             .target(address)
+             .request("text/plain")
+             .async()
+             .get()
+             .get()) {
+            assertEquals(200, response.getStatus());
+            assertEquals("true", response.getHeaderString("X-Done"));
+        }
+    }
+
+    @Test
+    public void testExceptionWhenMultipleClientResponseFilters() {
+        final String address = "http://localhost:" + PORT + "/bookstore/books/wildcard";
+        try (Response response = ClientBuilder.newClient()
+             .register(AddHeaderClientResponseFilter.class)
+             .register(FaultyClientResponseFilter.class)
+             .target(address)
+             .request()
+             .async()
+             .put(null)
+             .get(10, TimeUnit.SECONDS)) {
+            fail("Should not be invoked");
+        } catch (ExecutionException ex) {
+            assertThat(ex.getCause(), is(instanceOf(ResponseProcessingException.class)));
+        } catch (Throwable ex) {
+            fail("Should be handled by ResponseProcessingException block");
+        }
+    }
+
+    @Test
+    public void testExceptionInClientResponseFilter() throws Exception {
+        final String address = "http://localhost:" + PORT + "/bookstore/books/wildcard";
+        try (Response response = ClientBuilder.newClient()
+             .register(FaultyClientResponseFilter.class)
+             .target(address)
+             .request("text/plain")
+             .async()
+             .get()
+             .get(10, TimeUnit.SECONDS)) {
+            fail("Should raise ResponseProcessingException");
+        } catch (ExecutionException ex) {
+            assertThat(ex.getCause(), is(instanceOf(ResponseProcessingException.class)));
+        } catch (Throwable ex) {
+            fail("Should be handled by ResponseProcessingException block");
+        }
+    }
+
+    @Test
+    public void testExceptionInClientResponseFilterWhenNotFound() throws Exception {
+        final String address = "http://localhost:" + PORT + "/bookstore/notFound";
+        try (Response response = ClientBuilder.newClient()
+             .register(FaultyClientResponseFilter.class)
+             .target(address)
+             .request("text/plain")
+             .async()
+             .put(null)
+             .get(10, TimeUnit.SECONDS)) {
+            fail("Should not be invoked");
+        } catch (ExecutionException ex) {
+            assertThat(ex.getCause(), is(instanceOf(ResponseProcessingException.class)));
+        } catch (Throwable ex) {
+            fail("Should be handled by ResponseProcessingException block");
+        }
+    }
+    
+    @Test
+    public void testNotFound() throws Exception {
+        final String address = "http://localhost:" + PORT + "/bookstore/notFound";
+        try (Response response = ClientBuilder.newClient()
+             .target(address)
+             .request("text/plain")
+             .async()
+             .put(null)
+             .get(10, TimeUnit.SECONDS)) {
+            assertThat(response.getStatus(), equalTo(404));
+        }
+    }
+    
     private WebClient createWebClient(String address) {
         return WebClient.create(address);
     }
@@ -464,7 +553,23 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         public Response getResult() {
             return (Response)result;
         }
+    }
+    
+    @Priority(2)
+    public static class AddHeaderClientResponseFilter implements ClientResponseFilter {
+        @Override
+        public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext) 
+                throws IOException {
+            responseContext.getHeaders().add("X-Done", "true");
+        }
+    }
 
-
+    @Priority(1)
+    public static class FaultyClientResponseFilter implements ClientResponseFilter {
+        @Override
+        public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext) 
+                throws IOException {
+            throw new IOException("Exception from client response filter");
+        }
     }
 }

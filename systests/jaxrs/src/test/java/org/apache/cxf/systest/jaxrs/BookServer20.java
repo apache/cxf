@@ -293,31 +293,34 @@ public class BookServer20 extends AbstractBusTestServerBase {
         @Override
         public void filter(ContainerRequestContext requestContext,
                            ContainerResponseContext responseContext) throws IOException {
-            String ct = responseContext.getMediaType().toString();
-            if (requestContext.getProperty("filterexception") != null) {
-                if (!"text/plain".equals(ct)) {
-                    throw new RuntimeException();
+            if (responseContext.getMediaType() != null) {
+                String ct = responseContext.getMediaType().toString();
+                if (requestContext.getProperty("filterexception") != null) {
+                    if (!"text/plain".equals(ct)) {
+                        throw new RuntimeException();
+                    }
+                    responseContext.getHeaders().putSingle("FilterException",
+                                                           requestContext.getProperty("filterexception"));
                 }
-                responseContext.getHeaders().putSingle("FilterException",
-                                                       requestContext.getProperty("filterexception"));
-            }
-            Object entity = responseContext.getEntity();
-            Type entityType = responseContext.getEntityType();
-            if (entity instanceof GenericHandler && InjectionUtils.getActualType(entityType) == Book.class) {
-                ct += ";charset=ISO-8859-1";
-                if ("getGenericBook2".equals(rInfo.getResourceMethod().getName())) {
-                    Annotation[] anns = responseContext.getEntityAnnotations();
-                    if (anns.length == 4 && anns[3].annotationType() == Context.class) {
-                        responseContext.getHeaders().addFirst("Annotations", "OK");
+            
+                Object entity = responseContext.getEntity();
+                Type entityType = responseContext.getEntityType();
+                if (entity instanceof GenericHandler && InjectionUtils.getActualType(entityType) == Book.class) {
+                    ct += ";charset=ISO-8859-1";
+                    if ("getGenericBook2".equals(rInfo.getResourceMethod().getName())) {
+                        Annotation[] anns = responseContext.getEntityAnnotations();
+                        if (anns.length == 4 && anns[3].annotationType() == Context.class) {
+                            responseContext.getHeaders().addFirst("Annotations", "OK");
+                        }
+                    } else {
+                        responseContext.setEntity(new Book("book", 124L));
                     }
                 } else {
-                    responseContext.setEntity(new Book("book", 124L));
+                    ct += ";charset=";
                 }
-            } else {
-                ct += ";charset=";
+                responseContext.getHeaders().putSingle("Content-Type", ct);
+                responseContext.getHeaders().add("Response", "OK");
             }
-            responseContext.getHeaders().putSingle("Content-Type", ct);
-            responseContext.getHeaders().add("Response", "OK");
         }
 
     }
@@ -333,8 +336,14 @@ public class BookServer20 extends AbstractBusTestServerBase {
                 && "addBook2".equals(ri.getResourceMethod().getName())) {
                 return;
             }
-            if (!responseContext.getHeaders().containsKey("Response")) {
-                throw new RuntimeException();
+            
+            if (ri.getResourceMethod() != null
+                && "addBook2".equals(ri.getResourceMethod().getName())) {
+                return;
+            }
+            
+            if (requestContext.getUriInfo().getPath().contains("/notFound")) {
+                return;
             }
 
             if ((!responseContext.getHeaders().containsKey("DynamicResponse")

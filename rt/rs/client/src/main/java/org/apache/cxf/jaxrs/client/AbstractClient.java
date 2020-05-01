@@ -962,6 +962,7 @@ public abstract class AbstractClient implements Client {
         List<Interceptor<? extends Message>> i3 = cfg.getConduitSelector().getEndpoint().getInInterceptors();
         PhaseInterceptorChain chain = new PhaseChainCache().get(pm.getInPhases(), i1, i2, i3);
         chain.add(new ClientResponseFilterInterceptor());
+        chain.setFaultObserver(setupInFaultObserver(cfg));
         return chain;
     }
 
