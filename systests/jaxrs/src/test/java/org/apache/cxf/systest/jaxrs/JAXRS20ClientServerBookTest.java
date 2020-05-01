@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import javax.annotation.Priority;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -41,6 +42,7 @@ import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.InvocationCallback;
+import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
@@ -75,6 +77,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -854,6 +858,74 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         assertEquals(entity, response.readEntity(String.class));
     }
 
+    @Test
+    public void testClientResponseFilter() {
+        final String address = "http://localhost:" + PORT + "/bookstore/books/wildcard";
+        try (Response response = ClientBuilder.newClient()
+             .register(AddHeaderClientResponseFilter.class)
+             .target(address)
+             .request("text/plain")
+             .get()) {
+            assertEquals(200, response.getStatus());
+            assertEquals("true", response.getHeaderString("X-Done"));
+        }
+    }
+
+    @Test
+    public void testExceptionWhenMultipleClientResponseFilters() {
+        final String address = "http://localhost:" + PORT + "/bookstore/books/wildcard";
+        try (Response response = ClientBuilder.newClient()
+             .register(AddHeaderClientResponseFilter.class)
+             .register(FaultyClientResponseFilter.class)
+             .target(address)
+             .request("text/plain")
+             .put(null)) {
+            fail("Should not be invoked");
+        } catch (ResponseProcessingException ex) {
+            // Seems to be an issue here, CXF creates the response context only once
+            // for all client response filters, the changes performed upstream the chain
+            // are not visible to the downstream filters. 
+            assertEquals(null, ex.getResponse().getHeaderString("X-Done"));
+        } catch (Throwable ex) {
+            fail("Should be handled by ResponseProcessingException block");
+        }
+    }
+
+    @Test(expected = ResponseProcessingException.class)
+    public void testExceptionInClientResponseFilter() {
+        final String address = "http://localhost:" + PORT + "/bookstore/books/wildcard";
+        try (Response response = ClientBuilder.newClient()
+             .register(FaultyClientResponseFilter.class)
+             .target(address)
+             .request("text/plain")
+             .get()) {
+            fail("Should raise ResponseProcessingException");
+        }
+    }
+
+    @Test(expected = ResponseProcessingException.class)
+    public void testExceptionInClientResponseFilterWhenNotFound() {
+        final String address = "http://localhost:" + PORT + "/bookstore/notFound";
+        try (Response response = ClientBuilder.newClient()
+             .register(FaultyClientResponseFilter.class)
+             .target(address)
+             .request("text/plain")
+             .put(null)) {
+            fail("Should not be invoked");
+        }
+    }
+
+    @Test
+    public void testNotFound() throws Exception {
+        final String address = "http://localhost:" + PORT + "/bookstore/notFound";
+        try (Response response = ClientBuilder.newClient()
+             .target(address)
+             .request("text/plain")
+             .put(null)) {
+            assertThat(response.getStatus(), equalTo(404));
+        }
+    }
+
     private static class ReplaceBodyFilter implements ClientRequestFilter {
 
         @Override
@@ -1016,5 +1088,24 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
             return bType.b();
         }
 
+    }
+    
+    
+    @Priority(2)
+    public static class AddHeaderClientResponseFilter implements ClientResponseFilter {
+        @Override
+        public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext) 
+                throws IOException {
+            responseContext.getHeaders().add("X-Done", "true");
+        }
+    }
+
+    @Priority(1)
+    public static class FaultyClientResponseFilter implements ClientResponseFilter {
+        @Override
+        public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext) 
+                throws IOException {
+            throw new IOException("Exception from client response filter");
+        }
     }
 }
