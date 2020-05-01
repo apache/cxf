@@ -53,7 +53,7 @@ public class TrustedAuthorityValidator implements Validator {
     private static final Logger LOG = LogUtils.getL7dLogger(TrustedAuthorityValidator.class);
 
     final CertificateRepo certRepo;
-    boolean enableRevocation = true;
+    boolean enableRevocation;
 
     public TrustedAuthorityValidator(CertificateRepo certRepo) {
         this.certRepo = certRepo;
@@ -84,10 +84,10 @@ public class TrustedAuthorityValidator implements Validator {
             CertPath certPath = builder.build(pkixParams).getCertPath();
 
             // Now validate the CertPath (including CRL checking)
+            pkixParams.setRevocationEnabled(enableRevocation);
             if (enableRevocation) {
                 List<X509CRL> crls = certRepo.getCRLs();
                 if (!crls.isEmpty()) {
-                    pkixParams.setRevocationEnabled(true);
                     CertStoreParameters crlParams = new CollectionCertStoreParameters(crls);
                     pkixParams.addCertStore(CertStore.getInstance("Collection", crlParams));
                 }
