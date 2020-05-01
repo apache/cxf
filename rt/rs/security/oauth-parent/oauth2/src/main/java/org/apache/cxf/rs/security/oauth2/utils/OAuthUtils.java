@@ -166,13 +166,13 @@ public final class OAuthUtils {
         return setSessionToken(mc, 0);
     }
     public static String setSessionToken(MessageContext mc, int maxInactiveInterval) {
-        return setSessionToken(mc, generateRandomTokenKey());
+        return setSessionToken(mc, generateRandomTokenKey(), maxInactiveInterval);
     }
     public static String setSessionToken(MessageContext mc, String sessionToken) {
         return setSessionToken(mc, sessionToken, 0);
     }
     public static String setSessionToken(MessageContext mc, String sessionToken, int maxInactiveInterval) {
-        return setSessionToken(mc, sessionToken, null, 0);
+        return setSessionToken(mc, sessionToken, null, maxInactiveInterval);
     }
     public static String setSessionToken(MessageContext mc, String sessionToken,
                                                 String attribute, int maxInactiveInterval) {
