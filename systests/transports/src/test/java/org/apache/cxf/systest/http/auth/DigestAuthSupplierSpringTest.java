@@ -49,13 +49,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
     classes = {
-        DigestAuthSupplierTest.SecurityConfig.class,
-        DigestAuthSupplierTest.Controller.class
+        DigestAuthSupplierSpringTest.SecurityConfig.class,
+        DigestAuthSupplierSpringTest.Controller.class
     },
     webEnvironment = WebEnvironment.RANDOM_PORT
 )
 @SpringBootApplication
-public class DigestAuthSupplierTest {
+public class DigestAuthSupplierSpringTest {
 
     private static final String USER = "alice";
     private static final String PWD = "ecila";
@@ -139,7 +139,7 @@ public class DigestAuthSupplierTest {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(DigestAuthSupplierTest.class, args);
+        SpringApplication.run(DigestAuthSupplierSpringTest.class, args);
     }
 
 }
