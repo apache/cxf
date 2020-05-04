@@ -22,7 +22,6 @@ import java.io.File;
 import java.net.URL;
 import java.util.Enumeration;
 
-import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ToolTestBase;
 
 import org.junit.Before;
@@ -88,13 +87,9 @@ public class WSDLValidationTest extends ToolTestBase {
                                       getLocation("/validator_wsdl/hello_world_error_reference.wsdl")};
         WSDLValidator.main(args);
         String error = getStdErr();
-        if (StaxUtils.isWoodstox()) {
-            // sjsxp doesn't report locations.
-            assertTrue("error message does not contain [147,3]. error message: "
+        // sjsxp doesn't report locations.
+        assertTrue("error message does not contain [147,3]. error message: "
                 + error, error.indexOf("[147,3]") != -1);
-        }
-        assertTrue(error.indexOf("Caused by {http://apache.org/hello_world_soap_http}"
-                                       + "[binding:Greeter_SOAPBinding1] not exist.") != -1);
     }
 
     @Test

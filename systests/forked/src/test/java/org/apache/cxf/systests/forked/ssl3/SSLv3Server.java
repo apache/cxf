@@ -16,10 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.dispatch;
 
-public enum ResponseInterceptorType {
-    overflow,
-    ElementLevelThreshold,
-    ElementCountThreshold
+package org.apache.cxf.systests.forked.ssl3;
+
+import java.net.URL;
+
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+
+public class SSLv3Server extends AbstractBusTestServerBase {
+
+    protected void run()  {
+        URL busFile = SSLv3Server.class.getResource("sslv3-server.xml");
+        Bus busLocal = new SpringBusFactory().createBus(busFile);
+        BusFactory.setDefaultBus(busLocal);
+        setBus(busLocal);
+
+        try {
+            new SSLv3Server();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

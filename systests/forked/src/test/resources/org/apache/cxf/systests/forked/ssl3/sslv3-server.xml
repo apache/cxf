@@ -26,7 +26,7 @@
     xmlns:cxf="http://cxf.apache.org/core"
     xmlns:p="http://cxf.apache.org/policy"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd">
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
             <cxf:logging/>
@@ -54,7 +54,7 @@
     <jaxws:endpoint xmlns:e="http://apache.org/hello_world/services" 
                      xmlns:s="http://apache.org/hello_world/services" 
                      id="SSLv3NotAllowedByDefaultEndpoint" 
-                     implementor="org.apache.cxf.https.ssl3.GreeterImpl" 
+                     implementor="org.apache.cxf.systests.forked.ssl3.GreeterImpl"
                      address="https://localhost:${testutil.ports.SSLv3Server}/SoapContext/HttpsPort" 
                      serviceName="s:SOAPService" 
                      endpointName="e:HttpsPort" depends-on="default-tls-settings"/>
@@ -80,7 +80,7 @@
     <jaxws:endpoint xmlns:e="http://apache.org/hello_world/services" 
                      xmlns:s="http://apache.org/hello_world/services" 
                      id="SSLv3AllowedByDefaultEndpoint" 
-                     implementor="org.apache.cxf.https.ssl3.GreeterImpl" 
+                     implementor="org.apache.cxf.systests.forked.ssl3.GreeterImpl"
                      address="https://localhost:${testutil.ports.SSLv3Server.2}/SoapContext/HttpsPort" 
                      serviceName="s:SOAPService" 
                      endpointName="e:HttpsPort" depends-on="allow-sslv3-settings"/>
@@ -112,7 +112,7 @@
     <jaxws:endpoint xmlns:e="http://apache.org/hello_world/services" 
                      xmlns:s="http://apache.org/hello_world/services" 
                      id="TLSNotAllowedByEndpoint" 
-                     implementor="org.apache.cxf.https.ssl3.GreeterImpl" 
+                     implementor="org.apache.cxf.systests.forked.ssl3.GreeterImpl"
                      address="https://localhost:${testutil.ports.SSLv3Server.3}/SoapContext/HttpsPort" 
                      serviceName="s:SOAPService" 
                      endpointName="e:HttpsPort" depends-on="disallow-tls-via-configuration"/>
@@ -142,7 +142,7 @@
     <jaxws:endpoint xmlns:e="http://apache.org/hello_world/services" 
                      xmlns:s="http://apache.org/hello_world/services" 
                      id="TLSAllowSSLv3Endpoint" 
-                     implementor="org.apache.cxf.https.ssl3.GreeterImpl" 
+                     implementor="org.apache.cxf.systests.forked.ssl3.GreeterImpl"
                      address="https://localhost:${testutil.ports.SSLv3Server.4}/SoapContext/HttpsPort" 
                      serviceName="s:SOAPService" 
                      endpointName="e:HttpsPort" depends-on="tls-but-allow-ssl3"/>

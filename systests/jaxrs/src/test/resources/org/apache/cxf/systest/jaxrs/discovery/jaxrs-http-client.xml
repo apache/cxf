@@ -24,7 +24,7 @@ under the License.
 	xsi:schemaLocation="http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd         
 	   http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd  
 	   http://cxf.apache.org/jaxrs-client http://cxf.apache.org/schemas/jaxrs-client.xsd">	
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
 
     <jaxrs:client id="bookService" address="http://localhost:${testutil.ports.jaxrs-http}" 
      basePackages="org.apache.cxf.systest.jaxrs.discovery,org.apache.cxf.systest.jaxrs.discovery.sub"/>

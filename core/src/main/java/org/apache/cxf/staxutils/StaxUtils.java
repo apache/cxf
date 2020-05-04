@@ -86,7 +86,6 @@ import org.w3c.dom.UserDataHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -137,39 +136,48 @@ public final class StaxUtils {
         "ns7".intern(), "ns8".intern(), "ns9".intern()
     };
 
-    private static int innerElementLevelThreshold = 100;
-    private static int innerElementCountThreshold = 50000;
-    private static int maxAttributeCount = 500;
-    private static int maxAttributeSize = 64 * 1024; //64K per attribute, likely just "list" will hit
-    private static int maxTextLength = 128 * 1024 * 1024;  //128M - more than this should DEFINITLEY use MTOM
-    private static int minTextSegment = 64; // Same default as woodstox
-    private static long maxElementCount = Long.MAX_VALUE;
-    private static long maxXMLCharacters = Long.MAX_VALUE;
+    private static final int MAX_ATTR_COUNT_VAL =
+            getInteger(MAX_ATTRIBUTE_COUNT, 500);
+    private static final int MAX_ATTR_SIZE_VAL =
+            getInteger(MAX_ATTRIBUTE_SIZE, 64 * 1024); //64K per attribute, likely just "list" will hit
+    private static final int MAX_TEXT_LENGTH_VAL =
+            getInteger(MAX_TEXT_LENGTH, 128 * 1024 * 1024);  //128M - more than this should DEFINITELY use MTOM
+    private static final int MIN_TEXT_SEGMENT_VAL =
+            getInteger(MIN_TEXT_SEGMENT, 64); // Same default as woodstox
+    private static final long MAX_ELEMENT_COUNT_VAL =
+            getLong(MAX_ELEMENT_COUNT, Long.MAX_VALUE);
+    private static final long MAX_XML_CHARS_VAL =
+            getLong(MAX_XML_CHARACTERS, Long.MAX_VALUE);
+    private static final int PARSER_POOL_SIZE_VAL =
+            getInteger("org.apache.cxf.staxutils.pool-size", 20);
+    private static final boolean ALLOW_INSECURE_PARSER_VAL;
 
-    private static boolean allowInsecureParser;
+    // Here we check old names first and then new names for the threshold properties
+    private static final int MAX_ELEMENT_DEPTH_VAL =
+            getInteger(MAX_ELEMENT_DEPTH, getInteger(INNER_ELEMENT_LEVEL_SYSTEM_PROP, 100));
+    private static final int MAX_CHILD_ELEMENTS_VAL =
+            getInteger(MAX_CHILD_ELEMENTS, getInteger(INNER_ELEMENT_COUNT_SYSTEM_PROP, 50000));
+
+    // Variables from Woodstox
+    private static final String P_MAX_ATTRIBUTES_PER_ELEMENT = "com.ctc.wstx.maxAttributesPerElement";
+    private static final String P_MAX_ATTRIBUTE_SIZE = "com.ctc.wstx.maxAttributeSize";
+    private static final String P_MAX_TEXT_LENGTH = "com.ctc.wstx.maxTextLength";
+    private static final String P_MAX_ELEMENT_COUNT = "com.ctc.wstx.maxElementCount";
+    private static final String P_MAX_CHARACTERS = "com.ctc.wstx.maxCharacters";
+    private static final String P_MAX_ELEMENT_DEPTH = "com.ctc.wstx.maxElementDepth";
+    private static final String P_MAX_CHILDREN_PER_ELEMENT = "com.ctc.wstx.maxChildrenPerElement";
+    private static final String P_MIN_TEXT_SEGMENT = "com.ctc.wstx.minTextSegment";
+
 
     static {
-        int i = getInteger("org.apache.cxf.staxutils.pool-size", 20);
-
-        NS_AWARE_INPUT_FACTORY_POOL = new ArrayBlockingQueue<>(i);
-        OUTPUT_FACTORY_POOL = new ArrayBlockingQueue<>(i);
-
-        //old names
-        innerElementCountThreshold = getInteger(INNER_ELEMENT_COUNT_SYSTEM_PROP, innerElementCountThreshold);
-        innerElementLevelThreshold = getInteger(INNER_ELEMENT_LEVEL_SYSTEM_PROP, innerElementLevelThreshold);
-        //new names
-        innerElementCountThreshold = getInteger(MAX_CHILD_ELEMENTS, innerElementCountThreshold);
-        innerElementLevelThreshold = getInteger(MAX_ELEMENT_DEPTH, innerElementLevelThreshold);
-        maxAttributeCount = getInteger(MAX_ATTRIBUTE_COUNT, maxAttributeCount);
-        maxAttributeSize = getInteger(MAX_ATTRIBUTE_SIZE, maxAttributeSize);
-        maxTextLength = getInteger(MAX_TEXT_LENGTH, maxTextLength);
-        minTextSegment = getInteger(MIN_TEXT_SEGMENT, minTextSegment);
-        maxElementCount = getLong(MAX_ELEMENT_COUNT, maxElementCount);
-        maxXMLCharacters = getLong(MAX_XML_CHARACTERS, maxXMLCharacters);
+        NS_AWARE_INPUT_FACTORY_POOL = new ArrayBlockingQueue<>(PARSER_POOL_SIZE_VAL);
+        OUTPUT_FACTORY_POOL = new ArrayBlockingQueue<>(PARSER_POOL_SIZE_VAL);
 
         String s = SystemPropertyAction.getPropertyOrNull(ALLOW_INSECURE_PARSER);
         if (!StringUtils.isEmpty(s)) {
-            allowInsecureParser = "1".equals(s) || Boolean.parseBoolean(s);
+            ALLOW_INSECURE_PARSER_VAL = "1".equals(s) || Boolean.parseBoolean(s);
+        } else {
+            ALLOW_INSECURE_PARSER_VAL = false;
         }
 
         XMLInputFactory xif = null;
@@ -234,31 +242,6 @@ public final class StaxUtils {
             //ignore
         }
         return def;
-    }
-
-    public static void setInnerElementLevelThreshold(int i) {
-        innerElementLevelThreshold = i != -1 ? i : 500;
-        setProperty(SAFE_INPUT_FACTORY, "com.ctc.wstx.maxElementDepth", innerElementLevelThreshold);
-    }
-    public static void setInnerElementCountThreshold(int i) {
-        innerElementCountThreshold = i != -1 ? i : 50000;
-        setProperty(SAFE_INPUT_FACTORY, "com.ctc.wstx.maxChildrenPerElement", innerElementCountThreshold);
-    }
-
-    /**
-     * CXF works with multiple STaX parsers. When we can't find any other way to work
-     * against the different parsers, this can be used to condition code. Note: if you've got
-     * Woodstox in the class path without being the default provider, this will return
-     * the wrong answer.
-     * @return true if Woodstox is in the classpath.
-     */
-    public static boolean isWoodstox() {
-        try {
-            ClassLoaderUtils.loadClass("org.codehaus.stax2.XMLStreamReader2", StaxUtils.class);
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-        return true;
     }
 
     /**
@@ -327,7 +310,7 @@ public final class StaxUtils {
             }
 
             if (!setRestrictionProperties(factory)) {
-                if (allowInsecureParser) {
+                if (ALLOW_INSECURE_PARSER_VAL) {
                     LOG.log(Level.WARNING, "INSECURE_PARSER_DETECTED", factory.getClass().getName());
                 } else {
                     throw new RuntimeException("Cannot create a secure XMLInputFactory, "
@@ -362,15 +345,15 @@ public final class StaxUtils {
     private static boolean setRestrictionProperties(XMLInputFactory factory) {
         //For now, we can only support Woodstox 4.2.x and newer as none of the other
         //stax parsers support these settings
-        final boolean wstxMaxs = setProperty(factory, "com.ctc.wstx.maxAttributesPerElement", maxAttributeCount)
-                    && setProperty(factory, "com.ctc.wstx.maxAttributeSize", maxAttributeSize)
-                    && setProperty(factory, "com.ctc.wstx.maxChildrenPerElement", innerElementCountThreshold)
-                    && setProperty(factory, "com.ctc.wstx.maxElementCount", maxElementCount)
-                    && setProperty(factory, "com.ctc.wstx.maxElementDepth", innerElementLevelThreshold)
-                    && setProperty(factory, "com.ctc.wstx.maxCharacters", maxXMLCharacters)
-                    && setProperty(factory, "com.ctc.wstx.maxTextLength", maxTextLength);
+        final boolean wstxMaxs = setProperty(factory, P_MAX_ATTRIBUTES_PER_ELEMENT, MAX_ATTR_COUNT_VAL)
+                    && setProperty(factory, P_MAX_ATTRIBUTE_SIZE, MAX_ATTR_SIZE_VAL)
+                    && setProperty(factory, P_MAX_CHILDREN_PER_ELEMENT, MAX_CHILD_ELEMENTS_VAL)
+                    && setProperty(factory, P_MAX_ELEMENT_COUNT, MAX_ELEMENT_COUNT_VAL)
+                    && setProperty(factory, P_MAX_ELEMENT_DEPTH, MAX_ELEMENT_DEPTH_VAL)
+                    && setProperty(factory, P_MAX_CHARACTERS, MAX_XML_CHARS_VAL)
+                    && setProperty(factory, P_MAX_TEXT_LENGTH, MAX_TEXT_LENGTH_VAL);
         return wstxMaxs
-            && setProperty(factory, "com.ctc.wstx.minTextSegment", minTextSegment);
+            && setProperty(factory, P_MIN_TEXT_SEGMENT, MIN_TEXT_SEGMENT_VAL);
     }
 
     private static boolean setProperty(XMLInputFactory f, String p, Object o) {
@@ -736,15 +719,13 @@ public final class StaxUtils {
                 if (isThreshold) {
                     elementCount++;
 
-                    if (innerElementLevelThreshold != -1
-                        && read >= innerElementLevelThreshold) {
+                    if (MAX_ELEMENT_DEPTH_VAL != -1 && read >= MAX_ELEMENT_DEPTH_VAL) {
                         throw new DepthExceededStaxException("reach the innerElementLevelThreshold:"
-                                                   + innerElementLevelThreshold);
+                                                   + MAX_ELEMENT_DEPTH_VAL);
                     }
-                    if (innerElementCountThreshold != -1
-                        && elementCount >= innerElementCountThreshold) {
+                    if (MAX_CHILD_ELEMENTS_VAL != -1 && elementCount >= MAX_CHILD_ELEMENTS_VAL) {
                         throw new DepthExceededStaxException("reach the innerElementCountThreshold:"
-                                                   + innerElementCountThreshold);
+                                                   + MAX_CHILD_ELEMENTS_VAL);
                     }
                     countStack.push(elementCount);
                     elementCount = 0;
@@ -1304,15 +1285,15 @@ public final class StaxUtils {
                     declare(e, reader.getNamespaceURI(), reader.getPrefix());
                 }
                 stack.push(parent);
-                if (isThreshold && innerElementLevelThreshold != -1
-                    && stack.size() >= innerElementLevelThreshold) {
+                if (isThreshold && MAX_ELEMENT_DEPTH_VAL != -1
+                    && stack.size() >= MAX_ELEMENT_DEPTH_VAL) {
                     throw new DepthExceededStaxException("reach the innerElementLevelThreshold:"
-                                               + innerElementLevelThreshold);
+                                               + MAX_ELEMENT_DEPTH_VAL);
                 }
-                if (isThreshold && innerElementCountThreshold != -1
-                    && elementCount >= innerElementCountThreshold) {
+                if (isThreshold && MAX_CHILD_ELEMENTS_VAL != -1
+                    && elementCount >= MAX_CHILD_ELEMENTS_VAL) {
                     throw new DepthExceededStaxException("reach the innerElementCountThreshold:"
-                                               + innerElementCountThreshold);
+                                               + MAX_CHILD_ELEMENTS_VAL);
                 }
                 parent = e;
                 break;
@@ -1463,15 +1444,15 @@ public final class StaxUtils {
                     declare(e, reader.getNamespaceURI(), reader.getPrefix());
                 }
                 context.pushToStack(parent);
-                if (context.isThreshold() && innerElementLevelThreshold != -1
-                    && context.getStackSize() >= innerElementLevelThreshold) {
+                if (context.isThreshold() && MAX_ELEMENT_DEPTH_VAL != -1
+                    && context.getStackSize() >= MAX_ELEMENT_DEPTH_VAL) {
                     throw new DepthExceededStaxException("reach the innerElementLevelThreshold:"
-                                               + innerElementLevelThreshold);
+                                               + MAX_ELEMENT_DEPTH_VAL);
                 }
-                if (context.isThreshold() && innerElementCountThreshold != -1
-                    && context.getCount() >= innerElementCountThreshold) {
+                if (context.isThreshold() && MAX_CHILD_ELEMENTS_VAL != -1
+                    && context.getCount() >= MAX_CHILD_ELEMENTS_VAL) {
                     throw new DepthExceededStaxException("reach the innerElementCountThreshold:"
-                                               + innerElementCountThreshold);
+                                               + MAX_CHILD_ELEMENTS_VAL);
                 }
                 parent = e;
                 break;
@@ -1545,15 +1526,15 @@ public final class StaxUtils {
                 declare(e, name.getNamespaceURI(), name.getPrefix());
             }
             context.pushToStack(parent);
-            if (context.isThreshold() && innerElementLevelThreshold != -1
-                && context.getStackSize() >= innerElementLevelThreshold) {
+            if (context.isThreshold() && MAX_ELEMENT_DEPTH_VAL != -1
+                && context.getStackSize() >= MAX_ELEMENT_DEPTH_VAL) {
                 throw new DepthExceededStaxException("reach the innerElementLevelThreshold:"
-                                           + innerElementLevelThreshold);
+                                           + MAX_ELEMENT_DEPTH_VAL);
             }
-            if (context.isThreshold() && innerElementCountThreshold != -1
-                && context.getCount() >= innerElementCountThreshold) {
+            if (context.isThreshold() && MAX_CHILD_ELEMENTS_VAL != -1
+                && context.getCount() >= MAX_CHILD_ELEMENTS_VAL) {
                 throw new DepthExceededStaxException("reach the innerElementCountThreshold:"
-                                           + innerElementCountThreshold);
+                                           + MAX_CHILD_ELEMENTS_VAL);
             }
             parent = e;
             break;
@@ -2115,7 +2096,7 @@ public final class StaxUtils {
             return true;
         }
         try {
-            if (reader.getProperty("com.ctc.wstx.maxChildrenPerElement") != null) {
+            if (reader.getProperty(P_MAX_CHILDREN_PER_ELEMENT) != null) {
                 return true;
             }
         } catch (Exception ex) {
@@ -2151,7 +2132,7 @@ public final class StaxUtils {
             DocumentDepthProperties p = null;
             if (maxChildElements != null) {
                 try {
-                    setProperty(reader, "com.ctc.wstx.maxChildrenPerElement", maxChildElements);
+                    setProperty(reader, P_MAX_CHILDREN_PER_ELEMENT, maxChildElements);
                 } catch (Throwable t) {
                     //we can handle this via a wrapper
                     p = new DocumentDepthProperties();
@@ -2160,7 +2141,7 @@ public final class StaxUtils {
             }
             if (maxElementDepth != null) {
                 try {
-                    setProperty(reader, "com.ctc.wstx.maxElementDepth", maxElementDepth);
+                    setProperty(reader, P_MAX_ELEMENT_DEPTH, maxElementDepth);
                 } catch (Throwable t) {
                     //we can handle this via a wrapper
                     if (p == null) {
@@ -2170,17 +2151,17 @@ public final class StaxUtils {
                 }
             }
             if (maxAttributeCount != null) {
-                setProperty(reader, "com.ctc.wstx.maxAttributesPerElement", maxAttributeCount);
+                setProperty(reader, P_MAX_ATTRIBUTES_PER_ELEMENT, maxAttributeCount);
             }
             if (maxAttributeSize != null) {
-                setProperty(reader, "com.ctc.wstx.maxAttributeSize", maxAttributeSize);
+                setProperty(reader, P_MAX_ATTRIBUTE_SIZE, maxAttributeSize);
             }
             if (maxTextLength != null) {
-                setProperty(reader, "com.ctc.wstx.maxTextLength", maxTextLength);
+                setProperty(reader, P_MAX_TEXT_LENGTH, maxTextLength);
             }
             if (maxElementCount != null) {
                 try {
-                    setProperty(reader, "com.ctc.wstx.maxElementCount", maxElementCount);
+                    setProperty(reader, P_MAX_ELEMENT_COUNT, maxElementCount);
                 } catch (Throwable t) {
                     //we can handle this via a wrapper
                     if (p == null) {
@@ -2190,21 +2171,21 @@ public final class StaxUtils {
                 }
             }
             if (maxXMLCharacters != null) {
-                setProperty(reader, "com.ctc.wstx.maxCharacters", maxXMLCharacters);
+                setProperty(reader, P_MAX_CHARACTERS, maxXMLCharacters);
             }
             if (p != null) {
                 reader = new DepthRestrictingStreamReader(reader, p);
             }
         } catch (ClassCastException cce) {
             //not an XMLStreamReader2
-            if (allowInsecureParser) {
+            if (ALLOW_INSECURE_PARSER_VAL) {
                 LOG.warning("INSTANCE_NOT_XMLSTREAMREADER2");
             } else {
                 throw new XMLStreamException(cce.getMessage(), cce);
             }
         } catch (IllegalArgumentException cce) {
             //not a property supported by this version of woodstox
-            if (allowInsecureParser) {
+            if (ALLOW_INSECURE_PARSER_VAL) {
                 LOG.log(Level.WARNING, "SECURE_PROPERTY_NOT_SUPPORTED", cce.getMessage());
             } else {
                 throw new XMLStreamException(cce.getMessage(), cce);

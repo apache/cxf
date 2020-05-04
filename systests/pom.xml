@@ -34,7 +34,7 @@
         <module>container-integration</module>
         <module>uncategorized</module>
         <module>transports</module>
-        <module>transports-ssl3</module>
+        <module>forked</module>
         <module>transport-jms</module>
         <module>transport-undertow</module>
         <module>jaxws</module>

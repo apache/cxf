@@ -24,7 +24,7 @@
     xmlns:cxf="http://cxf.apache.org/core"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <bean id="sportsImpl" class="org.apache.cxf.systest.aegis.SportsServiceImpl"/>
     <simple:server id="sports-server" address="http://localhost:${testutil.ports.CharacterSchemaTest}/sports" serviceClass="org.apache.cxf.systest.aegis.SportsService">
         <simple:dataBinding>

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.https.ssl3;
+package org.apache.cxf.systests.forked.ssl3;
 
 import java.io.IOException;
 import java.io.InputStream;

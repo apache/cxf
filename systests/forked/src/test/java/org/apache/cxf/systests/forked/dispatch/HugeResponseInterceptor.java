@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.dispatch;
+package org.apache.cxf.systests.forked.dispatch;
 
 
 import java.io.IOException;
@@ -48,7 +48,7 @@ public class HugeResponseInterceptor extends AbstractPhaseInterceptor<Message> {
                 CachedOutputStream bos = new CachedOutputStream();
                 try {
                     is = getClass().getClassLoader().getResourceAsStream(
-                        "org/apache/cxf/systest/dispatch/resources/GreetMeDocLiteralRespBreakThreshold.xml");
+                        "org/apache/cxf/systests/forked/dispatch/GreetMeDocLiteralRespBreakThreshold.xml");
                     IOUtils.copy(is, bos);
                     bos.flush();
                     is.close();
@@ -65,7 +65,7 @@ public class HugeResponseInterceptor extends AbstractPhaseInterceptor<Message> {
                 CachedOutputStream bos = new CachedOutputStream();
                 try {
                     is = getClass().getClassLoader().getResourceAsStream(
-                        "org/apache/cxf/systest/dispatch/resources/"
+                        "org/apache/cxf/systests/forked/dispatch/"
                         + "GreetMeDocLiteralRespBreakElementCountThreshold.xml");
                     IOUtils.copy(is, bos);
                     bos.flush();

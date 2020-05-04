@@ -16,7 +16,7 @@
             <cm:property name="xkms.logExceptions" value="false"/>
             <cm:property name="xkms.certificate.repo" value="file"/>
             <cm:property name="xkms.file.storageDir" value="data/xkms/certificates"/>
-            <cm:property name="xkms.enableRevocation" value="true"/>
+            <cm:property name="xkms.enableRevocation" value="false"/>
         </cm:default-properties>
     </cm:property-placeholder>
     <service interface="org.apache.cxf.xkms.x509.repo.CertificateRepo" activation="eager">
