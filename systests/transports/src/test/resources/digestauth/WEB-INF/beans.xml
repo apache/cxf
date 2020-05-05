@@ -31,7 +31,6 @@
     <http:destination name="{http://apache.org/hello_world}Mortimer.http-destination">
         <!-- Nothing to Configure here for Mortimer -->
     </http:destination>
-    <bean id="greeterImpl" class="org.apache.cxf.systest.http.auth.GreeterImpl">
-  </bean>
+    <bean id="greeterImpl" class="org.apache.cxf.systest.http.auth.GreeterImpl" />
     <jaxws:endpoint address="/greeter" implementor="#greeterImpl" publish="true"/>
 </beans>

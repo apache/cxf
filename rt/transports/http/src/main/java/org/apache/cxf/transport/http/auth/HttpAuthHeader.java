@@ -135,8 +135,7 @@ public final class HttpAuthHeader {
      * @return The realm, or null if it is non-existent.
      */
     public String getRealm() {
-        Map<String, String> map = parseHeader();
-        return map.get("realm");
+        return params.get("realm");
     }
 
     public boolean authTypeIsDigest() {
