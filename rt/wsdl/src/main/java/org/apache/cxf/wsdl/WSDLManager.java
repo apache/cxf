@@ -104,10 +104,4 @@ public interface WSDLManager {
      */
     void removeDefinition(Definition wsdl);
 
-    /**
-     * If the definition is cached, remove it from the cache
-     * @param url
-     */
-    void removeDefinition(String url);
-
 }

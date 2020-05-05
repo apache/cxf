@@ -216,7 +216,7 @@ public class WSDLManagerImplTest {
         assertNotNull(service);
 
         // Now remove it
-        builder.removeDefinition(path2.toString());
+        ((WSDLManagerImpl)builder).removeDefinition(path2.toString());
 
         // This time loading should fail as the original resource is removed
         try {

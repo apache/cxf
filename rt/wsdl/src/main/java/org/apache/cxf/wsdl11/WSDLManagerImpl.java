@@ -354,7 +354,6 @@ public class WSDLManagerImpl implements WSDLManager {
         }
     }
 
-    @Override
     public void removeDefinition(String url) {
         synchronized (definitionsMap) {
             Definition wsdl = definitionsMap.get(url);
