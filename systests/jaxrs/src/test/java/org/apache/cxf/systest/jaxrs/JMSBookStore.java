@@ -29,7 +29,6 @@ import javax.jms.BytesMessage;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
-import javax.jms.JMSException;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.naming.Context;
@@ -130,22 +129,11 @@ public class JMSBookStore {
         ConnectionFactory factory = (ConnectionFactory)ctx.lookup("ConnectionFactory");
         Destination replyToDestination = (Destination)ctx.lookup("dynamicQueues/test.jmstransport.response");
 
-        Connection connection = null;
-        try {
-            connection = factory.createConnection();
+        try (Connection connection = factory.createConnection()) {
             connection.start();
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             postOneWayBook(session, replyToDestination, book);
             session.close();
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.stop();
-                    connection.close();
-                }
-            } catch (JMSException ex) {
-                // ignore
-            }
         }
     }
 

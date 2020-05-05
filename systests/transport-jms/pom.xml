@@ -223,6 +223,12 @@
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-broker</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-jms_1.1_spec</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
@@ -231,13 +237,9 @@
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
+                    <artifactId>geronimo-jms_1.1_spec</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-kahadb-store</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>

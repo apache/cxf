@@ -20,6 +20,7 @@ package org.apache.cxf.transport.jms.util;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
+import javax.jms.JMSContext;
 import javax.jms.JMSException;
 
 public class UserCredentialsConnectionFactoryAdapter implements ConnectionFactory {
@@ -47,6 +48,26 @@ public class UserCredentialsConnectionFactoryAdapter implements ConnectionFactor
     @Override
     public Connection createConnection(String userName2, String password2) throws JMSException {
         return targetConnectionFactory.createConnection(userName2, password2);
+    }
+
+    @Override
+    public JMSContext createContext() {
+        return targetConnectionFactory.createContext(userName, password);
+    }
+
+    @Override
+    public JMSContext createContext(String userName2, String password2) {
+        return targetConnectionFactory.createContext(userName2, password2);
+    }
+
+    @Override
+    public JMSContext createContext(String userName2, String password2, int sessionMode) {
+        return targetConnectionFactory.createContext(userName2, password2, sessionMode);
+    }
+
+    @Override
+    public JMSContext createContext(int sessionMode) {
+        return targetConnectionFactory.createContext(userName, password, sessionMode);
     }
 
 }
