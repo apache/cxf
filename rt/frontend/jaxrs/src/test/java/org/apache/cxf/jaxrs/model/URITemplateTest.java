@@ -53,6 +53,38 @@ public class URITemplateTest {
     }
 
     @Test
+    public void testCompareRegExTemplates2() {
+        // The purpose of this test is to ensure that enclosing a regex expression does not result
+        // in the matcher creating extraneous values.  See CXF-8278
+        URITemplate t1 = new URITemplate("/test/{uniqueid : ([0-9a-f]{4}-.*|[0-9a-f]{7}-.*)}/file/{file}");
+        URITemplate t2 = new URITemplate("/test/{uniqueid : [0-9a-f]{4}-.*|[0-9a-f]{7}-.*}/file/{file}");
+        MultivaluedMap<String, String> template = new MetadataMap<String, String>();
+        assertTrue(t1.match("/test/123e-12345/file/test.jpg", template));
+        assertEquals(template.getFirst("uniqueid"), "123e-12345");
+        assertEquals("test.jpg", template.getFirst("file"));
+
+        template.clear();
+        assertTrue(t1.match("/test/123456e-12345/file/test.jpg", template));
+        assertEquals(template.getFirst("uniqueid"), "123456e-12345");
+        assertEquals(template.getFirst("file"), "test.jpg");
+
+        template.clear();
+        assertTrue(t2.match("/test/123e-12345/file/test.jpg", template));
+        assertEquals(template.getFirst("uniqueid"), "123e-12345");
+        assertEquals(template.getFirst("file"), "test.jpg");
+
+        template.clear();
+        assertTrue(t2.match("/test/123456e-12345/file/test.jpg", template));
+        assertEquals(template.getFirst("uniqueid"), "123456e-12345");
+        assertEquals(template.getFirst("file"), "test.jpg");
+
+        template.clear();
+        assertFalse(t2.match("/test/12345678-12345/file/test.jpg", template));
+
+    }
+
+
+    @Test
     public void testPathCharacters() {
         String pathChars = ":@!$&'*+,;=-._~()";
         assertTrue(new URITemplate(pathChars).match(pathChars,
