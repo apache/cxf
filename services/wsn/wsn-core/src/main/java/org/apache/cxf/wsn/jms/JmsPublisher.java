@@ -89,10 +89,8 @@ public abstract class JmsPublisher extends AbstractPublisher implements Consumer
 
     @Override
     public void notify(NotificationMessageHolderType messageHolder) {
-        Session session = null;
-        try {
+        try (Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)) {
             Topic topic = topicConverter.toActiveMQTopic(messageHolder.getTopic());
-            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             MessageProducer producer = session.createProducer(topic);
             Notify notify = new Notify();
             notify.getNotificationMessage().add(messageHolder);
@@ -102,14 +100,6 @@ public abstract class JmsPublisher extends AbstractPublisher implements Consumer
             producer.send(message);
         } catch (JMSException | JAXBException | InvalidTopicException e) {
             LOGGER.log(Level.WARNING, "Error dispatching message", e);
-        } finally {
-            if (session != null) {
-                try {
-                    session.close();
-                } catch (JMSException e) {
-                    LOGGER.log(Level.FINE, "Error closing session", e);
-                }
-            }
         }
     }
 

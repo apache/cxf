@@ -122,14 +122,8 @@ public final class JMSUtil {
     }
 
     public static Queue createQueue(Connection connection, String name) throws JMSException {
-        Session session = null;
-        try {
-            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        try (Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)) {
             return session.createQueue(name);
-        } finally {
-            if (session != null) {
-                session.close();
-            }
         }
     }
 

@@ -47,16 +47,12 @@ public class JMSSender {
 
     public void sendMessage(Session session, Destination targetDest,
                             javax.jms.Message message) throws JMSException {
-        MessageProducer producer = null;
-        try {
-            producer = session.createProducer(targetDest);
+        try (MessageProducer producer = session.createProducer(targetDest)) {
             if (explicitQosEnabled) {
                 producer.send(message, deliveryMode, priority, timeToLive);
             } else {
                 producer.send(message);
             }
-        } finally {
-            ResourceCloser.close(producer);
         }
 
     }

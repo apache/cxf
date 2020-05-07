@@ -391,7 +391,7 @@
         <feature version="${project.version}">cxf-core</feature>
         <feature version="${project.version}">cxf-bindings-soap</feature>
         <bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/${cxf.geronimo.jta.version}</bundle>
-        <bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/${cxf.geronimo.jms.version}</bundle>
+        <bundle dependency="true">mvn:jakarta.jms/jakarta.jms-api/${cxf.jms-api.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-transports-jms/${project.version}</bundle>
     </feature>
     <feature name="cxf-transports-udp" version="${project.version}">
@@ -534,7 +534,7 @@
         <feature version="${project.version}">cxf-wsn-api</feature>
         <feature version="${project.version}">cxf-http-provider</feature>
         <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.aopalliance/1.0_6</bundle>
-        <bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/${cxf.geronimo.jms.version}</bundle>
+        <bundle dependency="true">mvn:jakarta.jms/jakarta.jms-api/${cxf.jms-api.version}</bundle>
         <bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-j2ee-management_1.1_spec/${cxf.geronimo.j2ee.management.version}</bundle>
         <bundle dependency="true">mvn:org.apache.activemq/activemq-osgi/${cxf.activemq.version}</bundle>
         <bundle>mvn:org.apache.cxf.services.wsn/cxf-services-wsn-core/${project.version}</bundle>

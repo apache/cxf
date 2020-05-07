@@ -43,8 +43,8 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jms_1.1_spec</artifactId>
+            <groupId>jakarta.jms</groupId>
+            <artifactId>jakarta.jms-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
@@ -69,9 +69,9 @@
         </dependency>
         
         <dependency>
-        	<groupId>org.awaitility</groupId>
-        	<artifactId>awaitility</artifactId>
-        	<scope>test</scope>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -100,6 +100,12 @@
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-broker</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-jms_1.1_spec</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
@@ -108,14 +114,9 @@
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
+                    <artifactId>geronimo-jms_1.1_spec</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-kahadb-store</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.xbean</groupId>
@@ -131,12 +132,6 @@
             <groupId>org.apache.geronimo.components</groupId>
             <artifactId>geronimo-transaction</artifactId>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
     <build>

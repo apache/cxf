@@ -32,6 +32,7 @@ import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.ExceptionListener;
 import javax.jms.InvalidClientIDException;
+import javax.jms.JMSContext;
 import javax.jms.JMSException;
 import javax.jms.Queue;
 import javax.jms.ServerSessionPool;
@@ -48,7 +49,6 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.MultiplexDestination;
-import org.apache.cxf.transport.jms.util.ResourceCloser;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -123,6 +123,30 @@ public class JMSDestinationTest extends AbstractJMSTester {
             return delegate.createDurableConnectionConsumer(topic, subscriptionName, messageSelector,
                 sessionPool, maxMessages);
         }
+
+        @Override
+        public Session createSession(int sessionMode) throws JMSException {
+            return delegate.createSession(sessionMode);
+        }
+
+        @Override
+        public Session createSession() throws JMSException {
+            return delegate.createSession();
+        }
+
+        @Override
+        public ConnectionConsumer createSharedConnectionConsumer(Topic topic, String subscriptionName,
+            String messageSelector, ServerSessionPool sessionPool, int maxMessages) throws JMSException {
+            return delegate.createSharedConnectionConsumer(topic, subscriptionName, messageSelector, sessionPool,
+                maxMessages);
+        }
+
+        @Override
+        public ConnectionConsumer createSharedDurableConnectionConsumer(Topic topic, String subscriptionName,
+            String messageSelector, ServerSessionPool sessionPool, int maxMessages) throws JMSException {
+            return delegate.createSharedDurableConnectionConsumer(topic, subscriptionName, messageSelector, sessionPool,
+                maxMessages);
+        }
     }
 
     private static final class FaultyConnectionFactory implements ConnectionFactory {
@@ -160,6 +184,26 @@ public class JMSDestinationTest extends AbstractJMSTester {
                 throw new JMSException("createConnection(userName, password) failed (simulated)");
             }
         }
+
+        @Override
+        public JMSContext createContext() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public JMSContext createContext(String userName, String password) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public JMSContext createContext(String userName, String password, int sessionMode) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public JMSContext createContext(int sessionMode) {
+            throw new UnsupportedOperationException();
+        }
     }
 
     @Test
@@ -193,9 +237,8 @@ public class JMSDestinationTest extends AbstractJMSTester {
 
     @Test(expected = InvalidClientIDException.class)
     public void testDurableInvalidClientId() throws Throwable {
-        Connection con = cf1.createConnection();
         JMSDestination destination = null;
-        try {
+        try (Connection con = cf1.createConnection()) {
             con.setClientID("testClient");
             con.start();
             EndpointInfo ei = setupServiceInfo("HelloWorldPubSubService", "HelloWorldPubSubPort");
@@ -208,7 +251,6 @@ public class JMSDestinationTest extends AbstractJMSTester {
         } catch (RuntimeException e) {
             throw e.getCause();
         } finally {
-            ResourceCloser.close(con);
             destination.shutdown();
         }
     }

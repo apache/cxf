@@ -30,7 +30,6 @@ import javax.jms.BytesMessage;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
-import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
@@ -141,15 +140,11 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
 
         Destination replyToDestination = (Destination)ctx.lookup("dynamicQueues/test.jmstransport.response");
 
-        Connection connection = null;
-        try {
-            connection = factory.createConnection();
+        try (Connection connection = factory.createConnection()) {
             connection.start();
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             checkBookInResponse(session, replyToDestination, 129L, "OneWay From WebClient");
             session.close();
-        } finally {
-            close(connection);
         }
     }
 
@@ -295,16 +290,12 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         Destination destination = (Destination)ctx.lookup("dynamicQueues/test.jmstransport.text");
         Destination replyToDestination = (Destination)ctx.lookup("dynamicQueues/test.jmstransport.response");
 
-        Connection connection = null;
-        try {
-            connection = factory.createConnection();
+        try (Connection connection = factory.createConnection()) {
             connection.start();
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             postGetMessage(session, destination, replyToDestination);
             checkBookInResponse(session, replyToDestination, 123L, "CXF JMS Rocks");
             session.close();
-        } finally {
-            close(connection);
         }
 
     }
@@ -318,16 +309,12 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         Destination destination = (Destination)ctx.lookup("dynamicQueues/test.jmstransport.text");
         Destination replyToDestination = (Destination)ctx.lookup("dynamicQueues/test.jmstransport.response");
 
-        Connection connection = null;
-        try {
-            connection = factory.createConnection();
+        try (Connection connection = factory.createConnection()) {
             connection.start();
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             postBook(session, destination, replyToDestination);
             checkBookInResponse(session, replyToDestination, 124L, "JMS");
             session.close();
-        } finally {
-            close(connection);
         }
 
     }
@@ -340,16 +327,12 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         Destination destination = (Destination)ctx.lookup("dynamicQueues/test.jmstransport.text");
         Destination replyToDestination = (Destination)ctx.lookup("dynamicQueues/test.jmstransport.response");
 
-        Connection connection = null;
-        try {
-            connection = factory.createConnection();
+        try (Connection connection = factory.createConnection()) {
             connection.start();
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             postOneWayBook(session, destination);
             checkBookInResponse(session, replyToDestination, 125L, "JMS OneWay");
             session.close();
-        } finally {
-            close(connection);
         }
 
     }
@@ -449,17 +432,6 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         m.marshal(b, bos);
         return bos.toByteArray();
-    }
-
-    private void close(Connection connection) {
-        try {
-            if (connection != null) {
-                connection.stop();
-                connection.close();
-            }
-        } catch (JMSException ex) {
-            // ignore
-        }
     }
 
 }
