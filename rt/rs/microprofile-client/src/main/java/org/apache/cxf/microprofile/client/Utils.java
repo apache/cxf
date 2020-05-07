@@ -19,29 +19,36 @@
 
 package org.apache.cxf.microprofile.client;
 
-import java.lang.reflect.Type;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
+import java.util.concurrent.ForkJoinPool;
 
-import javax.ws.rs.client.InvocationCallback;
-
-import org.apache.cxf.jaxrs.client.JaxrsClientCallback;
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.message.Message;
 
-public class MPRestClientCallback<T> extends JaxrsClientCallback<T> {
-    private final ExecutorService executor;
+public final class Utils {
 
-    public MPRestClientCallback(InvocationCallback<T> handler,
-                                Message outMessage,
-                                Class<?> responseClass,
-                                Type outGenericType) {
-        super(handler, responseClass, outGenericType);
-        executor = Utils.getExecutorService(outMessage);
+    private Utils() {
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public Future<T> createFuture() {
-        return delegate.thenApplyAsync(res -> (T)res[0], executor);
+    public static ExecutorService getExecutorService(Message message) {
+        ExecutorService es = message.get(ExecutorService.class);
+        if (es == null) {
+            es = AccessController.doPrivileged((PrivilegedAction<ExecutorService>)() -> {
+                return ForkJoinPool.commonPool();
+            });
+        }
+        return es;
+    }
+
+    public static ExecutorService getExecutorService(MessageContext mc) {
+        ExecutorService es = (ExecutorService) mc.get(ExecutorService.class);
+        if (es == null) {
+            es = AccessController.doPrivileged((PrivilegedAction<ExecutorService>) () -> {
+                return ForkJoinPool.commonPool();
+            });
+        }
+        return es;
     }
 }

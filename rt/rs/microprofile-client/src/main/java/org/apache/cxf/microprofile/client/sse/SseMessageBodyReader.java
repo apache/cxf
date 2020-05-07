@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ExecutorService;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -35,7 +35,10 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Providers;
 import javax.ws.rs.sse.InboundSseEvent;
 
+import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.impl.ProvidersImpl;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProviders;
+import org.apache.cxf.microprofile.client.Utils;
 import org.reactivestreams.Publisher;
 
 @Produces(MediaType.SERVER_SENT_EVENTS)
@@ -43,6 +46,9 @@ public class SseMessageBodyReader implements MessageBodyReader<Publisher<?>> {
 
     @Context
     Providers providers;
+
+    @Context
+    private MessageContext mc;
 
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
@@ -53,9 +59,10 @@ public class SseMessageBodyReader implements MessageBodyReader<Publisher<?>> {
     public Publisher<?> readFrom(Class<Publisher<?>> type, Type genericType,
             Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> httpHeaders,
             InputStream entityStream) throws IOException, WebApplicationException {
-        Providers providersImpl = (providers instanceof ThreadLocalProviders) ? ((ThreadLocalProviders)providers).get() 
-                                                                              : providers;
-        SsePublisher publisher = new SsePublisher(entityStream, ForkJoinPool.commonPool(), providersImpl);
+        ProvidersImpl providersImpl = (ProvidersImpl) (providers instanceof ThreadLocalProviders
+            ? ((ThreadLocalProviders)providers).get() : providers);
+        ExecutorService executor = Utils.getExecutorService(mc);
+        SsePublisher publisher = new SsePublisher(entityStream, executor, providersImpl);
         if (genericType instanceof ParameterizedType) {
             Type typeArgument = ((ParameterizedType)genericType).getActualTypeArguments()[0];
             if (typeArgument.equals(InboundSseEvent.class)) {

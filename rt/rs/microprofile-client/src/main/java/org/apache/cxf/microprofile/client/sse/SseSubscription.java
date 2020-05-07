@@ -38,6 +38,7 @@ public class SseSubscription implements Subscription {
     private final AtomicLong requested = new AtomicLong();
     private final AtomicLong delivered = new AtomicLong();
     private final AtomicBoolean completed = new AtomicBoolean();
+    private final AtomicBoolean canceled = new AtomicBoolean();
     //CHECKSTYLE:OFF
     private final LinkedList<InboundSseEvent> buffer = new LinkedList<>(); //NOPMD
     //CHECKSTYLE:ON
@@ -50,25 +51,30 @@ public class SseSubscription implements Subscription {
 
     @Override
     public void request(long n) {
+        if (canceled.get()) {
+            return;
+        }
         if (n < 1) {
-            throw new IllegalArgumentException("Only positive values are valid - passed-in " + n);
+            fireError(new IllegalArgumentException("Only positive values may be requested - passed-in " + n));
+            return;
         }
         requested.addAndGet(n);
         synchronized (buffer) {
             InboundSseEvent bufferedEvent = null;
-            while (delivered.get() < requested.get()
-                   && (bufferedEvent = buffer.pollFirst()) != null) {
-                InboundSseEvent finalEvent = bufferedEvent;
-                delivered.updateAndGet(l -> {
-                    subscriber.onNext(finalEvent);
-                    return l + 1;
-                });
+            synchronized (delivered) {
+                while (delivered.get() < requested.get()
+                       && (bufferedEvent = buffer.pollFirst()) != null) {
+
+                    subscriber.onNext(bufferedEvent);
+                    delivered.incrementAndGet();
+                }
             }
         }
     }
 
     @Override
     public void cancel() {
+        canceled.set(true);
         publisher.removeSubscription(this);
     }
 
@@ -77,6 +83,9 @@ public class SseSubscription implements Subscription {
     }
 
     void fireEvent(InboundSseEvent event) {
+        if (completed.get() || canceled.get()) {
+            return;
+        }
         delivered.updateAndGet(l -> {
             if (l < requested.get()) {
                 subscriber.onNext(event);
@@ -86,10 +95,12 @@ public class SseSubscription implements Subscription {
             }
             return l;
         });
+
+        fireCompleteIfReady();
     }
 
-    void fireComplete() {
-        if (completed.compareAndSet(false, true)) {
+    void fireCompleteIfReady() {
+        if (completed.get() && buffer.isEmpty()) {
             subscriber.onComplete();
         }
     }
@@ -111,5 +122,14 @@ public class SseSubscription implements Subscription {
                 buffer.removeFirst();
             }
         }
+    }
+
+    static boolean isActive(SseSubscription subscription) {
+        return !subscription.completed.get() && !subscription.canceled.get();
+    }
+
+    void complete() {
+        completed.set(true);
+        fireCompleteIfReady();
     }
 }

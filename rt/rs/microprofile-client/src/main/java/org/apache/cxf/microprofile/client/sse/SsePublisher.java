@@ -22,8 +22,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -38,7 +38,7 @@ public class SsePublisher implements Publisher<InboundSseEvent> {
     final Executor executor;
     final BufferedReader br;
     final Providers providers;
-    final List<SseSubscription> subscriptions = new LinkedList<>();
+    final List<SseSubscription> subscriptions = new CopyOnWriteArrayList<>();
     final AtomicBoolean isStarted = new AtomicBoolean(false);
 
     SsePublisher(InputStream is, Executor executor, Providers providers) {
@@ -80,7 +80,7 @@ public class SsePublisher implements Publisher<InboundSseEvent> {
                         line = br.readLine();
                     }
                     for (SseSubscription subscription : subscriptions) {
-                        subscription.fireComplete();
+                        subscription.complete();
                     }
                 } catch (IOException ex) {
                     for (SseSubscription subscription : subscriptions) {
@@ -93,7 +93,6 @@ public class SsePublisher implements Publisher<InboundSseEvent> {
 
     void removeSubscription(SseSubscription subscription) {
         subscriptions.remove(subscription);
-        subscription.fireComplete();
     }
 
     private String removeSpace(String s) {
