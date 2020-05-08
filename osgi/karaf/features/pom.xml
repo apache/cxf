@@ -38,10 +38,6 @@
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>javax.xml.bind</groupId>
-                    <artifactId>jaxb-api</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>com.sun.activation</groupId>
                     <artifactId>javax.activation</artifactId>
                 </exclusion>
@@ -60,7 +56,7 @@
             <type>xml</type>
             <scope>provided</scope>
         </dependency>
-		
+
 		<dependency>
 	        <groupId>org.apache.cxf.karaf</groupId>
 		    <artifactId>cxf-karaf-commands</artifactId>
@@ -154,23 +150,6 @@
                 <groupId>org.apache.karaf.tooling</groupId>
                 <artifactId>karaf-maven-plugin</artifactId>
                 <version>${cxf.karaf.version}</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>jakarta.xml.bind</groupId>
-                        <artifactId>jakarta.xml.bind-api</artifactId>
-                        <version>${cxf.jaxb.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>javax.activation</groupId>
-                        <artifactId>activation</artifactId>
-                        <version>1.1.1</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.glassfish.jaxb</groupId>
-                        <artifactId>jaxb-runtime</artifactId>
-                        <version>${cxf.jaxb.runtime.version}</version>
-                    </dependency>
-                </dependencies>
                 <executions>
                     <execution>
                         <id>verify</id>
@@ -183,7 +162,6 @@
                                 <descriptor>mvn:org.apache.karaf.features/framework/${cxf.karaf.version}/xml/features</descriptor>
                                 <descriptor>mvn:org.apache.karaf.features/standard/${cxf.karaf.version}/xml/features</descriptor>
                                 <descriptor>mvn:org.apache.karaf.features/spring/${cxf.karaf.version}/xml/features</descriptor>
-				<descriptor>mvn:org.ops4j.pax.web/pax-web-features/6.0.2/xml/features</descriptor>
                                 <descriptor>file:${project.build.directory}/classes/features.xml</descriptor>
                             </descriptors>
                             <distribution>org.apache.karaf.features:framework</distribution>
@@ -193,8 +171,6 @@
                             </framework>
                             <features>
                                 <feature>cxf-*</feature>
-                                <!-- <feature>cxf-management-web</feature> -->
-                                <!-- <feature>cxf-wsn</feature> -->
                             </features>
                         </configuration>
                     </execution>
