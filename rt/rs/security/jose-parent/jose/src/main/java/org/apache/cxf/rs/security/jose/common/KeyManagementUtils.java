@@ -57,6 +57,7 @@ import org.apache.cxf.rs.security.jose.jwk.KeyOperation;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 import org.apache.cxf.rt.security.rs.PrivateKeyPasswordProvider;
+import org.apache.cxf.rt.security.rs.RSSecurityConstants;
 
 /**
  * Encryption helpers
@@ -353,13 +354,19 @@ public final class KeyManagementUtils {
         }
         return null;
     }
+
     //TODO: enhance the certificate validation code
     public static void validateCertificateChain(Properties storeProperties, List<X509Certificate> inCerts) {
         Message message = PhaseInterceptorChain.getCurrentMessage();
         KeyStore ks = loadPersistKeyStore(message, storeProperties);
-        validateCertificateChain(ks, inCerts);
+        String enableRevocationProp = storeProperties.getProperty(RSSecurityConstants.RSSEC_ENABLE_REVOCATION);
+        if (enableRevocationProp == null) {
+            enableRevocationProp = (String)message.getContextualProperty(JoseConstants.RSSEC_ENABLE_REVOCATION);
+        }
+        boolean enableRevocation = enableRevocationProp != null && Boolean.parseBoolean(enableRevocationProp);
+        validateCertificateChain(ks, inCerts, enableRevocation);
     }
-    public static void validateCertificateChain(KeyStore ks, List<X509Certificate> inCerts) {
+    private static void validateCertificateChain(KeyStore ks, List<X509Certificate> inCerts, boolean enableRevocation) {
         // Initial chain validation, to be enhanced as needed
         try {
             X509CertSelector certSelect = new X509CertSelector();
@@ -370,6 +377,7 @@ public final class KeyManagementUtils {
             pbParams.setMaxPathLength(-1);
             pbParams.setRevocationEnabled(false);
             CertPathBuilderResult buildResult = CertPathBuilder.getInstance("PKIX").build(pbParams);
+            pbParams.setRevocationEnabled(enableRevocation);
             CertPath certPath = buildResult.getCertPath();
             CertPathValidator.getInstance("PKIX").validate(certPath, pbParams);
         } catch (Exception ex) {
