@@ -20,6 +20,8 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -124,14 +126,16 @@ public class AttachmentCallbackHandler implements CallbackHandler {
                 iterator.hasNext();) {
                 org.apache.cxf.message.Attachment attachment = iterator.next();
 
-                if (attachmentId != null && !attachmentId.equals(attachment.getId())) {
+                if (attachmentId != null
+                        && !(attachmentId.equals(attachment.getId())
+                            || attachmentId.equals(getDecodedAttachmentId(attachment.getId())))) {
                     continue;
                 }
 
                 org.apache.wss4j.common.ext.Attachment att =
                     new org.apache.wss4j.common.ext.Attachment();
                 att.setMimeType(attachment.getDataHandler().getContentType());
-                att.setId(attachment.getId());
+                att.setId(attachmentId == null ? attachment.getId() : attachmentId);
                 att.setSourceStream(attachment.getDataHandler().getInputStream());
                 Iterator<String> headerIterator = attachment.getHeaderNames();
                 while (headerIterator.hasNext()) {
@@ -145,6 +149,10 @@ public class AttachmentCallbackHandler implements CallbackHandler {
                 }
             }
         }
+    }
+
+    private static String getDecodedAttachmentId(String attachmentId) throws IOException {
+        return URLDecoder.decode(attachmentId, StandardCharsets.UTF_8.name());
     }
 
 }
