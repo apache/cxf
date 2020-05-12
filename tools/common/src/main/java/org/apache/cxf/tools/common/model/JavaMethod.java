@@ -148,9 +148,7 @@ public class JavaMethod implements JavaAnnotatable {
     }
 
     private void replaceParameter(JavaParameter p1, JavaParameter p2) {
-        int index = ((ArrayList<?>)parameters).indexOf(p1);
-        parameters.remove(index);
-        parameters.add(index, p2);
+        parameters.set(parameters.indexOf(p1), p2);
         if ((p1.isIN() && p2.isOUT()) || p1.isINOUT()) {
             p2.setStyle(Style.INOUT);
         }
