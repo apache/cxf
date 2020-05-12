@@ -86,7 +86,7 @@
         <cxf.artemis.version>2.10.1</cxf.artemis.version>
         <cxf.aspectj.version>1.9.1</cxf.aspectj.version>
         <cxf.atmosphere.version.range>[2.4,3.0)</cxf.atmosphere.version.range>
-        <cxf.atmosphere.version>2.5.2</cxf.atmosphere.version>
+        <cxf.atmosphere.version>2.5.15</cxf.atmosphere.version>
         <cxf.bcprov.version>1.65</cxf.bcprov.version>
         <cxf.brave.reporter.version>2.12.1</cxf.brave.reporter.version>
         <cxf.brave.version>5.10.1</cxf.brave.version>
@@ -2804,13 +2804,12 @@
             </build>
         </profile>
         <profile>
-	    <id>java9-plus</id>
-	    <properties>
-                <org.apache.cxf.transport.websocket.atmosphere.disabled>true</org.apache.cxf.transport.websocket.atmosphere.disabled>
+            <id>java9-plus</id>
+            <properties>
                 <cxf.jdk.version>11</cxf.jdk.version>
-	    </properties>
-	    <activation>
-        	<jdk>[9,)</jdk>
+            </properties>
+            <activation>
+                <jdk>[9,)</jdk>
             </activation>
             <build>
                 <plugins>
