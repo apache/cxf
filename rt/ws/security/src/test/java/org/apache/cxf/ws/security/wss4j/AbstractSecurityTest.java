@@ -21,6 +21,7 @@ package org.apache.cxf.ws.security.wss4j;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -152,17 +154,18 @@ public abstract class AbstractSecurityTest extends AbstractCXFTest {
     }
 
     @org.junit.AfterClass
-    public static void cleanup() {
+    public static void cleanup() throws IOException {
         String tmpDir = System.getProperty("java.io.tmpdir");
         if (tmpDir != null) {
             File[] tmpFiles = new File(tmpDir).listFiles();
             if (tmpFiles != null) {
                 for (File tmpFile : tmpFiles) {
                     if (tmpFile.exists() && (tmpFile.getName().startsWith("ws-security.nonce.cache.instance")
-                            || tmpFile.getName().startsWith("wss4j-nonce-cache")
                             || tmpFile.getName().startsWith("ws-security.timestamp.cache.instance")
+                            || tmpFile.getName().startsWith("ws-security.saml.cache.instance")
+                            || tmpFile.getName().startsWith("wss4j-nonce-cache")
                             || tmpFile.getName().startsWith("wss4j-timestamp-cache"))) {
-                        tmpFile.delete();
+                        FileUtils.forceDeleteOnExit(tmpFile);
                     }
                 }
             }
