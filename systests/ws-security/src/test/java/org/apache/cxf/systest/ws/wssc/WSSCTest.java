@@ -89,7 +89,9 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
             clearAction = a;
         }
         public String toString() {
-            return prefix + ":" + port + ":" + (streaming ? "streaming" : "dom")
+            return prefix + ":" 
+                + port + ((port == STAX_PORT || port == STAX_PORT2) ? "(stax)" : "") 
+                + ":" + (streaming ? "streaming" : "dom")
                 + (clearAction ? "/no SOAPAction" : "");
         }
     }
