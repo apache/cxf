@@ -337,10 +337,11 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         protected void connect(boolean output) {
             if ("https".equals(url.getScheme())) {
                 TLSClientParameters clientParameters = findTLSClientParameters();
-                bootstrap.handler(new NettyHttpClientPipelineFactory(clientParameters));
+                bootstrap.handler(new NettyHttpClientPipelineFactory(clientParameters, entity.getReceiveTimeout()));
             } else {
-                bootstrap.handler(new NettyHttpClientPipelineFactory(null));
+                bootstrap.handler(new NettyHttpClientPipelineFactory(null, entity.getReceiveTimeout()));
             }
+
             ChannelFuture connFuture =
                 bootstrap.connect(new InetSocketAddress(url.getHost(), url.getPort() != -1 ? url.getPort()
                                                             : "http".equals(url.getScheme()) ? 80 : 443));
@@ -380,6 +381,11 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
                 @Override
                 public void responseReceived(HttpResponse response) {
                     setHttpResponse(response);
+                }
+                
+                @Override
+                public void error(Throwable ex) {
+                    setException(ex);
                 }
             };
             entity.setCxfResponseCallback(callBack);
