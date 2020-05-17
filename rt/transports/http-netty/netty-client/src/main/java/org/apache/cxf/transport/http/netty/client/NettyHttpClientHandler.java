@@ -19,6 +19,7 @@
 
 package org.apache.cxf.transport.http.netty.client;
 
+import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -26,6 +27,7 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.timeout.ReadTimeoutException;
 
 public class NettyHttpClientHandler extends ChannelDuplexHandler {
     private final BlockingQueue<NettyHttpClientRequest> sendedQueue =
@@ -49,7 +51,6 @@ public class NettyHttpClientHandler extends ChannelDuplexHandler {
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-
         // need to deal with the request
         if (msg instanceof NettyHttpClientRequest) {
             NettyHttpClientRequest request = (NettyHttpClientRequest)msg;
@@ -61,9 +62,12 @@ public class NettyHttpClientHandler extends ChannelDuplexHandler {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
-        throws Exception {
-        //TODO need to handle the exception here
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        if (cause instanceof ReadTimeoutException) {
+            final NettyHttpClientRequest request = sendedQueue.poll();
+            request.getCxfResponseCallback().error(new IOException(cause));
+        }
+        
         cause.printStackTrace();
         ctx.close();
     }
