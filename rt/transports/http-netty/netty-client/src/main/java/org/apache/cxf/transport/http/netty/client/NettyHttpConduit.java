@@ -305,9 +305,13 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
                             }
                         }
                     };
-                    ChannelFuture channelFuture = getChannel().write(entity);
-                    channelFuture.addListener(listener);
-                    outputStream.close();
+                    
+                    synchronized (entity) {
+                        Channel syncChannel = getChannel();
+                        ChannelFuture channelFuture = syncChannel.write(entity);
+                        channelFuture.addListener(listener);
+                        outputStream.close();
+                    }
                 }
             };
 
@@ -355,6 +359,9 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
                         }
                     } else {
                         setException(future.cause());
+                    }
+                    synchronized (entity) {
+                        //ensure entity is write in main thread
                     }
                 }
             };
