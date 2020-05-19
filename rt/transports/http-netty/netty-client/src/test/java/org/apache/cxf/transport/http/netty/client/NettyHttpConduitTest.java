@@ -146,7 +146,6 @@ public class NettyHttpConduitTest extends AbstractBusClientServerTestBase {
         }
     }
 
-
     @Test
     public void testTimeoutWithPropertySetting() throws Exception {
         ((javax.xml.ws.BindingProvider)g).getRequestContext().put("javax.xml.ws.client.receiveTimeout",
@@ -174,6 +173,22 @@ public class NettyHttpConduitTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             //expected!!!
         }
+    }
+    
+    @Test
+    public void testNoTimeoutAsync() throws Exception {
+        updateAddressPort(g, PORT);
+        HTTPConduit c = (HTTPConduit)ClientProxy.getClient(g).getConduit();
+        c.getClient().setReceiveTimeout(2000);
+        c.getClient().setAsyncExecuteTimeout(2000);
+
+        Response<GreetMeLaterResponse> future = g.greetMeLaterAsync(-100L);
+        future.get();
+        
+        Response<GreetMeLaterResponse> future2 = g.greetMeLaterAsync(-100L);
+        future2.get();
+        
+        Thread.sleep(3000);
     }
 
     @Test
