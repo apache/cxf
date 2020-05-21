@@ -18,18 +18,23 @@
  under the License.
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:cxf="http://cxf.apache.org/core"
-    xmlns:jaxrs="http://cxf.apache.org/jaxrs"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:sec="http://cxf.apache.org/configuration/security"
-    xmlns:http="http://cxf.apache.org/transports/http/configuration"
-    xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
     xmlns:jaxws="http://cxf.apache.org/jaxws"
+    xmlns:jaxrs="http://cxf.apache.org/jaxrs"
     xmlns:util="http://www.springframework.org/schema/util"
-    xsi:schemaLocation="http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
-   
+    xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
+    xmlns:sec="http://cxf.apache.org/configuration/security"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+        http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+        http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd
+        http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd
+    ">
+
     <import resource="./cxf-sts-common.xml" />
-   
+
     <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="localSTS" implementor="#transportSTSProviderBean" address="https://localhost:${testutil.ports.custom.STSServer}/SecurityTokenService/UT" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl" depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService" endpointName="ns1:UT_Port">
         <jaxws:properties>
             <entry key="ws-security.ut.validator" value="org.apache.cxf.systest.sts.custom.CustomUTValidator"/>
@@ -41,9 +46,9 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    
+
     <bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
-    
+
     <jaxrs:server id="stsRESTService"
        depends-on="ClientAuthHttpsSettings" 
        address="https://localhost:${testutil.ports.custom.STSServer}/SecurityTokenServiceREST">
@@ -58,7 +63,27 @@
             <entry key="xml" value="application/xml;charset=UTF-8" />
         </jaxrs:extensionMappings>
     </jaxrs:server>
-    
+
+    <bean id="realmRestSTS" class="org.apache.cxf.sts.rest.impl.RealmSecurityTokenServiceImpl">
+        <property name="restSecurityTokenService" ref="restSTS" />
+    </bean>
+
+    <bean id="realmSecurityConfigFilter" class="org.apache.cxf.sts.rest.impl.RealmSecurityConfigurationFilter">
+        <property name="realmMap" ref="realms" />
+    </bean>
+
+    <jaxrs:server id="stsRealmRestService"
+       depends-on="ClientAuthHttpsSettings" 
+       address="https://localhost:${testutil.ports.custom.STSServer}/RealmSecurityTokenService">
+        <jaxrs:serviceBeans>
+            <ref bean="realmRestSTS" />
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="realmSecurityConfigFilter"/>
+            <ref bean="jsonProvider" />
+        </jaxrs:providers>
+    </jaxrs:server>
+
     <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
         <httpj:engine port="${testutil.ports.custom.STSServer}">
             <httpj:tlsServerParameters>

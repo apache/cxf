@@ -18,29 +18,12 @@
  */
 package org.apache.cxf.systest.sts.custom;
 
-import java.net.URL;
-
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {
 
-    public Server() {
-
-    }
-
     protected void run()  {
-        URL busFile = Server.class.getResource("cxf-service.xml");
-        Bus busLocal = new SpringBusFactory().createBus(busFile);
-        BusFactory.setDefaultBus(busLocal);
-        setBus(busLocal);
-
-        try {
-            new Server();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        setBus(new SpringBusFactory().createBus(Server.class.getResource("cxf-service.xml")));
     }
 }

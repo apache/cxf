@@ -16,18 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.sts.custom;
+package org.apache.cxf.sts.rest.token.realm;
 
-import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import java.util.Map;
 
-public class STSServer extends AbstractBusTestServerBase {
+import org.apache.cxf.sts.token.realm.RealmProperties;
 
-    protected void run()  {
-        setBus(new SpringBusFactory().createBus(STSServer.class.getResource("cxf-sts.xml")));
+import static java.util.Optional.ofNullable;
+
+public class ExtRealmProperties extends RealmProperties {
+
+    private Map<String, String> rsSecurityProperties;
+
+    public Map<String, String> getRsSecurityProperties() {
+        return rsSecurityProperties;
     }
 
-    public static void main(String[] args) {
-        new STSServer().run();
+    public void setRsSecurityProperties(Map<String, String> rsSecurityProperties) {
+        this.rsSecurityProperties = rsSecurityProperties;
+    }
+
+    public Object getRsSecurityProperty(final String propertyName) {
+        return ofNullable(getRsSecurityProperties())
+                .map(map -> map.get(propertyName))
+                .orElse(null);
     }
 }

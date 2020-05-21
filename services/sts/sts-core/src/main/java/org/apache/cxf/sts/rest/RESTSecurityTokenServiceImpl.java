@@ -69,7 +69,7 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
     public static final Map<String, String> DEFAULT_CLAIM_TYPE_MAP;
     public static final Map<String, String> DEFAULT_TOKEN_TYPE_MAP;
 
-    private static final Map<String, String> DEFAULT_KEY_TYPE_MAP = new HashMap<>();
+    public static final Map<String, String> DEFAULT_KEY_TYPE_MAP = new HashMap<>();
 
     private static final String CLAIM_TYPE = "ClaimType";
     private static final String CLAIM_TYPE_NS = "http://schemas.xmlsoap.org/ws/2005/05/identity";
@@ -400,6 +400,14 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
 
     public void setUseDeflateEncoding(boolean deflate) {
         useDeflateEncoding = deflate;
+    }
+
+    public void setMessageContext(MessageContext messageContext) {
+        this.messageContext = messageContext;
+    }
+
+    public void setSecurityContext(javax.ws.rs.core.SecurityContext securityContext) {
+        this.securityContext = securityContext;
     }
 
     protected String encodeToken(String assertion) throws Base64Exception {

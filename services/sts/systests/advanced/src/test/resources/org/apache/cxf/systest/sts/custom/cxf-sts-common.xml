@@ -73,12 +73,26 @@
         <ref bean="transportJWTTokenValidator"/>
     </util:list>
     <bean id="transportCustomBSTTokenProvider" class="org.apache.cxf.systest.sts.deployment.CustomBSTTokenProvider">
-        </bean>
+    </bean>
+
+    <bean id="customRealm" class="org.apache.cxf.sts.rest.token.realm.ExtRealmProperties">
+        <property name="issuer" value="STS Custom Realm" />
+        <property name="name" value="custom-realm" />
+        <property name="rsSecurityProperties">
+            <map/>
+        </property>
+    </bean>
+
+    <util:map id="realms">
+        <entry key="custom-realm" value-ref="customRealm" />
+    </util:map>
+
     <bean id="transportSamlTokenProvider" class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
         <!-- <property name="attributeStatementProviders" ref="attributeStatementProvidersList" />-->
+        <property name="realmMap" ref="realms" />
     </bean>
     <bean id="transportJWTTokenProvider" class="org.apache.cxf.sts.token.provider.jwt.JWTTokenProvider">
-        </bean>
+    </bean>
     <!-- 
         <util:list id="attributeStatementProvidersList">
                 <ref bean="defaultAttributeProvider" />
@@ -133,6 +147,9 @@
         <property name="encryptionCryptoProperties" value="${encryption.properties}"/>
         <property name="issuer" value="${issuer}"/>
         <property name="encryptionUsername" value="${encryption.username}"/>
+        <property name="realmParser">
+            <bean class="org.apache.cxf.sts.rest.impl.UriRealmParser" />
+        </property>
     </bean>
     
     <bean id="restSTS" class="org.apache.cxf.sts.rest.RESTSecurityTokenServiceImpl">

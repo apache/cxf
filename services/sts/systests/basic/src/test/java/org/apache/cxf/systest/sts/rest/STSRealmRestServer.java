@@ -16,18 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.sts.custom;
+package org.apache.cxf.systest.sts.rest;
 
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
-public class STSServer extends AbstractBusTestServerBase {
+public class STSRealmRestServer extends AbstractBusTestServerBase {
 
     protected void run()  {
-        setBus(new SpringBusFactory().createBus(STSServer.class.getResource("cxf-sts.xml")));
+        setBus(new SpringBusFactory().createBus(STSRealmRestServer.class.getResource("cxf-realm-rest-sts.xml")));
     }
 
-    public static void main(String[] args) {
-        new STSServer().run();
-    }
 }
