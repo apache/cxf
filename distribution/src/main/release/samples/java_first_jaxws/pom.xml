@@ -28,9 +28,6 @@
         <artifactId>cxf-samples</artifactId>
         <version>3.3.7-SNAPSHOT</version>
     </parent>
-    <properties>
-        <cxf.tomcat.version>8.5.47</cxf.tomcat.version>
-    </properties>
     <build>
         <plugins>
             <plugin>

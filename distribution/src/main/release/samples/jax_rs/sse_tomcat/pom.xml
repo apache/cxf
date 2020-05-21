@@ -11,10 +11,6 @@
         <relativePath>../..</relativePath>
     </parent>
 
-    <properties>
-        <cxf.tomcat.version>8.5.47</cxf.tomcat.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework</groupId>
