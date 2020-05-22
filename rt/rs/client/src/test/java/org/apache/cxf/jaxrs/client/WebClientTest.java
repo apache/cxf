@@ -141,6 +141,13 @@ public class WebClientTest {
     }
 
     @Test
+    public void testEmptyQueryKey() {
+        WebClient wc = WebClient.create("http://foo");
+        wc.query("");
+        assertEquals("http://foo", wc.getCurrentURI().toString());
+    }
+
+    @Test
     public void testForward() {
         WebClient wc = WebClient.create("http://foo");
         wc.to("http://foo/bar", true);

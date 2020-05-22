@@ -26,7 +26,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -456,8 +455,8 @@ public abstract class AbstractClient implements Client {
                 entry.getValue().forEach(valObject -> {
                     if (splitHeaders && valObject instanceof String) {
                         String val = (String) valObject;
-                        String[] values;
-                        if (val.length() == 0) {
+                        final String[] values;
+                        if (val.isEmpty()) {
                             values = new String[]{""};
                         } else if (val.charAt(0) == '"' && val.charAt(val.length() - 1) == '"') {
                             // if the value starts with a quote and ends with a quote, we do a best
@@ -470,7 +469,7 @@ public abstract class AbstractClient implements Client {
                         }
                         for (String s : values) {
                             String theValue = s.trim();
-                            if (theValue.length() > 0) {
+                            if (!theValue.isEmpty()) {
                                 currentResponseBuilder.header(entry.getKey(), theValue);
                             }
                         }
@@ -766,7 +765,7 @@ public abstract class AbstractClient implements Client {
             } else {
                 addMatrixOrQueryToBuilder(ub, paramName, pt, pValues);
             }
-        } else {
+        } else if (pValues != null && pValues.length > 0) {
             Object pValue = pValues[0];
             MultivaluedMap<String, Object> values = InjectionUtils.extractValuesFromBean(pValue, "");
             values.forEach((key, value) -> {
@@ -847,19 +846,6 @@ public abstract class AbstractClient implements Client {
         throw new ProcessingException(errorMessage, actualEx);
     }
 
-    protected static void setAllHeaders(MultivaluedMap<String, String> headers, HttpURLConnection conn) {
-        headers.forEach((key, value) -> {
-            StringBuilder b = new StringBuilder();
-            for (int i = 0; i < value.size(); i++) {
-                b.append(value.get(i));
-                if (i + 1 < value.size()) {
-                    b.append(',');
-                }
-            }
-            conn.setRequestProperty(key, b.toString());
-        });
-    }
-
     protected String[] parseQuotedHeaderValue(String originalValue) {
         // this algorithm isn't perfect; see CXF-3518 for further discussion.
         List<String> results = new ArrayList<>();
@@ -868,10 +854,10 @@ public abstract class AbstractClient implements Client {
         int lastIndex = chars.length - 1;
 
         boolean quote = false;
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
 
         for (int pos = 0; pos <= lastIndex; pos++) {
-            char c = chars[pos];
+            final char c = chars[pos];
             if (pos == lastIndex) {
                 sb.append(c);
                 results.add(sb.toString());
@@ -885,8 +871,7 @@ public abstract class AbstractClient implements Client {
                     if (quote) {
                         pos++;
                         if (pos <= lastIndex) {
-                            c = chars[pos];
-                            sb.append(c);
+                            sb.append(chars[pos]);
                         }
                         if (pos == lastIndex) {
                             results.add(sb.toString());
@@ -900,7 +885,7 @@ public abstract class AbstractClient implements Client {
                         sb.append(c);
                     } else {
                         results.add(sb.toString());
-                        sb = new StringBuilder();
+                        sb.setLength(0);
                     }
                     break;
                 default:
@@ -1071,7 +1056,7 @@ public abstract class AbstractClient implements Client {
     protected Object checkIfBodyEmpty(Object body, String contentType) {
         //CHECKSTYLE:OFF
         if (body != null
-            && (body.getClass() == String.class && ((String)body).length() == 0
+            && (body.getClass() == String.class && ((String)body).isEmpty()
             || body.getClass() == Form.class && ((Form)body).asMap().isEmpty()
             || Map.class.isAssignableFrom(body.getClass()) && ((Map<?, ?>)body).isEmpty()
                 && !MediaType.APPLICATION_JSON.equals(contentType)
@@ -1210,7 +1195,7 @@ public abstract class AbstractClient implements Client {
         }
     }
 
-    protected abstract class AbstractBodyWriter extends AbstractOutDatabindingInterceptor {
+    protected abstract static class AbstractBodyWriter extends AbstractOutDatabindingInterceptor {
 
         public AbstractBodyWriter() {
             super(Phase.WRITE);
