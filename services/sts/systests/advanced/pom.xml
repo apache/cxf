@@ -215,7 +215,6 @@
                             <systemPropertyVariables>
                                 <sts.deployment>standalone</sts.deployment>
                                 <java.security.auth.login.config>src/test/resources/kerberos.jaas</java.security.auth.login.config>
-                                <java.io.tmpdir>${basedir}/target/tmp</java.io.tmpdir>
                             </systemPropertyVariables>
                         </configuration>
                     </plugin>

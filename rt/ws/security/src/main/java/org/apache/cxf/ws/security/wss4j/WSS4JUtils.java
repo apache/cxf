@@ -21,6 +21,8 @@ package org.apache.cxf.ws.security.wss4j;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.Key;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
@@ -48,8 +50,9 @@ import org.apache.cxf.ws.security.cache.CXFEHCacheReplayCache;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
+import org.apache.wss4j.common.cache.MemoryReplayCache;
 import org.apache.wss4j.common.cache.ReplayCache;
-import org.apache.wss4j.common.cache.ReplayCacheFactory;
+import org.apache.wss4j.common.cache.WSS4JCacheUtil;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.JasyptPasswordEncryptor;
@@ -70,8 +73,6 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 public final class WSS4JUtils {
 
     private static final Logger LOG = LogUtils.getL7dLogger(WSS4JUtils.class);
-
-    private static final String DEFAULT_CONFIG_FILE = "cxf-ehcache.xml";
 
     private WSS4JUtils() {
         // complete
@@ -136,19 +137,17 @@ public final class WSS4JUtils {
                             cacheKey += "-" + hashcode;
                         }
                     }
-                    URL configFile = SecurityUtils.getConfigFileURL(message, SecurityConstants.CACHE_CONFIG_FILE,
-                            DEFAULT_CONFIG_FILE);
-                    if (configFile == null) {
-                        configFile = Loader.getResource(WSS4JUtils.class.getClassLoader(),
-                                DEFAULT_CONFIG_FILE);
-                    }
-
-                    if (ReplayCacheFactory.isEhCacheInstalled()) {
+                    if (WSS4JCacheUtil.isEhCacheInstalled()) {
                         Bus bus = message.getExchange().getBus();
-                        replayCache = new CXFEHCacheReplayCache(cacheKey, bus, configFile);
+                        Path diskstoreParent = null;
+                        try {
+                            diskstoreParent = Files.createTempDirectory("cxf");
+                        } catch (IOException ex) {
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
+                        }
+                        replayCache = new CXFEHCacheReplayCache(cacheKey, bus, diskstoreParent);
                     } else {
-                        ReplayCacheFactory replayCacheFactory = ReplayCacheFactory.newInstance();
-                        replayCache = replayCacheFactory.newReplayCache(cacheKey, configFile);
+                        replayCache = new MemoryReplayCache();
                     }
 
                     info.setProperty(instanceKey, replayCache);

@@ -198,7 +198,6 @@
                         <configuration>
                             <systemPropertyVariables>
                                 <sts.deployment>standalone</sts.deployment>
-                                <java.io.tmpdir>${basedir}/target/tmp</java.io.tmpdir>
                                 <java.security.auth.login.config>src/test/resources/sts.jaas</java.security.auth.login.config>
                             </systemPropertyVariables>
                         </configuration>
