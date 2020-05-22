@@ -47,7 +47,6 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.systest.sts.TLSClientParametersUtils;
-import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
@@ -104,7 +103,6 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
         stopAllServers();
 
         serviceCrypto = null;

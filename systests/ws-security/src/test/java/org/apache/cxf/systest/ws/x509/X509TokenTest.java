@@ -131,7 +131,6 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
         stopAllServers();
     }
 

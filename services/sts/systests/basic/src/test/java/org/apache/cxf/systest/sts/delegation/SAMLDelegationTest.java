@@ -41,7 +41,6 @@ import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.systest.sts.common.CommonCallbackHandler;
-import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -90,7 +89,6 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
         stopAllServers();
     }
 

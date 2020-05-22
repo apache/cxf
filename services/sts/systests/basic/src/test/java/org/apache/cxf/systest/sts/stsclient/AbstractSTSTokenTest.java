@@ -44,7 +44,6 @@ import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.systest.sts.TLSClientParametersUtils;
-import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.https.SSLUtils;
@@ -93,7 +92,6 @@ public abstract class AbstractSTSTokenTest extends AbstractBusClientServerTestBa
 
     @AfterClass
     public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
         stopAllServers();
     }
 

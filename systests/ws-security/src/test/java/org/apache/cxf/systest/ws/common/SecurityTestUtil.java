@@ -18,12 +18,8 @@
  */
 package org.apache.cxf.systest.ws.common;
 
-import java.io.File;
-import java.io.IOException;
-
 import javax.xml.ws.BindingProvider;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.example.contract.doubleit.DoubleItPortType;
 
@@ -35,25 +31,6 @@ public final class SecurityTestUtil {
     private SecurityTestUtil() {
         // complete
     }
-
-    public static void cleanup() throws IOException {
-        String tmpDir = System.getProperty("java.io.tmpdir");
-        if (tmpDir != null) {
-            File[] tmpFiles = new File(tmpDir).listFiles();
-            if (tmpFiles != null) {
-                for (File tmpFile : tmpFiles) {
-                    if (tmpFile.exists() && (tmpFile.getName().startsWith("ws-security.nonce.cache.instance")
-                            || tmpFile.getName().startsWith("ws-security.timestamp.cache.instance")
-                            || tmpFile.getName().startsWith("ws-security.saml.cache.instance")
-                            || tmpFile.getName().startsWith("wss4j-nonce-cache")
-                            || tmpFile.getName().startsWith("wss4j-timestamp-cache"))) {
-                        FileUtils.forceDeleteOnExit(tmpFile);
-                    }
-                }
-            }
-        }
-    }
-
     public static void enableStreaming(DoubleItPortType port) {
         enableStreaming((BindingProvider)port);
     }
