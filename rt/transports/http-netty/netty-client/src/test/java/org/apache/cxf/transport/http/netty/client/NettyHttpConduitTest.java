@@ -261,7 +261,7 @@ public class NettyHttpConduitTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testCallAsyncCallbackInvokedOnlyOnce() throws Exception {
-        updateAddressPort(g, PORT_INV);
+        updateAddressPort(g, PORT);
         int repeat = 20;
         final AtomicInteger count = new AtomicInteger(0);
         for (int i = 0; i < repeat; i++) {
@@ -274,7 +274,6 @@ public class NettyHttpConduitTest extends AbstractBusClientServerTestBase {
             } catch (Exception e) {
             }
         }
-        Thread.sleep(1000);
         assertEquals("Callback should be invoked only once per request", repeat, count.intValue());
     }
 }
