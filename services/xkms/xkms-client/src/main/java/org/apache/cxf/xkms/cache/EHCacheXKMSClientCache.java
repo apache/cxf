@@ -20,86 +20,105 @@
 package org.apache.cxf.xkms.cache;
 
 import java.io.File;
-import java.net.URL;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.wss4j.common.util.Loader;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
+import org.ehcache.CachePersistenceException;
+import org.ehcache.PersistentCacheManager;
 import org.ehcache.Status;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
-import org.ehcache.xml.XmlConfiguration;
+import org.ehcache.config.builders.ExpiryPolicyBuilder;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
+import org.ehcache.config.units.EntryUnit;
+import org.ehcache.config.units.MemoryUnit;
+import org.ehcache.expiry.ExpiryPolicy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An in-memory EHCache implementation of the XKMSClientCache interface.
  */
 public class EHCacheXKMSClientCache implements XKMSClientCache, BusLifeCycleListener {
 
-    public static final String TEMPLATE_KEY = "cxf.xkms.client.cache";
-    private static final String DEFAULT_CONFIG_URL = "cxf-xkms-client-ehcache.xml";
+    private static final Logger LOG = LoggerFactory.getLogger(EHCacheXKMSClientCache.class);
 
     private final Cache<String, XKMSCacheToken> cache;
     private final CacheManager cacheManager;
     private final Bus bus;
     private final String cacheKey;
+    private final Path diskstorePath;
+    private final boolean persistent;
 
     public EHCacheXKMSClientCache() throws XKMSClientCacheException {
-        this(DEFAULT_CONFIG_URL, null);
+        this(null);
     }
 
     public EHCacheXKMSClientCache(Bus cxfBus) throws XKMSClientCacheException {
-        this(DEFAULT_CONFIG_URL, cxfBus);
+        this(cxfBus, null, 10L, 5000L, false);
     }
 
-    public EHCacheXKMSClientCache(String configFileURL) throws XKMSClientCacheException {
-        this(configFileURL, null);
-    }
+    public EHCacheXKMSClientCache(Bus cxfBus, Path diskstorePath, long diskSize,
+                                  long heapEntries, boolean persistent) throws XKMSClientCacheException {
+        // Do some sanity checking on the arguments
+        if (persistent && diskstorePath == null) {
+            throw new NullPointerException();
+        }
+        if (diskstorePath != null && (diskSize < 5 || diskSize > 10000)) {
+            throw new IllegalArgumentException("The diskSize parameter must be between 5 and 10000 (megabytes)");
+        }
+        if (heapEntries < 100) {
+            throw new IllegalArgumentException("The heapEntries parameter must be greater than 100 (entries)");
+        }
 
-    public EHCacheXKMSClientCache(String configFile, Bus cxfBus) throws XKMSClientCacheException {
         if (cxfBus == null) {
             cxfBus = BusFactory.getThreadDefaultBus(true);
         }
+        if (cxfBus != null) {
+            cxfBus.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);
+        }
+
         this.bus = cxfBus;
-        if (bus != null) {
-            bus.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);
-        }
-        
-        URL configFileURL = null;
-        try {
-            configFileURL =
-                ClassLoaderUtils.getResource(configFile, EHCacheXKMSClientCache.class);
-        } catch (Exception ex) {
-            // ignore
-        }
-        if (configFileURL == null) {
-            configFileURL = Loader.getResource(this.getClass().getClassLoader(), configFile);
+        this.diskstorePath = diskstorePath;
+        this.persistent = persistent;
+
+        cacheKey = UUID.randomUUID().toString();
+
+        ResourcePoolsBuilder resourcePoolsBuilder = ResourcePoolsBuilder.newResourcePoolsBuilder()
+                .heap(heapEntries, EntryUnit.ENTRIES);
+        if (diskstorePath != null) {
+            resourcePoolsBuilder = resourcePoolsBuilder.disk(diskSize, MemoryUnit.MB, persistent);
         }
 
-        XmlConfiguration xmlConfig = new XmlConfiguration(configFileURL);
+        ExpiryPolicy<Object, Object> expiryPolicy =
+                ExpiryPolicyBuilder.timeToLiveExpiration(Duration.of(3600, ChronoUnit.SECONDS));
+        CacheConfigurationBuilder<String, XKMSCacheToken> configurationBuilder =
+                CacheConfigurationBuilder.newCacheConfigurationBuilder(
+                        String.class, XKMSCacheToken.class, resourcePoolsBuilder)
+                        .withExpiry(expiryPolicy);
 
-        try {
-            CacheConfigurationBuilder<String, XKMSCacheToken> configurationBuilder =
-                    xmlConfig.newCacheConfigurationBuilderFromTemplate(TEMPLATE_KEY,
-                            String.class, XKMSCacheToken.class);
-
-            cacheKey = UUID.randomUUID().toString();
-
-            cacheManager = CacheManagerBuilder.newCacheManagerBuilder().withCache(cacheKey,
-                    configurationBuilder)
-                    .with(CacheManagerBuilder.persistence(new File(System.getProperty("java.io.tmpdir"), cacheKey)))
+        if (diskstorePath != null) {
+            cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
+                    .with(CacheManagerBuilder.persistence(diskstorePath.toFile()))
+                    .withCache(cacheKey, configurationBuilder)
                     .build();
-
-            cacheManager.init();
-            cache = cacheManager.getCache(cacheKey, String.class, XKMSCacheToken.class);
-        } catch (IllegalAccessException | InstantiationException | ClassNotFoundException e) {
-            throw new XKMSClientCacheException(e);
+        } else {
+            cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
+                    .withCache(cacheKey, configurationBuilder)
+                    .build();
         }
+
+        cacheManager.init();
+        cache = cacheManager.getCache(cacheKey, String.class, XKMSCacheToken.class);
+
     }
 
     /**
@@ -121,6 +140,23 @@ public class EHCacheXKMSClientCache implements XKMSClientCache, BusLifeCycleList
         if (cacheManager.getStatus() == Status.AVAILABLE) {
             cacheManager.removeCache(cacheKey);
             cacheManager.close();
+
+            if (!persistent && cacheManager instanceof PersistentCacheManager) {
+                try {
+                    ((PersistentCacheManager) cacheManager).destroy();
+                } catch (CachePersistenceException e) {
+                    LOG.debug("Error in shutting down persistent cache", e);
+                }
+
+                // As we're not using a persistent disk store, just delete it - it should be empty after calling
+                // destroy above
+                if (diskstorePath != null) {
+                    File file = diskstorePath.toFile();
+                    if (file.exists() && file.canWrite()) {
+                        file.delete();
+                    }
+                }
+            }
 
             if (bus != null) {
                 bus.getExtension(BusLifeCycleManager.class).unregisterLifeCycleListener(this);

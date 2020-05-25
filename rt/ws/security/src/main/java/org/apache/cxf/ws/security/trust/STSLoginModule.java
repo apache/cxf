@@ -165,10 +165,15 @@ public class STSLoginModule implements LoginModule {
     private String tokenType = "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0";
     private String namespace;
     private Map<String, Object> stsClientProperties = new HashMap<>();
+    private final TokenStore tokenStore;
 
     /** the authentication status*/
     private boolean succeeded;
     private boolean commitSucceeded;
+
+    public STSLoginModule() throws MalformedURLException, TokenStoreException {
+        tokenStore = configureTokenStore();
+    }
 
     @Override
     public void initialize(Subject subj, CallbackHandler cbHandler, Map<String, ?> sharedState,
@@ -263,7 +268,6 @@ public class STSLoginModule implements LoginModule {
                 message.put(SecurityConstants.STS_CLIENT, stsClient);
                 data.setMsgContext(message);
             } else {
-                TokenStore tokenStore = configureTokenStore();
                 validator.setStsClient(stsClient);
                 validator.setTokenStore(tokenStore);
             }

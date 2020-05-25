@@ -57,14 +57,12 @@ import org.apache.cxf.rs.security.oidc.idp.OidcProviderMetadata;
 import org.apache.cxf.rs.security.oidc.rp.IdTokenReader;
 import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
-import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils.AuthorizationCodeParameters;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduitConfigurer;
 import org.apache.xml.security.utils.ClassLoaderUtils;
 
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
@@ -107,11 +105,6 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         assertTrue("Server failed to launch", launchServer(JWT_JCACHE_SERVER));
         assertTrue("Server failed to launch", launchServer(JPA_SERVER));
         assertTrue("Server failed to launch", launchServer(JWT_NON_PERSIST_JCACHE_SERVER));
-    }
-
-    @AfterClass
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
     }
 
     @Parameters(name = "{0}")

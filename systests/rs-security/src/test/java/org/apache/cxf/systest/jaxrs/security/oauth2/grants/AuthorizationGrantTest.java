@@ -38,7 +38,6 @@ import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
-import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.systest.jaxrs.security.oidc.SpringBusTestServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -46,7 +45,6 @@ import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.transport.http.HTTPConduitConfigurer;
 import org.apache.xml.security.utils.ClassLoaderUtils;
 
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
@@ -100,11 +98,6 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly", launchServer(JWT_JCACHE_SERVER));
         assertTrue("server did not launch correctly", launchServer(JPA_SERVER));
         assertTrue("server did not launch correctly", launchServer(JWT_NON_PERSIST_JCACHE_SERVER));
-    }
-
-    @AfterClass
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
     }
 
     @Parameters(name = "{0}")

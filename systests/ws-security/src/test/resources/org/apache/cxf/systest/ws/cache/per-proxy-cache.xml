@@ -4,18 +4,6 @@
         xmlns='http://www.ehcache.org/v3'
         xsi:schemaLocation="http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core.xsd">
 
-    <cache-template name="wss4jCache">
-        <key-type>java.lang.String</key-type>
-        <value-type>org.apache.wss4j.common.cache.EHCacheIdentityValue</value-type>
-        <expiry>
-            <class>org.apache.wss4j.common.cache.EHCacheExpiry</class>
-        </expiry>
-        <resources>
-            <heap unit="entries">5000</heap>
-            <disk unit="MB" persistent="false">10</disk>
-        </resources>
-    </cache-template>
-
     <!--
          Security Tokens are not writable to Disk so use a memory only
          cache with a bit larger maxEntriesLocalHeap.  However, this
