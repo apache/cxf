@@ -28,7 +28,7 @@ You can also use Karaf 4.0.x for this demo.)
        / /| |/ /_/ / /  / /_/ / __/        
       /_/ |_|\__,_/_/   \__,_/_/         
   
-    Apache Karaf (3.0.4)
+    Apache Karaf (4.2.8)
   
   Hit '<tab>' for a list of available commands
   and '[cmd] --help' for help on a specific command.
@@ -42,42 +42,50 @@ In order to install CXF's features, you need to add the CXF's features repo usin
  where 3.n.m corresponds to a valid CXF version number
 
 Install CXF's cxf-jaxrs and cxf-transports-websocket-server features that installs all the required bundles
-for this demo bundle.
+for this demo bundle:
 
-  feature:install cxf-jaxrs cxf-transports-websocket-server
   feature:install aries-blueprint
+  feature:install cxf-jaxrs
+  install -s mvn:org.eclipse.jetty.websocket/websocket-api/9.4.22.v20191022
+  install -s mvn:org.eclipse.jetty.websocket/websocket-common/9.4.22.v20191022
+  install -s mvn:org.eclipse.jetty.websocket/websocket-servlet/9.4.22.v20191022
+  install -s mvn:org.eclipse.jetty.websocket/websocket-server/9.4.22.v20191022
+  feature:install cxf-transports-websocket-server
 
-Install this demo bundle (using the appropriate bundle version number)
+Install this demo bundle (using the appropriate bundle version number):
 
-  install -s mvn:org.eclipse.jetty.websocket/websocket-api/9.4.12.v20180830
-  install -s mvn:org.eclipse.jetty.websocket/websocket-common/9.4.12.v20180830
-  install -s mvn:org.eclipse.jetty.websocket/websocket-servlet/9.4.12.v20180830
-  install -s mvn:org.eclipse.jetty.websocket/websocket-server/9.4.12.v20180830
   install -s mvn:org.apache.cxf.samples/jax_rs_websocket_osgi/3.n.m
 
 And verify the bundles are installed, e.g.:
 
-karaf@root()> feature:repo-add cxf 3.3.0
-Adding feature url mvn:org.apache.cxf.karaf/apache-cxf/3.3.0/xml/features
-karaf@root()> feature:install cxf-jaxrs cxf-transports-websocket-server
-karaf@root()> list -t 0 | grep CXF
- 80 | Active   |  40 | 3.3.0   | Apache CXF Core                                                    
- 81 | Active   |  40 | 3.3.0   | Apache CXF Runtime Management                                      
-100 | Active   |  40 | 3.3.0   | Apache CXF Runtime HTTP Transport                                  
-102 | Active   |  40 | 3.3.0   | Apache CXF JAX-RS Extensions: Providers                            
-103 | Active   |  40 | 3.3.0   | Apache CXF JAX-RS Extensions: Search                               
-104 | Active   |  40 | 3.3.0   | Apache CXF JAX-RS Service Description                              
-105 | Active   |  40 | 3.3.0   | Apache CXF Runtime JAX-RS Frontend                                 
-106 | Active   |  40 | 3.3.0   | Apache CXF JAX-RS Client                                           
-108 | Active   |  40 | 3.3.0   | Apache CXF Runtime WebSocket Transport                             
-karaf@root()> install -s mvn:org.apache.cxf.samples/jax_rs_websocket_osgi
-Bundle ID: 109
+karaf@root()> feature:repo-add cxf 3.3.6
+Adding feature url mvn:org.apache.cxf.karaf/apache-cxf/3.3.6/xml/features
+karaf@root()>  feature:install aries-blueprint
+karaf@root()> feature:install cxf-jaxrs
+karaf@root()> install -s mvn:org.eclipse.jetty.websocket/websocket-api/9.4.22.v20191022
+Bundle ID: 126
+karaf@root()> install -s mvn:org.eclipse.jetty.websocket/websocket-common/9.4.22.v20191022
+Bundle ID: 127
+karaf@root()> install -s mvn:org.eclipse.jetty.websocket/websocket-servlet/9.4.22.v20191022
+Bundle ID: 128
+karaf@root()> install -s mvn:org.eclipse.jetty.websocket/websocket-server/9.4.22.v20191022
+Bundle ID: 129
+karaf@root()> feature:install cxf-transports-websocket-server
+karaf@root()> install -s mvn:org.apache.cxf.samples/jax_rs_websocket_osgi/3.3.6
+Bundle ID: 132
 karaf@root()> list
 START LEVEL 100 , List Threshold: 50
- ID | State  | Lvl | Version        | Name                           
----------------------------------------------------------------------
-107 | Active |  80 | 2.4.3          | atmosphere-runtime             
-109 | Active |  80 | 3.3.0 | JAX-RS WebSocket Blueprint Demo
+ ID | State  | Lvl | Version          | Name
+----+--------+-----+------------------+--------------------------------------------------------------------------------
+ 22 | Active |  80 | 4.2.8            | Apache Karaf :: OSGi Services :: Event
+ 95 | Active |  80 | 4.14.0           | Apache XBean OSGI Bundle Utilities
+ 96 | Active |  80 | 4.14.0           | Apache XBean :: Classpath Resource Finder
+126 | Active |  80 | 9.4.22.v20191022 | Jetty :: Websocket :: API
+127 | Active |  80 | 9.4.22.v20191022 | Jetty :: Websocket :: Common
+128 | Active |  80 | 9.4.22.v20191022 | Jetty :: Websocket :: Servlet Interface
+129 | Active |  80 | 9.4.22.v20191022 | Jetty :: Websocket :: Server
+131 | Active |  80 | 2.5.2            | atmosphere-runtime
+132 | Active |  80 | 3.3.6            | JAX-RS WebSocket Blueprint Demo
 karaf@root()>
 
 
