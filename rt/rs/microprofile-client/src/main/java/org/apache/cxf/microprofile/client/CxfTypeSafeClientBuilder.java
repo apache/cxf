@@ -42,6 +42,7 @@ import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
 
 import org.apache.cxf.jaxrs.client.spec.TLSConfiguration;
+import org.apache.cxf.microprofile.client.sse.SseMessageBodyReader;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.spi.RestClientListener;
@@ -136,6 +137,8 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
                 }
             }
         }
+
+        register(SseMessageBodyReader.class);
 
         listeners().forEach(l -> l.onNewClient(aClass, this));
 
