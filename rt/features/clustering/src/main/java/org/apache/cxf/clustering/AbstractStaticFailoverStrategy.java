@@ -21,6 +21,7 @@ package org.apache.cxf.clustering;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -133,6 +134,13 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
     protected List<Endpoint> getEndpoints(Exchange exchange, boolean acceptCandidatesWithSameAddress) {
         Endpoint endpoint = exchange.getEndpoint();
         Collection<ServiceInfo> services = endpoint.getService().getServiceInfos();
+        
+        // If there are no services associated with this endpoint (often in case of JAX-RS), 
+        // returning the endpoint itself if allowed.
+        if (services.isEmpty() && acceptCandidatesWithSameAddress) {
+            return Collections.singletonList(endpoint);
+        }
+        
         QName currentBinding = endpoint.getBinding().getBindingInfo().getName();
         List<Endpoint> alternates = new ArrayList<>();
         for (ServiceInfo service : services) {
