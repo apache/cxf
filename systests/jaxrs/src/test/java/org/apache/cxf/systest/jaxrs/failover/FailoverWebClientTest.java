@@ -27,6 +27,7 @@ import java.util.List;
 import org.apache.cxf.clustering.FailoverFeature;
 import org.apache.cxf.clustering.RetryStrategy;
 import org.apache.cxf.clustering.SequentialStrategy;
+import org.apache.cxf.clustering.circuitbreaker.CircuitBreakerFailoverFeature;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
@@ -99,7 +100,6 @@ public class FailoverWebClientTest extends AbstractBusClientServerTestBase {
 
         final FailoverFeature feature = new FailoverFeature();
         RetryStrategy strategy = new RetryStrategy();
-        strategy.setAlternateAddresses(Arrays.asList(address));
         strategy.setMaxNumberOfRetries(5);
         feature.setStrategy(strategy);
 
@@ -114,4 +114,52 @@ public class FailoverWebClientTest extends AbstractBusClientServerTestBase {
         assertEquals("root", b.getName());
         assertEquals(address, webClient.getBaseURI().toString());
     }
+    
+    @Test
+    public void testCircuitBreakerRetryFailover() throws Exception {
+        String address = "http://localhost:" + PORT1 + "/bookstore/unavailable";
+
+        final CircuitBreakerFailoverFeature feature = new CircuitBreakerFailoverFeature();
+        feature.setThreshold(5);
+        RetryStrategy strategy = new RetryStrategy();
+        strategy.setMaxNumberOfRetries(5);
+        strategy.setDelayBetweenRetries(1000);
+        feature.setStrategy(strategy);
+
+        final JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(address);
+        bean.setFeatures(Arrays.asList(feature));
+        bean.setServiceClass(FailoverBookStore.class);
+        WebClient webClient = bean.createWebClient();
+        
+        final Book b = webClient.get(Book.class);
+        assertEquals(124L, b.getId());
+        assertEquals("root", b.getName());
+        assertEquals(address, webClient.getBaseURI().toString());
+    }
+
+    @Test
+    public void testRetryFailoverAlternateAddresses() throws Exception {
+        String address = "http://localhost:" + AbstractFailoverTest.NON_PORT + "/bookstore/unavailable";
+
+        final FailoverFeature feature = new FailoverFeature();
+        RetryStrategy strategy = new RetryStrategy();
+        strategy.setAlternateAddresses(Arrays.asList("http://localhost:" + PORT1 + "/bookstore/unavailable"));
+        strategy.setMaxNumberOfRetries(5);
+        strategy.setDelayBetweenRetries(500);
+        feature.setStrategy(strategy);
+
+        final JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(address);
+        bean.setFeatures(Arrays.asList(feature));
+        bean.setServiceClass(FailoverBookStore.class);
+        WebClient webClient = bean.createWebClient();
+        
+        final Book b = webClient.get(Book.class);
+        assertEquals(124L, b.getId());
+        assertEquals("root", b.getName());
+        assertEquals("http://localhost:" + PORT1 + "/bookstore/unavailable",
+            webClient.getBaseURI().toString());
+    }
+
 }
