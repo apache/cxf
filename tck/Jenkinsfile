@@ -41,7 +41,7 @@ pipeline {
        stage('Download JakartaEE TCK') {
            steps {
                checkout([$class: 'GitSCM',
-	               branches: [[name: '*/8.0']],
+	           branches: [[name: 'refs/tags/8.0.0']],
                    userRemoteConfigs: [[url: 'https://github.com/eclipse-ee4j/jakartaee-tck']],
                    extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'jakartaee-tck']]
                ])
