@@ -155,7 +155,7 @@
         <cxf.json.api.version>1.1.6</cxf.json.api.version>
         <cxf.jsr250.api.version>1.0</cxf.jsr250.api.version>
         <cxf.junit.version>4.13</cxf.junit.version>
-        <cxf.kerby.version>2.0.0</cxf.kerby.version>
+        <cxf.kerby.version>2.0.1</cxf.kerby.version>
         <cxf.littleproxy.version>1.1.2</cxf.littleproxy.version>
         <cxf.logback.classic.version>1.2.3</cxf.logback.classic.version>
         <cxf.lucene.version>8.2.0</cxf.lucene.version>
