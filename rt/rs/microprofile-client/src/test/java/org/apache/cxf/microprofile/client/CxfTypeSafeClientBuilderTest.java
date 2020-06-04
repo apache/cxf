@@ -191,4 +191,36 @@ public class CxfTypeSafeClientBuilderTest {
         Assert.fail(failureMessage);
     }
 
+    @Test
+    public void testFollowRedirectSetsProperty() {
+        CxfTypeSafeClientBuilder builder = (CxfTypeSafeClientBuilder) RestClientBuilder.newBuilder()
+                                                                                       .followRedirects(true);
+        assertEquals("true", builder.getConfiguration().getProperty("http.autoredirect"));
+
+        builder = (CxfTypeSafeClientBuilder) RestClientBuilder.newBuilder().followRedirects(false);
+        assertEquals("false", builder.getConfiguration().getProperty("http.autoredirect"));
+    }
+
+    @Test
+    public void testProxyAddressSetsProperty() {
+        CxfTypeSafeClientBuilder builder = (CxfTypeSafeClientBuilder)
+            RestClientBuilder.newBuilder().proxyAddress("cxf.apache.org", 8080);
+        assertEquals("cxf.apache.org", builder.getConfiguration().getProperty("http.proxy.server.uri"));
+        assertEquals(8080, builder.getConfiguration().getProperty("http.proxy.server.port"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testProxyAddressInvalidPort1() {
+        RestClientBuilder.newBuilder().proxyAddress("cxf.apache.org", -1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testProxyAddressInvalidPort2() {
+        RestClientBuilder.newBuilder().proxyAddress("a.com", Integer.MAX_VALUE);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testProxyAddressNullHost() {
+        RestClientBuilder.newBuilder().proxyAddress(null, 8080);
+    }
 }
