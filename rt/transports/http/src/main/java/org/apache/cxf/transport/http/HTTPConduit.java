@@ -1455,6 +1455,7 @@ public abstract class HTTPConduit
             case HttpURLConnection.HTTP_MOVED_TEMP:
             case HttpURLConnection.HTTP_SEE_OTHER:
             case 307:
+            case 308:
                 return redirectRetransmit();
             case HttpURLConnection.HTTP_UNAUTHORIZED:
             case HttpURLConnection.HTTP_PROXY_AUTH:
