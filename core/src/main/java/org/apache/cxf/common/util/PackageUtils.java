@@ -139,12 +139,14 @@ public final class PackageUtils {
             String token = tokens.get(i);
             token = removeIllegalIdentifierChars(token);
 
+            token = token.toLowerCase();
+
             // this will check for reserved keywords
             if (containsReservedKeywords(token)) {
                 token = '_' + token;
             }
 
-            tokens.set(i, token.toLowerCase());
+            tokens.set(i, token);
         }
 
         // concat all the pieces and return it
