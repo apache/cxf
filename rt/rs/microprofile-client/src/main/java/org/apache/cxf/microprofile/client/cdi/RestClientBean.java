@@ -57,6 +57,7 @@ import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.microprofile.client.CxfTypeSafeClientBuilder;
 import org.apache.cxf.microprofile.client.config.ConfigFacade;
+import org.eclipse.microprofile.rest.client.ext.QueryParamStyle;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
@@ -77,6 +78,7 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
     public static final String REST_KEY_STORE_TYPE_FORMAT = "%s/mp-rest/keyStoreType";
     public static final String REST_FOLLOW_REDIRECTS_FORMAT = "%s/mp-rest/followRedirects";
     public static final String REST_PROXY_ADDRESS_FORMAT = "%s/mp-rest/proxyAddress";
+    public static final String QUERY_PARAM_STYLE_FORMAT = "%s/mp-rest/queryParamStyle";
     private static final Logger LOG = LogUtils.getL7dLogger(RestClientBean.class);
     private static final Default DEFAULT_LITERAL = new DefaultLiteral();
     private final Class<?> clientInterface;
@@ -123,6 +125,7 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
         setSSLConfig(builder);
         setFollowRedirects(builder);
         setProxyAddress(builder);
+        setQueryParamStyle(builder);
         return builder.build(clientInterface);
     }
 
@@ -307,6 +310,23 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
                     LOG.finest("proxyAddress set by MP Config: " + address);
                 }
             });
+    }
+
+    private void setQueryParamStyle(CxfTypeSafeClientBuilder builder) {
+        ConfigFacade.getOptionalValue(QUERY_PARAM_STYLE_FORMAT, clientInterface, String.class).ifPresent(
+            styleString -> {
+                try {
+                    builder.queryParamStyle(QueryParamStyle.valueOf(styleString));
+                    if (LOG.isLoggable(Level.FINEST)) {
+                        LOG.finest("queryParamStyle set by MP Config: " + styleString);
+                    }
+                } catch (Throwable t) {
+                    throw new IllegalStateException(String.format("Invalid queryParamStyle value specified for %s: %s",
+                                                                  clientInterface.getName(),
+                                                                  styleString));
+                }
+            });
+    
     }
 
     private void setSSLConfig(CxfTypeSafeClientBuilder builder) {
