@@ -96,7 +96,7 @@
         <cxf.classmate.version>1.5.1</cxf.classmate.version>
         <cxf.commons-codec.version>1.14</cxf.commons-codec.version>
         <cxf.commons-collections.version>3.2.2</cxf.commons-collections.version>
-        <cxf.commons-io.version>2.6</cxf.commons-io.version>
+        <cxf.commons-io.version>2.7</cxf.commons-io.version>
         <cxf.commons-jcs-jcache.version>2.1</cxf.commons-jcs-jcache.version>
         <cxf.commons-lang3.version>3.10</cxf.commons-lang3.version>
         <cxf.commons-logging.version>1.2</cxf.commons-logging.version>
