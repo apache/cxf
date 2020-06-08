@@ -33,6 +33,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DefaultValue;
@@ -85,6 +86,8 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
         //CHECKSTYLE:OFF
         public List<CustomerBean> e;
         //CHECKSTYLE:ON
+        @FormParam("value")
+        private Boolean bool;
 
         public void setA(String aString) {
             this.a = aString;
@@ -122,7 +125,12 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
         public void setCb(boolean cb) {
             this.cb = cb;
         }
-
+        public void setBool(Boolean bool) {
+            this.bool = bool;
+        }
+        public Boolean getBool() {
+            return bool;
+        }
     }
 
     @Context private ContextResolver<JAXBContext> cr;
@@ -251,7 +259,9 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     public void testMatrixBean(@MatrixParam("") CustomerBean cb) {
 
     }
+    public void testBeanParam(@BeanParam CustomerBean cb) {
 
+    }
     public Application getApplication1() {
         return application1;
     }
