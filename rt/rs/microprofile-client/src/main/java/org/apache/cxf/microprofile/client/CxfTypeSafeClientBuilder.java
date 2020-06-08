@@ -41,6 +41,7 @@ import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
 
+import org.apache.cxf.jaxrs.client.ClientProperties;
 import org.apache.cxf.jaxrs.client.spec.TLSConfiguration;
 import org.apache.cxf.microprofile.client.sse.SseMessageBodyReader;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
@@ -246,6 +247,25 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
     @Override
     public RestClientBuilder hostnameVerifier(HostnameVerifier verifier) {
         secConfig.getTlsClientParams().setHostnameVerifier(verifier);
+        return this;
+    }
+
+    @Override
+    public RestClientBuilder followRedirects(boolean follows) {
+        configImpl.property(ClientProperties.HTTP_AUTOREDIRECT_PROP, Boolean.toString(follows));
+        return this;
+    }
+
+    @Override
+    public RestClientBuilder proxyAddress(String proxyHost, int proxyPort) {
+        if (proxyHost == null) {
+            throw new IllegalArgumentException("proxyHost must not be null");
+        }
+        if (proxyPort < 1 || proxyPort > 65535) {
+            throw new IllegalArgumentException("proxyPort must be between 1 and 65535");
+        }
+        configImpl.property(ClientProperties.HTTP_PROXY_SERVER_PROP, proxyHost);
+        configImpl.property(ClientProperties.HTTP_PROXY_SERVER_PORT_PROP, proxyPort);
         return this;
     }
 }
