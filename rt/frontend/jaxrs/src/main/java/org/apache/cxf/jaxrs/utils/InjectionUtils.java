@@ -45,6 +45,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
@@ -435,9 +436,12 @@ public final class InjectionUtils {
 
         value = decodeValue(value, decoded, pType);
 
+        final Optional<ParamConverter<T>> converter = getParamConverter(pClass, genericType, paramAnns, message);
         Object result = null;
         try {
-            result = createFromParameterHandler(value, pClass, genericType, paramAnns, message);
+            if (converter.isPresent()) {
+                result = converter.get().fromString(value);
+            }
         } catch (IllegalArgumentException nfe) {
             throw createParamConversionException(pType, nfe);
         }
@@ -449,6 +453,10 @@ public final class InjectionUtils {
                 theResult = pClass.cast(result);
             }
             return theResult;
+        } else if (converter.isPresent() && !pClass.isPrimitive()) {
+            // The converter was applied and returned null value, acceptable
+            // outcome for non-primitive type.
+            return pClass.cast(result);
         }
 
         if (Number.class.isAssignableFrom(pClass) && "".equals(value)) {
@@ -539,21 +547,30 @@ public final class InjectionUtils {
         }
         return ExceptionUtils.toBadRequestException(ex, null);
     }
+    
+    public static <T> Optional<ParamConverter<T>> getParamConverter(Class<T> pClass,
+            Type genericType, Annotation[] anns, Message message) {
+        
+        if (message != null) {
+            ServerProviderFactory pf = ServerProviderFactory.getInstance(message);
+            ParamConverter<T> pm = pf.createParameterHandler(pClass, genericType, anns, message);
+            return Optional.ofNullable(pm);
+        }
+        
+        return Optional.empty();
+    }
+
     public static <T> T createFromParameterHandler(String value,
                                                     Class<T> pClass,
                                                     Type genericType,
                                                     Annotation[] anns,
                                                     Message message) {
-        T result = null;
-        if (message != null) {
-            ServerProviderFactory pf = ServerProviderFactory.getInstance(message);
-            ParamConverter<T> pm = pf.createParameterHandler(pClass, genericType, anns, message);
-            if (pm != null) {
-                result = pm.fromString(value);
-            }
-        }
-        return result;
+        return getParamConverter(pClass, genericType, anns, message)
+            .map(pm -> pm.fromString(value))
+            .orElse(null);
     }
+    
+    
 
     public static void reportServerError(String messageName, String parameter) {
         reportServerError(messageName, parameter, true);
