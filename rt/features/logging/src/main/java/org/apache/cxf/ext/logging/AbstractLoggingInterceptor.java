@@ -102,4 +102,8 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         }
     }
 
+    protected String transform(final String originalLogString) {
+        return originalLogString;
+    }
+
 }

@@ -99,7 +99,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         StringBuilder payload = new StringBuilder();
         cos.writeCacheTo(payload, encoding, limit);
         cos.close();
-        event.setPayload(payload.toString());
+        event.setPayload(transform(payload.toString()));
         boolean isTruncated = cos.size() > limit && limit != -1;
         event.setTruncated(isTruncated);
         event.setFullContentFile(cos.getTempFile());
@@ -110,7 +110,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         StringBuilder payload = new StringBuilder();
         writer.writeCacheTo(payload, limit);
         writer.close();
-        event.setPayload(payload.toString());
+        event.setPayload(transform(payload.toString()));
         event.setTruncated(isTruncated);
         event.setFullContentFile(writer.getTempFile());
     }

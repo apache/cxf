@@ -146,7 +146,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             }
 
             String payload = shouldLogContent(event) ? getPayload(event, w2) : CONTENT_SUPPRESSED;
-            event.setPayload(payload);
+            event.setPayload(transform(payload));
             sender.send(event);
             message.setContent(Writer.class, out);
             super.close();
@@ -212,7 +212,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
                 String encoding = (String) message.get(Message.ENCODING);
                 StringBuilder payload = new StringBuilder();
                 writePayload(payload, cos, encoding, event.getContentType());
-                event.setPayload(payload.toString());
+                event.setPayload(transform(payload.toString()));
                 boolean isTruncated = cos.size() > limit && limit != -1;
                 event.setTruncated(isTruncated);
             } catch (Exception ex) {

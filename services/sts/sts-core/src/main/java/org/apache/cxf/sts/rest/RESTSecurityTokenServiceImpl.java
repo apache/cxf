@@ -413,6 +413,14 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
         return writer.toString();
     }
 
+    protected void setMessageContext(final MessageContext messageContext) {
+        this.messageContext = messageContext;
+    }
+
+    protected void setSecurityContext(final javax.ws.rs.core.SecurityContext securityContext) {
+        this.securityContext = securityContext;
+    }
+
     private static int getDeflateLevel() {
         Integer level = null;
 
@@ -438,4 +446,5 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
             return token;
         }
     }
+
 }
