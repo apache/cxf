@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -84,6 +85,7 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
     private final Class<?> clientInterface;
     private final Class<? extends Annotation> scope;
     private final BeanManager beanManager;
+    private final Map<Object, CxfTypeSafeClientBuilder> builders = new IdentityHashMap<>();
 
     public RestClientBean(Class<?> clientInterface, BeanManager beanManager) {
         this.clientInterface = clientInterface;
@@ -126,12 +128,17 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
         setFollowRedirects(builder);
         setProxyAddress(builder);
         setQueryParamStyle(builder);
-        return builder.build(clientInterface);
+        Object clientInstance = builder.build(clientInterface);
+        builders.put(clientInstance, builder);
+        return clientInstance;
     }
 
     @Override
     public void destroy(Object instance, CreationalContext<Object> creationalContext) {
-
+        CxfTypeSafeClientBuilder builder = builders.remove(instance);
+        if (builder != null) {
+            builder.close();
+        }
     }
 
     @Override

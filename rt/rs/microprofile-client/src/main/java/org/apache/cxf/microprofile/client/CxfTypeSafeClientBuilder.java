@@ -279,4 +279,8 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
         }
         return this;
     }
+
+    public void close() {
+        configImpl.close();
+    }
 }

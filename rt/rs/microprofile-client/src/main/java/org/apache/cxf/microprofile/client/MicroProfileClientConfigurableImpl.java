@@ -31,6 +31,7 @@ import javax.ws.rs.ext.WriterInterceptor;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.jaxrs.impl.ConfigurableImpl;
 import org.apache.cxf.jaxrs.impl.ConfigurationImpl;
+import org.apache.cxf.microprofile.client.cdi.CDIFacade;
 import org.apache.cxf.microprofile.client.config.ConfigFacade;
 import org.eclipse.microprofile.rest.client.ext.ResponseExceptionMapper;
 
@@ -41,6 +42,8 @@ public class MicroProfileClientConfigurableImpl<C extends Configurable<C>>
         ClientResponseFilter.class, ReaderInterceptor.class, WriterInterceptor.class,
         MessageBodyWriter.class, MessageBodyReader.class, ResponseExceptionMapper.class};
     private static final String CONFIG_KEY_DISABLE_MAPPER = "microprofile.rest.client.disable.default.mapper";
+
+    private Instantiator instantiator = CDIFacade.getInstantiator().orElse(super.getInstantiator());
 
     public MicroProfileClientConfigurableImpl(C configurable) {
         this(configurable, null);
@@ -58,5 +61,10 @@ public class MicroProfileClientConfigurableImpl<C extends Configurable<C>>
         }
         return ConfigFacade.getOptionalValue(CONFIG_KEY_DISABLE_MAPPER,
                                              Boolean.class).orElse(false);
+    }
+
+    @Override
+    protected Instantiator getInstantiator() {
+        return instantiator;
     }
 }
