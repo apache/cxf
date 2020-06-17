@@ -43,7 +43,7 @@ public class MicroProfileClientConfigurableImpl<C extends Configurable<C>>
         MessageBodyWriter.class, MessageBodyReader.class, ResponseExceptionMapper.class};
     private static final String CONFIG_KEY_DISABLE_MAPPER = "microprofile.rest.client.disable.default.mapper";
 
-    private Instantiator instantiator = CDIFacade.getInstantiator().orElse(super.getInstantiator());
+    private final Instantiator instantiator = CDIFacade.getInstantiator().orElse(super.getInstantiator());
 
     public MicroProfileClientConfigurableImpl(C configurable) {
         this(configurable, null);

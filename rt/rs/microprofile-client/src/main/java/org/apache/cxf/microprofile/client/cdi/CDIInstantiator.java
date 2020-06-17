@@ -19,7 +19,7 @@
 
 package org.apache.cxf.microprofile.client.cdi;
 
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 
 import org.apache.cxf.jaxrs.impl.ConfigurableImpl.Instantiator;
@@ -29,7 +29,7 @@ public final class CDIInstantiator implements Instantiator {
 
     static final CDIInstantiator INSTANCE = new CDIInstantiator();
 
-    private final Map<Object, Instance<?>> cdiInstances = new HashMap<>();
+    private final Map<Object, Instance<?>> cdiInstances = new IdentityHashMap<>();
 
     private CDIInstantiator() {
     }
