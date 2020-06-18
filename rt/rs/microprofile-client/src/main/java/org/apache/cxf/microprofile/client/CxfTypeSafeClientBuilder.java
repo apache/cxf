@@ -46,6 +46,7 @@ import org.apache.cxf.jaxrs.client.spec.TLSConfiguration;
 import org.apache.cxf.microprofile.client.sse.SseMessageBodyReader;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
+import org.eclipse.microprofile.rest.client.ext.QueryParamStyle;
 import org.eclipse.microprofile.rest.client.spi.RestClientListener;
 
 import static org.apache.cxf.jaxrs.client.ClientProperties.HTTP_CONNECTION_TIMEOUT_PROP;
@@ -267,5 +268,19 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
         configImpl.property(ClientProperties.HTTP_PROXY_SERVER_PROP, proxyHost);
         configImpl.property(ClientProperties.HTTP_PROXY_SERVER_PORT_PROP, proxyPort);
         return this;
+    }
+
+    @Override
+    public RestClientBuilder queryParamStyle(QueryParamStyle style) {
+        switch(style) {
+        case ARRAY_PAIRS: configImpl.property("use.array.syntax.for.query.values", true); break;
+        case COMMA_SEPARATED: configImpl.property("expand.query.value.as.collection", true); break;
+        default:
+        }
+        return this;
+    }
+
+    public void close() {
+        configImpl.close();
     }
 }

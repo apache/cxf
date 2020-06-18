@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.jaxrs.impl.ConfigurableImpl.Instantiator;
 
 
 public final class CDIFacade {
@@ -62,6 +63,10 @@ public final class CDIFacade {
 
     public static <T> Optional<Instance<T>> getInstanceFromCDI(Class<T> clazz) {
         return nullableOptional(() -> CDIUtils.getInstanceFromCDI(clazz));
+    }
+
+    public static Optional<Instantiator> getInstantiator() {
+        return Optional.ofNullable(CDI_AVAILABLE ? CDIInstantiator.INSTANCE : null);
     }
 
     private static <T> Optional<T> nullableOptional(Callable<T> callable) {

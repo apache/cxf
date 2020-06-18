@@ -68,6 +68,7 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
         super.setAddress(baseUri);
         super.setServiceClass(aClass);
         super.setProviderComparator(comparator);
+        super.setProperties(this.configuration.getProperties());
         registeredProviders = new ArrayList<>();
         registeredProviders.addAll(processProviders());
         if (!configuration.isDefaultExceptionMapperDisabled()) {
