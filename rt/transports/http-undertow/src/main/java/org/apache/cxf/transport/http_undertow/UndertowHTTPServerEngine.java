@@ -245,7 +245,12 @@ public class UndertowHTTPServerEngine implements ServerEngine {
                 builder = builder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS,
                               this.threadingParameters.getMaxThreads());
             }
+            if (this.threadingParameters.isWorkerIONameSet()) {
+                builder = builder.setWorkerOption(Options.WORKER_NAME,
+                              this.threadingParameters.getWorkerIOName());
+            }
         }
+        
         return builder;
     }
 
