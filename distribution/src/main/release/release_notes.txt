@@ -1,4 +1,4 @@
-Apache CXF 3.3.6 Release Notes
+Apache CXF 3.3.7 Release Notes
 
 1. Overview
 
@@ -23,7 +23,7 @@ http://cxf.apache.org/docs/33-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
-3.3.6 fixes over 31 JIRA issues reported by users and the community.
+3.3.7 fixes over 20 JIRA issues reported by users and the community.
 
 
 
@@ -67,43 +67,31 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-    * [CXF-7952] - MTOM + schema validation creates invalid SOAP FAULT response
-    * [CXF-7959] - WebClient invocation builder header(name, value) method is not implemented according to interface
-    * [CXF-8200] - Use name() instead of toString() for enums when generating WADL
-    * [CXF-8201] - Path not appended when using UriBuilder.fromUri().path() with file scheme
-    * [CXF-8204] - Dependency convergence issues with jaxws-api
-    * [CXF-8207] - SseEventSource loses lastEventId on the 2nd reconnect attempt
-    * [CXF-8208] - Requests with encoded special characters fail with IllegalArgument exception in SwaggerUiResourceLocator
-    * [CXF-8210] - Incompatibility with recent Brave versions causes NullPointerException and hides root cause
-    * [CXF-8215] - SSE breaks Pipeline Processing
-    * [CXF-8220] - The tag "http.status_code" is always 200 in server side tracing span, no matter what situation
-    * [CXF-8222] - OIDC Refresh Response: ID Token iat Claim MUST represent the time that the new ID Token is issued
-    * [CXF-8231] - JAX-RS JOSE can't decrypt ECDHAESKeywrap
-    * [CXF-8234] - Response Content-Type is missing 'charset' when Transformation feature is enabled
-    * [CXF-8235] - AsyncResponseImpl.initContinuation() throws NPE when Continuation is null
-    * [CXF-8240] - STSClient produces wrong element order for TokenType (issue, renew)
-    * [CXF-8241] - cxf-codegen-plugin not using the proxy port configured in settings.xml
-    * [CXF-8249] - SSE client refuses to accept valid stream
-
-** New Feature
-    * [CXF-7814] - wadl2java: support the JAX-RS 2.1 reactive results
-    * [CXF-8188] - MP Rest Client 1.4: Inject into ClientHeadersFactory
-    * [CXF-8194] - MicroProfile Rest Client 1.4 Implementation
+    * [CXF-5216] - WSDL definition cache issue for web service client when WSDL in service war changed
+    * [CXF-8242] - Stop blocking executor thread on microprofile rest asynchronous call
+    * [CXF-8251] - introduce a new property in http-undertow transport so that can enable http/2 if necessary
+    * [CXF-8254] - NPE in WebFaultOutInterceptor handleMessage method
+    * [CXF-8259] - Blocked thread of JMS transport during jboss shutdown
+    * [CXF-8261] - Exceptions being thrown in a ClientResponseFilter are ignored
+    * [CXF-8267] - Syntax error in wsdl2java.bat
+    * [CXF-8270] - Persistent SSL connection is closed when only URI path was changed
+    * [CXF-8280] - AttachmentId issue
+    * [CXF-8282] - Set read timeout using netty client
+    * [CXF-8296] - Custom Boolean ParamConverter wrong behaviour
+    * [CXF-8298] - An invalid package name is generated
 
 ** Improvement
-    * [CXF-8149] - Reduce synchronization in AbstractJAXBProvider
-    * [CXF-8193] - upgrade to jetty 9.4.27
-    * [CXF-8205] - Fix PollingMessageListenerContainer shutdown warnings
-    * [CXF-8209] - Add a way of configuring the RMI environment in InstrumentationManagerImpl
-    * [CXF-8219] - upgrade to netty 4.1.45.Final
-    * [CXF-8223] - Be able to read empty entity from a Response with 202
-    * [CXF-8225] - Make Slf4jEventSender extendable/better configurable
-    * [CXF-8229] - OAuth 2.0 Dynamic Client Registration: Client Update Request
-    * [CXF-8238] - Tracing spans need more tag to make it clearer
-    * [CXF-8246] - The bus may be null on instantiating ServiceListGeneratorServlet in OSGi
+    * [CXF-8253] - Provide a way to disable TLS trust verification for the OSGi HttpConduitConfigApplier
+    * [CXF-8269] - Servlet Transport: allow any whitespace character as param-value separator
+    * [CXF-8286] - AbstractStaticFailoverStrategy.getEndpoints() never returns anything for JAX-RS clients (with RetryStrategy)
+    * [CXF-8306] - be able to configure http-undertow worker|threadpool name
 
 ** Task
-    * [CXF-8196] - Update to Spring Boot 2.1.12 / Spring Framework 5.1.13
+    * [CXF-8078] - Support RxJava 3.0
+    * [CXF-8271] - The async JAX-RS client never completes the response in case of an exception during the interceptor chain processing.
+    * [CXF-8290] - Don't lock by default in org.apache.cxf.jaxrs.model.AbstractResourceInfo#getProxyMap
+    * [CXF-8300] - Swagger2Feature displays cached API when service is redeployed
+
 
 
 
