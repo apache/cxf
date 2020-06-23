@@ -91,6 +91,9 @@ public class UndertowHTTPServerEngineFactoryHolder {
                     if (threads.getThreadingParameters().getMinThreads() != null) {
                         rThreads.setMinThreads(threads.getThreadingParameters().getMinThreads());
                     }
+                    if (threads.getThreadingParameters().getWorkerIOName() != null) {
+                        rThreads.setWorkerIOName(threads.getThreadingParameters().getWorkerIOName());
+                    }
                     rThreads.setWorkerIOThreads(threads.getThreadingParameters().getWorkerIOThreads());
                     threadingParametersMap.put(id, rThreads);
                 }

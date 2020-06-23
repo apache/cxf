@@ -62,6 +62,7 @@ public final class UndertowSpringTypesFactory {
         ThreadingParameters params = new ThreadingParameters();
         params.setMaxThreads(paramtype.getMaxThreads());
         params.setMinThreads(paramtype.getMinThreads());
+        params.setWorkerIOName(paramtype.getWorkerIOName());
         params.setWorkerIOThreads(paramtype.getWorkerIOThreads());
         return params;
     }
