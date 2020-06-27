@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.ext.logging;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.cxf.common.util.PropertyUtils;
@@ -34,7 +35,8 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     public static final int DEFAULT_LIMIT = 48 * 1024;
     public static final int DEFAULT_THRESHOLD = -1;
     public static final String CONTENT_SUPPRESSED = "--- Content suppressed ---";
-    private static final String  LIVE_LOGGING_PROP = "org.apache.cxf.logging.enable"; 
+    private static final String  LIVE_LOGGING_PROP = "org.apache.cxf.logging.enable";
+
     protected int limit = DEFAULT_LIMIT;
     protected long threshold = DEFAULT_THRESHOLD;
     protected boolean logBinary;
@@ -42,6 +44,8 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
 
     protected LogEventSender sender;
     protected final DefaultLogEventMapper eventMapper = new DefaultLogEventMapper();
+
+    private List<String> sensitiveElementNames;
 
     public AbstractLoggingInterceptor(String phase, LogEventSender sender) {
         super(phase);
@@ -73,6 +77,10 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         return threshold;
     }
 
+    public void setSensitiveElementNames(final List<String> sensitiveElementNames) {
+        this.sensitiveElementNames = sensitiveElementNames;
+    }
+
     public void setPrettyLogging(boolean prettyLogging) {
         if (sender instanceof PrettyLoggingFilter) {
             ((PrettyLoggingFilter)this.sender).setPrettyLogging(prettyLogging);
@@ -102,8 +110,12 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         }
     }
 
-    protected String transform(final String originalLogString) {
+    protected String transform(final Message message, final String originalLogString) {
         return originalLogString;
     }
 
+    protected String maskSensitiveElements(final Message message, String originalLogString) {
+        return (new MaskSensitiveHelper(sensitiveElementNames))
+                .maskSensitiveElements(message, originalLogString);
+    }
 }
