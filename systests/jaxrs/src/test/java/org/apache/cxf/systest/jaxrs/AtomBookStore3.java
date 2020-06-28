@@ -25,7 +25,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
+import io.swagger.v3.oas.annotations.Hidden;
+
 @Path("/atom")
+@Hidden /* Excluding from Swagger's scans (Abdera's classes break model introspection */
 public class AtomBookStore3 extends AtomBookStore {
 
     @Context

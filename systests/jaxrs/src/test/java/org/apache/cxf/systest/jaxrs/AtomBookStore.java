@@ -47,7 +47,10 @@ import org.apache.abdera.model.Feed;
 import org.apache.cxf.customer.book.BookNotFoundDetails;
 import org.apache.cxf.customer.book.BookNotFoundFault;
 
+import io.swagger.v3.oas.annotations.Hidden;
+
 @Path("/")
+@Hidden /* Excluding from Swagger's scans (Abdera's classes break model introspection */
 public class AtomBookStore {
 
     @Context protected UriInfo uField;

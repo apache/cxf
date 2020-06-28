@@ -29,7 +29,10 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.abdera.model.Feed;
 
+import io.swagger.v3.oas.annotations.Hidden;
+
 @Path("/")
+@Hidden /* Excluding from Swagger's scans (Abdera's classes break model introspection */
 public class AtomBookStore2 extends AtomBookStore {
 
     @GET
