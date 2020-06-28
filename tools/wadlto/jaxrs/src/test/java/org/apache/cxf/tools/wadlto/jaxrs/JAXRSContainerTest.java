@@ -970,6 +970,27 @@ public class JAXRSContainerTest extends ProcessorTestBase {
         }
     }
 
+    public void testCodeGenHyphen() throws Exception {
+        JAXRSContainer container = new JAXRSContainer(null);
+
+        ToolContext context = new ToolContext();
+        context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+        context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstoreHyphen.xml"));
+        context.put(WadlToolConstants.CFG_IMPL, "true");
+        context.put(WadlToolConstants.CFG_COMPILE, "true");
+
+        container.setContext(context);
+        container.execute();
+
+        assertNotNull(output.list());
+
+        List<File> files = FileUtils.getFilesRecurse(output, ".class");
+        assertEquals(3, files.size());
+        assertTrue(checkContains(files, "application" + ".BookstoreResource.class"));
+        assertTrue(checkContains(files, "generated" + ".TestCompositeObject.class"));
+        assertTrue(checkContains(files, "generated" + ".ObjectFactory.class"));
+    }
+
     private void verifyFiles(String ext, boolean subresourceExpected, boolean interfacesAndImpl,
                              String schemaPackage, String resourcePackage, int expectedCount) {
         verifyFiles(ext, subresourceExpected, interfacesAndImpl, schemaPackage, resourcePackage,
