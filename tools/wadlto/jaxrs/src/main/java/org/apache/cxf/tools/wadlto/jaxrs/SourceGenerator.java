@@ -441,7 +441,7 @@ public class SourceGenerator {
         if (resourceId.isEmpty()) {
             String path = rElement.getAttribute("path");
             if (!path.isEmpty()) {
-                path = path.replaceAll("[\\{\\}_]*", "");
+                path = path.replaceAll("[-\\{\\}_]*", "");
                 String[] split = path.split("/");
                 StringBuilder builder = new StringBuilder(resourceId);
                 for (int i = 0; i < split.length; i++) {
