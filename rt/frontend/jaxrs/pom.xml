@@ -154,6 +154,10 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-servlet_2.5_spec</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>javax.servlet-api</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
