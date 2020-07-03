@@ -20,10 +20,7 @@ package org.apache.cxf.ext.logging;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.message.Message;
-
-import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
 public class MaskSensitiveHelper {
     private static final String ELEMENT_NAME_TEMPLATE = "-ELEMENT_NAME-";
@@ -45,14 +42,14 @@ public class MaskSensitiveHelper {
     public String maskSensitiveElements(
             final Message message,
             final String originalLogString) {
-        if (isEmpty(sensitiveElementNames)) {
+        if ((sensitiveElementNames == null) || sensitiveElementNames.isEmpty()) {
             return originalLogString;
         }
         String contentType = (String) message.get(Message.CONTENT_TYPE);
-        if (StringUtils.containsIgnoreCase(contentType, XML_CONTENT)
-                || StringUtils.containsIgnoreCase(contentType, HTML_CONTENT)) {
+        if (contentType.toLowerCase().contains(XML_CONTENT)
+                || contentType.toLowerCase().contains(HTML_CONTENT)) {
             return applyExpression(originalLogString, MATCH_PATTERN_XML, REPLACEMENT_PATTERN_XML);
-        } else if (StringUtils.containsIgnoreCase(contentType, JSON_CONTENT)) {
+        } else if (contentType.toLowerCase().contains(JSON_CONTENT)) {
             return applyExpression(originalLogString, MATCH_PATTERN_JSON, REPLACEMENT_PATTERN_JSON);
         } else {
             return originalLogString;

@@ -19,6 +19,7 @@
 package org.apache.cxf.ext.logging;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.cxf.common.util.PropertyUtils;
@@ -45,7 +46,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     protected LogEventSender sender;
     protected final DefaultLogEventMapper eventMapper = new DefaultLogEventMapper();
 
-    private List<String> sensitiveElementNames;
+    private MaskSensitiveHelper maskSensitiveHelper;
 
     public AbstractLoggingInterceptor(String phase, LogEventSender sender) {
         super(phase);
@@ -78,7 +79,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     }
 
     public void setSensitiveElementNames(final List<String> sensitiveElementNames) {
-        this.sensitiveElementNames = sensitiveElementNames;
+        maskSensitiveHelper = new MaskSensitiveHelper(sensitiveElementNames);
     }
 
     public void setPrettyLogging(boolean prettyLogging) {
@@ -115,7 +116,8 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     }
 
     protected String maskSensitiveElements(final Message message, String originalLogString) {
-        return (new MaskSensitiveHelper(sensitiveElementNames))
-                .maskSensitiveElements(message, originalLogString);
+        return Optional.ofNullable(maskSensitiveHelper)
+                .map(h -> h.maskSensitiveElements(message, originalLogString))
+                .orElse(originalLogString);
     }
 }
