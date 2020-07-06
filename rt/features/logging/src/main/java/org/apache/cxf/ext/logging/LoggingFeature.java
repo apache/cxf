@@ -147,8 +147,24 @@ public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
      * </pre>
      * @param sensitiveElementNames list of sensitive element names to be replaced
      */
-    public void setSensitiveElementNames(final List<String> sensitiveElementNames) {
-        delegate.setSensitiveElementNames(sensitiveElementNames);
+    public void addSensitiveElementNames(final List<String> sensitiveElementNames) {
+        delegate.addSensitiveElementNames(sensitiveElementNames);
+    }
+
+    /**
+     * Sets list of protocol headers containing sensitive information to be masked.
+     * Corresponded data will be replaced with configured mask
+     * For example:
+     * <pre>
+     * sensitiveHeaders: {Authorization}
+     *
+     * Initial logging statement: {Authorization=Basic QWxhZGRpbjpPcGVuU2VzYW1l}
+     * Result logging statement: {Authorization=XXX}
+     * </pre>
+     * @param sensitiveHeaders list of sensitive element names to be replaced
+     */
+    public void addSensitiveHeaders(final List<String> sensitiveHeaders) {
+        delegate.addSensitiveHeaders(sensitiveHeaders);
     }
 
     public static class Portable implements AbstractPortableFeature {
@@ -236,9 +252,14 @@ public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
             addOutBinaryContentMediaTypes(mediaTypes);
         }
 
-        public void setSensitiveElementNames(final List<String> sensitiveElementNames) {
-            in.setSensitiveElementNames(sensitiveElementNames);
-            out.setSensitiveElementNames(sensitiveElementNames);
+        public void addSensitiveElementNames(final List<String> sensitiveElementNames) {
+            in.addSensitiveElementNames(sensitiveElementNames);
+            out.addSensitiveElementNames(sensitiveElementNames);
+        }
+
+        public void addSensitiveHeaders(final List<String> sensitiveHeaders) {
+            in.addSensitiveHeaders(sensitiveHeaders);
+            out.addSensitiveHeaders(sensitiveHeaders);
         }
     }
 }

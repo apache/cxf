@@ -46,7 +46,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     protected LogEventSender sender;
     protected final DefaultLogEventMapper eventMapper = new DefaultLogEventMapper();
 
-    private MaskSensitiveHelper maskSensitiveHelper;
+    final MaskSensitiveHelper maskSensitiveHelper = new MaskSensitiveHelper();
 
     public AbstractLoggingInterceptor(String phase, LogEventSender sender) {
         super(phase);
@@ -78,8 +78,12 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         return threshold;
     }
 
-    public void setSensitiveElementNames(final List<String> sensitiveElementNames) {
-        maskSensitiveHelper = new MaskSensitiveHelper(sensitiveElementNames);
+    public void addSensitiveElementNames(final List<String> sensitiveElementNames) {
+        maskSensitiveHelper.addSensitiveElementNames(sensitiveElementNames);
+    }
+
+    public void addSensitiveHeaders(final List<String> sensitiveHeaders) {
+        maskSensitiveHelper.addSensitiveHeaders(sensitiveHeaders);
     }
 
     public void setPrettyLogging(boolean prettyLogging) {
@@ -116,7 +120,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     }
 
     protected String maskSensitiveElements(final Message message, String originalLogString) {
-        return Optional.ofNullable(maskSensitiveHelper)
+        return Optional.of(maskSensitiveHelper)
                 .map(h -> h.maskSensitiveElements(message, originalLogString))
                 .orElse(originalLogString);
     }

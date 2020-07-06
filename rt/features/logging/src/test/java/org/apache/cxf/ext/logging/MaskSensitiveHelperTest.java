@@ -43,7 +43,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(Parameterized.class)
-public class MaskSensitiveTest {
+public class MaskSensitiveHelperTest {
+
+    private static final String SENSITIVE_LOGGING_CONTENT_HEADER =
+            "{Accept=application/json, SessionId = sensitive data , Authorization=sensitive data}";
+    private static final String MASKED_LOGGING_CONTENT_HEADER =
+            "{Accept=application/json, SessionId=XXX, Authorization=XXX}";
 
     private static final String SENSITIVE_LOGGING_CONTENT_XML =
             "<user>testUser</user><password>my secret password</password>";
@@ -56,6 +61,7 @@ public class MaskSensitiveTest {
             "\"user\":\"testUser\", \"password\": \"XXX\"";
 
     private static final List<String> SENSITIVE_ELEMENTS = Arrays.asList("password");
+    private static final List<String> SENSITIVE_HEADERS = Arrays.asList("SessionId", "Authorization");
     private static final String APPLICATION_XML = "application/xml";
     private static final String APPLICATION_JSON = "application/json";
 
@@ -63,7 +69,7 @@ public class MaskSensitiveTest {
     private final String maskedContent;
     private final String contentType;
     private LogEventSenderMock logEventSender = new LogEventSenderMock();
-    public MaskSensitiveTest(String loggingContent, String maskedContent, String contentType) {
+    public MaskSensitiveHelperTest(String loggingContent, String maskedContent, String contentType) {
         this.loggingContent = loggingContent;
         this.maskedContent = maskedContent;
         this.contentType = contentType;
@@ -71,17 +77,19 @@ public class MaskSensitiveTest {
 
     @Parameterized.Parameters
     public static Collection primeNumbers() {
-        return Arrays.asList(new Object[][]{
+        return Arrays.asList(new Object[][] {
             {SENSITIVE_LOGGING_CONTENT_XML, MASKED_LOGGING_CONTENT_XML, APPLICATION_XML},
-            {SENSITIVE_LOGGING_CONTENT_JSON, MASKED_LOGGING_CONTENT_JSON, APPLICATION_JSON}
+            {SENSITIVE_LOGGING_CONTENT_JSON, MASKED_LOGGING_CONTENT_JSON, APPLICATION_JSON},
+            {SENSITIVE_LOGGING_CONTENT_HEADER, MASKED_LOGGING_CONTENT_HEADER, APPLICATION_JSON}
         });
     }
 
     @Test
-    public void shouldReplaceSensitiveDataIn() throws IOException {
+    public void shouldReplaceSensitiveDataIn() {
         // Arrange
         final LoggingInInterceptor inInterceptor = new LoggingInInterceptor(logEventSender);
-        inInterceptor.setSensitiveElementNames(SENSITIVE_ELEMENTS);
+        inInterceptor.addSensitiveElementNames(SENSITIVE_ELEMENTS);
+        inInterceptor.addSensitiveHeaders(SENSITIVE_HEADERS);
 
         final Message message = prepareInMessage();
 
@@ -102,7 +110,8 @@ public class MaskSensitiveTest {
     public void shouldReplaceSensitiveDataOut() throws IOException {
         // Arrange
         final LoggingOutInterceptor outInterceptor = new LoggingOutInterceptor(logEventSender);
-        outInterceptor.setSensitiveElementNames(SENSITIVE_ELEMENTS);
+        outInterceptor.addSensitiveElementNames(SENSITIVE_ELEMENTS);
+        outInterceptor.addSensitiveHeaders(SENSITIVE_HEADERS);
 
         final Message message = prepareOutMessage();
 
