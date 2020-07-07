@@ -44,12 +44,6 @@ import static org.junit.Assert.assertNotNull;
 
 @RunWith(Parameterized.class)
 public class MaskSensitiveHelperTest {
-
-    private static final String SENSITIVE_LOGGING_CONTENT_HEADER =
-            "{Accept=application/json, SessionId = sensitive data , Authorization=sensitive data}";
-    private static final String MASKED_LOGGING_CONTENT_HEADER =
-            "{Accept=application/json, SessionId=XXX, Authorization=XXX}";
-
     private static final String SENSITIVE_LOGGING_CONTENT_XML =
             "<user>testUser</user><password>my secret password</password>";
     private static final String MASKED_LOGGING_CONTENT_XML =
@@ -61,7 +55,6 @@ public class MaskSensitiveHelperTest {
             "\"user\":\"testUser\", \"password\": \"XXX\"";
 
     private static final List<String> SENSITIVE_ELEMENTS = Arrays.asList("password");
-    private static final List<String> SENSITIVE_HEADERS = Arrays.asList("SessionId", "Authorization");
     private static final String APPLICATION_XML = "application/xml";
     private static final String APPLICATION_JSON = "application/json";
 
@@ -79,8 +72,7 @@ public class MaskSensitiveHelperTest {
     public static Collection primeNumbers() {
         return Arrays.asList(new Object[][] {
             {SENSITIVE_LOGGING_CONTENT_XML, MASKED_LOGGING_CONTENT_XML, APPLICATION_XML},
-            {SENSITIVE_LOGGING_CONTENT_JSON, MASKED_LOGGING_CONTENT_JSON, APPLICATION_JSON},
-            {SENSITIVE_LOGGING_CONTENT_HEADER, MASKED_LOGGING_CONTENT_HEADER, APPLICATION_JSON}
+            {SENSITIVE_LOGGING_CONTENT_JSON, MASKED_LOGGING_CONTENT_JSON, APPLICATION_JSON}
         });
     }
 
@@ -89,7 +81,6 @@ public class MaskSensitiveHelperTest {
         // Arrange
         final LoggingInInterceptor inInterceptor = new LoggingInInterceptor(logEventSender);
         inInterceptor.addSensitiveElementNames(SENSITIVE_ELEMENTS);
-        inInterceptor.addSensitiveHeaders(SENSITIVE_HEADERS);
 
         final Message message = prepareInMessage();
 
@@ -111,7 +102,6 @@ public class MaskSensitiveHelperTest {
         // Arrange
         final LoggingOutInterceptor outInterceptor = new LoggingOutInterceptor(logEventSender);
         outInterceptor.addSensitiveElementNames(SENSITIVE_ELEMENTS);
-        outInterceptor.addSensitiveHeaders(SENSITIVE_HEADERS);
 
         final Message message = prepareOutMessage();
 

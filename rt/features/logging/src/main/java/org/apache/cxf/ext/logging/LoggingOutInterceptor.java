@@ -139,7 +139,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         }
 
         public void close() throws IOException {
-            final LogEvent event = eventMapper.map(message);
+            final LogEvent event = eventMapper.map(message, sensitiveHeaderMap);
             StringWriter w2 = out2;
             if (w2 == null) {
                 w2 = (StringWriter) out;
@@ -190,7 +190,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         }
 
         public void onClose(CachedOutputStream cos) {
-            final LogEvent event = eventMapper.map(message);
+            final LogEvent event = eventMapper.map(message, sensitiveHeaderMap);
             if (shouldLogContent(event)) {
                 copyPayload(cos, event);
             } else {

@@ -258,8 +258,8 @@ public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
         }
 
         public void addSensitiveHeaders(final List<String> sensitiveHeaders) {
-            in.addSensitiveHeaders(sensitiveHeaders);
-            out.addSensitiveHeaders(sensitiveHeaders);
+            in.addSensitiveHeaderNames(sensitiveHeaders);
+            out.addSensitiveHeaderNames(sensitiveHeaders);
         }
     }
 }

@@ -28,24 +28,17 @@ public class MaskSensitiveHelper {
     private static final String ELEMENT_NAME_TEMPLATE = "-ELEMENT_NAME-";
     private static final String MATCH_PATTERN_XML = "<-ELEMENT_NAME->(.*?)</-ELEMENT_NAME->";
     private static final String MATCH_PATTERN_JSON = "\"-ELEMENT_NAME-\"[ \\t]*:[ \\t]*\"(.*?)\"";
-    private static final String MATCH_PATTERN_HEADER = "-ELEMENT_NAME-[ \\t]*=([^,}])+";
     private static final String REPLACEMENT_PATTERN_XML = "<-ELEMENT_NAME->XXX</-ELEMENT_NAME->";
     private static final String REPLACEMENT_PATTERN_JSON = "\"-ELEMENT_NAME-\": \"XXX\"";
-    private static final String REPLACEMENT_PATTERN_HEADER = "-ELEMENT_NAME-=XXX";
 
     private static final String XML_CONTENT = "xml";
     private static final String HTML_CONTENT = "html";
     private static final String JSON_CONTENT = "json";
 
     final List<String> sensitiveElementNames = new ArrayList<>();
-    final List<String> sensitiveHeaders = new ArrayList<>();
 
     public void addSensitiveElementNames(final List<String> inSensitiveElementNames) {
         this.sensitiveElementNames.addAll(inSensitiveElementNames);
-    }
-
-    public void addSensitiveHeaders(final List<String> inSensitiveHeaders) {
-        this.sensitiveHeaders.addAll(inSensitiveHeaders);
     }
 
     public String maskSensitiveElements(
@@ -66,7 +59,6 @@ public class MaskSensitiveHelper {
 
     private String applyMasks(String originalLogString, String matchElementPattern, String replacementElementPattern) {
         return Optional.ofNullable(originalLogString)
-                .map(s -> applyExpression(s, MATCH_PATTERN_HEADER, REPLACEMENT_PATTERN_HEADER, sensitiveHeaders))
                 .map(s -> applyExpression(s, matchElementPattern, replacementElementPattern, sensitiveElementNames))
                 .orElse(originalLogString);
     }

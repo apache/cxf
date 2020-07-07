@@ -46,7 +46,9 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.ContextUtils;
 
 public class DefaultLogEventMapper {
+    public static final String MASKED_HEADER_VALUE = "XXX";
     private static final Set<String> DEFAULT_BINARY_CONTENT_MEDIA_TYPES;
+
     static {
         Set<String> mediaTypes = new HashSet<>(5);
         mediaTypes.add("application/octet-stream");
@@ -66,7 +68,7 @@ public class DefaultLogEventMapper {
         }
     }
 
-    public LogEvent map(Message message) {
+    public LogEvent map(final Message message, final Map<String, Boolean> sensitiveHeaderMap) {
         final LogEvent event = new LogEvent();
         event.setMessageId(getMessageId(message));
         event.setExchangeId((String)message.getExchange().get(LogEvent.KEY_EXCHANGE_ID));
@@ -84,7 +86,7 @@ public class DefaultLogEventMapper {
         event.setContentType(safeGet(message, Message.CONTENT_TYPE));
 
         Map<String, String> headerMap = getHeaders(message);
-        event.setHeaders(headerMap);
+        event.setHeaders(maskHeaders(headerMap, sensitiveHeaderMap));
 
         event.setAddress(getAddress(message, event));
 
@@ -93,6 +95,17 @@ public class DefaultLogEventMapper {
         event.setMultipartContent(isMultipartContent(message));
         setEpInfo(message, event);
         return event;
+    }
+
+    private Map<String, String> maskHeaders(
+            final Map<String, String> headerMap,
+            final Map<String, Boolean> sensitiveHeaderMap) {
+        final Map<String, String> maskedHeaderMap = new HashMap<>();
+        headerMap.keySet().forEach(key -> {
+            maskedHeaderMap.put(key, sensitiveHeaderMap.containsKey(key)
+                    ? MASKED_HEADER_VALUE : headerMap.get(key));
+        });
+        return maskedHeaderMap;
     }
 
     private String getPrincipal(Message message) {
