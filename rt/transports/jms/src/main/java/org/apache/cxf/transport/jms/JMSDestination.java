@@ -151,7 +151,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
                 Destination destination = jmsConfig.getTargetDestination(session);
                 container = new PollingMessageListenerContainer(connection, destination, this, exListener);
             } else {
-                container = new PollingMessageListenerContainer(jmsConfig, false, this);
+                container = new PollingMessageListenerContainer(jmsConfig, false, this, exListener);
             }
 
             container.setConcurrentConsumers(jmsConfig.getConcurrentConsumers());
