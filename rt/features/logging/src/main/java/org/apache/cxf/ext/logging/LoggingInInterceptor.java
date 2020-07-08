@@ -23,7 +23,6 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
@@ -67,7 +66,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
             return;
         }
         createExchangeId(message);
-        final LogEvent event = eventMapper.map(message, Collections.emptyMap());
+        final LogEvent event = eventMapper.map(message, sensitiveHeaderMap);
         if (shouldLogContent(event)) {
             addContent(message, event);
         } else {
