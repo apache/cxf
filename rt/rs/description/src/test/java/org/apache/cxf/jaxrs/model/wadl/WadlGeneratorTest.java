@@ -89,11 +89,11 @@ public class WadlGeneratorTest {
     }
 
     @Test
-    public void testWhiteList() throws Exception {
+    public void testAllowList() throws Exception {
         WadlGenerator wg = new WadlGenerator();
-        List<String> whiteList = new ArrayList<>();
-        whiteList.add("123.123.123.123");
-        wg.setWhiteList(whiteList);
+        List<String> allowList = new ArrayList<>();
+        allowList.add("123.123.123.123");
+        wg.setAllowList(allowList);
         wg.setExternalLinks(Collections.singletonList("http://books.xsd"));
 
         ClassResourceInfo cri =

@@ -39,8 +39,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     public static final int DEFAULT_LIMIT = 48 * 1024;
     public static final int DEFAULT_THRESHOLD = -1;
     public static final String CONTENT_SUPPRESSED = "--- Content suppressed ---";
-    private static final String  LIVE_LOGGING_PROP = "org.apache.cxf.logging.enable";
-
+    protected static final String  LIVE_LOGGING_PROP = "org.apache.cxf.logging.enable";
     protected int limit = DEFAULT_LIMIT;
     protected long threshold = DEFAULT_THRESHOLD;
     protected boolean logBinary;

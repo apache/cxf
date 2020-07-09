@@ -46,9 +46,15 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
 
     public PollingMessageListenerContainer(JMSConfiguration jmsConfig, boolean isReply,
                                            MessageListener listenerHandler) {
+        this(jmsConfig, isReply, listenerHandler, null);
+    }
+
+    public PollingMessageListenerContainer(JMSConfiguration jmsConfig, boolean isReply,
+                                           MessageListener listenerHandler, ExceptionListener exceptionListener) {
         this.jmsConfig = jmsConfig;
         this.reply = isReply;
         this.listenerHandler = listenerHandler;
+        this.exceptionListener = exceptionListener;
     }
 
     public PollingMessageListenerContainer(Connection connection, Destination destination,

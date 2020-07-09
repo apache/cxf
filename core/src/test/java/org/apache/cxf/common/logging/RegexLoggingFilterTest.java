@@ -31,7 +31,8 @@ public class RegexLoggingFilterTest {
         filter.setPattern("jms(.*?)password=+([^ ]+)");
         filter.setGroup(2);
         wantFilter = filter.filter(wantFilter).toString();
-        assertEquals(wantFilter, "jms:queue:soapRequestQueue?username=admin&password=*****");
+        assertEquals(wantFilter, "jms:queue:soapRequestQueue?username=admin&password="
+            + RegexLoggingFilter.DEFAULT_REPLACEMENT);
     }
 
 }
