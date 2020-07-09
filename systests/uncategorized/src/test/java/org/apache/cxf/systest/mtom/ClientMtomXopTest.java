@@ -358,6 +358,43 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void testMtomWithChineseFileName() throws Exception {
+        TestMtom mtomPort = createPort(MTOM_SERVICE, MTOM_PORT, TestMtom.class, true, true);
+        try {
+            Holder<DataHandler> param = new Holder<>();
+            Holder<String> name;
+
+            URL fileURL = getClass().getClassLoader().getResource("测试.bmp");
+
+            Object[] validationTypes = new Object[]{Boolean.TRUE, SchemaValidationType.IN, SchemaValidationType.BOTH};
+            for (Object validationType : validationTypes) {
+                ((BindingProvider)mtomPort).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED,
+                                                                    validationType);
+                param.value = new DataHandler(fileURL);
+                name = new Holder<>("have name");
+                mtomPort.testXop(name, param);
+               
+                assertEquals("can't get file name", "return detail   测试.bmp", java.net.URLDecoder.decode(name.value));
+                assertNotNull(param.value);
+            }
+        } catch (UndeclaredThrowableException ex) {
+            throw (Exception)ex.getCause();
+        } catch (Exception ex) {
+            if (ex.getMessage().contains("Connection reset")
+                && System.getProperty("java.specification.version", "1.5").contains("1.6")) {
+                //There seems to be a bug/interaction with Java 1.6 and Jetty where
+                //Jetty will occasionally send back a RST prior to all the data being
+                //sent back to the client when using localhost (which is what we do)
+                //we'll ignore for now
+                return;
+            }
+            System.out.println(System.getProperties());
+            ex.printStackTrace();
+            throw ex;
+        }
+    }
+    
+    @Test
     public void testMtomWithFileName() throws Exception {
         TestMtom mtomPort = createPort(MTOM_SERVICE, MTOM_PORT, TestMtom.class, true, true);
         try {
