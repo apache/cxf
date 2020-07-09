@@ -161,10 +161,10 @@ public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
      * Initial logging statement: {Authorization=Basic QWxhZGRpbjpPcGVuU2VzYW1l}
      * Result logging statement: {Authorization=XXX}
      * </pre>
-     * @param sensitiveHeaders list of sensitive element names to be replaced
+     * @param sensitiveProtocolHeaderNames list of sensitive element names to be replaced
      */
-    public void addSensitiveHeaders(final List<String> sensitiveHeaders) {
-        delegate.addSensitiveHeaders(sensitiveHeaders);
+    public void addSensitiveProtocolHeaderNames(final List<String> sensitiveProtocolHeaderNames) {
+        delegate.addSensitiveProtocolHeaderNames(sensitiveProtocolHeaderNames);
     }
 
     public static class Portable implements AbstractPortableFeature {
@@ -257,9 +257,9 @@ public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
             out.addSensitiveElementNames(sensitiveElementNames);
         }
 
-        public void addSensitiveHeaders(final List<String> sensitiveHeaders) {
-            in.addSensitiveHeaderNames(sensitiveHeaders);
-            out.addSensitiveHeaderNames(sensitiveHeaders);
+        public void addSensitiveProtocolHeaderNames(final List<String> sensitiveProtocolHeaderNames) {
+            in.addSensitiveProtocolHeaderNames(sensitiveProtocolHeaderNames);
+            out.addSensitiveProtocolHeaderNames(sensitiveProtocolHeaderNames);
         }
     }
 }

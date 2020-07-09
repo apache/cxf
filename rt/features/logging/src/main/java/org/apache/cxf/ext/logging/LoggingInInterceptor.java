@@ -66,7 +66,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
             return;
         }
         createExchangeId(message);
-        final LogEvent event = eventMapper.map(message, sensitiveHeaderMap);
+        final LogEvent event = eventMapper.map(message, sensitiveProtocolHeaderMap);
         if (shouldLogContent(event)) {
             addContent(message, event);
         } else {

@@ -21,7 +21,6 @@ package org.apache.cxf.ext.logging;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -52,7 +51,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
 
     protected final MaskSensitiveHelper maskSensitiveHelper = new MaskSensitiveHelper();
 
-    protected Map<String, Boolean> sensitiveHeaderMap = new HashMap();
+    protected Map<String, Boolean> sensitiveProtocolHeaderMap = new HashMap();
 
     public AbstractLoggingInterceptor(String phase, LogEventSender sender) {
         super(phase);
@@ -88,8 +87,8 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         maskSensitiveHelper.addSensitiveElementNames(sensitiveElementNames);
     }
 
-    public void addSensitiveHeaderNames(final List<String> sensitiveHeaderNames) {
-        sensitiveHeaderMap = sensitiveHeaderNames.stream()
+    public void addSensitiveProtocolHeaderNames(final List<String> sensitiveProtocolHeaderNames) {
+        sensitiveProtocolHeaderMap = sensitiveProtocolHeaderNames.stream()
                 .collect(Collectors.toMap(Function.identity(), name -> Boolean.TRUE));
     }
 
@@ -127,8 +126,6 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     }
 
     protected String maskSensitiveElements(final Message message, String originalLogString) {
-        return Optional.of(maskSensitiveHelper)
-                .map(h -> h.maskSensitiveElements(message, originalLogString))
-                .orElse(originalLogString);
+        return maskSensitiveHelper.maskSensitiveElements(message, originalLogString);
     }
 }
