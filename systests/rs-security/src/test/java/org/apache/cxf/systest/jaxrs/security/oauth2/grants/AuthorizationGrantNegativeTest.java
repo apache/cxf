@@ -416,6 +416,52 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
         }
     }
 
+    // Try to refresh the access token specifying an additional scope
+    @org.junit.Test
+    public void testRefreshWithScopeUpgrade() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + port + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+                org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code
+        String code = OAuth2TestUtils.getAuthorizationCode(client, "read_balance");
+        assertNotNull(code);
+
+        // Now get the access token
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                "consumer-id", "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+                org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        ClientAccessToken accessToken =
+                OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
+        assertNotNull(accessToken.getTokenKey());
+        assertNotNull(accessToken.getRefreshToken());
+
+        // Refresh the access token
+        client.type("application/x-www-form-urlencoded").accept("application/json");
+
+        Form form = new Form();
+        form.param("grant_type", "refresh_token");
+        form.param("refresh_token", accessToken.getRefreshToken());
+        form.param("client_id", "consumer-id");
+        form.param("scope", "read_balance create_balance");
+
+        try {
+            Response response = client.post(form);
+            response.readEntity(ClientAccessToken.class);
+            fail("Failure expected on trying to upgrade scopes");
+        } catch (ResponseProcessingException ex) {
+            //expected
+        }
+    }
+
     @org.junit.Test
     public void testAccessTokenBadCode() throws Exception {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");

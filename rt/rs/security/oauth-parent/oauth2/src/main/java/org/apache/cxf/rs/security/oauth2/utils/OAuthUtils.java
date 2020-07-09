@@ -329,10 +329,20 @@ public final class OAuthUtils {
                                                   String scopeParameter,
                                                   boolean useAllClientScopes,
                                                   boolean partialMatchScopeValidation) {
+        return getRequestedScopes(client, scopeParameter, useAllClientScopes, partialMatchScopeValidation, true);
+    }
+
+    public static List<String> getRequestedScopes(Client client,
+                                                  String scopeParameter,
+                                                  boolean useAllClientScopes,
+                                                  boolean partialMatchScopeValidation,
+                                                  boolean defaultToRegisteredScopes) {
         List<String> requestScopes = parseScope(scopeParameter);
         List<String> registeredScopes = client.getRegisteredScopes();
         if (requestScopes.isEmpty()) {
-            requestScopes.addAll(registeredScopes);
+            if (defaultToRegisteredScopes) {
+                return registeredScopes;
+            }
             return requestScopes;
         }
         if (!validateScopes(requestScopes, registeredScopes, partialMatchScopeValidation)) {
