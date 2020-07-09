@@ -131,6 +131,10 @@
             <groupId>javax.activation</groupId>
             <artifactId>javax.activation-api</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
+          </exclusion>
         </exclusions> 
     </dependency>
     <dependency>
@@ -186,12 +190,6 @@
       <groupId>org.aspectj</groupId>
       <artifactId>aspectjweaver</artifactId>
       <version>${cxf.aspectj.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate.javax.persistence</groupId>
-      <artifactId>hibernate-jpa-2.1-api</artifactId>
-      <version>${cxf.hibernate.jpa.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
