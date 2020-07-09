@@ -282,9 +282,11 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
     // Here we don't specify a scope in the refresh token call
     @org.junit.Test
     public void testAuthorizationCodeGrantRefreshWithoutScope() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
         String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
-                "alice", "security", null);
+                "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
         WebClient.getConfig(client).getRequestContext().put(
                 org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
@@ -295,7 +297,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
 
         // Now get the access token
         client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
-                "consumer-id", "this-is-a-secret", null);
+                "consumer-id", "this-is-a-secret", busFile.toString());
         // Save the Cookie for the second request...
         WebClient.getConfig(client).getRequestContext().put(
                 org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
@@ -312,8 +314,9 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         form.param("grant_type", "refresh_token");
         form.param("refresh_token", accessToken.getRefreshToken());
         form.param("client_id", "consumer-id");
+        Response response = client.post(form);
 
-        accessToken = client.post(form, ClientAccessToken.class);
+        accessToken = response.readEntity(ClientAccessToken.class);
         assertNotNull(accessToken.getTokenKey());
         assertNotNull(accessToken.getRefreshToken());
 //        assertEquals("read_balance", accessToken.getApprovedScope());
