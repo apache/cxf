@@ -124,7 +124,7 @@
         <cxf.hibernate.em.version>5.4.18.Final</cxf.hibernate.em.version>
         <cxf.hibernate.jpa.version>1.0.2.Final</cxf.hibernate.jpa.version>
         <cxf.hibernate.validator.version>6.1.4.Final</cxf.hibernate.validator.version>
-        <cxf.hsqldb.version>2.5.1</cxf.hsqldb.version>
+        <cxf.hsqldb.version>2.5.0</cxf.hsqldb.version>
         <cxf.httpcomponents.asyncclient.version.range>[4.0,4.2)</cxf.httpcomponents.asyncclient.version.range>
         <cxf.httpcomponents.asyncclient.version>4.1.4</cxf.httpcomponents.asyncclient.version>
         <cxf.httpcomponents.client.version>4.5.12</cxf.httpcomponents.client.version>
