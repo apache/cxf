@@ -346,9 +346,10 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
     public void testMtomWithChineseFileName() throws Exception {
         TestMtom mtomPort = createPort(MTOM_SERVICE, MTOM_PORT, TestMtom.class, true, true);
         try {
-            Holder<DataHandler> param = new Holder<>();
+            final Holder<DataHandler> param = new Holder<>();
 
-            URL fileURL = getClass().getClassLoader().getResource("测试.bmp");
+            URL fileURL = getClass().getResource("/测试.bmp");
+            assertNotNull(fileURL);
 
             Object[] validationTypes = new Object[]{Boolean.TRUE, SchemaValidationType.IN, SchemaValidationType.BOTH};
             for (Object validationType : validationTypes) {
