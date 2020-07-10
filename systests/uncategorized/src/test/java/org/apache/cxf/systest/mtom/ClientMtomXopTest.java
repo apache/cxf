@@ -202,14 +202,6 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         } catch (Exception ex) {
-            if (ex.getMessage().contains("Connection reset")
-                && System.getProperty("java.specification.version", "1.5").contains("1.6")) {
-                //There seems to be a bug/interaction with Java 1.6 and Jetty where
-                //Jetty will occasionally send back a RST prior to all the data being
-                //sent back to the client when using localhost (which is what we do)
-                //we'll ignore for now
-                return;
-            }
             System.out.println(System.getProperties());
             throw ex;
         }
@@ -344,14 +336,6 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         } catch (Exception ex) {
-            if (ex.getMessage().contains("Connection reset")
-                && System.getProperty("java.specification.version", "1.5").contains("1.6")) {
-                //There seems to be a bug/interaction with Java 1.6 and Jetty where
-                //Jetty will occasionally send back a RST prior to all the data being
-                //sent back to the client when using localhost (which is what we do)
-                //we'll ignore for now
-                return;
-            }
             System.out.println(System.getProperties());
             throw ex;
         }
@@ -380,14 +364,6 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         } catch (Exception ex) {
-            if (ex.getMessage().contains("Connection reset")
-                && System.getProperty("java.specification.version", "1.5").contains("1.6")) {
-                //There seems to be a bug/interaction with Java 1.6 and Jetty where
-                //Jetty will occasionally send back a RST prior to all the data being
-                //sent back to the client when using localhost (which is what we do)
-                //we'll ignore for now
-                return;
-            }
             System.out.println(System.getProperties());
             ex.printStackTrace();
             throw ex;
@@ -416,14 +392,6 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         } catch (Exception ex) {
-            if (ex.getMessage().contains("Connection reset")
-                && System.getProperty("java.specification.version", "1.5").contains("1.6")) {
-                //There seems to be a bug/interaction with Java 1.6 and Jetty where
-                //Jetty will occasionally send back a RST prior to all the data being
-                //sent back to the client when using localhost (which is what we do)
-                //we'll ignore for now
-                return;
-            }
             System.out.println(System.getProperties());
             throw ex;
         }
