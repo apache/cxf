@@ -23,6 +23,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 import javax.activation.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
@@ -346,7 +347,6 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
         TestMtom mtomPort = createPort(MTOM_SERVICE, MTOM_PORT, TestMtom.class, true, true);
         try {
             Holder<DataHandler> param = new Holder<>();
-            Holder<String> name;
 
             URL fileURL = getClass().getClassLoader().getResource("测试.bmp");
 
@@ -355,17 +355,16 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
                 ((BindingProvider)mtomPort).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED,
                                                                     validationType);
                 param.value = new DataHandler(fileURL);
-                name = new Holder<>("have name");
+                final Holder<String> name = new Holder<>("have name");
                 mtomPort.testXop(name, param);
-               
-                assertEquals("can't get file name", "return detail   测试.bmp", java.net.URLDecoder.decode(name.value));
+
+                assertEquals("can't get file name", "return detail   测试.bmp",
+                    java.net.URLDecoder.decode(name.value, StandardCharsets.UTF_8.name()));
                 assertNotNull(param.value);
             }
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         } catch (Exception ex) {
-            System.out.println(System.getProperties());
-            ex.printStackTrace();
             throw ex;
         }
     }
