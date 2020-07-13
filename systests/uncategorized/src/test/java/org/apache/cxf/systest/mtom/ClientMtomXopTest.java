@@ -349,7 +349,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
             final Holder<DataHandler> param = new Holder<>();
 
             URL fileURL = getClass().getResource("/测试.bmp");
-            assertNotNull(fileURL);
+            assertNotNull(getClass().getClassLoader().getClass().getName(), fileURL);
 
             Object[] validationTypes = new Object[]{Boolean.TRUE, SchemaValidationType.IN, SchemaValidationType.BOTH};
             for (Object validationType : validationTypes) {
