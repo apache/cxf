@@ -78,9 +78,14 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.johnzon</groupId>
-                <artifactId>johnzon-jaxrs</artifactId>
+                <artifactId>johnzon-jsonb</artifactId>
                 <version>${cxf.johnzon.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-jsonb_1.0_spec</artifactId>
+                <version>${cxf.geronimo.jsonb.version}</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.json</groupId>

@@ -43,7 +43,7 @@ import javax.ws.rs.core.MediaType;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
-import org.apache.johnzon.jaxrs.JohnzonProvider;
+import org.apache.johnzon.jaxrs.jsonb.jaxrs.JsonbJaxrsProvider;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.eclipse.microprofile.rest.client.ext.AsyncInvocationInterceptor;
 import org.eclipse.microprofile.rest.client.ext.AsyncInvocationInterceptorFactory;
@@ -85,7 +85,7 @@ public class AsyncThreadingTest {
         
         echo = RestClientBuilder
             .newBuilder()
-            .register(JohnzonProvider.class)
+            .register(JsonbJaxrsProvider.class)
             .register(AsyncInvocationInterceptorFactoryImpl.class)
             .baseUri(getBaseUri())
             .executorService(executorService)
