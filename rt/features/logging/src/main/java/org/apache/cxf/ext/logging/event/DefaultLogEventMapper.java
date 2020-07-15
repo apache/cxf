@@ -68,7 +68,7 @@ public class DefaultLogEventMapper {
         }
     }
 
-    public LogEvent map(final Message message, final Map<String, Boolean> sensitiveHeaderMap) {
+    public LogEvent map(final Message message, final Set<String> sensitiveProtocolHeaders) {
         final LogEvent event = new LogEvent();
         event.setMessageId(getMessageId(message));
         event.setExchangeId((String)message.getExchange().get(LogEvent.KEY_EXCHANGE_ID));
@@ -86,7 +86,7 @@ public class DefaultLogEventMapper {
         event.setContentType(safeGet(message, Message.CONTENT_TYPE));
 
         Map<String, String> headerMap = getHeaders(message);
-        event.setHeaders(maskHeaders(headerMap, sensitiveHeaderMap));
+        event.setHeaders(maskHeaders(headerMap, sensitiveProtocolHeaders));
 
         event.setAddress(getAddress(message, event));
 
@@ -99,11 +99,11 @@ public class DefaultLogEventMapper {
 
     private Map<String, String> maskHeaders(
             final Map<String, String> headerMap,
-            final Map<String, Boolean> sensitiveHeaderMap) {
+            final Set<String> sensitiveHeaderNames) {
         final Map<String, String> maskedHeaderMap = new HashMap<>();
-        headerMap.keySet().forEach(key -> {
-            maskedHeaderMap.put(key, sensitiveHeaderMap.containsKey(key)
-                    ? MASKED_HEADER_VALUE : headerMap.get(key));
+        headerMap.keySet().forEach(h -> {
+            maskedHeaderMap.put(h, sensitiveHeaderNames.contains(h)
+                    ? MASKED_HEADER_VALUE : headerMap.get(h));
         });
         return maskedHeaderMap;
     }

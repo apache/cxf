@@ -90,7 +90,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
             message.put(LIVE_LOGGING_PROP, Boolean.FALSE);
         }
         createExchangeId(message);
-        final LogEvent event = eventMapper.map(message, sensitiveProtocolHeaderMap);
+        final LogEvent event = eventMapper.map(message, sensitiveProtocolHeaderNames);
         if (shouldLogContent(event)) {
             addContent(message, event);
         } else {

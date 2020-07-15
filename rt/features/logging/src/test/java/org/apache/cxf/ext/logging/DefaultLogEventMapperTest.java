@@ -21,7 +21,9 @@ package org.apache.cxf.ext.logging;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.cxf.ext.logging.event.DefaultLogEventMapper;
 import org.apache.cxf.ext.logging.event.LogEvent;
@@ -48,7 +50,7 @@ public class DefaultLogEventMapperTest {
         message.put(Message.REQUEST_URI, "test");
         Exchange exchange = new ExchangeImpl();
         message.setExchange(exchange);
-        LogEvent event = mapper.map(message, Collections.emptyMap());
+        LogEvent event = mapper.map(message, Collections.emptySet());
         assertEquals("GET[test]", event.getOperationName());
     }
 
@@ -63,7 +65,7 @@ public class DefaultLogEventMapperTest {
         message.put(Message.REQUEST_URI, null);
         Exchange exchange = new ExchangeImpl();
         message.setExchange(exchange);
-        LogEvent event = mapper.map(message, Collections.emptyMap());
+        LogEvent event = mapper.map(message, Collections.emptySet());
         assertEquals("", event.getOperationName());
     }
 
@@ -78,7 +80,7 @@ public class DefaultLogEventMapperTest {
         message.put(Message.REQUEST_URI, "/api");
         Exchange exchange = new ExchangeImpl();
         message.setExchange(exchange);
-        LogEvent event = mapper.map(message, Collections.emptyMap());
+        LogEvent event = mapper.map(message, Collections.emptySet());
         assertEquals("http://localhost:9001/api", event.getAddress());
     }
 
@@ -92,8 +94,8 @@ public class DefaultLogEventMapperTest {
         message.setExchange(exchange);
         final Map<String, Object> headers = new HashMap<>();
         headers.put(TEST_HEADER_NAME, Arrays.asList(TEST_HEADER_VALUE));
-        final Map<String, Boolean> sensitiveHeaders = new HashMap<>();
-        sensitiveHeaders.put(TEST_HEADER_NAME, Boolean.TRUE);
+        final Set<String> sensitiveHeaders = new HashSet<>();
+        sensitiveHeaders.add(TEST_HEADER_NAME);
         message.put(Message.PROTOCOL_HEADERS, headers);
 
         LogEvent event = mapper.map(message, sensitiveHeaders);

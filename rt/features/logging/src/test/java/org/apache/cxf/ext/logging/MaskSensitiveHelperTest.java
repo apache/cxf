@@ -26,7 +26,8 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.message.Exchange;
@@ -54,7 +55,7 @@ public class MaskSensitiveHelperTest {
     private static final String MASKED_LOGGING_CONTENT_JSON =
             "\"user\":\"testUser\", \"password\": \"XXX\"";
 
-    private static final List<String> SENSITIVE_ELEMENTS = Arrays.asList("password");
+    private static final Set<String> SENSITIVE_ELEMENTS = new HashSet(Arrays.asList("password"));
     private static final String APPLICATION_XML = "application/xml";
     private static final String APPLICATION_JSON = "application/json";
 

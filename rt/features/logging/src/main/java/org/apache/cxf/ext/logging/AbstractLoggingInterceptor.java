@@ -18,12 +18,9 @@
  */
 package org.apache.cxf.ext.logging;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.ext.logging.event.DefaultLogEventMapper;
@@ -50,7 +47,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
 
     protected final MaskSensitiveHelper maskSensitiveHelper = new MaskSensitiveHelper();
 
-    protected Map<String, Boolean> sensitiveProtocolHeaderMap = new HashMap();
+    protected Set<String> sensitiveProtocolHeaderNames = new HashSet();
 
     public AbstractLoggingInterceptor(String phase, LogEventSender sender) {
         super(phase);
@@ -82,13 +79,12 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         return threshold;
     }
 
-    public void addSensitiveElementNames(final List<String> sensitiveElementNames) {
+    public void addSensitiveElementNames(final Set<String> sensitiveElementNames) {
         maskSensitiveHelper.addSensitiveElementNames(sensitiveElementNames);
     }
 
-    public void addSensitiveProtocolHeaderNames(final List<String> sensitiveProtocolHeaderNames) {
-        sensitiveProtocolHeaderMap = sensitiveProtocolHeaderNames.stream()
-                .collect(Collectors.toMap(Function.identity(), name -> Boolean.TRUE));
+    public void addSensitiveProtocolHeaderNames(final Set<String> inSensitiveProtocolHeaderNames) {
+        sensitiveProtocolHeaderNames.addAll(inSensitiveProtocolHeaderNames);
     }
 
     public void setPrettyLogging(boolean prettyLogging) {

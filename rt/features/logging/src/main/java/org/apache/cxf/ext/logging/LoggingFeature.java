@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.ext.logging;
 
-import java.util.List;
+import java.util.Set;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.Provider;
@@ -145,9 +145,9 @@ public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
      * Initial logging statement: <user>my user</user><password>my secret password</password>
      * Result logging statement: <user>my user</user><password>XXXX</password>
      * </pre>
-     * @param sensitiveElementNames list of sensitive element names to be replaced
+     * @param sensitiveElementNames set of sensitive element names to be replaced
      */
-    public void addSensitiveElementNames(final List<String> sensitiveElementNames) {
+    public void addSensitiveElementNames(final Set<String> sensitiveElementNames) {
         delegate.addSensitiveElementNames(sensitiveElementNames);
     }
 
@@ -161,9 +161,9 @@ public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
      * Initial logging statement: {Authorization=Basic QWxhZGRpbjpPcGVuU2VzYW1l}
      * Result logging statement: {Authorization=XXX}
      * </pre>
-     * @param sensitiveProtocolHeaderNames list of sensitive element names to be replaced
+     * @param sensitiveProtocolHeaderNames set of sensitive element names to be replaced
      */
-    public void addSensitiveProtocolHeaderNames(final List<String> sensitiveProtocolHeaderNames) {
+    public void addSensitiveProtocolHeaderNames(final Set<String> sensitiveProtocolHeaderNames) {
         delegate.addSensitiveProtocolHeaderNames(sensitiveProtocolHeaderNames);
     }
 
@@ -252,12 +252,12 @@ public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
             addOutBinaryContentMediaTypes(mediaTypes);
         }
 
-        public void addSensitiveElementNames(final List<String> sensitiveElementNames) {
+        public void addSensitiveElementNames(final Set<String> sensitiveElementNames) {
             in.addSensitiveElementNames(sensitiveElementNames);
             out.addSensitiveElementNames(sensitiveElementNames);
         }
 
-        public void addSensitiveProtocolHeaderNames(final List<String> sensitiveProtocolHeaderNames) {
+        public void addSensitiveProtocolHeaderNames(final Set<String> sensitiveProtocolHeaderNames) {
             in.addSensitiveProtocolHeaderNames(sensitiveProtocolHeaderNames);
             out.addSensitiveProtocolHeaderNames(sensitiveProtocolHeaderNames);
         }

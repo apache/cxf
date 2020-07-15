@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.ext.logging;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import org.apache.cxf.message.Message;
 
@@ -35,9 +35,9 @@ public class MaskSensitiveHelper {
     private static final String HTML_CONTENT = "html";
     private static final String JSON_CONTENT = "json";
 
-    final List<String> sensitiveElementNames = new ArrayList<>();
+    final Set<String> sensitiveElementNames = new HashSet<>();
 
-    public void addSensitiveElementNames(final List<String> inSensitiveElementNames) {
+    public void addSensitiveElementNames(final Set<String> inSensitiveElementNames) {
         this.sensitiveElementNames.addAll(inSensitiveElementNames);
     }
 
@@ -67,7 +67,7 @@ public class MaskSensitiveHelper {
             final String originalLogString,
             final String matchPatternTemplate,
             final String replacementTemplate,
-            final List<String> sensitiveNames) {
+            final Set<String> sensitiveNames) {
         String resultString = originalLogString;
         for (final String sensitiveName : sensitiveNames) {
             final String matchPattern = matchPatternTemplate.replaceAll(ELEMENT_NAME_TEMPLATE, sensitiveName);
