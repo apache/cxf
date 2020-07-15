@@ -24,26 +24,16 @@ import java.security.PrivilegedAction;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 
+import org.apache.cxf.jaxrs.client.AbstractClient;
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.message.Message;
 
 public final class Utils {
 
     private Utils() {
     }
 
-    public static ExecutorService getExecutorService(Message message) {
-        ExecutorService es = message.get(ExecutorService.class);
-        if (es == null) {
-            es = AccessController.doPrivileged((PrivilegedAction<ExecutorService>)() -> {
-                return ForkJoinPool.commonPool();
-            });
-        }
-        return es;
-    }
-
     public static ExecutorService getExecutorService(MessageContext mc) {
-        ExecutorService es = (ExecutorService) mc.get(ExecutorService.class);
+        ExecutorService es = (ExecutorService) mc.get(AbstractClient.EXECUTOR_SERVICE_PROPERTY);
         if (es == null) {
             es = AccessController.doPrivileged((PrivilegedAction<ExecutorService>) () -> {
                 return ForkJoinPool.commonPool();
