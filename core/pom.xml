@@ -39,6 +39,8 @@
             org.apache.cxf.*
         </cxf.osgi.export>
         <cxf.osgi.import>
+            com.sun.xml.messaging.saaj.soap;resolution:=optional,
+            com.sun.xml.internal.messaging.saaj.soap;resolution:=optional,
             com.ctc.wstx*;resolution:=optional,
             org.codehaus.stax2*;resolution:=optional,
             com.sun*;resolution:=optional,
