@@ -111,8 +111,7 @@
         <cxf.geronimo.inject.version>1.1</cxf.geronimo.inject.version>
         <cxf.geronimo.j2ee.management.version>1.0.1</cxf.geronimo.j2ee.management.version>
         <cxf.geronimo.jms.version>1.1.1</cxf.geronimo.jms.version>
-        <cxf.geronimo.jsonb.version>1.1</cxf.geronimo.jsonb.version>
-        <cxf.geronimo.json.version>1.3</cxf.geronimo.json.version>
+        <cxf.geronimo.json.version>1.4</cxf.geronimo.json.version>
         <cxf.geronimo.jta.version>1.1.1</cxf.geronimo.jta.version>
         <cxf.geronimo.servlet25.version>1.2</cxf.geronimo.servlet25.version>
         <cxf.geronimo.transaction.version>3.1.4</cxf.geronimo.transaction.version>
@@ -151,8 +150,9 @@
         <cxf.jetty9.version>9.4.30.v20200611</cxf.jetty9.version>
         <cxf.jexl.version>3.1</cxf.jexl.version>
         <cxf.joda.time.version>2.9.4</cxf.joda.time.version>
-        <cxf.johnzon.version>1.1.13</cxf.johnzon.version>
+        <cxf.johnzon.version>1.2.8</cxf.johnzon.version>
         <cxf.json.api.version>1.1.6</cxf.json.api.version>
+        <cxf.json.bind-api.version>1.0.2</cxf.json.bind-api.version>
         <cxf.jsr250.api.version>1.0</cxf.jsr250.api.version>
         <cxf.junit.version>4.13</cxf.junit.version>
         <cxf.kerby.version>2.0.1</cxf.kerby.version>
@@ -1016,6 +1016,11 @@
                 <optional>true</optional>
             </dependency>
             <dependency>
+                <groupId>jakarta.json.bind</groupId>
+                <artifactId>jakarta.json.bind-api</artifactId>
+                <version>${cxf.json.bind-api.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.glassfish</groupId>
                 <artifactId>javax.json</artifactId>
                 <version>${cxf.glassfish.json.version}</version>
@@ -1597,16 +1602,6 @@
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-ejb_3.0_spec</artifactId>
                 <version>1.0.1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-jsonb_1.0_spec</artifactId>
-                <version>${cxf.geronimo.jsonb.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-json_1.1_spec</artifactId>
-                <version>${cxf.geronimo.json.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.components</groupId>
