@@ -113,12 +113,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             }
             if (!jmsConfig.isOneSessionPerConnection()) {
                 // If first connect fails we will try to establish the connection in the background
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        restartConnection();
-                    }
-                }).start();
+                new Thread(() -> restartConnection()).start();
             }
         }
     }
@@ -126,19 +121,14 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
 
     private JMSListenerContainer createTargetDestinationListener() {
         Session session = null;
-        try {
+        try { // NOPMD - UseTryWithResources
             ExceptionListener exListener = new ExceptionListener() {
                 private boolean restartTriggered;
 
                 public synchronized void onException(JMSException exception) {
                     if (!shutdown && !restartTriggered) {
                         LOG.log(Level.WARNING, "Exception on JMS connection. Trying to reconnect", exception);
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                restartConnection();
-                            }
-                        }).start();
+                        new Thread(() -> restartConnection()).start();
                         restartTriggered = true;
                     }
                 }
