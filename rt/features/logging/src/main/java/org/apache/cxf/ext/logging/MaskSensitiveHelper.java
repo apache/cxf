@@ -19,23 +19,22 @@
 package org.apache.cxf.ext.logging;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 import org.apache.cxf.message.Message;
 
 public class MaskSensitiveHelper {
     private static final String ELEMENT_NAME_TEMPLATE = "-ELEMENT_NAME-";
-    private static final String MATCH_PATTERN_XML = "<-ELEMENT_NAME->(.*?)</-ELEMENT_NAME->";
-    private static final String MATCH_PATTERN_JSON = "\"-ELEMENT_NAME-\"[ \\t]*:[ \\t]*\"(.*?)\"";
-    private static final String REPLACEMENT_PATTERN_XML = "<-ELEMENT_NAME->XXX</-ELEMENT_NAME->";
-    private static final String REPLACEMENT_PATTERN_JSON = "\"-ELEMENT_NAME-\": \"XXX\"";
+    private static final String MATCH_PATTERN_XML_TEMPLATE = "<-ELEMENT_NAME->(.*?)</-ELEMENT_NAME->";
+    private static final String MATCH_PATTERN_JSON_TEMPLATE = "\"-ELEMENT_NAME-\"[ \\t]*:[ \\t]*\"(.*?)\"";
+    private static final String REPLACEMENT_PATTERN_XML_TEMPLATE = "<-ELEMENT_NAME->XXX</-ELEMENT_NAME->";
+    private static final String REPLACEMENT_PATTERN_JSON_TEMPLATE = "\"-ELEMENT_NAME-\": \"XXX\"";
 
     private static final String XML_CONTENT = "xml";
     private static final String HTML_CONTENT = "html";
     private static final String JSON_CONTENT = "json";
 
-    final Set<String> sensitiveElementNames = new HashSet<>();
+    private final Set<String> sensitiveElementNames = new HashSet<>();
 
     public void addSensitiveElementNames(final Set<String> inSensitiveElementNames) {
         this.sensitiveElementNames.addAll(inSensitiveElementNames);
@@ -44,34 +43,26 @@ public class MaskSensitiveHelper {
     public String maskSensitiveElements(
             final Message message,
             final String originalLogString) {
-        if (sensitiveElementNames.isEmpty() || message == null) {
+        if (sensitiveElementNames.isEmpty()
+                || message == null
+                || (originalLogString == null)) {
             return originalLogString;
         }
         final String contentType = (String) message.get(Message.CONTENT_TYPE);
         if (contentType.toLowerCase().contains(XML_CONTENT)
                 || contentType.toLowerCase().contains(HTML_CONTENT)) {
-            return applyMasks(originalLogString, MATCH_PATTERN_XML, REPLACEMENT_PATTERN_XML);
+            return applyMasks(originalLogString, MATCH_PATTERN_XML_TEMPLATE, REPLACEMENT_PATTERN_XML_TEMPLATE);
         } else if (contentType.toLowerCase().contains(JSON_CONTENT)) {
-            return applyMasks(originalLogString, MATCH_PATTERN_JSON, REPLACEMENT_PATTERN_JSON);
+            return applyMasks(originalLogString, MATCH_PATTERN_JSON_TEMPLATE, REPLACEMENT_PATTERN_JSON_TEMPLATE);
         }
         return originalLogString;
     }
 
     private String applyMasks(String originalLogString, String matchElementPattern, String replacementElementPattern) {
-        return Optional.ofNullable(originalLogString)
-                .map(s -> applyExpression(s, matchElementPattern, replacementElementPattern, sensitiveElementNames))
-                .orElse(originalLogString);
-    }
-
-    private String applyExpression(
-            final String originalLogString,
-            final String matchPatternTemplate,
-            final String replacementTemplate,
-            final Set<String> sensitiveNames) {
         String resultString = originalLogString;
-        for (final String sensitiveName : sensitiveNames) {
-            final String matchPattern = matchPatternTemplate.replaceAll(ELEMENT_NAME_TEMPLATE, sensitiveName);
-            final String replacement = replacementTemplate.replaceAll(ELEMENT_NAME_TEMPLATE, sensitiveName);
+        for (final String sensitiveName : sensitiveElementNames) {
+            final String matchPattern = matchElementPattern.replaceAll(ELEMENT_NAME_TEMPLATE, sensitiveName);
+            final String replacement = replacementElementPattern.replaceAll(ELEMENT_NAME_TEMPLATE, sensitiveName);
             resultString = resultString.replaceAll(matchPattern, replacement);
         }
         return resultString;
