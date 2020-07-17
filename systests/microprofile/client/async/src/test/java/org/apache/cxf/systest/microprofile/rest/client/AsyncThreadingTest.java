@@ -21,6 +21,7 @@ package org.apache.cxf.systest.microprofile.rest.client;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -52,6 +53,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -63,33 +67,44 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertThrows;
 
-
+@RunWith(Parameterized.class)
 public class AsyncThreadingTest {
     private static final ThreadLocal<String> CONTEXT = new ThreadLocal<>();
     
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(WireMockConfiguration.options().dynamicPort());
     
+    private final ExecutorService executorService;
+    private final String prefix;
     private EchoResource echo;
-    private AtomicInteger counter = new AtomicInteger();
     
+    public AsyncThreadingTest(final ExecutorService executorService, final String prefix) {
+        this.executorService = executorService;
+        this.prefix = prefix;
+    }
+
+    @Parameters(name = "Using pool: {1}")
+    public static Collection<Object[]> data() {
+        return Arrays.asList(new Object[][] 
+        {
+            {cachedExecutor(), "mp-async-"}, 
+            {null, "ForkJoinPool.commonPool-worker-"}
+        });
+    }
+        
     @Before
     public void setUp() {
-        final ExecutorService executorService = Executors
-            .newCachedThreadPool(new ThreadFactory() {
-                @Override
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, "mp-async-" + counter.incrementAndGet());
-                }
-            });
-        
-        echo = RestClientBuilder
+        final RestClientBuilder builder = RestClientBuilder
             .newBuilder()
             .register(JsonbJaxrsProvider.class)
             .register(AsyncInvocationInterceptorFactoryImpl.class)
-            .baseUri(getBaseUri())
-            .executorService(executorService)
-            .build(EchoResource.class);
+            .baseUri(getBaseUri());
+        
+        if (executorService == null /* use default one */) {
+            echo = builder.build(EchoResource.class);
+        } else {
+            echo = builder.executorService(executorService).build(EchoResource.class);
+        }
     }
     
     @After
@@ -109,7 +124,7 @@ public class AsyncThreadingTest {
             .handle((r, ex) -> {
                 try {
                     Thread.sleep(500);
-                    assertThat(Thread.currentThread().getName(), startsWith("mp-async-"));
+                    assertThat(Thread.currentThread().getName(), startsWith(prefix));
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
@@ -141,7 +156,7 @@ public class AsyncThreadingTest {
             .thenApply(s -> {
                 try {
                     Thread.sleep(500);
-                    assertThat(Thread.currentThread().getName(), startsWith("mp-async-"));
+                    assertThat(Thread.currentThread().getName(), startsWith(prefix));
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
@@ -170,7 +185,7 @@ public class AsyncThreadingTest {
             .thenApply(s -> {
                 try {
                     Thread.sleep(500);
-                    assertThat(Thread.currentThread().getName(), startsWith("mp-async-"));
+                    assertThat(Thread.currentThread().getName(), startsWith(prefix));
                     assertThat(CONTEXT.get(), equalTo("context-value"));
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -199,7 +214,7 @@ public class AsyncThreadingTest {
                     .thenApply(s -> {
                         try {
                             Thread.sleep(500);
-                            assertThat(Thread.currentThread().getName(), startsWith("mp-async-"));
+                            assertThat(Thread.currentThread().getName(), startsWith(prefix));
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                         }
@@ -266,5 +281,16 @@ public class AsyncThreadingTest {
         public void removeContext() {
             CONTEXT.remove();
         }
+    }
+    
+    private static ExecutorService cachedExecutor() {
+        return Executors.newCachedThreadPool(new ThreadFactory() {
+            private AtomicInteger counter = new AtomicInteger();
+             
+            @Override
+            public Thread newThread(Runnable r) {
+                return new Thread(r, "mp-async-" + counter.incrementAndGet());
+            }
+        });
     }
 }

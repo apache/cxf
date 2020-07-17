@@ -19,15 +19,12 @@
 package org.apache.cxf.microprofile.client;
 
 import java.net.URI;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
 
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.ClientResponseFilter;
@@ -66,7 +63,7 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
         super(new MicroProfileServiceFactoryBean());
         this.configuration = configuration.getConfiguration();
         this.comparator = MicroProfileClientProviderFactory.createComparator(this);
-        this.executorService = (executorService == null) ? defaultExecutorService() : executorService; 
+        this.executorService = (executorService == null) ? Utils.defaultExecutorService() : executorService; 
         this.secConfig = secConfig;
         super.setAddress(baseUri);
         super.setServiceClass(aClass);
@@ -156,11 +153,4 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
         }
         return providers;
     }
-    
-    private static ExecutorService defaultExecutorService() {
-        return AccessController.doPrivileged((PrivilegedAction<ExecutorService>)() -> {
-            return ForkJoinPool.commonPool();
-        });
-    }
-
 }
