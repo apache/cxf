@@ -131,9 +131,9 @@ public final class WSActionAnnotator implements Annotator {
         for (JavaException exception : method.getExceptions()) {
             QName faultName = faultInfo.getName();
             // Perform a case insensitive "startsWith" check that works for different locales
-            String pattern = faultName.getLocalPart();
+            String prefix = faultName.getLocalPart();
             if (exception.getTargetNamespace().equals(faultName.getNamespaceURI())
-                && exception.getName().regionMatches(true, 0, pattern, 0, pattern.length())) {
+                && exception.getName().regionMatches(true, 0, prefix, 0, prefix.length())) {
                 return exception;
             }
         }

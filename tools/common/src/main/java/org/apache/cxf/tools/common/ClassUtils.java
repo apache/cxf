@@ -90,7 +90,9 @@ public class ClassUtils {
                         } else {
                             // copy generated xml file or others to class directory
                             File otherFile = new File(path + File.separator + str);
-                            if (otherFile.isFile() && str.toLowerCase().endsWith("xml")
+                            String suffix = "xml";
+                            if (otherFile.isFile()
+                                && str.regionMatches(true, str.length() - suffix.length(), suffix, 0, suffix.length())
                                 && context.get(ToolConstants.CFG_CLASSDIR) != null) {
                                 String targetDir = (String)context.get(ToolConstants.CFG_CLASSDIR);
 
