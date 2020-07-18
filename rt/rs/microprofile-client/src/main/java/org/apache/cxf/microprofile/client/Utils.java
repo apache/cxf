@@ -122,8 +122,12 @@ public final class Utils {
     }
     
     private static ExecutorService getCommonPool() {
-        return AccessController.doPrivileged((PrivilegedAction<ExecutorService>) () -> {
+        if (System.getSecurityManager() != null) {
+            return AccessController.doPrivileged((PrivilegedAction<ExecutorService>) () -> {
+                return ForkJoinPool.commonPool();
+            });
+        } else {
             return ForkJoinPool.commonPool();
-        });
+        }
     }
 }
