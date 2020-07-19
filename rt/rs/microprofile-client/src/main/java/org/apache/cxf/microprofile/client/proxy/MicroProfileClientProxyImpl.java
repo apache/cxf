@@ -114,6 +114,11 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
         super(new LocalClientState(baseURI, configuration.getProperties()), loader, cri,
             isRoot, inheritHeaders, varValues);
         this.interceptorWrapper = interceptorWrapper;
+        
+        if (executorService == null) {
+            throw new IllegalArgumentException("The executorService is required and must be provided");
+        }
+        
         init(executorService, configuration);
     }
 
