@@ -21,34 +21,113 @@ package org.apache.cxf.microprofile.client;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
+import org.apache.cxf.jaxrs.client.AbstractClient;
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.message.Message;
 
 public final class Utils {
 
     private Utils() {
     }
 
-    public static ExecutorService getExecutorService(Message message) {
-        ExecutorService es = message.get(ExecutorService.class);
+    public static ExecutorService getExecutorService(MessageContext mc) {
+        ExecutorService es = (ExecutorService) mc.get(AbstractClient.EXECUTOR_SERVICE_PROPERTY);
         if (es == null) {
-            es = AccessController.doPrivileged((PrivilegedAction<ExecutorService>)() -> {
-                return ForkJoinPool.commonPool();
-            });
+            es = getCommonPool();
         }
         return es;
     }
+    
+    public static ExecutorService defaultExecutorService() {
+        return new LazyForkJoinExecutor();
+    }
+    
+    private static class LazyForkJoinExecutor implements ExecutorService {
+        @Override
+        public void execute(Runnable command) {
+            getCommonPool().execute(command);
+        }
 
-    public static ExecutorService getExecutorService(MessageContext mc) {
-        ExecutorService es = (ExecutorService) mc.get(ExecutorService.class);
-        if (es == null) {
-            es = AccessController.doPrivileged((PrivilegedAction<ExecutorService>) () -> {
+        @Override
+        public void shutdown() {
+            getCommonPool().shutdown();
+        }
+
+        @Override
+        public List<Runnable> shutdownNow() {
+            return getCommonPool().shutdownNow();
+        }
+
+        @Override
+        public boolean isShutdown() {
+            return getCommonPool().isShutdown();
+        }
+
+        @Override
+        public boolean isTerminated() {
+            return getCommonPool().isTerminated();
+        }
+
+        @Override
+        public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
+            return getCommonPool().awaitTermination(timeout, unit);
+        }
+
+        @Override
+        public <T> Future<T> submit(Callable<T> task) {
+            return getCommonPool().submit(task);
+        }
+
+        @Override
+        public <T> Future<T> submit(Runnable task, T result) {
+            return getCommonPool().submit(task, result);
+        }
+
+        @Override
+        public Future<?> submit(Runnable task) {
+            return getCommonPool().submit(task);
+        }
+
+        @Override
+        public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException {
+            return getCommonPool().invokeAll(tasks);
+        }
+
+        @Override
+        public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout,
+                TimeUnit unit) throws InterruptedException {
+            return getCommonPool().invokeAll(tasks, timeout, unit);
+        }
+
+        @Override
+        public <T> T invokeAny(Collection<? extends Callable<T>> tasks) 
+                throws InterruptedException, ExecutionException {
+            return getCommonPool().invokeAny(tasks);
+        }
+
+        @Override
+        public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, 
+                TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+            return getCommonPool().invokeAny(tasks, timeout, unit);
+        }
+    }
+    
+    private static ExecutorService getCommonPool() {
+        if (System.getSecurityManager() != null) {
+            return AccessController.doPrivileged((PrivilegedAction<ExecutorService>) () -> {
                 return ForkJoinPool.commonPool();
             });
+        } else {
+            return ForkJoinPool.commonPool();
         }
-        return es;
     }
 }
