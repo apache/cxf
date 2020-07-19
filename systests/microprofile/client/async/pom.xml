@@ -77,9 +77,9 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-jsonb_1.0_spec</artifactId>
-                <version>${cxf.geronimo.jsonb.version}</version>
+                <groupId>jakarta.json.bind</groupId>
+                <artifactId>jakarta.json.bind-api</artifactId>
+                <version>${cxf.json.bind-api.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
