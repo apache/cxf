@@ -56,7 +56,7 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
         super();
         this.configuration = configuration.getConfiguration();
         this.comparator = MicroProfileClientProviderFactory.createComparator(this);
-        this.executorService = executorService;
+        this.executorService = (executorService == null) ? Utils.defaultExecutorService() : executorService; 
         super.setAddress(baseUri);
         super.setServiceClass(aClass);
         super.setProviderComparator(comparator);

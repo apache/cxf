@@ -63,6 +63,11 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
                                        boolean isRoot, boolean inheritHeaders, ExecutorService executorService,
                                        Configuration configuration, Object... varValues) {
         super(new LocalClientState(baseURI, configuration.getProperties()), loader, cri, isRoot, inheritHeaders, varValues);
+        
+        if (executorService == null) {
+            throw new IllegalArgumentException("The executorService is required and must be provided");
+        }
+
         cfg.getRequestContext().put(EXECUTOR_SERVICE_PROPERTY, executorService);
         cfg.getRequestContext().putAll(configuration.getProperties());
     }
@@ -71,6 +76,11 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
                                        boolean isRoot, boolean inheritHeaders, ExecutorService executorService,
                                        Configuration configuration, Object... varValues) {
         super(initialState, loader, cri, isRoot, inheritHeaders, varValues);
+        
+        if (executorService == null) {
+            throw new IllegalArgumentException("The executorService is required and must be provided");
+        }
+        
         cfg.getRequestContext().put(EXECUTOR_SERVICE_PROPERTY, executorService);
         cfg.getRequestContext().putAll(configuration.getProperties());
     }
