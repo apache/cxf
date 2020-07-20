@@ -20,6 +20,7 @@ package org.apache.cxf.ext.logging;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.cxf.message.Message;
 
@@ -34,36 +35,57 @@ public class MaskSensitiveHelper {
     private static final String HTML_CONTENT = "html";
     private static final String JSON_CONTENT = "json";
 
-    private final Set<String> sensitiveElementNames = new HashSet<>();
+    private static class ReplacementPair {
+        private final Pattern matchPattern;
+        private final String replacement;
+
+        ReplacementPair(String matchPattern, String replacement) {
+            this.matchPattern = Pattern.compile(matchPattern);
+            this.replacement = replacement;
+        }
+    }
+
+    private final Set<ReplacementPair> replacementsXML = new HashSet<>();
+    private final Set<ReplacementPair> replacementsJSON = new HashSet<>();
 
     public void addSensitiveElementNames(final Set<String> inSensitiveElementNames) {
-        this.sensitiveElementNames.addAll(inSensitiveElementNames);
+        for (final String sensitiveName : inSensitiveElementNames) {
+            addReplacementPair(MATCH_PATTERN_XML_TEMPLATE, REPLACEMENT_XML_TEMPLATE, sensitiveName, replacementsXML);
+            addReplacementPair(MATCH_PATTERN_JSON_TEMPLATE, REPLACEMENT_JSON_TEMPLATE, sensitiveName, replacementsJSON);
+        }
+    }
+
+    private void addReplacementPair(final String matchPatternTemplate,
+                                    final String replacementTemplate,
+                                    final String sensitiveName,
+                                    final Set<ReplacementPair> replacements) {
+        final String matchPatternXML = matchPatternTemplate.replaceAll(ELEMENT_NAME_TEMPLATE, sensitiveName);
+        final String replacementXML = replacementTemplate.replaceAll(ELEMENT_NAME_TEMPLATE, sensitiveName);
+        replacements.add(new ReplacementPair(matchPatternXML, replacementXML));
     }
 
     public String maskSensitiveElements(
             final Message message,
             final String originalLogString) {
-        if (sensitiveElementNames.isEmpty()
+        if (replacementsXML.isEmpty() && replacementsJSON.isEmpty()
                 || message == null
-                || (originalLogString == null)) {
+                || originalLogString == null) {
             return originalLogString;
         }
         final String contentType = (String) message.get(Message.CONTENT_TYPE);
         if (contentType.toLowerCase().contains(XML_CONTENT)
                 || contentType.toLowerCase().contains(HTML_CONTENT)) {
-            return applyMasks(originalLogString, MATCH_PATTERN_XML_TEMPLATE, REPLACEMENT_XML_TEMPLATE);
+            return applyMasks(originalLogString, replacementsXML);
         } else if (contentType.toLowerCase().contains(JSON_CONTENT)) {
-            return applyMasks(originalLogString, MATCH_PATTERN_JSON_TEMPLATE, REPLACEMENT_JSON_TEMPLATE);
+            return applyMasks(originalLogString, replacementsJSON);
         }
         return originalLogString;
     }
 
-    private String applyMasks(String originalLogString, String matchElementPattern, String replacementElementTemplate) {
+    private String applyMasks(String originalLogString, Set<ReplacementPair> replacementPairs) {
         String resultString = originalLogString;
-        for (final String sensitiveName : sensitiveElementNames) {
-            final String matchPattern = matchElementPattern.replaceAll(ELEMENT_NAME_TEMPLATE, sensitiveName);
-            final String replacement = replacementElementTemplate.replaceAll(ELEMENT_NAME_TEMPLATE, sensitiveName);
-            resultString = resultString.replaceAll(matchPattern, replacement);
+        for (final ReplacementPair replacementPair : replacementPairs) {
+            resultString = replacementPair.matchPattern.matcher(resultString).replaceAll(replacementPair.replacement);
         }
         return resultString;
     }
