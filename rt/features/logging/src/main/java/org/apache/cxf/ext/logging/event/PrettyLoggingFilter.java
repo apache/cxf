@@ -58,6 +58,7 @@ public class PrettyLoggingFilter implements LogEventSender {
             && contentType != null 
             && contentType.indexOf("xml") >= 0
             && contentType.toLowerCase().indexOf("multipart/related") < 0
+            && event.getPayload() != null
             && event.getPayload().length() > 0;
     }
 
