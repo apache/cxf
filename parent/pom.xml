@@ -214,8 +214,8 @@
         <cxf.validation.api.version>2.0.2</cxf.validation.api.version>
         <cxf.velocity.version>2.2</cxf.velocity.version>
         <cxf.wiremock.version>2.23.2</cxf.wiremock.version>
-        <cxf.woodstox.core.version>6.2.0</cxf.woodstox.core.version>
-        <cxf.woodstox.stax2-api.version>4.2</cxf.woodstox.stax2-api.version>
+        <cxf.woodstox.core.version>6.2.1</cxf.woodstox.core.version>
+        <cxf.woodstox.stax2-api.version>4.2.1</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
         <cxf.wss4j.version>2.3.0</cxf.wss4j.version>
         <cxf.xalan.version>2.7.2</cxf.xalan.version>
@@ -832,6 +832,10 @@
                     <exclusion>
                         <groupId>junit</groupId>
                         <artifactId>junit</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>javax.enterprise</groupId>
+                        <artifactId>cdi-api</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
