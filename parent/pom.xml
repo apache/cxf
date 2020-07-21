@@ -171,7 +171,7 @@
         <cxf.netty.version>4.1.50.Final</cxf.netty.version>
         <cxf.oauth.version>20100527</cxf.oauth.version>
         <cxf.olingo.version>2.0.11</cxf.olingo.version>
-        <cxf.openjpa.version>3.1.0</cxf.openjpa.version>
+        <cxf.openjpa.version>3.1.2</cxf.openjpa.version>
         <cxf.opensaml.osgi.version.range>[3.1,4)</cxf.opensaml.osgi.version.range>
         <cxf.opensaml.osgi.version>3.4.5_2</cxf.opensaml.osgi.version>
         <cxf.opentracing.version>0.33.0</cxf.opentracing.version>
