@@ -38,6 +38,7 @@
             org.apache.cxf.ws.discovery.*,
         </cxf.osgi.export>
         <cxf.osgi.import>
+            javax.jws*;version="${cxf.osgi.jws.version}",
             javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
             javax.xml.bind*;version="${cxf.osgi.javax.bind.version}"
         </cxf.osgi.import>

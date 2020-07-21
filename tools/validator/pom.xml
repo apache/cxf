@@ -36,6 +36,10 @@
             =org.apache.cxf.tools.validator.internal,
             org.apache.cxf.tools.validator.*,
         </cxf.osgi.export>
+        <cxf.osgi.import>
+            javax.jws*;version="${cxf.osgi.jws.version}",
+            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}"
+        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>

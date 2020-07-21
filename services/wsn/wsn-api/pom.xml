@@ -94,9 +94,9 @@
                 <configuration>
                     <instructions>
                         <Import-Package>
-                            javax.xml.bind*;version="[0.0,3)",
-                            javax.jws*;version="[0.0,3)",
-                            javax.xml.ws*;version="[0.0,3)",
+                            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
+                            javax.jws*;version="${cxf.osgi.jws.version}",
+                            javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
                             org.apache.cxf*;version="[3.0,4)",
                             *
                         </Import-Package>
