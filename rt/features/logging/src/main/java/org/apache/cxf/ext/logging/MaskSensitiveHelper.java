@@ -19,6 +19,7 @@
 package org.apache.cxf.ext.logging;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -30,6 +31,7 @@ public class MaskSensitiveHelper {
     private static final String MATCH_PATTERN_JSON_TEMPLATE = "\"-ELEMENT_NAME-\"[ \\t]*:[ \\t]*\"(.*?)\"";
     private static final String REPLACEMENT_XML_TEMPLATE = "<-ELEMENT_NAME->XXX</-ELEMENT_NAME->";
     private static final String REPLACEMENT_JSON_TEMPLATE = "\"-ELEMENT_NAME-\": \"XXX\"";
+    private static final String MASKED_HEADER_VALUE = "XXX";
 
     private static final String XML_CONTENT = "xml";
     private static final String HTML_CONTENT = "html";
@@ -80,6 +82,15 @@ public class MaskSensitiveHelper {
             return applyMasks(originalLogString, replacementsJSON);
         }
         return originalLogString;
+    }
+
+    public void maskHeaders(
+            final Map<String, String> headerMap,
+            final Set<String> sensitiveHeaderNames) {
+        sensitiveHeaderNames.stream()
+                .forEach(h -> {
+                    headerMap.computeIfPresent(h, (key, value) -> MASKED_HEADER_VALUE);
+                });
     }
 
     private String applyMasks(String originalLogString, Set<ReplacementPair> replacementPairs) {
