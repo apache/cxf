@@ -34,9 +34,6 @@ under the License.
              http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <cxf:bus>
-        <cxf:features>
-            <cxf:logging/>
-        </cxf:features>
         <cxf:properties> 
           <entry key="org.apache.cxf.jaxrs.bus.providers" value-ref="busProviders"/> 
         </cxf:properties>
