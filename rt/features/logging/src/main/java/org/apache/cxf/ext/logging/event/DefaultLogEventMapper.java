@@ -86,7 +86,8 @@ public class DefaultLogEventMapper {
         event.setContentType(safeGet(message, Message.CONTENT_TYPE));
 
         Map<String, String> headerMap = getHeaders(message);
-        event.setHeaders(maskHeaders(headerMap, sensitiveProtocolHeaders));
+        maskHeaders(headerMap, sensitiveProtocolHeaders);
+        event.setHeaders(headerMap);
 
         event.setAddress(getAddress(message, event));
 
@@ -97,15 +98,13 @@ public class DefaultLogEventMapper {
         return event;
     }
 
-    private Map<String, String> maskHeaders(
+    private void maskHeaders(
             final Map<String, String> headerMap,
             final Set<String> sensitiveHeaderNames) {
-        final Map<String, String> maskedHeaderMap = new HashMap<>();
-        headerMap.keySet().forEach(h -> {
-            maskedHeaderMap.put(h, sensitiveHeaderNames.contains(h)
-                    ? MASKED_HEADER_VALUE : headerMap.get(h));
-        });
-        return maskedHeaderMap;
+        sensitiveHeaderNames.stream()
+                .forEach(h -> {
+                    headerMap.computeIfPresent(h, (key, value) -> MASKED_HEADER_VALUE);
+                });
     }
 
     private String getPrincipal(Message message) {
