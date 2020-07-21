@@ -2219,9 +2219,6 @@
         </profile>
         <profile>
             <id>java9-plus</id>
-            <properties>
-                <cxf.jdk.version>11</cxf.jdk.version>
-            </properties>
             <activation>
                 <jdk>[9,)</jdk>
             </activation>
