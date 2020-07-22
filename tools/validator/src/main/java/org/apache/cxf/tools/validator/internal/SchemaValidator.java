@@ -241,7 +241,8 @@ public class SchemaValidator extends AbstractDefinitionValidator {
         if (f.exists() && f.isDirectory()) {
             FilenameFilter filter = new FilenameFilter() {
                 public boolean accept(File dir, String name) {
-                    if (name.toLowerCase().endsWith(".xsd")
+                    String suffix = ".xsd";
+                    if (name.regionMatches(true, name.length() - suffix.length(), suffix, 0, suffix.length())
                             && !new File(dir.getPath() + File.separator + name).isDirectory()) {
                         return true;
                     }

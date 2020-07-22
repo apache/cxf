@@ -130,13 +130,37 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>compile-java11-sources</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>compile</goal>
+                                </goals>
+                                <configuration>
+                                    <showDeprecation>${cxf.compile.show.deprecation}</showDeprecation>
+                                    <showWarnings>true</showWarnings>
+                                    <source>11</source>
+                                    <target>11</target>
+                                    <outputDirectory>target/classes/META-INF/versions/11</outputDirectory>
+                                    <compilerArgs>
+                                        <arg>${cxf.compile.flags}</arg>
+                                        <arg>--add-exports</arg><arg>java.rmi/sun.rmi.registry=ALL-UNNAMED</arg>
+                                    </compilerArgs>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>maven-bundle-plugin</artifactId>
+                        <extensions>true</extensions>
                         <configuration>
-                            <showDeprecation>${cxf.compile.show.deprecation}</showDeprecation>
-                            <showWarnings>true</showWarnings>
-                            <compilerArgs>
-                                <arg>${cxf.compile.flags}</arg>
-                                <arg>--add-exports</arg><arg>java.rmi/sun.rmi.registry=ALL-UNNAMED</arg>
-                            </compilerArgs>
+                            <obrRepository>NONE</obrRepository>
+                            <instructions>
+                                <Export-Package>org.apache.cxf.management*,org.apache.cxf.tracing*</Export-Package>
+                            </instructions>
+                            <niceManifest>true</niceManifest>
                         </configuration>
                     </plugin>
                 </plugins>

@@ -243,11 +243,11 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         return finalResponse;
 
     }
-    //CHECKSTYLE:OFF
 
     public Set<String> getSupportedResponseTypes() {
         return supportedResponseTypes;
     }
+
     protected boolean canAuthorizationBeSkipped(MultivaluedMap<String, String> params,
                                                 Client client,
                                                 UserSubject userSubject,

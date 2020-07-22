@@ -1,4 +1,5 @@
---
+<?xml version="1.0"?>
+<!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
   distributed with this work for additional information
@@ -15,11 +16,18 @@
   KIND, either express or implied. See the License for the
   specific language governing permissions and limitations
   under the License.
---
+-->
 
 
-SYSTEM "http://www.w3.org/2011/03/ws-evt" "eventing.xsd"
-SYSTEM "http://www.w3.org/2011/03/ws-evd" "eventdescriptions.xsd"
-SYSTEM "http://www.w3.org/2005/08/addressing" "ws-addr.xsd"
-SYSTEM "http://www.w3.org/2006/03/addressing/ws-addr.xsd"  "ws-addr.xsd"
-SYSTEM "http://www.w3.org/2001/xml.xsd" "xml.xsd"
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+    <system systemId="http://www.w3.org/2011/03/ws-evt"
+            uri="eventing.xsd"/>
+    <system systemId="http://www.w3.org/2011/03/ws-evd"
+            uri="eventdescriptions.xsd"/>
+    <system systemId="http://www.w3.org/2005/08/addressing"
+            uri="ws-addr.xsd"/>
+    <system systemId="http://www.w3.org/2006/03/addressing/ws-addr.xsd"
+            uri="ws-addr.xsd"/>
+    <system systemId="http://www.w3.org/2001/xml.xsd"
+            uri="xml.xsd"/>
+</catalog>
