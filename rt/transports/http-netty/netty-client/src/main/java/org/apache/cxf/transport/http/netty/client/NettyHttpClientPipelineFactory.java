@@ -44,16 +44,24 @@ public class NettyHttpClientPipelineFactory extends ChannelInitializer<Channel> 
 
     private static final Logger LOG =
         LogUtils.getL7dLogger(NettyHttpClientPipelineFactory.class);
+
     private final TLSClientParameters tlsClientParameters;
     private final int readTimeout;
-    
+    private final int maxContentLength;
+
     public NettyHttpClientPipelineFactory(TLSClientParameters clientParameters) {
         this(clientParameters, 0);
     }
 
     public NettyHttpClientPipelineFactory(TLSClientParameters clientParameters, int readTimeout) {
+        this(clientParameters, readTimeout, NettyHttpConduit.DEFAULT_MAX_RESPONSE_CONTENT_LENGTH);
+    }
+
+    public NettyHttpClientPipelineFactory(TLSClientParameters clientParameters, int readTimeout,
+                                          int maxResponseContentLength) {
         this.tlsClientParameters = clientParameters;
         this.readTimeout = readTimeout;
+        this.maxContentLength = maxResponseContentLength;
     }
 
     @Override
@@ -70,8 +78,7 @@ public class NettyHttpClientPipelineFactory extends ChannelInitializer<Channel> 
 
 
         pipeline.addLast("decoder", new HttpResponseDecoder());
-        // TODO need to configure the aggregator size
-        pipeline.addLast("aggregator", new HttpObjectAggregator(1048576));
+        pipeline.addLast("aggregator", new HttpObjectAggregator(maxContentLength));
         pipeline.addLast("encoder", new HttpRequestEncoder());
         pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
         if (readTimeout > 0) {
