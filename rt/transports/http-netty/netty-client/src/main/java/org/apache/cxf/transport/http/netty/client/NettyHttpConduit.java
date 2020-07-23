@@ -35,6 +35,7 @@ import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
@@ -74,6 +75,9 @@ import io.netty.handler.ssl.SslHandler;
 
 public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLifeCycleListener {
     public static final String USE_ASYNC = "use.async.http.conduit";
+    public static final String MAX_RESPONSE_CONTENT_LENGTH =
+        "org.apache.cxf.transport.http.netty.maxResponseContentLength";
+    static final Integer DEFAULT_MAX_RESPONSE_CONTENT_LENGTH = 1048576;
     final NettyHttpConduitFactory factory;
     private Bootstrap bootstrap;
 
@@ -167,8 +171,10 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         final NettyHttpClientRequest request = new NettyHttpClientRequest(uri, httpRequestMethod);
         final int ctimeout = determineConnectionTimeout(message, csPolicy);
         final int rtimeout = determineReceiveTimeout(message, csPolicy);
+        final int maxResponseContentLength = determineMaxResponseContentLength(message);
         request.setConnectionTimeout(ctimeout);
         request.setReceiveTimeout(rtimeout);
+        request.setMaxResponseContentLength(maxResponseContentLength);
 
         message.put(NettyHttpClientRequest.class, request);
 
@@ -337,9 +343,11 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         protected void connect(boolean output) {
             if ("https".equals(url.getScheme())) {
                 TLSClientParameters clientParameters = findTLSClientParameters();
-                bootstrap.handler(new NettyHttpClientPipelineFactory(clientParameters, entity.getReceiveTimeout()));
+                bootstrap.handler(new NettyHttpClientPipelineFactory(clientParameters, entity.getReceiveTimeout(),
+                    entity.getMaxResponseContentLength()));
             } else {
-                bootstrap.handler(new NettyHttpClientPipelineFactory(null, entity.getReceiveTimeout()));
+                bootstrap.handler(new NettyHttpClientPipelineFactory(null, entity.getReceiveTimeout(),
+                    entity.getMaxResponseContentLength()));
             }
 
             ChannelFuture connFuture =
@@ -649,6 +657,24 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
 
     @Override
     public void preShutdown() {
+    }
+
+    protected static int determineMaxResponseContentLength(Message message) {
+        Integer maxResponseContentLength = null;
+        if (message.get(MAX_RESPONSE_CONTENT_LENGTH) != null) {
+            Object obj = message.get(MAX_RESPONSE_CONTENT_LENGTH);
+            try {
+                maxResponseContentLength = Integer.parseInt(obj.toString());
+            } catch (NumberFormatException e) {
+                LOG.log(Level.WARNING, "INVALID_TIMEOUT_FORMAT", new Object[] {
+                    MAX_RESPONSE_CONTENT_LENGTH, obj.toString()
+                });
+            }
+        }
+        if (maxResponseContentLength == null) {
+            maxResponseContentLength = DEFAULT_MAX_RESPONSE_CONTENT_LENGTH;
+        }
+        return maxResponseContentLength;
     }
 
 
