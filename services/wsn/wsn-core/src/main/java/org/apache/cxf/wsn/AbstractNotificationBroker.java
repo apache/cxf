@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -94,8 +93,6 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
 
     private Map<String, AbstractPublisher> publishers;
 
-    private List<AbstractPublisher> nonContactPublishers;
-
     private Map<String, AbstractSubscription> subscriptions;
 
     public AbstractNotificationBroker(String name) {
@@ -103,7 +100,6 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
         idGenerator = new IdGenerator();
         subscriptions = new ConcurrentHashMap<>();
         publishers = new ConcurrentHashMap<>();
-        nonContactPublishers = new CopyOnWriteArrayList<>();
     }
 
     @Override
@@ -342,8 +338,6 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
                 publishers.put(WSNHelper.getInstance()
                                    .getWSAAddress(publisher.getPublisherReference()),
                                publisher);
-            } else {
-                nonContactPublishers.add(publisher);
             }
             success = true;
             return response;

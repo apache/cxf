@@ -20,9 +20,8 @@ package org.apache.cxf.systest.sts.stsclient;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.systest.sts.TLSClientParametersUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSTokenRetriever;
@@ -53,9 +52,7 @@ public class STSTokenRetrieverTest extends AbstractSTSTokenTest {
 
         Bus bus = BusFactory.getThreadDefaultBus();
         STSClient stsClient = initStsClientTransportBinding(bus);
-
-        TLSClientParameters tlsParams = prepareTLSParams();
-        ((HTTPConduit)stsClient.getClient().getConduit()).setTlsClientParameters(tlsParams);
+        stsClient.setTlsClientParameters(TLSClientParametersUtils.getTLSClientParameters());
 
         MessageImpl message = prepareMessage(bus, stsClient, SERVICE_ENDPOINT_TRANSPORT);
         STSTokenRetriever.TokenRequestParams params = new STSTokenRetriever.TokenRequestParams();

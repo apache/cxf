@@ -35,7 +35,6 @@ public interface CryptoProviderFactory {
     /**
      * Create without fallback crypto
      *
-     * @param cryptoProperties
      * @return xkms crypto
      */
     Crypto create();
@@ -51,7 +50,6 @@ public interface CryptoProviderFactory {
     /**
      * Create with overridden keystoreProperties to create default Crypto
      *
-     * @param xkmsClient
      * @param keystoreProperties
      * @return
      */

@@ -17,30 +17,25 @@
  * under the License.
  */
 
-package org.apache.cxf.sts.event;
+package org.apache.cxf.sts.cache;
 
-import org.apache.cxf.sts.event.map.MapEventLogger;
-import org.apache.log4j.PatternLayout;
+import java.io.Serializable;
+import java.util.Map;
 
-public class LoggerPatternLayoutLog4J extends PatternLayout {
+/**
+ * A cache value for EHCache. It's just a wrapper for Map<String, String>.
+ */
+public class EHCacheIdentityValue implements Serializable {
 
-    private String header;
+    private final Map<String, String> value;
 
-    public void setHeader(String header) {
-        this.header = header;
+    public EHCacheIdentityValue(Map<String, String> value) {
+        this.value = value;
     }
 
-    @Override
-    public String getHeader() {
-        if (this.header != null) {
-            return this.header + System.getProperty("line.separator");
-        }
-        MapEventLogger ll = new MapEventLogger();
-        StringBuilder line = new StringBuilder();
-        for (String item : ll.getFieldOrder()) {
-            line.append(item).append(';');
-        }
-        return line.toString() + System.getProperty("line.separator");
+    public Map<String, String>  getValue() {
+        return value;
     }
+
 
 }

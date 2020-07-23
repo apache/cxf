@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.systest.sts.common;
 
-import java.io.File;
-
 import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -32,23 +30,6 @@ public final class SecurityTestUtil {
 
     private SecurityTestUtil() {
         // complete
-    }
-
-    public static void cleanup() {
-        String tmpDir = System.getProperty("java.io.tmpdir");
-        if (tmpDir != null) {
-            File[] tmpFiles = new File(tmpDir).listFiles();
-            if (tmpFiles != null) {
-                for (File tmpFile : tmpFiles) {
-                    if (tmpFile.exists() && (tmpFile.getName().startsWith("ws-security.nonce.cache")
-                        || tmpFile.getName().startsWith("wss4j-nonce-cache")
-                        || tmpFile.getName().startsWith("ws-security.timestamp.cache")
-                        || tmpFile.getName().startsWith("wss4j-timestamp-cache"))) {
-                        tmpFile.delete();
-                    }
-                }
-            }
-        }
     }
 
     public static void enableStreaming(DoubleItPortType port) {

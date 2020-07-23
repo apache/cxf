@@ -19,22 +19,16 @@
 package org.apache.cxf.systest.sts.stsclient;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.GeneralSecurityException;
-import java.security.KeyStore;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
@@ -49,9 +43,10 @@ import org.apache.cxf.service.ServiceImpl;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
-import org.apache.cxf.systest.sts.common.SecurityTestUtil;
+import org.apache.cxf.systest.sts.TLSClientParametersUtils;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.https.SSLUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
@@ -84,10 +79,6 @@ public abstract class AbstractSTSTokenTest extends AbstractBusClientServerTestBa
     private static final String TOKEN_TYPE_SAML_2_0 =
             "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0";
 
-    private static final String CLIENTSTORE = "/keys/clientstore.jks";
-    private static final String KEYSTORE_PASS = "cspass";
-    private static final String KEY_PASS = "ckpass";
-
     @BeforeClass
     public static void startServers() throws Exception {
         STSServer stsServer = new STSServer();
@@ -101,7 +92,6 @@ public abstract class AbstractSTSTokenTest extends AbstractBusClientServerTestBa
 
     @AfterClass
     public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
         stopAllServers();
     }
 
@@ -178,43 +168,13 @@ public abstract class AbstractSTSTokenTest extends AbstractBusClientServerTestBa
             }
         });
 
-        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory
-            .getDefaultAlgorithm());
-        KeyStore keyStore = loadClientKeystore();
-        trustManagerFactory.init(keyStore);
-        TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
-        SSLContext sc = SSLContext.getInstance("TLS");
-        sc.init(null, trustManagers, new java.security.SecureRandom());
+        SSLContext sc = SSLUtils.getSSLContext(TLSClientParametersUtils.getTLSClientParameters());
         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
         // Needed to prevent test failure using IBM JDK
         if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
             System.setProperty("https.protocols", "TLSv1");
         }
-    }
-
-    static TLSClientParameters prepareTLSParams() throws GeneralSecurityException, IOException {
-        TLSClientParameters tlsParams = new TLSClientParameters();
-        tlsParams.setDisableCNCheck(true);
-
-        KeyStore trustStore = loadClientKeystore();
-        TrustManagerFactory trustFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        trustFactory.init(trustStore);
-        tlsParams.setTrustManagers(trustFactory.getTrustManagers());
-
-        KeyStore keyStore = loadClientKeystore();
-        KeyManagerFactory keyFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        keyFactory.init(keyStore, KEY_PASS.toCharArray());
-        tlsParams.setKeyManagers(keyFactory.getKeyManagers());
-        return tlsParams;
-    }
-
-    static KeyStore loadClientKeystore() throws GeneralSecurityException, IOException {
-        KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-        try (InputStream keystoreStream = AbstractSTSTokenTest.class.getResourceAsStream(CLIENTSTORE)) {
-            keystore.load(keystoreStream, KEYSTORE_PASS.toCharArray());
-        }
-        return keystore;
     }
 
     static void validateSecurityToken(SecurityToken token) {

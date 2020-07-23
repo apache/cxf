@@ -1,4 +1,3 @@
-
 This folder contains the XKMS (XML Key Management Service) implementation of 
 Apache CXF. It contains:
 
@@ -15,8 +14,10 @@ xkms-war - Web spring configuration for Web depoyment
 Installation
 ------------
 
-features:addurl mvn:org.apache.cxf.services.xkms/cxf-services-xkms-features/3.1.1-SNAPSHOT/xml
+Karaf 2.x:
+features:addurl mvn:org.apache.cxf.services.xkms/cxf-services-xkms-features/3.4.0-SNAPSHOT/xml
 features:install cxf-xkms-service cxf-xkms-client
 
-feature:repo-add mvn:org.apache.cxf.services.xkms/cxf-services-xkms-features/3.1.1-SNAPSHOT/xml
+Karaf 3.x and later:
+feature:repo-add mvn:org.apache.cxf.services.xkms/cxf-services-xkms-features/3.4.0-SNAPSHOT/xml
 feature:install cxf-xkms-service cxf-xkms-client

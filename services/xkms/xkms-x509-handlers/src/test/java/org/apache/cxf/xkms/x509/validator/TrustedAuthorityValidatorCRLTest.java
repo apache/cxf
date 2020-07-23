@@ -86,6 +86,7 @@ public class TrustedAuthorityValidatorCRLTest extends BasicValidationTest {
     @Test
     public void testIsCertChainValid() throws CertificateException {
         TrustedAuthorityValidator validator = new TrustedAuthorityValidator(certificateRepo);
+        validator.setEnableRevocation(true);
         Assert.assertTrue("Root should be valid",
                           validator.isCertificateChainValid(Arrays.asList(certificateRoot)));
         Assert.assertTrue("wss40rev should not be valid",

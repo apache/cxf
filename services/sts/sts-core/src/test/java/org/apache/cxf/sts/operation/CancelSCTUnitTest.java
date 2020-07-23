@@ -50,11 +50,14 @@ import org.apache.cxf.ws.security.sts.provider.model.CancelTargetType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
+
+import org.junit.BeforeClass;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -69,7 +72,12 @@ public class CancelSCTUnitTest {
     private static final QName QNAME_REQ_TOKEN_CANCELLED =
         QNameConstants.WS_TRUST_FACTORY.createRequestedTokenCancelled(null).getName();
 
-    private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
+    private static TokenStore tokenStore;
+
+    @BeforeClass
+    public static void init() throws TokenStoreException {
+        tokenStore = new DefaultInMemoryTokenStore();
+    }
 
     /**
      * Test to successfully cancel a SecurityContextToken

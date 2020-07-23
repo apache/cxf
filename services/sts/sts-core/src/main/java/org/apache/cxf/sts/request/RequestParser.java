@@ -487,7 +487,7 @@ public class RequestParser {
 
     /**
      * Parse an Entropy object
-     * @param entropy an Entropy object
+     * @param entropyType an EntropyType object
      * @param stsProperties A STSPropertiesMBean object used to decrypt an EncryptedKey
      */
     private static Entropy parseEntropy(

@@ -91,7 +91,11 @@ public abstract class AbstractIdentityCache implements IdentityCache, IdentityMa
                     //Merge into identities object
                     this.mergeMap(identities, cachedItem);
                 }
-                this.add(targetPrincipal.getName(), targetRealm, identities);
+
+                // Update existing entries
+                for (Map.Entry<String, String> entry : identities.entrySet()) {
+                    this.add(entry.getValue(), entry.getKey(), identities);
+                }
             } else {
                 getStatistics().increaseCacheHit();
                 if (LOG.isLoggable(Level.INFO)) {

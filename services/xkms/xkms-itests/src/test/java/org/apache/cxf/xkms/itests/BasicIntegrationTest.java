@@ -32,7 +32,9 @@ import org.w3._2002._03.xkms_wsdl.XKMSPortType;
 
 import org.junit.Assert;
 import org.ops4j.pax.exam.Configuration;
+import org.ops4j.pax.exam.MavenUtils;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.OptionUtils;
 import org.ops4j.pax.exam.karaf.container.internal.JavaVersionUtil;
 import org.ops4j.pax.exam.options.MavenArtifactUrlReference;
 import org.ops4j.pax.exam.options.extra.VMOption;
@@ -53,8 +55,8 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.replaceCo
 public class BasicIntegrationTest {
 
     // Adding apache snapshots as cxf trunk may contain snapshot dependencies
-    //private static final String REPOS = "http://repo1.maven.org/maven2@id=central, "
-    //    + "http://repository.apache.org/content/groups/snapshots-group@snapshots@noreleases@id=apache-snapshots ";
+//    private static final String REPOS = "https://repo1.maven.org/maven2@id=central,"
+//        + "https://repository.apache.org/content/groups/snapshots-group@id=apache@snapshots@noreleases";
 
     @Inject
     protected XKMSPortType xkmsService;
@@ -65,111 +67,73 @@ public class BasicIntegrationTest {
         System.setProperty("BasicIntegrationTest.PORT", port);
         String xkmsEndpoint = "http://localhost:" + port + "/cxf/XKMS";
 
-        String karafVersion = System.getProperty("karaf.version", "4.2.5");
         String localRepository = System.getProperty("localRepository");
-        MavenArtifactUrlReference karafUrl = maven() //
-            .groupId("org.apache.karaf") //
-            .artifactId("apache-karaf") //
-            .version(karafVersion)
-            .type("tar.gz");
         MavenArtifactUrlReference xkmsFeatures = maven() //
             .groupId("org.apache.cxf.services.xkms") //
             .artifactId("cxf-services-xkms-features") //
             .versionAsInProject() //
             .type("xml");
+
+        final Option[] basicOptions = new Option[] {
+             karafDistributionConfiguration()
+                 .frameworkUrl(
+                     maven().groupId("org.apache.karaf").artifactId("apache-karaf-minimal").versionAsInProject()
+                         .type("tar.gz"))
+                 .unpackDirectory(new File("target/paxexam/"))
+                 .useDeployFolder(false),
+             systemProperty("java.awt.headless").value("true"),
+             systemProperty("BasicIntegrationTest.PORT").value(port),
+
+             copy("data/xkms/certificates/trusted_cas/root.cer"),
+             copy("data/xkms/certificates/trusted_cas/wss40CA.cer"),
+             copy("data/xkms/certificates/cas/alice.cer"),
+             copy("data/xkms/certificates/dave.cer"),
+             copy("data/xkms/certificates/http___localhost_8080_services_TestService.cer"),
+//             editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
+//                 "org.ops4j.pax.url.mvn.repositories", REPOS),
+             editConfigurationFilePut("etc/org.ops4j.pax.web.cfg",
+                                      "org.osgi.service.http.port", port),
+             editConfigurationFilePut("etc/org.apache.cxf.xkms.client.cfg",
+                                      "xkms.endpoint", xkmsEndpoint),
+             when(localRepository != null)
+                 .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
+                                                      "org.ops4j.pax.url.mvn.localRepository",
+                                                      localRepository)),
+             features(xkmsFeatures, "cxf-xkms-service", "cxf-xkms-client",
+                      "cxf-xkms-ldap"),
+             configureConsole().ignoreLocalConsole().ignoreRemoteShell(),
+
+            // org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder(),
+            // CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
+        };
         if (JavaVersionUtil.getMajorVersion() >= 9) {
-            return new Option[] {
-                 karafDistributionConfiguration().frameworkUrl(karafUrl)
-                                     .karafVersion(karafVersion)
-                                     .unpackDirectory(new File("target/paxexam/unpack/"))
-                                     .useDeployFolder(false),
-                                 systemProperty("java.awt.headless").value("true"),
-                                 systemProperty("BasicIntegrationTest.PORT").value(port),
-
-                copy("data/xkms/certificates/trusted_cas/root.cer"),
-                                 copy("data/xkms/certificates/trusted_cas/wss40CA.cer"),
-                                 copy("data/xkms/certificates/cas/alice.cer"),
-                                 copy("data/xkms/certificates/dave.cer"),
-                                 copy("data/xkms/certificates/http___localhost_8080_services_TestService.cer"),
-                                 copy("etc/org.ops4j.pax.logging.cfg"),
-                                 // editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
-                                 // "org.ops4j.pax.url.mvn.repositories", REPOS),
-                                 editConfigurationFilePut("etc/org.ops4j.pax.web.cfg",
-                                                          "org.osgi.service.http.port", port),
-                                 editConfigurationFilePut("etc/org.apache.cxf.xkms.client.cfg",
-                                                          "xkms.endpoint", xkmsEndpoint),
-                                 when(localRepository != null)
-                                     .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
-                                                                          "org.ops4j.pax.url.mvn.localRepository",
-                                                                          localRepository)),
-                                 features(xkmsFeatures, "cxf-xkms-service", "cxf-xkms-client",
-                                          "cxf-xkms-ldap"),
-                                 editConfigurationFilePut("etc/org.apache.karaf.features.cfg", "featuresBoot", 
-                                                          "(transaction, instance, package, log, ssh, framework, "
-                                                          + "system, eventadmin, "
-                                                          + "feature, shell, management, service, "
-                                                          + "jaas, deployer, diagnostic, "
-                                                          + "wrap, bundle, config, kar),"
-                                                          + "cxf-xkms-service,cxf-xkms-client,"
-                                                          + "cxf-xkms-ldap,exam,test-dependencies"),
-                                 configureConsole().ignoreLocalConsole(), 
-            new VMOption("--add-reads=java.xml=java.logging"),
-            new VMOption("--add-exports=java.base/"
-                + "org.apache.karaf.specs.locator=java.xml,ALL-UNNAMED"),
-            new VMOption("--patch-module"),
-            new VMOption("java.base=lib/endorsed/org.apache.karaf.specs.locator-" + karafVersion + ".jar"),
-            new VMOption("--patch-module"),
-            new VMOption("java.xml=lib/endorsed/org.apache.karaf.specs.java.xml-" + karafVersion + ".jar"),
-            new VMOption("--add-opens"),
-            new VMOption("java.base/java.security=ALL-UNNAMED"),
-            new VMOption("--add-opens"), new VMOption("java.base/java.net=ALL-UNNAMED"),
-            new VMOption("--add-opens"), new VMOption("java.base/java.lang=ALL-UNNAMED"),
-            new VMOption("--add-opens"), new VMOption("java.base/java.util=ALL-UNNAMED"),
-            new VMOption("--add-opens"),
-            new VMOption("java.naming/javax.naming.spi=ALL-UNNAMED"),
-            new VMOption("--add-opens"),
-            new VMOption("java.rmi/sun.rmi.transport.tcp=ALL-UNNAMED"),
-            new VMOption("--add-exports=java.base/sun.net.www.protocol.http=ALL-UNNAMED"),
-            new VMOption("--add-exports=java.base/sun.net.www.protocol.https=ALL-UNNAMED"),
-            new VMOption("--add-exports=java.base/sun.net.www.protocol.jar=ALL-UNNAMED"),
-            new VMOption("--add-exports=jdk.naming.rmi/com.sun.jndi.url.rmi=ALL-UNNAMED"),
-            new VMOption("-classpath"),
-            new VMOption("lib/jdk9plus/*" + File.pathSeparator + "lib/boot/*"),
-            };
-
-        } else {
-            return new Option[] {
-                                 karafDistributionConfiguration().frameworkUrl(karafUrl)
-                                     .karafVersion(karafVersion)
-                                     .unpackDirectory(new File("target/paxexam/unpack/"))
-                                     .useDeployFolder(false),
-                                 systemProperty("java.awt.headless").value("true"),
-                                 systemProperty("BasicIntegrationTest.PORT").value(port),
-
-                copy("data/xkms/certificates/trusted_cas/root.cer"),
-                                 copy("data/xkms/certificates/trusted_cas/wss40CA.cer"),
-                                 copy("data/xkms/certificates/cas/alice.cer"),
-                                 copy("data/xkms/certificates/dave.cer"),
-                                 copy("data/xkms/certificates/http___localhost_8080_services_TestService.cer"),
-                                 copy("etc/org.ops4j.pax.logging.cfg"),
-                                 // editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
-                                 // "org.ops4j.pax.url.mvn.repositories", REPOS),
-                                 editConfigurationFilePut("etc/org.ops4j.pax.web.cfg",
-                                                          "org.osgi.service.http.port", port),
-                                 editConfigurationFilePut("etc/org.apache.cxf.xkms.client.cfg",
-                                                          "xkms.endpoint", xkmsEndpoint),
-                                 when(localRepository != null)
-                                     .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
-                                                                          "org.ops4j.pax.url.mvn.localRepository",
-                                                                          localRepository)),
-                                 features(xkmsFeatures, "cxf-xkms-service", "cxf-xkms-client",
-                                          "cxf-xkms-ldap"),
-                                 configureConsole().ignoreLocalConsole(),
-
-                // org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder(),
-                // CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
-            };
+            final String karafVersion = MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf-minimal");
+            return OptionUtils.combine(basicOptions,
+                new VMOption("--add-reads=java.xml=java.logging"),
+                new VMOption("--add-exports=java.base/"
+                    + "org.apache.karaf.specs.locator=java.xml,ALL-UNNAMED"),
+                new VMOption("--patch-module"),
+                new VMOption("java.base=lib/endorsed/org.apache.karaf.specs.locator-" + karafVersion + ".jar"),
+                new VMOption("--patch-module"),
+                new VMOption("java.xml=lib/endorsed/org.apache.karaf.specs.java.xml-" + karafVersion + ".jar"),
+                new VMOption("--add-opens"),
+                new VMOption("java.base/java.security=ALL-UNNAMED"),
+                new VMOption("--add-opens"), new VMOption("java.base/java.net=ALL-UNNAMED"),
+                new VMOption("--add-opens"), new VMOption("java.base/java.lang=ALL-UNNAMED"),
+                new VMOption("--add-opens"), new VMOption("java.base/java.util=ALL-UNNAMED"),
+                new VMOption("--add-opens"),
+                new VMOption("java.naming/javax.naming.spi=ALL-UNNAMED"),
+                new VMOption("--add-opens"),
+                new VMOption("java.rmi/sun.rmi.transport.tcp=ALL-UNNAMED"),
+                new VMOption("--add-exports=java.base/sun.net.www.protocol.http=ALL-UNNAMED"),
+                new VMOption("--add-exports=java.base/sun.net.www.protocol.https=ALL-UNNAMED"),
+                new VMOption("--add-exports=java.base/sun.net.www.protocol.jar=ALL-UNNAMED"),
+                new VMOption("--add-exports=jdk.naming.rmi/com.sun.jndi.url.rmi=ALL-UNNAMED"),
+                new VMOption("-classpath"),
+                new VMOption("lib/jdk9plus/*" + File.pathSeparator + "lib/boot/*")
+            );
         }
+        return basicOptions;
     }
 
     protected static Option copy(String path) {

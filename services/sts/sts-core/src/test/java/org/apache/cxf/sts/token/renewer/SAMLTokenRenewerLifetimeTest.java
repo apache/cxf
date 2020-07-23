@@ -46,6 +46,7 @@ import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -68,7 +69,7 @@ public class SAMLTokenRenewerLifetimeTest {
     private static TokenStore tokenStore;
 
     @BeforeClass
-    public static void init() {
+    public static void init() throws TokenStoreException {
         tokenStore = new DefaultInMemoryTokenStore();
     }
 

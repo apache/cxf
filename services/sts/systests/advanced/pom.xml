@@ -135,9 +135,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>net.sf.ehcache</groupId>
+            <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
-            <version>${cxf.ehcache.version}</version>
+            <version>${cxf.ehcache3.version}</version>
         </dependency>
         <dependency>
             <groupId>com.hazelcast</groupId>
@@ -154,6 +154,12 @@
             <artifactId>jackson-jaxrs-json-provider</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
     <build>
         <testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
@@ -215,7 +221,6 @@
                             <systemPropertyVariables>
                                 <sts.deployment>standalone</sts.deployment>
                                 <java.security.auth.login.config>src/test/resources/kerberos.jaas</java.security.auth.login.config>
-                                <java.io.tmpdir>${basedir}/target/tmp</java.io.tmpdir>
                             </systemPropertyVariables>
                         </configuration>
                     </plugin>

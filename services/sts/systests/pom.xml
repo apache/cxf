@@ -33,7 +33,6 @@
         <module>basic</module>
         <module>advanced</module>
         <module>sts-osgi</module>
-        <module>sts-features</module>
         <module>sts-itests</module>
     </modules>
 </project>

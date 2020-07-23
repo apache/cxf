@@ -34,6 +34,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.xkms.cache.EHCacheXKMSClientCache;
 import org.apache.cxf.xkms.cache.XKMSCacheToken;
 import org.apache.cxf.xkms.cache.XKMSClientCache;
+import org.apache.cxf.xkms.cache.XKMSClientCacheException;
 import org.apache.cxf.xkms.client.XKMSInvoker;
 import org.apache.cxf.xkms.crypto.CryptoProviderException;
 import org.apache.cxf.xkms.handlers.Applications;
@@ -53,15 +54,16 @@ public class XkmsCryptoProvider extends CryptoBase {
     private XKMSClientCache xkmsClientCache;
     private boolean allowX509FromJKS = true;
 
-    public XkmsCryptoProvider(XKMSPortType xkmsConsumer) {
+    public XkmsCryptoProvider(XKMSPortType xkmsConsumer) throws XKMSClientCacheException {
         this(xkmsConsumer, null);
     }
 
-    public XkmsCryptoProvider(XKMSPortType xkmsConsumer, Crypto fallbackCrypto) {
+    public XkmsCryptoProvider(XKMSPortType xkmsConsumer, Crypto fallbackCrypto) throws XKMSClientCacheException {
         this(xkmsConsumer, fallbackCrypto, new EHCacheXKMSClientCache(), true);
     }
 
-    public XkmsCryptoProvider(XKMSPortType xkmsConsumer, Crypto fallbackCrypto, boolean allowX509FromJKS) {
+    public XkmsCryptoProvider(XKMSPortType xkmsConsumer, Crypto fallbackCrypto, boolean allowX509FromJKS)
+            throws XKMSClientCacheException {
         this(xkmsConsumer, fallbackCrypto, new EHCacheXKMSClientCache(), allowX509FromJKS);
     }
 

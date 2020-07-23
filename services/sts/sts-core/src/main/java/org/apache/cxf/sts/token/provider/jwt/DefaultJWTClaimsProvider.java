@@ -172,7 +172,7 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
 
         Instant currentDate = Instant.now();
         long currentTime = currentDate.getEpochSecond();
-        
+
         // Set the defaults first
         claims.setIssuedAt(currentTime);
         claims.setNotBefore(currentTime);
@@ -310,7 +310,7 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
 
     /**
      * Set the default lifetime in seconds for issued JWT tokens
-     * @param default lifetime in seconds
+     * @param lifetime default lifetime in seconds
      */
     public void setLifetime(long lifetime) {
         this.lifetime = lifetime;
@@ -327,7 +327,7 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
 
     /**
      * Set the maximum lifetime in seconds for issued JWT tokens
-     * @param maximum lifetime in seconds
+     * @param maxLifetime maximum lifetime in seconds
      */
     public void setMaxLifetime(long maxLifetime) {
         this.maxLifetime = maxLifetime;
