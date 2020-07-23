@@ -358,24 +358,14 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
     }
 
     private void initServer(SpringBusFactory bf, String cfgResource) {
-        String derbyHome = System.getProperty("derby.system.home");
-        try {
-            synchronized (GreeterProvider.CALL_ARGS) {
-                GreeterProvider.CALL_ARGS.clear();
-            }
-            System.setProperty("derby.system.home", derbyHome + "-server");
-            serverBus = bf.createBus(cfgResource);
-            BusFactory.setDefaultBus(serverBus);
-            LOG.info("Initialised bus " + serverBus + " with cfg file resource: " + cfgResource);
-            LOG.info("serverBus inInterceptors: " + serverBus.getInInterceptors());
-            endpoint = Endpoint.publish(GREETER_ADDRESS, new GreeterProvider());
-        } finally {
-            if (derbyHome != null) {
-                System.setProperty("derby.system.home", derbyHome);
-            } else {
-                System.clearProperty("derby.system.home");
-            }
+        synchronized (GreeterProvider.CALL_ARGS) {
+            GreeterProvider.CALL_ARGS.clear();
         }
+        serverBus = bf.createBus(cfgResource);
+        BusFactory.setDefaultBus(serverBus);
+        LOG.info("Initialised bus " + serverBus + " with cfg file resource: " + cfgResource);
+        LOG.info("serverBus inInterceptors: " + serverBus.getInInterceptors());
+        endpoint = Endpoint.publish(GREETER_ADDRESS, new GreeterProvider());
     }
 
     private void initGreeterBus(SpringBusFactory bf,

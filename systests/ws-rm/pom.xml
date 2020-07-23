@@ -134,9 +134,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.derby</groupId>
-            <artifactId>derby</artifactId>
-            <version>${cxf.derby.version}</version>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>${cxf.hsqldb.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
