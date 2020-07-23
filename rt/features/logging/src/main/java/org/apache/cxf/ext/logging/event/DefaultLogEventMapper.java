@@ -34,6 +34,7 @@ import javax.security.auth.Subject;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.ext.logging.MaskSensitiveHelper;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -46,7 +47,9 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.ContextUtils;
 
 public class DefaultLogEventMapper {
+    public static final String MASKED_HEADER_VALUE = "XXX";
     private static final Set<String> DEFAULT_BINARY_CONTENT_MEDIA_TYPES;
+
     static {
         Set<String> mediaTypes = new HashSet<>(5);
         mediaTypes.add("application/octet-stream");
@@ -60,13 +63,15 @@ public class DefaultLogEventMapper {
 
     private final Set<String> binaryContentMediaTypes = new HashSet<>(DEFAULT_BINARY_CONTENT_MEDIA_TYPES);
 
+    private MaskSensitiveHelper maskSensitiveHelper = new MaskSensitiveHelper();
+
     public void addBinaryContentMediaTypes(String mediaTypes) {
         if (mediaTypes != null) {
             Collections.addAll(binaryContentMediaTypes, mediaTypes.split(";"));
         }
     }
 
-    public LogEvent map(Message message) {
+    public LogEvent map(final Message message, final Set<String> sensitiveProtocolHeaders) {
         final LogEvent event = new LogEvent();
         event.setMessageId(getMessageId(message));
         event.setExchangeId((String)message.getExchange().get(LogEvent.KEY_EXCHANGE_ID));
@@ -84,6 +89,7 @@ public class DefaultLogEventMapper {
         event.setContentType(safeGet(message, Message.CONTENT_TYPE));
 
         Map<String, String> headerMap = getHeaders(message);
+        maskSensitiveHelper.maskHeaders(headerMap, sensitiveProtocolHeaders);
         event.setHeaders(headerMap);
 
         event.setAddress(getAddress(message, event));

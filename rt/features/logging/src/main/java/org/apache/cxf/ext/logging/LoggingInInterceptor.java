@@ -90,12 +90,14 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
             message.put(LIVE_LOGGING_PROP, Boolean.FALSE);
         }
         createExchangeId(message);
-        final LogEvent event = eventMapper.map(message);
+        final LogEvent event = eventMapper.map(message, sensitiveProtocolHeaderNames);
         if (shouldLogContent(event)) {
             addContent(message, event);
         } else {
             event.setPayload(AbstractLoggingInterceptor.CONTENT_SUPPRESSED);
         }
+        final String maskedContent = maskSensitiveElements(message, event.getPayload());
+        event.setPayload(transform(message, maskedContent));
         sender.send(event);
     }
 
@@ -123,7 +125,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         StringBuilder payload = new StringBuilder();
         cos.writeCacheTo(payload, encoding, limit);
         cos.close();
-        event.setPayload(transform(payload.toString()));
+        event.setPayload(payload.toString());
         boolean isTruncated = cos.size() > limit && limit != -1;
         event.setTruncated(isTruncated);
         event.setFullContentFile(cos.getTempFile());
@@ -134,7 +136,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         StringBuilder payload = new StringBuilder();
         writer.writeCacheTo(payload, limit);
         writer.close();
-        event.setPayload(transform(payload.toString()));
+        event.setPayload(payload.toString());
         event.setTruncated(isTruncated);
         event.setFullContentFile(writer.getTempFile());
     }

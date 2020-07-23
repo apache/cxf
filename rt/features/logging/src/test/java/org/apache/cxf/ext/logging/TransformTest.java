@@ -53,7 +53,8 @@ public class TransformTest {
             super(sender);
         }
 
-        protected String transform(String content) {
+        @Override
+        protected String transform(final Message message, final String content) {
             return content.replace(ORIG_LOGGING_CONTENT, TRANSFORMED_LOGGING_CONTENT);
         }
     }
@@ -63,7 +64,8 @@ public class TransformTest {
             super(sender);
         }
 
-        protected String transform(String content) {
+        @Override
+        protected String transform(final Message message, final String content) {
             return content.replace(ORIG_LOGGING_CONTENT, TRANSFORMED_LOGGING_CONTENT);
         }
     }
@@ -89,7 +91,7 @@ public class TransformTest {
         // Verify
         LogEvent event = logEventSender.getLogEvent();
         assertNotNull(event);
-        assertEquals(TRANSFORMED_LOGGING_CONTENT, event.getPayload()); // only the first byte is read!
+        assertEquals(TRANSFORMED_LOGGING_CONTENT, event.getPayload());
     }
 
     @Test
