@@ -74,7 +74,7 @@ public class SOAPLoggingTest extends AbstractJaxWsTest {
         BindingOperationInfo boi = new BindingOperationInfo(info, opInfo);
         exchange.put(BindingOperationInfo.class, boi);
         message.setExchange(exchange);
-        LogEvent event = mapper.map(message);
+        LogEvent event = mapper.map(message, Collections.emptySet());
         Assert.assertEquals("{http://my}Operation", event.getOperationName());
     }
     @Test
