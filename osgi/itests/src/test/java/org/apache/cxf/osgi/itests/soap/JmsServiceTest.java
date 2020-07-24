@@ -78,8 +78,11 @@ public class JmsServiceTest extends CXFOSGiTestSupport {
         return OptionUtils.combine(
             cxfBaseConfig(),
             features(cxfUrl, "cxf-jaxws", "cxf-transports-jms"),
+            // TODO: remove it when 5.16.1 is released, https://issues.apache.org/jira/browse/AMQ-8009
+            features(maven().groupId("org.apache.karaf.features").artifactId("spring-legacy").versionAsInProject()
+                .type("xml").classifier("features")),
             features(maven().groupId("org.apache.activemq").artifactId("activemq-karaf").versionAsInProject()
-                    .type("xml").classifier("features-core"),
+                .type("xml").classifier("features-core"),
                 "cxf-jackson", "activemq-client"),
             provision(serviceBundle())
         );
