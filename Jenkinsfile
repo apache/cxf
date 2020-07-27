@@ -39,48 +39,12 @@ pipeline {
             MAVEN_OPTS = "-Xmx1024m"
           }
           stages {
-            stage('Build') {
+            stage('Build JDK 11') {
               steps {
-                sh 'mvn -B clean install -DskipTests -DskipAssembly'
+                sh 'mvn -B clean install -Dmaven.test.skip.exec=true'
               }
             }
-            stage('Test') {
-              steps {
-                sh 'mvn -B test'
-                // step([$class: 'JiraIssueUpdater', issueSelector: [$class: 'DefaultIssueSelector'], scm: scm])
-              }
-              post {
-                always {
-                  junit(testResults: '**/surefire-reports/*.xml', allowEmptyResults: true)
-                  junit(testResults: '**/failsafe-reports/*.xml', allowEmptyResults: true)
-                }
-              }
-            }
-          }
-          post {
-            always {
-              cleanWs deleteDirs: true, patterns: [[pattern: '**/target/**', type: 'INCLUDE']]
-            }
-          }
-        }
-        stage('JDK 9') {
-          agent {
-            label 'ubuntu'
-          }
-          tools {
-            jdk 'JDK 1.9 (latest)'
-            maven 'Maven (latest)'
-          }
-          environment {
-            MAVEN_OPTS = "-Xmx1024m"
-          }
-          stages {
-            stage('Build') {
-              steps {
-                sh 'mvn -B clean install -DskipTests -DskipAssembly'
-              }
-            }
-            stage('Test') {
+            stage('Test JDK 11') {
               steps {
                 sh 'mvn -B test'
                 // step([$class: 'JiraIssueUpdater', issueSelector: [$class: 'DefaultIssueSelector'], scm: scm])
@@ -111,12 +75,12 @@ pipeline {
             MAVEN_OPTS = "-Xmx1024m"
           }
           stages {
-            stage('Build') {
+            stage('Build JDK 8') {
               steps {
-                sh 'mvn -B clean install -DskipTests -DskipAssembly'
+                sh 'mvn -B clean install -Dmaven.test.skip.exec=true '
               }
             }
-            stage('Test') {
+            stage('Test JDK 8') {
               steps {
                 sh 'mvn -B test'
                 // step([$class: 'JiraIssueUpdater', issueSelector: [$class: 'DefaultIssueSelector'], scm: scm])
