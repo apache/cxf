@@ -39,14 +39,9 @@ pipeline {
             MAVEN_OPTS = "-Xmx1024m"
           }
           stages {
-            stage('Build JDK 11') {
+            stage('Build & Test JDK 11') {
               steps {
-                sh 'mvn -B clean install -Dmaven.test.skip.exec=true'
-              }
-            }
-            stage('Test JDK 11') {
-              steps {
-                sh 'mvn -B test'
+                sh 'mvn -B clean install'
                 // step([$class: 'JiraIssueUpdater', issueSelector: [$class: 'DefaultIssueSelector'], scm: scm])
               }
               post {
@@ -75,14 +70,9 @@ pipeline {
             MAVEN_OPTS = "-Xmx1024m"
           }
           stages {
-            stage('Build JDK 8') {
+            stage('Build & Test JDK 8') {
               steps {
-                sh 'mvn -B clean install -Dmaven.test.skip.exec=true '
-              }
-            }
-            stage('Test JDK 8') {
-              steps {
-                sh 'mvn -B test'
+                sh 'mvn -B clean install'
                 // step([$class: 'JiraIssueUpdater', issueSelector: [$class: 'DefaultIssueSelector'], scm: scm])
               }
               post {
@@ -109,7 +99,7 @@ pipeline {
               }
               steps {
                 withCredentials([file(credentialsId: 'lukaszlenart-repository-access-token', variable: 'CUSTOM_SETTINGS')]) {
-                  sh 'mvn -s \${CUSTOM_SETTINGS} deploy -skipAssembly'
+                  sh 'mvn -U -B -e clean install -Pdeploy,everything,nochecks -Dmaven.test.skip.exec=true -V -DobrRepository=NONE'
                 }
               }
             }
