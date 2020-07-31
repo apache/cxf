@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.sts.rest.impl;
+package org.apache.cxf.sts.rs.impl;
 
 import java.util.Optional;
 
@@ -27,7 +27,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 
-import org.apache.cxf.sts.rest.api.BaseResponse;
+import org.apache.cxf.sts.rs.api.BaseResponse;
 
 public class RestExceptionMapper implements ExceptionMapper<Exception> {
 

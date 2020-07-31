@@ -34,7 +34,7 @@
 
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
 
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
             <cxf:logging/>
@@ -127,23 +127,46 @@
     <bean id="customClaimsHandler" class="org.apache.cxf.systest.sts.deployment.CustomClaimsHandler">
     </bean>
 
-    <bean id="restSTS" class="org.apache.cxf.sts.rest.RESTSecurityTokenServiceImpl">
+    <bean id="restSTS" class="org.apache.cxf.sts.rs.RESTSecurityTokenServiceImpl">
         <property name="issueSingleOperation" ref="transportIssueDelegate" />
         <property name="validateOperation" ref="transportValidateDelegate" />
         <property name="renewOperation" ref="transportRenewDelegate"/>
     </bean>
 
-    <bean id="realmRestSTS" class="org.apache.cxf.sts.rest.impl.RealmSecurityTokenServiceImpl">
+    <bean id="realmRestSTS" class="org.apache.cxf.sts.rs.impl.RealmSecurityTokenServiceImpl">
         <property name="restSecurityTokenService" ref="restSTS" />
     </bean>
 
+    <bean id="realmA" class="org.apache.cxf.sts.rs.token.realm.ExtRealmProperties">
+        <property name="issuer" value="STS Realm A" />
+        <property name="name" value="realmA" />
+        <property name="rsSecurityProperties">
+            <map>
+                <entry key="rs.security.keystore.type" value="jks" />
+                <entry key="rs.security.keystore.alias" value="mystskey"/>
+                <entry key="rs.security.keystore.password" value="stsspass" />
+                <entry key="rs.security.keystore.file" value="keys/stsstore.jks" />
+            </map>
+        </property>
+    </bean>
+
+    <util:map id="realms">
+        <entry key="realmA" value-ref="realmA" />
+    </util:map>
+
+    <bean id="realmSecurityConfigFilter" class="org.apache.cxf.sts.rs.impl.RealmSecurityConfigurationFilter">
+        <property name="realmMap" ref="realms" />
+    </bean>
+
     <jaxrs:server id="stsRESTService"
-       depends-on="ClientAuthHttpsSettings" 
-       address="https://localhost:${testutil.ports.STSRealmRestServer}/RealmSecurityTokenService">
+                  depends-on="ClientAuthHttpsSettings"
+                  address="https://localhost:${testutil.ports.STSRealmRestServer}/RealmSecurityTokenService">
         <jaxrs:serviceBeans>
             <ref bean="realmRestSTS" />
         </jaxrs:serviceBeans>
         <jaxrs:providers>
+            <ref bean="realmSecurityConfigFilter"/>
+            <bean class="org.apache.cxf.rs.security.jose.jaxrs.JsonWebKeysProvider" />
             <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
         </jaxrs:providers>
     </jaxrs:server>

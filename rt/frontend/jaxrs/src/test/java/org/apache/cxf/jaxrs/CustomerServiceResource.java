@@ -16,16 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.sts.rest.impl;
 
-import java.util.Map;
+package org.apache.cxf.jaxrs;
 
-import org.apache.cxf.sts.RealmParser;
-import org.apache.cxf.ws.security.sts.provider.STSException;
-
-public class UriRealmParser implements RealmParser {
+public class CustomerServiceResource implements CustomerService {
     @Override
-    public String parseRealm(Map<String, Object> messageContext) throws STSException {
-        return (String)messageContext.get(RealmSecurityConfigurationFilter.REALM_NAME_PARAM.toUpperCase());
+    public CustomerServiceResponse process(CustomerServiceRequest request) {
+        CustomerServiceResponse customerServiceResponse = new CustomerServiceResponse();
+        customerServiceResponse.setResponseId(request.getRequestId());
+        return customerServiceResponse;
     }
 }

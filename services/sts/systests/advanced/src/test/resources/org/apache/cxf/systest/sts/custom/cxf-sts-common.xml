@@ -75,7 +75,7 @@
     <bean id="transportCustomBSTTokenProvider" class="org.apache.cxf.systest.sts.deployment.CustomBSTTokenProvider">
     </bean>
 
-    <bean id="customRealm" class="org.apache.cxf.sts.rest.token.realm.ExtRealmProperties">
+    <bean id="customRealm" class="org.apache.cxf.sts.rs.token.realm.ExtRealmProperties">
         <property name="issuer" value="STS Custom Realm" />
         <property name="name" value="custom-realm" />
         <property name="rsSecurityProperties">
@@ -148,11 +148,11 @@
         <property name="issuer" value="${issuer}"/>
         <property name="encryptionUsername" value="${encryption.username}"/>
         <property name="realmParser">
-            <bean class="org.apache.cxf.sts.rest.impl.UriRealmParser" />
+            <bean class="org.apache.cxf.sts.rs.impl.UriRealmParser" />
         </property>
     </bean>
     
-    <bean id="restSTS" class="org.apache.cxf.sts.rest.RESTSecurityTokenServiceImpl">
+    <bean id="restSTS" class="org.apache.cxf.sts.rs.RESTSecurityTokenServiceImpl">
         <property name="issueSingleOperation" ref="transportIssueDelegate" />
     </bean>
 </beans>

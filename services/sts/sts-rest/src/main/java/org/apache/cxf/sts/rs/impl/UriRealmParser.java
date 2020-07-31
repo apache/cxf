@@ -16,18 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.sts.cache;
+package org.apache.cxf.sts.rs.impl;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.sts.IdentityMapper;
+import java.util.Map;
 
-public class EhCacheIdentityCacheTest extends MemoryIdentityCacheTest {
+import org.apache.cxf.sts.RealmParser;
+import org.apache.cxf.ws.security.sts.provider.STSException;
 
+public class UriRealmParser implements RealmParser {
     @Override
-    protected AbstractIdentityCache getIdentityCache(IdentityMapper mapper) {
-        Bus bus = BusFactory.getDefaultBus();
-        return new EHCacheIdentityCache(mapper, bus);
+    public String parseRealm(Map<String, Object> messageContext) throws STSException {
+        return (String)messageContext.get(RealmSecurityConfigurationFilter.REALM_NAME_PARAM.toUpperCase());
     }
-
 }

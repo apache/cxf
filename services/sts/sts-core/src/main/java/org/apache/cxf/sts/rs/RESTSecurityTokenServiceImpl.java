@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.sts.rest;
+package org.apache.cxf.sts.rs;
 
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
@@ -68,8 +68,7 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
 
     public static final Map<String, String> DEFAULT_CLAIM_TYPE_MAP;
     public static final Map<String, String> DEFAULT_TOKEN_TYPE_MAP;
-
-    public static final Map<String, String> DEFAULT_KEY_TYPE_MAP = new HashMap<>();
+    public static final Map<String, String> DEFAULT_KEY_TYPE_MAP;
 
     private static final String CLAIM_TYPE = "ClaimType";
     private static final String CLAIM_TYPE_NS = "http://schemas.xmlsoap.org/ws/2005/05/identity";
@@ -95,9 +94,11 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
         tmpTokenTypeMap.put("sct", STSUtils.TOKEN_TYPE_SCT_05_12);
         DEFAULT_TOKEN_TYPE_MAP = Collections.unmodifiableMap(tmpTokenTypeMap);
 
-        DEFAULT_KEY_TYPE_MAP.put("SymmetricKey", STSConstants.SYMMETRIC_KEY_KEYTYPE);
-        DEFAULT_KEY_TYPE_MAP.put("PublicKey", STSConstants.PUBLIC_KEY_KEYTYPE);
-        DEFAULT_KEY_TYPE_MAP.put("Bearer", STSConstants.BEARER_KEY_KEYTYPE);
+        Map<String, String> tmpKeyTypeMap = new HashMap<>();
+        tmpKeyTypeMap.put("SymmetricKey", STSConstants.SYMMETRIC_KEY_KEYTYPE);
+        tmpKeyTypeMap.put("PublicKey", STSConstants.PUBLIC_KEY_KEYTYPE);
+        tmpKeyTypeMap.put("Bearer", STSConstants.BEARER_KEY_KEYTYPE);
+        DEFAULT_KEY_TYPE_MAP = Collections.unmodifiableMap(tmpKeyTypeMap);
     }
 
     @Context

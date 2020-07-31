@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.sts.rest.impl;
+package org.apache.cxf.sts.rs.impl;
 
 import java.util.Optional;
 
@@ -28,7 +28,7 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.STSConstants;
-import org.apache.cxf.sts.rest.api.GetTokenRequest;
+import org.apache.cxf.sts.rs.api.GetTokenRequest;
 import org.apache.cxf.ws.security.sts.provider.model.CancelTargetType;
 import org.apache.cxf.ws.security.sts.provider.model.ObjectFactory;
 import org.apache.cxf.ws.security.sts.provider.model.RenewTargetType;
@@ -37,8 +37,8 @@ import org.apache.cxf.ws.security.sts.provider.model.ValidateTargetType;
 
 import static java.util.Optional.ofNullable;
 import static org.apache.cxf.sts.STSConstants.WST_NS_05_12;
-import static org.apache.cxf.sts.rest.RESTSecurityTokenServiceImpl.DEFAULT_KEY_TYPE_MAP;
-import static org.apache.cxf.sts.rest.RESTSecurityTokenServiceImpl.DEFAULT_TOKEN_TYPE_MAP;
+import static org.apache.cxf.sts.rs.RESTSecurityTokenServiceImpl.DEFAULT_KEY_TYPE_MAP;
+import static org.apache.cxf.sts.rs.RESTSecurityTokenServiceImpl.DEFAULT_TOKEN_TYPE_MAP;
 
 public final class TokenUtils {
     public static final String BEARER_AUTH_SCHEMA = "Bearer";

@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
-import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.List;
 
@@ -42,6 +41,7 @@ import org.apache.cxf.common.util.CompressionUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.rs.security.jose.jaxrs.JsonWebKeysProvider;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
@@ -51,17 +51,15 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.cxf.rt.security.saml.utils.SAMLUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.sts.STSConstants;
-import org.apache.cxf.sts.rest.api.GetTokenRequest;
-import org.apache.cxf.sts.rest.api.RealmSecurityTokenService;
-import org.apache.cxf.sts.rest.api.TokenRequest;
-import org.apache.cxf.systest.sts.common.SecurityTestUtil;
+import org.apache.cxf.sts.rs.api.GetTokenRequest;
+import org.apache.cxf.sts.rs.api.RealmSecurityTokenService;
+import org.apache.cxf.sts.rs.api.TokenRequest;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.StatusType;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
-import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
@@ -113,7 +111,6 @@ public class STSRealmRestTest extends AbstractBusClientServerTestBase {
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
         stopAllServers();
     }
 
@@ -602,10 +599,9 @@ public class STSRealmRestTest extends AbstractBusClientServerTestBase {
         assertNotNull(jwt.getClaims().getExpiryTime());
         assertNotNull(jwt.getClaims().getIssuedAt());
 
-        CryptoType alias = new CryptoType(CryptoType.TYPE.ALIAS);
-        alias.setAlias("mystskey");
-        X509Certificate stsCertificate = serviceCrypto.getX509Certificates(alias)[0];
-        assertTrue(jwtConsumer.verifySignatureWith(stsCertificate, SignatureAlgorithm.RS256));
+        assertTrue(jwtConsumer.verifySignatureWith(
+                client().getPublicVerificationKeys(REALM).getKeys().iterator().next(),
+                SignatureAlgorithm.getAlgorithm(jwt.getJwsHeaders().getAlgorithm())));
 
         return jwt;
     }
@@ -624,11 +620,11 @@ public class STSRealmRestTest extends AbstractBusClientServerTestBase {
         return false;
     }
 
-    private RealmSecurityTokenService client() throws Exception {
+    private static RealmSecurityTokenService client() throws Exception {
         final RealmSecurityTokenService client = JAXRSClientFactory.create(
             "https://localhost:" + STSPORT + "/RealmSecurityTokenService",
-            RealmSecurityTokenService.class/*,
-            Collections.singletonList(new JacksonJsonProvider())*/);
+            RealmSecurityTokenService.class,
+            Collections.singletonList(new JsonWebKeysProvider()));
         WebClient.getConfig(client).getHttpConduit().setTlsClientParameters(tlsClientParameters);
         return client;
     }

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.sts.rest.impl;
+package org.apache.cxf.sts.rs.impl;
 
 import java.io.IOException;
 import java.util.List;
@@ -34,7 +34,7 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.sts.rest.token.realm.ExtRealmProperties;
+import org.apache.cxf.sts.rs.token.realm.ExtRealmProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,11 +44,11 @@ import static javax.ws.rs.Priorities.AUTHENTICATION;
 import static javax.ws.rs.core.HttpHeaders.ACCEPT;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static javax.ws.rs.core.MediaType.WILDCARD;
+import static org.apache.cxf.common.util.StringUtils.isEmpty;
 import static org.apache.cxf.jaxrs.utils.HttpUtils.getPathToMatch;
 import static org.apache.cxf.jaxrs.utils.HttpUtils.getProtocolHeader;
 import static org.apache.cxf.message.Message.HTTP_REQUEST_METHOD;
 import static org.apache.cxf.message.Message.PROTOCOL_HEADERS;
-import static org.springframework.util.CollectionUtils.isEmpty;
 
 @PreMatching
 @Priority(AUTHENTICATION)

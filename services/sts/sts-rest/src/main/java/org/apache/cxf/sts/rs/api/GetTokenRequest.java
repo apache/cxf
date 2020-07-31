@@ -16,43 +16,38 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.sts.rest.api;
+package org.apache.cxf.sts.rs.api;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
- * Class describes request model for remove, renew and validate token endpoints
+ * Class describes request model for getTokenExchange and getToken endpoints
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "TokenRequest", propOrder = {
-        "tokenType",
-        "token"
-})
+@XmlType(name = "TokenRequest")
 @XmlRootElement(name = "TokenRequest")
-public class TokenRequest implements Serializable {
+public class GetTokenRequest implements Serializable {
     private static final long serialVersionUID = 100L;
 
     @XmlElement(required = true)
     private String tokenType;
 
-    @XmlAnyElement(lax = true)
-//    @XmlElement(required = true)
-    private Object token;
+    @XmlElement(required = true)
+    private String keyType;
 
-    public Object getToken() {
-        return token;
-    }
+    @XmlElement(required = true)
+    private List<String> claims = new ArrayList();
 
-    public void setToken(Object token) {
-        this.token = token;
-    }
+    @XmlElement
+    private String audience;
 
     public String getTokenType() {
         return tokenType;
@@ -62,4 +57,29 @@ public class TokenRequest implements Serializable {
         this.tokenType = tokenType;
     }
 
+    public List<String> getClaims() {
+        return claims;
+    }
+
+    public void setClaims(List<String> claims) {
+        this.claims = claims;
+    }
+
+    public String getAudience() {
+        return audience;
+    }
+
+    public void setAudience(String audience) {
+        this.audience = audience;
+    }
+
+    public String getKeyType() {
+        return keyType;
+    }
+
+    public void setKeyType(String keyType) {
+        this.keyType = keyType;
+    }
 }
+
+

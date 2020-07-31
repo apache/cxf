@@ -40,15 +40,15 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-
+    
     <bean id="hokDelegationHandler" class="org.apache.cxf.sts.token.delegation.HOKDelegationHandler"/>
     <bean id="utDelegationHandler" class="org.apache.cxf.sts.token.delegation.UsernameTokenDelegationHandler"/>
-
+    
     <util:list id="delegationHandlers">
         <ref bean="hokDelegationHandler"/>
         <ref bean="utDelegationHandler"/>
     </util:list>
-
+    
     <bean id="transportIssueDelegate" class="org.apache.cxf.sts.operation.TokenIssueOperation">
         <property name="tokenProviders" ref="transportTokenProviders"/>
         <property name="tokenValidators" ref="transportTokenValidators"/>
@@ -120,19 +120,21 @@
         <property name="issuer" value="DoubleItSTSIssuer"/>
         <property name="encryptionUsername" value="myservicekey"/>
     </bean>
-
+    
     <bean id="claimsManager" class="org.apache.cxf.sts.claims.ClaimsManager">
         <property name="claimHandlers" ref="customClaimsHandler"/>
     </bean>
     <bean id="customClaimsHandler" class="org.apache.cxf.systest.sts.deployment.CustomClaimsHandler">
     </bean>
-
-    <bean id="restSTS" class="org.apache.cxf.sts.rest.RESTSecurityTokenServiceImpl">
+    
+    <bean id="restSTS" class="org.apache.cxf.sts.rs.RESTSecurityTokenServiceImpl">
         <property name="issueSingleOperation" ref="transportIssueDelegate" />
         <property name="validateOperation" ref="transportValidateDelegate" />
         <property name="renewOperation" ref="transportRenewDelegate"/>
     </bean>
-
+    
+    <bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
+    
     <jaxrs:server id="stsRESTService"
        depends-on="ClientAuthHttpsSettings" 
        address="https://localhost:${testutil.ports.STSRESTServer}/SecurityTokenService">
@@ -140,14 +142,14 @@
             <ref bean="restSTS" />
         </jaxrs:serviceBeans>
         <jaxrs:providers>
-            <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
+            <ref bean="jsonProvider" />
         </jaxrs:providers>
         <jaxrs:extensionMappings>
             <entry key="json" value="application/json;charset=UTF-8" />
             <entry key="xml" value="application/xml;charset=UTF-8" />
         </jaxrs:extensionMappings>
     </jaxrs:server>
-
+    
     <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
         <httpj:engine port="${testutil.ports.STSRESTServer}">
             <httpj:tlsServerParameters>

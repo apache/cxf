@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.sts.rest.impl;
+package org.apache.cxf.sts.rs.impl;
 
 import java.util.List;
 
@@ -25,16 +25,16 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
-import org.apache.cxf.sts.rest.RESTSecurityTokenServiceImpl;
-import org.apache.cxf.sts.rest.api.GetTokenRequest;
-import org.apache.cxf.sts.rest.api.RealmSecurityTokenService;
-import org.apache.cxf.sts.rest.api.TokenRequest;
+import org.apache.cxf.sts.rs.RESTSecurityTokenServiceImpl;
+import org.apache.cxf.sts.rs.api.GetTokenRequest;
+import org.apache.cxf.sts.rs.api.RealmSecurityTokenService;
+import org.apache.cxf.sts.rs.api.TokenRequest;
 
 import io.swagger.v3.oas.annotations.Hidden;
 
 import static org.apache.cxf.jaxrs.utils.JAXRSUtils.getCurrentMessage;
-import static org.apache.cxf.sts.rest.RESTSecurityTokenService.Action.renew;
-import static org.apache.cxf.sts.rest.RESTSecurityTokenService.Action.validate;
+import static org.apache.cxf.sts.rs.RESTSecurityTokenService.Action.renew;
+import static org.apache.cxf.sts.rs.RESTSecurityTokenService.Action.validate;
 
 
 public class RealmSecurityTokenServiceImpl implements RealmSecurityTokenService {
@@ -106,7 +106,7 @@ public class RealmSecurityTokenServiceImpl implements RealmSecurityTokenService 
     }
 
     @Override
-    public JsonWebKeys getPublicVerificationKeys() {
+    public JsonWebKeys getPublicVerificationKeys(String realm) {
         setContext();
         return JwkOperation.loadPublicKeys(getCurrentMessage());
     }

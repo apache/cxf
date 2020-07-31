@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.sts.rest;
+package org.apache.cxf.sts.rs;
 
 import java.util.List;
 

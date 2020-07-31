@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.sts.rest.authentication;
+package org.apache.cxf.sts.rs.authentication;
 
 import java.util.Map;
 import java.util.Optional;
@@ -27,7 +27,7 @@ import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.SecurityContext;
 
 import org.apache.cxf.jaxrs.security.JAASAuthenticationFilter;
-import org.apache.cxf.sts.rest.token.realm.ExtRealmProperties;
+import org.apache.cxf.sts.rs.token.realm.ExtRealmProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ import static java.util.Optional.ofNullable;
 import static javax.ws.rs.Priorities.AUTHENTICATION;
 import static javax.ws.rs.core.SecurityContext.BASIC_AUTH;
 import static org.apache.cxf.jaxrs.utils.JAXRSUtils.getCurrentMessage;
-import static org.apache.cxf.sts.rest.impl.RealmSecurityConfigurationFilter.REALM_NAME_PARAM;
+import static org.apache.cxf.sts.rs.impl.RealmSecurityConfigurationFilter.REALM_NAME_PARAM;
 
 @PreMatching
 @Priority(AUTHENTICATION)

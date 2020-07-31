@@ -159,6 +159,12 @@
             <artifactId>commons-io</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.cxf.services.sts.systests</groupId>
+            <artifactId>cxf-services-sts-systests-basic</artifactId>
+            <version>3.4.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
     <build>

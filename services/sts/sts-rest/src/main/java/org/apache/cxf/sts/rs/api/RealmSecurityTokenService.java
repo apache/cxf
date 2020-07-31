@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.sts.rest.api;
+package org.apache.cxf.sts.rs.api;
 
 import java.util.List;
 
@@ -236,6 +236,7 @@ public interface RealmSecurityTokenService {
         GetTokenRequest request);
 
     @GET
+    @PathParam("realm")
     @Path("/jwk/keys")
     @Produces({"application/json"})
     @Operation(
@@ -246,6 +247,9 @@ public interface RealmSecurityTokenService {
                 description = "In case wrong configuration of RS security for requested realm")
         }
     )
-    JsonWebKeys getPublicVerificationKeys();
+    JsonWebKeys getPublicVerificationKeys(
+            @PathParam("realm")
+            @Parameter(name = "realm", description = "Name of realm", required = true)
+            String realm);
 
 }

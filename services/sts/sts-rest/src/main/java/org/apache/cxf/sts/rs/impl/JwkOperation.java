@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.sts.rest.impl;
+package org.apache.cxf.sts.rs.impl;
 
 import java.security.PublicKey;
 import java.util.Properties;
