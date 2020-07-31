@@ -82,7 +82,7 @@ pipeline {
                 }
               }
             }
-            stage('Build Source & JavaDoc') {
+            /* stage('Build Source & JavaDoc') {
               when {
                 branch 'master'
               }
@@ -112,7 +112,7 @@ pipeline {
                   sh 'mvn sonar:sonar -DskipAssembly -Dsonar.projectKey=cxf -Dsonar.organization=apache -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN}'
                 }
               }
-            }
+            } */
           }
           post {
             always {
