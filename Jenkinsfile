@@ -4,7 +4,7 @@ pipeline {
   agent none
   options {
     buildDiscarder logRotator(daysToKeepStr: '14', numToKeepStr: '10')
-    timeout(80)
+    timeout(140)
     disableConcurrentBuilds()
     skipStagesAfterUnstable()
     quietPeriod(30)
