@@ -26,62 +26,41 @@ pipeline {
       }
     }
     stage('Build') {
-      parallel {
-        stage('JDK 11') {
-          agent {
-            label 'ubuntu'
-          }
-          tools {
-            jdk 'JDK 11 (latest)'
-            maven 'Maven (latest)'
-          }
-          environment {
-            MAVEN_OPTS = "-Xmx1024m"
-          }
-          stages {
-            stage('Build & Test JDK 11') {
-              steps {
-                sh 'mvn -B clean install'
-                // step([$class: 'JiraIssueUpdater', issueSelector: [$class: 'DefaultIssueSelector'], scm: scm])
-              }
-              post {
-                always {
-                  junit(testResults: '**/surefire-reports/*.xml', allowEmptyResults: true)
-                  junit(testResults: '**/failsafe-reports/*.xml', allowEmptyResults: true)
-                }
-              }
-            }
-          }
-          post {
-            always {
-              cleanWs deleteDirs: true, patterns: [[pattern: '**/target/**', type: 'INCLUDE']]
-            }
+      matrix {
+        agent {
+          label 'ubuntu'
+        }
+        axes {
+          axis {
+            name 'JDK'
+            values 'JDK 8', 'JDK 11'
           }
         }
-        stage('JDK 8') {
-          agent {
-            label 'ubuntu'
-          }
-          tools {
-            jdk 'JDK 1.8 (latest)'
-            maven 'Maven (latest)'
-          }
-          environment {
-            MAVEN_OPTS = "-Xmx1024m"
-          }
-          stages {
-            stage('Build & Test JDK 8') {
-              steps {
-                sh 'mvn -B clean install'
-                // step([$class: 'JiraIssueUpdater', issueSelector: [$class: 'DefaultIssueSelector'], scm: scm])
-              }
-              post {
-                always {
-                  junit(testResults: '**/surefire-reports/*.xml', allowEmptyResults: true)
-                  junit(testResults: '**/failsafe-reports/*.xml', allowEmptyResults: true)
+        stages {
+          stage('${JDK}') {
+            agent {
+              label 'ubuntu'
+            }
+            tools {
+              jdk '${JDK} (latest)'
+              maven 'Maven (latest)'
+            }
+            environment {
+              MAVEN_OPTS = "-Xmx1024m"
+            }
+            stages {
+              stage('Build & Test ${JDK}') {
+                steps {
+                  sh 'mvn -B clean install'
+                  // step([$class: 'JiraIssueUpdater', issueSelector: [$class: 'DefaultIssueSelector'], scm: scm])
+                }
+                post {
+                  always {
+                    junit(testResults: '**/surefire-reports/*.xml', allowEmptyResults: true)
+                    junit(testResults: '**/failsafe-reports/*.xml', allowEmptyResults: true)
+                  }
                 }
               }
-            }
             /* stage('Build Source & JavaDoc') {
               when {
                 branch 'master'
