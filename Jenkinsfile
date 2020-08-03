@@ -42,7 +42,7 @@ pipeline {
               label 'ubuntu'
             }
             tools {
-              jdk '${JDK}'
+              jdk ${JDK}
               maven 'Maven (latest)'
             }
             environment {
