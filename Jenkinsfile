@@ -61,7 +61,7 @@ pipeline {
                   }
                 }
               }
-            /* stage('Build Source & JavaDoc') {
+              /* stage('Build Source & JavaDoc') {
               when {
                 branch 'master'
               }
@@ -92,10 +92,11 @@ pipeline {
                 }
               }
             } */
-          }
-          post {
-            always {
-              cleanWs deleteDirs: true, patterns: [[pattern: '**/target/**', type: 'INCLUDE']]
+            }
+            post {
+              always {
+                cleanWs deleteDirs: true, patterns: [[pattern: '**/target/**', type: 'INCLUDE']]
+              }
             }
           }
         }
