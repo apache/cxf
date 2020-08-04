@@ -32,7 +32,7 @@ pipeline {
         }
         axes {
           axis {
-            name 'JDK'
+            name 'JAVA_VERSION'
             values 'JDK 8 (latest)', 'JDK 11 (latest)'
           }
         }
@@ -42,7 +42,7 @@ pipeline {
               label 'ubuntu'
             }
             tools {
-              jdk "${JDK}"
+              jdk "${JAVA_VERSION}"
               maven 'Maven (latest)'
             }
             environment {
