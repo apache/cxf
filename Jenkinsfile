@@ -37,7 +37,7 @@ pipeline {
           }
         }
         stages {
-          stage("${JDK}") {
+          stage('JDK specific build') {
             agent {
               label 'ubuntu'
             }
