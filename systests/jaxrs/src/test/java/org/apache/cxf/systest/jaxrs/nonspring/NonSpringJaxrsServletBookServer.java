@@ -17,26 +17,30 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs;
+package org.apache.cxf.systest.jaxrs.nonspring;
 
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
-public class NonSpringJaxrsServletBookServer2 extends AbstractBusTestServerBase {
-    public static final String PORT = allocatePort(NonSpringJaxrsServletBookServer2.class);
+public class NonSpringJaxrsServletBookServer extends AbstractBusTestServerBase {
+    public static final String PORT = allocatePort(NonSpringJaxrsServletBookServer.class);
     private org.eclipse.jetty.server.Server server;
 
     protected void run() {
         server = new org.eclipse.jetty.server.Server(Integer.parseInt(PORT));
 
         final ServletHolder servletHolder =
-            new ServletHolder(new CXFNonSpringJaxrsServlet(new BookApplicationNonSpring()));
+            new ServletHolder(new CXFNonSpringJaxrsServlet(new BookStoreOpenAPI()));
         final ServletContextHandler context = new ServletContextHandler();
         context.setContextPath("/");
         context.addServlet(servletHolder, "/*");
         //servletHolder.setInitParameter("jaxrs.serviceClasses", BookStore.class.getName());
+        servletHolder.setInitParameter("jaxrs.outInterceptors", LoggingOutInterceptor.class.getName());
+        servletHolder.setInitParameter("jaxrs.inInterceptors", LoggingInInterceptor.class.getName());
 
         server.setHandler(context);
         try {
@@ -57,7 +61,7 @@ public class NonSpringJaxrsServletBookServer2 extends AbstractBusTestServerBase 
 
     public static void main(String[] args) {
         try {
-            NonSpringJaxrsServletBookServer2 s = new NonSpringJaxrsServletBookServer2();
+            NonSpringJaxrsServletBookServer s = new NonSpringJaxrsServletBookServer();
             s.start();
         } catch (Exception ex) {
             ex.printStackTrace();

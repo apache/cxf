@@ -17,12 +17,13 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs;
+package org.apache.cxf.systest.jaxrs.nonspring;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
 import org.apache.cxf.feature.Features;
+import org.apache.cxf.systest.jaxrs.Book;
 
 @Path("/bookstore")
 @Features(features = "org.apache.cxf.jaxrs.openapi.OpenApiFeature")
