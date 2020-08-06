@@ -1600,7 +1600,7 @@ public abstract class HTTPConduit
             }
             if (exchange != null) {
                 exchange.put(Message.RESPONSE_CODE, rc);
-                if (rc == 404 || rc == 503) {
+                if (rc == 404 || rc == 503 || rc == 429) {
                     exchange.put("org.apache.cxf.transport.service_not_available", true);
                 }
             }
