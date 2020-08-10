@@ -44,6 +44,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 
 import javax.activation.CommandInfo;
 import javax.activation.CommandMap;
@@ -54,6 +55,7 @@ import javax.activation.FileDataSource;
 import javax.activation.MailcapCommandMap;
 import javax.activation.URLDataSource;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -64,6 +66,8 @@ import org.apache.cxf.message.MessageUtils;
 
 public final class AttachmentUtil {
     public static final String BODY_ATTACHMENT_ID = "root.message@cxf.apache.org";
+
+    private static final Logger LOG = LogUtils.getL7dLogger(AttachmentUtil.class);
 
     private static final AtomicInteger COUNTER = new AtomicInteger();
     private static final String ATT_UUID = UUID.randomUUID().toString();
@@ -165,18 +169,34 @@ public final class AttachmentUtil {
         Object directory = message.getContextualProperty(AttachmentDeserializer.ATTACHMENT_DIRECTORY);
         if (directory != null) {
             if (directory instanceof File) {
-                bos.setOutputDir((File)directory);
+                bos.setOutputDir((File) directory);
+            } else if (directory instanceof String) {
+                bos.setOutputDir(new File((String) directory));
             } else {
-                bos.setOutputDir(new File((String)directory));
+                throw new IOException("The value set as " + AttachmentDeserializer.ATTACHMENT_DIRECTORY
+                        + " should be either an instance of File or String");
             }
         }
 
         Object threshold = message.getContextualProperty(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD);
         if (threshold != null) {
-            if (threshold instanceof Long) {
-                bos.setThreshold((Long)threshold);
+            if (threshold instanceof Number) {
+                long t = ((Number) threshold).longValue();
+                if (t >= 0) {
+                    bos.setThreshold(t);
+                } else {
+                    LOG.warning("Threshold value overflowed long. Setting default value!");
+                    bos.setThreshold(AttachmentDeserializer.THRESHOLD);
+                }
+            } else if (threshold instanceof String) {
+                try {
+                    bos.setThreshold(Long.parseLong((String) threshold));
+                } catch (NumberFormatException e) {
+                    throw new IOException("Provided threshold String is not a number", e);
+                }
             } else {
-                bos.setThreshold(Long.parseLong((String)threshold));
+                throw new IOException("The value set as " + AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD
+                        + " should be either an instance of Number or String");
             }
         } else if (!CachedOutputStream.isThresholdSysPropSet()) {
             // Use the default AttachmentDeserializer Threshold only if there is no system property defined
@@ -185,10 +205,22 @@ public final class AttachmentUtil {
 
         Object maxSize = message.getContextualProperty(AttachmentDeserializer.ATTACHMENT_MAX_SIZE);
         if (maxSize != null) {
-            if (maxSize instanceof Long) {
-                bos.setMaxSize((Long) maxSize);
+            if (maxSize instanceof Number) {
+                long size = ((Number) maxSize).longValue();
+                if (size >= 0) {
+                    bos.setMaxSize(size);
+                } else {
+                    LOG.warning("Max size value overflowed long. Do not set max size!");
+                }
+            } else if (maxSize instanceof String) {
+                try {
+                    bos.setMaxSize(Long.parseLong((String) maxSize));
+                } catch (NumberFormatException e) {
+                    throw new IOException("Provided threshold String is not a number", e);
+                }
             } else {
-                bos.setMaxSize(Long.parseLong((String)maxSize));
+                throw new IOException("The value set as " + AttachmentDeserializer.ATTACHMENT_MAX_SIZE
+                        + " should be either an instance of Number or String");
             }
         }
     }
