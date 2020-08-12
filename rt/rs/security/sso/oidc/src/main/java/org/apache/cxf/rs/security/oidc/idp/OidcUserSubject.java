@@ -55,7 +55,7 @@ public class OidcUserSubject extends UserSubject {
 
     @Lob
     @Basic(fetch = FetchType.EAGER)
-    @Column(length = 1024)
+    @Column(columnDefinition = "blob")
     public IdToken getIdToken() {
         return idToken;
     }
@@ -66,7 +66,7 @@ public class OidcUserSubject extends UserSubject {
 
     @Lob
     @Basic(fetch = FetchType.EAGER)
-    @Column(length = 1024)
+    @Column(columnDefinition = "blob")
     public UserInfo getUserInfo() {
         return userInfo;
     }

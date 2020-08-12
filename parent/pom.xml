@@ -119,7 +119,7 @@
         <cxf.guava.version>29.0-jre</cxf.guava.version>
         <cxf.hamcrest.version>1.3</cxf.hamcrest.version>
         <cxf.hazelcast.version>3.12.7</cxf.hazelcast.version>
-        <cxf.hibernate.em.version>5.4.18.Final</cxf.hibernate.em.version>
+        <cxf.hibernate.em.version>5.4.19.Final</cxf.hibernate.em.version>
         <cxf.hibernate.validator.version>6.1.4.Final</cxf.hibernate.validator.version>
         <cxf.hsqldb.version>2.5.1</cxf.hsqldb.version>
         <cxf.httpcomponents.asyncclient.version.range>[4.0,4.2)</cxf.httpcomponents.asyncclient.version.range>
