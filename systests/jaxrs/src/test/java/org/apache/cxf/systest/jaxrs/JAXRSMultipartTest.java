@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -37,12 +38,17 @@ import java.util.Map;
 import javax.activation.DataHandler;
 import javax.imageio.ImageIO;
 import javax.mail.util.ByteArrayDataSource;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
+
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
@@ -52,6 +58,7 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.AttachmentBuilder;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.cxf.jaxrs.ext.multipart.InputStreamDataSource;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
@@ -72,10 +79,12 @@ import org.apache.http.util.EntityUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
@@ -1007,6 +1016,30 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         assertEquals(response.getStatus(), 200);
 
         client.close();
+    }
+
+    @Test
+    public void testUpdateBookMultipart() {
+        final WebTarget target = ClientBuilder
+            .newClient()
+            .register(JacksonJsonProvider.class)
+            .target("http://localhost:" + PORT + "/bookstore");
+
+        final MultipartBody builder = new MultipartBody(Arrays.asList(
+                new AttachmentBuilder()
+                    .id("name")
+                    .contentDisposition(new ContentDisposition("form-data; name=\"name\""))
+                    .object("The Book")
+                    .build()
+            ));
+        
+        try (Response response = target
+                .path("1")
+                .request()
+                .put(Entity.entity(builder, MediaType.MULTIPART_FORM_DATA))) {
+            assertThat(response.getStatus(), equalTo(200));
+            assertThat(response.readEntity(Book.class).getName(), equalTo("The Book"));
+        }
     }
 
     private void doAddBook(String address, String resourceName, int status) throws Exception {
