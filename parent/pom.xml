@@ -130,7 +130,7 @@
         <cxf.jackson.version>2.11.2</cxf.jackson.version>
         <cxf.jackson.databind.version>2.11.2</cxf.jackson.databind.version>
         <cxf.jacorb.version>3.9</cxf.jacorb.version>
-        <cxf.jaeger.version>1.3.1</cxf.jaeger.version>
+        <cxf.jaeger.version>1.3.2</cxf.jaeger.version>
         <cxf.jakarta.activation.version>1.2.2</cxf.jakarta.activation.version>
         <cxf.james.mim4j.version>0.7.2</cxf.james.mim4j.version>
         <cxf.javassist.version>3.25.0-GA</cxf.javassist.version>
