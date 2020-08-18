@@ -100,7 +100,7 @@
         <cxf.commons-lang3.version>3.11</cxf.commons-lang3.version>
         <cxf.commons-logging.version>1.2</cxf.commons-logging.version>
         <cxf.commons-text.version>1.9</cxf.commons-text.version>
-        <cxf.derby.version>10.14.2.0</cxf.derby.version>
+        <cxf.derby.version>10.15.2.0</cxf.derby.version>
         <cxf.dom4j.version>2.1.3</cxf.dom4j.version>
         <cxf.dropwizard3.version>3.2.6</cxf.dropwizard3.version>
         <cxf.dropwizard4.version>4.1.12.1</cxf.dropwizard4.version>
@@ -882,6 +882,16 @@
             <dependency>
                 <groupId>org.apache.derby</groupId>
                 <artifactId>derby</artifactId>
+                <version>${cxf.derby.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derbyshared</artifactId>
+                <version>${cxf.derby.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derbytools</artifactId>
                 <version>${cxf.derby.version}</version>
             </dependency>
             <dependency>
