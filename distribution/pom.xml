@@ -425,7 +425,6 @@
         <dependency>
             <groupId>jakarta.xml.ws</groupId>
             <artifactId>jakarta.xml.ws-api</artifactId>
-            <version>2.3.3</version>
         </dependency>
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
@@ -434,12 +433,10 @@
         <dependency>
             <groupId>jakarta.jws</groupId>
             <artifactId>jakarta.jws-api</artifactId>
-            <version>1.1.1</version>
         </dependency>
         <dependency>
             <groupId>jakarta.xml.soap</groupId>
             <artifactId>jakarta.xml.soap-api</artifactId>
-            <version>1.4.2</version>
         </dependency>
     </dependencies>
     <build>
