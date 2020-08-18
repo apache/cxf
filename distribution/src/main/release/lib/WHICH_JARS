@@ -6,8 +6,8 @@ specific parts of CXF.
 The 'manifest jar' is a jar containing only a MANIFEST.MF with a classpath
 that calls in all the other jar.
 
-Jars marked with a [7] at the end are optional for Java 7 as the 
-functionality provided by those jars are provided in the JDK.
+!!Please note the following list is outdated and needs an update!!
+Use the mvn dependency:list command to identify dependencies in the meantime.
 
 The following jars are required for all CXF usage:
 - cxf-core.jar
