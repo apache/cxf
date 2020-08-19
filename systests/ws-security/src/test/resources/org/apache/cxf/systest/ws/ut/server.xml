@@ -63,6 +63,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="PlaintextSupporting" address="https://localhost:${testutil.ports.ut.Server}/DoubleItUTPlaintextSupporting" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextSupportingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="ws-security.actor" value="recipient"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="PlaintextSupportingSP11" address="https://localhost:${testutil.ports.ut.Server}/DoubleItUTPlaintextSupportingSP11" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextSupportingSP11Port" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">

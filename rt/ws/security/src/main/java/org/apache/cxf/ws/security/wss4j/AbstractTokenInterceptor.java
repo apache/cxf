@@ -149,12 +149,16 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
     }
 
     protected Header findSecurityHeader(SoapMessage message, boolean create) {
+        String actor = (String)message.getContextualProperty(SecurityConstants.ACTOR);
         for (Header h : message.getHeaders()) {
             QName n = h.getName();
             if ("Security".equals(n.getLocalPart())
                 && (n.getNamespaceURI().equals(WSS4JConstants.WSSE_NS)
                     || n.getNamespaceURI().equals(WSS4JConstants.WSSE11_NS))) {
-                return h;
+                String receivedActor = ((SoapHeader)h).getActor();
+                if (actor == null || actor.equalsIgnoreCase(receivedActor)) {
+                    return h;
+                }
             }
         }
         if (!create) {
@@ -163,8 +167,12 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
         Document doc = DOMUtils.getEmptyDocument();
         Element el = doc.createElementNS(WSS4JConstants.WSSE_NS, "wsse:Security");
         el.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsse", WSS4JConstants.WSSE_NS);
+
         SoapHeader sh = new SoapHeader(new QName(WSS4JConstants.WSSE_NS, "Security"), el);
         sh.setMustUnderstand(true);
+        if (actor != null && actor.length() > 0) {
+            sh.setActor(actor);
+        }
         message.getHeaders().add(sh);
         return sh;
     }
