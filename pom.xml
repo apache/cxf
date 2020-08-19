@@ -469,7 +469,7 @@
                         <encoding>UTF-8</encoding>
                         <detectOfflineLinks>false</detectOfflineLinks>
                         <notimestamp>true</notimestamp>
-                        <additionalJOption>-Xdoclint:none</additionalJOption>
+                        <doclint>none</doclint>
                         <!--subpackages>org.apache.cxf</subpackages-->
                     </configuration>
                 </plugin>
