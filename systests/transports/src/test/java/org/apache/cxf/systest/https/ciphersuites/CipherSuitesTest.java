@@ -535,7 +535,7 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         tmf.init(ts);
 
-        SSLContext sslContext = SSLContext.getInstance("TLSv1");
+        SSLContext sslContext = SSLContext.getInstance("TLSv1.1");
         sslContext.init(null, tmf.getTrustManagers(), new java.security.SecureRandom());
 
         TLSClientParameters tlsParams = new TLSClientParameters();
