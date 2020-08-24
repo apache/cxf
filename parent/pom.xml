@@ -185,7 +185,7 @@
         <cxf.rhino.version>1.7R2</cxf.rhino.version>
         <cxf.rxjava.version>1.3.8</cxf.rxjava.version>
         <cxf.rxjava2.version>2.2.19</cxf.rxjava2.version>
-        <cxf.rxjava3.version>3.0.5</cxf.rxjava3.version>
+        <cxf.rxjava3.version>3.0.6</cxf.rxjava3.version>
         <cxf.saaj-impl.version>1.5.2</cxf.saaj-impl.version>
         <cxf.servlet-api.artifact>jakarta.servlet-api</cxf.servlet-api.artifact>
         <cxf.servlet-api.group>jakarta.servlet</cxf.servlet-api.group>
