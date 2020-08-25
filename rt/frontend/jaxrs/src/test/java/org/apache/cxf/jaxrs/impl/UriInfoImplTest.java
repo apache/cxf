@@ -301,6 +301,19 @@ public class UriInfoImplTest {
         assertEquals("Wrong query value", qps.get("n").get(1), "3");
         assertEquals("Wrong query value", qps.get("b").get(0), "2");
         assertEquals("Wrong query value", qps.get("a.b").get(0), "ab");
+
+        Message m = mockMessage("http://localhost:8080/baz", "/bar",
+                "N=0&n=1%202&n=3&&b=2&a%2Eb=ab");
+        m.put("parse.query.value.as.collection", Boolean.TRUE);
+        u = new UriInfoImpl(m, null);
+
+        qps = u.getQueryParameters();
+        assertEquals("Number of queries is wrong", 4, qps.size());
+        assertEquals("Wrong query value", qps.get("N").get(0), "0");
+        assertEquals("Wrong query value", qps.get("n").get(0), "1 2");
+        assertEquals("Wrong query value", qps.get("n").get(1), "3");
+        assertEquals("Wrong query value", qps.get("b").get(0), "2");
+        assertEquals("Wrong query value", qps.get("a.b").get(0), "ab");
     }
 
     @Test

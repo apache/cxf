@@ -1325,8 +1325,10 @@ public final class JAXRSUtils {
                     value = index < part.length() ? part.substring(index + 1) : "";
                 }
                 if (valueIsCollection) {
-                    for (String s : value.split(",")) {
-                        addStructuredPartToMap(queries, sep, name, s, decode, decodePlus);
+                    if (value != null) {
+                        for (String s : value.split(",")) {
+                            addStructuredPartToMap(queries, sep, name, s, decode, decodePlus);
+                        }
                     }
                 } else {
                     addStructuredPartToMap(queries, sep, name, value, decode, decodePlus);
