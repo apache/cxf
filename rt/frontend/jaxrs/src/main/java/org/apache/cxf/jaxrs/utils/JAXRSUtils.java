@@ -880,7 +880,11 @@ public final class JAXRSUtils {
         MediaType mt = mc.getHttpHeaders().getMediaType();
 
         InputStream is;
-        if (mt == null || mt.isCompatible(MediaType.APPLICATION_FORM_URLENCODED_TYPE)) {
+        if (
+            mt == null
+            || mt.isCompatible(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
+            || mt.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)
+        ) {
             is = copyAndGetEntityStream(message);
         } else {
             is = message.getContent(InputStream.class);
