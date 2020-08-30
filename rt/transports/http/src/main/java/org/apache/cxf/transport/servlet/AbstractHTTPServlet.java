@@ -28,10 +28,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterConfig;
@@ -308,7 +310,10 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
             String originalPrefix = request.getHeader(X_FORWARDED_PREFIX_HEADER);
             String originalHost = request.getHeader(X_FORWARDED_HOST_HEADER);
             String originalPort = request.getHeader(X_FORWARDED_PORT_HEADER);
-            if (originalProtocol != null || originalRemoteAddr != null) {
+            
+            // If at least one of the X-Forwarded-Xxx headers is set, try to use them
+            if (Stream.of(originalProtocol, originalRemoteAddr, originalPrefix, 
+                    originalHost, originalPort).anyMatch(Objects::nonNull)) {
                 return new HttpServletRequestXForwardedFilter(request, 
                                                               originalProtocol, 
                                                               originalRemoteAddr,
