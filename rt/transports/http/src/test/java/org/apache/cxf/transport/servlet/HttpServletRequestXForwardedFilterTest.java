@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -182,7 +183,7 @@ public class HttpServletRequestXForwardedFilterTest {
         servlet.service(request, response);
     }
     
-    private AbstractHTTPServlet servlet(BiConsumer<HttpServletRequest, HttpServletResponse> assertions) {
+    private static AbstractHTTPServlet servlet(BiConsumer<HttpServletRequest, HttpServletResponse> assertions) {
         return new AbstractHTTPServlet() {
             private static final long serialVersionUID = -3870709934037062681L;
 
