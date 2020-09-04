@@ -447,7 +447,7 @@ public abstract class AbstractClient implements Client {
             if (null == entry.getKey()) {
                 continue;
             }
-            if (entry.getValue().size() > 0) {
+            if (!entry.getValue().isEmpty()) {
                 if (HttpUtils.isDateRelatedHeader(entry.getKey())) {
                     currentResponseBuilder.header(entry.getKey(), entry.getValue().get(0));
                     continue;
@@ -868,15 +868,7 @@ public abstract class AbstractClient implements Client {
                     quote = !quote;
                     break;
                 case '\\':
-                    if (quote) {
-                        pos++;
-                        if (pos <= lastIndex) {
-                            sb.append(chars[pos]);
-                        }
-                        if (pos == lastIndex) {
-                            results.add(sb.toString());
-                        }
-                    } else {
+                    if (!quote) {
                         sb.append(c);
                     }
                     break;

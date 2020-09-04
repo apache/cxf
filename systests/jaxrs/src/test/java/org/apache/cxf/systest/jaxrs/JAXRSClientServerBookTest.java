@@ -2841,7 +2841,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertEquals(3, header2.size());
         assertEquals("\"some text\"", header2.get(0));
         assertEquals("\"quoted,text\"", header2.get(1));
-        assertEquals("\"even more text\"", header2.get(2));
+        assertEquals("\"and backslash\"", header2.get(2));
 
         List<Object> header3 = r.getMetadata().get("SomeHeader3");
         assertEquals(1, header3.size());
