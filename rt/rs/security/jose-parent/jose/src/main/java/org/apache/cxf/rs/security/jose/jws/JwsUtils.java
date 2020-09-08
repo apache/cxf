@@ -416,7 +416,7 @@ public final class JwsUtils {
         } else {
             SignatureAlgorithm signatureAlgo = getSignatureAlgorithm(m, props, null, null);
             if (signatureAlgo == SignatureAlgorithm.NONE
-                && SignatureAlgorithm.NONE.getJwaName().equals(inHeaders.getAlgorithm())) {
+                && (null == inHeaders || SignatureAlgorithm.NONE.getJwaName().equals(inHeaders.getAlgorithm()))) {
                 theVerifier = new NoneJwsSignatureVerifier();
             } else {
                 X509Certificate[] certs = KeyManagementUtils.loadX509CertificateOrChain(m, props);
