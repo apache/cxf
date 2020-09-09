@@ -186,17 +186,33 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
             doTestPerRequest("http://localhost:" + PORT + "/application11/thebooks/bookstore2/bookheaders");
         assertEquals("TheBook", r.getHeaderString("BookWriter"));
     }
+    
+    @Test
+    public void testGetBook123Application11PerRequestWithHeader() throws Exception {
+        Response r = 
+            doTestPerRequest("http://localhost:" + PORT + "/application11/thebooks/bookstore2/bookheaders", 
+                "PropValue");
+        assertEquals("PropValue", r.getHeaderString("X-Book-Header"));
+    }
+
 
     @Test
     public void testGetBook123TwoApplications() throws Exception {
         doTestPerRequest("http://localhost:" + PORT + "/application6/thebooks/bookstore2/bookheaders");
         doTestPerRequest("http://localhost:" + PORT + "/application6/the%20books2/bookstore2/book%20headers");
     }
-
+    
     private Response doTestPerRequest(String address) throws Exception {
+        return doTestPerRequest(address, null);
+    }
+
+    private Response doTestPerRequest(String address, String header) throws Exception {
         WebClient wc = WebClient.create(address);
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(100000000L);
         wc.accept("application/xml");
+        if (header != null) {
+            wc.header("X-Book-Header", header);
+        }
         Response r = wc.get();
         Book book = r.readEntity(Book.class);
         assertEquals("CXF in Action", book.getName());
