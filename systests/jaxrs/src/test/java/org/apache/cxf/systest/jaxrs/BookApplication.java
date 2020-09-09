@@ -107,9 +107,9 @@ public class BookApplication extends Application {
             WebApplicationException {
             context.getHeaders().putSingle("BookWriter", "TheBook");
             
-            final Object property = context.getProperty("x-book");
+            final Object property = context.getProperty("property");
             if (property != null) {
-                context.getHeaders().putSingle("X-Book-Header", property);
+                context.getHeaders().putSingle("X-Property-WriterInterceptor", property);
             }
             
             context.proceed();
@@ -138,9 +138,9 @@ public class BookApplication extends Application {
                 context.getHeaders().put("BOOK", Arrays.asList("1", "2"));
             }
             
-            final String header = context.getHeaderString("X-Book-Header");
-            if (header != null) {
-                context.setProperty("x-book", header);
+            final String value = context.getUriInfo().getQueryParameters().getFirst("property");
+            if (value != null) {
+                context.setProperty("property", value);
             }
         }
 

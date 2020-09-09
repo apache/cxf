@@ -49,7 +49,7 @@ public final class PropertyHolderFactory {
     
     private static class ServletRequestPropertyHolder extends MessagePropertyHolder {
         private static final String ENDPOINT_ADDRESS_PROPERTY = "org.apache.cxf.transport.endpoint.address";
-        private HttpServletRequest request;
+        private final HttpServletRequest request;
         
         ServletRequestPropertyHolder(Message m) {
             super(m);
