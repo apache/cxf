@@ -20,8 +20,10 @@
 package org.apache.cxf.systest.jaxrs;
 
 import java.io.InputStream;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.WebApplicationException;
@@ -186,6 +188,15 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
             doTestPerRequest("http://localhost:" + PORT + "/application11/thebooks/bookstore2/bookheaders");
         assertEquals("TheBook", r.getHeaderString("BookWriter"));
     }
+    
+    @Test
+    public void testGetBook123PropagatingContextPropertyToWriterInterceptor() throws Exception {
+        Response r = 
+            doTestPerRequest("http://localhost:" + PORT + "/application6/thebooks/bookstore2/bookheaders",
+                new SimpleEntry<>("property", "PropValue"));
+        assertEquals("PropValue", r.getHeaderString("X-Property-WriterInterceptor"));
+    }
+
 
     @Test
     public void testGetBook123TwoApplications() throws Exception {
@@ -193,10 +204,16 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
         doTestPerRequest("http://localhost:" + PORT + "/application6/the%20books2/bookstore2/book%20headers");
     }
 
-    private Response doTestPerRequest(String address) throws Exception {
+    @SafeVarargs
+    private final Response doTestPerRequest(String address, Map.Entry<String, String> ... params) throws Exception {
         WebClient wc = WebClient.create(address);
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(100000000L);
         wc.accept("application/xml");
+        
+        for (Map.Entry<String, String> param: params) {
+            wc.query(param.getKey(), param.getValue());
+        }
+        
         Response r = wc.get();
         Book book = r.readEntity(Book.class);
         assertEquals("CXF in Action", book.getName());
