@@ -31,7 +31,6 @@
     <description>Apache CXF JAX-RS System Tests</description>
     <url>https://cxf.apache.org</url>
     <properties>
-        <cxf.glassfish.el.version>3.0.1-b11</cxf.glassfish.el.version>
         <cxf.module.name>org.apache.cxf.systests.jaxrs</cxf.module.name>
     </properties>
     <dependencies>
@@ -79,21 +78,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>javax.el</artifactId>
-            <version>${cxf.glassfish.el.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.aries.blueprint</groupId>
             <artifactId>org.apache.aries.blueprint.web</artifactId>
             <version>1.1.1</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.aries.blueprint</groupId>
-            <artifactId>blueprint-parser</artifactId>
-            <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.aries.blueprint</groupId>

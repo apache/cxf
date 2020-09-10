@@ -30,7 +30,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -482,8 +481,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         wc.accept("application/xhtml+xml").path(666).matrix("name2", 2).query("name", "Action - ");
         XMLSource source = wc.get(XMLSource.class);
         source.setBuffering();
-        Map<String, String> namespaces = new HashMap<>();
-        namespaces.put("xhtml", "http://www.w3.org/1999/xhtml");
+        Map<String, String> namespaces = Collections.singletonMap("xhtml", "http://www.w3.org/1999/xhtml");
         Book2 b = source.getNode("xhtml:html/xhtml:body/xhtml:ul/xhtml:Book", namespaces, Book2.class);
         assertEquals(666, b.getId());
         assertEquals("CXF in Action - 2", b.getName());
