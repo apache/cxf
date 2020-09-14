@@ -239,7 +239,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String theCookie = r.getStringHeaders().getFirst("TheCookie");
         assertEquals("b", theCookie);
     }
-
     @Test
     public void testGetBookDiffUriAutoRedirect() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/redirect?sameuri=false";
@@ -254,8 +253,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             assertTrue(cause.getMessage().contains("Different HTTP Scheme or Host Redirect detected on"));
         }
     }
-
-
     @Test
     public void testGetBookRelativeUriAutoRedirect() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/redirect/relative?loop=false";
@@ -270,7 +267,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String newAddress = "http://localhost:" + PORT + "/bookstore/redirect/relative?redirect=true";
         assertEquals(newAddress, wc.getCurrentURI().toString());
     }
-
     @Test
     public void testGetBookRelativeUriAutoRedirectLoop() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/redirect/relative?loop=true";
@@ -285,7 +281,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             assertTrue(cause.getMessage().contains("Redirect loop detected on"));
         }
     }
-
     @Test
     public void testGetBookRelativeUriAutoRedirectNotAllowed() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/redirect/relative?loop=true";
@@ -366,7 +361,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertEquals("OK", r.getHeaderString("customresponse"));
     }
 
-
     @Test
     public void testGetCustomBookText() {
         String address = "http://localhost:" + PORT + "/bookstore/customtext";
@@ -436,7 +430,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertEquals(123L, book.getId());
     }
 
-
     @Test
     public void testGetIntroChapterFromSelectedBook() {
         String address = "http://localhost:" + PORT + "/bookstore/books(id=le=123)/chapter";
@@ -454,7 +447,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
 
     private void doTestGetChapterFromSelectedBook(String address) {
-
         WebClient wc = WebClient.create(address);
         wc.accept("application/xml");
         Chapter chapter = wc.get(Chapter.class);
@@ -582,9 +574,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testGetBookWithNameInQuery() throws Exception {
-
-        String endpointAddress =
-            "http://localhost:" + PORT + "/bookstore/name-in-query";
+        String endpointAddress = "http://localhost:" + PORT + "/bookstore/name-in-query";
         WebClient wc = WebClient.create(endpointAddress);
         String name = "Many        spaces";
         wc.query("name", name);
@@ -594,9 +584,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testGetBookAsObject() throws Exception {
-
-        String endpointAddress =
-            "http://localhost:" + PORT + "/bookstore/object";
+        String endpointAddress = "http://localhost:" + PORT + "/bookstore/object";
         WebClient wc = WebClient.create(endpointAddress);
         Book b = wc.get(Book.class);
         assertEquals("Book as Object", b.getName());
@@ -618,7 +606,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testGetBookWithColonMarks() throws Exception {
-
         // URLEncoder will turn ":" into "%3A" but ':' is actually
         // not disallowed in the path components
         String endpointAddressUrlEncoded =
@@ -628,8 +615,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         Response r = WebClient.create(endpointAddressUrlEncoded).get();
         assertEquals(404, r.getStatus());
 
-        String endpointAddress =
-            "http://localhost:" + PORT + "/bookstore/books/colon/1:2:3";
+        String endpointAddress = "http://localhost:" + PORT + "/bookstore/books/colon/1:2:3";
         WebClient wc = WebClient.create(endpointAddress);
         Book b = wc.get(Book.class);
         assertEquals(123L, b.getId());
@@ -637,9 +623,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testPostAnd401WithText() throws Exception {
-
-        String endpointAddress =
-            "http://localhost:" + PORT + "/bookstore/post401";
+        String endpointAddress = "http://localhost:" + PORT + "/bookstore/post401";
         WebClient wc = WebClient.create(endpointAddress);
         WebClient.getConfig(wc).getHttpConduit().getClient().setAllowChunking(false);
         assertFalse(WebClient.getConfig(wc).getHttpConduit().getClient().isAllowChunking());
@@ -651,9 +635,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testCapturedServerInFault() throws Exception {
-
-        String endpointAddress =
-            "http://localhost:" + PORT + "/bookstore/infault";
+        String endpointAddress = "http://localhost:" + PORT + "/bookstore/infault";
         WebClient wc = WebClient.create(endpointAddress);
         Response r = wc.get();
         assertEquals(401, r.getStatus());
@@ -661,9 +643,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testCapturedServerOutFault() throws Exception {
-
-        String endpointAddress =
-            "http://localhost:" + PORT + "/bookstore/outfault";
+        String endpointAddress = "http://localhost:" + PORT + "/bookstore/outfault";
         WebClient wc = WebClient.create(endpointAddress);
         Response r = wc.get();
         assertEquals(403, r.getStatus());
@@ -671,9 +651,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testGetCollectionOfBooks() throws Exception {
-
-        String endpointAddress =
-            "http://localhost:" + PORT + "/bookstore/collections";
+        String endpointAddress = "http://localhost:" + PORT + "/bookstore/collections";
         WebClient wc = WebClient.create(endpointAddress);
         wc.accept("application/xml");
         Collection<? extends Book> collection = wc.getCollection(Book.class);
@@ -684,9 +662,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testPostCollectionGetBooksWebClient() throws Exception {
-
-        String endpointAddress =
-            "http://localhost:" + PORT + "/bookstore/collections3";
+        String endpointAddress = "http://localhost:" + PORT + "/bookstore/collections3";
         WebClient wc = WebClient.create(endpointAddress);
         wc.accept("application/xml").type("application/xml");
         Book b1 = new Book("CXF in Action", 123L);
@@ -702,9 +678,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testPostCollectionGenericEntityWebClient() throws Exception {
-
-        String endpointAddress =
-            "http://localhost:" + PORT + "/bookstore/collections3";
+        String endpointAddress = "http://localhost:" + PORT + "/bookstore/collections3";
         WebClient wc = WebClient.create(endpointAddress);
         wc.accept("application/xml").type("application/xml");
         Book b1 = new Book("CXF in Action", 123L);
@@ -724,7 +698,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testPostGetCollectionGenericEntityAndType() throws Exception {
-
         String endpointAddress =
             "http://localhost:" + PORT + "/bookstore/collections";
         WebClient wc = WebClient.create(endpointAddress);
@@ -757,7 +730,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testPostCollectionOfBooksWebClient() throws Exception {
-
         String endpointAddress =
             "http://localhost:" + PORT + "/bookstore/collections";
         WebClient wc = WebClient.create(endpointAddress);
@@ -782,18 +754,15 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testPostNullGetEmptyCollectionProxy() throws Exception {
-
         String endpointAddress = "http://localhost:" + PORT;
         BookStore bs = JAXRSClientFactory.create(endpointAddress, BookStore.class);
         List<Book> books = bs.postBookGetCollection(null);
         assertNotNull(books);
         assertEquals(0, books.size());
-
     }
 
     @Test
     public void testPostObjectGetCollection() throws Exception {
-
         String endpointAddress =
             "http://localhost:" + PORT + "/bookstore/collectionBook";
         WebClient wc = WebClient.create(endpointAddress);
@@ -809,7 +778,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testCaching() throws Exception {
-
         String endpointAddress =
             "http://localhost:" + PORT + "/bookstore/books/response/123";
 
@@ -850,7 +818,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testCachingExpires() throws Exception {
-
         String endpointAddress =
             "http://localhost:" + PORT + "/bookstore/books/response2/123";
 
@@ -893,7 +860,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testCachingExpiresUsingETag() throws Exception {
-
         String endpointAddress =
             "http://localhost:" + PORT + "/bookstore/books/response3/123";
 
@@ -933,7 +899,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
         cacheControlFeature.close();
     }
-
 
     @Test
     public void testOnewayWebClient() throws Exception {
@@ -1113,12 +1078,19 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertTrue("Did not contain dummy2", hasDummy2);
     }
 
-
     @Test
     public void testOnewayProxy() throws Exception {
         BookStore proxy = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
         proxy.onewayRequest();
         assertEquals(202, WebClient.client(proxy).getResponse().getStatus());
+    }
+
+    @Test
+    public void testOnewayPropogateExceptionVar() throws Exception {
+        final String endpointAddress = "http://localhost:" + PORT + "/bookstore/oneway/propogateExceptionVar/1";
+        WebClient wc = WebClient.create(endpointAddress);
+        Response r = wc.post(null);
+        assertEquals(500, r.getStatus());
     }
 
     @Test
@@ -2676,7 +2648,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         }
     }
 
-
     @Test
     public void testMutipleAcceptHeader() throws Exception {
         String endpointAddress =
@@ -2923,7 +2894,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         }
     }
 
-
     private ReaderInterceptor getReaderInterceptor() {
         return readerInterceptorContext -> {
             InputStream is = new BufferedInputStream(readerInterceptorContext.getInputStream());
@@ -2931,7 +2901,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             return readerInterceptorContext.proceed();
         };
     }
-
 
     private void getAndCompareAsStrings(String address,
                                         String resourcePath,
@@ -2990,11 +2959,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         return str;
     }
 
-
-
     private String getStringFromInputStream(InputStream in) throws Exception {
         return IOUtils.toString(in);
     }
-
-
 }
