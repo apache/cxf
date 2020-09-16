@@ -82,20 +82,6 @@ public final class MBServerConnectorFactory {
 
     }
 
-    static int getServerPort(final String url) {
-        int portStart = url.indexOf("localhost") + 10;
-        int portEnd;
-        int port = 0;
-        if (portStart > 0) {
-            portEnd = indexNotOfNumber(url, portStart);
-            if (portEnd > portStart) {
-                final String portString = url.substring(portStart, portEnd);
-                port = Integer.parseInt(portString);
-            }
-        }
-        return port;
-    }
-
     private static int indexNotOfNumber(String str, int index) {
         int i = 0;
         for (i = index; i < str.length(); i++) {
@@ -152,7 +138,7 @@ public final class MBServerConnectorFactory {
             }
         }
 
-        rmiServer = new RMIJRMPServerImpl(getServerPort(serviceUrl), null, null, environment);
+        rmiServer = new RMIJRMPServerImpl(url.getPort(), null, null, environment);
 
         // Create the connector server now.
         connectorServer = new RMIConnectorServer(url, environment, rmiServer, server);
