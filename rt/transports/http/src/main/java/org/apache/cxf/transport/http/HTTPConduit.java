@@ -48,6 +48,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
+import org.apache.cxf.common.util.RunnableWrapperFactory;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -274,6 +275,7 @@ public abstract class HTTPConduit
 
     private volatile boolean clientSidePolicyCalced;
 
+    private final RunnableWrapperFactory runnableWrapperFactory;
 
     /**
      * Constructor
@@ -309,6 +311,8 @@ public abstract class HTTPConduit
         }
         proxyFactory = new ProxyFactory();
         cookies = new Cookies();
+        RunnableWrapperFactory rwf = bus.getExtension(RunnableWrapperFactory.class);
+        runnableWrapperFactory = rwf != null ? rwf : new RunnableWrapperFactory();
     }
 
     /**
@@ -350,6 +354,7 @@ public abstract class HTTPConduit
     /**
      * This method returns the registered Logger for this conduit.
      */
+    @Override
     protected Logger getLogger() {
         return LOG;
     }
@@ -487,6 +492,7 @@ public abstract class HTTPConduit
      *
      * @param message The message to be sent.
      */
+    @Override
     public void prepare(Message message) throws IOException {
         // This call can possibly change the conduit endpoint address and
         // protocol from the default set in EndpointInfo that is associated
@@ -652,6 +658,7 @@ public abstract class HTTPConduit
         return (int)ctimeout;
     }
 
+    @Override
     public void close(Message msg) throws IOException {
         InputStream in = msg.getContent(InputStream.class);
         try {
@@ -668,7 +675,12 @@ public abstract class HTTPConduit
                 }
             }
         } finally {
-            super.close(msg);
+            try {
+                super.close(msg);
+            } finally {
+                //clean up address within threadlocal of EndPointInfo
+                endpointInfo.resetAddress();
+            }
         }
     }
 
@@ -723,9 +735,15 @@ public abstract class HTTPConduit
     /**
      * Close the conduit
      */
+    @Override
     public void close() {
-        if (clientSidePolicy != null) {
-            clientSidePolicy.removePropertyChangeListener(this);
+        try {
+            if (clientSidePolicy != null) {
+                clientSidePolicy.removePropertyChangeListener(this);
+            }
+        } finally {
+            //clean up address within threadlocal of EndPointInfo
+            endpointInfo.resetAddress();
         }
     }
 
@@ -823,6 +841,7 @@ public abstract class HTTPConduit
      * configuration from spring injection.
      */
     // REVISIT:What happens when the endpoint/bean name is null?
+    @Override
     public String getBeanName() {
         if (endpointInfo.getName() != null) {
             return endpointInfo.getName().toString() + ".http-conduit";
@@ -1039,6 +1058,7 @@ public abstract class HTTPConduit
          *
          * @param inMessage
          */
+        @Override
         public void onMessage(Message inMessage) {
             // disposable exchange, swapped with real Exchange on correlation
             inMessage.setExchange(new ExchangeImpl());
@@ -1075,15 +1095,18 @@ public abstract class HTTPConduit
         LOG.warning(sw.toString());
     }
 
+    @Override
     public void assertMessage(Message message) {
         PolicyDataEngine policyDataEngine = bus.getExtension(PolicyDataEngine.class);
         policyDataEngine.assertMessage(message, getClient(), new ClientPolicyCalculator());
     }
 
+    @Override
     public boolean canAssert(QName type) {
         return type.equals(new QName("http://cxf.apache.org/transports/http/configuration", "client"));
     }
 
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() == clientSidePolicy
             && "decoupledEndpoint".equals(evt.getPropertyName())) {
@@ -1186,7 +1209,8 @@ public abstract class HTTPConduit
 
 
         protected void handleResponseOnWorkqueue(boolean allowCurrentThread, boolean forceWQ) throws IOException {
-            Runnable runnable = new Runnable() {
+            Runnable runnable = runnableWrapperFactory.wrap(new Runnable() {
+                @Override
                 public void run() {
                     try {
                         handleResponseInternal();
@@ -1201,7 +1225,7 @@ public abstract class HTTPConduit
                         mo.onMessage(outMessage);
                     }
                 }
-            };
+            }, outMessage);
             HTTPClientPolicy policy = getClient(outMessage);
             boolean exceptionSet = outMessage.getContent(Exception.class) != null;
             if (!exceptionSet) {
@@ -1211,6 +1235,7 @@ public abstract class HTTPConduit
                         final Executor ex2 = ex;
                         final Runnable origRunnable = runnable;
                         runnable = new Runnable() {
+                            @Override
                             public void run() {
                                 outMessage.getExchange().put(Executor.class.getName()
                                                              + ".USING_SPECIFIED", Boolean.TRUE);
@@ -1237,6 +1262,9 @@ public abstract class HTTPConduit
                     } else {
                         outMessage.getExchange().put(Executor.class.getName()
                                                  + ".USING_SPECIFIED", Boolean.TRUE);
+                        if (LOG.isLoggable(Level.FINEST)) {
+                            LOG.log(Level.FINEST, "Executing with " + ex);
+                        }
                         ex.execute(runnable);
                     }
                 } catch (RejectedExecutionException rex) {
@@ -1347,6 +1375,7 @@ public abstract class HTTPConduit
         /**
          * Perform any actions required on stream closure (handle response etc.)
          */
+        @Override
         public void close() throws IOException {
             try {
                 if (buffer != null && buffer.size() > 0) {
@@ -1661,7 +1690,6 @@ public abstract class HTTPConduit
                         }
                     }
                     exchange.put("IN_CHAIN_COMPLETE", Boolean.TRUE);
-                    
                     exchange.setInMessage(inMessage);
                     return;
                 }

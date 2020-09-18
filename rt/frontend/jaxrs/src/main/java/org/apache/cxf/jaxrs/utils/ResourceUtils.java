@@ -29,10 +29,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -78,6 +81,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.CastUtils;
@@ -144,27 +148,28 @@ public final class ResourceUtils {
     public static Method findPostConstructMethod(Class<?> c) {
         return findPostConstructMethod(c, null);
     }
-    public static Method findPostConstructMethod(Class<?> c, String name) {
+
+    public static Method findPostConstructMethod(final Class<?> c, String name) {
         if (Object.class == c || null == c) {
             return null;
         }
         for (Method m : getDeclaredMethods(c)) {
             if (name != null) {
                 if (m.getName().equals(name)) {
-                    return m;
+                    return ReflectionUtil.setAccessible(m);
                 }
             } else if (m.getAnnotation(PostConstruct.class) != null) {
-                return m;
+                return ReflectionUtil.setAccessible(m);
             }
         }
         Method m = findPostConstructMethod(c.getSuperclass(), name);
         if (m != null) {
-            return m;
+            return ReflectionUtil.setAccessible(m);
         }
         for (Class<?> i : c.getInterfaces()) {
             m = findPostConstructMethod(i, name);
             if (m != null) {
-                return m;
+                return ReflectionUtil.setAccessible(m);
             }
         }
         return null;
@@ -181,20 +186,20 @@ public final class ResourceUtils {
         for (Method m : getDeclaredMethods(c)) {
             if (name != null) {
                 if (m.getName().equals(name)) {
-                    return m;
+                    return ReflectionUtil.setAccessible(m);
                 }
             } else if (m.getAnnotation(PreDestroy.class) != null) {
-                return m;
+                return ReflectionUtil.setAccessible(m);
             }
         }
         Method m = findPreDestroyMethod(c.getSuperclass(), name);
         if (m != null) {
-            return m;
+            return ReflectionUtil.setAccessible(m);
         }
         for (Class<?> i : c.getInterfaces()) {
             m = findPreDestroyMethod(i, name);
             if (m != null) {
-                return m;
+                return ReflectionUtil.setAccessible(m);
             }
         }
         return null;
@@ -206,7 +211,7 @@ public final class ResourceUtils {
         boolean isRoot, boolean enableStatic,
         Bus bus) {
         final boolean isDefaultClass = defaultClass != null;
-        Class<?> sClass = !isDefaultClass  ? loadClass(model.getName()) : defaultClass;
+        Class<?> sClass = !isDefaultClass ? loadClass(model.getName()) : defaultClass;
         return createServiceClassResourceInfo(resources, model, sClass, isRoot, enableStatic, bus);
     }
 
@@ -216,10 +221,12 @@ public final class ResourceUtils {
         if (model == null) {
             throw new RuntimeException("Resource class " + sClass.getName() + " has no model info");
         }
+
         ClassResourceInfo cri =
             new ClassResourceInfo(sClass, sClass, isRoot, enableStatic, true,
                                   model.getConsumes(), model.getProduces(), bus);
-        URITemplate t = URITemplate.createTemplate(model.getPath());
+        String classNameandPath = getClassNameandPath(cri.getResourceClass().getName(), model.getPath());
+        URITemplate t = URITemplate.createTemplate(model.getPath(), classNameandPath);
         cri.setURITemplate(t);
 
         MethodDispatcher md = new MethodDispatcher();
@@ -244,8 +251,10 @@ public final class ResourceUtils {
             if (actualMethod == null) {
                 continue;
             }
+            String classNameandPath2 = getClassNameandPath(cri.getResourceClass().getName(), op.getPath());
+            URITemplate t2 = URITemplate.createTemplate(op.getPath(), classNameandPath2);
             OperationResourceInfo ori =
-                new OperationResourceInfo(actualMethod, cri, URITemplate.createTemplate(op.getPath()),
+                new OperationResourceInfo(actualMethod, cri, t2,
                                           op.getVerb(), op.getConsumes(), op.getProduces(),
                                           op.getParameters(),
                                           op.isOneway());
@@ -310,7 +319,8 @@ public final class ResourceUtils {
         cri.setParent(parent);
 
         if (root) {
-            URITemplate t = URITemplate.createTemplate(cri.getPath());
+            String classNameandPath = getClassNameandPath(cri.getResourceClass().getName(), cri.getPath());
+            URITemplate t = URITemplate.createTemplate(cri.getPath(), classNameandPath);
             cri.setURITemplate(t);
         }
 
@@ -400,11 +410,10 @@ public final class ResourceUtils {
                     reportInvalidResourceMethod(m, NOT_SUSPENDED_ASYNC_MESSAGE_ID, Level.FINE);
                     return false;
                 }
-                if (m.getReturnType() == Void.TYPE || m.getReturnType() == Void.class) {
-                    return true;
+                if (m.getReturnType() != Void.TYPE && m.getReturnType() != Void.class) {
+                    reportInvalidResourceMethod(m, NO_VOID_RETURN_ASYNC_MESSAGE_ID, Level.WARNING);
                 }
-                reportInvalidResourceMethod(m, NO_VOID_RETURN_ASYNC_MESSAGE_ID, Level.WARNING);
-                return false;
+                return true;
             }
         }
         return true;
@@ -423,16 +432,21 @@ public final class ResourceUtils {
     public static Constructor<?> findResourceConstructor(Class<?> resourceClass, boolean perRequest) {
         List<Constructor<?>> cs = new LinkedList<>();
         for (Constructor<?> c : resourceClass.getConstructors()) {
+            Annotation[] anna = c.getDeclaredAnnotations();
+            boolean hasInject = hasInjectAnnotation(anna);
             Class<?>[] params = c.getParameterTypes();
             Annotation[][] anns = c.getParameterAnnotations();
             boolean match = true;
             for (int i = 0; i < params.length; i++) {
                 if (!perRequest) {
-                    if (AnnotationUtils.getAnnotation(anns[i], Context.class) == null) {
+                    //annotation is not null and not equals context
+                    if (AnnotationUtils.getAnnotation(anns[i], Context.class) == null 
+                        && !isInjectionPara(hasInject, anns[i])) {
                         match = false;
                         break;
                     }
-                } else if (!AnnotationUtils.isValidParamAnnotations(anns[i])) {
+                } else if ((!AnnotationUtils.isValidParamAnnotations(anns[i])) 
+                    && !isInjectionPara(hasInject, anns[i])) {
                     match = false;
                     break;
                 }
@@ -443,6 +457,7 @@ public final class ResourceUtils {
         }
         Collections.sort(cs, new Comparator<Constructor<?>>() {
 
+            @Override
             public int compare(Constructor<?> c1, Constructor<?> c2) {
                 int p1 = c1.getParameterTypes().length;
                 int p2 = c2.getParameterTypes().length;
@@ -451,6 +466,30 @@ public final class ResourceUtils {
 
         });
         return cs.isEmpty() ? null : cs.get(0);
+    }
+
+    /**
+     * @param hasInject
+     * @param anns
+     * @param i
+     * @return
+     */
+    private static boolean isInjectionPara(boolean hasInject, Annotation[] anns) {
+        return anns.length == 0 && hasInject;
+    }
+
+    /**
+     * @param anna
+     * @return
+     */
+    private static boolean hasInjectAnnotation(Annotation[] anna) {
+        for (Annotation a : anna) {
+            String annotationName = a.annotationType().getCanonicalName();
+            if ("javax.inject.Inject".equalsIgnoreCase(annotationName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static List<Parameter> getParameters(Method resourceMethod) {
@@ -486,7 +525,9 @@ public final class ResourceUtils {
 
         PathParam a = AnnotationUtils.getAnnotation(anns, PathParam.class);
         if (a != null) {
-            return new Parameter(ParameterType.PATH, index, a.value(), isEncoded, dValue);
+            Parameter p = new Parameter(ParameterType.PATH, index, a.value(), isEncoded, dValue);
+            p.setJavaType(type);
+            return p;
         }
         QueryParam q = AnnotationUtils.getAnnotation(anns, QueryParam.class);
         if (q != null) {
@@ -518,14 +559,39 @@ public final class ResourceUtils {
     //CHECKSTYLE:ON
 
     private static OperationResourceInfo createOperationInfo(Method m, Method annotatedMethod,
-                                                      ClassResourceInfo cri, Path path, String httpMethod) {
+                                                             ClassResourceInfo cri, Path path, String httpMethod) {
         OperationResourceInfo ori = new OperationResourceInfo(m, annotatedMethod, cri);
-        URITemplate t = URITemplate.createTemplate(path);
+        String classNameandPath = getClassNameandPath(cri.getResourceClass().getName(), path);
+        URITemplate t = URITemplate.createTemplate(path, ori.getParameters(), classNameandPath);
         ori.setURITemplate(t);
         ori.setHttpMethod(httpMethod);
         return ori;
     }
 
+    private static String getClassNameandPath(String className, Path path) {
+        if (path == null) {
+            return getClassNameandPath(className, "/");
+        } else {
+            return getClassNameandPath(className, path.value()); 
+        }
+    }
+    
+    private static String getClassNameandPath(String className, String pathValue) {
+        int pathLength = pathValue == null ? 0 : pathValue.length();
+        StringBuilder sb = new StringBuilder(className.length() + pathLength + 1);
+        sb.append('/').append(className);
+
+        if (pathLength == 0) {
+            sb.append('/');
+        } else {
+            if (pathValue.charAt(0) != '/') {
+                sb.append('/');
+            }
+            sb.append(pathValue);
+        }
+
+        return sb.toString();
+    }
 
     private static boolean checkMethodDispatcher(ClassResourceInfo cr) {
         if (cr.getMethodDispatcher().getOperationResourceInfos().isEmpty()) {
@@ -537,7 +603,6 @@ public final class ResourceUtils {
         return true;
     }
 
-
     private static Class<?> loadClass(String cName) {
         try {
             return ClassLoaderUtils.loadClass(cName.trim(), ResourceUtils.class);
@@ -545,7 +610,6 @@ public final class ResourceUtils {
             throw new RuntimeException("No class " + cName.trim() + " can be found", ex);
         }
     }
-
 
     public static List<UserResource> getUserResources(String loc, Bus bus) {
         try (InputStream is = ResourceUtils.getResourceStream(loc, bus)) {
@@ -565,24 +629,41 @@ public final class ResourceUtils {
         return url == null ? null : url.openStream();
     }
 
-    public static URL getResourceURL(String loc, Bus bus) throws IOException {
+    public static URL getResourceURL(final String loc, final Bus bus) throws IOException {
         URL url = null;
         if (loc.startsWith(CLASSPATH_PREFIX)) {
             String path = loc.substring(CLASSPATH_PREFIX.length());
             url = ResourceUtils.getClasspathResourceURL(path, ResourceUtils.class, bus);
         } else {
             try {
-                url = new URL(loc);
-            } catch (Exception ex) {
-                // it can be either a classpath or file resource without a scheme
-                url = ResourceUtils.getClasspathResourceURL(loc, ResourceUtils.class, bus);
-                if (url == null) {
-                    File file = new File(loc);
-                    if (file.exists()) {
-                        url = file.toURI().toURL();
+                url = AccessController.doPrivileged(new PrivilegedExceptionAction<URL>() {
+
+                    @Override
+                    public URL run() throws MalformedURLException {
+                        URL url;
+                        try {
+                            url = new URL(loc);
+                        } catch (Exception ex) {
+                            // it can be either a classpath or file resource without a scheme
+                            url = ResourceUtils.getClasspathResourceURL(loc, ResourceUtils.class, bus);
+                            if (url == null) {
+                                File file = new File(loc);
+                                if (file.exists()) {
+                                    url = file.toURI().toURL();
+                                }
+                            }
+                        }
+                        return url;
                     }
+                });
+            } catch (PrivilegedActionException pae) {
+                Exception ex = pae.getException();
+                if (ex instanceof IOException) {
+                    throw (IOException) ex;
                 }
+                throw new IOException(ex);
             }
+
         }
         if (url == null) {
             LOG.warning("No resource " + loc + " is available");
@@ -638,7 +719,6 @@ public final class ResourceUtils {
         return resources;
     }
 
-
     public static ResourceTypes getAllRequestResponseTypes(List<ClassResourceInfo> cris,
                                                            boolean jaxbOnly) {
         return getAllRequestResponseTypes(cris, jaxbOnly, null);
@@ -656,7 +736,7 @@ public final class ResourceUtils {
 
     public static Class<?> getActualJaxbType(Class<?> type, Method resourceMethod, boolean inbound) {
         ElementClass element = resourceMethod.getAnnotation(ElementClass.class);
-        if  (element != null) {
+        if (element != null) {
             Class<?> cls = inbound ? element.request() : element.response();
             if (cls != Object.class) {
                 return cls;
@@ -740,8 +820,8 @@ public final class ResourceUtils {
         if (type == Object.class && !(genericType instanceof Class)
             || genericType instanceof TypeVariable) {
             Type theType = InjectionUtils.processGenericTypeIfNeeded(serviceClass,
-                                                      Object.class,
-                                                      genericType);
+                                                                     Object.class,
+                                                                     genericType);
             type = InjectionUtils.getActualType(theType);
         }
         if (type == null
@@ -785,7 +865,7 @@ public final class ResourceUtils {
         resource.setProduces(e.getAttribute("produces"));
         List<Element> operEls =
             DOMUtils.findAllElementsByTagNameNS(e,
-                 "http://cxf.apache.org/jaxrs", "operation");
+                "http://cxf.apache.org/jaxrs", "operation");
         List<UserOperation> opers = new ArrayList<>(operEls.size());
         for (Element operEl : operEls) {
             opers.add(getOperationFromElement(operEl));
@@ -804,7 +884,7 @@ public final class ResourceUtils {
         op.setProduces(e.getAttribute("produces"));
         List<Element> paramEls =
             DOMUtils.findAllElementsByTagNameNS(e,
-                 "http://cxf.apache.org/jaxrs", "param");
+                "http://cxf.apache.org/jaxrs", "param");
         List<Parameter> params = new ArrayList<>(paramEls.size());
         for (int i = 0; i < paramEls.size(); i++) {
             Element paramEl = paramEls.get(i);
@@ -873,7 +953,7 @@ public final class ResourceUtils {
                 // is guaranteed to have only Context parameters, if any, for singletons
                 Parameter p = ResourceUtils.getParameter(i, anns[i], params[i]);
                 values[i] = JAXRSUtils.createHttpParameterValue(
-                                p, params[i], genericTypes[i], anns[i], m, templateValues, null);
+                    p, params[i], genericTypes[i], anns[i], m, templateValues, null);
             }
         }
         return values;
@@ -1040,5 +1120,4 @@ public final class ResourceUtils {
         }
         return true;
     }
-
 }

@@ -43,13 +43,16 @@ public final class URITemplate {
     public static final String LIMITED_REGEX_SUFFIX = "(/.*)?";
     public static final String FINAL_MATCH_GROUP = "FINAL_MATCH_GROUP";
     private static final String DEFAULT_PATH_VARIABLE_REGEX = "([^/]+?)";
+    private static final Pattern INTEGER_PATH_VARIABLE_REGEX_PATTERN = Pattern.compile("\\-?[0-9]+");
+    private static final Pattern DECIMAL_PATH_VARIABLE_REGEX_PATTERN = 
+        Pattern.compile("[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?");
     private static final String CHARACTERS_TO_ESCAPE = ".*+$()";
     private static final String SLASH = "/";
     private static final String SLASH_QUOTE = "/;";
     private static final int MAX_URI_TEMPLATE_CACHE_SIZE = 
         SystemPropertyAction.getInteger("org.apache.cxf.jaxrs.max_uri_template_cache_size", 2000);
     private static final Map<String, URITemplate> URI_TEMPLATE_CACHE = new ConcurrentHashMap<>();
-    
+
     private final String template;
     private final List<String> variables = new ArrayList<>();
     private final List<String> customVariables = new ArrayList<>();
@@ -58,14 +61,18 @@ public final class URITemplate {
     private final List<UriChunk> uriChunks;
 
     public URITemplate(String theTemplate) {
-        template = theTemplate;
+        this(theTemplate, Collections.<Parameter> emptyList());
+    }
+
+    public URITemplate(String theTemplate, List<Parameter> params) {
+        template = theTemplate == null ? "" : theTemplate;
         StringBuilder literalChars = new StringBuilder();
         StringBuilder patternBuilder = new StringBuilder();
         CurlyBraceTokenizer tok = new CurlyBraceTokenizer(template);
         uriChunks = new ArrayList<>();
         while (tok.hasNext()) {
             String templatePart = tok.next();
-            UriChunk chunk = UriChunk.createUriChunk(templatePart);
+            UriChunk chunk = UriChunk.createUriChunk(templatePart, params);
             uriChunks.add(chunk);
             if (chunk instanceof Literal) {
                 String encodedValue = HttpUtils.encodePartiallyEncoded(chunk.getValue(), false);
@@ -359,32 +366,65 @@ public final class URITemplate {
         return sb.toString();
     }
 
-    public static URITemplate createTemplate(Path path) {
+    public static URITemplate createTemplate(Path path, List<Parameter> params, String classNameandPath) {
+        return createTemplate(path == null ? null : path.value(), params, classNameandPath);
+    }
 
-        return createTemplate(path == null ? null : path.value());
+    public static URITemplate createTemplate(Path path, List<Parameter> params) {
+        return createTemplate(path == null ? null : path.value(), params);
+    }
+
+    public static URITemplate createTemplate(Path path) {
+        return createTemplate(path == null ? null : path.value(), Collections.<Parameter> emptyList());
+    }
+
+    public static URITemplate createTemplate(Path path, String classNameandPath) {
+        return createTemplate(path == null ? null 
+                                           : path.value(), Collections.<Parameter> emptyList(), classNameandPath);
     }
 
     public static URITemplate createTemplate(String pathValue) {
+        return createTemplate(pathValue, Collections.<Parameter> emptyList(), pathValue);
+    }
+
+    public static URITemplate createTemplate(String pathValue, String classNameandPath) {
+        return createTemplate(pathValue, Collections.<Parameter> emptyList(), classNameandPath);
+    }
+
+    public static URITemplate createTemplate(String pathValue, List<Parameter> params) {
+        return createExactTemplate(pathValue, params, pathValue);
+    }
+
+    public static URITemplate createTemplate(String pathValue, List<Parameter> params, String classNameandPath) {
         if (pathValue == null) {
             pathValue = "/";
         } else if (!pathValue.startsWith("/")) {
             pathValue = "/" + pathValue;
         }
-        return createExactTemplate(pathValue);
+        return createExactTemplate(pathValue, params, classNameandPath);
     }
-    
+
     public static URITemplate createExactTemplate(String pathValue) {
-        URITemplate template = URI_TEMPLATE_CACHE.get(pathValue);
+        return createExactTemplate(pathValue, Collections.<Parameter> emptyList());
+    }
+
+    public static URITemplate createExactTemplate(String pathValue, List<Parameter> params) {
+        return createExactTemplate(pathValue, params, pathValue);
+    }
+
+    public static URITemplate createExactTemplate(String pathValue, List<Parameter> params, String classNameandPath) {
+        classNameandPath = classNameandPath == null ? "" : classNameandPath;
+        URITemplate template = URI_TEMPLATE_CACHE.get(classNameandPath);
         if (template == null) {
-            template = new URITemplate(pathValue);
+            template = new URITemplate(pathValue, params);
             if (URI_TEMPLATE_CACHE.size() >= MAX_URI_TEMPLATE_CACHE_SIZE) {
                 URI_TEMPLATE_CACHE.clear();
             }
-            URI_TEMPLATE_CACHE.put(pathValue, template);
+            URI_TEMPLATE_CACHE.put(classNameandPath, template);
         }
         return template;
     }
-    
+
     public static int compareTemplates(URITemplate t1, URITemplate t2) {
         int l1 = t1.getLiteralChars().length();
         int l2 = t2.getLiteralChars().length();
@@ -422,11 +462,11 @@ public final class URITemplate {
          * @return If param has variable form then {@link Variable} instance is created, otherwise chunk is
          *         treated as {@link Literal}.
          */
-        public static UriChunk createUriChunk(String uriChunk) {
+        public static UriChunk createUriChunk(String uriChunk, List<Parameter> params) {
             if (uriChunk == null || "".equals(uriChunk)) {
                 throw new IllegalArgumentException("uriChunk is empty");
             }
-            UriChunk uriChunkRepresentation = Variable.create(uriChunk);
+            UriChunk uriChunkRepresentation = Variable.create(uriChunk, params);
             if (uriChunkRepresentation == null) {
                 uriChunkRepresentation = Literal.create(uriChunk);
             }
@@ -482,8 +522,7 @@ public final class URITemplate {
          * @param uriChunk uriChunk chunk that depicts variable
          * @return Variable if variable was successfully created; null if uriChunk was not a variable
          */
-        public static Variable create(String uriChunk) {
-            Variable newVariable = new Variable();
+        public static Variable create(String uriChunk, List<Parameter> params) {
             if (uriChunk == null || "".equals(uriChunk)) {
                 return null;
             }
@@ -491,10 +530,29 @@ public final class URITemplate {
                 uriChunk = CurlyBraceTokenizer.stripBraces(uriChunk).trim();
                 Matcher matcher = VARIABLE_PATTERN.matcher(uriChunk);
                 if (matcher.matches()) {
+                    Variable newVariable = new Variable();
                     newVariable.name = matcher.group(1).trim();
                     if (matcher.group(2) != null && matcher.group(3) != null) {
                         String patternExpression = matcher.group(3).trim();
                         newVariable.pattern = Pattern.compile(patternExpression);
+                    } else {
+                        //check parameter types
+                        for (Parameter p : params) {
+                            if (p.getName() != null && p.getName().equals(newVariable.name)) {
+                                Class<?> paramType = p.getJavaType();
+                                //CHECKSTYLE:OFF
+                                if (paramType.isPrimitive()) {
+                                    if (int.class.equals(paramType) || short.class.equals(paramType)
+                                        || long.class.equals(paramType)) {
+                                        newVariable.pattern = INTEGER_PATH_VARIABLE_REGEX_PATTERN;
+                                    } else if (double.class.equals(paramType) || float.class.equals(paramType)) {
+                                        newVariable.pattern = DECIMAL_PATH_VARIABLE_REGEX_PATTERN;
+                                    }
+                                }
+                                //CHECKSTYLE:ON
+                                break;
+                            }
+                        }
                     }
                     return newVariable;
                 }
@@ -548,7 +606,7 @@ public final class URITemplate {
      */
     static class CurlyBraceTokenizer {
 
-        private List<String> tokens = new ArrayList<>();
+        private final List<String> tokens = new ArrayList<>();
         private int tokenIdx;
 
         CurlyBraceTokenizer(String string) {
@@ -556,8 +614,10 @@ public final class URITemplate {
             int level = 0;
             int lastIdx = 0;
             int idx;
-            for (idx = 0; idx < string.length(); idx++) {
-                if (string.charAt(idx) == '{') {
+            int length = string.length();
+            for (idx = 0; idx < length; idx++) {
+                char c = string.charAt(idx);
+                if (c == '{') {
                     if (outside) {
                         if (lastIdx < idx) {
                             tokens.add(string.substring(lastIdx, idx));
@@ -567,12 +627,12 @@ public final class URITemplate {
                     } else {
                         level++;
                     }
-                } else if (string.charAt(idx) == '}' && !outside) {
+                } else if (c == '}' && !outside) {
                     if (level > 0) {
                         level--;
                     } else {
                         if (lastIdx < idx) {
-                            tokens.add(string.substring(lastIdx, idx + 1));
+                            tokens.add(lastIdx == 0 && idx + 1 == length ? string : string.substring(lastIdx, idx + 1));
                         }
                         lastIdx = idx + 1;
                         outside = true;
@@ -580,7 +640,7 @@ public final class URITemplate {
                 }
             }
             if (lastIdx < idx) {
-                tokens.add(string.substring(lastIdx, idx));
+                tokens.add(lastIdx == 0 ? string : string.substring(lastIdx, idx));
             }
         }
 
@@ -622,5 +682,3 @@ public final class URITemplate {
         }
     }
 }
-
-

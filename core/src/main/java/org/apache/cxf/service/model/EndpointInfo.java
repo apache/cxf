@@ -32,7 +32,11 @@ public class EndpointInfo extends AbstractDescriptionElement implements NamedIte
     ServiceInfo service;
     BindingInfo binding;
     QName name;
-    EndpointReferenceType address;
+    private volatile EndpointReferenceType lastAddressSet; // Keep last address set for when threadlocal val may be null
+    
+    // Store address in a theadLocal to avoid issue where redirected URL is mismatched when accessed from both
+    // IP address and machine name.
+    private final ThreadLocal<EndpointReferenceType> threadLocal = new ThreadLocal<EndpointReferenceType>();
 
     public EndpointInfo() {
     }
@@ -89,27 +93,38 @@ public class EndpointInfo extends AbstractDescriptionElement implements NamedIte
     }
 
     public String getAddress() {
+        EndpointReferenceType address = threadLocal.get();
+        if (address == null) {
+            address = lastAddressSet;
+        }
         return (null != address && null != address.getAddress()) ? address.getAddress().getValue() : null;
     }
 
     public void setAddress(String addr) {
+        EndpointReferenceType address = threadLocal.get();
         if (null == address) {
-            // address = EndpointReferenceUtils.getEndpointReference(addr); loads jaxb and we want to avoid it
             final EndpointReferenceType reference = new EndpointReferenceType();
             final AttributedURIType a = new AttributedURIType();
             a.setValue(addr);
             reference.setAddress(a);
             address = reference;
+            threadLocal.set(address);
         } else {
             final AttributedURIType a = new AttributedURIType();
             a.setValue(addr);
             address.setAddress(a);
-            // EndpointReferenceUtils.setAddress(address, addr);
         }
+        lastAddressSet = address;
     }
 
     public void setAddress(EndpointReferenceType endpointReference) {
-        address = endpointReference;
+        threadLocal.set(endpointReference);
+        lastAddressSet = endpointReference;
+    }
+
+    //When finished the threadlocal must be cleared.
+    public void resetAddress() {
+        threadLocal.remove();
     }
 
     @Override
@@ -134,6 +149,10 @@ public class EndpointInfo extends AbstractDescriptionElement implements NamedIte
     }
 
     public EndpointReferenceType getTarget() {
+        EndpointReferenceType address = threadLocal.get();
+        if (address == null) {
+            address = lastAddressSet;
+        }
         return address;
     }
 

@@ -25,15 +25,19 @@ import java.util.Collections;
 import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class FormUtilsTest {
 
@@ -91,6 +95,17 @@ public class FormUtilsTest {
         assertEquals(FORM_PARAM_VALUE2, params.get(FORM_PARAM2).iterator().next());
     }
 
+    @Test
+    public void testIsFormPostRequest() {
+        Message m = new MessageImpl();
+        m.put(Message.HTTP_REQUEST_METHOD, HttpMethod.POST);
+        m.put(Message.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED);
+        assertTrue(FormUtils.isFormPostRequest(m));
+
+        m.put(Message.CONTENT_TYPE,
+            MediaType.APPLICATION_FORM_URLENCODED_TYPE.withCharset(StandardCharsets.UTF_16BE.name()).toString());
+        assertTrue(FormUtils.isFormPostRequest(m));
+    }
 
     private void mockObjects(String formPropertyValue) {
         mockMessage = EasyMock.createMock(Message.class);
