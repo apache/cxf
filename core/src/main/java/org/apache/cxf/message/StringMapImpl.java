@@ -34,6 +34,11 @@ public class StringMapImpl
 
     public StringMapImpl() {
     }
+
+    public StringMapImpl(int initialSize, float factor) {
+        super(initialSize, factor);
+    }
+
     public StringMapImpl(Map<String, Object> i) {
         super(i);
     }
