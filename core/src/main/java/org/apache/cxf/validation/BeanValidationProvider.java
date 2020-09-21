@@ -216,7 +216,7 @@ public class BeanValidationProvider implements AutoCloseable {
         }
 
         public boolean shouldValidateBean(final Validator validator, final Class<?> clazz) {
-            return types.computeIfAbsent(clazz, it -> validator.getConstraintsForClass(it).hasConstraints());
+            return types.computeIfAbsent(clazz, it -> validator.getConstraintsForClass(it).isBeanConstrained());
         }
     }
 }
