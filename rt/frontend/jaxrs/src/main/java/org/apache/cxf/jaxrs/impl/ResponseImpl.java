@@ -20,7 +20,6 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.io.ByteArrayInputStream;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
@@ -191,9 +190,8 @@ public final class ResponseImpl extends Response {
             } catch (IOException ex) {
                 throw new ProcessingException(ex);
             }
-        } else {
-            return true;
         }
+        return true;
     }
 
     @Override
@@ -478,7 +476,7 @@ public final class ResponseImpl extends Response {
                                                                   responseMessage);
                 // close the entity after readEntity is called.
                 T tCastLastEntity = castLastEntity();
-                shouldClose = shouldClose && !(tCastLastEntity instanceof Closeable)
+                shouldClose = shouldClose && !(tCastLastEntity instanceof AutoCloseable)
                     && !(tCastLastEntity instanceof Source);
                 if (closeAfterRead && shouldClose) {
                     close();
@@ -629,39 +627,8 @@ public final class ResponseImpl extends Response {
         };
     }
 
-    private enum PrimitiveTypes {
-        BYTE(Byte.class, byte.class) { },
-        SHORT(Short.class, short.class) { },
-        INTEGER(Integer.class, int.class) { },
-        LONG(Long.class, long.class) { },
-        FLOAT(Float.class, float.class) { },
-        DOUBLE(Double.class, double.class) { },
-        BOOLEAN(Boolean.class, boolean.class) { },
-        CHAR(Character.class, char.class) { };
-
-        private final Class<?> wrapper;
-        private final Class<?> primitive;
-
-        PrimitiveTypes(Class<?> wrapper, Class<?> primitive) {
-            this.wrapper = wrapper;
-            this.primitive = primitive;
-        }
-
-        public static PrimitiveTypes forType(Class<?> type) {
-            for (PrimitiveTypes primitive : PrimitiveTypes.values()) {
-                if (primitive.supports(type)) {
-                    return primitive;
-                }
-            }
-            return null;
-        }
-
-        public boolean supports(Class<?> type) {
-            return type == wrapper || type == primitive;
-        }
-    }
-
     private static boolean isBasicType(Class<?> type) {
-        return PrimitiveTypes.forType(type) != null || Number.class.isAssignableFrom(type);
+        return type.isPrimitive() || Number.class.isAssignableFrom(type) || Boolean.class.isAssignableFrom(type)
+            || Character.class.isAssignableFrom(type);
     }
 }
