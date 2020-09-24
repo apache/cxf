@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
@@ -176,6 +177,62 @@ public class ResponseImplTest {
     public void testHasEntity() {
         assertTrue(new ResponseImpl(200, "").hasEntity());
         assertFalse(new ResponseImpl(200).hasEntity());
+    }
+
+    @Test
+    public void testHasEntityWithEmptyStreamThatIsMarkSupported() throws Exception {
+        InputStream entityStream = EasyMock.createStrictMock(InputStream.class);
+        EasyMock.expect(entityStream.markSupported()).andReturn(true);
+        entityStream.mark(1);
+        EasyMock.expect(entityStream.read()).andReturn(-1);
+        entityStream.reset();
+        EasyMock.replay(entityStream);
+        assertFalse(new ResponseImpl(200, entityStream).hasEntity());
+        EasyMock.verify(entityStream);
+    }
+
+    @Test
+    public void testHasEntityWithNonEmptyStreamThatIsMarkSupported() throws Exception {
+        InputStream entityStream = EasyMock.createStrictMock(InputStream.class);
+        EasyMock.expect(entityStream.markSupported()).andReturn(true);
+        entityStream.mark(1);
+        EasyMock.expect(entityStream.read()).andReturn(0);
+        entityStream.reset();
+        EasyMock.replay(entityStream);
+        assertTrue(new ResponseImpl(200, entityStream).hasEntity());
+        EasyMock.verify(entityStream);
+    }
+
+    @Test
+    public void testHasEntityWithEmptyStreamThatIsNotMarkSupported() throws Exception {
+        InputStream entityStream = EasyMock.createStrictMock(InputStream.class);
+        EasyMock.expect(entityStream.markSupported()).andReturn(false);
+        EasyMock.expect(entityStream.available()).andReturn(0);
+        EasyMock.expect(entityStream.read()).andReturn(-1);
+        EasyMock.replay(entityStream);
+        assertFalse(new ResponseImpl(200, entityStream).hasEntity());
+        EasyMock.verify(entityStream);
+    }
+
+    @Test
+    public void testHasEntityWithNonEmptyStreamThatIsNotMarkSupportedButIsAvailableSupported() throws Exception {
+        InputStream entityStream = EasyMock.createStrictMock(InputStream.class);
+        EasyMock.expect(entityStream.markSupported()).andReturn(false);
+        EasyMock.expect(entityStream.available()).andReturn(10);
+        EasyMock.replay(entityStream);
+        assertTrue(new ResponseImpl(200, entityStream).hasEntity());
+        EasyMock.verify(entityStream);
+    }
+
+    @Test
+    public void testHasEntityWithnNonEmptyStreamThatIsNotMarkSupportedNorAvailableSupported() throws Exception {
+        InputStream entityStream = EasyMock.createStrictMock(InputStream.class);
+        EasyMock.expect(entityStream.markSupported()).andReturn(false).once();
+        EasyMock.expect(entityStream.available()).andReturn(0).once();
+        EasyMock.expect(entityStream.read()).andReturn(0).once();
+        EasyMock.replay(entityStream);
+        assertTrue(new ResponseImpl(200, entityStream).hasEntity());
+        EasyMock.verify(entityStream);
     }
 
     @Test
