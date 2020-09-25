@@ -39,6 +39,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
@@ -311,6 +313,19 @@ public class DynamicClientFactory {
                                ClassLoader classLoader, QName port,
                                List<String> bindingFiles) {
 
+        BiConsumer<StringBuilder, ClassLoader>  classPathSupplier = (stringBuilder, lambdaClassLoader) -> {
+            try {
+                setupClasspath(stringBuilder, lambdaClassLoader);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        };
+        return this.createClient(wsdlUrl, service, classLoader, port, bindingFiles, classPathSupplier);
+    }
+    public Client createClient(String wsdlUrl, QName service,
+                               ClassLoader classLoader, QName port,
+                               List<String> bindingFiles, BiConsumer<StringBuilder, ClassLoader> classPathSupplier) {
+
         if (classLoader == null) {
             classLoader = Thread.currentThread().getContextClassLoader();
         }
@@ -381,11 +396,7 @@ public class DynamicClientFactory {
             throw new IllegalStateException("Unable to create working directory " + classes.getPath());
         }
         StringBuilder classPath = new StringBuilder();
-        try {
-            setupClasspath(classPath, classLoader);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
+        classPathSupplier.accept(classPath, classLoader);
 
         List<File> srcFiles = FileUtils.getFilesRecurseUsingSuffix(src, ".java");
         if (!srcFiles.isEmpty() && !compileJavaSrc(classPath.toString(), srcFiles, classes.toString())) {
