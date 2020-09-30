@@ -93,6 +93,7 @@ public class ASMHelper {
         if (cwClass == null) {
             //try the "real" asm first, then the others
             tryClass("org.objectweb.asm.ClassWriter");
+            tryClass("org.apache.xbean.asm9.ClassWriter");
             tryClass("org.apache.xbean.asm8.ClassWriter");
             tryClass("org.apache.xbean.asm7.ClassWriter");
             tryClass("org.apache.xbean.asm5.ClassWriter");
