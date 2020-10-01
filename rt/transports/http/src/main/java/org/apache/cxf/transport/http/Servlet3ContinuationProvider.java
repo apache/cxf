@@ -29,7 +29,6 @@ import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationCallback;
@@ -41,22 +40,10 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
  *
  */
 public class Servlet3ContinuationProvider implements ContinuationProvider {
-    static final boolean IS_31;
-    static {
-        boolean is31 = false;
-        try {
-            ClassLoaderUtils.loadClass("javax.servlet.WriteListener", HttpServletRequest.class);
-            is31 = true;
-        } catch (Throwable t) {
-            is31 = false;
-        }
-        IS_31 = is31;
-    }
-    
     HttpServletRequest req;
     HttpServletResponse resp;
     Message inMessage;
-    Servlet3Continuation continuation;
+    Servlet31Continuation continuation;
 
     public Servlet3ContinuationProvider(HttpServletRequest req,
                                         HttpServletResponse resp,
@@ -73,7 +60,6 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         }
     }
 
-
     /** {@inheritDoc}*/
     public Continuation getContinuation() {
         if (inMessage.getExchange().isOneWay()) {
@@ -81,14 +67,14 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         }
 
         if (continuation == null) {
-            continuation = IS_31 ? new Servlet31Continuation() : new Servlet3Continuation();
+            continuation = new Servlet31Continuation();
         } else {
             continuation.startAsyncAgain();
         }
         return continuation;
     }
 
-    public class Servlet3Continuation implements Continuation, AsyncListener {
+    public class Servlet31Continuation implements Continuation, AsyncListener {
         private static final String BLOCK_RESTART = "org.apache.cxf.continuation.block.restart";
         AsyncContext context;
         volatile boolean isNew = true;
@@ -99,8 +85,8 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         volatile Object obj;
         private ContinuationCallback callback;
         private boolean blockRestart;
-        
-        public Servlet3Continuation() {
+
+        public Servlet31Continuation() {
             req.setAttribute(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE,
                              inMessage.getExchange().getInMessage());
             callback = inMessage.getExchange().get(ContinuationCallback.class);
@@ -139,7 +125,15 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
             return true;
         }
         protected void updateMessageForSuspend() {
-            inMessage.getExchange().getInMessage().getInterceptorChain().suspend();
+            Message currentMessage = PhaseInterceptorChain.getCurrentMessage();
+            if (currentMessage.get(WriteListener.class) != null) {
+                // CXF Continuation WriteListener will likely need to be introduced
+                // for NIO supported with non-Servlet specific mechanisms
+                getOutputStream().setWriteListener(currentMessage.get(WriteListener.class));
+                currentMessage.getInterceptorChain().suspend();
+            } else {
+                inMessage.getExchange().getInMessage().getInterceptorChain().suspend();
+            }
         }
         public void redispatch() {
             if (!isComplete) {
@@ -240,7 +234,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
 
         @Override
         public boolean isReadyForWrite() {
-            return true;
+            return getOutputStream().isReady();
         }
 
         protected ServletOutputStream getOutputStream() {
@@ -254,28 +248,6 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         @Override
         public boolean isTimeout() {
             return isTimeout;
-        }
-    }
-    public class Servlet31Continuation extends Servlet3Continuation {
-        public Servlet31Continuation() {
-        }
-
-        @Override
-        protected void updateMessageForSuspend() {
-            Message currentMessage = PhaseInterceptorChain.getCurrentMessage();
-            if (currentMessage.get(WriteListener.class) != null) {
-                // CXF Continuation WriteListener will likely need to be introduced
-                // for NIO supported with non-Servlet specific mechanisms
-                getOutputStream().setWriteListener(currentMessage.get(WriteListener.class));
-                currentMessage.getInterceptorChain().suspend();
-            } else {
-                inMessage.getExchange().getInMessage().getInterceptorChain().suspend();
-            }
-        }
-        
-        @Override
-        public boolean isReadyForWrite() {
-            return getOutputStream().isReady();
         }
     }
 }
