@@ -210,6 +210,7 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
 
     @Override
     public RestClientBuilder sslContext(SSLContext sslContext) {
+        property("org.apache.cxf.microprofile.client.sslConfigProvided", "true");
         secConfig.getTlsClientParams().setKeyManagers(null);
         secConfig.getTlsClientParams().setTrustManagers(null);
         secConfig.setSslContext(sslContext);
@@ -218,6 +219,7 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
 
     @Override
     public RestClientBuilder keyStore(KeyStore store, String password) {
+        property("org.apache.cxf.microprofile.client.sslConfigProvided", "true");
         secConfig.setSslContext(null);
         try {
             KeyManagerFactory kmf =
@@ -232,6 +234,7 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
 
     @Override
     public RestClientBuilder trustStore(KeyStore store) {
+        property("org.apache.cxf.microprofile.client.sslConfigProvided", "true");
         secConfig.setSslContext(null);
         try {
             TrustManagerFactory tmf =
@@ -247,6 +250,7 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
 
     @Override
     public RestClientBuilder hostnameVerifier(HostnameVerifier verifier) {
+        property("org.apache.cxf.microprofile.client.sslConfigProvided", "true");
         secConfig.getTlsClientParams().setHostnameVerifier(verifier);
         return this;
     }
