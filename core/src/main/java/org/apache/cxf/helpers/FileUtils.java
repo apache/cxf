@@ -385,7 +385,7 @@ public final class FileUtils {
     }
 
     public static boolean exists(File file) {
-        if (System.getSecurityManager() != null) {
+        if (System.getSecurityManager() == null) {
             return file.exists();
         }
         return AccessController.doPrivileged((PrivilegedAction<Boolean>) () -> {
