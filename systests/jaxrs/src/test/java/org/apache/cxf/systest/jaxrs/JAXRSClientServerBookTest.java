@@ -839,7 +839,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             assertTrue(cacheControl.toString().contains("max-age=100000"));
 
             // Now make a second call. This should be retrieved from the client's cache
-            target.request().get();
+            response = target.request().get();
             assertEquals(200, response.getStatus());
             book = response.readEntity(Book.class);
             assertEquals(123L, book.getId());
@@ -881,7 +881,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             // Now make a second call. The value in the cache will have expired, so
             // it should call the service again
             Thread.sleep(1500L);
-            target.request().get();
+            response = target.request().get();
             assertEquals(200, response.getStatus());
             book = response.readEntity(Book.class);
             assertEquals(123L, book.getId());
@@ -923,13 +923,11 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             // Now make a second call. The value in the clients cache will have expired, so it should call
             // out to the service, which will return 304, and the client will re-use the cached payload
             Thread.sleep(1500L);
-            target.request().get();
-            assertEquals(200, response.getStatus());
-            book = response.readEntity(Book.class);
-            assertEquals(123L, book.getId());
+            response = target.request().get();
+            assertEquals(304, response.getStatus());
+            assertFalse(response.hasEntity());
         }
     }
-
 
     @Test
     public void testOnewayWebClient() throws Exception {
