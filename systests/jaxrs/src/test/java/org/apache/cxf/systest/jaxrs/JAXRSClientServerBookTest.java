@@ -905,6 +905,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             // First call
             Response response = target.request().get();
             assertEquals(200, response.getStatus());
+            response.bufferEntity();
             Book book = response.readEntity(Book.class);
             assertEquals(123L, book.getId());
 
@@ -923,9 +924,11 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             // Now make a second call. The value in the clients cache will have expired, so it should call
             // out to the service, which will return 304, and the client will re-use the cached payload
             Thread.sleep(1500L);
-            response = target.request().get();
-            assertEquals(304, response.getStatus());
-            assertFalse(response.hasEntity());
+            Response response2 = target.request().get();
+            assertEquals(304, response2.getStatus());
+            assertFalse(response2.hasEntity());
+            Book book2 = response.readEntity(Book.class);
+            assertEquals(123L, book2.getId());
         }
     }
 
