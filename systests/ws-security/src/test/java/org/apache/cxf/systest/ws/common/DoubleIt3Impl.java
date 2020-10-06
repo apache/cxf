@@ -16,26 +16,38 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.sts.common;
+package org.apache.cxf.systest.ws.common;
 
-import javax.annotation.Resource;
+import java.util.Arrays;
+
 import javax.jws.WebService;
-import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.feature.Features;
-import org.example.contract.doubleit.DoubleItPortType;
+import org.example.contract.doubleit.DoubleItFault;
+import org.example.contract.doubleit.DoubleItSwaPortType;
+import org.example.schema.doubleit.DoubleIt3;
+import org.example.schema.doubleit.DoubleItResponse;
 
 @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
             serviceName = "DoubleItService",
-            endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
+            endpointInterface = "org.example.contract.doubleit.DoubleItSwaPortType")
 @Features(features = "org.apache.cxf.feature.LoggingFeature")
-public class DoubleItImpl implements DoubleItPortType {
+public class DoubleIt3Impl implements DoubleItSwaPortType {
 
-    @Resource
-    WebServiceContext wsContext;
+    @Override
+    public DoubleItResponse doubleIt3(DoubleIt3 parameters, byte[] attachment) throws DoubleItFault {
+        int numberToDouble = parameters.getNumberToDouble();
+        if (numberToDouble == 0) {
+            throw new DoubleItFault("0 can't be doubled!");
+        }
 
-    public int doubleIt(int numberToDouble) {
-        return numberToDouble * 2;
+        if (!Arrays.equals(attachment, "12345".getBytes())) {
+            throw new DoubleItFault("Unexpected attachment value!");
+        }
+
+        DoubleItResponse response = new DoubleItResponse();
+        response.setDoubledNumber(numberToDouble * 2);
+        return response;
     }
 
 }

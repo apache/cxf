@@ -33,7 +33,12 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="GCM128" address="http://localhost:${testutil.ports.gcm.StaxServer}/DoubleItGCM128" serviceName="s:DoubleItService" endpointName="s:DoubleItGCM128Port" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/gcm/DoubleItGCM.wsdl">
+
+    <bean id="doubleItNoSecurity" class="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl">
+        <property name="enforcePrincipal" value="false"/>
+    </bean>
+
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="GCM128" address="http://localhost:${testutil.ports.gcm.StaxServer}/DoubleItGCM128" serviceName="s:DoubleItService" endpointName="s:DoubleItGCM128Port" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/gcm/DoubleItGCM.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -42,7 +47,7 @@
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="GCM192" address="http://localhost:${testutil.ports.gcm.StaxServer}/DoubleItGCM192" serviceName="s:DoubleItService" endpointName="s:DoubleItGCM192Port" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/gcm/DoubleItGCM.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="GCM192" address="http://localhost:${testutil.ports.gcm.StaxServer}/DoubleItGCM192" serviceName="s:DoubleItService" endpointName="s:DoubleItGCM192Port" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/gcm/DoubleItGCM.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -52,7 +57,7 @@
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="GCM256" address="http://localhost:${testutil.ports.gcm.StaxServer}/DoubleItGCM256" serviceName="s:DoubleItService" endpointName="s:DoubleItGCM256Port" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/gcm/DoubleItGCM.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="GCM256" address="http://localhost:${testutil.ports.gcm.StaxServer}/DoubleItGCM256" serviceName="s:DoubleItService" endpointName="s:DoubleItGCM256Port" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/gcm/DoubleItGCM.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>

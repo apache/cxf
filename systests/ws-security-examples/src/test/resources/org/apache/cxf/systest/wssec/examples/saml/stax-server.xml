@@ -37,8 +37,11 @@
     <bean id="allowUnsignedBearerAssertions" class="org.apache.wss4j.stax.validate.SamlTokenValidatorImpl">
         <property name="requireBearerSignature" value="false" />
     </bean>
+    <bean id="doubleItNoSecurity" class="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl">
+        <property name="enforcePrincipal" value="false"/>
+    </bean>
     
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Bearer" address="http://localhost:${testutil.ports.saml.StaxServer}/DoubleItSamlBearer" serviceName="s:DoubleItService" endpointName="s:DoubleItBearerPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/saml/DoubleItSaml.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Bearer" address="http://localhost:${testutil.ports.saml.StaxServer}/DoubleItSamlBearer" serviceName="s:DoubleItService" endpointName="s:DoubleItBearerPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/wssec/examples/saml/DoubleItSaml.wsdl">
         <jaxws:properties>
             <entry key="ws-security.enable.streaming" value="true"/>
             <entry key="ws-security.saml1.validator" value-ref="allowUnsignedBearerAssertions"/>

@@ -26,7 +26,12 @@
     xmlns:jaxws="http://cxf.apache.org/jaxws"
     xsi:schemaLocation="http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportsecureconv" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItTransportSecureConvPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.secure_conv.Server}/doubleit/services/doubleittransportsecureconv" wsdlLocation="org/apache/cxf/systest/sts/secure_conv/DoubleIt.wsdl">
+
+    <bean id="doubleItNoSecurity" class="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl">
+        <property name="enforcePrincipal" value="false"/>
+    </bean>
+
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportsecureconv" implementor="#doubleItNoSecurity" endpointName="s:DoubleItTransportSecureConvPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.secure_conv.Server}/doubleit/services/doubleittransportsecureconv" wsdlLocation="org/apache/cxf/systest/sts/secure_conv/DoubleIt.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="security.signature.properties" value="serviceKeystore.properties"/>
@@ -44,7 +49,7 @@
             </entry>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleitsymmetricsecureconv" implementor="org.apache.cxf.systest.sts.secure_conv.DoubleItPortTypeImpl" endpointName="s:DoubleItSymmetricSecureConvPort" serviceName="s:DoubleItService" address="http://localhost:${testutil.ports.secure_conv.Server.2}/doubleit/services/doubleitsymmetricsecureconv" wsdlLocation="org/apache/cxf/systest/sts/secure_conv/DoubleIt.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleitsymmetricsecureconv" implementor="#doubleItNoSecurity" endpointName="s:DoubleItSymmetricSecureConvPort" serviceName="s:DoubleItService" address="http://localhost:${testutil.ports.secure_conv.Server.2}/doubleit/services/doubleitsymmetricsecureconv" wsdlLocation="org/apache/cxf/systest/sts/secure_conv/DoubleIt.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="security.signature.properties" value="serviceKeystore.properties"/>
@@ -62,7 +67,7 @@
             </entry>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportsupporting" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItTransportSupportingPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.secure_conv.Server}/doubleit/services/doubleittransportsupporting" wsdlLocation="org/apache/cxf/systest/sts/secure_conv/DoubleIt.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportsupporting" implementor="#doubleItNoSecurity" endpointName="s:DoubleItTransportSupportingPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.secure_conv.Server}/doubleit/services/doubleittransportsupporting" wsdlLocation="org/apache/cxf/systest/sts/secure_conv/DoubleIt.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="security.signature.properties" value="serviceKeystore.properties"/>

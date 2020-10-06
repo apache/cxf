@@ -33,6 +33,11 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
+
+    <bean id="doubleItNoSecurity" class="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl">
+        <property name="enforcePrincipal" value="false"/>
+    </bean>
+
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricSignEncrypt" address="http://localhost:${testutil.ports.x509.StaxServer}/DoubleItX509AsymmetricSignEncrypt" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricSignEncryptPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/x509/DoubleItX509.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
@@ -51,7 +56,7 @@
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SymmetricSignEncrypt" address="http://localhost:${testutil.ports.x509.StaxServer}/DoubleItX509SymmetricSignEncrypt" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricSignEncryptPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/x509/DoubleItX509.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SymmetricSignEncrypt" address="http://localhost:${testutil.ports.x509.StaxServer}/DoubleItX509SymmetricSignEncrypt" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricSignEncryptPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/wssec/examples/x509/DoubleItX509.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="security.signature.username" value="bob"/>

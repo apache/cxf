@@ -37,8 +37,11 @@
     <bean id="mgfPolicyLoader" class="org.apache.cxf.systest.ws.gcm.MGF256AlgorithmSuiteLoader" >
           <constructor-arg ref="cxf"/>
     </bean>
-    
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="GCM256MGFSHA256" address="http://localhost:${testutil.ports.gcm.MGFStaxServer}/DoubleItGCM256MGFSHA256" serviceName="s:DoubleItService" endpointName="s:DoubleItGCM256MGFSHA256Port" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/gcm/DoubleItGCM.wsdl">
+    <bean id="doubleItNoSecurity" class="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl">
+        <property name="enforcePrincipal" value="false"/>
+    </bean>
+
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="GCM256MGFSHA256" address="http://localhost:${testutil.ports.gcm.MGFStaxServer}/DoubleItGCM256MGFSHA256" serviceName="s:DoubleItService" endpointName="s:DoubleItGCM256MGFSHA256Port" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/gcm/DoubleItGCM.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -48,7 +51,7 @@
         </jaxws:properties>
     </jaxws:endpoint>
     
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="GCM256MGFSHA256Digest" address="http://localhost:${testutil.ports.gcm.MGFStaxServer}/DoubleItGCM256MGFSHA256digest" serviceName="s:DoubleItService" endpointName="s:DoubleItGCM256MGFSHA256DigestPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/gcm/DoubleItGCM.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="GCM256MGFSHA256Digest" address="http://localhost:${testutil.ports.gcm.MGFStaxServer}/DoubleItGCM256MGFSHA256digest" serviceName="s:DoubleItService" endpointName="s:DoubleItGCM256MGFSHA256DigestPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/gcm/DoubleItGCM.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>

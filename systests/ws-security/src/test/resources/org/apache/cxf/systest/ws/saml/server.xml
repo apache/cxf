@@ -51,6 +51,11 @@
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
+
+    <bean id="doubleItNoSecurity" class="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl">
+        <property name="enforcePrincipal" value="false"/>
+    </bean>
+
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml1TokenOverTransport" address="https://localhost:${testutil.ports.saml.Server.2}/DoubleItSaml1Transport" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml1TransportPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
         <jaxws:properties>
        </jaxws:properties>
@@ -158,7 +163,7 @@
             <entry key="ws-security.saml2.validator" value="org.apache.cxf.systest.ws.saml.CustomSaml2Validator"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TokenOverSymmetricSignedElements" address="http://localhost:${testutil.ports.saml.Server}/DoubleItSaml2SymmetricSignedElements" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2SymmetricSignedElementsPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TokenOverSymmetricSignedElements" address="http://localhost:${testutil.ports.saml.Server}/DoubleItSaml2SymmetricSignedElements" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2SymmetricSignedElementsPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>

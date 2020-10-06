@@ -34,10 +34,14 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    
+
+    <bean id="doubleItNoSecurity" class="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl">
+        <property name="enforcePrincipal" value="false"/>
+    </bean>
+
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="UT" 
         address="http://localhost:${testutil.ports.password.Server}/DoubleItUT" serviceName="s:DoubleItService" 
-        endpointName="s:DoubleItUTPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" 
+        endpointName="s:DoubleItUTPort" implementor="#doubleItNoSecurity"
         wsdlLocation="org/apache/cxf/systest/ws/password/DoubleItPassword.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
@@ -46,7 +50,7 @@
     
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="UTSigned" 
         address="http://localhost:${testutil.ports.password.Server}/DoubleItUTSigned" serviceName="s:DoubleItService" 
-        endpointName="s:DoubleItUTSignedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" 
+        endpointName="s:DoubleItUTSignedPort" implementor="#doubleItNoSecurity"
         wsdlLocation="org/apache/cxf/systest/ws/password/DoubleItPassword.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
@@ -56,7 +60,7 @@
     
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Asymmetric" 
         address="http://localhost:${testutil.ports.password.Server}/DoubleItAsymmetric" serviceName="s:DoubleItService" 
-        endpointName="s:DoubleItAsymmetricPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" 
+        endpointName="s:DoubleItAsymmetricPort" implementor="#doubleItNoSecurity"
         wsdlLocation="org/apache/cxf/systest/ws/password/DoubleItPassword.wsdl">
         <jaxws:properties>
             <entry key="security.signature.username" value="bob"/>
