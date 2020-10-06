@@ -156,7 +156,7 @@
             <entry key="security.signature.properties" value="clientKeystore.properties"/>
             <entry key="security.signature.username" value="myclientkey"/>
             <entry key="security.sts.client" value-ref="saml2STSIntermediaryClient" />
-            <entry key="ws-security.cache.issued.token.in.endpoint" value="false"/>
+            <entry key="security.cache.issued.token.in.endpoint" value="false"/>
         </jaxws:properties>
     </jaxws:client>
     
