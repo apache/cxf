@@ -84,7 +84,7 @@ public class MessageContextImpl implements MessageContext {
                 throw new WebApplicationException(e, 413);
             }
         }
-        if (keyValue.equals("WRITE-" + Message.ATTACHMENTS)) {
+        if (keyValue.equals("WRITE-" + Message.ATTACHMENTS) && m.getExchange().getOutMessage() != null) {
             return m.getExchange().getOutMessage().get(Message.ATTACHMENTS);
         }
 
