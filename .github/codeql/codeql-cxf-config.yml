@@ -1,0 +1,6 @@
+
+name: "CXF CodeQL config"
+
+paths:
+  # Exclude test code
+  - src/main
