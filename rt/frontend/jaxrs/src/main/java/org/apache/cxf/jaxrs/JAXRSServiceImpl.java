@@ -97,7 +97,7 @@ public class JAXRSServiceImpl extends AbstractAttributedInterceptorProvider impl
         if (serviceName != null) {
             return serviceName;
         }
-        if (address == null) {
+        if (address == null && !classResourceInfos.isEmpty()) {
             Class<?> primaryClass = classResourceInfos.get(0).getServiceClass();
             String ns = PackageUtils.getNamespace(PackageUtils.getPackageName(primaryClass));
             return new QName(ns, primaryClass.getSimpleName());
