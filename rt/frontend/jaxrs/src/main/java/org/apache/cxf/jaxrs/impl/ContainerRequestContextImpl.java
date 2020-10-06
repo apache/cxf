@@ -123,8 +123,9 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
 
     protected void doSetRequestUri(URI requestUri) throws IllegalStateException {
         checkNotPreMatch();
-        // The JAX-RS TCK requires the full uri toString() rather than just the raw path:
-        HttpUtils.resetRequestURI(m, requestUri.toString());
+        // TODO: The JAX-RS TCK requires the full uri toString() rather than just the raw path, but
+        // changing to toString() seems to have adverse effects downstream. Needs more investigation.
+        HttpUtils.resetRequestURI(m, requestUri.getRawPath());
         String query = requestUri.getRawQuery();
         if (query != null) {
             m.put(Message.QUERY_STRING, query);
