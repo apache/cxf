@@ -316,7 +316,7 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
                         // Sleep long enough so that the workqueue will fill up and then
                         // handleResponseOnWorkqueue will fail for the calls from both
                         // responseReceived and consumeContent
-                        Thread.sleep(3 * asyncExecuteTimeout);
+                        Thread.sleep(3L * asyncExecuteTimeout);
                         initialThreadsLatch.countDown();
                     } else {
                         Thread.sleep(50);
