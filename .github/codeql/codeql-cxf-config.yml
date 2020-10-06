@@ -2,5 +2,7 @@
 name: "CXF CodeQL config"
 
 paths:
-  # Exclude test code
-  - src/main
+  - src
+paths-ignore:
+  # Exclude tests
+  - '**/src/test/java/**'
