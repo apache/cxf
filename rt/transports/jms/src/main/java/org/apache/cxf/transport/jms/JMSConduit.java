@@ -204,7 +204,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         if (staticReplyDestination == null) {
             synchronized (this) {
                 if (staticReplyDestination == null) {
-                    staticReplyDestination = jmsConfig.getReplyDestination(session);
+                    Destination staticReplyDestinationTmp = jmsConfig.getReplyDestination(session);
 
                     String messageSelector = JMSFactory.getMessageSelector(jmsConfig, conduitId);
                     if (jmsConfig.getMessageSelector() != null) {
@@ -222,7 +222,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                     if (jmsConfig.isOneSessionPerConnection()) {
                         container = new PollingMessageListenerContainer(jmsConfig, true, this);
                     } else {
-                        container = new MessageListenerContainer(getConnection(), staticReplyDestination, this);
+                        container = new MessageListenerContainer(getConnection(), staticReplyDestinationTmp, this);
                     }
 
                     container.setTransactionManager(jmsConfig.getTransactionManager());
@@ -236,6 +236,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                     container.start();
                     jmsListener = container;
                     addBusListener();
+                    staticReplyDestination = staticReplyDestinationTmp;
                 }
             }
         }
