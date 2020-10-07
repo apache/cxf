@@ -63,8 +63,8 @@ public abstract class AbstractSseBaseTest extends AbstractBusClientServerTestBas
             .target("http://localhost:" + getPort() + url);
     }
     
-    protected void awaitEvents(long timeout, final Collection<?> events, int size) throws InterruptedException {
-        final long sleep = timeout / 10;
+    protected void awaitEvents(int timeout, final Collection<?> events, int size) throws InterruptedException {
+        final int sleep = timeout / 10;
         
         for (int i = 0; i < timeout; i += sleep) {
             if (events.size() == size) {

@@ -421,6 +421,6 @@ public class UsernameActAsCachingTest extends AbstractBusClientServerTestBase {
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
-        assertEquals(2 * numToDouble, resp);
+        assertEquals(2L * numToDouble, resp);
     }
 }
