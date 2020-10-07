@@ -813,38 +813,37 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             "http://localhost:" + PORT + "/bookstore/books/response/123";
 
         // Add the CacheControlFeature to cache books returned by the service on the client side
-        CacheControlFeature cacheControlFeature = new CacheControlFeature();
-        cacheControlFeature.setCacheResponseInputStream(true);
-        Client client = ClientBuilder.newBuilder()
-            .register(cacheControlFeature)
-            .build();
-        WebTarget target = client.target(endpointAddress);
+        try (CacheControlFeature cacheControlFeature = new CacheControlFeature()) {
+            cacheControlFeature.setCacheResponseInputStream(true);
+            Client client = ClientBuilder.newBuilder()
+                .register(cacheControlFeature)
+                .build();
+            WebTarget target = client.target(endpointAddress);
 
-        // First call
-        Response response = target.request().get();
-        assertEquals(200, response.getStatus());
-        Book book = response.readEntity(Book.class);
-        assertEquals(123L, book.getId());
+            // First call
+            Response response = target.request().get();
+            assertEquals(200, response.getStatus());
+            Book book = response.readEntity(Book.class);
+            assertEquals(123L, book.getId());
 
-        MultivaluedMap<String, Object> headers = response.getMetadata();
-        assertFalse(headers.isEmpty());
-        Object etag = headers.getFirst("ETag");
-        assertNotNull(etag);
-        assertTrue(etag.toString().startsWith("\""));
-        assertTrue(etag.toString().endsWith("\""));
+            MultivaluedMap<String, Object> headers = response.getMetadata();
+            assertFalse(headers.isEmpty());
+            Object etag = headers.getFirst("ETag");
+            assertNotNull(etag);
+            assertTrue(etag.toString().startsWith("\""));
+            assertTrue(etag.toString().endsWith("\""));
 
-        Object cacheControl = headers.getFirst("Cache-Control");
-        assertNotNull(cacheControl);
-        assertTrue(cacheControl.toString().contains("private"));
-        assertTrue(cacheControl.toString().contains("max-age=100000"));
+            Object cacheControl = headers.getFirst("Cache-Control");
+            assertNotNull(cacheControl);
+            assertTrue(cacheControl.toString().contains("private"));
+            assertTrue(cacheControl.toString().contains("max-age=100000"));
 
-        // Now make a second call. This should be retrieved from the client's cache
-        target.request().get();
-        assertEquals(200, response.getStatus());
-        book = response.readEntity(Book.class);
-        assertEquals(123L, book.getId());
-
-        cacheControlFeature.close();
+            // Now make a second call. This should be retrieved from the client's cache
+            target.request().get();
+            assertEquals(200, response.getStatus());
+            book = response.readEntity(Book.class);
+            assertEquals(123L, book.getId());
+        }
     }
 
     @Test
@@ -854,40 +853,39 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             "http://localhost:" + PORT + "/bookstore/books/response2/123";
 
         // Add the CacheControlFeature to cache books returned by the service on the client side
-        CacheControlFeature cacheControlFeature = new CacheControlFeature();
-        cacheControlFeature.setCacheResponseInputStream(true);
-        Client client = ClientBuilder.newBuilder()
-            .register(cacheControlFeature)
-            .build();
-        WebTarget target = client.target(endpointAddress);
+        try (CacheControlFeature cacheControlFeature = new CacheControlFeature()) {
+            cacheControlFeature.setCacheResponseInputStream(true);
+            Client client = ClientBuilder.newBuilder()
+                .register(cacheControlFeature)
+                .build();
+            WebTarget target = client.target(endpointAddress);
 
-        // First call
-        Response response = target.request().get();
-        assertEquals(200, response.getStatus());
-        Book book = response.readEntity(Book.class);
-        assertEquals(123L, book.getId());
+            // First call
+            Response response = target.request().get();
+            assertEquals(200, response.getStatus());
+            Book book = response.readEntity(Book.class);
+            assertEquals(123L, book.getId());
 
-        MultivaluedMap<String, Object> headers = response.getMetadata();
-        assertFalse(headers.isEmpty());
-        Object etag = headers.getFirst("ETag");
-        assertNotNull(etag);
-        assertTrue(etag.toString().startsWith("\""));
-        assertTrue(etag.toString().endsWith("\""));
+            MultivaluedMap<String, Object> headers = response.getMetadata();
+            assertFalse(headers.isEmpty());
+            Object etag = headers.getFirst("ETag");
+            assertNotNull(etag);
+            assertTrue(etag.toString().startsWith("\""));
+            assertTrue(etag.toString().endsWith("\""));
 
-        Object cacheControl = headers.getFirst("Cache-Control");
-        assertNotNull(cacheControl);
-        assertTrue(cacheControl.toString().contains("private"));
-        assertTrue(cacheControl.toString().contains("max-age=1"));
+            Object cacheControl = headers.getFirst("Cache-Control");
+            assertNotNull(cacheControl);
+            assertTrue(cacheControl.toString().contains("private"));
+            assertTrue(cacheControl.toString().contains("max-age=1"));
 
-        // Now make a second call. The value in the cache will have expired, so
-        // it should call the service again
-        Thread.sleep(1500L);
-        target.request().get();
-        assertEquals(200, response.getStatus());
-        book = response.readEntity(Book.class);
-        assertEquals(123L, book.getId());
-
-        cacheControlFeature.close();
+            // Now make a second call. The value in the cache will have expired, so
+            // it should call the service again
+            Thread.sleep(1500L);
+            target.request().get();
+            assertEquals(200, response.getStatus());
+            book = response.readEntity(Book.class);
+            assertEquals(123L, book.getId());
+        }
     }
 
     @Test
@@ -897,40 +895,39 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             "http://localhost:" + PORT + "/bookstore/books/response3/123";
 
         // Add the CacheControlFeature to cache books returned by the service on the client side
-        CacheControlFeature cacheControlFeature = new CacheControlFeature();
-        cacheControlFeature.setCacheResponseInputStream(true);
-        Client client = ClientBuilder.newBuilder()
-            .register(cacheControlFeature)
-            .build();
-        WebTarget target = client.target(endpointAddress);
+        try (CacheControlFeature cacheControlFeature = new CacheControlFeature()) {
+            cacheControlFeature.setCacheResponseInputStream(true);
+            Client client = ClientBuilder.newBuilder()
+                .register(cacheControlFeature)
+                .build();
+            WebTarget target = client.target(endpointAddress);
 
-        // First call
-        Response response = target.request().get();
-        assertEquals(200, response.getStatus());
-        Book book = response.readEntity(Book.class);
-        assertEquals(123L, book.getId());
+            // First call
+            Response response = target.request().get();
+            assertEquals(200, response.getStatus());
+            Book book = response.readEntity(Book.class);
+            assertEquals(123L, book.getId());
 
-        MultivaluedMap<String, Object> headers = response.getMetadata();
-        assertFalse(headers.isEmpty());
-        Object etag = headers.getFirst("ETag");
-        assertNotNull(etag);
-        assertTrue(etag.toString().startsWith("\""));
-        assertTrue(etag.toString().endsWith("\""));
+            MultivaluedMap<String, Object> headers = response.getMetadata();
+            assertFalse(headers.isEmpty());
+            Object etag = headers.getFirst("ETag");
+            assertNotNull(etag);
+            assertTrue(etag.toString().startsWith("\""));
+            assertTrue(etag.toString().endsWith("\""));
 
-        Object cacheControl = headers.getFirst("Cache-Control");
-        assertNotNull(cacheControl);
-        assertTrue(cacheControl.toString().contains("private"));
-        assertTrue(cacheControl.toString().contains("max-age=1"));
+            Object cacheControl = headers.getFirst("Cache-Control");
+            assertNotNull(cacheControl);
+            assertTrue(cacheControl.toString().contains("private"));
+            assertTrue(cacheControl.toString().contains("max-age=1"));
 
-        // Now make a second call. The value in the clients cache will have expired, so it should call
-        // out to the service, which will return 304, and the client will re-use the cached payload
-        Thread.sleep(1500L);
-        target.request().get();
-        assertEquals(200, response.getStatus());
-        book = response.readEntity(Book.class);
-        assertEquals(123L, book.getId());
-
-        cacheControlFeature.close();
+            // Now make a second call. The value in the clients cache will have expired, so it should call
+            // out to the service, which will return 304, and the client will re-use the cached payload
+            Thread.sleep(1500L);
+            target.request().get();
+            assertEquals(200, response.getStatus());
+            book = response.readEntity(Book.class);
+            assertEquals(123L, book.getId());
+        }
     }
 
 
