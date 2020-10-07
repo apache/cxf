@@ -41,7 +41,7 @@ import javax.ws.rs.ext.Provider;
 
 
 @Provider
-public class CacheControlFeature implements Feature {
+public class CacheControlFeature implements Feature, Closeable {
     private CachingProvider provider;
     private CacheManager manager;
     private Cache<Key, Entry> cache;
