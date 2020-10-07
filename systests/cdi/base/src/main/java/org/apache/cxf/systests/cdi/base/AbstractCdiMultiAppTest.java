@@ -52,10 +52,12 @@ public abstract class AbstractCdiMultiAppTest extends AbstractCdiSingleAppTest {
     @Test
     public void testGetBookStoreVersion() {
         Response r1 = createWebClient("/rest/v3/bookstore/versioned/version", MediaType.TEXT_PLAIN).get();
+        r1.bufferEntity();
         assertEquals(Response.Status.OK.getStatusCode(), r1.getStatus());
         assertThat(r1.readEntity(String.class), startsWith("1.0."));
 
         Response r2 = createWebClient("/rest/v3/bookstore/versioned/version", MediaType.TEXT_PLAIN).get();
+        r2.bufferEntity();
         assertEquals(Response.Status.OK.getStatusCode(), r2.getStatus());
         assertThat(r2.readEntity(String.class), startsWith("1.0."));
 
