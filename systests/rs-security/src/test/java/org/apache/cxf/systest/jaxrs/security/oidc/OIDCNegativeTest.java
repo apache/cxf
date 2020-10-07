@@ -47,6 +47,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -113,12 +114,7 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
         client.path("authorize-implicit/");
         Response response = client.get();
 
-        try {
-            response.readEntity(OAuthAuthorizationData.class);
-            fail("Failure expected on a bad prompt");
-        } catch (Exception ex) {
-            // expected
-        }
+        assertNull(response.readEntity(OAuthAuthorizationData.class));
     }
 
     @org.junit.Test
@@ -196,12 +192,7 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
         client.path("authorize-implicit/");
         Response response = client.get();
 
-        try {
-            response.readEntity(OAuthAuthorizationData.class);
-            fail("Failure expected on no nonce");
-        } catch (Exception ex) {
-            // expected
-        }
+        assertNull(response.readEntity(OAuthAuthorizationData.class));
 
         // Add a nonce and it should succeed
         String nonce = "1234565635";
