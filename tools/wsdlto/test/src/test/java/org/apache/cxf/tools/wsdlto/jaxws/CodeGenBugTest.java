@@ -56,10 +56,13 @@ import org.eclipse.jetty.server.handler.ResourceHandler;
 
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -1058,6 +1061,15 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         Class<?> clz = classLoader.loadClass("org.apache.intfault.BadRecordLitFault");
         WebFault webFault = AnnotationUtil.getPrivClassAnnotation(clz, WebFault.class);
         assertEquals("int", webFault.name());
+    }
+    
+    @Test
+    public void testCXF8337() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/cxf964/hello_world_fault.wsdl"));
+        processor.setContext(env);
+        processor.execute();
+        Class<?> clz = classLoader.loadClass("org.apache.intfault.BadRecordLitFault");
+        assertThat(clz.getDeclaredField("faultInfo"), not(nullValue()));
     }
 
     @Test
