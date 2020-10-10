@@ -124,7 +124,10 @@ public class StreamingAsyncSubscriber<T> extends AbstractSubscriber<T> {
             }
 
             if (throwable != null) {
-                if (throwable instanceof RuntimeException) {
+                // non-empty stream
+                if (firstWriteDone.get()) {
+                    throw new ResponseStatusOnlyException(throwable);
+                } else if (throwable instanceof RuntimeException) {
                     throw (RuntimeException)throwable;
                 } else if (throwable instanceof IOException) {
                     throw (IOException)throwable;

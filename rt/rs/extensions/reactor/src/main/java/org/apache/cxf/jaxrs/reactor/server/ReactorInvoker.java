@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.reactor.server;
 
+import java.util.Collections;
+
 import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.jaxrs.reactivestreams.server.AbstractReactiveInvoker;
 import org.apache.cxf.message.Message;
@@ -32,20 +34,29 @@ public class ReactorInvoker extends AbstractReactiveInvoker {
             final Flux<?> flux = (Flux<?>) result;
             final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
             if (!isStreamingSubscriberUsed(flux, asyncResponse, inMessage)) {
-                flux.doOnNext(asyncResponse::resume)
-                    .doOnError(t -> handleThrowable(asyncResponse, t))
-                    .subscribe();
+                subscribe(flux, asyncResponse);
             }
             return asyncResponse;
         } else if (result instanceof Mono) {
             final Mono<?> mono = (Mono<?>) result;
             final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
-            mono.doOnNext(asyncResponse::resume)
-                .doOnError(t -> handleThrowable(asyncResponse, t))
-                .subscribe();
+            subscribe(mono, asyncResponse);
             return asyncResponse;
         }
         return null;
+    }
+
+    private void subscribe(final Mono<?> mono, final AsyncResponseImpl asyncResponse) {
+        mono.doOnSuccess(asyncResponse::resume)
+            .doOnError(t -> handleThrowable(asyncResponse, t))
+            .subscribe();
+    }
+
+    private <T> void subscribe(final Flux<T> flux, final AsyncResponseImpl asyncResponse) {
+        flux.doOnNext(asyncResponse::resume)
+            .switchIfEmpty(Mono.<T>empty().doOnSuccess(v -> asyncResponse.resume(Collections.emptyList())))
+            .doOnError(t -> handleThrowable(asyncResponse, t))
+            .subscribe();
     }
     
 }
