@@ -19,7 +19,10 @@
 
 package org.apache.cxf.systest.jaxrs.reactor;
 
+import java.util.List;
+
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
@@ -43,6 +46,7 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly", launchServer(ReactorServer.class, true));
         createStaticBus();
     }
+    
     @Test
     public void testGetHelloWorldJson() throws Exception {
         String address = "http://localhost:" + PORT + "/reactor/flux/textJson";
@@ -56,6 +60,27 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
                 .rx(ReactorInvoker.class)
                 .get(HelloWorldBean.class))
             .expectNextMatches(bean -> bean.getGreeting().equals("Hello") && bean.getAudience().equals("World"))
+            .expectComplete()
+            .verify();
+    }
+    
+    @Test
+    public void testGetHelloWorldJsonMany() throws Exception {
+        String address = "http://localhost:" + PORT + "/reactor2/flux/textJsonMany";
+        StepVerifier
+            .create(ClientBuilder
+                .newClient()
+                .register(new JacksonJsonProvider())
+                .register(new ReactorInvokerProvider())
+                .target(address)
+                .request(MediaType.APPLICATION_JSON)
+                .rx(ReactorInvoker.class)
+                .getFlux(HelloWorldBean.class))
+            .expectNextMatches(bean -> bean.getGreeting().equals("Hello 1") && bean.getAudience().equals("World"))
+            .expectNextMatches(bean -> bean.getGreeting().equals("Hello 2") && bean.getAudience().equals("World"))
+            .expectNextMatches(bean -> bean.getGreeting().equals("Hello 3") && bean.getAudience().equals("World"))
+            .expectNextMatches(bean -> bean.getGreeting().equals("Hello 4") && bean.getAudience().equals("World"))
+            .expectNextMatches(bean -> bean.getGreeting().equals("Hello 5") && bean.getAudience().equals("World"))
             .expectComplete()
             .verify();
     }
@@ -73,6 +98,23 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testFluxEmpty() throws Exception {
+        String address = "http://localhost:" + PORT + "/reactor/flux/empty";
+        
+        StepVerifier
+            .create(ClientBuilder
+                .newClient()
+                .register(new JacksonJsonProvider())
+                .register(new ReactorInvokerProvider())
+                .target(address)
+                .request(MediaType.APPLICATION_JSON)
+                .rx(ReactorInvoker.class)
+                .getFlux(HelloWorldBean.class))
+            .expectComplete()
+            .verify();
+    }
+    
+    @Test
+    public void testFluxEmpty2() throws Exception {
         String address = "http://localhost:" + PORT + "/reactor2/flux/empty";
         
         StepVerifier
@@ -158,6 +200,24 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
             .expectError()
             .verify();
     }
+    
+    @Test
+    public void testFluxImmediateErrorsWithExceptionMapper() throws Exception {
+        String address = "http://localhost:" + PORT + "/reactor2/flux/immediate/mapper/errors";
+        
+        StepVerifier
+            .create(ClientBuilder
+                .newClient()
+                .register(new JacksonJsonProvider())
+                .register(new ReactorInvokerProvider())
+                .target(address)
+                .request(MediaType.APPLICATION_JSON)
+                .rx(ReactorInvoker.class)
+                .get())
+            .expectNextMatches(r -> r.getStatus() == 409 && r.readEntity(String.class).contains("stackTrace"))
+            .expectComplete()
+            .verify();
+    }
 
     @Test
     public void testFluxImmediateErrorsResponse() throws Exception {
@@ -173,6 +233,66 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
                 .rx(ReactorInvoker.class)
                 .get())
             .expectNextMatches(r -> r.getStatus() == 500)
+            .expectComplete()
+            .verify();
+    }
+    
+    @Test
+    public void testFluxErrorWithExceptionMapperReturnsContentPayload() throws Exception {
+        GenericType<List<HelloWorldBean>> helloWorldBeanListType = new GenericType<List<HelloWorldBean>>() {  };
+        String address = "http://localhost:" + PORT + "/reactor2/flux/mixed/error";
+        
+        StepVerifier
+            .create(ClientBuilder
+                .newClient()
+                .register(new JacksonJsonProvider())
+                .register(new ReactorInvokerProvider())
+                .target(address)
+                .request(MediaType.APPLICATION_JSON)
+                .rx(ReactorInvoker.class)
+                .get())
+            // The response should include the emitted elements prior the error
+            .expectNextMatches(r -> r.getStatus() == 409 && r.readEntity(helloWorldBeanListType).size() == 4)
+            .expectComplete()
+            .verify();
+    }
+    
+    @Test
+    public void testFluxErrorWithWebException() throws Exception {
+        String address = "http://localhost:" + PORT + "/reactor2/flux/web/errors";
+        
+        StepVerifier
+            .create(ClientBuilder
+                .newClient()
+                .register(new JacksonJsonProvider())
+                .register(new ReactorInvokerProvider())
+                .target(address)
+                .request(MediaType.APPLICATION_JSON)
+                .rx(ReactorInvoker.class)
+                .get())
+            // The response should not include the exception payload (injected by exception mapper)
+            // if some elements have been emitted before
+            .expectNextMatches(r -> r.getStatus() == 403 && !r.readEntity(String.class).contains("stackTrace"))
+            .expectComplete()
+            .verify();
+    }
+
+    @Test
+    public void testFluxErrorWithExceptionMapperReturnsNoExceptionPayload() throws Exception {
+        String address = "http://localhost:" + PORT + "/reactor2/flux/mixed/error";
+        
+        StepVerifier
+            .create(ClientBuilder
+                .newClient()
+                .register(new JacksonJsonProvider())
+                .register(new ReactorInvokerProvider())
+                .target(address)
+                .request(MediaType.APPLICATION_JSON)
+                .rx(ReactorInvoker.class)
+                .get())
+            // The response should not include the exception payload (injected by exception mapper)
+            // if some elements have been emitted before
+            .expectNextMatches(r -> r.getStatus() == 409 && !r.readEntity(String.class).contains("stackTrace"))
             .expectComplete()
             .verify();
     }
