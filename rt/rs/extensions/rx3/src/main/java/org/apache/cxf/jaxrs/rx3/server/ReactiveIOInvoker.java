@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.rx3.server;
 
+import java.util.Collections;
+
 import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.jaxrs.reactivestreams.server.AbstractReactiveInvoker;
 import org.apache.cxf.message.Message;
@@ -51,7 +53,7 @@ public class ReactiveIOInvoker extends AbstractReactiveInvoker {
     protected AsyncResponseImpl handleFlowable(Message inMessage, Flowable<?> f) {
         final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
         if (!isStreamingSubscriberUsed(f, asyncResponse, inMessage)) {
-            Disposable d = f.subscribe(asyncResponse::resume, t -> handleThrowable(asyncResponse, t));
+            Disposable d = subscribe(f, asyncResponse);
             if (d == null) {
                 throw new IllegalStateException("Subscribe did not return a Disposable");
             }
@@ -61,11 +63,22 @@ public class ReactiveIOInvoker extends AbstractReactiveInvoker {
     
     protected AsyncResponseImpl handleObservable(Message inMessage, Observable<?> obs) {
         final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
-        Disposable d = obs.subscribe(v -> asyncResponse.resume(v), t -> handleThrowable(asyncResponse, t));
+        Disposable d = subscribe(obs, asyncResponse);
         if (d == null) {
             throw new IllegalStateException("Subscribe did not return a Disposable");
         }
         return asyncResponse;
     }
 
+    private <T> Disposable subscribe(final Flowable<T> f, final AsyncResponseImpl asyncResponse) {
+        return f
+            .switchIfEmpty(Flowable.<T>empty().doOnComplete(() -> asyncResponse.resume(Collections.emptyList())))
+            .subscribe(asyncResponse::resume, t -> handleThrowable(asyncResponse, t));
+    }
+
+    private <T> Disposable subscribe(final Observable<T> obs, final AsyncResponseImpl asyncResponse) {
+        return obs
+            .switchIfEmpty(Observable.<T>empty().doOnComplete(() -> asyncResponse.resume(Collections.emptyList())))
+            .subscribe(asyncResponse::resume, t -> handleThrowable(asyncResponse, t));
+    }
 }
