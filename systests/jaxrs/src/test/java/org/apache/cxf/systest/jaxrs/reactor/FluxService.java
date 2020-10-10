@@ -19,7 +19,9 @@
 
 package org.apache.cxf.systest.jaxrs.reactor;
 
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
@@ -39,6 +41,15 @@ public class FluxService {
     @Path("textJson")
     public Flux<HelloWorldBean> getJson() {
         return Flux.just(new HelloWorldBean());
+    }
+
+    @GET
+    @Produces("application/json")
+    @Path("textJsonMany")
+    public Flux<HelloWorldBean> getJsonMany() {
+        return Flux 
+            .range(1, 5) 
+            .flatMap(item -> Mono.just(new HelloWorldBean("Hello " + item))); 
     }
 
     @GET
@@ -92,6 +103,21 @@ public class FluxService {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @Path("/web/errors")
+    public Flux<HelloWorldBean> webErrors() { 
+        return Flux 
+            .range(1, 3) 
+            .concatMap(item -> { 
+                if (item < 3) { 
+                    return Mono.just(new HelloWorldBean("Person " + item)); 
+                } else { 
+                    return Mono.error(new ForbiddenException("Oops")); 
+                } 
+            }); 
+    }
+    
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("/immediate/errors")
     public Flux<HelloWorldBean> immediateErrors() { 
         return Flux 
@@ -101,8 +127,33 @@ public class FluxService {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @Path("/immediate/mapper/errors")
+    public Flux<HelloWorldBean> immediateMapperErrors() { 
+        return Flux 
+            .range(1, 2) 
+            .flatMap(item -> Mono.error(new IllegalStateException("Oops"))); 
+    }
+    
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("/empty")
     public Flux<HelloWorldBean> empty() { 
         return Flux.empty(); 
+    }
+
+    @GET
+    @Path("/mixed/error")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Flux<HelloWorldBean> errorAndData() {
+        return Flux
+            .range(1, 5)
+            .flatMap(item -> {
+                if (item <= 4) {
+                    return Mono.just(new HelloWorldBean(" of Item: " + item));
+                } else {
+                    return Mono.error(new NotFoundException("Item not found"));
+                }
+            })
+            .onErrorMap(e -> new IllegalStateException("Oops", e));
     }
 }
