@@ -30,36 +30,26 @@ import org.apache.cxf.jaxrs.rx3.server.ReactiveIOCustomizer;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 
-public class RxJava3FlowableServer extends AbstractBusTestServerBase {
-    public static final String PORT = allocatePort(RxJava3FlowableServer.class);
+public class RxJava3SingleServer extends AbstractBusTestServerBase {
+    public static final String PORT = allocatePort(RxJava3SingleServer.class);
 
     org.apache.cxf.endpoint.Server server;
-    org.apache.cxf.endpoint.Server server2;
-    public RxJava3FlowableServer() {
+    public RxJava3SingleServer() {
     }
 
     protected void run() {
         Bus bus = BusFactory.getDefaultBus();
         // Make sure default JSONProvider is not loaded
         bus.setProperty("skip.default.json.provider.registration", true);
-        server = createFactoryBean(bus, false, "/rx3").create();
-        server = createFactoryBean(bus, true, "/rx33").create();
-    }
-
-    private JAXRSServerFactoryBean createFactoryBean(Bus bus, boolean useStreamingSubscriber,
-                                                     String relAddress) {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        sf.getProperties(true).put("useStreamingSubscriber", useStreamingSubscriber);
         sf.setProvider(new JacksonJsonProvider());
-        sf.setProvider(new IllegalArgumentExceptionMapper());
-        sf.setProvider(new IllegalStateExceptionMapper());
         new ReactiveIOCustomizer().customize(sf);
         sf.getOutInterceptors().add(new LoggingOutInterceptor());
-        sf.setResourceClasses(RxJava3FlowableService.class);
-        sf.setResourceProvider(RxJava3FlowableService.class,
-                               new SingletonResourceProvider(new RxJava3FlowableService(), true));
-        sf.setAddress("http://localhost:" + PORT + relAddress);
-        return sf;
+        sf.setResourceClasses(RxJava3SingleService.class);
+        sf.setResourceProvider(RxJava3SingleService.class,
+                               new SingletonResourceProvider(new RxJava3SingleService(), true));
+        sf.setAddress("http://localhost:" + PORT + "/");
+        server = sf.create();
     }
 
     public void tearDown() throws Exception {
@@ -70,7 +60,7 @@ public class RxJava3FlowableServer extends AbstractBusTestServerBase {
 
     public static void main(String[] args) {
         try {
-            RxJava3FlowableServer s = new RxJava3FlowableServer();
+            RxJava3SingleServer s = new RxJava3SingleServer();
             s.start();
         } catch (Exception ex) {
             ex.printStackTrace();
