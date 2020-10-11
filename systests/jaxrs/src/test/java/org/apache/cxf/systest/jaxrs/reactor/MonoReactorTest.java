@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.jaxrs.reactor;
 
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
