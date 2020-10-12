@@ -85,8 +85,8 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
         int paramsStart = mType.indexOf(';', i + 1);
         int end = paramsStart == -1  ? mType.length() : paramsStart;
 
-        String type = mType.substring(0, i);
-        String subtype = mType.substring(i + 1, end);
+        String type = mType.substring(0, i).trim();
+        String subtype = mType.substring(i + 1, end).trim();
         if (!isValid(type) || !isValid(subtype)) {
             throw new IllegalArgumentException("Invalid media type string: " + mType);
         }
@@ -111,8 +111,8 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
             }
         }
 
-        return new MediaType(type.trim().toLowerCase(),
-                             subtype.trim().toLowerCase(),
+        return new MediaType(type.toLowerCase(),
+                             subtype.toLowerCase(),
                              parameters);
     }
 
