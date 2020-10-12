@@ -43,7 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.boot.test.system.OutputCaptureRule;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -80,7 +80,7 @@ public class SpringJaxwsTest {
     private static final String HELLO_SERVICE_NAME_V3 = "HelloV3";
 
     @Rule
-    public OutputCapture output = new OutputCapture();
+    public OutputCaptureRule output = new OutputCaptureRule();
 
     @Autowired
     MeterRegistry registry;
@@ -200,8 +200,7 @@ public class SpringJaxwsTest {
 
         // then
         assertThat(registry.get("cxf.server.requests").meters()).hasSize(2);
-        assertThat(this.output.toString())
-                .contains("Reached the maximum number of URI tags " + "for 'cxf.server.requests'");
+        assertThat(this.output).contains("Reached the maximum number of URI tags " + "for 'cxf.server.requests'");
     }
 
     @Test
@@ -213,8 +212,7 @@ public class SpringJaxwsTest {
 
         // then
         assertThat(registry.get("cxf.server.requests").meters()).hasSize(1);
-        assertThat(this.output.toString())
-                .doesNotContain("Reached the maximum number of URI tags " + "for 'cxf.server.requests'");
+        assertThat(this.output).doesNotContain("Reached the maximum number of URI tags " + "for 'cxf.server.requests'");
 
     }
 
