@@ -72,7 +72,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         ex.setInMessage(inmsg);
         inmsg.setContent(SOAPMessage.class, saajMsg);
 
-        inHandler.setProperty(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        inHandler.setProperty(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
         inHandler.setProperty(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
         inHandler.setProperty(ConfigurationConstants.PW_CALLBACK_CLASS, TestPwdCallback.class.getName());
 
@@ -207,7 +207,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         inmsg.setContent(SOAPMessage.class, saajMsg);
 
         inHandler.setProperty(ConfigurationConstants.ACTION,
-                              ConfigurationConstants.SIGNATURE + " "  + ConfigurationConstants.ENCRYPT);
+                              ConfigurationConstants.SIGNATURE + " "  + ConfigurationConstants.ENCRYPTION);
         inHandler.setProperty(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
         inHandler.setProperty(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         inHandler.setProperty(ConfigurationConstants.PW_CALLBACK_CLASS, TestPwdCallback.class.getName());

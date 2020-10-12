@@ -31,7 +31,6 @@ import javax.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItMtomPortType;
 import org.example.contract.doubleit.DoubleItPortType;
@@ -70,7 +69,6 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
         stopAllServers();
     }
 

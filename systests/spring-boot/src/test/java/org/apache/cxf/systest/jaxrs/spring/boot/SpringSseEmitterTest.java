@@ -118,8 +118,8 @@ public class SpringSseEmitterTest {
         return event -> books.add(event.readData(Book.class, javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE));
     }
     
-    private void awaitEvents(long timeout, final Collection<?> events, int size) throws InterruptedException {
-        final long sleep = timeout / 10;
+    private void awaitEvents(int timeout, final Collection<?> events, int size) throws InterruptedException {
+        final int sleep = timeout / 10;
         
         for (int i = 0; i < timeout; i += sleep) {
             if (events.size() == size) {

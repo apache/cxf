@@ -45,6 +45,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class MessageListenerTest {
 
@@ -91,7 +92,8 @@ public class MessageListenerTest {
         JMSException ex = exListener.exception;
         assertNotNull(ex);
         // Closing the pooled connection will result in a NPE when using it
-        assertEquals("Wrapped exception. null", ex.getMessage());
+        assertTrue(ex.getMessage().contains("Wrapped exception.") 
+                   && ex.getMessage().contains("null"));
     }
 
     @Test
@@ -182,7 +184,7 @@ public class MessageListenerTest {
 
     private static Connection createXAConnection(String name, TransactionManager tm) throws JMSException {
         ActiveMQXAConnectionFactory cf = new ActiveMQXAConnectionFactory("vm://" + name
-                                                                         + "?broker.persistent=false");
+                                                                         + "?broker.persistent=false&jms.xaAckMode=1");
         cf.setRedeliveryPolicy(redeliveryPolicy());
         XaPooledConnectionFactory cfp = new XaPooledConnectionFactory(cf);
         cfp.setTransactionManager(tm);

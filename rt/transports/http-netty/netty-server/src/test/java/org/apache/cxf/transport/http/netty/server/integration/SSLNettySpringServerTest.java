@@ -69,7 +69,9 @@ public class SSLNettySpringServerTest extends SSLNettyServerTest {
             ep.stop();
         }
         ep = null;
-        context.close();
+        if (context != null) {
+            context.close();
+        }
     }
 
 }

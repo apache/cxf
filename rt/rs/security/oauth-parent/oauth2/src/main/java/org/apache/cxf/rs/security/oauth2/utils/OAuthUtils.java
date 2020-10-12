@@ -166,13 +166,13 @@ public final class OAuthUtils {
         return setSessionToken(mc, 0);
     }
     public static String setSessionToken(MessageContext mc, int maxInactiveInterval) {
-        return setSessionToken(mc, generateRandomTokenKey());
+        return setSessionToken(mc, generateRandomTokenKey(), maxInactiveInterval);
     }
     public static String setSessionToken(MessageContext mc, String sessionToken) {
         return setSessionToken(mc, sessionToken, 0);
     }
     public static String setSessionToken(MessageContext mc, String sessionToken, int maxInactiveInterval) {
-        return setSessionToken(mc, sessionToken, null, 0);
+        return setSessionToken(mc, sessionToken, null, maxInactiveInterval);
     }
     public static String setSessionToken(MessageContext mc, String sessionToken,
                                                 String attribute, int maxInactiveInterval) {
@@ -316,10 +316,21 @@ public final class OAuthUtils {
                                                   String scopeParameter,
                                                   boolean useAllClientScopes,
                                                   boolean partialMatchScopeValidation) {
+        return getRequestedScopes(client, scopeParameter, useAllClientScopes, partialMatchScopeValidation, true);
+    }
+
+    public static List<String> getRequestedScopes(Client client,
+                                                  String scopeParameter,
+                                                  boolean useAllClientScopes,
+                                                  boolean partialMatchScopeValidation,
+                                                  boolean defaultToRegisteredScopes) {
         List<String> requestScopes = parseScope(scopeParameter);
         List<String> registeredScopes = client.getRegisteredScopes();
         if (requestScopes.isEmpty()) {
-            return registeredScopes;
+            if (defaultToRegisteredScopes) {
+                return registeredScopes;
+            }
+            return requestScopes;
         }
         if (!validateScopes(requestScopes, registeredScopes, partialMatchScopeValidation)) {
             throw new OAuthServiceException("Unexpected scope");

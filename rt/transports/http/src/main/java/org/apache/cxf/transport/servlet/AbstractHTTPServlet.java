@@ -21,17 +21,19 @@ package org.apache.cxf.transport.servlet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterConfig;
@@ -39,7 +41,6 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
@@ -180,14 +181,13 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
 
     protected static List<Pattern> parseListSequence(String values) {
         if (values != null) {
-            List<Pattern> list = new LinkedList<>();
-            String[] pathValues = values.split(" ");
-            for (String value : pathValues) {
-                String theValue = value.trim();
-                if (theValue.length() > 0) {
-                    list.add(Pattern.compile(theValue));
+            List<Pattern> list = new ArrayList<>();
+            for (String value : values.split("\\s")) {
+                if (!value.isEmpty()) {
+                    list.add(Pattern.compile(value));
                 }
             }
+            ((ArrayList<?>)list).trimToSize();
             return list;
         }
         return null;
@@ -197,17 +197,14 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
         if (sequence != null) {
             sequence = sequence.trim();
             Map<String, String> map = new HashMap<>();
-            String[] pairs = sequence.split(" ");
-            for (String pair : pairs) {
-                String thePair = pair.trim();
-                if (thePair.length() == 0) {
-                    continue;
-                }
-                String[] value = thePair.split("=");
-                if (value.length == 2) {
-                    map.put(value[0].trim(), value[1].trim());
-                } else {
-                    map.put(thePair, "");
+            for (String pair : sequence.split("\\s")) {
+                if (!pair.isEmpty()) {
+                    String[] value = pair.split("=");
+                    if (value.length == 2) {
+                        map.put(value[0], value[1]);
+                    } else {
+                        map.put(pair, "");
+                    }
                 }
             }
             return map;
@@ -308,7 +305,10 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
             String originalPrefix = request.getHeader(X_FORWARDED_PREFIX_HEADER);
             String originalHost = request.getHeader(X_FORWARDED_HOST_HEADER);
             String originalPort = request.getHeader(X_FORWARDED_PORT_HEADER);
-            if (originalProtocol != null || originalRemoteAddr != null) {
+            
+            // If at least one of the X-Forwarded-Xxx headers is set, try to use them
+            if (Stream.of(originalProtocol, originalRemoteAddr, originalPrefix, 
+                    originalHost, originalPort).anyMatch(Objects::nonNull)) {
                 return new HttpServletRequestXForwardedFilter(request, 
                                                               originalProtocol, 
                                                               originalRemoteAddr,
@@ -330,7 +330,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
         }
         if (redirectQueryCheck) {
             String queryString = request.getQueryString();
-            if (queryString != null && queryString.length() > 0) {
+            if (queryString != null && !queryString.isEmpty()) {
                 path += "?" + queryString;
             }
         }
@@ -347,13 +347,12 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
     protected void serveStaticContent(HttpServletRequest request,
                                       HttpServletResponse response,
                                       String pathInfo) throws ServletException {
-        InputStream is = getResourceAsStream(pathInfo);
-        if (is == null) {
-            throw new ServletException("Static resource " + pathInfo + " is not available");
-        }
-        try {
+        try (InputStream is = getResourceAsStream(pathInfo)) {
+            if (is == null) {
+                throw new ServletException("Static resource " + pathInfo + " is not available");
+            }
             int ind = pathInfo.lastIndexOf('.');
-            if (ind != -1 && ind < pathInfo.length()) {
+            if (ind > 0) {
                 String type = getStaticResourceContentType(pathInfo.substring(ind + 1));
                 if (type != null) {
                     response.setContentType(type);
@@ -363,9 +362,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
             if (cacheControl != null) {
                 response.setHeader("Cache-Control", cacheControl.trim());
             }
-            ServletOutputStream os = response.getOutputStream();
-            IOUtils.copyAndCloseInput(is, os);
-            os.flush();
+            IOUtils.copy(is, response.getOutputStream());
         } catch (IOException ex) {
             throw new ServletException("Static resource " + pathInfo
                                        + " can not be written to the output stream");

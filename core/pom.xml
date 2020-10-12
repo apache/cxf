@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>3.4.1-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
     <properties>
@@ -39,11 +39,12 @@
             org.apache.cxf.*
         </cxf.osgi.export>
         <cxf.osgi.import>
+            com.sun.xml.messaging.saaj.soap;resolution:=optional,
+            com.sun.xml.internal.messaging.saaj.soap;resolution:=optional,
             com.ctc.wstx*;resolution:=optional,
             org.codehaus.stax2*;resolution:=optional,
             com.sun*;resolution:=optional,
             org.slf4j*;resolution:=optional;version="${cxf.osgi.slf4j.version}",
-            org.apache.log4j*;resolution:=optional,
             net.sf.cglib*;resolution:=optional;version="${cxf.cglib.osgi.version}",
             org.springframework.osgi.io;resolution:=optional;version="${cxf.osgi.spring.osgi.version}",
             org.springframework.osgi.util;resolution:=optional;version="${cxf.osgi.spring.osgi.version}",
@@ -105,12 +106,6 @@
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <optional>true</optional>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -192,12 +187,6 @@
         <dependency>
             <groupId>net.java.dev.msv</groupId>
             <artifactId>msv-core</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.java.dev.msv</groupId>
-                    <artifactId>msv-testharness</artifactId>
-                </exclusion>
-            </exclusions>
             <optional>true</optional>
             <scope>provided</scope>
         </dependency>

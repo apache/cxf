@@ -139,14 +139,15 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         }
 
         public void close() throws IOException {
-            final LogEvent event = eventMapper.map(message);
+            final LogEvent event = eventMapper.map(message, sensitiveProtocolHeaderNames);
             StringWriter w2 = out2;
             if (w2 == null) {
                 w2 = (StringWriter) out;
             }
 
             String payload = shouldLogContent(event) ? getPayload(event, w2) : CONTENT_SUPPRESSED;
-            event.setPayload(payload);
+            final String maskedContent = maskSensitiveElements(message, payload);
+            event.setPayload(transform(message, maskedContent));
             sender.send(event);
             message.setContent(Writer.class, out);
             super.close();
@@ -189,7 +190,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         }
 
         public void onClose(CachedOutputStream cos) {
-            final LogEvent event = eventMapper.map(message);
+            final LogEvent event = eventMapper.map(message, sensitiveProtocolHeaderNames);
             if (shouldLogContent(event)) {
                 copyPayload(cos, event);
             } else {
@@ -212,7 +213,8 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
                 String encoding = (String) message.get(Message.ENCODING);
                 StringBuilder payload = new StringBuilder();
                 writePayload(payload, cos, encoding, event.getContentType());
-                event.setPayload(payload.toString());
+                final String maskedContent = maskSensitiveElements(message, payload.toString());
+                event.setPayload(transform(message, maskedContent));
                 boolean isTruncated = cos.size() > limit && limit != -1;
                 event.setTruncated(isTruncated);
             } catch (Exception ex) {

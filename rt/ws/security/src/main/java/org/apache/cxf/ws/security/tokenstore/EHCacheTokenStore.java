@@ -22,99 +22,74 @@ package org.apache.cxf.ws.security.tokenstore;
 import java.io.Closeable;
 import java.net.URL;
 import java.util.Collection;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.HashSet;
+import java.util.Set;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.Status;
-import net.sf.ehcache.config.CacheConfiguration;
 import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.ws.security.cache.EHCacheUtils;
-import org.apache.wss4j.common.cache.EHCacheManagerHolder;
+import org.ehcache.Cache;
+import org.ehcache.CacheManager;
+import org.ehcache.Status;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.xml.XmlConfiguration;
 
 /**
  * An in-memory EHCache implementation of the TokenStore interface. The default TTL is 60 minutes
  * and the max TTL is 12 hours.
  */
 public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleListener {
-    public static final long DEFAULT_TTL = 3600L;
-    public static final long MAX_TTL = DEFAULT_TTL * 12L;
+    private final Bus bus;
+    private final Cache<String, SecurityToken> cache;
+    private final CacheManager cacheManager;
+    private final String key;
 
-    private Ehcache cache;
-    private Bus bus;
-    private CacheManager cacheManager;
-    private long ttl = DEFAULT_TTL;
-
-    public EHCacheTokenStore(String key, Bus b, URL configFileURL) {
+    public EHCacheTokenStore(String key, Bus b, URL configFileURL) throws TokenStoreException {
         bus = b;
         if (bus != null) {
             b.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);
         }
-        cacheManager = EHCacheUtils.getCacheManager(bus, configFileURL);
-        // Cannot overflow to disk as SecurityToken Elements can't be serialized
-        @SuppressWarnings("deprecation")
-        CacheConfiguration cc = EHCacheManagerHolder.getCacheConfiguration(key, cacheManager)
-            .overflowToDisk(false); //tokens not writable
 
-        Cache newCache = new RefCountCache(cc);
-        cache = cacheManager.addCacheIfAbsent(newCache);
-        synchronized (cache) {
-            if (cache.getStatus() != Status.STATUS_ALIVE) {
-                cache = cacheManager.addCacheIfAbsent(newCache);
+        this.key = key;
+        try {
+            XmlConfiguration xmlConfig = new XmlConfiguration(configFileURL);
+
+            // Exclude the endpoint info bit added in TokenStoreUtils when getting the template name
+            String template = key;
+            if (template.contains("-")) {
+                template = key.substring(0, key.lastIndexOf('-'));
             }
-            if (cache instanceof RefCountCache) {
-                ((RefCountCache)cache).incrementAndGet();
-            }
-        }
 
-        // Set the TimeToLive value from the CacheConfiguration
-        ttl = cc.getTimeToLiveSeconds();
-    }
+            CacheConfigurationBuilder<String, SecurityToken> configurationBuilder =
+                    xmlConfig.newCacheConfigurationBuilderFromTemplate(template,
+                            String.class, SecurityToken.class);
 
-    private static class RefCountCache extends Cache {
-        AtomicInteger count = new AtomicInteger();
-        RefCountCache(CacheConfiguration cc) {
-            super(cc);
-        }
-        public int incrementAndGet() {
-            return count.incrementAndGet();
-        }
-        public int decrementAndGet() {
-            return count.decrementAndGet();
-        }
-    }
+            cacheManager = CacheManagerBuilder.newCacheManagerBuilder().withCache(key, configurationBuilder).build();
 
-    /**
-     * Set a new (default) TTL value in seconds
-     * @param newTtl a new (default) TTL value in seconds
-     */
-    public void setTTL(long newTtl) {
-        ttl = newTtl;
+            cacheManager.init();
+            cache = cacheManager.getCache(key, String.class, SecurityToken.class);
+
+        } catch (Exception e) {
+            throw new TokenStoreException(e);
+        }
     }
 
     public void add(SecurityToken token) {
         if (token != null && !StringUtils.isEmpty(token.getId())) {
-            Element element = new Element(token.getId(), token, getTTL(), getTTL());
-            element.resetAccessStatistics();
-            cache.put(element);
+            cache.put(token.getId(), token);
         }
     }
 
     public void add(String identifier, SecurityToken token) {
         if (token != null && !StringUtils.isEmpty(identifier)) {
-            Element element = new Element(identifier, token, getTTL(), getTTL());
-            element.resetAccessStatistics();
-            cache.put(element);
+            cache.put(identifier, token);
         }
     }
 
     public void remove(String identifier) {
-        if (cache != null && !StringUtils.isEmpty(identifier) && cache.isKeyInCache(identifier)) {
+        if (cache != null && !StringUtils.isEmpty(identifier)) {
             cache.remove(identifier);
         }
     }
@@ -124,47 +99,27 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
         if (cache == null) {
             return null;
         }
-        return cache.getKeysWithExpiryCheck();
+
+        // Not very efficient, but we are only using this method for testing
+        Set<String> keys = new HashSet<>();
+        for (Cache.Entry<String, SecurityToken> entry : cache) {
+            keys.add(entry.getKey());
+        }
+
+        return keys;
     }
 
     public SecurityToken getToken(String identifier) {
         if (cache == null) {
             return null;
         }
-        Element element = cache.get(identifier);
-        if (element != null && !cache.isExpired(element)) {
-            return (SecurityToken)element.getObjectValue();
-        }
-        return null;
+        return cache.get(identifier);
     }
 
-    private int getTTL() {
-        int parsedTTL = (int)ttl;
-        if (ttl != parsedTTL) {
-             // Fall back to 60 minutes if the default TTL is set incorrectly
-            parsedTTL = 3600;
-        }
-        return parsedTTL;
-    }
-
-    public void close() {
-        if (cacheManager != null) {
-            // this step is especially important for global shared cache manager
-            if (cache != null) {
-                synchronized (cache) {
-                    if (cache instanceof RefCountCache
-                        && ((RefCountCache)cache).decrementAndGet() == 0) {
-                        cacheManager.removeCache(cache.getName());
-                    }
-                }
-            }
-
-            EHCacheManagerHolder.releaseCacheManger(cacheManager);
-            cacheManager = null;
-            cache = null;
-            if (bus != null) {
-                bus.getExtension(BusLifeCycleManager.class).unregisterLifeCycleListener(this);
-            }
+    public synchronized void close() {
+        if (cacheManager.getStatus() == Status.AVAILABLE) {
+            cacheManager.removeCache(key);
+            cacheManager.close();
         }
     }
 

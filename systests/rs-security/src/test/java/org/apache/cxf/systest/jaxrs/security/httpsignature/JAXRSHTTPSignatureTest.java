@@ -1260,7 +1260,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
                 if (!emptyDigestValue) {
                     if (changeDigestValue) {
                         byte[] bytes = messageDigest.digest();
-                        bytes[0] += 1;
+                        bytes[0]++;
                         digest += Base64.getEncoder().encodeToString(bytes);
                     } else {
                         digest += Base64.getEncoder().encodeToString(messageDigest.digest());

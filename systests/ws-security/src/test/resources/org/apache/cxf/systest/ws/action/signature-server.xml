@@ -27,15 +27,19 @@
     xmlns:cxf="http://cxf.apache.org/core"
     xmlns:p="http://cxf.apache.org/policy"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd">
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
             <p:policies/>
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Signature" address="http://localhost:${testutil.ports.SignatureServer}/DoubleItSignature" serviceName="s:DoubleItService" endpointName="s:DoubleItSignaturePort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
+
+    <bean id="doubleItNoSecurity" class="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl">
+        <property name="enforcePrincipal" value="false"/>
+    </bean>
+
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Signature" address="http://localhost:${testutil.ports.SignatureServer}/DoubleItSignature" serviceName="s:DoubleItService" endpointName="s:DoubleItSignaturePort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
         <jaxws:outInterceptors>
             <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
                 <constructor-arg>
@@ -61,7 +65,7 @@
         </jaxws:inInterceptors>
     </jaxws:endpoint>
     
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Signature2" address="http://localhost:${testutil.ports.SignatureServer}/DoubleItSignature2" serviceName="s:DoubleItService" endpointName="s:DoubleItSignaturePort2" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Signature2" address="http://localhost:${testutil.ports.SignatureServer}/DoubleItSignature2" serviceName="s:DoubleItService" endpointName="s:DoubleItSignaturePort2" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
         <jaxws:outInterceptors>
             <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
                 <constructor-arg>

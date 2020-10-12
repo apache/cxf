@@ -224,6 +224,9 @@ public class UndertowHTTPServerEngineBeanDefinitionParser extends AbstractBeanDe
         if (paramtype.getWorkerIOThreads() != null) {
             params.setWorkerIOThreads(paramtype.getWorkerIOThreads());
         }
+        if (paramtype.getWorkerIOName() != null) {
+            params.setWorkerIOName(paramtype.getWorkerIOName());
+        }
 
         return params;
     }

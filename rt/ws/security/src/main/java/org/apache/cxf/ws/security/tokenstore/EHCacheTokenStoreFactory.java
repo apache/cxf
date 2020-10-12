@@ -24,6 +24,7 @@ import java.net.URL;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.wss4j.common.util.Loader;
 
 
 /**
@@ -31,9 +32,16 @@ import org.apache.cxf.ws.security.SecurityConstants;
  */
 public class EHCacheTokenStoreFactory extends TokenStoreFactory {
 
-    public TokenStore newTokenStore(String key, Message message) {
+    private static final String DEFAULT_CONFIG_FILE = "cxf-ehcache.xml";
+
+    @Override
+    public TokenStore newTokenStore(String key, Message message) throws TokenStoreException {
         URL configFileURL = SecurityUtils.getConfigFileURL(message, SecurityConstants.CACHE_CONFIG_FILE,
-                                                           "cxf-ehcache.xml");
+                DEFAULT_CONFIG_FILE);
+        if (configFileURL == null) {
+            configFileURL = Loader.getResource(this.getClass().getClassLoader(),
+                    DEFAULT_CONFIG_FILE);
+        }
         return new EHCacheTokenStore(key, message.getExchange().getBus(), configFileURL);
     }
 

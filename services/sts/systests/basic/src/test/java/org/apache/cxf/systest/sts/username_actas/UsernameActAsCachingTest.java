@@ -29,7 +29,6 @@ import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.EndpointException;
-import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -78,7 +77,6 @@ public class UsernameActAsCachingTest extends AbstractBusClientServerTestBase {
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
         stopAllServers();
     }
 
@@ -423,6 +421,6 @@ public class UsernameActAsCachingTest extends AbstractBusClientServerTestBase {
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
-        assertEquals(2 * numToDouble, resp);
+        assertEquals(2L * numToDouble, resp);
     }
 }

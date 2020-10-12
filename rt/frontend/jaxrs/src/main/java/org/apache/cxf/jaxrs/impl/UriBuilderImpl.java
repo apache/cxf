@@ -48,6 +48,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 public class UriBuilderImpl extends UriBuilder implements Cloneable {
     private static final String EXPAND_QUERY_VALUE_AS_COLLECTION = "expand.query.value.as.collection";
+    private static final String USE_ARRAY_SYNTAX_FOR_QUERY_VALUES = "use.array.syntax.for.query.values";
 
     private String scheme;
     private String userInfo;
@@ -66,6 +67,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     private Map<String, Object> resolvedEncodedTemplates;
 
     private boolean queryValueIsCollection;
+    private boolean useArraySyntaxForQueryParams;
 
     /**
      * Creates builder with empty URI.
@@ -78,6 +80,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
      */
     public UriBuilderImpl(Map<String, Object> properties) {
         queryValueIsCollection = PropertyUtils.isTrue(properties, EXPAND_QUERY_VALUE_AS_COLLECTION);
+        useArraySyntaxForQueryParams = PropertyUtils.isTrue(properties, USE_ARRAY_SYNTAX_FOR_QUERY_VALUES);
     }
 
     /**
@@ -444,6 +447,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             resolvedTemplates == null ? null : new HashMap<String, Object>(resolvedTemplates);
         builder.resolvedTemplatesPathEnc =
             resolvedTemplatesPathEnc == null ? null : new HashMap<String, Object>(resolvedTemplatesPathEnc);
+        builder.useArraySyntaxForQueryParams = useArraySyntaxForQueryParams;
         return builder;
     }
     // CHECKSTYLE:ON
@@ -865,7 +869,11 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
 
             // Expand query parameter as "name=v1,v2,v3"
             if (isQuery && queryValueIsCollection) {
-                b.append(entry.getKey()).append('=');
+                b.append(entry.getKey());
+                if (useArraySyntaxForQueryParams) {
+                    b.append("[]");
+                }
+                b.append('=');
 
                 for (Iterator<String> sit = entry.getValue().iterator(); sit.hasNext();) {
                     String val = sit.next();
@@ -899,6 +907,9 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                 for (Iterator<String> sit = entry.getValue().iterator(); sit.hasNext();) {
                     String val = sit.next();
                     b.append(entry.getKey());
+                    if (useArraySyntaxForQueryParams) {
+                        b.append("[]");
+                    }
                     if (val != null) {
                         boolean templateValue = val.startsWith("{") && val.endsWith("}");
                         if (!templateValue) {

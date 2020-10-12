@@ -38,13 +38,38 @@ public class DoubleItPortTypeImpl implements DoubleItPortType {
     @Resource
     WebServiceContext wsContext;
 
-    public int doubleIt(int numberToDouble) {
-        Principal pr = wsContext.getUserPrincipal();
+    private boolean enforcePrincipal = true;
+    private String requiredPrincipalName;
 
-        Assert.assertNotNull("Principal must not be null", pr);
-        Assert.assertNotNull("Principal.getName() must not return null", pr.getName());
+    public int doubleIt(int numberToDouble) {
+        if (enforcePrincipal) {
+            Principal pr = wsContext.getUserPrincipal();
+
+            Assert.assertNotNull("Principal must not be null", pr);
+            Assert.assertNotNull("Principal.getName() must not return null", pr.getName());
+
+            if (requiredPrincipalName != null) {
+                Assert.assertTrue(pr.getName().contains(requiredPrincipalName));
+            }
+        }
 
         return numberToDouble * 2;
+    }
+
+    public boolean isEnforcePrincipal() {
+        return enforcePrincipal;
+    }
+
+    public void setEnforcePrincipal(boolean enforcePrincipal) {
+        this.enforcePrincipal = enforcePrincipal;
+    }
+
+    public String getRequiredPrincipalName() {
+        return requiredPrincipalName;
+    }
+
+    public void setRequiredPrincipalName(String requiredPrincipalName) {
+        this.requiredPrincipalName = requiredPrincipalName;
     }
 
 }

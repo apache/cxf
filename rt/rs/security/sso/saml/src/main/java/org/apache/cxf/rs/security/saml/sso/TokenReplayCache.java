@@ -21,14 +21,15 @@ package org.apache.cxf.rs.security.saml.sso;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.time.Instant;
 
 public interface TokenReplayCache<T> extends Closeable {
 
-    T getId(T id);
+    boolean contains(T id);
 
     void putId(T id);
 
-    void putId(T id, long timeToLive);
+    void putId(T id, Instant expiry);
 
     void close() throws IOException;
 }

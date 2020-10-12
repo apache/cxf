@@ -26,6 +26,8 @@ import java.lang.reflect.Modifier;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 
+import org.apache.cxf.common.util.ReflectionUtil;
+
 public class ReferencingAuthenticator extends Authenticator {
     final Reference<Authenticator> auth;
     final Authenticator wrapped;
@@ -120,7 +122,7 @@ public class ReferencingAuthenticator extends Authenticator {
         if (a == null) {
             return null;
         }
-        for (final Field f : Authenticator.class.getDeclaredFields()) {
+        for (final Field f : ReflectionUtil.getDeclaredFields(Authenticator.class)) {
             if (!Modifier.isStatic(f.getModifiers())) {
                 f.setAccessible(true);
                 Object o = f.get(this);

@@ -90,7 +90,7 @@ public class JAXRSOAuth2TlsTest extends AbstractBusClientServerTestBase {
         book = wcRsDiffClientCert.get(Book.class);
         assertEquals(123L, book.getId());
 
-        // Protected resource, access token was created with Morphit.jks key, RS is accessed with
+        // Protected resource, access token was created with Morpit.jks key, RS is accessed with
         // Bethal.jks key, thus 401 is expected
         wcRsDiffClientCert = createRsWebClient(protectedRsAddress, at, "client2.xml");
         assertEquals(401, wcRsDiffClientCert.get().getStatus());
@@ -167,7 +167,7 @@ public class JAXRSOAuth2TlsTest extends AbstractBusClientServerTestBase {
         book = wcRsDiffClientCert.get(Book.class);
         assertEquals(123L, book.getId());
 
-        // Protected resource, access token was created with Morphit.jks key, RS is accessed with
+        // Protected resource, access token was created with Morpit.jks key, RS is accessed with
         // Bethal.jks key, thus 401 is expected
         wcRsDiffClientCert = createRsWebClient(protectedRsAddress, at, "client2.xml");
         assertEquals(401, wcRsDiffClientCert.get().getStatus());

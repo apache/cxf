@@ -416,7 +416,7 @@ public final class JwsUtils {
         } else {
             SignatureAlgorithm signatureAlgo = getSignatureAlgorithm(m, props, null, null);
             if (signatureAlgo == SignatureAlgorithm.NONE
-                && SignatureAlgorithm.NONE.getJwaName().equals(inHeaders.getAlgorithm())) {
+                && (null == inHeaders || SignatureAlgorithm.NONE.getJwaName().equals(inHeaders.getAlgorithm()))) {
                 theVerifier = new NoneJwsSignatureVerifier();
             } else {
                 X509Certificate[] certs = KeyManagementUtils.loadX509CertificateOrChain(m, props);
@@ -506,11 +506,7 @@ public final class JwsUtils {
         jws.signWith(jwsSig);
         return jws.getSignedEncodedJws();
     }
-    public static void validateJwsCertificateChain(List<X509Certificate> certs) {
 
-        Properties props = loadSignatureInProperties(true);
-        KeyManagementUtils.validateCertificateChain(props, certs);
-    }
     public static boolean isPayloadUnencoded(JwsHeaders jwsHeaders) {
         return jwsHeaders.getPayloadEncodingStatus() == Boolean.FALSE;
     }

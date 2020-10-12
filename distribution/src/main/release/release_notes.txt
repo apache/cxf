@@ -1,30 +1,27 @@
-Apache CXF 3.3.3 Release Notes
+Apache CXF 3.4.0 Release Notes
 
 1. Overview
 
-The 3.3.x versions of Apache CXF is a significant new version of CXF
+The 3.4.x versions of Apache CXF is a significant new version of CXF
 that provides several new features and enhancements.  
 
 New features include: 
-* Support for signing HTTP messages via the HTTP Signature draft spec
-   (https://tools.ietf.org/html/draft-cavage-http-signatures)
-   in the cxf-rt-rs-security-http-signature module.
-* Initial support for Java 11 - CXF has been built and tested with
-  Java 11.   It is not using the Java 11 modules, but it can be built
-  and the tests pass with Java 11.
-* MicroProfile Rest Client v1.2 implementation
-
+* New cxf-bom artifactId for importing all the CXF artifacts
+* New support for Microprofile OpenAPI (as alternative to Swagger Core 2.0)
+* New samples to show WS-Transaction usage, OpenAPI v3.0 with Microprofile
+* Ability in Logging feature to mask sensitive information
+* New support for SSEs in Microprofile Rest Client
+* OAuth 2.0 Authorization Server Metadata / OpenID Provider Metadata
 
 Important notes:
-CXF 3.3.x no longer supports Java 7.   You must upgrade to Java 8 or later.
+* Many dependencies have been upgraded to newer versions.  Check
+  the migration guide.
+
 
 Users are encouraged to review the migration guide at:
-http://cxf.apache.org/docs/33-migration-guide.html
+http://cxf.apache.org/docs/34-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
-
-3.3.3 fixes over 30 JIRA issues reported by users and the community.
-
 
 
 2. Installation Prerequisites 
@@ -61,118 +58,5 @@ http://issues.apache.org/jira/browse/CXF
 6. Migration notes:
 
 See the migration guide at:
-http://cxf.apache.org/docs/33-migration-guide.html
+http://cxf.apache.org/docs/34-migration-guide.html
 for caveats when upgrading.
-
-7. Specific issues, features, and improvements fixed in this version
-
-** Bug
-* [CXF-8032] - Adding LoggingFeature enables chunking response
-* [CXF-8041] - Error resolving relative XSD Schema on Tomcat
-* [CXF-8042] - doPrivileged block doesn't totally work in ProxyClassLoaderCache
-* [CXF-8043] - XKMS LdapCertificateRepo searching using DN doesn't work
-* [CXF-8044] - Setting compiler-fork to true is causing problems with Dynamic client
-* [CXF-8046] - Resource Listing in CXF 3.3.x does not recognize OpenAPI endpoints
-* [CXF-8049] - org.apache.cxf.common.util.Compiler fails to compile if a classpath entry contains spaces
-* [CXF-8051] - Request gets corrupted when calling a stateful streamed secure conversation
-* [CXF-8052] - Cannot set JAXB schema compiler options
-* [CXF-8055] - AsyncHTTPConduit should also consider jaxws spec timeout properties
-* [CXF-8059] - @FormParam inside @BeanParam not working
-* [CXF-8060] - Automatic ssl configuration using javax.net.ssl.. broken
-* [CXF-8062] - MessageContext.HTTP_RESPONSE_CODE cannot be obtained if response code is not 4xx
-* [CXF-8071] - XKMS LdapCertificateRepo searching using Service UID doesn't work
-* [CXF-8072] - Loggers logs request twice in case of Fault (CXF-7518 again)
-* [CXF-8073] - oauth2.provider.OAuthServiceException error message doesn't includes "error" field
-* [CXF-8077] - WSS4JInInterceptor is not thread safe
-* [CXF-8080] - MP Rest Client CompletionStages from async methods are never completed
-* [CXF-8088] - ensure jaxrs endpoint can work correctly when using a shared bus exposed from another bundle
-
-** Improvement
-* [CXF-7966] - Beanspector throws IllegalArgumentException when dealing with overridden methods
-* [CXF-8021] - Upgrade to OpenTracing 0.33
-* [CXF-8045] - Disable HTTP TRACE method on CXF http-undertow transport
-* [CXF-8056] - Update to latest Brave 5.6.5
-* [CXF-8063] - Support lower logging level in Slf4jEventSender
-* [CXF-8064] - OpenApiFeature(OpenAPI V3) should be able to work with camel-cxfrs endpoint
-* [CXF-8066] - Support Doclet API (JDK13+)
-* [CXF-8068] - Log any error in the SAML SSO component under warning
-* [CXF-8076] - Check for recursive calls when invoking on an STS using its own IssuedToken policy
-* [CXF-8083] - ensure java2swagger-plugin|java2ws-plugin m2e compatible
-
-** Test
-* [CXF-8081] - should cache reactor OutputStream
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

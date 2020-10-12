@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements. See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership. The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License. You may obtain a copy of the License at
+ 
+ http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied. See the License for the
+ specific language governing permissions and limitations
+ under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:jaxws="http://cxf.apache.org/jaxws"
+    xmlns:http="http://cxf.apache.org/transports/http/configuration"
+    xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
+    xmlns:sec="http://cxf.apache.org/configuration/security"
+    xmlns:cxf="http://cxf.apache.org/core"
+    xmlns:p="http://cxf.apache.org/policy"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd">
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
+    <cxf:bus>
+        <cxf:features>
+            <cxf:logging/>
+        </cxf:features>
+    </cxf:bus>
+   
+    <httpj:engine-factory id="default-tls-settings">
+        <httpj:engine port="${testutil.ports.SSLv3Server}">
+            <httpj:tlsServerParameters>
+                <sec:keyManagers keyPassword="password">
+                    <sec:keyStore type="jks" password="password" resource="keys/Bethal.jks"/>
+                </sec:keyManagers>
+                <sec:trustManagers>
+                    <sec:keyStore type="jks" password="password" resource="keys/Truststore.jks"/>
+                </sec:trustManagers>
+                <sec:cipherSuitesFilter>
+                    <sec:include>.*_WITH_AES_.*</sec:include>
+                    <sec:exclude>SSL_RSA_WITH_DES_CBC_SHA</sec:exclude>
+                </sec:cipherSuitesFilter>
+                <sec:clientAuthentication want="true" required="false"/>
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
+    
+    <jaxws:endpoint xmlns:e="http://apache.org/hello_world/services" 
+                     xmlns:s="http://apache.org/hello_world/services" 
+                     id="SSLv3NotAllowedByDefaultEndpoint" 
+                     implementor="org.apache.cxf.systests.forked.ssl3.GreeterImpl"
+                     address="https://localhost:${testutil.ports.SSLv3Server}/SoapContext/HttpsPort" 
+                     serviceName="s:SOAPService" 
+                     endpointName="e:HttpsPort" depends-on="default-tls-settings"/>
+    
+    <httpj:engine-factory id="allow-sslv3-settings">
+        <httpj:engine port="${testutil.ports.SSLv3Server.2}">
+            <httpj:tlsServerParameters secureSocketProtocol="SSLv3" >
+                <sec:keyManagers keyPassword="password">
+                    <sec:keyStore type="jks" password="password" resource="keys/Bethal.jks"/>
+                </sec:keyManagers>
+                <sec:trustManagers>
+                    <sec:keyStore type="jks" password="password" resource="keys/Truststore.jks"/>
+                </sec:trustManagers>
+                <sec:cipherSuitesFilter>
+                    <sec:include>.*_WITH_AES_.*</sec:include>
+                    <sec:exclude>SSL_RSA_WITH_DES_CBC_SHA</sec:exclude>
+                </sec:cipherSuitesFilter>
+                <sec:clientAuthentication want="true" required="false"/>
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
+    
+    <jaxws:endpoint xmlns:e="http://apache.org/hello_world/services" 
+                     xmlns:s="http://apache.org/hello_world/services" 
+                     id="SSLv3AllowedByDefaultEndpoint" 
+                     implementor="org.apache.cxf.systests.forked.ssl3.GreeterImpl"
+                     address="https://localhost:${testutil.ports.SSLv3Server.2}/SoapContext/HttpsPort" 
+                     serviceName="s:SOAPService" 
+                     endpointName="e:HttpsPort" depends-on="allow-sslv3-settings"/>
+    
+    <httpj:engine-factory id="disallow-tls-via-configuration">
+        <httpj:engine port="${testutil.ports.SSLv3Server.3}">
+            <httpj:tlsServerParameters secureSocketProtocol="SSLv3">
+                <sec:keyManagers keyPassword="password">
+                    <sec:keyStore type="jks" password="password" resource="keys/Bethal.jks"/>
+                </sec:keyManagers>
+                <sec:trustManagers>
+                    <sec:keyStore type="jks" password="password" resource="keys/Truststore.jks"/>
+                </sec:trustManagers>
+                <sec:clientAuthentication want="true" required="false"/>
+                <sec:excludeProtocols>
+                    <sec:excludeProtocol>TLS</sec:excludeProtocol>
+                    <sec:excludeProtocol>TLSv1</sec:excludeProtocol>
+                    <sec:excludeProtocol>TLSv1.1</sec:excludeProtocol>
+                    <sec:excludeProtocol>TLSv1.2</sec:excludeProtocol>
+                </sec:excludeProtocols>
+                <sec:cipherSuitesFilter>
+                    <sec:include>.*_WITH_AES_.*</sec:include>
+                    <sec:exclude>SSL_RSA_WITH_DES_CBC_SHA</sec:exclude>
+                </sec:cipherSuitesFilter>
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
+    
+    <jaxws:endpoint xmlns:e="http://apache.org/hello_world/services" 
+                     xmlns:s="http://apache.org/hello_world/services" 
+                     id="TLSNotAllowedByEndpoint" 
+                     implementor="org.apache.cxf.systests.forked.ssl3.GreeterImpl"
+                     address="https://localhost:${testutil.ports.SSLv3Server.3}/SoapContext/HttpsPort" 
+                     serviceName="s:SOAPService" 
+                     endpointName="e:HttpsPort" depends-on="disallow-tls-via-configuration"/>
+                
+    <httpj:engine-factory id="tls-but-allow-ssl3">
+        <httpj:engine port="${testutil.ports.SSLv3Server.4}">
+            <httpj:tlsServerParameters>
+                <sec:keyManagers keyPassword="password">
+                    <sec:keyStore type="jks" password="password" resource="keys/Bethal.jks"/>
+                </sec:keyManagers>
+                <sec:trustManagers>
+                    <sec:keyStore type="jks" password="password" resource="keys/Truststore.jks"/>
+                </sec:trustManagers>
+                <sec:clientAuthentication want="true" required="false"/>
+                <sec:includeProtocols>
+                    <sec:includeProtocol>SSLv3</sec:includeProtocol>
+                    <sec:includeProtocol>SSLv2Hello</sec:includeProtocol>
+                </sec:includeProtocols>
+                <sec:cipherSuitesFilter>
+                    <sec:include>.*_WITH_AES_.*</sec:include>
+                    <sec:exclude>SSL_RSA_WITH_DES_CBC_SHA</sec:exclude>
+                </sec:cipherSuitesFilter>
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
+    
+    <jaxws:endpoint xmlns:e="http://apache.org/hello_world/services" 
+                     xmlns:s="http://apache.org/hello_world/services" 
+                     id="TLSAllowSSLv3Endpoint" 
+                     implementor="org.apache.cxf.systests.forked.ssl3.GreeterImpl"
+                     address="https://localhost:${testutil.ports.SSLv3Server.4}/SoapContext/HttpsPort" 
+                     serviceName="s:SOAPService" 
+                     endpointName="e:HttpsPort" depends-on="tls-but-allow-ssl3"/>
+    
+    
+</beans>

@@ -27,7 +27,7 @@
   <parent>
     <artifactId>cxf-rt-rs-security-oauth-parent</artifactId>
     <groupId>org.apache.cxf</groupId>
-    <version>3.4.0-SNAPSHOT</version>
+    <version>3.4.1-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <properties>
@@ -131,6 +131,10 @@
             <groupId>javax.activation</groupId>
             <artifactId>javax.activation-api</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
+          </exclusion>
         </exclusions> 
     </dependency>
     <dependency>
@@ -186,12 +190,6 @@
       <groupId>org.aspectj</groupId>
       <artifactId>aspectjweaver</artifactId>
       <version>${cxf.aspectj.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate.javax.persistence</groupId>
-      <artifactId>hibernate-jpa-2.1-api</artifactId>
-      <version>${cxf.hibernate.jpa.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

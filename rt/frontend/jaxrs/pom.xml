@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>3.4.1-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
@@ -153,6 +153,10 @@
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-servlet_2.5_spec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>javax.servlet-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

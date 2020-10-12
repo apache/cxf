@@ -25,7 +25,7 @@
     xmlns:wsrm-policy="http://schemas.xmlsoap.org/ws/2005/02/rm/policy"
     xmlns:http="http://cxf.apache.org/transports/http/configuration"
     xsi:schemaLocation="http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://schemas.xmlsoap.org/ws/2005/02/rm/policy http://schemas.xmlsoap.org/ws/2005/02/rm/wsrm-policy.xsd http://cxf.apache.org/ws/rm/manager http://cxf.apache.org/schemas/configuration/wsrm-manager.xsd http://cxf.apache.org/configuration/beans http://cxf.apache.org/schemas/configuration/cxf-beans.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <bean id="messageLoss" class="org.apache.cxf.systest.ws.rm.MessageLossSimulator"/>
     <cxf:bus>
         <cxf:features>
@@ -38,7 +38,9 @@
                     <wsrm-mgr:sequenceTerminationPolicy terminateOnShutdown="false"/>
                 </wsrm-mgr:sourcePolicy>
                 <wsrm-mgr:store>
-                    <wsrm-mgr:jdbcStore url="jdbc:derby:${db.name};create=true"/>
+                    <wsrm-mgr:jdbcStore url="jdbc:hsqldb:mem:${db.name}"
+                        driverClassName="org.hsqldb.jdbcDriver"
+                        tableExistsState="42504" tableExistsCode="-5504" />
                 </wsrm-mgr:store>
             </wsrm-mgr:reliableMessaging>
         </cxf:features>

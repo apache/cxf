@@ -101,7 +101,6 @@ public class UsernameActAsTest extends AbstractBusClientServerTestBase {
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
         stopAllServers();
     }
 
@@ -166,6 +165,6 @@ public class UsernameActAsTest extends AbstractBusClientServerTestBase {
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
-        assertEquals(2 * numToDouble, resp);
+        assertEquals(2L * numToDouble, resp);
     }
 }

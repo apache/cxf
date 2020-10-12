@@ -44,9 +44,8 @@ public class AbstractJwtHandlerTest {
     private static final byte[] SIGNATURE = "mySignature".getBytes();
 
     @Rule
-    //CHECKSTYLE:OFF
     public EasyMockRule rule = new EasyMockRule(this);
-    //CHECKSTYLE:ON
+
     private AbstractJwtHandler handler;
     @Mock
     private JwsSignatureVerifier signatureVerifier;

@@ -27,12 +27,13 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>3.4.1-SNAPSHOT</version>
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.tools.wsdl.jaxws</cxf.module.name>
         <cxf.osgi.import>
+            javax.jws*;version="${cxf.osgi.jws.version}",
             javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
             javax.xml.bind*;version="${cxf.osgi.javax.bind.version}"
         </cxf.osgi.import>

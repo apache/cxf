@@ -25,12 +25,12 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>3.4.1-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <cxf.brave.version>5.10.1</cxf.brave.version>
+        <cxf.brave.version>5.11.2</cxf.brave.version>
     </properties>
     <profiles>
         <profile>
@@ -170,7 +170,7 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-integration-tracing-brave</artifactId>
-            <version>3.4.0-SNAPSHOT</version>
+            <version>3.4.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>

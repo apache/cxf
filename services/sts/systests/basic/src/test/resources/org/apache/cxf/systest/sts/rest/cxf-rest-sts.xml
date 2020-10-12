@@ -34,7 +34,7 @@
 
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
 
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
             <cxf:logging/>

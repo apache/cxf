@@ -45,6 +45,7 @@ import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.token.provider.jwt.JWTTokenProvider;
 import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -54,6 +55,7 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -64,11 +66,16 @@ import static org.junit.Assert.assertTrue;
  */
 public class JWTTokenProviderTest {
     private static boolean unrestrictedPoliciesInstalled;
-    private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
+    private static TokenStore tokenStore;
 
     static {
         unrestrictedPoliciesInstalled = TestUtilities.checkUnrestrictedPoliciesInstalled();
     };
+
+    @BeforeClass
+    public static void init() throws TokenStoreException {
+        tokenStore = new DefaultInMemoryTokenStore();
+    }
 
     @org.junit.Test
     public void testCreateUnsignedJWT() throws Exception {

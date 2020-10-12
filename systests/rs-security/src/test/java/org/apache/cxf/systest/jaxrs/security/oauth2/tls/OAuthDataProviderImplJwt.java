@@ -26,7 +26,7 @@ import org.apache.cxf.rs.security.oauth2.grants.code.JCacheCodeDataProvider;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 /**
- * Extend the DefaultEHCacheCodeDataProvider to allow refreshing of tokens
+ * Extend the JCacheCodeDataProvider to allow refreshing of tokens
  */
 public class OAuthDataProviderImplJwt extends JCacheCodeDataProvider {
     public OAuthDataProviderImplJwt() throws Exception {

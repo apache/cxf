@@ -46,6 +46,7 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.rt.security.saml.utils.SAMLUtils;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.WSSPolicyException;
@@ -175,7 +176,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             soapMessage.put(SECURITY_PROCESSED, Boolean.TRUE);
         } catch (WSSecurityException e) {
             throw WSS4JUtils.createSoapFault(soapMessage, soapMessage.getVersion(), e);
-        } catch (XMLSecurityException e) {
+        } catch (XMLSecurityException | TokenStoreException e) {
             throw new SoapFault(new Message("STAX_EX", LOG), e, soapMessage.getVersion().getSender());
         } catch (WSSPolicyException e) {
             throw new SoapFault(e.getMessage(), e, soapMessage.getVersion().getSender());

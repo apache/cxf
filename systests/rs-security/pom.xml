@@ -21,7 +21,7 @@
     <parent>
         <artifactId>cxf-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>3.4.1-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -58,13 +58,6 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-security-oauth2-saml</artifactId>
             <version>${project.version}</version>
-            <!-- TODO Remove when we pick up WSS4J 2.3.0-SNAPSHOT -->
-            <exclusions>
-                <exclusion>
-                    <groupId>net.sf.ehcache</groupId>
-                    <artifactId>ehcache</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -85,13 +78,6 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-security-sso-saml</artifactId>
             <version>${project.version}</version>
-            <!-- TODO Remove when we pick up WSS4J 2.3.0-SNAPSHOT -->
-            <exclusions>
-                <exclusion>
-                    <groupId>net.sf.ehcache</groupId>
-                    <artifactId>ehcache</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -223,15 +209,15 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.1-api</artifactId>
-            <version>${cxf.hibernate.jpa.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
             <version>${cxf.spring.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+            <version>${cxf.persistence-api.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -247,6 +233,10 @@
                 <exclusion>
                     <groupId>javax.activation</groupId>
                     <artifactId>javax.activation-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.persistence</groupId>
+                    <artifactId>javax.persistence-api</artifactId>
                 </exclusion>
             </exclusions> 
         </dependency>

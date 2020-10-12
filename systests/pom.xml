@@ -28,13 +28,13 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf</artifactId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>3.4.1-SNAPSHOT</version>
     </parent>
     <modules>
         <module>container-integration</module>
         <module>uncategorized</module>
         <module>transports</module>
-        <module>transports-ssl3</module>
+        <module>forked</module>
         <module>transport-jms</module>
         <module>transport-undertow</module>
         <module>jaxws</module>

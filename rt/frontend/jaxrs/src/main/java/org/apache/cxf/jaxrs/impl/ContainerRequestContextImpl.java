@@ -29,6 +29,7 @@ import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.io.DelegatingInputStream;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
@@ -68,12 +69,21 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
 
     @Override
     public boolean hasEntity() {
+        InputStream is = getEntityStream();
+        if (is == null) {
+            return false;
+        }
         // Is Content-Length is explicitly set to 0 ?
         if (HttpUtils.isPayloadEmpty(getHeaders())) {
             return false;
         }
+
+        if (is instanceof DelegatingInputStream) {
+            ((DelegatingInputStream) is).cacheInput();
+        }
+
         try {
-            return !IOUtils.isEmpty(getEntityStream());
+            return !IOUtils.isEmpty(is);
         } catch (IOException ex) {
             throw ExceptionUtils.toInternalServerErrorException(ex, null);
         }
@@ -85,6 +95,7 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
         m.setContent(InputStream.class, is);
     }
 
+    @Override
     public MultivaluedMap<String, String> getHeaders() {
         h = null;
         return HttpUtils.getModifiableStringHeaders(m);
@@ -112,6 +123,8 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
 
     protected void doSetRequestUri(URI requestUri) throws IllegalStateException {
         checkNotPreMatch();
+        // TODO: The JAX-RS TCK requires the full uri toString() rather than just the raw path, but
+        // changing to toString() seems to have adverse effects downstream. Needs more investigation.
         HttpUtils.resetRequestURI(m, requestUri.getRawPath());
         String query = requestUri.getRawQuery();
         if (query != null) {

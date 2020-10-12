@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -576,6 +577,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature<Swagger2Feature.Port
 
         private class ServletConfigProvider implements ContextProvider<ServletConfig> {
 
+            private String id = UUID.randomUUID().toString();
+
             @Override
             public ServletConfig createContext(Message message) {
                 final ServletConfig sc = (ServletConfig)message.get("HTTP.CONFIG");
@@ -592,6 +595,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature<Swagger2Feature.Port
                             public String getInitParameter(String name) {
                                 if (Objects.equals(SwaggerContextService.USE_PATH_BASED_CONFIG, name)) {
                                     return "true";
+                                } else if (SwaggerContextService.CONFIG_ID_KEY.equals(name)) {
+                                    return id;
                                 } else {
                                     return super.getInitParameter(name);
                                 }
@@ -604,6 +609,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature<Swagger2Feature.Port
                         public String getInitParameter(String name) {
                             if (Objects.equals(SwaggerContextService.USE_PATH_BASED_CONFIG, name)) {
                                 return "true";
+                            } else if (SwaggerContextService.CONFIG_ID_KEY.equals(name)) {
+                                return id;
                             } else {
                                 return super.getInitParameter(name);
                             }

@@ -22,7 +22,7 @@
 
     <feature name="cxf-specs" version="${project.version}">
         <bundle start-level="9">mvn:org.apache.geronimo.specs/geronimo-osgi-registry/1.1</bundle>
-        <bundle start-level="10" dependency="true">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.activation-api-1.1/${cxf.servicemix.specs.version}</bundle>
+        <bundle start-level="10" dependency="true">mvn:com.sun.activation/jakarta.activation/${cxf.jakarta.activation.version}</bundle>
         <bundle start-level="10" dependency="true">mvn:jakarta.annotation/jakarta.annotation-api/${cxf.javax.annotation-api.version}</bundle>
         <bundle start-level="10" dependency="true">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.stax-api-1.0/${cxf.servicemix.specs.version}</bundle>
         <bundle start-level="10" dependency="true">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxb-api-2.3/${cxf.servicemix.specs.jaxb.version}</bundle>
@@ -58,16 +58,20 @@
         <!--bundle start-level='35'>mvn:org.apache.abdera/abdera-extensions-html/${cxf.abdera.version}</bundle>
         <bundle start-level='35'>mvn:org.apache.abdera/abdera-extensions-json/${cxf.abdera.version}</bundle>-->
     </feature>
+    <feature name="saaj-impl" version="${cxf.saaj-impl.version}">
+        <bundle start-level="25">mvn:org.jvnet.staxex/stax-ex/${cxf.stax-ex.version}</bundle>
+        <bundle start-level="25">mvn:com.sun.xml.messaging.saaj/saaj-impl/${cxf.saaj-impl.version}</bundle>
+    </feature>
     <feature name="wss4j" version="${cxf.wss4j.version}">
         <feature version="${project.version}">cxf-specs</feature>
+        <feature version="${cxf.saaj-impl.version}">saaj-impl</feature>
         <bundle start-level="25" dependency="true">mvn:joda-time/joda-time/${cxf.joda.time.version}</bundle>
         <bundle start-level="25" dependency="true">mvn:commons-codec/commons-codec/${cxf.commons-codec.version}</bundle>
         <bundle start-level="25" dependency="true">mvn:org.apache.santuario/xmlsec/${cxf.xmlsec.bundle.version}</bundle>
+        <bundle start-level="25" dependency="true">mvn:com.google.guava/failureaccess/1.0.1</bundle>
         <bundle start-level="25" dependency="true">mvn:com.google.guava/guava/${cxf.guava.version}</bundle>
         <bundle start-level="25" dependency='true'>mvn:io.dropwizard.metrics/metrics-core/${cxf.dropwizard3.version}</bundle>
         <bundle start-level="25" dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.opensaml/${cxf.opensaml.osgi.version}</bundle>
-        <bundle start-level="25">mvn:org.jvnet.staxex/stax-ex/${cxf.stax-ex.version}</bundle>
-        <bundle start-level="25">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.saaj-impl/${cxf.saaj-impl.bundle.version}</bundle>
         <bundle start-level="25">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlresolver/${cxf.xmlresolver.bundle.version}</bundle>
         <bundle start-level="30" dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xerces/${cxf.xerces.bundle.version}</bundle>
         <bundle start-level="30">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.bcel/${cxf.bcel.bundle.version}</bundle>
@@ -128,12 +132,13 @@
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-ws-mex/${project.version}</bundle>
     </feature>
     <feature name="cxf-ws-security" version="${project.version}">
+        <feature prerequisite="true">wrap</feature>
         <feature version="${cxf.wss4j.version}">wss4j</feature>
         <feature version="${project.version}">cxf-rt-security-saml</feature>
         <feature version="${project.version}">cxf-ws-policy</feature>
         <feature version="${project.version}">cxf-ws-addr</feature>
         <bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/${cxf.geronimo.jta.version}</bundle>
-        <bundle start-level="40" dependency="true">mvn:net.sf.ehcache/ehcache/${cxf.ehcache.version}</bundle>
+        <bundle start-level="40" dependency="true">wrap:mvn:org.ehcache/ehcache/${cxf.ehcache3.version}$overwrite=merge&amp;Import-Package=javax.xml.bind*,*;resolution:=optional</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-ws-security/${project.version}</bundle>
     </feature>
     <feature name="cxf-rt-security" version="${project.version}">
@@ -220,8 +225,7 @@
     </feature>
     <feature name="cxf-bindings-soap" version="${project.version}">
         <feature version="${project.version}">cxf-wsdl</feature>
-        <bundle start-level="25">mvn:org.jvnet.staxex/stax-ex/${cxf.stax-ex.version}</bundle>
-        <bundle start-level="25">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.saaj-impl/${cxf.saaj-impl.bundle.version}</bundle>
+        <feature version="${cxf.saaj-impl.version}">saaj-impl</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-bindings-xml/${project.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-bindings-soap/${project.version}</bundle>
     </feature>
@@ -289,7 +293,6 @@
     </feature>
     <feature name="cxf-jsr-json" version="${project.version}">
         <bundle dependency="true" start-level="30">mvn:org.apache.aries.spifly/org.apache.aries.spifly.dynamic.bundle/${cxf.aries.fly.version}</bundle>
-        <bundle dependency="true" start-level="35">mvn:jakarta.json/jakarta.json-api/${cxf.json.api.version}</bundle>
         <bundle dependency="true" start-level="35">mvn:org.apache.geronimo.specs/geronimo-json_1.1_spec/${cxf.geronimo.json.version}</bundle>
         <bundle start-level="35">mvn:org.apache.johnzon/johnzon-core/${cxf.johnzon.version}</bundle>
     </feature>
@@ -297,6 +300,7 @@
         <feature version="${project.version}">cxf-core</feature>
         <bundle start-level="35">mvn:io.zipkin.zipkin2/zipkin/${cxf.brave.zipkin.version}</bundle>
         <bundle start-level="35">mvn:io.zipkin.reporter2/zipkin-reporter/${cxf.brave.reporter.version}</bundle>
+        <bundle start-level="35">mvn:io.zipkin.reporter2/zipkin-reporter-brave/${cxf.brave.reporter.version}</bundle>
         <bundle start-level="35">mvn:io.zipkin.brave/brave/${cxf.brave.version}</bundle>
         <bundle start-level="35">mvn:io.zipkin.brave/brave-instrumentation-http/${cxf.brave.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-integration-tracing-brave/${project.version}</bundle>
@@ -321,8 +325,7 @@
         <bundle start-level="25" dependency="true">mvn:com.google.guava/guava/${cxf.swagger2.guava.version}</bundle>
         <bundle start-level="35" dependency="true">mvn:io.swagger/swagger-annotations/${cxf.swagger2.version}</bundle>
         <bundle start-level="35" dependency="true">mvn:io.swagger/swagger-models/${cxf.swagger2.version}</bundle>
-        <!-- TODO: update after https://github.com/swagger-api/swagger-core/pull/3497 will done -->
-        <bundle start-level="35" dependency="true">wrap:mvn:io.swagger/swagger-core/${cxf.swagger2.version}$overwrite=merge&amp;Import-Package=javax.validation*;version="[1.1,3)"</bundle>
+        <bundle start-level="35" dependency="true">wrap:mvn:io.swagger/swagger-core/${cxf.swagger2.version}</bundle>
         <bundle start-level="35" dependency="true">mvn:io.swagger/swagger-jaxrs/${cxf.swagger2.version}</bundle>
     </feature>
     <feature name="cxf-rs-description-openapi-v3" version="${project.version}">
@@ -399,14 +402,22 @@
     </feature>
     <feature name="cxf-transports-websocket-client" version="${project.version}">
         <feature version="${project.version}">cxf-http</feature>
-        <feature prerequisite="true">wrap</feature>
-        <bundle dependency='true'>wrap:mvn:org.asynchttpclient/async-http-client/${cxf.ahc.version}</bundle>
+        <bundle dependency='true'>mvn:org.asynchttpclient/async-http-client/${cxf.ahc.version}</bundle>
+        <bundle dependency='true'>mvn:org.asynchttpclient/async-http-client-netty-utils/${cxf.ahc.version}</bundle>
         <bundle dependency='true'>mvn:io.netty/netty-common/${cxf.netty.version}</bundle>
         <bundle dependency='true'>mvn:io.netty/netty-handler/${cxf.netty.version}</bundle>
         <bundle dependency='true'>mvn:io.netty/netty-buffer/${cxf.netty.version}</bundle>
         <bundle dependency='true'>mvn:io.netty/netty-transport/${cxf.netty.version}</bundle>
+        <bundle dependency='true'>mvn:io.netty/netty-resolver/${cxf.netty.version}</bundle>
         <bundle dependency='true'>mvn:io.netty/netty-codec/${cxf.netty.version}</bundle>
         <bundle dependency='true'>mvn:io.netty/netty-codec-http/${cxf.netty.version}</bundle>
+        <bundle dependency='true'>mvn:io.netty/netty-transport-native-epoll/${cxf.netty.version}</bundle>
+        <bundle dependency='true'>mvn:io.netty/netty-transport-native-unix-common/${cxf.netty.version}</bundle>
+        <bundle dependency='true'>mvn:io.netty/netty-transport-native-kqueue/${cxf.netty.version}</bundle>
+        <bundle dependency='true'>mvn:io.netty/netty-handler-proxy/${cxf.netty.version}</bundle>
+        <bundle dependency='true'>mvn:io.netty/netty-codec-socks/${cxf.netty.version}</bundle>
+        <bundle dependency='true'>mvn:org.reactivestreams/reactive-streams/${cxf.reactivestreams.version}</bundle>
+        <bundle dependency='true'>mvn:com.typesafe.netty/netty-reactive-streams/2.0.4</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-transports-websocket/${project.version}</bundle>
     </feature>
     <feature name="cxf-transports-websocket-server" version="${project.version}">
@@ -452,7 +463,7 @@
         <feature version="${project.version}">cxf-javascript</feature>
         <bundle start-level="35" dependency="true">mvn:org.apache.commons/commons-lang3/${cxf.commons-lang3.version}</bundle>
         <bundle start-level="35" dependency="true">mvn:org.apache.commons/commons-text/${cxf.commons-text.version}</bundle>
-        <bundle dependency="true">wrap:mvn:org.apache.velocity/velocity-engine-core/${cxf.velocity.version}</bundle>
+        <bundle dependency="true">mvn:org.apache.velocity/velocity-engine-core/${cxf.velocity.version}</bundle>
         <bundle dependency="true">mvn:commons-collections/commons-collections/${cxf.commons-collections.version}</bundle>
         <bundle>mvn:org.apache.cxf/cxf-tools-common/${project.version}</bundle>
         <bundle>mvn:org.apache.cxf/cxf-tools-java2ws/${project.version}</bundle>
@@ -496,8 +507,9 @@
         <bundle>mvn:org.apache.cxf/cxf-wstx-msv-validation/${project.version}</bundle-->
     </feature>
     <feature name="cxf-sts" version="${project.version}">
+        <feature prerequisite="true">wrap</feature>
         <bundle start-level="40" dependency="true">mvn:com.hazelcast/hazelcast/${cxf.hazelcast.version}</bundle>
-        <bundle start-level="40" dependency="true">mvn:net.sf.ehcache/ehcache/${cxf.ehcache.version}</bundle>
+        <bundle start-level="40" dependency="true">wrap:mvn:org.ehcache/ehcache/${cxf.ehcache3.version}$overwrite=merge&amp;Import-Package=javax.xml.bind*,*;resolution:=optional</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-rs-json-basic/${project.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-rs-security-jose/${project.version}</bundle>
         <feature version="${project.version}">cxf-core</feature>

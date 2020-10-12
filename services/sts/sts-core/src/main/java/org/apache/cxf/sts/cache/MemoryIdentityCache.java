@@ -19,9 +19,8 @@
 
 package org.apache.cxf.sts.cache;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,8 +44,7 @@ public class MemoryIdentityCache extends AbstractIdentityCache {
 
     private static final Logger LOG = LogUtils.getL7dLogger(MemoryIdentityCache.class);
 
-    private final Map<String, Map<String, String>> cache =
-            Collections.synchronizedMap(new HashMap<String, Map<String, String>>());
+    private final Map<String, Map<String, String>> cache = new ConcurrentHashMap<>();
 
     private long maxCacheItems = 10000L;
 
@@ -85,30 +83,18 @@ public class MemoryIdentityCache extends AbstractIdentityCache {
         if (cache.size() >= maxCacheItems) {
             cache.clear();
         }
-        cache.put(user + "@" + realm, identities);
+        cache.put(user + '@' + realm, identities);
     }
 
     @ManagedOperation()
     @Override
     public Map<String, String> get(String user, String realm) {
-        return cache.get(user + "@" + realm);
+        return cache.get(user + '@' + realm);
     }
 
     @Override
     public void remove(String user, String realm) {
-        cache.remove(user + "@" + realm);
-    }
-
-    @ManagedOperation()
-    @Override
-    public void clear() {
-        cache.clear();
-    }
-
-    @ManagedOperation()
-    @Override
-    public int size() {
-        return cache.size();
+        cache.remove(user + '@' + realm);
     }
 
     @ManagedOperation()

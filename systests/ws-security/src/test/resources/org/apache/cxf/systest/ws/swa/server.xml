@@ -27,7 +27,7 @@
     xmlns:cxf="http://cxf.apache.org/core"
     xmlns:p="http://cxf.apache.org/policy"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd">
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
             <p:policies/>
@@ -38,7 +38,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignatureContentAction" 
         address="http://localhost:${testutil.ports.swa.Server}/DoubleItSWASignatureContentAction" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWASignatureContentActionPort" 
-        implementor="org.apache.cxf.systest.ws.swa.DoubleIt3Impl" 
+        implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa.wsdl">
         <jaxws:outInterceptors>
             <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
@@ -68,7 +68,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignatureCompleteAction" 
         address="http://localhost:${testutil.ports.swa.Server}/DoubleItSWASignatureCompleteAction" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWASignatureCompleteActionPort" 
-        implementor="org.apache.cxf.systest.ws.swa.DoubleIt3Impl" 
+        implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa.wsdl">
         <jaxws:outInterceptors>
             <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
@@ -98,7 +98,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptionContentAction" 
         address="http://localhost:${testutil.ports.swa.Server}/DoubleItSWAEncryptionContentAction" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWAEncryptionContentActionPort" 
-        implementor="org.apache.cxf.systest.ws.swa.DoubleIt3Impl" 
+        implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa.wsdl">
         <jaxws:outInterceptors>
             <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
@@ -128,7 +128,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptionCompleteAction" 
         address="http://localhost:${testutil.ports.swa.Server}/DoubleItSWAEncryptionCompleteAction" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWAEncryptionCompleteActionPort" 
-        implementor="org.apache.cxf.systest.ws.swa.DoubleIt3Impl" 
+        implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa.wsdl">
         <jaxws:outInterceptors>
             <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
@@ -158,7 +158,7 @@
      <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignatureEncryptionContentAction" 
         address="http://localhost:${testutil.ports.swa.Server}/DoubleItSWASignatureEncryptionContentAction" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWASignatureEncryptionContentActionPort" 
-        implementor="org.apache.cxf.systest.ws.swa.DoubleIt3Impl" 
+        implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa.wsdl">
         <jaxws:outInterceptors>
             <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">

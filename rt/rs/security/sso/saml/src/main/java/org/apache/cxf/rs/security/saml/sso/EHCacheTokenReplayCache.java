@@ -22,155 +22,137 @@ package org.apache.cxf.rs.security.saml.sso;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.time.Instant;
+import java.util.Random;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.config.CacheConfiguration;
-import net.sf.ehcache.config.Configuration;
-import net.sf.ehcache.config.ConfigurationFactory;
-import net.sf.ehcache.config.DiskStoreConfiguration;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
+import org.apache.wss4j.common.cache.EHCacheReplayCache;
+import org.apache.wss4j.common.cache.EHCacheValue;
+import org.apache.wss4j.common.util.Loader;
+import org.ehcache.Cache;
+import org.ehcache.CacheManager;
+import org.ehcache.Status;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.xml.XmlConfiguration;
 
 /**
  * An in-memory EHCache implementation of the TokenReplayCache interface.
  * The default TTL is 60 minutes and the max TTL is 12 hours.
  */
+
 public class EHCacheTokenReplayCache implements TokenReplayCache<String> {
 
-    public static final long DEFAULT_TTL = 3600L;
-    public static final long MAX_TTL = DEFAULT_TTL * 12L;
     public static final String CACHE_KEY = "cxf.samlp.replay.cache";
+
+    private static final org.slf4j.Logger LOG =
+            org.slf4j.LoggerFactory.getLogger(EHCacheReplayCache.class);
     private static final String DEFAULT_CONFIG_URL = "/cxf-samlp-ehcache.xml";
 
-    private Ehcache cache;
-    private CacheManager cacheManager;
-    private long ttl = DEFAULT_TTL;
+    private final Cache<String, EHCacheValue> cache;
+    private final CacheManager cacheManager;
 
-    public EHCacheTokenReplayCache() {
+    public EHCacheTokenReplayCache()
+            throws IllegalAccessException, InstantiationException, ClassNotFoundException {
         this(DEFAULT_CONFIG_URL, null);
     }
 
-    public EHCacheTokenReplayCache(Bus bus) {
+    public EHCacheTokenReplayCache(Bus bus)
+            throws IllegalAccessException, InstantiationException, ClassNotFoundException {
         this(DEFAULT_CONFIG_URL, bus);
     }
 
-    public EHCacheTokenReplayCache(String configFileURL) {
-        this(configFileURL, null);
+    public EHCacheTokenReplayCache(String configFile)
+            throws IllegalAccessException, InstantiationException, ClassNotFoundException {
+        this(configFile, null);
     }
 
-    public EHCacheTokenReplayCache(String configFileURL, Bus bus) {
-        createCache(configFileURL, bus);
-    }
-
-    private void createCache(String configFile, Bus bus) {
+    public EHCacheTokenReplayCache(String configFile, Bus bus)
+            throws IllegalAccessException, ClassNotFoundException, InstantiationException {
         if (bus == null) {
             bus = BusFactory.getThreadDefaultBus(true);
         }
         URL configFileURL = null;
         try {
             configFileURL =
-                ResourceUtils.getClasspathResourceURL(configFile, EHCacheTokenReplayCache.class, bus);
+                    ResourceUtils.getClasspathResourceURL(configFile, EHCacheTokenReplayCache.class, bus);
         } catch (Exception ex) {
             // ignore
         }
-        if (configFileURL == null) {
-            cacheManager = EHCacheUtil.createCacheManager();
-        } else {
-            Configuration conf = ConfigurationFactory.parseConfiguration(configFileURL);
 
-            if (bus != null) {
-                conf.setName(bus.getId());
-                DiskStoreConfiguration dsc = conf.getDiskStoreConfiguration();
-                if (dsc != null && "java.io.tmpdir".equals(dsc.getOriginalPath())) {
-                    String path = conf.getDiskStoreConfiguration().getPath() + File.separator
-                        + bus.getId();
-                    conf.getDiskStoreConfiguration().setPath(path);
+        XmlConfiguration xmlConfig = new XmlConfiguration(getConfigFileURL(configFileURL));
+        CacheConfigurationBuilder<String, EHCacheValue> configurationBuilder =
+                xmlConfig.newCacheConfigurationBuilderFromTemplate(CACHE_KEY,
+                        String.class, EHCacheValue.class);
+        // Note, we don't require strong random values here
+        String diskKey = CACHE_KEY + "-" + Math.abs(new Random().nextInt());
+        cacheManager = CacheManagerBuilder.newCacheManagerBuilder().withCache(CACHE_KEY, configurationBuilder)
+                .with(CacheManagerBuilder.persistence(new File(System.getProperty("java.io.tmpdir"), diskKey))).build();
+
+        cacheManager.init();
+        cache = cacheManager.getCache(CACHE_KEY, String.class, EHCacheValue.class);
+
+    }
+
+    private URL getConfigFileURL(URL suppliedConfigFileURL) {
+        if (suppliedConfigFileURL == null) {
+            //using the default
+            URL configFileURL = null;
+            try {
+                configFileURL = Loader.getResource(DEFAULT_CONFIG_URL);
+                if (configFileURL == null) {
+                    configFileURL = new URL(DEFAULT_CONFIG_URL);
                 }
+                return configFileURL;
+            } catch (IOException e) {
+                // Do nothing
+                LOG.debug(e.getMessage());
             }
-
-            cacheManager = EHCacheUtil.createCacheManager(conf);
         }
-
-        CacheConfiguration cc = EHCacheUtil.getCacheConfiguration(CACHE_KEY, cacheManager);
-
-        Ehcache newCache = new Cache(cc);
-        cache = cacheManager.addCacheIfAbsent(newCache);
-    }
-
-    /**
-     * Set a new (default) TTL value in seconds
-     * @param newTtl a new (default) TTL value in seconds
-     */
-    public void setTTL(long newTtl) {
-        ttl = newTtl;
-    }
-
-    /**
-     * Get the (default) TTL value in seconds
-     * @return the (default) TTL value in seconds
-     */
-    public long getTTL() {
-        return ttl;
+        return suppliedConfigFileURL;
     }
 
     /**
      * Add the given identifier to the cache. It will be cached for a default amount of time.
-     * @param id The identifier to be added
+     * @param identifier The identifier to be added
      */
-    public void putId(String id) {
-        putId(id, ttl);
+    public void putId(String identifier) {
+        putId(identifier, null);
     }
 
     /**
-     * Add the given identifier to the cache.
-     * @param id The identifier to be added
-     * @param timeToLive The length of time to cache the Identifier in seconds
+     * Add the given identifier to the cache to be cached for the given time
+     * @param identifier The identifier to be added
+     * @param expiry A custom expiry time for the identifier. Can be null in which case, the default expiry is used.
      */
-    public void putId(String id, long timeToLive) {
-        if (id == null || "".equals(id)) {
+    public void putId(String identifier, Instant expiry) {
+        if (identifier == null || "".equals(identifier)) {
             return;
         }
 
-        int parsedTTL = (int)timeToLive;
-        if (timeToLive != parsedTTL || parsedTTL < 0 || parsedTTL > MAX_TTL) {
-            // Default to configured value
-            parsedTTL = (int)ttl;
-            if (ttl != parsedTTL) {
-                // Fall back to 60 minutes if the default TTL is set incorrectly
-                parsedTTL = 3600;
-            }
-        }
-        Element element = new Element(id, id, parsedTTL, parsedTTL);
-        element.resetAccessStatistics();
-        cache.put(element);
+        cache.put(identifier, new EHCacheValue(identifier, expiry));
     }
 
     /**
-     * Return the given identifier if it is contained in the cache, otherwise null.
-     * @param id The identifier to check
+     * Return true if the given identifier is contained in the cache
+     * @param identifier The identifier to check
      */
-    public String getId(String id) {
-        Element element = cache.get(id);
-        if (element != null) {
-            if (cache.isExpired(element)) {
-                cache.remove(id);
-                return null;
-            }
-            return (String)element.getObjectValue();
+    public boolean contains(String identifier) {
+        if (cache == null) {
+            return false;
         }
-        return null;
+        EHCacheValue element = cache.get(identifier);
+        return element != null;
     }
 
-    public void close() throws IOException {
-        if (cacheManager != null) {
-            cacheManager.shutdown();
-            cacheManager = null;
-            cache = null;
+    public synchronized void close() {
+        if (cacheManager.getStatus() == Status.AVAILABLE) {
+            cacheManager.removeCache(CACHE_KEY);
+            cacheManager.close();
         }
     }
+
 
 }

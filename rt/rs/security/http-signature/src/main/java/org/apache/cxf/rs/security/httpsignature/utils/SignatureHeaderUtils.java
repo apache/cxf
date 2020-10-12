@@ -82,7 +82,7 @@ public final class SignatureHeaderUtils {
             String foundAlgorithm = Stream.of("SHA-256", "SHA-512")
                  .filter(s -> s.equalsIgnoreCase(algorithmName))
                  .findAny()
-                 .orElseThrow(() -> new NoSuchAlgorithmException("found no match in digest algorithm whitelist"));
+                 .orElseThrow(() -> new NoSuchAlgorithmException("found no match in digest algorithm allow-list"));
             return MessageDigest.getInstance(foundAlgorithm);
         } catch (NoSuchAlgorithmException e) {
             throw new DigestFailureException("failed to retrieve digest from digest string", e);

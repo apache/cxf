@@ -24,7 +24,7 @@
     xmlns:httpu="http://cxf.apache.org/transports/http-undertow/configuration"
     xmlns:jaxws="http://cxf.apache.org/jaxws"
     xsi:schemaLocation="http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/transports/http-undertow/configuration http://cxf.apache.org/schemas/configuration/http-undertow.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <httpu:engine-factory bus="cxf">
         <httpu:engine port="${testutil.ports.SessionServer}">
         </httpu:engine>

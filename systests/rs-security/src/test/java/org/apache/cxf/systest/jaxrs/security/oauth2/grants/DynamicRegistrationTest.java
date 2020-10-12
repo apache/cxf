@@ -28,14 +28,12 @@ import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.services.ClientRegistration;
 import org.apache.cxf.rs.security.oauth2.services.ClientRegistrationResponse;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
-import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.transport.http.HTTPConduitConfigurer;
 
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
@@ -77,11 +75,6 @@ public class DynamicRegistrationTest extends AbstractBusClientServerTestBase {
                    launchServer(BookServerOAuth2DynamicRegistrationJCacheJWT.class));
         assertTrue("server did not launch correctly",
                    launchServer(BookServerOAuth2DynamicRegistrationJPA.class));
-    }
-
-    @AfterClass
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
     }
 
     @Parameters(name = "{0}")

@@ -31,8 +31,10 @@ import org.apache.wss4j.common.util.DateUtil;
 import static org.apache.wss4j.common.WSS4JConstants.WST_NS_05_12;
 import static org.apache.wss4j.common.WSS4JConstants.WSU_NS;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class SecurityTokenTest {
 
@@ -118,5 +120,17 @@ public class SecurityTokenTest {
         assertEquals(key, token.getId());
         assertEquals(created, token.getCreated());
         assertNull(token.getExpires());
+    }
+
+    @org.junit.Test
+    public void testTokenExpiry() {
+        SecurityToken token = new SecurityToken();
+
+        Instant expires = Instant.now().plusSeconds(5L * 60L);
+        token.setExpires(expires);
+
+        assertFalse(token.isExpired());
+        assertFalse(token.isAboutToExpire(100L));
+        assertTrue(token.isAboutToExpire((5L * 60L * 1000L) + 1L));
     }
 }

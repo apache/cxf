@@ -54,7 +54,6 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.saml.SAMLUtils;
 import org.apache.cxf.rs.security.saml.SAMLUtils.SelfSignInfo;
 import org.apache.cxf.rt.security.SecurityConstants;
-import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.SamlCallbackHandler;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -67,7 +66,6 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
 
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -117,11 +115,6 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
                    launchServer(BookServerOAuth2JPA.class, true));
         assertTrue("server did not launch correctly",
                    launchServer(BookServerOAuth2JCacheJWTNonPersist.class, true));
-    }
-
-    @AfterClass
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
     }
 
     @Parameters(name = "{0}")

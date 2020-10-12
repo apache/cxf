@@ -27,7 +27,7 @@
     xmlns:cxf="http://cxf.apache.org/core"
     xmlns:p="http://cxf.apache.org/policy"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd">
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
             <p:policies/>
@@ -38,7 +38,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignatureContentPolicy" 
         address="http://localhost:${testutil.ports.swa.PolicyServer}/DoubleItSWASignatureContentPolicy" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWASignatureContentPolicyPort" 
-        implementor="org.apache.cxf.systest.ws.swa.DoubleIt3Impl" 
+        implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
@@ -49,7 +49,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignatureCompletePolicy" 
         address="http://localhost:${testutil.ports.swa.PolicyServer}/DoubleItSWASignatureCompletePolicy" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWASignatureCompletePolicyPort" 
-        implementor="org.apache.cxf.systest.ws.swa.DoubleIt3Impl" 
+        implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
@@ -60,7 +60,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptionPolicy" 
         address="http://localhost:${testutil.ports.swa.PolicyServer}/DoubleItSWAEncryptionPolicy" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWAEncryptionPolicyPort" 
-        implementor="org.apache.cxf.systest.ws.swa.DoubleIt3Impl" 
+        implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
@@ -71,7 +71,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptionContentPolicy" 
         address="http://localhost:${testutil.ports.swa.PolicyServer}/DoubleItSWAEncryptionContentPolicy" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWAEncryptionContentPolicyPort" 
-        implementor="org.apache.cxf.systest.ws.swa.DoubleIt3Impl" 
+        implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
@@ -82,7 +82,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="CombinedPolicy" 
         address="http://localhost:${testutil.ports.swa.PolicyServer}/DoubleItSWACombinedPolicy" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWACombinedPolicyPort" 
-        implementor="org.apache.cxf.systest.ws.swa.DoubleIt3Impl" 
+        implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
@@ -93,7 +93,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="CombinedDerivedPolicy" 
         address="http://localhost:${testutil.ports.swa.PolicyServer}/DoubleItSWACombinedDerivedPolicy" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWACombinedDerivedPolicyPort" 
-        implementor="org.apache.cxf.systest.ws.swa.DoubleIt3Impl" 
+        implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
@@ -104,7 +104,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="CombinedAsymmetricPolicy" 
         address="http://localhost:${testutil.ports.swa.PolicyServer}/DoubleItSWACombinedAsymmetricPolicy" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWACombinedAsymmetricPolicyPort" 
-        implementor="org.apache.cxf.systest.ws.swa.DoubleIt3Impl" 
+        implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>

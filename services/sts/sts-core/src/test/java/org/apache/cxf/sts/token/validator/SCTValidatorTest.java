@@ -39,12 +39,15 @@ import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
+
+import org.junit.BeforeClass;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -56,7 +59,12 @@ import static org.junit.Assert.assertTrue;
  */
 public class SCTValidatorTest {
 
-    private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
+    private static TokenStore tokenStore;
+
+    @BeforeClass
+    public static void init() throws TokenStoreException {
+        tokenStore = new DefaultInMemoryTokenStore();
+    }
 
     /**
      * Test a valid SecurityContextToken

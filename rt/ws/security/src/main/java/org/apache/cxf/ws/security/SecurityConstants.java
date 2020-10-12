@@ -218,8 +218,8 @@ public final class SecurityConstants extends org.apache.cxf.rt.security.Security
     public static final String SAML_ONE_TIME_USE_CACHE_INSTANCE = "ws-security.saml.cache.instance";
 
     /**
-     * Set this property to point to a configuration file for the underlying caching implementation.
-     * The default configuration file that is used is cxf-ehcache.xml in this module.
+     * Set this property to point to a configuration file for the underlying caching implementation for the
+     * TokenStore. The default configuration file that is used is cxf-ehcache.xml in this module.
      */
     public static final String CACHE_CONFIG_FILE =
         "ws-security.cache.config.file";

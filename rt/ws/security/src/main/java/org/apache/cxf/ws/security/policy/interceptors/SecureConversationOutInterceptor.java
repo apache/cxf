@@ -38,6 +38,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.policy.interceptors.IssuedTokenInterceptorProvider.IssuedTokenOutInterceptor;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSUtils;
@@ -70,29 +71,33 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                 SecureConversationToken itok = (SecureConversationToken)ais.iterator()
                     .next().getAssertion();
 
-                SecurityToken tok = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
-                if (tok == null) {
-                    String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
-                    if (tokId != null) {
-                        tok = TokenStoreUtils.getTokenStore(message).getToken(tokId);
+                try {
+                    SecurityToken tok = (SecurityToken) message.getContextualProperty(SecurityConstants.TOKEN);
+                    if (tok == null) {
+                        String tokId = (String) message.getContextualProperty(SecurityConstants.TOKEN_ID);
+                        if (tokId != null) {
+                            tok = TokenStoreUtils.getTokenStore(message).getToken(tokId);
+                        }
                     }
-                }
-                if (tok == null) {
-                    tok = issueToken(message, aim, itok);
-                } else {
-                    tok = renewToken(message, aim, tok, itok);
-                }
-                if (tok != null) {
-                    for (AssertionInfo ai : ais) {
-                        ai.setAsserted(true);
+                    if (tok == null) {
+                        tok = issueToken(message, aim, itok);
+                    } else {
+                        tok = renewToken(message, aim, tok, itok);
                     }
-                    message.getExchange().getEndpoint().put(SecurityConstants.TOKEN, tok);
-                    message.getExchange().getEndpoint().put(SecurityConstants.TOKEN_ID, tok.getId());
-                    message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getId());
-                    message.getExchange().put(SecurityConstants.TOKEN, tok);
-                    TokenStoreUtils.getTokenStore(message).add(tok);
+                    if (tok != null) {
+                        for (AssertionInfo ai : ais) {
+                            ai.setAsserted(true);
+                        }
+                        message.getExchange().getEndpoint().put(SecurityConstants.TOKEN, tok);
+                        message.getExchange().getEndpoint().put(SecurityConstants.TOKEN_ID, tok.getId());
+                        message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getId());
+                        message.getExchange().put(SecurityConstants.TOKEN, tok);
+                        TokenStoreUtils.getTokenStore(message).add(tok);
+                    }
+                    PolicyUtils.assertPolicy(aim, SPConstants.BOOTSTRAP_POLICY);
+                } catch (TokenStoreException ex) {
+                    throw new Fault(ex);
                 }
-                PolicyUtils.assertPolicy(aim, SPConstants.BOOTSTRAP_POLICY);
             } else {
                 //server side should be checked on the way in
                 for (AssertionInfo ai : ais) {
@@ -107,7 +112,7 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
     private SecurityToken renewToken(SoapMessage message,
                             AssertionInfoMap aim,
                             SecurityToken tok,
-                            SecureConversationToken itok) {
+                            SecureConversationToken itok) throws TokenStoreException {
         if (!tok.isExpired()) {
             return tok;
         }

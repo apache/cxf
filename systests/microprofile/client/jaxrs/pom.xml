@@ -21,7 +21,7 @@
     <parent>
         <artifactId>cxf-microprofile-tck</artifactId>
         <groupId>org.apache.cxf.systests</groupId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>3.4.1-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -63,15 +63,6 @@
             <artifactId>cxf-rt-rs-service-description-openapi-v3</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>swagger-ui</artifactId>
-            <version>${cxf.swagger.ui.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ant</groupId>
-            <artifactId>ant</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>

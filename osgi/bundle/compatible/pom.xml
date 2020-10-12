@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-bundle-parent</artifactId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>3.4.1-SNAPSHOT</version>
     </parent>
     <properties>
         <cxf.osgi.symbolic.name>${project.groupId}.bundle</cxf.osgi.symbolic.name>
@@ -154,7 +154,7 @@
                             antlr*;resolution:=optional,
                             com.sun*;resolution:=optional,
                             com.ctc.wstx.msv*;resolution:=optional,
-                            net.sf.ehcache*;resolution:=optional,
+                            org.ehcache*;resolution:=optional,
                             org.codehaus.stax2*;resolution:=optional,
                             commonj.sdo*;resolution:=optional,
                             javax.ws.rs*;resolution:=optional,
@@ -167,7 +167,6 @@
                             org.apache.commons.lang3*;resolution:=optional;version="[3,4)",
                             org.apache.commons.codec*;resolution:=optional,
                             org.apache.commons.pool*;resolution:=optional,
-                            org.apache.log4j*;resolution:=optional,
                             org.apache.mina*;resolution:=optional,
                             org.apache.velocity*;resolution:=optional,
                             org.apache.xml.security*;resolution:=optional,

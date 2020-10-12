@@ -570,7 +570,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             }
 
 
-            if (sslURL != null && !sslURL.equals(url)) {
+            if (sslURL != null && isSslTargetDifferent(sslURL, url)) {
                 sslURL = null;
                 sslState = null;
                 session = null;
@@ -597,6 +597,12 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                       new CXFHttpAsyncResponseConsumer(this, inbuf, responseCallback),
                       ctx,
                       callback);
+        }
+
+        private boolean isSslTargetDifferent(URI lastURL, URI url) {
+            return !lastURL.getScheme().equals(url.getScheme())
+                    || !lastURL.getHost().equals(url.getHost())
+                    || lastURL.getPort() != url.getPort();
         }
 
         protected boolean retrySetHttpResponse(HttpResponse r) {

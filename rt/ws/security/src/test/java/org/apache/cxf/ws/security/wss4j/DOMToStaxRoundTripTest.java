@@ -168,7 +168,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
         properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
         properties.put(ConfigurationConstants.USER, "myalias");
@@ -200,7 +200,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
         properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
         properties.put(ConfigurationConstants.USER, "myalias");
@@ -247,7 +247,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         Map<String, Object> properties = new HashMap<>();
         properties.put(
             ConfigurationConstants.ACTION,
-            ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.ENCRYPT
+            ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.ENCRYPTION
         );
         properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
@@ -496,7 +496,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         Map<String, Object> properties = new HashMap<>();
         properties.put(
             ConfigurationConstants.ACTION,
-            ConfigurationConstants.SIGNATURE + " " + ConfigurationConstants.ENCRYPT
+            ConfigurationConstants.SIGNATURE + " " + ConfigurationConstants.ENCRYPTION
         );
         properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");

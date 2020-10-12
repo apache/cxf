@@ -23,7 +23,7 @@
     xmlns:wsa="http://cxf.apache.org/ws/addressing"
     xmlns:wsrm-mgr="http://cxf.apache.org/ws/rm/manager"
     xsi:schemaLocation="http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/ws/rm/manager http://cxf.apache.org/schemas/configuration/wsrm-manager.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
             <wsa:addressing/>
@@ -37,5 +37,7 @@
             </wsrm-mgr:reliableMessaging>
         </cxf:features>
     </cxf:bus>
-    <wsrm-mgr:jdbcStore id="testStore" url="jdbc:derby:${db.name};create=true"/>
+    <wsrm-mgr:jdbcStore id="testStore" url="jdbc:hsqldb:mem:${db.name}"
+        driverClassName="org.hsqldb.jdbcDriver"
+        tableExistsState="42504" tableExistsCode="-5504" />
 </beans>

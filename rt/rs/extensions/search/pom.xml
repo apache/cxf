@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>3.4.1-SNAPSHOT</version>
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
@@ -84,18 +84,6 @@
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
             <optional>true</optional>
-        </dependency>
-        <dependency>
-           <groupId>org.apache.hbase</groupId>
-           <artifactId>hbase-client</artifactId>
-           <optional>true</optional>
-           <scope>provided</scope>
-           <exclusions>
-               <exclusion>
-                    <groupId>jdk.tools</groupId>
-                    <artifactId>jdk.tools</artifactId>
-               </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>

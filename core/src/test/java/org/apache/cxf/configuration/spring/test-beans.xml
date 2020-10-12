@@ -20,7 +20,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-    <bean id="placeholderConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <bean id="placeholderConfig" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
         <property name="location" value="org/apache/cxf/configuration/spring/bean.properties"/>
     </bean>
     <bean name="*2" abstract="true" class="org.apache.cxf.configuration.spring.ConfigurerImplTest$SimpleBean">

@@ -443,7 +443,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<>();
-        actions.add(XMLSecurityConstants.ENCRYPT);
+        actions.add(XMLSecurityConstants.ENCRYPTION);
         properties.setActions(actions);
         properties.setEncryptionSymAlgorithm(XMLSecurityConstants.NS_XENC_AES128);
         properties.setEncryptionUser("myalias");
@@ -477,7 +477,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> outConfig = new HashMap<>();
-        outConfig.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        outConfig.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
         outConfig.put(ConfigurationConstants.ENCRYPTION_USER, "myalias");
         outConfig.put(ConfigurationConstants.ENC_SYM_ALGO, XMLSecurityConstants.NS_XENC_AES128);
         outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
@@ -512,7 +512,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.USERNAMETOKEN);
-        actions.add(XMLSecurityConstants.ENCRYPT);
+        actions.add(XMLSecurityConstants.ENCRYPTION);
         properties.setActions(actions);
         properties.addEncryptionPart(
             new SecurePart(new QName(WSSConstants.NS_WSSE10, "UsernameToken"), SecurePart.Modifier.Element)
@@ -552,7 +552,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         Map<String, Object> outConfig = new HashMap<>();
         outConfig.put(
             ConfigurationConstants.ACTION,
-            ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.ENCRYPT
+            ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.ENCRYPTION
         );
         outConfig.put(
             ConfigurationConstants.ENCRYPTION_PARTS,
@@ -968,7 +968,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<>();
-        actions.add(XMLSecurityConstants.ENCRYPT);
+        actions.add(XMLSecurityConstants.ENCRYPTION);
         actions.add(XMLSecurityConstants.SIGNATURE);
         properties.setActions(actions);
         properties.setEncryptionUser("myalias");
@@ -1008,7 +1008,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         Map<String, Object> outConfig = new HashMap<>();
         outConfig.put(
             ConfigurationConstants.ACTION,
-            ConfigurationConstants.ENCRYPT + " " + ConfigurationConstants.SIGNATURE
+            ConfigurationConstants.ENCRYPTION + " " + ConfigurationConstants.SIGNATURE
         );
         outConfig.put(ConfigurationConstants.SIGNATURE_USER, "myalias");
         outConfig.put(ConfigurationConstants.ENCRYPTION_USER, "myalias");

@@ -34,7 +34,6 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -89,13 +88,10 @@ public class ServerCachingTest extends AbstractBusClientServerTestBase {
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
         stopAllServers();
     }
 
-    // Disabled due to continually failing on Jenkins build
     @org.junit.Test
-    @org.junit.Ignore
     public void testServerSideSAMLTokenCaching() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -261,6 +257,6 @@ public class ServerCachingTest extends AbstractBusClientServerTestBase {
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
-        assertEquals(numToDouble * 2, resp);
+        assertEquals(numToDouble * 2L, resp);
     }
 }

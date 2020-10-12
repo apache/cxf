@@ -54,8 +54,8 @@ public final class ConfigFacade {
             String propertyName = String.format(propertyNameFormat, clientIntf.getName());
             T value = c.get().getOptionalValue(propertyName, clazz).orElseGet(() -> {
                 RegisterRestClient anno = clientIntf.getAnnotation(RegisterRestClient.class);
-                if (anno != null && !StringUtils.isEmpty(anno.configKey())) {
-                    String configKeyPropName = String.format(propertyNameFormat, anno.configKey());
+                if (anno != null && !StringUtils.isEmpty(getConfigKey(anno))) {
+                    String configKeyPropName = String.format(propertyNameFormat, getConfigKey(anno));
                     return c.get().getOptionalValue(configKeyPropName, clazz).orElse(null);
                 }
                 return null;
@@ -78,8 +78,8 @@ public final class ConfigFacade {
             String propertyName = String.format(propertyNameFormat, clientIntf.getName());
             value = c.get().getOptionalValue(propertyName, clazz).orElseGet(() -> {
                 RegisterRestClient anno = clientIntf.getAnnotation(RegisterRestClient.class);
-                if (anno != null && !StringUtils.isEmpty(anno.configKey())) {
-                    String configKeyPropName = String.format(propertyNameFormat, anno.configKey());
+                if (anno != null && !StringUtils.isEmpty(getConfigKey(anno))) {
+                    String configKeyPropName = String.format(propertyNameFormat, getConfigKey(anno));
                     return c.get().getValue(configKeyPropName, clazz);
                 }
                 return null;
@@ -102,8 +102,8 @@ public final class ConfigFacade {
             String propertyName = String.format(propNameFormat, clientIntf.getName());
             Long value = c.get().getOptionalValue(propertyName, Long.class).orElseGet(() -> {
                 RegisterRestClient anno = clientIntf.getAnnotation(RegisterRestClient.class);
-                if (anno != null && !StringUtils.isEmpty(anno.configKey())) {
-                    String configKeyPropName = String.format(propNameFormat, anno.configKey());
+                if (anno != null && !StringUtils.isEmpty(getConfigKey(anno))) {
+                    String configKeyPropName = String.format(propNameFormat, getConfigKey(anno));
                     return c.get().getOptionalValue(configKeyPropName, Long.class).orElse(null);
                 }
                 return null;
@@ -111,5 +111,13 @@ public final class ConfigFacade {
             return value == null ? OptionalLong.empty() : OptionalLong.of(value);
         }
         return OptionalLong.empty();
+    }
+
+    private static String getConfigKey(RegisterRestClient anno) {
+        try {
+            return anno.configKey();
+        } catch (Throwable t) {
+            return "";
+        }
     }
 }

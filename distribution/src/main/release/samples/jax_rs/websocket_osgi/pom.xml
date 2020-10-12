@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>3.4.1-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
     <properties>
@@ -47,6 +47,7 @@
                             javax.servlet.http;version="[2.6,4)",
                             javax.ws.rs,
                             javax.ws.rs.core,
+                            javax.xml.bind*;version=!,
                             org.apache.cxf.jaxrs.provider,
                             org.osgi.service.blueprint,
                             *
@@ -71,10 +72,6 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.ws.rs</groupId>
-            <artifactId>jakarta.ws.rs-api</artifactId>
         </dependency>
 
         <!-- add atmosphere -->

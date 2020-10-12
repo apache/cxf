@@ -62,7 +62,7 @@ public class ServiceInvokerInterceptor extends AbstractPhaseInterceptor<Message>
 
                     Message outMessage = runableEx.getOutMessage();
                     if (outMessage == null) {
-                        outMessage = new MessageImpl();
+                        outMessage = new MessageImpl(16, 1); // perf: size 16 / factor 1 to avoid resize operation
                         outMessage.setExchange(exchange);
                         outMessage = ep.getBinding().createMessage(outMessage);
                         exchange.setOutMessage(outMessage);

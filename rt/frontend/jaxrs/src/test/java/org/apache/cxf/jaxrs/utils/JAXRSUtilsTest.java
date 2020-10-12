@@ -2061,6 +2061,42 @@ public class JAXRSUtilsTest {
         SimpleFactory sf = (SimpleFactory)params.get(1);
         assertEquals(2, sf.getId());
     }
+    
+    @Test
+    public void testBeanParamsWithBooleanConverter() throws Exception {
+        Class<?>[] argType = {Customer.CustomerBean.class};
+        Method m = Customer.class.getMethod("testBeanParam", argType);
+        Message messageImpl = createMessage();
+        messageImpl.put(Message.REQUEST_URI, "/bar");
+        
+        // The converter converts any Boolean to null
+        ProviderFactory.getInstance(messageImpl)
+            .registerUserProvider(new MyBoolParamConverterProvider());
+        
+        MultivaluedMap<String, String> headers = new MetadataMap<>();
+        headers.putSingle("Content-Type", MediaType.APPLICATION_FORM_URLENCODED);
+        messageImpl.put(Message.PROTOCOL_HEADERS, headers);
+        String body = "value=true";
+        messageImpl.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes()));
+
+        final ClassResourceInfo cri = new ClassResourceInfo(Customer.class);
+        final MethodDispatcher md = new MethodDispatcher();
+        
+        final OperationResourceInfo ori = new OperationResourceInfo(m, cri);
+        md.bind(ori, m);
+        
+        cri.setMethodDispatcher(md);
+        cri.initBeanParamInfo(ServerProviderFactory.getInstance(messageImpl));
+
+        List<Object> params = JAXRSUtils.processParameters(ori,
+                                                           null,
+                                                           messageImpl);
+        assertEquals("Bean should be created", 1, params.size());
+        Customer.CustomerBean cb = (Customer.CustomerBean)params.get(0);
+        assertNotNull(cb);
+
+        assertNull(cb.getBool());
+    }
 
     private static OperationResourceInfo findTargetResourceClass(List<ClassResourceInfo> resources,
                                                                 Message message,
@@ -2108,6 +2144,32 @@ public class JAXRSUtilsTest {
         return endpoint;
     }
 
+    @SuppressWarnings("unchecked")
+    static class MyBoolParamConverterProvider implements ParamConverterProvider {
+        @Override
+        public <T> ParamConverter<T> getConverter(Class<T> rawType, Type genericType, Annotation[] annotations) {
+            if (rawType.isAssignableFrom(Boolean.TYPE) || rawType.isAssignableFrom(Boolean.class)) {
+                return (ParamConverter<T>) new ParamConverter<Boolean>() {
+                    @Override
+                    public Boolean fromString(String value) {
+                        if (rawType.isAssignableFrom(Boolean.TYPE)) {
+                            return true;
+                        }
+                        return null;
+                    }
+        
+                    @Override
+                    public String toString(Boolean value) {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+            }
+            
+            return null;
+        }
+    }
+    
+    
     static class MyTypeParamConverterProvider
         implements ParamConverterProvider, ParamConverter<MyType<Integer>> {
 

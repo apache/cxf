@@ -29,8 +29,4 @@ public interface IdentityCache {
 
     void remove(String user, String realm);
 
-    void clear();
-
-    int size();
-
 }

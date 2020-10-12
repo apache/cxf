@@ -21,7 +21,7 @@
     <parent>
         <artifactId>cxf-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>3.4.1-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -277,17 +277,6 @@
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.java.dev.msv</groupId>
-            <artifactId>msv-core</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.java.dev.msv</groupId>
-                    <artifactId>msv-testharness</artifactId>
-                </exclusion>
-            </exclusions>
             <scope>test</scope>
         </dependency>
     </dependencies>

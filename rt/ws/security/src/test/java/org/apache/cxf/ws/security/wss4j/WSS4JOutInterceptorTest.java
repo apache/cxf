@@ -97,7 +97,7 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
         PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
 
-        msg.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        msg.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
         msg.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
         msg.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
         msg.put(ConfigurationConstants.USER, "myalias");

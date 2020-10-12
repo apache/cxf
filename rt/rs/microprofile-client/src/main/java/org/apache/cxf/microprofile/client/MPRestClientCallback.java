@@ -20,10 +20,6 @@
 package org.apache.cxf.microprofile.client;
 
 import java.lang.reflect.Type;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 
 import javax.ws.rs.client.InvocationCallback;
@@ -32,25 +28,16 @@ import org.apache.cxf.jaxrs.client.JaxrsClientCallback;
 import org.apache.cxf.message.Message;
 
 public class MPRestClientCallback<T> extends JaxrsClientCallback<T> {
-    private final ExecutorService executor;
-
     public MPRestClientCallback(InvocationCallback<T> handler,
                                 Message outMessage,
                                 Class<?> responseClass,
                                 Type outGenericType) {
         super(handler, responseClass, outGenericType);
-        ExecutorService es = outMessage.get(ExecutorService.class);
-        if (es == null) {
-            es = AccessController.doPrivileged((PrivilegedAction<ExecutorService>)() -> {
-                return ForkJoinPool.commonPool();
-            });
-        }
-        executor = es;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public Future<T> createFuture() {
-        return delegate.thenApplyAsync(res -> (T)res[0], executor);
+        return delegate.thenApply(res -> (T)res[0]);
     }
 }

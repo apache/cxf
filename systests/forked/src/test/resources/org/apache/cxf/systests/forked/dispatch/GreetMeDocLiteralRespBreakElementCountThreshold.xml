@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <SOAP-ENV:Body>
+        <a xmlns="http://apache.org/hello_world_soap_http/types">
+            <a0/>
+            <a1/>
+            <a2/>
+            <a3/>
+            <a4/>
+            <a5/>
+            <a6/>
+            <a7/>
+            <a8/>
+            <a9/>
+            <a10/>
+            <a11/>
+            <a12/>
+            <a13/>
+            <a14/>
+            <a15/>
+            <a16/>
+            <a17/>
+            <a18/>
+            <a19/>
+            <a20/>
+            <a21/>
+            <a22/>
+            <a23/>
+            <a24/>
+            <a25/>
+            <a26/>
+            <a27/>
+            <a28/>
+            <a29/>
+            <a30/>
+            <a31/>
+            <a32/>
+            <a33/>
+            <a34/>
+            <a35/>
+            <a36/>
+            <a37/>
+            <a38/>
+            <a39/>
+        </a>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

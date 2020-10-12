@@ -26,7 +26,7 @@
     xmlns:cxf="http://cxf.apache.org/core"
     xmlns:p="http://cxf.apache.org/policy"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd">
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
             <p:policies/>
@@ -50,6 +50,11 @@
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
+
+    <bean id="doubleItNoSecurity" class="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl">
+        <property name="enforcePrincipal" value="false"/>
+    </bean>
+
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Plaintext" address="https://localhost:${testutil.ports.ut.StaxServer}/DoubleItUTPlaintext" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
@@ -65,6 +70,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="PlaintextSupporting" address="https://localhost:${testutil.ports.ut.StaxServer}/DoubleItUTPlaintextSupporting" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextSupportingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="ws-security.actor" value="recipient"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
@@ -109,7 +115,7 @@
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="InlinePolicy" address="https://localhost:${testutil.ports.ut.StaxServer}/DoubleItUTInlinePolicy" serviceName="s:DoubleItService" endpointName="s:DoubleItInlinePolicyPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="InlinePolicy" address="https://localhost:${testutil.ports.ut.StaxServer}/DoubleItUTInlinePolicy" serviceName="s:DoubleItService" endpointName="s:DoubleItInlinePolicyPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.enable.streaming" value="true"/>

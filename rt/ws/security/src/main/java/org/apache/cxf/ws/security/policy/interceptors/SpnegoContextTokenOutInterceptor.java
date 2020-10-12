@@ -34,6 +34,7 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSUtils;
@@ -48,6 +49,7 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
     SpnegoContextTokenOutInterceptor() {
         super(Phase.PREPARE_SEND);
     }
+
     public void handleMessage(SoapMessage message) throws Fault {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         // extract Assertion information
@@ -60,26 +62,30 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
             if (isRequestor(message)) {
                 String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
                 SecurityToken tok = null;
-                if (tokId != null) {
-                    tok = TokenStoreUtils.getTokenStore(message).getToken(tokId);
+                try {
+                    if (tokId != null) {
+                        tok = TokenStoreUtils.getTokenStore(message).getToken(tokId);
 
-                    if (tok != null && tok.isExpired()) {
-                        message.getExchange().getEndpoint().remove(SecurityConstants.TOKEN_ID);
-                        message.getExchange().remove(SecurityConstants.TOKEN_ID);
-                        TokenStoreUtils.getTokenStore(message).remove(tokId);
-                        tok = null;
+                        if (tok != null && tok.isExpired()) {
+                            message.getExchange().getEndpoint().remove(SecurityConstants.TOKEN_ID);
+                            message.getExchange().remove(SecurityConstants.TOKEN_ID);
+                            TokenStoreUtils.getTokenStore(message).remove(tokId);
+                            tok = null;
+                        }
                     }
-                }
 
-                if (tok == null) {
-                    tok = issueToken(message, aim);
+                    if (tok == null) {
+                        tok = issueToken(message, aim);
+                    }
+                    for (AssertionInfo ai : ais) {
+                        ai.setAsserted(true);
+                    }
+                    message.getExchange().getEndpoint().put(SecurityConstants.TOKEN_ID, tok.getId());
+                    message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getId());
+                    TokenStoreUtils.getTokenStore(message).add(tok);
+                } catch (TokenStoreException ex) {
+                    throw new Fault(ex);
                 }
-                for (AssertionInfo ai : ais) {
-                    ai.setAsserted(true);
-                }
-                message.getExchange().getEndpoint().put(SecurityConstants.TOKEN_ID, tok.getId());
-                message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getId());
-                TokenStoreUtils.getTokenStore(message).add(tok);
             } else {
                 // server side should be checked on the way in
                 for (AssertionInfo ai : ais) {

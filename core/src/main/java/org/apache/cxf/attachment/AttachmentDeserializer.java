@@ -19,6 +19,7 @@
 
 package org.apache.cxf.attachment;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
@@ -47,10 +48,21 @@ import org.apache.cxf.message.MessageUtils;
 
 public class AttachmentDeserializer {
     public static final String ATTACHMENT_PART_HEADERS = AttachmentDeserializer.class.getName() + ".headers";
+
+    /**
+     * Allowed value is any instance of {@link File} or {@link String}.
+     */
     public static final String ATTACHMENT_DIRECTORY = "attachment-directory";
 
+    /**
+     * The memory threshold of attachments. Allowed value is any instance of {@link Number} or {@link String}.
+     * The default is {@link AttachmentDeserializer#THRESHOLD}.
+     */
     public static final String ATTACHMENT_MEMORY_THRESHOLD = "attachment-memory-threshold";
 
+    /**
+     * The maximum size of the attachment. Allowed value is any of {@link Number} or {@link String}.
+     */
     public static final String ATTACHMENT_MAX_SIZE = "attachment-max-size";
 
     /**

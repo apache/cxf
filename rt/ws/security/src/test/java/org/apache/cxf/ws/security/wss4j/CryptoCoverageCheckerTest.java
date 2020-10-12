@@ -237,7 +237,7 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
 
     private PhaseInterceptor<SoapMessage> getWss4jInInterceptor() {
         final WSS4JInInterceptor inHandler = new WSS4JInInterceptor(true);
-        final String action = ConfigurationConstants.SIGNATURE + " " + ConfigurationConstants.ENCRYPT;
+        final String action = ConfigurationConstants.SIGNATURE + " " + ConfigurationConstants.ENCRYPTION;
 
         inHandler.setProperty(ConfigurationConstants.ACTION, action);
         inHandler.setProperty(ConfigurationConstants.SIG_VER_PROP_FILE,

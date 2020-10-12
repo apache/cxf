@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.saml.sso.state;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -77,5 +78,27 @@ public class ResponseState implements Serializable {
 
     public String getAssertion() {
         return assertion;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ResponseState that = (ResponseState) o;
+        return createdAt == that.createdAt
+                && expiresAt == that.expiresAt
+                && Objects.equals(assertion, that.assertion)
+                && Objects.equals(relayState, that.relayState)
+                && Objects.equals(webAppContext, that.webAppContext)
+                && Objects.equals(webAppDomain, that.webAppDomain);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(assertion, relayState, webAppContext, webAppDomain, createdAt, expiresAt);
     }
 }

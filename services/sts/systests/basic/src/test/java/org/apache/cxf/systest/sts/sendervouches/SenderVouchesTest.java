@@ -103,7 +103,6 @@ public class SenderVouchesTest extends AbstractBusClientServerTestBase {
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
         stopAllServers();
     }
 
@@ -136,6 +135,6 @@ public class SenderVouchesTest extends AbstractBusClientServerTestBase {
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
-        assertEquals(numToDouble * 2, resp);
+        assertEquals(numToDouble * 2L, resp);
     }
 }

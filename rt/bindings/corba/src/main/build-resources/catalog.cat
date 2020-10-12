@@ -1,4 +1,5 @@
---
+<?xml version="1.0"?>
+<!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
   distributed with this work for additional information
@@ -15,9 +16,12 @@
   KIND, either express or implied. See the License for the
   specific language governing permissions and limitations
   under the License.
---
+-->
 
-
-SYSTEM "http://schemas.xmlsoap.org/wsdl/2003-02-11.xsd" "../../../../../../core/src/main/resources/schemas/wsdl/wsdl.xsd"
-SYSTEM "http://schemas.xmlsoap.org/wsdl/" "../../../../../../core/src/main/resources/schemas/wsdl/wsdl.xsd"
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+    <system systemId="http://schemas.xmlsoap.org/wsdl/2003-02-11.xsd"
+            uri="../../../../../../core/src/main/resources/schemas/wsdl/wsdl.xsd"/>
+    <system systemId="http://schemas.xmlsoap.org/wsdl/"
+            uri="../../../../../../core/src/main/resources/schemas/wsdl/wsdl.xsd"/>
+</catalog>
 

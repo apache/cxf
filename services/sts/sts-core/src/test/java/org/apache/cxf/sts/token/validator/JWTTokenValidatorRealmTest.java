@@ -48,10 +48,13 @@ import org.apache.cxf.sts.token.realm.JWTRealmCodec;
 import org.apache.cxf.sts.token.realm.RealmProperties;
 import org.apache.cxf.sts.token.validator.jwt.JWTTokenValidator;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
+
+import org.junit.BeforeClass;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -62,7 +65,12 @@ import static org.junit.Assert.assertTrue;
  * Some unit tests for validating JWTTokens in different realms
  */
 public class JWTTokenValidatorRealmTest {
-    private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
+    private static TokenStore tokenStore;
+
+    @BeforeClass
+    public static void init() throws TokenStoreException {
+        tokenStore = new DefaultInMemoryTokenStore();
+    }
 
     @org.junit.Test
     public void testRealmA() throws Exception {

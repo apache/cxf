@@ -29,8 +29,6 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -77,12 +75,7 @@ public class CommandLineParser {
     public CommandDocument parseArguments(String[] args) throws BadUsageException, IOException {
 
         if (LOG.isLoggable(Level.FINE)) {
-            StringBuilder debugMsg = new StringBuilder("Parsing arguments: ");
-
-            for (int i = 0; i < args.length; i++) {
-                debugMsg.append(args[i]).append(' ');
-            }
-            LOG.fine(debugMsg.toString());
+            LOG.fine("Parsing arguments: " + String.join(" ", args));
         }
 
         if (toolspec == null) {
@@ -91,17 +84,8 @@ public class CommandLineParser {
 
         // Create a result document
 
-        Document resultDoc = null;
+        final Document resultDoc = DOMUtils.newDocument();
 
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
-            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            resultDoc = factory.newDocumentBuilder().newDocument();
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "FAIL_CREATE_DOM_MSG");
-        }
         Element commandEl = resultDoc.createElementNS("http://cxf.apache.org/Xutil/Command", "command");
 
         Attr attr =

@@ -36,7 +36,6 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.wss4j.common.WSS4JConstants;
@@ -78,7 +77,6 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
         stopAllServers();
     }
 

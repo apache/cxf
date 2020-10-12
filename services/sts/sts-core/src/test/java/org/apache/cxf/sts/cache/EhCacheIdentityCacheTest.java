@@ -22,14 +22,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.sts.IdentityMapper;
 
-import org.junit.BeforeClass;
-
 public class EhCacheIdentityCacheTest extends MemoryIdentityCacheTest {
-
-    @BeforeClass
-    public static void init() throws Exception {
-
-    }
 
     @Override
     protected AbstractIdentityCache getIdentityCache(IdentityMapper mapper) {

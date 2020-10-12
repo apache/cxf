@@ -977,10 +977,7 @@ public final class JweUtils {
     private static JweHeaders toJweHeaders(String ct) {
         return new JweHeaders(Collections.<String, Object>singletonMap(JoseConstants.HEADER_CONTENT_TYPE, ct));
     }
-    public static void validateJweCertificateChain(List<X509Certificate> certs) {
-        Properties props = loadEncryptionInProperties(true);
-        KeyManagementUtils.validateCertificateChain(props, certs);
-    }
+
     public static Properties loadEncryptionInProperties(boolean required) {
         Message m = PhaseInterceptorChain.getCurrentMessage();
         String keyEncryptionAlgorithm =

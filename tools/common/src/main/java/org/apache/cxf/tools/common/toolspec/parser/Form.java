@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -37,34 +38,24 @@ public class Form implements TokenConsumer {
     private static final Logger LOG = LogUtils.getL7dLogger(Form.class);
     private final Element element;
 
-    private final List<Object> arguments = new ArrayList<>();
-    private final List<Object> optionGroups = new ArrayList<>();
-    private final List<Object> options = new ArrayList<>();
+    private final List<Argument> arguments;
+    private final List<OptionGroup> optionGroups;
+    private final List<Option> options = new ArrayList<>();
 
     public Form(Element el) {
         this.element = el;
 
-        List<Element> elemList =
+        optionGroups =
             DOMUtils.findAllElementsByTagNameNS(element,
                                                 Tool.TOOL_SPEC_PUBLIC_ID,
-                                                "optionGroup");
+                                                "optionGroup")
+            .stream().map(elem -> new OptionGroup(elem)).collect(Collectors.toList());
 
-        for (Element elem : elemList) {
-            optionGroups.add(new OptionGroup(elem));
-        }
-
-        elemList =
+        arguments =
             DOMUtils.findAllElementsByTagNameNS(element,
                                                 Tool.TOOL_SPEC_PUBLIC_ID,
-                                                "argument");
-        for (Element elem : elemList) {
-            arguments.add(new Argument(elem));
-        }
-
-        getOptions(element);
-    }
-
-    private void getOptions(Element el) {
+                                                "argument")
+            .stream().map(elem -> new Argument(elem)).collect(Collectors.toList());
 
         Node node = el.getFirstChild();
         while (node != null) {
@@ -94,8 +85,7 @@ public class Form implements TokenConsumer {
                 LOG.fine("Args is available");
             }
             boolean accepted = false;
-            for (int i = 0; i < optionGroups.size(); i++) {
-                OptionGroup optionGroup = (OptionGroup)optionGroups.get(i);
+            for (OptionGroup optionGroup : optionGroups) {
                 if (optionGroup.accept(args, result, errors)) {
                     accepted = true;
                     break;
@@ -103,8 +93,7 @@ public class Form implements TokenConsumer {
             }
 
             if (!accepted) {
-                for (int i = 0; i < options.size(); i++) {
-                    Option option = (Option)options.get(i);
+                for (Option option : options) {
                     if (option.accept(args, result, errors)) {
                         accepted = true;
                         break;
@@ -117,30 +106,22 @@ public class Form implements TokenConsumer {
             }
         }
 
-        for (int i = 0; i < optionGroups.size(); i++) {
-            OptionGroup optionGroup = (OptionGroup)optionGroups.get(i);
-
+        for (OptionGroup optionGroup : optionGroups) {
             if (!optionGroup.isSatisfied(errors) && !hasInfo) {
                 return false;
             }
         }
 
-        for (int i = 0; i < options.size(); i++) {
-            Option option = (Option)options.get(i);
-
+        for (Option option : options) {
             if (!option.isSatisfied(errors) && !hasInfo) {
                 return false;
             }
         }
 
-        if (arguments != null) {
-            for (int i = 0; i < arguments.size(); i++) {
-                Argument argument = (Argument)arguments.get(i);
-
-                argument.accept(args, result, errors);
-                if (!argument.isSatisfied(errors) && !hasInfo) {
-                    return false;
-                }
+        for (Argument argument : arguments) {
+            argument.accept(args, result, errors);
+            if (!argument.isSatisfied(errors) && !hasInfo) {
+                return false;
             }
         }
 

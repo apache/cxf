@@ -106,6 +106,12 @@ public class BookApplication extends Application {
         public void aroundWriteTo(WriterInterceptorContext context) throws IOException,
             WebApplicationException {
             context.getHeaders().putSingle("BookWriter", "TheBook");
+            
+            final Object property = context.getProperty("property");
+            if (property != null) {
+                context.getHeaders().putSingle("X-Property-WriterInterceptor", property);
+            }
+            
             context.proceed();
         }
 
@@ -131,7 +137,11 @@ public class BookApplication extends Application {
                 || uri.contains("/application6")) {
                 context.getHeaders().put("BOOK", Arrays.asList("1", "2"));
             }
-
+            
+            final String value = context.getUriInfo().getQueryParameters().getFirst("property");
+            if (value != null) {
+                context.setProperty("property", value);
+            }
         }
 
     }

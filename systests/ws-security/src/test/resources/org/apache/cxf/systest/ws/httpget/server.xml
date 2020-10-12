@@ -26,20 +26,25 @@
     xmlns:cxf="http://cxf.apache.org/core"
     xmlns:p="http://cxf.apache.org/policy"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd">
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
             <p:policies/>
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KeyIdentifier" address="http://localhost:${testutil.ports.httpget.Server}/DoubleItX509KeyIdentifier" serviceName="s:DoubleItService" endpointName="s:DoubleItKeyIdentifierPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/httpget/DoubleItHTTPGet.wsdl">
+
+    <bean id="doubleItNoSecurity" class="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl">
+        <property name="enforcePrincipal" value="false"/>
+    </bean>
+
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KeyIdentifier" address="http://localhost:${testutil.ports.httpget.Server}/DoubleItX509KeyIdentifier" serviceName="s:DoubleItService" endpointName="s:DoubleItKeyIdentifierPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/httpget/DoubleItHTTPGet.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignBody" address="http://localhost:${testutil.ports.httpget.Server}/DoubleItSignBody" serviceName="s:DoubleItService" endpointName="s:DoubleItSignBodyPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/httpget/DoubleItHTTPGet.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignBody" address="http://localhost:${testutil.ports.httpget.Server}/DoubleItSignBody" serviceName="s:DoubleItService" endpointName="s:DoubleItSignBodyPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/httpget/DoubleItHTTPGet.wsdl">
         <jaxws:inInterceptors>
             <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
                 <constructor-arg>

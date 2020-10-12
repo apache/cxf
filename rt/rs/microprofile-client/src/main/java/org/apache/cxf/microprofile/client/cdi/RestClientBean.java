@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,9 +54,11 @@ import javax.ws.rs.Priorities;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.microprofile.client.CxfTypeSafeClientBuilder;
 import org.apache.cxf.microprofile.client.config.ConfigFacade;
+import org.eclipse.microprofile.rest.client.ext.QueryParamStyle;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
@@ -74,11 +77,15 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
     public static final String REST_KEY_STORE_FORMAT = "%s/mp-rest/keyStore";
     public static final String REST_KEY_STORE_PASSWORD_FORMAT = "%s/mp-rest/keyStorePassword";
     public static final String REST_KEY_STORE_TYPE_FORMAT = "%s/mp-rest/keyStoreType";
+    public static final String REST_FOLLOW_REDIRECTS_FORMAT = "%s/mp-rest/followRedirects";
+    public static final String REST_PROXY_ADDRESS_FORMAT = "%s/mp-rest/proxyAddress";
+    public static final String QUERY_PARAM_STYLE_FORMAT = "%s/mp-rest/queryParamStyle";
     private static final Logger LOG = LogUtils.getL7dLogger(RestClientBean.class);
     private static final Default DEFAULT_LITERAL = new DefaultLiteral();
     private final Class<?> clientInterface;
     private final Class<? extends Annotation> scope;
     private final BeanManager beanManager;
+    private final Map<Object, CxfTypeSafeClientBuilder> builders = new IdentityHashMap<>();
 
     public RestClientBean(Class<?> clientInterface, BeanManager beanManager) {
         this.clientInterface = clientInterface;
@@ -118,12 +125,20 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
         }
         setTimeouts(builder);
         setSSLConfig(builder);
-        return builder.build(clientInterface);
+        setFollowRedirects(builder);
+        setProxyAddress(builder);
+        setQueryParamStyle(builder);
+        Object clientInstance = builder.build(clientInterface);
+        builders.put(clientInstance, builder);
+        return clientInstance;
     }
 
     @Override
     public void destroy(Object instance, CreationalContext<Object> creationalContext) {
-
+        CxfTypeSafeClientBuilder builder = builders.remove(instance);
+        if (builder != null) {
+            builder.close();
+        }
     }
 
     @Override
@@ -267,6 +282,58 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
                     LOG.finest("readTimeout set by MP Config: " + timeoutValue);
                 }
             });
+    }
+
+    private void setFollowRedirects(CxfTypeSafeClientBuilder builder) {
+        ConfigFacade.getOptionalValue(REST_FOLLOW_REDIRECTS_FORMAT, clientInterface, String.class).ifPresent(
+            follows -> {
+                builder.followRedirects(PropertyUtils.isTrue(follows));
+                if (LOG.isLoggable(Level.FINEST)) {
+                    LOG.finest("followRedirect set by MP Config: " + follows);
+                }
+            });
+    }
+
+    private void setProxyAddress(CxfTypeSafeClientBuilder builder) {
+        ConfigFacade.getOptionalValue(REST_PROXY_ADDRESS_FORMAT, clientInterface, String.class).ifPresent(
+            address -> {
+                String[] split = address.split(":");
+                if (split.length != 2) {
+                    throw new IllegalStateException(String.format("Invalid proxy server address configured for %s: %s",
+                                                                  clientInterface.getName(),
+                                                                  address));
+                }
+                try {
+                    String hostname = split[0];
+                    int port = Integer.parseInt(split[1]);
+                    builder.proxyAddress(hostname, port);
+                } catch (Throwable t) {
+                    throw new IllegalStateException(String.format("Invalid proxy server address configured for %s: %s",
+                                                                  clientInterface.getName(),
+                                                                  address), t);
+                }
+
+                if (LOG.isLoggable(Level.FINEST)) {
+                    LOG.finest("proxyAddress set by MP Config: " + address);
+                }
+            });
+    }
+
+    private void setQueryParamStyle(CxfTypeSafeClientBuilder builder) {
+        ConfigFacade.getOptionalValue(QUERY_PARAM_STYLE_FORMAT, clientInterface, String.class).ifPresent(
+            styleString -> {
+                try {
+                    builder.queryParamStyle(QueryParamStyle.valueOf(styleString));
+                    if (LOG.isLoggable(Level.FINEST)) {
+                        LOG.finest("queryParamStyle set by MP Config: " + styleString);
+                    }
+                } catch (Throwable t) {
+                    throw new IllegalStateException(String.format("Invalid queryParamStyle value specified for %s: %s",
+                                                                  clientInterface.getName(),
+                                                                  styleString));
+                }
+            });
+    
     }
 
     private void setSSLConfig(CxfTypeSafeClientBuilder builder) {

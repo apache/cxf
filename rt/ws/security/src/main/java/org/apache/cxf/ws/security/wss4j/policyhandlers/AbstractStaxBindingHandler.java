@@ -48,6 +48,7 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -202,7 +203,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
 
     protected SecurePart addKerberosToken(
         KerberosToken token, boolean signed, boolean endorsing, boolean encrypting
-    ) throws WSSecurityException {
+    ) throws WSSecurityException, TokenStoreException {
         assertToken(token);
         IncludeTokenType includeToken = token.getIncludeTokenType();
         if (!isTokenRequired(includeToken)) {
@@ -277,7 +278,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         */
 
         SecurePart securePart = new SecurePart(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN, Modifier.Element);
-        securePart.setIdToSign(wss4jToken.getId());
+        securePart.setIdToSecure(wss4jToken.getId());
 
         return securePart;
     }

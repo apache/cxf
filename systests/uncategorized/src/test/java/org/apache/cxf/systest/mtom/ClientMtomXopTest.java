@@ -23,6 +23,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 import javax.activation.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
@@ -60,6 +61,7 @@ import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -202,14 +204,6 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         } catch (Exception ex) {
-            if (ex.getMessage().contains("Connection reset")
-                && System.getProperty("java.specification.version", "1.5").contains("1.6")) {
-                //There seems to be a bug/interaction with Java 1.6 and Jetty where
-                //Jetty will occasionally send back a RST prior to all the data being
-                //sent back to the client when using localhost (which is what we do)
-                //we'll ignore for now
-                return;
-            }
             System.out.println(System.getProperties());
             throw ex;
         }
@@ -344,19 +338,39 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         } catch (Exception ex) {
-            if (ex.getMessage().contains("Connection reset")
-                && System.getProperty("java.specification.version", "1.5").contains("1.6")) {
-                //There seems to be a bug/interaction with Java 1.6 and Jetty where
-                //Jetty will occasionally send back a RST prior to all the data being
-                //sent back to the client when using localhost (which is what we do)
-                //we'll ignore for now
-                return;
-            }
             System.out.println(System.getProperties());
             throw ex;
         }
     }
 
+    @Ignore("failed on jenkins CI")
+    public void testMtomWithChineseFileName() throws Exception {
+        TestMtom mtomPort = createPort(MTOM_SERVICE, MTOM_PORT, TestMtom.class, true, true);
+        try {
+            final Holder<DataHandler> param = new Holder<>();
+
+            URL fileURL = getClass().getResource("/\u6d4b\u8bd5.bmp");
+            assertNotNull(fileURL);
+
+            Object[] validationTypes = new Object[]{Boolean.TRUE, SchemaValidationType.IN, SchemaValidationType.BOTH};
+            for (Object validationType : validationTypes) {
+                ((BindingProvider)mtomPort).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED,
+                                                                    validationType);
+                param.value = new DataHandler(fileURL);
+                final Holder<String> name = new Holder<>("have name");
+                mtomPort.testXop(name, param);
+
+                assertEquals("can't get file name", "return detail   测试.bmp",
+                    java.net.URLDecoder.decode(name.value, StandardCharsets.UTF_8.name()));
+                assertNotNull(param.value);
+            }
+        } catch (UndeclaredThrowableException ex) {
+            throw (Exception)ex.getCause();
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+    
     @Test
     public void testMtomWithFileName() throws Exception {
         TestMtom mtomPort = createPort(MTOM_SERVICE, MTOM_PORT, TestMtom.class, true, true);
@@ -379,14 +393,6 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         } catch (Exception ex) {
-            if (ex.getMessage().contains("Connection reset")
-                && System.getProperty("java.specification.version", "1.5").contains("1.6")) {
-                //There seems to be a bug/interaction with Java 1.6 and Jetty where
-                //Jetty will occasionally send back a RST prior to all the data being
-                //sent back to the client when using localhost (which is what we do)
-                //we'll ignore for now
-                return;
-            }
             System.out.println(System.getProperties());
             throw ex;
         }

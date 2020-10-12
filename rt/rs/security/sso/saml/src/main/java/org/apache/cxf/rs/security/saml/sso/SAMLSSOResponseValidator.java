@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.rs.security.saml.sso;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.logging.Logger;
@@ -240,11 +239,9 @@ public class SAMLSSOResponseValidator {
 
         // Need to keep bearer assertion IDs based on NotOnOrAfter to detect replay attacks
         if (postBinding && replayCache != null) {
-            if (replayCache.getId(id) == null) {
+            if (!replayCache.contains(id)) {
                 Instant expires = Instant.ofEpochMilli(subjectConfData.getNotOnOrAfter().toDate().getTime());
-                Instant currentTime = Instant.now();
-                long ttl = Duration.between(currentTime, expires).getSeconds();
-                replayCache.putId(id, ttl);
+                replayCache.putId(id, expires);
             } else {
                 LOG.warning("Replay attack with token id: " + id);
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");

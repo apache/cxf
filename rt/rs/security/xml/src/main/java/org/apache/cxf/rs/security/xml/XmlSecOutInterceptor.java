@@ -203,7 +203,7 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
             }
         }
 
-        properties.addAction(XMLSecurityConstants.ENCRYPT);
+        properties.addAction(XMLSecurityConstants.ENCRYPTION);
 
         if (elementsToEncrypt == null || elementsToEncrypt.isEmpty()) {
             LOG.fine("No Elements to encrypt are specified, so the entire request is encrypt");

@@ -89,6 +89,11 @@ public class RSSecurityConstants {
      */
     public static final String RSSEC_SIGNATURE_PROPS = "rs.security.signature.properties";
 
+    /**
+     * Whether to enable revocation or not. The default is "false".
+     */
+    public static final String RSSEC_ENABLE_REVOCATION = "rs.security.enable.revocation";
+
     protected RSSecurityConstants() {
         // complete
     }

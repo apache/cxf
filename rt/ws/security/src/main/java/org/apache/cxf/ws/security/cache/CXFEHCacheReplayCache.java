@@ -19,22 +19,23 @@
 
 package org.apache.cxf.ws.security.cache;
 
-import java.net.URL;
+import java.nio.file.Path;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.wss4j.common.cache.EHCacheReplayCache;
+import org.apache.wss4j.common.ext.WSSecurityException;
 
 /**
  * Wrap the default WSS4J EHCacheReplayCache in a BusLifeCycleListener, to make sure that
  * the cache is shutdown correctly.
  */
 public class CXFEHCacheReplayCache extends EHCacheReplayCache implements BusLifeCycleListener {
-    private Bus bus;
+    private final Bus bus;
 
-    public CXFEHCacheReplayCache(String key, Bus bus, URL configFileURL) {
-        super(key, EHCacheUtils.getCacheManager(bus, configFileURL));
+    public CXFEHCacheReplayCache(String key, Bus bus, Path diskstorePath) throws WSSecurityException {
+        super(key, diskstorePath);
         this.bus = bus;
         if (bus != null) {
             bus.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);

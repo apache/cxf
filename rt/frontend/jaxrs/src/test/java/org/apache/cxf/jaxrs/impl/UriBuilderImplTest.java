@@ -1688,6 +1688,30 @@ public class UriBuilderImplTest {
         assertEquals(url, uri.toString());
     }
 
+    @Test
+    public void testExpandQueryValueAsCollection() {
+        Map<String, Object> props = Collections.singletonMap("expand.query.value.as.collection", true);
+        URI uri = new UriBuilderImpl(props).queryParam("foo", "v1", "v2", "v3").build();
+        assertEquals("foo=v1,v2,v3", uri.getQuery());
+    }
+
+    @Test
+    public void testUseArraySyntaxForQueryParams() {
+        Map<String, Object> props = Collections.singletonMap("use.array.syntax.for.query.values", true);
+        URI uri = new UriBuilderImpl(props).queryParam("foo", "v1", "v2", "v3").build();
+        assertEquals("foo[]=v1&foo[]=v2&foo[]=v3", uri.getQuery());
+    }
+
+    @Test
+    public void testUseArraySyntaxForQueryParamsBuildFromEncodedNormalize() {
+        Map<String, Object> props = Collections.singletonMap("use.array.syntax.for.query.values", true);
+        URI uri = new UriBuilderImpl(props).queryParam("foo", "v1")
+                                           .queryParam("foo", "v2")
+                                           .queryParam("foo", "v3")
+                                           .buildFromEncoded().normalize();
+        assertEquals("foo[]=v1&foo[]=v2&foo[]=v3", uri.getQuery());
+    }
+
     @Path(value = "/TestPath")
     public static class TestPath {
 

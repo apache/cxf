@@ -65,7 +65,7 @@ public class StaxServer {
         properties.addAction(WSSConstants.USERNAMETOKEN);
         properties.addAction(WSSConstants.TIMESTAMP);
         properties.addAction(WSSConstants.SIGNATURE);
-        properties.addAction(WSSConstants.ENCRYPT);
+        properties.addAction(WSSConstants.ENCRYPTION);
 
         properties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
         properties.setTokenUser("Alice");
@@ -106,7 +106,7 @@ public class StaxServer {
         inProperties.addAction(WSSConstants.USERNAMETOKEN);
         inProperties.addAction(WSSConstants.TIMESTAMP);
         inProperties.addAction(WSSConstants.SIGNATURE);
-        inProperties.addAction(WSSConstants.ENCRYPT);
+        inProperties.addAction(WSSConstants.ENCRYPTION);
 
         inProperties.setCallbackHandler(new UTPasswordCallback());
         inProperties.setDecryptionCryptoProperties(decCryptoProperties);

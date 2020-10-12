@@ -36,7 +36,7 @@ public class DirectTrustValidator implements Validator {
 
     private static final Logger LOG = LogUtils.getL7dLogger(DirectTrustValidator.class);
 
-    private CertificateRepo certRepo;
+    private final CertificateRepo certRepo;
 
     public DirectTrustValidator(CertificateRepo certRepo) {
         this.certRepo = certRepo;

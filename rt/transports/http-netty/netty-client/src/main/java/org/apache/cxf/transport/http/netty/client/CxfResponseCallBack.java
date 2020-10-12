@@ -22,6 +22,6 @@ package org.apache.cxf.transport.http.netty.client;
 import io.netty.handler.codec.http.HttpResponse;
 
 public interface CxfResponseCallBack {
-
     void responseReceived(HttpResponse response);
+    void error(Throwable ex);
 }

@@ -21,7 +21,7 @@
     <parent>
         <artifactId>cxf-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>3.4.1-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -31,7 +31,6 @@
     <description>Apache CXF JAX-RS System Tests</description>
     <url>https://cxf.apache.org</url>
     <properties>
-        <cxf.glassfish.el.version>3.0.1-b11</cxf.glassfish.el.version>
         <cxf.module.name>org.apache.cxf.systests.jaxrs</cxf.module.name>
     </properties>
     <dependencies>
@@ -60,10 +59,17 @@
         <dependency>
           <groupId>io.reactivex</groupId>
           <artifactId>rxjava</artifactId>
+          <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>io.reactivex.rxjava2</groupId>
           <artifactId>rxjava</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>io.reactivex.rxjava3</groupId>
+          <artifactId>rxjava</artifactId>
+          <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -72,21 +78,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>javax.el</artifactId>
-            <version>${cxf.glassfish.el.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.aries.blueprint</groupId>
             <artifactId>org.apache.aries.blueprint.web</artifactId>
             <version>1.1.1</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.aries.blueprint</groupId>
-            <artifactId>blueprint-parser</artifactId>
-            <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.aries.blueprint</groupId>
@@ -141,10 +136,6 @@
             <groupId>org.webjars</groupId>
             <artifactId>swagger-ui</artifactId>
             <version>${cxf.swagger.ui.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ant</groupId>
-            <artifactId>ant</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
@@ -332,6 +323,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-extension-rx3</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-extension-reactor</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -380,11 +376,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-tx</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
             <version>${cxf.aspectj.version}</version>
@@ -418,12 +409,6 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
-            <version>${cxf.spring.security.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-acl</artifactId>
             <version>${cxf.spring.security.version}</version>
             <scope>test</scope>
         </dependency>
@@ -478,7 +463,6 @@
         <dependency>
             <groupId>org.asynchttpclient</groupId>
             <artifactId>async-http-client</artifactId>
-            <version>${cxf.ahc.version}</version>
             <scope>test</scope>
         </dependency>
          <dependency>

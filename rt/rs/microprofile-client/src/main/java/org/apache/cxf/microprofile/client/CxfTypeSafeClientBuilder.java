@@ -41,9 +41,12 @@ import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
 
+import org.apache.cxf.jaxrs.client.ClientProperties;
 import org.apache.cxf.jaxrs.client.spec.TLSConfiguration;
+import org.apache.cxf.microprofile.client.sse.SseMessageBodyReader;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
+import org.eclipse.microprofile.rest.client.ext.QueryParamStyle;
 import org.eclipse.microprofile.rest.client.spi.RestClientListener;
 
 import static org.apache.cxf.jaxrs.client.ClientProperties.HTTP_CONNECTION_TIMEOUT_PROP;
@@ -137,6 +140,8 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
             }
         }
 
+        register(SseMessageBodyReader.class);
+
         listeners().forEach(l -> l.onNewClient(aClass, this));
 
         MicroProfileClientFactoryBean bean = new MicroProfileClientFactoryBean(configImpl,
@@ -205,6 +210,7 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
 
     @Override
     public RestClientBuilder sslContext(SSLContext sslContext) {
+        property("org.apache.cxf.microprofile.client.sslConfigProvided", "true");
         secConfig.getTlsClientParams().setKeyManagers(null);
         secConfig.getTlsClientParams().setTrustManagers(null);
         secConfig.setSslContext(sslContext);
@@ -213,6 +219,7 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
 
     @Override
     public RestClientBuilder keyStore(KeyStore store, String password) {
+        property("org.apache.cxf.microprofile.client.sslConfigProvided", "true");
         secConfig.setSslContext(null);
         try {
             KeyManagerFactory kmf =
@@ -227,6 +234,7 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
 
     @Override
     public RestClientBuilder trustStore(KeyStore store) {
+        property("org.apache.cxf.microprofile.client.sslConfigProvided", "true");
         secConfig.setSslContext(null);
         try {
             TrustManagerFactory tmf =
@@ -242,7 +250,41 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
 
     @Override
     public RestClientBuilder hostnameVerifier(HostnameVerifier verifier) {
+        property("org.apache.cxf.microprofile.client.sslConfigProvided", "true");
         secConfig.getTlsClientParams().setHostnameVerifier(verifier);
         return this;
+    }
+
+    @Override
+    public RestClientBuilder followRedirects(boolean follows) {
+        configImpl.property(ClientProperties.HTTP_AUTOREDIRECT_PROP, Boolean.toString(follows));
+        return this;
+    }
+
+    @Override
+    public RestClientBuilder proxyAddress(String proxyHost, int proxyPort) {
+        if (proxyHost == null) {
+            throw new IllegalArgumentException("proxyHost must not be null");
+        }
+        if (proxyPort < 1 || proxyPort > 65535) {
+            throw new IllegalArgumentException("proxyPort must be between 1 and 65535");
+        }
+        configImpl.property(ClientProperties.HTTP_PROXY_SERVER_PROP, proxyHost);
+        configImpl.property(ClientProperties.HTTP_PROXY_SERVER_PORT_PROP, proxyPort);
+        return this;
+    }
+
+    @Override
+    public RestClientBuilder queryParamStyle(QueryParamStyle style) {
+        switch(style) {
+        case ARRAY_PAIRS: configImpl.property("use.array.syntax.for.query.values", true); break;
+        case COMMA_SEPARATED: configImpl.property("expand.query.value.as.collection", true); break;
+        default:
+        }
+        return this;
+    }
+
+    public void close() {
+        configImpl.close();
     }
 }

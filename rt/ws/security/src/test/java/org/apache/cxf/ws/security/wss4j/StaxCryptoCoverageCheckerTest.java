@@ -74,7 +74,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractSecurityTest {
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<>();
-        actions.add(XMLSecurityConstants.ENCRYPT);
+        actions.add(XMLSecurityConstants.ENCRYPTION);
         properties.setActions(actions);
         properties.setEncryptionUser("myalias");
         properties.setEncryptionSymAlgorithm(XMLSecurityConstants.NS_XENC_AES128);
@@ -171,7 +171,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractSecurityTest {
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.USERNAMETOKEN);
-        actions.add(XMLSecurityConstants.ENCRYPT);
+        actions.add(XMLSecurityConstants.ENCRYPTION);
         properties.setActions(actions);
         properties.addEncryptionPart(
             new SecurePart(new QName(WSSConstants.NS_WSSE10, "UsernameToken"), SecurePart.Modifier.Element)
@@ -419,7 +419,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractSecurityTest {
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<>();
-        actions.add(XMLSecurityConstants.ENCRYPT);
+        actions.add(XMLSecurityConstants.ENCRYPTION);
         actions.add(XMLSecurityConstants.SIGNATURE);
         properties.setActions(actions);
         properties.setEncryptionUser("myalias");

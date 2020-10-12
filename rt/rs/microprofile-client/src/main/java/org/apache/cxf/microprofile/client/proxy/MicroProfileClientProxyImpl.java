@@ -114,6 +114,11 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
         super(new LocalClientState(baseURI, configuration.getProperties()), loader, cri,
             isRoot, inheritHeaders, varValues);
         this.interceptorWrapper = interceptorWrapper;
+        
+        if (executorService == null) {
+            throw new IllegalArgumentException("The executorService is required and must be provided");
+        }
+        
         init(executorService, configuration);
     }
 
@@ -428,7 +433,7 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
         }
     }
 
-    private ClientHeadersFactory mapClientHeadersInstance(Instance<ClientHeadersFactory> instance) {
+    private <T> T mapInstance(Instance<T> instance) {
         cdiInstances.add(instance);
         return instance.getValue();
     }
@@ -443,7 +448,7 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
 
             if (m != null) {
                 factory = CDIFacade.getInstanceFromCDI(factoryCls, m.getExchange().getBus())
-                                   .map(this::mapClientHeadersInstance)
+                                   .map(this::mapInstance)
                                    .orElse(factoryCls.newInstance());
                 ProviderInfo<ClientHeadersFactory> pi = clientHeaderFactories.computeIfAbsent(factoryCls, k -> {
                     return new ProviderInfo<ClientHeadersFactory>(factory, m.getExchange().getBus(), true);
@@ -451,7 +456,7 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
                 InjectionUtils.injectContexts(factory, pi, m);
             } else {
                 factory = CDIFacade.getInstanceFromCDI(factoryCls)
-                                   .map(this::mapClientHeadersInstance)
+                                   .map(this::mapInstance)
                                    .orElse(factoryCls.newInstance());
             }
 

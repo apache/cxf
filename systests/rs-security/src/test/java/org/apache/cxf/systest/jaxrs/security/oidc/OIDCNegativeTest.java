@@ -36,12 +36,10 @@ import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.common.UserInfo;
-import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils.AuthorizationCodeParameters;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -49,6 +47,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -84,11 +83,6 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
         assertTrue("Server failed to launch", launchServer(JWT_NON_PERSIST_JCACHE_SERVER));
     }
 
-    @AfterClass
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
-    }
-
     @Parameters(name = "{0}")
     public static String[] data() {
         return new String[]{
@@ -120,12 +114,7 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
         client.path("authorize-implicit/");
         Response response = client.get();
 
-        try {
-            response.readEntity(OAuthAuthorizationData.class);
-            fail("Failure expected on a bad prompt");
-        } catch (Exception ex) {
-            // expected
-        }
+        assertNull(response.readEntity(OAuthAuthorizationData.class));
     }
 
     @org.junit.Test
@@ -203,12 +192,7 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
         client.path("authorize-implicit/");
         Response response = client.get();
 
-        try {
-            response.readEntity(OAuthAuthorizationData.class);
-            fail("Failure expected on no nonce");
-        } catch (Exception ex) {
-            // expected
-        }
+        assertNull(response.readEntity(OAuthAuthorizationData.class));
 
         // Add a nonce and it should succeed
         String nonce = "1234565635";
