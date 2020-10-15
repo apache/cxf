@@ -35,10 +35,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class DefaultJaxwsFaultCodeProviderTest {
+public class JaxwsFaultCodeProviderTest {
 
     private static final String RUNTIME_FAULT_STRING = "RUNTIME_FAULT";
-    private DefaultJaxwsFaultCodeProvider underTest;
+
+    private JaxwsFaultCodeProvider underTest;
+
     @Mock
     private Exchange ex;
     @Mock
@@ -47,7 +49,7 @@ public class DefaultJaxwsFaultCodeProviderTest {
     @Before
     public void setUp() {
         initMocks(this);
-        underTest = new DefaultJaxwsFaultCodeProvider();
+        underTest = new JaxwsFaultCodeProvider();
     }
 
     @Test

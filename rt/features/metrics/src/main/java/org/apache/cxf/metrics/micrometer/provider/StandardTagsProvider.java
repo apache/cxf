@@ -17,32 +17,24 @@
  * under the License.
  */
 
-package org.apache.cxf.metrics.micrometer.provider.jaxws;
+package org.apache.cxf.metrics.micrometer.provider;
 
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.metrics.micrometer.provider.ExceptionClassProvider;
-import org.apache.cxf.metrics.micrometer.provider.StandardTags;
-import org.apache.cxf.metrics.micrometer.provider.TagsProvider;
 
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
 
 import static java.util.Optional.ofNullable;
 
-public class JaxwsTagsProvider implements TagsProvider {
+public class StandardTagsProvider implements TagsProvider {
 
     private final ExceptionClassProvider exceptionClassProvider;
-    private final JaxwsFaultCodeProvider faultCodeProvider;
     private final StandardTags standardTags;
-    private final JaxwsTags cxfTags;
 
-    public JaxwsTagsProvider(ExceptionClassProvider exceptionClassProvider, JaxwsFaultCodeProvider faultCodeProvider,
-                             StandardTags standardTags, JaxwsTags cxfTags) {
+    public StandardTagsProvider(ExceptionClassProvider exceptionClassProvider, StandardTags standardTags) {
         this.exceptionClassProvider = exceptionClassProvider;
-        this.faultCodeProvider = faultCodeProvider;
         this.standardTags = standardTags;
-        this.cxfTags = cxfTags;
     }
 
     @Override
@@ -51,15 +43,12 @@ public class JaxwsTagsProvider implements TagsProvider {
         Message response = ofNullable(ex.getOutMessage()).orElseGet(ex::getOutFaultMessage);
 
         Class<?> exception = exceptionClassProvider.getExceptionClass(ex);
-        String faultCode = faultCodeProvider.getFaultCode(ex);
 
         return Tags.of(
                 standardTags.method(request),
                 standardTags.uri(request),
                 standardTags.exception(exception),
                 standardTags.status(response),
-                standardTags.outcome(response),
-                cxfTags.operation(request),
-                cxfTags.faultCode(faultCode));
+                standardTags.outcome(response));
     }
 }

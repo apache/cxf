@@ -19,10 +19,13 @@
 
 package org.apache.cxf.metrics.micrometer;
 
+import java.util.List;
+
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.metrics.MetricsContext;
 import org.apache.cxf.metrics.MetricsProvider;
+import org.apache.cxf.metrics.micrometer.provider.TagsCustomizer;
 import org.apache.cxf.metrics.micrometer.provider.TagsProvider;
 import org.apache.cxf.metrics.micrometer.provider.TimedAnnotationProvider;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -37,15 +40,18 @@ public class MicrometerMetricsProvider implements MetricsProvider {
 
     private final MeterRegistry registry;
     private final TagsProvider tagsProvider;
+    private final List<TagsCustomizer> tagsCustomizers;
     private final TimedAnnotationProvider timedAnnotationProvider;
     private final MicrometerMetricsProperties micrometerMetricsProperties;
 
     public MicrometerMetricsProvider(MeterRegistry registry,
                                      TagsProvider tagsProvider,
+                                     List<TagsCustomizer> tagsCustomizers,
                                      TimedAnnotationProvider timedAnnotationProvider,
                                      MicrometerMetricsProperties micrometerMetricsProperties) {
         this.registry = registry;
         this.tagsProvider = tagsProvider;
+        this.tagsCustomizers = tagsCustomizers;
         this.timedAnnotationProvider = timedAnnotationProvider;
         this.micrometerMetricsProperties = micrometerMetricsProperties;
     }
@@ -64,9 +70,8 @@ public class MicrometerMetricsProvider implements MetricsProvider {
     @Override
     public MetricsContext createOperationContext(Endpoint endpoint, BindingOperationInfo boi, boolean asClient,
                                                  String clientId) {
-        return new MicrometerMetricsContext(registry, tagsProvider, timedAnnotationProvider,
-                micrometerMetricsProperties.getRequestsMetricName(),
-                micrometerMetricsProperties.isAutoTimeRequests());
+        return new MicrometerMetricsContext(registry, tagsProvider, timedAnnotationProvider, tagsCustomizers,
+                micrometerMetricsProperties.getRequestsMetricName(), micrometerMetricsProperties.isAutoTimeRequests());
     }
 
 

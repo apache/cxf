@@ -39,7 +39,6 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 public class JaxwsTagsTest {
 
-    private static final String URI_METRIC_NAME = "uri";
     private static final String OPERATION_METRIC_NAME = "operation";
     private static final String FAULTCODE_METRIC_NAME = "faultCode";
 
@@ -50,8 +49,6 @@ public class JaxwsTagsTest {
 
     @Mock
     private Message request;
-    @Mock
-    private Message response;
     @Mock
     private Exchange exchange;
     @Mock

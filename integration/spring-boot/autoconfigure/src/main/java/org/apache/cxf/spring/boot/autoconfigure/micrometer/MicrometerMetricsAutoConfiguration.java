@@ -19,6 +19,8 @@
 
 package org.apache.cxf.spring.boot.autoconfigure.micrometer;
 
+import java.util.List;
+
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.metrics.MetricsProvider;
 import org.apache.cxf.metrics.micrometer.MicrometerMetricsProperties;
@@ -26,12 +28,14 @@ import org.apache.cxf.metrics.micrometer.MicrometerMetricsProvider;
 import org.apache.cxf.metrics.micrometer.provider.DefaultExceptionClassProvider;
 import org.apache.cxf.metrics.micrometer.provider.ExceptionClassProvider;
 import org.apache.cxf.metrics.micrometer.provider.StandardTags;
+import org.apache.cxf.metrics.micrometer.provider.StandardTagsProvider;
+import org.apache.cxf.metrics.micrometer.provider.TagsCustomizer;
 import org.apache.cxf.metrics.micrometer.provider.TagsProvider;
 import org.apache.cxf.metrics.micrometer.provider.TimedAnnotationProvider;
-import org.apache.cxf.metrics.micrometer.provider.jaxws.DefaultJaxwsFaultCodeProvider;
 import org.apache.cxf.metrics.micrometer.provider.jaxws.JaxwsFaultCodeProvider;
+import org.apache.cxf.metrics.micrometer.provider.jaxws.JaxwsFaultCodeTagsCustomizer;
+import org.apache.cxf.metrics.micrometer.provider.jaxws.JaxwsOperationTagsCustomizer;
 import org.apache.cxf.metrics.micrometer.provider.jaxws.JaxwsTags;
-import org.apache.cxf.metrics.micrometer.provider.jaxws.JaxwsTagsProvider;
 import org.apache.cxf.spring.boot.autoconfigure.CxfProperties;
 import org.apache.cxf.spring.boot.autoconfigure.CxfProperties.Metrics.Server;
 import org.apache.cxf.spring.boot.autoconfigure.micrometer.provider.SpringBasedTimedAnnotationProvider;
@@ -84,7 +88,20 @@ public class MicrometerMetricsAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(JaxwsFaultCodeProvider.class)
     public JaxwsFaultCodeProvider jaxwsFaultCodeProvider() {
-        return new DefaultJaxwsFaultCodeProvider();
+        return new JaxwsFaultCodeProvider();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(JaxwsFaultCodeTagsCustomizer.class)
+    public JaxwsFaultCodeTagsCustomizer jaxwsFaultCodeTagsCustomizer(JaxwsTags jaxwsTags,
+                                                                     JaxwsFaultCodeProvider jaxwsFaultCodeProvider) {
+        return new JaxwsFaultCodeTagsCustomizer(jaxwsTags, jaxwsFaultCodeProvider);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(JaxwsOperationTagsCustomizer.class)
+    public JaxwsOperationTagsCustomizer jaxwsOperationTagsCustomizer(JaxwsTags jaxwsTags) {
+        return new JaxwsOperationTagsCustomizer(jaxwsTags);
     }
 
     @Bean
@@ -95,16 +112,14 @@ public class MicrometerMetricsAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(TagsProvider.class)
-    public TagsProvider tagsProvider(ExceptionClassProvider exceptionClassProvider,
-                                     JaxwsFaultCodeProvider faultCodeProvider,
-                                     StandardTags standardTags,
-                                     JaxwsTags cxfTags) {
-        return new JaxwsTagsProvider(exceptionClassProvider, faultCodeProvider, standardTags, cxfTags);
+    public TagsProvider tagsProvider(ExceptionClassProvider exceptionClassProvider, StandardTags standardTags) {
+        return new StandardTagsProvider(exceptionClassProvider, standardTags);
     }
 
     @Bean
     @ConditionalOnMissingBean(MetricsProvider.class)
     public MetricsProvider metricsProvider(TagsProvider tagsProvider,
+                                           List<TagsCustomizer> tagsCustomizers,
                                            TimedAnnotationProvider timedAnnotationProvider,
                                            MeterRegistry registry) {
         MicrometerMetricsProperties micrometerMetricsProperties = new MicrometerMetricsProperties();
@@ -113,7 +128,7 @@ public class MicrometerMetricsAutoConfiguration {
         micrometerMetricsProperties.setAutoTimeRequests(server.isAutoTimeRequests());
         micrometerMetricsProperties.setRequestsMetricName(server.getRequestsMetricName());
 
-        return new MicrometerMetricsProvider(registry, tagsProvider, timedAnnotationProvider,
+        return new MicrometerMetricsProvider(registry, tagsProvider, tagsCustomizers, timedAnnotationProvider,
                 micrometerMetricsProperties);
     }
 
@@ -122,7 +137,7 @@ public class MicrometerMetricsAutoConfiguration {
     public MeterFilter metricsSoapServerUriTagFilter() {
         String metricName = this.properties.getMetrics().getServer().getRequestsMetricName();
         MeterFilter filter = new OnlyOnceLoggingDenyMeterFilter(
-        () -> String.format("Reached the maximum number of URI tags for '%s'.", metricName));
+                () -> String.format("Reached the maximum number of URI tags for '%s'.", metricName));
         return MeterFilter.maximumAllowableTags(
                 metricName, "uri", this.properties.getMetrics().getServer().getMaxUriTags(), filter);
     }

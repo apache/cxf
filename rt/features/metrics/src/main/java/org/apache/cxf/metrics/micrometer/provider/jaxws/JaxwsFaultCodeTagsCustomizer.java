@@ -20,21 +20,24 @@
 package org.apache.cxf.metrics.micrometer.provider.jaxws;
 
 import org.apache.cxf.message.Exchange;
-import org.apache.cxf.message.FaultMode;
+import org.apache.cxf.metrics.micrometer.provider.TagsCustomizer;
 
-public class JaxwsFaultCodeProvider {
-    
-    public String getFaultCode(Exchange ex) {
-        FaultMode fm = ex.get(FaultMode.class);
-        if (fm == null && ex.getOutFaultMessage() != null) {
-            fm = ex.getOutFaultMessage().get(FaultMode.class);
-        }
-        if (fm == null && ex.getInMessage() != null) {
-            fm = ex.getInMessage().get(FaultMode.class);
-        }
-        if (fm == null) {
-            return null;
-        }
-        return fm.name();
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Tags;
+
+public class JaxwsFaultCodeTagsCustomizer implements TagsCustomizer {
+
+    private final JaxwsTags jaxwsTags;
+    private final JaxwsFaultCodeProvider jaxwsFaultCodeProvider;
+
+    public JaxwsFaultCodeTagsCustomizer(JaxwsTags jaxwsTags, JaxwsFaultCodeProvider jaxwsFaultCodeProvider) {
+        this.jaxwsTags = jaxwsTags;
+        this.jaxwsFaultCodeProvider = jaxwsFaultCodeProvider;
+    }
+
+    @Override
+    public Iterable<Tag> getAdditionalTags(Exchange ex) {
+        String faultCode = jaxwsFaultCodeProvider.getFaultCode(ex);
+        return Tags.of(jaxwsTags.faultCode(faultCode));
     }
 }

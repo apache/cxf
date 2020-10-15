@@ -20,9 +20,11 @@
 package org.apache.cxf.metrics.micrometer;
 
 import java.lang.reflect.Field;
+import java.util.Collections;
 
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.metrics.MetricsContext;
+import org.apache.cxf.metrics.micrometer.provider.TagsCustomizer;
 import org.apache.cxf.metrics.micrometer.provider.TagsProvider;
 import org.apache.cxf.metrics.micrometer.provider.TimedAnnotationProvider;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -40,7 +42,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class MicrometerMetricsProviderTest {
+
     private MicrometerMetricsProvider underTest;
+
     @Mock
     private MeterRegistry registry;
     @Mock
@@ -51,6 +55,8 @@ public class MicrometerMetricsProviderTest {
     private Endpoint endpoint;
     @Mock
     private BindingOperationInfo boi;
+    @Mock
+    private TagsCustomizer tagsCustomizer;
 
     private MicrometerMetricsProperties micrometerMetricsProperties;
 
@@ -65,6 +71,7 @@ public class MicrometerMetricsProviderTest {
         underTest =
                 new MicrometerMetricsProvider(registry,
                         tagsProvider,
+                        Collections.singletonList(tagsCustomizer),
                         timedAnnotationProvider,
                         micrometerMetricsProperties);
     }
@@ -90,6 +97,7 @@ public class MicrometerMetricsProviderTest {
         assertThat(getFieldValue(actual, "timedAnnotationProvider"), is(timedAnnotationProvider));
         assertThat(getFieldValue(actual, "metricName"), is("http.server.requests"));
         assertThat(getFieldValue(actual, "autoTimeRequests"), is(true));
+        assertThat(getFieldValue(actual, "tagsCustomizers"), is(Collections.singletonList(tagsCustomizer)));
     }
 
     @Test

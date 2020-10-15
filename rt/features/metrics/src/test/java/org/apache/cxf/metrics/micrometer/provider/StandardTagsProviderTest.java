@@ -17,12 +17,10 @@
  * under the License.
  */
 
-package org.apache.cxf.metrics.micrometer.provider.jaxws;
+package org.apache.cxf.metrics.micrometer.provider;
 
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.metrics.micrometer.provider.ExceptionClassProvider;
-import org.apache.cxf.metrics.micrometer.provider.StandardTags;
 
 import io.micrometer.core.instrument.ImmutableTag;
 import io.micrometer.core.instrument.Tag;
@@ -37,12 +35,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class JaxwsTagsProviderTest {
+public class StandardTagsProviderTest {
 
     @Mock
     private ExceptionClassProvider exceptionClassProvider;
-    @Mock
-    private JaxwsFaultCodeProvider faultCodeProvider;
     @Mock
     private Exchange exchange;
     @Mock
@@ -50,18 +46,16 @@ public class JaxwsTagsProviderTest {
     @Mock
     private Message response;
     @Mock
-    private JaxwsTags cxfTags;
-    @Mock
     private StandardTags standardTags;
 
-    private JaxwsTagsProvider underTest;
+    private StandardTagsProvider underTest;
     private Tags expectedTags;
 
     @Before
     public void setUp() {
         initMocks(this);
 
-        underTest = new JaxwsTagsProvider(exceptionClassProvider, faultCodeProvider, standardTags, cxfTags);
+        underTest = new StandardTagsProvider(exceptionClassProvider, standardTags);
 
         Tag methodTag = new ImmutableTag("method", "method");
         doReturn(methodTag).when(standardTags).method(request);
@@ -79,15 +73,7 @@ public class JaxwsTagsProviderTest {
         Tag outcomeTag = new ImmutableTag("outcome", "outcome");
         doReturn(outcomeTag).when(standardTags).outcome(response);
 
-        Tag operationTag = new ImmutableTag("operation", "operation");
-        doReturn(operationTag).when(cxfTags).operation(request);
-
-        Tag faultCodeTag = new ImmutableTag("faultCode", "faultCode");
-        doReturn("getFaultCode").when(faultCodeProvider).getFaultCode(exchange);
-        doReturn(faultCodeTag).when(cxfTags).faultCode("getFaultCode");
-
-        expectedTags =
-                Tags.of(methodTag, uriTag, exceptionTag, statusTag, outcomeTag, operationTag, faultCodeTag);
+        expectedTags = Tags.of(methodTag, uriTag, exceptionTag, statusTag, outcomeTag);
     }
 
     @Test

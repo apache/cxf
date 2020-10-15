@@ -43,7 +43,9 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 @SuppressWarnings({"unused"})
 public class DefaultTimedAnnotationProviderTest {
+
     private DefaultTimedAnnotationProvider underTest;
+
     @Mock
     private Exchange exchange;
     @Mock

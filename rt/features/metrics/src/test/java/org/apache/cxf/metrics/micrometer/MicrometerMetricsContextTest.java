@@ -19,11 +19,12 @@
 
 package org.apache.cxf.metrics.micrometer;
 
-import java.util.Collections;
+import java.util.Arrays;
 
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.metrics.micrometer.MicrometerMetricsContext.TimingContext;
+import org.apache.cxf.metrics.micrometer.provider.TagsCustomizer;
 import org.apache.cxf.metrics.micrometer.provider.TagsProvider;
 import org.apache.cxf.metrics.micrometer.provider.TimedAnnotationProvider;
 
@@ -40,6 +41,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.internal.util.reflection.FieldReader;
 
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -51,7 +53,10 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class MicrometerMetricsContextTest {
 
     private static final long DUMMY_LONG = 0L;
-    private static final Tag DUMMY_TAG = Tag.of("dummyKey", "dummyValue");
+    private static final Tag DEFAULT_DUMMY_TAG = Tag.of("defaultDummyKey", "dummyValue");
+    private static final Tag FIRST_ADDITIONAL_DUMMY_TAG = Tag.of("firstAdditionalDummyKey", "dummyValue");
+    private static final Tag SECOND_ADDITIONAL_DUMMY_TAG = Tag.of("secondAdditionalDummyKey", "dummyValue");
+
     private static final String DUMMY_METRIC = "dummyMetric";
 
     @Captor
@@ -71,6 +76,11 @@ public class MicrometerMetricsContextTest {
     @Mock
     private Exchange exchange;
 
+    @Mock
+    private TagsCustomizer firstTagsCustomizer;
+    @Mock
+    private TagsCustomizer secondTagsCustomizer;
+
     private MeterRegistry registry = new SimpleMeterRegistry();
 
     private MicrometerMetricsContext underTest;
@@ -80,11 +90,14 @@ public class MicrometerMetricsContextTest {
         initMocks(this);
 
         doReturn(request).when(exchange).getInMessage();
-        doReturn(Collections.singletonList(DUMMY_TAG)).when(tagsProvider).getTags(exchange);
+        doReturn(singletonList(DEFAULT_DUMMY_TAG)).when(tagsProvider).getTags(exchange);
+        doReturn(singletonList(FIRST_ADDITIONAL_DUMMY_TAG)).when(firstTagsCustomizer).getAdditionalTags(exchange);
+        doReturn(singletonList(SECOND_ADDITIONAL_DUMMY_TAG)).when(secondTagsCustomizer).getAdditionalTags(exchange);
 
         underTest =
                 new MicrometerMetricsContext(
-                        registry, tagsProvider, timedAnnotationProvider, DUMMY_METRIC, true);
+                        registry, tagsProvider, timedAnnotationProvider,
+                        Arrays.asList(firstTagsCustomizer, secondTagsCustomizer), DUMMY_METRIC, true);
     }
 
     @Test
@@ -118,7 +131,7 @@ public class MicrometerMetricsContextTest {
         Meter.Id id = timerArgumentCaptor.getValue().getId();
 
         assertThat(id.getName(), equalTo(DUMMY_METRIC));
-        assertThat(id.getTags(), contains(DUMMY_TAG));
+        assertThat(id.getTags(), contains(DEFAULT_DUMMY_TAG, FIRST_ADDITIONAL_DUMMY_TAG, SECOND_ADDITIONAL_DUMMY_TAG));
     }
 
     private Object getTimer(ArgumentCaptor<TimingContext> content) throws NoSuchFieldException {

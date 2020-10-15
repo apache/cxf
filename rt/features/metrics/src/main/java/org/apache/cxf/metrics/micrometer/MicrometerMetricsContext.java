@@ -19,12 +19,17 @@
 
 package org.apache.cxf.metrics.micrometer;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
+
+import com.google.common.collect.Iterables;
 
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.metrics.MetricsContext;
+import org.apache.cxf.metrics.micrometer.provider.TagsCustomizer;
 import org.apache.cxf.metrics.micrometer.provider.TagsProvider;
 import org.apache.cxf.metrics.micrometer.provider.TimedAnnotationProvider;
 
@@ -38,16 +43,18 @@ public class MicrometerMetricsContext implements MetricsContext {
     private final MeterRegistry registry;
     private final TagsProvider tagsProvider;
     private final TimedAnnotationProvider timedAnnotationProvider;
+    private final List<TagsCustomizer> tagsCustomizers;
 
     private final String metricName;
     private final boolean autoTimeRequests;
 
     public MicrometerMetricsContext(MeterRegistry registry, TagsProvider tagsProvider,
-                                    TimedAnnotationProvider timedAnnotationProvider, String metricName,
-                                    boolean autoTimeRequests) {
+                                    TimedAnnotationProvider timedAnnotationProvider,
+                                    List<TagsCustomizer> tagsCustomizers, String metricName, boolean autoTimeRequests) {
         this.registry = registry;
         this.tagsProvider = tagsProvider;
         this.timedAnnotationProvider = timedAnnotationProvider;
+        this.tagsCustomizers = tagsCustomizers;
         this.metricName = metricName;
         this.autoTimeRequests = autoTimeRequests;
     }
@@ -81,7 +88,14 @@ public class MicrometerMetricsContext implements MetricsContext {
     private void record(TimingContext timingContext, Exchange ex) {
         Set<Timed> annotations = timedAnnotationProvider.getTimedAnnotations(ex);
         Timer.Sample timerSample = timingContext.getTimerSample();
-        Supplier<Iterable<Tag>> tags = () -> this.tagsProvider.getTags(ex);
+        Supplier<Iterable<Tag>> tags = () -> {
+            Iterable<Tag> defaultTags = this.tagsProvider.getTags(ex);
+            List<Tag> additionalTags = new ArrayList<>();
+            tagsCustomizers
+                    .forEach(tagsCustomizer -> tagsCustomizer.getAdditionalTags(ex).forEach(additionalTags::add));
+            return Iterables.concat(defaultTags, additionalTags);
+        };
+
         if (annotations.isEmpty()) {
             if (this.autoTimeRequests) {
                 stop(timerSample, tags, Timer.builder(this.metricName));
