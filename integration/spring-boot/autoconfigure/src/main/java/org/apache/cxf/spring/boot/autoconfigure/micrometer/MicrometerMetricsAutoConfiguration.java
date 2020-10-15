@@ -25,6 +25,7 @@ import org.apache.cxf.metrics.micrometer.MicrometerMetricsProperties;
 import org.apache.cxf.metrics.micrometer.MicrometerMetricsProvider;
 import org.apache.cxf.metrics.micrometer.provider.DefaultExceptionClassProvider;
 import org.apache.cxf.metrics.micrometer.provider.ExceptionClassProvider;
+import org.apache.cxf.metrics.micrometer.provider.StandardTags;
 import org.apache.cxf.metrics.micrometer.provider.TagsProvider;
 import org.apache.cxf.metrics.micrometer.provider.TimedAnnotationProvider;
 import org.apache.cxf.metrics.micrometer.provider.jaxws.DefaultJaxwsFaultCodeProvider;
@@ -87,11 +88,18 @@ public class MicrometerMetricsAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean(StandardTags.class)
+    public StandardTags standardTags() {
+        return new StandardTags();
+    }
+
+    @Bean
     @ConditionalOnMissingBean(TagsProvider.class)
     public TagsProvider tagsProvider(ExceptionClassProvider exceptionClassProvider,
                                      JaxwsFaultCodeProvider faultCodeProvider,
+                                     StandardTags standardTags,
                                      JaxwsTags cxfTags) {
-        return new JaxwsTagsProvider(exceptionClassProvider, faultCodeProvider, cxfTags);
+        return new JaxwsTagsProvider(exceptionClassProvider, faultCodeProvider, standardTags, cxfTags);
     }
 
     @Bean

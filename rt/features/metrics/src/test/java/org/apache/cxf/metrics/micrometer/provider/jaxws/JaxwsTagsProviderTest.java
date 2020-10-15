@@ -22,6 +22,7 @@ package org.apache.cxf.metrics.micrometer.provider.jaxws;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.metrics.micrometer.provider.ExceptionClassProvider;
+import org.apache.cxf.metrics.micrometer.provider.StandardTags;
 
 import io.micrometer.core.instrument.ImmutableTag;
 import io.micrometer.core.instrument.Tag;
@@ -50,6 +51,8 @@ public class JaxwsTagsProviderTest {
     private Message response;
     @Mock
     private JaxwsTags cxfTags;
+    @Mock
+    private StandardTags standardTags;
 
     private JaxwsTagsProvider underTest;
     private Tags expectedTags;
@@ -58,23 +61,23 @@ public class JaxwsTagsProviderTest {
     public void setUp() {
         initMocks(this);
 
-        underTest = new JaxwsTagsProvider(exceptionClassProvider, faultCodeProvider, cxfTags);
+        underTest = new JaxwsTagsProvider(exceptionClassProvider, faultCodeProvider, standardTags, cxfTags);
 
         Tag methodTag = new ImmutableTag("method", "method");
-        doReturn(methodTag).when(cxfTags).method(request);
+        doReturn(methodTag).when(standardTags).method(request);
 
         Tag uriTag = new ImmutableTag("uri", "uri");
-        doReturn(uriTag).when(cxfTags).uri(request);
+        doReturn(uriTag).when(standardTags).uri(request);
 
         Tag exceptionTag = new ImmutableTag("exception", "exception");
         doReturn(RuntimeException.class).when(exceptionClassProvider).getExceptionClass(exchange);
-        doReturn(exceptionTag).when(cxfTags).exception(RuntimeException.class);
+        doReturn(exceptionTag).when(standardTags).exception(RuntimeException.class);
 
         Tag statusTag = new ImmutableTag("status", "status");
-        doReturn(statusTag).when(cxfTags).status(response);
+        doReturn(statusTag).when(standardTags).status(response);
 
         Tag outcomeTag = new ImmutableTag("outcome", "outcome");
-        doReturn(outcomeTag).when(cxfTags).outcome(response);
+        doReturn(outcomeTag).when(standardTags).outcome(response);
 
         Tag operationTag = new ImmutableTag("operation", "operation");
         doReturn(operationTag).when(cxfTags).operation(request);

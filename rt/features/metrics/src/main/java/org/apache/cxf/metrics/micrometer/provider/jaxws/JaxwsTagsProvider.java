@@ -22,6 +22,7 @@ package org.apache.cxf.metrics.micrometer.provider.jaxws;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.metrics.micrometer.provider.ExceptionClassProvider;
+import org.apache.cxf.metrics.micrometer.provider.StandardTags;
 import org.apache.cxf.metrics.micrometer.provider.TagsProvider;
 
 import io.micrometer.core.instrument.Tag;
@@ -33,12 +34,14 @@ public class JaxwsTagsProvider implements TagsProvider {
 
     private final ExceptionClassProvider exceptionClassProvider;
     private final JaxwsFaultCodeProvider faultCodeProvider;
+    private final StandardTags standardTags;
     private final JaxwsTags cxfTags;
 
     public JaxwsTagsProvider(ExceptionClassProvider exceptionClassProvider, JaxwsFaultCodeProvider faultCodeProvider,
-                             JaxwsTags cxfTags) {
+                             StandardTags standardTags, JaxwsTags cxfTags) {
         this.exceptionClassProvider = exceptionClassProvider;
         this.faultCodeProvider = faultCodeProvider;
+        this.standardTags = standardTags;
         this.cxfTags = cxfTags;
     }
 
@@ -51,11 +54,11 @@ public class JaxwsTagsProvider implements TagsProvider {
         String faultCode = faultCodeProvider.getFaultCode(ex);
 
         return Tags.of(
-                cxfTags.method(request),
-                cxfTags.uri(request),
-                cxfTags.exception(exception),
-                cxfTags.status(response),
-                cxfTags.outcome(response),
+                standardTags.method(request),
+                standardTags.uri(request),
+                standardTags.exception(exception),
+                standardTags.status(response),
+                standardTags.outcome(response),
                 cxfTags.operation(request),
                 cxfTags.faultCode(faultCode));
     }
