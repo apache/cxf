@@ -22,9 +22,11 @@ package org.apache.cxf.metrics.micrometer;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.metrics.MetricsContext;
@@ -41,6 +43,9 @@ import static java.util.stream.Stream.concat;
 import static java.util.stream.StreamSupport.stream;
 
 public class MicrometerMetricsContext implements MetricsContext {
+
+    private static final Logger LOG =
+            LogUtils.getL7dLogger(MicrometerMetricsContext.class);
 
     private final MeterRegistry registry;
     private final TagsProvider tagsProvider;
@@ -75,16 +80,16 @@ public class MicrometerMetricsContext implements MetricsContext {
         Message request = ex.getInMessage();
         TimingContext timingContext = TimingContext.get(request);
         if (timingContext == null) {
-            timingContext = startAndAttachTimingContext(request);
+            LOG.warning("Unable for record metric for exchange: " + ex);
+        } else {
+            record(timingContext, ex);
         }
-        record(timingContext, ex);
     }
 
-    private TimingContext startAndAttachTimingContext(Message request) {
+    private void startAndAttachTimingContext(Message request) {
         Timer.Sample timerSample = Timer.start(this.registry);
         TimingContext timingContext = new TimingContext(timerSample);
         timingContext.attachTo(request);
-        return timingContext;
     }
 
     private void record(TimingContext timingContext, Exchange ex) {

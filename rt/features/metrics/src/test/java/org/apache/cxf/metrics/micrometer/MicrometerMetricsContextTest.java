@@ -19,7 +19,9 @@
 
 package org.apache.cxf.metrics.micrometer;
 
-import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -28,9 +30,11 @@ import org.apache.cxf.metrics.micrometer.provider.TagsCustomizer;
 import org.apache.cxf.metrics.micrometer.provider.TagsProvider;
 import org.apache.cxf.metrics.micrometer.provider.TimedAnnotationProvider;
 
+import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
@@ -41,13 +45,17 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.internal.util.reflection.FieldReader;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class MicrometerMetricsContextTest {
@@ -58,6 +66,8 @@ public class MicrometerMetricsContextTest {
     private static final Tag SECOND_ADDITIONAL_DUMMY_TAG = Tag.of("secondAdditionalDummyKey", "dummyValue");
 
     private static final String DUMMY_METRIC = "dummyMetric";
+    private static final String FIRST_TIMED_ANNOTATION_DUMMY_VALUE = "firstTimedAnnotationDummyValue";
+    private static final String SECOND_TIMED_ANNOTATION_DUMMY_VALUE = "secondTimedAnnotationDummyValue";
 
     @Captor
     ArgumentCaptor<TimingContext> timingContextCaptor;
@@ -75,6 +85,11 @@ public class MicrometerMetricsContextTest {
     private Message request;
     @Mock
     private Exchange exchange;
+
+    @Mock
+    private Timed firstTimedAnnotation;
+    @Mock
+    private Timed secondTimedAnnotation;
 
     @Mock
     private TagsCustomizer firstTagsCustomizer;
@@ -97,11 +112,11 @@ public class MicrometerMetricsContextTest {
         underTest =
                 new MicrometerMetricsContext(
                         registry, tagsProvider, timedAnnotationProvider,
-                        Arrays.asList(firstTagsCustomizer, secondTagsCustomizer), DUMMY_METRIC, true);
+                        asList(firstTagsCustomizer, secondTagsCustomizer), DUMMY_METRIC, true);
     }
 
     @Test
-    public void testStartAttachTimingContext() throws NoSuchFieldException {
+    public void testStartShouldAttachTimingContext() throws NoSuchFieldException {
         // given in setUp
 
         // when
@@ -116,7 +131,7 @@ public class MicrometerMetricsContextTest {
     }
 
     @Test
-    public void testStopCallsStopOnTimer() {
+    public void testStopShouldCallStopOnTimer() {
         // given
         TimingContext timingContext = new TimingContext(sample);
 
@@ -132,6 +147,58 @@ public class MicrometerMetricsContextTest {
 
         assertThat(id.getName(), equalTo(DUMMY_METRIC));
         assertThat(id.getTags(), contains(DEFAULT_DUMMY_TAG, FIRST_ADDITIONAL_DUMMY_TAG, SECOND_ADDITIONAL_DUMMY_TAG));
+    }
+
+    @Test
+    public void testStopShouldNotRecordWhenTimerIsMissing() {
+        // given
+
+        // when
+        underTest.stop(DUMMY_LONG, DUMMY_LONG, DUMMY_LONG, exchange);
+
+        // then
+        verifyNoInteractions(sample);
+    }
+
+    @Test
+    public void testStopShouldCallStopOnAllTimedAnnotations() {
+        // given
+        doReturn(new HashSet<>(asList(firstTimedAnnotation, secondTimedAnnotation)))
+                .when(timedAnnotationProvider).getTimedAnnotations(exchange);
+
+        doReturn(FIRST_TIMED_ANNOTATION_DUMMY_VALUE).when(firstTimedAnnotation).value();
+        doReturn("").when(firstTimedAnnotation).description();
+        doReturn(new double[]{}).when(firstTimedAnnotation).percentiles();
+
+
+        doReturn(SECOND_TIMED_ANNOTATION_DUMMY_VALUE).when(secondTimedAnnotation).value();
+        doReturn("").when(secondTimedAnnotation).description();
+        doReturn(new double[]{}).when(secondTimedAnnotation).percentiles();
+
+        TimingContext timingContext = new TimingContext(sample);
+
+        doReturn(timingContext).when(request).getContent(TimingContext.class);
+
+        // when
+        underTest.stop(DUMMY_LONG, DUMMY_LONG, DUMMY_LONG, exchange);
+
+        // then
+        verify(sample, times(2)).stop(timerArgumentCaptor.capture());
+
+        List<Meter.Id> timers = timerArgumentCaptor.getAllValues().stream().map(Meter::getId)
+                .collect(Collectors.toList());
+
+        assertThat(timers, hasItems(
+                new Meter.Id(FIRST_TIMED_ANNOTATION_DUMMY_VALUE,
+                        Tags.of(DEFAULT_DUMMY_TAG, FIRST_ADDITIONAL_DUMMY_TAG, SECOND_ADDITIONAL_DUMMY_TAG),
+                        null,
+                        null,
+                        Meter.Type.OTHER),
+                new Meter.Id(SECOND_TIMED_ANNOTATION_DUMMY_VALUE,
+                        Tags.of(DEFAULT_DUMMY_TAG, FIRST_ADDITIONAL_DUMMY_TAG, SECOND_ADDITIONAL_DUMMY_TAG),
+                        null,
+                        null,
+                        Meter.Type.OTHER)));
     }
 
     private Object getTimer(ArgumentCaptor<TimingContext> content) throws NoSuchFieldException {
