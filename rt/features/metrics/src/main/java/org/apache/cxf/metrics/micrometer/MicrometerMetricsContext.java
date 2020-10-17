@@ -19,12 +19,11 @@
 
 package org.apache.cxf.metrics.micrometer;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
-
-import com.google.common.collect.Iterables;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -37,6 +36,9 @@ import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
+
+import static java.util.stream.Stream.concat;
+import static java.util.stream.StreamSupport.stream;
 
 public class MicrometerMetricsContext implements MetricsContext {
 
@@ -88,13 +90,7 @@ public class MicrometerMetricsContext implements MetricsContext {
     private void record(TimingContext timingContext, Exchange ex) {
         Set<Timed> annotations = timedAnnotationProvider.getTimedAnnotations(ex);
         Timer.Sample timerSample = timingContext.getTimerSample();
-        Supplier<Iterable<Tag>> tags = () -> {
-            Iterable<Tag> defaultTags = this.tagsProvider.getTags(ex);
-            List<Tag> additionalTags = new ArrayList<>();
-            tagsCustomizers
-                    .forEach(tagsCustomizer -> tagsCustomizer.getAdditionalTags(ex).forEach(additionalTags::add));
-            return Iterables.concat(defaultTags, additionalTags);
-        };
+        Supplier<Iterable<Tag>> tags = () -> getAllTags(ex);
 
         if (annotations.isEmpty()) {
             if (this.autoTimeRequests) {
@@ -105,6 +101,21 @@ public class MicrometerMetricsContext implements MetricsContext {
                 stop(timerSample, tags, Timer.builder(annotation, this.metricName));
             }
         }
+    }
+
+    private Iterable<Tag> getAllTags(Exchange ex) {
+        Stream<Tag> defaultTags = getStreamFrom(this.tagsProvider.getTags(ex));
+        Stream<Tag> additionalTags =
+                tagsCustomizers.stream()
+                        .map(tagsCustomizer -> tagsCustomizer.getAdditionalTags(ex))
+                        .flatMap(this::getStreamFrom);
+
+        return concat(defaultTags, additionalTags)
+                .collect(Collectors.toList());
+    }
+
+    private Stream<Tag> getStreamFrom(Iterable<Tag> tags) {
+        return stream(tags.spliterator(), false);
     }
 
     private void stop(Timer.Sample timerSample, Supplier<Iterable<Tag>> tags, Timer.Builder builder) {

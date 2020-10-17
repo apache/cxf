@@ -372,8 +372,6 @@
         <feature version="${project.version}">cxf-core</feature>
         <bundle start-level="40" dependency='true'>mvn:io.dropwizard.metrics/metrics-core/${cxf.dropwizard4.version}</bundle>
         <bundle start-level="40" dependency='true'>mvn:io.dropwizard.metrics/metrics-jmx/${cxf.dropwizard4.version}</bundle>
-        <bundle start-level="40" dependency="true">mvn:com.google.guava/failureaccess/1.0.1</bundle>
-        <bundle start-level="40" dependency="true">mvn:com.google.guava/guava/${cxf.guava.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-features-metrics/${project.version}</bundle>
     </feature>
     <feature name="cxf-bindings-corba" version="${project.version}">
