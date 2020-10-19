@@ -73,8 +73,7 @@ jobs:
     #    uses a compiled language
 
     - run: |
-        #mvn clean install -Pnochecks -DskipTests
-        mvn process-sources -Pnochecks
+        mvn clean process-classes -Pnochecks
     #   make bootstrap
     #   make release
 
