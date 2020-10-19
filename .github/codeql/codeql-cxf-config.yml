@@ -1,5 +1,0 @@
-
-name: "CXF CodeQL config"
-
-queries:
-  - uses: security-and-quality
