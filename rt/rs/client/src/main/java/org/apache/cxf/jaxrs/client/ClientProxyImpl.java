@@ -1089,9 +1089,12 @@ public class ClientProxyImpl extends AbstractClient implements
                     Class<?> paramClass = method.getParameterTypes()[bodyIndex];
                     Class<?> bodyClass =
                         paramClass.isAssignableFrom(body.getClass()) ? paramClass : body.getClass();
-                    Type genericType = method.getGenericParameterTypes()[bodyIndex];
-                    if (bodyType != null) {
-                        genericType = bodyType;
+                    Type genericType = bodyType;
+                    if (genericType == null) {
+                        Type[] genericParameterTypes = method.getGenericParameterTypes();
+                        if (bodyIndex < genericParameterTypes.length) {
+                            genericType = genericParameterTypes[bodyIndex];
+                        }
                     }
                     genericType = InjectionUtils.processGenericTypeIfNeeded(
                         ori.getClassResourceInfo().getServiceClass(), bodyClass, genericType);
