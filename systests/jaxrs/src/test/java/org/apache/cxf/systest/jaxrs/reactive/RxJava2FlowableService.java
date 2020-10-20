@@ -24,11 +24,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.jaxrs.reactivestreams.server.AbstractSubscriber;
 import org.apache.cxf.jaxrs.reactivestreams.server.JsonStreamingAsyncSubscriber;
@@ -121,6 +124,77 @@ public class RxJava2FlowableService {
         Flowable.just("Hello, ").map(s -> s + "world!")
             .subscribe(new StringAsyncSubscriber(ar));
 
+    }
+    
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/empty")
+    public Flowable<HelloWorldBean> empty() { 
+        return Flowable.empty(); 
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/mapper/errors")
+    public Flowable<HelloWorldBean> mapperErrors() { 
+        return Flowable 
+            .range(1, 3) 
+            .flatMap(item -> { 
+                if (item < 3) { 
+                    return Flowable.just(new HelloWorldBean("Person " + item)); 
+                } else { 
+                    return Flowable.error(new IllegalArgumentException("Oops")); 
+                } 
+            }); 
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/web/errors")
+    public Flowable<HelloWorldBean> webErrors() { 
+        return Flowable 
+            .range(1, 3) 
+            .concatMap(item -> { 
+                if (item < 3) { 
+                    return Flowable.just(new HelloWorldBean("Person " + item)); 
+                } else { 
+                    return Flowable.error(new ForbiddenException("Oops")); 
+                } 
+            }); 
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/immediate/errors")
+    public Flowable<HelloWorldBean> immediateErrors() { 
+        return Flowable 
+            .range(1, 2) 
+            .flatMap(item -> Flowable.error(new RuntimeException("Oops"))); 
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/immediate/mapper/errors")
+    public Flowable<HelloWorldBean> immediateMapperErrors() { 
+        return Flowable 
+            .range(1, 2) 
+            .flatMap(item -> Flowable.error(new IllegalStateException("Oops"))); 
+    }
+
+    @GET
+    @Path("/mixed/error")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Flowable<HelloWorldBean> errorAndData() {
+        return Flowable
+            .range(1, 5)
+            .flatMap(item -> {
+                if (item <= 4) {
+                    return Flowable.just(new HelloWorldBean(" of Item: " + item));
+                } else {
+                    return Flowable.error(new NotFoundException("Item not found"));
+                }
+            })
+            .onErrorResumeNext((Throwable e) -> Flowable.error(new IllegalStateException("Oops", e)));
     }
     
     private static class StringAsyncSubscriber extends AbstractSubscriber<String> {
