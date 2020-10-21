@@ -4,9 +4,9 @@ pipeline {
    }
    
     tools { 
-        ant 'Ant 1.10.6'
-        maven 'Maven 3.6.2' 
-        jdk 'JDK 1.8.0_241' 
+        ant 'ant_1.10.6'
+        maven 'maven_3.6.2' 
+        jdk 'jdk_1.8.0_241' 
     }
     
     environment {
