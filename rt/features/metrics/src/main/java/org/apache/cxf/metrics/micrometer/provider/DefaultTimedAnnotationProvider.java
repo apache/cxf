@@ -38,17 +38,28 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.annotation.TimedSet;
 
+import static java.util.Collections.emptySet;
+
 public class DefaultTimedAnnotationProvider implements TimedAnnotationProvider {
 
-    private ConcurrentHashMap<HandlerMethod, Set<Timed>> timedAnnotationCache = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<HandlerMethod, Set<Timed>> timedAnnotationCache = new ConcurrentHashMap<>();
 
     @Override
     public Set<Timed> getTimedAnnotations(Exchange ex) {
         HandlerMethod handlerMethod = new HandlerMethod(ex);
+
+        final Set<Timed> exists = timedAnnotationCache.get(handlerMethod);
+        if (exists != null) {
+            return exists;
+        }
+
         return timedAnnotationCache.computeIfAbsent(handlerMethod, method -> {
             Set<Timed> timed = findTimedAnnotations(method.getMethod());
             if (timed.isEmpty()) {
-                return findTimedAnnotations(method.getBeanType());
+                timed = findTimedAnnotations(method.getBeanType());
+                if (timed.isEmpty()) {
+                    return emptySet();
+                }
             }
             return timed;
         });
