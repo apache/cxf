@@ -137,7 +137,7 @@ public class MicrometerMetricsAutoConfiguration {
     public MeterFilter cxfMetricsMaxAllowedServerUriTagsFilter() {
         String metricName = this.properties.getMetrics().getServer().getRequestsMetricName();
         MeterFilter filter = new OnlyOnceLoggingDenyMeterFilter(
-                () -> String.format("Reached the maximum number of URI tags for '%s'.", metricName));
+        () -> String.format("Reached the maximum number of URI tags for '%s'.", metricName));
         return MeterFilter.maximumAllowableTags(
                 metricName, "uri", this.properties.getMetrics().getServer().getMaxUriTags(), filter);
     }
