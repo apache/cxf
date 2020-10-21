@@ -19,15 +19,11 @@
 
 package org.apache.cxf.systest.jaxrs.spring.boot;
 
-import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
-import org.apache.cxf.jaxrs.spring.AbstractSpringComponentScanServer;
-import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationFeature;
-import org.apache.cxf.systest.jaxrs.resources.Library;
+import org.apache.cxf.jaxrs.spring.AbstractJaxrsClassesScanServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -38,25 +34,23 @@ import org.junit.runner.RunWith;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = SpringComponentScanningTest.TestConfig.class)
-@ActiveProfiles("component-scan")
-public class SpringComponentScanningTest {
-    @Autowired private AbstractSpringComponentScanServer scanner; 
-    
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT,
+        classes = SpringJaxrsClassesScanningTest.TestConfig.class)
+@ActiveProfiles("jaxrs-classes-scan")
+public class SpringJaxrsClassesScanningTest {
+    @Autowired
+    private AbstractJaxrsClassesScanServer scanner;
+
     @Configuration
     @EnableAutoConfiguration
-    @ComponentScan(basePackageClasses = Library.class)
     static class TestConfig {
     }
-    
+
     @Test
-    public void testCxfComponentScan() {
-        // The component scanner only looks for CXF's @Provider annotations, 
-        // not JAX-RS Features/@Provider.
-        assertThat(scanner.getFeatures())
-            .hasSize(2)
-            .hasOnlyElementsOfTypes(OpenApiFeature.class, JAXRSBeanValidationFeature.class);
-        
+    public void testCxfClassesScan() {
+        // No features are registered since class scanner only looks for JAX-RS's 
+        // @Provider annotations, not JAX-RS/CXF Features.
+        assertThat(scanner.getFeatures()).isEmpty();
         assertThat(scanner.getOutInterceptors()).isEmpty();
         assertThat(scanner.getInInterceptors()).isEmpty();
         assertThat(scanner.getOutFaultInterceptors()).isEmpty();
