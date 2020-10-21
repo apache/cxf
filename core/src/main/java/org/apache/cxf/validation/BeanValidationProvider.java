@@ -36,6 +36,7 @@ import javax.validation.ValidationProviderResolver;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.executable.ExecutableValidator;
+import javax.validation.metadata.MethodDescriptor;
 import javax.validation.spi.ValidationProvider;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -204,15 +205,21 @@ public class BeanValidationProvider implements AutoCloseable {
         private final ConcurrentMap<Method, Boolean> returnedValues = new ConcurrentHashMap<>();
 
         public boolean shouldValidateParameters(final Validator validator, final Method method) {
-            return params.computeIfAbsent(method, m -> validator.getConstraintsForClass(m.getDeclaringClass())
-                    .getConstraintsForMethod(m.getName(), m.getParameterTypes())
-                    .hasConstrainedParameters());
+            return params.computeIfAbsent(method, m -> {
+                final MethodDescriptor constraint = validator
+                    .getConstraintsForClass(m.getDeclaringClass())
+                    .getConstraintsForMethod(m.getName(), m.getParameterTypes());
+                return constraint != null && constraint.hasConstrainedParameters();
+            });
         }
 
         public boolean shouldValidateReturnedValue(final Validator validator, final Method method) {
-            return returnedValues.computeIfAbsent(method, m -> validator.getConstraintsForClass(m.getDeclaringClass())
-                    .getConstraintsForMethod(m.getName(), method.getParameterTypes())
-                    .hasConstrainedReturnValue());
+            return returnedValues.computeIfAbsent(method, m -> {
+                final MethodDescriptor constraint = validator
+                    .getConstraintsForClass(m.getDeclaringClass())
+                    .getConstraintsForMethod(m.getName(), method.getParameterTypes());
+                return constraint != null && constraint.hasConstrainedReturnValue();
+            });
         }
 
         public boolean shouldValidateBean(final Validator validator, final Class<?> clazz) {
