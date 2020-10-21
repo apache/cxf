@@ -85,9 +85,9 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
         int paramsStart = mType.indexOf(';', i + 1);
         int end = paramsStart == -1  ? mType.length() : paramsStart;
 
-        String type = mType.substring(0, i);
-        String subtype = mType.substring(i + 1, end);
-        if (subtype.indexOf('/') != -1) {
+        String type = mType.substring(0, i).trim();
+        String subtype = mType.substring(i + 1, end).trim();
+        if (!isValid(type) || !isValid(subtype)) {
             throw new IllegalArgumentException("Invalid media type string: " + mType);
         }
 
@@ -111,8 +111,8 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
             }
         }
 
-        return new MediaType(type.trim().toLowerCase(),
-                             subtype.trim().toLowerCase(),
+        return new MediaType(type.toLowerCase(),
+                             subtype.toLowerCase(),
                              parameters);
     }
 
@@ -189,5 +189,36 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
             return mt;
         }
         throw new IllegalArgumentException("Media type separator is missing");
+    }
+
+    // Determines whether the type or subtype contains any of the tspecials characters defined at:
+    // https://tools.ietf.org/html/rfc2045#section-5.1
+    private static boolean isValid(String str) {
+        final int len = str.length();
+        if (len == 0) {
+            return false;
+        }
+        for (int i = 0; i < len; i++) {
+            switch (str.charAt(i)) {
+            case '/':
+            case '\\':
+            case '?':
+            case ':':
+            case '<':
+            case '>':
+            case ';':
+            case '(':
+            case ')':
+            case '@':
+            case ',':
+            case '[':
+            case ']':
+            case '=':
+                return false;
+            default:
+                continue;
+            }
+        }
+        return true;
     }
 }

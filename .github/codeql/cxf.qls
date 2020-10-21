@@ -1,0 +1,5 @@
+- import: codeql-suites/java-security-extended.qls
+  from: codeql-java
+#- exclude:
+    #id: java/missing-override-annotation
+

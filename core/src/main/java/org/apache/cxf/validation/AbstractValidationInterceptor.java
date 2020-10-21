@@ -36,11 +36,13 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.service.invoker.FactoryInvoker;
 import org.apache.cxf.service.invoker.Invoker;
 
-public abstract class AbstractValidationInterceptor extends AbstractPhaseInterceptor< Message > {
+public abstract class AbstractValidationInterceptor extends AbstractPhaseInterceptor< Message >
+        implements AutoCloseable {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractValidationInterceptor.class);
     protected static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractValidationInterceptor.class);
 
     private Object serviceObject;
+    private boolean customProvider;
     private volatile BeanValidationProvider provider;
 
     public AbstractValidationInterceptor(String phase) {
@@ -53,6 +55,13 @@ public abstract class AbstractValidationInterceptor extends AbstractPhaseInterce
 
     public void setProvider(BeanValidationProvider provider) {
         this.provider = provider;
+    }
+
+    @Override
+    public void close() {
+        if (customProvider) {
+            provider.close();
+        }
     }
 
     @Override
@@ -125,7 +134,13 @@ public abstract class AbstractValidationInterceptor extends AbstractPhaseInterce
             if (prop != null) {
                 provider = (BeanValidationProvider)prop;
             } else {
-                provider = new BeanValidationProvider();
+                // don't create 2 validator factories and one not released!
+                synchronized (this) {
+                    if (provider == null) {
+                        provider = new BeanValidationProvider();
+                        customProvider = true;
+                    }
+                }
             }
         }
         return provider;

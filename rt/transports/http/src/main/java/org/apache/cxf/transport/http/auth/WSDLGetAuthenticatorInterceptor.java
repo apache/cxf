@@ -62,25 +62,21 @@ public class WSDLGetAuthenticatorInterceptor extends AbstractPhaseInterceptor<Me
 
         String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
         String query = (String)message.get(Message.QUERY_STRING);
-        if (!"GET".equals(method) || StringUtils.isEmpty(query)) {
+        if (!"GET".equals(method) || StringUtils.isEmpty(query) || StringUtils.isEmpty(contextName)) {
             return;
         }
         Endpoint endpoint = message.getExchange().getEndpoint();
         synchronized (endpoint) {
-            if (!StringUtils.isEmpty(contextName)) {
-                AuthorizationPolicy policy = message.get(AuthorizationPolicy.class);
-                if (policy == null) {
-                    handle401response(message, endpoint);
-                    return;
-                }
-                Subject subject = (Subject)authenticate(policy.getUserName(), policy.getPassword());
-                if (subject == null) {
-                    handle401response(message, endpoint);
-                    return;
-                }
-
+            AuthorizationPolicy policy = message.get(AuthorizationPolicy.class);
+            if (policy == null) {
+                handle401response(message, endpoint);
+                return;
             }
-
+            Subject subject = (Subject) authenticate(policy.getUserName(), policy.getPassword());
+            if (subject == null) {
+                handle401response(message, endpoint);
+                return;
+            }
         }
     }
 

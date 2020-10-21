@@ -158,6 +158,48 @@ public class MediaTypeHeaderProviderTest {
         } catch (IllegalArgumentException pe) {
             // expected
         }
+
+        try {
+            new MediaTypeHeaderProvider().fromString("@pplication/json");
+            fail("Parse exception expected");
+        } catch (IllegalArgumentException pe) {
+            // expected
+        }
+
+        try {
+            new MediaTypeHeaderProvider().fromString("application/<xml>");
+            fail("Parse exception expected");
+        } catch (IllegalArgumentException pe) {
+            // expected
+        }
+
+        try {
+            new MediaTypeHeaderProvider().fromString("application/xml,json");
+            fail("Parse exception expected");
+        } catch (IllegalArgumentException pe) {
+            // expected
+        }
+
+        try {
+            new MediaTypeHeaderProvider().fromString("t[ext]/plain");
+            fail("Parse exception expected");
+        } catch (IllegalArgumentException pe) {
+            // expected
+        }
+
+        try {
+            new MediaTypeHeaderProvider().fromString("text/pla:n");
+            fail("Parse exception expected");
+        } catch (IllegalArgumentException pe) {
+            // expected
+        }
+
+        try {
+            new MediaTypeHeaderProvider().fromString("text/reg(ex)");
+            fail("Parse exception expected");
+        } catch (IllegalArgumentException pe) {
+            // expected
+        }
     }
 
     @Test

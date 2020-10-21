@@ -189,7 +189,7 @@ public final class CorbaHandlerUtils {
             arrayBound = anonArrayType.getBound();
             elementName = anonArrayType.getElemname();
         }
-        for (int i = 0; i < arrayBound; ++i) {
+        for (long i = 0; i < arrayBound; ++i) {
             CorbaObjectHandler elementObj =
                 initializeObjectHandler(orb, elementName, arrayElementType, typeMap, serviceInfo,
                                         seenTypes);
@@ -261,7 +261,7 @@ public final class CorbaHandlerUtils {
             }
             ((CorbaSequenceHandler)obj).setTemplateElement(elementObj);
         }
-        for (int i = 0; i < seqBound; ++i) {
+        for (long i = 0; i < seqBound; ++i) {
             CorbaObjectHandler elementObj = null;
 
             // Check for a recursive type
