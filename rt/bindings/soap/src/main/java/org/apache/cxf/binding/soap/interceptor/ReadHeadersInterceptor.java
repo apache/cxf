@@ -218,13 +218,20 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                     }
                 }
 
+                List<Element> soapBody = null; 
                 // Find header
                 if (doc != null) {
                     Element element = doc.getDocumentElement();
                     QName header = soapVersion.getHeader();
+                    QName body = soapVersion.getBody();
                     List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(element,
                                                                                  header.getNamespaceURI(),
                                                                                  header.getLocalPart());
+                    soapBody = new ArrayList<Element>();      
+                    soapBody = DOMUtils.getChildrenWithName(element,
+                                                                                 body.getNamespaceURI(),
+                                                                                 body.getLocalPart());
+                    
                     for (Element elem : elemList) {
                         Element hel = DOMUtils.getFirstElement(elem);
                         while (hel != null) {
@@ -285,6 +292,11 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
 
                 if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, message)) {
                     message.getInterceptorChain().add(new CheckClosingTagsInterceptor());
+                }
+                if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, message)
+                    && soapBody != null && soapBody.isEmpty()) {
+                    throw new SoapFault(new Message("NO_SOAP_BODY", LOG, "no soap body"),
+                                        soapVersion.getSender());
                 }
             }
         } catch (XMLStreamException e) {
