@@ -30,11 +30,11 @@ import org.apache.cxf.jaxrs.rx2.server.ReactiveIOCustomizer;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 
-public class RxJava2ObservableServer extends AbstractBusTestServerBase {
-    public static final String PORT = allocatePort(RxJava2ObservableServer.class);
+public class RxJava2SingleServer extends AbstractBusTestServerBase {
+    public static final String PORT = allocatePort(RxJava2SingleServer.class);
 
     org.apache.cxf.endpoint.Server server;
-    public RxJava2ObservableServer() {
+    public RxJava2SingleServer() {
     }
 
     protected void run() {
@@ -43,12 +43,11 @@ public class RxJava2ObservableServer extends AbstractBusTestServerBase {
         bus.setProperty("skip.default.json.provider.registration", true);
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setProvider(new JacksonJsonProvider());
-        sf.setProvider(new IllegalStateExceptionMapper());
         new ReactiveIOCustomizer().customize(sf);
         sf.getOutInterceptors().add(new LoggingOutInterceptor());
-        sf.setResourceClasses(RxJava2ObservableService.class);
-        sf.setResourceProvider(RxJava2ObservableService.class,
-                               new SingletonResourceProvider(new RxJava2ObservableService(), true));
+        sf.setResourceClasses(RxJava2SingleService.class);
+        sf.setResourceProvider(RxJava2SingleService.class,
+                               new SingletonResourceProvider(new RxJava2SingleService(), true));
         sf.setAddress("http://localhost:" + PORT + "/");
         server = sf.create();
     }
@@ -61,7 +60,7 @@ public class RxJava2ObservableServer extends AbstractBusTestServerBase {
 
     public static void main(String[] args) {
         try {
-            RxJava2ObservableServer s = new RxJava2ObservableServer();
+            RxJava2SingleServer s = new RxJava2SingleServer();
             s.start();
         } catch (Exception ex) {
             ex.printStackTrace();
