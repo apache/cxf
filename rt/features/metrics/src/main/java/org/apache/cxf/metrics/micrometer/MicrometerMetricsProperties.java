@@ -31,7 +31,7 @@ public class MicrometerMetricsProperties {
     /**
      * Name of the metric for received requests.
      */
-    private String requestsMetricName = "soap.server.requests";
+    private String requestsMetricName = "cxf.server.requests";
 
     public boolean isAutoTimeRequests() {
         return autoTimeRequests;
