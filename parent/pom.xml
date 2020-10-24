@@ -244,13 +244,13 @@
         <cxf.jaxb.bundle.version>2.3.2_1</cxf.jaxb.bundle.version>
         <cxf.jaxb.context.class.property>none</cxf.jaxb.context.class.property>
         <cxf.jdom.bundle.version>1.1_4</cxf.jdom.bundle.version>
-        <cxf.karaf.version>4.2.9</cxf.karaf.version>
+        <cxf.karaf.version>4.2.10</cxf.karaf.version>
         <cxf.oauth.bundle.version>20100527_1</cxf.oauth.bundle.version>
         <cxf.oro.bundle.version>2.0.8_6</cxf.oro.bundle.version>
         <cxf.osgi.saaj.version>[1.4,2)</cxf.osgi.saaj.version>
         <cxf.osgi.jws.version>[0,3)</cxf.osgi.jws.version>
         <cxf.osgi.version>6.0.0</cxf.osgi.version>
-        <cxf.pax.exam.version>4.13.3</cxf.pax.exam.version>
+        <cxf.pax.exam.version>4.13.4</cxf.pax.exam.version>
         <cxf.reflections.bundle.version>0.9.11_2</cxf.reflections.bundle.version>
         <cxf.rhino.bundle.version>1.7R2_3</cxf.rhino.bundle.version>
         <cxf.servicemix.aspectj.version>1.9.1_1</cxf.servicemix.aspectj.version>
