@@ -19,8 +19,6 @@
 
 package org.apache.cxf.systest.jaxrs.websocket;
 
-import java.net.URISyntaxException;
-
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systest.jaxrs.Book;
@@ -54,13 +52,8 @@ public class JAXRSClientServerWebSocketSpringWebAppNoAtmosphereTest extends Abst
         server = new org.eclipse.jetty.server.Server(Integer.parseInt(port));
 
         WebAppContext webappcontext = new WebAppContext();
-        String contextPath = null;
-        try {
-            contextPath = JAXRSClientServerWebSocketSpringWebAppTest.class
-                .getResource("/jaxrs_websocket").toURI().getPath();
-        } catch (URISyntaxException e1) {
-            e1.printStackTrace();
-        }
+        String contextPath = JAXRSClientServerWebSocketSpringWebAppTest.class
+                .getResource("/jaxrs_websocket").toString();
         webappcontext.setContextPath("/webapp");
 
         webappcontext.setWar(contextPath);

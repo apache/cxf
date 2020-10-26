@@ -35,11 +35,6 @@
     </properties>
     <dependencies>
         <dependency>
-            <groupId>org.javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>${cxf.javassist.version}</version>
-        </dependency>        
-        <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
         </dependency>
