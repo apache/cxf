@@ -22,6 +22,7 @@ package org.apache.cxf.tools.common;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.lang.reflect.Constructor;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -71,10 +72,18 @@ public final class VelocityGenerator {
             props.put("resource.loaders", "class");
             props.put("resource.loader.class.class", clzName);
             props.put("runtime.log", getVelocityLogFile("velocity.log"));
-//            if (!log) {
-//                props.put(VelocityEngine.RUNTIME_LOG_INSTANCE,
-//                          "org.apache.velocity.runtime.log.NullLogSystem");
-//            }
+            if (!log) {
+                try {
+                    Class<?> nopLoggerClass = Class.forName("org.slf4j.helpers.NOPLogger");
+                    Constructor<?> cons1 = nopLoggerClass.getDeclaredConstructor();
+                    cons1.setAccessible(true);
+                
+                    props.put(Velocity.RUNTIME_LOG_INSTANCE,
+                          cons1.newInstance());
+                } catch (Exception ex) {
+                    LOG.log(Level.INFO, ex.getMessage());
+                }
+            }
             Velocity.init(props);
         } catch (Exception e) {
             Message msg = new Message("FAIL_TO_INITIALIZE_VELOCITY_ENGINE", LOG);
