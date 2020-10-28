@@ -94,8 +94,12 @@ public class CxfProperties {
     }
 
     public static class Metrics {
-
         private final Server server = new Server();
+        
+        /**
+         * Enables or disables metrics instrumentation
+         */
+        private boolean enabled = true;
 
         public Server getServer() {
             return this.server;
@@ -145,6 +149,15 @@ public class CxfProperties {
                 this.maxUriTags = maxUriTags;
             }
         }
+        
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
     }
 
 }

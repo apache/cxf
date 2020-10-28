@@ -32,7 +32,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 public class DefaultExceptionClassProviderTest {
 
@@ -50,7 +50,7 @@ public class DefaultExceptionClassProviderTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
 
         underTest = new DefaultExceptionClassProvider();
     }
@@ -58,7 +58,7 @@ public class DefaultExceptionClassProviderTest {
     @Test
     public void testGetExceptionClassReturnCauseExceptionFromExchange() {
         // given
-        Class expected = CauseException.class;
+        Class<?> expected = CauseException.class;
 
         doReturn(FAULT_EXCEPTION).when(exchange).get(Exception.class);
 

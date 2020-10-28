@@ -60,7 +60,7 @@ public class MicrometerMetricsProvider implements MetricsProvider {
      * {@inheritDoc}
      */
     @Override
-    public MetricsContext createEndpointContext(Endpoint endpoint, boolean isClient, String clientId) {
+    public MetricsContext createEndpointContext(Endpoint endpoint, boolean asClient, String clientId) {
         return null;
     }
 
@@ -70,8 +70,14 @@ public class MicrometerMetricsProvider implements MetricsProvider {
     @Override
     public MetricsContext createOperationContext(Endpoint endpoint, BindingOperationInfo boi, boolean asClient,
                                                  String clientId) {
+        // Client metrics are not yet supported
+        if (asClient) {
+            return null;
+        }
+        
         return new MicrometerMetricsContext(registry, tagsProvider, timedAnnotationProvider, tagsCustomizers,
-                micrometerMetricsProperties.getRequestsMetricName(), micrometerMetricsProperties.isAutoTimeRequests());
+            micrometerMetricsProperties.getServerRequestsMetricName(), 
+            micrometerMetricsProperties.isAutoTimeRequests());
     }
 
 
@@ -81,6 +87,13 @@ public class MicrometerMetricsProvider implements MetricsProvider {
     @Override
     public MetricsContext createResourceContext(Endpoint endpoint, String resourceName, boolean asClient,
                                                 String clientId) {
-        return null;
+        // Client metrics are not yet supported
+        if (asClient) {
+            return null;
+        }
+        
+        return new MicrometerMetricsContext(registry, tagsProvider, timedAnnotationProvider, tagsCustomizers,
+            micrometerMetricsProperties.getServerRequestsMetricName(), 
+            micrometerMetricsProperties.isAutoTimeRequests());
     }
 }
