@@ -74,6 +74,7 @@ public class SpringSseEmitterTest {
                         emitter.send(event);
                         Thread.sleep(100);
                     }
+                    emitter.complete();
                 } catch (Exception ex) {
                     emitter.completeWithError(ex);
                 }
