@@ -41,10 +41,26 @@ import org.eclipse.microprofile.rest.client.ext.ResponseExceptionMapper;
 
 public final class MicroProfileClientProviderFactory extends ProviderFactory {
     static final String CLIENT_FACTORY_NAME = MicroProfileClientProviderFactory.class.getName();
+    private static final Class<?> ASYNC_II_FACTORY_CLASS;
     private static final Logger LOG = LogUtils.getL7dLogger(MicroProfileClientProviderFactory.class);
     private List<ProviderInfo<ResponseExceptionMapper<?>>> responseExceptionMappers = new ArrayList<>(1);
     private List<ProviderInfo<Object>> asyncInvocationInterceptorFactories = new ArrayList<>();
     private final Comparator<ProviderInfo<?>> comparator;
+    
+
+    static {
+        Class<?> c;
+        try {
+            c = ClassLoaderUtils.loadClass("org.eclipse.microprofile.rest.client.ext.AsyncInvocationInterceptorFactory",
+                                           MicroProfileClientProviderFactory.class);
+        } catch (ClassNotFoundException ex) {
+            // expected if using the MP Rest Client 1.0 APIs
+            c = null;
+            LOG.log(Level.FINEST, ex, () -> {
+                return "Caught ClassNotFoundException - expected if using MP Rest Client 1.0 APIs"; });
+        }
+        ASYNC_II_FACTORY_CLASS = c;
+    }
 
     private MicroProfileClientProviderFactory(Bus bus, Comparator<ProviderInfo<?>> comparator) {
         super(bus);
@@ -87,20 +103,9 @@ public final class MicroProfileClientProviderFactory extends ProviderFactory {
             if (ResponseExceptionMapper.class.isAssignableFrom(providerCls)) {
                 addProviderToList(responseExceptionMappers, provider);
             }
-            String className = "org.eclipse.microprofile.rest.client.ext.AsyncInvocationInterceptorFactory";
-            try {
-                
-                Class<?> asyncIIFactoryClass = ClassLoaderUtils.loadClass(className,
-                                                                          MicroProfileClientProviderFactory.class);
-                if (asyncIIFactoryClass.isAssignableFrom(providerCls)) {
-                    addProviderToList(asyncInvocationInterceptorFactories, provider);
-                }
-            } catch (ClassNotFoundException ex) {
-                // expected if using the MP Rest Client 1.0 APIs
-                LOG.log(Level.FINEST, ex, () -> {
-                    return "Caught ClassNotFoundException - expected if using MP Rest Client 1.0 APIs"; });
+            if (ASYNC_II_FACTORY_CLASS != null && ASYNC_II_FACTORY_CLASS.isAssignableFrom(providerCls)) {
+                addProviderToList(asyncInvocationInterceptorFactories, provider);
             }
-
         }
         responseExceptionMappers.sort(comparator);
         asyncInvocationInterceptorFactories.sort(comparator);
