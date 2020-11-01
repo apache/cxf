@@ -40,7 +40,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.MockitoAnnotations.openMocks;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 @SuppressWarnings({"unused"})
 public class DefaultTimedAnnotationProviderTest {
@@ -60,7 +60,7 @@ public class DefaultTimedAnnotationProviderTest {
 
     @Before
     public void setUp() {
-        openMocks(this);
+        initMocks(this);
         underTest = new DefaultTimedAnnotationProvider();
 
         doReturn(service).when(exchange).getService();

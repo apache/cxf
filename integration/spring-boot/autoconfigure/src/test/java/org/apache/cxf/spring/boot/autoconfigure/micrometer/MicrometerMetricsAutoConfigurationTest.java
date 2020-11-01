@@ -39,7 +39,7 @@ import static org.junit.Assert.assertThrows;
 
 public class MicrometerMetricsAutoConfigurationTest {
     private final WebApplicationContextRunner runner = new WebApplicationContextRunner()
-            .withBean(CxfProperties.class)
+            .withUserConfiguration(CxfProperties.class)
             .withConfiguration(AutoConfigurations.of(
                 MetricsAutoConfiguration.class,
                 SimpleMetricsExportAutoConfiguration.class,

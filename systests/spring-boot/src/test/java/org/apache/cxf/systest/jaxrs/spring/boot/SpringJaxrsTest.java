@@ -39,7 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.system.OutputCaptureRule;
+import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -66,7 +66,7 @@ import static org.assertj.core.api.Assertions.entry;
 @ActiveProfiles("jaxrs")
 public class SpringJaxrsTest {
     @Rule
-    public OutputCaptureRule output = new OutputCaptureRule();
+    public OutputCapture output = new OutputCapture();
 
     @Autowired
     private MeterRegistry registry;
