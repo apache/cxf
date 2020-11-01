@@ -33,7 +33,7 @@ import org.mockito.Mock;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 public class StandardTagsProviderTest {
 
@@ -53,7 +53,7 @@ public class StandardTagsProviderTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
 
         underTest = new StandardTagsProvider(exceptionClassProvider, standardTags);
 

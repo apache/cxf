@@ -75,7 +75,7 @@ public class StandardTags {
 
     public Tag uri(Message request) {
         return ofNullable(request)
-                .map(e -> e.get(Message.BASE_PATH))
+                .map(e -> e.get(Message.REQUEST_URI))
                 .filter(e -> e instanceof String)
                 .map(e -> (String) e)
                 .map(e -> Tag.of("uri", e))

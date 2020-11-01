@@ -31,9 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.cxf.message.Exchange;
-import org.apache.cxf.service.Service;
-import org.apache.cxf.service.invoker.MethodDispatcher;
-import org.apache.cxf.service.model.BindingOperationInfo;
+import org.apache.cxf.message.MessageUtils;
 
 import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.annotation.TimedSet;
@@ -46,8 +44,11 @@ public class DefaultTimedAnnotationProvider implements TimedAnnotationProvider {
 
     @Override
     public Set<Timed> getTimedAnnotations(Exchange ex) {
-        HandlerMethod handlerMethod = new HandlerMethod(ex);
-
+        final HandlerMethod handlerMethod = HandlerMethod.create(ex);
+        if (handlerMethod == null) {
+            return emptySet();
+        }
+        
         final Set<Timed> exists = timedAnnotationCache.get(handlerMethod);
         if (exists != null) {
             return exists;
@@ -94,19 +95,22 @@ public class DefaultTimedAnnotationProvider implements TimedAnnotationProvider {
     }
 
     private static final class HandlerMethod {
-        private final Class beanType;
+        private final Class<?> beanType;
         private final Method method;
 
-        private HandlerMethod(Exchange exchange) {
-            Service service = exchange.getService();
-            BindingOperationInfo bop = exchange.getBindingOperationInfo();
-            MethodDispatcher md = (MethodDispatcher) service.get(MethodDispatcher.class.getName());
-
-            this.method = md.getMethod(bop);
-            this.beanType = method.getDeclaringClass();
+        private HandlerMethod(Class<?> beanType, Method method) {
+            this.method = method;
+            this.beanType = beanType;
+        }
+        
+        private static HandlerMethod create(Exchange exchange) {
+            return MessageUtils
+                .getTargetMethod(exchange.getInMessage())
+                .map(method -> new HandlerMethod(method.getDeclaringClass(), method))
+                .orElse(null);
         }
 
-        private Class getBeanType() {
+        private Class<?> getBeanType() {
             return beanType;
         }
 

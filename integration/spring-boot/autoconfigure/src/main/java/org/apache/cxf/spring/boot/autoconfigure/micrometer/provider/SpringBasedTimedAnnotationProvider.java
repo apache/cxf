@@ -25,6 +25,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.metrics.micrometer.provider.TimedAnnotationProvider;
 import org.apache.cxf.service.Service;
@@ -42,7 +43,10 @@ public class SpringBasedTimedAnnotationProvider implements TimedAnnotationProvid
 
     @Override
     public Set<Timed> getTimedAnnotations(Exchange ex) {
-        HandlerMethod handlerMethod = new HandlerMethod(ex);
+        HandlerMethod handlerMethod = HandlerMethod.create(ex);
+        if (handlerMethod == null) {
+            return emptySet();
+        }
 
         final Set<Timed> exists = timedAnnotationCache.get(handlerMethod);
         if (exists != null) {
@@ -66,19 +70,35 @@ public class SpringBasedTimedAnnotationProvider implements TimedAnnotationProvid
     }
 
     private static final class HandlerMethod {
-        private final Class beanType;
+        private final Class<?> beanType;
         private final Method method;
 
-        private HandlerMethod(Exchange exchange) {
-            Service service = exchange.getService();
-            BindingOperationInfo bop = exchange.getBindingOperationInfo();
-            MethodDispatcher md = (MethodDispatcher) service.get(MethodDispatcher.class.getName());
-
-            this.method = md.getMethod(bop);
-            this.beanType = method.getDeclaringClass();
+        private HandlerMethod(Class<?> beanType, Method method) {
+            this.beanType = beanType;
+            this.method = method;
         }
 
-        private Class getBeanType() {
+        private static HandlerMethod create(Exchange exchange) {
+            final Service service = exchange.getService();
+            if (service != null) {
+                final BindingOperationInfo bop = exchange.getBindingOperationInfo();
+                if (bop != null) { /* JAX-WS call */
+                    final MethodDispatcher md = (MethodDispatcher) service.get(MethodDispatcher.class.getName());
+                    final Method method = md.getMethod(bop);
+                    return new HandlerMethod(method.getDeclaringClass(), method);
+                } else { /* JAX-RS call */
+                    final OperationResourceInfo ori = exchange.get(OperationResourceInfo.class);
+                    if (ori != null) {
+                        return new HandlerMethod(ori.getClassResourceInfo().getResourceClass(), 
+                            ori.getAnnotatedMethod());
+                    }
+                }
+            }
+            
+            return null;
+        }
+
+        private Class<?> getBeanType() {
             return beanType;
         }
 

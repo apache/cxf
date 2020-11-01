@@ -31,7 +31,7 @@ public class MicrometerMetricsProperties {
     /**
      * Name of the metric for received requests.
      */
-    private String requestsMetricName = "cxf.server.requests";
+    private String serverRequestsMetricName = "cxf.server.requests";
 
     public boolean isAutoTimeRequests() {
         return autoTimeRequests;
@@ -41,11 +41,11 @@ public class MicrometerMetricsProperties {
         this.autoTimeRequests = autoTimeRequests;
     }
 
-    public String getRequestsMetricName() {
-        return requestsMetricName;
+    public String getServerRequestsMetricName() {
+        return serverRequestsMetricName;
     }
 
-    public void setRequestsMetricName(String requestsMetricName) {
-        this.requestsMetricName = requestsMetricName;
+    public void setServerRequestsMetricName(String requestsMetricName) {
+        this.serverRequestsMetricName = requestsMetricName;
     }
 }
