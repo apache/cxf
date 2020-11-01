@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -61,5 +62,10 @@ public class Library {
         return books.containsKey(id) 
             ? Response.ok().entity(books.get(id)).build() 
                 : Response.status(Status.NOT_FOUND).build();
+    }
+    
+    @DELETE
+    public void deleteBooks() {
+        throw new UnsupportedOperationException("Operation is not supported by the server");
     }
 }

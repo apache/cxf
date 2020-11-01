@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -39,7 +40,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 @SuppressWarnings({"unused"})
 public class DefaultTimedAnnotationProviderTest {
@@ -54,15 +55,19 @@ public class DefaultTimedAnnotationProviderTest {
     private BindingOperationInfo bindingOperationInfo;
     @Mock
     private MethodDispatcher methodDispatcher;
+    @Mock
+    private Message message;
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
         underTest = new DefaultTimedAnnotationProvider();
 
         doReturn(service).when(exchange).getService();
         doReturn(bindingOperationInfo).when(exchange).getBindingOperationInfo();
         doReturn(methodDispatcher).when(service).get(MethodDispatcher.class.getName());
+        doReturn(message).when(exchange).getInMessage();
+        doReturn(exchange).when(message).getExchange();
     }
 
     @Test

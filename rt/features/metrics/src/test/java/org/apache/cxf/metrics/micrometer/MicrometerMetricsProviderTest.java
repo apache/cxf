@@ -65,7 +65,7 @@ public class MicrometerMetricsProviderTest {
         initMocks(this);
 
         micrometerMetricsProperties = new MicrometerMetricsProperties();
-        micrometerMetricsProperties.setRequestsMetricName("http.server.requests");
+        micrometerMetricsProperties.setServerRequestsMetricName("http.server.requests");
         micrometerMetricsProperties.setAutoTimeRequests(true);
 
         underTest =
@@ -86,9 +86,33 @@ public class MicrometerMetricsProviderTest {
     }
 
     @Test
-    public void testCreateOperationContext() throws NoSuchFieldException, IllegalAccessException {
+    public void testCreateServerOperationContext() throws NoSuchFieldException, IllegalAccessException {
+        // when
+        MetricsContext actual = underTest.createOperationContext(endpoint, boi, false, "clientId");
+
+        // then
+        assertThat(actual, instanceOf(MicrometerMetricsContext.class));
+        assertThat(getFieldValue(actual, "registry"), is(registry));
+        assertThat(getFieldValue(actual, "tagsProvider"), is(tagsProvider));
+        assertThat(getFieldValue(actual, "timedAnnotationProvider"), is(timedAnnotationProvider));
+        assertThat(getFieldValue(actual, "metricName"), is("http.server.requests"));
+        assertThat(getFieldValue(actual, "autoTimeRequests"), is(true));
+        assertThat(getFieldValue(actual, "tagsCustomizers"), is(Collections.singletonList(tagsCustomizer)));
+    }
+    
+    @Test
+    public void testCreateClientOperationContext() throws NoSuchFieldException, IllegalAccessException {
         // when
         MetricsContext actual = underTest.createOperationContext(endpoint, boi, true, "clientId");
+
+        // then
+        assertThat(actual, is(nullValue()));
+    }
+    
+    @Test
+    public void testCreateServerResourceContext() throws NoSuchFieldException, IllegalAccessException {
+        // when
+        MetricsContext actual = underTest.createResourceContext(endpoint, "resourceName", false, "clientId");
 
         // then
         assertThat(actual, instanceOf(MicrometerMetricsContext.class));
@@ -101,7 +125,7 @@ public class MicrometerMetricsProviderTest {
     }
 
     @Test
-    public void testCreateResourceContext() {
+    public void testCreateClientResourceContext() {
         // when
         MetricsContext actual = underTest.createResourceContext(endpoint, "resourceName", true, "clientId");
 

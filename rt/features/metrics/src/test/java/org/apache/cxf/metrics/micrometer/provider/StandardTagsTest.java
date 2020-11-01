@@ -34,7 +34,7 @@ import org.mockito.Mock;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 
 public class StandardTagsTest {
@@ -65,7 +65,7 @@ public class StandardTagsTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
 
         doReturn(exchange).when(request).getExchange();
         doReturn(bindingOperationInfo).when(exchange).getBindingOperationInfo();
@@ -263,7 +263,7 @@ public class StandardTagsTest {
     @Test
     public void testUriReturnWithCorrectValue() {
         // given
-        doReturn(DUMMY_URI).when(request).get(Message.BASE_PATH);
+        doReturn(DUMMY_URI).when(request).get(Message.REQUEST_URI);
 
         // when
         Tag actual = underTest.uri(request);
@@ -298,6 +298,7 @@ public class StandardTagsTest {
     public void testExceptionReturnWithNameWhenExceptionIsAnonymous() {
         // given
         Exception exception = new Exception() {
+            private static final long serialVersionUID = 1L;
         };
 
         // when
