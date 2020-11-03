@@ -1,4 +1,4 @@
-Apache CXF 3.3.7 Release Notes
+Apache CXF 3.3.8 Release Notes
 
 1. Overview
 
@@ -23,7 +23,7 @@ http://cxf.apache.org/docs/33-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
-3.3.7 fixes over 20 JIRA issues reported by users and the community.
+3.3.8 fixes over 19 JIRA issues reported by users and the community.
 
 
 
@@ -67,30 +67,32 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-    * [CXF-5216] - WSDL definition cache issue for web service client when WSDL in service war changed
-    * [CXF-8242] - Stop blocking executor thread on microprofile rest asynchronous call
-    * [CXF-8251] - introduce a new property in http-undertow transport so that can enable http/2 if necessary
-    * [CXF-8254] - NPE in WebFaultOutInterceptor handleMessage method
-    * [CXF-8259] - Blocked thread of JMS transport during jboss shutdown
-    * [CXF-8261] - Exceptions being thrown in a ClientResponseFilter are ignored
-    * [CXF-8267] - Syntax error in wsdl2java.bat
-    * [CXF-8270] - Persistent SSL connection is closed when only URI path was changed
-    * [CXF-8280] - AttachmentId issue
-    * [CXF-8282] - Set read timeout using netty client
-    * [CXF-8296] - Custom Boolean ParamConverter wrong behaviour
-    * [CXF-8298] - An invalid package name is generated
+    * [CXF-8227] - Failure to comply with JAX-RS spec with ContainerRequestContext and WriterInterceptorContext
+    * [CXF-8257] - Logger no longer logs bad requests
+    * [CXF-8303] - MP: Context propagation impossible using  AsyncInvocationInterceptorFactory
+    * [CXF-8307] - Invalid class generated if resource contains hyphen
+    * [CXF-8310] - JMS transport with flag oneSessionPerConnection causes reconnection to not work
+    * [CXF-8311] - OAuth 2.0: Refresh token redemption unexpectedly fails with invalid_grant error
+    * [CXF-8318] - NullPointerException in PrettyLoggingFilter
+    * [CXF-8325] - Schema validation allows invalid SOAP header
+    * [CXF-8327] - UsernameTokenInterceptor doesn't set soap:actor
+    * [CXF-8329] - NPE with empty query parameters and collections
+    * [CXF-8331] - Reverse proxy url is not reflected when use-x-forwarded-headers is true
+    * [CXF-8337] - wsdl2java generates exceptions which do not follow naming convention
+    * [CXF-8349] - Flux Returns Mixed Response on Errors and Mono Hangs when Empty
+
+** New Feature
+    * [CXF-8213] - Add Micrometer metric support for JAX-WS Spring Boot
+    * [CXF-8252] - Add Micrometer metric support for JAX-RS (Spring Boot)
 
 ** Improvement
-    * [CXF-8253] - Provide a way to disable TLS trust verification for the OSGi HttpConduitConfigApplier
-    * [CXF-8269] - Servlet Transport: allow any whitespace character as param-value separator
-    * [CXF-8286] - AbstractStaticFailoverStrategy.getEndpoints() never returns anything for JAX-RS clients (with RetryStrategy)
-    * [CXF-8306] - be able to configure http-undertow worker|threadpool name
+    * [CXF-8317] - Make netty transport HttpObjectAggregator.maxContentLength configurable
+    * [CXF-8360] - Configurable property for Apache Velocity logs
 
 ** Task
-    * [CXF-8078] - Support RxJava 3.0
-    * [CXF-8271] - The async JAX-RS client never completes the response in case of an exception during the interceptor chain processing.
-    * [CXF-8290] - Don't lock by default in org.apache.cxf.jaxrs.model.AbstractResourceInfo#getProxyMap
-    * [CXF-8300] - Swagger2Feature displays cached API when service is redeployed
+    * [CXF-8355] - RxJava3: Observable / Flowable Returns Mixed Response on Errors and Hangs when Empty
+    * [CXF-8358] - RxJava2: Observable / Flowable Returns Mixed Response on Errors and Hangs when Empty
+
 
 
 
