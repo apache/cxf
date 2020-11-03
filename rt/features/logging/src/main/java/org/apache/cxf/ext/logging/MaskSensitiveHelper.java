@@ -20,7 +20,6 @@ package org.apache.cxf.ext.logging;
 
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -71,15 +70,14 @@ public class MaskSensitiveHelper {
             final Message message,
             final String originalLogString) {
         if (replacementsXML.isEmpty() && replacementsJSON.isEmpty()
-                || originalLogString == null) {
+                || originalLogString == null || message == null) {
             return originalLogString;
         }
-        final Optional<String> contentType = Optional.ofNullable(message)
-                .map(m -> (String) m.get(Message.CONTENT_TYPE));
-        if (!contentType.isPresent()) {
+        final String contentType = (String) message.get(Message.CONTENT_TYPE);
+        if (contentType == null) {
             return originalLogString;
         }
-        final String lowerCaseContentType = contentType.get().toLowerCase();
+        final String lowerCaseContentType = contentType.toLowerCase();
         if (lowerCaseContentType.contains(XML_CONTENT)
                 || lowerCaseContentType.contains(HTML_CONTENT)) {
             return applyMasks(originalLogString, replacementsXML);
