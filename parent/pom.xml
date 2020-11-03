@@ -145,9 +145,9 @@
         <cxf.jdom.version>1.0</cxf.jdom.version>
         <cxf.jettison.version>1.4.1</cxf.jettison.version>
         <cxf.jetty.osgi.version>[9.2,10)</cxf.jetty.osgi.version>
+        <cxf.jetty9.version>9.4.33.v20201020</cxf.jetty9.version>
         <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
         <cxf.jexl.version>2.1.1</cxf.jexl.version>
-        <cxf.jetty9.version>9.4.32.v20200930</cxf.jetty9.version>
         <cxf.joda.time.version>2.9.4</cxf.joda.time.version>
         <cxf.johnzon.version>1.1.13</cxf.johnzon.version>
         <cxf.json.api.version>1.1.4</cxf.json.api.version>
