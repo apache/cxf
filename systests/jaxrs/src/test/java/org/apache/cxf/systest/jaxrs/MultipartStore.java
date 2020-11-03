@@ -23,10 +23,13 @@ package org.apache.cxf.systest.jaxrs;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -48,6 +51,8 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
@@ -492,6 +497,19 @@ public class MultipartStore {
         throws Exception {
         b1.setId(124);
         return Response.ok(b1).build();
+    }
+    
+    @POST
+    @Path("/books/jsonstream")
+    @Produces("text/xml")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public List<Book> addBookJsonTypeFromStreams(
+            @Multipart(value = "part1", type = "application/octet-stream") InputStream in1,
+            @Multipart(value = "part2", type = "application/octet-stream") InputStream in2) throws Exception {
+        final ObjectMapper mapper = new ObjectMapper();
+        final Book[] array1 = mapper.readValue(in1, Book[].class);
+        final Book[] array2 = mapper.readValue(in2, Book[].class);
+        return Stream.concat(Arrays.stream(array1), Arrays.stream(array2)).collect(Collectors.toList());
     }
 
     @POST

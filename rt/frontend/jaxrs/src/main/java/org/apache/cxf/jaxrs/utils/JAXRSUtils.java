@@ -876,11 +876,16 @@ public final class JAXRSUtils {
             contentType = defaultCt == null ? MediaType.APPLICATION_OCTET_STREAM : defaultCt;
         }
 
-        MessageContext mc = new MessageContextImpl(message);
+        final MediaType contentTypeMt = toMediaType(contentType);
+        final MessageContext mc = new MessageContextImpl(message);
+
         MediaType mt = mc.getHttpHeaders().getMediaType();
+        if (mt == null) {
+            mt = contentTypeMt;
+        }
 
         InputStream is;
-        if (mt == null || mt.isCompatible(MediaType.APPLICATION_FORM_URLENCODED_TYPE)) {
+        if (mt.isCompatible(MediaType.APPLICATION_FORM_URLENCODED_TYPE)) {
             is = copyAndGetEntityStream(message);
         } else {
             is = message.getContent(InputStream.class);
@@ -897,7 +902,7 @@ public final class JAXRSUtils {
                                    parameterType,
                                    parameterAnns,
                                    is,
-                                   toMediaType(contentType),
+                                   contentTypeMt,
                                    ori,
                                    message);
     }
