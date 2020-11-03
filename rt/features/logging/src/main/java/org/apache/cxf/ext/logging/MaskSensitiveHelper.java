@@ -27,9 +27,9 @@ import org.apache.cxf.message.Message;
 
 public class MaskSensitiveHelper {
     private static final String ELEMENT_NAME_TEMPLATE = "-ELEMENT_NAME-";
-    private static final String MATCH_PATTERN_XML_TEMPLATE = "<-ELEMENT_NAME->(.*?)</-ELEMENT_NAME->";
+    private static final String MATCH_PATTERN_XML_TEMPLATE = "(<-ELEMENT_NAME-.*>)(.*?)(</-ELEMENT_NAME->)";
+    private static final String REPLACEMENT_XML_TEMPLATE = "$1XXX$3";
     private static final String MATCH_PATTERN_JSON_TEMPLATE = "\"-ELEMENT_NAME-\"[ \\t]*:[ \\t]*\"(.*?)\"";
-    private static final String REPLACEMENT_XML_TEMPLATE = "<-ELEMENT_NAME->XXX</-ELEMENT_NAME->";
     private static final String REPLACEMENT_JSON_TEMPLATE = "\"-ELEMENT_NAME-\": \"XXX\"";
     private static final String MASKED_HEADER_VALUE = "XXX";
 
@@ -70,15 +70,18 @@ public class MaskSensitiveHelper {
             final Message message,
             final String originalLogString) {
         if (replacementsXML.isEmpty() && replacementsJSON.isEmpty()
-                || message == null
-                || originalLogString == null) {
+                || originalLogString == null || message == null) {
             return originalLogString;
         }
         final String contentType = (String) message.get(Message.CONTENT_TYPE);
-        if (contentType.toLowerCase().contains(XML_CONTENT)
-                || contentType.toLowerCase().contains(HTML_CONTENT)) {
+        if (contentType == null) {
+            return originalLogString;
+        }
+        final String lowerCaseContentType = contentType.toLowerCase();
+        if (lowerCaseContentType.contains(XML_CONTENT)
+                || lowerCaseContentType.contains(HTML_CONTENT)) {
             return applyMasks(originalLogString, replacementsXML);
-        } else if (contentType.toLowerCase().contains(JSON_CONTENT)) {
+        } else if (lowerCaseContentType.contains(JSON_CONTENT)) {
             return applyMasks(originalLogString, replacementsJSON);
         }
         return originalLogString;
