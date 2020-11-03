@@ -1,4 +1,4 @@
-Apache CXF 3.4.0 Release Notes
+Apache CXF 3.4.1 Release Notes
 
 1. Overview
 
@@ -22,6 +22,9 @@ Users are encouraged to review the migration guide at:
 http://cxf.apache.org/docs/34-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
+
+3.4.1 fixes over 15 JIRA issues reported by users and the community.
+
 
 
 2. Installation Prerequisites 
@@ -60,3 +63,29 @@ http://issues.apache.org/jira/browse/CXF
 See the migration guide at:
 http://cxf.apache.org/docs/34-migration-guide.html
 for caveats when upgrading.
+
+7. Specific issues, features, and improvements fixed in this version
+
+** Bug
+    * [CXF-8227] - Failure to comply with JAX-RS spec with ContainerRequestContext and WriterInterceptorContext
+    * [CXF-8325] - Schema validation allows invalid SOAP header
+    * [CXF-8329] - NPE with empty query parameters and collections
+    * [CXF-8331] - Reverse proxy url is not reflected when use-x-forwarded-headers is true
+    * [CXF-8337] - wsdl2java generates exceptions which do not follow naming convention
+    * [CXF-8346] - JAX-RS TCK: Resolve test cases where empty entities are checked
+    * [CXF-8349] - Flux Returns Mixed Response on Errors and Mono Hangs when Empty
+    * [CXF-8354] - Logs not redirecting to Log4J
+
+** New Feature
+    * [CXF-8213] - Add Micrometer metric support for JAX-WS Spring Boot
+    * [CXF-8252] - Add Micrometer metric support for JAX-RS (Spring Boot)
+
+** Improvement
+    * [CXF-8338] - Add getters for iv, cypherBytes and authTag to JweJsonConsumer
+    * [CXF-8345] - Improve Performance by avoiding MessageImpl resizing
+    * [CXF-8359] - Masking sensitive elements does not work if the element has a property
+    * [CXF-8360] - Configurable property for Apache Velocity logs
+
+** Task
+    * [CXF-8355] - RxJava3: Observable / Flowable Returns Mixed Response on Errors and Hangs when Empty
+    * [CXF-8358] - RxJava2: Observable / Flowable Returns Mixed Response on Errors and Hangs when Empty
