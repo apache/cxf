@@ -619,7 +619,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
         }
     }
 
-    @SuppressWarnings("deprecation")
+    
     private Connector createConnector(String hosto, int porto) {
         // now we just use the SelectChannelConnector as the default connector
         SslContextFactory sslcf = null;
