@@ -35,7 +35,6 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -74,7 +73,7 @@ public class XMLSource {
      */
     public void setBuffering() {
         try {
-            doc = StaxUtils.read(new StreamSource(stream));
+            doc = StaxUtils.read(stream);
             stream = null;
         } catch (XMLStreamException e) {
             throw new Fault(e); 
