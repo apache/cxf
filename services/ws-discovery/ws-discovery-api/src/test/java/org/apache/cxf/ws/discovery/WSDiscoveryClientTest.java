@@ -61,15 +61,15 @@ public final class WSDiscoveryClientTest {
     static NetworkInterface findIpv4Interface() throws Exception {
         Enumeration<NetworkInterface> ifcs = NetworkInterface.getNetworkInterfaces();
         List<NetworkInterface> possibles = new ArrayList<>();
-        while (ifcs.hasMoreElements()) {
-            NetworkInterface ni = ifcs.nextElement();
-            if (ni.supportsMulticast()
-                && ni.isUp()) {
-                for (InterfaceAddress ia : ni.getInterfaceAddresses()) {
-                    if (ia.getAddress() instanceof java.net.Inet4Address
-                        && !ia.getAddress().isLoopbackAddress()
-                        && !ni.getDisplayName().startsWith("vnic")) {
-                        possibles.add(ni);
+        if (ifcs != null) {
+            while (ifcs.hasMoreElements()) {
+                NetworkInterface ni = ifcs.nextElement();
+                if (ni.supportsMulticast() && ni.isUp()) {
+                    for (InterfaceAddress ia : ni.getInterfaceAddresses()) {
+                        if (ia.getAddress() instanceof java.net.Inet4Address && !ia.getAddress().isLoopbackAddress()
+                                && !ni.getDisplayName().startsWith("vnic")) {
+                            possibles.add(ni);
+                        }
                     }
                 }
             }
@@ -88,12 +88,14 @@ public final class WSDiscoveryClientTest {
 
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         int count = 0;
-        while (interfaces.hasMoreElements()) {
-            NetworkInterface networkInterface = interfaces.nextElement();
-            if (!networkInterface.isUp() || networkInterface.isLoopback()) {
-                continue;
+        if (interfaces != null) {
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface networkInterface = interfaces.nextElement();
+                if (!networkInterface.isUp() || networkInterface.isLoopback()) {
+                    continue;
+                }
+                count++;
             }
-            count++;
         }
         if (count == 0) {
             //no non-loopbacks, cannot do broadcasts
