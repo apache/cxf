@@ -19,7 +19,7 @@
 package org.apache.cxf.sts.common;
 
 import java.security.Principal;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.cxf.rt.security.claims.Claim;
@@ -43,21 +43,18 @@ public class CustomClaimsHandler implements ClaimsHandler {
 
     public static final String ROLE_CLAIM =
             "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
-    private static List<String> knownURIs = new ArrayList<>();
-
-    static {
-        knownURIs.add(ClaimTypes.FIRSTNAME.toString());
-        knownURIs.add(ClaimTypes.LASTNAME.toString());
-        knownURIs.add(ClaimTypes.EMAILADDRESS.toString());
-        knownURIs.add(ClaimTypes.STREETADDRESS.toString());
-        knownURIs.add(ClaimTypes.MOBILEPHONE.toString());
-        knownURIs.add(ROLE_CLAIM);
-    }
+    private static final List<String> SUPPORTED_CLAIM_TYPES = Arrays.asList(
+        ClaimTypes.FIRSTNAME.toString(),
+        ClaimTypes.LASTNAME.toString(),
+        ClaimTypes.EMAILADDRESS.toString(),
+        ClaimTypes.STREETADDRESS.toString(),
+        ClaimTypes.MOBILEPHONE.toString(),
+        ROLE_CLAIM);
 
     private String role = "DUMMY";
 
     public List<String> getSupportedClaimTypes() {
-        return knownURIs;
+        return SUPPORTED_CLAIM_TYPES;
     }
 
     public ProcessedClaimCollection retrieveClaimValues(

@@ -23,9 +23,8 @@ import java.net.URI;
 import java.security.Principal;
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -340,10 +339,9 @@ public class SAMLTokenValidatorTest {
         validatorParameters.setToken(validateTarget);
 
         assertTrue(samlTokenValidator.canHandleToken(validateTarget));
-        List<String> certConstraints = new ArrayList<>();
-        certConstraints.add("XYZ");
-        certConstraints.add(".*CN=www.sts.com.*");
-        ((SAMLTokenValidator)samlTokenValidator).setSubjectConstraints(certConstraints);
+        ((SAMLTokenValidator)samlTokenValidator).setSubjectConstraints(Arrays.asList(
+            "XYZ",
+            ".*CN=www.sts.com.*"));
 
         TokenValidatorResponse validatorResponse =
             samlTokenValidator.validateToken(validatorParameters);
@@ -351,9 +349,8 @@ public class SAMLTokenValidatorTest {
         assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
 
-        certConstraints.clear();
-        certConstraints.add("XYZ");
-        ((SAMLTokenValidator)samlTokenValidator).setSubjectConstraints(certConstraints);
+        ((SAMLTokenValidator)samlTokenValidator).setSubjectConstraints(Collections.singletonList(
+            "XYZ"));
         validatorResponse = samlTokenValidator.validateToken(validatorParameters);
         assertNotNull(validatorResponse);
         assertNotNull(validatorResponse.getToken());

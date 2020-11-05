@@ -19,7 +19,6 @@
 package org.apache.cxf.sts.operation;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +43,6 @@ import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.service.ServiceMBean;
 import org.apache.cxf.sts.service.StaticService;
 import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
-import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.realm.RealmProperties;
 import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.ws.security.sts.provider.STSException;
@@ -83,11 +81,9 @@ public class IssueSamlRealmUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
         SAMLTokenProvider provider = new SAMLTokenProvider();
         provider.setRealmMap(createRealms());
-        providerList.add(provider);
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(provider));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -159,11 +155,9 @@ public class IssueSamlRealmUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
         SAMLTokenProvider provider = new SAMLTokenProvider();
         provider.setRealmMap(createRealms());
-        providerList.add(provider);
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(provider));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -235,11 +229,9 @@ public class IssueSamlRealmUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
         SAMLTokenProvider provider = new SAMLTokenProvider();
         provider.setRealmMap(createRealms());
-        providerList.add(provider);
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(provider));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -313,11 +305,9 @@ public class IssueSamlRealmUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
         SAMLTokenProvider provider = new SAMLTokenProvider();
         provider.setRealmMap(createRealms());
-        providerList.add(provider);
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(provider));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -412,11 +402,9 @@ public class IssueSamlRealmUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
         SAMLTokenProvider provider = new SAMLTokenProvider();
         provider.setRealmMap(createRealms());
-        providerList.add(provider);
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(provider));
 
         // Add Service
         ServiceMBean service = new StaticService();

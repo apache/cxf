@@ -21,7 +21,6 @@ package org.apache.cxf.sts.claims.mapper;
 import java.io.IOException;
 import java.net.URI;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -61,14 +60,12 @@ import org.apache.cxf.sts.token.delegation.SAMLDelegationHandler;
 import org.apache.cxf.sts.token.delegation.TokenDelegationHandler;
 import org.apache.cxf.sts.token.provider.AttributeStatementProvider;
 import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
-import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.sts.token.realm.RealmProperties;
 import org.apache.cxf.sts.token.realm.Relationship;
 import org.apache.cxf.sts.token.validator.IssuerSAMLRealmCodec;
 import org.apache.cxf.sts.token.validator.SAMLTokenValidator;
-import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.ws.security.sts.provider.model.ClaimsType;
 import org.apache.cxf.ws.security.sts.provider.model.OnBehalfOfType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseCollectionType;
@@ -133,37 +130,30 @@ public class JexlIssueSamlClaimsTest {
         Map<String, RealmProperties> realms = createSamlRealms();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         samlTokenProvider.setRealmMap(realms);
-        List<AttributeStatementProvider> customProviderList = new ArrayList<>();
-        customProviderList.add(new ClaimsAttributeStatementProvider());
-        samlTokenProvider.setAttributeStatementProviders(customProviderList);
-        providerList.add(samlTokenProvider);
-        issueOperation.setTokenProviders(providerList);
+        samlTokenProvider.setAttributeStatementProviders(Collections.singletonList(
+            new ClaimsAttributeStatementProvider()));
+        issueOperation.setTokenProviders(Collections.singletonList(samlTokenProvider));
 
         TokenDelegationHandler delegationHandler = new SAMLDelegationHandler();
         issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
 
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<>();
         SAMLTokenValidator samlTokenValidator = new SAMLTokenValidator();
         samlTokenValidator.setSamlRealmCodec(new IssuerSAMLRealmCodec());
-        validatorList.add(samlTokenValidator);
-        issueOperation.setTokenValidators(validatorList);
+        issueOperation.setTokenValidators(Collections.singletonList(samlTokenValidator));
 
         addService(issueOperation);
 
         // Add Relationship list
-        List<Relationship> relationshipList = new ArrayList<>();
         Relationship rs = createRelationship();
-        relationshipList.add(rs);
 
         // Add STSProperties object
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         STSPropertiesMBean stsProperties = createSTSPropertiesMBean(crypto);
         stsProperties.setRealmParser(new CustomRealmParser());
-        stsProperties.setRelationships(relationshipList);
+        stsProperties.setRelationships(Collections.singletonList(rs));
         issueOperation.setStsProperties(stsProperties);
 
         // Set the ClaimsManager
@@ -325,8 +315,8 @@ public class JexlIssueSamlClaimsTest {
 
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         samlTokenProvider.setRealmMap(realms);
-        List<AttributeStatementProvider> customProviderList = new ArrayList<>();
-        customProviderList.add(new ClaimsAttributeStatementProvider());
+        List<AttributeStatementProvider> customProviderList = Collections.singletonList(
+            new ClaimsAttributeStatementProvider());
         samlTokenProvider.setAttributeStatementProviders(customProviderList);
 
         TokenProviderParameters providerParameters = createProviderParameters(tokenType,

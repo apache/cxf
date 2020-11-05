@@ -18,7 +18,8 @@
  */
 package org.apache.cxf.sts.token.provider;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -60,8 +61,7 @@ public class SAMLProviderCustomTest {
         TokenProviderParameters providerParameters =
             createProviderParameters(WSS4JConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE);
 
-        List<AttributeStatementProvider> customProviderList = new ArrayList<>();
-        customProviderList.add(new CustomAttributeProvider());
+        List<AttributeStatementProvider> customProviderList = Collections.singletonList(new CustomAttributeProvider());
         ((SAMLTokenProvider)samlTokenProvider).setAttributeStatementProviders(customProviderList);
 
         assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML_TOKEN_TYPE));
@@ -87,9 +87,8 @@ public class SAMLProviderCustomTest {
         TokenProviderParameters providerParameters =
             createProviderParameters(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE);
 
-        List<AuthenticationStatementProvider> customProviderList =
-            new ArrayList<>();
-        customProviderList.add(new CustomAuthenticationProvider());
+        List<AuthenticationStatementProvider> customProviderList = Collections.singletonList(
+            new CustomAuthenticationProvider());
         ((SAMLTokenProvider)samlTokenProvider).setAuthenticationStatementProviders(customProviderList);
 
         assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
@@ -115,9 +114,8 @@ public class SAMLProviderCustomTest {
         TokenProviderParameters providerParameters =
             createProviderParameters(WSS4JConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE);
 
-        List<AuthenticationStatementProvider> customProviderList =
-            new ArrayList<>();
-        customProviderList.add(new CustomAuthenticationProvider());
+        List<AuthenticationStatementProvider> customProviderList = Collections.singletonList(
+            new CustomAuthenticationProvider());
         ((SAMLTokenProvider)samlTokenProvider).setAuthenticationStatementProviders(customProviderList);
 
         assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML_TOKEN_TYPE));
@@ -143,14 +141,12 @@ public class SAMLProviderCustomTest {
         TokenProviderParameters providerParameters =
             createProviderParameters(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE);
 
-        List<AuthenticationStatementProvider> customProviderList =
-            new ArrayList<>();
-        customProviderList.add(new CustomAuthenticationProvider());
+        List<AuthenticationStatementProvider> customProviderList = Collections.singletonList(
+            new CustomAuthenticationProvider());
         ((SAMLTokenProvider)samlTokenProvider).setAuthenticationStatementProviders(customProviderList);
 
-        List<AttributeStatementProvider> customAttributeProviderList =
-            new ArrayList<>();
-        customAttributeProviderList.add(new CustomAttributeProvider());
+        List<AttributeStatementProvider> customAttributeProviderList = Collections.singletonList(
+            new CustomAttributeProvider());
         ((SAMLTokenProvider)samlTokenProvider).setAttributeStatementProviders(customAttributeProviderList);
 
         assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
@@ -175,9 +171,9 @@ public class SAMLProviderCustomTest {
         TokenProviderParameters providerParameters =
             createProviderParameters(WSS4JConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE);
 
-        List<AttributeStatementProvider> customProviderList = new ArrayList<>();
-        customProviderList.add(new CustomAttributeProvider());
-        customProviderList.add(new CustomAttributeProvider());
+        List<AttributeStatementProvider> customProviderList = Arrays.asList(
+            new CustomAttributeProvider(),
+            new CustomAttributeProvider());
         ((SAMLTokenProvider)samlTokenProvider).setAttributeStatementProviders(customProviderList);
 
         assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML_TOKEN_TYPE));
@@ -203,9 +199,8 @@ public class SAMLProviderCustomTest {
         TokenProviderParameters providerParameters =
             createProviderParameters(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE);
 
-        List<AuthDecisionStatementProvider> customProviderList =
-            new ArrayList<>();
-        customProviderList.add(new CustomAuthDecisionProvider());
+        List<AuthDecisionStatementProvider> customProviderList = Collections.singletonList(
+            new CustomAuthDecisionProvider());
         ((SAMLTokenProvider)samlTokenProvider).setAuthDecisionStatementProviders(customProviderList);
 
         assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));

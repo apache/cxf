@@ -19,8 +19,7 @@
 package org.apache.cxf.sts.token.provider;
 
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Properties;
 
 import org.w3c.dom.Element;
@@ -486,10 +485,9 @@ public class SAMLProviderKeyTypeTest {
 
         STSPropertiesMBean stsProperties = providerParameters.getStsProperties();
         SignatureProperties sigProperties = new SignatureProperties();
-        List<String> acceptedC14nAlgorithms = new ArrayList<>();
-        acceptedC14nAlgorithms.add(WSS4JConstants.C14N_EXCL_OMIT_COMMENTS);
-        acceptedC14nAlgorithms.add(WSS4JConstants.C14N_EXCL_WITH_COMMENTS);
-        sigProperties.setAcceptedC14nAlgorithms(acceptedC14nAlgorithms);
+        sigProperties.setAcceptedC14nAlgorithms(Arrays.asList(
+            WSS4JConstants.C14N_EXCL_OMIT_COMMENTS,
+            WSS4JConstants.C14N_EXCL_WITH_COMMENTS));
         stsProperties.setSignatureProperties(sigProperties);
 
         // This will succeed as the requested c14n algorithm is accepted
