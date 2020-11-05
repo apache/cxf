@@ -19,8 +19,7 @@
 package org.apache.cxf.sts.request;
 
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 import java.util.Properties;
 
 import javax.xml.bind.JAXBContext;
@@ -144,9 +143,7 @@ public class RequestParserUnitTest {
 
         WSHandlerResult results =
             securityEngine.processSecurityHeader(secHeaderElement, reqData);
-        List<WSHandlerResult> resultsList = new ArrayList<>();
-        resultsList.add(results);
-        msgContext.put(WSHandlerConstants.RECV_RESULTS, resultsList);
+        msgContext.put(WSHandlerConstants.RECV_RESULTS, Collections.singletonList(results));
 
         RequestRequirements requestRequirements = parser.parseRequest(request, msgContext, null, null);
 
@@ -174,9 +171,7 @@ public class RequestParserUnitTest {
 
         WSHandlerResult results =
             securityEngine.processSecurityHeader(secHeaderElement, reqData);
-        List<WSHandlerResult> resultsList = new ArrayList<>();
-        resultsList.add(results);
-        msgContext.put(WSHandlerConstants.RECV_RESULTS, resultsList);
+        msgContext.put(WSHandlerConstants.RECV_RESULTS, Collections.singletonList(results));
 
         RequestRequirements requestRequirements = parser.parseRequest(request, msgContext, null, null);
 
@@ -205,9 +200,7 @@ public class RequestParserUnitTest {
 
         WSHandlerResult results =
             securityEngine.processSecurityHeader(secHeaderElement, reqData);
-        List<WSHandlerResult> resultsList = new ArrayList<>();
-        resultsList.add(results);
-        msgContext.put(WSHandlerConstants.RECV_RESULTS, resultsList);
+        msgContext.put(WSHandlerConstants.RECV_RESULTS, Collections.singletonList(results));
 
         RequestRequirements requestRequirements = parser.parseRequest(request, msgContext, null, null);
 

@@ -19,7 +19,6 @@
 package org.apache.cxf.sts.operation;
 
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -53,14 +52,12 @@ import org.apache.cxf.sts.token.delegation.SAMLDelegationHandler;
 import org.apache.cxf.sts.token.delegation.TokenDelegationHandler;
 import org.apache.cxf.sts.token.delegation.UsernameTokenDelegationHandler;
 import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
-import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.sts.token.provider.jwt.JWTTokenProvider;
 import org.apache.cxf.sts.token.realm.RealmProperties;
 import org.apache.cxf.sts.token.validator.IssuerSAMLRealmCodec;
 import org.apache.cxf.sts.token.validator.SAMLTokenValidator;
-import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.UsernameTokenValidator;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.sts.provider.model.OnBehalfOfType;
@@ -101,14 +98,12 @@ public class IssueJWTOnbehalfofUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new JWTTokenProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new JWTTokenProvider()));
 
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<>();
-        validatorList.add(new SAMLTokenValidator());
-        issueOperation.setTokenValidators(validatorList);
+        issueOperation.setTokenValidators(Collections.singletonList(
+            new SAMLTokenValidator()));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -191,14 +186,12 @@ public class IssueJWTOnbehalfofUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new JWTTokenProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new JWTTokenProvider()));
 
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<>();
-        validatorList.add(new UsernameTokenValidator());
-        issueOperation.setTokenValidators(validatorList);
+        issueOperation.setTokenValidators(Collections.singletonList(
+            new UsernameTokenValidator()));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -289,20 +282,16 @@ public class IssueJWTOnbehalfofUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
         JWTTokenProvider tokenProvider = new JWTTokenProvider();
-        providerList.add(tokenProvider);
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(tokenProvider));
 
         TokenDelegationHandler delegationHandler = new SAMLDelegationHandler();
         issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
 
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<>();
         SAMLTokenValidator samlTokenValidator = new SAMLTokenValidator();
         samlTokenValidator.setSamlRealmCodec(new IssuerSAMLRealmCodec());
-        validatorList.add(samlTokenValidator);
-        issueOperation.setTokenValidators(validatorList);
+        issueOperation.setTokenValidators(Collections.singletonList(samlTokenValidator));
 
         // Add Service
         ServiceMBean service = new StaticService();

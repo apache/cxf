@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.sts.common;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.cxf.rt.security.claims.Claim;
@@ -34,14 +34,11 @@ import org.apache.cxf.sts.claims.ProcessedClaimCollection;
  */
 public class CustomUserClaimsHandler implements ClaimsHandler {
 
-    private static List<String> knownURIs = new ArrayList<>();
-
-    static {
-        knownURIs.add(ClaimTypes.FIRSTNAME.toString());
-    }
+    private static final List<String> SUPPORTED_CLAIM_TYPES = Collections.singletonList(
+        ClaimTypes.FIRSTNAME.toString());
 
     public List<String> getSupportedClaimTypes() {
-        return knownURIs;
+        return SUPPORTED_CLAIM_TYPES;
     }
 
     public ProcessedClaimCollection retrieveClaimValues(
