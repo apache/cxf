@@ -102,12 +102,14 @@ public class UDPTransportTest {
 
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         int count = 0;
-        while (interfaces.hasMoreElements()) {
-            NetworkInterface networkInterface = interfaces.nextElement();
-            if (!networkInterface.isUp() || networkInterface.isLoopback()) {
-                continue;
+        if (interfaces != null) {
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface networkInterface = interfaces.nextElement();
+                if (!networkInterface.isUp() || networkInterface.isLoopback()) {
+                    continue;
+                }
+                count++;
             }
-            count++;
         }
         if (count == 0) {
             //no non-loopbacks, cannot do broadcasts
