@@ -342,7 +342,10 @@ public class ASMHelper {
         TypeHelperClassLoader loader = getTypeHelperClassLoader(l);
         return loader.lookupDefinedClass(className);
     }
-
+    public static void addExternalClass(String className, ClassLoader l, Class<?> cls) {
+        TypeHelperClassLoader loader = getTypeHelperClassLoader(l);
+        loader.addExternalClass(className, cls);
+    }
     private static synchronized TypeHelperClassLoader getTypeHelperClassLoader(ClassLoader l) {
         WeakReference<TypeHelperClassLoader> ref = LOADER_MAP.get(l);
         TypeHelperClassLoader ret;
@@ -383,7 +386,12 @@ public class ASMHelper {
             }
             return super.findClass(name);
         }
-
+        public void addExternalClass(String name, Class<?> cls) {
+            if (name == null) {
+                return;
+            }
+            defined.putIfAbsent(name.replace('/', '.'), cls);
+        }
         public Class<?> defineClass(String name, byte[] bytes) {
             Class<?> ret = defined.get(name.replace('/', '.'));
             if (ret != null) {
