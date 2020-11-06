@@ -196,22 +196,21 @@ public class UDPDestination extends AbstractDestination {
         }
         if (ret == null) {
             Enumeration<NetworkInterface> ifcs = NetworkInterface.getNetworkInterfaces();
-            List<NetworkInterface> possibles = new ArrayList<>();
-            while (ifcs.hasMoreElements()) {
-                NetworkInterface ni = ifcs.nextElement();
-                if (ni.supportsMulticast()
-                    && ni.isUp()) {
-                    for (InterfaceAddress ia : ni.getInterfaceAddresses()) {
-                        if (ia.getAddress() instanceof java.net.Inet4Address
-                            && !ia.getAddress().isLoopbackAddress()
-                            && !ni.getDisplayName().startsWith("vnic")) {
-                            possibles.add(ni);
+            if (ifcs != null) {
+                List<NetworkInterface> possibles = new ArrayList<>();
+                while (ifcs.hasMoreElements()) {
+                    NetworkInterface ni = ifcs.nextElement();
+                    if (ni.supportsMulticast() && ni.isUp()) {
+                        for (InterfaceAddress ia : ni.getInterfaceAddresses()) {
+                            if (ia.getAddress() instanceof java.net.Inet4Address && !ia.getAddress().isLoopbackAddress()
+                                    && !ni.getDisplayName().startsWith("vnic")) {
+                                possibles.add(ni);
+                            }
                         }
                     }
                 }
+                ret = possibles.isEmpty() ? null : possibles.get(possibles.size() - 1);
             }
-            ret = possibles.isEmpty() ? null : possibles.get(possibles.size() - 1);
-
         }
         return ret;
     }
