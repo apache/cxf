@@ -1346,7 +1346,11 @@ public final class JAXBUtils {
             + ("RI".equals(postFix) ? "" : "internal/")
             + "bind/marshaller/NamespacePrefixMapper";
         String postFixedName = "org/apache/cxf/jaxb/NamespaceMapper" + postFix;
+        Class<?> cls = helper.findClass(className, ref);
 
+        if (cls != null) {
+            return cls;
+        }
         FieldVisitor fv;
         MethodVisitor mv;
 
