@@ -43,7 +43,7 @@ pipeline {
             }
             tools {
               jdk "${JAVA_VERSION}"
-              maven 'Maven (latest)'
+              maven 'maven_latest'
             }
             environment {
               MAVEN_OPTS = "-Xmx1024m"
