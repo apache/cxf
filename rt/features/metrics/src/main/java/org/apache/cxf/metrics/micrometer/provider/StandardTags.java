@@ -77,9 +77,9 @@ public class StandardTags {
         return ofNullable(request)
                 .map(e -> e.get(Message.REQUEST_URI))
                 .filter(e -> e instanceof String)
-                .map(e -> (String) e)
+                .map(e -> stripQueryString((String) e))
                 .map(e -> Tag.of("uri", e))
-                .orElse(URI_UNKNOWN);
+                .orElse(endpoint(request));
     }
 
     public Tag exception(Class<?> exceptionClass) {
@@ -112,5 +112,30 @@ public class StandardTags {
             return OUTCOME_CLIENT_ERROR;
         }
         return OUTCOME_SERVER_ERROR;
+    }
+    
+    /**
+     * The Request URI endpoint fallback in case of JAX-WS client invocations
+     */
+    private Tag endpoint(Message request) {
+        return ofNullable(request)
+                .map(e -> e.get(Message.ENDPOINT_ADDRESS))
+                .filter(e -> e instanceof String)
+                .map(e -> stripQueryString((String) e))
+                .map(e -> Tag.of("uri", e))
+                .orElse(URI_UNKNOWN);
+    }
+    
+    /**
+     * Strips the query string from the request URI
+     */
+    private String stripQueryString(String uri) {
+        final int index = uri.indexOf('?');
+        
+        if (index != -1) {
+            return uri.substring(0, index);
+        }
+        
+        return uri;
     }
 }
