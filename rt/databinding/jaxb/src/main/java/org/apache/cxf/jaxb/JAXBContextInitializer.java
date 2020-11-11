@@ -54,7 +54,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.util.ASMHelper.ClassWriter;
 import org.apache.cxf.common.util.ASMHelper.MethodVisitor;
-import org.apache.cxf.common.util.ASMHelper.Opcodes;
+import org.apache.cxf.common.util.ASMHelperImpl;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.ServiceModelVisitor;
@@ -560,7 +560,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
     @SuppressWarnings("unused")
     private Object getFactory(Class<?> cls) {
         String newClassName = cls.getName() + "Factory";
-        ASMHelper helper = new ASMHelper();
+        ASMHelper helper = new ASMHelperImpl();
         Class<?> factoryClass = helper.findClass(newClassName, cls);
         if (factoryClass == null) {
             return null;
@@ -575,12 +575,13 @@ class JAXBContextInitializer extends ServiceModelVisitor {
     @SuppressWarnings("unused")
     private Object createFactory(Class<?> cls, Constructor<?> contructor) {
         String newClassName = cls.getName() + "Factory";
-        ASMHelper helper = new ASMHelper();
+        ASMHelper helper = new ASMHelperImpl();
+        ASMHelper.OpcodesProxy Opcodes = helper.getOpCodes();
         ClassWriter cw = helper.createClassWriter();
         MethodVisitor mv;
 
         cw.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER,
-                 ASMHelper.periodToSlashes(newClassName), null, "java/lang/Object", null);
+                helper.periodToSlashes(newClassName), null, "java/lang/Object", null);
 
         cw.visitSource(cls.getSimpleName() + "Factory" + ".java", null);
 
@@ -593,7 +594,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         mv.visitEnd();
 
         mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "create" + cls.getSimpleName(),
-                            "()L" + ASMHelper.periodToSlashes(cls.getName()) + ";", null, null);
+                            "()L" + helper.periodToSlashes(cls.getName()) + ";", null, null);
         mv.visitCode();
         String name = cls.getName().replace(".", "/");
         mv.visitTypeInsn(Opcodes.NEW, name);
