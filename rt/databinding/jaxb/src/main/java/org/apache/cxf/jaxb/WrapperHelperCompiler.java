@@ -24,11 +24,12 @@ import java.util.List;
 
 import javax.xml.bind.JAXBElement;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.util.ASMHelperImpl;
 import org.apache.cxf.databinding.WrapperHelper;
 
-final class WrapperHelperCompiler extends ASMHelperImpl {
+final class WrapperHelperCompiler {
 
 
     final Class<?> wrapperType;
@@ -37,9 +38,10 @@ final class WrapperHelperCompiler extends ASMHelperImpl {
     final Method[] jaxbMethods;
     final Field[] fields;
     final Object objectFactory;
-    final ClassWriter cw;
+    final ASMHelper.ClassWriter cw;
+    final ASMHelper asmhelper;
 
-    private WrapperHelperCompiler(Class<?> wrapperType,
+    private WrapperHelperCompiler(Bus bus, Class<?> wrapperType,
                                   Method[] setMethods,
                                   Method[] getMethods,
                                   Method[] jaxbMethods,
@@ -51,17 +53,18 @@ final class WrapperHelperCompiler extends ASMHelperImpl {
         this.jaxbMethods = jaxbMethods;
         this.fields = fields;
         this.objectFactory = objectFactory;
-        cw = createClassWriter();
+        asmhelper = bus.getExtension(ASMHelper.class);
+        cw = asmhelper.createClassWriter();
     }
 
-    static WrapperHelper compileWrapperHelper(Class<?> wrapperType,
+    static WrapperHelper compileWrapperHelper(Bus bus, Class<?> wrapperType,
                                               Method[] setMethods,
                                               Method[] getMethods,
                                               Method[] jaxbMethods,
                                               Field[] fields,
                                               Object objectFactory) {
         try {
-            return new WrapperHelperCompiler(wrapperType,
+            return new WrapperHelperCompiler(bus, wrapperType,
                                         setMethods,
                                         getMethods,
                                         jaxbMethods,
@@ -85,9 +88,9 @@ final class WrapperHelperCompiler extends ASMHelperImpl {
         int count = 1;
         String newClassName = wrapperType.getName() + "_WrapperTypeHelper" + count;
         newClassName = newClassName.replaceAll("\\$", ".");
-        newClassName = periodToSlashes(newClassName);
+        newClassName = asmhelper.periodToSlashes(newClassName);
 
-        Class<?> cls = super.findClass(newClassName.replace('/', '.'), wrapperType);
+        Class<?> cls = asmhelper.findClass(newClassName.replace('/', '.'), wrapperType);
         while (cls != null) {
             try {
                 WrapperHelper helper = WrapperHelper.class.cast(cls.newInstance());
@@ -95,8 +98,8 @@ final class WrapperHelperCompiler extends ASMHelperImpl {
                     count++;
                     newClassName = wrapperType.getName() + "_WrapperTypeHelper" + count;
                     newClassName = newClassName.replaceAll("\\$", ".");
-                    newClassName = periodToSlashes(newClassName);
-                    cls = super.findClass(newClassName.replace('/', '.'), wrapperType);
+                    newClassName = asmhelper.periodToSlashes(newClassName);
+                    cls = asmhelper.findClass(newClassName.replace('/', '.'), wrapperType);
                 } else {
                     return helper;
                 }
@@ -105,14 +108,14 @@ final class WrapperHelperCompiler extends ASMHelperImpl {
             }
         }
 
-        OpcodesProxy Opcodes = getOpCodes();
+        ASMHelper.OpcodesProxy Opcodes = asmhelper.getOpCodes();
 
         cw.visit(Opcodes.V1_5,
                  Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER,
                  newClassName,
                  null,
                  "java/lang/Object",
-                 new String[] {periodToSlashes(WrapperHelper.class.getName())});
+                 new String[] {asmhelper.periodToSlashes(WrapperHelper.class.getName())});
 
         addConstructor(newClassName, objectFactory == null ? null : objectFactory.getClass());
         boolean b = addSignature();
@@ -128,7 +131,7 @@ final class WrapperHelperCompiler extends ASMHelperImpl {
             if (b) {
                 cw.visitEnd();
                 byte[] bt = cw.toByteArray();
-                Class<?> cl = loadClass(newClassName.replace('/', '.'), wrapperType, bt);
+                Class<?> cl = asmhelper.loadClass(newClassName.replace('/', '.'), wrapperType, bt);
                 Object o = cl.newInstance();
                 return WrapperHelper.class.cast(o);
             }
@@ -153,13 +156,13 @@ final class WrapperHelperCompiler extends ASMHelperImpl {
     }
 
     private boolean addSignature() {
-        OpcodesProxy Opcodes = getOpCodes();
+        ASMHelper.OpcodesProxy Opcodes = asmhelper.getOpCodes();
         String sig = computeSignature();
-        MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC,
+        ASMHelper.MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC,
                                           "getSignature", "()Ljava/lang/String;", null, null);
         mv.visitCode();
         mv.visitLdcInsn(sig);
-        Label l0 = createLabel();
+        ASMHelper.Label l0 = asmhelper.createLabel();
         mv.visitLabel(l0);
         mv.visitLineNumber(100, l0);
         mv.visitInsn(Opcodes.ARETURN);
@@ -172,17 +175,17 @@ final class WrapperHelperCompiler extends ASMHelperImpl {
                                 Class<?> objectFactoryCls) {
 
         if (objectFactoryCls != null) {
-            String ofName = "L" + periodToSlashes(objectFactoryCls.getName()) + ";";
-            FieldVisitor fv = cw.visitField(0, "factory",
+            String ofName = "L" + asmhelper.periodToSlashes(objectFactoryCls.getName()) + ";";
+            ASMHelper.FieldVisitor fv = cw.visitField(0, "factory",
                                             ofName,
                                             null, null);
             fv.visitEnd();
         }
-        OpcodesProxy Opcodes = getOpCodes();
+        ASMHelper.OpcodesProxy Opcodes = asmhelper.getOpCodes();
 
-        MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
+        ASMHelper.MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
         mv.visitCode();
-        Label l0 = createLabel();
+        ASMHelper.Label l0 = asmhelper.createLabel();
         mv.visitLabel(l0);
         mv.visitLineNumber(102, l0);
 
@@ -193,18 +196,18 @@ final class WrapperHelperCompiler extends ASMHelperImpl {
                            "()V", false);
         if (objectFactoryCls != null) {
             mv.visitVarInsn(Opcodes.ALOAD, 0);
-            mv.visitTypeInsn(Opcodes.NEW, periodToSlashes(objectFactoryCls.getName()));
+            mv.visitTypeInsn(Opcodes.NEW, asmhelper.periodToSlashes(objectFactoryCls.getName()));
             mv.visitInsn(Opcodes.DUP);
             mv.visitMethodInsn(Opcodes.INVOKESPECIAL,
-                               periodToSlashes(objectFactoryCls.getName()),
+                    asmhelper.periodToSlashes(objectFactoryCls.getName()),
                                "<init>", "()V", false);
-            mv.visitFieldInsn(Opcodes.PUTFIELD, periodToSlashes(newClassName),
-                              "factory", "L" + periodToSlashes(objectFactoryCls.getName()) + ";");
+            mv.visitFieldInsn(Opcodes.PUTFIELD, asmhelper.periodToSlashes(newClassName),
+                              "factory", "L" + asmhelper.periodToSlashes(objectFactoryCls.getName()) + ";");
         }
 
         mv.visitInsn(Opcodes.RETURN);
 
-        Label l1 = createLabel();
+        ASMHelper.Label l1 = asmhelper.createLabel();
         mv.visitLabel(l1);
         mv.visitLineNumber(103, l0);
 
@@ -216,8 +219,8 @@ final class WrapperHelperCompiler extends ASMHelperImpl {
     private boolean addCreateWrapperObject(String newClassName,
                                            Class<?> objectFactoryClass) {
 
-        OpcodesProxy Opcodes = getOpCodes();
-        MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC,
+        ASMHelper.OpcodesProxy Opcodes = asmhelper.getOpCodes();
+        ASMHelper.MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC,
                                           "createWrapperObject",
                                           "(Ljava/util/List;)Ljava/lang/Object;",
                                           "(Ljava/util/List<*>;)Ljava/lang/Object;",
@@ -225,13 +228,13 @@ final class WrapperHelperCompiler extends ASMHelperImpl {
                                               "org/apache/cxf/interceptor/Fault"
                                           });
         mv.visitCode();
-        Label lBegin = createLabel();
+        ASMHelper.Label lBegin = asmhelper.createLabel();
         mv.visitLabel(lBegin);
         mv.visitLineNumber(104, lBegin);
 
-        mv.visitTypeInsn(Opcodes.NEW, periodToSlashes(wrapperType.getName()));
+        mv.visitTypeInsn(Opcodes.NEW, asmhelper.periodToSlashes(wrapperType.getName()));
         mv.visitInsn(Opcodes.DUP);
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, periodToSlashes(wrapperType.getName()),
+        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, asmhelper.periodToSlashes(wrapperType.getName()),
                            "<init>", "()V", false);
         mv.visitVarInsn(Opcodes.ASTORE, 2);
 
@@ -252,48 +255,48 @@ final class WrapperHelperCompiler extends ASMHelperImpl {
             } else {
                 if (JAXBElement.class.isAssignableFrom(tp)) {
                     mv.visitVarInsn(Opcodes.ALOAD, 0);
-                    mv.visitFieldInsn(Opcodes.GETFIELD, periodToSlashes(newClassName),
+                    mv.visitFieldInsn(Opcodes.GETFIELD, asmhelper.periodToSlashes(newClassName),
                                       "factory",
-                                      "L" + periodToSlashes(objectFactoryClass.getName()) + ";");
+                                      "L" + asmhelper.periodToSlashes(objectFactoryClass.getName()) + ";");
                 }
                 mv.visitVarInsn(Opcodes.ALOAD, 1);
                 mv.visitIntInsn(Opcodes.SIPUSH, x);
                 mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/List", "get", "(I)Ljava/lang/Object;", true);
 
                 if (tp.isPrimitive()) {
-                    mv.visitTypeInsn(Opcodes.CHECKCAST, NONPRIMITIVE_MAP.get(tp));
-                    Label l45 = createLabel();
-                    Label l46 = createLabel();
+                    mv.visitTypeInsn(Opcodes.CHECKCAST, asmhelper.getNonPrimitive(tp));
+                    ASMHelper.Label l45 = asmhelper.createLabel();
+                    ASMHelper.Label l46 = asmhelper.createLabel();
                     mv.visitInsn(Opcodes.DUP);
                     mv.visitJumpInsn(Opcodes.IFNULL, l45);
-                    mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, NONPRIMITIVE_MAP.get(tp),
-                                       tp.getName() + "Value", "()" + PRIMITIVE_MAP.get(tp), false);
+                    mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmhelper.getNonPrimitive(tp),
+                                       tp.getName() + "Value", "()" + asmhelper.getPrimitive(tp), false);
                     mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
-                                       periodToSlashes(wrapperType.getName()),
-                                       setMethods[x].getName(), "(" + getClassCode(tp) + ")V", false);
+                            asmhelper.periodToSlashes(wrapperType.getName()),
+                                       setMethods[x].getName(), "(" + asmhelper.getClassCode(tp) + ")V", false);
                     mv.visitJumpInsn(Opcodes.GOTO, l46);
                     mv.visitLabel(l45);
                     mv.visitInsn(Opcodes.POP);
                     mv.visitLabel(l46);
                 } else if (JAXBElement.class.isAssignableFrom(tp)) {
                     mv.visitTypeInsn(Opcodes.CHECKCAST,
-                                     periodToSlashes(jaxbMethods[x].getParameterTypes()[0].getName()));
-                    mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, periodToSlashes(objectFactoryClass.getName()),
+                                     asmhelper.periodToSlashes(jaxbMethods[x].getParameterTypes()[0].getName()));
+                    mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmhelper.periodToSlashes(objectFactoryClass.getName()),
                                        jaxbMethods[x].getName(),
-                                       getMethodSignature(jaxbMethods[x]), false);
+                                       asmhelper.getMethodSignature(jaxbMethods[x]), false);
                     mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
-                                       periodToSlashes(wrapperType.getName()),
-                                       setMethods[x].getName(), "(" + getClassCode(tp) + ")V", false);
+                                       asmhelper.periodToSlashes(wrapperType.getName()),
+                                       setMethods[x].getName(), "(" + asmhelper.getClassCode(tp) + ")V", false);
                 } else if (tp.isArray()) {
-                    mv.visitTypeInsn(Opcodes.CHECKCAST, getClassCode(tp));
+                    mv.visitTypeInsn(Opcodes.CHECKCAST, asmhelper.getClassCode(tp));
                     mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
-                                       periodToSlashes(wrapperType.getName()),
-                                       setMethods[x].getName(), "(" + getClassCode(tp) + ")V", false);
+                                       asmhelper.periodToSlashes(wrapperType.getName()),
+                                       setMethods[x].getName(), "(" + asmhelper.getClassCode(tp) + ")V", false);
                 } else {
-                    mv.visitTypeInsn(Opcodes.CHECKCAST, periodToSlashes(tp.getName()));
+                    mv.visitTypeInsn(Opcodes.CHECKCAST, asmhelper.periodToSlashes(tp.getName()));
                     mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
-                                       periodToSlashes(wrapperType.getName()),
-                                       setMethods[x].getName(), "(" + getClassCode(tp) + ")V", false);
+                                       asmhelper.periodToSlashes(wrapperType.getName()),
+                                       setMethods[x].getName(), "(" + asmhelper.getClassCode(tp) + ")V", false);
                 }
             }
         }
@@ -301,18 +304,18 @@ final class WrapperHelperCompiler extends ASMHelperImpl {
         mv.visitVarInsn(Opcodes.ALOAD, 2);
         mv.visitInsn(Opcodes.ARETURN);
 
-        Label lEnd = createLabel();
+        ASMHelper.Label lEnd = asmhelper.createLabel();
         mv.visitLabel(lEnd);
         mv.visitLocalVariable("this", "L" + newClassName + ";", null, lBegin, lEnd, 0);
         mv.visitLocalVariable("lst", "Ljava/util/List;", "Ljava/util/List<*>;", lBegin, lEnd, 1);
-        mv.visitLocalVariable("ok", "L" + periodToSlashes(wrapperType.getName()) + ";",
+        mv.visitLocalVariable("ok", "L" + asmhelper.periodToSlashes(wrapperType.getName()) + ";",
                               null, lBegin, lEnd, 2);
         mv.visitMaxs(0, 0);
         mv.visitEnd();
         return true;
     }
 
-    private void doCollection(MethodVisitor mv, int x) {
+    private void doCollection(ASMHelper.MethodVisitor mv, int x) {
         // List aVal = obj.getA();
         // List newA = (List)lst.get(99);
         // if (aVal == null) {
@@ -321,15 +324,15 @@ final class WrapperHelperCompiler extends ASMHelperImpl {
         // aVal.addAll(newA);
         // }
 
-        OpcodesProxy Opcodes = getOpCodes();
-        Label l3 = createLabel();
+        ASMHelper.OpcodesProxy Opcodes = asmhelper.getOpCodes();
+        ASMHelper.Label l3 = asmhelper.createLabel();
         mv.visitLabel(l3);
         mv.visitLineNumber(114, l3);
 
         mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
-                           periodToSlashes(wrapperType.getName()),
+                           asmhelper.periodToSlashes(wrapperType.getName()),
                            getMethods[x].getName(),
-                           getMethodSignature(getMethods[x]), false);
+                           asmhelper.getMethodSignature(getMethods[x]), false);
         mv.visitVarInsn(Opcodes.ASTORE, 3);
         mv.visitVarInsn(Opcodes.ALOAD, 1);
         mv.visitIntInsn(Opcodes.SIPUSH, x);
@@ -338,7 +341,7 @@ final class WrapperHelperCompiler extends ASMHelperImpl {
         mv.visitTypeInsn(Opcodes.CHECKCAST, "java/util/List");
         mv.visitVarInsn(Opcodes.ASTORE, 4);
         mv.visitVarInsn(Opcodes.ALOAD, 3);
-        Label nonNullLabel = createLabel();
+        ASMHelper.Label nonNullLabel = asmhelper.createLabel();
         mv.visitJumpInsn(Opcodes.IFNONNULL, nonNullLabel);
 
         if (setMethods[x] == null) {
@@ -355,11 +358,11 @@ final class WrapperHelperCompiler extends ASMHelperImpl {
             mv.visitTypeInsn(Opcodes.CHECKCAST,
                              getMethods[x].getReturnType().getName().replace('.', '/'));
             mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
-                               periodToSlashes(wrapperType.getName()),
+                               asmhelper.periodToSlashes(wrapperType.getName()),
                                setMethods[x].getName(),
-                               getMethodSignature(setMethods[x]), false);
+                               asmhelper.getMethodSignature(setMethods[x]), false);
         }
-        Label jumpOverLabel = createLabel();
+        ASMHelper.Label jumpOverLabel = asmhelper.createLabel();
         mv.visitJumpInsn(Opcodes.GOTO, jumpOverLabel);
         mv.visitLabel(nonNullLabel);
         mv.visitLineNumber(106, nonNullLabel);
@@ -377,8 +380,8 @@ final class WrapperHelperCompiler extends ASMHelperImpl {
 
     private boolean addGetWrapperParts(String newClassName,
                                        Class<?> wrapperClass) {
-        OpcodesProxy Opcodes = getOpCodes();
-        MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC,
+        ASMHelper.OpcodesProxy Opcodes = asmhelper.getOpCodes();
+        ASMHelper.MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC,
                                           "getWrapperParts",
                                           "(Ljava/lang/Object;)Ljava/util/List;",
                                           "(Ljava/lang/Object;)Ljava/util/List<Ljava/lang/Object;>;",
@@ -386,7 +389,7 @@ final class WrapperHelperCompiler extends ASMHelperImpl {
                                               "org/apache/cxf/interceptor/Fault"
                                           });
         mv.visitCode();
-        Label lBegin = createLabel();
+        ASMHelper.Label lBegin = asmhelper.createLabel();
         mv.visitLabel(lBegin);
         mv.visitLineNumber(108, lBegin);
 
@@ -398,7 +401,7 @@ final class WrapperHelperCompiler extends ASMHelperImpl {
 
         // cast the Object to the wrapperType type
         mv.visitVarInsn(Opcodes.ALOAD, 1);
-        mv.visitTypeInsn(Opcodes.CHECKCAST, periodToSlashes(wrapperClass.getName()));
+        mv.visitTypeInsn(Opcodes.CHECKCAST, asmhelper.periodToSlashes(wrapperClass.getName()));
         mv.visitVarInsn(Opcodes.ASTORE, 3);
 
         for (int x = 0; x < getMethods.length; x++) {
@@ -409,7 +412,7 @@ final class WrapperHelperCompiler extends ASMHelperImpl {
             }
 
             if (method == null) {
-                Label l3 = createLabel();
+                ASMHelper.Label l3 = asmhelper.createLabel();
                 mv.visitLabel(l3);
                 mv.visitLineNumber(200 + x, l3);
 
@@ -419,22 +422,22 @@ final class WrapperHelperCompiler extends ASMHelperImpl {
                                    "add", "(Ljava/lang/Object;)Z", true);
                 mv.visitInsn(Opcodes.POP);
             } else {
-                Label l3 = createLabel();
+                ASMHelper.Label l3 = asmhelper.createLabel();
                 mv.visitLabel(l3);
                 mv.visitLineNumber(250 + x, l3);
 
                 mv.visitVarInsn(Opcodes.ALOAD, 2);
                 mv.visitVarInsn(Opcodes.ALOAD, 3);
                 mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
-                                   periodToSlashes(wrapperClass.getName()),
+                                   asmhelper.periodToSlashes(wrapperClass.getName()),
                                    method.getName(),
-                                   getMethodSignature(method), false);
+                        asmhelper.getMethodSignature(method), false);
                 if (method.getReturnType().isPrimitive()) {
                     // wrap into Object type
                     createObjectWrapper(mv, method.getReturnType());
                 }
                 if (JAXBElement.class.isAssignableFrom(method.getReturnType())) {
-                    Label jumpOverLabel = createLabel();
+                    ASMHelper.Label jumpOverLabel = asmhelper.createLabel();
                     mv.visitInsn(Opcodes.DUP);
                     mv.visitJumpInsn(Opcodes.IFNULL, jumpOverLabel);
 
@@ -450,20 +453,20 @@ final class WrapperHelperCompiler extends ASMHelperImpl {
         }
 
         // return the list
-        Label l2 = createLabel();
+        ASMHelper.Label l2 = asmhelper.createLabel();
         mv.visitLabel(l2);
         mv.visitLineNumber(108, l2);
         mv.visitVarInsn(Opcodes.ALOAD, 2);
         mv.visitInsn(Opcodes.ARETURN);
 
 
-        Label lEnd = createLabel();
+        ASMHelper.Label lEnd = asmhelper.createLabel();
         mv.visitLabel(lEnd);
         mv.visitLocalVariable("this", "L" + newClassName + ";", null, lBegin, lEnd, 0);
         mv.visitLocalVariable("o", "Ljava/lang/Object;", null, lBegin, lEnd, 1);
         mv.visitLocalVariable("ret", "Ljava/util/List;", "Ljava/util/List<Ljava/lang/Object;>;",
                               lBegin, lEnd, 2);
-        mv.visitLocalVariable("ok", "L" + periodToSlashes(wrapperClass.getName()) + ";",
+        mv.visitLocalVariable("ok", "L" + asmhelper.periodToSlashes(wrapperClass.getName()) + ";",
                               null, lBegin, lEnd, 3);
         mv.visitMaxs(0, 0);
         mv.visitEnd();
@@ -473,10 +476,10 @@ final class WrapperHelperCompiler extends ASMHelperImpl {
 
 
 
-    private void createObjectWrapper(MethodVisitor mv, Class<?> cl) {
-        OpcodesProxy Opcodes = getOpCodes();
-        mv.visitMethodInsn(Opcodes.INVOKESTATIC, NONPRIMITIVE_MAP.get(cl),
-                           "valueOf", "(" + PRIMITIVE_MAP.get(cl) + ")L"
-                           + NONPRIMITIVE_MAP.get(cl) + ";", false);
+    private void createObjectWrapper(ASMHelper.MethodVisitor mv, Class<?> cl) {
+        ASMHelper.OpcodesProxy Opcodes = asmhelper.getOpCodes();
+        mv.visitMethodInsn(Opcodes.INVOKESTATIC, asmhelper.getNonPrimitive(cl),
+                           "valueOf", "(" + asmhelper.getPrimitive(cl) + ")L"
+                           + asmhelper.getNonPrimitive(cl) + ";", false);
     }
 }

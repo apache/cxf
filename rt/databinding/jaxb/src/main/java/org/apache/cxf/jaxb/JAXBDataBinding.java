@@ -58,6 +58,7 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 
+import org.apache.cxf.Bus;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -335,7 +336,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
 
         for (ServiceInfo serviceInfo : service.getServiceInfos()) {
             JAXBContextInitializer initializer
-                = new JAXBContextInitializer(serviceInfo, contextClasses, typeRefs, this.getUnmarshallerProperties());
+                = new JAXBContextInitializer(getBus(), serviceInfo, contextClasses, typeRefs, this.getUnmarshallerProperties());
             initializer.walk();
             if (serviceInfo.getProperty("extra.class") != null) {
                 Set<Class<?>> exClasses = serviceInfo.getProperty("extra.class", Set.class);
@@ -801,7 +802,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
 
         }
 
-        return createWrapperHelper(wrapperType,
+        return createWrapperHelper(getBus(), wrapperType,
                                  setMethods.toArray(new Method[0]),
                                  getMethods.toArray(new Method[0]),
                                  jaxbMethods.toArray(new Method[0]),
@@ -832,11 +833,11 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
     }
 
 
-    private static WrapperHelper createWrapperHelper(Class<?> wrapperType, Method[] setMethods,
+    private static WrapperHelper createWrapperHelper(Bus bus, Class<?> wrapperType, Method[] setMethods,
                                                      Method[] getMethods, Method[] jaxbMethods,
                                                      Field[] fields, Object objectFactory) {
 
-        WrapperHelper wh = compileWrapperHelper(wrapperType, setMethods, getMethods, jaxbMethods, fields,
+        WrapperHelper wh = compileWrapperHelper(bus,wrapperType, setMethods, getMethods, jaxbMethods, fields,
                                                 objectFactory);
 
         if (wh == null) {
@@ -846,10 +847,10 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
         return wh;
     }
 
-    private static WrapperHelper compileWrapperHelper(Class<?> wrapperType, Method[] setMethods,
+    private static WrapperHelper compileWrapperHelper(Bus bus, Class<?> wrapperType, Method[] setMethods,
                                                       Method[] getMethods, Method[] jaxbMethods,
                                                       Field[] fields, Object objectFactory) {
-        return WrapperHelperCompiler.compileWrapperHelper(wrapperType, setMethods, getMethods,
+        return WrapperHelperCompiler.compileWrapperHelper(bus, wrapperType, setMethods, getMethods,
                                                           jaxbMethods, fields, objectFactory);
     }
 

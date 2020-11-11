@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -16,18 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.common.spi;
 
-import org.apache.cxf.common.util.ASMHelper;
+package org.apache.cxf.common.spi;
 
 /**
  * SPI interface to implement the proxy defining logic.
  * It enables to switch from unsafe to classloader logic for instance for java >= 9.
  */
-public interface ASMHelperService {
+public interface ClassLoaderService {
     /**
-     * Returns the ASMHelper to use to define the given class.
-     * @return the ASMHelper to use to define the class
+     * Returns the ClassLoader to use to define the given class.
+     * @return the ClassLoader to use to define the class
      */
-    ASMHelper getProxyASMHelper();
+    ClassLoader getProxyClassLoader();
+
+    /**
+     * Register the proxy class from its bytecode.
+     * @param name the proxy name.
+     * @param bytecode the bytecode to "define".
+     * @param proxiedClass the original class.
+     * @param <T> type of the class to proxy.
+     * @return the proxy class.
+     */
+    <T> Class<T> defineAndLoad(String name, byte[] bytecode, Class<T> proxiedClass);
+
+
 }

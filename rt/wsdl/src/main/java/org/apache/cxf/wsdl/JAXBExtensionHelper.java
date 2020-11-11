@@ -457,7 +457,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
     private static Class<?> createExtensionClass(Class<?> cls, QName qname, ClassLoader loader) {
 
         String className = ASMHelper.periodToSlashes(cls.getName());
-        ASMHelper helper = new ASMHelper();
+        ASMHelper helper = bus.getExtension(ASMHelper.class);;
         Class<?> extClass = helper.findClass(className + "Extensibility", loader);
         if (extClass != null) {
             return extClass;

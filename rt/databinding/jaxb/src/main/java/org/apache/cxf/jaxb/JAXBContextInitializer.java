@@ -48,6 +48,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapters;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -73,15 +74,17 @@ class JAXBContextInitializer extends ServiceModelVisitor {
     private Collection<Object> typeReferences;
     private Set<Class<?>> globalAdapters = new HashSet<>();
     private Map<String, Object> unmarshallerProperties;
+    private ASMHelper helper;
 
-    JAXBContextInitializer(ServiceInfo serviceInfo,
-                                  Set<Class<?>> classes,
-                                  Collection<Object> typeReferences,
-                                  Map<String, Object> unmarshallerProperties) {
+    JAXBContextInitializer(Bus bus, ServiceInfo serviceInfo,
+                           Set<Class<?>> classes,
+                           Collection<Object> typeReferences,
+                           Map<String, Object> unmarshallerProperties) {
         super(serviceInfo);
         this.classes = classes;
         this.typeReferences = typeReferences;
         this.unmarshallerProperties = unmarshallerProperties;
+        this.helper = bus.getExtension(ASMHelper.class);
     }
 
     @Override
@@ -560,7 +563,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
     @SuppressWarnings("unused")
     private Object getFactory(Class<?> cls) {
         String newClassName = cls.getName() + "Factory";
-        ASMHelper helper = new ASMHelperImpl();
+
         Class<?> factoryClass = helper.findClass(newClassName, cls);
         if (factoryClass == null) {
             return null;
@@ -575,7 +578,6 @@ class JAXBContextInitializer extends ServiceModelVisitor {
     @SuppressWarnings("unused")
     private Object createFactory(Class<?> cls, Constructor<?> contructor) {
         String newClassName = cls.getName() + "Factory";
-        ASMHelper helper = new ASMHelperImpl();
         ASMHelper.OpcodesProxy Opcodes = helper.getOpCodes();
         ClassWriter cw = helper.createClassWriter();
         MethodVisitor mv;

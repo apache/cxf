@@ -431,7 +431,7 @@ public class DynamicClientFactory {
         // Setup the new classloader!
         ClassLoaderUtils.setThreadContextClassloader(cl);
 
-        TypeClassInitializer visitor = new TypeClassInitializer(svcfo,
+        TypeClassInitializer visitor = new TypeClassInitializer(bus, svcfo,
                                                                 intermediateModel,
                                                                 allowWrapperOps());
         visitor.walk();

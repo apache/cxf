@@ -608,7 +608,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         assertEquals(3, ints.length);
         assertEquals(1, ints[0]);
 
-        if (new ASMHelper().createClassWriter() != null) {
+        if (bus.getExtension(ASMHelper.class);.createClassWriter() != null) {
             //doing the type adapter things and such really
             //requires the ASM generated helper classes
             assertEquals("Val", port.createBar("Val").getName());

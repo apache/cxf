@@ -285,7 +285,7 @@ public final class CorbaAnyHelper {
             return;
         }
 
-        ASMHelper helper = new ASMHelperImpl();
+        ASMHelper helper = bus.getExtension(ASMHelper.class);;
         ASMHelper.OpcodesProxy Opcodes = helper.getOpCodes();
         ClassWriter cw = helper.createClassWriter();
         FieldVisitor fv;
