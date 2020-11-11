@@ -328,8 +328,11 @@ class JAXBContextInitializer extends ServiceModelVisitor {
                 if (LOG.isLoggable(Level.INFO)) {
                     LOG.info("Class " + claz.getName() + " does not have a default constructor which JAXB requires.");
                 }
-                //there is no init(), but other constructors
-                Object factory = createFactory(claz, ReflectionUtil.getDeclaredConstructors(claz)[0]);
+                Object factory = getFactory(claz);
+                if (factory == null) {
+                    //there is no init(), but other constructors
+                    factory = createFactory(claz, ReflectionUtil.getDeclaredConstructors(claz)[0]);
+                }
                 unmarshallerProperties.put("com.sun.xml.bind.ObjectFactory", factory);
                 cls = claz;
             }
@@ -554,52 +557,63 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         }
         return null;
     }
-
     @SuppressWarnings("unused")
-    private Object createFactory(Class<?> cls, Constructor<?> contructor) {
+    private Object getFactory(Class<?> cls) {
         String newClassName = cls.getName() + "Factory";
         ASMHelper helper = new ASMHelper();
         Class<?> factoryClass = helper.findClass(newClassName, cls);
         if (factoryClass == null) {
-            ClassWriter cw = helper.createClassWriter();
-            MethodVisitor mv;
-
-            cw.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER,
-                     ASMHelper.periodToSlashes(newClassName), null, "java/lang/Object", null);
-
-            cw.visitSource(cls.getSimpleName() + "Factory" + ".java", null);
-
-            mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
-            mv.visitCode();
-            mv.visitVarInsn(Opcodes.ALOAD, 0);
-            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
-            mv.visitInsn(Opcodes.RETURN);
-            mv.visitMaxs(1, 1);
-            mv.visitEnd();
-
-            mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "create" + cls.getSimpleName(),
-                                "()L" + ASMHelper.periodToSlashes(cls.getName()) + ";", null, null);
-            mv.visitCode();
-            String name = cls.getName().replace(".", "/");
-            mv.visitTypeInsn(Opcodes.NEW, name);
-            mv.visitInsn(Opcodes.DUP);
-            StringBuilder paraString = new StringBuilder(32).append("(");
-
-            for (Class<?> paraClass : contructor.getParameterTypes()) {
-                mv.visitInsn(Opcodes.ACONST_NULL);
-                paraString.append("Ljava/lang/Object;");
-            }
-            paraString.append(")V");
-
-            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, name, "<init>", paraString.toString(), false);
-
-            mv.visitInsn(Opcodes.ARETURN);
-            mv.visitMaxs(1, 1);
-            mv.visitEnd();
-
-            cw.visitEnd();
-            factoryClass = helper.loadClass(newClassName, cls, cw.toByteArray());
+            return null;
         }
+        try {
+            return factoryClass.newInstance();
+        } catch (Exception e) {
+           //ignore
+        }
+        return null;
+    }
+    @SuppressWarnings("unused")
+    private Object createFactory(Class<?> cls, Constructor<?> contructor) {
+        String newClassName = cls.getName() + "Factory";
+        ASMHelper helper = new ASMHelper();
+        ClassWriter cw = helper.createClassWriter();
+        MethodVisitor mv;
+
+        cw.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER,
+                 ASMHelper.periodToSlashes(newClassName), null, "java/lang/Object", null);
+
+        cw.visitSource(cls.getSimpleName() + "Factory" + ".java", null);
+
+        mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
+        mv.visitCode();
+        mv.visitVarInsn(Opcodes.ALOAD, 0);
+        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
+        mv.visitInsn(Opcodes.RETURN);
+        mv.visitMaxs(1, 1);
+        mv.visitEnd();
+
+        mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "create" + cls.getSimpleName(),
+                            "()L" + ASMHelper.periodToSlashes(cls.getName()) + ";", null, null);
+        mv.visitCode();
+        String name = cls.getName().replace(".", "/");
+        mv.visitTypeInsn(Opcodes.NEW, name);
+        mv.visitInsn(Opcodes.DUP);
+        StringBuilder paraString = new StringBuilder(32).append("(");
+
+        for (Class<?> paraClass : contructor.getParameterTypes()) {
+            mv.visitInsn(Opcodes.ACONST_NULL);
+            paraString.append("Ljava/lang/Object;");
+        }
+        paraString.append(")V");
+
+        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, name, "<init>", paraString.toString(), false);
+
+        mv.visitInsn(Opcodes.ARETURN);
+        mv.visitMaxs(1, 1);
+        mv.visitEnd();
+
+        cw.visitEnd();
+        Class<?> factoryClass = helper.loadClass(newClassName, cls, cw.toByteArray());
         try {
             return factoryClass.newInstance();
         } catch (Exception e) {
