@@ -10,7 +10,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
- * software distribNuted under the License is distributed on an
+ * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
@@ -32,18 +32,16 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.common.util.ReflectionInvokationHandler.Optional;
-import org.apache.cxf.common.util.ReflectionInvokationHandler.UnwrapParam;
-import org.apache.cxf.common.util.ReflectionInvokationHandler.WrapReturn;
+
 
 public class ASMHelperImpl implements ASMHelper {
     protected static final Map<Class<?>, String> PRIMITIVE_MAP = new HashMap<>();
     protected static final Map<Class<?>, String> NONPRIMITIVE_MAP = new HashMap<>();
     protected static final Map<Class<?>, Integer> PRIMITIVE_ZERO_MAP = new HashMap<>();
 
-    protected final Map<ClassLoader, WeakReference<TypeHelperClassLoader>> LOADER_MAP
+    protected static final Map<ClassLoader, WeakReference<TypeHelperClassLoader>> LOADER_MAP
             = new WeakIdentityHashMap<>();
-    protected final Map<Class<?>, WeakReference<TypeHelperClassLoader>> CLASS_MAP
+    protected static final Map<Class<?>, WeakReference<TypeHelperClassLoader>> CLASS_MAP
             = new WeakIdentityHashMap<>();
 
     protected boolean badASM;
@@ -112,11 +110,10 @@ public class ASMHelperImpl implements ASMHelper {
         return cwClass;
     }
     public OpcodesProxy getOpCodes() {
-        return new OpcodesImpl (this);
+        return new OpcodesImpl(this);
     }
 
     public class OpcodesImpl extends OpcodesProxy {
-
         //CHECKSTYLE:ON
         public OpcodesImpl(ASMHelper helper) {
             try {
@@ -141,7 +138,7 @@ public class ASMHelperImpl implements ASMHelper {
         }
     }
 
-    protected String getMethodSignature(Method m) {
+    public String getMethodSignature(Method m) {
         StringBuilder buf = new StringBuilder("(");
         for (Class<?> cl : m.getParameterTypes()) {
             buf.append(getClassCode(cl));
@@ -150,6 +147,15 @@ public class ASMHelperImpl implements ASMHelper {
         buf.append(getClassCode(m.getReturnType()));
 
         return buf.toString();
+    }
+
+    @Override
+    public String getNonPrimitive(Class<?> tp) {
+        return NONPRIMITIVE_MAP.get(tp);
+    }
+    @Override
+    public String getPrimitive(Class<?> tp) {
+        return PRIMITIVE_MAP.get(tp);
     }
 
     public String periodToSlashes(String s) {

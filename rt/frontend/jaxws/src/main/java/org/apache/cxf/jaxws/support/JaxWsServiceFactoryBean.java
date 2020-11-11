@@ -666,7 +666,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         if (b.getClass().getName().endsWith("JAXBDataBinding")
             && schemaLocations == null) {
             ServiceInfo serviceInfo = getService().getServiceInfos().get(0);
-            WrapperClassGenerator wrapperGen = new WrapperClassGenerator(this,
+            WrapperClassGenerator wrapperGen = new WrapperClassGenerator(getBus(),this,
                                                                          serviceInfo.getInterface(),
                                                                          getQualifyWrapperSchema());
             return wrapperGen.generate();

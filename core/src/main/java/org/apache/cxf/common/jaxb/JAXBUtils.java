@@ -70,13 +70,13 @@ import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.cxf.common.util.ASMHelperImpl;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ASMHelper;
@@ -619,9 +619,9 @@ public final class JAXBUtils {
         return jaxbXjcLoader;
     }
 
-    public static Object setNamespaceMapper(final Map<String, String> nspref,
-                                           Marshaller marshaller) throws PropertyException {
-        Object mapper = createNamespaceWrapper(marshaller.getClass(), nspref);
+    public static Object setNamespaceMapper(Bus bus, final Map<String, String> nspref,
+                                            Marshaller marshaller) throws PropertyException {
+        Object mapper = createNamespaceWrapper(bus, marshaller.getClass(), nspref);
         if (mapper != null) {
             if (marshaller.getClass().getName().contains(".internal.")) {
                 marshaller.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper",
@@ -1081,16 +1081,17 @@ public final class JAXBUtils {
         return false;
     }
 
-    private static synchronized Object createNamespaceWrapper(Class<?> mcls, Map<String, String> map) {
+    private static synchronized Object createNamespaceWrapper(Bus bus, Class<?> mcls, Map<String, String> map) {
         String postFix = "";
+        ASMHelper helper = bus.getExtension(ASMHelper.class);
         if (mcls.getName().contains("eclipse")) {
-            return createEclipseNamespaceMapper(mcls, map);
+            return createEclipseNamespaceMapper(helper, mcls, map);
         } else if (mcls.getName().contains(".internal")) {
             postFix = "Internal";
         } else if (mcls.getName().contains("com.sun")) {
             postFix = "RI";
         }
-        ASMHelper helper = new ASMHelperImpl();
+
         String className = "org.apache.cxf.jaxb.NamespaceMapper";
         className += postFix;
         Class<?> cls = helper.findClass(className, JAXBUtils.class);
@@ -1161,8 +1162,7 @@ public final class JAXBUtils {
     */
     //CHECKSTYLE:OFF
     //bunch of really long ASM based methods that cannot be shortened easily
-    private static Object createEclipseNamespaceMapper(Class<?> mcls, Map<String, String> map) {
-        ASMHelper helper = new ASMHelperImpl();
+    private static Object createEclipseNamespaceMapper(ASMHelper helper, Class<?> mcls, Map<String, String> map) {
         ASMHelper.OpcodesProxy Opcodes = helper.getOpCodes();
         String className = "org.apache.cxf.jaxb.EclipseNamespaceMapper";
         String slashedName = "org/apache/cxf/jaxb/EclipseNamespaceMapper";

@@ -10,7 +10,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
- * software distribNuted under the License is distributed on an
+ * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
@@ -19,22 +19,12 @@
 
 package org.apache.cxf.common.util;
 
-import java.lang.ref.WeakReference;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.TypeVariable;
-import java.lang.reflect.WildcardType;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.ReflectionInvokationHandler.Optional;
 import org.apache.cxf.common.util.ReflectionInvokationHandler.UnwrapParam;
 import org.apache.cxf.common.util.ReflectionInvokationHandler.WrapReturn;
+
 
 public interface ASMHelper {
     String periodToSlashes(String s);
@@ -45,10 +35,13 @@ public interface ASMHelper {
     Class<?> loadClass(String className, ClassLoader l, byte[] bytes);
     Class<?> findClass(String className, Class<?> clz);
     Class<?> findClass(String className, ClassLoader l);
-    ASMType getType(final String type);
+    ASMType getType(String type);
     Label createLabel();
-    public OpcodesProxy getOpCodes();
+    OpcodesProxy getOpCodes();
     Class<?> getASMClass() throws ClassNotFoundException;
+    String getMethodSignature(Method m);
+    String getNonPrimitive(Class<?> tp);
+    String getPrimitive(Class<?> tp);
 
     class OpcodesProxy {
         //CHECKSTYLE:OFF
