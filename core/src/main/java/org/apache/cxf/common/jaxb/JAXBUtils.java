@@ -70,6 +70,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.cxf.common.util.ASMHelperImpl;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -83,7 +84,6 @@ import org.apache.cxf.common.util.ASMHelper.ClassWriter;
 import org.apache.cxf.common.util.ASMHelper.FieldVisitor;
 import org.apache.cxf.common.util.ASMHelper.Label;
 import org.apache.cxf.common.util.ASMHelper.MethodVisitor;
-import org.apache.cxf.common.util.ASMHelper.Opcodes;
 import org.apache.cxf.common.util.CachedClass;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.ProxyHelper;
@@ -1090,7 +1090,7 @@ public final class JAXBUtils {
         } else if (mcls.getName().contains("com.sun")) {
             postFix = "RI";
         }
-        ASMHelper helper = new ASMHelper();
+        ASMHelper helper = new ASMHelperImpl();
         String className = "org.apache.cxf.jaxb.NamespaceMapper";
         className += postFix;
         Class<?> cls = helper.findClass(className, JAXBUtils.class);
@@ -1162,7 +1162,8 @@ public final class JAXBUtils {
     //CHECKSTYLE:OFF
     //bunch of really long ASM based methods that cannot be shortened easily
     private static Object createEclipseNamespaceMapper(Class<?> mcls, Map<String, String> map) {
-        ASMHelper helper = new ASMHelper();
+        ASMHelper helper = new ASMHelperImpl();
+        ASMHelper.OpcodesProxy Opcodes = helper.getOpCodes();
         String className = "org.apache.cxf.jaxb.EclipseNamespaceMapper";
         String slashedName = "org/apache/cxf/jaxb/EclipseNamespaceMapper";
         Class<?> cls = helper.findClass(className, JAXBUtils.class);
@@ -1357,7 +1358,7 @@ public final class JAXBUtils {
 
         FieldVisitor fv;
         MethodVisitor mv;
-
+        ASMHelper.OpcodesProxy Opcodes= helper.getOpCodes();
         cw.visit(Opcodes.V1_6,
                  Opcodes.ACC_PUBLIC + Opcodes.ACC_FINAL + Opcodes.ACC_SUPER,
                  postFixedName, null,

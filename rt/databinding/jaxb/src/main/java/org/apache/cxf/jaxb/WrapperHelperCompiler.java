@@ -25,9 +25,10 @@ import java.util.List;
 import javax.xml.bind.JAXBElement;
 
 import org.apache.cxf.common.util.ASMHelper;
+import org.apache.cxf.common.util.ASMHelperImpl;
 import org.apache.cxf.databinding.WrapperHelper;
 
-final class WrapperHelperCompiler extends ASMHelper {
+final class WrapperHelperCompiler extends ASMHelperImpl {
 
 
     final Class<?> wrapperType;
@@ -104,7 +105,7 @@ final class WrapperHelperCompiler extends ASMHelper {
             }
         }
 
-
+        OpcodesProxy Opcodes = getOpCodes();
 
         cw.visit(Opcodes.V1_5,
                  Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER,
@@ -152,6 +153,7 @@ final class WrapperHelperCompiler extends ASMHelper {
     }
 
     private boolean addSignature() {
+        OpcodesProxy Opcodes = getOpCodes();
         String sig = computeSignature();
         MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC,
                                           "getSignature", "()Ljava/lang/String;", null, null);
@@ -176,6 +178,7 @@ final class WrapperHelperCompiler extends ASMHelper {
                                             null, null);
             fv.visitEnd();
         }
+        OpcodesProxy Opcodes = getOpCodes();
 
         MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
         mv.visitCode();
@@ -213,6 +216,7 @@ final class WrapperHelperCompiler extends ASMHelper {
     private boolean addCreateWrapperObject(String newClassName,
                                            Class<?> objectFactoryClass) {
 
+        OpcodesProxy Opcodes = getOpCodes();
         MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC,
                                           "createWrapperObject",
                                           "(Ljava/util/List;)Ljava/lang/Object;",
@@ -317,6 +321,7 @@ final class WrapperHelperCompiler extends ASMHelper {
         // aVal.addAll(newA);
         // }
 
+        OpcodesProxy Opcodes = getOpCodes();
         Label l3 = createLabel();
         mv.visitLabel(l3);
         mv.visitLineNumber(114, l3);
@@ -372,6 +377,7 @@ final class WrapperHelperCompiler extends ASMHelper {
 
     private boolean addGetWrapperParts(String newClassName,
                                        Class<?> wrapperClass) {
+        OpcodesProxy Opcodes = getOpCodes();
         MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC,
                                           "getWrapperParts",
                                           "(Ljava/lang/Object;)Ljava/util/List;",
@@ -467,7 +473,8 @@ final class WrapperHelperCompiler extends ASMHelper {
 
 
 
-    private static void createObjectWrapper(MethodVisitor mv, Class<?> cl) {
+    private void createObjectWrapper(MethodVisitor mv, Class<?> cl) {
+        OpcodesProxy Opcodes = getOpCodes();
         mv.visitMethodInsn(Opcodes.INVOKESTATIC, NONPRIMITIVE_MAP.get(cl),
                            "valueOf", "(" + PRIMITIVE_MAP.get(cl) + ")L"
                            + NONPRIMITIVE_MAP.get(cl) + ";", false);

@@ -35,7 +35,7 @@ import org.apache.cxf.common.util.ASMHelper.ClassWriter;
 import org.apache.cxf.common.util.ASMHelper.FieldVisitor;
 import org.apache.cxf.common.util.ASMHelper.Label;
 import org.apache.cxf.common.util.ASMHelper.MethodVisitor;
-import org.apache.cxf.common.util.ASMHelper.Opcodes;
+import org.apache.cxf.common.util.ASMHelperImpl;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.TCKind;
@@ -285,7 +285,8 @@ public final class CorbaAnyHelper {
             return;
         }
 
-        ASMHelper helper = new ASMHelper();
+        ASMHelper helper = new ASMHelperImpl();
+        ASMHelper.OpcodesProxy Opcodes = helper.getOpCodes();
         ClassWriter cw = helper.createClassWriter();
         FieldVisitor fv;
 
@@ -316,6 +317,7 @@ public final class CorbaAnyHelper {
     }
 
     private static void addReadOverride(ASMHelper helper, ClassWriter cw) {
+        ASMHelper.OpcodesProxy Opcodes = helper.getOpCodes();
         MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "read_value",
                             "(Lorg/omg/CORBA/portable/InputStream;Lorg/omg/CORBA/TypeCode;)V",
                             null, null);
@@ -361,6 +363,7 @@ public final class CorbaAnyHelper {
     }
 
     private static void addWriteOverride(ASMHelper helper, ClassWriter cw) {
+        ASMHelper.OpcodesProxy Opcodes = helper.getOpCodes();
         MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "write_value",
                             "(Lorg/omg/CORBA/portable/OutputStream;)V", null, null);
         mv.visitCode();
@@ -404,6 +407,7 @@ public final class CorbaAnyHelper {
     }
 
     private static void addExtractOverride(ASMHelper helper, ClassWriter cw) {
+        ASMHelper.OpcodesProxy Opcodes = helper.getOpCodes();
         MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "extract_Streamable",
                             "()Lorg/omg/CORBA/portable/Streamable;", null, null);
         mv.visitCode();
@@ -437,6 +441,7 @@ public final class CorbaAnyHelper {
     }
 
     private static void addInsertOverride(ASMHelper helper, ClassWriter cw) {
+        ASMHelper.OpcodesProxy Opcodes = helper.getOpCodes();
         MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC,
                             "insert_Streamable",
                             "(Lorg/omg/CORBA/portable/Streamable;)V", null, null);
@@ -472,6 +477,7 @@ public final class CorbaAnyHelper {
     }
 
     private static void addFixedAnyConstructor(ASMHelper helper, ClassWriter cw) {
+        ASMHelper.OpcodesProxy Opcodes = helper.getOpCodes();
         MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "(Lorg/omg/CORBA/ORB;)V", null, null);
         mv.visitCode();
         Label l0 = helper.createLabel();
