@@ -1096,14 +1096,17 @@ public final class JAXBUtils {
         Class<?> cls = helper.findClass(className, JAXBUtils.class);
         Throwable t = null;
         if (cls == null) {
-            try {
-                ClassWriter cw = helper.createClassWriter();
-                if (cw != null) {
-                    cls = createNamespaceWrapperInternal(helper, cw, postFix, mcls);
+            cls = getNamespaceWrapperInternal(helper, postFix, mcls);
+            if (cls == null) {
+                try {
+                    ClassWriter cw = helper.createClassWriter();
+                    if (cw != null) {
+                        cls = createNamespaceWrapperInternal(helper, cw, postFix, mcls);
+                    }
+                } catch (RuntimeException ex) {
+                    // continue
+                    t = ex;
                 }
-            } catch (RuntimeException ex) {
-                // continue
-                t = ex;
             }
         }
         if (cls == null
@@ -1338,7 +1341,12 @@ public final class JAXBUtils {
             return null;
         }
     }
-
+    private static Class<?> getNamespaceWrapperInternal(ASMHelper helper, String postFix,
+                                                            Class<?> ref) {
+        String className = "org.apache.cxf.jaxb.NamespaceMapper" + postFix;
+        Class<?> cls = helper.findClass(className, ref);
+        return cls;
+    }
     private static Class<?> createNamespaceWrapperInternal(ASMHelper helper, ClassWriter cw,
                                                            String postFix, Class<?> ref) {
         String className = "org.apache.cxf.jaxb.NamespaceMapper" + postFix;
@@ -1346,11 +1354,7 @@ public final class JAXBUtils {
             + ("RI".equals(postFix) ? "" : "internal/")
             + "bind/marshaller/NamespacePrefixMapper";
         String postFixedName = "org/apache/cxf/jaxb/NamespaceMapper" + postFix;
-        Class<?> cls = helper.findClass(className, ref);
 
-        if (cls != null) {
-            return cls;
-        }
         FieldVisitor fv;
         MethodVisitor mv;
 
