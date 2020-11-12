@@ -31,10 +31,6 @@ public interface ASMHelper {
     String getClassCode(Class<?> cl);
     String getClassCode(java.lang.reflect.Type type);
     ClassWriter createClassWriter();
-    Class<?> loadClass(String className, Class<?> clz, byte[] bytes);
-    Class<?> loadClass(String className, ClassLoader l, byte[] bytes);
-    Class<?> findClass(String className, Class<?> clz);
-    Class<?> findClass(String className, ClassLoader l);
     ASMType getType(String type);
     Label createLabel();
     OpcodesProxy getOpCodes();
