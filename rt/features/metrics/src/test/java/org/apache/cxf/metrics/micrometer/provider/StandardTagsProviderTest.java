@@ -64,7 +64,7 @@ public class StandardTagsProviderTest {
         doReturn(uriTag).when(standardTags).uri(request);
 
         Tag exceptionTag = new ImmutableTag("exception", "exception");
-        doReturn(RuntimeException.class).when(exceptionClassProvider).getExceptionClass(exchange);
+        doReturn(RuntimeException.class).when(exceptionClassProvider).getExceptionClass(exchange, false);
         doReturn(exceptionTag).when(standardTags).exception(RuntimeException.class);
 
         Tag statusTag = new ImmutableTag("status", "status");
@@ -83,7 +83,7 @@ public class StandardTagsProviderTest {
         doReturn(response).when(exchange).getOutMessage();
 
         // when
-        Iterable<Tag> actual = underTest.getTags(exchange);
+        Iterable<Tag> actual = underTest.getTags(exchange, false);
 
         // then
         assertThat(actual, equalTo(expectedTags));
@@ -97,7 +97,7 @@ public class StandardTagsProviderTest {
         doReturn(response).when(exchange).getOutMessage();
 
         // when
-        Iterable<Tag> actual = underTest.getTags(exchange);
+        Iterable<Tag> actual = underTest.getTags(exchange, false);
 
         // then
         assertThat(actual, equalTo(expectedTags));
@@ -111,7 +111,7 @@ public class StandardTagsProviderTest {
         doReturn(response).when(exchange).getOutFaultMessage();
 
         // when
-        Iterable<Tag> actual = underTest.getTags(exchange);
+        Iterable<Tag> actual = underTest.getTags(exchange, false);
 
         // then
         assertThat(actual, equalTo(expectedTags));

@@ -70,14 +70,14 @@ public class MicrometerMetricsProvider implements MetricsProvider {
     @Override
     public MetricsContext createOperationContext(Endpoint endpoint, BindingOperationInfo boi, boolean asClient,
                                                  String clientId) {
-        // Client metrics are not yet supported
         if (asClient) {
-            return null;
+            return new MicrometerClientMetricsContext(registry, tagsProvider, timedAnnotationProvider, tagsCustomizers,
+                micrometerMetricsProperties.getClientRequestsMetricName());
+        } else {
+            return new MicrometerServerMetricsContext(registry, tagsProvider, timedAnnotationProvider, tagsCustomizers,
+                micrometerMetricsProperties.getServerRequestsMetricName(), 
+                micrometerMetricsProperties.isAutoTimeRequests());
         }
-        
-        return new MicrometerMetricsContext(registry, tagsProvider, timedAnnotationProvider, tagsCustomizers,
-            micrometerMetricsProperties.getServerRequestsMetricName(), 
-            micrometerMetricsProperties.isAutoTimeRequests());
     }
 
 
@@ -87,13 +87,13 @@ public class MicrometerMetricsProvider implements MetricsProvider {
     @Override
     public MetricsContext createResourceContext(Endpoint endpoint, String resourceName, boolean asClient,
                                                 String clientId) {
-        // Client metrics are not yet supported
         if (asClient) {
-            return null;
+            return new MicrometerClientMetricsContext(registry, tagsProvider, timedAnnotationProvider, tagsCustomizers,
+                micrometerMetricsProperties.getClientRequestsMetricName());
+        } else {
+            return new MicrometerServerMetricsContext(registry, tagsProvider, timedAnnotationProvider, tagsCustomizers,
+                micrometerMetricsProperties.getServerRequestsMetricName(), 
+                micrometerMetricsProperties.isAutoTimeRequests());
         }
-        
-        return new MicrometerMetricsContext(registry, tagsProvider, timedAnnotationProvider, tagsCustomizers,
-            micrometerMetricsProperties.getServerRequestsMetricName(), 
-            micrometerMetricsProperties.isAutoTimeRequests());
     }
 }

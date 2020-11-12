@@ -62,7 +62,7 @@ public class JaxwsOperationTagsCustomizerTest {
         doReturn(DUMMY_TAG).when(jaxwsTags).operation(request);
 
         // when
-        Iterable<Tag> actual = underTest.getAdditionalTags(ex);
+        Iterable<Tag> actual = underTest.getAdditionalTags(ex, false);
 
         // then
         assertThat(actual, equalTo(Tags.of(DUMMY_TAG)));
@@ -75,7 +75,7 @@ public class JaxwsOperationTagsCustomizerTest {
         doReturn(DUMMY_TAG).when(jaxwsTags).operation(request);
 
         // when
-        Iterable<Tag> actual = underTest.getAdditionalTags(ex);
+        Iterable<Tag> actual = underTest.getAdditionalTags(ex, false);
 
         // then
         assertThat(actual, equalTo(Tags.of(DUMMY_TAG)));

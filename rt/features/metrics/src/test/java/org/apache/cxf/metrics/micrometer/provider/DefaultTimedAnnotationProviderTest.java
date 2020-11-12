@@ -83,7 +83,7 @@ public class DefaultTimedAnnotationProviderTest {
         mockClass(TesterClass.class);
 
         // when
-        Set<Timed> actual = underTest.getTimedAnnotations(exchange);
+        Set<Timed> actual = underTest.getTimedAnnotations(exchange, false);
 
         // then
         assertThat(actual.stream()
@@ -103,7 +103,7 @@ public class DefaultTimedAnnotationProviderTest {
         mockClass(TesterClass.class);
 
         // when
-        Set<Timed> actual = underTest.getTimedAnnotations(exchange);
+        Set<Timed> actual = underTest.getTimedAnnotations(exchange, false);
 
         // then
         assertThat(actual.stream()
@@ -122,7 +122,7 @@ public class DefaultTimedAnnotationProviderTest {
         mockClass(TesterClass.class);
 
         // when
-        Set<Timed> actual = underTest.getTimedAnnotations(exchange);
+        Set<Timed> actual = underTest.getTimedAnnotations(exchange, false);
 
         // then
         assertThat(actual.stream().map(Timed::value).collect(Collectors.toSet()), containsInAnyOrder("customTimed"));
@@ -141,7 +141,7 @@ public class DefaultTimedAnnotationProviderTest {
         mockClass(TesterClass.class);
 
         // when
-        Set<Timed> actual = underTest.getTimedAnnotations(exchange);
+        Set<Timed> actual = underTest.getTimedAnnotations(exchange, false);
 
         // then
         assertThat(actual.stream()
@@ -162,7 +162,7 @@ public class DefaultTimedAnnotationProviderTest {
         mockClass(TesterClass.class);
 
         // when
-        Set<Timed> actual = underTest.getTimedAnnotations(exchange);
+        Set<Timed> actual = underTest.getTimedAnnotations(exchange, false);
 
         // then
         assertThat(actual.stream().map(Timed::value).collect(Collectors.toSet()), containsInAnyOrder("timed2"));
@@ -183,7 +183,7 @@ public class DefaultTimedAnnotationProviderTest {
         mockClass(TesterClass.class);
 
         // when
-        Set<Timed> actual = underTest.getTimedAnnotations(exchange);
+        Set<Timed> actual = underTest.getTimedAnnotations(exchange, false);
 
         // then
         assertThat(actual.stream().map(Timed::value).collect(Collectors.toSet()), empty());

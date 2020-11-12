@@ -58,11 +58,11 @@ public class JaxwsFaultCodeTagsCustomizerTest {
     @Test
     public void testAdditionalTagsShouldReturnFaultCodeAsTags() {
         // given
-        doReturn(DUMMY_FAULT_CODE).when(jaxwsFaultCodeProvider).getFaultCode(ex);
+        doReturn(DUMMY_FAULT_CODE).when(jaxwsFaultCodeProvider).getFaultCode(ex, false);
         doReturn(DUMMY_TAG).when(jaxwsTags).faultCode(DUMMY_FAULT_CODE);
 
         // when
-        Iterable<Tag> actual = underTest.getAdditionalTags(ex);
+        Iterable<Tag> actual = underTest.getAdditionalTags(ex, false);
 
         // then
         assertThat(actual, equalTo(Tags.of(DUMMY_TAG)));

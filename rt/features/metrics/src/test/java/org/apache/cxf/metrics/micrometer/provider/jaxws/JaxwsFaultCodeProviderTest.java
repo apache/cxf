@@ -58,7 +58,7 @@ public class JaxwsFaultCodeProviderTest {
         doReturn(RUNTIME_FAULT).when(ex).get(FaultMode.class);
 
         // when
-        String actual = underTest.getFaultCode(ex);
+        String actual = underTest.getFaultCode(ex, false);
 
         // then
         assertThat(actual, equalTo(RUNTIME_FAULT_STRING));
@@ -72,7 +72,7 @@ public class JaxwsFaultCodeProviderTest {
         doReturn(RUNTIME_FAULT).when(message).get(FaultMode.class);
 
         // when
-        String actual = underTest.getFaultCode(ex);
+        String actual = underTest.getFaultCode(ex, false);
 
         // then
         assertThat(actual, equalTo(RUNTIME_FAULT_STRING));
@@ -85,7 +85,7 @@ public class JaxwsFaultCodeProviderTest {
         doReturn(message).when(ex).getOutFaultMessage();
 
         // when
-        String actual = underTest.getFaultCode(ex);
+        String actual = underTest.getFaultCode(ex, false);
 
         // then
         assertThat(actual, is(nullValue()));
@@ -100,7 +100,7 @@ public class JaxwsFaultCodeProviderTest {
         doReturn(RUNTIME_FAULT).when(message).get(FaultMode.class);
 
         // when
-        String actual = underTest.getFaultCode(ex);
+        String actual = underTest.getFaultCode(ex, false);
 
         // then
         assertThat(actual, equalTo(RUNTIME_FAULT_STRING));
@@ -114,7 +114,7 @@ public class JaxwsFaultCodeProviderTest {
         doReturn(message).when(ex).getInMessage();
 
         // when
-        String actual = underTest.getFaultCode(ex);
+        String actual = underTest.getFaultCode(ex, false);
 
         // then
         assertThat(actual, is(nullValue()));
@@ -128,7 +128,7 @@ public class JaxwsFaultCodeProviderTest {
         doReturn(null).when(ex).getInMessage();
 
         // when
-        String actual = underTest.getFaultCode(ex);
+        String actual = underTest.getFaultCode(ex, false);
 
         // then
         assertThat(actual, is(nullValue()));

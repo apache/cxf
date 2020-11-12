@@ -58,7 +58,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class MicrometerMetricsContextTest {
+public class MicrometerClientMetricsContextTest {
 
     private static final long DUMMY_LONG = 0L;
     private static final Tag DEFAULT_DUMMY_TAG = Tag.of("defaultDummyKey", "dummyValue");
@@ -104,15 +104,15 @@ public class MicrometerMetricsContextTest {
     public void setUp() {
         initMocks(this);
 
-        doReturn(request).when(exchange).getInMessage();
-        doReturn(singletonList(DEFAULT_DUMMY_TAG)).when(tagsProvider).getTags(exchange);
-        doReturn(singletonList(FIRST_ADDITIONAL_DUMMY_TAG)).when(firstTagsCustomizer).getAdditionalTags(exchange);
-        doReturn(singletonList(SECOND_ADDITIONAL_DUMMY_TAG)).when(secondTagsCustomizer).getAdditionalTags(exchange);
+        doReturn(request).when(exchange).getOutMessage();
+        doReturn(singletonList(DEFAULT_DUMMY_TAG)).when(tagsProvider).getTags(exchange, true);
+        doReturn(singletonList(FIRST_ADDITIONAL_DUMMY_TAG)).when(firstTagsCustomizer)
+            .getAdditionalTags(exchange, true);
+        doReturn(singletonList(SECOND_ADDITIONAL_DUMMY_TAG)).when(secondTagsCustomizer)
+            .getAdditionalTags(exchange, true);
 
-        underTest =
-                new MicrometerMetricsContext(
-                        registry, tagsProvider, timedAnnotationProvider,
-                        asList(firstTagsCustomizer, secondTagsCustomizer), DUMMY_METRIC, true);
+        underTest = new MicrometerClientMetricsContext(registry, tagsProvider, timedAnnotationProvider,
+            asList(firstTagsCustomizer, secondTagsCustomizer), DUMMY_METRIC);
     }
 
     @Test
@@ -164,17 +164,16 @@ public class MicrometerMetricsContextTest {
     public void testStopShouldCallStopOnAllTimedAnnotations() {
         // given
         doReturn(new HashSet<>(asList(firstTimedAnnotation, secondTimedAnnotation)))
-                .when(timedAnnotationProvider).getTimedAnnotations(exchange);
+                .when(timedAnnotationProvider).getTimedAnnotations(exchange, true);
 
         doReturn(FIRST_TIMED_ANNOTATION_DUMMY_VALUE).when(firstTimedAnnotation).value();
         doReturn("").when(firstTimedAnnotation).description();
         doReturn(new double[]{}).when(firstTimedAnnotation).percentiles();
-        doReturn(new String[]{}).when(firstTimedAnnotation).extraTags();
+
 
         doReturn(SECOND_TIMED_ANNOTATION_DUMMY_VALUE).when(secondTimedAnnotation).value();
         doReturn("").when(secondTimedAnnotation).description();
         doReturn(new double[]{}).when(secondTimedAnnotation).percentiles();
-        doReturn(new String[]{}).when(secondTimedAnnotation).extraTags();
 
         TimingContext timingContext = new TimingContext(sample);
 
