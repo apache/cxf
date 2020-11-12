@@ -10,4 +10,5 @@ org.apache.cxf.bus.managers.ClientLifeCycleManagerImpl:org.apache.cxf.endpoint.C
 org.apache.cxf.bus.resource.ResourceManagerImpl:org.apache.cxf.resource.ResourceManager:true
 org.apache.cxf.catalog.OASISCatalogManager:org.apache.cxf.catalog.OASISCatalogManager:true
 org.apache.cxf.common.util.ASMHelper:org.apache.cxf.common.util.ASMHelperImpl:true
+org.apache.cxf.common.spi.ClassLoaderService:org.apache.cxf.common.spi.ClassLoaderProxyService$GenerateJustInTime:true
 

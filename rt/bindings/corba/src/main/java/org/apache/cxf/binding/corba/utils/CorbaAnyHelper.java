@@ -35,7 +35,6 @@ import org.apache.cxf.common.util.ASMHelper.ClassWriter;
 import org.apache.cxf.common.util.ASMHelper.FieldVisitor;
 import org.apache.cxf.common.util.ASMHelper.Label;
 import org.apache.cxf.common.util.ASMHelper.MethodVisitor;
-import org.apache.cxf.common.util.ASMHelperImpl;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.TCKind;

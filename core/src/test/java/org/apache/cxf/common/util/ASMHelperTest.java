@@ -32,7 +32,8 @@ public class ASMHelperTest {
             EnumObject.class
         });
         Type[] types = method.getGenericParameterTypes();
-        String classCode = ASMHelper.getClassCode(types[0]);
+        ASMHelper helper = new ASMHelperImpl();
+        String classCode = helper.getClassCode(types[0]);
         assertEquals("Lorg/apache/cxf/common/util/ASMHelperTest$EnumObject<Ljava/lang/Enum;>;", classCode);
     }
 

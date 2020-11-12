@@ -25,28 +25,27 @@ import java.util.List;
 import javax.xml.bind.JAXBElement;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.spi.ClassGeneratorClassLoader;
 import org.apache.cxf.common.util.ASMHelper;
-import org.apache.cxf.common.util.ASMHelperImpl;
 import org.apache.cxf.databinding.WrapperHelper;
 
-final class WrapperHelperCompiler {
+final class WrapperHelperCompiler extends ClassGeneratorClassLoader implements WrapperHelperCreator {
 
+    private Class<?> wrapperType;
+    private Method[] setMethods;
+    private Method[] getMethods;
+    private Method[] jaxbMethods;
+    private Field[] fields;
+    private Object objectFactory;
+    private ASMHelper.ClassWriter cw;
+    private ASMHelper asmhelper;
 
-    final Class<?> wrapperType;
-    final Method[] setMethods;
-    final Method[] getMethods;
-    final Method[] jaxbMethods;
-    final Field[] fields;
-    final Object objectFactory;
-    final ASMHelper.ClassWriter cw;
-    final ASMHelper asmhelper;
+    public WrapperHelperCompiler(Bus bus) {
+    }
 
-    private WrapperHelperCompiler(Bus bus, Class<?> wrapperType,
-                                  Method[] setMethods,
-                                  Method[] getMethods,
-                                  Method[] jaxbMethods,
-                                  Field[] fields,
-                                  Object objectFactory) {
+    public WrapperHelper compile(Bus bus, Class<?> wrapperType, Method[] setMethods,
+                                 Method[] getMethods, Method[] jaxbMethods,
+                                 Field[] fields, Object objectFactory) {
         this.wrapperType = wrapperType;
         this.setMethods = setMethods;
         this.getMethods = getMethods;
@@ -55,33 +54,7 @@ final class WrapperHelperCompiler {
         this.objectFactory = objectFactory;
         asmhelper = bus.getExtension(ASMHelper.class);
         cw = asmhelper.createClassWriter();
-    }
 
-    static WrapperHelper compileWrapperHelper(Bus bus, Class<?> wrapperType,
-                                              Method[] setMethods,
-                                              Method[] getMethods,
-                                              Method[] jaxbMethods,
-                                              Field[] fields,
-                                              Object objectFactory) {
-        try {
-            return new WrapperHelperCompiler(bus, wrapperType,
-                                        setMethods,
-                                        getMethods,
-                                        jaxbMethods,
-                                        fields,
-                                        objectFactory).compile();
-
-        } catch (Throwable t) {
-            // Some error - probably a bad version of ASM or similar
-        }
-        return null;
-    }
-
-
-
-
-
-    public WrapperHelper compile() {
         if (cw == null) {
             return null;
         }
@@ -90,16 +63,16 @@ final class WrapperHelperCompiler {
         newClassName = newClassName.replaceAll("\\$", ".");
         newClassName = asmhelper.periodToSlashes(newClassName);
 
-        Class<?> cls = asmhelper.findClass(newClassName.replace('/', '.'), wrapperType);
+        Class<?> cls = findClass(newClassName.replace('/', '.'), wrapperType);
         while (cls != null) {
             try {
                 WrapperHelper helper = WrapperHelper.class.cast(cls.newInstance());
-                if (!helper.getSignature().equals(computeSignature())) {
+                if (!helper.getSignature().equals(computeSignature(setMethods, getMethods))) {
                     count++;
                     newClassName = wrapperType.getName() + "_WrapperTypeHelper" + count;
                     newClassName = newClassName.replaceAll("\\$", ".");
                     newClassName = asmhelper.periodToSlashes(newClassName);
-                    cls = asmhelper.findClass(newClassName.replace('/', '.'), wrapperType);
+                    cls = findClass(newClassName.replace('/', '.'), wrapperType);
                 } else {
                     return helper;
                 }
@@ -131,7 +104,7 @@ final class WrapperHelperCompiler {
             if (b) {
                 cw.visitEnd();
                 byte[] bt = cw.toByteArray();
-                Class<?> cl = asmhelper.loadClass(newClassName.replace('/', '.'), wrapperType, bt);
+                Class<?> cl = loadClass(newClassName.replace('/', '.'), wrapperType, bt);
                 Object o = cl.newInstance();
                 return WrapperHelper.class.cast(o);
             }
@@ -141,7 +114,7 @@ final class WrapperHelperCompiler {
         return null;
     }
 
-    private String computeSignature() {
+    public static String computeSignature(Method[] setMethods, Method[] getMethods) {
         StringBuilder b = new StringBuilder();
         b.append(setMethods.length).append(':');
         for (int x = 0; x < setMethods.length; x++) {
@@ -157,7 +130,7 @@ final class WrapperHelperCompiler {
 
     private boolean addSignature() {
         ASMHelper.OpcodesProxy Opcodes = asmhelper.getOpCodes();
-        String sig = computeSignature();
+        String sig = computeSignature(setMethods, getMethods);
         ASMHelper.MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC,
                                           "getSignature", "()Ljava/lang/String;", null, null);
         mv.visitCode();
