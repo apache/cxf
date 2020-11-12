@@ -19,97 +19,39 @@
 
 package org.apache.cxf.common.spi;
 
-import java.util.HashMap;
+import org.apache.cxf.Bus;
+
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 public class ClassLoaderProxyService implements ClassLoaderService {
-    private final ProxiesClassLoader loader;
-
-    public ClassLoaderProxyService() {
-        this(new ProxiesClassLoader());
+    ClassCreator srv;
+    private ClassLoaderProxyService(Bus bus) {
+        this(new ClassGeneratorClassLoader(bus));
     }
-
-    public ClassLoaderProxyService(ProxiesClassLoader loader) {
-        this.loader = loader;
-    }
-
-    @Override
-    public <T> Class<T> defineAndLoad(String name, byte[] bytecode, Class<T> proxiedClass) {
-        return (Class<T>) loader.getOrRegister(name, bytecode);
+    private ClassLoaderProxyService(ClassCreator srv) {
+        super();
+        this.srv = srv;
     }
 
     @Override
-    public ClassLoader getProxyClassLoader() {
-        return loader;
-    }
-    public static class LoadFirst extends ClassLoaderProxyService {
-        public LoadFirst() {
-            super();
-        }
-
-        @Override
-        public <T> Class<T> defineAndLoad(final String name, final byte[] bytecode, final Class<T> proxiedClass) {
-            ClassLoader proxyClassLoader = getProxyClassLoader();
-            if (proxyClassLoader == null) {
-                proxyClassLoader = Thread.currentThread().getContextClassLoader();
-            }
-            try {
-                return (Class<T>) proxyClassLoader.loadClass(name);
-            } catch (final ClassNotFoundException e) {
-                return super.defineAndLoad(name, bytecode, proxiedClass);
-            }
+    public Object createNamespaceWrapper(Class<?> mcls, Map<String, String> map) {
+        Class<?> cls = srv.createNamespaceWrapper(mcls, map);
+        try {
+            return cls.getConstructor(Map.class).newInstance(map);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            return null;
         }
     }
-    public static class Spy extends ClassLoaderProxyService {
-        private final Map<String, Class<?>> proxies = new HashMap<>();
-
-        public Spy() {
-            super();
-        }
-
-        public Map<String, Class<?>> getProxies() {
-            return proxies;
-        }
-
-        @Override
-        public <T> Class<T> defineAndLoad(final String name, final byte[] bytecode, final Class<T> proxiedClass) {
-            proxies.put(name, proxiedClass);
-            return super.defineAndLoad(name, bytecode, proxiedClass);
+    public class LoadFirst extends ClassLoaderProxyService{
+        public LoadFirst(Bus bus) {
+            //TODO not sure here if I get class loader like that ???
+            super(new GeneratedClassLoader(LoadFirst.class.getClassLoader()));
         }
     }
-    private static final class ProxiesClassLoader extends ClassLoader {
-        private final ConcurrentMap<String, Class<?>> classes = new ConcurrentHashMap<>();
-
-        private ProxiesClassLoader() {
-            super();
-        }
-
-
-        @Override
-        protected Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException {
-            final Class<?> clazz = classes.get(name);
-            if (clazz == null) {
-                return getParent().loadClass(name);
-            }
-            return clazz;
-        }
-
-        private Class<?> getOrRegister(final String proxyClassName, final byte[] proxyBytes) {
-            final String key = proxyClassName.replace('/', '.');
-            Class<?> existing = classes.get(key);
-            if (existing == null) {
-                synchronized (this) {
-                    existing = classes.get(key);
-                    if (existing == null) {
-                        existing = super.defineClass(proxyClassName, proxyBytes, 0, proxyBytes.length);
-                        resolveClass(existing);
-                        classes.put(key, existing);
-                    }
-                }
-            }
-            return existing;
+    public class GenerateJustInTime extends ClassLoaderProxyService{
+        public GenerateJustInTime(Bus bus) {
+            super(new ClassGeneratorClassLoader(bus));
         }
     }
 }

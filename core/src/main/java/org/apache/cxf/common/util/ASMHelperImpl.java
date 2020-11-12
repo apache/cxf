@@ -19,7 +19,6 @@
 
 package org.apache.cxf.common.util;
 
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
@@ -29,7 +28,6 @@ import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 
@@ -38,11 +36,6 @@ public class ASMHelperImpl implements ASMHelper {
     protected static final Map<Class<?>, String> PRIMITIVE_MAP = new HashMap<>();
     protected static final Map<Class<?>, String> NONPRIMITIVE_MAP = new HashMap<>();
     protected static final Map<Class<?>, Integer> PRIMITIVE_ZERO_MAP = new HashMap<>();
-
-    protected static final Map<ClassLoader, WeakReference<TypeHelperClassLoader>> LOADER_MAP
-            = new WeakIdentityHashMap<>();
-    protected static final Map<Class<?>, WeakReference<TypeHelperClassLoader>> CLASS_MAP
-            = new WeakIdentityHashMap<>();
 
     protected boolean badASM;
     private Class<?> cwClass;
@@ -274,109 +267,6 @@ public class ASMHelperImpl implements ASMHelper {
     }
 
 
-    public Class<?> loadClass(String className, Class<?> clz, byte[] bytes) {
-        TypeHelperClassLoader loader = getTypeHelperClassLoader(clz);
-        synchronized (loader) {
-            Class<?> cls = loader.lookupDefinedClass(className);
-            if (cls == null) {
-                return loader.defineClass(className, bytes);
-            }
-            return cls;
-        }
-    }
-    public Class<?> loadClass(String className, ClassLoader l, byte[] bytes) {
-        TypeHelperClassLoader loader = getTypeHelperClassLoader(l);
-        synchronized (loader) {
-            Class<?> cls = loader.lookupDefinedClass(className);
-            if (cls == null) {
-                return loader.defineClass(className, bytes);
-            }
-            return cls;
-        }
-    }
-    public Class<?> findClass(String className, Class<?> clz) {
-        TypeHelperClassLoader loader = getTypeHelperClassLoader(clz);
-        return loader.lookupDefinedClass(className);
-    }
-    public Class<?> findClass(String className, ClassLoader l) {
-        TypeHelperClassLoader loader = getTypeHelperClassLoader(l);
-        return loader.lookupDefinedClass(className);
-    }
-
-    private synchronized TypeHelperClassLoader getTypeHelperClassLoader(ClassLoader l) {
-        WeakReference<TypeHelperClassLoader> ref = LOADER_MAP.get(l);
-        TypeHelperClassLoader ret;
-        if (ref == null || ref.get() == null) {
-            ret = new TypeHelperClassLoader(l);
-            LOADER_MAP.put(l, new WeakReference<TypeHelperClassLoader>(ret));
-        } else {
-            ret = ref.get();
-        }
-        return ret;
-    }
-    private synchronized TypeHelperClassLoader getTypeHelperClassLoader(Class<?> cls) {
-        WeakReference<TypeHelperClassLoader> ref = CLASS_MAP.get(cls);
-        TypeHelperClassLoader ret;
-        if (ref == null || ref.get() == null) {
-            ret = new TypeHelperClassLoader(cls.getClassLoader());
-            CLASS_MAP.put(cls, new WeakReference<TypeHelperClassLoader>(ret));
-        } else {
-            ret = ref.get();
-        }
-        return ret;
-    }
-
-
-    public class TypeHelperClassLoader extends ClassLoader {
-        ConcurrentHashMap<String, Class<?>> defined = new ConcurrentHashMap<>();
-
-        TypeHelperClassLoader(ClassLoader parent) {
-            super(parent);
-        }
-        public Class<?> lookupDefinedClass(String name) {
-            return defined.get(name.replace('/', '.'));
-        }
-
-        @Override
-        protected Class<?> findClass(String name) throws ClassNotFoundException {
-            if (name.endsWith("package-info")) {
-                return getParent().loadClass(name);
-            }
-            return super.findClass(name);
-        }
-        public void addExternalClass(String name, Class<?> cls) {
-            if (name == null) {
-                return;
-            }
-            defined.putIfAbsent(name.replace('/', '.'), cls);
-        }
-        public Class<?> defineClass(String name, byte[] bytes) {
-            Class<?> ret = defined.get(name.replace('/', '.'));
-            if (ret != null) {
-                return ret;
-            }
-            if (name.endsWith("package-info")) {
-                Package p = super.getPackage(name.substring(0, name.length() - 13));
-                if (p == null) {
-                    definePackage(name.substring(0, name.length() - 13).replace('/', '.'),
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null);
-                }
-            }
-
-            ret = super.defineClass(name.replace('/', '.'), bytes, 0, bytes.length);
-            Class<?> tmpRet = defined.putIfAbsent(name.replace('/', '.'), ret);
-            if (tmpRet != null) {
-                ret = tmpRet;
-            }
-            return ret;
-        }
-    }
     public ASMType getType(final String type) {
         try {
             final Class<?> cls = ClassLoaderUtils.loadClass(cwClass.getPackage().getName() + ".Type", cwClass);
