@@ -1,18 +1,93 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.apache.cxf.common.spi;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ASMHelper;
 
+import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ClassGenerator {
+public class NamespaceClassGenerator extends ClassGeneratorClassLoader implements NamespaceClassCreator {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(ClassGenerator.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(ClassGeneratorClassLoader.class);
     ASMHelper helper;
 
-    public ClassGenerator(Bus bus) {
+    public NamespaceClassGenerator(Bus bus) {
         helper = bus.getExtension(ASMHelper.class);
+    }
+
+    @Override
+    public synchronized Class<?> createNamespaceWrapper(Class<?> mcls, Map<String, String> map) {
+        String postFix = "";
+
+        if (mcls.getName().contains("eclipse")) {
+            return createEclipseNamespaceMapper(mcls, map);
+        } else if (mcls.getName().contains(".internal")) {
+            postFix = "Internal";
+        } else if (mcls.getName().contains("com.sun")) {
+            postFix = "RI";
+        }
+
+        String className = "org.apache.cxf.jaxb.NamespaceMapper";
+        className += postFix;
+        Class<?> cls = findClass(className, NamespaceClassGenerator.class);
+        if (cls == null) {
+            cls = findClass(className, mcls);
+        }
+        Throwable t = null;
+        if (cls == null) {
+            try {
+                byte[] bts = createNamespaceWrapperInternal(postFix);
+                className = "org.apache.cxf.jaxb.NamespaceMapper" + postFix;
+                return loadClass(className, mcls, bts);
+            } catch (RuntimeException ex) {
+                // continue
+                t = ex;
+            }
+        }
+        if (cls == null
+                && (!mcls.getName().contains(".internal.") && mcls.getName().contains("com.sun"))) {
+            try {
+                cls = ClassLoaderUtils.loadClass("org.apache.cxf.common.jaxb.NamespaceMapper",
+                        NamespaceClassGenerator.class);
+            } catch (Throwable ex2) {
+                // ignore
+                t = ex2;
+            }
+        }
+        LOG.log(Level.INFO, "Could not create a NamespaceMapper compatible with Marshaller class " + mcls.getName(), t);
+        return cls;
+    }
+
+    private Class<?> createEclipseNamespaceMapper(Class<?> mcls, Map<String, String> map) {
+        String className = "org.apache.cxf.jaxb.EclipseNamespaceMapper";
+        Class<?> cls = findClass(className, NamespaceClassGenerator.class);
+        if (cls != null) {
+            return cls;
+        }
+        byte[] bts = createEclipseNamespaceMapper();
+        return loadClass(className, mcls, bts);
     }
 
     /*
@@ -46,7 +121,7 @@ public class ClassGenerator {
     */
     //CHECKSTYLE:OFF
     //bunch of really long ASM based methods that cannot be shortened easily
-    public byte[] createEclipseNamespaceMapper(Class<?> mcls) {
+    private byte[] createEclipseNamespaceMapper() {
         ASMHelper.OpcodesProxy Opcodes = helper.getOpCodes();
         String slashedName = "org/apache/cxf/jaxb/EclipseNamespaceMapper";
         ASMHelper.ClassWriter cw = helper.createClassWriter();
@@ -215,7 +290,7 @@ public class ClassGenerator {
         return bts;
     }
 
-    public byte[] createNamespaceWrapperInternal(String postFix) {
+    private byte[] createNamespaceWrapperInternal(String postFix) {
 
         String superName = "com/sun/xml/"
                 + ("RI".equals(postFix) ? "" : "internal/")

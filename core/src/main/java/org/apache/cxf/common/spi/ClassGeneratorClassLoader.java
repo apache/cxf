@@ -1,73 +1,41 @@
-package org.apache.cxf.common.spi;
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.common.util.WeakIdentityHashMap;
+package org.apache.cxf.common.spi;
 
 import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ClassGeneratorClassLoader implements ClassCreator {
+import org.apache.cxf.common.util.WeakIdentityHashMap;
+
+public class ClassGeneratorClassLoader {
     protected static final Map<ClassLoader, WeakReference<TypeHelperClassLoader>> LOADER_MAP
             = new WeakIdentityHashMap<>();
     protected static final Map<Class<?>, WeakReference<TypeHelperClassLoader>> CLASS_MAP
             = new WeakIdentityHashMap<>();
-    private ClassGenerator gen;
-    public ClassGeneratorClassLoader(Bus bus) {
-        gen = new ClassGenerator(bus);
-    }
-    public synchronized Class<?> createNamespaceWrapper(Class<?> mcls, Map<String, String> map) {
-        String postFix = "";
 
-        if (mcls.getName().contains("eclipse")) {
-            return createEclipseNamespaceMapper(mcls, map);
-        } else if (mcls.getName().contains(".internal")) {
-            postFix = "Internal";
-        } else if (mcls.getName().contains("com.sun")) {
-            postFix = "RI";
-        }
-
-        String className = "org.apache.cxf.jaxb.NamespaceMapper";
-        className += postFix;
-        Class<?> cls = findClass(className, ClassGeneratorClassLoader.class);
-        if (cls == null) {
-            cls = findClass(className, mcls);
-        }
-        Throwable t = null;
-        if (cls == null) {
-            try {
-                byte[] bts = gen.createNamespaceWrapperInternal(postFix);
-                className = "org.apache.cxf.jaxb.NamespaceMapper" + postFix;
-                return loadClass(className, mcls, bts);
-            } catch (RuntimeException ex) {
-                // continue
-                t = ex;
-            }
-        }
-        if (cls == null
-                && (!mcls.getName().contains(".internal.") && mcls.getName().contains("com.sun"))) {
-            try {
-                cls = ClassLoaderUtils.loadClass("org.apache.cxf.common.jaxb.NamespaceMapper",
-                        ClassGenerator.class);
-            } catch (Throwable ex2) {
-                // ignore
-                t = ex2;
-            }
-        }
-        return cls;
+    public ClassGeneratorClassLoader() {
     }
 
-    private Class<?> createEclipseNamespaceMapper(Class<?> mcls, Map<String, String> map) {
-        String className = "org.apache.cxf.jaxb.EclipseNamespaceMapper";
-        Class<?> cls = findClass(className, ClassGeneratorClassLoader.class);
-        if (cls != null)
-            return cls;
-        byte[] bts = gen.createEclipseNamespaceMapper(mcls);
-        return loadClass(className, mcls, bts);
-    }
 
-    private Class<?> loadClass(String className, Class<?> clz, byte[] bytes) {
+    protected Class<?> loadClass(String className, Class<?> clz, byte[] bytes) {
         TypeHelperClassLoader loader = getTypeHelperClassLoader(clz);
         synchronized (loader) {
             Class<?> cls = loader.lookupDefinedClass(className);
@@ -77,7 +45,7 @@ public class ClassGeneratorClassLoader implements ClassCreator {
             return cls;
         }
     }
-    private Class<?> loadClass(String className, ClassLoader l, byte[] bytes) {
+    protected Class<?> loadClass(String className, ClassLoader l, byte[] bytes) {
         TypeHelperClassLoader loader = getTypeHelperClassLoader(l);
         synchronized (loader) {
             Class<?> cls = loader.lookupDefinedClass(className);
@@ -87,11 +55,11 @@ public class ClassGeneratorClassLoader implements ClassCreator {
             return cls;
         }
     }
-    private Class<?> findClass(String className, Class<?> clz) {
+    protected Class<?> findClass(String className, Class<?> clz) {
         TypeHelperClassLoader loader = getTypeHelperClassLoader(clz);
         return loader.lookupDefinedClass(className);
     }
-    private Class<?> findClass(String className, ClassLoader l) {
+    protected Class<?> findClass(String className, ClassLoader l) {
         TypeHelperClassLoader loader = getTypeHelperClassLoader(l);
         return loader.lookupDefinedClass(className);
     }

@@ -850,8 +850,9 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
     private static WrapperHelper compileWrapperHelper(Bus bus, Class<?> wrapperType, Method[] setMethods,
                                                       Method[] getMethods, Method[] jaxbMethods,
                                                       Field[] fields, Object objectFactory) {
-        return WrapperHelperCompiler.compileWrapperHelper(bus, wrapperType, setMethods, getMethods,
-                                                          jaxbMethods, fields, objectFactory);
+        WrapperHelperCreator creator = bus.getExtension(WrapperHelperCreator.class);
+        return creator.compile(bus, wrapperType, setMethods, getMethods,
+                jaxbMethods, fields, objectFactory);
     }
 
 }

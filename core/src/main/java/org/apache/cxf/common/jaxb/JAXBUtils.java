@@ -70,7 +70,6 @@ import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.cxf.common.spi.ClassLoaderService;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -80,11 +79,7 @@ import org.xml.sax.InputSource;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.ASMHelper;
-import org.apache.cxf.common.util.ASMHelper.ClassWriter;
-import org.apache.cxf.common.util.ASMHelper.FieldVisitor;
-import org.apache.cxf.common.util.ASMHelper.Label;
-import org.apache.cxf.common.util.ASMHelper.MethodVisitor;
+import org.apache.cxf.common.spi.ClassLoaderService;
 import org.apache.cxf.common.util.CachedClass;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.ProxyHelper;

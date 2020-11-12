@@ -45,10 +45,12 @@ import javax.xml.ws.Holder;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.spi.ClassGeneratorClassLoader;
 import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.JavaUtils;
+import org.apache.cxf.jaxws.spi.WrapperClassCreator;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.MessageInfo;
@@ -57,21 +59,17 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
-public final class WrapperClassGenerator {
+public final class WrapperClassGenerator extends ClassGeneratorClassLoader implements WrapperClassCreator {
     public static final String DEFAULT_PACKAGE_NAME = "defaultnamespace";
 
     private static final Logger LOG = LogUtils.getL7dLogger(WrapperClassGenerator.class);
     private Set<Class<?>> wrapperBeans = new LinkedHashSet<>();
-    private InterfaceInfo interfaceInfo;
     private boolean qualified;
     private JaxWsServiceFactoryBean factory;
+    private InterfaceInfo interfaceInfo;
     private ASMHelper helper;
 
-    public WrapperClassGenerator(Bus bus, JaxWsServiceFactoryBean fact, InterfaceInfo inf, boolean q) {
-        factory = fact;
-        interfaceInfo = inf;
-        qualified = q;
-        helper = bus.getExtension(ASMHelper.class);
+    public WrapperClassGenerator() {
     }
 
     private String getPackageName(Method method) {
@@ -112,7 +110,11 @@ public final class WrapperClassGenerator {
         return list;
     }
 
-    public Set<Class<?>> generate() {
+    public Set<Class<?>> generate(Bus bus, JaxWsServiceFactoryBean fact, InterfaceInfo interfaceInfo, boolean q) {
+        factory = fact;
+        qualified = q;
+        this.interfaceInfo = interfaceInfo;
+        helper = bus.getExtension(ASMHelper.class);
         for (OperationInfo opInfo : interfaceInfo.getOperations()) {
             if (opInfo.isUnwrappedCapable()) {
                 Method method = (Method)opInfo.getProperty(ReflectionServiceFactoryBean.METHOD);
@@ -167,20 +169,20 @@ public final class WrapperClassGenerator {
             className = className + "Response";
         }
         String pname = pkg + ".package-info";
-        Class<?> def = helper.findClass(pname, method.getDeclaringClass());
+        Class<?> def = findClass(pname, method.getDeclaringClass());
         if (def == null) {
             generatePackageInfo(pname, wrapperElement.getNamespaceURI(),
                                 method.getDeclaringClass());
         }
 
-        def = helper.findClass(className, method.getDeclaringClass());
+        def = findClass(className, method.getDeclaringClass());
         String origClassName = className;
         int count = 0;
         while (def != null) {
             Boolean b = messageInfo.getProperty("parameterized", Boolean.class);
             if (b != null && b) {
                 className = origClassName + (++count);
-                def = helper.findClass(className, method.getDeclaringClass());
+                def = findClass(className, method.getDeclaringClass());
             } else {
                 wrapperPart.setTypeClass(def);
                 wrapperBeans.add(def);
@@ -230,7 +232,7 @@ public final class WrapperClassGenerator {
 
         cw.visitEnd();
 
-        Class<?> clz = helper.loadClass(className, method.getDeclaringClass(), cw.toByteArray());
+        Class<?> clz = loadClass(className, method.getDeclaringClass(), cw.toByteArray());
         wrapperPart.setTypeClass(clz);
         wrapperBeans.add(clz);
     }
@@ -269,7 +271,7 @@ public final class WrapperClassGenerator {
         }
         cw.visitEnd();
 
-        helper.loadClass(className, clz, cw.toByteArray());
+        loadClass(className, clz, cw.toByteArray());
     }
 
     private void generateXmlJavaTypeAdapters(ASMHelper.AnnotationVisitor av, XmlJavaTypeAdapters adapters) {

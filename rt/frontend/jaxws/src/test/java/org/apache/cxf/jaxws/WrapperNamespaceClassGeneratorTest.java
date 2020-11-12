@@ -41,7 +41,7 @@ import org.junit.After;
 
 import static org.junit.Assert.assertTrue;
 
-public class WrapperClassGeneratorTest {
+public class WrapperNamespaceClassGeneratorTest {
 
     @After
     public void tearDown() {

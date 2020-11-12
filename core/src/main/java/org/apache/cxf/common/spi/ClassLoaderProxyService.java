@@ -19,16 +19,16 @@
 
 package org.apache.cxf.common.spi;
 
-import org.apache.cxf.Bus;
-
 import java.util.Map;
 
+import org.apache.cxf.Bus;
+
 public class ClassLoaderProxyService implements ClassLoaderService {
-    ClassCreator srv;
-    private ClassLoaderProxyService(Bus bus) {
-        this(new ClassGeneratorClassLoader(bus));
+    NamespaceClassCreator srv;
+    public ClassLoaderProxyService(Bus bus) {
+        this(new NamespaceClassGenerator(bus));
     }
-    private ClassLoaderProxyService(ClassCreator srv) {
+    public ClassLoaderProxyService(NamespaceClassCreator srv) {
         super();
         this.srv = srv;
     }
@@ -43,15 +43,16 @@ public class ClassLoaderProxyService implements ClassLoaderService {
             return null;
         }
     }
-    public class LoadFirst extends ClassLoaderProxyService{
+    public class LoadFirst extends ClassLoaderProxyService {
         public LoadFirst(Bus bus) {
             //TODO not sure here if I get class loader like that ???
-            super(new GeneratedClassLoader(LoadFirst.class.getClassLoader()));
+            // or I need to inject another class loader from outside
+            super(new GeneratedNamespaceClassLoader(LoadFirst.class.getClassLoader()));
         }
     }
-    public class GenerateJustInTime extends ClassLoaderProxyService{
+    public class GenerateJustInTime extends ClassLoaderProxyService {
         public GenerateJustInTime(Bus bus) {
-            super(new ClassGeneratorClassLoader(bus));
+            super(new NamespaceClassGenerator(bus));
         }
     }
 }

@@ -25,7 +25,7 @@ import java.util.Map;
  * SPI interface to implement the proxy defining logic.
  * It enables to switch from unsafe to classloader logic for instance for java >= 9.
  */
-public interface ClassCreator {
+public interface NamespaceClassCreator {
 
     Class<?> createNamespaceWrapper(Class<?> mcls, Map<String, String> map);
 
