@@ -56,9 +56,9 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
-public class MicrometerMetricsContextTest {
+public class MicrometerServerMetricsContextTest {
 
     private static final long DUMMY_LONG = 0L;
     private static final Tag DEFAULT_DUMMY_TAG = Tag.of("defaultDummyKey", "dummyValue");
@@ -102,15 +102,17 @@ public class MicrometerMetricsContextTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
 
         doReturn(request).when(exchange).getInMessage();
-        doReturn(singletonList(DEFAULT_DUMMY_TAG)).when(tagsProvider).getTags(exchange);
-        doReturn(singletonList(FIRST_ADDITIONAL_DUMMY_TAG)).when(firstTagsCustomizer).getAdditionalTags(exchange);
-        doReturn(singletonList(SECOND_ADDITIONAL_DUMMY_TAG)).when(secondTagsCustomizer).getAdditionalTags(exchange);
+        doReturn(singletonList(DEFAULT_DUMMY_TAG)).when(tagsProvider).getTags(exchange, false);
+        doReturn(singletonList(FIRST_ADDITIONAL_DUMMY_TAG)).when(firstTagsCustomizer)
+            .getAdditionalTags(exchange, false);
+        doReturn(singletonList(SECOND_ADDITIONAL_DUMMY_TAG)).when(secondTagsCustomizer)
+            .getAdditionalTags(exchange, false);
 
         underTest =
-                new MicrometerMetricsContext(
+                new MicrometerServerMetricsContext(
                         registry, tagsProvider, timedAnnotationProvider,
                         asList(firstTagsCustomizer, secondTagsCustomizer), DUMMY_METRIC, true);
     }
@@ -164,7 +166,7 @@ public class MicrometerMetricsContextTest {
     public void testStopShouldCallStopOnAllTimedAnnotations() {
         // given
         doReturn(new HashSet<>(asList(firstTimedAnnotation, secondTimedAnnotation)))
-                .when(timedAnnotationProvider).getTimedAnnotations(exchange);
+                .when(timedAnnotationProvider).getTimedAnnotations(exchange, false);
 
         doReturn(FIRST_TIMED_ANNOTATION_DUMMY_VALUE).when(firstTimedAnnotation).value();
         doReturn("").when(firstTimedAnnotation).description();

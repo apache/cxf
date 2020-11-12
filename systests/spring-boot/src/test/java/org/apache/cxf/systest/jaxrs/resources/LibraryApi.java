@@ -17,11 +17,28 @@
  * under the License.
  */
 
-package org.apache.cxf.metrics.micrometer.provider;
+package org.apache.cxf.systest.jaxrs.resources;
 
-import org.apache.cxf.message.Exchange;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
-public interface ExceptionClassProvider {
+public interface LibraryApi {
+    @Produces({ MediaType.APPLICATION_JSON })
+    @GET
+    Response getBooks(@QueryParam("page") @DefaultValue("1") int page);
 
-    Class<?> getExceptionClass(Exchange ex, boolean client);
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path("{id}")
+    @GET
+    Response getBook(@PathParam("id") String id);
+    
+    @DELETE
+    void deleteBooks();
 }

@@ -38,11 +38,11 @@ public class StandardTagsProvider implements TagsProvider {
     }
 
     @Override
-    public Iterable<Tag> getTags(Exchange ex) {
-        Message request = ofNullable(ex.getInMessage()).orElseGet(ex::getInFaultMessage);
-        Message response = ofNullable(ex.getOutMessage()).orElseGet(ex::getOutFaultMessage);
+    public Iterable<Tag> getTags(Exchange ex, boolean client) {
+        final Message request = getRequest(ex, client);
+        final Message response = getResponse(ex, client);
 
-        Class<?> exception = exceptionClassProvider.getExceptionClass(ex);
+        Class<?> exception = exceptionClassProvider.getExceptionClass(ex, client);
 
         return Tags.of(
                 standardTags.method(request),
@@ -50,5 +50,21 @@ public class StandardTagsProvider implements TagsProvider {
                 standardTags.exception(exception),
                 standardTags.status(response),
                 standardTags.outcome(response));
+    }
+
+    private Message getResponse(Exchange ex, boolean client) {
+        if (client) {
+            return ofNullable(ex.getInMessage()).orElseGet(ex::getInFaultMessage);
+        } else {
+            return ofNullable(ex.getOutMessage()).orElseGet(ex::getOutFaultMessage);
+        }
+    }
+
+    private Message getRequest(Exchange ex, boolean client) {
+        if (client) {
+            return ofNullable(ex.getOutMessage()).orElseGet(ex::getOutFaultMessage);
+        } else {
+            return ofNullable(ex.getInMessage()).orElseGet(ex::getInFaultMessage);
+        }
     }
 }
