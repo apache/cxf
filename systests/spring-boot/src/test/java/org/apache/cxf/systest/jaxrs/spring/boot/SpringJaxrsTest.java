@@ -19,10 +19,12 @@
 
 package org.apache.cxf.systest.jaxrs.spring.boot;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
@@ -31,10 +33,12 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.feature.Feature;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.metrics.MetricsFeature;
 import org.apache.cxf.metrics.MetricsProvider;
 import org.apache.cxf.systest.jaxrs.resources.Book;
 import org.apache.cxf.systest.jaxrs.resources.Library;
+import org.apache.cxf.systest.jaxrs.resources.LibraryApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,6 +50,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.SocketUtils;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -70,6 +75,9 @@ public class SpringJaxrsTest {
 
     @Autowired
     private MeterRegistry registry;
+    
+    @Autowired
+    private MetricsProvider metricsProvider;
     
     @LocalServerPort
     private int port;
@@ -110,19 +118,33 @@ public class SpringJaxrsTest {
             assertThat(r.getStatus()).isEqualTo(200);
         }
         
-        RequiredSearch requestMetrics = registry.get("cxf.server.requests");
+        RequiredSearch serverRequestMetrics = registry.get("cxf.server.requests");
 
-        Map<Object, Object> tags = requestMetrics.timer().getId().getTags().stream()
+        Map<Object, Object> serverTags = serverRequestMetrics.timer().getId().getTags().stream()
                 .collect(toMap(Tag::getKey, Tag::getValue));
 
-        assertThat(tags)
+        assertThat(serverTags)
             .containsOnly(
-                    entry("exception", "None"),
-                    entry("method", "GET"),
-                    entry("operation", "getBooks"),
-                    entry("uri", "/api/library"),
-                    entry("outcome", "SUCCESS"),
-                    entry("status", "200"));
+                entry("exception", "None"),
+                entry("method", "GET"),
+                entry("operation", "getBooks"),
+                entry("uri", "/api/library"),
+                entry("outcome", "SUCCESS"),
+                entry("status", "200"));
+        
+        RequiredSearch clientRequestMetrics = registry.get("cxf.client.requests");
+
+        Map<Object, Object> clientTags = clientRequestMetrics.timer().getId().getTags().stream()
+                .collect(toMap(Tag::getKey, Tag::getValue));
+
+        assertThat(clientTags)
+            .containsOnly(
+                entry("exception", "None"),
+                entry("method", "GET"),
+                entry("operation", "UNKNOWN"),
+                entry("uri", "http://localhost:" + port + "/api/library"),
+                entry("outcome", "SUCCESS"),
+                entry("status", "200"));
     }
     
     @Test
@@ -133,19 +155,33 @@ public class SpringJaxrsTest {
             .isInstanceOf(NotFoundException.class)
             .hasMessageContaining("Not Found");
 
-        RequiredSearch requestMetrics = registry.get("cxf.server.requests");
+        RequiredSearch serverRequestMetrics = registry.get("cxf.server.requests");
 
-        Map<Object, Object> tags = requestMetrics.timer().getId().getTags().stream()
+        Map<Object, Object> serverTags = serverRequestMetrics.timer().getId().getTags().stream()
                 .collect(toMap(Tag::getKey, Tag::getValue));
 
-        assertThat(tags)
-                .containsOnly(
-                        entry("exception", "None"),
-                        entry("method", "GET"),
-                        entry("operation", "getBook"),
-                        entry("uri", "/api/library/100"),
-                        entry("outcome", "CLIENT_ERROR"),
-                        entry("status", "404"));
+        assertThat(serverTags)
+            .containsOnly(
+                entry("exception", "None"),
+                entry("method", "GET"),
+                entry("operation", "getBook"),
+                entry("uri", "/api/library/100"),
+                entry("outcome", "CLIENT_ERROR"),
+                entry("status", "404"));
+        
+        RequiredSearch clientRequestMetrics = registry.get("cxf.client.requests");
+
+        Map<Object, Object> clientTags = clientRequestMetrics.timer().getId().getTags().stream()
+                .collect(toMap(Tag::getKey, Tag::getValue));
+
+        assertThat(clientTags)
+            .containsOnly(
+                entry("exception", "None"),
+                entry("method", "GET"),
+                entry("operation", "UNKNOWN"),
+                entry("uri", "http://localhost:" + port + "/api/library/100"),
+                entry("outcome", "CLIENT_ERROR"),
+                entry("status", "404"));
     }
     
     @Test
@@ -156,25 +192,219 @@ public class SpringJaxrsTest {
             .isInstanceOf(InternalServerErrorException.class)
             .hasMessageContaining("Internal Server Error");
 
-        RequiredSearch requestMetrics = registry.get("cxf.server.requests");
+        RequiredSearch serverRequestMetrics = registry.get("cxf.server.requests");
 
-        Map<Object, Object> tags = requestMetrics.timer().getId().getTags().stream()
+        Map<Object, Object> serverTags = serverRequestMetrics.timer().getId().getTags().stream()
                 .collect(toMap(Tag::getKey, Tag::getValue));
 
-        assertThat(tags)
-                .containsOnly(
-                        entry("exception", "UnsupportedOperationException"),
-                        entry("method", "DELETE"),
-                        entry("operation", "deleteBooks"),
-                        entry("uri", "/api/library"),
-                        entry("outcome", "SERVER_ERROR"),
-                        entry("status", "500"));
+        assertThat(serverTags)
+            .containsOnly(
+                entry("exception", "UnsupportedOperationException"),
+                entry("method", "DELETE"),
+                entry("operation", "deleteBooks"),
+                entry("uri", "/api/library"),
+                entry("outcome", "SERVER_ERROR"),
+                entry("status", "500"));
+        
+        RequiredSearch clientRequestMetrics = registry.get("cxf.client.requests");
+
+        Map<Object, Object> clientTags = clientRequestMetrics.timer().getId().getTags().stream()
+                .collect(toMap(Tag::getKey, Tag::getValue));
+
+        assertThat(clientTags)
+            .containsOnly(
+                entry("exception", "None"),
+                entry("method", "DELETE"),
+                entry("operation", "UNKNOWN"),
+                entry("uri", "http://localhost:" + port + "/api/library"),
+                entry("outcome", "SERVER_ERROR"),
+                entry("status", "500"));
     }
     
+    @Test
+    public void testJaxrsClientExceptionMetric() {
+        final int fakePort = SocketUtils.findAvailableTcpPort();
+        
+        final WebTarget target = ClientBuilder
+            .newClient()
+            .register(new MetricsFeature(metricsProvider))
+            .target("http://localhost:" + fakePort + "/api/library");
+        
+        assertThatThrownBy(() -> target.request().delete(String.class))
+            .isInstanceOf(ProcessingException.class)
+            .hasMessageContaining("Connection refused");
+
+        // no server meters
+        assertThat(registry.getMeters())
+            .noneMatch(m -> m.getId().getName().equals("cxf.server.requests"));
+        
+        RequiredSearch clientRequestMetrics = registry.get("cxf.client.requests");
+
+        Map<Object, Object> clientTags = clientRequestMetrics.timer().getId().getTags().stream()
+                .collect(toMap(Tag::getKey, Tag::getValue));
+
+        assertThat(clientTags)
+            .containsOnly(
+                entry("exception", "None"),
+                entry("method", "DELETE"),
+                entry("operation", "UNKNOWN"),
+                entry("uri", "http://localhost:" + fakePort + "/api/library"),
+                entry("outcome", "UNKNOWN"),
+                entry("status", "UNKNOWN"));
+    }
+    
+    @Test
+    public void testJaxrsProxySuccessMetric() {
+        final LibraryApi api = createApi(port);
+        
+        try (Response r = api.getBooks(1)) {
+            assertThat(r.getStatus()).isEqualTo(200);
+        }
+        
+        RequiredSearch serverRequestMetrics = registry.get("cxf.server.requests");
+
+        Map<Object, Object> serverTags = serverRequestMetrics.timer().getId().getTags().stream()
+                .collect(toMap(Tag::getKey, Tag::getValue));
+
+        assertThat(serverTags)
+            .containsOnly(
+                entry("exception", "None"),
+                entry("method", "GET"),
+                entry("operation", "getBooks"),
+                entry("uri", "/api/library"),
+                entry("outcome", "SUCCESS"),
+                entry("status", "200"));
+        
+        RequiredSearch clientRequestMetrics = registry.get("cxf.client.requests");
+
+        Map<Object, Object> clientTags = clientRequestMetrics.timer().getId().getTags().stream()
+                .collect(toMap(Tag::getKey, Tag::getValue));
+
+        assertThat(clientTags)
+            .containsOnly(
+                entry("exception", "None"),
+                entry("method", "GET"),
+                entry("operation", "UNKNOWN"),
+                entry("uri", "http://localhost:" + port + "/api/library"),
+                entry("outcome", "SUCCESS"),
+                entry("status", "200"));
+    }
+    
+    @Test
+    public void testJaxrsProxyExceptionMetric() {
+        final LibraryApi api = createApi(port);
+        
+        assertThatThrownBy(() -> api.deleteBooks())
+            .isInstanceOf(InternalServerErrorException.class)
+            .hasMessageContaining("Internal Server Error");
+
+        RequiredSearch serverRequestMetrics = registry.get("cxf.server.requests");
+
+        Map<Object, Object> serverTags = serverRequestMetrics.timer().getId().getTags().stream()
+                .collect(toMap(Tag::getKey, Tag::getValue));
+
+        assertThat(serverTags)
+            .containsOnly(
+                entry("exception", "UnsupportedOperationException"),
+                entry("method", "DELETE"),
+                entry("operation", "deleteBooks"),
+                entry("uri", "/api/library"),
+                entry("outcome", "SERVER_ERROR"),
+                entry("status", "500"));
+        
+        RequiredSearch clientRequestMetrics = registry.get("cxf.client.requests");
+
+        Map<Object, Object> clientTags = clientRequestMetrics.timer().getId().getTags().stream()
+                .collect(toMap(Tag::getKey, Tag::getValue));
+
+        assertThat(clientTags)
+            .containsOnly(
+                entry("exception", "None"),
+                entry("method", "DELETE"),
+                entry("operation", "UNKNOWN"),
+                entry("uri", "http://localhost:" + port + "/api/library"),
+                entry("outcome", "SERVER_ERROR"),
+                entry("status", "500"));
+    }
+    
+    @Test
+    public void testJaxrsProxyFailedMetric() {
+        final LibraryApi api = createApi(port);
+
+        try (Response r = api.getBook("100")) {
+            assertThat(r.getStatus()).isEqualTo(404);
+        }
+
+        RequiredSearch serverRequestMetrics = registry.get("cxf.server.requests");
+
+        Map<Object, Object> serverTags = serverRequestMetrics.timer().getId().getTags().stream()
+                .collect(toMap(Tag::getKey, Tag::getValue));
+
+        assertThat(serverTags)
+            .containsOnly(
+                entry("exception", "None"),
+                entry("method", "GET"),
+                entry("operation", "getBook"),
+                entry("uri", "/api/library/100"),
+                entry("outcome", "CLIENT_ERROR"),
+                entry("status", "404"));
+        
+        RequiredSearch clientRequestMetrics = registry.get("cxf.client.requests");
+
+        Map<Object, Object> clientTags = clientRequestMetrics.timer().getId().getTags().stream()
+                .collect(toMap(Tag::getKey, Tag::getValue));
+
+        assertThat(clientTags)
+            .containsOnly(
+                entry("exception", "None"),
+                entry("method", "GET"),
+                entry("operation", "UNKNOWN"),
+                entry("uri", "http://localhost:" + port + "/api/library/100"),
+                entry("outcome", "CLIENT_ERROR"),
+                entry("status", "404"));
+    }
+    
+    @Test
+    public void testJaxrsProxyClientExceptionMetric() {
+        final int fakePort = SocketUtils.findAvailableTcpPort();
+        final LibraryApi api = createApi(fakePort);
+
+        assertThatThrownBy(() -> api.deleteBooks())
+            .isInstanceOf(ProcessingException.class)
+            .hasMessageContaining("Connection refused");
+
+        // no server meters
+        assertThat(registry.getMeters())
+            .noneMatch(m -> m.getId().getName().equals("cxf.server.requests"));
+        
+        RequiredSearch clientRequestMetrics = registry.get("cxf.client.requests");
+
+        Map<Object, Object> clientTags = clientRequestMetrics.timer().getId().getTags().stream()
+                .collect(toMap(Tag::getKey, Tag::getValue));
+
+        assertThat(clientTags)
+            .containsOnly(
+                entry("exception", "None"),
+                entry("method", "DELETE"),
+                entry("operation", "UNKNOWN"),
+                entry("uri", "http://localhost:" + fakePort + "/api/library"),
+                entry("outcome", "UNKNOWN"),
+                entry("status", "UNKNOWN"));
+    }
+    
+    private LibraryApi createApi(int portToUse) {
+        final JAXRSClientFactoryBean factory = new JAXRSClientFactoryBean();
+        factory.setAddress("http://localhost:" + portToUse + "/api/library");
+        factory.setFeatures(Arrays.asList(new MetricsFeature(metricsProvider)));
+        factory.setResourceClass(LibraryApi.class);
+        return factory.create(LibraryApi.class);
+    }
+
     private WebTarget createWebTarget() {
         return ClientBuilder
             .newClient()
             .register(JacksonJsonProvider.class)
+            .register(new MetricsFeature(metricsProvider))
             .target("http://localhost:" + port + "/api/library");
     }
 

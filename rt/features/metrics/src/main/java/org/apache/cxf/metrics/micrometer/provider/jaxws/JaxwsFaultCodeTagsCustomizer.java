@@ -36,8 +36,8 @@ public class JaxwsFaultCodeTagsCustomizer implements TagsCustomizer {
     }
 
     @Override
-    public Iterable<Tag> getAdditionalTags(Exchange ex) {
-        String faultCode = jaxwsFaultCodeProvider.getFaultCode(ex);
+    public Iterable<Tag> getAdditionalTags(Exchange ex, boolean client) {
+        String faultCode = jaxwsFaultCodeProvider.getFaultCode(ex, client);
         return Tags.of(jaxwsTags.faultCode(faultCode));
     }
 }

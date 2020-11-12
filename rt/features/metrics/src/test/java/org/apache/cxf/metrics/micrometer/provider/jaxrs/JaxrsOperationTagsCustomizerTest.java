@@ -55,14 +55,14 @@ public class JaxrsOperationTagsCustomizerTest {
     
     @Test
     public void testOperationReturnWithUnknownWhenRequestIsNull() {
-        final Iterable<Tag> actual = tagsCustomizer.getAdditionalTags(exchange);
+        final Iterable<Tag> actual = tagsCustomizer.getAdditionalTags(exchange, false);
         assertThat(actual, equalTo(Tags.of(Tag.of(OPERATION_METRIC_NAME, "UNKNOWN"))));
     }
 
     @Test
     public void testOperationReturnWithCorrectValue() throws NoSuchMethodException, SecurityException {
         message.put("org.apache.cxf.resource.method", getClass().getDeclaredMethod("getOperator"));
-        final Iterable<Tag> actual = tagsCustomizer.getAdditionalTags(exchange);
+        final Iterable<Tag> actual = tagsCustomizer.getAdditionalTags(exchange, false);
         assertThat(actual, equalTo(Tags.of(Tag.of(OPERATION_METRIC_NAME, DUMMY_OPERATOR))));
     }
     

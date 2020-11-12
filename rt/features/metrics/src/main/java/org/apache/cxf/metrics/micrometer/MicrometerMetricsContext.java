@@ -42,10 +42,8 @@ import io.micrometer.core.instrument.Timer;
 import static java.util.stream.Stream.concat;
 import static java.util.stream.StreamSupport.stream;
 
-public class MicrometerMetricsContext implements MetricsContext {
-
-    private static final Logger LOG =
-            LogUtils.getL7dLogger(MicrometerMetricsContext.class);
+abstract class MicrometerMetricsContext implements MetricsContext {
+    private static final Logger LOG = LogUtils.getL7dLogger(MicrometerMetricsContext.class);
 
     private final MeterRegistry registry;
     private final TagsProvider tagsProvider;
@@ -55,9 +53,9 @@ public class MicrometerMetricsContext implements MetricsContext {
     private final String metricName;
     private final boolean autoTimeRequests;
 
-    public MicrometerMetricsContext(MeterRegistry registry, TagsProvider tagsProvider,
-                                    TimedAnnotationProvider timedAnnotationProvider,
-                                    List<TagsCustomizer> tagsCustomizers, String metricName, boolean autoTimeRequests) {
+    MicrometerMetricsContext(MeterRegistry registry, TagsProvider tagsProvider,
+                             TimedAnnotationProvider timedAnnotationProvider,
+                             List<TagsCustomizer> tagsCustomizers, String metricName, boolean autoTimeRequests) {
         this.registry = registry;
         this.tagsProvider = tagsProvider;
         this.timedAnnotationProvider = timedAnnotationProvider;
@@ -66,18 +64,14 @@ public class MicrometerMetricsContext implements MetricsContext {
         this.autoTimeRequests = autoTimeRequests;
     }
 
-    @Override
-    public void start(Exchange ex) {
-        Message request = ex.getInMessage();
+    protected void start(Message request, Exchange ex) {
         TimingContext timingContext = TimingContext.get(request);
         if (timingContext == null) {
             startAndAttachTimingContext(request);
         }
     }
 
-    @Override
-    public void stop(long timeInNS, long inSize, long outSize, Exchange ex) {
-        Message request = ex.getInMessage();
+    protected void stop(Message request, long timeInNS, long inSize, long outSize, Exchange ex) {
         TimingContext timingContext = TimingContext.get(request);
         if (timingContext == null) {
             LOG.warning("Unable for record metric for exchange: " + ex);
@@ -85,15 +79,23 @@ public class MicrometerMetricsContext implements MetricsContext {
             record(timingContext, ex);
         }
     }
+    
+    protected abstract Iterable<Tag> getAllTags(Exchange ex);
+    protected abstract void record(TimingContext timingContext, Exchange ex);
+    
+    protected Iterable<Tag> getAllTags(Exchange ex, boolean client) {
+        Stream<Tag> defaultTags = getStreamFrom(this.tagsProvider.getTags(ex, client));
+        Stream<Tag> additionalTags =
+                tagsCustomizers.stream()
+                        .map(tagsCustomizer -> tagsCustomizer.getAdditionalTags(ex, client))
+                        .flatMap(this::getStreamFrom);
 
-    private void startAndAttachTimingContext(Message request) {
-        Timer.Sample timerSample = Timer.start(this.registry);
-        TimingContext timingContext = new TimingContext(timerSample);
-        timingContext.attachTo(request);
+        return concat(defaultTags, additionalTags)
+                .collect(Collectors.toList());
     }
 
-    private void record(TimingContext timingContext, Exchange ex) {
-        Set<Timed> annotations = timedAnnotationProvider.getTimedAnnotations(ex);
+    protected void record(TimingContext timingContext, Exchange ex, boolean client) {
+        Set<Timed> annotations = timedAnnotationProvider.getTimedAnnotations(ex, client);
         Timer.Sample timerSample = timingContext.getTimerSample();
         Supplier<Iterable<Tag>> tags = () -> getAllTags(ex);
 
@@ -108,15 +110,10 @@ public class MicrometerMetricsContext implements MetricsContext {
         }
     }
 
-    private Iterable<Tag> getAllTags(Exchange ex) {
-        Stream<Tag> defaultTags = getStreamFrom(this.tagsProvider.getTags(ex));
-        Stream<Tag> additionalTags =
-                tagsCustomizers.stream()
-                        .map(tagsCustomizer -> tagsCustomizer.getAdditionalTags(ex))
-                        .flatMap(this::getStreamFrom);
-
-        return concat(defaultTags, additionalTags)
-                .collect(Collectors.toList());
+    private void startAndAttachTimingContext(Message request) {
+        Timer.Sample timerSample = Timer.start(this.registry);
+        TimingContext timingContext = new TimingContext(timerSample);
+        timingContext.attachTo(request);
     }
 
     private Stream<Tag> getStreamFrom(Iterable<Tag> tags) {
