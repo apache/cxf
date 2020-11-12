@@ -15,7 +15,6 @@ import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import javax.xml.namespace.QName;
 import java.lang.reflect.Method;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 
 public class GeneratedWrapperClassLoader implements WrapperClassCreator {
