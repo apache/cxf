@@ -70,9 +70,9 @@ public class MicrometerServerMetricsContextTest {
     private static final String SECOND_TIMED_ANNOTATION_DUMMY_VALUE = "secondTimedAnnotationDummyValue";
 
     @Captor
-    ArgumentCaptor<TimingContext> timingContextCaptor;
+    private ArgumentCaptor<TimingContext> timingContextCaptor;
     @Captor
-    ArgumentCaptor<Timer> timerArgumentCaptor;
+    private ArgumentCaptor<Timer> timerArgumentCaptor;
 
     @Mock
     private Timer.Sample sample;
