@@ -28,8 +28,6 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.FormAuthorizationResponse;
-import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
-import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.OAuthRedirectionState;
 import org.apache.cxf.rs.security.oauth2.common.OOBAuthorizationResponse;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
@@ -61,29 +59,13 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
     public AuthorizationCodeGrantService() {
         super(OAuthConstants.CODE_RESPONSE_TYPE, OAuthConstants.AUTHORIZATION_CODE_GRANT);
     }
-    @Override
-    protected OAuthAuthorizationData createAuthorizationData(Client client,
-                                                             MultivaluedMap<String, String> params,
-                                                             String redirectUri,
-                                                             UserSubject subject,
-                                                             List<OAuthPermission> requestedPerms,
-                                                             List<OAuthPermission> alreadyAuthorizedPerms,
-                                                             boolean authorizationCanBeSkipped) {
-        OAuthAuthorizationData data =
-            super.createAuthorizationData(client, params, redirectUri, subject,
-                                          requestedPerms, alreadyAuthorizedPerms, authorizationCanBeSkipped);
-        setCodeChallenge(data, params);
-        return data;
-    }
-    protected OAuthRedirectionState recreateRedirectionStateFromParams(
-        MultivaluedMap<String, String> params) {
+
+    protected OAuthRedirectionState recreateRedirectionStateFromParams(MultivaluedMap<String, String> params) {
         OAuthRedirectionState state = super.recreateRedirectionStateFromParams(params);
-        setCodeChallenge(state, params);
+        state.setClientCodeChallenge(params.getFirst(OAuthConstants.AUTHORIZATION_CODE_CHALLENGE));
         return state;
     }
-    private static void setCodeChallenge(OAuthRedirectionState data, MultivaluedMap<String, String> params) {
-        data.setClientCodeChallenge(params.getFirst(OAuthConstants.AUTHORIZATION_CODE_CHALLENGE));
-    }
+
     protected Response createGrant(OAuthRedirectionState state,
                                    Client client,
                                    List<String> requestedScope,
