@@ -48,7 +48,7 @@ under the License.
     <bean id="oauthJson" class="org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider"/>
     
     <httpj:engine-factory id="tls-config">
-        <httpj:engine port="${testutil.ports.jaxrs-oauth2-grants-jcache-public}">
+        <httpj:engine port="${testutil.ports.jaxrs-oauth2-grants-jcache-public-session}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="JKS" password="password" resource="keys/Bethal.jks"/>
@@ -63,15 +63,19 @@ under the License.
     </httpj:engine-factory>
     
    <bean id="oauthProvider" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.JCacheOAuthDataProviderImpl">
-       <constructor-arg><value>${testutil.ports.jaxrs-oauth2-grants2-jcache-public}</value></constructor-arg>
+       <constructor-arg><value>${testutil.ports.jaxrs-oauth2-grants2-jcache-public-session}</value></constructor-arg>
        <constructor-arg><value>null</value></constructor-arg>
        <constructor-arg><value>false</value></constructor-arg>
        <constructor-arg><value>true</value></constructor-arg>
    </bean>
-   
+
+    <bean id="sessionTokenProvider" class="org.apache.cxf.rs.security.oauth2.provider.JoseSessionTokenProvider">
+    </bean>
+
    <bean id="authorizationService" class="org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService">
       <property name="dataProvider" ref="oauthProvider"/>
       <property name="canSupportPublicClients" value="true"/>
+       <property name="sessionAuthenticityTokenProvider" ref="sessionTokenProvider"/>
    </bean>
    
    <bean id="implicitService" class="org.apache.cxf.rs.security.oauth2.services.ImplicitGrantService">
@@ -106,10 +110,12 @@ under the License.
    <bean id="basicAuthFilter" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.WSS4JBasicAuthFilter">
        <property name="callbackHandler" ref="callbackHandler"/>
    </bean>
-   
+
+    <bean id="keyPasswordProvider" class="org.apache.cxf.systest.jaxrs.security.jose.jwejws.PrivateKeyPasswordProviderImpl"/>
+
    <jaxrs:server 
        depends-on="tls-config" 
-       address="https://localhost:${testutil.ports.jaxrs-oauth2-grants-jcache-public}/services">
+       address="https://localhost:${testutil.ports.jaxrs-oauth2-grants-jcache-public-session}/services">
        <jaxrs:serviceBeans>
            <ref bean="authorizationService"/>
            <ref bean="implicitService"/>
@@ -118,26 +124,28 @@ under the License.
            <ref bean="basicAuthFilter"/>
        </jaxrs:providers>
        <jaxrs:properties>
-           <entry key="rs.security.keystore.type" value="jks" />
-           <entry key="rs.security.keystore.alias" value="alice"/>
-           <entry key="rs.security.keystore.password" value="password"/>
-           <entry key="rs.security.keystore.file" value="keys/alice.jks" />
-           <entry key="rs.security.signature.algorithm" value="RS256" />
+           <entry key="rs.security.signature.out.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
+           <entry key="rs.security.encryption.in.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs.properties"/>
+           <entry key="rs.security.encryption.out.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs.properties"/>
+           <entry key="rs.security.signature.in.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
+           <entry key="rs.security.signature.key.password.provider" value-ref="keyPasswordProvider"/>
+           <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
        </jaxrs:properties>
    </jaxrs:server>
    
    <jaxrs:server 
        depends-on="tls-config" 
-       address="https://localhost:${testutil.ports.jaxrs-oauth2-grants-jcache-public}/services2">
+       address="https://localhost:${testutil.ports.jaxrs-oauth2-grants-jcache-public-session}/services2">
        <jaxrs:serviceBeans>
            <ref bean="tokenService"/>
        </jaxrs:serviceBeans>
        <jaxrs:properties>
-           <entry key="rs.security.keystore.type" value="jks" />
-           <entry key="rs.security.keystore.alias" value="alice"/>
-           <entry key="rs.security.keystore.password" value="password"/>
-           <entry key="rs.security.keystore.file" value="keys/alice.jks" />
-           <entry key="rs.security.signature.algorithm" value="RS256" />
+           <entry key="rs.security.signature.out.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
+           <entry key="rs.security.encryption.in.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs.properties"/>
+           <entry key="rs.security.encryption.out.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs.properties"/>
+           <entry key="rs.security.signature.in.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
+           <entry key="rs.security.signature.key.password.provider" value-ref="keyPasswordProvider"/>
+           <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
        </jaxrs:properties>
    </jaxrs:server>
    
@@ -159,16 +167,17 @@ under the License.
    
    <jaxrs:server 
        depends-on="tls-config" 
-       address="https://localhost:${testutil.ports.jaxrs-oauth2-grants-jcache-public}/services3">
+       address="https://localhost:${testutil.ports.jaxrs-oauth2-grants-jcache-public-session}/services3">
        <jaxrs:serviceBeans>
            <ref bean="digestTokenService"/>
        </jaxrs:serviceBeans>
        <jaxrs:properties>
-           <entry key="rs.security.keystore.type" value="jks" />
-           <entry key="rs.security.keystore.alias" value="alice"/>
-           <entry key="rs.security.keystore.password" value="password"/>
-           <entry key="rs.security.keystore.file" value="keys/alice.jks" />
-           <entry key="rs.security.signature.algorithm" value="RS256" />
+           <entry key="rs.security.signature.out.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
+           <entry key="rs.security.encryption.in.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs.properties"/>
+           <entry key="rs.security.encryption.out.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs.properties"/>
+           <entry key="rs.security.signature.in.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
+           <entry key="rs.security.signature.key.password.provider" value-ref="keyPasswordProvider"/>
+           <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
        </jaxrs:properties>
    </jaxrs:server>
    
