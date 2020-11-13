@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements. See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership. The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License. You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied. See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:http="http://cxf.apache.org/transports/http/configuration" 
+    xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" 
+    xmlns:sec="http://cxf.apache.org/configuration/security" 
+    xmlns:cxf="http://cxf.apache.org/core" 
+    xmlns:jaxrs="http://cxf.apache.org/jaxrs" 
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+             http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
+             http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+             http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util-4.2.xsd
+             http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd
+             http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd 
+             http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd">
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
+    <cxf:bus>
+        <cxf:features>
+            <cxf:logging/>
+        </cxf:features>
+        <cxf:properties> 
+          <entry key="org.apache.cxf.jaxrs.bus.providers" value-ref="busProviders"/> 
+        </cxf:properties>
+    </cxf:bus>
+    <!-- providers -->
+    <util:list id="busProviders"> 
+        <ref bean="oauthJson"/> 
+    </util:list> 
+    <bean id="oauthJson" class="org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider"/>
+    
+    <httpj:engine-factory id="tls-config">
+        <httpj:engine port="${testutil.ports.grants-server-jcache-session}">
+            <httpj:tlsServerParameters>
+                <sec:keyManagers keyPassword="password">
+                    <sec:keyStore type="JKS" password="password" resource="keys/Bethal.jks"/>
+                </sec:keyManagers>
+                <sec:trustManagers>
+                    <sec:keyStore type="JKS" password="password" resource="keys/Truststore.jks"/>
+                </sec:trustManagers>
+                <sec:clientAuthentication want="true" required="true"/>
+            </httpj:tlsServerParameters>
+            <httpj:sessionSupport>true</httpj:sessionSupport>
+        </httpj:engine>
+    </httpj:engine-factory>
+    
+   <bean id="oauthProvider" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.JCacheOAuthDataProviderImpl">
+       <constructor-arg><value>${testutil.ports.grants-server-jcache-session.2}</value></constructor-arg>
+   </bean>
+
+    <bean id="sessionTokenProvider" class="org.apache.cxf.rs.security.oauth2.provider.JoseSessionTokenProvider">
+    </bean>
+
+    <bean id="authorizationService" class="org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService">
+      <property name="dataProvider" ref="oauthProvider"/>
+       <property name="sessionAuthenticityTokenProvider" ref="sessionTokenProvider"/>
+   </bean>
+   
+   <bean id="implicitService" class="org.apache.cxf.rs.security.oauth2.services.ImplicitGrantService">
+      <property name="dataProvider" ref="oauthProvider"/>
+   </bean>
+   
+   <bean id="refreshGrantHandler" class="org.apache.cxf.rs.security.oauth2.grants.refresh.RefreshTokenGrantHandler">
+      <property name="dataProvider" ref="oauthProvider"/>
+   </bean>
+   
+   <bean id="callbackHandlerLoginHandler" class="org.apache.cxf.systest.jaxrs.security.oauth2.grants.CallbackHandlerLoginHandler">
+      <property name="callbackHandler" ref="callbackHandler"/>
+   </bean>
+   
+   <bean id="passwordGrantHandler" class="org.apache.cxf.rs.security.oauth2.grants.owner.ResourceOwnerGrantHandler">
+      <property name="dataProvider" ref="oauthProvider"/>
+      <property name="loginHandler" ref="callbackHandlerLoginHandler"/>
+   </bean>
+   
+   <bean id="clientCredsGrantHandler" class="org.apache.cxf.rs.security.oauth2.grants.clientcred.ClientCredentialsGrantHandler">
+      <property name="dataProvider" ref="oauthProvider"/>
+   </bean>
+   
+   <bean id="samlGrantHandler" class="org.apache.cxf.rs.security.oauth2.grants.saml.Saml2BearerGrantHandler">
+      <property name="dataProvider" ref="oauthProvider"/>
+   </bean>
+   
+   <bean id="jwtGrantHandler" class="org.apache.cxf.rs.security.oauth2.grants.jwt.JwtBearerGrantHandler">
+      <property name="dataProvider" ref="oauthProvider"/>
+   </bean>
+
+   <bean id="tokenService" class="org.apache.cxf.rs.security.oauth2.services.AccessTokenService">
+      <property name="dataProvider" ref="oauthProvider"/>
+      <property name="grantHandlers">
+         <list>
+             <ref bean="refreshGrantHandler"/>
+             <ref bean="passwordGrantHandler"/>
+             <ref bean="clientCredsGrantHandler"/>
+             <ref bean="samlGrantHandler"/>
+             <ref bean="jwtGrantHandler"/>
+         </list>
+      </property>
+   </bean>
+   
+   <bean id="callbackHandler" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.CallbackHandlerImpl"/>
+   <bean id="basicAuthFilter" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.WSS4JBasicAuthFilter">
+       <property name="callbackHandler" ref="callbackHandler"/>
+   </bean>
+
+    <bean id="keyPasswordProvider" class="org.apache.cxf.systest.jaxrs.security.jose.jwejws.PrivateKeyPasswordProviderImpl"/>
+
+   <jaxrs:server 
+       depends-on="tls-config" 
+       address="https://localhost:${testutil.ports.grants-server-jcache-session}/services">
+       <jaxrs:serviceBeans>
+           <ref bean="authorizationService"/>
+           <ref bean="implicitService"/>
+           <ref bean="tokenService"/>
+       </jaxrs:serviceBeans>
+       <jaxrs:providers>
+           <ref bean="basicAuthFilter"/>
+       </jaxrs:providers>
+       <jaxrs:properties>
+           <entry key="security.signature.properties" 
+                  value="org/apache/cxf/systest/jaxrs/security/bob.properties"/>
+           <entry key="rs.security.signature.out.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
+           <entry key="rs.security.encryption.in.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs.properties"/>
+           <entry key="rs.security.encryption.out.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs.properties"/>
+           <entry key="rs.security.signature.in.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
+           <entry key="rs.security.signature.key.password.provider" value-ref="keyPasswordProvider"/>
+           <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
+       </jaxrs:properties>
+   </jaxrs:server>
+   
+
+</beans>

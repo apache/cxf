@@ -80,6 +80,10 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
     private static final String JWT_NON_PERSIST_JCACHE_PORT2 =
         TestUtil.getPortNumber("grants-server-jcache-jwt-non-persist.2");
 
+    private static final SpringBusTestServer JCACHE_SERVER_SESSION =
+            new SpringBusTestServer("grants-server-jcache-session") { };
+    private static final String JCACHE_PORT3 = TestUtil.getPortNumber("grants-server-jcache-session.2");
+
     private static final String ISSUER = "OIDC IdP";
 
     final String port;
@@ -98,6 +102,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly", launchServer(JWT_JCACHE_SERVER));
         assertTrue("server did not launch correctly", launchServer(JPA_SERVER));
         assertTrue("server did not launch correctly", launchServer(JWT_NON_PERSIST_JCACHE_SERVER));
+        assertTrue("server did not launch correctly", launchServer(JCACHE_SERVER_SESSION));
     }
 
     @Parameters(name = "{0}")
@@ -106,7 +111,8 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
             JCACHE_SERVER.getPort(),
             JWT_JCACHE_SERVER.getPort(),
             JPA_SERVER.getPort(),
-            JWT_NON_PERSIST_JCACHE_SERVER.getPort()};
+            JWT_NON_PERSIST_JCACHE_SERVER.getPort(),
+            JCACHE_SERVER_SESSION.getPort()};
     }
 
     @org.junit.Test
@@ -370,6 +376,8 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
             audPort = JPA_PORT2;
         } else if (JWT_NON_PERSIST_JCACHE_SERVER.getPort().equals(port)) {
             audPort = JWT_NON_PERSIST_JCACHE_PORT2;
+        } else if (JCACHE_SERVER_SESSION.getPort().equals(port)) {
+            audPort = JCACHE_PORT3;
         }
         String audience = "https://localhost:" + audPort + "/secured/bookstore/books";
         ClientAccessToken accessToken =
