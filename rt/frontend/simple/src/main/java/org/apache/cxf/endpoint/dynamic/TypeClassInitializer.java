@@ -165,7 +165,8 @@ public class TypeClassInitializer extends ServiceModelVisitor {
     }
 
     private Class<?> createFaultClass(Class<?> cls) {
-        return new ExceptionCreator(bus).createExceptionClass(cls);
+        ExceptionClassCreator exceptionClassCreator = bus.getExtension(ExceptionClassCreator.class);
+        return exceptionClassCreator.createExceptionClass(cls);
     }
 
     private Class<?> getClassByName(JType jType) throws ClassNotFoundException {
@@ -185,72 +186,4 @@ public class TypeClassInitializer extends ServiceModelVisitor {
         isFault = false;
     }
 
-
-    private static class ExceptionCreator {
-        ASMHelper helper;
-        public ExceptionCreator(Bus bus) {
-            helper = bus.getExtension(ASMHelper.class);
-        }
-
-        public Class<?> createExceptionClass(Class<?> bean) {
-            String newClassName = bean.getName() + "_Exception";
-            newClassName = newClassName.replaceAll("\\$", ".");
-            newClassName = helper.periodToSlashes(newClassName);
-
-            Class<?> cls = helper.findClass(newClassName.replace('/', '.'), bean);
-            if (cls == null) {
-                ASMHelper.ClassWriter cw = helper.createClassWriter();
-                ASMHelper.OpcodesProxy Opcodes = helper.getOpCodes();
-
-                cw.visit(Opcodes.V1_5,
-                         Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER,
-                         newClassName,
-                         null,
-                         "java/lang/Exception",
-                         null);
-
-                ASMHelper.FieldVisitor fv;
-                ASMHelper.MethodVisitor mv;
-
-                String beanClassCode = helper.getClassCode(bean);
-                fv = cw.visitField(0, "faultInfo", beanClassCode, null, null);
-                fv.visitEnd();
-
-
-                mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>",
-                                    "(Ljava/lang/String;" + beanClassCode + ")V", null, null);
-                mv.visitCode();
-                mv.visitLabel(helper.createLabel());
-                mv.visitVarInsn(Opcodes.ALOAD, 0);
-                mv.visitVarInsn(Opcodes.ALOAD, 1);
-                mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Exception",
-                                   "<init>", "(Ljava/lang/String;)V", false);
-                mv.visitLabel(helper.createLabel());
-                mv.visitVarInsn(Opcodes.ALOAD, 0);
-                mv.visitVarInsn(Opcodes.ALOAD, 2);
-                mv.visitFieldInsn(Opcodes.PUTFIELD, newClassName, "faultInfo", beanClassCode);
-                mv.visitLabel(helper.createLabel());
-                mv.visitInsn(Opcodes.RETURN);
-                mv.visitLabel(helper.createLabel());
-                mv.visitMaxs(2, 3);
-                mv.visitEnd();
-
-                mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "getFaultInfo",
-                                    "()" + beanClassCode, null, null);
-                mv.visitCode();
-                mv.visitLabel(helper.createLabel());
-                mv.visitVarInsn(Opcodes.ALOAD, 0);
-                mv.visitFieldInsn(Opcodes.GETFIELD, newClassName, "faultInfo", beanClassCode);
-                mv.visitInsn(Opcodes.ARETURN);
-                mv.visitLabel(helper.createLabel());
-                mv.visitMaxs(1, 1);
-                mv.visitEnd();
-
-                cw.visitEnd();
-
-                return helper.loadClass(bean.getName() + "_Exception", bean, cw.toByteArray());
-            }
-            return cls;
-        }
-    }
 }
