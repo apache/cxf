@@ -39,65 +39,6 @@ public interface ASMHelper {
     String getNonPrimitive(Class<?> tp);
     String getPrimitive(Class<?> tp);
 
-    class OpcodesProxy {
-        //CHECKSTYLE:OFF
-        //Will use reflection to set these based on the package name and such
-        //so we don't want them "final" or the compiler will optimize them out
-        //to just "0" which we really don't want
-        public int INVOKESTATIC = 0;
-        public int ACC_STATIC = 0;
-        public int PUTSTATIC = 0;
-        public int GETSTATIC = 0;
-        public int ARETURN = 0;
-        public int ALOAD = 0;
-        public int IFNULL = 0;
-        public int CHECKCAST = 0;
-        public int INVOKEINTERFACE = 0;
-        public int GETFIELD = 0;
-        public int GET= 0;
-        public int ASTORE = 0;
-        public int PUTFIELD = 0;
-        public int PUT= 0;
-        public int RETURN = 0;
-        public int F_APPEND = 0;
-        public int F_SAME = 0;
-        public int F_SAME1 = 0;
-        public int INVOKESPECIAL = 0;
-        public int ACC_PUBLIC = 0;
-        public int ACC_FINAL = 0;
-        public int ACC_SUPER = 0;
-        public int ACC_PRIVATE = 0;
-        public int ACC_= 0;
-        public int V1_5 = 0;
-        public int V1_6 = 0;
-        public int V1_7 = 0;
-        public int ACC_ABSTRACT = 0;
-        public int ACC_INTERFACE = 0;
-        public int ACC_SYNTHETIC = 0;
-        public int ILOAD = 0;
-        public int ISTORE = 0;
-        public int AALOAD = 0;
-        public int ARRAYLENGTH = 0;
-        public int IRETURN = 0;
-        public int NEW = 0;
-        public int ANEWARRAY = 0;
-        public int DUP = 0;
-        public int ATHROW = 0;
-        public int INVOKEVIRTUAL = 0;
-        public int GOTO = 0;
-        public int POP = 0;
-        public int ACONST_NULL = 0;
-        public int IFNONNULL = 0;
-        public int SIPUSH = 0;
-        public int INVOKE= 0;
-        public int ICONST_0;
-        public int ICONST_1;
-        public int LCONST_0;
-        public int FCONST_0;
-        public int DCONST_0;
-        public int IF_ICMPLT = 0;
-        public java.lang.Integer INTEGER;
-    }
     public interface ASMType {
         int getOpcode(int ireturn);
     }

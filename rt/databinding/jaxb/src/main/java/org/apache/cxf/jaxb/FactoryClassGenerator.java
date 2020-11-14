@@ -1,15 +1,36 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.apache.cxf.jaxb;
+
+import java.lang.reflect.Constructor;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.spi.ClassGeneratorClassLoader;
 import org.apache.cxf.common.util.ASMHelper;
+import org.apache.cxf.common.util.OpcodesProxy;
 import org.apache.cxf.common.util.ReflectionUtil;
 
-import java.lang.reflect.Constructor;
 
 public class FactoryClassGenerator extends ClassGeneratorClassLoader implements FactoryClassCreator {
     private ASMHelper helper;
-    FactoryClassGenerator (Bus bus) {
+    FactoryClassGenerator(Bus bus) {
         helper = bus.getExtension(ASMHelper.class);
     }
     @SuppressWarnings("unused")
@@ -20,40 +41,40 @@ public class FactoryClassGenerator extends ClassGeneratorClassLoader implements 
             return factoryClass;
         }
         Constructor<?> contructor = ReflectionUtil.getDeclaredConstructors(cls)[0];
-        ASMHelper.OpcodesProxy Opcodes = helper.getOpCodes();
+        OpcodesProxy opcodes = helper.getOpCodes();
         ASMHelper.ClassWriter cw = helper.createClassWriter();
         ASMHelper.MethodVisitor mv;
 
-        cw.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER,
+        cw.visit(opcodes.V1_6, opcodes.ACC_PUBLIC + opcodes.ACC_SUPER,
                 helper.periodToSlashes(newClassName), null, "java/lang/Object", null);
 
         cw.visitSource(cls.getSimpleName() + "Factory" + ".java", null);
 
-        mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
+        mv = cw.visitMethod(opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
         mv.visitCode();
-        mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
-        mv.visitInsn(Opcodes.RETURN);
+        mv.visitVarInsn(opcodes.ALOAD, 0);
+        mv.visitMethodInsn(opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
+        mv.visitInsn(opcodes.RETURN);
         mv.visitMaxs(1, 1);
         mv.visitEnd();
 
-        mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "create" + cls.getSimpleName(),
+        mv = cw.visitMethod(opcodes.ACC_PUBLIC, "create" + cls.getSimpleName(),
                 "()L" + helper.periodToSlashes(cls.getName()) + ";", null, null);
         mv.visitCode();
         String name = cls.getName().replace(".", "/");
-        mv.visitTypeInsn(Opcodes.NEW, name);
-        mv.visitInsn(Opcodes.DUP);
+        mv.visitTypeInsn(opcodes.NEW, name);
+        mv.visitInsn(opcodes.DUP);
         StringBuilder paraString = new StringBuilder(32).append("(");
 
         for (Class<?> paraClass : contructor.getParameterTypes()) {
-            mv.visitInsn(Opcodes.ACONST_NULL);
+            mv.visitInsn(opcodes.ACONST_NULL);
             paraString.append("Ljava/lang/Object;");
         }
         paraString.append(")V");
 
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, name, "<init>", paraString.toString(), false);
+        mv.visitMethodInsn(opcodes.INVOKESPECIAL, name, "<init>", paraString.toString(), false);
 
-        mv.visitInsn(Opcodes.ARETURN);
+        mv.visitInsn(opcodes.ARETURN);
         mv.visitMaxs(1, 1);
         mv.visitEnd();
 

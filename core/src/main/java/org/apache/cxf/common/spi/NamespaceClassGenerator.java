@@ -27,6 +27,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ASMHelper;
+import org.apache.cxf.common.util.OpcodesProxy;
 
 public class NamespaceClassGenerator extends ClassGeneratorClassLoader implements NamespaceClassCreator {
 
@@ -122,7 +123,7 @@ public class NamespaceClassGenerator extends ClassGeneratorClassLoader implement
     //CHECKSTYLE:OFF
     //bunch of really long ASM based methods that cannot be shortened easily
     private byte[] createEclipseNamespaceMapper() {
-        ASMHelper.OpcodesProxy Opcodes = helper.getOpCodes();
+        OpcodesProxy Opcodes = helper.getOpCodes();
         String slashedName = "org/apache/cxf/jaxb/EclipseNamespaceMapper";
         ASMHelper.ClassWriter cw = helper.createClassWriter();
         if (cw == null) {
@@ -302,7 +303,7 @@ public class NamespaceClassGenerator extends ClassGeneratorClassLoader implement
         }
         ASMHelper.FieldVisitor fv;
         ASMHelper.MethodVisitor mv;
-        ASMHelper.OpcodesProxy Opcodes= helper.getOpCodes();
+        OpcodesProxy Opcodes= helper.getOpCodes();
         cw.visit(Opcodes.V1_6,
                 Opcodes.ACC_PUBLIC + Opcodes.ACC_FINAL + Opcodes.ACC_SUPER,
                 postFixedName, null,

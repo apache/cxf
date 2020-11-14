@@ -47,6 +47,7 @@ import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.spi.ClassGeneratorClassLoader;
 import org.apache.cxf.common.util.ASMHelper;
+import org.apache.cxf.common.util.OpcodesProxy;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.JavaUtils;
@@ -110,10 +111,11 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
         return list;
     }
 
-    public Set<Class<?>> generate(Bus bus, JaxWsServiceFactoryBean fact, InterfaceInfo interfaceInfo, boolean q) {
+    public Set<Class<?>> generate(Bus bus, JaxWsServiceFactoryBean fact, InterfaceInfo ii, boolean q) {
+        factory = fact;
         factory = fact;
         qualified = q;
-        this.interfaceInfo = interfaceInfo;
+        this.interfaceInfo = ii;
         helper = bus.getExtension(ASMHelper.class);
         for (OperationInfo opInfo : interfaceInfo.getOperations()) {
             if (opInfo.isUnwrappedCapable()) {
@@ -190,8 +192,8 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
             }
         }
         String classFileName = helper.periodToSlashes(className);
-        ASMHelper.OpcodesProxy Opcodes = helper.getOpCodes();
-        cw.visit(Opcodes.V1_5, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER, classFileName, null,
+        OpcodesProxy opCodes = helper.getOpCodes();
+        cw.visit(opCodes.V1_5, opCodes.ACC_PUBLIC + opCodes.ACC_SUPER, classFileName, null,
                  "java/lang/Object", null);
 
         ASMHelper.AnnotationVisitor av0 = cw.visitAnnotation("Ljavax/xml/bind/annotation/XmlRootElement;", true);
@@ -213,13 +215,13 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
         av0.visitEnd();
 
         // add constructor
-        ASMHelper.MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
+        ASMHelper.MethodVisitor mv = cw.visitMethod(opCodes.ACC_PUBLIC, "<init>", "()V", null, null);
         mv.visitCode();
         ASMHelper.Label lbegin = helper.createLabel();
         mv.visitLabel(lbegin);
-        mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
-        mv.visitInsn(Opcodes.RETURN);
+        mv.visitVarInsn(opCodes.ALOAD, 0);
+        mv.visitMethodInsn(opCodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
+        mv.visitInsn(opCodes.RETURN);
         ASMHelper.Label lend = helper.createLabel();
         mv.visitLabel(lend);
         mv.visitLocalVariable("this", "L" + classFileName + ";", null, lbegin, lend, 0);
@@ -240,8 +242,8 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
     private void generatePackageInfo(String className, String ns, Class<?> clz) {
         ASMHelper.ClassWriter cw = helper.createClassWriter();
         String classFileName = helper.periodToSlashes(className);
-        ASMHelper.OpcodesProxy Opcodes = helper.getOpCodes();
-        cw.visit(Opcodes.V1_5, Opcodes.ACC_ABSTRACT + Opcodes.ACC_INTERFACE, classFileName, null,
+        OpcodesProxy opCodes = helper.getOpCodes();
+        cw.visit(opCodes.V1_5, opCodes.ACC_ABSTRACT + opCodes.ACC_INTERFACE, classFileName, null,
                  "java/lang/Object", null);
 
         boolean q = qualified;
@@ -299,7 +301,7 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
         if (Boolean.TRUE.equals(mpi.getProperty(ReflectionServiceFactoryBean.HEADER))) {
             return;
         }
-        ASMHelper.OpcodesProxy Opcodes = helper.getOpCodes();
+        OpcodesProxy opCodes = helper.getOpCodes();
         String classFileName = helper.periodToSlashes(className);
         String name = mpi.getName().getLocalPart();
         Class<?> clz = mpi.getTypeClass();
@@ -342,7 +344,7 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
         }
         String fieldName = JavaUtils.isJavaKeyword(name) ? JavaUtils.makeNonJavaKeyword(name) : name;
 
-        ASMHelper.FieldVisitor fv = cw.visitField(Opcodes.ACC_PRIVATE,
+        ASMHelper.FieldVisitor fv = cw.visitField(opCodes.ACC_PRIVATE,
                                         fieldName,
                                         classCode,
                                         fieldDescriptor,
@@ -368,26 +370,26 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
         fv.visitEnd();
 
         String methodName = JAXBUtils.nameToIdentifier(name, JAXBUtils.IdentifierType.GETTER);
-        ASMHelper.MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, methodName, "()" + classCode,
+        ASMHelper.MethodVisitor mv = cw.visitMethod(opCodes.ACC_PUBLIC, methodName, "()" + classCode,
                                           fieldDescriptor == null ? null : "()" + fieldDescriptor,
                                           null);
         mv.visitCode();
 
-        mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitFieldInsn(Opcodes.GETFIELD, classFileName, fieldName, classCode);
-        mv.visitInsn(helper.getType(classCode).getOpcode(Opcodes.IRETURN));
+        mv.visitVarInsn(opCodes.ALOAD, 0);
+        mv.visitFieldInsn(opCodes.GETFIELD, classFileName, fieldName, classCode);
+        mv.visitInsn(helper.getType(classCode).getOpcode(opCodes.IRETURN));
         mv.visitMaxs(0, 0);
         mv.visitEnd();
 
         methodName = JAXBUtils.nameToIdentifier(name, JAXBUtils.IdentifierType.SETTER);
-        mv = cw.visitMethod(Opcodes.ACC_PUBLIC, methodName, "(" + classCode + ")V",
+        mv = cw.visitMethod(opCodes.ACC_PUBLIC, methodName, "(" + classCode + ")V",
                             fieldDescriptor == null ? null : "(" + fieldDescriptor + ")V", null);
         mv.visitCode();
-        mv.visitVarInsn(Opcodes.ALOAD, 0);
+        mv.visitVarInsn(opCodes.ALOAD, 0);
         ASMHelper.ASMType setType = helper.getType(classCode);
-        mv.visitVarInsn(setType.getOpcode(Opcodes.ILOAD), 1);
-        mv.visitFieldInsn(Opcodes.PUTFIELD, className, fieldName, classCode);
-        mv.visitInsn(Opcodes.RETURN);
+        mv.visitVarInsn(setType.getOpcode(opCodes.ILOAD), 1);
+        mv.visitFieldInsn(opCodes.PUTFIELD, className, fieldName, classCode);
+        mv.visitInsn(opCodes.RETURN);
         mv.visitMaxs(0, 0);
         mv.visitEnd();
 

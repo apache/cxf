@@ -20,7 +20,6 @@
 package org.apache.cxf.common.util;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -67,7 +66,7 @@ public class ASMHelperImpl implements ASMHelper {
     private void tryClass(String s) {
         if (cwClass == null) {
             try {
-                Class<?> c2 = ClassLoaderUtils.loadClass(s, ASMHelper.class);
+                Class<?> c2 = ClassLoaderUtils.loadClass(s, ASMHelperImpl.class);
 
                 //old versions don't have this, but we need it
                 Class<?> cls = ClassLoaderUtils.loadClass(c2.getPackage().getName() + ".MethodVisitor", c2);
@@ -103,32 +102,16 @@ public class ASMHelperImpl implements ASMHelper {
         return cwClass;
     }
     public OpcodesProxy getOpCodes() {
-        return new OpcodesImpl(this);
-    }
-
-    public class OpcodesImpl extends OpcodesProxy {
-        //CHECKSTYLE:ON
-        public OpcodesImpl(ASMHelper helper) {
-            try {
-                Class<?> cls = helper.getASMClass();
-                cls = ClassLoaderUtils.loadClass(cls.getPackage().getName() + ".Opcodes", cls);
-                for (Field f1 : OpcodesProxy.class.getDeclaredFields()) {
-                    Field f = cls.getDeclaredField(f1.getName());
-                    ReflectionUtil.setAccessible(f1).set(null, ReflectionUtil.setAccessible(f).get(null));
-                }
-            } catch (Throwable e) {
-                //ignore
-            }
-
-            PRIMITIVE_ZERO_MAP.put(Byte.TYPE, ICONST_0);
-            PRIMITIVE_ZERO_MAP.put(Boolean.TYPE, ICONST_0);
-            PRIMITIVE_ZERO_MAP.put(Long.TYPE, LCONST_0);
-            PRIMITIVE_ZERO_MAP.put(Integer.TYPE, ICONST_0);
-            PRIMITIVE_ZERO_MAP.put(Short.TYPE, ICONST_0);
-            PRIMITIVE_ZERO_MAP.put(Character.TYPE, ICONST_0);
-            PRIMITIVE_ZERO_MAP.put(Float.TYPE, FCONST_0);
-            PRIMITIVE_ZERO_MAP.put(Double.TYPE, DCONST_0);
-        }
+        OpcodesProxy ops = new OpcodesProxy(this);
+        PRIMITIVE_ZERO_MAP.put(Byte.TYPE, ops.ICONST_0);
+        PRIMITIVE_ZERO_MAP.put(Boolean.TYPE, ops.ICONST_0);
+        PRIMITIVE_ZERO_MAP.put(Long.TYPE, ops.LCONST_0);
+        PRIMITIVE_ZERO_MAP.put(Integer.TYPE, ops.ICONST_0);
+        PRIMITIVE_ZERO_MAP.put(Short.TYPE, ops.ICONST_0);
+        PRIMITIVE_ZERO_MAP.put(Character.TYPE, ops.ICONST_0);
+        PRIMITIVE_ZERO_MAP.put(Float.TYPE, ops.FCONST_0);
+        PRIMITIVE_ZERO_MAP.put(Double.TYPE, ops.DCONST_0);
+        return ops;
     }
 
     public String getMethodSignature(Method m) {
