@@ -24,6 +24,7 @@ import java.lang.reflect.Constructor;
 import org.apache.cxf.common.spi.ClassGeneratorClassLoader;
 import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.util.ASMHelperImpl;
+import org.apache.cxf.common.util.OpcodesProxy;
 
 public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {
     private Constructor<?> fixedAnyConstructor;
@@ -31,7 +32,7 @@ public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {
     public Class<?> createFixedAnyClass() {
         //TODO move to bus.getExtension(ASMHelper.class)
         ASMHelper helper = new ASMHelperImpl();
-        ASMHelper.OpcodesProxy Opcodes = helper.getOpCodes();
+        OpcodesProxy Opcodes = helper.getOpCodes();
         ASMHelper.ClassWriter cw = helper.createClassWriter();
         ASMHelper.FieldVisitor fv;
 
@@ -57,7 +58,7 @@ public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {
     }
 
     private void addReadOverride(ASMHelper helper, ASMHelper.ClassWriter cw) {
-        ASMHelper.OpcodesProxy Opcodes = helper.getOpCodes();
+        OpcodesProxy Opcodes = helper.getOpCodes();
         ASMHelper.MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "read_value",
                 "(Lorg/omg/CORBA/portable/InputStream;Lorg/omg/CORBA/TypeCode;)V",
                 null, null);
@@ -103,7 +104,7 @@ public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {
     }
 
     private void addWriteOverride(ASMHelper helper, ASMHelper.ClassWriter cw) {
-        ASMHelper.OpcodesProxy Opcodes = helper.getOpCodes();
+        OpcodesProxy Opcodes = helper.getOpCodes();
         ASMHelper.MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "write_value",
                 "(Lorg/omg/CORBA/portable/OutputStream;)V", null, null);
         mv.visitCode();
@@ -147,7 +148,7 @@ public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {
     }
 
     private void addExtractOverride(ASMHelper helper, ASMHelper.ClassWriter cw) {
-        ASMHelper.OpcodesProxy Opcodes = helper.getOpCodes();
+        OpcodesProxy Opcodes = helper.getOpCodes();
         ASMHelper.MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "extract_Streamable",
                 "()Lorg/omg/CORBA/portable/Streamable;", null, null);
         mv.visitCode();
@@ -181,7 +182,7 @@ public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {
     }
 
     private void addInsertOverride(ASMHelper helper, ASMHelper.ClassWriter cw) {
-        ASMHelper.OpcodesProxy Opcodes = helper.getOpCodes();
+        OpcodesProxy Opcodes = helper.getOpCodes();
         ASMHelper.MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC,
                 "insert_Streamable",
                 "(Lorg/omg/CORBA/portable/Streamable;)V", null, null);
@@ -217,7 +218,7 @@ public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {
     }
 
     private void addFixedAnyConstructor(ASMHelper helper, ASMHelper.ClassWriter cw) {
-        ASMHelper.OpcodesProxy Opcodes = helper.getOpCodes();
+        OpcodesProxy Opcodes = helper.getOpCodes();
         ASMHelper.MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "(Lorg/omg/CORBA/ORB;)V", null, null);
         mv.visitCode();
         ASMHelper.Label l0 = helper.createLabel();

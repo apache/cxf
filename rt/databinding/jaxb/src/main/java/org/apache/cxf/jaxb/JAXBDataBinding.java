@@ -58,12 +58,12 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 
-import org.apache.cxf.Bus;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import org.xml.sax.InputSource;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.jaxb.JAXBBeanInfo;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
@@ -284,15 +284,15 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
             r.setMtomThreshold(mtomThresholdInt);
             return (DataWriter<T>)r;
         } else if (c == OutputStream.class) {
-            DataWriterImpl<OutputStream> r = new DataWriterImpl<>(getBus(),this, false);
+            DataWriterImpl<OutputStream> r = new DataWriterImpl<>(getBus(), this, false);
             r.setMtomThreshold(mtomThresholdInt);
             return (DataWriter<T>)r;
         } else if (c == XMLEventWriter.class) {
-            DataWriterImpl<XMLEventWriter> r = new DataWriterImpl<>(getBus(),this, true);
+            DataWriterImpl<XMLEventWriter> r = new DataWriterImpl<>(getBus(), this, true);
             r.setMtomThreshold(mtomThresholdInt);
             return (DataWriter<T>)r;
         } else if (c == Node.class) {
-            DataWriterImpl<Node> r = new DataWriterImpl<>(getBus(),this, false);
+            DataWriterImpl<Node> r = new DataWriterImpl<>(getBus(), this, false);
             r.setMtomThreshold(mtomThresholdInt);
             return (DataWriter<T>)r;
         }
@@ -335,8 +335,8 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
         contextClasses = new LinkedHashSet<>();
 
         for (ServiceInfo serviceInfo : service.getServiceInfos()) {
-            JAXBContextInitializer initializer
-                = new JAXBContextInitializer(getBus(), serviceInfo, contextClasses, typeRefs, this.getUnmarshallerProperties());
+            JAXBContextInitializer initializer = new JAXBContextInitializer(getBus(), serviceInfo, contextClasses,
+                    typeRefs, this.getUnmarshallerProperties());
             initializer.walk();
             if (serviceInfo.getProperty("extra.class") != null) {
                 Set<Class<?>> exClasses = serviceInfo.getProperty("extra.class", Set.class);
@@ -837,7 +837,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
                                                      Method[] getMethods, Method[] jaxbMethods,
                                                      Field[] fields, Object objectFactory) {
 
-        WrapperHelper wh = compileWrapperHelper(bus,wrapperType, setMethods, getMethods, jaxbMethods, fields,
+        WrapperHelper wh = compileWrapperHelper(bus, wrapperType, setMethods, getMethods, jaxbMethods, fields,
                                                 objectFactory);
 
         if (wh == null) {

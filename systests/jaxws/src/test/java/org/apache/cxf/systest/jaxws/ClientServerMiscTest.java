@@ -57,6 +57,7 @@ import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.xml.XMLBinding;
 import org.apache.cxf.common.util.ASMHelper;
+import org.apache.cxf.common.util.ASMHelperImpl;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
@@ -419,7 +420,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
     }
 
     private void setASM(boolean b) throws Exception {
-        Field f = ASMHelper.class.getDeclaredField("badASM");
+        Field f = ASMHelperImpl.class.getDeclaredField("badASM");
         ReflectionUtil.setAccessible(f);
         f.set(null, !b);
     }
@@ -608,7 +609,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         assertEquals(3, ints.length);
         assertEquals(1, ints[0]);
 
-        if (bus.getExtension(ASMHelper.class);.createClassWriter() != null) {
+        if (bus.getExtension(ASMHelper.class).createClassWriter() != null) {
             //doing the type adapter things and such really
             //requires the ASM generated helper classes
             assertEquals("Val", port.createBar("Val").getName());

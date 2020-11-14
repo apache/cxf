@@ -1,7 +1,28 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.apache.cxf.jaxws.spi;
 
+import java.lang.reflect.Method;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.apache.cxf.Bus;
-import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxws.WrapperClassGenerator;
@@ -12,16 +33,10 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
-import javax.xml.namespace.QName;
-import java.lang.reflect.Method;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 public class GeneratedWrapperClassLoader implements WrapperClassCreator {
     private ClassLoader cl;
     private Set<Class<?>> wrapperBeans = new LinkedHashSet<>();
     private InterfaceInfo interfaceInfo;
-    private boolean qualified;
     private JaxWsServiceFactoryBean factory;
 
     public GeneratedWrapperClassLoader(ClassLoader cl) {
@@ -29,10 +44,9 @@ public class GeneratedWrapperClassLoader implements WrapperClassCreator {
     }
 
     @Override
-    public Set<Class<?>> generate(Bus bus, JaxWsServiceFactoryBean fact, InterfaceInfo interfaceInfo, boolean q) {
+    public Set<Class<?>> generate(Bus bus, JaxWsServiceFactoryBean fact, InterfaceInfo ii, boolean q) {
         factory = fact;
-        this.interfaceInfo = interfaceInfo;
-        qualified = q;
+        this.interfaceInfo = ii;
         for (OperationInfo opInfo : interfaceInfo.getOperations()) {
             if (opInfo.isUnwrappedCapable()) {
                 Method method = (Method)opInfo.getProperty(ReflectionServiceFactoryBean.METHOD);
@@ -69,7 +83,6 @@ public class GeneratedWrapperClassLoader implements WrapperClassCreator {
                                     OperationInfo op,
                                     Method method,
                                     boolean isRequest) {
-        QName wrapperElement = messageInfo.getName();
         boolean anonymous = factory.getAnonymousWrapperTypes();
 
         String pkg = getPackageName(method) + ".jaxws_asm" + (anonymous ? "_an" : "");

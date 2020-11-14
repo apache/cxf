@@ -21,13 +21,12 @@ package org.apache.cxf.endpoint.dynamic;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.spi.ClassGeneratorClassLoader;
 import org.apache.cxf.common.util.ASMHelper;
+import org.apache.cxf.common.util.OpcodesProxy;
 
 public class ExceptionClassGenerator extends ClassGeneratorClassLoader implements ExceptionClassCreator {
-    private Bus bus;
     private ASMHelper helper;
 
     public ExceptionClassGenerator(Bus bus) {
-        this.bus = bus;
         this.helper = bus.getExtension(ASMHelper.class);
     }
     @Override
@@ -39,10 +38,10 @@ public class ExceptionClassGenerator extends ClassGeneratorClassLoader implement
         Class<?> cls = findClass(newClassName.replace('/', '.'), bean);
         if (cls == null) {
             ASMHelper.ClassWriter cw = helper.createClassWriter();
-            ASMHelper.OpcodesProxy Opcodes = helper.getOpCodes();
+            OpcodesProxy opCodes = helper.getOpCodes();
 
-            cw.visit(Opcodes.V1_5,
-                    Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER,
+            cw.visit(opCodes.V1_5,
+                    opCodes.ACC_PUBLIC | opCodes.ACC_SUPER,
                     newClassName,
                     null,
                     "java/lang/Exception",
@@ -56,31 +55,31 @@ public class ExceptionClassGenerator extends ClassGeneratorClassLoader implement
             fv.visitEnd();
 
 
-            mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>",
+            mv = cw.visitMethod(opCodes.ACC_PUBLIC, "<init>",
                     "(Ljava/lang/String;" + beanClassCode + ")V", null, null);
             mv.visitCode();
             mv.visitLabel(helper.createLabel());
-            mv.visitVarInsn(Opcodes.ALOAD, 0);
-            mv.visitVarInsn(Opcodes.ALOAD, 1);
-            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Exception",
+            mv.visitVarInsn(opCodes.ALOAD, 0);
+            mv.visitVarInsn(opCodes.ALOAD, 1);
+            mv.visitMethodInsn(opCodes.INVOKESPECIAL, "java/lang/Exception",
                     "<init>", "(Ljava/lang/String;)V", false);
             mv.visitLabel(helper.createLabel());
-            mv.visitVarInsn(Opcodes.ALOAD, 0);
-            mv.visitVarInsn(Opcodes.ALOAD, 2);
-            mv.visitFieldInsn(Opcodes.PUTFIELD, newClassName, "faultInfo", beanClassCode);
+            mv.visitVarInsn(opCodes.ALOAD, 0);
+            mv.visitVarInsn(opCodes.ALOAD, 2);
+            mv.visitFieldInsn(opCodes.PUTFIELD, newClassName, "faultInfo", beanClassCode);
             mv.visitLabel(helper.createLabel());
-            mv.visitInsn(Opcodes.RETURN);
+            mv.visitInsn(opCodes.RETURN);
             mv.visitLabel(helper.createLabel());
             mv.visitMaxs(2, 3);
             mv.visitEnd();
 
-            mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "getFaultInfo",
+            mv = cw.visitMethod(opCodes.ACC_PUBLIC, "getFaultInfo",
                     "()" + beanClassCode, null, null);
             mv.visitCode();
             mv.visitLabel(helper.createLabel());
-            mv.visitVarInsn(Opcodes.ALOAD, 0);
-            mv.visitFieldInsn(Opcodes.GETFIELD, newClassName, "faultInfo", beanClassCode);
-            mv.visitInsn(Opcodes.ARETURN);
+            mv.visitVarInsn(opCodes.ALOAD, 0);
+            mv.visitFieldInsn(opCodes.GETFIELD, newClassName, "faultInfo", beanClassCode);
+            mv.visitInsn(opCodes.ARETURN);
             mv.visitLabel(helper.createLabel());
             mv.visitMaxs(1, 1);
             mv.visitEnd();

@@ -68,7 +68,6 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxws.JAXWSMethodDispatcher;
 import org.apache.cxf.jaxws.JAXWSMethodInvoker;
 import org.apache.cxf.jaxws.JAXWSProviderMethodDispatcher;
-import org.apache.cxf.jaxws.WrapperClassGenerator;
 import org.apache.cxf.jaxws.interceptors.WebFaultOutInterceptor;
 import org.apache.cxf.jaxws.spi.WrapperClassCreator;
 import org.apache.cxf.service.factory.FactoryBeanListener;
@@ -668,7 +667,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
             && schemaLocations == null) {
             ServiceInfo serviceInfo = getService().getServiceInfos().get(0);
             WrapperClassCreator wrapperGen = getBus().getExtension(WrapperClassCreator.class);
-            return wrapperGen.generate(getBus(),this,
+            return wrapperGen.generate(getBus(), this,
                     serviceInfo.getInterface(),
                     getQualifyWrapperSchema());
         }

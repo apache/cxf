@@ -32,7 +32,6 @@ import org.apache.cxf.common.jaxb.JAXBUtils.Mapping;
 import org.apache.cxf.common.jaxb.JAXBUtils.S2JJAXBModel;
 import org.apache.cxf.common.jaxb.JAXBUtils.TypeAndAnnotation;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.util.PrimitiveUtils;
 import org.apache.cxf.service.ServiceModelVisitor;
 import org.apache.cxf.service.factory.ServiceConstructionException;

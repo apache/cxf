@@ -19,5 +19,5 @@
 package org.apache.cxf.endpoint.dynamic;
 
 public interface ExceptionClassCreator {
-    public Class<?> createExceptionClass(Class<?> bean);
+    Class<?> createExceptionClass(Class<?> bean);
 }

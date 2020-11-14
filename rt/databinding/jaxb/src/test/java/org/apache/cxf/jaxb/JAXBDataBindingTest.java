@@ -67,8 +67,6 @@ import org.apache.cxf.jaxb.fortest.unqualified.UnqualifiedBean;
 import org.apache.cxf.jaxb.io.DataReaderImpl;
 import org.apache.cxf.jaxb.io.DataWriterImpl;
 import org.apache.cxf.transport.DestinationFactoryManager;
-import org.apache.cxf.wsdl.ExtensionClassCreator;
-import org.apache.cxf.wsdl.ExtensionClassGenerator;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeOneWay;
@@ -251,10 +249,15 @@ public class JAXBDataBindingTest {
                 return;
             }
         }
+        Bus b = new ExtensionManagerBus();
+        ASMHelper helper = new ASMHelperImpl();
+        b.setExtension(helper, ASMHelper.class);
+        FactoryClassCreator extr = new FactoryClassProxyService(b);
+        b.setExtension(extr, FactoryClassCreator.class);
         try {
             if (!asm) {
-                ReflectionUtil.setAccessible(ReflectionUtil.getDeclaredField(ASMHelper.class, "badASM"))
-                    .set(null, Boolean.TRUE);
+                ReflectionUtil.setAccessible(ReflectionUtil.getDeclaredField(ASMHelperImpl.class, "badASM"))
+                    .set(helper, Boolean.TRUE);
             }
 
             JAXBDataBinding db = createJaxbContext(internal);
@@ -271,8 +274,8 @@ public class JAXBDataBindingTest {
             assertTrue("Failed to map namespace " + xml, xml.contains("greenland=\"uri:ultima:thule"));
         } finally {
             if (!asm) {
-                ReflectionUtil.setAccessible(ReflectionUtil.getDeclaredField(ASMHelper.class, "badASM"))
-                    .set(null, Boolean.FALSE);
+                ReflectionUtil.setAccessible(ReflectionUtil.getDeclaredField(ASMHelperImpl.class, "badASM"))
+                    .set(helper, Boolean.FALSE);
             }
         }
     }
@@ -356,7 +359,7 @@ public class JAXBDataBindingTest {
         b.setExtension(new ASMHelperImpl(), ASMHelper.class);
         FactoryClassCreator extr = new FactoryClassProxyService(b);
         b.setExtension(extr, FactoryClassCreator.class);
-        JAXBContextInitializer init = new JAXBContextInitializer(b,null, classes, typeReferences, props);
+        JAXBContextInitializer init = new JAXBContextInitializer(b, null, classes, typeReferences, props);
         init.addClass(sampleClassInDefaultPackage);
         assertEquals(1, classes.size());
     }
