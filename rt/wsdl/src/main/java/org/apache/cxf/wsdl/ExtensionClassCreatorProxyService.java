@@ -16,42 +16,37 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.wsdl;
 
-package org.apache.cxf.common.spi;
-
-import java.util.Map;
+import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 
-public class ClassLoaderProxyService implements ClassLoaderService {
-    NamespaceClassCreator srv;
-    public ClassLoaderProxyService(Bus bus) {
-        this(new NamespaceClassGenerator(bus));
+public class ExtensionClassCreatorProxyService implements ExtensionClassCreator {
+    ExtensionClassCreator srv;
+    public ExtensionClassCreatorProxyService(Bus bus) {
+        this(new ExtensionClassGenerator(bus));
     }
-    public ClassLoaderProxyService(NamespaceClassCreator srv) {
+    public ExtensionClassCreatorProxyService(ExtensionClassCreator srv) {
+        super();
         this.srv = srv;
     }
 
     @Override
-    public Object createNamespaceWrapper(Class<?> mcls, Map<String, String> map) {
-        Class<?> cls = srv.createNamespaceWrapper(mcls, map);
-        try {
-            return cls.getConstructor(Map.class).newInstance(map);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            return null;
-        }
+    public Class<?> createExtensionClass(Class<?> cls, QName qname, ClassLoader loader) {
+        return srv.createExtensionClass(cls, qname, loader);
     }
-    public class LoadFirst extends ClassLoaderProxyService {
-        public LoadFirst(Bus bus) {
+
+    public class LoadFirst extends ExtensionClassCreatorProxyService {
+        public LoadFirst(ClassLoader cl) {
             //TODO not sure here if I get class loader like that ???
             // or I need to inject another class loader from outside
-            super(new GeneratedNamespaceClassLoader(LoadFirst.class.getClassLoader()));
+            super(new ExtensionClassLoader(cl));
         }
     }
-    public class GenerateJustInTime extends ClassLoaderProxyService {
+    public class GenerateJustInTime extends ExtensionClassCreatorProxyService {
         public GenerateJustInTime(Bus bus) {
-            super(new NamespaceClassGenerator(bus));
+            super(new ExtensionClassGenerator(bus));
         }
     }
 }

@@ -19,14 +19,14 @@
 
 package org.apache.cxf.common.spi;
 
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ASMHelper;
-
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class NamespaceClassGenerator extends ClassGeneratorClassLoader implements NamespaceClassCreator {
 
