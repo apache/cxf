@@ -30,8 +30,8 @@
         <!-- don't deploy the samples, kind of pointless -->
         <maven.deploy.skip>true</maven.deploy.skip>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.boot.version>2.3.6.RELEASE</spring.boot.version>
-        <spring.cloud.eureka.version>2.2.3.RELEASE</spring.cloud.eureka.version>
+        <spring.boot.version>2.4.0</spring.boot.version>
+        <spring.cloud.eureka.version>3.0.0-M4</spring.cloud.eureka.version>
         <cxf.jetty9.version>9.4.34.v20201102</cxf.jetty9.version>
         <cxf.httpcomponents.client.version>4.5.13</cxf.httpcomponents.client.version>
         <cxf.swagger.ui.version>3.32.1</cxf.swagger.ui.version>
@@ -50,7 +50,6 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-features-logging</artifactId>
-            <version>${project.version}</version>
         </dependency>
     </dependencies>
     <modules>
@@ -209,6 +208,11 @@
                     <artifactId>maven-war-plugin</artifactId>
                     <version>3.3.0</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.22.2</version>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -259,7 +263,6 @@
                 <dependency>
                     <groupId>jakarta.xml.ws</groupId>
                     <artifactId>jakarta.xml.ws-api</artifactId>
-                    <version>2.3.3</version>
                 </dependency>
                 <dependency>
                     <groupId>jakarta.activation</groupId>
@@ -269,7 +272,6 @@
                 <dependency>
                     <groupId>jakarta.jws</groupId>
                     <artifactId>jakarta.jws-api</artifactId>
-                    <version>1.1.1</version>
                 </dependency>
                 <dependency>
                     <groupId>com.sun.xml.messaging.saaj</groupId>
@@ -314,4 +316,16 @@
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
     </distributionManagement>
+    
+    <!-- 
+        TODO: Please remove, temporary repository settings in order to enable milestones for
+        Spring Cloud Netflix (3.0.0-M4 at the moment).
+    -->
+    <repositories>
+        <repository>
+            <id>spring-milestones</id>
+            <snapshots><enabled>false</enabled></snapshots>
+            <url>https://repo.spring.io/milestone</url>
+        </repository>
+    </repositories>
 </project>
