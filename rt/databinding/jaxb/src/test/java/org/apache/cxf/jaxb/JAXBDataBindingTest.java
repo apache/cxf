@@ -54,8 +54,10 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.BindingFactoryManager;
+import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ASMHelper;
+import org.apache.cxf.common.util.ASMHelperImpl;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
@@ -65,6 +67,8 @@ import org.apache.cxf.jaxb.fortest.unqualified.UnqualifiedBean;
 import org.apache.cxf.jaxb.io.DataReaderImpl;
 import org.apache.cxf.jaxb.io.DataWriterImpl;
 import org.apache.cxf.transport.DestinationFactoryManager;
+import org.apache.cxf.wsdl.ExtensionClassCreator;
+import org.apache.cxf.wsdl.ExtensionClassGenerator;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeOneWay;
@@ -300,7 +304,11 @@ public class JAXBDataBindingTest {
         Set<Class<?>> classes = new HashSet<>();
         Collection<Object> typeReferences = new ArrayList<>();
         Map<String, Object> props = new HashMap<>();
-        JAXBContextInitializer init = new JAXBContextInitializer(null, classes, typeReferences, props);
+        Bus b = new ExtensionManagerBus();
+        b.setExtension(new ASMHelperImpl(), ASMHelper.class);
+        FactoryClassCreator extr = new FactoryClassProxyService(b);
+        b.setExtension(extr, FactoryClassCreator.class);
+        JAXBContextInitializer init = new JAXBContextInitializer(b, null, classes, typeReferences, props);
         init.addClass(Type2.class);
         assertEquals(2, classes.size());
     }
@@ -344,7 +352,11 @@ public class JAXBDataBindingTest {
         Set<Class<?>> classes = new HashSet<>();
         Collection<Object> typeReferences = new ArrayList<>();
         Map<String, Object> props = new HashMap<>();
-        JAXBContextInitializer init = new JAXBContextInitializer(null, classes, typeReferences, props);
+        Bus b = new ExtensionManagerBus();
+        b.setExtension(new ASMHelperImpl(), ASMHelper.class);
+        FactoryClassCreator extr = new FactoryClassProxyService(b);
+        b.setExtension(extr, FactoryClassCreator.class);
+        JAXBContextInitializer init = new JAXBContextInitializer(b,null, classes, typeReferences, props);
         init.addClass(sampleClassInDefaultPackage);
         assertEquals(1, classes.size());
     }
