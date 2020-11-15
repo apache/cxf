@@ -19,6 +19,10 @@
 
 package org.apache.cxf.common.spi;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,12 +34,16 @@ public class ClassGeneratorClassLoader {
             = new WeakIdentityHashMap<>();
     protected static final Map<Class<?>, WeakReference<TypeHelperClassLoader>> CLASS_MAP
             = new WeakIdentityHashMap<>();
+    private static final boolean DEBUG = true;
 
     public ClassGeneratorClassLoader() {
     }
 
 
     protected Class<?> loadClass(String className, Class<?> clz, byte[] bytes) {
+        if (DEBUG) {
+            saveClass(className, bytes);
+        }
         TypeHelperClassLoader loader = ClassGeneratorClassLoader.getTypeHelperClassLoader(clz);
         synchronized (loader) {
             Class<?> cls = loader.lookupDefinedClass(className);
@@ -43,6 +51,37 @@ public class ClassGeneratorClassLoader {
                 return loader.defineClass(className, bytes);
             }
             return cls;
+        }
+    }
+    private String getFilePath(String s) {
+        String sep = System.getProperty("file.separator");
+        String relativePath = s.replace('.', sep.charAt(0));
+        String userDir = System.getProperty("user.dir");
+        return userDir + sep + "target" + sep + "dump" + sep + relativePath + ".class";
+    }
+    private void saveClass(String className, byte[] bytes) {
+
+        File file;
+        try {
+            String classFileName = getFilePath(className);
+            String finalFileName = classFileName;
+            file = new File(finalFileName);
+            int i = 1;
+            while (file.exists()) {
+                finalFileName = classFileName.substring(0, classFileName.length() - 6) + String.valueOf(i) + ".class";
+                file = new File(finalFileName);
+                i++;
+            }
+            file.getParentFile().mkdirs();
+            try (FileOutputStream fop = new FileOutputStream(file)) {
+                file.createNewFile();
+                fop.write(bytes);
+                fop.flush();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
     protected Class<?> loadClass(String className, ClassLoader l, byte[] bytes) {
