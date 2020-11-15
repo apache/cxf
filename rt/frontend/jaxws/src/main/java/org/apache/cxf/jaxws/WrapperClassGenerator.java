@@ -19,7 +19,6 @@
 
 package org.apache.cxf.jaxws;
 
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
