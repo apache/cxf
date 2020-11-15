@@ -19,24 +19,21 @@
 
 package org.apache.cxf.binding.corba.utils;
 
-import java.lang.reflect.Constructor;
-
 import org.apache.cxf.common.spi.ClassGeneratorClassLoader;
 import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.util.ASMHelperImpl;
 import org.apache.cxf.common.util.OpcodesProxy;
 
 public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {
-    private Constructor<?> fixedAnyConstructor;
 
     public Class<?> createFixedAnyClass() {
         //TODO move to bus.getExtension(ASMHelper.class)
         ASMHelper helper = new ASMHelperImpl();
-        OpcodesProxy Opcodes = helper.getOpCodes();
+        OpcodesProxy opCodes = helper.getOpCodes();
         ASMHelper.ClassWriter cw = helper.createClassWriter();
         ASMHelper.FieldVisitor fv;
 
-        cw.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER,
+        cw.visit(opCodes.V1_6, opCodes.ACC_PUBLIC + opCodes.ACC_SUPER,
                 "org/apache/cxf/binding/corba/utils/FixedAnyImpl",
                 null, "com/sun/corba/se/impl/corba/AnyImpl", null);
 
@@ -58,41 +55,41 @@ public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {
     }
 
     private void addReadOverride(ASMHelper helper, ASMHelper.ClassWriter cw) {
-        OpcodesProxy Opcodes = helper.getOpCodes();
-        ASMHelper.MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "read_value",
+        OpcodesProxy opCodes = helper.getOpCodes();
+        ASMHelper.MethodVisitor mv = cw.visitMethod(opCodes.ACC_PUBLIC, "read_value",
                 "(Lorg/omg/CORBA/portable/InputStream;Lorg/omg/CORBA/TypeCode;)V",
                 null, null);
         mv.visitCode();
         ASMHelper.Label l0 = helper.createLabel();
         mv.visitLabel(l0);
         mv.visitLineNumber(54, l0);
-        mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitFieldInsn(Opcodes.GETFIELD, "org/apache/cxf/binding/corba/utils/FixedAnyImpl",
+        mv.visitVarInsn(opCodes.ALOAD, 0);
+        mv.visitFieldInsn(opCodes.GETFIELD, "org/apache/cxf/binding/corba/utils/FixedAnyImpl",
                 "obj", "Lorg/omg/CORBA/portable/Streamable;");
         ASMHelper.Label l1 = helper.createLabel();
-        mv.visitJumpInsn(Opcodes.IFNULL, l1);
+        mv.visitJumpInsn(opCodes.IFNULL, l1);
         ASMHelper.Label l2 = helper.createLabel();
         mv.visitLabel(l2);
         mv.visitLineNumber(55, l2);
-        mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitFieldInsn(Opcodes.GETFIELD, "org/apache/cxf/binding/corba/utils/FixedAnyImpl",
+        mv.visitVarInsn(opCodes.ALOAD, 0);
+        mv.visitFieldInsn(opCodes.GETFIELD, "org/apache/cxf/binding/corba/utils/FixedAnyImpl",
                 "obj", "Lorg/omg/CORBA/portable/Streamable;");
-        mv.visitVarInsn(Opcodes.ALOAD, 1);
-        mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "org/omg/CORBA/portable/Streamable",
+        mv.visitVarInsn(opCodes.ALOAD, 1);
+        mv.visitMethodInsn(opCodes.INVOKEINTERFACE, "org/omg/CORBA/portable/Streamable",
                 "_read", "(Lorg/omg/CORBA/portable/InputStream;)V", true);
         ASMHelper.Label l3 = helper.createLabel();
-        mv.visitJumpInsn(Opcodes.GOTO, l3);
+        mv.visitJumpInsn(opCodes.GOTO, l3);
         mv.visitLabel(l1);
         mv.visitLineNumber(57, l1);
-        mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitVarInsn(Opcodes.ALOAD, 1);
-        mv.visitVarInsn(Opcodes.ALOAD, 2);
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "com/sun/corba/se/impl/corba/AnyImpl",
+        mv.visitVarInsn(opCodes.ALOAD, 0);
+        mv.visitVarInsn(opCodes.ALOAD, 1);
+        mv.visitVarInsn(opCodes.ALOAD, 2);
+        mv.visitMethodInsn(opCodes.INVOKESPECIAL, "com/sun/corba/se/impl/corba/AnyImpl",
                 "read_value",
                 "(Lorg/omg/CORBA/portable/InputStream;Lorg/omg/CORBA/TypeCode;)V", false);
         mv.visitLabel(l3);
         mv.visitLineNumber(59, l3);
-        mv.visitInsn(Opcodes.RETURN);
+        mv.visitInsn(opCodes.RETURN);
         ASMHelper.Label l4 = helper.createLabel();
         mv.visitLabel(l4);
         mv.visitLocalVariable("this", "Lorg/apache/cxf/binding/corba/utils/FixedAnyImpl;",
@@ -104,39 +101,39 @@ public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {
     }
 
     private void addWriteOverride(ASMHelper helper, ASMHelper.ClassWriter cw) {
-        OpcodesProxy Opcodes = helper.getOpCodes();
-        ASMHelper.MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "write_value",
+        OpcodesProxy opCodes = helper.getOpCodes();
+        ASMHelper.MethodVisitor mv = cw.visitMethod(opCodes.ACC_PUBLIC, "write_value",
                 "(Lorg/omg/CORBA/portable/OutputStream;)V", null, null);
         mv.visitCode();
         ASMHelper.Label l0 = helper.createLabel();
         mv.visitLabel(l0);
         mv.visitLineNumber(61, l0);
-        mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitFieldInsn(Opcodes.GETFIELD, "org/apache/cxf/binding/corba/utils/FixedAnyImpl",
+        mv.visitVarInsn(opCodes.ALOAD, 0);
+        mv.visitFieldInsn(opCodes.GETFIELD, "org/apache/cxf/binding/corba/utils/FixedAnyImpl",
                 "obj", "Lorg/omg/CORBA/portable/Streamable;");
         ASMHelper.Label l1 = helper.createLabel();
-        mv.visitJumpInsn(Opcodes.IFNULL, l1);
+        mv.visitJumpInsn(opCodes.IFNULL, l1);
         ASMHelper.Label l2 = helper.createLabel();
         mv.visitLabel(l2);
         mv.visitLineNumber(62, l2);
-        mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitFieldInsn(Opcodes.GETFIELD, "org/apache/cxf/binding/corba/utils/FixedAnyImpl",
+        mv.visitVarInsn(opCodes.ALOAD, 0);
+        mv.visitFieldInsn(opCodes.GETFIELD, "org/apache/cxf/binding/corba/utils/FixedAnyImpl",
                 "obj", "Lorg/omg/CORBA/portable/Streamable;");
 
         ASMHelper.Label l3 = helper.createLabel();
-        mv.visitVarInsn(Opcodes.ALOAD, 1);
-        mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "org/omg/CORBA/portable/Streamable",
+        mv.visitVarInsn(opCodes.ALOAD, 1);
+        mv.visitMethodInsn(opCodes.INVOKEINTERFACE, "org/omg/CORBA/portable/Streamable",
                 "_write", "(Lorg/omg/CORBA/portable/OutputStream;)V", true);
-        mv.visitJumpInsn(Opcodes.GOTO, l3);
+        mv.visitJumpInsn(opCodes.GOTO, l3);
         mv.visitLabel(l1);
         mv.visitLineNumber(64, l1);
-        mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitVarInsn(Opcodes.ALOAD, 1);
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "com/sun/corba/se/impl/corba/AnyImpl",
+        mv.visitVarInsn(opCodes.ALOAD, 0);
+        mv.visitVarInsn(opCodes.ALOAD, 1);
+        mv.visitMethodInsn(opCodes.INVOKESPECIAL, "com/sun/corba/se/impl/corba/AnyImpl",
                 "write_value", "(Lorg/omg/CORBA/portable/OutputStream;)V", false);
         mv.visitLabel(l3);
         mv.visitLineNumber(66, l3);
-        mv.visitInsn(Opcodes.RETURN);
+        mv.visitInsn(opCodes.RETURN);
         ASMHelper.Label l4 = helper.createLabel();
         mv.visitLabel(l4);
         mv.visitLocalVariable("this", "Lorg/apache/cxf/binding/corba/utils/FixedAnyImpl;",
@@ -148,31 +145,31 @@ public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {
     }
 
     private void addExtractOverride(ASMHelper helper, ASMHelper.ClassWriter cw) {
-        OpcodesProxy Opcodes = helper.getOpCodes();
-        ASMHelper.MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "extract_Streamable",
+        OpcodesProxy opCodes = helper.getOpCodes();
+        ASMHelper.MethodVisitor mv = cw.visitMethod(opCodes.ACC_PUBLIC, "extract_Streamable",
                 "()Lorg/omg/CORBA/portable/Streamable;", null, null);
         mv.visitCode();
         ASMHelper.Label l0 = helper.createLabel();
         mv.visitLabel(l0);
         mv.visitLineNumber(47, l0);
-        mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitFieldInsn(Opcodes.GETFIELD, "org/apache/cxf/binding/corba/utils/FixedAnyImpl",
+        mv.visitVarInsn(opCodes.ALOAD, 0);
+        mv.visitFieldInsn(opCodes.GETFIELD, "org/apache/cxf/binding/corba/utils/FixedAnyImpl",
                 "obj", "Lorg/omg/CORBA/portable/Streamable;");
         ASMHelper.Label l1 = helper.createLabel();
-        mv.visitJumpInsn(Opcodes.IFNULL, l1);
+        mv.visitJumpInsn(opCodes.IFNULL, l1);
         ASMHelper.Label l2 = helper.createLabel();
         mv.visitLabel(l2);
         mv.visitLineNumber(48, l2);
-        mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitFieldInsn(Opcodes.GETFIELD, "org/apache/cxf/binding/corba/utils/FixedAnyImpl",
+        mv.visitVarInsn(opCodes.ALOAD, 0);
+        mv.visitFieldInsn(opCodes.GETFIELD, "org/apache/cxf/binding/corba/utils/FixedAnyImpl",
                 "obj", "Lorg/omg/CORBA/portable/Streamable;");
-        mv.visitInsn(Opcodes.ARETURN);
+        mv.visitInsn(opCodes.ARETURN);
         mv.visitLabel(l1);
         mv.visitLineNumber(50, l1);
-        mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "com/sun/corba/se/impl/corba/AnyImpl",
+        mv.visitVarInsn(opCodes.ALOAD, 0);
+        mv.visitMethodInsn(opCodes.INVOKESPECIAL, "com/sun/corba/se/impl/corba/AnyImpl",
                 "extract_Streamable", "()Lorg/omg/CORBA/portable/Streamable;", false);
-        mv.visitInsn(Opcodes.ARETURN);
+        mv.visitInsn(opCodes.ARETURN);
         ASMHelper.Label l3 = helper.createLabel();
         mv.visitLabel(l3);
         mv.visitLocalVariable("this", "Lorg/apache/cxf/binding/corba/utils/FixedAnyImpl;", null, l0, l3, 0);
@@ -182,32 +179,32 @@ public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {
     }
 
     private void addInsertOverride(ASMHelper helper, ASMHelper.ClassWriter cw) {
-        OpcodesProxy Opcodes = helper.getOpCodes();
-        ASMHelper.MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC,
+        OpcodesProxy opCodes = helper.getOpCodes();
+        ASMHelper.MethodVisitor mv = cw.visitMethod(opCodes.ACC_PUBLIC,
                 "insert_Streamable",
                 "(Lorg/omg/CORBA/portable/Streamable;)V", null, null);
         mv.visitCode();
         ASMHelper.Label l0 = helper.createLabel();
         mv.visitLabel(l0);
         mv.visitLineNumber(43, l0);
-        mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitVarInsn(Opcodes.ALOAD, 1);
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL,
+        mv.visitVarInsn(opCodes.ALOAD, 0);
+        mv.visitVarInsn(opCodes.ALOAD, 1);
+        mv.visitMethodInsn(opCodes.INVOKESPECIAL,
                 "com/sun/corba/se/impl/corba/AnyImpl",
                 "insert_Streamable",
                 "(Lorg/omg/CORBA/portable/Streamable;)V", false);
         ASMHelper.Label l1 = helper.createLabel();
         mv.visitLabel(l1);
         mv.visitLineNumber(44, l1);
-        mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitVarInsn(Opcodes.ALOAD, 1);
-        mv.visitFieldInsn(Opcodes.PUTFIELD,
+        mv.visitVarInsn(opCodes.ALOAD, 0);
+        mv.visitVarInsn(opCodes.ALOAD, 1);
+        mv.visitFieldInsn(opCodes.PUTFIELD,
                 "org/apache/cxf/binding/corba/utils/FixedAnyImpl", "obj",
                 "Lorg/omg/CORBA/portable/Streamable;");
         ASMHelper.Label l2 = helper.createLabel();
         mv.visitLabel(l2);
         mv.visitLineNumber(45, l2);
-        mv.visitInsn(Opcodes.RETURN);
+        mv.visitInsn(opCodes.RETURN);
         ASMHelper.Label l3 = helper.createLabel();
         mv.visitLabel(l3);
         mv.visitLocalVariable("this", "Lorg/apache/cxf/binding/corba/utils/FixedAnyImpl;",
@@ -218,22 +215,22 @@ public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {
     }
 
     private void addFixedAnyConstructor(ASMHelper helper, ASMHelper.ClassWriter cw) {
-        OpcodesProxy Opcodes = helper.getOpCodes();
-        ASMHelper.MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "(Lorg/omg/CORBA/ORB;)V", null, null);
+        OpcodesProxy opCodes = helper.getOpCodes();
+        ASMHelper.MethodVisitor mv = cw.visitMethod(opCodes.ACC_PUBLIC, "<init>", "(Lorg/omg/CORBA/ORB;)V", null, null);
         mv.visitCode();
         ASMHelper.Label l0 = helper.createLabel();
         mv.visitLabel(l0);
         mv.visitLineNumber(36, l0);
-        mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitVarInsn(Opcodes.ALOAD, 1);
-        mv.visitTypeInsn(Opcodes.CHECKCAST, "com/sun/corba/se/spi/orb/ORB");
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL,
+        mv.visitVarInsn(opCodes.ALOAD, 0);
+        mv.visitVarInsn(opCodes.ALOAD, 1);
+        mv.visitTypeInsn(opCodes.CHECKCAST, "com/sun/corba/se/spi/orb/ORB");
+        mv.visitMethodInsn(opCodes.INVOKESPECIAL,
                 "com/sun/corba/se/impl/corba/AnyImpl",
                 "<init>", "(Lcom/sun/corba/se/spi/orb/ORB;)V", false);
         ASMHelper.Label l1 = helper.createLabel();
         mv.visitLabel(l1);
         mv.visitLineNumber(37, l1);
-        mv.visitInsn(Opcodes.RETURN);
+        mv.visitInsn(opCodes.RETURN);
         ASMHelper.Label l2 = helper.createLabel();
         mv.visitLabel(l2);
         mv.visitLocalVariable("this",
@@ -244,25 +241,25 @@ public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {
         mv.visitEnd();
 
 
-        mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>",
+        mv = cw.visitMethod(opCodes.ACC_PUBLIC, "<init>",
                 "(Lorg/omg/CORBA/ORB;Lorg/omg/CORBA/Any;)V",
                 null, null);
         mv.visitCode();
         l0 = helper.createLabel();
         mv.visitLabel(l0);
         mv.visitLineNumber(39, l0);
-        mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitVarInsn(Opcodes.ALOAD, 1);
-        mv.visitTypeInsn(Opcodes.CHECKCAST, "com/sun/corba/se/spi/orb/ORB");
-        mv.visitVarInsn(Opcodes.ALOAD, 2);
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL,
+        mv.visitVarInsn(opCodes.ALOAD, 0);
+        mv.visitVarInsn(opCodes.ALOAD, 1);
+        mv.visitTypeInsn(opCodes.CHECKCAST, "com/sun/corba/se/spi/orb/ORB");
+        mv.visitVarInsn(opCodes.ALOAD, 2);
+        mv.visitMethodInsn(opCodes.INVOKESPECIAL,
                 "com/sun/corba/se/impl/corba/AnyImpl",
                 "<init>",
                 "(Lcom/sun/corba/se/spi/orb/ORB;Lorg/omg/CORBA/Any;)V", false);
         l1 = helper.createLabel();
         mv.visitLabel(l1);
         mv.visitLineNumber(40, l1);
-        mv.visitInsn(Opcodes.RETURN);
+        mv.visitInsn(opCodes.RETURN);
         l2 = helper.createLabel();
         mv.visitLabel(l2);
         mv.visitLocalVariable("this", "Lorg/apache/cxf/binding/corba/utils/FixedAnyImpl;",
