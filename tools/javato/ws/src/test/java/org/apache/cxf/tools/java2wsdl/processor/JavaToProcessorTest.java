@@ -77,19 +77,14 @@ import static org.junit.Assert.fail;
 
 public class JavaToProcessorTest extends ProcessorTestBase {
     JavaToWSDLProcessor processor = new JavaToWSDLProcessor();
-    String classPath = "";
     @Before
     public void startUp() throws Exception {
         env = new ToolContext();
         env.put(ToolConstants.CFG_WSDL, ToolConstants.CFG_WSDL);
-
-        classPath = System.getProperty("java.class.path");
-        System.setProperty("java.class.path", getClassPath());
     }
     @After
     public void tearDown() {
         super.tearDown();
-        System.setProperty("java.class.path", classPath);
     }
 
     @Test
