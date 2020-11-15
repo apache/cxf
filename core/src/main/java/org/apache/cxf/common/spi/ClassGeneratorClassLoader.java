@@ -36,7 +36,7 @@ public class ClassGeneratorClassLoader {
 
 
     protected Class<?> loadClass(String className, Class<?> clz, byte[] bytes) {
-        TypeHelperClassLoader loader = getTypeHelperClassLoader(clz);
+        TypeHelperClassLoader loader = ClassGeneratorClassLoader.getTypeHelperClassLoader(clz);
         synchronized (loader) {
             Class<?> cls = loader.lookupDefinedClass(className);
             if (cls == null) {
@@ -46,7 +46,7 @@ public class ClassGeneratorClassLoader {
         }
     }
     protected Class<?> loadClass(String className, ClassLoader l, byte[] bytes) {
-        TypeHelperClassLoader loader = getTypeHelperClassLoader(l);
+        TypeHelperClassLoader loader = ClassGeneratorClassLoader.getTypeHelperClassLoader(l);
         synchronized (loader) {
             Class<?> cls = loader.lookupDefinedClass(className);
             if (cls == null) {
@@ -56,15 +56,15 @@ public class ClassGeneratorClassLoader {
         }
     }
     protected Class<?> findClass(String className, Class<?> clz) {
-        TypeHelperClassLoader loader = getTypeHelperClassLoader(clz);
+        TypeHelperClassLoader loader = ClassGeneratorClassLoader.getTypeHelperClassLoader(clz);
         return loader.lookupDefinedClass(className);
     }
     protected Class<?> findClass(String className, ClassLoader l) {
-        TypeHelperClassLoader loader = getTypeHelperClassLoader(l);
+        TypeHelperClassLoader loader = ClassGeneratorClassLoader.getTypeHelperClassLoader(l);
         return loader.lookupDefinedClass(className);
     }
 
-    private synchronized TypeHelperClassLoader getTypeHelperClassLoader(ClassLoader l) {
+    public static synchronized TypeHelperClassLoader getTypeHelperClassLoader(ClassLoader l) {
         WeakReference<TypeHelperClassLoader> ref = LOADER_MAP.get(l);
         TypeHelperClassLoader ret;
         if (ref == null || ref.get() == null) {
@@ -75,7 +75,7 @@ public class ClassGeneratorClassLoader {
         }
         return ret;
     }
-    private synchronized TypeHelperClassLoader getTypeHelperClassLoader(Class<?> cls) {
+    public static synchronized TypeHelperClassLoader getTypeHelperClassLoader(Class<?> cls) {
         WeakReference<TypeHelperClassLoader> ref = CLASS_MAP.get(cls);
         TypeHelperClassLoader ret;
         if (ref == null || ref.get() == null) {
@@ -105,12 +105,7 @@ public class ClassGeneratorClassLoader {
             }
             return super.findClass(name);
         }
-        public void addExternalClass(String name, Class<?> cls) {
-            if (name == null) {
-                return;
-            }
-            defined.putIfAbsent(name.replace('/', '.'), cls);
-        }
+
         public Class<?> defineClass(String name, byte[] bytes) {
             Class<?> ret = defined.get(name.replace('/', '.'));
             if (ret != null) {

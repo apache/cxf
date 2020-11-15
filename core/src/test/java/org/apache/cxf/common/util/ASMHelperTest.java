@@ -21,9 +21,13 @@ package org.apache.cxf.common.util;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
+import org.apache.cxf.common.spi.ClassGeneratorClassLoader;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ASMHelperTest {
     @Test
@@ -37,6 +41,29 @@ public class ASMHelperTest {
         assertEquals("Lorg/apache/cxf/common/util/ASMHelperTest$EnumObject<Ljava/lang/Enum;>;", classCode);
     }
 
+    @Test
+    public void testLoader() throws Exception {
+        CustomLoader cl = new CustomLoader();
+        Class<?> clz = cl.createCustom();
+        assertNotNull(clz);
+        assertTrue(cl.isFound());
+    }
+    public class CustomLoader extends ClassGeneratorClassLoader {
+        public Class<?> createCustom() {
+            ASMHelper helper = new ASMHelperImpl();
+            ASMHelper.ClassWriter cw = helper.createClassWriter();
+            OpcodesProxy opCodes = helper.getOpCodes();
+            cw.visit(opCodes.V1_5, opCodes.ACC_PUBLIC + opCodes.ACC_SUPER, "test/testClass", null,
+                    "java/lang/Object", null);
+            cw.visitEnd();
+
+            return loadClass("test.testClass", CustomLoader.class, cw.toByteArray());
+        }
+        public boolean isFound() {
+            Class<?> cls = findClass("test.testClass", CustomLoader.class);
+            return cls != null;
+        }
+    }
     public class EnumObject<E extends Enum<E>> {
         private String name;
 
