@@ -63,7 +63,7 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
     public static final String DEFAULT_PACKAGE_NAME = "defaultnamespace";
 
     private static final Logger LOG = LogUtils.getL7dLogger(WrapperClassGenerator.class);
-    private Set<Class<?>> wrapperBeans = new LinkedHashSet<>();
+    private Set<Class<?>> wrapperBeans;
     private boolean qualified;
     private JaxWsServiceFactoryBean factory;
     private InterfaceInfo interfaceInfo;
@@ -112,10 +112,10 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
 
     public Set<Class<?>> generate(Bus bus, JaxWsServiceFactoryBean fact, InterfaceInfo ii, boolean q) {
         factory = fact;
-        factory = fact;
         qualified = q;
         this.interfaceInfo = ii;
         helper = bus.getExtension(ASMHelper.class);
+        wrapperBeans = new LinkedHashSet<>();
         for (OperationInfo opInfo : interfaceInfo.getOperations()) {
             if (opInfo.isUnwrappedCapable()) {
                 Method method = (Method)opInfo.getProperty(ReflectionServiceFactoryBean.METHOD);
