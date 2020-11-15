@@ -77,6 +77,21 @@ public class JaxwsFaultCodeProviderTest {
         // then
         assertThat(actual, equalTo(RUNTIME_FAULT_STRING));
     }
+    
+    @Test
+    public void testFaultModeIsNotPresentButInFaultModeIsPresentThenShouldReturnThat() {
+        // given
+        doReturn(null).when(ex).get(FaultMode.class);
+        doReturn(message).when(ex).getInFaultMessage();
+        doReturn(RUNTIME_FAULT).when(message).get(FaultMode.class);
+
+        // when
+        String actual = underTest.getFaultCode(ex, true);
+
+        // then
+        assertThat(actual, equalTo(RUNTIME_FAULT_STRING));
+    }
+
 
     @Test
     public void testFaultModeIsNotPresentButOutFaultModeIsMissingThenShouldReturnNull() {
@@ -92,7 +107,7 @@ public class JaxwsFaultCodeProviderTest {
     }
 
     @Test
-    public void testNeitherFaultModeNorOutFaultModePresentsThenShouldReturnInMessagesFaultMode() {
+    public void testNeitherFaultModeNorOutFaultModePresentsThenShouldNotReturnInMessageFaultMode() {
         // given
         doReturn(null).when(ex).get(FaultMode.class);
         doReturn(null).when(ex).getOutFaultMessage();
@@ -103,7 +118,22 @@ public class JaxwsFaultCodeProviderTest {
         String actual = underTest.getFaultCode(ex, false);
 
         // then
-        assertThat(actual, equalTo(RUNTIME_FAULT_STRING));
+        assertThat(actual, is(nullValue()));
+    }
+    
+    @Test
+    public void testNeitherFaultModeNorOutFaultModePresentsThenShouldNotReturnOutMessageFaultMode() {
+        // given
+        doReturn(null).when(ex).get(FaultMode.class);
+        doReturn(null).when(ex).getInFaultMessage();
+        doReturn(message).when(ex).getOutMessage();
+        doReturn(RUNTIME_FAULT).when(message).get(FaultMode.class);
+
+        // when
+        String actual = underTest.getFaultCode(ex, true);
+
+        // then
+        assertThat(actual, is(nullValue()));
     }
 
     @Test
