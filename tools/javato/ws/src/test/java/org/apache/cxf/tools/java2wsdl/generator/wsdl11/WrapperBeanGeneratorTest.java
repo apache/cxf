@@ -49,8 +49,6 @@ public class WrapperBeanGeneratorTest extends ProcessorTestBase {
     @Rule
     public ExternalResource envRule = new ExternalResource() {
         protected void before() throws Throwable {
-            System.setProperty("java.class.path", getClassPath() + tmpDir.getRoot().getCanonicalPath()
-                                                  + File.separatorChar);
             classLoader = new URLClassLoader(new URL[] {tmpDir.getRoot().toURI().toURL()},
                                              Thread.currentThread().getContextClassLoader());
         }
