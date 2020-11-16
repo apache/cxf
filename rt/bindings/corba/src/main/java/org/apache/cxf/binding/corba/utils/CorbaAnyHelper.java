@@ -268,7 +268,7 @@ public final class CorbaAnyHelper {
 
     private static Any createFixedAny(ORB orb, Any any) {
         if (fixedAnyConstructor == null) {
-            CorbaFixedAnyImplGenerator corbaFixedAnyImplGenerator = new CorbaFixedAnyImplGenerator();
+            CorbaFixedAnyImplGenerator corbaFixedAnyImplGenerator = new CorbaFixedAnyImplGenerator(null);
             Class<?> c = corbaFixedAnyImplGenerator.createFixedAnyClass();
             try {
                 fixedAnyConstructor = c.getConstructor(ORB.class, Any.class);
