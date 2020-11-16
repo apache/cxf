@@ -19,13 +19,12 @@
 
 package org.apache.cxf.systest.jaxrs.security.oauth;
 
-import java.net.URISyntaxException;
-
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 
@@ -42,15 +41,8 @@ public class OAuthServer extends AbstractBusTestServerBase {
         server = new org.eclipse.jetty.server.Server(PORT);
 
         WebAppContext webappcontext = new WebAppContext();
-        String contextPath = null;
-        try {
-            contextPath = getClass().getResource(RESOURCE_PATH).toURI().getPath();
-        } catch (URISyntaxException e1) {
-            e1.printStackTrace();
-        }
         webappcontext.setContextPath("/");
-
-        webappcontext.setWar(contextPath);
+        webappcontext.setBaseResource(Resource.newClassPathResource(RESOURCE_PATH));
 
         HandlerCollection handlers = new HandlerCollection();
         handlers.setHandlers(new Handler[] {webappcontext, new DefaultHandler()});

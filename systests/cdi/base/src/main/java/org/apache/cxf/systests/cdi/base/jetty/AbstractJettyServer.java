@@ -28,6 +28,7 @@ import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 import static org.junit.Assert.fail;
@@ -70,7 +71,7 @@ public abstract class AbstractJettyServer extends AbstractBusTestServerBase {
             } else {
                 final WebAppContext context = new WebAppContext();
                 context.setContextPath(contextPath);
-                context.setWar(getClass().getResource(resourcePath).toURI().getPath());
+                context.setBaseResource(Resource.newClassPathResource(resourcePath));
                 context.setServerClasses(new String[] {
                     "org.eclipse.jetty.servlet.ServletContextHandler.Decorator"
                 });

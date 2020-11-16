@@ -50,8 +50,7 @@ public class JettyEmptyPathApplicationTest extends AbstractSciTest {
 
         @Override
         protected void configureContext(final WebAppContext context) throws Exception {
-            context.setDescriptor(Resource
-                .newClassPathResource("/WEB-INF/web-subclass.xml").getFile().toURI().getPath());
+            context.setDescriptor(getClass().getResource("/WEB-INF/web-subclass.xml").toString());
         }
     }
 
