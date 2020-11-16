@@ -58,12 +58,12 @@ import static org.junit.Assert.assertTrue;
 
 public class ProcessorTestBase {
 
-    public static final List<String> DEFAULT_IGNORE_ATTR = Arrays.asList(new String[]{"attributeFormDefault",
-                                                                                      "elementFormDefault",
-                                                                                      "form",
-                                                                                      "version",
-                                                                                      "part@name"});
-    public static final List<String> DEFAULT_IGNORE_TAG = Arrays.asList(new String[]{"sequence"});
+    public static final List<String> DEFAULT_IGNORE_ATTR = Arrays.asList("attributeFormDefault",
+                                                                         "elementFormDefault",
+                                                                         "form",
+                                                                         "version",
+                                                                         "part@name");
+    public static final List<String> DEFAULT_IGNORE_TAG = Arrays.asList("sequence");
 
     //CHECKSTYLE:OFF
     @Rule
