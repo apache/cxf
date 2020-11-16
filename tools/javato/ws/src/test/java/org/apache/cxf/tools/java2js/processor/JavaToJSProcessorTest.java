@@ -53,11 +53,13 @@ public class JavaToJSProcessorTest extends ProcessorTestBase {
     public void testDocLitUseClassPathFlag() throws Exception {
         File classFile = new java.io.File(output.getCanonicalPath() + "/classes");
         classFile.mkdir();
+
+        String oldCP = System.getProperty("java.class.path");
         if (JavaUtils.isJava9Compatible()) {
             System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
             String java9PlusFolder = output.getParent() + java.io.File.separator + "java9";
-            System.setProperty("java.class.path", System.getProperty("java.class.path")
-                               + java.io.File.pathSeparator + java9PlusFolder + java.io.File.separator + "*");
+            System.setProperty("java.class.path",
+                oldCP + java.io.File.pathSeparator + java9PlusFolder + java.io.File.separator + "*");
         }
 
 
@@ -73,7 +75,7 @@ public class JavaToJSProcessorTest extends ProcessorTestBase {
         w2jProcessor.setContext(env);
         w2jProcessor.execute();
 
-        System.setProperty("java.class.path", "");
+        System.setProperty("java.class.path", oldCP);
 
         //      test flag
         String[] args = new String[] {"-o",
