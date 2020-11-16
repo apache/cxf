@@ -22,10 +22,7 @@ package org.apache.cxf.tools.common;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,8 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.jar.Attributes;
-import java.util.jar.JarFile;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -106,47 +101,6 @@ public class ProcessorTestBase {
         } catch (JAXBException e) {
             return false;
         }
-    }
-
-    protected String getClassPath() throws URISyntaxException, IOException {
-        ClassLoader loader = getClass().getClassLoader();
-        StringBuilder classPath = new StringBuilder();
-        if (loader instanceof URLClassLoader) {
-            for (URL url : ((URLClassLoader)loader).getURLs()) {
-                File file = new File(url.toURI());
-                String filename = file.getAbsolutePath();
-                if (filename.indexOf("junit") == -1) {
-                    classPath.append(filename);
-                    classPath.append(System.getProperty("path.separator"));
-                }
-                if (filename.indexOf("surefirebooter") != -1) {
-                    //surefire 2.4 uses a MANIFEST classpath that javac doesn't like
-                    try (JarFile jar = new JarFile(filename)) {
-                        Attributes attr = jar.getManifest().getMainAttributes();
-                        if (attr != null) {
-                            String cp = attr.getValue("Class-Path");
-                            while (cp != null) {
-                                String fileName = cp;
-                                int idx = fileName.indexOf(' ');
-                                if (idx != -1) {
-                                    fileName = fileName.substring(0, idx);
-                                    cp = cp.substring(idx + 1).trim();
-                                } else {
-                                    cp = null;
-                                }
-                                URI uri = new URI(fileName);
-                                File f2 = new File(uri);
-                                if (f2.exists()) {
-                                    classPath.append(f2.getAbsolutePath());
-                                    classPath.append(System.getProperty("path.separator"));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return classPath.toString();
     }
 
     protected String getLocation(String wsdlFile) throws URISyntaxException {

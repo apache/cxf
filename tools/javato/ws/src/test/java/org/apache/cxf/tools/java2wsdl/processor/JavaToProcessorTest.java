@@ -64,7 +64,6 @@ import org.apache.cxf.tools.wsdlto.core.PluginLoader;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.JAXWSContainer;
 import org.apache.cxf.wsdl.WSDLConstants;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -77,19 +76,10 @@ import static org.junit.Assert.fail;
 
 public class JavaToProcessorTest extends ProcessorTestBase {
     JavaToWSDLProcessor processor = new JavaToWSDLProcessor();
-    String classPath = "";
+
     @Before
     public void startUp() throws Exception {
-        env = new ToolContext();
         env.put(ToolConstants.CFG_WSDL, ToolConstants.CFG_WSDL);
-
-        classPath = System.getProperty("java.class.path");
-        System.setProperty("java.class.path", getClassPath());
-    }
-    @After
-    public void tearDown() {
-        super.tearDown();
-        System.setProperty("java.class.path", classPath);
     }
 
     @Test
