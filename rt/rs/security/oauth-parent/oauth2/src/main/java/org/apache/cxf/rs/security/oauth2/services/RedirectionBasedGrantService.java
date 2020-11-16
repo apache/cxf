@@ -293,6 +293,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
             secData.setProposedScope(builder.toString().trim());
         }
         secData.setClientCodeChallenge(params.getFirst(OAuthConstants.AUTHORIZATION_CODE_CHALLENGE));
+        secData.setClientCodeChallengeMethod(params.getFirst(OAuthConstants.AUTHORIZATION_CODE_CHALLENGE_METHOD));
         if (!authorizationCanBeSkipped) {
             secData.setPermissions(requestedPerms);
             secData.setAlreadyAuthorizedPermissions(alreadyAuthorizedPerms);

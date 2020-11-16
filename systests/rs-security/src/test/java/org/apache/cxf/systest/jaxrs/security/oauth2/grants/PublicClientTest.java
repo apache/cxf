@@ -61,15 +61,12 @@ public class PublicClientTest extends AbstractClientServerTestBase {
 
     final String port;
 
-    private final String tokenServiceAddressPlain;
-    private final String tokenServiceAddressDigest;
+    private final String tokenServiceAddress;
 
     public PublicClientTest(String port) {
         this.port = port;
         // services2 doesn't require basic auth
-        tokenServiceAddressPlain = "https://localhost:" + port + "/services2/";
-        // services3 doesn't require basic auth
-        tokenServiceAddressDigest = "https://localhost:" + port + "/services3/";
+        tokenServiceAddress = "https://localhost:" + port + "/services2/";
     }
 
     @BeforeClass
@@ -133,35 +130,35 @@ public class PublicClientTest extends AbstractClientServerTestBase {
 
     @org.junit.Test
     public void testPKCEPlain() throws Exception {
-        testPKCE(new PlainCodeVerifier(), tokenServiceAddressPlain);
+        testPKCE(new PlainCodeVerifier());
     }
 
     @org.junit.Test
     public void testPKCEPlainMissingVerifier() throws Exception {
-        testPKCEMissingVerifier(new PlainCodeVerifier(), tokenServiceAddressPlain);
+        testPKCEMissingVerifier(new PlainCodeVerifier());
     }
 
     @org.junit.Test
     public void testPKCEPlainDifferentVerifier() throws Exception {
-        testPKCEDifferentVerifier(new PlainCodeVerifier(), tokenServiceAddressPlain);
+        testPKCEDifferentVerifier(new PlainCodeVerifier());
     }
 
     @org.junit.Test
     public void testPKCEDigest() {
-        testPKCE(new DigestCodeVerifier(), tokenServiceAddressDigest);
+        testPKCE(new DigestCodeVerifier());
     }
 
     @org.junit.Test
     public void testPKCEDigestMissingVerifier() {
-        testPKCEMissingVerifier(new DigestCodeVerifier(), tokenServiceAddressDigest);
+        testPKCEMissingVerifier(new DigestCodeVerifier());
     }
 
     @org.junit.Test
     public void testPKCEDigestDifferentVerifier() {
-        testPKCEDifferentVerifier(new DigestCodeVerifier(), tokenServiceAddressDigest);
+        testPKCEDifferentVerifier(new DigestCodeVerifier());
     }
 
-    private void testPKCE(CodeVerifierTransformer transformer, String tokenServiceAddress) {
+    private void testPKCE(CodeVerifierTransformer transformer) {
         URL busFile = PublicClientTest.class.getResource("publicclient.xml");
 
         String address = "https://localhost:" + port + "/services/";
@@ -191,7 +188,7 @@ public class PublicClientTest extends AbstractClientServerTestBase {
         assertNotNull(accessToken.getTokenKey());
     }
 
-    private void testPKCEMissingVerifier(CodeVerifierTransformer transformer, String tokenServiceAddress) {
+    private void testPKCEMissingVerifier(CodeVerifierTransformer transformer) {
         URL busFile = PublicClientTest.class.getResource("publicclient.xml");
 
         String address = "https://localhost:" + port + "/services/";
@@ -224,7 +221,7 @@ public class PublicClientTest extends AbstractClientServerTestBase {
         }
     }
 
-    private void testPKCEDifferentVerifier(CodeVerifierTransformer transformer, String tokenServiceAddress) {
+    private void testPKCEDifferentVerifier(CodeVerifierTransformer transformer) {
         URL busFile = PublicClientTest.class.getResource("publicclient.xml");
 
         String address = "https://localhost:" + port + "/services/";

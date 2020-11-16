@@ -63,6 +63,7 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
     protected OAuthRedirectionState recreateRedirectionStateFromParams(MultivaluedMap<String, String> params) {
         OAuthRedirectionState state = super.recreateRedirectionStateFromParams(params);
         state.setClientCodeChallenge(params.getFirst(OAuthConstants.AUTHORIZATION_CODE_CHALLENGE));
+        state.setClientCodeChallengeMethod(params.getFirst(OAuthConstants.AUTHORIZATION_CODE_CHALLENGE_METHOD));
         return state;
     }
 
@@ -147,6 +148,7 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
         codeReg.setAudience(state.getAudience());
         codeReg.setNonce(state.getNonce());
         codeReg.setClientCodeChallenge(state.getClientCodeChallenge());
+        codeReg.setClientCodeChallengeMethod(state.getClientCodeChallengeMethod());
         codeReg.getExtraProperties().putAll(state.getExtraProperties());
         return codeReg;
     }

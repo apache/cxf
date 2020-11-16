@@ -19,6 +19,7 @@
 
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,7 +40,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
  */
 public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
 
-    private CodeVerifierTransformer codeVerifierTransformer;
+    private List<CodeVerifierTransformer> codeVerifierTransformers = Collections.emptyList();
     private boolean expectCodeVerifierForPublicClients;
 
     public AuthorizationCodeGrantHandler() {
@@ -79,7 +80,9 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
 
         String clientCodeVerifier = params.getFirst(OAuthConstants.AUTHORIZATION_CODE_VERIFIER);
         String clientCodeChallenge = grant.getClientCodeChallenge();
-        if (!compareCodeVerifierWithChallenge(client, clientCodeVerifier, clientCodeChallenge)) {
+        String clientCodeChallengeMethod = grant.getClientCodeChallengeMethod();
+        if (!compareCodeVerifierWithChallenge(client, clientCodeVerifier,
+                clientCodeChallenge, clientCodeChallengeMethod)) {
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
         List<String> audiences = getAudiences(client, params, grant.getAudience());
@@ -149,7 +152,7 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
     }
 
     private boolean compareCodeVerifierWithChallenge(Client c, String clientCodeVerifier,
-                                                     String clientCodeChallenge) {
+                                                     String clientCodeChallenge, String clientCodeChallengeMethod) {
         if (clientCodeChallenge == null && clientCodeVerifier == null
             && (c.isConfidential() || !expectCodeVerifierForPublicClients)) {
             return true;
@@ -157,14 +160,35 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
             || clientCodeChallenge == null && clientCodeVerifier != null) {
             return false;
         } else {
-            String transformedCodeVerifier = codeVerifierTransformer == null
-                ? clientCodeVerifier : codeVerifierTransformer.transformCodeVerifier(clientCodeVerifier);
+            CodeVerifierTransformer codeVerifierTransformer = null;
+            if (!codeVerifierTransformers.isEmpty() && clientCodeChallengeMethod != null) {
+                codeVerifierTransformer = codeVerifierTransformers.stream()
+                        .filter(t -> clientCodeChallengeMethod.equals(t.getChallengeMethod()))
+                        .findAny()
+                        .orElse(null);
+                // If we have configured codeVerifierTransformers then we must have a match
+                if (codeVerifierTransformer == null) {
+                    return false;
+                }
+            }
+            // Fall back to plain
+            if (codeVerifierTransformer == null) {
+                codeVerifierTransformer = new PlainCodeVerifier();
+            }
+            String transformedCodeVerifier = codeVerifierTransformer.transformCodeVerifier(clientCodeVerifier);
             return clientCodeChallenge.equals(transformedCodeVerifier);
         }
     }
 
     public void setCodeVerifierTransformer(CodeVerifierTransformer codeVerifier) {
-        this.codeVerifierTransformer = codeVerifier;
+        setCodeVerifierTransformers(codeVerifier == null ? null : Collections.singletonList(codeVerifier));
+    }
+
+    public void setCodeVerifierTransformers(List<CodeVerifierTransformer> codeVerifierTransformers) {
+        if (codeVerifierTransformers == null) {
+            this.codeVerifierTransformers = Collections.emptyList();
+        }
+        this.codeVerifierTransformers = new ArrayList<>(codeVerifierTransformers);
     }
 
     public void setExpectCodeVerifierForPublicClients(boolean expectCodeVerifierForPublicClients) {

@@ -51,6 +51,7 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
     private String audience;
     private String responseType;
     private String clientCodeChallenge;
+    private String clientCodeChallengeMethod;
     private String nonce;
     private boolean preauthorizedTokenAvailable;
     private Map<String, String> extraProperties = new LinkedHashMap<>();
@@ -207,5 +208,13 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
 
     public void setResponseType(String responseType) {
         this.responseType = responseType;
+    }
+
+    public String getClientCodeChallengeMethod() {
+        return clientCodeChallengeMethod;
+    }
+
+    public void setClientCodeChallengeMethod(String clientCodeChallengeMethod) {
+        this.clientCodeChallengeMethod = clientCodeChallengeMethod;
     }
 }
