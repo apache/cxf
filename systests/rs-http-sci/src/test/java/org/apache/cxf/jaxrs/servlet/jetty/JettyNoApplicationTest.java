@@ -48,7 +48,7 @@ public class JettyNoApplicationTest extends AbstractSciTest {
 
         @Override
         protected void configureContext(final WebAppContext context) throws Exception {
-            context.setDescriptor(Resource.newClassPathResource("/WEB-INF/web.xml").getFile().toURI().getPath());
+            context.setDescriptor(getClass().getResource("/WEB-INF/web.xml").toString());
         }
     }
 
