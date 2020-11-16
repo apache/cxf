@@ -34,7 +34,8 @@ public class ClassGeneratorClassLoader {
             = new WeakIdentityHashMap<>();
     protected static final Map<Class<?>, WeakReference<TypeHelperClassLoader>> CLASS_MAP
             = new WeakIdentityHashMap<>();
-    private static final boolean DEBUG = true;
+    //TODO handle that with system property
+    private static final boolean DEBUG = false;
 
     public ClassGeneratorClassLoader() {
     }
