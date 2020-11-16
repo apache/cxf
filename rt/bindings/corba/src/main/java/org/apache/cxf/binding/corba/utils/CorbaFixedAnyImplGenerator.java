@@ -19,6 +19,7 @@
 
 package org.apache.cxf.binding.corba.utils;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.spi.ClassGeneratorClassLoader;
 import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.util.ASMHelperImpl;
@@ -26,6 +27,9 @@ import org.apache.cxf.common.util.OpcodesProxy;
 
 public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {
 
+    public CorbaFixedAnyImplGenerator(Bus bus) {
+        super(bus);
+    }
     public Class<?> createFixedAnyClass() {
         //TODO move to bus.getExtension(ASMHelper.class)
         ASMHelper helper = new ASMHelperImpl();
@@ -50,7 +54,7 @@ public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {
         cw.visitEnd();
 
         byte[] b = cw.toByteArray();
-        Class<?> c = loadClass("org.apache.cxf.binding.corba.utils.FixedAnyImpl", CorbaAnyHelper.class, b);
+        Class<?> c = loadClass("org.apache.cxf.binding.corba.utils.FixedAnyImpl", b);
         return c;
     }
 

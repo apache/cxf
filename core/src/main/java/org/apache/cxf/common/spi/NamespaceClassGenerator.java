@@ -35,6 +35,7 @@ public class NamespaceClassGenerator extends ClassGeneratorClassLoader implement
     ASMHelper helper;
 
     public NamespaceClassGenerator(Bus bus) {
+        super(bus);
         helper = bus.getExtension(ASMHelper.class);
     }
 
@@ -52,16 +53,13 @@ public class NamespaceClassGenerator extends ClassGeneratorClassLoader implement
 
         String className = "org.apache.cxf.jaxb.NamespaceMapper";
         className += postFix;
-        Class<?> cls = findClass(className, NamespaceClassGenerator.class);
-        if (cls == null) {
-            cls = findClass(className, mcls);
-        }
+        Class<?> cls = findClass(className);
         Throwable t = null;
         if (cls == null) {
             try {
                 byte[] bts = createNamespaceWrapperInternal(postFix);
                 className = "org.apache.cxf.jaxb.NamespaceMapper" + postFix;
-                return loadClass(className, mcls, bts);
+                return loadClass(className, bts);
             } catch (RuntimeException ex) {
                 // continue
                 t = ex;
@@ -83,12 +81,12 @@ public class NamespaceClassGenerator extends ClassGeneratorClassLoader implement
 
     private Class<?> createEclipseNamespaceMapper(Class<?> mcls, Map<String, String> map) {
         String className = "org.apache.cxf.jaxb.EclipseNamespaceMapper";
-        Class<?> cls = findClass(className, NamespaceClassGenerator.class);
+        Class<?> cls = findClass(className);
         if (cls != null) {
             return cls;
         }
         byte[] bts = createEclipseNamespaceMapper();
-        return loadClass(className, mcls, bts);
+        return loadClass(className, bts);
     }
 
     /*

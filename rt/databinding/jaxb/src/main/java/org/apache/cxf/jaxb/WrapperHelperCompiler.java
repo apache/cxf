@@ -42,6 +42,7 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
     private ASMHelper asmhelper;
 
     WrapperHelperCompiler(Bus bus) {
+        super(bus);
     }
 
     public WrapperHelper compile(Bus bus, Class<?> wt, Method[] setters,
@@ -64,7 +65,7 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
         newClassName = newClassName.replaceAll("\\$", ".");
         newClassName = asmhelper.periodToSlashes(newClassName);
 
-        Class<?> cls = findClass(newClassName.replace('/', '.'), wrapperType);
+        Class<?> cls = findClass(newClassName.replace('/', '.'));
         while (cls != null) {
             try {
                 WrapperHelper helper = WrapperHelper.class.cast(cls.newInstance());
@@ -73,7 +74,7 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
                     newClassName = wrapperType.getName() + "_WrapperTypeHelper" + count;
                     newClassName = newClassName.replaceAll("\\$", ".");
                     newClassName = asmhelper.periodToSlashes(newClassName);
-                    cls = findClass(newClassName.replace('/', '.'), wrapperType);
+                    cls = findClass(newClassName.replace('/', '.'));
                 } else {
                     return helper;
                 }
@@ -105,7 +106,7 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
             if (b) {
                 cw.visitEnd();
                 byte[] bt = cw.toByteArray();
-                Class<?> cl = loadClass(newClassName.replace('/', '.'), wrapperType, bt);
+                Class<?> cl = loadClass(newClassName.replace('/', '.'), bt);
                 Object o = cl.newInstance();
                 return WrapperHelper.class.cast(o);
             }

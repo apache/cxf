@@ -21,6 +21,8 @@ package org.apache.cxf.common.util;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.common.spi.ClassGeneratorClassLoader;
 
 import org.junit.Test;
@@ -43,12 +45,15 @@ public class ASMHelperTest {
 
     @Test
     public void testLoader() throws Exception {
-        CustomLoader cl = new CustomLoader();
+        CustomLoader cl = new CustomLoader(new ExtensionManagerBus());
         Class<?> clz = cl.createCustom();
         assertNotNull(clz);
         assertTrue(cl.isFound());
     }
     public class CustomLoader extends ClassGeneratorClassLoader {
+        public CustomLoader(Bus bus) {
+            super(bus);
+        }
         public Class<?> createCustom() {
             ASMHelper helper = new ASMHelperImpl();
             ASMHelper.ClassWriter cw = helper.createClassWriter();
@@ -57,10 +62,10 @@ public class ASMHelperTest {
                     "java/lang/Object", null);
             cw.visitEnd();
 
-            return loadClass("test.testClass", CustomLoader.class, cw.toByteArray());
+            return loadClass("test.testClass", cw.toByteArray());
         }
         public boolean isFound() {
-            Class<?> cls = findClass("test.testClass", CustomLoader.class);
+            Class<?> cls = findClass("test.testClass");
             return cls != null;
         }
     }

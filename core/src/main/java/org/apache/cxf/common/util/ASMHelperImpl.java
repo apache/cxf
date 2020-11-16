@@ -213,34 +213,15 @@ public class ASMHelperImpl implements ASMHelper {
                     throw new RuntimeException("No ASM ClassWriterFound", error);
                 }
             }
+            // ASM >= 3.x (since cxf is java 8 min we don't care of asm 1/2)
             try {
-                // ASM 1.5.x/2.x
                 Constructor<?> cons
-                        = cwClass.getConstructor(new Class<?>[] {Boolean.TYPE});
-
-                try {
-                    // got constructor, now check if it's 1.x which is very
-                    // different from 2.x and 3.x
-                    cwClass.getMethod("newConstInt", new Class<?>[] {Integer.TYPE});
-                    // newConstInt was removed in 2.x, if we get this far, we're
-                    // using 1.5.x,
-                    // set to null so we don't attempt to use it.
-                    badASM = true;
-                } catch (Throwable t) {
-                    newCw = cons.newInstance(new Object[] {Boolean.TRUE});
-                }
-
-            } catch (Throwable e) {
-                // ASM 3.x/4.x
-                try {
-                    Constructor<?> cons
-                            = cwClass.getConstructor(new Class<?>[] {Integer.TYPE});
-                    int i = cwClass.getField("COMPUTE_MAXS").getInt(null);
-                    i |= cwClass.getField("COMPUTE_FRAMES").getInt(null);
-                    newCw = cons.newInstance(new Object[] {Integer.valueOf(i)});
-                } catch (Throwable e1) {
-                    // ignore
-                }
+                        = cwClass.getConstructor(new Class<?>[] {Integer.TYPE});
+                int i = cwClass.getField("COMPUTE_MAXS").getInt(null);
+                i |= cwClass.getField("COMPUTE_FRAMES").getInt(null);
+                newCw = cons.newInstance(new Object[] {Integer.valueOf(i)});
+            } catch (Throwable e1) {
+                // ignore
             }
         }
         if (newCw != null) {

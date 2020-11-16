@@ -69,7 +69,8 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
     private InterfaceInfo interfaceInfo;
     private ASMHelper helper;
 
-    public WrapperClassGenerator() {
+    public WrapperClassGenerator(final Bus bus) {
+        super(bus);
     }
 
     private String getPackageName(Method method) {
@@ -170,20 +171,20 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
             className = className + "Response";
         }
         String pname = pkg + ".package-info";
-        Class<?> def = findClass(pname, method.getDeclaringClass());
+        Class<?> def = findClass(pname);
         if (def == null) {
             generatePackageInfo(pname, wrapperElement.getNamespaceURI(),
                                 method.getDeclaringClass());
         }
 
-        def = findClass(className, method.getDeclaringClass());
+        def = findClass(className);
         String origClassName = className;
         int count = 0;
         while (def != null) {
             Boolean b = messageInfo.getProperty("parameterized", Boolean.class);
             if (b != null && b) {
                 className = origClassName + (++count);
-                def = findClass(className, method.getDeclaringClass());
+                def = findClass(className);
             } else {
                 wrapperPart.setTypeClass(def);
                 wrapperBeans.add(def);
@@ -233,7 +234,7 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
 
         cw.visitEnd();
 
-        Class<?> clz = loadClass(className, method.getDeclaringClass(), cw.toByteArray());
+        Class<?> clz = loadClass(className, cw.toByteArray());
         wrapperPart.setTypeClass(clz);
         wrapperBeans.add(clz);
     }
@@ -272,7 +273,7 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
         }
         cw.visitEnd();
 
-        loadClass(className, clz, cw.toByteArray());
+        loadClass(className, cw.toByteArray());
     }
 
     private void generateXmlJavaTypeAdapters(ASMHelper.AnnotationVisitor av, XmlJavaTypeAdapters adapters) {

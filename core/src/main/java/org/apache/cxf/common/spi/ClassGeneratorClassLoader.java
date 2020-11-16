@@ -23,37 +23,20 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.cxf.common.util.WeakIdentityHashMap;
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 
 public class ClassGeneratorClassLoader {
-    protected static final Map<ClassLoader, WeakReference<TypeHelperClassLoader>> LOADER_MAP
-            = new WeakIdentityHashMap<>();
-    protected static final Map<Class<?>, WeakReference<TypeHelperClassLoader>> CLASS_MAP
-            = new WeakIdentityHashMap<>();
     //TODO handle that with system property
     private static final boolean DEBUG = false;
+    protected final Bus bus;
 
-    public ClassGeneratorClassLoader() {
+    public ClassGeneratorClassLoader(final Bus bus) {
+        this.bus = bus == null ? BusFactory.getDefaultBus() : bus;
     }
 
-
-    protected Class<?> loadClass(String className, Class<?> clz, byte[] bytes) {
-        if (DEBUG) {
-            saveClass(className, bytes);
-        }
-        TypeHelperClassLoader loader = ClassGeneratorClassLoader.getTypeHelperClassLoader(clz);
-        synchronized (loader) {
-            Class<?> cls = loader.lookupDefinedClass(className);
-            if (cls == null) {
-                return loader.defineClass(className, bytes);
-            }
-            return cls;
-        }
-    }
     private String getFilePath(String s) {
         String sep = System.getProperty("file.separator");
         String relativePath = s.replace('.', sep.charAt(0));
@@ -85,8 +68,11 @@ public class ClassGeneratorClassLoader {
             e.printStackTrace();
         }
     }
-    protected Class<?> loadClass(String className, ClassLoader l, byte[] bytes) {
-        TypeHelperClassLoader loader = ClassGeneratorClassLoader.getTypeHelperClassLoader(l);
+    protected Class<?> loadClass(String className, byte[] bytes) {
+        if (DEBUG) {
+            saveClass(className, bytes);
+        }
+        TypeHelperClassLoader loader = getOrCreateLoader();
         synchronized (loader) {
             Class<?> cls = loader.lookupDefinedClass(className);
             if (cls == null) {
@@ -95,36 +81,25 @@ public class ClassGeneratorClassLoader {
             return cls;
         }
     }
-    protected Class<?> findClass(String className, Class<?> clz) {
-        TypeHelperClassLoader loader = ClassGeneratorClassLoader.getTypeHelperClassLoader(clz);
-        return loader.lookupDefinedClass(className);
+    protected Class<?> findClass(String className) {
+        return getOrCreateLoader().lookupDefinedClass(className);
     }
-    protected Class<?> findClass(String className, ClassLoader l) {
-        TypeHelperClassLoader loader = ClassGeneratorClassLoader.getTypeHelperClassLoader(l);
-        return loader.lookupDefinedClass(className);
-    }
-
-    public static synchronized TypeHelperClassLoader getTypeHelperClassLoader(ClassLoader l) {
-        WeakReference<TypeHelperClassLoader> ref = LOADER_MAP.get(l);
-        TypeHelperClassLoader ret;
-        if (ref == null || ref.get() == null) {
-            ret = new TypeHelperClassLoader(l);
-            LOADER_MAP.put(l, new WeakReference<TypeHelperClassLoader>(ret));
-        } else {
-            ret = ref.get();
+    private TypeHelperClassLoader getOrCreateLoader() {
+        TypeHelperClassLoader loader = bus.getExtension(TypeHelperClassLoader.class);
+        if (loader == null) {
+            synchronized (bus) {
+                loader = bus.getExtension(TypeHelperClassLoader.class);
+                if (loader == null) {
+                    ClassLoader parent = bus.getExtension(ClassLoader.class);
+                    if (parent == null) {
+                        parent = Thread.currentThread().getContextClassLoader();
+                    }
+                    loader = new TypeHelperClassLoader(parent);
+                    bus.setExtension(loader, TypeHelperClassLoader.class);
+                }
+            }
         }
-        return ret;
-    }
-    public static synchronized TypeHelperClassLoader getTypeHelperClassLoader(Class<?> cls) {
-        WeakReference<TypeHelperClassLoader> ref = CLASS_MAP.get(cls);
-        TypeHelperClassLoader ret;
-        if (ref == null || ref.get() == null) {
-            ret = new TypeHelperClassLoader(cls.getClassLoader());
-            CLASS_MAP.put(cls, new WeakReference<TypeHelperClassLoader>(ret));
-        } else {
-            ret = ref.get();
-        }
-        return ret;
+        return loader;
     }
 
 
