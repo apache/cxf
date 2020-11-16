@@ -174,6 +174,9 @@ public class JoseSessionTokenProvider implements SessionAuthenticityTokenProvide
         if (!StringUtils.isEmpty(parts[8])) {
             state.setExtraProperties(ModelEncryptionSupport.parseSimpleMap(parts[8]));
         }
+        if (!StringUtils.isEmpty(parts[9])) {
+            state.setClientCodeChallengeMethod(parts[9]);
+        }
         return state;
     }
     protected String convertStateToString(OAuthRedirectionState secData) {
@@ -185,7 +188,7 @@ public class JoseSessionTokenProvider implements SessionAuthenticityTokenProvide
         // 1: client audience
         state.append(ModelEncryptionSupport.tokenizeString(secData.getAudience()));
         state.append(ModelEncryptionSupport.SEP);
-        // 2: client code verifier
+        // 2: client code challenge
         state.append(ModelEncryptionSupport.tokenizeString(secData.getClientCodeChallenge()));
         state.append(ModelEncryptionSupport.SEP);
         // 3: state
@@ -205,6 +208,9 @@ public class JoseSessionTokenProvider implements SessionAuthenticityTokenProvide
         state.append(ModelEncryptionSupport.SEP);
         // 8: extra props
         state.append(secData.getExtraProperties().toString());
+        state.append(ModelEncryptionSupport.SEP);
+        // 9: client code challenge method
+        state.append(ModelEncryptionSupport.tokenizeString(secData.getClientCodeChallengeMethod()));
 
         return state.toString();
     }
