@@ -27,6 +27,7 @@ public class ExceptionClassGenerator extends ClassGeneratorClassLoader implement
     private ASMHelper helper;
 
     public ExceptionClassGenerator(Bus bus) {
+        super(bus);
         this.helper = bus.getExtension(ASMHelper.class);
     }
     @Override
@@ -35,7 +36,7 @@ public class ExceptionClassGenerator extends ClassGeneratorClassLoader implement
         newClassName = newClassName.replaceAll("\\$", ".");
         newClassName = helper.periodToSlashes(newClassName);
 
-        Class<?> cls = findClass(newClassName.replace('/', '.'), bean);
+        Class<?> cls = findClass(newClassName.replace('/', '.'));
         if (cls == null) {
             ASMHelper.ClassWriter cw = helper.createClassWriter();
             OpcodesProxy opCodes = helper.getOpCodes();
@@ -86,7 +87,7 @@ public class ExceptionClassGenerator extends ClassGeneratorClassLoader implement
 
             cw.visitEnd();
 
-            return loadClass(bean.getName() + "_Exception", bean, cw.toByteArray());
+            return loadClass(bean.getName() + "_Exception", cw.toByteArray());
         }
         return cls;
     }

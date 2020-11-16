@@ -30,11 +30,10 @@ import org.apache.cxf.common.util.OpcodesProxy;
 
 public class ExtensionClassGenerator extends ClassGeneratorClassLoader implements ExtensionClassCreator {
 
-    private Bus bus;
     private ASMHelper helper;
 
     public ExtensionClassGenerator(Bus bus) {
-        this.bus = bus;
+        super(bus);
         this.helper = bus.getExtension(ASMHelper.class);
     }
     //CHECKSTYLE:OFF - very complicated ASM code
@@ -44,7 +43,7 @@ public class ExtensionClassGenerator extends ClassGeneratorClassLoader implement
         ASMHelper helper = bus.getExtension(ASMHelper.class);
         OpcodesProxy Opcodes = helper.getOpCodes();
 
-        Class<?> extClass = findClass(className + "Extensibility", loader);
+        Class<?> extClass = findClass(className + "Extensibility");
         if (extClass != null) {
             return extClass;
         }
@@ -292,6 +291,6 @@ public class ExtensionClassGenerator extends ClassGeneratorClassLoader implement
         cw.visitEnd();
 
         byte[] bytes = cw.toByteArray();
-        return loadClass(className + "Extensibility", loader, bytes);
+        return loadClass(className + "Extensibility", bytes);
     }
 }

@@ -31,12 +31,13 @@ import org.apache.cxf.common.util.ReflectionUtil;
 public class FactoryClassGenerator extends ClassGeneratorClassLoader implements FactoryClassCreator {
     private ASMHelper helper;
     FactoryClassGenerator(Bus bus) {
+        super(bus);
         helper = bus.getExtension(ASMHelper.class);
     }
     @SuppressWarnings("unused")
     public Class<?> createFactory(Class<?> cls) {
         String newClassName = cls.getName() + "Factory";
-        Class<?> factoryClass = findClass(newClassName, cls);
+        Class<?> factoryClass = findClass(newClassName);
         if (factoryClass != null) {
             return factoryClass;
         }
@@ -79,6 +80,6 @@ public class FactoryClassGenerator extends ClassGeneratorClassLoader implements 
         mv.visitEnd();
 
         cw.visitEnd();
-        return loadClass(newClassName, cls, cw.toByteArray());
+        return loadClass(newClassName, cw.toByteArray());
     }
 }

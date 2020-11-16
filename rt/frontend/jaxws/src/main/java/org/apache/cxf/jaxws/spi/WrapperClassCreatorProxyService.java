@@ -27,8 +27,8 @@ import org.apache.cxf.service.model.InterfaceInfo;
 
 public class WrapperClassCreatorProxyService implements WrapperClassCreator {
     WrapperClassCreator srv;
-    public WrapperClassCreatorProxyService() {
-        this(new WrapperClassGenerator());
+    public WrapperClassCreatorProxyService(final Bus bus) {
+        this(new WrapperClassGenerator(bus));
     }
     public WrapperClassCreatorProxyService(WrapperClassCreator srv) {
         super();
@@ -48,8 +48,8 @@ public class WrapperClassCreatorProxyService implements WrapperClassCreator {
         }
     }
     public class GenerateJustInTime extends WrapperClassCreatorProxyService {
-        public GenerateJustInTime() {
-            super(new WrapperClassGenerator());
+        public GenerateJustInTime(final Bus bus) {
+            super(new WrapperClassGenerator(bus));
         }
     }
 }
