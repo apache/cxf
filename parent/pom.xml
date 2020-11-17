@@ -495,6 +495,18 @@
                             <org.apache.cxf.transport.websocket.atmosphere.disabled>${org.apache.cxf.transport.websocket.atmosphere.disabled}</org.apache.cxf.transport.websocket.atmosphere.disabled>
                         </systemPropertyVariables>
                     </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.junit.vintage</groupId>
+                            <artifactId>junit-vintage-engine</artifactId>
+                            <version>${cxf.junit5.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.junit.jupiter</groupId>
+                            <artifactId>junit-jupiter-engine</artifactId>
+                            <version>${cxf.junit5.version}</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -804,12 +816,6 @@
                         <artifactId>jsr173_api</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.junit.vintage</groupId>
-                <artifactId>junit-vintage-engine</artifactId>
-                <version>${cxf.junit5.version}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
