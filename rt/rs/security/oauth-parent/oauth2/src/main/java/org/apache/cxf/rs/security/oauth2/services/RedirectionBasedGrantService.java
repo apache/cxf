@@ -137,11 +137,15 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
      * Starts the authorization process
      */
     protected Response startAuthorization(MultivaluedMap<String, String> params) {
-        // Make sure the end user has authenticated, check if HTTPS is used
-        SecurityContext sc = getAndValidateSecurityContext(params);
+        UserSubject userSubject = null;
+        SecurityContext securityContext =
+                (SecurityContext)getMessageContext().get(SecurityContext.class.getName());
+        if (securityContext != null && securityContext.getUserPrincipal() != null) {
+            // Create a UserSubject representing the end user, if we have already authenticated
+            userSubject = createUserSubject(securityContext, params);
+        }
+        checkTransportSecurity();
         Client client = getClient(params.getFirst(OAuthConstants.CLIENT_ID), params);
-        // Create a UserSubject representing the end user
-        UserSubject userSubject = createUserSubject(sc, params);
 
         if (authorizationFilter != null) {
             params = authorizationFilter.process(params, userSubject, client);
@@ -340,7 +344,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         return state;
     }
     protected void personalizeData(OAuthAuthorizationData data, UserSubject userSubject) {
-        if (resourceOwnerNameProvider != null) {
+        if (resourceOwnerNameProvider != null && userSubject != null) {
             data.setEndUserName(resourceOwnerNameProvider.getName(userSubject));
         }
     }
