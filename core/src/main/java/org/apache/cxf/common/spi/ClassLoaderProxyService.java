@@ -20,11 +20,14 @@
 package org.apache.cxf.common.spi;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.logging.LogUtils;
 
 public class ClassLoaderProxyService implements ClassLoaderService {
     NamespaceClassCreator srv;
+    private static final Logger LOG = LogUtils.getL7dLogger(ClassLoaderProxyService.class);
     public ClassLoaderProxyService(Bus bus) {
         this(new NamespaceClassGenerator(bus));
     }
@@ -38,15 +41,13 @@ public class ClassLoaderProxyService implements ClassLoaderService {
         try {
             return cls.getConstructor(Map.class).newInstance(map);
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOG.warning("NamespaceWrapper not found : " + e.toString());
             return null;
         }
     }
     public class LoadFirst extends ClassLoaderProxyService {
         public LoadFirst(Bus bus) {
-            //TODO not sure here if I get class loader like that ???
-            // or I need to inject another class loader from outside
-            super(new GeneratedNamespaceClassLoader(LoadFirst.class.getClassLoader()));
+            super(new GeneratedNamespaceClassLoader());
         }
     }
     public class GenerateJustInTime extends ClassLoaderProxyService {

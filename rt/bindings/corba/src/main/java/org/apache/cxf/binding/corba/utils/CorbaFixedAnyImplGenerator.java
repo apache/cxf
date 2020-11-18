@@ -31,8 +31,7 @@ public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {
         super(bus);
     }
     public Class<?> createFixedAnyClass() {
-        //TODO move to bus.getExtension(ASMHelper.class)
-        ASMHelper helper = new ASMHelperImpl();
+        ASMHelper helper = bus.getExtension(ASMHelper.class);
         OpcodesProxy opCodes = helper.getOpCodes();
         ASMHelper.ClassWriter cw = helper.createClassWriter();
         ASMHelper.FieldVisitor fv;

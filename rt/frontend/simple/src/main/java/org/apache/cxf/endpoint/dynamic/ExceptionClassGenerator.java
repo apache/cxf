@@ -22,6 +22,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.spi.ClassGeneratorClassLoader;
 import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.util.OpcodesProxy;
+import org.apache.cxf.common.util.StringUtils;
 
 public class ExceptionClassGenerator extends ClassGeneratorClassLoader implements ExceptionClassCreator {
     private ASMHelper helper;
@@ -34,9 +35,9 @@ public class ExceptionClassGenerator extends ClassGeneratorClassLoader implement
     public Class<?> createExceptionClass(Class<?> bean) {
         String newClassName = bean.getName() + "_Exception";
         newClassName = newClassName.replaceAll("\\$", ".");
-        newClassName = helper.periodToSlashes(newClassName);
+        newClassName = StringUtils.periodToSlashes(newClassName);
 
-        Class<?> cls = findClass(newClassName.replace('/', '.'));
+        Class<?> cls = findClass(StringUtils.slashesToPeriod(newClassName));
         if (cls == null) {
             ASMHelper.ClassWriter cw = helper.createClassWriter();
             OpcodesProxy opCodes = helper.getOpCodes();

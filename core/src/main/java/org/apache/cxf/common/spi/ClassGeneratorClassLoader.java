@@ -19,67 +19,25 @@
 
 package org.apache.cxf.common.spi;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.util.StringUtils;
 
 public class ClassGeneratorClassLoader {
-    //TODO handle that with system property
-    private static final boolean DEBUG = false;
     protected final Bus bus;
 
     public ClassGeneratorClassLoader(final Bus bus) {
         this.bus = bus == null ? BusFactory.getDefaultBus() : bus;
     }
-
-    private String getFilePath(String s) {
-        String sep = System.getProperty("file.separator");
-        String relativePath = s.replace('.', sep.charAt(0));
-        String userDir = System.getProperty("user.dir");
-        return userDir + sep + "target" + sep + "dump" + sep + relativePath + ".class";
-    }
-    private void saveClass(String className, byte[] bytes) {
-
-        File file;
-        try {
-            String classFileName = getFilePath(className);
-            String finalFileName = classFileName;
-            file = new File(finalFileName);
-            int i = 1;
-            while (file.exists()) {
-                finalFileName = classFileName.substring(0, classFileName.length() - 6) + String.valueOf(i) + ".class";
-                file = new File(finalFileName);
-                i++;
-            }
-            file.getParentFile().mkdirs();
-            try (FileOutputStream fop = new FileOutputStream(file)) {
-                file.createNewFile();
-                fop.write(bytes);
-                fop.flush();
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
     protected Class<?> loadClass(String className, byte[] bytes) {
-        if (DEBUG) {
-            saveClass(className, bytes);
-        }
         TypeHelperClassLoader loader = getOrCreateLoader();
-        synchronized (loader) {
-            Class<?> cls = loader.lookupDefinedClass(className);
-            if (cls == null) {
-                return loader.defineClass(className, bytes);
-            }
-            return cls;
+        Class<?> cls = loader.lookupDefinedClass(className);
+        if (cls == null) {
+            return loader.defineClass(className, bytes);
         }
+        return cls;
     }
     protected Class<?> findClass(String className) {
         return getOrCreateLoader().lookupDefinedClass(className);
@@ -87,17 +45,12 @@ public class ClassGeneratorClassLoader {
     private TypeHelperClassLoader getOrCreateLoader() {
         TypeHelperClassLoader loader = bus.getExtension(TypeHelperClassLoader.class);
         if (loader == null) {
-            synchronized (bus) {
-                loader = bus.getExtension(TypeHelperClassLoader.class);
-                if (loader == null) {
-                    ClassLoader parent = bus.getExtension(ClassLoader.class);
-                    if (parent == null) {
-                        parent = Thread.currentThread().getContextClassLoader();
-                    }
-                    loader = new TypeHelperClassLoader(parent);
-                    bus.setExtension(loader, TypeHelperClassLoader.class);
-                }
+            ClassLoader parent = bus.getExtension(ClassLoader.class);
+            if (parent == null) {
+                parent = Thread.currentThread().getContextClassLoader();
             }
+            loader = new TypeHelperClassLoader(parent);
+            bus.setExtension(loader, TypeHelperClassLoader.class);
         }
         return loader;
     }
@@ -110,7 +63,7 @@ public class ClassGeneratorClassLoader {
             super(parent);
         }
         public Class<?> lookupDefinedClass(String name) {
-            return defined.get(name.replace('/', '.'));
+            return defined.get(StringUtils.slashesToPeriod(name));
         }
 
         @Override
@@ -122,14 +75,14 @@ public class ClassGeneratorClassLoader {
         }
 
         public Class<?> defineClass(String name, byte[] bytes) {
-            Class<?> ret = defined.get(name.replace('/', '.'));
+            Class<?> ret = defined.get(StringUtils.slashesToPeriod(name));
             if (ret != null) {
                 return ret;
             }
             if (name.endsWith("package-info")) {
                 Package p = super.getPackage(name.substring(0, name.length() - 13));
                 if (p == null) {
-                    definePackage(name.substring(0, name.length() - 13).replace('/', '.'),
+                    definePackage(StringUtils.slashesToPeriod(name.substring(0, name.length() - 13)),
                             null,
                             null,
                             null,
@@ -140,11 +93,9 @@ public class ClassGeneratorClassLoader {
                 }
             }
 
-            ret = super.defineClass(name.replace('/', '.'), bytes, 0, bytes.length);
-            Class<?> tmpRet = defined.putIfAbsent(name.replace('/', '.'), ret);
-            if (tmpRet != null) {
-                ret = tmpRet;
-            }
+            ret = defined.computeIfAbsent(StringUtils.slashesToPeriod(name),
+                    key -> TypeHelperClassLoader.super.defineClass(key, bytes, 0, bytes.length));
+
             return ret;
         }
     }

@@ -38,10 +38,8 @@ public class ExtensionClassCreatorProxyService implements ExtensionClassCreator 
     }
 
     public class LoadFirst extends ExtensionClassCreatorProxyService {
-        public LoadFirst(ClassLoader cl) {
-            //TODO not sure here if I get class loader like that ???
-            // or I need to inject another class loader from outside
-            super(new ExtensionClassLoader(cl));
+        public LoadFirst(Bus bus) {
+            super(new ExtensionClassLoader());
         }
     }
     public class GenerateJustInTime extends ExtensionClassCreatorProxyService {

@@ -36,10 +36,8 @@ public class ExceptionClassCreatorProxyService implements ExceptionClassCreator 
     }
 
     public class LoadFirst extends ExceptionClassCreatorProxyService {
-        public LoadFirst(ClassLoader cl) {
-            //TODO not sure here if I get class loader like that ???
-            // or I need to inject another class loader from outside
-            super(new ExceptionClassLoader(cl));
+        public LoadFirst(Bus bus) {
+            super(new ExceptionClassLoader());
         }
     }
     public class GenerateJustInTime extends ExceptionClassCreatorProxyService {

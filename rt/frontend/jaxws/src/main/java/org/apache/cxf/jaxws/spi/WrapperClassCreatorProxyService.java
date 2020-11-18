@@ -41,10 +41,8 @@ public class WrapperClassCreatorProxyService implements WrapperClassCreator {
     }
 
     public class LoadFirst extends WrapperClassCreatorProxyService {
-        public LoadFirst(ClassLoader cl) {
-            //TODO not sure here if I get class loader like that ???
-            // or I need to inject another class loader from outside
-            super(new GeneratedWrapperClassLoader(cl));
+        public LoadFirst(Bus bus) {
+            super(new GeneratedWrapperClassLoader());
         }
     }
     public class GenerateJustInTime extends WrapperClassCreatorProxyService {

@@ -28,6 +28,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.spi.ClassGeneratorClassLoader;
 import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.util.OpcodesProxy;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.databinding.WrapperHelper;
 
 public final class WrapperHelperCompiler extends ClassGeneratorClassLoader implements WrapperHelperCreator {
@@ -63,9 +64,9 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
         int count = 1;
         String newClassName = wrapperType.getName() + "_WrapperTypeHelper" + count;
         newClassName = newClassName.replaceAll("\\$", ".");
-        newClassName = asmhelper.periodToSlashes(newClassName);
+        newClassName = StringUtils.periodToSlashes(newClassName);
 
-        Class<?> cls = findClass(newClassName.replace('/', '.'));
+        Class<?> cls = findClass(StringUtils.slashesToPeriod(newClassName));
         while (cls != null) {
             try {
                 WrapperHelper helper = WrapperHelper.class.cast(cls.newInstance());
@@ -73,8 +74,8 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
                     count++;
                     newClassName = wrapperType.getName() + "_WrapperTypeHelper" + count;
                     newClassName = newClassName.replaceAll("\\$", ".");
-                    newClassName = asmhelper.periodToSlashes(newClassName);
-                    cls = findClass(newClassName.replace('/', '.'));
+                    newClassName = StringUtils.periodToSlashes(newClassName);
+                    cls = findClass(StringUtils.slashesToPeriod(newClassName));
                 } else {
                     return helper;
                 }
@@ -90,7 +91,7 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
                  newClassName,
                  null,
                  "java/lang/Object",
-                 new String[] {asmhelper.periodToSlashes(WrapperHelper.class.getName())});
+                 new String[] {StringUtils.periodToSlashes(WrapperHelper.class.getName())});
 
         addConstructor(newClassName, objectFactory == null ? null : objectFactory.getClass());
         boolean b = addSignature();
@@ -106,7 +107,7 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
             if (b) {
                 cw.visitEnd();
                 byte[] bt = cw.toByteArray();
-                Class<?> cl = loadClass(newClassName.replace('/', '.'), bt);
+                Class<?> cl = loadClass(StringUtils.slashesToPeriod(newClassName), bt);
                 Object o = cl.newInstance();
                 return WrapperHelper.class.cast(o);
             }
@@ -149,7 +150,7 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
     private void addConstructor(String newClassName, Class<?> objectFactoryCls) {
 
         if (objectFactoryCls != null) {
-            String ofName = "L" + asmhelper.periodToSlashes(objectFactoryCls.getName()) + ";";
+            String ofName = "L" + StringUtils.periodToSlashes(objectFactoryCls.getName()) + ";";
             ASMHelper.FieldVisitor fv = cw.visitField(0, "factory",
                                             ofName,
                                             null, null);
@@ -170,13 +171,13 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
                            "()V", false);
         if (objectFactoryCls != null) {
             mv.visitVarInsn(opCodes.ALOAD, 0);
-            mv.visitTypeInsn(opCodes.NEW, asmhelper.periodToSlashes(objectFactoryCls.getName()));
+            mv.visitTypeInsn(opCodes.NEW, StringUtils.periodToSlashes(objectFactoryCls.getName()));
             mv.visitInsn(opCodes.DUP);
             mv.visitMethodInsn(opCodes.INVOKESPECIAL,
-                    asmhelper.periodToSlashes(objectFactoryCls.getName()),
+                    StringUtils.periodToSlashes(objectFactoryCls.getName()),
                                "<init>", "()V", false);
-            mv.visitFieldInsn(opCodes.PUTFIELD, asmhelper.periodToSlashes(newClassName),
-                              "factory", "L" + asmhelper.periodToSlashes(objectFactoryCls.getName()) + ";");
+            mv.visitFieldInsn(opCodes.PUTFIELD, StringUtils.periodToSlashes(newClassName),
+                              "factory", "L" + StringUtils.periodToSlashes(objectFactoryCls.getName()) + ";");
         }
 
         mv.visitInsn(opCodes.RETURN);
@@ -205,9 +206,9 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
         mv.visitLabel(lBegin);
         mv.visitLineNumber(104, lBegin);
 
-        mv.visitTypeInsn(opCodes.NEW, asmhelper.periodToSlashes(wrapperType.getName()));
+        mv.visitTypeInsn(opCodes.NEW, StringUtils.periodToSlashes(wrapperType.getName()));
         mv.visitInsn(opCodes.DUP);
-        mv.visitMethodInsn(opCodes.INVOKESPECIAL, asmhelper.periodToSlashes(wrapperType.getName()),
+        mv.visitMethodInsn(opCodes.INVOKESPECIAL, StringUtils.periodToSlashes(wrapperType.getName()),
                            "<init>", "()V", false);
         mv.visitVarInsn(opCodes.ASTORE, 2);
 
@@ -228,9 +229,9 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
             } else {
                 if (JAXBElement.class.isAssignableFrom(tp)) {
                     mv.visitVarInsn(opCodes.ALOAD, 0);
-                    mv.visitFieldInsn(opCodes.GETFIELD, asmhelper.periodToSlashes(newClassName),
+                    mv.visitFieldInsn(opCodes.GETFIELD, StringUtils.periodToSlashes(newClassName),
                                       "factory",
-                                      "L" + asmhelper.periodToSlashes(objectFactoryClass.getName()) + ";");
+                                      "L" + StringUtils.periodToSlashes(objectFactoryClass.getName()) + ";");
                 }
                 mv.visitVarInsn(opCodes.ALOAD, 1);
                 mv.visitIntInsn(opCodes.SIPUSH, x);
@@ -245,7 +246,7 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
                     mv.visitMethodInsn(opCodes.INVOKEVIRTUAL, asmhelper.getNonPrimitive(tp),
                                        tp.getName() + "Value", "()" + asmhelper.getPrimitive(tp), false);
                     mv.visitMethodInsn(opCodes.INVOKEVIRTUAL,
-                            asmhelper.periodToSlashes(wrapperType.getName()),
+                            StringUtils.periodToSlashes(wrapperType.getName()),
                                        setMethods[x].getName(), "(" + asmhelper.getClassCode(tp) + ")V", false);
                     mv.visitJumpInsn(opCodes.GOTO, l46);
                     mv.visitLabel(l45);
@@ -253,22 +254,22 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
                     mv.visitLabel(l46);
                 } else if (JAXBElement.class.isAssignableFrom(tp)) {
                     mv.visitTypeInsn(opCodes.CHECKCAST,
-                                     asmhelper.periodToSlashes(jaxbMethods[x].getParameterTypes()[0].getName()));
-                    mv.visitMethodInsn(opCodes.INVOKEVIRTUAL, asmhelper.periodToSlashes(objectFactoryClass.getName()),
+                                     StringUtils.periodToSlashes(jaxbMethods[x].getParameterTypes()[0].getName()));
+                    mv.visitMethodInsn(opCodes.INVOKEVIRTUAL, StringUtils.periodToSlashes(objectFactoryClass.getName()),
                                        jaxbMethods[x].getName(),
                                        asmhelper.getMethodSignature(jaxbMethods[x]), false);
                     mv.visitMethodInsn(opCodes.INVOKEVIRTUAL,
-                                       asmhelper.periodToSlashes(wrapperType.getName()),
+                                       StringUtils.periodToSlashes(wrapperType.getName()),
                                        setMethods[x].getName(), "(" + asmhelper.getClassCode(tp) + ")V", false);
                 } else if (tp.isArray()) {
                     mv.visitTypeInsn(opCodes.CHECKCAST, asmhelper.getClassCode(tp));
                     mv.visitMethodInsn(opCodes.INVOKEVIRTUAL,
-                                       asmhelper.periodToSlashes(wrapperType.getName()),
+                                       StringUtils.periodToSlashes(wrapperType.getName()),
                                        setMethods[x].getName(), "(" + asmhelper.getClassCode(tp) + ")V", false);
                 } else {
-                    mv.visitTypeInsn(opCodes.CHECKCAST, asmhelper.periodToSlashes(tp.getName()));
+                    mv.visitTypeInsn(opCodes.CHECKCAST, StringUtils.periodToSlashes(tp.getName()));
                     mv.visitMethodInsn(opCodes.INVOKEVIRTUAL,
-                                       asmhelper.periodToSlashes(wrapperType.getName()),
+                                       StringUtils.periodToSlashes(wrapperType.getName()),
                                        setMethods[x].getName(), "(" + asmhelper.getClassCode(tp) + ")V", false);
                 }
             }
@@ -281,7 +282,7 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
         mv.visitLabel(lEnd);
         mv.visitLocalVariable("this", "L" + newClassName + ";", null, lBegin, lEnd, 0);
         mv.visitLocalVariable("lst", "Ljava/util/List;", "Ljava/util/List<*>;", lBegin, lEnd, 1);
-        mv.visitLocalVariable("ok", "L" + asmhelper.periodToSlashes(wrapperType.getName()) + ";",
+        mv.visitLocalVariable("ok", "L" + StringUtils.periodToSlashes(wrapperType.getName()) + ";",
                               null, lBegin, lEnd, 2);
         mv.visitMaxs(0, 0);
         mv.visitEnd();
@@ -303,7 +304,7 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
         mv.visitLineNumber(114, l3);
 
         mv.visitMethodInsn(opCodes.INVOKEVIRTUAL,
-                           asmhelper.periodToSlashes(wrapperType.getName()),
+                           StringUtils.periodToSlashes(wrapperType.getName()),
                            getMethods[x].getName(),
                            asmhelper.getMethodSignature(getMethods[x]), false);
         mv.visitVarInsn(opCodes.ASTORE, 3);
@@ -331,7 +332,7 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
             mv.visitTypeInsn(opCodes.CHECKCAST,
                              getMethods[x].getReturnType().getName().replace('.', '/'));
             mv.visitMethodInsn(opCodes.INVOKEVIRTUAL,
-                               asmhelper.periodToSlashes(wrapperType.getName()),
+                               StringUtils.periodToSlashes(wrapperType.getName()),
                                setMethods[x].getName(),
                                asmhelper.getMethodSignature(setMethods[x]), false);
         }
@@ -373,7 +374,7 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
 
         // cast the Object to the wrapperType type
         mv.visitVarInsn(opCodes.ALOAD, 1);
-        mv.visitTypeInsn(opCodes.CHECKCAST, asmhelper.periodToSlashes(wrapperClass.getName()));
+        mv.visitTypeInsn(opCodes.CHECKCAST, StringUtils.periodToSlashes(wrapperClass.getName()));
         mv.visitVarInsn(opCodes.ASTORE, 3);
 
         for (int x = 0; x < getMethods.length; x++) {
@@ -401,7 +402,7 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
                 mv.visitVarInsn(opCodes.ALOAD, 2);
                 mv.visitVarInsn(opCodes.ALOAD, 3);
                 mv.visitMethodInsn(opCodes.INVOKEVIRTUAL,
-                                   asmhelper.periodToSlashes(wrapperClass.getName()),
+                                   StringUtils.periodToSlashes(wrapperClass.getName()),
                                    method.getName(),
                         asmhelper.getMethodSignature(method), false);
                 if (method.getReturnType().isPrimitive()) {
@@ -438,7 +439,7 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
         mv.visitLocalVariable("o", "Ljava/lang/Object;", null, lBegin, lEnd, 1);
         mv.visitLocalVariable("ret", "Ljava/util/List;", "Ljava/util/List<Ljava/lang/Object;>;",
                               lBegin, lEnd, 2);
-        mv.visitLocalVariable("ok", "L" + asmhelper.periodToSlashes(wrapperClass.getName()) + ";",
+        mv.visitLocalVariable("ok", "L" + StringUtils.periodToSlashes(wrapperClass.getName()) + ";",
                               null, lBegin, lEnd, 3);
         mv.visitMaxs(0, 0);
         mv.visitEnd();

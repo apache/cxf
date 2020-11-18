@@ -27,7 +27,6 @@ import org.apache.cxf.common.util.ReflectionInvokationHandler.WrapReturn;
 
 
 public interface ASMHelper {
-    String periodToSlashes(String s);
     String getClassCode(Class<?> cl);
     String getClassCode(java.lang.reflect.Type type);
     ClassWriter createClassWriter();

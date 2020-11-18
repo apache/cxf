@@ -36,10 +36,8 @@ public class FactoryClassProxyService implements FactoryClassCreator {
     }
 
     public class LoadFirst extends FactoryClassProxyService {
-        public LoadFirst(ClassLoader cl) {
-            //TODO not sure here if I get class loader like that ???
-            // or I need to inject another class loader from outside
-            super(new FactoryClassLoader(cl));
+        public LoadFirst(Bus bus) {
+            super(new FactoryClassLoader());
         }
     }
     public class GenerateJustInTime extends FactoryClassProxyService {

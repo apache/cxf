@@ -27,6 +27,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.spi.ClassGeneratorClassLoader;
 import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.util.OpcodesProxy;
+import org.apache.cxf.common.util.StringUtils;
 
 public class ExtensionClassGenerator extends ClassGeneratorClassLoader implements ExtensionClassCreator {
 
@@ -39,7 +40,7 @@ public class ExtensionClassGenerator extends ClassGeneratorClassLoader implement
     //CHECKSTYLE:OFF - very complicated ASM code
     public Class<?> createExtensionClass(Class<?> cls, QName qname, ClassLoader loader) {
 
-        String className = helper.periodToSlashes(cls.getName());
+        String className = StringUtils.periodToSlashes(cls.getName());
         ASMHelper helper = bus.getExtension(ASMHelper.class);
         OpcodesProxy Opcodes = helper.getOpCodes();
 
