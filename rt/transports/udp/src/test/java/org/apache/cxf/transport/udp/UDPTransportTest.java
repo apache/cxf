@@ -79,6 +79,7 @@ public class UDPTransportTest {
     }
 
     @Test
+    @org.junit.Ignore
     public void testSimpleUDP() throws Exception {
         JaxWsProxyFactoryBean fact = new JaxWsProxyFactoryBean();
         fact.setAddress("udp://localhost:" + PORT);
