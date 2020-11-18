@@ -22,12 +22,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.databinding.WrapperHelper;
 
 public class WrapperHelperClassLoader implements WrapperHelperCreator {
-    ClassLoader cl;
-    public WrapperHelperClassLoader(ClassLoader cl) {
-        this.cl = cl;
+    public WrapperHelperClassLoader() {
     }
 
     @Override
@@ -39,7 +38,7 @@ public class WrapperHelperClassLoader implements WrapperHelperCreator {
 
         Class<?> cls = null;
         try {
-            cls = cl.loadClass(newClassName);
+            cls = ClassLoaderUtils.loadClass(newClassName, WrapperHelperClassLoader.class);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -49,7 +48,7 @@ public class WrapperHelperClassLoader implements WrapperHelperCreator {
                 if (!helper.getSignature().equals(WrapperHelperCompiler.computeSignature(setMethods, getMethods))) {
                     count++;
                     newClassName = wrapperType.getName() + "_WrapperTypeHelper" + count;
-                    cls = cl.loadClass(newClassName);
+                    cls = ClassLoaderUtils.loadClass(newClassName, WrapperHelperClassLoader.class);
                 } else {
                     return helper;
                 }

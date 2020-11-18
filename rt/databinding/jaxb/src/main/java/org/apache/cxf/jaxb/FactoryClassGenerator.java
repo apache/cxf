@@ -26,6 +26,7 @@ import org.apache.cxf.common.spi.ClassGeneratorClassLoader;
 import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.util.OpcodesProxy;
 import org.apache.cxf.common.util.ReflectionUtil;
+import org.apache.cxf.common.util.StringUtils;
 
 
 public class FactoryClassGenerator extends ClassGeneratorClassLoader implements FactoryClassCreator {
@@ -47,7 +48,7 @@ public class FactoryClassGenerator extends ClassGeneratorClassLoader implements 
         ASMHelper.MethodVisitor mv;
 
         cw.visit(opcodes.V1_6, opcodes.ACC_PUBLIC + opcodes.ACC_SUPER,
-                helper.periodToSlashes(newClassName), null, "java/lang/Object", null);
+                StringUtils.periodToSlashes(newClassName), null, "java/lang/Object", null);
 
         cw.visitSource(cls.getSimpleName() + "Factory" + ".java", null);
 
@@ -60,7 +61,7 @@ public class FactoryClassGenerator extends ClassGeneratorClassLoader implements 
         mv.visitEnd();
 
         mv = cw.visitMethod(opcodes.ACC_PUBLIC, "create" + cls.getSimpleName(),
-                "()L" + helper.periodToSlashes(cls.getName()) + ";", null, null);
+                "()L" + StringUtils.periodToSlashes(cls.getName()) + ";", null, null);
         mv.visitCode();
         String name = cls.getName().replace(".", "/");
         mv.visitTypeInsn(opcodes.NEW, name);

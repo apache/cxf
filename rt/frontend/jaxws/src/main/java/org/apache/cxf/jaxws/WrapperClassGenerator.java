@@ -191,7 +191,7 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
                 return;
             }
         }
-        String classFileName = helper.periodToSlashes(className);
+        String classFileName = StringUtils.periodToSlashes(className);
         OpcodesProxy opCodes = helper.getOpCodes();
         cw.visit(opCodes.V1_5, opCodes.ACC_PUBLIC + opCodes.ACC_SUPER, classFileName, null,
                  "java/lang/Object", null);
@@ -241,7 +241,7 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
 
     private void generatePackageInfo(String className, String ns, Class<?> clz) {
         ASMHelper.ClassWriter cw = helper.createClassWriter();
-        String classFileName = helper.periodToSlashes(className);
+        String classFileName = StringUtils.periodToSlashes(className);
         OpcodesProxy opCodes = helper.getOpCodes();
         cw.visit(opCodes.V1_5, opCodes.ACC_ABSTRACT + opCodes.ACC_INTERFACE, classFileName, null,
                  "java/lang/Object", null);
@@ -302,7 +302,7 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
             return;
         }
         OpcodesProxy opCodes = helper.getOpCodes();
-        String classFileName = helper.periodToSlashes(className);
+        String classFileName = StringUtils.periodToSlashes(className);
         String name = mpi.getName().getLocalPart();
         Class<?> clz = mpi.getTypeClass();
         Object obj = mpi.getProperty(ReflectionServiceFactoryBean.RAW_CLASS);

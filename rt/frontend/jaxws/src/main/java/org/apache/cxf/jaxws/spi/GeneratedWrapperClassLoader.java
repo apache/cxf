@@ -23,6 +23,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxws.WrapperClassGenerator;
@@ -34,13 +35,11 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
 public class GeneratedWrapperClassLoader implements WrapperClassCreator {
-    private ClassLoader cl;
     private Set<Class<?>> wrapperBeans = new LinkedHashSet<>();
     private InterfaceInfo interfaceInfo;
     private JaxWsServiceFactoryBean factory;
 
-    public GeneratedWrapperClassLoader(ClassLoader cl) {
-        this.cl = cl;
+    public GeneratedWrapperClassLoader() {
     }
 
     @Override
@@ -94,7 +93,7 @@ public class GeneratedWrapperClassLoader implements WrapperClassCreator {
 
         Class<?> clz = null;
         try {
-            clz = cl.loadClass(className);
+            clz = ClassLoaderUtils.loadClass(className, GeneratedWrapperClassLoader.class);
         } catch (ClassNotFoundException e) {
         }
         wrapperPart.setTypeClass(clz);

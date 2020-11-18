@@ -134,15 +134,7 @@ public class ASMHelperImpl implements ASMHelper {
         return PRIMITIVE_MAP.get(tp);
     }
 
-    public String periodToSlashes(String s) {
-        char[] ch = s.toCharArray();
-        for (int x = 0; x < ch.length; x++) {
-            if (ch[x] == '.') {
-                ch[x] = '/';
-            }
-        }
-        return new String(ch);
-    }
+
 
 
     public String getClassCode(Class<?> cl) {
@@ -155,7 +147,7 @@ public class ASMHelperImpl implements ASMHelper {
         if (cl.isArray()) {
             return "[" + getClassCode(cl.getComponentType());
         }
-        return "L" + periodToSlashes(cl.getName()) + ";";
+        return "L" + StringUtils.periodToSlashes(cl.getName()) + ";";
     }
     public String getClassCode(java.lang.reflect.Type type) {
         if (type instanceof Class) {
@@ -200,7 +192,6 @@ public class ASMHelperImpl implements ASMHelper {
         }
         return null;
     }
-
 
     public ClassWriter createClassWriter() {
         Object newCw = null;
