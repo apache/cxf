@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -107,11 +106,6 @@ public class ProcessorTestBase {
         return getClass().getResource(wsdlFile).toURI().toString();
     }
 
-    protected File getResource(String wsdlFile) throws URISyntaxException {
-        return new File(getClass().getResource(wsdlFile).toURI());
-    }
-
-
     protected void assertFileEquals(String resource, File location) throws IOException {
         String str1 = TestFileUtils.getStringFromStream(getClass().getResourceAsStream(resource));
         String str2 = TestFileUtils.getStringFromFile(location);
@@ -147,52 +141,6 @@ public class ProcessorTestBase {
         assertFalse(st1.hasMoreTokens());
         assertFalse(st2.hasMoreTokens());
         assertTrue("Files did not match: " + unmatched, unmatched.isEmpty());
-    }
-
-    public boolean assertXmlEquals(final File expected, final File source) throws Exception {
-        List<String> attr = Arrays.asList(new String[]{"attributeFormDefault", "elementFormDefault", "form"});
-        return assertXmlEquals(expected, source, attr);
-    }
-
-    public boolean assertXmlEquals(final File expected, final File source,
-                                   final List<String> ignoreAttr) throws Exception {
-        List<Tag> expectedTags = ToolsStaxUtils.getTags(expected);
-        List<Tag> sourceTags = ToolsStaxUtils.getTags(source);
-
-        Iterator<Tag> iterator = sourceTags.iterator();
-
-        for (Tag expectedTag : expectedTags) {
-            Tag sourceTag = iterator.next();
-            if (!expectedTag.getName().equals(sourceTag.getName())) {
-                throw new ComparisonFailure("Tags not equal: ",
-                                            expectedTag.getName().toString(),
-                                            sourceTag.getName().toString());
-            }
-            for (Map.Entry<QName, String> attr : expectedTag.getAttributes().entrySet()) {
-                if (ignoreAttr.contains(attr.getKey().getLocalPart())) {
-                    continue;
-                }
-
-                if (sourceTag.getAttributes().containsKey(attr.getKey())) {
-                    if (!sourceTag.getAttributes().get(attr.getKey()).equals(attr.getValue())) {
-                        throw new ComparisonFailure("Attributes not equal: ",
-                                                attr.getKey() + ":" + attr.getValue(),
-                                                attr.getKey() + ":"
-                                                + sourceTag.getAttributes().get(attr.getKey()));
-                    }
-                } else {
-                    throw new AssertionError("Attribute: " + attr + " is missing in the source file.");
-                }
-            }
-
-            if (!StringUtils.isEmpty(expectedTag.getText())
-                && !expectedTag.getText().equals(sourceTag.getText())) {
-                throw new ComparisonFailure("Text not equal: ",
-                                            expectedTag.getText(),
-                                            sourceTag.getText());
-            }
-        }
-        return true;
     }
 
     protected void assertTagEquals(Tag expected, Tag source) {
@@ -271,14 +219,14 @@ public class ProcessorTestBase {
         return null;
     }
 
-    public void assertWsdlEquals(final File expected, final File source, List<String> attr, List<String> tag)
+    public void assertWsdlEquals(final InputStream expected, final File source, List<String> attr, List<String> tag)
         throws Exception {
         Tag expectedTag = ToolsStaxUtils.getTagTree(expected, attr, qnameAtts);
         Tag sourceTag = ToolsStaxUtils.getTagTree(source, attr, qnameAtts);
         assertTagEquals(expectedTag, sourceTag, attr, tag);
     }
 
-    public void assertWsdlEquals(final File expected, final File source) throws Exception {
+    public void assertWsdlEquals(final InputStream expected, final File source) throws Exception {
         assertWsdlEquals(expected, source, DEFAULT_IGNORE_ATTR, DEFAULT_IGNORE_TAG);
     }
 

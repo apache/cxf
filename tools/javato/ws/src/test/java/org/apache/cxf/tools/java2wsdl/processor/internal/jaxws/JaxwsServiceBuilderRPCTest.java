@@ -20,6 +20,7 @@
 package org.apache.cxf.tools.java2wsdl.processor.internal.jaxws;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,22 +59,17 @@ public class JaxwsServiceBuilderRPCTest extends ProcessorTestBase {
         builder.setServiceClass(org.apache.cxf.tools.fortest.jaxws.rpc.Greeter.class);
         ServiceInfo service = builder.createService();
         generator.setServiceModel(service);
-        File output = getOutputFile("rpc_greeter.wsdl");
-        assertNotNull(output);
-        generator.generate(output);
-        assertTrue(output.exists());
+        File wsdlFile = new File(output, "rpc_greeter.wsdl");
+        assertNotNull(wsdlFile);
+        generator.generate(wsdlFile);
+        assertTrue(wsdlFile.exists());
 
-        File expectedFile = new File(this.getClass()
-            .getResource("expected/rpc_greeter.wsdl").toURI());
+        InputStream expectedFile = getClass().getResourceAsStream("expected/rpc_greeter.wsdl");
 
         //MOXy doesn't put a final attribute on the array types, we can ignore that
         //for the purpose of this test
         List<String> ignores = new ArrayList<>(DEFAULT_IGNORE_ATTR);
         ignores.add("final");
-        assertWsdlEquals(expectedFile, output, ignores, DEFAULT_IGNORE_TAG);
-    }
-
-    private File getOutputFile(String fileName) {
-        return new File(output, fileName);
+        assertWsdlEquals(expectedFile, wsdlFile, ignores, DEFAULT_IGNORE_TAG);
     }
 }

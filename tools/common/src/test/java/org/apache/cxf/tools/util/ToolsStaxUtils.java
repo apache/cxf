@@ -23,12 +23,8 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Deque;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,68 +40,10 @@ public final class ToolsStaxUtils {
     private ToolsStaxUtils() {
     }
 
-    public static List<Tag> getTags(final File source) throws Exception {
-        List<Tag> tags = new ArrayList<>();
-        Collection<String> ignoreEmptyTags = Collections.singleton("sequence");
-
-        try (InputStream is = new BufferedInputStream(Files.newInputStream(source.toPath()))) {
-            XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
-            Tag newTag = null;
-            int count = 0;
-            QName checkingPoint = null;
-
-            final Deque<Tag> stack = new ArrayDeque<>();
-
-            while (reader.hasNext()) {
-                int event = reader.next();
-
-                if (checkingPoint != null) {
-                    count++;
-                }
-
-                if (event == XMLStreamConstants.START_ELEMENT) {
-                    newTag = new Tag();
-                    newTag.setName(reader.getName());
-
-                    if (ignoreEmptyTags.contains(reader.getLocalName())) {
-                        checkingPoint = reader.getName();
-                    }
-
-                    for (int i = 0; i < reader.getAttributeCount(); i++) {
-                        newTag.getAttributes().put(reader.getAttributeName(i),
-                                reader.getAttributeValue(i));
-                    }
-                    stack.push(newTag);
-                } else if (event == XMLStreamConstants.CHARACTERS) {
-                    newTag.setText(reader.getText());
-                } else if (event == XMLStreamConstants.END_ELEMENT) {
-                    Tag startTag = stack.pop();
-
-                    if (checkingPoint != null && checkingPoint.equals(reader.getName())) {
-                        if (count == 1) {
-                            //Tag is empty, and it's in the ignore collection, so we just skip this tag
-                        } else {
-                            tags.add(startTag);
-                        }
-                        count = 0;
-                        checkingPoint = null;
-                    } else {
-                        tags.add(startTag);
-                    }
-                }
-            }
-            reader.close();
-        }
-        return tags;
+    public static Tag getTagTree(final InputStream source) throws Exception {
+        return getTagTree(source, Collections.emptyList(), null);
     }
 
-    public static Tag getTagTree(final File source) throws Exception {
-        return getTagTree(source, Collections.emptyList());
-    }
-
-    public static Tag getTagTree(final File source, final Collection<String> ignoreAttr) throws Exception {
-        return getTagTree(source, ignoreAttr, null);
-    }
     public static Tag getTagTree(final File source,
                                  final Collection<String> ignoreAttr,
                                  Map<QName, Set<String>> types) throws Exception {
