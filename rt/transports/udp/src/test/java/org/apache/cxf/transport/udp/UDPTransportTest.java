@@ -31,13 +31,13 @@ import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.hello_world.Greeter;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  *
@@ -61,7 +61,7 @@ public class UDPTransportTest {
     }
 
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpBeforeClass() throws Exception {
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
         factory.setAddress("udp://:" + PORT);
@@ -71,7 +71,7 @@ public class UDPTransportTest {
         server = factory.create();
     }
 
-    @AfterClass
+    @AfterAll
     public static void shutdown() throws Exception {
         if (server != null) {
             server.stop();
@@ -79,7 +79,6 @@ public class UDPTransportTest {
     }
 
     @Test
-    @org.junit.Ignore
     public void testSimpleUDP() throws Exception {
         JaxWsProxyFactoryBean fact = new JaxWsProxyFactoryBean();
         fact.setAddress("udp://localhost:" + PORT);
