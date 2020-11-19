@@ -517,7 +517,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         }
         Path ann = method.getAnnotation(Path.class);
         if (ann == null) {
-            throw new IllegalArgumentException("Method '" + method.getClass().getCanonicalName() + "."
+            throw new IllegalArgumentException("Method '" + method.getDeclaringClass().getCanonicalName() + "."
                                                + method.getName() + "' is not annotated with Path");
         }
         // path(String) decomposes multi-segment path when necessary
