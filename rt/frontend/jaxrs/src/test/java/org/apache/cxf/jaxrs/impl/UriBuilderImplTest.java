@@ -37,12 +37,17 @@ import org.apache.cxf.jaxrs.resources.BookStore;
 import org.apache.cxf.jaxrs.resources.UriBuilderWrongAnnotations;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class UriBuilderImplTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void testFromUriRelativePath() throws Exception {
@@ -854,8 +859,12 @@ public class UriBuilderImplTest {
         new UriBuilderImpl().path((Method)null).build();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testAddPathMethodNoAnnotation() throws Exception {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(
+                String.format("Method '%s.getBook' is not annotated with Path",
+                BookStore.class.getCanonicalName()));
         Method noAnnot = BookStore.class.getMethod("getBook", String.class);
         new UriBuilderImpl().path(noAnnot).build();
     }
