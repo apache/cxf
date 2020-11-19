@@ -37,7 +37,7 @@ public class FactoryClassProxyService implements FactoryClassCreator {
 
     public class LoadFirst extends FactoryClassProxyService {
         public LoadFirst(Bus bus) {
-            super(new FactoryClassLoader());
+            super(new FactoryClassLoader(bus));
         }
     }
     public class GenerateJustInTime extends FactoryClassProxyService {

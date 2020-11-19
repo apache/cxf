@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.spi.GeneratedClassClassLoader;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxws.WrapperClassGenerator;
@@ -34,18 +35,14 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
-public class GeneratedWrapperClassLoader implements WrapperClassCreator {
-    private Set<Class<?>> wrapperBeans = new LinkedHashSet<>();
-    private InterfaceInfo interfaceInfo;
-    private JaxWsServiceFactoryBean factory;
-
-    public GeneratedWrapperClassLoader() {
+public class GeneratedWrapperClassLoader extends GeneratedClassClassLoader implements WrapperClassCreator {
+   public GeneratedWrapperClassLoader(Bus bus) {
+        super(bus);
     }
 
     @Override
-    public Set<Class<?>> generate(Bus bus, JaxWsServiceFactoryBean fact, InterfaceInfo ii, boolean q) {
-        factory = fact;
-        this.interfaceInfo = ii;
+    public Set<Class<?>> generate(JaxWsServiceFactoryBean factory, InterfaceInfo interfaceInfo, boolean q) {
+        Set<Class<?>> wrapperBeans = new LinkedHashSet<>();
         for (OperationInfo opInfo : interfaceInfo.getOperations()) {
             if (opInfo.isUnwrappedCapable()) {
                 Method method = (Method)opInfo.getProperty(ReflectionServiceFactoryBean.METHOD);
@@ -55,21 +52,23 @@ public class GeneratedWrapperClassLoader implements WrapperClassCreator {
                 MessagePartInfo inf = opInfo.getInput().getFirstMessagePart();
                 if (inf.getTypeClass() == null) {
                     MessageInfo messageInfo = opInfo.getUnwrappedOperation().getInput();
-                    createWrapperClass(inf,
+                    wrapperBeans.add(createWrapperClass(inf,
                             messageInfo,
                             opInfo,
                             method,
-                            true);
+                            true,
+                            factory));
                 }
                 MessageInfo messageInfo = opInfo.getUnwrappedOperation().getOutput();
                 if (messageInfo != null) {
                     inf = opInfo.getOutput().getFirstMessagePart();
                     if (inf.getTypeClass() == null) {
-                        createWrapperClass(inf,
+                        wrapperBeans.add(createWrapperClass(inf,
                                 messageInfo,
                                 opInfo,
                                 method,
-                                false);
+                                false,
+                                factory));
                     }
                 }
             }
@@ -77,11 +76,12 @@ public class GeneratedWrapperClassLoader implements WrapperClassCreator {
         return wrapperBeans;
     }
 
-    private void createWrapperClass(MessagePartInfo wrapperPart,
+    private Class<?> createWrapperClass(MessagePartInfo wrapperPart,
                                     MessageInfo messageInfo,
                                     OperationInfo op,
                                     Method method,
-                                    boolean isRequest) {
+                                    boolean isRequest,
+                                    JaxWsServiceFactoryBean factory) {
         boolean anonymous = factory.getAnonymousWrapperTypes();
 
         String pkg = getPackageName(method) + ".jaxws_asm" + (anonymous ? "_an" : "");
@@ -97,7 +97,7 @@ public class GeneratedWrapperClassLoader implements WrapperClassCreator {
         } catch (ClassNotFoundException e) {
         }
         wrapperPart.setTypeClass(clz);
-        wrapperBeans.add(clz);
+        return clz;
     }
     private String getPackageName(Method method) {
         String pkg = PackageUtils.getPackageName(method.getDeclaringClass());

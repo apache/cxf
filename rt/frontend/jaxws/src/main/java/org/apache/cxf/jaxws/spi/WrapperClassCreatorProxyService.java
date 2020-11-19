@@ -36,13 +36,13 @@ public class WrapperClassCreatorProxyService implements WrapperClassCreator {
     }
 
     @Override
-    public Set<Class<?>> generate(Bus bus, JaxWsServiceFactoryBean fact, InterfaceInfo inf, boolean q) {
-        return srv.generate(bus, fact, inf, q);
+    public Set<Class<?>> generate(JaxWsServiceFactoryBean fact, InterfaceInfo inf, boolean q) {
+        return srv.generate(fact, inf, q);
     }
 
     public class LoadFirst extends WrapperClassCreatorProxyService {
         public LoadFirst(Bus bus) {
-            super(new GeneratedWrapperClassLoader());
+            super(new GeneratedWrapperClassLoader(bus));
         }
     }
     public class GenerateJustInTime extends WrapperClassCreatorProxyService {

@@ -19,18 +19,16 @@
 
 package org.apache.cxf.jaxb;
 
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.Bus;
+import org.apache.cxf.common.spi.GeneratedClassClassLoader;
 
-public class FactoryClassLoader implements FactoryClassCreator {
-    public FactoryClassLoader() {
+public class FactoryClassLoader extends GeneratedClassClassLoader implements FactoryClassCreator {
+    public FactoryClassLoader(Bus bus) {
+        super(bus);
     }
     @Override
     public Class<?> createFactory(Class<?> cls) {
         String newClassName = cls.getName() + "Factory";
-        try {
-            return ClassLoaderUtils.loadClass(newClassName, FactoryClassLoader.class);
-        } catch (ClassNotFoundException e) {
-        }
-        return null;
+        return loadClass(newClassName, FactoryClassLoader.class);
     }
 }

@@ -21,30 +21,25 @@ package org.apache.cxf.common.spi;
 
 import java.util.Map;
 
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.Bus;
 
-public class GeneratedNamespaceClassLoader implements NamespaceClassCreator {
-    GeneratedNamespaceClassLoader() {
+public class GeneratedNamespaceClassLoader extends GeneratedClassClassLoader implements NamespaceClassCreator {
+    GeneratedNamespaceClassLoader(Bus bus) {
+        super(bus);
     }
     public synchronized Class<?> createNamespaceWrapper(Class<?> mcls, Map<String, String> map) {
         String postFix = "";
 
         if (mcls.getName().contains("eclipse")) {
-            try {
-                return ClassLoaderUtils.loadClass("org.apache.cxf.jaxb.EclipseNamespaceMapper",
+            return loadClass("org.apache.cxf.jaxb.EclipseNamespaceMapper",
                         GeneratedNamespaceClassLoader.class);
-            } catch (ClassNotFoundException e) {
-            }
         } else if (mcls.getName().contains(".internal")) {
             postFix = "Internal";
         } else if (mcls.getName().contains("com.sun")) {
             postFix = "RI";
         }
-        try {
-            return ClassLoaderUtils.loadClass("org.apache.cxf.jaxb.NamespaceMapper" + postFix,
-                    GeneratedNamespaceClassLoader.class);
-        } catch (ClassNotFoundException e) {
-        }
-        return null;
+        return loadClass("org.apache.cxf.jaxb.NamespaceMapper" + postFix, GeneratedNamespaceClassLoader.class);
+
+
     }
 }

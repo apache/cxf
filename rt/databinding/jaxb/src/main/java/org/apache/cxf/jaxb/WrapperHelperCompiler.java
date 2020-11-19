@@ -38,7 +38,6 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
     private Method[] getMethods;
     private Method[] jaxbMethods;
     private Field[] fields;
-    private Object objectFactory;
     private ASMHelper.ClassWriter cw;
     private ASMHelper asmhelper;
 
@@ -46,15 +45,14 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
         super(bus);
     }
 
-    public WrapperHelper compile(Bus bus, Class<?> wt, Method[] setters,
+    public WrapperHelper compile(Class<?> wt, Method[] setters,
                                  Method[] getters, Method[] jms,
-                                 Field[] fs, Object of) {
+                                 Field[] fs, Object objectFactory) {
         this.wrapperType = wt;
         this.setMethods = setters;
         this.getMethods = getters;
         this.jaxbMethods = jms;
         this.fields = fs;
-        this.objectFactory = of;
         asmhelper = bus.getExtension(ASMHelper.class);
         cw = asmhelper.createClassWriter();
 
