@@ -63,13 +63,9 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
     public static final String DEFAULT_PACKAGE_NAME = "defaultnamespace";
 
     private static final Logger LOG = LogUtils.getL7dLogger(WrapperClassGenerator.class);
-    private Set<Class<?>> wrapperBeans;
-    private boolean qualified;
-    private JaxWsServiceFactoryBean factory;
-    private InterfaceInfo interfaceInfo;
     private ASMHelper helper;
 
-    public WrapperClassGenerator(final Bus bus) {
+    public WrapperClassGenerator(Bus bus) {
         super(bus);
     }
 
@@ -111,12 +107,9 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
         return list;
     }
 
-    public Set<Class<?>> generate(Bus bus, JaxWsServiceFactoryBean fact, InterfaceInfo ii, boolean q) {
-        factory = fact;
-        qualified = q;
-        this.interfaceInfo = ii;
+    public Set<Class<?>> generate(JaxWsServiceFactoryBean factory, InterfaceInfo interfaceInfo, boolean qualified) {
         helper = bus.getExtension(ASMHelper.class);
-        wrapperBeans = new LinkedHashSet<>();
+        Set<Class<?>> wrapperBeans = new LinkedHashSet<>();
         for (OperationInfo opInfo : interfaceInfo.getOperations()) {
             if (opInfo.isUnwrappedCapable()) {
                 Method method = (Method)opInfo.getProperty(ReflectionServiceFactoryBean.METHOD);
@@ -130,7 +123,11 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
                                        messageInfo,
                                        opInfo,
                                        method,
-                                       true);
+                                       true,
+                                       wrapperBeans,
+                                       factory,
+                                       qualified,
+                                       interfaceInfo);
                 }
                 MessageInfo messageInfo = opInfo.getUnwrappedOperation().getOutput();
                 if (messageInfo != null) {
@@ -140,7 +137,11 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
                                            messageInfo,
                                            opInfo,
                                            method,
-                                           false);
+                                           false,
+                                            wrapperBeans,
+                                            factory,
+                                            qualified,
+                                            interfaceInfo);
                     }
                 }
             }
@@ -152,7 +153,11 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
                                         MessageInfo messageInfo,
                                         OperationInfo op,
                                         Method method,
-                                        boolean isRequest) {
+                                        boolean isRequest,
+                                        Set<Class<?>> wrapperBeans,
+                                        JaxWsServiceFactoryBean factory,
+                                        boolean qualified,
+                                        InterfaceInfo interfaceInfo) {
 
 
         ASMHelper.ClassWriter cw = helper.createClassWriter();
@@ -173,8 +178,8 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
         String pname = pkg + ".package-info";
         Class<?> def = findClass(pname);
         if (def == null) {
-            generatePackageInfo(pname, wrapperElement.getNamespaceURI(),
-                                method.getDeclaringClass());
+            generatePackageInfo(pname, wrapperElement.getNamespaceURI(), method.getDeclaringClass(),
+                    qualified, interfaceInfo);
         }
 
         def = findClass(className);
@@ -229,7 +234,7 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
         mv.visitEnd();
 
         for (MessagePartInfo mpi : messageInfo.getMessageParts()) {
-            generateMessagePart(cw, mpi, method, classFileName);
+            generateMessagePart(cw, mpi, method, classFileName, factory);
         }
 
         cw.visitEnd();
@@ -239,7 +244,8 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
         wrapperBeans.add(clz);
     }
 
-    private void generatePackageInfo(String className, String ns, Class<?> clz) {
+    private void generatePackageInfo(String className, String ns, Class<?> clz, boolean qualified,
+                                     InterfaceInfo interfaceInfo) {
         ASMHelper.ClassWriter cw = helper.createClassWriter();
         String classFileName = StringUtils.periodToSlashes(className);
         OpcodesProxy opCodes = helper.getOpCodes();
@@ -297,7 +303,7 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
     }
 
     private void generateMessagePart(ASMHelper.ClassWriter cw, MessagePartInfo mpi,
-                                     Method method, String className) {
+                                     Method method, String className, JaxWsServiceFactoryBean factory) {
         if (Boolean.TRUE.equals(mpi.getProperty(ReflectionServiceFactoryBean.HEADER))) {
             return;
         }

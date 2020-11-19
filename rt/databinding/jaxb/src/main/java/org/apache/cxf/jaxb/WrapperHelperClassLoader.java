@@ -22,33 +22,29 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.spi.GeneratedClassClassLoader;
 import org.apache.cxf.databinding.WrapperHelper;
 
-public class WrapperHelperClassLoader implements WrapperHelperCreator {
-    public WrapperHelperClassLoader() {
+public class WrapperHelperClassLoader extends GeneratedClassClassLoader implements WrapperHelperCreator {
+    public WrapperHelperClassLoader(Bus bus) {
+        super(bus);
     }
 
     @Override
-    public WrapperHelper compile(Bus bus, Class<?> wrapperType, Method[] setMethods, Method[] getMethods,
+    public WrapperHelper compile(Class<?> wrapperType, Method[] setMethods, Method[] getMethods,
                                  Method[] jaxbMethods, Field[] fields, Object objectFactory) {
 
         int count = 1;
         String newClassName = wrapperType.getName() + "_WrapperTypeHelper" + count;
 
-        Class<?> cls = null;
-        try {
-            cls = ClassLoaderUtils.loadClass(newClassName, WrapperHelperClassLoader.class);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        Class<?> cls = loadClass(newClassName, WrapperHelperClassLoader.class);
         while (cls != null) {
             try {
-                WrapperHelper helper = WrapperHelper.class.cast(cls.newInstance());
+                WrapperHelper helper = WrapperHelper.class.cast(cls.getDeclaredConstructor().newInstance());
                 if (!helper.getSignature().equals(WrapperHelperCompiler.computeSignature(setMethods, getMethods))) {
                     count++;
                     newClassName = wrapperType.getName() + "_WrapperTypeHelper" + count;
-                    cls = ClassLoaderUtils.loadClass(newClassName, WrapperHelperClassLoader.class);
+                    cls = loadClass(newClassName, WrapperHelperClassLoader.class);
                 } else {
                     return helper;
                 }

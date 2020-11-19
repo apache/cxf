@@ -21,18 +21,17 @@ package org.apache.cxf.wsdl;
 
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.Bus;
+import org.apache.cxf.common.spi.GeneratedClassClassLoader;
 
-public class ExtensionClassLoader implements ExtensionClassCreator {
+public class ExtensionClassLoader extends GeneratedClassClassLoader implements ExtensionClassCreator {
 
-    public ExtensionClassLoader() {
-    }
+    public ExtensionClassLoader(Bus bus) {
+            super(bus);
+        }
+
     @Override
     public Class<?> createExtensionClass(Class<?> cls, QName qname, ClassLoader loader) {
-        try {
-            return ClassLoaderUtils.loadClass(cls.getName() + "Extensibility", ExtensionClassLoader.class);
-        } catch (ClassNotFoundException e) {
-        }
-        return null;
+        return loadClass(cls.getName() + "Extensibility", ExtensionClassLoader.class);
     }
 }

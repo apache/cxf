@@ -18,20 +18,19 @@
  */
 package org.apache.cxf.endpoint.dynamic;
 
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.Bus;
+import org.apache.cxf.common.spi.GeneratedClassClassLoader;
 
-public class ExceptionClassLoader implements ExceptionClassCreator {
+public class ExceptionClassLoader extends GeneratedClassClassLoader implements ExceptionClassCreator {
 
-    public ExceptionClassLoader() {
+    public ExceptionClassLoader(Bus bus) {
+        super(bus);
     }
 
     @Override
     public Class<?> createExceptionClass(Class<?> bean) {
         String newClassName = bean.getName() + "_Exception";
-        try {
-            return ClassLoaderUtils.loadClass(newClassName, ExceptionClassLoader.class);
-        } catch (ClassNotFoundException e) {
-        }
-        return null;
+        return loadClass(newClassName, ExceptionClassLoader.class);
+
     }
 }

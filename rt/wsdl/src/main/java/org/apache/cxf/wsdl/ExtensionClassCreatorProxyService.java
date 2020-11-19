@@ -39,7 +39,7 @@ public class ExtensionClassCreatorProxyService implements ExtensionClassCreator 
 
     public class LoadFirst extends ExtensionClassCreatorProxyService {
         public LoadFirst(Bus bus) {
-            super(new ExtensionClassLoader());
+            super(new ExtensionClassLoader(bus));
         }
     }
     public class GenerateJustInTime extends ExtensionClassCreatorProxyService {

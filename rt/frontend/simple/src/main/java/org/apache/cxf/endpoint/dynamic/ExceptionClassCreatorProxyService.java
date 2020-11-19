@@ -37,7 +37,7 @@ public class ExceptionClassCreatorProxyService implements ExceptionClassCreator 
 
     public class LoadFirst extends ExceptionClassCreatorProxyService {
         public LoadFirst(Bus bus) {
-            super(new ExceptionClassLoader());
+            super(new ExceptionClassLoader(bus));
         }
     }
     public class GenerateJustInTime extends ExceptionClassCreatorProxyService {

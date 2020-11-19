@@ -35,14 +35,14 @@ public class WrapperHelperProxyService implements WrapperHelperCreator {
     }
 
     @Override
-    public WrapperHelper compile(Bus bus, Class<?> wrapperType, Method[] setMethods, Method[] getMethods,
+    public WrapperHelper compile(Class<?> wrapperType, Method[] setMethods, Method[] getMethods,
                                  Method[] jaxbMethods, Field[] fields, Object objectFactory) {
-        return srv.compile(bus, wrapperType, setMethods, getMethods, jaxbMethods, fields, objectFactory);
+        return srv.compile(wrapperType, setMethods, getMethods, jaxbMethods, fields, objectFactory);
     }
 
     public class LoadFirst extends WrapperHelperProxyService {
         public LoadFirst(Bus bus) {
-            super(new WrapperHelperClassLoader());
+            super(new WrapperHelperClassLoader(bus));
         }
     }
     public class GenerateJustInTime extends WrapperHelperProxyService {

@@ -47,7 +47,7 @@ public class ClassLoaderProxyService implements ClassLoaderService {
     }
     public class LoadFirst extends ClassLoaderProxyService {
         public LoadFirst(Bus bus) {
-            super(new GeneratedNamespaceClassLoader());
+            super(new GeneratedNamespaceClassLoader(bus));
         }
     }
     public class GenerateJustInTime extends ClassLoaderProxyService {
