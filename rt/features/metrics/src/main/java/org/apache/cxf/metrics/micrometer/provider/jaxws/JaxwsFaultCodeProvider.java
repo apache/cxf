@@ -26,19 +26,16 @@ public class JaxwsFaultCodeProvider {
     
     public String getFaultCode(Exchange ex, boolean client) {
         FaultMode fm = ex.get(FaultMode.class);
+        // We check OutFaultMessage/InFaultMessage only because some features propagate the
+        // fault mode using InMessage/OutMessage (which may not end-up with a fault), for
+        // example check MAPAggregatorImpl.
         if (client) {
             if (fm == null && ex.getInFaultMessage() != null) {
                 fm = ex.getInFaultMessage().get(FaultMode.class);
             }
-            if (fm == null && ex.getOutMessage() != null) {
-                fm = ex.getOutMessage().get(FaultMode.class);
-            }
         } else {
             if (fm == null && ex.getOutFaultMessage() != null) {
                 fm = ex.getOutFaultMessage().get(FaultMode.class);
-            }
-            if (fm == null && ex.getInMessage() != null) {
-                fm = ex.getInMessage().get(FaultMode.class);
             }
         }
         
