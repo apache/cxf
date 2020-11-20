@@ -192,26 +192,27 @@ public class StandardTagsTest {
     }
 
     @Test
-    public void testStatusReturnWithUnknownWhenStatusIsNull() {
+    public void testStatusReturnWith200WhenResponseCodeIsNotSet() {
         // given
 
         // when
         Tag actual = underTest.status(response);
 
         // then
-        assertThat(actual, is(Tag.of(STATUS_METRIC_NAME, "UNKNOWN")));
+        assertThat(actual, is(Tag.of(STATUS_METRIC_NAME, "200")));
     }
 
     @Test
-    public void testStatusReturnWithUnknownWhenResponseCodeIsNotInteger() {
+    public void testStatusReturnWith202WhenResponseCodeIsNullAndResponseIsPartial() {
         // given
-        doReturn("").when(request).get(Message.RESPONSE_CODE);
+        doReturn(null).when(request).get(Message.RESPONSE_CODE);
+        doReturn(true).when(request).get(Message.EMPTY_PARTIAL_RESPONSE_MESSAGE);
 
         // when
         Tag actual = underTest.status(request);
 
         // then
-        assertThat(actual, is(Tag.of(STATUS_METRIC_NAME, "UNKNOWN")));
+        assertThat(actual, is(Tag.of(STATUS_METRIC_NAME, "202")));
     }
 
     @Test
@@ -327,18 +328,6 @@ public class StandardTagsTest {
         Tag actual = underTest.outcome(response);
 
         // then
-        assertThat(actual, is(Tag.of(OUTCOME_METRIC_NAME, "UNKNOWN")));
-    }
-
-    @Test
-    public void testOutcomeReturnWithUnknownWhenMethodIsNotInteger() {
-        // given
-        doReturn(new Object()).when(response).get(Message.BASE_PATH);
-
-        // when
-        Tag actual = underTest.outcome(response);
-
-        // then
-        assertThat(actual, is(Tag.of(OUTCOME_METRIC_NAME, "UNKNOWN")));
+        assertThat(actual, is(Tag.of(OUTCOME_METRIC_NAME, "SUCCESS")));
     }
 }

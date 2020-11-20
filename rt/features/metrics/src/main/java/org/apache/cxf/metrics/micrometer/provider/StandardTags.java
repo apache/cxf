@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 
 import io.micrometer.core.instrument.Tag;
 
@@ -65,10 +66,8 @@ public class StandardTags {
 
     public Tag status(Message response) {
         return ofNullable(response)
-                .map(e -> e.get(Message.RESPONSE_CODE))
-                .filter(e -> e instanceof Integer)
-                .map(e -> (Integer) e)
-                .map(String::valueOf)
+                .map(e -> MessageUtils.getReponseCodeFromMessage(response))
+                .map(code -> Integer.toString(code))
                 .map(status -> Tag.of("status", status))
                 .orElse(STATUS_UNKNOWN);
     }
@@ -90,11 +89,8 @@ public class StandardTags {
     }
 
     public Tag outcome(Message response) {
-        Optional<Integer> statusCode =
-                ofNullable(response)
-                        .map(e -> e.get(Message.RESPONSE_CODE))
-                        .filter(e -> e instanceof Integer)
-                        .map(e -> (Integer) e);
+        Optional<Integer> statusCode = ofNullable(response)
+           .map(e -> MessageUtils.getReponseCodeFromMessage(response));
         if (!statusCode.isPresent()) {
             return OUTCOME_UNKNOWN;
         }
