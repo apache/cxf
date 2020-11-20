@@ -667,7 +667,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
             && schemaLocations == null) {
             ServiceInfo serviceInfo = getService().getServiceInfos().get(0);
             WrapperClassCreator wrapperGen = getBus().getExtension(WrapperClassCreator.class);
-            return wrapperGen.generate(getBus(), this,
+            return wrapperGen.generate(this,
                     serviceInfo.getInterface(),
                     getQualifyWrapperSchema());
         }
