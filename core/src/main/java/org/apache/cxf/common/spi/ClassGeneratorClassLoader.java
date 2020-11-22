@@ -94,7 +94,7 @@ public class ClassGeneratorClassLoader {
             }
 
             ret = defined.computeIfAbsent(StringUtils.slashesToPeriod(name),
-                    key -> TypeHelperClassLoader.super.defineClass(key, bytes, 0, bytes.length));
+                key -> TypeHelperClassLoader.super.defineClass(key, bytes, 0, bytes.length));
 
             return ret;
         }

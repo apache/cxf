@@ -31,11 +31,8 @@ import org.apache.cxf.common.util.StringUtils;
 
 public class ExtensionClassGenerator extends ClassGeneratorClassLoader implements ExtensionClassCreator {
 
-    private ASMHelper helper;
-
     public ExtensionClassGenerator(Bus bus) {
         super(bus);
-        this.helper = bus.getExtension(ASMHelper.class);
     }
     //CHECKSTYLE:OFF - very complicated ASM code
     public Class<?> createExtensionClass(Class<?> cls, QName qname, ClassLoader loader) {

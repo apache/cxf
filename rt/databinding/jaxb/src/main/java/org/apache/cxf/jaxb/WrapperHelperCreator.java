@@ -22,7 +22,6 @@ package org.apache.cxf.jaxb;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.databinding.WrapperHelper;
 
 public interface WrapperHelperCreator {

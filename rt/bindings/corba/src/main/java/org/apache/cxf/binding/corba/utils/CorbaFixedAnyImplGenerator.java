@@ -22,7 +22,6 @@ package org.apache.cxf.binding.corba.utils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.spi.ClassGeneratorClassLoader;
 import org.apache.cxf.common.util.ASMHelper;
-import org.apache.cxf.common.util.ASMHelperImpl;
 import org.apache.cxf.common.util.OpcodesProxy;
 
 public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {

@@ -36,7 +36,7 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
 public class GeneratedWrapperClassLoader extends GeneratedClassClassLoader implements WrapperClassCreator {
-   public GeneratedWrapperClassLoader(Bus bus) {
+    public GeneratedWrapperClassLoader(Bus bus) {
         super(bus);
     }
 
