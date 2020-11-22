@@ -26,8 +26,8 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 
 public class ClassLoaderProxyService implements ClassLoaderService {
-    NamespaceClassCreator srv;
     private static final Logger LOG = LogUtils.getL7dLogger(ClassLoaderProxyService.class);
+    NamespaceClassCreator srv;
     public ClassLoaderProxyService(Bus bus) {
         this(new NamespaceClassGenerator(bus));
     }

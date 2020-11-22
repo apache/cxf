@@ -20,7 +20,6 @@ package org.apache.cxf.jaxws.spi;
 
 import java.util.Set;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
 import org.apache.cxf.service.model.InterfaceInfo;
 

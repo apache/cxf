@@ -64,6 +64,8 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
 
     private static final Logger LOG = LogUtils.getL7dLogger(WrapperClassGenerator.class);
     private ASMHelper helper;
+    private boolean qualified;
+    private InterfaceInfo interfaceInfo;
 
     public WrapperClassGenerator(Bus bus) {
         super(bus);
@@ -107,7 +109,9 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
         return list;
     }
 
-    public Set<Class<?>> generate(JaxWsServiceFactoryBean factory, InterfaceInfo interfaceInfo, boolean qualified) {
+    public Set<Class<?>> generate(JaxWsServiceFactoryBean factory, InterfaceInfo ii, boolean q) {
+        this.qualified = q;
+        this.interfaceInfo = ii;
         helper = bus.getExtension(ASMHelper.class);
         Set<Class<?>> wrapperBeans = new LinkedHashSet<>();
         for (OperationInfo opInfo : interfaceInfo.getOperations()) {
@@ -125,9 +129,7 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
                                        method,
                                        true,
                                        wrapperBeans,
-                                       factory,
-                                       qualified,
-                                       interfaceInfo);
+                                       factory);
                 }
                 MessageInfo messageInfo = opInfo.getUnwrappedOperation().getOutput();
                 if (messageInfo != null) {
@@ -139,9 +141,7 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
                                            method,
                                            false,
                                             wrapperBeans,
-                                            factory,
-                                            qualified,
-                                            interfaceInfo);
+                                            factory);
                     }
                 }
             }
@@ -155,9 +155,7 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
                                         Method method,
                                         boolean isRequest,
                                         Set<Class<?>> wrapperBeans,
-                                        JaxWsServiceFactoryBean factory,
-                                        boolean qualified,
-                                        InterfaceInfo interfaceInfo) {
+                                        JaxWsServiceFactoryBean factory) {
 
 
         ASMHelper.ClassWriter cw = helper.createClassWriter();
@@ -178,8 +176,7 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
         String pname = pkg + ".package-info";
         Class<?> def = findClass(pname);
         if (def == null) {
-            generatePackageInfo(pname, wrapperElement.getNamespaceURI(), method.getDeclaringClass(),
-                    qualified, interfaceInfo);
+            generatePackageInfo(pname, wrapperElement.getNamespaceURI(), method.getDeclaringClass());
         }
 
         def = findClass(className);
@@ -244,8 +241,7 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
         wrapperBeans.add(clz);
     }
 
-    private void generatePackageInfo(String className, String ns, Class<?> clz, boolean qualified,
-                                     InterfaceInfo interfaceInfo) {
+    private void generatePackageInfo(String className, String ns, Class<?> clz) {
         ASMHelper.ClassWriter cw = helper.createClassWriter();
         String classFileName = StringUtils.periodToSlashes(className);
         OpcodesProxy opCodes = helper.getOpCodes();

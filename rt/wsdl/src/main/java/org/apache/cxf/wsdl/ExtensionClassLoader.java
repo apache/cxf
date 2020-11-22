@@ -27,8 +27,8 @@ import org.apache.cxf.common.spi.GeneratedClassClassLoader;
 public class ExtensionClassLoader extends GeneratedClassClassLoader implements ExtensionClassCreator {
 
     public ExtensionClassLoader(Bus bus) {
-            super(bus);
-        }
+        super(bus);
+    }
 
     @Override
     public Class<?> createExtensionClass(Class<?> cls, QName qname, ClassLoader loader) {
