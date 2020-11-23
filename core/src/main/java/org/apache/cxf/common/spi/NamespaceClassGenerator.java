@@ -155,7 +155,7 @@ public class NamespaceClassGenerator extends ClassGeneratorClassLoader implement
         mv.visitInsn(Opcodes.RETURN);
         ASMHelper.Label l2 = helper.createLabel();
         mv.visitLabel(l2);
-        mv.visitMaxs(2, 2);
+        mv.visitMaxs(0, 0);
         mv.visitEnd();
 
 
@@ -176,7 +176,7 @@ public class NamespaceClassGenerator extends ClassGeneratorClassLoader implement
         mv.visitLabel(l2);
         mv.visitLocalVariable("this", "L" + slashedName + ";", null, l0, l2, 0);
         mv.visitLocalVariable("contextualNamespaceDecls", "[Ljava/lang/String;", null, l0, l2, 1);
-        mv.visitMaxs(2, 2);
+        mv.visitMaxs(0, 0);
         mv.visitEnd();
 
         mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "getContextualNamespaceDecls", "()[Ljava/lang/String;", null, null);
@@ -192,7 +192,7 @@ public class NamespaceClassGenerator extends ClassGeneratorClassLoader implement
         mv.visitLabel(l1);
         mv.visitLocalVariable("this", "L" + slashedName + ";", null, l0, l1, 0);
 
-        mv.visitMaxs(1, 1);
+        mv.visitMaxs(0, 0);
         mv.visitEnd();
 
 
@@ -280,7 +280,7 @@ public class NamespaceClassGenerator extends ClassGeneratorClassLoader implement
         mv.visitLocalVariable("sup", "[Ljava/lang/String;", null, l1, l10, 1);
         mv.visitLocalVariable("s", "Ljava/util/List;", "Ljava/util/List<Ljava/lang/String;>;", l4, l10, 2);
         mv.visitLocalVariable("x", "I", null, l5, l9, 3);
-        mv.visitMaxs(3, 4);
+        mv.visitMaxs(0, 0);
         mv.visitEnd();
 
         cw.visitEnd();
@@ -330,7 +330,7 @@ public class NamespaceClassGenerator extends ClassGeneratorClassLoader implement
         mv.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/String");
         mv.visitFieldInsn(Opcodes.PUTSTATIC, postFixedName, "EMPTY_STRING", "[Ljava/lang/String;");
         mv.visitInsn(Opcodes.RETURN);
-        mv.visitMaxs(1, 0);
+        mv.visitMaxs(0, 0);
         mv.visitEnd();
 
         mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>",
@@ -364,7 +364,7 @@ public class NamespaceClassGenerator extends ClassGeneratorClassLoader implement
         mv.visitLocalVariable("nspref",
                 "Ljava/util/Map;", "Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;",
                 l0, l4, 1);
-        mv.visitMaxs(2, 2);
+        mv.visitMaxs(0, 0);
         mv.visitEnd();
 
         mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "getPreferredPrefix",
@@ -404,7 +404,7 @@ public class NamespaceClassGenerator extends ClassGeneratorClassLoader implement
         mv.visitLocalVariable("suggestion", "Ljava/lang/String;", null, l0, l4, 2);
         mv.visitLocalVariable("requirePrefix", "Z", null, l0, l4, 3);
         mv.visitLocalVariable("prefix", "Ljava/lang/String;", null, l1, l4, 4);
-        mv.visitMaxs(2, 5);
+        mv.visitMaxs(0, 0);
         mv.visitEnd();
 
         mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "setContextualNamespaceDecls", "([Ljava/lang/String;)V", null, null);
@@ -423,7 +423,7 @@ public class NamespaceClassGenerator extends ClassGeneratorClassLoader implement
         mv.visitLabel(l2);
         mv.visitLocalVariable("this", "L" + postFixedName + ";", null, l0, l2, 0);
         mv.visitLocalVariable("contextualNamespaceDecls", "[Ljava/lang/String;", null, l0, l2, 1);
-        mv.visitMaxs(2, 2);
+        mv.visitMaxs(0, 0);
         mv.visitEnd();
 
         mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "getContextualNamespaceDecls", "()[Ljava/lang/String;", null, null);
@@ -439,7 +439,7 @@ public class NamespaceClassGenerator extends ClassGeneratorClassLoader implement
         mv.visitLabel(l1);
         mv.visitLocalVariable("this", "L" + postFixedName + ";", null, l0, l1, 0);
 
-        mv.visitMaxs(1, 1);
+        mv.visitMaxs(0, 0);
         mv.visitEnd();
 
         cw.visitEnd();

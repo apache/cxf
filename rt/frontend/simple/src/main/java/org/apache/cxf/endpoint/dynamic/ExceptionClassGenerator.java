@@ -72,7 +72,7 @@ public class ExceptionClassGenerator extends ClassGeneratorClassLoader implement
             mv.visitLabel(helper.createLabel());
             mv.visitInsn(opCodes.RETURN);
             mv.visitLabel(helper.createLabel());
-            mv.visitMaxs(2, 3);
+            mv.visitMaxs(0, 0);
             mv.visitEnd();
 
             mv = cw.visitMethod(opCodes.ACC_PUBLIC, "getFaultInfo",
@@ -83,7 +83,7 @@ public class ExceptionClassGenerator extends ClassGeneratorClassLoader implement
             mv.visitFieldInsn(opCodes.GETFIELD, newClassName, "faultInfo", beanClassCode);
             mv.visitInsn(opCodes.ARETURN);
             mv.visitLabel(helper.createLabel());
-            mv.visitMaxs(1, 1);
+            mv.visitMaxs(0, 0);
             mv.visitEnd();
 
             cw.visitEnd();

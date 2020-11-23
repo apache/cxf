@@ -89,7 +89,7 @@ public class ExtensionClassGenerator extends ClassGeneratorClassLoader implement
             mv.visitFieldInsn(Opcodes.PUTSTATIC, className + "Extensibility", "WSDL_REQUIRED",
                     "Ljavax/xml/namespace/QName;");
             mv.visitInsn(Opcodes.RETURN);
-            mv.visitMaxs(4, 0);
+            mv.visitMaxs(0, 0);
             mv.visitEnd();
         } else {
             fv = cw.visitField(Opcodes.ACC_PRIVATE, "required", "Ljava/lang/Boolean;", null, null);
@@ -125,7 +125,7 @@ public class ExtensionClassGenerator extends ClassGeneratorClassLoader implement
         mv.visitLabel(l3);
 
         mv.visitLocalVariable("this", "L" + className + "Extensibility;", null, l0, l3, 0);
-        mv.visitMaxs(5, 1);
+        mv.visitMaxs(0, 0);
         mv.visitEnd();
 
         mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "setElementType", "(Ljavax/xml/namespace/QName;)V", null, null);
@@ -144,7 +144,7 @@ public class ExtensionClassGenerator extends ClassGeneratorClassLoader implement
         mv.visitLabel(l2);
         mv.visitLocalVariable("this", "L" + className + "Extensibility;", null, l0, l2, 0);
         mv.visitLocalVariable("elementType", "Ljavax/xml/namespace/QName;", null, l0, l2, 1);
-        mv.visitMaxs(2, 2);
+        mv.visitMaxs(0, 0);
         mv.visitEnd();
 
         mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "getElementType", "()Ljavax/xml/namespace/QName;", null, null);
@@ -160,7 +160,7 @@ public class ExtensionClassGenerator extends ClassGeneratorClassLoader implement
         l1 = helper.createLabel();
         mv.visitLabel(l1);
         mv.visitLocalVariable("this", "L" + className + "Extensibility;", null, l0, l1, 0);
-        mv.visitMaxs(1, 1);
+        mv.visitMaxs(0, 0);
         mv.visitEnd();
 
         if (hasAttributes) {
@@ -199,7 +199,7 @@ public class ExtensionClassGenerator extends ClassGeneratorClassLoader implement
             mv.visitLabel(l4);
             mv.visitLocalVariable("this", "L" + className + "Extensibility;", null, l0, l4, 0);
             mv.visitLocalVariable("s", "Ljava/lang/String;", null, l1, l4, 1);
-            mv.visitMaxs(2, 2);
+            mv.visitMaxs(0, 0);
             mv.visitEnd();
 
 
@@ -249,7 +249,7 @@ public class ExtensionClassGenerator extends ClassGeneratorClassLoader implement
             mv.visitLabel(l5);
             mv.visitLocalVariable("this", "L" + className + "Extensibility;", null, l0, l5, 0);
             mv.visitLocalVariable("b", "Ljava/lang/Boolean;", null, l0, l5, 1);
-            mv.visitMaxs(3, 2);
+            mv.visitMaxs(0, 0);
             mv.visitEnd();
         } else {
             mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "getRequired", "()Ljava/lang/Boolean;", null, null);
@@ -263,7 +263,7 @@ public class ExtensionClassGenerator extends ClassGeneratorClassLoader implement
             l1 = helper.createLabel();
             mv.visitLabel(l1);
             mv.visitLocalVariable("this", "L" + className + "Extensibility;", null, l0, l1, 0);
-            mv.visitMaxs(1, 1);
+            mv.visitMaxs(0, 0);
             mv.visitEnd();
 
             mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "setRequired", "(Ljava/lang/Boolean;)V", null, null);
@@ -282,7 +282,7 @@ public class ExtensionClassGenerator extends ClassGeneratorClassLoader implement
             mv.visitLabel(l2);
             mv.visitLocalVariable("this", "L" + className + "Extensibility;", null, l0, l2, 0);
             mv.visitLocalVariable("b", "Ljava/lang/Boolean;", null, l0, l2, 1);
-            mv.visitMaxs(2, 2);
+            mv.visitMaxs(0, 0);
             mv.visitEnd();
         }
 

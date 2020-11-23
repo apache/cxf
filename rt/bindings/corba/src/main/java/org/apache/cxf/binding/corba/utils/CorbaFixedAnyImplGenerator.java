@@ -98,7 +98,7 @@ public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {
                 null, l0, l4, 0);
         mv.visitLocalVariable("is", "Lorg/omg/CORBA/portable/InputStream;", null, l0, l4, 1);
         mv.visitLocalVariable("t", "Lorg/omg/CORBA/TypeCode;", null, l0, l4, 2);
-        mv.visitMaxs(3, 3);
+        mv.visitMaxs(0, 0);
         mv.visitEnd();
     }
 
@@ -141,7 +141,7 @@ public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {
         mv.visitLocalVariable("this", "Lorg/apache/cxf/binding/corba/utils/FixedAnyImpl;",
                 null, l0, l4, 0);
         mv.visitLocalVariable("os", "Lorg/omg/CORBA/portable/OutputStream;", null, l0, l4, 1);
-        mv.visitMaxs(2, 2);
+        mv.visitMaxs(0, 0);
         mv.visitEnd();
 
     }
@@ -175,7 +175,7 @@ public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {
         ASMHelper.Label l3 = helper.createLabel();
         mv.visitLabel(l3);
         mv.visitLocalVariable("this", "Lorg/apache/cxf/binding/corba/utils/FixedAnyImpl;", null, l0, l3, 0);
-        mv.visitMaxs(1, 1);
+        mv.visitMaxs(0, 0);
         mv.visitEnd();
 
     }
@@ -212,7 +212,7 @@ public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {
         mv.visitLocalVariable("this", "Lorg/apache/cxf/binding/corba/utils/FixedAnyImpl;",
                 null, l0, l3, 0);
         mv.visitLocalVariable("s", "Lorg/omg/CORBA/portable/Streamable;", null, l0, l3, 1);
-        mv.visitMaxs(2, 2);
+        mv.visitMaxs(0, 0);
         mv.visitEnd();
     }
 
@@ -239,7 +239,7 @@ public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {
                 "Lorg/apache/cxf/binding/corba/utils/FixedAnyImpl;",
                 null, l0, l2, 0);
         mv.visitLocalVariable("orb", "Lorg/omg/CORBA/ORB;", null, l0, l2, 1);
-        mv.visitMaxs(2, 2);
+        mv.visitMaxs(0, 0);
         mv.visitEnd();
 
 
@@ -268,7 +268,7 @@ public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {
                 null, l0, l2, 0);
         mv.visitLocalVariable("orb", "Lorg/omg/CORBA/ORB;", null, l0, l2, 1);
         mv.visitLocalVariable("any", "Lorg/omg/CORBA/Any;", null, l0, l2, 2);
-        mv.visitMaxs(3, 3);
+        mv.visitMaxs(0, 0);
         mv.visitEnd();
 
     }

@@ -57,7 +57,7 @@ public class FactoryClassGenerator extends ClassGeneratorClassLoader implements 
         mv.visitVarInsn(opcodes.ALOAD, 0);
         mv.visitMethodInsn(opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
         mv.visitInsn(opcodes.RETURN);
-        mv.visitMaxs(1, 1);
+        mv.visitMaxs(0, 0);
         mv.visitEnd();
 
         mv = cw.visitMethod(opcodes.ACC_PUBLIC, "create" + cls.getSimpleName(),
@@ -77,7 +77,7 @@ public class FactoryClassGenerator extends ClassGeneratorClassLoader implements 
         mv.visitMethodInsn(opcodes.INVOKESPECIAL, name, "<init>", paraString.toString(), false);
 
         mv.visitInsn(opcodes.ARETURN);
-        mv.visitMaxs(1, 1);
+        mv.visitMaxs(0, 0);
         mv.visitEnd();
 
         cw.visitEnd();

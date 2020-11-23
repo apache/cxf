@@ -227,7 +227,7 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
         ASMHelper.Label lend = helper.createLabel();
         mv.visitLabel(lend);
         mv.visitLocalVariable("this", "L" + classFileName + ";", null, lbegin, lend, 0);
-        mv.visitMaxs(1, 1);
+        mv.visitMaxs(0, 0);
         mv.visitEnd();
 
         for (MessagePartInfo mpi : messageInfo.getMessageParts()) {
