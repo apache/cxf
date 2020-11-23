@@ -29,6 +29,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 public class ReferencingAuthenticator extends Authenticator {
+    private static final boolean SKIPCHECK = System.getSecurityManager() == null;
     final Reference<Authenticator> auth;
     final Authenticator wrapped;
 
@@ -125,16 +126,16 @@ public class ReferencingAuthenticator extends Authenticator {
         if (a == null) {
             return null;
         }
-        Field[] fileds = null;
-        if (System.getSecurityManager() == null) {
-            fileds = Authenticator.class.getDeclaredFields();
+        Field[] fields = null;
+        if (SKIPCHECK) {
+            fields = Authenticator.class.getDeclaredFields();
         } else {
-            fileds = AccessController.doPrivileged(
+            fields = AccessController.doPrivileged(
                     (PrivilegedAction<Field[]>) () -> Authenticator.class.getDeclaredFields());
 
         }
 
-        for (final Field f : fileds) {
+        for (final Field f : fields) {
             if (!Modifier.isStatic(f.getModifiers())) {
                 f.setAccessible(true);
                 Object o = f.get(this);
@@ -142,7 +143,7 @@ public class ReferencingAuthenticator extends Authenticator {
             }
         }
         Method method;
-        if (System.getSecurityManager() == null) {
+        if (SKIPCHECK) {
             method = Authenticator.class.getDeclaredMethod("getPasswordAuthentication");
             method.setAccessible(true);
         } else {
