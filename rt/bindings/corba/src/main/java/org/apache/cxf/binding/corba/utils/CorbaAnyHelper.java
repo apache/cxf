@@ -266,16 +266,14 @@ public final class CorbaAnyHelper {
         IDL_TO_SCHEMA_TYPES.put(CorbaConstants.NT_CORBA_ANY, W3CConstants.NT_SCHEMA_ANYTYPE);
     }
 
-    private static Any createFixedAny(ORB orb, Any any) {
-        synchronized (fixedAnyConstructor) {
-            if (fixedAnyConstructor == null) {
-                CorbaFixedAnyImplGenerator corbaFixedAnyImplGenerator = new CorbaFixedAnyImplGenerator(null);
-                Class<?> c = corbaFixedAnyImplGenerator.createFixedAnyClass();
-                try {
-                    fixedAnyConstructor = c.getConstructor(ORB.class, Any.class);
-                } catch (Exception e) {
-                    //shouldn't happen since we generated that constructor
-                }
+    private static synchronized Any createFixedAny(ORB orb, Any any) {
+        if (fixedAnyConstructor == null) {
+            CorbaFixedAnyImplGenerator corbaFixedAnyImplGenerator = new CorbaFixedAnyImplGenerator(null);
+            Class<?> c = corbaFixedAnyImplGenerator.createFixedAnyClass();
+            try {
+                fixedAnyConstructor = c.getConstructor(ORB.class, Any.class);
+            } catch (Exception e) {
+                //shouldn't happen since we generated that constructor
             }
         }
         try {
