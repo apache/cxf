@@ -47,7 +47,7 @@ public class ClassGeneratorClassLoader {
         if (loader == null) {
             ClassLoader parent = bus.getExtension(ClassLoader.class);
             if (parent == null) {
-                parent = Thread.currentThread().getContextClassLoader();
+                parent = ClassGeneratorClassLoader.class.getClassLoader();
             }
             loader = new TypeHelperClassLoader(parent);
             bus.setExtension(loader, TypeHelperClassLoader.class);
