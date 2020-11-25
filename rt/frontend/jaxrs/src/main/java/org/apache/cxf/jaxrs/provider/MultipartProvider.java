@@ -445,7 +445,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
                                      Type genericType,
                                      Annotation[] anns,
                                      MediaType contentType) {
-            super(new ByteDataSource("1".getBytes()));
+            super(new ByteDataSource("1".getBytes(), contentType.toString()));
             this.writer = writer;
             this.obj = obj;
             this.cls = cls;
