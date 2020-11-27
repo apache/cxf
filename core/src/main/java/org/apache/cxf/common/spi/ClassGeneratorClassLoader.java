@@ -19,6 +19,7 @@
 
 package org.apache.cxf.common.spi;
 
+import java.lang.ref.WeakReference;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.cxf.Bus;
@@ -26,6 +27,8 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.StringUtils;
 
 public class ClassGeneratorClassLoader {
+    protected static WeakReference<TypeHelperClassLoader> loaderInstance;
+    
     protected final Bus bus;
 
     public ClassGeneratorClassLoader(final Bus bus) {
@@ -42,19 +45,20 @@ public class ClassGeneratorClassLoader {
     protected Class<?> findClass(String className) {
         return getOrCreateLoader().lookupDefinedClass(className);
     }
-    private TypeHelperClassLoader getOrCreateLoader() {
-        TypeHelperClassLoader loader = bus.getExtension(TypeHelperClassLoader.class);
-        if (loader == null) {
+    private synchronized TypeHelperClassLoader getOrCreateLoader() {
+        TypeHelperClassLoader loader;
+        if (loaderInstance == null || loaderInstance.get() == null) {
             ClassLoader parent = bus.getExtension(ClassLoader.class);
             if (parent == null) {
                 parent = ClassGeneratorClassLoader.class.getClassLoader();
             }
             loader = new TypeHelperClassLoader(parent);
-            bus.setExtension(loader, TypeHelperClassLoader.class);
+            loaderInstance = new WeakReference<>(loader);
+        } else {
+            loader = loaderInstance.get();
         }
         return loader;
     }
-
 
     public static class TypeHelperClassLoader extends ClassLoader {
         ConcurrentHashMap<String, Class<?>> defined = new ConcurrentHashMap<>();
@@ -80,9 +84,10 @@ public class ClassGeneratorClassLoader {
                 return ret;
             }
             if (name.endsWith("package-info")) {
-                Package p = super.getPackage(name.substring(0, name.length() - 13));
+                String s = name.substring(0, name.length() - 13);
+                Package p = super.getPackage(s);
                 if (p == null) {
-                    definePackage(StringUtils.slashesToPeriod(name.substring(0, name.length() - 13)),
+                    definePackage(StringUtils.slashesToPeriod(s),
                             null,
                             null,
                             null,
