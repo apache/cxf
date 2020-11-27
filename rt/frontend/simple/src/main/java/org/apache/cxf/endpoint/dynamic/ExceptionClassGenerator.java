@@ -37,7 +37,7 @@ public class ExceptionClassGenerator extends ClassGeneratorClassLoader implement
         newClassName = newClassName.replaceAll("\\$", ".");
         newClassName = StringUtils.periodToSlashes(newClassName);
 
-        Class<?> cls = findClass(StringUtils.slashesToPeriod(newClassName));
+        Class<?> cls = findClass(StringUtils.slashesToPeriod(newClassName), bean);
         if (cls == null) {
             ASMHelper.ClassWriter cw = helper.createClassWriter();
             OpcodesProxy opCodes = helper.getOpCodes();
@@ -88,7 +88,7 @@ public class ExceptionClassGenerator extends ClassGeneratorClassLoader implement
 
             cw.visitEnd();
 
-            return loadClass(bean.getName() + "_Exception", cw.toByteArray());
+            return loadClass(bean.getName() + "_Exception", bean, cw.toByteArray());
         }
         return cls;
     }

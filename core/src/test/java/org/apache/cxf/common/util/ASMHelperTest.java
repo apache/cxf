@@ -62,10 +62,10 @@ public class ASMHelperTest {
                     "java/lang/Object", null);
             cw.visitEnd();
 
-            return loadClass("test.testClass", cw.toByteArray());
+            return loadClass("test.testClass", ASMHelperTest.class, cw.toByteArray());
         }
         public boolean isFound() {
-            Class<?> cls = findClass("test.testClass");
+            Class<?> cls = findClass("test.testClass", ASMHelperTest.class);
             return cls != null;
         }
     }

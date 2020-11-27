@@ -20,42 +20,74 @@
 package org.apache.cxf.common.spi;
 
 import java.lang.ref.WeakReference;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.WeakIdentityHashMap;
 
 public class ClassGeneratorClassLoader {
-    protected static WeakReference<TypeHelperClassLoader> loaderInstance;
-    
+    protected static final Map<Class<?>, WeakReference<TypeHelperClassLoader>> CLASS_MAP
+            = new WeakIdentityHashMap<>();
+    protected static final Map<ClassLoader, WeakReference<TypeHelperClassLoader>> LOADER_MAP
+            = new WeakIdentityHashMap<>();
     protected final Bus bus;
 
     public ClassGeneratorClassLoader(final Bus bus) {
         this.bus = bus == null ? BusFactory.getDefaultBus() : bus;
     }
-    protected Class<?> loadClass(String className, byte[] bytes) {
-        TypeHelperClassLoader loader = getOrCreateLoader();
-        Class<?> cls = loader.lookupDefinedClass(className);
-        if (cls == null) {
+    protected Class<?> loadClass(String className, Class<?> cls, byte[] bytes) {
+        TypeHelperClassLoader loader = getOrCreateLoader(cls);
+        Class<?> clz = loader.lookupDefinedClass(className);
+        if (clz == null) {
             return loader.defineClass(className, bytes);
         }
-        return cls;
+        return clz;
     }
-    protected Class<?> findClass(String className) {
-        return getOrCreateLoader().lookupDefinedClass(className);
+    protected Class<?> loadClass(String className, ClassLoader l, byte[] bytes) {
+        TypeHelperClassLoader loader = getOrCreateLoader(l);
+        Class<?> clz = loader.lookupDefinedClass(className);
+        if (clz == null) {
+            return loader.defineClass(className, bytes);
+        }
+        return clz;
     }
-    private synchronized TypeHelperClassLoader getOrCreateLoader() {
+    protected Class<?> findClass(String className, Class<?> cls) {
+        return getOrCreateLoader(cls).lookupDefinedClass(className);
+    }
+
+    protected Class<?> findClass(String className, ClassLoader classLoader) {
+        return getOrCreateLoader(classLoader).lookupDefinedClass(className);
+    }
+    private synchronized TypeHelperClassLoader getOrCreateLoader(Class<?> cls) {
+        WeakReference<TypeHelperClassLoader> ref = CLASS_MAP.get(cls);
         TypeHelperClassLoader loader;
-        if (loaderInstance == null || loaderInstance.get() == null) {
+        if (ref == null || ref.get() == null) {
             ClassLoader parent = bus.getExtension(ClassLoader.class);
             if (parent == null) {
                 parent = ClassGeneratorClassLoader.class.getClassLoader();
             }
             loader = new TypeHelperClassLoader(parent);
-            loaderInstance = new WeakReference<>(loader);
+            CLASS_MAP.put(cls, new WeakReference<>(loader));
         } else {
-            loader = loaderInstance.get();
+            loader = ref.get();
+        }
+        return loader;
+    }
+    private synchronized TypeHelperClassLoader getOrCreateLoader(ClassLoader l) {
+        WeakReference<TypeHelperClassLoader> ref = LOADER_MAP.get(l);
+        TypeHelperClassLoader loader;
+        if (ref == null || ref.get() == null) {
+            ClassLoader parent = bus.getExtension(ClassLoader.class);
+            if (parent == null) {
+                parent = ClassGeneratorClassLoader.class.getClassLoader();
+            }
+            loader = new TypeHelperClassLoader(parent);
+            LOADER_MAP.put(l, new WeakReference<>(loader));
+        } else {
+            loader = ref.get();
         }
         return loader;
     }

@@ -41,7 +41,7 @@ public class ExtensionClassGenerator extends ClassGeneratorClassLoader implement
         ASMHelper helper = bus.getExtension(ASMHelper.class);
         OpcodesProxy Opcodes = helper.getOpCodes();
 
-        Class<?> extClass = findClass(className + "Extensibility");
+        Class<?> extClass = findClass(className + "Extensibility", loader);
         if (extClass != null) {
             return extClass;
         }
@@ -289,6 +289,6 @@ public class ExtensionClassGenerator extends ClassGeneratorClassLoader implement
         cw.visitEnd();
 
         byte[] bytes = cw.toByteArray();
-        return loadClass(className + "Extensibility", bytes);
+        return loadClass(className + "Extensibility", loader, bytes);
     }
 }

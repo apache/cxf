@@ -64,7 +64,7 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
         newClassName = newClassName.replaceAll("\\$", ".");
         newClassName = StringUtils.periodToSlashes(newClassName);
 
-        Class<?> cls = findClass(StringUtils.slashesToPeriod(newClassName));
+        Class<?> cls = findClass(StringUtils.slashesToPeriod(newClassName), wrapperType);
         while (cls != null) {
             try {
                 WrapperHelper helper = WrapperHelper.class.cast(cls.newInstance());
@@ -73,7 +73,7 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
                     newClassName = wrapperType.getName() + "_WrapperTypeHelper" + count;
                     newClassName = newClassName.replaceAll("\\$", ".");
                     newClassName = StringUtils.periodToSlashes(newClassName);
-                    cls = findClass(StringUtils.slashesToPeriod(newClassName));
+                    cls = findClass(StringUtils.slashesToPeriod(newClassName), wrapperType);
                 } else {
                     return helper;
                 }
@@ -105,7 +105,7 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
             if (b) {
                 cw.visitEnd();
                 byte[] bt = cw.toByteArray();
-                Class<?> cl = loadClass(StringUtils.slashesToPeriod(newClassName), bt);
+                Class<?> cl = loadClass(StringUtils.slashesToPeriod(newClassName), wrapperType, bt);
                 Object o = cl.newInstance();
                 return WrapperHelper.class.cast(o);
             }

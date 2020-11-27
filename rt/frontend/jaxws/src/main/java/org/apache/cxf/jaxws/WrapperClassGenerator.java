@@ -174,19 +174,19 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
             className = className + "Response";
         }
         String pname = pkg + ".package-info";
-        Class<?> def = findClass(pname);
+        Class<?> def = findClass(pname, method.getDeclaringClass());
         if (def == null) {
-            generatePackageInfo(pname, wrapperElement.getNamespaceURI(), method.getDeclaringClass());
+            generatePackageInfo(pname, wrapperElement.getNamespaceURI(), method.getDeclaringClass(), method);
         }
 
-        def = findClass(className);
+        def = findClass(className, method.getDeclaringClass());
         String origClassName = className;
         int count = 0;
         while (def != null) {
             Boolean b = messageInfo.getProperty("parameterized", Boolean.class);
             if (b != null && b) {
                 className = origClassName + (++count);
-                def = findClass(className);
+                def = findClass(className, method.getDeclaringClass());
             } else {
                 wrapperPart.setTypeClass(def);
                 wrapperBeans.add(def);
@@ -236,12 +236,12 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
 
         cw.visitEnd();
 
-        Class<?> clz = loadClass(className, cw.toByteArray());
+        Class<?> clz = loadClass(className, method.getDeclaringClass(), cw.toByteArray());
         wrapperPart.setTypeClass(clz);
         wrapperBeans.add(clz);
     }
 
-    private void generatePackageInfo(String className, String ns, Class<?> clz) {
+    private void generatePackageInfo(String className, String ns, Class<?> clz, Method method) {
         ASMHelper.ClassWriter cw = helper.createClassWriter();
         String classFileName = StringUtils.periodToSlashes(className);
         OpcodesProxy opCodes = helper.getOpCodes();
@@ -275,7 +275,7 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
         }
         cw.visitEnd();
 
-        loadClass(className, cw.toByteArray());
+        loadClass(className, method.getDeclaringClass(), cw.toByteArray());
     }
 
     private void generateXmlJavaTypeAdapters(ASMHelper.AnnotationVisitor av, XmlJavaTypeAdapters adapters) {

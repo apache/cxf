@@ -52,7 +52,8 @@ public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {
         cw.visitEnd();
 
         byte[] b = cw.toByteArray();
-        Class<?> c = loadClass("org.apache.cxf.binding.corba.utils.FixedAnyImpl", b);
+        Class<?> c = loadClass("org.apache.cxf.binding.corba.utils.FixedAnyImpl",
+                CorbaFixedAnyImplGenerator.class, b);
         return c;
     }
 
