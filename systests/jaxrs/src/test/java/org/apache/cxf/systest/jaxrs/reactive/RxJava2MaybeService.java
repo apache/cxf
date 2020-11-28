@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs.reactor;
+package org.apache.cxf.systest.jaxrs.reactive;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -27,50 +27,50 @@ import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.jaxrs.reactivestreams.server.AbstractSubscriber;
-import org.apache.cxf.jaxrs.reactivestreams.server.JsonStreamingAsyncSubscriber;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
+import org.apache.cxf.systest.jaxrs.reactor.HelloWorldBean;
 
-@Path("/mono")
-public class MonoService {
+import io.reactivex.Maybe;
+
+@Path("/rx2/maybe")
+public class RxJava2MaybeService {
 
     @GET
     @Produces("application/json")
     @Path("textJson")
-    public Mono<HelloWorldBean> getJson() {
-        return Mono.just(new HelloWorldBean());
-    }
-
-    @GET
-    @Produces("application/json")
-    @Path("textJsonImplicitListAsyncStream")
-    public void getJsonImplicitListStreamingAsync(@Suspended AsyncResponse ar) {
-        Mono.just("Hello")
-                .map(HelloWorldBean::new)
-                .subscribeOn(Schedulers.elastic())
-                .subscribe(new JsonStreamingAsyncSubscriber<>(ar, null, null, null, 1000, 0));
+    public Maybe<HelloWorldBean> getJson() {
+        return Maybe.just(new HelloWorldBean());
     }
 
     @GET
     @Produces("text/plain")
     @Path("textAsync")
     public void getTextAsync(@Suspended final AsyncResponse ar) {
-        Mono.just("Hello, ").map(s -> s + "world!")
-                .subscribe(new StringAsyncSubscriber(ar));
+        final StringAsyncSubscriber subscriber = new StringAsyncSubscriber(ar);
+        
+        Maybe
+            .just("Hello, ")
+            .map(s -> s + "world!")
+            .subscribe(
+                s -> {
+                    subscriber.onNext(s);
+                    subscriber.onComplete();
+                },
+                subscriber::onError);
+
+    }
+    
+    @GET
+    @Produces("application/json")
+    @Path("error")
+    public Maybe<HelloWorldBean> getError() {
+        return Maybe.error(new RuntimeException("Oops"));
     }
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/empty")
-    public Mono<HelloWorldBean> empty() { 
-        return Mono.empty(); 
-    }
-
-    @GET
-    @Produces("application/json")
-    @Path("error")
-    public Mono<HelloWorldBean> getError() {
-        return Mono.error(new RuntimeException("Oops"));
+    @Path("empty")
+    public Maybe<HelloWorldBean> empty() { 
+        return Maybe.empty(); 
     }
 
     private static class StringAsyncSubscriber extends AbstractSubscriber<String> {

@@ -25,6 +25,7 @@ import org.apache.cxf.jaxrs.reactivestreams.server.AbstractReactiveInvoker;
 import org.apache.cxf.message.Message;
 
 import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -37,8 +38,19 @@ public class ReactiveIOInvoker extends AbstractReactiveInvoker {
             return handleSingle(inMessage, (Single<?>)result);
         } else if (result instanceof Observable) {
             return handleObservable(inMessage, (Observable<?>)result);
+        } else if (result instanceof Maybe) {
+            return handleMaybe(inMessage, (Maybe<?>)result);
         }
         return null;
+    }
+    
+    protected AsyncResponseImpl handleMaybe(Message inMessage, Maybe<?> maybe) {
+        final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
+        Disposable d = subscribe(maybe, asyncResponse);
+        if (d == null) {
+            throw new IllegalStateException("Subscribe did not return a Disposable");
+        }
+        return asyncResponse;
     }
     
     protected AsyncResponseImpl handleSingle(Message inMessage, Single<?> single) {
@@ -79,6 +91,12 @@ public class ReactiveIOInvoker extends AbstractReactiveInvoker {
     private <T> Disposable subscribe(final Observable<T> obs, final AsyncResponseImpl asyncResponse) {
         return obs
             .switchIfEmpty(Observable.<T>empty().doOnComplete(() -> asyncResponse.resume(Collections.emptyList())))
+            .subscribe(asyncResponse::resume, t -> handleThrowable(asyncResponse, t));
+    }
+    
+    private <T> Disposable subscribe(Maybe<T> maybe, final AsyncResponseImpl asyncResponse) {
+        return maybe
+            .switchIfEmpty(Maybe.<T>empty().doOnComplete(() -> asyncResponse.resume(null)))
             .subscribe(asyncResponse::resume, t -> handleThrowable(asyncResponse, t));
     }
 }
