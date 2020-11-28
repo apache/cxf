@@ -130,7 +130,7 @@ public class JAXRSRxJava3MaybeTest extends AbstractBusClientServerTestBase {
 
         subscriber.await(3, TimeUnit.SECONDS);
         subscriber
-            .assertValue(r -> !r.hasEntity())
+            .assertValue(r -> "".equals(r.readEntity(String.class)))
             .assertComplete();
     }
 }
