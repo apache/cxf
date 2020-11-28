@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs.reactor;
 
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.MediaType;
 
@@ -111,5 +112,22 @@ public class MonoReactorTest extends AbstractBusClientServerTestBase {
                 .get(HelloWorldBean.class))
             .expectComplete()
             .verify();
+    }
+    
+    @Test
+    public void testGetError() throws Exception {
+        String address = "http://localhost:" + PORT + "/reactor/mono/error";
+        
+        StepVerifier
+        .create(ClientBuilder
+            .newClient()
+            .register(new JacksonJsonProvider())
+            .register(new ReactorInvokerProvider())
+            .target(address)
+            .request(MediaType.APPLICATION_JSON)
+            .rx(ReactorInvoker.class)
+            .get(HelloWorldBean.class))
+        .expectErrorMatches(ex -> ex.getCause() instanceof InternalServerErrorException)
+        .verify();
     }
 }
