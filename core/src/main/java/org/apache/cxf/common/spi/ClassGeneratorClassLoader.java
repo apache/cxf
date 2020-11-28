@@ -40,19 +40,23 @@ public class ClassGeneratorClassLoader {
     }
     protected Class<?> loadClass(String className, Class<?> cls, byte[] bytes) {
         TypeHelperClassLoader loader = getOrCreateLoader(cls);
-        Class<?> clz = loader.lookupDefinedClass(className);
-        if (clz == null) {
-            return loader.defineClass(className, bytes);
+        synchronized (loader) {
+            Class<?> clz = loader.lookupDefinedClass(className);
+            if (clz == null) {
+                return loader.defineClass(className, bytes);
+            }
+            return clz;
         }
-        return clz;
     }
     protected Class<?> loadClass(String className, ClassLoader l, byte[] bytes) {
         TypeHelperClassLoader loader = getOrCreateLoader(l);
-        Class<?> clz = loader.lookupDefinedClass(className);
-        if (clz == null) {
-            return loader.defineClass(className, bytes);
+        synchronized (loader) {
+            Class<?> clz = loader.lookupDefinedClass(className);
+            if (clz == null) {
+                return loader.defineClass(className, bytes);
+            }
+            return clz;
         }
-        return clz;
     }
     protected Class<?> findClass(String className, Class<?> cls) {
         return getOrCreateLoader(cls).lookupDefinedClass(className);
@@ -63,33 +67,25 @@ public class ClassGeneratorClassLoader {
     }
     private synchronized TypeHelperClassLoader getOrCreateLoader(Class<?> cls) {
         WeakReference<TypeHelperClassLoader> ref = CLASS_MAP.get(cls);
-        TypeHelperClassLoader loader;
+        TypeHelperClassLoader ret;
         if (ref == null || ref.get() == null) {
-            ClassLoader parent = bus.getExtension(ClassLoader.class);
-            if (parent == null) {
-                parent = ClassGeneratorClassLoader.class.getClassLoader();
-            }
-            loader = new TypeHelperClassLoader(parent);
-            CLASS_MAP.put(cls, new WeakReference<>(loader));
+            ret = new TypeHelperClassLoader(cls.getClassLoader());
+            CLASS_MAP.put(cls, new WeakReference<TypeHelperClassLoader>(ret));
         } else {
-            loader = ref.get();
+            ret = ref.get();
         }
-        return loader;
+        return ret;
     }
     private synchronized TypeHelperClassLoader getOrCreateLoader(ClassLoader l) {
         WeakReference<TypeHelperClassLoader> ref = LOADER_MAP.get(l);
-        TypeHelperClassLoader loader;
+        TypeHelperClassLoader ret;
         if (ref == null || ref.get() == null) {
-            ClassLoader parent = bus.getExtension(ClassLoader.class);
-            if (parent == null) {
-                parent = ClassGeneratorClassLoader.class.getClassLoader();
-            }
-            loader = new TypeHelperClassLoader(parent);
-            LOADER_MAP.put(l, new WeakReference<>(loader));
+            ret = new TypeHelperClassLoader(l);
+            LOADER_MAP.put(l, new WeakReference<TypeHelperClassLoader>(ret));
         } else {
-            loader = ref.get();
+            ret = ref.get();
         }
-        return loader;
+        return ret;
     }
 
     public static class TypeHelperClassLoader extends ClassLoader {
