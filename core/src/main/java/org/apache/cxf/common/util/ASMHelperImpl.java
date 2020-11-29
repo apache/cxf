@@ -113,6 +113,9 @@ public class ASMHelperImpl implements ASMHelper {
         PRIMITIVE_ZERO_MAP.put(Double.TYPE, ops.DCONST_0);
         return ops;
     }
+    public void setBadASM(boolean b) {
+        badASM = b;
+    }
 
     public String getMethodSignature(Method m) {
         StringBuilder buf = new StringBuilder("(");
