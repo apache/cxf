@@ -126,7 +126,7 @@ public class MonoReactorTest extends AbstractBusClientServerTestBase {
             .request(MediaType.APPLICATION_JSON)
             .rx(ReactorInvoker.class)
             .get(HelloWorldBean.class))
-        .expectErrorMatches(ex -> ex.getCause() instanceof InternalServerErrorException)
+        .expectErrorMatches(ex -> ex.getCause().getCause() instanceof InternalServerErrorException)
         .verify();
     }
 }
