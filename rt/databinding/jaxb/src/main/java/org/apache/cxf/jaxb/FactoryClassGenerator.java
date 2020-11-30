@@ -38,7 +38,7 @@ public class FactoryClassGenerator extends ClassGeneratorClassLoader implements 
     @SuppressWarnings("unused")
     public Class<?> createFactory(Class<?> cls) {
         String newClassName = cls.getName() + "Factory";
-        Class<?> factoryClass = findClass(newClassName, FactoryClassGenerator.class);
+        Class<?> factoryClass = findClass(newClassName, cls);
         if (factoryClass != null) {
             return factoryClass;
         }

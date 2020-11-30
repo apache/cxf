@@ -53,13 +53,13 @@ public class NamespaceClassGenerator extends ClassGeneratorClassLoader implement
 
         String className = "org.apache.cxf.jaxb.NamespaceMapper";
         className += postFix;
-        Class<?> cls = findClass(className, NamespaceClassGenerator.class);
+        Class<?> cls = findClass(className, NamespaceClassCreator.class);
         Throwable t = null;
         if (cls == null) {
             try {
                 byte[] bts = createNamespaceWrapperInternal(postFix);
                 className = "org.apache.cxf.jaxb.NamespaceMapper" + postFix;
-                return loadClass(className, NamespaceClassGenerator.class, bts);
+                return loadClass(className, NamespaceClassCreator.class, bts);
             } catch (RuntimeException ex) {
                 // continue
                 t = ex;
@@ -69,7 +69,7 @@ public class NamespaceClassGenerator extends ClassGeneratorClassLoader implement
                 && (!mcls.getName().contains(".internal.") && mcls.getName().contains("com.sun"))) {
             try {
                 cls = ClassLoaderUtils.loadClass("org.apache.cxf.common.jaxb.NamespaceMapper",
-                        NamespaceClassGenerator.class);
+                        NamespaceClassCreator.class);
             } catch (Throwable ex2) {
                 // ignore
                 t = ex2;
@@ -81,13 +81,13 @@ public class NamespaceClassGenerator extends ClassGeneratorClassLoader implement
 
     private Class<?> createEclipseNamespaceMapper(Class<?> mcls, Map<String, String> map) {
         String className = "org.apache.cxf.jaxb.EclipseNamespaceMapper";
-        Class<?> cls = findClass(className, NamespaceClassGenerator.class);
+        Class<?> cls = findClass(className, NamespaceClassCreator.class);
         if (cls != null) {
             return cls;
         }
         byte[] bts = createEclipseNamespaceMapper();
         //previous code use mcls instead of NamespaceClassGenerator.class
-        return loadClass(className, NamespaceClassGenerator.class, bts);
+        return loadClass(className, NamespaceClassCreator.class, bts);
     }
 
     /*

@@ -18,26 +18,28 @@
  */
 package org.apache.cxf.common.spi;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 
 public class GeneratedClassClassLoader {
     private static final Logger LOG = LogUtils.getL7dLogger(ClassLoaderProxyService.class);
     protected final Bus bus;
+
     public GeneratedClassClassLoader(Bus bus) {
         this.bus = bus;
     }
-    protected Class<?> loadClass(String className, Class<?> callingClass) {
-        ClassLoader cl = bus.getExtension(ClassLoader.class);
-        if (cl != null) {
-            try {
-                return cl.loadClass(className);
-            } catch (ClassNotFoundException e) {
-                //ignore and try with other class loader
-            }
+    protected Class<?> findClass(String className, Class<?> callingClass) {
+        ClassLoader cl = getClassLoader();
+        try {
+            return cl.loadClass(className);
+        } catch (ClassNotFoundException e) {
+            //ignore and try with other class loader
         }
         try {
             return ClassLoaderUtils.loadClass(className, callingClass);
@@ -45,5 +47,72 @@ public class GeneratedClassClassLoader {
             LOG.fine("Failed to load class :" + e.toString());
         }
         return null;
+    }
+    public TypeHelperClassLoader getClassLoader() {
+        TypeHelperClassLoader loader = bus.getExtension(TypeHelperClassLoader.class);
+        if (loader == null) {
+            loader = bus.getExtension(TypeHelperClassLoader.class);
+            if (loader == null) {
+                ClassLoader parent = bus.getExtension(ClassLoader.class);
+                if (parent == null) {
+                        parent = Thread.currentThread().getContextClassLoader();
+                    }
+                loader = new TypeHelperClassLoader(parent);
+                bus.setExtension(loader, TypeHelperClassLoader.class);
+            }
+        }
+        return loader;
+    }
+
+    public void restore(ClassGeneratorCapture capture) {
+        TypeHelperClassLoader cl = getClassLoader();
+        for  (Map.Entry<String, byte[]> cls : capture.restore().entrySet()) {
+            cl.defineClass(cls.getKey(), cls.getValue());
+        }
+    }
+
+    public static class TypeHelperClassLoader extends ClassLoader {
+        ConcurrentHashMap<String, Class<?>> defined = new ConcurrentHashMap<>();
+
+        TypeHelperClassLoader(ClassLoader parent) {
+            super(parent);
+        }
+        public Class<?> lookupDefinedClass(String name) {
+            return defined.get(StringUtils.slashesToPeriod(name));
+        }
+
+        @Override
+        protected Class<?> findClass(String name) throws ClassNotFoundException {
+            if (name.endsWith("package-info")) {
+                return getParent().loadClass(name);
+            }
+            return super.findClass(name);
+        }
+
+        public Class<?> defineClass(String name, byte[] bytes) {
+            Class<?> ret = defined.get(StringUtils.slashesToPeriod(name));
+            if (ret != null) {
+                return ret;
+            }
+            if (name.endsWith("package-info")) {
+                String s = name.substring(0, name.length() - 13);
+                Package p = super.getPackage(s);
+                if (p == null) {
+                    definePackage(StringUtils.slashesToPeriod(s),
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null);
+                }
+            }
+
+            ret = defined.computeIfAbsent(StringUtils.slashesToPeriod(name),
+                    key -> TypeHelperClassLoader.super.defineClass(key, bytes, 0, bytes.length));
+
+            return ret;
+        }
     }
 }

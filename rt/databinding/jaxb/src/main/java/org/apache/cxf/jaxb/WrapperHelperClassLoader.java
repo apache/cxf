@@ -37,14 +37,14 @@ public class WrapperHelperClassLoader extends GeneratedClassClassLoader implemen
         int count = 1;
         String newClassName = wrapperType.getName() + "_WrapperTypeHelper" + count;
 
-        Class<?> cls = loadClass(newClassName, WrapperHelperClassLoader.class);
+        Class<?> cls = findClass(newClassName, wrapperType);
         while (cls != null) {
             try {
                 WrapperHelper helper = WrapperHelper.class.cast(cls.getDeclaredConstructor().newInstance());
                 if (!helper.getSignature().equals(WrapperHelperCompiler.computeSignature(setMethods, getMethods))) {
                     count++;
                     newClassName = wrapperType.getName() + "_WrapperTypeHelper" + count;
-                    cls = loadClass(newClassName, WrapperHelperClassLoader.class);
+                    cls = findClass(newClassName, wrapperType);
                 } else {
                     return helper;
                 }

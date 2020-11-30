@@ -31,14 +31,14 @@ public class GeneratedNamespaceClassLoader extends GeneratedClassClassLoader imp
         String postFix = "";
 
         if (mcls.getName().contains("eclipse")) {
-            return loadClass("org.apache.cxf.jaxb.EclipseNamespaceMapper",
-                        GeneratedNamespaceClassLoader.class);
+            return findClass("org.apache.cxf.jaxb.EclipseNamespaceMapper",
+                    NamespaceClassCreator.class);
         } else if (mcls.getName().contains(".internal")) {
             postFix = "Internal";
         } else if (mcls.getName().contains("com.sun")) {
             postFix = "RI";
         }
-        return loadClass("org.apache.cxf.jaxb.NamespaceMapper" + postFix, GeneratedNamespaceClassLoader.class);
+        return findClass("org.apache.cxf.jaxb.NamespaceMapper" + postFix, NamespaceClassCreator.class);
 
 
     }

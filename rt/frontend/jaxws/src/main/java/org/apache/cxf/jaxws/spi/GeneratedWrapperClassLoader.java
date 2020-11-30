@@ -23,7 +23,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.spi.GeneratedClassClassLoader;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -91,13 +90,21 @@ public class GeneratedWrapperClassLoader extends GeneratedClassClassLoader imple
             className = className + "Response";
         }
 
-        Class<?> clz = null;
-        try {
-            clz = ClassLoaderUtils.loadClass(className, GeneratedWrapperClassLoader.class);
-        } catch (ClassNotFoundException e) {
+        Class<?> def = findClass(className, method.getDeclaringClass());
+        String origClassName = className;
+        int count = 0;
+        while (def != null) {
+            Boolean b = messageInfo.getProperty("parameterized", Boolean.class);
+            if (b != null && b) {
+                className = origClassName + (++count);
+                def = findClass(className, method.getDeclaringClass());
+            } else {
+                wrapperPart.setTypeClass(def);
+                return def;
+            }
         }
-        wrapperPart.setTypeClass(clz);
-        return clz;
+        //throw new ClassNotFoundException(origClassName);
+        return null;
     }
     private String getPackageName(Method method) {
         String pkg = PackageUtils.getPackageName(method.getDeclaringClass());

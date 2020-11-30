@@ -21,7 +21,9 @@ package org.apache.cxf.jaxws;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.bind.JAXBContext;
@@ -29,6 +31,7 @@ import javax.xml.bind.Marshaller;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.spi.ClassGeneratorCapture;
 import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.util.ASMHelperImpl;
 import org.apache.cxf.common.util.StringUtils;
@@ -126,90 +129,17 @@ public class WrapperNamespaceClassGeneratorTest {
         assertTrue("The generated response wrapper class is not correct", bout.toString().contains(expected));
 
     }
-    public class CustomClassLoader extends ClassLoader {
-        ConcurrentHashMap<String, Class<?>> defined = new ConcurrentHashMap<>();
-
-        CustomClassLoader(ClassLoader parent) {
-            super(parent);
+    public class Capture implements ClassGeneratorCapture {
+        private Map<String, byte[]> sources;
+        public Capture() {
+            sources = new HashMap<>();
         }
-        public Class<?> lookupDefinedClass(String name) {
-            return defined.get(StringUtils.slashesToPeriod(name));
-        }
-
-        public Class<?> defineClass(String name, byte[] bytes) {
-            Class<?> ret = defined.get(StringUtils.slashesToPeriod(name));
-            if (ret != null) {
-                return ret;
-            }
-
-            ret = defined.computeIfAbsent(StringUtils.slashesToPeriod(name),
-                key -> CustomClassLoader.super.defineClass(key, bytes, 0, bytes.length));
-
-            return ret;
-        }
-    }
-    public class ProxyASMHelper extends ASMHelperImpl {
-        private CustomClassLoader customClassLoader;
-
-        public ProxyASMHelper(CustomClassLoader customClassLoader) {
-            this.customClassLoader = customClassLoader;
-        }
-        public ClassWriter createClassWriter() {
-            ClassWriter parent = super.createClassWriter();
-            return new ProxyClassWriter(parent, this);
+        public void save(String className, byte[] bytes) {
+            sources.put(className, bytes);
         }
 
-        public void notif(String className, byte[] bytes) {
-            customClassLoader.defineClass(className, bytes);
-        }
-    }
-    public class ProxyClassWriter implements ASMHelper.ClassWriter {
-        private final ASMHelper.ClassWriter proxy;
-        private final ProxyASMHelper handler;
-        private String className;
-
-        public ProxyClassWriter(ASMHelper.ClassWriter parent, ProxyASMHelper handler) {
-            this.proxy = parent;
-            this.handler = handler;
-        }
-        @Override
-        public ASMHelper.AnnotationVisitor visitAnnotation(String cls, boolean t) {
-            return proxy.visitAnnotation(cls, t);
-        }
-
-        @Override
-        public ASMHelper.FieldVisitor visitField(int accPrivate, String fieldName, String classCode,
-                                                 String fieldDescriptor, Object object) {
-            return proxy.visitField(accPrivate, fieldName, classCode, fieldDescriptor, object);
-        }
-
-        @Override
-        public void visitEnd() {
-            proxy.visitEnd();
-        }
-
-        @Override
-        public byte[] toByteArray() {
-            byte[] bytes = proxy.toByteArray();
-            handler.notif(className, bytes);
-            return bytes;
-        }
-
-        @Override
-        public ASMHelper.MethodVisitor visitMethod(int accPublic, String string, String string2, String s3,
-                                                   String[] s4) {
-            return proxy.visitMethod(accPublic, string, string2, s3, s4);
-        }
-
-        @Override
-        public void visit(int v15, int i, String newClassName, String object, String string, String[] object2) {
-            className = newClassName;
-            proxy.visit(v15, i, newClassName, object, string, object2);
-        }
-
-        @Override
-        public void visitSource(String arg0, String arg1) {
-            proxy.visitSource(arg0, arg1);
+        public Map<String, byte[]> restore(){
+            return sources;
         }
     }
     @org.junit.Test
@@ -233,19 +163,25 @@ public class WrapperNamespaceClassGeneratorTest {
         List<String> elTypeNames = Arrays.asList(new String[] {"list"});
         List<Class<?>> partClasses = Arrays.asList(new Class<?>[] {List.class});
 
-        String className = requestClass.getName();
-        className = className.substring(0, className.lastIndexOf('.') + 1);
         Bus bus = jaxwsFac.getBus();
-        CustomClassLoader cl = new CustomClassLoader(WrapperNamespaceClassGeneratorTest.class.getClassLoader());
-
-        bus.setExtension(new ProxyASMHelper(cl), ASMHelper.class);
+        ClassGeneratorCapture capture = bus.getExtension(ClassGeneratorCapture.class);
+        Capture c = new Capture();
+        bus.setExtension(c, ClassGeneratorCapture.class);
         // generate class and store it to class loader
         WrapperHelper wh = new JAXBDataBinding().createWrapperHelper(requestClass, null,
                 partNames, elTypeNames, partClasses);
+        List<String> respPartNames = Arrays.asList(new String[] {"return"});
+        List<String> respElTypeNames = Arrays.asList(new String[] {"list"});
+        List<Class<?>> respPartClasses = Arrays.asList(new Class<?>[] {List.class});
+
+        wh = new JAXBDataBinding().createWrapperHelper(responseClass, null,
+                respPartNames, respElTypeNames, respPartClasses);
+
         // now no more generation is allowed
         WrapperHelperClassLoader wrapperHelperClassLoader = new WrapperHelperClassLoader(bus);
+        wrapperHelperClassLoader.restore(c);
         bus.setExtension(wrapperHelperClassLoader, WrapperHelperCreator.class);
-        bus.setExtension(cl, ClassLoader.class);
+
         wh = new JAXBDataBinding().createWrapperHelper(requestClass, null,
                 partNames, elTypeNames, partClasses);
         List<Object> paraList = new ArrayList<>();
@@ -261,11 +197,9 @@ public class WrapperNamespaceClassGeneratorTest {
         elTypeNames = Arrays.asList(new String[] {"list"});
         partClasses = Arrays.asList(new Class<?>[] {List.class});
 
-        className = responseClass.getName();
-        className = className.substring(0, className.lastIndexOf('.') + 1);
 
         wh = new JAXBDataBinding().createWrapperHelper(responseClass, null,
-                partNames, elTypeNames, partClasses);
+                respPartNames, respElTypeNames, respPartClasses);
         List<Object> resPara = new ArrayList<>();
         List<Integer> intValueList = new ArrayList<>();
         intValueList.add(1);
@@ -290,6 +224,5 @@ public class WrapperNamespaceClassGeneratorTest {
         marshaller.marshal(responseObj, bout);
         expected = "<return>1</return><return>2</return><return>3</return>";
         assertTrue("The generated response wrapper class is not correct", bout.toString().contains(expected));
-
     }
 }

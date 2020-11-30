@@ -29,6 +29,6 @@ public class FactoryClassLoader extends GeneratedClassClassLoader implements Fac
     @Override
     public Class<?> createFactory(Class<?> cls) {
         String newClassName = cls.getName() + "Factory";
-        return loadClass(newClassName, FactoryClassLoader.class);
+        return findClass(newClassName, cls);
     }
 }

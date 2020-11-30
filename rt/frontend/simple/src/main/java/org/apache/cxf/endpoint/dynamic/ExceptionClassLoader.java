@@ -30,7 +30,7 @@ public class ExceptionClassLoader extends GeneratedClassClassLoader implements E
     @Override
     public Class<?> createExceptionClass(Class<?> bean) {
         String newClassName = bean.getName() + "_Exception";
-        return loadClass(newClassName, ExceptionClassLoader.class);
+        return findClass(newClassName, bean);
 
     }
 }

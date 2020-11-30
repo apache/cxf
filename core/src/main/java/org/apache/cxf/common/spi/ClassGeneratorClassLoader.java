@@ -38,7 +38,12 @@ public class ClassGeneratorClassLoader {
     public ClassGeneratorClassLoader(final Bus bus) {
         this.bus = bus == null ? BusFactory.getDefaultBus() : bus;
     }
+
     protected Class<?> loadClass(String className, Class<?> cls, byte[] bytes) {
+        ClassGeneratorCapture capture = bus.getExtension(ClassGeneratorCapture.class);
+        if (capture != null) {
+            capture.save(className, bytes);
+        }
         TypeHelperClassLoader loader = getOrCreateLoader(cls);
         synchronized (loader) {
             Class<?> clz = loader.lookupDefinedClass(className);

@@ -32,6 +32,6 @@ public class ExtensionClassLoader extends GeneratedClassClassLoader implements E
 
     @Override
     public Class<?> createExtensionClass(Class<?> cls, QName qname, ClassLoader loader) {
-        return loadClass(cls.getName() + "Extensibility", ExtensionClassLoader.class);
+        return findClass(cls.getName() + "Extensibility", ExtensionClassLoader.class);
     }
 }
