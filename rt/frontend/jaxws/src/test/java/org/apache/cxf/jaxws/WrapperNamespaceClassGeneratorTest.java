@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -32,13 +31,12 @@ import javax.xml.bind.Marshaller;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.spi.ClassGeneratorCapture;
-import org.apache.cxf.common.util.ASMHelper;
-import org.apache.cxf.common.util.ASMHelperImpl;
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.databinding.WrapperHelper;
 import org.apache.cxf.jaxb.JAXBDataBinding;
+import org.apache.cxf.jaxb.JAXBWrapperHelper;
 import org.apache.cxf.jaxb.WrapperHelperClassLoader;
 import org.apache.cxf.jaxb.WrapperHelperCreator;
+import org.apache.cxf.jaxws.service.AddNumbers2Impl;
 import org.apache.cxf.jaxws.service.AddNumbersImpl;
 import org.apache.cxf.jaxws.support.JaxWsImplementorInfo;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
@@ -49,6 +47,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 
 import org.junit.After;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class WrapperNamespaceClassGeneratorTest {
@@ -138,16 +137,20 @@ public class WrapperNamespaceClassGeneratorTest {
             sources.put(className, bytes);
         }
 
-        public Map<String, byte[]> restore(){
+        public Map<String, byte[]> restore() {
             return sources;
         }
     }
+
     @org.junit.Test
     public void testGeneratedFirst() throws Exception {
         JaxWsImplementorInfo implInfo =
-                new JaxWsImplementorInfo(AddNumbersImpl.class);
+                new JaxWsImplementorInfo(AddNumbers2Impl.class);
         JaxWsServiceFactoryBean jaxwsFac = new JaxWsServiceFactoryBean(implInfo);
-        jaxwsFac.setBus(BusFactory.getDefaultBus());
+        Bus bus = BusFactory.getDefaultBus();
+        jaxwsFac.setBus(bus);
+        Capture c = new Capture();
+        bus.setExtension(c, ClassGeneratorCapture.class);
         Service service = jaxwsFac.create();
 
 
@@ -156,26 +159,15 @@ public class WrapperNamespaceClassGeneratorTest {
         InterfaceInfo interfaceInfo = serviceInfo.getInterface();
         OperationInfo inf = interfaceInfo.getOperations().iterator().next();
         Class<?> requestClass = inf.getInput().getMessagePart(0).getTypeClass();
-        Class<?> responseClass = inf.getOutput().getMessagePart(0).getTypeClass();
 
         // Create request wrapper Object
         List<String> partNames = Arrays.asList(new String[] {"arg0"});
         List<String> elTypeNames = Arrays.asList(new String[] {"list"});
         List<Class<?>> partClasses = Arrays.asList(new Class<?>[] {List.class});
 
-        Bus bus = jaxwsFac.getBus();
-        ClassGeneratorCapture capture = bus.getExtension(ClassGeneratorCapture.class);
-        Capture c = new Capture();
-        bus.setExtension(c, ClassGeneratorCapture.class);
         // generate class and store it to class loader
         WrapperHelper wh = new JAXBDataBinding().createWrapperHelper(requestClass, null,
                 partNames, elTypeNames, partClasses);
-        List<String> respPartNames = Arrays.asList(new String[] {"return"});
-        List<String> respElTypeNames = Arrays.asList(new String[] {"list"});
-        List<Class<?>> respPartClasses = Arrays.asList(new Class<?>[] {List.class});
-
-        wh = new JAXBDataBinding().createWrapperHelper(responseClass, null,
-                respPartNames, respElTypeNames, respPartClasses);
 
         // now no more generation is allowed
         WrapperHelperClassLoader wrapperHelperClassLoader = new WrapperHelperClassLoader(bus);
@@ -184,45 +176,7 @@ public class WrapperNamespaceClassGeneratorTest {
 
         wh = new JAXBDataBinding().createWrapperHelper(requestClass, null,
                 partNames, elTypeNames, partClasses);
-        List<Object> paraList = new ArrayList<>();
-        List<String> valueList = new ArrayList<>();
-        valueList.add("str1");
-        valueList.add("str2");
-        valueList.add("str3");
-        paraList.add(valueList);
-        Object requestObj = wh.createWrapperObject(paraList);
-        // Create response wrapper Object
 
-        partNames = Arrays.asList(new String[] {"return"});
-        elTypeNames = Arrays.asList(new String[] {"list"});
-        partClasses = Arrays.asList(new Class<?>[] {List.class});
-
-
-        wh = new JAXBDataBinding().createWrapperHelper(responseClass, null,
-                respPartNames, respElTypeNames, respPartClasses);
-        List<Object> resPara = new ArrayList<>();
-        List<Integer> intValueList = new ArrayList<>();
-        intValueList.add(1);
-        intValueList.add(2);
-        intValueList.add(3);
-        resPara.add(intValueList);
-        Object responseObj = wh.createWrapperObject(resPara);
-
-        JAXBContext jaxbContext = JAXBContext.newInstance(requestClass, responseClass);
-        java.io.ByteArrayOutputStream bout = new java.io.ByteArrayOutputStream();
-        Marshaller marshaller = jaxbContext.createMarshaller();
-
-        //check marshall wrapper
-        marshaller.marshal(requestObj, bout);
-        String expected = "<arg0>str1 str2 str3</arg0>";
-
-        assertTrue("The generated request wrapper class does not contain the correct annotations",
-                bout.toString().contains(expected));
-
-
-        bout.reset();
-        marshaller.marshal(responseObj, bout);
-        expected = "<return>1</return><return>2</return><return>3</return>";
-        assertTrue("The generated response wrapper class is not correct", bout.toString().contains(expected));
+        assertFalse("Precompiled class not loaded", wh instanceof JAXBWrapperHelper);
     }
 }

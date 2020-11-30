@@ -16,12 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.common.spi;
 
-import java.util.Map;
+package org.apache.cxf.jaxws.service;
+import java.util.List;
 
-public interface ClassGeneratorCapture {
-    void save(String className, byte[] bytes);
+import javax.jws.WebMethod;
+import javax.jws.WebParam;
+import javax.jws.WebService;
+import javax.xml.bind.annotation.XmlList;
 
-    Map<String, byte[]> restore();
+@WebService
+public interface AddNumbers2 {
+    @WebMethod
+    List<Integer> addListNumbers(
+                             @WebParam
+                             @XmlList
+                             List<String> arg);
 }

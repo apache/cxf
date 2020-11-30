@@ -55,8 +55,8 @@ public class GeneratedClassClassLoader {
             if (loader == null) {
                 ClassLoader parent = bus.getExtension(ClassLoader.class);
                 if (parent == null) {
-                        parent = Thread.currentThread().getContextClassLoader();
-                    }
+                    parent = Thread.currentThread().getContextClassLoader();
+                }
                 loader = new TypeHelperClassLoader(parent);
                 bus.setExtension(loader, TypeHelperClassLoader.class);
             }
@@ -110,7 +110,7 @@ public class GeneratedClassClassLoader {
             }
 
             ret = defined.computeIfAbsent(StringUtils.slashesToPeriod(name),
-                    key -> TypeHelperClassLoader.super.defineClass(key, bytes, 0, bytes.length));
+                key -> TypeHelperClassLoader.super.defineClass(key, bytes, 0, bytes.length));
 
             return ret;
         }

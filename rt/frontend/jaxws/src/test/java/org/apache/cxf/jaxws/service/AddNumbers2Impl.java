@@ -16,12 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.common.spi;
 
-import java.util.Map;
+package org.apache.cxf.jaxws.service;
 
-public interface ClassGeneratorCapture {
-    void save(String className, byte[] bytes);
+import java.util.ArrayList;
+import java.util.List;
 
-    Map<String, byte[]> restore();
+@javax.jws.WebService(endpointInterface = "org.apache.cxf.jaxws.service.AddNumbers2")
+public class AddNumbers2Impl implements AddNumbers2 {
+
+    public List<Integer> addListNumbers(List<String> arg) {
+        List<Integer> res = new ArrayList<>();
+        res.add(100);
+        res.add(200);
+        return res;
+
+    }
+
 }
