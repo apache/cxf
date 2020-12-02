@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.common.spi;
 
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
@@ -62,13 +61,6 @@ public class GeneratedClassClassLoader {
             }
         }
         return loader;
-    }
-
-    public void restore(ClassGeneratorCapture capture) {
-        TypeHelperClassLoader cl = getClassLoader();
-        for  (Map.Entry<String, byte[]> cls : capture.restore().entrySet()) {
-            cl.defineClass(cls.getKey(), cls.getValue());
-        }
     }
 
     public static class TypeHelperClassLoader extends ClassLoader {

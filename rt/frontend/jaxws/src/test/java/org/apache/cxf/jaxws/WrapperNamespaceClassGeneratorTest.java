@@ -31,6 +31,7 @@ import javax.xml.bind.Marshaller;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.spi.ClassGeneratorCapture;
+import org.apache.cxf.common.spi.GeneratedClassClassLoader;
 import org.apache.cxf.databinding.WrapperHelper;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxb.JAXBWrapperHelper;
@@ -128,8 +129,8 @@ public class WrapperNamespaceClassGeneratorTest {
         assertTrue("The generated response wrapper class is not correct", bout.toString().contains(expected));
 
     }
-    public class Capture implements ClassGeneratorCapture {
-        private Map<String, byte[]> sources;
+    public static class Capture implements ClassGeneratorCapture {
+        private final Map<String, byte[]> sources;
         public Capture() {
             sources = new HashMap<>();
         }
@@ -137,8 +138,10 @@ public class WrapperNamespaceClassGeneratorTest {
             sources.put(className, bytes);
         }
 
-        public Map<String, byte[]> restore() {
-            return sources;
+        public void restore(GeneratedClassClassLoader.TypeHelperClassLoader cl) {
+            for  (Map.Entry<String, byte[]> cls : sources.entrySet()) {
+                cl.defineClass(cls.getKey(), cls.getValue());
+            }
         }
     }
 
@@ -171,7 +174,10 @@ public class WrapperNamespaceClassGeneratorTest {
 
         // now no more generation is allowed
         WrapperHelperClassLoader wrapperHelperClassLoader = new WrapperHelperClassLoader(bus);
-        wrapperHelperClassLoader.restore(c);
+
+        GeneratedClassClassLoader.TypeHelperClassLoader cl = wrapperHelperClassLoader.getClassLoader();
+        c.restore(cl);
+
         bus.setExtension(wrapperHelperClassLoader, WrapperHelperCreator.class);
 
         wh = new JAXBDataBinding().createWrapperHelper(requestClass, null,
