@@ -18,6 +18,6 @@
  */
 package org.apache.cxf.common.spi;
 
-public interface ClassGeneratorCapture {
+public interface GeneratedClassClassLoaderCapture {
     void save(String className, byte[] bytes);
 }

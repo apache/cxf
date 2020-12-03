@@ -30,8 +30,8 @@ import javax.xml.bind.Marshaller;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.common.spi.ClassGeneratorCapture;
 import org.apache.cxf.common.spi.GeneratedClassClassLoader;
+import org.apache.cxf.common.spi.GeneratedClassClassLoaderCapture;
 import org.apache.cxf.databinding.WrapperHelper;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxb.JAXBWrapperHelper;
@@ -129,7 +129,7 @@ public class WrapperNamespaceClassGeneratorTest {
         assertTrue("The generated response wrapper class is not correct", bout.toString().contains(expected));
 
     }
-    public static class Capture implements ClassGeneratorCapture {
+    public static class Capture implements GeneratedClassClassLoaderCapture {
         private final Map<String, byte[]> sources;
         public Capture() {
             sources = new HashMap<>();
@@ -153,7 +153,7 @@ public class WrapperNamespaceClassGeneratorTest {
         Bus bus = BusFactory.getDefaultBus();
         jaxwsFac.setBus(bus);
         Capture c = new Capture();
-        bus.setExtension(c, ClassGeneratorCapture.class);
+        bus.setExtension(c, GeneratedClassClassLoaderCapture.class);
         Service service = jaxwsFac.create();
 
 

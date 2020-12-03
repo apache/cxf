@@ -40,7 +40,7 @@ public class ClassGeneratorClassLoader {
     }
 
     protected Class<?> loadClass(String className, Class<?> cls, byte[] bytes) {
-        ClassGeneratorCapture capture = bus.getExtension(ClassGeneratorCapture.class);
+        GeneratedClassClassLoaderCapture capture = bus.getExtension(GeneratedClassClassLoaderCapture.class);
         if (capture != null) {
             capture.save(className, bytes);
         }
