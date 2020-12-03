@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.http_undertow;
 
+import java.io.File;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
@@ -76,6 +77,13 @@ public class UndertowBasicAuthTest extends AbstractClientServerTestBase {
     @org.junit.Test
     public void testBasicAuth() throws Exception {
         assertEquals("Hello Alice", greeter.greetMe("Alice"));
+    }
+    
+    @org.junit.Test
+    public void testRequestLog() throws Exception {
+        assertEquals("Hello Log", greeter.greetMe("Log"));
+        File logFile = new File("target/request.log");
+        assertTrue(logFile.exists());
     }
 
     @org.junit.Test
