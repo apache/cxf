@@ -36,7 +36,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 
-public class AnnotationHandlerChainBuilderTest {
+public class JavaxAnnotationHandlerChainBuilderTest {
 
     @Before
     public void setUp() {
@@ -137,7 +137,7 @@ public class AnnotationHandlerChainBuilderTest {
     }
 
     @WebService()
-    @HandlerChain(file = "./handlers.xml", name = "TestHandlerChain")
+    @HandlerChain(file = "./javax-handlers.xml", name = "TestHandlerChain")
     public class HandlerTestImpl {
 
     }
