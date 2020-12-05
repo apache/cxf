@@ -55,6 +55,10 @@ import org.apache.cxf.staxutils.StaxUtils;
 @SuppressWarnings("rawtypes")
 public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
 
+    private static final String HANDLER_CHAINS_E = "handler-chains";
+    private static final String HANDLER_CHAIN_E = "handler-chain";
+    private static final String JAKARTAEE_NS = "https://jakarta.ee/xml/ns/jakartaee";
+    private static final String JAVAEE_NS = "http://java.sun.com/xml/ns/javaee";
     private static final Logger LOG = LogUtils.getL7dLogger(AnnotationHandlerChainBuilder.class);
     private static final ResourceBundle BUNDLE = LOG.getResourceBundle();
     private static JAXBContext context;
@@ -97,16 +101,30 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
 
                 Document doc = StaxUtils.read(handlerFileURL.openStream());
                 Element el = doc.getDocumentElement();
-                if (!"http://java.sun.com/xml/ns/javaee".equals(el.getNamespaceURI())
-                    || !"handler-chains".equals(el.getLocalName())) {
-
+                boolean isJavaEENamespace = JAVAEE_NS.equals(el.getNamespaceURI());
+                boolean isJakartaEENamespace = JAKARTAEE_NS.equals(el.getNamespaceURI());
+                if (!isJavaEENamespace && !isJakartaEENamespace) {
+                    throw new WebServiceException(
+                        BundleUtils.getFormattedString(BUNDLE,
+                                                       "NOT_VALID_NAMESPACE",
+                                                       el.getNamespaceURI()));
+                }
+                if (isJavaEENamespace && !HANDLER_CHAINS_E.equals(el.getLocalName())) {
                     String xml = StaxUtils.toString(el);
                     throw new WebServiceException(
                         BundleUtils.getFormattedString(BUNDLE,
                                                        "NOT_VALID_ROOT_ELEMENT",
-                                                       "http://java.sun.com/xml/ns/javaee"
-                                                           .equals(el.getNamespaceURI()),
-                                                       "handler-chains".equals(el.getLocalName()),
+                                                       JAVAEE_NS.equals(el.getNamespaceURI()),
+                                                       HANDLER_CHAINS_E.equals(el.getLocalName()),
+                                                       xml, handlerFileURL));
+                }
+                if (isJakartaEENamespace && !HANDLER_CHAINS_E.equals(el.getLocalName())) {
+                    String xml = StaxUtils.toString(el);
+                    throw new WebServiceException(
+                        BundleUtils.getFormattedString(BUNDLE,
+                                                       "NOT_VALID_ROOT_ELEMENT",
+                                                       JAKARTAEE_NS.equals(el.getNamespaceURI()),
+                                                       HANDLER_CHAINS_E.equals(el.getLocalName()),
                                                        xml, handlerFileURL));
                 }
                 chain = new ArrayList<>();
@@ -114,9 +132,15 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
                 while (node != null) {
                     if (node instanceof Element) {
                         el = (Element)node;
-                        if (!"http://java.sun.com/xml/ns/javaee".equals(el.getNamespaceURI())
-                            || !"handler-chain".equals(el.getLocalName())) {
-
+                        isJavaEENamespace = JAVAEE_NS.equals(el.getNamespaceURI());
+                        isJakartaEENamespace = JAKARTAEE_NS.equals(el.getNamespaceURI());
+                        if (!isJavaEENamespace && !isJakartaEENamespace) {
+                            throw new WebServiceException(
+                                BundleUtils.getFormattedString(BUNDLE,
+                                                               "NOT_VALID_NAMESPACE",
+                                                               el.getNamespaceURI()));
+                        }
+                        if (!HANDLER_CHAIN_E.equals(el.getLocalName())) {
                             String xml = StaxUtils.toString(el);
                             throw new WebServiceException(
                                 BundleUtils.getFormattedString(BUNDLE,
@@ -161,7 +185,9 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
             node = node.getNextSibling();
             if (cur instanceof Element) {
                 el = (Element)cur;
-                if (!"http://java.sun.com/xml/ns/javaee".equals(el.getNamespaceURI())) {
+                boolean isJavaEENamespace = JAVAEE_NS.equals(el.getNamespaceURI());
+                boolean isJakartaEENamespace = JAKARTAEE_NS.equals(el.getNamespaceURI());
+                if (!isJavaEENamespace && !isJakartaEENamespace) {
                     String xml = StaxUtils.toString(el);
                     throw new WebServiceException(
                         BundleUtils.getFormattedString(BUNDLE,
