@@ -67,6 +67,7 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
 
     public WrapperClassGenerator(Bus bus) {
         super(bus);
+        helper = bus.getExtension(ASMHelper.class);
     }
 
     private String getPackageName(Method method) {
@@ -108,7 +109,6 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
     }
 
     public Set<Class<?>> generate(JaxWsServiceFactoryBean factory, InterfaceInfo interfaceInfo, boolean qualified) {
-        helper = bus.getExtension(ASMHelper.class);
         Set<Class<?>> wrapperBeans = new LinkedHashSet<>();
         for (OperationInfo opInfo : interfaceInfo.getOperations()) {
             if (opInfo.isUnwrappedCapable()) {
