@@ -33,28 +33,15 @@ import org.apache.cxf.databinding.WrapperHelper;
 
 public final class WrapperHelperCompiler extends ClassGeneratorClassLoader implements WrapperHelperCreator {
 
-    private Class<?> wrapperType;
-    private Method[] setMethods;
-    private Method[] getMethods;
-    private Method[] jaxbMethods;
-    private Field[] fields;
-    private ASMHelper.ClassWriter cw;
-    private ASMHelper asmhelper;
-
     WrapperHelperCompiler(Bus bus) {
         super(bus);
     }
 
-    public WrapperHelper compile(Class<?> wt, Method[] setters,
-                                 Method[] getters, Method[] jms,
-                                 Field[] fs, Object objectFactory) {
-        this.wrapperType = wt;
-        this.setMethods = setters;
-        this.getMethods = getters;
-        this.jaxbMethods = jms;
-        this.fields = fs;
-        asmhelper = bus.getExtension(ASMHelper.class);
-        cw = asmhelper.createClassWriter();
+    public WrapperHelper compile(Class<?> wrapperType, Method[] setMethods,
+                                 Method[] getMethods, Method[] jaxbMethods,
+                                 Field[] fields, Object objectFactory) {
+        ASMHelper asmhelper = bus.getExtension(ASMHelper.class);
+        ASMHelper.ClassWriter cw = asmhelper.createClassWriter();
 
         if (cw == null) {
             return null;
@@ -91,14 +78,15 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
                  "java/lang/Object",
                  new String[] {StringUtils.periodToSlashes(WrapperHelper.class.getName())});
 
-        addConstructor(newClassName, objectFactory == null ? null : objectFactory.getClass());
-        boolean b = addSignature();
+        addConstructor(newClassName, objectFactory == null ? null : objectFactory.getClass(), asmhelper, cw);
+        boolean b = addSignature(setMethods, getMethods, asmhelper, cw);
         if (b) {
             b = addCreateWrapperObject(newClassName,
-                                       objectFactory == null ? null : objectFactory.getClass());
+                                       objectFactory == null ? null : objectFactory.getClass(),
+                                       wrapperType, setMethods, getMethods, jaxbMethods, fields, asmhelper, cw);
         }
         if (b) {
-            b = addGetWrapperParts(newClassName, wrapperType);
+            b = addGetWrapperParts(newClassName, wrapperType, getMethods, fields, asmhelper, cw);
         }
 
         try {
@@ -129,7 +117,8 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
         return b.toString();
     }
 
-    private boolean addSignature() {
+    private boolean addSignature(Method[] setMethods, Method[] getMethods,
+                                 ASMHelper asmhelper, ASMHelper.ClassWriter cw) {
         OpcodesProxy opCodes = asmhelper.getOpCodes();
         String sig = computeSignature(setMethods, getMethods);
         ASMHelper.MethodVisitor mv = cw.visitMethod(opCodes.ACC_PUBLIC,
@@ -145,7 +134,8 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
         return true;
     }
 
-    private void addConstructor(String newClassName, Class<?> objectFactoryCls) {
+    private void addConstructor(String newClassName, Class<?> objectFactoryCls,
+                                ASMHelper asmhelper, ASMHelper.ClassWriter cw) {
 
         if (objectFactoryCls != null) {
             String ofName = "L" + StringUtils.periodToSlashes(objectFactoryCls.getName()) + ";";
@@ -188,8 +178,11 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
         mv.visitMaxs(0, 0);
         mv.visitEnd();
     }
-
-    private boolean addCreateWrapperObject(String newClassName, Class<?> objectFactoryClass) {
+    //CHECKSTYLE:OFF
+    private boolean addCreateWrapperObject(String newClassName, Class<?> objectFactoryClass,
+                                           Class<?> wrapperType, Method[] setMethods,
+                                           Method[] getMethods, Method[] jaxbMethods,
+                                           Field[] fields, ASMHelper asmhelper, ASMHelper.ClassWriter cw) {
 
         OpcodesProxy opCodes = asmhelper.getOpCodes();
         ASMHelper.MethodVisitor mv = cw.visitMethod(opCodes.ACC_PUBLIC,
@@ -223,7 +216,7 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
             mv.visitVarInsn(opCodes.ALOAD, 2);
 
             if (List.class.isAssignableFrom(tp)) {
-                doCollection(mv, x);
+                doCollection(mv, x, wrapperType, setMethods, getMethods, asmhelper);
             } else {
                 if (JAXBElement.class.isAssignableFrom(tp)) {
                     mv.visitVarInsn(opCodes.ALOAD, 0);
@@ -286,8 +279,9 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
         mv.visitEnd();
         return true;
     }
-
-    private void doCollection(ASMHelper.MethodVisitor mv, int x) {
+    //CHECKSTYLE:ON
+    private void doCollection(ASMHelper.MethodVisitor mv, int x, Class<?> wrapperType, Method[] setMethods,
+                              Method[] getMethods, ASMHelper asmhelper) {
         // List aVal = obj.getA();
         // List newA = (List)lst.get(99);
         // if (aVal == null) {
@@ -350,7 +344,8 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
         mv.visitLineNumber(107, jumpOverLabel);
     }
 
-    private boolean addGetWrapperParts(String newClassName, Class<?> wrapperClass) {
+    private boolean addGetWrapperParts(String newClassName, Class<?> wrapperClass, Method[] getMethods, Field[] fields,
+                                       ASMHelper asmhelper, ASMHelper.ClassWriter cw) {
         OpcodesProxy opCodes = asmhelper.getOpCodes();
         ASMHelper.MethodVisitor mv = cw.visitMethod(opCodes.ACC_PUBLIC,
                                           "getWrapperParts",
@@ -405,7 +400,7 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
                         asmhelper.getMethodSignature(method), false);
                 if (method.getReturnType().isPrimitive()) {
                     // wrap into Object type
-                    createObjectWrapper(mv, method.getReturnType());
+                    createObjectWrapper(mv, method.getReturnType(), asmhelper);
                 }
                 if (JAXBElement.class.isAssignableFrom(method.getReturnType())) {
                     ASMHelper.Label jumpOverLabel = asmhelper.createLabel();
@@ -447,7 +442,7 @@ public final class WrapperHelperCompiler extends ClassGeneratorClassLoader imple
 
 
 
-    private void createObjectWrapper(ASMHelper.MethodVisitor mv, Class<?> cl) {
+    private void createObjectWrapper(ASMHelper.MethodVisitor mv, Class<?> cl, ASMHelper asmhelper) {
         OpcodesProxy opCodes = asmhelper.getOpCodes();
         mv.visitMethodInsn(opCodes.INVOKESTATIC, asmhelper.getNonPrimitive(cl),
                            "valueOf", "(" + asmhelper.getPrimitive(cl) + ")L"
