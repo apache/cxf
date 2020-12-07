@@ -24,6 +24,12 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.spi.GeneratedClassClassLoader;
 
+/** If class has been generated during build time
+ *  (use @see org.apache.cxf.common.spi.GeneratedClassClassLoaderCapture capture to save bytes)
+ *  you can set class loader to avoid class generation during runtime:
+ *  bus.setExtension(new ExtensionClassLoader(bus), ExtensionClassCreator.class);
+ * @author olivier dufour
+ */
 public class ExtensionClassLoader extends GeneratedClassClassLoader implements ExtensionClassCreator {
 
     public ExtensionClassLoader(Bus bus) {

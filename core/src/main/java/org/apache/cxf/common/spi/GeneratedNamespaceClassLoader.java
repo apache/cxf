@@ -23,6 +23,12 @@ import java.util.Map;
 
 import org.apache.cxf.Bus;
 
+/** If class has been generated during build time
+ *  (use @see org.apache.cxf.common.spi.GeneratedClassClassLoaderCapture capture to save bytes)
+ *  you can set class loader to avoid class generation during runtime:
+ *  bus.setExtension(new GeneratedNamespaceClassLoader(bus), NamespaceClassCreator.class);
+ * @author olivier dufour
+ */
 public class GeneratedNamespaceClassLoader extends GeneratedClassClassLoader implements NamespaceClassCreator {
     GeneratedNamespaceClassLoader(Bus bus) {
         super(bus);

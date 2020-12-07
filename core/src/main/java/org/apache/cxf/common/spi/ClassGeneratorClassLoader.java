@@ -28,6 +28,12 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.WeakIdentityHashMap;
 
+/** Class loader used to store and retrieve class generated during runtime to avoid class generation each time.
+ *  inherited class use asmHelper to generate bytes and use @see #loadClass(String, Class&lt;?&gt;, byte[])
+ *  or @see #loadClass(String, ClassLoader, byte[]) to store generated class.
+ *  Class can be generated during buildtime. equivalent class is @see org.apache.cxf.common.spi.GeneratedClassClassLoader
+ * @author olivier dufour
+ */
 public class ClassGeneratorClassLoader {
     protected static final Map<Class<?>, WeakReference<TypeHelperClassLoader>> CLASS_MAP
             = new WeakIdentityHashMap<>();

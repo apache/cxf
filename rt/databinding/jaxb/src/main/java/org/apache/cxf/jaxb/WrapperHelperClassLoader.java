@@ -25,6 +25,12 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.spi.GeneratedClassClassLoader;
 import org.apache.cxf.databinding.WrapperHelper;
 
+/** If class has been generated during build time
+ *  (use @see org.apache.cxf.common.spi.GeneratedClassClassLoaderCapture capture to save bytes)
+ *  you can set class loader to avoid class generation during runtime:
+ *  bus.setExtension(new WrapperHelperClassLoader(bus), WrapperHelperCreator.class);
+ * @author olivier dufour
+ */
 public class WrapperHelperClassLoader extends GeneratedClassClassLoader implements WrapperHelperCreator {
     public WrapperHelperClassLoader(Bus bus) {
         super(bus);

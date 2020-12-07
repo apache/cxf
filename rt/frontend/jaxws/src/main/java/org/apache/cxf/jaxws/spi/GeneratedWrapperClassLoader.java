@@ -34,6 +34,12 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
+/** If class has been generated during build time
+ *  (use @see org.apache.cxf.common.spi.GeneratedClassClassLoaderCapture capture to save bytes)
+ *  you can set class loader to avoid class generation during runtime:
+ *  bus.setExtension(new GeneratedWrapperClassLoader(bus), WrapperClassCreator.class);
+ * @author olivier dufour
+ */
 public class GeneratedWrapperClassLoader extends GeneratedClassClassLoader implements WrapperClassCreator {
     public GeneratedWrapperClassLoader(Bus bus) {
         super(bus);

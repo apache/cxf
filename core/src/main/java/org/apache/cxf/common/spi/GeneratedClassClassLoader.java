@@ -26,6 +26,11 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 
+/** Class loader used to find class generated during build time to avoid class generation during runtime.
+ *  inherited class implement same interface than generator class but find class in TypeHelperClassLoader
+ *  Runtime class generator use @see org.apache.cxf.common.spi.ClassGeneratorClassLoader
+ * @author olivier dufour
+ */
 public class GeneratedClassClassLoader {
     private static final Logger LOG = LogUtils.getL7dLogger(ClassLoaderProxyService.class);
     protected final Bus bus;
