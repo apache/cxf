@@ -51,8 +51,7 @@
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-ext-jdk15on</artifactId>
-            <version>${cxf.bcprov.version}</version>
+            <artifactId>bcprov-jdk15on</artifactId>
             <scope>provided</scope>
             <optional>true</optional> 
         </dependency>

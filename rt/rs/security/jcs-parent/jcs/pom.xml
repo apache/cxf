@@ -44,13 +44,6 @@
             <artifactId>cxf-rt-security</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-ext-jdk15on</artifactId>
-            <version>${cxf.bcprov.version}</version>
-            <scope>provided</scope>
-            <optional>true</optional> 
-        </dependency>
         <!--test dependencies-->
         <dependency>
             <groupId>junit</groupId>
