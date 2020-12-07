@@ -118,15 +118,15 @@ public class MonoReactorTest extends AbstractBusClientServerTestBase {
         String address = "http://localhost:" + PORT + "/reactor/mono/error";
         
         StepVerifier
-        .create(ClientBuilder
-            .newClient()
-            .register(new JacksonJsonProvider())
-            .register(new ReactorInvokerProvider())
-            .target(address)
-            .request(MediaType.APPLICATION_JSON)
-            .rx(ReactorInvoker.class)
-            .get(HelloWorldBean.class))
-        .expectErrorMatches(ex -> ex.getCause().getCause() instanceof InternalServerErrorException)
-        .verify();
+            .create(ClientBuilder
+                .newClient()
+                .register(new JacksonJsonProvider())
+                .register(new ReactorInvokerProvider())
+                .target(address)
+                .request(MediaType.APPLICATION_JSON)
+                .rx(ReactorInvoker.class)
+                .get(HelloWorldBean.class))
+            .expectErrorMatches(ex -> ex.getCause().getCause() instanceof InternalServerErrorException)
+            .verify();
     }
 }
