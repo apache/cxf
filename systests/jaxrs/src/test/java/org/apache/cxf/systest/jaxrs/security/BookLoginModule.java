@@ -78,7 +78,8 @@ public class BookLoginModule implements LoginModule {
         Map<String, String> customOptions = new HashMap<>();
         customOptions.put("file", fileResource);
 
-        module.initialize(subject, handler, sharedState, customOptions);
+        // See please https://github.com/eclipse/jetty.project/issues/5486
+        BookLoginService.withInstance(() -> module.initialize(subject, handler, sharedState, customOptions));
     }
 
     public boolean login() throws LoginException {
