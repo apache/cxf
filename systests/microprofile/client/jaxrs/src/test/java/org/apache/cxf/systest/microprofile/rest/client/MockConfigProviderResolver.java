@@ -18,67 +18,27 @@
  */
 package org.apache.cxf.systest.microprofile.rest.client;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.spi.ConfigBuilder;
 import org.eclipse.microprofile.config.spi.ConfigProviderResolver;
-import org.eclipse.microprofile.config.spi.ConfigSource;
 
 public class MockConfigProviderResolver extends ConfigProviderResolver {
 
     private final Map<String, String> configValues;
     
-    private final Config config = new Config() {
-        @Override
-        public <T> T getValue(String propertyName, Class<T> propertyType) {
-            String value = configValues.get(propertyName);
-            System.out.println("getValue(" + propertyName + ") = " + value);
-            if (value != null) {
-                if (propertyType == String.class) {
-                    return propertyType.cast(value);
-                }
-                if (propertyType == Integer.class) {
-                    return propertyType.cast(Integer.parseInt(value));
-                }
-            }
-            return null;
-        }
-        @Override
-        public <T> Optional<T> getOptionalValue(String propertyName, Class<T> propertyType) {
-            return Optional.ofNullable(getValue(propertyName, propertyType));
-        }
-        @Override
-        public Iterable<String> getPropertyNames() {
-            return configValues.keySet();
-        }
-        @Override
-        public Iterable<ConfigSource> getConfigSources() {
-            ConfigSource source = new ConfigSource() {
-                @Override
-                public Map<String, String> getProperties() {
-                    return configValues;
-                }
-                @Override
-                public String getValue(String propertyName) {
-                    return (String) configValues.get(propertyName);
-                }
-                @Override
-                public String getName() {
-                    return "stub";
-                } };
-            return Arrays.asList(source);
-        } };
+    private final Config config;
 
     public MockConfigProviderResolver() {
         configValues = new HashMap<>();
+        config = new MockConfig(configValues);
     }
 
     public MockConfigProviderResolver(Map<String, String> configValues) {
         this.configValues = configValues;
+        this.config = new MockConfig(configValues);
     }
 
     public void setConfigValues(Map<String, String> configValues) {
