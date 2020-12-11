@@ -32,5 +32,5 @@ package org.apache.cxf.common.spi;
  * @author olivier dufour
  */
 public interface GeneratedClassClassLoaderCapture {
-    void save(String className, byte[] bytes);
+    void capture(String className, byte[] bytes);
 }

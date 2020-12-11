@@ -422,7 +422,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
     private void setASM(boolean b) throws Exception {
 
         ASMHelper helper = getBus().getExtension(ASMHelper.class);
-        Method m = ASMHelper.class.getMethod("setBadASM", Boolean.TYPE);
+        Method m = helper.getClass().getMethod("setBadASM", Boolean.TYPE);
         ReflectionUtil.setAccessible(m);
         m.invoke(helper, !b);
     }

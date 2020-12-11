@@ -21,7 +21,7 @@ package org.apache.cxf.endpoint.dynamic;
 import org.apache.cxf.Bus;
 
 public class ExceptionClassCreatorProxyService implements ExceptionClassCreator {
-    ExceptionClassCreator srv;
+    private final ExceptionClassCreator srv;
     public ExceptionClassCreatorProxyService(Bus bus) {
         this(new ExceptionClassGenerator(bus));
     }

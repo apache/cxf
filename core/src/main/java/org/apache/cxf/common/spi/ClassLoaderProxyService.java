@@ -27,7 +27,7 @@ import org.apache.cxf.common.logging.LogUtils;
 
 public class ClassLoaderProxyService implements ClassLoaderService {
     private static final Logger LOG = LogUtils.getL7dLogger(ClassLoaderProxyService.class);
-    NamespaceClassCreator srv;
+    private final NamespaceClassCreator srv;
     public ClassLoaderProxyService(Bus bus) {
         this(new NamespaceClassGenerator(bus));
     }
@@ -36,8 +36,8 @@ public class ClassLoaderProxyService implements ClassLoaderService {
     }
 
     @Override
-    public Object createNamespaceWrapper(Class<?> mcls, Map<String, String> map) {
-        Class<?> cls = srv.createNamespaceWrapper(mcls, map);
+    public Object createNamespaceWrapperInstance(Class<?> mcls, Map<String, String> map) {
+        Class<?> cls = srv.createNamespaceWrapperClass(mcls, map);
         try {
             return cls.getConstructor(Map.class).newInstance(map);
         } catch (Throwable e) {

@@ -16,33 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxb;
+package org.apache.cxf.binding.corba.utils;
 
 import org.apache.cxf.Bus;
 
-public class FactoryClassProxyService implements FactoryClassCreator {
-    private final FactoryClassCreator srv;
-    public FactoryClassProxyService(Bus bus) {
-        this(new FactoryClassGenerator(bus));
+public class CorbaFixedAnyImplClassCreatorProxyService implements CorbaFixedAnyImplClassCreator {
+    CorbaFixedAnyImplClassCreator srv;
+    public CorbaFixedAnyImplClassCreatorProxyService(Bus bus) {
+        this(new CorbaFixedAnyImplGenerator(bus));
     }
-    public FactoryClassProxyService(FactoryClassCreator srv) {
+    public CorbaFixedAnyImplClassCreatorProxyService(CorbaFixedAnyImplClassCreator srv) {
         super();
         this.srv = srv;
     }
 
     @Override
-    public Class<?> createFactory(Class<?> cls) {
-        return srv.createFactory(cls);
+    public Class<?> createFixedAnyClass() {
+        return srv.createFixedAnyClass();
     }
 
-    public class LoadFirst extends FactoryClassProxyService {
+    public class LoadFirst extends CorbaFixedAnyImplClassCreatorProxyService {
         public LoadFirst(Bus bus) {
-            super(new FactoryClassLoader(bus));
+            super(new CorbaFixedAnyImplClassLoader(bus));
         }
     }
-    public class GenerateJustInTime extends FactoryClassProxyService {
+    public class GenerateJustInTime extends CorbaFixedAnyImplClassCreatorProxyService {
         public GenerateJustInTime(Bus bus) {
-            super(new FactoryClassGenerator(bus));
+            super(new CorbaFixedAnyImplGenerator(bus));
         }
     }
 }

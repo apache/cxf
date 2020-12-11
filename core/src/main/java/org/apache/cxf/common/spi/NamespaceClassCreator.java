@@ -27,6 +27,6 @@ import java.util.Map;
  */
 public interface NamespaceClassCreator {
 
-    Class<?> createNamespaceWrapper(Class<?> mcls, Map<String, String> map);
+    Class<?> createNamespaceWrapperClass(Class<?> mcls, Map<String, String> map);
 
 }

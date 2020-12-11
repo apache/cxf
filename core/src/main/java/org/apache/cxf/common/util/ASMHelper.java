@@ -37,7 +37,6 @@ public interface ASMHelper {
     String getMethodSignature(Method m);
     String getNonPrimitive(Class<?> tp);
     String getPrimitive(Class<?> tp);
-    void setBadASM(boolean b);
 
     public interface ASMType {
         int getOpcode(int ireturn);

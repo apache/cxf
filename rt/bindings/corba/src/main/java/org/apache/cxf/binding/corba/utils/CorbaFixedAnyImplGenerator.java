@@ -24,7 +24,7 @@ import org.apache.cxf.common.spi.ClassGeneratorClassLoader;
 import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.util.OpcodesProxy;
 
-public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader {
+public class CorbaFixedAnyImplGenerator extends ClassGeneratorClassLoader implements CorbaFixedAnyImplClassCreator {
 
     public CorbaFixedAnyImplGenerator(Bus bus) {
         super(bus);

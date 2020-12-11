@@ -134,7 +134,7 @@ public class WrapperNamespaceClassGeneratorTest {
         public Capture() {
             sources = new HashMap<>();
         }
-        public void save(String className, byte[] bytes) {
+        public void capture(String className, byte[] bytes) {
             sources.put(className, bytes);
         }
 

@@ -16,33 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxb;
+package org.apache.cxf.binding.corba.utils;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.spi.GeneratedClassClassLoader;
 
-public class FactoryClassProxyService implements FactoryClassCreator {
-    private final FactoryClassCreator srv;
-    public FactoryClassProxyService(Bus bus) {
-        this(new FactoryClassGenerator(bus));
-    }
-    public FactoryClassProxyService(FactoryClassCreator srv) {
-        super();
-        this.srv = srv;
+public class CorbaFixedAnyImplClassLoader extends GeneratedClassClassLoader implements CorbaFixedAnyImplClassCreator {
+
+    public CorbaFixedAnyImplClassLoader(Bus bus) {
+        super(bus);
     }
 
     @Override
-    public Class<?> createFactory(Class<?> cls) {
-        return srv.createFactory(cls);
-    }
-
-    public class LoadFirst extends FactoryClassProxyService {
-        public LoadFirst(Bus bus) {
-            super(new FactoryClassLoader(bus));
-        }
-    }
-    public class GenerateJustInTime extends FactoryClassProxyService {
-        public GenerateJustInTime(Bus bus) {
-            super(new FactoryClassGenerator(bus));
-        }
+    public Class<?> createFixedAnyClass() {
+        String newClassName = "org.apache.cxf.binding.corba.utils.FixedAnyImpl";
+        return findClass(newClassName, CorbaFixedAnyImplClassLoader.class);
     }
 }

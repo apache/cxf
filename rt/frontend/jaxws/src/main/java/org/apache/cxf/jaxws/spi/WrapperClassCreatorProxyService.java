@@ -26,7 +26,7 @@ import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
 import org.apache.cxf.service.model.InterfaceInfo;
 
 public class WrapperClassCreatorProxyService implements WrapperClassCreator {
-    WrapperClassCreator srv;
+    private final WrapperClassCreator srv;
     public WrapperClassCreatorProxyService(final Bus bus) {
         this(new WrapperClassGenerator(bus));
     }
@@ -42,7 +42,7 @@ public class WrapperClassCreatorProxyService implements WrapperClassCreator {
 
     public class LoadFirst extends WrapperClassCreatorProxyService {
         public LoadFirst(Bus bus) {
-            super(new GeneratedWrapperClassLoader(bus));
+            super(new WrapperClassLoader(bus));
         }
     }
     public class GenerateJustInTime extends WrapperClassCreatorProxyService {

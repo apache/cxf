@@ -47,7 +47,8 @@ public class WrapperHelperClassLoader extends GeneratedClassClassLoader implemen
         while (cls != null) {
             try {
                 WrapperHelper helper = WrapperHelper.class.cast(cls.getDeclaredConstructor().newInstance());
-                if (!helper.getSignature().equals(WrapperHelperCompiler.computeSignature(setMethods, getMethods))) {
+                if (!helper.getSignature().equals(
+                        WrapperHelperClassGenerator.computeSignature(setMethods, getMethods))) {
                     count++;
                     newClassName = wrapperType.getName() + "_WrapperTypeHelper" + count;
                     cls = findClass(newClassName, wrapperType);

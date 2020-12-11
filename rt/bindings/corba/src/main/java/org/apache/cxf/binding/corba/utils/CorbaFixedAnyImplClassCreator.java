@@ -16,11 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.binding.corba.utils;
 
-package org.apache.cxf.common.spi;
-
-import java.util.Map;
-
-public interface ClassLoaderService {
-    Object createNamespaceWrapperInstance(Class<?> mcls, Map<String, String> map);
+public interface CorbaFixedAnyImplClassCreator {
+    Class<?> createFixedAnyClass();
 }

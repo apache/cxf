@@ -26,6 +26,7 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.binding.corba.CorbaBindingException;
 import org.apache.cxf.binding.corba.types.CorbaPrimitiveHandler;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
@@ -46,10 +47,10 @@ public final class CorbaAnyHelper {
         //utility class
     }
 
-    public static Any createAny(ORB orb) {
+    public static Any createAny(ORB orb, Bus bus) {
         Any value = orb.create_any();
         if ("com.sun.corba.se.impl.corba.AnyImpl".equals(value.getClass().getName())) {
-            value = createFixedAny(orb, value);
+            value = createFixedAny(orb, value, bus);
         }
         return value;
     }
@@ -266,10 +267,11 @@ public final class CorbaAnyHelper {
         IDL_TO_SCHEMA_TYPES.put(CorbaConstants.NT_CORBA_ANY, W3CConstants.NT_SCHEMA_ANYTYPE);
     }
 
-    private static synchronized Any createFixedAny(ORB orb, Any any) {
+    private static synchronized Any createFixedAny(ORB orb, Any any, Bus bus) {
         if (fixedAnyConstructor == null) {
-            CorbaFixedAnyImplGenerator corbaFixedAnyImplGenerator = new CorbaFixedAnyImplGenerator(null);
-            Class<?> c = corbaFixedAnyImplGenerator.createFixedAnyClass();
+            CorbaFixedAnyImplClassCreator corbaFixedAnyImplClassCreator =
+                    bus.getExtension(CorbaFixedAnyImplClassCreator.class);
+            Class<?> c = corbaFixedAnyImplClassCreator.createFixedAnyClass();
             try {
                 fixedAnyConstructor = c.getConstructor(ORB.class, Any.class);
             } catch (Exception e) {

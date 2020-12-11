@@ -33,7 +33,7 @@ public class GeneratedNamespaceClassLoader extends GeneratedClassClassLoader imp
     GeneratedNamespaceClassLoader(Bus bus) {
         super(bus);
     }
-    public synchronized Class<?> createNamespaceWrapper(Class<?> mcls, Map<String, String> map) {
+    public synchronized Class<?> createNamespaceWrapperClass(Class<?> mcls, Map<String, String> map) {
         String postFix = "";
 
         if (mcls.getName().contains("eclipse")) {

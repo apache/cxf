@@ -32,7 +32,7 @@ import org.apache.cxf.common.util.OpcodesProxy;
 public class NamespaceClassGenerator extends ClassGeneratorClassLoader implements NamespaceClassCreator {
 
     private static final Logger LOG = LogUtils.getL7dLogger(ClassGeneratorClassLoader.class);
-    ASMHelper helper;
+    private final ASMHelper helper;
 
     public NamespaceClassGenerator(Bus bus) {
         super(bus);
@@ -40,7 +40,7 @@ public class NamespaceClassGenerator extends ClassGeneratorClassLoader implement
     }
 
     @Override
-    public synchronized Class<?> createNamespaceWrapper(Class<?> mcls, Map<String, String> map) {
+    public synchronized Class<?> createNamespaceWrapperClass(Class<?> mcls, Map<String, String> map) {
         String postFix = "";
 
         if (mcls.getName().contains("eclipse")) {

@@ -618,7 +618,7 @@ public final class JAXBUtils {
     public static Object setNamespaceMapper(Bus bus, final Map<String, String> nspref,
                                             Marshaller marshaller) throws PropertyException {
         ClassLoaderService classLoaderService = bus.getExtension(ClassLoaderService.class);
-        Object mapper = classLoaderService.createNamespaceWrapper(marshaller.getClass(), nspref);
+        Object mapper = classLoaderService.createNamespaceWrapperInstance(marshaller.getClass(), nspref);
         if (mapper != null) {
             if (marshaller.getClass().getName().contains(".internal.")) {
                 marshaller.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper",

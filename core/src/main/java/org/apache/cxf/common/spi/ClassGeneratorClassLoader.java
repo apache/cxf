@@ -30,8 +30,8 @@ import org.apache.cxf.common.util.WeakIdentityHashMap;
 
 /** Class loader used to store and retrieve class generated during runtime to avoid class generation each time.
  *  inherited class use asmHelper to generate bytes and use @see #loadClass(String, Class&lt;?&gt;, byte[])
- *  or @see #loadClass(String, ClassLoader, byte[]) to store generated class.
- *  Class can be generated during buildtime. equivalent class is @see org.apache.cxf.common.spi.GeneratedClassClassLoader
+ *  or @see #loadClass(String, ClassLoader, byte[]) to store generated class.Class can be generated during buildtime.
+ *  equivalent class is @see org.apache.cxf.common.spi.GeneratedClassClassLoader
  * @author olivier dufour
  */
 public class ClassGeneratorClassLoader {
@@ -48,7 +48,7 @@ public class ClassGeneratorClassLoader {
     protected Class<?> loadClass(String className, Class<?> cls, byte[] bytes) {
         GeneratedClassClassLoaderCapture capture = bus.getExtension(GeneratedClassClassLoaderCapture.class);
         if (capture != null) {
-            capture.save(className, bytes);
+            capture.capture(className, bytes);
         }
         TypeHelperClassLoader loader = getOrCreateLoader(cls);
         synchronized (loader) {
@@ -62,7 +62,7 @@ public class ClassGeneratorClassLoader {
     protected Class<?> loadClass(String className, ClassLoader l, byte[] bytes) {
         GeneratedClassClassLoaderCapture capture = bus.getExtension(GeneratedClassClassLoaderCapture.class);
         if (capture != null) {
-            capture.save(className, bytes);
+            capture.capture(className, bytes);
         }
         TypeHelperClassLoader loader = getOrCreateLoader(l);
         synchronized (loader) {

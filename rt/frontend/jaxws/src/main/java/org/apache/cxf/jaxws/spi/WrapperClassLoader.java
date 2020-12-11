@@ -40,8 +40,8 @@ import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
  *  bus.setExtension(new GeneratedWrapperClassLoader(bus), WrapperClassCreator.class);
  * @author olivier dufour
  */
-public class GeneratedWrapperClassLoader extends GeneratedClassClassLoader implements WrapperClassCreator {
-    public GeneratedWrapperClassLoader(Bus bus) {
+public class WrapperClassLoader extends GeneratedClassClassLoader implements WrapperClassCreator {
+    public WrapperClassLoader(Bus bus) {
         super(bus);
     }
 

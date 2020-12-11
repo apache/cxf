@@ -25,9 +25,9 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.databinding.WrapperHelper;
 
 public class WrapperHelperProxyService implements WrapperHelperCreator {
-    WrapperHelperCreator srv;
+    private final WrapperHelperCreator srv;
     public WrapperHelperProxyService(Bus bus) {
-        this(new WrapperHelperCompiler(bus));
+        this(new WrapperHelperClassGenerator(bus));
     }
     public WrapperHelperProxyService(WrapperHelperCreator srv) {
         super();
@@ -47,7 +47,7 @@ public class WrapperHelperProxyService implements WrapperHelperCreator {
     }
     public class GenerateJustInTime extends WrapperHelperProxyService {
         public GenerateJustInTime(Bus bus) {
-            super(new WrapperHelperCompiler(bus));
+            super(new WrapperHelperClassGenerator(bus));
         }
     }
 }

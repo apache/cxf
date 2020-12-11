@@ -31,9 +31,9 @@ import org.apache.cxf.common.util.OpcodesProxy;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.databinding.WrapperHelper;
 
-public final class WrapperHelperCompiler extends ClassGeneratorClassLoader implements WrapperHelperCreator {
+public final class WrapperHelperClassGenerator extends ClassGeneratorClassLoader implements WrapperHelperCreator {
 
-    WrapperHelperCompiler(Bus bus) {
+    WrapperHelperClassGenerator(Bus bus) {
         super(bus);
     }
 

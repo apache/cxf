@@ -120,7 +120,7 @@ public class CorbaServerConduit implements Conduit {
                 NVList list = inMsg.getList();
 
                 if (msg.getStreamableException() != null) {
-                    Any exAny = CorbaAnyHelper.createAny(orb);
+                    Any exAny = CorbaAnyHelper.createAny(orb, msg.getExchange().getBus());
                     CorbaStreamable exception = msg.getStreamableException();
                     exAny.insert_Streamable(exception);
                     request.set_exception(exAny);
@@ -140,7 +140,7 @@ public class CorbaServerConduit implements Conduit {
 
                     CorbaStreamable resultValue = msg.getStreamableReturn();
                     if (resultValue != null) {
-                        Any resultAny = CorbaAnyHelper.createAny(orb);
+                        Any resultAny = CorbaAnyHelper.createAny(orb, msg.getExchange().getBus());
                         resultValue.getObject().setIntoAny(resultAny, resultValue, true);
                         request.set_result(resultAny);
                     }
