@@ -21,7 +21,7 @@ package org.apache.cxf.binding.corba.utils;
 import org.apache.cxf.Bus;
 
 public class CorbaFixedAnyImplClassCreatorProxyService implements CorbaFixedAnyImplClassCreator {
-    CorbaFixedAnyImplClassCreator srv;
+    private final CorbaFixedAnyImplClassCreator srv;
     public CorbaFixedAnyImplClassCreatorProxyService(Bus bus) {
         this(new CorbaFixedAnyImplGenerator(bus));
     }

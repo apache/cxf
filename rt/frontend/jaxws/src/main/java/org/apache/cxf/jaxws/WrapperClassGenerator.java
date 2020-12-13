@@ -63,7 +63,7 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
     public static final String DEFAULT_PACKAGE_NAME = "defaultnamespace";
 
     private static final Logger LOG = LogUtils.getL7dLogger(WrapperClassGenerator.class);
-    private ASMHelper helper;
+    private final ASMHelper helper;
 
     public WrapperClassGenerator(Bus bus) {
         super(bus);

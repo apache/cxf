@@ -25,7 +25,7 @@ import org.apache.cxf.common.util.OpcodesProxy;
 import org.apache.cxf.common.util.StringUtils;
 
 public class ExceptionClassGenerator extends ClassGeneratorClassLoader implements ExceptionClassCreator {
-    private ASMHelper helper;
+    private final ASMHelper helper;
 
     public ExceptionClassGenerator(Bus bus) {
         super(bus);

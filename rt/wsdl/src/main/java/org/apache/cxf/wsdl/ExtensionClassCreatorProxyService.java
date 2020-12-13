@@ -23,7 +23,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.Bus;
 
 public class ExtensionClassCreatorProxyService implements ExtensionClassCreator {
-    ExtensionClassCreator srv;
+    private final ExtensionClassCreator srv;
     public ExtensionClassCreatorProxyService(Bus bus) {
         this(new ExtensionClassGenerator(bus));
     }
