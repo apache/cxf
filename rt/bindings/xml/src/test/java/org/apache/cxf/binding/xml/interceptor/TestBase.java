@@ -35,6 +35,8 @@ import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.binding.xml.XMLBindingFactory;
 import org.apache.cxf.binding.xml.wsdl11.XMLWSDLExtensionLoader;
+import org.apache.cxf.common.util.ASMHelper;
+import org.apache.cxf.common.util.ASMHelperImpl;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.helpers.JavaUtils;
@@ -49,6 +51,8 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.DestinationFactoryManager;
+import org.apache.cxf.wsdl.ExtensionClassCreator;
+import org.apache.cxf.wsdl.ExtensionClassCreatorProxyService;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLManagerImpl;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
@@ -126,8 +130,11 @@ public class TestBase {
         bus = control.createMock(Bus.class);
 
         WSDLManagerImpl manager = new WSDLManagerImpl();
-        XMLWSDLExtensionLoader.registerExtensors(manager);
         EasyMock.expect(bus.getExtension(WSDLManager.class)).andStubReturn(manager);
+        EasyMock.expect(bus.getExtension(ASMHelper.class)).andStubReturn(new ASMHelperImpl());
+
+        EasyMock.expect(bus.getExtension(ExtensionClassCreator.class))
+            .andStubReturn(new ExtensionClassCreatorProxyService(bus));
 
         BindingFactoryManager bindingFactoryManager = control.createMock(BindingFactoryManager.class);
         EasyMock.expect(bus.getExtension(BindingFactoryManager.class)).andStubReturn(bindingFactoryManager);
@@ -135,6 +142,9 @@ public class TestBase {
         EasyMock.expect(bus.getExtension(DestinationFactoryManager.class)).andStubReturn(dfm);
 
         control.replay();
+
+        XMLWSDLExtensionLoader loader = new XMLWSDLExtensionLoader(bus);
+        loader.registerExtensors(manager);
 
         assertNotNull(bus.getExtension(WSDLManager.class));
 

@@ -50,6 +50,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -251,7 +253,8 @@ public class JAXBEncoderDecoderTest {
         opFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
         XMLEventWriter writer = opFactory.createXMLEventWriter(stringWriter);
         Marshaller m = context.createMarshaller();
-        JAXBUtils.setNamespaceMapper(mapper, m);
+        Bus bus = new ExtensionManagerBus();
+        JAXBUtils.setNamespaceMapper(bus, mapper, m);
         JAXBEncoderDecoder.marshall(m, testObject, part, writer);
         writer.flush();
         writer.close();

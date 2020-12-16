@@ -63,25 +63,18 @@ import javax.xml.stream.util.StreamReaderDelegate;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.ASMHelper;
-import org.apache.cxf.common.util.ASMHelper.AnnotationVisitor;
-import org.apache.cxf.common.util.ASMHelper.ClassWriter;
-import org.apache.cxf.common.util.ASMHelper.FieldVisitor;
-import org.apache.cxf.common.util.ASMHelper.Label;
-import org.apache.cxf.common.util.ASMHelper.MethodVisitor;
-import org.apache.cxf.common.util.ASMHelper.Opcodes;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.staxutils.PrettyPrintXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.transform.OutTransformWriter;
-
 
 /**
  * JAXBExtensionHelper
@@ -99,13 +92,15 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
     private JAXBContext marshalContext;
     private JAXBContext unmarshalContext;
     private Set<Class<?>> classes;
+    private Bus bus;
 
 
-    public JAXBExtensionHelper(Class<?> cls,
+    public JAXBExtensionHelper(Bus bus, Class<?> cls,
                                String ns) {
         typeClass = cls;
         namespace = ns;
         extensionClass = cls;
+        this.bus = bus;
     }
 
     void setJaxbNamespace(String ns) {
@@ -138,16 +133,16 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
     }
 
 
-    public static void addExtensions(ExtensionRegistry registry, String parentType, String elementType)
+    public static void addExtensions(Bus b, ExtensionRegistry registry, String parentType, String elementType)
         throws JAXBException, ClassNotFoundException {
         Class<?> parentTypeClass = ClassLoaderUtils.loadClass(parentType, JAXBExtensionHelper.class);
 
         Class<? extends ExtensibilityElement> elementTypeClass =
             ClassLoaderUtils.loadClass(elementType, JAXBExtensionHelper.class)
                 .asSubclass(ExtensibilityElement.class);
-        addExtensions(registry, parentTypeClass, elementTypeClass, null);
+        addExtensions(b, registry, parentTypeClass, elementTypeClass, null);
     }
-    public static void addExtensions(ExtensionRegistry registry,
+    public static void addExtensions(Bus b, ExtensionRegistry registry,
                                      String parentType,
                                      String elementType,
                                      String namespace)
@@ -157,27 +152,28 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
         Class<? extends ExtensibilityElement> elementTypeClass =
             ClassLoaderUtils.loadClass(elementType, JAXBExtensionHelper.class)
                 .asSubclass(ExtensibilityElement.class);
-        addExtensions(registry, parentTypeClass, elementTypeClass, namespace);
+        addExtensions(b, registry, parentTypeClass, elementTypeClass, namespace);
     }
-    public static void addExtensions(ExtensionRegistry registry,
+    public static void addExtensions(Bus b, ExtensionRegistry registry,
                                      Class<?> parentType,
                                      Class<?> cls)
         throws JAXBException {
-        addExtensions(registry, parentType, cls, null);
+        addExtensions(b, registry, parentType, cls, null);
     }
-    public static void addExtensions(ExtensionRegistry registry,
+    public static void addExtensions(Bus b, ExtensionRegistry registry,
                                      Class<?> parentType,
                                      Class<?> cls,
                                      String namespace) throws JAXBException {
-        addExtensions(registry, parentType, cls, namespace, cls.getClassLoader());
+        addExtensions(b, registry, parentType, cls, namespace, cls.getClassLoader());
     }
-    public static void addExtensions(ExtensionRegistry registry,
+    public static void addExtensions(Bus b, ExtensionRegistry registry,
                                      Class<?> parentType,
                                      Class<?> cls,
                                      String namespace,
                                      ClassLoader loader) throws JAXBException {
 
-        JAXBExtensionHelper helper = new JAXBExtensionHelper(cls, namespace);
+        JAXBExtensionHelper helper = new JAXBExtensionHelper(b, cls, namespace);
+        ExtensionClassCreator extensionClassCreator = b.getExtension(ExtensionClassCreator.class);
         boolean found = false;
         Class<?> extCls = cls;
         try {
@@ -197,7 +193,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                         }
                         QName elementType = new QName(ns, name);
                         if (!ExtensibilityElement.class.isAssignableFrom(extCls)) {
-                            extCls = createExtensionClass(cls, elementType, loader);
+                            extCls = extensionClassCreator.createExtensionClass(cls, elementType, loader);
                             helper.setExtensionClass(extCls);
                         }
                         registry.registerDeserializer(parentType, elementType, helper);
@@ -234,7 +230,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                     }
                     QName elementType = new QName(ns, name);
                     if (!ExtensibilityElement.class.isAssignableFrom(extCls)) {
-                        extCls = createExtensionClass(cls, elementType, loader);
+                        extCls = extensionClassCreator.createExtensionClass(cls, elementType, loader);
                         helper.setExtensionClass(extCls);
                     }
                     registry.registerDeserializer(parentType, elementType, helper);
@@ -326,7 +322,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                 Map.Entry<?, ?> entry = (Map.Entry<?, ?>)ent;
                 nspref.put((String)entry.getValue(), (String)entry.getKey());
             }
-            JAXBUtils.setNamespaceMapper(nspref, u);
+            JAXBUtils.setNamespaceMapper(bus, nspref, u);
             u.marshal(mObj, writer);
             writer.flush();
         } catch (Exception ex) {
@@ -453,260 +449,5 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
 
     };
 
-    //CHECKSTYLE:OFF - very complicated ASM code
-    private static Class<?> createExtensionClass(Class<?> cls, QName qname, ClassLoader loader) {
-
-        String className = ASMHelper.periodToSlashes(cls.getName());
-        ASMHelper helper = new ASMHelper();
-        Class<?> extClass = helper.findClass(className + "Extensibility", loader);
-        if (extClass != null) {
-            return extClass;
-        }
-
-        ClassWriter cw = helper.createClassWriter();
-        FieldVisitor fv;
-        MethodVisitor mv;
-        AnnotationVisitor av0;
-
-        cw.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER + Opcodes.ACC_SYNTHETIC,
-                 className + "Extensibility", null,
-                 className,
-                 new String[] {"javax/wsdl/extensions/ExtensibilityElement"});
-
-        cw.visitSource(cls.getSimpleName() + "Extensibility.java", null);
-
-        fv = cw.visitField(Opcodes.ACC_PRIVATE + Opcodes.ACC_FINAL + Opcodes.ACC_STATIC,
-                           "WSDL_REQUIRED", "Ljavax/xml/namespace/QName;", null, null);
-        fv.visitEnd();
-        fv = cw.visitField(0, "qn", "Ljavax/xml/namespace/QName;", null, null);
-        fv.visitEnd();
-
-
-        boolean hasAttributes = false;
-        try {
-            Method m = cls.getDeclaredMethod("getOtherAttributes");
-            if (m != null && m.getReturnType() == Map.class){
-                hasAttributes = true;
-            }
-        } catch (Throwable t) {
-            //ignore
-        }
-        if (hasAttributes) {
-            mv = cw.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null);
-            mv.visitCode();
-            Label l0 = helper.createLabel();
-            mv.visitLabel(l0);
-            mv.visitLineNumber(64, l0);
-            mv.visitTypeInsn(Opcodes.NEW, "javax/xml/namespace/QName");
-            mv.visitInsn(Opcodes.DUP);
-            mv.visitLdcInsn("http://schemas.xmlsoap.org/wsdl/");
-            mv.visitLdcInsn("required");
-            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "javax/xml/namespace/QName", "<init>",
-                  "(Ljava/lang/String;Ljava/lang/String;)V", false);
-            mv.visitFieldInsn(Opcodes.PUTSTATIC, className + "Extensibility", "WSDL_REQUIRED",
-                  "Ljavax/xml/namespace/QName;");
-            mv.visitInsn(Opcodes.RETURN);
-            mv.visitMaxs(4, 0);
-            mv.visitEnd();
-        } else {
-            fv = cw.visitField(Opcodes.ACC_PRIVATE, "required", "Ljava/lang/Boolean;", null, null);
-            fv.visitEnd();
-        }
-
-        mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
-        mv.visitCode();
-        Label l0 = helper.createLabel();
-        mv.visitLabel(l0);
-        mv.visitLineNumber(33, l0);
-        mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, className, "<init>", "()V", false);
-        Label l1 = helper.createLabel();
-        mv.visitLabel(l1);
-        mv.visitLineNumber(31, l1);
-        mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitTypeInsn(Opcodes.NEW, "javax/xml/namespace/QName");
-        mv.visitInsn(Opcodes.DUP);
-
-        mv.visitLdcInsn(qname.getNamespaceURI());
-        mv.visitLdcInsn(qname.getLocalPart());
-
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "javax/xml/namespace/QName",
-                           "<init>", "(Ljava/lang/String;Ljava/lang/String;)V", false);
-        mv.visitFieldInsn(Opcodes.PUTFIELD, className + "Extensibility",
-                          "qn", "Ljavax/xml/namespace/QName;");
-        Label l2 = helper.createLabel();
-        mv.visitLabel(l2);
-        mv.visitLineNumber(34, l2);
-        mv.visitInsn(Opcodes.RETURN);
-        Label l3 = helper.createLabel();
-        mv.visitLabel(l3);
-
-        mv.visitLocalVariable("this", "L" + className + "Extensibility;", null, l0, l3, 0);
-        mv.visitMaxs(5, 1);
-        mv.visitEnd();
-
-        mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "setElementType", "(Ljavax/xml/namespace/QName;)V", null, null);
-        mv.visitCode();
-        l0 = helper.createLabel();
-        mv.visitLabel(l0);
-        mv.visitLineNumber(37, l0);
-        mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitVarInsn(Opcodes.ALOAD, 1);
-        mv.visitFieldInsn(Opcodes.PUTFIELD, className + "Extensibility", "qn", "Ljavax/xml/namespace/QName;");
-        l1 = helper.createLabel();
-        mv.visitLabel(l1);
-        mv.visitLineNumber(38, l1);
-        mv.visitInsn(Opcodes.RETURN);
-        l2 = helper.createLabel();
-        mv.visitLabel(l2);
-        mv.visitLocalVariable("this", "L" + className + "Extensibility;", null, l0, l2, 0);
-        mv.visitLocalVariable("elementType", "Ljavax/xml/namespace/QName;", null, l0, l2, 1);
-        mv.visitMaxs(2, 2);
-        mv.visitEnd();
-
-        mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "getElementType", "()Ljavax/xml/namespace/QName;", null, null);
-        av0 = mv.visitAnnotation("Ljavax/xml/bind/annotation/XmlTransient;", true);
-        av0.visitEnd();
-        mv.visitCode();
-        l0 = helper.createLabel();
-        mv.visitLabel(l0);
-        mv.visitLineNumber(40, l0);
-        mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitFieldInsn(Opcodes.GETFIELD, className + "Extensibility", "qn", "Ljavax/xml/namespace/QName;");
-        mv.visitInsn(Opcodes.ARETURN);
-        l1 = helper.createLabel();
-        mv.visitLabel(l1);
-        mv.visitLocalVariable("this", "L" + className + "Extensibility;", null, l0, l1, 0);
-        mv.visitMaxs(1, 1);
-        mv.visitEnd();
-
-        if (hasAttributes) {
-            mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "getRequired", "()Ljava/lang/Boolean;", null, null);
-            mv.visitCode();
-            l0 = helper.createLabel();
-            mv.visitLabel(l0);
-            mv.visitLineNumber(66, l0);
-            mv.visitVarInsn(Opcodes.ALOAD, 0);
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, className + "Extensibility", "getOtherAttributes",
-                 "()Ljava/util/Map;", false);
-            mv.visitFieldInsn(Opcodes.GETSTATIC, className + "Extensibility", "WSDL_REQUIRED",
-                 "Ljavax/xml/namespace/QName;");
-            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/Map", "get",
-                 "(Ljava/lang/Object;)Ljava/lang/Object;", true);
-            mv.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/String");
-            mv.visitVarInsn(Opcodes.ASTORE, 1);
-            l1 = helper.createLabel();
-            mv.visitLabel(l1);
-            mv.visitLineNumber(67, l1);
-            mv.visitVarInsn(Opcodes.ALOAD, 1);
-            l2 = helper.createLabel();
-            mv.visitJumpInsn(Opcodes.IFNONNULL, l2);
-            mv.visitInsn(Opcodes.ACONST_NULL);
-            l3 = helper.createLabel();
-            mv.visitJumpInsn(Opcodes.GOTO, l3);
-            mv.visitLabel(l2);
-            mv.visitFrame(Opcodes.F_APPEND, 1, new Object[] {"java/lang/String"}, 0, null);
-            mv.visitVarInsn(Opcodes.ALOAD, 1);
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Boolean", "valueOf",
-                 "(Ljava/lang/String;)Ljava/lang/Boolean;", false);
-            mv.visitLabel(l3);
-            mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[] {"java/lang/Boolean"});
-            mv.visitInsn(Opcodes.ARETURN);
-            Label l4 = helper.createLabel();
-            mv.visitLabel(l4);
-            mv.visitLocalVariable("this", "L" + className + "Extensibility;", null, l0, l4, 0);
-            mv.visitLocalVariable("s", "Ljava/lang/String;", null, l1, l4, 1);
-            mv.visitMaxs(2, 2);
-            mv.visitEnd();
-
-
-
-            mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "setRequired", "(Ljava/lang/Boolean;)V", null, null);
-            mv.visitCode();
-            l0 = helper.createLabel();
-            mv.visitLabel(l0);
-            mv.visitLineNumber(76, l0);
-            mv.visitVarInsn(Opcodes.ALOAD, 1);
-            l1 = helper.createLabel();
-            mv.visitJumpInsn(Opcodes.IFNONNULL, l1);
-            l2 = helper.createLabel();
-            mv.visitLabel(l2);
-            mv.visitLineNumber(77, l2);
-            mv.visitVarInsn(Opcodes.ALOAD, 0);
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, className + "Extensibility", "getOtherAttributes",
-                 "()Ljava/util/Map;", false);
-            mv.visitFieldInsn(Opcodes.GETSTATIC, className + "Extensibility", "WSDL_REQUIRED",
-                 "Ljavax/xml/namespace/QName;");
-            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/Map", "remove",
-                 "(Ljava/lang/Object;)Ljava/lang/Object;", true);
-            mv.visitInsn(Opcodes.POP);
-            l3 = helper.createLabel();
-            mv.visitLabel(l3);
-            mv.visitLineNumber(78, l3);
-            l4 = helper.createLabel();
-            mv.visitJumpInsn(Opcodes.GOTO, l4);
-            mv.visitLabel(l1);
-            mv.visitLineNumber(79, l1);
-            mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            mv.visitVarInsn(Opcodes.ALOAD, 0);
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, className + "Extensibility", "getOtherAttributes", 
-                "()Ljava/util/Map;", false);
-            mv.visitFieldInsn(Opcodes.GETSTATIC, className + "Extensibility", "WSDL_REQUIRED",
-                 "Ljavax/xml/namespace/QName;");
-            mv.visitVarInsn(Opcodes.ALOAD, 1);
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Boolean", "toString", "()Ljava/lang/String;", false);
-            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/Map", "put",
-                 "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", true);
-            mv.visitInsn(Opcodes.POP);
-            mv.visitLabel(l4);
-            mv.visitLineNumber(81, l4);
-            mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            mv.visitInsn(Opcodes.RETURN);
-            Label l5 = helper.createLabel();
-            mv.visitLabel(l5);
-            mv.visitLocalVariable("this", "L" + className + "Extensibility;", null, l0, l5, 0);
-            mv.visitLocalVariable("b", "Ljava/lang/Boolean;", null, l0, l5, 1);
-            mv.visitMaxs(3, 2);
-            mv.visitEnd();
-        } else {
-            mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "getRequired", "()Ljava/lang/Boolean;", null, null);
-            mv.visitCode();
-            l0 = helper.createLabel();
-            mv.visitLabel(l0);
-            mv.visitLineNumber(68, l0);
-            mv.visitVarInsn(Opcodes.ALOAD, 0);
-            mv.visitFieldInsn(Opcodes.GETFIELD, className + "Extensibility", "required", "Ljava/lang/Boolean;");
-            mv.visitInsn(Opcodes.ARETURN);
-            l1 = helper.createLabel();
-            mv.visitLabel(l1);
-            mv.visitLocalVariable("this", "L" + className + "Extensibility;", null, l0, l1, 0);
-            mv.visitMaxs(1, 1);
-            mv.visitEnd();
-
-            mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "setRequired", "(Ljava/lang/Boolean;)V", null, null);
-            mv.visitCode();
-            l0 = helper.createLabel();
-            mv.visitLabel(l0);
-            mv.visitLineNumber(71, l0);
-            mv.visitVarInsn(Opcodes.ALOAD, 0);
-            mv.visitVarInsn(Opcodes.ALOAD, 1);
-            mv.visitFieldInsn(Opcodes.PUTFIELD, className + "Extensibility", "required", "Ljava/lang/Boolean;");
-            l1 = helper.createLabel();
-            mv.visitLabel(l1);
-            mv.visitLineNumber(72, l1);
-            mv.visitInsn(Opcodes.RETURN);
-            l2 = helper.createLabel();
-            mv.visitLabel(l2);
-            mv.visitLocalVariable("this", "L" + className + "Extensibility;", null, l0, l2, 0);
-            mv.visitLocalVariable("b", "Ljava/lang/Boolean;", null, l0, l2, 1);
-            mv.visitMaxs(2, 2);
-            mv.visitEnd();
-        }
-
-        cw.visitEnd();
-
-        byte[] bytes = cw.toByteArray();
-        return helper.loadClass(className + "Extensibility", loader, bytes);
-    }
 
 }

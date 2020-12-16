@@ -166,7 +166,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
 
     protected void setNamespaceMapper(Marshaller ms,
                                       Map<String, String> map) throws Exception {
-        Object nsMapper = JAXBUtils.setNamespaceMapper(map, ms);
+        Object nsMapper = JAXBUtils.setNamespaceMapper(getBus(), map, ms);
         if (nsMapper != null && namespaceMapperPropertyName != null) {
             setMarshallerProp(ms, nsMapper, namespaceMapperPropertyName, null);
         }
