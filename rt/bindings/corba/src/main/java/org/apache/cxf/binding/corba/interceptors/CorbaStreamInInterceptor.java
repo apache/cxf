@@ -87,6 +87,7 @@ public class CorbaStreamInInterceptor extends AbstractPhaseInterceptor<Message> 
         } else {
             destination = (CorbaDestination)msg.getExchange().getDestination();
         }
+
         service = destination.getBindingInfo().getService();
 
         CorbaMessage message = (CorbaMessage)msg;
@@ -298,7 +299,7 @@ public class CorbaStreamInInterceptor extends AbstractPhaseInterceptor<Message> 
                     CorbaHandlerUtils.initializeObjectHandler(orb, paramName, paramIdlType, map, service);
                 streamables[i] = corbaMsg.createStreamableObject(obj, paramName);
 
-                Any value = CorbaAnyHelper.createAny(orb);
+                Any value = CorbaAnyHelper.createAny(orb, corbaMsg.getExchange().getBus());
                 if ("in".equals(paramMode.value())) {
                     streamables[i].setMode(org.omg.CORBA.ARG_IN.value);
                     streamables[i].getObject().setIntoAny(value, streamables[i], false);

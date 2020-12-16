@@ -235,9 +235,12 @@ public class CorbaServerConduitTest {
         EasyMock.expect(exchange.get(ServerRequest.class)).andReturn(request);
 
         EasyMock.expect(exchange.isOneWay()).andReturn(false);
+
         CorbaMessage inMsg = EasyMock.createMock(CorbaMessage.class);
         EasyMock.expect(msg.getExchange()).andReturn(exchange);
         EasyMock.expect(exchange.getInMessage()).andReturn(inMsg);
+        EasyMock.expect(exchange.getBus()).andReturn(bus);
+
 
         EasyMock.expect(inMsg.getList()).andReturn(list);
         QName objName = new QName("object");
@@ -274,6 +277,7 @@ public class CorbaServerConduitTest {
         CorbaMessage msg = control.createMock(CorbaMessage.class);
         Exchange exchange = control.createMock(Exchange.class);
         ServerRequest request = control.createMock(ServerRequest.class);
+        EasyMock.expect(exchange.getBus()).andReturn(bus);
 
         EasyMock.expect(msg.getExchange()).andReturn(exchange);
         EasyMock.expect(exchange.get(ServerRequest.class)).andReturn(request);

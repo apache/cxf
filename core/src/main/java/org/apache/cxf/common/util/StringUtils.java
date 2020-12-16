@@ -160,4 +160,18 @@ public final class StringUtils {
         sb.append(HEX[(0xF0 & b) >> 4]);
         sb.append(HEX[0x0F & b]);
     }
+
+    public static String periodToSlashes(String s) {
+        char[] ch = s.toCharArray();
+        for (int x = 0; x < ch.length; x++) {
+            if (ch[x] == '.') {
+                ch[x] = '/';
+            }
+        }
+        return new String(ch);
+    }
+    public static String slashesToPeriod(String s) {
+        return s.replace('/', '.');
+    }
+
 }
