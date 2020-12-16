@@ -33,7 +33,10 @@ import org.apache.cxf.wsdl.WSDLManager;
 @NoJSR250Annotations
 public final class AddressingWSDLExtensionLoader implements WSDLExtensionLoader {
 
+    private final Bus bus;
+
     public AddressingWSDLExtensionLoader(Bus b) {
+        this.bus = b;
         WSDLManager manager = b.getExtension(WSDLManager.class);
 
         createExtensor(manager, javax.wsdl.Binding.class,
@@ -43,7 +46,7 @@ public final class AddressingWSDLExtensionLoader implements WSDLExtensionLoader 
                                 Class<?> parentType,
                                 Class<?> elementType) {
         try {
-            JAXBExtensionHelper.addExtensions(manager.getExtensionRegistry(),
+            JAXBExtensionHelper.addExtensions(bus, manager.getExtensionRegistry(),
                                               parentType,
                                               elementType, null,
                                               this.getClass().getClassLoader());

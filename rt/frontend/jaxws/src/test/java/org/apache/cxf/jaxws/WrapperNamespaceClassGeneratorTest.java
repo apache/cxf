@@ -21,14 +21,23 @@ package org.apache.cxf.jaxws;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.spi.GeneratedClassClassLoader;
+import org.apache.cxf.common.spi.GeneratedClassClassLoaderCapture;
 import org.apache.cxf.databinding.WrapperHelper;
 import org.apache.cxf.jaxb.JAXBDataBinding;
+import org.apache.cxf.jaxb.JAXBWrapperHelper;
+import org.apache.cxf.jaxb.WrapperHelperClassLoader;
+import org.apache.cxf.jaxb.WrapperHelperCreator;
+import org.apache.cxf.jaxws.service.AddNumbers2Impl;
 import org.apache.cxf.jaxws.service.AddNumbersImpl;
 import org.apache.cxf.jaxws.support.JaxWsImplementorInfo;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
@@ -39,9 +48,10 @@ import org.apache.cxf.service.model.ServiceInfo;
 
 import org.junit.After;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class WrapperClassGeneratorTest {
+public class WrapperNamespaceClassGeneratorTest {
 
     @After
     public void tearDown() {
@@ -119,5 +129,60 @@ public class WrapperClassGeneratorTest {
         assertTrue("The generated response wrapper class is not correct", bout.toString().contains(expected));
 
     }
+    public static class Capture implements GeneratedClassClassLoaderCapture {
+        private final Map<String, byte[]> sources;
+        public Capture() {
+            sources = new HashMap<>();
+        }
+        public void capture(String className, byte[] bytes) {
+            sources.put(className, bytes);
+        }
 
+        public void restore(GeneratedClassClassLoader.TypeHelperClassLoader cl) {
+            for  (Map.Entry<String, byte[]> cls : sources.entrySet()) {
+                cl.defineClass(cls.getKey(), cls.getValue());
+            }
+        }
+    }
+
+    @org.junit.Test
+    public void testGeneratedFirst() throws Exception {
+        JaxWsImplementorInfo implInfo =
+                new JaxWsImplementorInfo(AddNumbers2Impl.class);
+        JaxWsServiceFactoryBean jaxwsFac = new JaxWsServiceFactoryBean(implInfo);
+        Bus bus = BusFactory.getDefaultBus();
+        jaxwsFac.setBus(bus);
+        Capture c = new Capture();
+        bus.setExtension(c, GeneratedClassClassLoaderCapture.class);
+        Service service = jaxwsFac.create();
+
+
+        ServiceInfo serviceInfo = service.getServiceInfos().get(0);
+
+        InterfaceInfo interfaceInfo = serviceInfo.getInterface();
+        OperationInfo inf = interfaceInfo.getOperations().iterator().next();
+        Class<?> requestClass = inf.getInput().getMessagePart(0).getTypeClass();
+
+        // Create request wrapper Object
+        List<String> partNames = Arrays.asList(new String[] {"arg0"});
+        List<String> elTypeNames = Arrays.asList(new String[] {"list"});
+        List<Class<?>> partClasses = Arrays.asList(new Class<?>[] {List.class});
+
+        // generate class and store it to class loader
+        WrapperHelper wh = new JAXBDataBinding().createWrapperHelper(requestClass, null,
+                partNames, elTypeNames, partClasses);
+
+        // now no more generation is allowed
+        WrapperHelperClassLoader wrapperHelperClassLoader = new WrapperHelperClassLoader(bus);
+
+        GeneratedClassClassLoader.TypeHelperClassLoader cl = wrapperHelperClassLoader.getClassLoader();
+        c.restore(cl);
+
+        bus.setExtension(wrapperHelperClassLoader, WrapperHelperCreator.class);
+
+        wh = new JAXBDataBinding().createWrapperHelper(requestClass, null,
+                partNames, elTypeNames, partClasses);
+
+        assertFalse("Precompiled class not loaded", wh instanceof JAXBWrapperHelper);
+    }
 }

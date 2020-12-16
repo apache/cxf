@@ -22,7 +22,7 @@ package org.apache.cxf.systest.jaxws;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
@@ -99,6 +99,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
+        createStaticBus();
         assertTrue("server did not launch correctly", launchServer(ServerMisc.class, true));
     }
 
@@ -419,9 +420,11 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
     }
 
     private void setASM(boolean b) throws Exception {
-        Field f = ASMHelper.class.getDeclaredField("badASM");
-        ReflectionUtil.setAccessible(f);
-        f.set(null, !b);
+
+        ASMHelper helper = getBus().getExtension(ASMHelper.class);
+        Method m = helper.getClass().getMethod("setBadASM", Boolean.TYPE);
+        ReflectionUtil.setAccessible(m);
+        m.invoke(helper, !b);
     }
 
     @Test
@@ -608,7 +611,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         assertEquals(3, ints.length);
         assertEquals(1, ints[0]);
 
-        if (new ASMHelper().createClassWriter() != null) {
+        if (getBus().getExtension(ASMHelper.class).createClassWriter() != null) {
             //doing the type adapter things and such really
             //requires the ASM generated helper classes
             assertEquals("Val", port.createBar("Val").getName());

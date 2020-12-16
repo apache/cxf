@@ -77,7 +77,8 @@ public class TestBase {
         Bus bus = BusFactory.getDefaultBus();
 
         WSDLManagerImpl manager = new WSDLManagerImpl();
-        XMLWSDLExtensionLoader.registerExtensors(manager);
+        XMLWSDLExtensionLoader loader = new XMLWSDLExtensionLoader(bus);
+        loader.registerExtensors(manager);
 
         assertNotNull(bus.getExtension(WSDLManager.class));
 

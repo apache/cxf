@@ -37,9 +37,13 @@ import javax.xml.namespace.QName;
 
 import org.xml.sax.InputSource;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.abc.test.AnotherPolicyType;
 import org.apache.cxf.abc.test.NewServiceType;
 import org.apache.cxf.abc.test.TestPolicyType;
+import org.apache.cxf.bus.extension.ExtensionManagerBus;
+import org.apache.cxf.common.util.ASMHelper;
+import org.apache.cxf.common.util.ASMHelperImpl;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -58,6 +62,8 @@ public class JAXBExtensionHelperTest {
 
     private ExtensionRegistry registry;
 
+    private Bus bus;
+
     @Before
     public void setUp() throws Exception {
 
@@ -68,19 +74,24 @@ public class JAXBExtensionHelperTest {
         if (registry == null) {
             registry = wsdlFactory.newPopulatedExtensionRegistry();
         }
+        bus = new ExtensionManagerBus();
+        bus.setExtension(new ASMHelperImpl(), ASMHelper.class);
+        ExtensionClassCreator extr = new ExtensionClassGenerator(bus);
+        bus.setExtension(extr, ExtensionClassCreator.class);
     }
 
     @Test
     public void testAddTestExtension() throws Exception {
 
-        JAXBExtensionHelper.addExtensions(registry, "javax.wsdl.Port",
-                        "org.apache.cxf.abc.test.TestPolicyType");
 
-        JAXBExtensionHelper.addExtensions(registry, "javax.wsdl.Port",
-                        "org.apache.cxf.abc.test.AnotherPolicyType");
+        JAXBExtensionHelper.addExtensions(bus, registry, "javax.wsdl.Port",
+                "org.apache.cxf.abc.test.TestPolicyType");
 
-        JAXBExtensionHelper.addExtensions(registry, "javax.wsdl.Definition",
-                        "org.apache.cxf.abc.test.NewServiceType");
+        JAXBExtensionHelper.addExtensions(bus, registry, "javax.wsdl.Port",
+                "org.apache.cxf.abc.test.AnotherPolicyType");
+
+        JAXBExtensionHelper.addExtensions(bus, registry, "javax.wsdl.Definition",
+                "org.apache.cxf.abc.test.NewServiceType");
 
         String file = this.getClass().getResource("/wsdl/test_ext.wsdl").toURI().toString();
 
@@ -92,8 +103,8 @@ public class JAXBExtensionHelperTest {
 
     @Test
     public void testPrettyPrintXMLStreamWriter() throws Exception {
-        JAXBExtensionHelper.addExtensions(registry, "javax.wsdl.Definition",
-                        "org.apache.cxf.abc.test.NewServiceType");
+        JAXBExtensionHelper.addExtensions(bus, registry, "javax.wsdl.Definition",
+                "org.apache.cxf.abc.test.NewServiceType");
 
         String file = this.getClass().getResource("/wsdl/test_ext.wsdl").toURI().toString();
 
@@ -114,13 +125,13 @@ public class JAXBExtensionHelperTest {
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
-        JAXBExtensionHelper helper = new JAXBExtensionHelper(NewServiceType.class, null);
+        JAXBExtensionHelper helper = new JAXBExtensionHelper(bus, NewServiceType.class, null);
         helper.marshall(javax.wsdl.Definition.class,
-                        new QName("http://cxf.apache.org/test/hello_world", "newService"),
-                        newService,
-                        new PrintWriter(stream),
-                        wsdlDefinition,
-                        registry);
+                new QName("http://cxf.apache.org/test/hello_world", "newService"),
+                newService,
+                new PrintWriter(stream),
+                wsdlDefinition,
+                registry);
         BufferedReader reader = new BufferedReader(new StringReader(new String(stream.toByteArray())));
         String actual = reader.readLine();
         int spaces = 0;
@@ -139,17 +150,17 @@ public class JAXBExtensionHelperTest {
 
     @Test
     public void testMappedNamespace() throws Exception {
-        JAXBExtensionHelper.addExtensions(registry, javax.wsdl.Port.class,
-            org.apache.cxf.abc.test.TestPolicyType.class,
-            "http://cxf.apache.org/abc/test/remapped");
+        JAXBExtensionHelper.addExtensions(bus, registry, javax.wsdl.Port.class,
+                org.apache.cxf.abc.test.TestPolicyType.class,
+                "http://cxf.apache.org/abc/test/remapped");
 
-        JAXBExtensionHelper.addExtensions(registry, javax.wsdl.Port.class,
-            org.apache.cxf.abc.test.AnotherPolicyType.class,
-            "http://cxf.apache.org/abc/test/remapped");
+        JAXBExtensionHelper.addExtensions(bus, registry, javax.wsdl.Port.class,
+                org.apache.cxf.abc.test.AnotherPolicyType.class,
+                "http://cxf.apache.org/abc/test/remapped");
 
-        JAXBExtensionHelper.addExtensions(registry, javax.wsdl.Definition.class,
-            org.apache.cxf.abc.test.NewServiceType.class,
-            "http://cxf.apache.org/abc/test/remapped");
+        JAXBExtensionHelper.addExtensions(bus, registry, javax.wsdl.Definition.class,
+                org.apache.cxf.abc.test.NewServiceType.class,
+                "http://cxf.apache.org/abc/test/remapped");
 
         String file = this.getClass().getResource("/wsdl/test_ext_remapped.wsdl").toURI().toString();
         wsdlReader.setExtensionRegistry(registry);
@@ -159,13 +170,13 @@ public class JAXBExtensionHelperTest {
         StringWriter out = new StringWriter();
         wsdlFactory.newWSDLWriter().writeWSDL(wsdlDefinition, out);
         wsdlDefinition = wsdlReader.readWSDL(null,
-                                             new InputSource(new StringReader(out.toString())));
+                new InputSource(new StringReader(out.toString())));
         checkTestExt();
     }
 
     private void checkTestExt() throws Exception {
         Service s = wsdlDefinition.getService(new QName("http://cxf.apache.org/test/hello_world",
-            "HelloWorldService"));
+                "HelloWorldService"));
         Port p = s.getPort("HelloWorldPort");
         List<?> extPortList = p.getExtensibilityElements();
 
@@ -177,7 +188,7 @@ public class JAXBExtensionHelperTest {
             } else if (ext instanceof AnotherPolicyType) {
                 ap = (AnotherPolicyType) ext;
             } else if (ext instanceof UnknownExtensibilityElement) {
-                UnknownExtensibilityElement e = (UnknownExtensibilityElement)ext;
+                UnknownExtensibilityElement e = (UnknownExtensibilityElement) ext;
                 System.out.println(e.getElementType());
             }
         }
@@ -187,7 +198,7 @@ public class JAXBExtensionHelperTest {
         assertEquals("Unexpected value for TestPolicyType intAttr", 30, tp.getIntAttr());
         assertEquals("Unexpected value for TestPolicyType stringAttr", "hello", tp.getStringAttr());
         assertTrue("Unexpected value for AnotherPolicyType floatAttr",
-                   Math.abs(0.1F - ap.getFloatAttr()) < 0.5E-5);
+                Math.abs(0.1F - ap.getFloatAttr()) < 0.5E-5);
     }
 
     private void checkSpaces(String actual, int spaces) {
@@ -196,7 +207,7 @@ public class JAXBExtensionHelperTest {
             space += " ";
         }
         assertTrue("Indentation level not proper when marshalling a extension element;" + actual,
-                   actual.startsWith(space));
+                actual.startsWith(space));
     }
 
 }
