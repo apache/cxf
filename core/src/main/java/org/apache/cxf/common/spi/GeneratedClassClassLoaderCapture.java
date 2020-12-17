@@ -26,7 +26,7 @@ package org.apache.cxf.common.spi;
  *  bus.setExtension(new WrapperHelperClassLoader(bus), WrapperHelperCreator.class);
  *  bus.setExtension(new ExtensionClassLoader(bus), ExtensionClassCreator.class);
  *  bus.setExtension(new ExceptionClassLoader(bus), ExceptionClassCreator.class);
- *  bus.setExtension(new GeneratedWrapperClassLoader(bus), WrapperClassCreator.class);
+ *  bus.setExtension(new WrapperHelperClassLoader(bus), WrapperClassCreator.class);
  *  bus.setExtension(new FactoryClassLoader(bus), FactoryClassCreator.class);
  *  bus.setExtension(new GeneratedNamespaceClassLoader(bus), NamespaceClassCreator.class);
  * @author olivier dufour
