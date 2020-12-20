@@ -30,9 +30,11 @@ import org.apache.cxf.Bus;
  * @author olivier dufour
  */
 public class GeneratedNamespaceClassLoader extends GeneratedClassClassLoader implements NamespaceClassCreator {
-    GeneratedNamespaceClassLoader(Bus bus) {
+    public GeneratedNamespaceClassLoader(Bus bus) {
         super(bus);
     }
+    
+    @Override
     public synchronized Class<?> createNamespaceWrapperClass(Class<?> mcls, Map<String, String> map) {
         String postFix = "";
 
@@ -44,8 +46,7 @@ public class GeneratedNamespaceClassLoader extends GeneratedClassClassLoader imp
         } else if (mcls.getName().contains("com.sun")) {
             postFix = "RI";
         }
+
         return findClass("org.apache.cxf.jaxb.NamespaceMapper" + postFix, NamespaceClassCreator.class);
-
-
     }
 }
