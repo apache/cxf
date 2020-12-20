@@ -32,7 +32,7 @@ import org.apache.cxf.common.util.StringUtils;
  * @author olivier dufour
  */
 public class GeneratedClassClassLoader {
-    private static final Logger LOG = LogUtils.getL7dLogger(ClassLoaderProxyService.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(GeneratedClassClassLoader.class);
     protected final Bus bus;
 
     public GeneratedClassClassLoader(Bus bus) {
