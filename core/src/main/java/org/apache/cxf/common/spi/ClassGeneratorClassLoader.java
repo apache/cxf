@@ -104,11 +104,12 @@ public class ClassGeneratorClassLoader {
     }
 
     public static class TypeHelperClassLoader extends ClassLoader {
-        ConcurrentHashMap<String, Class<?>> defined = new ConcurrentHashMap<>();
+        private final ConcurrentHashMap<String, Class<?>> defined = new ConcurrentHashMap<>();
 
         TypeHelperClassLoader(ClassLoader parent) {
             super(parent);
         }
+        
         public Class<?> lookupDefinedClass(String name) {
             return defined.get(StringUtils.slashesToPeriod(name));
         }
