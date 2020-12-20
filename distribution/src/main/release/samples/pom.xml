@@ -145,6 +145,9 @@
         <module>wsdl_first_soap12</module>
         <module>wsdl_first_xml_wrapped</module>
         <module>jax_rs/description_openapi_microprofile_spring</module>
+        <module>jaxws_graalvm</module>
+        <module>jaxws_graalvm_dynamic/client</module>
+        <module>jaxws_graalvm_dynamic/server</module>
     </modules>
     <dependencyManagement>
         <dependencies>
