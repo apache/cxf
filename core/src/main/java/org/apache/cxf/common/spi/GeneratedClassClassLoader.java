@@ -69,7 +69,7 @@ public class GeneratedClassClassLoader {
     }
 
     public static class TypeHelperClassLoader extends ClassLoader {
-        ConcurrentHashMap<String, Class<?>> defined = new ConcurrentHashMap<>();
+        private final ConcurrentHashMap<String, Class<?>> defined = new ConcurrentHashMap<>();
 
         TypeHelperClassLoader(ClassLoader parent) {
             super(parent);
