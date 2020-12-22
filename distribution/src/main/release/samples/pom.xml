@@ -31,7 +31,7 @@
         <maven.deploy.skip>true</maven.deploy.skip>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.boot.version>2.4.0</spring.boot.version>
-        <spring.cloud.eureka.version>3.0.0-RC1</spring.cloud.eureka.version>
+        <spring.cloud.eureka.version>3.0.0</spring.cloud.eureka.version>
         <cxf.jetty9.version>9.4.34.v20201102</cxf.jetty9.version>
         <cxf.httpcomponents.client.version>4.5.13</cxf.httpcomponents.client.version>
         <cxf.swagger.ui.version>3.32.1</cxf.swagger.ui.version>
