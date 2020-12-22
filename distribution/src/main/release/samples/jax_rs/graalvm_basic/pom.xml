@@ -19,44 +19,19 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>jaxws_graalvm</artifactId>
-    <name>JAX-WS GraalVM Demo</name>
-    <description>JAX-WS GraalVM Demo</description>
+    <artifactId>jax_rs_graalvm_basic</artifactId>
+    <name>JAX-RS Basic Demo</name>
+    <description>JAX-RS Basic Demo</description>
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>3.3.9-SNAPSHOT</version>
+        <version>3.5.0-SNAPSHOT</version>
+        <relativePath>../..</relativePath>
     </parent>
-    <properties>
+     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <wsdl.file>${basedir}/src/main/resources/addNumbers.wsdl</wsdl.file>
         <graalvm.version>20.3.0</graalvm.version>
     </properties>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-codegen-plugin</artifactId>
-                <version>${project.version}</version>
-                <executions>
-                    <execution>
-                        <id>generate-SOAPService1</id>
-                        <phase>generate-sources</phase>
-                        <configuration>
-                            <wsdlOptions>
-                                <wsdlOption>
-                                    <wsdl>${wsdl.file}</wsdl>
-                                </wsdlOption>
-                            </wsdlOptions>
-                        </configuration>
-                        <goals>
-                            <goal>wsdl2java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
     <profiles>
         <profile>
             <id>server</id>
@@ -79,7 +54,7 @@
                                     <goal>copy-resources</goal>
                                 </goals>
                                 <configuration>
-                                    <outputDirectory>${project.build.outputDirectory}/META-INF/native-image/org.apache.cxf.samples/jaxws_graalvm</outputDirectory>
+                                    <outputDirectory>${project.build.outputDirectory}/META-INF/native-image/org.apache.cxf.samples/jax_rs_graalvm_basic</outputDirectory>
                                     <resources>
                                         <resource>
                                             <directory>src/graalvm/server</directory>
@@ -103,8 +78,8 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <mainClass>demo.jaxws.server.Server</mainClass>
-                            <imageName>jaxws-demo-server</imageName>
+                            <mainClass>demo.jaxrs.server.Server</mainClass>
+                            <imageName>jaxrs-demo-server</imageName>
                             <buildArgs>--no-fallback</buildArgs>
                             <outputDirectory>${basedir}/bin</outputDirectory>
                         </configuration>
@@ -118,6 +93,10 @@
                 <dependency>
                     <groupId>org.apache.cxf</groupId>
                     <artifactId>cxf-rt-transports-http-netty-client</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.cxf</groupId>
+                    <artifactId>cxf-rt-rs-client</artifactId>
                 </dependency>
             </dependencies>
             <build>
@@ -133,7 +112,7 @@
                                     <goal>copy-resources</goal>
                                 </goals>
                                 <configuration>
-                                    <outputDirectory>${project.build.outputDirectory}/META-INF/native-image/org.apache.cxf.samples/jaxws_graalvm</outputDirectory>
+                                    <outputDirectory>${project.build.outputDirectory}/META-INF/native-image/org.apache.cxf.samples/jax_rs_graalvm_basic</outputDirectory>
                                     <resources>
                                         <resource>
                                             <directory>src/graalvm/client</directory>
@@ -157,8 +136,8 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <mainClass>demo.jaxws.client.Client</mainClass>
-                            <imageName>jaxws-demo-client</imageName>
+                            <mainClass>demo.jaxrs.client.Client</mainClass>
+                            <imageName>jaxrs-demo-client</imageName>
                             <buildArgs>--no-fallback</buildArgs>
                             <outputDirectory>${basedir}/bin</outputDirectory>
                         </configuration>
@@ -167,15 +146,18 @@
             </build>
         </profile>
     </profiles>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-frontend-jaxws</artifactId>
+            <artifactId>cxf-rt-transports-http</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-http</artifactId>
+            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
         </dependency>
     </dependencies>
 </project>
