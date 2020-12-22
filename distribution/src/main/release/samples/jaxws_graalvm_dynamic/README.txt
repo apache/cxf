@@ -38,7 +38,7 @@ Than build the client in capturing mode (please note that the server has to be u
 
 Than build the client:
   
-  mvn -f client -Pclient (from a second command line window)
+  mvn clean package -f client -Pclient (from a second command line window)
 
 This goal will produce 'client/target/jaxws-demo-client' executable (platform-dependent) 
 which could be run right away: 
