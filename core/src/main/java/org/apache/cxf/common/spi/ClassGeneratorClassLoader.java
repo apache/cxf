@@ -80,7 +80,8 @@ public class ClassGeneratorClassLoader {
     protected Class<?> findClass(String className, ClassLoader classLoader) {
         return getOrCreateLoader(classLoader).lookupDefinedClass(className);
     }
-    private synchronized TypeHelperClassLoader getOrCreateLoader(Class<?> cls) {
+    
+    private static synchronized TypeHelperClassLoader getOrCreateLoader(Class<?> cls) {
         WeakReference<TypeHelperClassLoader> ref = CLASS_MAP.get(cls);
         TypeHelperClassLoader ret;
         if (ref == null || ref.get() == null) {
@@ -91,7 +92,8 @@ public class ClassGeneratorClassLoader {
         }
         return ret;
     }
-    private synchronized TypeHelperClassLoader getOrCreateLoader(ClassLoader l) {
+    
+    private static synchronized TypeHelperClassLoader getOrCreateLoader(ClassLoader l) {
         WeakReference<TypeHelperClassLoader> ref = LOADER_MAP.get(l);
         TypeHelperClassLoader ret;
         if (ref == null || ref.get() == null) {
