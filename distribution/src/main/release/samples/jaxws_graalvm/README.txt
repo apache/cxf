@@ -19,29 +19,25 @@ Building and running the demo using Maven
 From the base directory of this sample (i.e., where this README file is
 located), the pom.xml file is used to build and run the demo. 
 
-Using either UNIX or Windows:
+Using either UNIX or Windows, build server:
   
-  mvn clean
-
-Than build server:  
-  
-  mvn package -Pserver  (from one command line window)
+  mvn clean package -Pserver  (from one command line window)
   
 This goal will produce 'target/jaxws-demo-server' executable (platform-dependent) 
 which could be run right away: 
 
-  On Windows: target\jaxws-demo-server.exe
-  On Linux: ./target/jaxws-demo-server
+  On Windows: bin\jaxws-demo-server.exe
+  On Linux: ./bin/jaxws-demo-server
 
 Than build client:
   
-  mvn package -Pclient  (from a second command line window)
+  mvn clean package -Pclient  (from a second command line window)
 
 This goal will produce 'target/jaxws-demo-client' executable (platform-dependent) 
 which could be run right away: 
 
-  On Windows: target\jaxws-demo-client.exe src\main\resources\addNumbers.wsdl
-  On Linux: ./target/jaxws-demo-client src/main/resources/addNumbers.wsdl
+  On Windows: bin\jaxws-demo-client.exe src\main\resources\addNumbers.wsdl
+  On Linux: ./bin/jaxws-demo-client src/main/resources/addNumbers.wsdl
 
 The command should produce the following output (assuming the server is up and running):
 

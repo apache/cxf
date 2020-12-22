@@ -148,6 +148,7 @@
         <module>jaxws_graalvm</module>
         <module>jaxws_graalvm_dynamic/client</module>
         <module>jaxws_graalvm_dynamic/server</module>
+        <module>jax_rs/graalvm_basic</module>
     </modules>
     <dependencyManagement>
         <dependencies>
