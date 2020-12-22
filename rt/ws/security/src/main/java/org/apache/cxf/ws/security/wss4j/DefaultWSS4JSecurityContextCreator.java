@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.security.auth.Subject;
-import javax.security.auth.kerberos.KerberosPrincipal;
+import jakarta.security.auth.Subject;
+import jakarta.security.auth.kerberos.KerberosPrincipal;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.interceptor.security.DefaultSecurityContext;

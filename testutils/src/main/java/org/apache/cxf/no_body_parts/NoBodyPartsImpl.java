@@ -22,7 +22,7 @@ package org.apache.cxf.no_body_parts;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 import javax.xml.ws.Holder;
 import javax.xml.ws.WebServiceException;
 

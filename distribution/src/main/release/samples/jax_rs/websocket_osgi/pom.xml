@@ -43,11 +43,11 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.${project.artifactId};blueprint.aries.xml-validation:=false</Bundle-SymbolicName>
                         <Import-Package>
-                            javax.servlet;version="[2.6,4)",
-                            javax.servlet.http;version="[2.6,4)",
-                            javax.ws.rs,
-                            javax.ws.rs.core,
-                            javax.xml.bind*;version=!,
+                            jakarta.servlet;version="[2.6,4)",
+                            jakarta.servlet.http;version="[2.6,4)",
+                            jakarta.ws.rs,
+                            jakarta.ws.rs.core,
+                            jakarta.xml.bind*;version=!,
                             org.apache.cxf.jaxrs.provider,
                             org.osgi.service.blueprint,
                             *

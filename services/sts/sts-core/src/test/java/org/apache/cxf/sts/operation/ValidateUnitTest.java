@@ -21,7 +21,7 @@ package org.apache.cxf.sts.operation;
 import java.util.Collections;
 import java.util.List;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.jaxws.context.WrappedMessageContext;

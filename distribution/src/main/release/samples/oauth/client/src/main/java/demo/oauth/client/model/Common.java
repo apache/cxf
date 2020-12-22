@@ -18,8 +18,8 @@
  */
 package demo.oauth.client.model;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 
 public final class Common {
     private Common() {

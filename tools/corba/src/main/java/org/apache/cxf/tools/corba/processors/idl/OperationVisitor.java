@@ -19,22 +19,22 @@
 
 package org.apache.cxf.tools.corba.processors.idl;
 
-import javax.wsdl.Binding;
-import javax.wsdl.BindingFault;
-import javax.wsdl.BindingInput;
-import javax.wsdl.BindingOperation;
-import javax.wsdl.BindingOutput;
-import javax.wsdl.Definition;
-import javax.wsdl.Fault;
-import javax.wsdl.Input;
-import javax.wsdl.Message;
-import javax.wsdl.Operation;
-import javax.wsdl.Output;
-import javax.wsdl.Part;
-import javax.wsdl.PortType;
-import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.ExtensionRegistry;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.BindingFault;
+import jakarta.wsdl.BindingInput;
+import jakarta.wsdl.BindingOperation;
+import jakarta.wsdl.BindingOutput;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Fault;
+import jakarta.wsdl.Input;
+import jakarta.wsdl.Message;
+import jakarta.wsdl.Operation;
+import jakarta.wsdl.Output;
+import jakarta.wsdl.Part;
+import jakarta.wsdl.PortType;
+import jakarta.wsdl.WSDLException;
+import jakarta.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.extensions.ExtensionRegistry;
 import javax.xml.namespace.QName;
 
 import antlr.collections.AST;

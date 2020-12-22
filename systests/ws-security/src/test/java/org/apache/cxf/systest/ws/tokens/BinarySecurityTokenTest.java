@@ -23,8 +23,8 @@ import java.net.URL;
 import java.util.UUID;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Service;
+import jakarta..BindingProvider;
+import jakarta..Service;
 
 import org.w3c.dom.Document;
 

@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.systest.ws.addr_responses;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
 
 @SOAPBinding(use = SOAPBinding.Use.LITERAL)
 @WebService(name = "Hello", targetNamespace = "http://cxf.apache.org/systest/wsa/responses")

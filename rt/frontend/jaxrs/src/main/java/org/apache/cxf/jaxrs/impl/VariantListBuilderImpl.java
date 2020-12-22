@@ -25,9 +25,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Variant;
-import javax.ws.rs.core.Variant.VariantListBuilder;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Variant;
+import jakarta.ws.rs.core.Variant.VariantListBuilder;
 
 public class VariantListBuilderImpl extends VariantListBuilder {
 

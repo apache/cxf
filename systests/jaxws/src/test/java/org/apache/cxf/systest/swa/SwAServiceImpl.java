@@ -22,12 +22,12 @@ import java.awt.Image;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.activation.DataHandler;
-import javax.jws.WebService;
+import jakarta.xml.bind.DataHandler;
+import jakarta.jws.WebService;
 import javax.mail.util.ByteArrayDataSource;
 import javax.xml.transform.Source;
-import javax.xml.ws.Holder;
-import javax.xml.ws.WebServiceException;
+import jakarta.xml.ws.Holder;
+import jakarta.xml.ws.WebServiceException;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.swa.SwAServiceInterface;

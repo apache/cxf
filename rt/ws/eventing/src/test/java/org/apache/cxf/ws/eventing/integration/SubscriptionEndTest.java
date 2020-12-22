@@ -23,7 +23,7 @@ package org.apache.cxf.ws.eventing.integration;
 import java.io.IOException;
 import java.util.UUID;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;

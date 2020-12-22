@@ -21,8 +21,8 @@ package org.apache.cxf.binding.soap.wsdl11;
 
 import java.util.Map;
 
-import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.WSDLException;
+import jakarta.wsdl.extensions.ExtensibilityElement;
 
 import org.apache.cxf.binding.soap.SOAPBindingUtil;
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapAddress;

@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.security.auth.callback.CallbackHandler;
-import javax.wsdl.Definition;
+import jakarta.security.auth.callback.CallbackHandler;
+import jakarta.wsdl.Definition;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;

@@ -24,12 +24,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.wsdl.Binding;
-import javax.wsdl.Definition;
-import javax.wsdl.PortType;
-import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.ExtensionRegistry;
-import javax.wsdl.factory.WSDLFactory;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.PortType;
+import jakarta.wsdl.WSDLException;
+import jakarta.wsdl.extensions.ExtensionRegistry;
+import jakarta.wsdl.factory.WSDLFactory;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
@@ -126,7 +126,7 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
                 }
             }
         } else {
-            javax.wsdl.Service wsdlService = definition.getService(serviceName);
+            jakarta.wsdl.Service wsdlService = definition.getService(serviceName);
             if (wsdlService == null) {
                 if ((!PartialWSDLProcessor.isServiceExisted(definition, serviceName))
                     && (!PartialWSDLProcessor.isBindingExisted(definition, serviceName))

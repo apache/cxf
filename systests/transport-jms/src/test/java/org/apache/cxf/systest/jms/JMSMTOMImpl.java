@@ -21,9 +21,9 @@ package org.apache.cxf.systest.jms;
 import java.io.IOException;
 import java.net.URL;
 
-import javax.activation.DataHandler;
-import javax.jws.WebService;
-import javax.xml.ws.Holder;
+import jakarta.xml.bind.DataHandler;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Holder;
 
 import org.apache.cxf.jms_mtom.JMSMTOMPortType;
 

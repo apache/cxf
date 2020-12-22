@@ -26,10 +26,10 @@ import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.wsdl.Definition;
-import javax.wsdl.Service;
-import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLReader;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Service;
+import jakarta.wsdl.factory.WSDLFactory;
+import jakarta.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -115,7 +115,7 @@ public class TestBase {
 
     protected ServiceInfo getMockedServiceModel(String wsdlUrl) throws Exception {
         WSDLReader wsdlReader = WSDLFactory.newInstance().newWSDLReader();
-        wsdlReader.setFeature("javax.wsdl.verbose", false);
+        wsdlReader.setFeature("jakarta.wsdl.verbose", false);
         Definition def = wsdlReader.readWSDL(wsdlUrl);
 
         IMocksControl control = EasyMock.createNiceControl();

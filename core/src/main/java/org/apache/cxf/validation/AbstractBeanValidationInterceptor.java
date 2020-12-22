@@ -21,7 +21,7 @@ package org.apache.cxf.validation;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 
 import org.apache.cxf.message.Message;
 

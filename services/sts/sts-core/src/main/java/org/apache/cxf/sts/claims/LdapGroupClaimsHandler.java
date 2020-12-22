@@ -30,8 +30,8 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.naming.Name;
-import javax.security.auth.kerberos.KerberosPrincipal;
-import javax.security.auth.x500.X500Principal;
+import jakarta.security.auth.kerberos.KerberosPrincipal;
+import jakarta.security.auth.x500.X500Principal;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rt.security.claims.Claim;

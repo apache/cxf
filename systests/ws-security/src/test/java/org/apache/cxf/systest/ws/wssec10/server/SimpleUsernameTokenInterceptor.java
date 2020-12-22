@@ -20,7 +20,7 @@ package org.apache.cxf.systest.ws.wssec10.server;
 
 import java.security.Principal;
 
-import javax.security.auth.Subject;
+import jakarta.security.auth.Subject;
 
 import org.apache.cxf.common.security.SimpleGroup;
 import org.apache.cxf.common.security.SimplePrincipal;

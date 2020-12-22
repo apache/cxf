@@ -32,11 +32,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.wsdl.Definition;
-import javax.wsdl.Import;
-import javax.wsdl.WSDLException;
-import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLWriter;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Import;
+import jakarta.wsdl.WSDLException;
+import jakarta.wsdl.factory.WSDLFactory;
+import jakarta.wsdl.xml.WSDLWriter;
 import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Element;

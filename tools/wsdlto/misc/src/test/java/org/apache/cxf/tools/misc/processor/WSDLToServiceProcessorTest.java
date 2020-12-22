@@ -22,9 +22,9 @@ package org.apache.cxf.tools.misc.processor;
 import java.io.File;
 import java.util.Iterator;
 
-import javax.wsdl.Service;
-import javax.wsdl.extensions.soap.SOAPAddress;
-import javax.wsdl.extensions.soap12.SOAP12Address;
+import jakarta.wsdl.Service;
+import jakarta.wsdl.extensions.soap.SOAPAddress;
+import jakarta.wsdl.extensions.soap12.SOAP12Address;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;

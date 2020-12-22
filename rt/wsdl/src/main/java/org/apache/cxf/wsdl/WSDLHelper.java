@@ -24,14 +24,14 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.wsdl.Binding;
-import javax.wsdl.BindingOperation;
-import javax.wsdl.Definition;
-import javax.wsdl.Input;
-import javax.wsdl.Operation;
-import javax.wsdl.Output;
-import javax.wsdl.Part;
-import javax.wsdl.PortType;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.BindingOperation;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Input;
+import jakarta.wsdl.Operation;
+import jakarta.wsdl.Output;
+import jakarta.wsdl.Part;
+import jakarta.wsdl.PortType;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.helpers.CastUtils;

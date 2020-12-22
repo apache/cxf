@@ -30,7 +30,7 @@ import org.apache.hello_world_soap_http_source.source.GreetMeFault;
 import org.apache.hello_world_soap_http_source.source.Greeter;
 import org.apache.hello_world_soap_http_source.source.PingMeFault;
 
-@javax.jws.WebService(portName = "SoapPort", serviceName = "SOAPService",
+@jakarta.jws.WebService(portName = "SoapPort", serviceName = "SOAPService",
                       targetNamespace = "http://apache.org/hello_world_soap_http_source/source",
                       endpointInterface = "org.apache.hello_world_soap_http_source.source.Greeter")
 public class GreeterImpl implements Greeter {

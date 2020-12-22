@@ -4,7 +4,7 @@
     {"pattern":"\\QMETA-INF/cxf/bus-extensions.txt\\E"}, 
     {"pattern":"\\QMETA-INF/io.netty.versions.properties\\E"}, 
     {"pattern":"\\QMETA-INF/mailcap.default\\E"}, 
-    {"pattern":"\\QMETA-INF/services/javax.xml.bind.JAXBContextFactory\\E"}, 
+    {"pattern":"\\QMETA-INF/services/jakarta.xml.bind.JAXBContextFactory\\E"}, 
     {"pattern":"\\QMETA-INF/services/javax.xml.stream.XMLEventFactory\\E"}, 
     {"pattern":"\\QMETA-INF/services/javax.xml.stream.XMLInputFactory\\E"}, 
     {"pattern":"\\QMETA-INF/services/javax.xml.stream.XMLOutputFactory\\E"}, 
@@ -16,7 +16,7 @@
     {"pattern":"\\Qschemas/wsdl/wsrm.xsd\\E"}
   ]},
   "bundles":[
-    {"name":"javax.servlet.LocalStrings"}, 
+    {"name":"jakarta.servlet.LocalStrings"}, 
     {"name":"org.apache.cxf.Messages"}, 
     {"name":"org.apache.cxf.binding.soap.interceptor.Messages"}, 
     {"name":"org.apache.cxf.binding.soap.saaj.Messages"}, 

@@ -21,7 +21,7 @@ package org.apache.cxf.jaxrs.impl.tl;
 
 import java.security.Principal;
 
-import javax.ws.rs.core.SecurityContext;
+import jakarta.ws.rs.core.SecurityContext;
 
 public class ThreadLocalSecurityContext extends AbstractThreadLocalProxy<SecurityContext>
     implements SecurityContext {

@@ -21,7 +21,7 @@ package org.apache.cxf.wsn.jms;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.jms.Topic;
+import jakarta.jms.Topic;
 import javax.xml.namespace.QName;
 
 import org.apache.activemq.command.ActiveMQTopic;

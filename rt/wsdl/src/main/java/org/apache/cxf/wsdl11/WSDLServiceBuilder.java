@@ -32,24 +32,24 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.wsdl.Binding;
-import javax.wsdl.BindingFault;
-import javax.wsdl.BindingOperation;
-import javax.wsdl.Definition;
-import javax.wsdl.Fault;
-import javax.wsdl.Import;
-import javax.wsdl.Input;
-import javax.wsdl.Message;
-import javax.wsdl.Operation;
-import javax.wsdl.Output;
-import javax.wsdl.Part;
-import javax.wsdl.Port;
-import javax.wsdl.PortType;
-import javax.wsdl.Service;
-import javax.wsdl.WSDLElement;
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.soap.SOAPBinding;
-import javax.wsdl.extensions.soap12.SOAP12Binding;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.BindingFault;
+import jakarta.wsdl.BindingOperation;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Fault;
+import jakarta.wsdl.Import;
+import jakarta.wsdl.Input;
+import jakarta.wsdl.Message;
+import jakarta.wsdl.Operation;
+import jakarta.wsdl.Output;
+import jakarta.wsdl.Part;
+import jakarta.wsdl.Port;
+import jakarta.wsdl.PortType;
+import jakarta.wsdl.Service;
+import jakarta.wsdl.WSDLElement;
+import jakarta.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.extensions.soap.SOAPBinding;
+import jakarta.wsdl.extensions.soap12.SOAP12Binding;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
@@ -147,7 +147,7 @@ public class WSDLServiceBuilder {
     }
 
     private void copyExtensionAttributes(AbstractPropertiesHolder info,
-                                         javax.wsdl.extensions.AttributeExtensible ae) {
+                                         jakarta.wsdl.extensions.AttributeExtensible ae) {
         Map<QName, Object> attrs = CastUtils.cast(ae.getExtensionAttributes());
         if (!attrs.isEmpty()) {
             info.setExtensionAttributes(attrs);

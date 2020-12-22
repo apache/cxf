@@ -30,9 +30,9 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.zip.Deflater;
 
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBElement;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Response;
+import jakarta.xml.bind.JAXBElement;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -104,7 +104,7 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
     private MessageContext messageContext;
 
     @Context
-    private javax.ws.rs.core.SecurityContext securityContext;
+    private jakarta.ws.rs.core.SecurityContext securityContext;
 
     private Map<String, String> claimTypeMap = DEFAULT_CLAIM_TYPE_MAP;
     private Map<String, String> tokenTypeMap = DEFAULT_TOKEN_TYPE_MAP;

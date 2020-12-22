@@ -44,8 +44,8 @@ import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.PasswordCallback;
+import jakarta.security.auth.callback.CallbackHandler;
+import jakarta.security.auth.callback.PasswordCallback;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;

@@ -24,7 +24,7 @@ package org.apache.hello_world_soap_http;
 
 import java.util.concurrent.Future;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Response;
 

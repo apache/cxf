@@ -24,8 +24,8 @@ import java.security.Principal;
 import java.util.Enumeration;
 import java.util.Locale;
 
-import javax.servlet.DispatcherType;
-import javax.servlet.ServletContext;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.ServletContext;
 
 /**
  *

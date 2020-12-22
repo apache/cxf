@@ -37,8 +37,8 @@ Files without support for comments (and one liners with no creativity)
  !????? ./rt/ws/addr/src/main/resources/META-INF/cxf/cxf.extension
  !????? ./rt/ws/policy/src/main/resources/META-INF/cxf/cxf.extension
  !????? ./rt/ws/rm/src/main/resources/META-INF/cxf/cxf.extension
- !????? ./rt/frontend/jaxws/src/main/resources/META-INF/services/javax.xml.ws.spi.Provider
- !????? ./rt/frontend/js/src/main/resources/META-INF/services/javax.xml.ws.spi.Provider
+ !????? ./rt/frontend/jaxws/src/main/resources/META-INF/services/jakarta.xml.ws.spi.Provider
+ !????? ./rt/frontend/js/src/main/resources/META-INF/services/jakarta.xml.ws.spi.Provider
  !????? ./rt/core/src/main/resources/META-INF/services/org.apache.cxf.bus.factory
 
 Readme type files

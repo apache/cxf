@@ -19,7 +19,7 @@
 
 package org.apache.cxf.binding.xml.wsdl11;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
@@ -45,11 +45,11 @@ public final class XMLWSDLExtensionLoader implements WSDLExtensionLoader {
     }
 
     public void registerExtensors(WSDLManager manager) {
-        createExtensor(manager, javax.wsdl.BindingInput.class,
+        createExtensor(manager, jakarta.wsdl.BindingInput.class,
                        org.apache.cxf.bindings.xformat.XMLBindingMessageFormat.class);
-        createExtensor(manager, javax.wsdl.BindingOutput.class,
+        createExtensor(manager, jakarta.wsdl.BindingOutput.class,
                        org.apache.cxf.bindings.xformat.XMLBindingMessageFormat.class);
-        createExtensor(manager, javax.wsdl.Binding.class,
+        createExtensor(manager, jakarta.wsdl.Binding.class,
                        org.apache.cxf.bindings.xformat.XMLFormatBinding.class);
     }
 

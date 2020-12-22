@@ -77,14 +77,14 @@ public class NoAriesBlueprintTest extends OSGiTestSupport {
             mavenBundle("org.apache.cxf", "cxf-rt-frontend-jaxws").versionAsInProject(),
             junitBundles(),
             systemPackages(
-                "javax.annotation;version=\"1.3\"",
+                "jakarta.annotation;version=\"1.3\"",
                 "javax.xml.soap;version=\"1.5\""
             )
         };
         if (JavaUtils.isJava9Compatible()) {
             return OptionUtils.combine(basicOptions,
                 mavenBundle("jakarta.annotation", "jakarta.annotation-api").versionAsInProject(),
-                mavenBundle("com.sun.activation", "jakarta.activation").versionAsInProject(),
+                mavenBundle("jakarta.activation", "jakarta.activation-api").versionAsInProject(),
                 mavenBundle("jakarta.xml.ws", "jakarta.xml.ws-api").versionAsInProject(),
                 mavenBundle("jakarta.xml.bind", "jakarta.xml.bind-api").versionAsInProject(),
                 mavenBundle("jakarta.xml.soap", "jakarta.xml.soap-api").versionAsInProject(),

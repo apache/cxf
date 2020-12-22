@@ -22,8 +22,8 @@ import java.net.URL;
 import java.security.Principal;
 import java.util.Map;
 
-import javax.annotation.Resource;
-import javax.jws.WebService;
+import jakarta.annotation.Resource;
+import jakarta.jws.WebService;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;

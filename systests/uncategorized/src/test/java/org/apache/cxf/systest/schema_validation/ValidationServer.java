@@ -24,15 +24,15 @@ import java.io.StringReader;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Provider;
-import javax.xml.ws.Service;
-import javax.xml.ws.ServiceMode;
-import javax.xml.ws.WebServiceProvider;
+import jakarta.x.Endpoint;
+import jakarta.x.Provider;
+import jakarta.x.Service;
+import jakarta.x.ServiceMode;
+import jakarta.x.WebServiceProvider;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

@@ -20,20 +20,20 @@ package org.apache.cxf.transport.jms.util;
 
 import java.io.Serializable;
 
-import javax.jms.BytesMessage;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.ObjectMessage;
-import javax.jms.Session;
-import javax.jms.StreamMessage;
-import javax.jms.TextMessage;
+import jakarta.jms.BytesMessage;
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.ObjectMessage;
+import jakarta.jms.Session;
+import jakarta.jms.StreamMessage;
+import jakarta.jms.TextMessage;
 
 /**
  * Converts jms messages to Objects and vice a versa.
  * <p>
- * String <=> {@link javax.jms.TextMessage}
- * byte[] <=> {@link javax.jms.BytesMessage}
- * Serializable object <=> {@link javax.jms.ObjectMessage}
+ * String <=> {@link jakarta.jms.TextMessage}
+ * byte[] <=> {@link jakarta.jms.BytesMessage}
+ * Serializable object <=> {@link jakarta.jms.ObjectMessage}
  */
 public class JMSMessageConverter {
 

@@ -29,17 +29,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.wsdl.BindingInput;
-import javax.wsdl.BindingOutput;
-import javax.wsdl.Definition;
-import javax.wsdl.Import;
-import javax.wsdl.Part;
-import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.ExtensionRegistry;
-import javax.wsdl.extensions.mime.MIMEContent;
-import javax.wsdl.extensions.mime.MIMEMultipartRelated;
-import javax.wsdl.extensions.mime.MIMEPart;
+import jakarta.wsdl.BindingInput;
+import jakarta.wsdl.BindingOutput;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Import;
+import jakarta.wsdl.Part;
+import jakarta.wsdl.WSDLException;
+import jakarta.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.extensions.ExtensionRegistry;
+import jakarta.wsdl.extensions.mime.MIMEContent;
+import jakarta.wsdl.extensions.mime.MIMEMultipartRelated;
+import jakarta.wsdl.extensions.mime.MIMEPart;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
@@ -507,7 +507,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
             if (def != null && schemas != null) {
                 QName qn = header.getMessage();
 
-                javax.wsdl.Message msg = findMessage(qn, def);
+                jakarta.wsdl.Message msg = findMessage(qn, def);
                 if (msg != null) {
                     addOutOfBandParts(bop, msg, schemas, isInput, header.getPart());
                     serviceInfo.refresh();
@@ -519,15 +519,15 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
             }
         }
     }
-    private javax.wsdl.Message findMessage(QName qn, Definition def) {
-        javax.wsdl.Message msg = def.getMessage(qn);
+    private jakarta.wsdl.Message findMessage(QName qn, Definition def) {
+        jakarta.wsdl.Message msg = def.getMessage(qn);
         if (msg == null) {
             msg = findMessage(qn, def, new ArrayList<>());
         }
         return msg;
     }
-    private javax.wsdl.Message findMessage(QName qn, Definition def, List<Definition> done) {
-        javax.wsdl.Message msg = def.getMessage(qn);
+    private jakarta.wsdl.Message findMessage(QName qn, Definition def, List<Definition> done) {
+        jakarta.wsdl.Message msg = def.getMessage(qn);
         if (msg == null) {
             if (done.contains(def)) {
                 return null;
@@ -553,7 +553,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
         return msg;
     }
 
-    private void addOutOfBandParts(final BindingOperationInfo bop, final javax.wsdl.Message msg,
+    private void addOutOfBandParts(final BindingOperationInfo bop, final jakarta.wsdl.Message msg,
                                    final SchemaCollection schemas, boolean isInput,
                                    final String partName) {
         MessageInfo minfo = null;
@@ -626,7 +626,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
     }
 
     private void buildMessage(MessageInfo minfo,
-                              javax.wsdl.Message msg,
+                              jakarta.wsdl.Message msg,
                               SchemaCollection schemas,
                               int nextId,
                               String partNameFilter) {
@@ -669,7 +669,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
         }
     }
 
-    public BindingInfo createBindingInfo(ServiceInfo service, javax.wsdl.Binding binding, String ns) {
+    public BindingInfo createBindingInfo(ServiceInfo service, jakarta.wsdl.Binding binding, String ns) {
         SoapBindingInfo bi = new SoapBindingInfo(service, ns);
         // Copy all the extensors
         initializeBindingInfo(service, binding, bi);

@@ -28,14 +28,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Variant;
+import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.core.EntityTag;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Request;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
+import jakarta.ws.rs.core.Variant;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
@@ -144,7 +144,7 @@ public class RequestImpl implements Request {
                     }
                     sb.append(varyValues.get(i).toString());
                 }
-                ((javax.servlet.http.HttpServletResponse)httpResponse)
+                ((jakarta.servlet.http.HttpServletResponse)httpResponse)
                     .setHeader(HttpHeaders.VARY, sb.toString());
             }
         }

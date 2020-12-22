@@ -26,7 +26,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import javax.security.auth.DestroyFailedException;
+import jakarta.security.auth.DestroyFailedException;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;

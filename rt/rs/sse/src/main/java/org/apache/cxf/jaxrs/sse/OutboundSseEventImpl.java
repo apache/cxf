@@ -20,9 +20,9 @@ package org.apache.cxf.jaxrs.sse;
 
 import java.lang.reflect.Type;
 
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.sse.OutboundSseEvent;
+import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.sse.OutboundSseEvent;
 
 public final class OutboundSseEventImpl implements OutboundSseEvent {
     private final String id;

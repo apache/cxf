@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.mtom_schema_validation;
 
-import javax.xml.ws.WebFault;
+import jakarta.xml.ws.WebFault;
 @WebFault(name = "ExceptionType", targetNamespace = "http://cxf.apache.org/")
 public class ExceptionTypeException extends Exception {
     public static final long serialVersionUID = 20130719154625L;

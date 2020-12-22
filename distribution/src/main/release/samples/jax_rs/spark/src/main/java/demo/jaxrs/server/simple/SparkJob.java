@@ -18,7 +18,7 @@
  */
 package demo.jaxrs.server.simple;
 
-import javax.ws.rs.container.AsyncResponse;
+import jakarta.ws.rs.container.AsyncResponse;
 
 public class SparkJob implements Runnable {
     private AsyncResponse ac;

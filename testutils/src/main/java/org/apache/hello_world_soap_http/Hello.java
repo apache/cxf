@@ -18,13 +18,13 @@
  */
 package org.apache.hello_world_soap_http;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
 
 
 @WebService(name = "Hello", targetNamespace = "http://apache.org/hello_world_soap_http")
-@SOAPBinding(style = javax.jws.soap.SOAPBinding.Style.RPC, use = javax.jws.soap.SOAPBinding.Use.LITERAL)
+@SOAPBinding(style = jakarta.jws.soap.SOAPBinding.Style.RPC, use = jakarta.jws.soap.SOAPBinding.Use.LITERAL)
 public interface Hello {
     @WebMethod(operationName = "sayHi")
     String sayHi();

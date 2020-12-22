@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.ws.wssec10.server;
 
-import javax.security.auth.Subject;
+import jakarta.security.auth.Subject;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.security.SimpleGroup;

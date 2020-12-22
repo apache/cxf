@@ -21,7 +21,7 @@ package org.apache.cxf.jaxrs.interceptor;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 

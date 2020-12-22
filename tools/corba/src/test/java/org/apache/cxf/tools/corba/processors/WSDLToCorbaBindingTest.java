@@ -26,12 +26,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.wsdl.Binding;
-import javax.wsdl.BindingFault;
-import javax.wsdl.BindingOperation;
-import javax.wsdl.Definition;
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.xml.WSDLWriter;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.BindingFault;
+import jakarta.wsdl.BindingOperation;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.xml.WSDLWriter;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
@@ -1033,7 +1033,7 @@ public class WSDLToCorbaBindingTest {
         assertTrue(p12qitem.getMember().get(0).isQualified());
     }
 
-    private List<ExtensibilityElement> getExtensibilityElements(javax.wsdl.extensions.ElementExtensible e) {
+    private List<ExtensibilityElement> getExtensibilityElements(jakarta.wsdl.extensions.ElementExtensible e) {
         return CastUtils.cast(e.getExtensibilityElements());
     }
 }

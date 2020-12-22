@@ -24,8 +24,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.ws.Holder;
+import jakarta.xml.bind.JAXBElement;
+import jakarta..Holder;
 
 import org.apache.type_test.types1.AnonymousStruct;
 import org.apache.type_test.types1.BoundedArray;

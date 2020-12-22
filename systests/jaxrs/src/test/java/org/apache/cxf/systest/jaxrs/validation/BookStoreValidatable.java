@@ -20,8 +20,8 @@ package org.apache.cxf.systest.jaxrs.validation;
 
 import java.util.Collection;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 
 public interface BookStoreValidatable {
     @Valid Collection< BookWithValidation > list(@Min(1) int page);

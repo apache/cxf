@@ -27,22 +27,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.wsdl.Binding;
-import javax.wsdl.Definition;
-import javax.wsdl.Fault;
-import javax.wsdl.Input;
-import javax.wsdl.Message;
-import javax.wsdl.Operation;
-import javax.wsdl.Output;
-import javax.wsdl.Part;
-import javax.wsdl.PortType;
-import javax.wsdl.Service;
-import javax.wsdl.Types;
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.schema.Schema;
-import javax.wsdl.extensions.schema.SchemaImport;
-import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLReader;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Fault;
+import jakarta.wsdl.Input;
+import jakarta.wsdl.Message;
+import jakarta.wsdl.Operation;
+import jakarta.wsdl.Output;
+import jakarta.wsdl.Part;
+import jakarta.wsdl.PortType;
+import jakarta.wsdl.Service;
+import jakarta.wsdl.Types;
+import jakarta.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.extensions.schema.Schema;
+import jakarta.wsdl.extensions.schema.SchemaImport;
+import jakarta.wsdl.factory.WSDLFactory;
+import jakarta.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -101,7 +101,7 @@ public class ServiceWSDLBuilderTest {
         LOG.info("the path of wsdl file is " + wsdlUrl);
         WSDLFactory wsdlFactory = WSDLFactory.newInstance();
         WSDLReader wsdlReader = wsdlFactory.newWSDLReader();
-        wsdlReader.setFeature("javax.wsdl.verbose", false);
+        wsdlReader.setFeature("jakarta.wsdl.verbose", false);
         def = wsdlReader.readWSDL(wsdlUrl);
 
         control = EasyMock.createNiceControl();

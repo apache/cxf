@@ -4,7 +4,7 @@
     {"pattern":"\\QMETA-INF/cxf/bus-extensions.txt\\E"}, 
     {"pattern":"\\QMETA-INF/io.netty.versions.properties\\E"}, 
     {"pattern":"\\QMETA-INF/mailcap.default\\E"}, 
-    {"pattern":"\\QMETA-INF/services/javax.xml.bind.JAXBContextFactory\\E"}, 
+    {"pattern":"\\QMETA-INF/services/jakarta.xml.bind.JAXBContextFactory\\E"}, 
     {"pattern":"\\QMETA-INF/services/javax.xml.stream.XMLEventFactory\\E"}, 
     {"pattern":"\\QMETA-INF/services/javax.xml.stream.XMLInputFactory\\E"}, 
     {"pattern":"\\QMETA-INF/services/javax.xml.stream.XMLOutputFactory\\E"}, 

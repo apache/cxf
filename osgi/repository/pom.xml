@@ -249,7 +249,7 @@
 			<artifactId>cxf-xjc-runtime</artifactId>
 			<exclusions>
 				<exclusion><!-- TODO can be removed with next cxf-xjc-runtime release -->
-					<groupId>javax.xml.ws</groupId>
+					<groupId>jakarta.xml.ws</groupId>
 					<artifactId>jaxws-api</artifactId>
 				</exclusion>
 			</exclusions>

@@ -24,7 +24,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.Map;
 
-import javax.wsdl.WSDLException;
+import jakarta.wsdl.WSDLException;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 

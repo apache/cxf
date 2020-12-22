@@ -26,7 +26,7 @@ import java.util.logging.Logger;
  * 3.1.0 2015-05-18T13:02:03.098-05:00 Generated source version: 3.1.0
  */
 
-@javax.jws.WebService(serviceName = "HelloService", portName = "HelloPort",
+@jakarta.jws.WebService(serviceName = "HelloService", portName = "HelloPort",
                     targetNamespace = "http://service.ws.sample/",
                     endpointInterface = "sample.ws.service.Hello")
 public class HelloPortImpl implements Hello {

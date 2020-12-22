@@ -25,8 +25,8 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jms.ConnectionFactory;
-import javax.jms.DeliveryMode;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.DeliveryMode;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;

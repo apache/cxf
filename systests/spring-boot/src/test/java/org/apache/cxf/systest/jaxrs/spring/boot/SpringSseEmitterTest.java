@@ -25,10 +25,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.sse.InboundSseEvent;
-import javax.ws.rs.sse.SseEventSource;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.sse.InboundSseEvent;
+import jakarta.ws.rs.sse.SseEventSource;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
@@ -116,7 +116,7 @@ public class SpringSseEmitterTest {
     }
 
     private static Consumer<InboundSseEvent> collect(final Collection< Book > books) {
-        return event -> books.add(event.readData(Book.class, javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE));
+        return event -> books.add(event.readData(Book.class, jakarta.ws.rs.core.MediaType.APPLICATION_JSON_TYPE));
     }
     
     private void awaitEvents(int timeout, final Collection<?> events, int size) throws InterruptedException {

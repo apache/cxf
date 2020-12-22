@@ -31,9 +31,9 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.wsdl.Definition;
-import javax.wsdl.Import;
-import javax.wsdl.extensions.ExtensionRegistry;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Import;
+import jakarta.wsdl.extensions.ExtensionRegistry;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;

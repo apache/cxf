@@ -33,7 +33,7 @@
     <properties>
         <cxf.module.name>org.apache.cxf.rs.swagger.ui</cxf.module.name>
         <cxf.osgi.import>
-            javax.annotation*;version="${cxf.osgi.javax.annotation.version}",
+            jakarta.annotation*;version="${cxf.osgi.jakarta.annotation.version}",
             *
         </cxf.osgi.import>
     </properties>

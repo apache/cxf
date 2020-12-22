@@ -21,11 +21,11 @@ package org.apache.cxf.tools.common.model;
 
 import java.util.Arrays;
 
-import javax.jws.WebParam;
-import javax.jws.WebParam.Mode;
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
-import javax.xml.bind.annotation.XmlSeeAlso;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebParam.Mode;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.ws.Action;
 import javax.xml.ws.FaultAction;
 
@@ -41,7 +41,7 @@ public class JAnnotationTest {
         annotation.addElement(new JAnnotationElement(null,
                                                             Arrays.asList(new Class[]{XmlSeeAlso.class})));
         assertEquals("@XmlSeeAlso({XmlSeeAlso.class})", annotation.toString());
-        assertEquals("javax.xml.bind.annotation.XmlSeeAlso", annotation.getImports().iterator().next());
+        assertEquals("jakarta.activation.annotation.XmlSeeAlso", annotation.getImports().iterator().next());
     }
 
     @Test

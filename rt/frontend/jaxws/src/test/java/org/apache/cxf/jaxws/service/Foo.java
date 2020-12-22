@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.jaxws.service;
 
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlType;
 
 @XmlType(name = "foo", namespace = "http://service.jaxws.cxf.apache.org/fooStuff")
 public class Foo {

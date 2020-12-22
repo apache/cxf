@@ -25,10 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.wsdl.Definition;
-import javax.wsdl.Port;
-import javax.wsdl.Service;
-import javax.wsdl.extensions.soap.SOAPAddress;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Port;
+import jakarta.wsdl.Service;
+import jakarta.wsdl.extensions.soap.SOAPAddress;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;

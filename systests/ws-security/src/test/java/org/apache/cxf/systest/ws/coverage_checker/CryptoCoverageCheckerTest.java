@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
+import jakarta..Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;

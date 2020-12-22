@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth.services;
 
-import javax.ws.rs.core.Context;
+import jakarta.ws.rs.core.Context;
 
 import net.oauth.OAuthValidator;
 import org.apache.cxf.jaxrs.ext.MessageContext;

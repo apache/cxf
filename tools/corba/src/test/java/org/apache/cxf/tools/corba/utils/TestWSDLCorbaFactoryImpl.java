@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.tools.corba.utils;
 
-import javax.wsdl.xml.WSDLWriter;
+import jakarta.wsdl.xml.WSDLWriter;
 
 import com.ibm.wsdl.factory.WSDLFactoryImpl;
 

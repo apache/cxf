@@ -23,7 +23,7 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.activation.DataHandler;
+import jakarta.activation.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;

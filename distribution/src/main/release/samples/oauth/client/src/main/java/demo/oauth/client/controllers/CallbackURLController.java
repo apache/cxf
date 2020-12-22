@@ -18,7 +18,7 @@
  */
 package demo.oauth.client.controllers;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import net.oauth.OAuth;
 import net.oauth.OAuthMessage;

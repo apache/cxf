@@ -21,7 +21,7 @@ package org.apache.cxf.sts.token.validator;
 import java.security.Principal;
 import java.util.Properties;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

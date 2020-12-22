@@ -19,8 +19,8 @@
 
 package org.apache.cxf.jaxrs.fortest;
 
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 
 
 public class AbstractEntity<T, E> {

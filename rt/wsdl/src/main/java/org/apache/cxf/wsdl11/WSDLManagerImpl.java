@@ -27,17 +27,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
-import javax.wsdl.BindingInput;
-import javax.wsdl.Definition;
-import javax.wsdl.Types;
-import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.AttributeExtensible;
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.ExtensionRegistry;
-import javax.wsdl.extensions.mime.MIMEPart;
-import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLReader;
+import jakarta.annotation.Resource;
+import jakarta.wsdl.BindingInput;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Types;
+import jakarta.wsdl.WSDLException;
+import jakarta.wsdl.extensions.AttributeExtensible;
+import jakarta.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.extensions.ExtensionRegistry;
+import jakarta.wsdl.extensions.mime.MIMEPart;
+import jakarta.wsdl.factory.WSDLFactory;
+import jakarta.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -176,7 +176,7 @@ public class WSDLManagerImpl implements WSDLManager {
             }
         }
         final WSDLReader reader = factory.newWSDLReader();
-        reader.setFeature("javax.wsdl.verbose", false);
+        reader.setFeature("jakarta.wsdl.verbose", false);
         reader.setExtensionRegistry(registry);
 
         final Definition def;
@@ -208,8 +208,8 @@ public class WSDLManagerImpl implements WSDLManager {
 
     protected Definition loadDefinition(String url) throws WSDLException {
         final WSDLReader reader = factory.newWSDLReader();
-        reader.setFeature("javax.wsdl.verbose", false);
-        reader.setFeature("javax.wsdl.importDocuments", true);
+        reader.setFeature("jakarta.wsdl.verbose", false);
+        reader.setFeature("jakarta.wsdl.importDocuments", true);
         reader.setExtensionRegistry(registry);
 
         //we'll create a new String here to make sure the passed in key is not referenced in the loading of
@@ -284,17 +284,17 @@ public class WSDLManagerImpl implements WSDLManager {
     private void addExtensionAttributeTypes(ExtensionRegistry extreg) {
         // register types that are not of wsdl4j's default attribute type QName
         QName qn = new QName("http://www.w3.org/2006/05/addressing/wsdl", "Action");
-        extreg.registerExtensionAttributeType(javax.wsdl.Input.class, qn, AttributeExtensible.STRING_TYPE);
-        extreg.registerExtensionAttributeType(javax.wsdl.Output.class, qn, AttributeExtensible.STRING_TYPE);
-        extreg.registerExtensionAttributeType(javax.wsdl.Fault.class, qn, AttributeExtensible.STRING_TYPE);
+        extreg.registerExtensionAttributeType(jakarta.wsdl.Input.class, qn, AttributeExtensible.STRING_TYPE);
+        extreg.registerExtensionAttributeType(jakarta.wsdl.Output.class, qn, AttributeExtensible.STRING_TYPE);
+        extreg.registerExtensionAttributeType(jakarta.wsdl.Fault.class, qn, AttributeExtensible.STRING_TYPE);
         qn = new QName("http://www.w3.org/2007/05/addressing/metadata", "Action");
-        extreg.registerExtensionAttributeType(javax.wsdl.Input.class, qn, AttributeExtensible.STRING_TYPE);
-        extreg.registerExtensionAttributeType(javax.wsdl.Output.class, qn, AttributeExtensible.STRING_TYPE);
-        extreg.registerExtensionAttributeType(javax.wsdl.Fault.class, qn, AttributeExtensible.STRING_TYPE);
+        extreg.registerExtensionAttributeType(jakarta.wsdl.Input.class, qn, AttributeExtensible.STRING_TYPE);
+        extreg.registerExtensionAttributeType(jakarta.wsdl.Output.class, qn, AttributeExtensible.STRING_TYPE);
+        extreg.registerExtensionAttributeType(jakarta.wsdl.Fault.class, qn, AttributeExtensible.STRING_TYPE);
         qn = new QName("http://www.w3.org/2005/02/addressing/wsdl", "Action");
-        extreg.registerExtensionAttributeType(javax.wsdl.Input.class, qn, AttributeExtensible.STRING_TYPE);
-        extreg.registerExtensionAttributeType(javax.wsdl.Output.class, qn, AttributeExtensible.STRING_TYPE);
-        extreg.registerExtensionAttributeType(javax.wsdl.Fault.class, qn, AttributeExtensible.STRING_TYPE);
+        extreg.registerExtensionAttributeType(jakarta.wsdl.Input.class, qn, AttributeExtensible.STRING_TYPE);
+        extreg.registerExtensionAttributeType(jakarta.wsdl.Output.class, qn, AttributeExtensible.STRING_TYPE);
+        extreg.registerExtensionAttributeType(jakarta.wsdl.Fault.class, qn, AttributeExtensible.STRING_TYPE);
     }
 
     public ServiceSchemaInfo getSchemasForDefinition(Definition wsdl) {

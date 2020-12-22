@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.customer.bare;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "GetCustomers")
 public class GetCustomers {

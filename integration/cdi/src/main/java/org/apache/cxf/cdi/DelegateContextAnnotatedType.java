@@ -31,7 +31,7 @@ import javax.enterprise.inject.spi.AnnotatedMethod;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Inject;
-import javax.ws.rs.core.Context;
+import jakarta.ws.rs.core.Context;
 
 import static java.util.stream.Collectors.toSet;
 

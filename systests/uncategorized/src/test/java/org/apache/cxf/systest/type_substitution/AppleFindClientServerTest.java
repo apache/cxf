@@ -21,8 +21,8 @@ package org.apache.cxf.systest.type_substitution;
 
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
-import javax.xml.ws.soap.SOAPBinding;
+import jakarta..Service;
+import jakarta..soap.SOAPBinding;
 
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 

@@ -17,7 +17,7 @@
 
 package ${package};
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(endpointInterface = "${package}.HelloWorld")
 public class HelloWorldImpl implements HelloWorld {

@@ -1,4 +1,4 @@
-<%@ page import="javax.servlet.http.HttpServletRequest, org.apache.cxf.rs.security.oidc.common.IdToken" %>
+<%@ page import="jakarta.servlet.http.HttpServletRequest, org.apache.cxf.rs.security.oidc.common.IdToken" %>
 
 <%
     IdToken token = (IdToken) request.getAttribute("data");

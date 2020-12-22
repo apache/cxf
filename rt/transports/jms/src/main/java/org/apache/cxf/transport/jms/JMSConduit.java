@@ -30,12 +30,12 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jms.Connection;
-import javax.jms.Destination;
-import javax.jms.ExceptionListener;
-import javax.jms.JMSException;
-import javax.jms.MessageListener;
-import javax.jms.Session;
+import jakarta.jms.Connection;
+import jakarta.jms.Destination;
+import jakarta.jms.ExceptionListener;
+import jakarta.jms.JMSException;
+import jakarta.jms.MessageListener;
+import jakarta.jms.Session;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
@@ -277,7 +277,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
             try {
                 if (useSyncReceive) {
                     exchange.put(JMSUtil.JMS_IGNORE_TIMEOUT, this.jmsConfig.isIgnoreTimeoutException());
-                    javax.jms.Message replyMessage = JMSUtil.receive(session, replyDestination,
+                    jakarta.jms.Message replyMessage = JMSUtil.receive(session, replyDestination,
                                                                      correlationId,
                                                                      jmsConfig.getReceiveTimeout(),
                                                                      jmsConfig.isPubSubNoLocal(),
@@ -310,7 +310,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                                Destination replyToDestination, String correlationId,
                                ResourceCloser closer, Session session) throws JMSException {
         JMSMessageHeadersType headers = getOrCreateJmsHeaders(outMessage);
-        javax.jms.Message message = JMSMessageUtils.asJMSMessage(jmsConfig,
+        jakarta.jms.Message message = JMSMessageUtils.asJMSMessage(jmsConfig,
                                                                  outMessage,
                                                                  request,
                                                                  jmsConfig.getMessageType(),
@@ -423,7 +423,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
      * correlationId. If it is found the message is converted to a CXF message and the thread sending the
      * request is notified {@inheritDoc}
      */
-    public void onMessage(javax.jms.Message jmsMessage) {
+    public void onMessage(jakarta.jms.Message jmsMessage) {
         try {
             String correlationId = jmsMessage.getJMSCorrelationID();
             LOG.log(Level.FINE, "Received reply message with correlation id " + correlationId);
@@ -468,7 +468,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
      * Process the reply message
      * @throws JMSException
      */
-    protected void processReplyMessage(Exchange exchange, javax.jms.Message jmsMessage) throws JMSException {
+    protected void processReplyMessage(Exchange exchange, jakarta.jms.Message jmsMessage) throws JMSException {
 
         LOG.log(Level.FINE, "client received reply: ", jmsMessage);
         try {

@@ -26,13 +26,13 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.wsdl.Binding;
-import javax.wsdl.Definition;
-import javax.wsdl.Operation;
-import javax.wsdl.Part;
-import javax.wsdl.Port;
-import javax.wsdl.PortType;
-import javax.wsdl.Service;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Operation;
+import jakarta.wsdl.Part;
+import jakarta.wsdl.Port;
+import jakarta.wsdl.PortType;
+import jakarta.wsdl.Service;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 

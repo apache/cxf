@@ -28,10 +28,10 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.soap.SOAPBinding;
-import javax.xml.ws.spi.Provider;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.soap.SOAPBinding;
+import jakarta.xml.ws.spi.Provider;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 
 import org.apache.cxf.wsn.AbstractEndpoint;
 import org.apache.cxf.wsn.EndpointManager;
@@ -62,7 +62,7 @@ public class JaxwsEndpointManager implements EndpointManager {
                     if (endpoint.getProperties() == null) {
                         endpoint.setProperties(new HashMap<String, Object>());
                     }
-                    endpoint.getProperties().put("javax.xml.ws.wsdl.description", wsdlLocation.toExternalForm());
+                    endpoint.getProperties().put("jakarta.xml.ws.wsdl.description", wsdlLocation.toExternalForm());
                     List<Source> mt = new ArrayList<>();
                     StreamSource src = new StreamSource(wsdlLocation.openStream(), wsdlLocation.toExternalForm());
                     mt.add(src);

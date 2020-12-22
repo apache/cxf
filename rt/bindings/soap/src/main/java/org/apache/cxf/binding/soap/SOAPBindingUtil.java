@@ -28,28 +28,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.wsdl.Binding;
-import javax.wsdl.BindingFault;
-import javax.wsdl.BindingInput;
-import javax.wsdl.BindingOperation;
-import javax.wsdl.BindingOutput;
-import javax.wsdl.Definition;
-import javax.wsdl.Port;
-import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.ExtensionRegistry;
-import javax.wsdl.extensions.soap.SOAPAddress;
-import javax.wsdl.extensions.soap.SOAPBinding;
-import javax.wsdl.extensions.soap.SOAPBody;
-import javax.wsdl.extensions.soap.SOAPFault;
-import javax.wsdl.extensions.soap.SOAPHeader;
-import javax.wsdl.extensions.soap.SOAPOperation;
-import javax.wsdl.extensions.soap12.SOAP12Address;
-import javax.wsdl.extensions.soap12.SOAP12Binding;
-import javax.wsdl.extensions.soap12.SOAP12Body;
-import javax.wsdl.extensions.soap12.SOAP12Fault;
-import javax.wsdl.extensions.soap12.SOAP12Header;
-import javax.wsdl.extensions.soap12.SOAP12Operation;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.BindingFault;
+import jakarta.wsdl.BindingInput;
+import jakarta.wsdl.BindingOperation;
+import jakarta.wsdl.BindingOutput;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Port;
+import jakarta.wsdl.WSDLException;
+import jakarta.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.extensions.ExtensionRegistry;
+import jakarta.wsdl.extensions.soap.SOAPAddress;
+import jakarta.wsdl.extensions.soap.SOAPBinding;
+import jakarta.wsdl.extensions.soap.SOAPBody;
+import jakarta.wsdl.extensions.soap.SOAPFault;
+import jakarta.wsdl.extensions.soap.SOAPHeader;
+import jakarta.wsdl.extensions.soap.SOAPOperation;
+import jakarta.wsdl.extensions.soap12.SOAP12Address;
+import jakarta.wsdl.extensions.soap12.SOAP12Binding;
+import jakarta.wsdl.extensions.soap12.SOAP12Body;
+import jakarta.wsdl.extensions.soap12.SOAP12Fault;
+import jakarta.wsdl.extensions.soap12.SOAP12Header;
+import jakarta.wsdl.extensions.soap12.SOAP12Operation;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapAddress;
@@ -528,23 +528,23 @@ public final class SOAPBindingUtil {
         }
     }
 
-    public static javax.jws.soap.SOAPBinding.Style getSoapStyle(String soapStyle) {
+    public static jakarta.jws.soap.SOAPBinding.Style getSoapStyle(String soapStyle) {
         if ("".equals(soapStyle)) {
             return null;
         } else if ("RPC".equalsIgnoreCase(soapStyle)) {
-            return javax.jws.soap.SOAPBinding.Style.RPC;
+            return jakarta.jws.soap.SOAPBinding.Style.RPC;
         } else {
-            return javax.jws.soap.SOAPBinding.Style.DOCUMENT;
+            return jakarta.jws.soap.SOAPBinding.Style.DOCUMENT;
         }
     }
 
-    public static javax.jws.soap.SOAPBinding.Use getSoapUse(String soapUse) {
+    public static jakarta.jws.soap.SOAPBinding.Use getSoapUse(String soapUse) {
         if ("".equals(soapUse)) {
             return null;
         } else if ("ENCODED".equalsIgnoreCase(soapUse)) {
-            return javax.jws.soap.SOAPBinding.Use.ENCODED;
+            return jakarta.jws.soap.SOAPBinding.Use.ENCODED;
         } else {
-            return javax.jws.soap.SOAPBinding.Use.LITERAL;
+            return jakarta.jws.soap.SOAPBinding.Use.LITERAL;
         }
     }
 

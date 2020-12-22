@@ -21,8 +21,8 @@ package org.apache.cxf.aegis.type.array;
 
 import java.util.List;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
 
 @WebService(name = "DuplicateArray", targetNamespace = "urn:org.apache.cxf.aegis.type.java5")
 public interface DuplicateArrayService {

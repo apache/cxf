@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.ws.security.trust;
 
-import javax.security.auth.callback.CallbackHandler;
-import javax.xml.bind.JAXBElement;
+import jakarta.security.auth.callback.CallbackHandler;
+import jakarta.xml.bind.JAXBElement;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

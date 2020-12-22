@@ -91,18 +91,18 @@ public class SecurityConstants {
     /**
      * The CallbackHandler implementation class used to obtain passwords, for both outbound and inbound
      * requests. The value of this tag must be either:
-     * a) The class name of a {@link javax.security.auth.callback.CallbackHandler} instance, which must
+     * a) The class name of a {@link jakarta.security.auth.callback.CallbackHandler} instance, which must
      * be accessible via the classpath.
-     * b) A {@link javax.security.auth.callback.CallbackHandler} instance.
+     * b) A {@link jakarta.security.auth.callback.CallbackHandler} instance.
      */
     public static final String CALLBACK_HANDLER = "security.callback-handler";
 
     /**
      * The SAML CallbackHandler implementation class used to construct SAML Assertions. The value of this
      * tag must be either:
-     * a) The class name of a {@link javax.security.auth.callback.CallbackHandler} instance, which must
+     * a) The class name of a {@link jakarta.security.auth.callback.CallbackHandler} instance, which must
      * be accessible via the classpath.
-     * b) A {@link javax.security.auth.callback.CallbackHandler} instance.
+     * b) A {@link jakarta.security.auth.callback.CallbackHandler} instance.
      */
     public static final String SAML_CALLBACK_HANDLER = "security.saml-callback-handler";
 

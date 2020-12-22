@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.binding.corba.utils;
 
-import javax.wsdl.Binding;
-import javax.wsdl.Definition;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.Definition;
 import javax.xml.namespace.QName;
 
 public class EprMetaData {

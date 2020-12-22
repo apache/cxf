@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.ws.policy.handler;
 
-import javax.xml.ws.Endpoint;
+import jakarta..Endpoint;
 
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 

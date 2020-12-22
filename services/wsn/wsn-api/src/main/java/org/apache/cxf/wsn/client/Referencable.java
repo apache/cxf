@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.wsn.client;
 
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 
 public interface Referencable {
 

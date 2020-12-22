@@ -19,7 +19,7 @@
 package org.apache.cxf.systest.provider;
 
 import javax.xml.transform.Source;
-import javax.xml.ws.Provider;
+import jakarta.xml.ws.Provider;
 
 public interface SourceProvider extends Provider<Source> {
 

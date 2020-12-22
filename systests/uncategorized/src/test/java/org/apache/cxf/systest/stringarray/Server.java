@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.stringarray;
 
-import javax.xml.ws.Endpoint;
+import jakarta..Endpoint;
 
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 

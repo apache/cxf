@@ -22,7 +22,7 @@ package org.apache.cxf.tools.validator.internal;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.wsdl.Definition;
+import jakarta.wsdl.Definition;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;

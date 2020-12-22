@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.kerberos.jaxrs.kerberos;
 
-import javax.security.auth.callback.CallbackHandler;
+import jakarta.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.interceptor.security.NamePasswordCallbackHandler;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;

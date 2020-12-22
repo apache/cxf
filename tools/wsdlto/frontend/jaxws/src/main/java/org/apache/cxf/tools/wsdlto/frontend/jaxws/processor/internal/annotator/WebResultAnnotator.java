@@ -19,9 +19,9 @@
 
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.annotator;
 
-import javax.jws.Oneway;
-import javax.jws.WebResult;
-import javax.jws.soap.SOAPBinding;
+import jakarta.jws.Oneway;
+import jakarta.jws.WebResult;
+import jakarta.jws.soap.SOAPBinding;
 
 import org.apache.cxf.tools.common.model.Annotator;
 import org.apache.cxf.tools.common.model.JAnnotation;
@@ -81,6 +81,6 @@ public class WebResultAnnotator implements Annotator {
         }
 
         method.addAnnotation("WebResult", resultAnnotation);
-        method.getInterface().addImport("javax.jws.WebResult");
+        method.getInterface().addImport("jakarta.jws.WebResult");
     }
 }

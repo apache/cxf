@@ -19,7 +19,7 @@
 package demo.hw.server;
 
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 
 public class UserAdapter extends XmlAdapter<UserImpl, User> {

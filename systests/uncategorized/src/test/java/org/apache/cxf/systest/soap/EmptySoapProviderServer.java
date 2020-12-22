@@ -23,11 +23,11 @@ import java.util.List;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.BindingType;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Provider;
-import javax.xml.ws.ServiceMode;
-import javax.xml.ws.WebServiceProvider;
+import jakarta..BindingType;
+import jakarta..Endpoint;
+import jakarta..Provider;
+import jakarta..ServiceMode;
+import jakarta..WebServiceProvider;
 
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
@@ -64,8 +64,8 @@ public class EmptySoapProviderServer extends AbstractBusTestServerBase {
     @WebServiceProvider(serviceName = "HelloProviderService", 
                         portName = "HelloProviderPort", 
                         targetNamespace = "http://apache.org/hello_world_xml_http/bare")
-    @BindingType(value = javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING)
-    @ServiceMode(value = javax.xml.ws.Service.Mode.PAYLOAD)
+    @BindingType(value = jakarta..soap.SOAPBinding.SOAP11HTTP_BINDING)
+    @ServiceMode(value = jakarta..Service.Mode.PAYLOAD)
     public class GreeterProvider implements Provider<Source> {
         public Source invoke(Source req) {
             return new StreamSource();

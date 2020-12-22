@@ -38,7 +38,7 @@
 -->
         <cxf.module.name>org.apache.cxf.transport.websocket</cxf.module.name>
         <cxf.osgi.import>
-            javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
+            jakarta.servlet*;version="${cxf.osgi.jakarta.servlet.version}",
             org.eclipse.jetty*;version="${cxf.jetty.osgi.version}";resolution:=optional,
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
             org.atmosphere*;version="${cxf.atmosphere.version.range}";resolution:=optional,
@@ -84,12 +84,12 @@
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>javax.servlet-api</artifactId>
+                    <groupId>jakarta.servlet</groupId>
+                    <artifactId>jakarta.servlet-api</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.eclipse.jetty.orbit</groupId>
-                    <artifactId>javax.servlet</artifactId>
+                    <artifactId>jakarta.servlet</artifactId>
                 </exclusion>
             </exclusions>
             <optional>true</optional>
@@ -121,12 +121,12 @@
             <optional>true</optional>
             <exclusions>
                 <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>javax.servlet-api</artifactId>
+                    <groupId>jakarta.servlet</groupId>
+                    <artifactId>jakarta.servlet-api</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.eclipse.jetty.orbit</groupId>
-                    <artifactId>javax.servlet</artifactId>
+                    <artifactId>jakarta.servlet</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -178,8 +178,8 @@
             <optional>true</optional>
             <exclusions>
                 <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>javax.servlet-api</artifactId>
+                    <groupId>jakarta.servlet</groupId>
+                    <artifactId>jakarta.servlet-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

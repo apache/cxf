@@ -21,7 +21,7 @@ package org.apache.cxf.rs.security.oauth.data;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 /**
  * This bean represents a resource owner authorization challenge.

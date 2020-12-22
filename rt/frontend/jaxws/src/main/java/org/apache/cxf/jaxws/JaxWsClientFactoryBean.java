@@ -20,7 +20,7 @@ package org.apache.cxf.jaxws;
 
 
 
-import javax.xml.ws.soap.SOAPBinding;
+import jakarta.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.binding.soap.SoapBindingConfiguration;
 import org.apache.cxf.frontend.ClientFactoryBean;

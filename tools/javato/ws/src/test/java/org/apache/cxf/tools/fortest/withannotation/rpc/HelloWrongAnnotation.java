@@ -19,11 +19,11 @@
 
 package org.apache.cxf.tools.fortest.withannotation.rpc;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
-import javax.jws.soap.SOAPBinding.Style;
-import javax.jws.soap.SOAPBinding.Use;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
+import jakarta.jws.soap.SOAPBinding.Style;
+import jakarta.jws.soap.SOAPBinding.Use;
 
 @WebService(name = "HelloWrongAnnotation", targetNamespace = "http://cxf.com/")
 public interface HelloWrongAnnotation {

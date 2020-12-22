@@ -23,7 +23,7 @@ import java.util.List;
 
 import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPFactory;
-import javax.xml.ws.Holder;
+import jakarta..Holder;
 
 import org.apache.type_test.types1.ComplexRestriction;
 import org.apache.type_test.types1.ComplexRestriction2;

@@ -24,10 +24,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.URL;
 
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Holder;
+import jakarta.xml.ws.Holder;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;

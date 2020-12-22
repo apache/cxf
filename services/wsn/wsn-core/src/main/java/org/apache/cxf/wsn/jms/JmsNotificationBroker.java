@@ -21,9 +21,9 @@ package org.apache.cxf.wsn.jms;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.xml.bind.JAXBElement;
+import jakarta.jms.Connection;
+import jakarta.jms.ConnectionFactory;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.wsn.AbstractNotificationBroker;

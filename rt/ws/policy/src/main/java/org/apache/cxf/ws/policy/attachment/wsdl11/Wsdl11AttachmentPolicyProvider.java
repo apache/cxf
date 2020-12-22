@@ -25,9 +25,9 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
-import javax.wsdl.Definition;
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.UnknownExtensibilityElement;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.extensions.UnknownExtensibilityElement;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
@@ -307,7 +307,7 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
             return null;
         }
 
-        javax.wsdl.Message m = def.getMessage(name);
+        jakarta.wsdl.Message m = def.getMessage(name);
         if (null != m) {
             List<ExtensibilityElement> extensors =
                 CastUtils.cast(m.getExtensibilityElements(), ExtensibilityElement.class);

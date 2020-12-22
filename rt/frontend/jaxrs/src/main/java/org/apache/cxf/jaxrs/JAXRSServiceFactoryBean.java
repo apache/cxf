@@ -28,7 +28,7 @@ import java.util.concurrent.Executor;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.Path;
+import jakarta.ws.rs.Path;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;

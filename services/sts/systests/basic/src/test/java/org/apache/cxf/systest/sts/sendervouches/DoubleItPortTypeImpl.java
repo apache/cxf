@@ -20,8 +20,8 @@ package org.apache.cxf.systest.sts.sendervouches;
 
 import java.net.URL;
 
-import javax.annotation.Resource;
-import javax.jws.WebService;
+import jakarta.annotation.Resource;
+import jakarta.jws.WebService;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;

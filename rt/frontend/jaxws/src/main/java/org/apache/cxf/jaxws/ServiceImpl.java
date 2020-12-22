@@ -33,25 +33,25 @@ import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jws.WebService;
-import javax.wsdl.Definition;
-import javax.wsdl.Port;
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.http.HTTPAddress;
-import javax.wsdl.extensions.soap.SOAPAddress;
-import javax.wsdl.extensions.soap12.SOAP12Address;
-import javax.wsdl.extensions.soap12.SOAP12Binding;
-import javax.xml.bind.JAXBContext;
+import jakarta.jws.WebService;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Port;
+import jakarta.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.extensions.http.HTTPAddress;
+import jakarta.wsdl.extensions.soap.SOAPAddress;
+import jakarta.wsdl.extensions.soap12.SOAP12Address;
+import jakarta.wsdl.extensions.soap12.SOAP12Binding;
+import jakarta.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.EndpointReference;
-import javax.xml.ws.Service.Mode;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.WebServiceFeature;
-import javax.xml.ws.handler.Handler;
-import javax.xml.ws.handler.HandlerResolver;
-import javax.xml.ws.soap.SOAPBinding;
-import javax.xml.ws.spi.ServiceDelegate;
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.EndpointReference;
+import jakarta.xml.ws.Service.Mode;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.WebServiceFeature;
+import jakarta.xml.ws.handler.Handler;
+import jakarta.xml.ws.handler.HandlerResolver;
+import jakarta.xml.ws.soap.SOAPBinding;
+import jakarta.xml.ws.spi.ServiceDelegate;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
@@ -167,7 +167,7 @@ public class ServiceImpl extends ServiceDelegate {
     private void initializePorts() {
         try {
             Definition def = bus.getExtension(WSDLManager.class).getDefinition(wsdlURL);
-            javax.wsdl.Service serv = def.getService(serviceName);
+            jakarta.wsdl.Service serv = def.getService(serviceName);
             if (serv == null) {
                 throw new WebServiceException("Could not find service named " + serviceName
                                               + " in wsdl " + wsdlURL);
@@ -187,7 +187,7 @@ public class ServiceImpl extends ServiceDelegate {
                         bindingID = SOAPBinding.SOAP11HTTP_BINDING;
                     } else if (e instanceof SOAP12Binding) {
                         bindingID = SOAPBinding.SOAP12HTTP_BINDING;
-                    } else if (e instanceof javax.wsdl.extensions.soap.SOAPBinding) {
+                    } else if (e instanceof jakarta.wsdl.extensions.soap.SOAPBinding) {
                         bindingID = SOAPBinding.SOAP11HTTP_BINDING;
                     }
                 }
@@ -593,7 +593,7 @@ public class ServiceImpl extends ServiceDelegate {
                     Message msg = new Message("COULD_NOT_LOAD_CLASS", BUNDLE, epi);
                     throw new WebServiceException(msg.toString());
                 }
-                if (!seiClass.isAnnotationPresent(javax.jws.WebService.class)) {
+                if (!seiClass.isAnnotationPresent(jakarta.jws.WebService.class)) {
                     Message msg = new Message("SEI_NO_WEBSERVICE_ANNOTATION", BUNDLE,
                                               seiClass.getCanonicalName());
                     throw new WebServiceException(msg.toString());

@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.jaxrs.client;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 /**
  * Converts Response to checked or runtime Exception

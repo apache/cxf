@@ -19,7 +19,7 @@
 
 package org.apache.cxf.ws.eventing.integration.notificationapi;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "earthquakeEvent", namespace = "http://www.example.com/earthquake/event")
 public class EarthquakeEvent {

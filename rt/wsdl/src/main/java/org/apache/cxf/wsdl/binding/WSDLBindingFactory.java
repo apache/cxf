@@ -19,7 +19,7 @@
 
 package org.apache.cxf.wsdl.binding;
 
-import javax.wsdl.Binding;
+import jakarta.wsdl.Binding;
 
 import org.apache.cxf.binding.BindingFactory;
 import org.apache.cxf.service.model.BindingInfo;

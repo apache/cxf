@@ -22,7 +22,7 @@ package org.apache.cxf.ws.security.sts.provider;
 import java.security.Principal;
 import java.util.Map;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
 import javax.xml.ws.WebServiceContext;

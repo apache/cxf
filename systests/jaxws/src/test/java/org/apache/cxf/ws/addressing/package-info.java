@@ -19,7 +19,7 @@
 @XmlJavaTypeAdapter(value = StringTrimAdapter.class,
                     type = String.class)
 package org.apache.cxf.ws.addressing;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 

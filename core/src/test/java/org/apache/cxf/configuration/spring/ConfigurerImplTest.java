@@ -23,9 +23,9 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Set;
 
-import javax.xml.bind.DatatypeConverter;
-import javax.xml.bind.DatatypeConverterInterface;
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
+import jakarta.xml.bind.DatatypeConverter;
+import jakarta.xml.bind.DatatypeConverterInterface;
+import jakarta.xml.bind.annotation.adapters.HexBinaryAdapter;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.bus.spring.BusApplicationContext;

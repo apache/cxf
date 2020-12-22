@@ -65,7 +65,7 @@
             <!-- using compile instead of test so we don't need to import geronimo-servlet_3.0_spec -->
             <exclusions>
                 <exclusion>
-                    <groupId>javax.servlet</groupId>
+                    <groupId>jakarta.servlet</groupId>
                     <artifactId>servlet-api</artifactId>
                 </exclusion>
                 <exclusion>

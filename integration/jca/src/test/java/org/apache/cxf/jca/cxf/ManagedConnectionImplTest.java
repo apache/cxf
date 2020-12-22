@@ -27,7 +27,7 @@ import javax.resource.spi.ConnectionEvent;
 import javax.resource.spi.ManagedConnectionMetaData;
 import javax.resource.spi.ResourceAdapterInternalException;
 import javax.resource.spi.security.PasswordCredential;
-import javax.security.auth.Subject;
+import jakarta.security.auth.Subject;
 import javax.xml.namespace.QName;
 
 

@@ -20,8 +20,8 @@ package org.apache.cxf.aegis.namespaces.intf;
 
 import java.util.List;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
 
 import org.apache.cxf.aegis.namespaces.data.Name;
 

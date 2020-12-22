@@ -21,7 +21,7 @@ package org.apache.cxf.jaxrs.nio;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.servlet.ServletInputStream;
+import jakarta.servlet.ServletInputStream;
 
 public class NioInputStream extends InputStream {
     private final ServletInputStream in;

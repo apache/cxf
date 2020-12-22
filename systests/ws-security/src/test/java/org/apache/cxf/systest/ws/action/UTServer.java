@@ -22,7 +22,7 @@ package org.apache.cxf.systest.ws.action;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.ws.Endpoint;
+import jakarta..Endpoint;
 
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl;

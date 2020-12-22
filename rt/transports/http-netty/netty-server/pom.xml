@@ -34,13 +34,13 @@
         <cxf.module.name>org.apache.cxf.transport.http.netty.server</cxf.module.name>
         <cxf.bundle.activator>org.apache.cxf.transport.http.netty.server.blueprint.Activator</cxf.bundle.activator>
         <cxf.osgi.import>
-            javax.servlet*;version="[2,4)",
+            jakarta.servlet*;version="[2,4)",
             io.netty.*;version="${cxf.netty.version.range}",
-            javax.annotation;version="${cxf.osgi.javax.annotation.version}",
+            jakarta.annotation;version="${cxf.osgi.jakarta.annotation.version}",
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
             org.osgi.service.blueprint*;resolution:=optional,
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
-            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}"
+            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}"
         </cxf.osgi.import>
         <cxf.osgi.export>
             org.apache.cxf.*,

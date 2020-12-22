@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.tools.fortest.inherit;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(
     portName = "J2WDLSharedEndpointPort",

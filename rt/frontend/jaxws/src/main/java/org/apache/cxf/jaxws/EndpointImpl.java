@@ -31,19 +31,19 @@ import java.util.Map.Entry;
 import java.util.concurrent.Executor;
 import java.util.logging.Logger;
 
-import javax.wsdl.Definition;
+import jakarta.wsdl.Definition;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
-import javax.xml.ws.Binding;
-import javax.xml.ws.EndpointContext;
-import javax.xml.ws.EndpointReference;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.WebServiceFeature;
-import javax.xml.ws.WebServicePermission;
-import javax.xml.ws.handler.Handler;
-import javax.xml.ws.http.HTTPBinding;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
-import javax.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
+import jakarta.xml.ws.Binding;
+import jakarta.xml.ws.EndpointContext;
+import jakarta.xml.ws.EndpointReference;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.WebServiceFeature;
+import jakarta.xml.ws.WebServicePermission;
+import jakarta.xml.ws.handler.Handler;
+import jakarta.xml.ws.http.HTTPBinding;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
 
 import org.w3c.dom.Element;
 
@@ -78,7 +78,7 @@ import org.apache.cxf.transport.http_jaxws_spi.JAXWSHttpSpiTransportFactory;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 
-public class EndpointImpl extends javax.xml.ws.Endpoint
+public class EndpointImpl extends jakarta.xml.ws.Endpoint
     implements InterceptorProvider, Configurable, AutoCloseable {
     /**
      * This property controls whether the 'publishEndpoint' permission is checked
@@ -295,14 +295,14 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
 
     protected void checkProperties() {
         if (properties != null) {
-            if (properties.containsKey("javax.xml.ws.wsdl.description")) {
-                wsdlLocation = properties.get("javax.xml.ws.wsdl.description").toString();
+            if (properties.containsKey("jakarta.xml.ws.wsdl.description")) {
+                wsdlLocation = properties.get("jakarta.xml.ws.wsdl.description").toString();
             }
-            if (properties.containsKey(javax.xml.ws.Endpoint.WSDL_PORT)) {
-                endpointName = (QName)properties.get(javax.xml.ws.Endpoint.WSDL_PORT);
+            if (properties.containsKey(jakarta.xml.ws.Endpoint.WSDL_PORT)) {
+                endpointName = (QName)properties.get(jakarta.xml.ws.Endpoint.WSDL_PORT);
             }
-            if (properties.containsKey(javax.xml.ws.Endpoint.WSDL_SERVICE)) {
-                serviceName = (QName)properties.get(javax.xml.ws.Endpoint.WSDL_SERVICE);
+            if (properties.containsKey(jakarta.xml.ws.Endpoint.WSDL_SERVICE)) {
+                serviceName = (QName)properties.get(jakarta.xml.ws.Endpoint.WSDL_SERVICE);
             }
         }
     }
@@ -848,7 +848,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     public EndpointContext getEndpointContext() {
         return endpointContext;
     }
-    public void publish(javax.xml.ws.spi.http.HttpContext context) {
+    public void publish(jakarta.xml.ws.spi.http.HttpContext context) {
         ServerFactoryBean sf = getServerFactory();
         if (sf.getDestinationFactory() == null) {
             sf.setDestinationFactory(new JAXWSHttpSpiTransportFactory(context));

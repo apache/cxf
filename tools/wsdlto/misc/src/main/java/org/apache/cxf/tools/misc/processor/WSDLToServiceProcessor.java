@@ -23,12 +23,12 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 
-import javax.wsdl.Binding;
-import javax.wsdl.Port;
-import javax.wsdl.Service;
-import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.xml.WSDLWriter;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.Port;
+import jakarta.wsdl.Service;
+import jakarta.wsdl.WSDLException;
+import jakarta.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.xml.WSDLWriter;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.i18n.Message;

@@ -47,9 +47,9 @@ import java.util.jar.Manifest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.wsdl.Definition;
-import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLWriter;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.factory.WSDLFactory;
+import jakarta.wsdl.xml.WSDLWriter;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
@@ -419,8 +419,8 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
         defs.add(def);
         Iterator<?> ite1 = def.getImports().values().iterator();
         while (ite1.hasNext()) {
-            List<javax.wsdl.Import> defList = CastUtils.cast((List<?>)ite1.next());
-            for (javax.wsdl.Import importDef : defList) {
+            List<jakarta.wsdl.Import> defList = CastUtils.cast((List<?>)ite1.next());
+            for (jakarta.wsdl.Import importDef : defList) {
                 defs.add(importDef.getDefinition());
             }
         }

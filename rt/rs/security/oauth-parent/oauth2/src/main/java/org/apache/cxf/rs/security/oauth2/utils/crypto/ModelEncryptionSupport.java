@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.crypto.SecretKey;
-import javax.security.auth.DestroyFailedException;
+import jakarta.security.auth.DestroyFailedException;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;

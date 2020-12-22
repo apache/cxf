@@ -28,7 +28,7 @@ import java.net.URL;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.activation.DataSource;
+import jakarta.xml.bind.DataSource;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;

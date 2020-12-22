@@ -25,7 +25,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.ws.Binding;
+import jakarta.xml.ws.Binding;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;

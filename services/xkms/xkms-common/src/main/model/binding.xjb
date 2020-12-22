@@ -47,7 +47,7 @@
        </jaxb:schemaBindings>
        <!--jaxb:bindings node="xs:complexType[@name='MessageExtensionAbstractType']">
             <annox:annotate target="class">
-                <annox:annotate annox:class="javax.xml.bind.annotation.XmlSeeAlso" value="org.apache.cxf.xkms.model.extensions.ResultDetails.class" />
+                <annox:annotate annox:class="jakarta.xm.annotation.XmlSeeAlso" value="org.apache.cxf.xkms.model.extensions.ResultDetails.class" />
             </annox:annotate>           
        </jaxb:bindings-->
     </jaxb:bindings>

@@ -20,7 +20,7 @@
 package org.apache.cxf.jaxws.handler;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Binding;
+import jakarta.xml.ws.Binding;
 
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;

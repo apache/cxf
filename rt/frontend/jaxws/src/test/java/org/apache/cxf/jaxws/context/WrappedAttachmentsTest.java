@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.activation.DataHandler;
+import jakarta.acti.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.apache.cxf.attachment.AttachmentImpl;

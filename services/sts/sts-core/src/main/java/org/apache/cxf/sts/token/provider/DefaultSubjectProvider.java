@@ -31,8 +31,8 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
-import javax.security.auth.kerberos.KerberosPrincipal;
-import javax.security.auth.x500.X500Principal;
+import jakarta.security.auth.kerberos.KerberosPrincipal;
+import jakarta.security.auth.x500.X500Principal;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

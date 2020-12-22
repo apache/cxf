@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.performance.complex_type.server;
 
-import javax.xml.ws.Endpoint;
+import jakarta.xml.ws.Endpoint;
 
 
 

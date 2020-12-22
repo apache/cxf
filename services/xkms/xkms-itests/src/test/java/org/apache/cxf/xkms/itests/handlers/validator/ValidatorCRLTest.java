@@ -25,7 +25,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.UUID;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 
 import org.apache.cxf.xkms.handlers.XKMSConstants;
 import org.apache.cxf.xkms.itests.BasicIntegrationTest;

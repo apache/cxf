@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.systest.ws.security.handler;
 
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebService;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
 
 @WebService(name = "HelloWorld", targetNamespace = "http://cxf.apache.org/wsse/handler/helloworld")
 public interface HelloWorld {

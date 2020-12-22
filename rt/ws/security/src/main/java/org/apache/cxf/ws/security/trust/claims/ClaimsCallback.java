@@ -19,7 +19,7 @@
 
 package org.apache.cxf.ws.security.trust.claims;
 
-import javax.security.auth.callback.Callback;
+import jakarta.security.auth.callback.Callback;
 
 import org.apache.cxf.message.Message;
 

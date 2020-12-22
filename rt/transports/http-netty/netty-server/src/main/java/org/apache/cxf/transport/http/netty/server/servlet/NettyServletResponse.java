@@ -25,8 +25,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Locale;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
 
 import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -71,7 +71,7 @@ public class NettyServletResponse implements HttpServletResponse {
     }
 
     @Override
-    public void addCookie(javax.servlet.http.Cookie cookie) {
+    public void addCookie(jakarta.servlet.http.Cookie cookie) {
         //TODO Do we need to implement it ?
     }
 

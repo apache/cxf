@@ -64,7 +64,7 @@
                         org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet
                 </servlet-class>
         <init-param>
-            <param-name>javax.ws.rs.Application</param-name>
+            <param-name>jakarta.ws.rs.Application</param-name>
             <param-value>
                         org.apache.cxf.systest.jaxrs.BookApplication
                         (defaultName=default defaultId=543)
@@ -127,7 +127,7 @@
                         org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet
                 </servlet-class>
         <init-param>
-            <param-name>javax.ws.rs.Application</param-name>
+            <param-name>jakarta.ws.rs.Application</param-name>
             <param-value>org.apache.cxf.systest.jaxrs.BookApplication</param-value>
         </init-param>
         <init-param>
@@ -143,7 +143,7 @@
             org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet
         </servlet-class>
         <init-param>
-            <param-name>javax.ws.rs.Application</param-name>
+            <param-name>jakarta.ws.rs.Application</param-name>
             <param-value>
                org.apache.cxf.systest.jaxrs.BookApplication,
                org.apache.cxf.systest.jaxrs.BookApplication2

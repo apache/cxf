@@ -26,8 +26,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.soap.Detail;
 import javax.xml.soap.MessageFactory;
@@ -42,20 +42,20 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.ws.Binding;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.LogicalMessage;
-import javax.xml.ws.ProtocolException;
-import javax.xml.ws.Service;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.handler.Handler;
-import javax.xml.ws.handler.HandlerResolver;
-import javax.xml.ws.handler.LogicalMessageContext;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.PortInfo;
-import javax.xml.ws.handler.soap.SOAPMessageContext;
-import javax.xml.ws.soap.SOAPFaultException;
+import jakarta.xml.ws.Binding;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.LogicalMessage;
+import jakarta.xml.ws.ProtocolException;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.handler.Handler;
+import jakarta.xml.ws.handler.HandlerResolver;
+import jakarta.xml.ws.handler.LogicalMessageContext;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.handler.PortInfo;
+import jakarta.xml.ws.handler.soap.SOAPMessageContext;
+import jakarta.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Element;
 
@@ -928,8 +928,8 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
             e.printStackTrace(ps);
             assertTrue("Did not get expected exception message",  baos.toString()
                 .indexOf("HandleMessage throws exception") > -1);
-            assertTrue("Did not get expected javax.xml.ws.soap.SOAPFaultException", baos.toString()
-                .indexOf("javax.xml.ws.soap.SOAPFaultException") > -1);*/
+            assertTrue("Did not get expected jakarta.xml.ws.soap.SOAPFaultException", baos.toString()
+                .indexOf("jakarta.xml.ws.soap.SOAPFaultException") > -1);*/
 
         }
 
@@ -1107,8 +1107,8 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
             e.printStackTrace(ps);
             assertTrue("Did not get expected exception message", baos.toString()
                 .indexOf("handler2 HandleFault throws RuntimeException") > -1);
-            assertTrue("Did not get expected javax.xml.ws.soap.SOAPFaultException", baos.toString()
-                .indexOf("javax.xml.ws.soap.SOAPFaultException") > -1);*/
+            assertTrue("Did not get expected jakarta.xml.ws.soap.SOAPFaultException", baos.toString()
+                .indexOf("jakarta.xml.ws.soap.SOAPFaultException") > -1);*/
 
         }
     }
@@ -1126,8 +1126,8 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
             e.printStackTrace(ps);
             assertTrue("Did not get expected exception message", baos.toString()
                 .indexOf("handler2 HandleFault throws SOAPFaultException") > -1);
-            assertTrue("Did not get expected javax.xml.ws.soap.SOAPFaultException", baos.toString()
-                .indexOf("javax.xml.ws.soap.SOAPFaultException") > -1);*/
+            assertTrue("Did not get expected jakarta.xml.ws.soap.SOAPFaultException", baos.toString()
+                .indexOf("jakarta.xml.ws.soap.SOAPFaultException") > -1);*/
         }
     }
 

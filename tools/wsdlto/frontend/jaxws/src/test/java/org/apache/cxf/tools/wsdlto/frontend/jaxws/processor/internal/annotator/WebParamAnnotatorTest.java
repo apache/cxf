@@ -21,7 +21,7 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.annotator;
 
 import java.util.List;
 
-import javax.jws.soap.SOAPBinding;
+import jakarta.jws.soap.SOAPBinding;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.tools.common.model.JAnnotation;

@@ -24,12 +24,12 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
 
-import javax.wsdl.WSDLException;
-import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLReader;
+import jakarta.wsdl.WSDLException;
+import jakarta.wsdl.factory.WSDLFactory;
+import jakarta.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.WebServiceException;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.WebServiceException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -228,7 +228,7 @@ public class OASISCatalogTest {
         CatalogWSDLLocator wsdlLocator =
             new CatalogWSDLLocator(wsdl.toString(),
                                    OASISCatalogManager.getCatalogManager(null));
-        wsdlReader.setFeature("javax.wsdl.verbose", false);
+        wsdlReader.setFeature("jakarta.wsdl.verbose", false);
         wsdlReader.readWSDL(wsdlLocator);
     }
 
@@ -240,7 +240,7 @@ public class OASISCatalogTest {
 
         WSDLFactory wsdlFactory = WSDLFactory.newInstance();
         WSDLReader wsdlReader = wsdlFactory.newWSDLReader();
-        wsdlReader.setFeature("javax.wsdl.verbose", false);
+        wsdlReader.setFeature("jakarta.wsdl.verbose", false);
 
         OASISCatalogManager catalog = new OASISCatalogManager();
         CatalogWSDLLocator wsdlLocator =

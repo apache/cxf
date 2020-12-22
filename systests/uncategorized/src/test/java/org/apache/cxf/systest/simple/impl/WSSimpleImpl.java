@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.simple.impl;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 import org.apache.cxf.systest.simple.intf.WSSimple;
 

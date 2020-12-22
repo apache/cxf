@@ -24,8 +24,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.jms.ConnectionFactory;
-import javax.xml.ws.Endpoint;
+import jakarta.jms.ConnectionFactory;
+import jakarta.xml.ws.Endpoint;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.RedeliveryPolicy;

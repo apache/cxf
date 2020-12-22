@@ -27,7 +27,7 @@ import javax.resource.ResourceException;
 import javax.resource.spi.ConnectionManager;
 import javax.resource.spi.ConnectionRequestInfo;
 import javax.resource.spi.ManagedConnection;
-import javax.security.auth.Subject;
+import jakarta.security.auth.Subject;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
@@ -107,7 +107,7 @@ public class ManagedConnectionFactoryImpl
     // multiple instances with same config do not make sense to me
 
 
-    protected void validateReference(AbstractManagedConnectionImpl conn, javax.security.auth.Subject subj) {
+    protected void validateReference(AbstractManagedConnectionImpl conn, jakarta.security.auth.Subject subj) {
     }
 
     public Object createConnectionFactory() throws ResourceException {

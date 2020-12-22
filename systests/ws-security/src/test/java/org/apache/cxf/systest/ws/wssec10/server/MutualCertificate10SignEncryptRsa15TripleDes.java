@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.ws.wssec10.server;
 
-@javax.jws.WebService(
+@jakarta.jws.WebService(
     targetNamespace = "http://WSSec/wssec10",
     serviceName = "PingService",
     portName = "MutualCertificate10SignEncryptRsa15TripleDes_IPingService",

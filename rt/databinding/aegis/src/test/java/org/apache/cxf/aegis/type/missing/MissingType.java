@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.aegis.type.missing;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
 
 @WebService(name = "MissingType", targetNamespace = "urn:org:apache:cxf:aegis:type:missing")
 public interface MissingType {

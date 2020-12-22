@@ -21,7 +21,7 @@ package org.apache.cxf.ws.eventing.integration.notificationapi.assertions;
 
 import java.util.Set;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.xml.ws.handler.MessageContext;

@@ -86,7 +86,7 @@
             <artifactId>cxf-testutils</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.annotation</groupId>
+            <groupId>jakarta.annotation</groupId>
             <artifactId>jsr250-api</artifactId>
         </dependency>
         <dependency>

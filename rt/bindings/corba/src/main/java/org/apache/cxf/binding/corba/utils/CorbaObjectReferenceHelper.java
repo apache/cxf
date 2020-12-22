@@ -25,12 +25,12 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.wsdl.Binding;
-import javax.wsdl.Definition;
-import javax.wsdl.Import;
-import javax.wsdl.Port;
-import javax.wsdl.Service;
-import javax.xml.bind.DatatypeConverter;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Import;
+import jakarta.wsdl.Port;
+import jakarta.wsdl.Service;
+import jakarta.xml.bind.DatatypeConverter;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.corba.wsdl.BindingType;

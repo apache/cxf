@@ -21,7 +21,7 @@ package org.apache.cxf.wsdl11;
 import java.io.InputStream;
 import java.net.URL;
 
-import javax.wsdl.xml.WSDLLocator;
+import jakarta.wsdl.xml.WSDLLocator;
 
 import org.xml.sax.InputSource;
 

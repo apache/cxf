@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.jaxws.holder;
 
-import javax.xml.ws.Holder;
+import jakarta.xml.ws.Holder;
 
 import org.w3c.dom.Node;
 

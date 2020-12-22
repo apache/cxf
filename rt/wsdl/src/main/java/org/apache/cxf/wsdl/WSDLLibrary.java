@@ -27,7 +27,7 @@ public final class WSDLLibrary {
     static {
         boolean libraryAvailable = true;
         try {
-            ClassLoaderUtils.loadClass("javax.wsdl.Definition", WSDLLibrary.class);
+            ClassLoaderUtils.loadClass("jakarta.wsdl.Definition", WSDLLibrary.class);
         } catch (Throwable ex) {
             libraryAvailable = false;
         }

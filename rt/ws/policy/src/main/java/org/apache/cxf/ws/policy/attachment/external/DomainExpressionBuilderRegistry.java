@@ -22,7 +22,7 @@ package org.apache.cxf.ws.policy.attachment.external;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;

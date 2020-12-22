@@ -21,9 +21,9 @@ package org.apache.cxf.jaxws.handler;
 
 import java.util.List;
 
-import javax.jws.HandlerChain;
-import javax.jws.WebService;
-import javax.xml.ws.handler.Handler;
+import jakarta.jws.HandlerChain;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.handler.Handler;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -21,13 +21,13 @@ package org.apache.cxf.systest.jaxws;
 
 import java.math.BigInteger;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFactory;
 import javax.xml.soap.SOAPFault;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.soap.SOAPFaultException;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.soap.SOAPFaultException;
 
 @WebService(endpointInterface = "org.apache.cxf.systest.jaxws.DocLitBareCodeFirstService",
             serviceName = "DocLitBareCodeFirstService",

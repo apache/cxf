@@ -1,4 +1,4 @@
-<%@ page import="javax.servlet.http.HttpServletRequest, org.apache.cxf.rs.security.oidc.rp.OidcClientTokenContext" %>
+<%@ page import="jakarta.servlet.http.HttpServletRequest, org.apache.cxf.rs.security.oidc.rp.OidcClientTokenContext" %>
 
 <%
     OidcClientTokenContext oidc = (OidcClientTokenContext) request.getAttribute("data");

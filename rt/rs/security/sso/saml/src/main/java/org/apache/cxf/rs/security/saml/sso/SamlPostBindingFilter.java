@@ -23,11 +23,11 @@ import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
-import javax.security.auth.DestroyFailedException;
-import javax.security.auth.callback.CallbackHandler;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
+import jakarta.security.auth.DestroyFailedException;
+import jakarta.security.auth.callback.CallbackHandler;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response;
 
 import org.w3c.dom.Element;
 

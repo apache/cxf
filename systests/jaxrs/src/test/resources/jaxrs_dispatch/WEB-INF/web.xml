@@ -46,7 +46,7 @@
         <init-param>
             <param-name>redirect-attributes</param-name>
             <param-value>
-                javax.servlet.include.request_uri
+                jakarta.servlet.include.request_uri
             </param-value>
         </init-param>
         <init-param>
@@ -146,7 +146,7 @@
         <init-param>
             <param-name>redirect-attributes</param-name>
             <param-value>
-                javax.servlet.include.request_uri
+                jakarta.servlet.include.request_uri
             </param-value>
         </init-param>
         <init-param>

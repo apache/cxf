@@ -22,7 +22,7 @@ package org.apache.cxf.ws.policy.attachment.wsdl11;
 import java.net.URL;
 import java.util.List;
 
-import javax.wsdl.WSDLException;
+import jakarta.wsdl.WSDLException;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;

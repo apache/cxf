@@ -25,9 +25,9 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.wsdl.Binding;
-import javax.wsdl.Definition;
-import javax.wsdl.PortType;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.PortType;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Node;

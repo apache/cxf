@@ -21,7 +21,7 @@ package org.apache.cxf.interceptor.security;
 import java.security.Principal;
 import java.util.logging.Logger;
 
-import javax.security.auth.Subject;
+import jakarta.security.auth.Subject;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SecurityToken;

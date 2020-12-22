@@ -20,10 +20,10 @@ package org.apache.cxf.systest.https.conduit;
 
 import java.io.IOException;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
+import jakarta.security.auth.callback.Callback;
+import jakarta.security.auth.callback.CallbackHandler;
+import jakarta.security.auth.callback.PasswordCallback;
+import jakarta.security.auth.callback.UnsupportedCallbackException;
 
 public class KeyPasswordCallbackHandler implements CallbackHandler {
 

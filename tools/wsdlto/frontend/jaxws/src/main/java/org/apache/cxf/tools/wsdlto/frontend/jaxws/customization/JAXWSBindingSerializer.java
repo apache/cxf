@@ -21,11 +21,11 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.customization;
 
 import java.io.*;
 
-import javax.wsdl.Definition;
-import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.ExtensionRegistry;
-import javax.wsdl.extensions.ExtensionSerializer;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.WSDLException;
+import jakarta.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.extensions.ExtensionRegistry;
+import jakarta.wsdl.extensions.ExtensionSerializer;
 import javax.xml.namespace.QName;
 
 public class JAXWSBindingSerializer implements ExtensionSerializer, Serializable {

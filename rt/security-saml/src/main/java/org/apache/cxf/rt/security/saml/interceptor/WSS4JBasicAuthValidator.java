@@ -22,7 +22,7 @@ import java.security.Principal;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.security.auth.callback.CallbackHandler;
+import jakarta.security.auth.callback.CallbackHandler;
 
 import org.w3c.dom.Document;
 

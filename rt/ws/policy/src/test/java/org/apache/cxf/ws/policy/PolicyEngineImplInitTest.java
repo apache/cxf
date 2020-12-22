@@ -19,7 +19,7 @@
 
 package org.apache.cxf.ws.policy;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 
 import org.apache.cxf.Bus;

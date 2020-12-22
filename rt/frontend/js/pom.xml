@@ -33,7 +33,7 @@
     <properties>
         <cxf.module.name>org.apache.cxf.frontend.js</cxf.module.name>
         <cxf.osgi.import>
-            javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
+            jakarta.xml.ws*;version="${cxf.osgi.jakarta.xml.ws.version}",
         </cxf.osgi.import>
     </properties>
     <dependencies>

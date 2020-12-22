@@ -22,7 +22,7 @@ package org.apache.cxf.systest.jaxws;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.ws.Endpoint;
+import jakarta.xml.ws.Endpoint;
 
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.headers.HeaderTesterImpl;

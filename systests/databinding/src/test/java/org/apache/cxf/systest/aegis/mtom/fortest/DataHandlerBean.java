@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.aegis.mtom.fortest;
 
-import javax.activation.DataHandler;
+import jakarta.xml.bind.DataHandler;
 
 public class DataHandlerBean {
 

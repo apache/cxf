@@ -578,7 +578,7 @@ public abstract class AbstractCodegenMojo extends AbstractMojo {
             MessageDigest cript = MessageDigest.getInstance("SHA-1");
             cript.reset();
             cript.update(doneFileName.getBytes("utf8"));
-            doneFileName = new javax.xml.bind.annotation.adapters.HexBinaryAdapter().marshal(cript.digest());
+            doneFileName = new jakarta.xml.bind.annotation.adapters.HexBinaryAdapter().marshal(cript.digest());
         } catch (Exception e) {
             //ignore, we'll try and fake it based on the wsdl
 

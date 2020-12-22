@@ -18,7 +18,7 @@
 package $intf.PackageName;
 
 #if ($markGenerated == "true")
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 #end
 import javax.xml.ws.Endpoint;
 

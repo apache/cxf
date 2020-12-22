@@ -21,7 +21,7 @@ package demo.ws_policy.server;
 
 import java.util.logging.Logger;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.PingMeFault;

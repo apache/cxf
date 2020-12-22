@@ -24,19 +24,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionConsumer;
-import javax.jms.ConnectionFactory;
-import javax.jms.ConnectionMetaData;
-import javax.jms.DeliveryMode;
-import javax.jms.Destination;
-import javax.jms.ExceptionListener;
-import javax.jms.InvalidClientIDException;
-import javax.jms.JMSException;
-import javax.jms.Queue;
-import javax.jms.ServerSessionPool;
-import javax.jms.Session;
-import javax.jms.Topic;
+import jakarta.jms.Connection;
+import jakarta.jms.ConnectionConsumer;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.ConnectionMetaData;
+import jakarta.jms.DeliveryMode;
+import jakarta.jms.Destination;
+import jakarta.jms.ExceptionListener;
+import jakarta.jms.InvalidClientIDException;
+import jakarta.jms.JMSException;
+import jakarta.jms.Queue;
+import jakarta.jms.ServerSessionPool;
+import jakarta.jms.Session;
+import jakarta.jms.Topic;
 
 import org.apache.activemq.util.ServiceStopper;
 import org.apache.cxf.message.Exchange;
@@ -636,8 +636,8 @@ public class JMSDestinationTest extends AbstractJMSTester {
 
 
     protected void verifyReplyToNotSet(Message cxfMsg) {
-        javax.jms.Message jmsMsg =
-            javax.jms.Message.class.cast(cxfMsg.get(JMSConstants.JMS_REQUEST_MESSAGE));
+        jakarta.jms.Message jmsMsg =
+            jakarta.jms.Message.class.cast(cxfMsg.get(JMSConstants.JMS_REQUEST_MESSAGE));
         assertNotNull("JMS Messsage must be null", jmsMsg);
     }
 
@@ -651,8 +651,8 @@ public class JMSDestinationTest extends AbstractJMSTester {
     protected void verifyReplyToSet(Message cxfMsg,
                                     Class<? extends Destination> type,
                                     String expectedName) throws Exception {
-        javax.jms.Message jmsMsg =
-            javax.jms.Message.class.cast(cxfMsg.get(JMSConstants.JMS_REQUEST_MESSAGE));
+        jakarta.jms.Message jmsMsg =
+            jakarta.jms.Message.class.cast(cxfMsg.get(JMSConstants.JMS_REQUEST_MESSAGE));
         assertNotNull("JMS Messsage must not be null", jmsMsg);
         assertNotNull("JMS Messsage's replyTo must not be null", jmsMsg.getJMSReplyTo());
         assertTrue("JMS Messsage's replyTo type must be of type " + type.getName(),

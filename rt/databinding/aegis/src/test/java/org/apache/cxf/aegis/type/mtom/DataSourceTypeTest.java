@@ -21,7 +21,7 @@ package org.apache.cxf.aegis.type.mtom;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.activation.DataSource;
+import jakarta.activation.DataSource;
 
 import org.easymock.MockType;
 import org.junit.Test;

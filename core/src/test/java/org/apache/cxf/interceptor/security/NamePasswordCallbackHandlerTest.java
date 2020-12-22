@@ -19,9 +19,9 @@
 
 package org.apache.cxf.interceptor.security;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
+import jakarta.security.auth.callback.Callback;
+import jakarta.security.auth.callback.NameCallback;
+import jakarta.security.auth.callback.PasswordCallback;
 
 import org.junit.Test;
 

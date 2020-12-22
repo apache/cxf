@@ -30,7 +30,7 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.OrderColumn;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;

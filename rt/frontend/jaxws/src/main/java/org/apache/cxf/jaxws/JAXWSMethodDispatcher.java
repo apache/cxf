@@ -26,7 +26,7 @@ import java.lang.reflect.TypeVariable;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
-import javax.xml.ws.Response;
+import jakarta.xml.ws.Response;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;

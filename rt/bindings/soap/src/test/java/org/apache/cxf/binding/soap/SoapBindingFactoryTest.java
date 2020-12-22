@@ -23,8 +23,8 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 
-import javax.wsdl.Definition;
-import javax.wsdl.factory.WSDLFactory;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.factory.WSDLFactory;
 import javax.xml.namespace.QName;
 
 import org.xml.sax.InputSource;

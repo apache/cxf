@@ -77,7 +77,7 @@ public class SAMLSecurityContext implements ClaimsSecurityContext {
         return false;
     }
 
-    public javax.security.auth.Subject getSubject() {
+    public jakarta.security.auth.Subject getSubject() {
         return null;
     }
 

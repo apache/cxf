@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
+import jakarta..BindingProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;

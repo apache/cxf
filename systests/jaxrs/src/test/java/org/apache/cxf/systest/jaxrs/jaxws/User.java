@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.jaxrs.jaxws;
 
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @XmlJavaTypeAdapter(UserAdapter.class)
 public interface User {

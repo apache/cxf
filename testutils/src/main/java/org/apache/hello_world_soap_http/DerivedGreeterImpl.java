@@ -37,7 +37,7 @@ import org.apache.hello_world_soap_http.types.TestDocLitFaultResponse;
 import org.apache.hello_world_soap_http.types.TestNillableResponse;
 
 
-@javax.jws.WebService(name = "DerivedGreeter", serviceName = "DerivedGreeterService",
+@jakarta.jws.WebService(name = "DerivedGreeter", serviceName = "DerivedGreeterService",
                       targetNamespace = "http://apache.org/hello_world_soap_http")
 public class DerivedGreeterImpl implements Greeter {
 
@@ -69,9 +69,9 @@ public class DerivedGreeterImpl implements Greeter {
         return "Hi " + me + "!";
     }
 
-    @javax.jws.WebMethod(operationName = "sayHi")
+    @jakarta.jws.WebMethod(operationName = "sayHi")
     /*
-     * @javax.jws.WebResult(name="responseType",
+     * @jakarta.jws.WebResult(name="responseType",
      * targetNamespace="http://apache.org/hello_world_soap_http")
      */
     public String sayHi() {

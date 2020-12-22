@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.jose.jaxrs.multipart;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import org.apache.cxf.jaxrs.ext.multipart.MultipartInputFilter;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;

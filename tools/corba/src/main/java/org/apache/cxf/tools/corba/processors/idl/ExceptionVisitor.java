@@ -19,9 +19,9 @@
 
 package org.apache.cxf.tools.corba.processors.idl;
 
-import javax.wsdl.Definition;
-import javax.wsdl.Message;
-import javax.wsdl.Part;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Message;
+import jakarta.wsdl.Part;
 import javax.xml.namespace.QName;
 
 import antlr.collections.AST;

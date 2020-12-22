@@ -21,9 +21,9 @@ package org.apache.cxf.wsdl;
 
 import java.util.Map;
 
-import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.ExtensionRegistry;
+import jakarta.wsdl.WSDLException;
+import jakarta.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.extensions.ExtensionRegistry;
 
 public interface WSDLExtensibilityPlugin {
     void setExtensionRegistry(ExtensionRegistry registry);

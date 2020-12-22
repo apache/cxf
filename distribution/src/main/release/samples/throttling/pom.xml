@@ -47,7 +47,7 @@
                                     <wsdl>${wsdl.location}</wsdl>
                                     <seiSuper>
                                         <super>java.lang.AutoCloseable</super>
-                                        <super>javax.xml.ws.BindingProvider</super>
+                                        <super>jakarta.xml.ws.BindingProvider</super>
                                     </seiSuper>
                                 </wsdlOption>
                             </wsdlOptions>

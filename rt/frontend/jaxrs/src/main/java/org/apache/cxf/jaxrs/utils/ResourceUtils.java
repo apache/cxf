@@ -47,27 +47,27 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.BeanParam;
-import javax.ws.rs.CookieParam;
-import javax.ws.rs.Encoded;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.MatrixParam;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.Suspended;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.Provider;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.BeanParam;
+import jakarta.ws.rs.CookieParam;
+import jakarta.ws.rs.Encoded;
+import jakarta.ws.rs.FormParam;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.MatrixParam;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.container.AsyncResponse;
+import jakarta.ws.rs.container.Suspended;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.MessageBodyWriter;
+import jakarta.ws.rs.ext.Provider;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
@@ -115,17 +115,17 @@ public final class ResourceUtils {
     private static final Set<String> SERVER_PROVIDER_CLASS_NAMES;
     static {
         SERVER_PROVIDER_CLASS_NAMES = new HashSet<>();
-        SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.ext.MessageBodyWriter");
-        SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.ext.MessageBodyReader");
-        SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.ext.ExceptionMapper");
-        SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.ext.ContextResolver");
-        SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.ext.ReaderInterceptor");
-        SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.ext.WriterInterceptor");
-        SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.ext.ParamConverterProvider");
-        SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.container.ContainerRequestFilter");
-        SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.container.ContainerResponseFilter");
-        SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.container.DynamicFeature");
-        SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.core.Feature");
+        SERVER_PROVIDER_CLASS_NAMES.add("jakarta.ws.rs.ext.MessageBodyWriter");
+        SERVER_PROVIDER_CLASS_NAMES.add("jakarta.ws.rs.ext.MessageBodyReader");
+        SERVER_PROVIDER_CLASS_NAMES.add("jakarta.ws.rs.ext.ExceptionMapper");
+        SERVER_PROVIDER_CLASS_NAMES.add("jakarta.ws.rs.ext.ContextResolver");
+        SERVER_PROVIDER_CLASS_NAMES.add("jakarta.ws.rs.ext.ReaderInterceptor");
+        SERVER_PROVIDER_CLASS_NAMES.add("jakarta.ws.rs.ext.WriterInterceptor");
+        SERVER_PROVIDER_CLASS_NAMES.add("jakarta.ws.rs.ext.ParamConverterProvider");
+        SERVER_PROVIDER_CLASS_NAMES.add("jakarta.ws.rs.container.ContainerRequestFilter");
+        SERVER_PROVIDER_CLASS_NAMES.add("jakarta.ws.rs.container.ContainerResponseFilter");
+        SERVER_PROVIDER_CLASS_NAMES.add("jakarta.ws.rs.container.DynamicFeature");
+        SERVER_PROVIDER_CLASS_NAMES.add("jakarta.ws.rs.core.Feature");
         SERVER_PROVIDER_CLASS_NAMES.add("org.apache.cxf.jaxrs.ext.ContextProvider");
 
     }
@@ -671,7 +671,7 @@ public final class ResourceUtils {
                                                MessageBodyWriter<?> jaxbWriter) {
         Class<?> jaxbElement = null;
         try {
-            jaxbElement = ClassLoaderUtils.loadClass("javax.xml.bind.JAXBElement", ResourceUtils.class);
+            jaxbElement = ClassLoaderUtils.loadClass("jakarta.xml.bind.JAXBElement", ResourceUtils.class);
         } catch (final ClassNotFoundException e) {
             // no-op
         }

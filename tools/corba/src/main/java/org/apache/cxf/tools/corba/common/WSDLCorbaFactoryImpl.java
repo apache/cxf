@@ -19,12 +19,12 @@
 
 package org.apache.cxf.tools.corba.common;
 
-import javax.wsdl.Definition;
-import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.ExtensionRegistry;
-import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLReader;
-import javax.wsdl.xml.WSDLWriter;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.WSDLException;
+import jakarta.wsdl.extensions.ExtensionRegistry;
+import jakarta.wsdl.factory.WSDLFactory;
+import jakarta.wsdl.xml.WSDLReader;
+import jakarta.wsdl.xml.WSDLWriter;
 
 
 /**

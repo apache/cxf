@@ -36,9 +36,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.annotation.XmlElementDecl;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.annotation.XmlElementDecl;
 import javax.xml.transform.dom.DOMSource;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;

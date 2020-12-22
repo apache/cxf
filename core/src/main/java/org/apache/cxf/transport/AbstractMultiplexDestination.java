@@ -20,7 +20,7 @@ package org.apache.cxf.transport;
 
 import java.util.Map;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;

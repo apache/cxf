@@ -19,7 +19,7 @@
 
 package org.apache.cxf.ws.transfer.integration;
 
-import javax.xml.ws.BindingProvider;
+import jakarta.xml.ws.BindingProvider;
 
 import org.w3c.dom.Element;
 

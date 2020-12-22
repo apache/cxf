@@ -19,7 +19,7 @@
 
 package org.apache.cxf.transport.jms.wsdl11;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
@@ -58,9 +58,9 @@ public final class JMSWSDLExtensionLoader implements WSDLExtensionLoader {
         this.bus = b;
         WSDLManager manager = b.getExtension(WSDLManager.class);
         for (Class<?> extensor : EXTENSORS) {
-            addExtensions(manager, javax.wsdl.Binding.class, extensor);
-            addExtensions(manager, javax.wsdl.Port.class, extensor);
-            addExtensions(manager, javax.wsdl.Service.class, extensor);
+            addExtensions(manager, jakarta.wsdl.Binding.class, extensor);
+            addExtensions(manager, jakarta.wsdl.Port.class, extensor);
+            addExtensions(manager, jakarta.wsdl.Service.class, extensor);
         }
     }
 

@@ -21,7 +21,7 @@ package org.apache.cxf.jaxws.support;
 
 import java.lang.reflect.Method;
 
-import javax.activation.DataSource;
+import jakarta.activation.DataSource;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.transform.Source;

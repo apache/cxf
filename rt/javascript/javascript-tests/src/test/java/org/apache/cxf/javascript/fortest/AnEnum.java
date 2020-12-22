@@ -19,8 +19,8 @@
 
 package org.apache.cxf.javascript.fortest;
 
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlEnum;
+import jakarta.xml.bind.annotation.XmlType;
 
 @XmlEnum
 @XmlType(namespace = "uri:org.apache.cxf.javascript.testns")

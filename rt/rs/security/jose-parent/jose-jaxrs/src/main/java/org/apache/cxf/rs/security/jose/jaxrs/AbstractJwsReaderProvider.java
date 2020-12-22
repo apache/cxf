@@ -20,7 +20,7 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.util.Set;
 
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsHeaders;

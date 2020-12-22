@@ -23,7 +23,7 @@ import java.security.Principal;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.security.auth.Subject;
+import jakarta.security.auth.Subject;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.message.Message;

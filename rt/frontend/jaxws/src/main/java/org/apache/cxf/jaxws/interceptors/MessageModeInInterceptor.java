@@ -27,7 +27,7 @@ import java.io.Writer;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.activation.DataSource;
+import jakarta.activation.DataSource;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.stream.XMLStreamWriter;

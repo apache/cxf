@@ -26,12 +26,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
 
-import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.ExtensionRegistry;
-import javax.wsdl.xml.WSDLWriter;
+import jakarta.wsdl.WSDLException;
+import jakarta.wsdl.extensions.ExtensionRegistry;
+import jakarta.wsdl.xml.WSDLWriter;
 
 public abstract class SchemaFactory {
-    private static final String PROPERTY_NAME = "javax.wsdl.factory.SchemaFactory";
+    private static final String PROPERTY_NAME = "jakarta.wsdl.factory.SchemaFactory";
     private static final String PROPERTY_FILE_NAME = "wsdl.properties";
     private static final String DEFAULT_FACTORY_IMPL_NAME =
         "org.apache.cxf.tools.corba.processors.wsdl.SchemaFactoryImpl";
@@ -45,7 +45,7 @@ public abstract class SchemaFactory {
      * class which implements WSDLFactory. The steps (in order)
      * are:
      *<pre>
-     *  Check the javax.wsdl.factory.WSDLFactory system property.
+     *  Check the jakarta.wsdl.factory.WSDLFactory system property.
      *  Check the lib/wsdl.properties file in the JRE directory. The key
      * will have the same name as the above system property.
      *  Use the default value.

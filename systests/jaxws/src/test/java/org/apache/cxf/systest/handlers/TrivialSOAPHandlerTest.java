@@ -21,7 +21,7 @@ package org.apache.cxf.systest.handlers;
 
 import java.lang.reflect.UndeclaredThrowableException;
 
-import javax.xml.ws.Endpoint;
+import jakarta.xml.ws.Endpoint;
 
 
 import org.apache.cxf.greeter_control.Greeter;

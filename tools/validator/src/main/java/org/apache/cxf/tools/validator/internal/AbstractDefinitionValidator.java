@@ -19,7 +19,7 @@
 
 package org.apache.cxf.tools.validator.internal;
 
-import javax.wsdl.Definition;
+import jakarta.wsdl.Definition;
 import javax.xml.stream.Location;
 
 import org.apache.cxf.Bus;

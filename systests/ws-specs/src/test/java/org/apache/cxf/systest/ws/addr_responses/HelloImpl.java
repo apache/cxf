@@ -17,7 +17,7 @@
  * under the License.
  */
 package org.apache.cxf.systest.ws.addr_responses;
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 import javax.xml.ws.soap.Addressing;
 import javax.xml.ws.soap.AddressingFeature.Responses;
 

@@ -19,8 +19,8 @@
 
 package org.apache.cxf.tools.fortest.refparam;
 
-import javax.jws.WebParam;
-import javax.jws.WebService;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
 import javax.xml.ws.Action;
 import javax.xml.ws.soap.Addressing;
 

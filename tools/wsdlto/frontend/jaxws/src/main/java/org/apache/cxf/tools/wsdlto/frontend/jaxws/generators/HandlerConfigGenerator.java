@@ -22,7 +22,7 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.generators;
 import java.io.Writer;
 import java.util.List;
 
-import javax.jws.HandlerChain;
+import jakarta.jws.HandlerChain;
 
 import org.w3c.dom.Element;
 

@@ -22,8 +22,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.attachment.AttachmentImpl;
@@ -31,7 +31,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Attachment;
 
 /**
- * Binding for {@link javax.activation.DataSource}.
+ * Binding for {@link jakarta.activation.DataSource}.
  */
 public class DataSourceType extends AbstractXOPType {
     public DataSourceType(boolean useXmimeBinaryType, String expectedContentTypes) {

@@ -33,14 +33,14 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
-import javax.jws.HandlerChain;
-import javax.jws.Oneway;
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
-import javax.xml.bind.annotation.XmlList;
+import jakarta.jws.HandlerChain;
+import jakarta.jws.Oneway;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
+import jakarta.xml.bind.annotation.XmlList;
 import javax.xml.ws.Holder;
 import javax.xml.ws.RequestWrapper;
 import javax.xml.ws.ResponseWrapper;
@@ -277,7 +277,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         Class<?> clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_rpclit.GreeterRPCLit");
 
-        javax.jws.WebService ws = AnnotationUtil.getPrivClassAnnotation(clz, javax.jws.WebService.class);
+        jakarta.jws.WebService ws = AnnotationUtil.getPrivClassAnnotation(clz, jakarta.jws.WebService.class);
 
         SOAPBinding soapBindingAnno = AnnotationUtil.getPrivClassAnnotation(clz, SOAPBinding.class);
         assertEquals("LITERAL", soapBindingAnno.use().toString());
@@ -292,7 +292,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_rpclit.SoapPortRPCLitImpl");
         assertNotNull(clz);
-        ws = AnnotationUtil.getPrivClassAnnotation(clz, javax.jws.WebService.class);
+        ws = AnnotationUtil.getPrivClassAnnotation(clz, jakarta.jws.WebService.class);
         assertNotNull(ws);
         assertTrue("Webservice annotation wsdlLocation should begin with file", ws.wsdlLocation()
             .startsWith("file"));
@@ -1168,7 +1168,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         Type[] types = method1.getGenericParameterTypes();
         ParameterizedType paraType = (ParameterizedType)types[1];
         Class<?> typeClass = (Class<?>)paraType.getActualTypeArguments()[0];
-        assertEquals("javax.activation.DataHandler", typeClass.getName());
+        assertEquals("jakarta.activation.DataHandler", typeClass.getName());
     }
 
     @Test

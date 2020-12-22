@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.transport.servlet;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
 
 /**
  * Interface to be implemented by any Destination that wishes to be notified of the

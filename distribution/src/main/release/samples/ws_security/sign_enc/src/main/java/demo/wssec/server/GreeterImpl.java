@@ -22,7 +22,7 @@ package demo.wssec.server;
 import java.util.logging.Logger;
 import org.apache.cxf.hello_world_soap_http.Greeter;
 
-@javax.jws.WebService(serviceName = "GreeterService",
+@jakarta.jws.WebService(serviceName = "GreeterService",
             portName = "GreeterPort",
             endpointInterface = "org.apache.cxf.hello_world_soap_http.Greeter",
             wsdlLocation = "file:./wsdl/hello_world_wssec.wsdl",

@@ -21,8 +21,8 @@ package org.apache.cxf.jaxws;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.wsdl.Definition;
-import javax.wsdl.xml.WSDLWriter;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.xml.WSDLWriter;
 import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;

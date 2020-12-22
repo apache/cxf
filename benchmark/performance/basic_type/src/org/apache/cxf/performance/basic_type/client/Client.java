@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
+import jakarta.xml.ws.BindingProvider;
 
 import org.apache.cxf.pat.internal.TestCaseBase;
 import org.apache.cxf.pat.internal.TestResult;

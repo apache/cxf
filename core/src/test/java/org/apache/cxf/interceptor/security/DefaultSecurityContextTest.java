@@ -22,7 +22,7 @@ import java.security.Principal;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.security.auth.Subject;
+import jakarta.security.auth.Subject;
 
 import org.apache.cxf.common.security.GroupPrincipal;
 import org.apache.cxf.common.security.SimpleGroup;

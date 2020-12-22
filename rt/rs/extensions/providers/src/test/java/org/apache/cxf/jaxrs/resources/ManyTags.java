@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.jaxrs.resources;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "ManyTags")
 public class ManyTags {

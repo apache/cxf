@@ -21,9 +21,9 @@
 package org.apache.cxf.systest.jaxrs;
 
 
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.UriInfo;
 
 @Path("/atom")
 public class AtomBookStore3 extends AtomBookStore {

@@ -19,7 +19,7 @@
 
 package org.apache.cxf.jaxrs.ext.multipart;
 
-import javax.activation.DataHandler;
+import jakarta.activation.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;

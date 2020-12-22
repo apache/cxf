@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.jaxws.cxf5064;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(targetNamespace = "http://cxf.apache.org/cxf5064")
 public class SOAPHeaderServiceImpl implements SOAPHeaderSEI {

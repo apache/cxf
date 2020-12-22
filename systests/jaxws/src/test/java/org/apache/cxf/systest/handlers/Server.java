@@ -21,8 +21,8 @@ package org.apache.cxf.systest.handlers;
 
 // import java.util.ArrayList;
 // import java.util.List;
-import javax.xml.ws.Endpoint;
-// import javax.xml.ws.handler.Handler;
+import jakarta.xml.ws.Endpoint;
+// import jakarta.xml.ws.handler.Handler;
 
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;

@@ -19,7 +19,7 @@
 
 package demo.jaxws.tracing.server;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService
 public interface CatalogService {

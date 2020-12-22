@@ -53,20 +53,20 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.ParamConverter;
-import javax.ws.rs.ext.Providers;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.GenericEntity;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.PathSegment;
+import jakarta.ws.rs.core.Request;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.SecurityContext;
+import jakarta.ws.rs.core.UriInfo;
+import jakarta.ws.rs.ext.ContextResolver;
+import jakarta.ws.rs.ext.ParamConverter;
+import jakarta.ws.rs.ext.Providers;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
@@ -116,24 +116,24 @@ public final class InjectionUtils {
         STANDARD_CONTEXT_CLASSES.add(SecurityContext.class.getName());
         STANDARD_CONTEXT_CLASSES.add(Providers.class.getName());
         STANDARD_CONTEXT_CLASSES.add(ContextResolver.class.getName());
-        STANDARD_CONTEXT_CLASSES.add("javax.servlet.http.HttpServletRequest");
-        STANDARD_CONTEXT_CLASSES.add("javax.servlet.http.HttpServletResponse");
-        STANDARD_CONTEXT_CLASSES.add("javax.servlet.ServletContext");
+        STANDARD_CONTEXT_CLASSES.add("jakarta.servlet.http.HttpServletRequest");
+        STANDARD_CONTEXT_CLASSES.add("jakarta.servlet.http.HttpServletResponse");
+        STANDARD_CONTEXT_CLASSES.add("jakarta.servlet.ServletContext");
         // JAX-RS 2.0
-        STANDARD_CONTEXT_CLASSES.add("javax.ws.rs.container.ResourceContext");
-        STANDARD_CONTEXT_CLASSES.add("javax.ws.rs.container.ResourceInfo");
-        STANDARD_CONTEXT_CLASSES.add("javax.ws.rs.core.Configuration");
+        STANDARD_CONTEXT_CLASSES.add("jakarta.ws.rs.container.ResourceContext");
+        STANDARD_CONTEXT_CLASSES.add("jakarta.ws.rs.container.ResourceInfo");
+        STANDARD_CONTEXT_CLASSES.add("jakarta.ws.rs.core.Configuration");
         // JAX-RS 2.1
-        STANDARD_CONTEXT_CLASSES.add("javax.ws.rs.sse.Sse");
-        STANDARD_CONTEXT_CLASSES.add("javax.ws.rs.sse.SseEventSink");
+        STANDARD_CONTEXT_CLASSES.add("jakarta.ws.rs.sse.Sse");
+        STANDARD_CONTEXT_CLASSES.add("jakarta.ws.rs.sse.SseEventSink");
 
         VALUE_CONTEXTS.add(Application.class.getName());
-        VALUE_CONTEXTS.add("javax.ws.rs.sse.Sse");
+        VALUE_CONTEXTS.add("jakarta.ws.rs.sse.Sse");
 
         boolean useJaxb;
         try {
             ClassLoaderUtils.loadClass(
-                    "javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter",
+                    "jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter",
                     InjectionUtils.class);
             useJaxb = true;
         } catch (final ClassNotFoundException cnfe) {
@@ -145,10 +145,10 @@ public final class InjectionUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(InjectionUtils.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(InjectionUtils.class);
 
-    private static final String SERVLET_CONFIG_CLASS_NAME = "javax.servlet.ServletConfig";
-    private static final String SERVLET_CONTEXT_CLASS_NAME = "javax.servlet.ServletContext";
-    private static final String HTTP_SERVLET_REQUEST_CLASS_NAME = "javax.servlet.http.HttpServletRequest";
-    private static final String HTTP_SERVLET_RESPONSE_CLASS_NAME = "javax.servlet.http.HttpServletResponse";
+    private static final String SERVLET_CONFIG_CLASS_NAME = "jakarta.servlet.ServletConfig";
+    private static final String SERVLET_CONTEXT_CLASS_NAME = "jakarta.servlet.ServletContext";
+    private static final String HTTP_SERVLET_REQUEST_CLASS_NAME = "jakarta.servlet.http.HttpServletRequest";
+    private static final String HTTP_SERVLET_RESPONSE_CLASS_NAME = "jakarta.servlet.http.HttpServletResponse";
     private static final String ENUM_CONVERSION_CASE_SENSITIVE = "enum.conversion.case.sensitive";
 
     private static final String IGNORE_MATRIX_PARAMETERS = "ignore.matrix.parameters";
@@ -1148,7 +1148,7 @@ public final class InjectionUtils {
     }
 
     private static boolean isServletApiContext(String name) {
-        return name.startsWith("javax.servlet.");
+        return name.startsWith("jakarta.servlet.");
     }
 
     private static ThreadLocalProxy<?> createThreadLocalServletApiContext(String name) {
@@ -1417,7 +1417,7 @@ public final class InjectionUtils {
         for (Annotation ann : m.getAnnotations()) {
             String annType = ann.annotationType().getName();
             if ("org.apache.cxf.aegis.type.java5.IgnoreProperty".equals(annType)
-                || "javax.xml.bind.annotation.XmlTransient".equals(annType)) {
+                || "jakarta.xml.bind.annotation.XmlTransient".equals(annType)) {
                 return true;
             }
         }

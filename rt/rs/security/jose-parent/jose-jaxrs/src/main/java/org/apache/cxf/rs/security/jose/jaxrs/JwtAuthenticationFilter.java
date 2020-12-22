@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.rs.security.jose.jaxrs;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.HttpHeaders;
 
 import org.apache.cxf.rs.security.jose.common.JoseException;
 

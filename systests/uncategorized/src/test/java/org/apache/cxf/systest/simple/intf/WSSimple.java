@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.simple.intf;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(name = "WSSimple ", targetNamespace = "http://systest.cxf.apache.org")
 public interface WSSimple {

@@ -19,7 +19,7 @@
 
 package org.apache.cxf.ws.security.kerberos;
 
-import javax.security.auth.callback.CallbackHandler;
+import jakarta.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;

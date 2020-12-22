@@ -20,7 +20,7 @@
 package org.apache.cxf.systest.ws.rm;
 
 
-import javax.xml.ws.Endpoint;
+import jakarta..Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;

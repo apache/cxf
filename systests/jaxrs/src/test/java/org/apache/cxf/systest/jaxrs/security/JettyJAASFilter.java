@@ -20,8 +20,8 @@ package org.apache.cxf.systest.jaxrs.security;
 
 import java.lang.reflect.InvocationTargetException;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
+import jakarta.security.auth.callback.Callback;
+import jakarta.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.interceptor.security.NamePasswordCallbackHandler;
 import org.apache.cxf.jaxrs.security.JAASAuthenticationFilter;

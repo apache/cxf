@@ -22,9 +22,9 @@ package org.apache.cxf.systest.jaxrs;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.ws.rs.Path;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import jakarta.ws.rs.Path;
 
 @Path("/bookstorestorage/")
 public abstract class BookStoreStorage implements LifecycleInterface {

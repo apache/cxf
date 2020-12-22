@@ -23,7 +23,7 @@ import java.net.URL;
 
 import javax.resource.ResourceException;
 import javax.resource.spi.ConnectionEventListener;
-import javax.security.auth.Subject;
+import jakarta.security.auth.Subject;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;

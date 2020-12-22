@@ -31,12 +31,12 @@ import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.TrustManagerFactory;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
+import jakarta.security.auth.callback.Callback;
+import jakarta.security.auth.callback.CallbackHandler;
+import jakarta.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Service;
+import jakarta..BindingProvider;
+import jakarta..Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;

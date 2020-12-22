@@ -28,11 +28,11 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Service;
-import javax.xml.ws.handler.MessageContext;
+import jakarta..BindingProvider;
+import jakarta..Dispatch;
+import jakarta..Endpoint;
+import jakarta..Service;
+import jakarta..handler.MessageContext;
 
 import org.w3c.dom.Document;
 

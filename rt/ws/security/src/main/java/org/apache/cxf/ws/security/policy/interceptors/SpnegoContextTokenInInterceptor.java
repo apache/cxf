@@ -22,7 +22,7 @@ package org.apache.cxf.ws.security.policy.interceptors;
 import java.time.Instant;
 import java.util.Collection;
 
-import javax.security.auth.callback.CallbackHandler;
+import jakarta.security.auth.callback.CallbackHandler;
 
 import org.w3c.dom.Element;
 

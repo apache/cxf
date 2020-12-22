@@ -29,8 +29,8 @@ import java.util.Arrays;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
-import javax.security.auth.DestroyFailedException;
-import javax.security.auth.callback.CallbackHandler;
+import jakarta.security.auth.DestroyFailedException;
+import jakarta.security.auth.callback.CallbackHandler;
 import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Document;

@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.services;
 
-import javax.ws.rs.Path;
+import jakarta.ws.rs.Path;
 
 public class WellKnownService {
 

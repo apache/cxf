@@ -19,7 +19,7 @@
 
 package org.apache.cxf.binding.corba.wsdl;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
@@ -43,27 +43,27 @@ public final class WSDLExtensionRegister implements WSDLExtensionLoader {
     }
 
     void registerCXFExtensors(WSDLManager manager) {
-        createExtensor(manager, javax.wsdl.Binding.class,
+        createExtensor(manager, jakarta.wsdl.Binding.class,
                              org.apache.cxf.binding.corba.wsdl.BindingType.class);
-        createExtensor(manager, javax.wsdl.BindingOperation.class,
+        createExtensor(manager, jakarta.wsdl.BindingOperation.class,
                              org.apache.cxf.binding.corba.wsdl.OperationType.class);
-        createExtensor(manager, javax.wsdl.Definition.class,
+        createExtensor(manager, jakarta.wsdl.Definition.class,
                              org.apache.cxf.binding.corba.wsdl.TypeMappingType.class);
-        createExtensor(manager, javax.wsdl.Port.class,
+        createExtensor(manager, jakarta.wsdl.Port.class,
                              org.apache.cxf.binding.corba.wsdl.AddressType.class);
-        createExtensor(manager, javax.wsdl.Port.class,
+        createExtensor(manager, jakarta.wsdl.Port.class,
                              org.apache.cxf.binding.corba.wsdl.PolicyType.class);
     }
     void registerYokoCompatibleExtensors(WSDLManager manager) {
-        createCompatExtensor(manager, javax.wsdl.Binding.class,
+        createCompatExtensor(manager, jakarta.wsdl.Binding.class,
                              org.apache.cxf.binding.corba.wsdl.BindingType.class);
-        createCompatExtensor(manager, javax.wsdl.BindingOperation.class,
+        createCompatExtensor(manager, jakarta.wsdl.BindingOperation.class,
                              org.apache.cxf.binding.corba.wsdl.OperationType.class);
-        createCompatExtensor(manager, javax.wsdl.Definition.class,
+        createCompatExtensor(manager, jakarta.wsdl.Definition.class,
                              org.apache.cxf.binding.corba.wsdl.TypeMappingType.class);
-        createCompatExtensor(manager, javax.wsdl.Port.class,
+        createCompatExtensor(manager, jakarta.wsdl.Port.class,
                              org.apache.cxf.binding.corba.wsdl.AddressType.class);
-        createCompatExtensor(manager, javax.wsdl.Port.class,
+        createCompatExtensor(manager, jakarta.wsdl.Port.class,
                              org.apache.cxf.binding.corba.wsdl.PolicyType.class);
     }
     private void createExtensor(WSDLManager manager,

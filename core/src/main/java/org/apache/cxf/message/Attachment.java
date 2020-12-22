@@ -21,7 +21,7 @@ package org.apache.cxf.message;
 
 import java.util.Iterator;
 
-import javax.activation.DataHandler;
+import jakarta.activation.DataHandler;
 
 public interface Attachment {
     DataHandler getDataHandler();

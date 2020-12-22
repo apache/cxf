@@ -16,10 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-@javax.xml.bind.annotation.XmlSchema(
+@jakarta.xml.bind.annotation.XmlSchema(
     namespace = "http://schemas.xmlsoap.org/ws/2005/02/rm",
-    elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED,
-    xmlns = { @javax.xml.bind.annotation.XmlNs(namespaceURI = "http://schemas.xmlsoap.org/ws/2005/02/rm",
+    elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED,
+    xmlns = { @jakarta.xml.bind.annotation.XmlNs(namespaceURI = "http://schemas.xmlsoap.org/ws/2005/02/rm",
                                                prefix = "wsrm") })
 package org.apache.cxf.ws.rm.v200502wsa15;
 

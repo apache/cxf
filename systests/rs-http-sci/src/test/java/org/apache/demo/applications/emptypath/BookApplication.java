@@ -18,7 +18,7 @@
  */
 package org.apache.demo.applications.emptypath;
 
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.core.Application;
 
 public class BookApplication extends Application {
 }

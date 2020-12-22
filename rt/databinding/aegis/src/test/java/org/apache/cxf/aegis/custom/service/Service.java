@@ -21,7 +21,7 @@ package org.apache.cxf.aegis.custom.service;
 import java.util.Collection;
 import java.util.Map;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService
 public interface Service {

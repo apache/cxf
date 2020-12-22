@@ -27,7 +27,7 @@ import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
 import cxf.common.Bank;
 
-@javax.jws.WebService(portName = "BankCORBAPort",
+@jakarta.jws.WebService(portName = "BankCORBAPort",
                       serviceName = "BankCORBAService",
                       targetNamespace = "http://cxf.apache.org/schemas/cxf/idl/Bank",
                       wsdlLocation = "classpath:/wsdl/BankWS-corba.wsdl",

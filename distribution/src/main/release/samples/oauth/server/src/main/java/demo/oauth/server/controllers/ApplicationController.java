@@ -22,8 +22,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.security.SecureRandom;
 import java.util.Set;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.cxf.common.util.StringUtils;
 

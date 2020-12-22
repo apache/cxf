@@ -22,8 +22,8 @@ package org.apache.cxf.jaxb.attachment;
 import java.util.Collection;
 import java.util.UUID;
 
-import javax.activation.DataHandler;
-import javax.xml.bind.attachment.AttachmentMarshaller;
+import jakarta.activation.DataHandler;
+import jakarta.xml.bind.attachment.AttachmentMarshaller;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.attachment.AttachmentImpl;

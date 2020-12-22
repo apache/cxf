@@ -240,7 +240,7 @@ public class Java2WSMojo extends AbstractMojo {
             boolean skipXmlWsModule = JavaUtils.isJava11Compatible(); //
             additionalJvmArgs = "--add-exports=jdk.xml.dom/org.w3c.dom.html=ALL-UNNAMED "
                     + "--add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs=ALL-UNNAMED "
-                    + (skipXmlWsModule ? "" : "--add-opens java.xml.ws/javax.xml.ws.wsaddressing=ALL-UNNAMED ")
+                    + (skipXmlWsModule ? "" : "--add-opens java.xml.ws/jakarta.xml.ws.wsaddressing=ALL-UNNAMED ")
                     + "--add-opens java.base/java.security=ALL-UNNAMED "
                     + "--add-opens java.base/java.net=ALL-UNNAMED "
                     + "--add-opens java.base/java.lang=ALL-UNNAMED "

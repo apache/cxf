@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.ws.wssec11.server;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.systest.ws.common.KeystorePasswordCallback;

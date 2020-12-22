@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 import javax.json.JsonObject;
 import javax.json.JsonString;
 import javax.json.JsonStructure;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
