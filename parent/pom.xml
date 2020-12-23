@@ -126,7 +126,7 @@
         <cxf.httpcomponents.asyncclient.version>4.1.4</cxf.httpcomponents.asyncclient.version>
         <cxf.httpcomponents.client.version>4.5.13</cxf.httpcomponents.client.version>
         <cxf.httpcomponents.core.version.range>[4.3,4.5.0)</cxf.httpcomponents.core.version.range>
-        <cxf.httpcomponents.core.version>4.4.13</cxf.httpcomponents.core.version>
+        <cxf.httpcomponents.core.version>4.4.14</cxf.httpcomponents.core.version>
         <cxf.jackson.version>2.11.4</cxf.jackson.version>
         <cxf.jackson.databind.version>2.11.4</cxf.jackson.databind.version>
         <cxf.jacorb.version>3.9</cxf.jacorb.version>
@@ -218,7 +218,7 @@
         <cxf.validation.api.version>2.0.2</cxf.validation.api.version>
         <cxf.velocity.version>2.2</cxf.velocity.version>
         <cxf.wiremock.version>2.23.2</cxf.wiremock.version>
-        <cxf.woodstox.core.version>6.2.1</cxf.woodstox.core.version>
+        <cxf.woodstox.core.version>6.2.3</cxf.woodstox.core.version>
         <cxf.woodstox.stax2-api.version>4.2.1</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
         <cxf.wss4j.version>2.3.1</cxf.wss4j.version>
