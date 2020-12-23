@@ -1,4 +1,4 @@
-Apache CXF 3.3.8 Release Notes
+Apache CXF 3.3.9 Release Notes
 
 1. Overview
 
@@ -23,7 +23,7 @@ http://cxf.apache.org/docs/33-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
-3.3.8 fixes over 19 JIRA issues reported by users and the community.
+3.3.9 fixes over 12 JIRA issues reported by users and the community.
 
 
 
@@ -67,66 +67,19 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-    * [CXF-8227] - Failure to comply with JAX-RS spec with ContainerRequestContext and WriterInterceptorContext
-    * [CXF-8257] - Logger no longer logs bad requests
-    * [CXF-8303] - MP: Context propagation impossible using  AsyncInvocationInterceptorFactory
-    * [CXF-8307] - Invalid class generated if resource contains hyphen
-    * [CXF-8310] - JMS transport with flag oneSessionPerConnection causes reconnection to not work
-    * [CXF-8311] - OAuth 2.0: Refresh token redemption unexpectedly fails with invalid_grant error
-    * [CXF-8318] - NullPointerException in PrettyLoggingFilter
-    * [CXF-8325] - Schema validation allows invalid SOAP header
-    * [CXF-8327] - UsernameTokenInterceptor doesn't set soap:actor
-    * [CXF-8329] - NPE with empty query parameters and collections
-    * [CXF-8331] - Reverse proxy url is not reflected when use-x-forwarded-headers is true
-    * [CXF-8337] - wsdl2java generates exceptions which do not follow naming convention
-    * [CXF-8349] - Flux Returns Mixed Response on Errors and Mono Hangs when Empty
-
-** New Feature
-    * [CXF-8213] - Add Micrometer metric support for JAX-WS Spring Boot
-    * [CXF-8252] - Add Micrometer metric support for JAX-RS (Spring Boot)
+    * [CXF-8340] - Graalvm native image fails to run
+    * [CXF-8356] - JAXRS Multipart-Handling broken for InputStream/Datasource parameters
+    * [CXF-8361] - Support for Jakarta EE9 namespace in AnnotationHandlerChainBuilder
+    * [CXF-8367] - Micrometer always reports outcome=UNKNOWN on success cases
+    * [CXF-8376] - Misleading Error Message From UriBuilder.path(Method)
+    * [CXF-8378] - NoClassDefFoundError: org/apache/cxf/common/util/ReflectionUtil from ReferencingAuthenticator
+    * [CXF-8380] - MultipartProvider:ensure contentType is specified when initializing ByteDataSource
 
 ** Improvement
-    * [CXF-8317] - Make netty transport HttpObjectAggregator.maxContentLength configurable
-    * [CXF-8360] - Configurable property for Apache Velocity logs
+    * [CXF-7988] - SSE sink warning on tomcat
+    * [CXF-8363] - Jetty certificate hot reload throws exception due to usage of depreciated SslContextFactory
 
 ** Task
-    * [CXF-8355] - RxJava3: Observable / Flowable Returns Mixed Response on Errors and Hangs when Empty
-    * [CXF-8358] - RxJava2: Observable / Flowable Returns Mixed Response on Errors and Hangs when Empty
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    * [CXF-8357] - RxJava2/RxJava3: Add support of MayBe type
+    * [CXF-8362] - Add Micrometer metric support for JAX-RS / JAX-WS (Client)
+    * [CXF-8386] - Upgrade BouncyCastle to 1.67
