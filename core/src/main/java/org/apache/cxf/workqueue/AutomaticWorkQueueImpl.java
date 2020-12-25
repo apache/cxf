@@ -63,7 +63,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
     int lowWaterMark;
     int highWaterMark;
     long dequeueTimeout;
-    volatile int approxThreadCount;
+    AtomicInteger approxThreadCount = new AtomicInteger();
 
     ThreadPoolExecutor executor;
     Method addWorkerMethod;
@@ -340,11 +340,11 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
             }
             Runnable wrapped = new Runnable() {
                 public void run() {
-                    ++approxThreadCount;
+                    approxThreadCount.incrementAndGet();
                     try {
                         r.run();
                     } finally {
-                        --approxThreadCount;
+                        approxThreadCount.decrementAndGet();
                     }
                 }
             };
@@ -426,7 +426,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         ex.execute(r);
         if (addWorkerMethod != null
             && !ex.getQueue().isEmpty()
-            && this.approxThreadCount < highWaterMark
+            && this.approxThreadCount.get() < highWaterMark
             && addThreadLock.tryLock()) {
             try {
                 mainLock.lock();

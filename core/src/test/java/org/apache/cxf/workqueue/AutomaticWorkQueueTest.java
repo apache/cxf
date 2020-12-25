@@ -191,7 +191,9 @@ public class AutomaticWorkQueueTest {
                 Thread.sleep(100L);
                 numRun = numRunning(workItems);
             }
+
             numRun = numRunning(workItems);
+            assertEquals(0, workqueue.getSize());
             assertEquals(DEFAULT_HIGH_WATER_MARK, numRun);
 
             for (int i = 0; i < DEFAULT_MAX_QUEUE_SIZE; i++) {
