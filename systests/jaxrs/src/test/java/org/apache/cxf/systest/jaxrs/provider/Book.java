@@ -59,4 +59,8 @@ public class Book {
     public Collection<BookChapter> getChapters() {
         return chapters.values();
     }
+    
+    public void setChapters(Collection<BookChapter> value) {
+        value.forEach(c -> chapters.put(c.getId(), c));
+    }
 }
