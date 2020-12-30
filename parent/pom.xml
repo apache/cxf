@@ -151,6 +151,7 @@
         <cxf.joda.time.version>2.9.4</cxf.joda.time.version>
         <cxf.johnzon.version>1.1.13</cxf.johnzon.version>
         <cxf.json.api.version>1.1.4</cxf.json.api.version>
+        <cxf.json.bind.version>1.0</cxf.json.bind.version>
         <cxf.jsr250.api.version>1.0</cxf.jsr250.api.version>
         <cxf.junit.version>4.13.1</cxf.junit.version>
         <cxf.kerby.version>2.0.1</cxf.kerby.version>
@@ -1582,6 +1583,12 @@
                 <groupId>javax.json</groupId>
                 <artifactId>javax.json-api</artifactId>
                 <version>${cxf.json.api.version}</version>
+                <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>javax.json.bind</groupId>
+                <artifactId>javax.json.bind-api</artifactId>
+                <version>${cxf.json.bind.version}</version>
                 <optional>true</optional>
             </dependency>
             <dependency>
