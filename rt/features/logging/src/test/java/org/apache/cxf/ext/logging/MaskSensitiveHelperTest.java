@@ -59,6 +59,13 @@ public class MaskSensitiveHelperTest {
             "\"user\":\"testUser\", \"password\": \"my secret password\"";
     private static final String MASKED_LOGGING_CONTENT_JSON =
             "\"user\":\"testUser\", \"password\": \"XXX\"";
+    
+    private static final String SENSITIVE_LOGGING_MULTIPLE_ELEMENT_XML =
+        "<item><user>testUser1</user><password myAttribute=\"test\">my secret password 1</password></item>"+
+            "<item><user>testUser2</user><password>my secret password 2</password></item>";
+    private static final String MASKED_LOGGING_MULTIPLE_ELEMENT_XML =
+        "<item><user>testUser1</user><password myAttribute=\"test\">XXX</password></item>"+
+            "<item><user>testUser2</user><password>XXX</password></item>";
 
     private static final Set<String> SENSITIVE_ELEMENTS = new HashSet(Arrays.asList("password"));
     private static final String APPLICATION_XML = "application/xml";
@@ -79,6 +86,7 @@ public class MaskSensitiveHelperTest {
         return Arrays.asList(new Object[][] {
             {SENSITIVE_LOGGING_CONTENT_XML, MASKED_LOGGING_CONTENT_XML, APPLICATION_XML},
             {SENSITIVE_LOGGING_CONTENT_XML_WITH_ATTRIBUTE, MASKED_LOGGING_CONTENT_XML_WITH_ATTRIBUTE, APPLICATION_XML},
+            {SENSITIVE_LOGGING_MULTIPLE_ELEMENT_XML, MASKED_LOGGING_MULTIPLE_ELEMENT_XML, APPLICATION_XML},
             {SENSITIVE_LOGGING_CONTENT_JSON, MASKED_LOGGING_CONTENT_JSON, APPLICATION_JSON}
         });
     }
