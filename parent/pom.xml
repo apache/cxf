@@ -116,7 +116,7 @@
         <cxf.geronimo.transaction.version>3.1.4</cxf.geronimo.transaction.version>
         <cxf.geronimo.openapi.version>1.0.12</cxf.geronimo.openapi.version>
         <cxf.glassfish.json.version>1.1.4</cxf.glassfish.json.version>
-        <cxf.guava.version>29.0-jre</cxf.guava.version>
+        <cxf.guava.version>30.1-jre</cxf.guava.version>
         <cxf.hamcrest.version>2.2</cxf.hamcrest.version>
         <cxf.hazelcast.version>3.12.9</cxf.hazelcast.version>
         <cxf.hibernate.em.version>5.4.19.Final</cxf.hibernate.em.version>
