@@ -176,6 +176,8 @@ public class AutomaticWorkQueueTest {
                 workItems[i] = new BlockingWorkItem();
                 try {
                     workqueue.execute(workItems[i]);
+                    //wait some time to allow worker to be created and work to be assigned
+                    Thread.sleep(100L);
                 } catch (RejectedExecutionException ex) {
                     fail("failed on item[" + i + "] with: " + ex);
                 }
