@@ -21,6 +21,9 @@ package org.apache.cxf.systest.http_undertow;
 
 import java.io.File;
 import java.net.URL;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -87,6 +90,19 @@ public class UndertowBasicAuthTest extends AbstractClientServerTestBase {
     }
 
     @org.junit.Test
+    public void testRequestLimitHandler() throws Exception {
+        CountDownLatch latch = new CountDownLatch(50); 
+
+        ExecutorService executor = Executors.newFixedThreadPool(200); 
+
+        for (int i = 0; i < 50; i++) {
+            executor.execute(new SendRequest(latch)); 
+        }
+        latch.await();
+        
+    }
+    
+    @org.junit.Test
     public void testGetWSDL() throws Exception {
         BusFactory bf = BusFactory.newInstance();
         Bus bus = bf.createBus();
@@ -108,6 +124,26 @@ public class UndertowBasicAuthTest extends AbstractClientServerTestBase {
             authorizationPolicy.setPassword("pswd");
             authorizationPolicy.setAuthorizationType("Basic");
             c.setAuthorization(authorizationPolicy);
+        }
+    }
+    
+    class SendRequest implements Runnable {
+        private CountDownLatch latch;
+
+        SendRequest(CountDownLatch latch) {
+            this.latch = latch;
+        }
+
+        public void run() {
+            try {
+                assertEquals("Hello Request Limit", greeter.greetMe("Request Limit"));
+            } catch (Throwable ex) {
+                //some requests are expected to fail and receive 503 error
+                //cause Server side limit the concurrent request
+                assertTrue(ex.getCause().getMessage().contains("503: Service Unavailable"));
+            } finally {
+                latch.countDown();
+            }
         }
     }
 }
