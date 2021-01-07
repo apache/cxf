@@ -26,6 +26,10 @@
         <httpu:engine port="${testutil.ports.UndertowBasicAuthServer}">
             <httpu:handlers>
                 <bean class="org.apache.cxf.systest.http_undertow.UndertowBasicAuthHandler"/>
+                <bean class="org.apache.cxf.transport.http_undertow.handlers.CxfRequestLimitingHandler">
+                    <property name="maximumConcurrentRequests" value="1" />
+                    <property name="queueSize" value="1"/>
+                </bean>
                 <bean class="org.apache.cxf.systest.http_undertow.LogHandler"/>
             </httpu:handlers>
         </httpu:engine>
