@@ -2386,26 +2386,5 @@
                 <cxf.surefire.fork.vmargs>-ea --add-opens java.base/java.lang=ALL-UNNAMED</cxf.surefire.fork.vmargs>
             </properties>
         </profile>
-        <profile>
-            <id>test-on-jdk</id>
-            <activation>
-                <property>
-                    <name>test-on</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <jdkToolchain>
-                                <version>${test-on}</version>
-                            </jdkToolchain>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
     </profiles>
 </project>
