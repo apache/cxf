@@ -2387,10 +2387,10 @@
             </properties>
         </profile>
         <profile>
-            <id>test-on-latest</id>
+            <id>test-on-jdk</id>
             <activation>
                 <property>
-                    <name>test-on-latest</name>
+                    <name>test-on</name>
                 </property>
             </activation>
             <build>
@@ -2400,7 +2400,7 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <jdkToolchain>
-                                <version>15</version>
+                                <version>${test-on}</version>
                             </jdkToolchain>
                         </configuration>
                     </plugin>
