@@ -18,11 +18,15 @@
  */
 package org.apache.cxf.rs.security.jose.jwk;
 
+import java.io.InputStream;
 import java.math.BigInteger;
+import java.security.cert.CertificateFactory;
+import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Properties;
 
+import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.common.JoseException;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
@@ -200,6 +204,20 @@ public class JwkUtilsTest {
             fail();
         } catch (JwkException e) {
             assertNull(e.getCause());
+        }
+    }
+
+    @Test
+    public void testEcLeadingZeros() throws Exception {
+        try (InputStream inputStream = this.getClass().getResourceAsStream("cert.pem")) {
+            ECPublicKey publicKey = (ECPublicKey) CertificateFactory.getInstance("X.509")
+                    .generateCertificate(inputStream).getPublicKey();
+            JsonWebKey jwk = JwkUtils.fromECPublicKey(publicKey, "P-256");
+            String x = (String)jwk.getProperty(JsonWebKey.EC_X_COORDINATE);
+            String y = (String)jwk.getProperty(JsonWebKey.EC_Y_COORDINATE);
+            int xLength = Base64UrlUtility.decode(x).length;
+            int yLength = Base64UrlUtility.decode(y).length;
+            assertEquals(xLength, yLength);
         }
     }
 
