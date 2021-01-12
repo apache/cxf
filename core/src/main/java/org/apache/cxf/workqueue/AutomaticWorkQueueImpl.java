@@ -436,6 +436,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
                     int sz2 = this.getActiveCount();
 
                     if ((sz + sz2) > ps) {
+                        // Needs --add-opens java.base/java.util.concurrent=ALL-UNNAMED for JDK16+
                         ReflectionUtil.setAccessible(addWorkerMethod).invoke(executor, addWorkerArgs);
                     }
                 } catch (Exception exc) {
