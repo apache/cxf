@@ -377,12 +377,14 @@ public final class JwkUtils {
     }
     public static JsonWebKey fromECPublicKey(ECPublicKey pk, String curve, String kid) {
         JsonWebKey jwk = prepareECJwk(curve, kid);
+        int fieldSize = pk.getParams().getCurve().getField().getFieldSize();
         jwk.setProperty(JsonWebKey.EC_X_COORDINATE,
-                        Base64UrlUtility.encode(pk.getW().getAffineX().toByteArray()));
+                encodeCoordinate(fieldSize, pk.getW().getAffineX()));
         jwk.setProperty(JsonWebKey.EC_Y_COORDINATE,
-                        Base64UrlUtility.encode(pk.getW().getAffineY().toByteArray()));
+                encodeCoordinate(fieldSize, pk.getW().getAffineY()));
         return jwk;
     }
+
     public static JsonWebKey fromECPrivateKey(ECPrivateKey pk, String curve) {
         return fromECPrivateKey(pk, curve, null);
     }
@@ -602,5 +604,66 @@ public final class JwkUtils {
             }
         }
         return parsedKeys;
+    }
+
+    /**
+     * Returns the Base64URL encoding of the specified elliptic curve 'x',
+     * 'y' or 'd' coordinate, with leading zero padding up to the specified
+     * field size in bits.
+     * Copied and adapted from nimbus-jose-jwt (ECKey#encodeCoordinate)
+     *
+     * @param fieldSize  The field size in bits.
+     * @param coordinate The elliptic curve coordinate. Must not be
+     *                   {@code null}.
+     *
+     * @return The Base64URL-encoded coordinate, with leading zero padding
+     *         up to the curve's field size.
+     */
+    private static String encodeCoordinate(final int fieldSize, final BigInteger coordinate) {
+        final byte[] notPadded = toIntegerBytes(coordinate);
+        int bytesToOutput = (fieldSize + 7) / 8;
+
+        if (notPadded.length >= bytesToOutput) {
+            // Greater-than check to prevent exception on malformed
+            // key below
+            return Base64UrlUtility.encode(notPadded);
+        }
+
+        final byte[] padded = new byte[bytesToOutput];
+        System.arraycopy(notPadded, 0, padded, bytesToOutput - notPadded.length, notPadded.length);
+        return Base64UrlUtility.encode(padded);
+    }
+
+    /**
+     * Returns a byte-array representation of a {@code BigInteger} without sign bit.
+     * Copied from Apache Commons Codec
+     *
+     * @param bigInt
+     *            {@code BigInteger} to be converted
+     * @return a byte array representation of the BigInteger parameter
+     */
+    private static byte[] toIntegerBytes(final BigInteger bigInt) {
+
+        int bitlen = bigInt.bitLength();
+        // round bitlen
+        bitlen = ((bitlen + 7) >> 3) << 3;
+        final byte[] bigBytes = bigInt.toByteArray();
+
+        if (((bigInt.bitLength() % 8) != 0) && (((bigInt.bitLength() / 8) + 1) == (bitlen / 8))) {
+            return bigBytes;
+        }
+        // set up params for copying everything but sign bit
+        int startSrc = 0;
+        int len = bigBytes.length;
+
+        // if bigInt is exactly byte-aligned, just skip signbit in copy
+        if ((bigInt.bitLength() % 8) == 0) {
+            startSrc = 1;
+            len--;
+        }
+        final int startDst = bitlen / 8 - len; // to pad w/ nulls as per spec
+        final byte[] resizedBytes = new byte[bitlen / 8];
+        System.arraycopy(bigBytes, startSrc, resizedBytes, startDst, len);
+        return resizedBytes;
     }
 }
