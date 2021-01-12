@@ -19,7 +19,7 @@
 
 package org.apache.cxf.jaxb;
 
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.Unmarshaller;
 
 /*
  * A XML Reader that adjusts it's behaviour based on the state of the unmarshaller.

@@ -26,8 +26,8 @@ import java.util.Collection;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Service;
+import jakarta..Dispatch;
+import jakarta..Service;
 
 import org.w3c.dom.Document;
 

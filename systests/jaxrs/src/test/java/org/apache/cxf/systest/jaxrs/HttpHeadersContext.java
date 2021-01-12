@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
 
 public interface HttpHeadersContext {
     @Context

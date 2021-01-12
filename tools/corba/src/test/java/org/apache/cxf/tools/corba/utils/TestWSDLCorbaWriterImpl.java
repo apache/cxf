@@ -21,9 +21,9 @@ package org.apache.cxf.tools.corba.utils;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.wsdl.Definition;
-import javax.wsdl.PortType;
-import javax.wsdl.WSDLException;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.PortType;
+import jakarta.wsdl.WSDLException;
 import javax.xml.namespace.QName;
 
 import com.ibm.wsdl.xml.WSDLWriterImpl;

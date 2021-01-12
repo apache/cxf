@@ -23,7 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 // Represents the information about the validated ServerAccessToken.
 // It is returned by AccessTokenValidatorService and is checked by CXF OAuthRequestFilter

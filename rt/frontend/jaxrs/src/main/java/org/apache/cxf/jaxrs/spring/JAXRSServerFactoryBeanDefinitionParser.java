@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.ws.rs.Path;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.ext.Provider;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;

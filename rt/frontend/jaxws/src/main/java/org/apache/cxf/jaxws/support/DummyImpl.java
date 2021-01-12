@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.jaxws.support;
 
-import javax.jws.soap.SOAPBinding;
-import javax.jws.soap.SOAPBinding.ParameterStyle;
+import jakarta.jws.soap.SOAPBinding;
+import jakarta.jws.soap.SOAPBinding.ParameterStyle;
 
 // this class do nothing here, just for a dispatch impl
 @SOAPBinding(parameterStyle = ParameterStyle.BARE)

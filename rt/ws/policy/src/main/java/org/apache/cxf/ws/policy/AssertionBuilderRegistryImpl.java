@@ -24,7 +24,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import javax.xml.namespace.QName;
 
 

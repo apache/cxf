@@ -23,10 +23,10 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.wsdl.Definition;
-import javax.wsdl.Operation;
-import javax.wsdl.PortType;
-import javax.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Operation;
+import jakarta.wsdl.PortType;
+import jakarta.wsdl.extensions.ExtensibilityElement;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.BusFactory;

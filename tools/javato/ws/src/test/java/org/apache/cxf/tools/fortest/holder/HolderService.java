@@ -19,9 +19,9 @@
 package org.apache.cxf.tools.fortest.holder;
 
 
-import javax.jws.WebParam;
-import javax.jws.WebParam.Mode;
-import javax.jws.WebService;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebParam.Mode;
+import jakarta.jws.WebService;
 import javax.xml.ws.Holder;
 
 @WebService

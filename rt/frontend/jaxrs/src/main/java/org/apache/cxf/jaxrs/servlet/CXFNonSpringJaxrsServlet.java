@@ -31,10 +31,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.ws.rs.core.Application;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.ws.rs.core.Application;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
@@ -89,7 +89,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     private static final String DEFAULT_PARAMETER_SPLIT_CHAR = ",";
     private static final String SPACE_PARAMETER_SPLIT_CHAR = "space";
 
-    private static final String JAXRS_APPLICATION_PARAM = "javax.ws.rs.Application";
+    private static final String JAXRS_APPLICATION_PARAM = "jakarta.ws.rs.Application";
 
     private ClassLoader classLoader;
     private Application application;

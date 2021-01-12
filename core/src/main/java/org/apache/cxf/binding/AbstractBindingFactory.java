@@ -21,7 +21,7 @@ package org.apache.cxf.binding;
 
 import java.util.Collection;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;

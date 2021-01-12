@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.systest.jaxrs.validation;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 
 public abstract class AbstractBookStoreWithValidation {
     @Valid public abstract BookWithValidation getBook(@Pattern(regexp = "\\d+") String id);

@@ -33,9 +33,9 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.Iterator;
 
-import javax.activation.ActivationDataFlavor;
-import javax.activation.DataContentHandler;
-import javax.activation.DataSource;
+import jakarta.activation.ActivationDataFlavor;
+import jakarta.activation.DataContentHandler;
+import jakarta.activation.DataSource;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;

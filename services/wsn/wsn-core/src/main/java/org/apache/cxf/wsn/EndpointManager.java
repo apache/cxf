@@ -20,8 +20,8 @@ package org.apache.cxf.wsn;
 
 import java.net.URL;
 
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 
 public interface EndpointManager {
 

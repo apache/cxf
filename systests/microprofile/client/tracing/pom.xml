@@ -90,8 +90,8 @@
                     <artifactId>asm-commons</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>javax.annotation</groupId>
-                    <artifactId>javax.annotation-api</artifactId>
+                    <groupId>jakarta.annotation</groupId>
+                    <artifactId>jakarta.annotation-api</artifactId>
                 </exclusion>
             </exclusions> 
         </dependency>
@@ -142,7 +142,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>javax.annotation</groupId>
+            <groupId>jakarta.annotation</groupId>
             <artifactId>jsr250-api</artifactId>
             <version>${cxf.jsr250.api.version}</version>
             <scope>test</scope>

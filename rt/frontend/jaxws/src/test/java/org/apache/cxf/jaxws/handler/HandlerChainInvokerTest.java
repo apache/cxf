@@ -35,12 +35,12 @@ import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.ws.ProtocolException;
-import javax.xml.ws.handler.Handler;
-import javax.xml.ws.handler.LogicalHandler;
-import javax.xml.ws.handler.LogicalMessageContext;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.soap.SOAPMessageContext;
+import jakarta.xml.ws.ProtocolException;
+import jakarta.xml.ws.handler.Handler;
+import jakarta.xml.ws.handler.LogicalHandler;
+import jakarta.xml.ws.handler.LogicalMessageContext;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;

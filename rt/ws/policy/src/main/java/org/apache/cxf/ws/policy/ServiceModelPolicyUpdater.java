@@ -45,7 +45,7 @@ package org.apache.cxf.ws.policy;
 
 import java.util.Collection;
 
-import javax.wsdl.extensions.UnknownExtensibilityElement;
+import jakarta.wsdl.extensions.UnknownExtensibilityElement;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;

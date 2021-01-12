@@ -28,7 +28,7 @@ import java.util.Set;
 import javax.resource.ResourceException;
 import javax.resource.spi.ConnectionManager;
 import javax.resource.spi.ManagedConnection;
-import javax.security.auth.Subject;
+import jakarta.security.auth.Subject;
 import javax.xml.namespace.QName;
 
 

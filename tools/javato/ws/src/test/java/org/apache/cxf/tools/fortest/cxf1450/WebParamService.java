@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.tools.fortest.cxf1450;
 
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
 import javax.xml.ws.Holder;
 
 public class WebParamService {

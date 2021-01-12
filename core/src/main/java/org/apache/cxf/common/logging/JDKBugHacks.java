@@ -142,7 +142,7 @@ final class JDKBugHacks {
                     // Policy.getPolicy();
                     if (!skipHack("org.apache.cxf.JDKBugHacks.policy")) {
                         Class<?> policyClass = Class
-                            .forName("javax.security.auth.Policy");
+                            .forName("jakarta.security.auth.Policy");
                         Method method = policyClass.getMethod("getPolicy");
                         method.invoke(null);
                     }
@@ -150,10 +150,10 @@ final class JDKBugHacks {
                     // ignore
                 }
                 try {
-                    // Initializing javax.security.auth.login.Configuration retains a static reference
+                    // Initializing jakarta.security.auth.login.Configuration retains a static reference
                     // to the context class loader.
                     if (!skipHack("org.apache.cxf.JDKBugHacks.authConfiguration")) {
-                        Class.forName("javax.security.auth.login.Configuration", true,
+                        Class.forName("jakarta.security.auth.login.Configuration", true,
                                       ClassLoader.getSystemClassLoader());
                     }
                 } catch (Throwable e) {

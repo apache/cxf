@@ -22,7 +22,7 @@ package org.apache.cxf.systest.jms.multitransport;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Endpoint;
+import jakarta.xml.ws.Endpoint;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.pool.PooledConnectionFactory;

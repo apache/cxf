@@ -29,8 +29,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.ExtensionRegistry;
+import jakarta.wsdl.WSDLException;
+import jakarta.wsdl.extensions.ExtensionRegistry;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;

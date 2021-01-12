@@ -23,10 +23,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 
-import javax.wsdl.Definition;
-import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLReader;
-import javax.wsdl.xml.WSDLWriter;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.factory.WSDLFactory;
+import jakarta.wsdl.xml.WSDLReader;
+import jakarta.wsdl.xml.WSDLWriter;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
@@ -161,7 +161,7 @@ public class WSDLGenerationTester {
         WSDLFactory factory
             = WSDLFactory.newInstance("org.apache.cxf.tools.corba.utils.TestWSDLCorbaFactoryImpl");
         WSDLReader reader = factory.newWSDLReader();
-        reader.setFeature("javax.wsdl.importDocuments", false);
+        reader.setFeature("jakarta.wsdl.importDocuments", false);
         reader.setExtensionRegistry(wm.getExtensionRegistry());
         final String url = defnFile.toString();
         CatalogWSDLLocator locator = new CatalogWSDLLocator(url, (Bus)null);

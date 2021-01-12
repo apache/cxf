@@ -29,9 +29,9 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
-import javax.wsdl.Binding;
-import javax.wsdl.BindingOperation;
-import javax.wsdl.Definition;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.BindingOperation;
+import jakarta.wsdl.Definition;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.corba.wsdl.Alias;

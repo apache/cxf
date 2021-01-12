@@ -22,7 +22,7 @@ package org.apache.cxf.systest.provider;
 
 import java.io.InputStream;
 
-import javax.xml.ws.Endpoint;
+import jakarta.xml.ws.Endpoint;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

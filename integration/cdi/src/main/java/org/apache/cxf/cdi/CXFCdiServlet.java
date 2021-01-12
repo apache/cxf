@@ -24,7 +24,7 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.CDI;
 import javax.inject.Inject;
-import javax.servlet.ServletConfig;
+import jakarta.servlet.ServletConfig;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;

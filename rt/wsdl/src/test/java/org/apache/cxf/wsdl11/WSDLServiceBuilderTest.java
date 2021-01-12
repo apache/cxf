@@ -29,11 +29,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.wsdl.Definition;
-import javax.wsdl.Service;
-import javax.wsdl.extensions.UnknownExtensibilityElement;
-import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLReader;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Service;
+import jakarta.wsdl.extensions.UnknownExtensibilityElement;
+import jakarta.wsdl.factory.WSDLFactory;
+import jakarta.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -123,7 +123,7 @@ public class WSDLServiceBuilderTest {
         LOG.info("the path of wsdl file is " + wsdlUrl);
         WSDLFactory wsdlFactory = WSDLFactory.newInstance();
         WSDLReader wsdlReader = wsdlFactory.newWSDLReader();
-        wsdlReader.setFeature("javax.wsdl.verbose", false);
+        wsdlReader.setFeature("jakarta.wsdl.verbose", false);
 
         def = wsdlReader.readWSDL(new CatalogWSDLLocator(wsdlUrl));
 

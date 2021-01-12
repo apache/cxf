@@ -20,7 +20,7 @@
 package org.apache.cxf.tools.corba.processors.idl;
 
 
-import javax.wsdl.Definition;
+import jakarta.wsdl.Definition;
 import javax.xml.namespace.QName;
 
 import antlr.collections.AST;

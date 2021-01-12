@@ -24,13 +24,13 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.login.Configuration;
-import javax.security.auth.login.LoginContext;
-import javax.security.auth.login.LoginException;
+import jakarta.security.auth.Subject;
+import jakarta.security.auth.callback.Callback;
+import jakarta.security.auth.callback.CallbackHandler;
+import jakarta.security.auth.callback.NameCallback;
+import jakarta.security.auth.login.Configuration;
+import jakarta.security.auth.login.LoginContext;
+import jakarta.security.auth.login.LoginException;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.InterceptorChain;

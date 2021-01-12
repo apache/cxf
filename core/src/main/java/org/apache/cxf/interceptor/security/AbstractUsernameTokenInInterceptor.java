@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.interceptor.security;
 
-import javax.security.auth.Subject;
+import jakarta.security.auth.Subject;
 
 import org.apache.cxf.common.security.SecurityToken;
 import org.apache.cxf.common.security.TokenType;

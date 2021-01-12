@@ -19,8 +19,8 @@
 
 package org.apache.cxf.systest.jaxrs.jaxws;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
 
 @WebService(targetNamespace = "http://books.com")
 public interface BookStoreJaxws {

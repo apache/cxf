@@ -28,7 +28,7 @@ import java.util.Properties;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 
-import javax.security.auth.Subject;
+import jakarta.security.auth.Subject;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;

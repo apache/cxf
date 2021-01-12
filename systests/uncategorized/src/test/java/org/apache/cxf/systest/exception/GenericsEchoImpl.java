@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.exception;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(serviceName = "HelloService",
             portName = "HelloPort",

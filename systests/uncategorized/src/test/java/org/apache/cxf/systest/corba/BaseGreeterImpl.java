@@ -48,7 +48,7 @@ import static org.junit.Assert.assertEquals;
  * under the License.
  */
 
-@javax.jws.WebService(portName = "GreeterCORBAPort",
+@jakarta.jws.WebService(portName = "GreeterCORBAPort",
         serviceName = "GreeterCORBAService",
         targetNamespace = "http://cxf.apache.org/hello_world_corba",
         wsdlLocation = "classpath:/wsdl_systest/hello_world_corba.wsdl",

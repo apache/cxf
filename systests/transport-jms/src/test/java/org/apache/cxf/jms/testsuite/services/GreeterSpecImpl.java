@@ -20,7 +20,7 @@ package org.apache.cxf.jms.testsuite.services;
 
 import org.apache.cxf.jms_greeter.JMSGreeterPortType;
 
-@javax.jws.WebService(portName = "GreeterPort",
+@jakarta.jws.WebService(portName = "GreeterPort",
                       serviceName = "JMSGreeterService",
                       targetNamespace = "http://cxf.apache.org/jms_greeter",
                       endpointInterface = "org.apache.cxf.jms_greeter.JMSGreeterPortType")

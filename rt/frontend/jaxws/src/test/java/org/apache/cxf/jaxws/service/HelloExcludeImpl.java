@@ -21,7 +21,7 @@ package org.apache.cxf.jaxws.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(endpointInterface = "org.apache.cxf.jaxws.service.HelloExcludeOnInterface")
 public class HelloExcludeImpl implements HelloExcludeOnInterface {

@@ -54,7 +54,7 @@
                                 <validate>basic</validate>
                                 <seiSuper>
                                   <super>java.lang.AutoCloseable</super>
-                                  <super>javax.xml.ws.BindingProvider</super>
+                                  <super>jakarta.xml.ws.BindingProvider</super>
                                   <super>org.apache.cxf.endpoint.Client</super>
                                 </seiSuper>
                             </defaultOptions>
@@ -165,8 +165,8 @@
             <optional>true</optional>
             <exclusions>
                 <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>javax.servlet-api</artifactId>
+                    <groupId>jakarta.servlet</groupId>
+                    <artifactId>jakarta.servlet-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

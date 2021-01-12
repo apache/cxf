@@ -23,13 +23,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.wsdl.Binding;
-import javax.wsdl.BindingOperation;
-import javax.wsdl.Definition;
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.mime.MIMEContent;
-import javax.wsdl.extensions.mime.MIMEMultipartRelated;
-import javax.wsdl.extensions.mime.MIMEPart;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.BindingOperation;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.extensions.mime.MIMEContent;
+import jakarta.wsdl.extensions.mime.MIMEMultipartRelated;
+import jakarta.wsdl.extensions.mime.MIMEPart;
 
 import org.apache.cxf.binding.soap.SOAPBindingUtil;
 import org.apache.cxf.helpers.CastUtils;

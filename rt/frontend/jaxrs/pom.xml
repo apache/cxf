@@ -33,15 +33,15 @@
     <properties>
         <cxf.module.name>org.apache.cxf.frontend.jaxrs</cxf.module.name>
         <cxf.osgi.import>
-            javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
-            javax.activation;version="${cxf.osgi.javax.activation.version}",
+            jakarta.servlet*;version="${cxf.osgi.jakarta.servlet.version}",
+            jakarta.activation;version="${cxf.osgi.jakarta.activation.version}",
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
-            javax.validation*;resolution:=optional;version="${cxf.validation.api.package.version}",
-            javax.ws.rs.client;version="[2.0,3)",
-            javax.ws.rs*;version="[1.0,3)",
-            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
-            javax.annotation*;version="${cxf.osgi.javax.annotation.version}"
+            jakarta.validation*;resolution:=optional;version="${cxf.validation.api.package.version}",
+            jakarta.ws.rs.client;version="[3.0,3.1)",
+            jakarta.ws.rs*;version="[3.0,3.1)",
+            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}",
+            jakarta.annotation*;version="${cxf.osgi.jakarta.annotation.version}"
         </cxf.osgi.import>
         <cxf.osgi.export>
             org.apache.cxf.jaxrs*
@@ -155,8 +155,8 @@
                     <artifactId>geronimo-servlet_2.5_spec</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>javax.servlet-api</artifactId>
+                    <groupId>jakarta.servlet</groupId>
+                    <artifactId>jakarta.servlet-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

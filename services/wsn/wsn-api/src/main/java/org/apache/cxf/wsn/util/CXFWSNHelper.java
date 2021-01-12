@@ -29,8 +29,8 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.soap.SOAPBinding;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.wsn.wsdl.WSNWSDLLocator;
@@ -85,7 +85,7 @@ public class CXFWSNHelper extends WSNHelper {
                 if (endpoint.getProperties() == null) {
                     endpoint.setProperties(new HashMap<String, Object>());
                 }
-                endpoint.getProperties().put("javax.xml.ws.wsdl.description", wsdlLocation.toExternalForm());
+                endpoint.getProperties().put("jakarta.xml.ws.wsdl.description", wsdlLocation.toExternalForm());
                 List<Source> mt = new ArrayList<>();
                 StreamSource src = new StreamSource(wsdlLocation.openStream(), wsdlLocation.toExternalForm());
                 mt.add(src);

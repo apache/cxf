@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.systest.jaxrs.security;
 
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
+import jakarta.ws.rs.core.SecurityContext;
+import jakarta.ws.rs.core.UriInfo;
 
 public interface Injectable {
     void setSecurityContext(SecurityContext sc);

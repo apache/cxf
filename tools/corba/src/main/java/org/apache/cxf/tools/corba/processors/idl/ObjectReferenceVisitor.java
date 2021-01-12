@@ -23,8 +23,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.wsdl.Binding;
-import javax.wsdl.Definition;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.Definition;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;

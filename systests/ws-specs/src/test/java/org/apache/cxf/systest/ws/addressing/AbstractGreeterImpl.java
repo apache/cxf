@@ -22,7 +22,7 @@ package org.apache.cxf.systest.ws.addressing;
 import java.util.Date;
 import java.util.concurrent.Future;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Response;
 import javax.xml.ws.WebServiceContext;

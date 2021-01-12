@@ -36,7 +36,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.crypto.SecretKey;
-import javax.security.auth.callback.CallbackHandler;
+import jakarta.security.auth.callback.CallbackHandler;
 import javax.xml.XMLConstants;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.namespace.QName;

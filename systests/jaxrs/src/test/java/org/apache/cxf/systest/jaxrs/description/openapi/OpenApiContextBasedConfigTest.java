@@ -21,7 +21,7 @@ package org.apache.cxf.systest.jaxrs.description.openapi;
 import java.util.Arrays;
 import java.util.Collections;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 

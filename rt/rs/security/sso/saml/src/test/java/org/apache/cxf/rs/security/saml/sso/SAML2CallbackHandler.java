@@ -21,8 +21,8 @@ package org.apache.cxf.rs.security.saml.sso;
 
 import java.io.IOException;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.UnsupportedCallbackException;
+import jakarta.security.auth.callback.Callback;
+import jakarta.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;

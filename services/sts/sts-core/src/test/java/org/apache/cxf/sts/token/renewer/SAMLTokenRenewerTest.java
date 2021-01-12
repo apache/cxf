@@ -22,7 +22,7 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Properties;
 
-import javax.security.auth.callback.CallbackHandler;
+import jakarta.security.auth.callback.CallbackHandler;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

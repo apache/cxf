@@ -22,9 +22,9 @@ package org.apache.cxf.ws.security.wss4j;
 import java.util.Collections;
 import java.util.List;
 
-import javax.activation.CommandMap;
-import javax.activation.DataHandler;
-import javax.security.auth.callback.Callback;
+import jakarta.xml.bind.CommandMap;
+import jakarta.xml.bind.DataHandler;
+import jakarta.security.auth.callback.Callback;
 
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.message.Attachment;

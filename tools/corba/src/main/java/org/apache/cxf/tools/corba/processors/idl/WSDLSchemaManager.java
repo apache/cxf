@@ -27,15 +27,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.wsdl.Definition;
-import javax.wsdl.Import;
-import javax.wsdl.Types;
-import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.schema.Schema;
-import javax.wsdl.extensions.schema.SchemaImport;
-import javax.wsdl.factory.WSDLFactory;
-import javax.xml.bind.JAXBException;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Import;
+import jakarta.wsdl.Types;
+import jakarta.wsdl.WSDLException;
+import jakarta.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.extensions.schema.Schema;
+import jakarta.wsdl.extensions.schema.SchemaImport;
+import jakarta.wsdl.factory.WSDLFactory;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.BusFactory;

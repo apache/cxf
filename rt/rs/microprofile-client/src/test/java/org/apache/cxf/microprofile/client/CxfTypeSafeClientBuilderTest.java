@@ -22,9 +22,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 
-import javax.ws.rs.PathParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.client.WebClientUtil;
 import org.apache.cxf.microprofile.client.mock.EchoClientReqFilter;

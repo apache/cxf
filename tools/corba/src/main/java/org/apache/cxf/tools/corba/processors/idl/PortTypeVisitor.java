@@ -24,15 +24,15 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.wsdl.Binding;
-import javax.wsdl.BindingOperation;
-import javax.wsdl.Definition;
-import javax.wsdl.Fault;
-import javax.wsdl.Operation;
-import javax.wsdl.PortType;
-import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.ExtensionRegistry;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.BindingOperation;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Fault;
+import jakarta.wsdl.Operation;
+import jakarta.wsdl.PortType;
+import jakarta.wsdl.WSDLException;
+import jakarta.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.extensions.ExtensionRegistry;
 import javax.xml.namespace.QName;
 
 import antlr.collections.AST;

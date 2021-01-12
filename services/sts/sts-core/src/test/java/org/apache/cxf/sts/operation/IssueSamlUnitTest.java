@@ -28,7 +28,7 @@ import java.util.Properties;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;

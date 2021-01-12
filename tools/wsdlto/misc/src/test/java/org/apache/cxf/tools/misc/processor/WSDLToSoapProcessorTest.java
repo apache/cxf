@@ -22,16 +22,16 @@ package org.apache.cxf.tools.misc.processor;
 import java.io.File;
 import java.util.*;
 
-import javax.wsdl.Binding;
-import javax.wsdl.BindingFault;
-import javax.wsdl.BindingInput;
-import javax.wsdl.BindingOperation;
-import javax.wsdl.extensions.soap.SOAPBinding;
-import javax.wsdl.extensions.soap.SOAPBody;
-import javax.wsdl.extensions.soap.SOAPOperation;
-import javax.wsdl.extensions.soap12.SOAP12Binding;
-import javax.wsdl.extensions.soap12.SOAP12Body;
-import javax.wsdl.extensions.soap12.SOAP12Operation;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.BindingFault;
+import jakarta.wsdl.BindingInput;
+import jakarta.wsdl.BindingOperation;
+import jakarta.wsdl.extensions.soap.SOAPBinding;
+import jakarta.wsdl.extensions.soap.SOAPBody;
+import jakarta.wsdl.extensions.soap.SOAPOperation;
+import jakarta.wsdl.extensions.soap12.SOAP12Binding;
+import jakarta.wsdl.extensions.soap12.SOAP12Body;
+import jakarta.wsdl.extensions.soap12.SOAP12Operation;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;

@@ -19,9 +19,9 @@
 
 package org.apache.cxf.customer.book;
 
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-import javax.jws.WebService;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
+import jakarta.jws.WebService;
 
 @WebService(targetNamespace = "http://book.acme.com")
 public interface BookService {

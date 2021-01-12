@@ -21,7 +21,7 @@ package org.apache.cxf.jms.testsuite.services;
 
 import org.apache.cxf.jms_simple.JMSSimplePortType;
 
-@javax.jws.WebService(portName = "SimplePort",
+@jakarta.jws.WebService(portName = "SimplePort",
                       serviceName = "JMSSimpleService1103",
                       targetNamespace = "http://cxf.apache.org/jms_simple",
                       endpointInterface = "org.apache.cxf.jms_simple.JMSSimplePortType",

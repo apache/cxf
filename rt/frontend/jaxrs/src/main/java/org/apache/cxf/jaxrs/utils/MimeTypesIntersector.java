@@ -19,7 +19,7 @@
 
 package org.apache.cxf.jaxrs.utils;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 public interface MimeTypesIntersector {
     boolean intersect(MediaType requiredType, MediaType userType);

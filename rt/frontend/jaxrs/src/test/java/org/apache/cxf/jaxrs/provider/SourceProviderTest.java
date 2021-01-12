@@ -26,8 +26,8 @@ import java.io.StringReader;
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.ext.MessageBodyReader;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLStreamReader;

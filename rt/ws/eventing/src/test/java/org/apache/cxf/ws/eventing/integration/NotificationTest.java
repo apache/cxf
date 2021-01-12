@@ -21,7 +21,7 @@ package org.apache.cxf.ws.eventing.integration;
 
 import java.io.IOException;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.endpoint.Server;

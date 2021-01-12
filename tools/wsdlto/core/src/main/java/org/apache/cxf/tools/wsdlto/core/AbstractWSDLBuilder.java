@@ -19,7 +19,7 @@
 
 package org.apache.cxf.tools.wsdlto.core;
 
-import javax.wsdl.Definition;
+import jakarta.wsdl.Definition;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.tools.common.ToolContext;

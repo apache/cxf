@@ -27,9 +27,9 @@ import java.net.URL;
 import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPMessage;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Service;
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Service;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws.AbstractJaxWsTest;

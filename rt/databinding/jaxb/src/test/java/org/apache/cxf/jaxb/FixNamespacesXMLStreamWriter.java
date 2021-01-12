@@ -19,7 +19,7 @@
 
 package org.apache.cxf.jaxb;
 
-import javax.xml.bind.Marshaller;
+import jakarta.xml.bind.Marshaller;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.codehaus.stax2.util.StreamWriterDelegate;

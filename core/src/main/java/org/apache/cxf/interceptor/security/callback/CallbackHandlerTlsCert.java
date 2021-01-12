@@ -21,7 +21,7 @@ package org.apache.cxf.interceptor.security.callback;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 
-import javax.security.auth.callback.CallbackHandler;
+import jakarta.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.interceptor.security.NamePasswordCallbackHandler;
 import org.apache.cxf.message.Message;

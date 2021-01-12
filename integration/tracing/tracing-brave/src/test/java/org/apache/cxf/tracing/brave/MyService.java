@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.tracing.brave;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService
 public interface MyService {

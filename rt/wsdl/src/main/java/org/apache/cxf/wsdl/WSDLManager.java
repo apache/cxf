@@ -21,10 +21,10 @@ package org.apache.cxf.wsdl;
 
 import java.util.Map;
 
-import javax.wsdl.Definition;
-import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.ExtensionRegistry;
-import javax.wsdl.factory.WSDLFactory;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.WSDLException;
+import jakarta.wsdl.extensions.ExtensionRegistry;
+import jakarta.wsdl.factory.WSDLFactory;
 
 import org.w3c.dom.Element;
 

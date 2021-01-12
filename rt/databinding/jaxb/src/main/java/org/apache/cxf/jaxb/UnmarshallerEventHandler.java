@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.jaxb;
 
-import javax.xml.bind.UnmarshalException;
+import jakarta.xml.bind.UnmarshalException;
 
 public interface UnmarshallerEventHandler {
     void onUnmarshalComplete() throws UnmarshalException;

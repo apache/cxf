@@ -22,11 +22,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Request;
+import jakarta.ws.rs.core.SecurityContext;
+import jakarta.ws.rs.core.UriInfo;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.DelegatingInputStream;
@@ -137,7 +137,7 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
         doSetRequestUri(requestUri);
         Object servletRequest = m.get("HTTP.REQUEST");
         if (servletRequest != null) {
-            ((javax.servlet.http.HttpServletRequest)servletRequest)
+            ((jakarta.servlet.http.HttpServletRequest)servletRequest)
                 .setAttribute(ENDPOINT_ADDRESS_PROPERTY, baseUri.toString());
         }
     }

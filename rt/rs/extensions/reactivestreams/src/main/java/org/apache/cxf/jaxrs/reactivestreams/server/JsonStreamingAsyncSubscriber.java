@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.jaxrs.reactivestreams.server;
 
-import javax.ws.rs.container.AsyncResponse;
+import jakarta.ws.rs.container.AsyncResponse;
 
 public class JsonStreamingAsyncSubscriber<T> extends StreamingAsyncSubscriber<T> {
     public JsonStreamingAsyncSubscriber(AsyncResponse ar) {

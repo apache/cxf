@@ -21,12 +21,12 @@ package org.apache.cxf.wsdl11;
 
 import java.io.PrintWriter;
 
-import javax.wsdl.Definition;
-import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.ExtensionRegistry;
-import javax.wsdl.extensions.ExtensionSerializer;
-import javax.wsdl.extensions.schema.Schema;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.WSDLException;
+import jakarta.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.extensions.ExtensionRegistry;
+import jakarta.wsdl.extensions.ExtensionSerializer;
+import jakarta.wsdl.extensions.schema.Schema;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;

@@ -46,12 +46,12 @@ import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.wsdl.Operation;
-import javax.xml.bind.annotation.XmlAttachmentRef;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlList;
-import javax.xml.bind.annotation.XmlMimeType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.wsdl.Operation;
+import jakarta.xml.bind.annotation.XmlAttachmentRef;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlList;
+import jakarta.xml.bind.annotation.XmlMimeType;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.DOMError;
@@ -2421,7 +2421,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
         if (anns != null) {
             for (Annotation ann : anns) {
                 String pkg = ann.annotationType().getPackage().getName();
-                if ("javax.xml.ws".equals(pkg)
+                if ("jakarta.xml.ws".equals(pkg)
                     || "javax.jws".equals(pkg)) {
 
                     LOG.log(Level.WARNING, "JAXWS_ANNOTATION_FOUND", serviceClass.getName());
@@ -2434,7 +2434,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
             if (anns != null) {
                 for (Annotation ann : anns) {
                     String pkg = ann.annotationType().getPackage().getName();
-                    if ("javax.xml.ws".equals(pkg)
+                    if ("jakarta.xml.ws".equals(pkg)
                         || "javax.jws".equals(pkg)) {
 
                         LOG.log(Level.WARNING, "JAXWS_ANNOTATION_FOUND", serviceClass.getName());

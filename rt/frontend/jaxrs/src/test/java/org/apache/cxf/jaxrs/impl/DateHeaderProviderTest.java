@@ -21,7 +21,7 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.util.Date;
 
-import javax.ws.rs.ServiceUnavailableException;
+import jakarta.ws.rs.ServiceUnavailableException;
 
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 

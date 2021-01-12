@@ -37,14 +37,14 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import javax.wsdl.Binding;
-import javax.wsdl.Definition;
-import javax.wsdl.Port;
-import javax.wsdl.Service;
-import javax.wsdl.Types;
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.schema.Schema;
-import javax.wsdl.extensions.schema.SchemaImport;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Port;
+import jakarta.wsdl.Service;
+import jakarta.wsdl.Types;
+import jakarta.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.extensions.schema.Schema;
+import jakarta.wsdl.extensions.schema.SchemaImport;
 import javax.xml.namespace.QName;
 
 import antlr.collections.AST;

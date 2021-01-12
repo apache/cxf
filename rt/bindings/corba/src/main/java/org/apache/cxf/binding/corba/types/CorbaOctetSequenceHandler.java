@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.binding.corba.types;
 
-import javax.xml.bind.DatatypeConverter;
+import jakarta.xml.bind.DatatypeConverter;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.corba.CorbaBindingException;

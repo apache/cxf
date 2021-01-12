@@ -22,9 +22,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.soap.SOAPHandler;
-import javax.xml.ws.handler.soap.SOAPMessageContext;
+import jakarta..handler.MessageContext;
+import jakarta..handler.soap.SOAPHandler;
+import jakarta..handler.soap.SOAPMessageContext;
 
 public class DummyHandler implements SOAPHandler<SOAPMessageContext> {
 

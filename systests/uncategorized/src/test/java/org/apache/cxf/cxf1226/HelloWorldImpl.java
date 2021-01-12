@@ -19,7 +19,7 @@
 
 package org.apache.cxf.cxf1226;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(endpointInterface = "org.apache.cxf.cxf1226.HelloWorld",
             targetNamespace = "http://nstest.helloworld")

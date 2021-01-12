@@ -16,7 +16,7 @@
 ##    under the License.
 package ${package};
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService
 public interface HelloWorld {

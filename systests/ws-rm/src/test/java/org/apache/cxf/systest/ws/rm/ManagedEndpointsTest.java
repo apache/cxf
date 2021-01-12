@@ -33,7 +33,7 @@ import javax.management.NotificationListener;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.management.openmbean.CompositeData;
-import javax.xml.ws.Endpoint;
+import jakarta..Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;

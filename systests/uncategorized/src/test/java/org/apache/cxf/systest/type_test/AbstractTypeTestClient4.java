@@ -27,8 +27,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Holder;
+import jakarta..BindingProvider;
+import jakarta..Holder;
 
 import org.apache.type_test.types1.AnonymousType;
 import org.apache.type_test.types1.ComplexArray;

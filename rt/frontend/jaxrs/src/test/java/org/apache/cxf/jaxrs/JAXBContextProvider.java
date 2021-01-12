@@ -19,9 +19,9 @@
 
 package org.apache.cxf.jaxrs;
 
-import javax.ws.rs.Produces;
-import javax.ws.rs.ext.ContextResolver;
-import javax.xml.bind.JAXBContext;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.ext.ContextResolver;
+import jakarta.xml.bind.JAXBContext;
 
 @Produces("text/xml+a")
 public class JAXBContextProvider implements ContextResolver<JAXBContext> {

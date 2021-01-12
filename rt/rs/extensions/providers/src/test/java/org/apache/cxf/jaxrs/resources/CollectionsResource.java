@@ -20,8 +20,8 @@ package org.apache.cxf.jaxrs.resources;
 
 import java.util.List;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
 
 public class CollectionsResource {
 

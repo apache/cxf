@@ -32,7 +32,7 @@ import org.apache.headers.OutHeaderResponse;
 import org.apache.headers.SOAPHeaderData;
 
 
-@javax.jws.WebService(serviceName = "HeaderService",
+@jakarta.jws.WebService(serviceName = "HeaderService",
             portName = "SoapPort",
             endpointInterface = "org.apache.headers.HeaderTester",
             targetNamespace = "http://apache.org/headers")

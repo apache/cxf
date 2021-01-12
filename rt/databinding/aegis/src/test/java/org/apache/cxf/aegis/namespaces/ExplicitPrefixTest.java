@@ -23,8 +23,8 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.wsdl.Definition;
-import javax.wsdl.factory.WSDLFactory;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.factory.WSDLFactory;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;

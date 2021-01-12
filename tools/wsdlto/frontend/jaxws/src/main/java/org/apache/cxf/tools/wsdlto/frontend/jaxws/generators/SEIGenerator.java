@@ -21,7 +21,7 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.generators;
 
 import java.util.Map;
 
-import javax.jws.HandlerChain;
+import jakarta.jws.HandlerChain;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.annotations.DataBinding;
@@ -101,7 +101,7 @@ public class SEIGenerator extends AbstractJAXWSGenerator {
                         }
                         if (!existHandlerAnno) {
                             intf.addAnnotation(annot);
-                            intf.addImport("javax.jws.HandlerChain");
+                            intf.addImport("jakarta.jws.HandlerChain");
                         }
                     }
                 }

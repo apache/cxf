@@ -47,8 +47,8 @@
             <artifactId>apache-jsp</artifactId>
             <exclusions>
                 <exclusion>
-                    <groupId>javax.annotation</groupId>
-                    <artifactId>javax.annotation-api</artifactId>
+                    <groupId>jakarta.annotation</groupId>
+                    <artifactId>jakarta.annotation-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

@@ -36,12 +36,12 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.wsdl.Definition;
-import javax.wsdl.Types;
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.schema.Schema;
+import jakarta.security.auth.callback.Callback;
+import jakarta.security.auth.callback.CallbackHandler;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Types;
+import jakarta.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.extensions.schema.Schema;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;

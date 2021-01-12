@@ -20,8 +20,8 @@ package org.apache.cxf.validation;
 
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 
 @SuppressWarnings("serial")
 public class ResponseConstraintViolationException extends ConstraintViolationException {

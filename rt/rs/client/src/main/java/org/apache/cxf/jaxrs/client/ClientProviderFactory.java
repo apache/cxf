@@ -22,10 +22,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.client.ClientResponseFilter;
-import javax.ws.rs.client.RxInvokerProvider;
-import javax.ws.rs.core.Configuration;
+import jakarta.ws.rs.client.ClientRequestFilter;
+import jakarta.ws.rs.client.ClientResponseFilter;
+import jakarta.ws.rs.client.RxInvokerProvider;
+import jakarta.ws.rs.core.Configuration;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;

@@ -47,13 +47,13 @@ import javax.enterprise.inject.spi.ProcessProducerField;
 import javax.enterprise.inject.spi.ProcessProducerMethod;
 import javax.enterprise.inject.spi.WithAnnotations;
 import javax.inject.Singleton;
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.ext.MessageBodyWriter;
+import jakarta.ws.rs.ext.Provider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
@@ -159,8 +159,8 @@ public class JAXRSCdiResourceExtension implements Extension {
         }
         if (webHandled) {
             existingStandardClasses.addAll(asList(
-                "javax.servlet.http.HttpServletRequest",
-                "javax.servlet.ServletContext"));
+                "jakarta.servlet.http.HttpServletRequest",
+                "jakarta.servlet.ServletContext"));
         }
         beanManager.fireEvent(this);
     }
@@ -195,7 +195,7 @@ public class JAXRSCdiResourceExtension implements Extension {
             serviceBeans.add(event.getBean());
         } else if (event.getAnnotated().isAnnotationPresent(Provider.class)) {
             providerBeans.add(event.getBean());
-        } else if (event.getBean().getTypes().contains(javax.ws.rs.core.Feature.class)) {
+        } else if (event.getBean().getTypes().contains(jakarta.ws.rs.core.Feature.class)) {
             providerBeans.add(event.getBean());
         } else if (event.getBean().getTypes().contains(Feature.class)) {
             featureBeans.add((Bean< ? extends Feature >)event.getBean());

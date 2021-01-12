@@ -32,7 +32,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -79,7 +79,7 @@ public abstract class WsnBrokerTest {
     public void setUp() throws Exception {
         loader = Thread.currentThread().getContextClassLoader();
         String impl = getProviderImpl();
-        System.setProperty("javax.xml.ws.spi.Provider", impl);
+        System.setProperty("jakarta.xml.ws.spi.Provider", impl);
         Thread.currentThread()
             .setContextClassLoader(new FakeClassLoader(impl));
         WSNHelper.getInstance().setClassLoader(false);
@@ -120,7 +120,7 @@ public abstract class WsnBrokerTest {
             notificationBrokerServer.destroy();
             createPullPointServer.destroy();
         }
-        System.clearProperty("javax.xml.ws.spi.Provider");
+        System.clearProperty("jakarta.xml.ws.spi.Provider");
         Thread.currentThread()
             .setContextClassLoader(loader);
         WSNHelper.clearInstance();
@@ -385,14 +385,14 @@ public abstract class WsnBrokerTest {
         }
         @Override
         public InputStream getResourceAsStream(String name) {
-            if ("META-INF/services/javax.xml.ws.spi.Provider".equals(name)) {
+            if ("META-INF/services/jakarta.xml.ws.spi.Provider".equals(name)) {
                 return provider != null ? new ByteArrayInputStream(provider.getBytes()) : null;
             }
             return super.getResourceAsStream(name);
         }
         @Override
         public Enumeration<URL> getResources(String name) throws IOException {
-            if ("META-INF/services/javax.xml.ws.spi.Provider".equals(name)) {
+            if ("META-INF/services/jakarta.xml.ws.spi.Provider".equals(name)) {
                 return new Enumeration<URL>() {
                     public boolean hasMoreElements() {
                         return false;

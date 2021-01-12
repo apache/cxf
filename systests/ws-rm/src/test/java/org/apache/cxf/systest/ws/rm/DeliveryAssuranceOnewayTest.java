@@ -30,13 +30,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Provider;
-import javax.xml.ws.Service.Mode;
-import javax.xml.ws.ServiceMode;
+import jakarta..Endpoint;
+import jakarta..Provider;
+import jakarta..Service.Mode;
+import jakarta..ServiceMode;
 import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;

@@ -20,10 +20,10 @@
 package org.apache.cxf.binding.soap;
 
 
-import javax.wsdl.Definition;
-import javax.wsdl.Service;
-import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLReader;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Service;
+import jakarta.wsdl.factory.WSDLFactory;
+import jakarta.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
 
 
@@ -66,7 +66,7 @@ public class ServiceModelUtilTest {
         String wsdlUrl = getClass().getResource(WSDL_PATH).toString();
         WSDLFactory wsdlFactory = WSDLFactory.newInstance();
         WSDLReader wsdlReader = wsdlFactory.newWSDLReader();
-        wsdlReader.setFeature("javax.wsdl.verbose", false);
+        wsdlReader.setFeature("jakarta.wsdl.verbose", false);
         def = wsdlReader.readWSDL(wsdlUrl);
 
         WSDLServiceBuilder wsdlServiceBuilder = new WSDLServiceBuilder(bus);

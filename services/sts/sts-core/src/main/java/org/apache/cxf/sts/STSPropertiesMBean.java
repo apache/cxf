@@ -21,7 +21,7 @@ package org.apache.cxf.sts;
 
 import java.util.List;
 
-import javax.security.auth.callback.CallbackHandler;
+import jakarta.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.token.realm.Relationship;

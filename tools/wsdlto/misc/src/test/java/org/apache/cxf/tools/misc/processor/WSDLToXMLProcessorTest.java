@@ -21,10 +21,10 @@ package org.apache.cxf.tools.misc.processor;
 
 import java.io.File;
 
-import javax.wsdl.Binding;
-import javax.wsdl.BindingOperation;
-import javax.wsdl.Service;
-import javax.wsdl.extensions.http.HTTPAddress;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.BindingOperation;
+import jakarta.wsdl.Service;
+import jakarta.wsdl.extensions.http.HTTPAddress;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;

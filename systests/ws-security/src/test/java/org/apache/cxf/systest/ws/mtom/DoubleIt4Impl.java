@@ -21,9 +21,9 @@ package org.apache.cxf.systest.ws.mtom;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-import javax.activation.DataHandler;
+import jakarta.xml.bind.DataHandler;
 import javax.imageio.ImageIO;
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 import org.apache.cxf.feature.Features;
 import org.example.contract.doubleit.DoubleItFault;

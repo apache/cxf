@@ -71,7 +71,7 @@ public class CertConstraints {
          *              is empty, then any dn will match (by definition of the universal quantifier)
          */
         final boolean matches(
-            final javax.security.auth.x500.X500Principal dn
+            final jakarta.security.auth.x500.X500Principal dn
         ) {
             boolean atLeastOnePatternMatches = false;
             boolean atLeastOnePatternDoesNotMatch = false;

@@ -20,7 +20,7 @@ package org.apache.cxf.interceptor.security;
 
 import java.security.Principal;
 
-import javax.security.auth.Subject;
+import jakarta.security.auth.Subject;
 
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.interceptor.security.test.GroupWrapper;

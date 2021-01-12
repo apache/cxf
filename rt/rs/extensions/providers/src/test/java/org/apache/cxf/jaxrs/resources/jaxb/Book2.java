@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.jaxrs.resources.jaxb;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "thebook2")
 public class Book2 {

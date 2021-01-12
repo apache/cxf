@@ -29,10 +29,10 @@ import javax.xml.soap.SOAPMessage;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.ws.Binding;
-import javax.xml.ws.handler.Handler;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.soap.SOAPHandler;
+import jakarta.xml.ws.Binding;
+import jakarta.xml.ws.handler.Handler;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.handler.soap.SOAPHandler;
 
 import org.apache.cxf.binding.soap.HeaderUtil;
 import org.apache.cxf.binding.soap.SoapMessage;

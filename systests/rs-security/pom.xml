@@ -128,7 +128,7 @@
             <classifier>keys</classifier>
         </dependency>
         <dependency>
-            <groupId>javax.annotation</groupId>
+            <groupId>jakarta.annotation</groupId>
             <artifactId>jsr250-api</artifactId>
             <version>${cxf.jsr250.api.version}</version>
             <scope>test</scope>
@@ -221,12 +221,12 @@
             <scope>test</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>javax.xml.bind</groupId>
+                    <groupId>jakarta.xml.bind</groupId>
                     <artifactId>jaxb-api</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>javax.activation</groupId>
-                    <artifactId>javax.activation-api</artifactId>
+                    <groupId>jakarta.activation</groupId>
+                    <artifactId>jakarta.activation-api</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>javax.persistence</groupId>

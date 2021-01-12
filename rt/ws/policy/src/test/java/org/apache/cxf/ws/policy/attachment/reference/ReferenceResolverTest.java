@@ -23,7 +23,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.wsdl.extensions.UnknownExtensibilityElement;
+import jakarta.wsdl.extensions.UnknownExtensibilityElement;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;

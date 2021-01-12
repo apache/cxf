@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 
-import javax.jws.WebParam;
+import jakarta.jws.WebParam;
 
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.service.model.FaultInfo;
@@ -317,7 +317,7 @@ public class OperationProcessor  extends AbstractProcessor {
         asyncHandlerAnnotation.addElement(new JAnnotationElement("targetNamespace", ""));
         asyncHandler.addAnnotation("WebParam", asyncHandlerAnnotation);
 
-        method.getInterface().addImport("javax.jws.WebParam");
+        method.getInterface().addImport("jakarta.jws.WebParam");
         method.getInterface().addMethod(callbackMethod);
     }
 

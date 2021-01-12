@@ -19,9 +19,9 @@
 
 package minimalosgi;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.ws.rs.core.Application;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
+import jakarta.ws.rs.core.Application;
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 
 public class SampleServlet extends CXFNonSpringJaxrsServlet {

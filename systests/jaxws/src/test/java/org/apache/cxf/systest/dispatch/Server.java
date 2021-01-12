@@ -20,7 +20,7 @@
 package org.apache.cxf.systest.dispatch;
 
 
-import javax.xml.ws.Endpoint;
+import jakarta.xml.ws.Endpoint;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;

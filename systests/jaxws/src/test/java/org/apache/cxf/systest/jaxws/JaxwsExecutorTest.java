@@ -21,8 +21,8 @@ package org.apache.cxf.systest.jaxws;
 
 import java.util.concurrent.Executor;
 
-import javax.jws.WebService;
-import javax.xml.ws.Response;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Response;
 
 import org.apache.cxf.greeter_control.AbstractGreeterImpl;
 import org.apache.cxf.greeter_control.BasicGreeterService;
@@ -49,7 +49,7 @@ public class JaxwsExecutorTest  extends AbstractBusClientServerTestBase {
         protected void run()  {
             GreeterImpl implementor = new GreeterImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
-            javax.xml.ws.Endpoint.publish(address, implementor);
+            jakarta.xml.ws.Endpoint.publish(address, implementor);
         }
 
 

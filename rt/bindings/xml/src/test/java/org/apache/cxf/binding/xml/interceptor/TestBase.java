@@ -22,7 +22,7 @@ package org.apache.cxf.binding.xml.interceptor;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;

@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.jaxws.service;
 
-import javax.xml.ws.WebFault;
+import jakarta.xml.ws.WebFault;
 
 @WebFault
 public class AddNumbersException extends Exception {

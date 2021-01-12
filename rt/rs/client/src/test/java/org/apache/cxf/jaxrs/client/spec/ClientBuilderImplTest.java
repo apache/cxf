@@ -20,7 +20,7 @@ package org.apache.cxf.jaxrs.client.spec;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.ws.rs.client.Client;
+import jakarta.ws.rs.client.Client;
 
 import org.apache.cxf.jaxrs.impl.ConfigurableImpl;
 import org.apache.cxf.jaxrs.provider.PrimitiveTextProvider;

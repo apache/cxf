@@ -19,7 +19,7 @@
 package org.apache.cxf.ws.transfer.integration;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.ws.soap.SOAPFaultException;
+import jakarta.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

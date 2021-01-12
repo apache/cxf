@@ -1,4 +1,4 @@
-<%@ page import="javax.servlet.http.HttpServletRequest, demo.jaxrs.server.BigQueryStart" %>
+<%@ page import="jakarta.servlet.http.HttpServletRequest, demo.jaxrs.server.BigQueryStart" %>
 
 <%
     BigQueryStart bq = (BigQueryStart) request.getAttribute("data");

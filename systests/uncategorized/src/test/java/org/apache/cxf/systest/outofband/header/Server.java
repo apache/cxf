@@ -24,9 +24,9 @@ package org.apache.cxf.systest.outofband.header;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Endpoint;
+import jakarta.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.EndpointProperty;

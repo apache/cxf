@@ -21,10 +21,10 @@ package org.apache.cxf.systest.mtom_schema_validation;
 import java.io.File;
 import java.net.URL;
 
-import javax.activation.DataHandler;
-import javax.activation.FileDataSource;
+import jakarta.xml.bind.DataHandler;
+import jakarta.xml.bind.FileDataSource;
 import javax.xml.namespace.QName;
-import javax.xml.ws.soap.MTOMFeature;
+import jakarta.xml.ws.soap.MTOMFeature;
 
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 

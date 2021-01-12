@@ -19,8 +19,8 @@
 
 package org.apache.cxf.wsdl11;
 
-import javax.wsdl.Binding;
-import javax.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.extensions.ExtensibilityElement;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;

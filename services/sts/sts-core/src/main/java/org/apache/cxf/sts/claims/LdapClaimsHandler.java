@@ -31,8 +31,8 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
-import javax.security.auth.kerberos.KerberosPrincipal;
-import javax.security.auth.x500.X500Principal;
+import jakarta.security.auth.kerberos.KerberosPrincipal;
+import jakarta.security.auth.x500.X500Principal;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rt.security.claims.Claim;

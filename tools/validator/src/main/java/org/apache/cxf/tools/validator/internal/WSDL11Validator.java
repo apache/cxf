@@ -37,8 +37,8 @@ import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.wsdl.Definition;
-import javax.wsdl.WSDLException;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.WSDLException;
 
 import org.w3c.dom.Document;
 

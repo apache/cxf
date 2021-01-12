@@ -252,7 +252,7 @@ Examples:
             </option>
             <option id="beanValidation" maxOccurs="1">
                 <annotation>
-                    Specifies that javax.validation.Valid annotation needs to be added to
+                    Specifies that jakarta.validation.Valid annotation needs to be added to
                     methods which return data entities and method parameters which represent
                     data entities    
                 </annotation>

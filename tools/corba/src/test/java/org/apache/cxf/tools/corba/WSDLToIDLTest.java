@@ -32,7 +32,7 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import javax.wsdl.Definition;
+import jakarta.wsdl.Definition;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.tools.corba.common.ToolTestBase;

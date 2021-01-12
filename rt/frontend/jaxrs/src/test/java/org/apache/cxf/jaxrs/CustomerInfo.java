@@ -19,10 +19,10 @@
 
 package org.apache.cxf.jaxrs;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.ContextResolver;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.UriInfo;
+import jakarta.ws.rs.ext.ContextResolver;
 
 public interface CustomerInfo {
     void setUriInfoContext(@Context UriInfo uriInfo);

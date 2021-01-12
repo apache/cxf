@@ -24,9 +24,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.security.auth.login.AppConfigurationEntry;
-import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
-import javax.security.auth.login.Configuration;
+import jakarta.security.auth.login.AppConfigurationEntry;
+import jakarta.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
+import jakarta.security.auth.login.Configuration;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;

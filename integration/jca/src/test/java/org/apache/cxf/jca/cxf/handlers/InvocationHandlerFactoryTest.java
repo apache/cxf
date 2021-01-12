@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.resource.spi.ResourceAdapterInternalException;
-import javax.security.auth.Subject;
+import jakarta.security.auth.Subject;
 
 
 import org.apache.cxf.jca.cxf.CXFInvocationHandler;

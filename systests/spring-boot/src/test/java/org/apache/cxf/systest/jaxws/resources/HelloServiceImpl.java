@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.jaxws.resources;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 import static java.util.Objects.requireNonNull;
 

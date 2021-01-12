@@ -18,12 +18,12 @@
  */
 package org.apache.cxf.wsn.client;
 
-import javax.jws.WebParam;
-import javax.jws.WebService;
-import javax.xml.bind.JAXBElement;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 
 import org.apache.cxf.wsn.util.IdGenerator;
 import org.apache.cxf.wsn.util.WSNHelper;

@@ -19,7 +19,7 @@
 
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.mapper;
 
-import javax.wsdl.OperationType;
+import jakarta.wsdl.OperationType;
 
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.tools.common.model.JavaMethod;
@@ -31,7 +31,7 @@ public final class MethodMapper {
     public JavaMethod map(OperationInfo operation) {
         JavaMethod method = new JavaMethod();
         // set default Document Bare style
-        method.setSoapStyle(javax.jws.soap.SOAPBinding.Style.DOCUMENT);
+        method.setSoapStyle(jakarta.jws.soap.SOAPBinding.Style.DOCUMENT);
 
         String operationName = operation.getName().getLocalPart();
 

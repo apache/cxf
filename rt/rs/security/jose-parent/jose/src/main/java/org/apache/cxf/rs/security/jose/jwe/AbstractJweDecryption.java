@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 
 import javax.crypto.SecretKey;
-import javax.security.auth.DestroyFailedException;
+import jakarta.security.auth.DestroyFailedException;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;

@@ -25,7 +25,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
-import javax.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElement;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 

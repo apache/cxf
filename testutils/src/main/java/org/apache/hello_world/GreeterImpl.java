@@ -19,7 +19,7 @@
 
 package org.apache.hello_world;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 import org.apache.hello_world.messages.PingMeFault;
 

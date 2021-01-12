@@ -22,7 +22,7 @@ package org.apache.cxf.tools.corba.processors.idl;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.wsdl.Definition;
+import jakarta.wsdl.Definition;
 import javax.xml.namespace.QName;
 
 import antlr.collections.AST;

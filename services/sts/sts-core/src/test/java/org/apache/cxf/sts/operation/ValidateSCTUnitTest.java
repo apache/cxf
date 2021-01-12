@@ -22,7 +22,7 @@ import java.security.Principal;
 import java.util.Collections;
 import java.util.Properties;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;

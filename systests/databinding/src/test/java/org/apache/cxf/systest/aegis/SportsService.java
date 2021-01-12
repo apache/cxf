@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(targetNamespace = "http://cxf.apache.org/systest/aegis/sports")
 public interface SportsService {

@@ -21,8 +21,8 @@ package org.apache.cxf.jaxws.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
 
 @WebService(serviceName = "MyService",
             portName = "MyPort",

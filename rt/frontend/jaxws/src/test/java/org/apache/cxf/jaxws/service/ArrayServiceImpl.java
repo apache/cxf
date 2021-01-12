@@ -22,8 +22,8 @@ package org.apache.cxf.jaxws.service;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.jws.WebParam;
-import javax.jws.WebService;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
 
 @WebService(endpointInterface = "org.apache.cxf.jaxws.service.ArrayService",
             serviceName = "ArrayService",

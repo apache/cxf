@@ -23,7 +23,7 @@ import javax.enterprise.inject.spi.Annotated;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.ProcessBean;
-import javax.ws.rs.Path;
+import jakarta.ws.rs.Path;
 
 import org.apache.cxf.Bus;
 

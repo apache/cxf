@@ -24,7 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.extensions.ExtensibilityElement;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapHeader;

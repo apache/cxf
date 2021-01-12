@@ -65,7 +65,7 @@
             <scope>test</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>javax.xml.ws</groupId>
+                    <groupId>jakarta.xml.ws</groupId>
                     <artifactId>jaxws-api</artifactId>
                 </exclusion>
             </exclusions>

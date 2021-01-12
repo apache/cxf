@@ -21,10 +21,10 @@ package org.apache.cxf.binding.xml.wsdl11;
 
 import java.util.Map;
 
-import javax.wsdl.Port;
-import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.http.HTTPAddress;
+import jakarta.wsdl.Port;
+import jakarta.wsdl.WSDLException;
+import jakarta.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.extensions.http.HTTPAddress;
 
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.wsdl.AbstractWSDLPlugin;

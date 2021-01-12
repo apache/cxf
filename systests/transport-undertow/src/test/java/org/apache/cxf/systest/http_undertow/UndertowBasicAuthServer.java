@@ -22,7 +22,7 @@ package org.apache.cxf.systest.http_undertow;
 
 import java.net.URL;
 
-import javax.xml.ws.Endpoint;
+import jakarta.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;

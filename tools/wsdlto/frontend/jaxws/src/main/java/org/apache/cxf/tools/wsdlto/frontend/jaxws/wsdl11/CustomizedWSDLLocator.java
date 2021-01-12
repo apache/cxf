@@ -33,7 +33,7 @@ import org.apache.cxf.catalog.OASISCatalogManagerHelper;
 import org.apache.cxf.resource.ExtendedURIResolver;
 import org.apache.cxf.staxutils.StaxUtils;
 
-public class CustomizedWSDLLocator implements javax.wsdl.xml.WSDLLocator {
+public class CustomizedWSDLLocator implements jakarta.wsdl.xml.WSDLLocator {
     private String wsdlUrl;
     private ExtendedURIResolver resolver;
 

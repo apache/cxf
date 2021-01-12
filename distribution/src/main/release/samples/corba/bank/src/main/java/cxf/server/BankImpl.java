@@ -28,7 +28,7 @@ import bank.common.AccountNotFoundException;
 import bank.common.AccountNotFoundExceptionType;
 import bank.common.Bank;
 
-@javax.jws.WebService(portName = "BankCORBAPort", serviceName = "BankCORBAService",
+@jakarta.jws.WebService(portName = "BankCORBAPort", serviceName = "BankCORBAService",
                       targetNamespace = "http://cxf.apache.org/schemas/cxf/idl/bank",
                       wsdlLocation = "classpath:/wsdl/bank.wsdl",
                       endpointInterface = "bank.common.Bank")

@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.soap;
 
-import javax.xml.ws.BindingProvider;
+import jakarta..BindingProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;

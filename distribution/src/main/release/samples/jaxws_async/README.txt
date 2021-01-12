@@ -22,11 +22,11 @@ delivered to the client application asynchronously using one
 of two alternative approaches:
 
 - Callback: the client application implements the 
-javax.xml.ws.AsyncHandler interface to accept notification
+jakarta.xml.ws.AsyncHandler interface to accept notification
 of the response availability
 
 - Polling: the client application periodically polls a
-javax.xml.ws.Response instance to check if the response
+jakarta.xml.ws.Response instance to check if the response
 is available
 
 This demo illustrates both approaches.

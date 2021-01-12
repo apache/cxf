@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.jaxb.validators;
 
-@javax.jws.WebService(endpointInterface = "org.apache.cxf.systest.jaxb.validators.HelloWorld")
+@jakarta.jws.WebService(endpointInterface = "org.apache.cxf.systest.jaxb.validators.HelloWorld")
 public class HelloWorldImpl implements HelloWorld {
 
     public PassedObject sayHi(PassedObject name) {

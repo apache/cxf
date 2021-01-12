@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.ws.transfer.integration;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Element;

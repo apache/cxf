@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.jca.outbound;
 
-import javax.security.auth.Subject;
+import jakarta.security.auth.Subject;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.BusFactory;

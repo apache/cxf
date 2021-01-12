@@ -31,10 +31,10 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;

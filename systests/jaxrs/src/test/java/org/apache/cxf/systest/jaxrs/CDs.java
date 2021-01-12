@@ -21,7 +21,7 @@ package org.apache.cxf.systest.jaxrs;
 
 import java.util.Collection;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "CDs")
 public class CDs {

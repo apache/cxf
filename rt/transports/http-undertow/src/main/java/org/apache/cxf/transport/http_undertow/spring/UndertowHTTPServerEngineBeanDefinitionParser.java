@@ -24,8 +24,8 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-import javax.xml.bind.JAXBContext;
+import jakarta.annotation.PostConstruct;
+import jakarta.xml.bind.JAXBContext;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;

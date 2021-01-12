@@ -19,8 +19,8 @@
 package org.apache.cxf.systest.type_test.corba;
 
 
-import javax.jws.WebService;
-import javax.xml.ws.Endpoint;
+import jakarta.jws.WebService;
+import jakarta..Endpoint;
 
 
 import org.apache.cxf.BusFactory;

@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 /**
  * Service that echoes the username and password back to the user in an xml

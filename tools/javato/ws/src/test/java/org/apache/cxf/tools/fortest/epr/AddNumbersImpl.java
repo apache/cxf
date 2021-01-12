@@ -19,7 +19,7 @@
 
 package org.apache.cxf.tools.fortest.epr;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 import javax.xml.ws.BindingType;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.soap.Addressing;

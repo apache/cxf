@@ -28,10 +28,10 @@ import java.util.Locale;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Service.Mode;
-import javax.xml.ws.WebServiceException;
+import jakarta.xml.w.BindingProvider;
+import jakarta.xml.w.Dispatch;
+import jakarta.xml.w.Service.Mode;
+import jakarta.xml.w.WebServiceException;
 
 import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.endpoint.Client;

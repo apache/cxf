@@ -34,7 +34,7 @@
     <compilerArguments>-Aopenjpa.source=7 -Aopenjpa.metamodel=true</compilerArguments>
     <cxf.module.name>org.apache.cxf.rs.security.sso.oidc</cxf.module.name>
     <cxf.osgi.import>
-        javax.annotation*;version="${cxf.osgi.javax.annotation.version}",
+        jakarta.annotation*;version="${cxf.osgi.jakarta.annotation.version}",
         *
     </cxf.osgi.import>
   </properties>
@@ -86,12 +86,12 @@
       <scope>test</scope>
         <exclusions>
           <exclusion>
-            <groupId>javax.xml.bind</groupId>
+            <groupId>jakarta.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
           </exclusion>
           <exclusion>
-            <groupId>javax.activation</groupId>
-            <artifactId>javax.activation-api</artifactId>
+            <groupId>jakarta.activation</groupId>
+            <artifactId>jakarta.activation-api</artifactId>
           </exclusion>
           <exclusion>
             <groupId>javax.persistence</groupId>

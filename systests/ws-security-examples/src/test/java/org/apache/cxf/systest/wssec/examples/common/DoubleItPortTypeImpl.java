@@ -20,9 +20,9 @@ package org.apache.cxf.systest.wssec.examples.common;
 
 import java.security.Principal;
 
-import javax.annotation.Resource;
-import javax.jws.WebService;
-import javax.xml.ws.WebServiceContext;
+import jakarta.annotation.Resource;
+import jakarta.jws.WebService;
+import jakarta..WebServiceContext;
 
 import org.apache.cxf.feature.Features;
 import org.example.contract.doubleit.DoubleItPortType;

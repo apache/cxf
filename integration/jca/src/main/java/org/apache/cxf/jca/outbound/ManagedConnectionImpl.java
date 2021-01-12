@@ -41,9 +41,9 @@ import javax.resource.spi.ConnectionRequestInfo;
 import javax.resource.spi.LocalTransaction;
 import javax.resource.spi.ManagedConnection;
 import javax.resource.spi.ManagedConnectionMetaData;
-import javax.security.auth.Subject;
+import jakarta.security.auth.Subject;
 import javax.transaction.xa.XAResource;
-import javax.xml.ws.BindingProvider;
+import jakarta.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;

@@ -24,13 +24,13 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.List;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.core.Configuration;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientRequestContext;
+import jakarta.ws.rs.core.Configuration;
+import jakarta.ws.rs.core.GenericEntity;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.client.ClientProviderFactory;
 import org.apache.cxf.jaxrs.impl.AbstractRequestContextImpl;

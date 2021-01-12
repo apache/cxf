@@ -22,8 +22,8 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.customization;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
-import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.ExtensionRegistry;
+import jakarta.wsdl.WSDLException;
+import jakarta.wsdl.extensions.ExtensionRegistry;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;

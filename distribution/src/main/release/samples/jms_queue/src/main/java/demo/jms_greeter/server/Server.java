@@ -21,7 +21,7 @@ package demo.jms_greeter.server;
 
 import java.util.Collections;
 
-import javax.jms.ConnectionFactory;
+import jakarta.jms.ConnectionFactory;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.ext.logging.LoggingFeature;

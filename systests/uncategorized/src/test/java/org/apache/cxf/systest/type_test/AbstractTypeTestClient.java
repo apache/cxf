@@ -29,8 +29,8 @@ import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Holder;
-import javax.xml.ws.soap.SOAPFaultException;
+import jakarta..Holder;
+import jakarta..soap.SOAPFaultException;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;

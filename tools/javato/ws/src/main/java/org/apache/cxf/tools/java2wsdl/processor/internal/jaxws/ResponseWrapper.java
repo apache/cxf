@@ -26,8 +26,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.jws.WebParam;
-import javax.jws.WebResult;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
 import javax.xml.ws.Holder;
 
 import org.apache.cxf.common.util.CollectionUtils;
@@ -129,7 +129,7 @@ public final class ResponseWrapper extends Wrapper {
     @Override
     public WrapperBeanClass getWrapperBeanClass(final Method method) {
         javax.xml.ws.ResponseWrapper resWrapper = method.getAnnotation(javax.xml.ws.ResponseWrapper.class);
-        javax.jws.WebMethod webMethod = method.getAnnotation(javax.jws.WebMethod.class);
+        jakarta.jws.WebMethod webMethod = method.getAnnotation(jakarta.jws.WebMethod.class);
         String methName = webMethod == null ? null : webMethod.operationName();
         if (StringUtils.isEmpty(methName)) {
             methName = method.getName();

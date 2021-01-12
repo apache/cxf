@@ -25,7 +25,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.activation.DataHandler;
+import jakarta.activation.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.apache.cxf.attachment.AttachmentImpl;

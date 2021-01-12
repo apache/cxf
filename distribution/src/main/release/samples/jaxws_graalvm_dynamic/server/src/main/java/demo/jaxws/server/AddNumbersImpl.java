@@ -19,7 +19,7 @@
 
 package demo.jaxws.server;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 import org.apache.handlers.AddNumbers;
 import org.apache.handlers.AddNumbersFault;
 import org.apache.handlers.types.FaultDetail;

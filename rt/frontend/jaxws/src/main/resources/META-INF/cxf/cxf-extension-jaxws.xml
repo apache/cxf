@@ -25,5 +25,5 @@
         <constructor-arg ref="cxf"/>
     </bean>
     <bean class="org.apache.cxf.jaxws.context.WebServiceContextImpl" id="org.apache.cxf.jaxws.context.WebServiceContextImpl" lazy-init="true"/>
-    <alias name="org.apache.cxf.jaxws.context.WebServiceContextImpl" alias="javax.xml.ws.WebServiceContext"/>
+    <alias name="org.apache.cxf.jaxws.context.WebServiceContextImpl" alias="jakarta.xml.ws.WebServiceContext"/>
 </beans>

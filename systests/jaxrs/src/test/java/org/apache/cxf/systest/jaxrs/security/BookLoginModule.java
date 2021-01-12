@@ -21,10 +21,10 @@ package org.apache.cxf.systest.jaxrs.security;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.security.auth.Subject;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.login.LoginException;
-import javax.security.auth.spi.LoginModule;
+import jakarta.security.auth.Subject;
+import jakarta.security.auth.callback.CallbackHandler;
+import jakarta.security.auth.login.LoginException;
+import jakarta.security.auth.spi.LoginModule;
 
 public class BookLoginModule implements LoginModule {
     private static final Class<LoginModule> LOGIN_MODULE_C = getLoginModuleClass();

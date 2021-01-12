@@ -20,10 +20,10 @@
 package org.apache.cxf.jaxws.service;
 import java.util.List;
 
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebService;
-import javax.xml.bind.annotation.XmlList;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
+import jakarta.xml.bind.annotation.XmlList;
 
 @WebService
 public interface AddNumbers {

@@ -22,9 +22,9 @@ package org.apache.cxf.rs.security.oauth2.auth.saml;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 import org.w3c.dom.Element;
 

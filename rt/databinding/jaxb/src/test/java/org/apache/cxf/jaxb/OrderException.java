@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.jaxb;
 
-import javax.xml.bind.annotation.XmlAccessOrder;
-import javax.xml.bind.annotation.XmlAccessorOrder;
-import javax.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlAccessOrder;
+import jakarta.xml.bind.annotation.XmlAccessorOrder;
+import jakarta.xml.bind.annotation.XmlAttribute;
 
 @XmlAccessorOrder(XmlAccessOrder.ALPHABETICAL)
 public class OrderException extends Exception {

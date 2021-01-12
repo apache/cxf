@@ -23,7 +23,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.extensions.ExtensibilityElement;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;

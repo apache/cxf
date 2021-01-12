@@ -31,16 +31,16 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.wsdl.Binding;
-import javax.wsdl.BindingOperation;
-import javax.wsdl.Definition;
-import javax.wsdl.Fault;
-import javax.wsdl.Import;
-import javax.wsdl.Operation;
-import javax.wsdl.Part;
-import javax.wsdl.Port;
-import javax.wsdl.PortType;
-import javax.wsdl.Service;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.BindingOperation;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Fault;
+import jakarta.wsdl.Import;
+import jakarta.wsdl.Operation;
+import jakarta.wsdl.Part;
+import jakarta.wsdl.Port;
+import jakarta.wsdl.PortType;
+import jakarta.wsdl.Service;
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
 import javax.xml.xpath.XPathConstants;
@@ -369,7 +369,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
         return oNode;
     }
 
-    private XNode getXNode(javax.wsdl.Message msg) {
+    private XNode getXNode(jakarta.wsdl.Message msg) {
         XDef xdef = new XDef();
         xdef.setTargetNamespace(msg.getQName().getNamespaceURI());
 
@@ -460,8 +460,8 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
         }
     }
 
-    private javax.wsdl.Message getMessage(QName msgName) {
-        javax.wsdl.Message message = this.definition.getMessage(msgName);
+    private jakarta.wsdl.Message getMessage(QName msgName) {
+        jakarta.wsdl.Message message = this.definition.getMessage(msgName);
         if (message == null) {
             for (Definition d : importedDefinitions) {
                 message = d.getMessage(msgName);
@@ -475,7 +475,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
 
     private void collectValidationPointsForMessages() {
         for (QName msgName : messageRefNames) {
-            javax.wsdl.Message message = getMessage(msgName);
+            jakarta.wsdl.Message message = getMessage(msgName);
             for (Iterator<?> iter = message.getParts().values().iterator(); iter.hasNext();) {
                 Part part = (Part) iter.next();
                 QName elementName = part.getElementName();
@@ -542,7 +542,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
                                                   portType.getQName()));
                     continue;
                 }
-                javax.wsdl.Message inMsg = operation.getInput().getMessage();
+                jakarta.wsdl.Message inMsg = operation.getInput().getMessage();
                 if (inMsg == null) {
                     addWarning("Operation " + operation.getName() + " in PortType: "
                                + portType.getQName() + " has no input message");
@@ -554,7 +554,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
                 }
 
                 if (operation.getOutput() != null) {
-                    javax.wsdl.Message outMsg = operation.getOutput().getMessage();
+                    jakarta.wsdl.Message outMsg = operation.getOutput().getMessage();
 
                     if (outMsg == null) {
                         addWarning("Operation " + operation.getName() + " in PortType: "
@@ -569,7 +569,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
                 }
                 for (Iterator<?> iter = operation.getFaults().values().iterator(); iter.hasNext();) {
                     Fault fault = (Fault) iter.next();
-                    javax.wsdl.Message faultMsg = fault.getMessage();
+                    jakarta.wsdl.Message faultMsg = fault.getMessage();
                     XNode vFaultMsgNode = getXNode(faultMsg);
                     vFaultMsgNode.setFailurePoint(getFaultXNode(vOperationNode, fault.getName()));
                     vNodes.add(vFaultMsgNode);

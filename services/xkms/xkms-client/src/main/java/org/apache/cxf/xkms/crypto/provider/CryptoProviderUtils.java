@@ -21,7 +21,7 @@ package org.apache.cxf.xkms.crypto.provider;
 
 import java.util.Properties;
 
-import javax.security.auth.callback.CallbackHandler;
+import jakarta.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rt.security.utils.SecurityUtils;

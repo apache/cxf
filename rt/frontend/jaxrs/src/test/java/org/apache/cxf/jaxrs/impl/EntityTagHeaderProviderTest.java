@@ -19,7 +19,7 @@
 
 package org.apache.cxf.jaxrs.impl;
 
-import javax.ws.rs.core.EntityTag;
+import jakarta.ws.rs.core.EntityTag;
 
 import org.junit.Test;
 

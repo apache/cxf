@@ -20,8 +20,8 @@ package org.apache.cxf.systest.sts.common;
 
 import java.security.Principal;
 
-import javax.annotation.Resource;
-import javax.jws.WebService;
+import jakarta.annotation.Resource;
+import jakarta.jws.WebService;
 import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.feature.Features;

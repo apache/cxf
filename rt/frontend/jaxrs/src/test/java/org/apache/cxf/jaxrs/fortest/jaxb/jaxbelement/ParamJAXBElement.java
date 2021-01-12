@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.jaxrs.fortest.jaxb.jaxbelement;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 public class ParamJAXBElement extends JAXBElement<ParamType> {

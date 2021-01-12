@@ -25,9 +25,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.wsdl.Definition;
-import javax.wsdl.extensions.ExtensionRegistry;
-import javax.wsdl.factory.WSDLFactory;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.extensions.ExtensionRegistry;
+import jakarta.wsdl.factory.WSDLFactory;
 
 import org.xml.sax.SAXParseException;
 

@@ -22,8 +22,8 @@ package org.apache.cxf.systest.handlers;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import javax.xml.namespace.QName;
 import javax.xml.soap.Detail;
 import javax.xml.soap.DetailEntry;
@@ -33,11 +33,11 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFactory;
 import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPMessage;
-import javax.xml.ws.ProtocolException;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.soap.SOAPHandler;
-import javax.xml.ws.handler.soap.SOAPMessageContext;
-import javax.xml.ws.soap.SOAPFaultException;
+import jakarta.xml.ws.ProtocolException;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.handler.soap.SOAPHandler;
+import jakarta.xml.ws.handler.soap.SOAPMessageContext;
+import jakarta.xml.ws.soap.SOAPFaultException;
 
 
 import org.w3c.dom.DOMException;
@@ -80,7 +80,7 @@ public class  TestSOAPHandler extends TestHandlerBase
         }
     }
 
-    // Implementation of javax.xml.ws.handler.soap.SOAPHandler
+    // Implementation of jakarta.xml.ws.handler.soap.SOAPHandler
 
     public final Set<QName> getHeaders() {
         return null;

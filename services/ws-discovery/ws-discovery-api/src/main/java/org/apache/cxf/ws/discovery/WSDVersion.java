@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Dispatch;
+import jakarta.xml.ws.Dispatch;
 
 import org.apache.cxf.feature.StaxTransformFeature;
 import org.apache.cxf.jaxws.DispatchImpl;

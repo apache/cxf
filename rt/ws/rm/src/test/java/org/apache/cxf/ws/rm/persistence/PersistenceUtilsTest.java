@@ -26,7 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.activation.DataHandler;
+import jakarta.xml.biDataHandler;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.apache.cxf.attachment.AttachmentImpl;

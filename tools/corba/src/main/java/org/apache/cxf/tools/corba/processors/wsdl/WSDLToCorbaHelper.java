@@ -31,9 +31,9 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.wsdl.Binding;
-import javax.wsdl.Definition;
-import javax.wsdl.Part;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Part;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.corba.wsdl.Abstractanonsequence;

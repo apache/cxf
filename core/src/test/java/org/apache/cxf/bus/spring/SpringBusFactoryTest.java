@@ -24,9 +24,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.SortedSet;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.annotation.Resource;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import jakarta.annotation.Resource;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;

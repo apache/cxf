@@ -25,9 +25,9 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Service;
+import jakarta..BindingProvider;
+import jakarta..Dispatch;
+import jakarta..Service;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

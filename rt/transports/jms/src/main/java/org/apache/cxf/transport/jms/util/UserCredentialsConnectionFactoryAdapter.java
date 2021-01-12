@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.transport.jms.util;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
+import jakarta.jms.Connection;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.JMSException;
 
 public class UserCredentialsConnectionFactoryAdapter implements ConnectionFactory {
     private String userName;

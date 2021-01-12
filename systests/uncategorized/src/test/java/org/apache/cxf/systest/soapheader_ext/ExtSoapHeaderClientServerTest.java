@@ -26,8 +26,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.WebServiceClient;
+import jakarta..Endpoint;
+import jakarta..WebServiceClient;
 
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.soap_ext_header.audit.Audit;

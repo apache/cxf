@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.systest.jaxws;
 
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.ws.WebFault;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.ws.WebFault;
 
 @WebFault()
 public class ServiceTestFault extends Exception {

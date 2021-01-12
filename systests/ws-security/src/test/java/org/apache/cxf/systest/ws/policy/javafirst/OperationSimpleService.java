@@ -19,8 +19,8 @@
 
 package org.apache.cxf.systest.ws.policy.javafirst;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
 
 @WebService(name = "OperationSimpleService",
             targetNamespace = "http://www.example.org/contract/OperationSimpleService")

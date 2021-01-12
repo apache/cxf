@@ -24,7 +24,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 

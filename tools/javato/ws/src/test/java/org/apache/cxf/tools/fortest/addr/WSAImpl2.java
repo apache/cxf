@@ -19,7 +19,7 @@
 
 package org.apache.cxf.tools.fortest.addr;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 import javax.xml.ws.Action;
 import javax.xml.ws.BindingType;
 import javax.xml.ws.Holder;

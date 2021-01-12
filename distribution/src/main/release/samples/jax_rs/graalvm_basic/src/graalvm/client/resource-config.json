@@ -3,8 +3,8 @@
   "includes":[
     {"pattern":"\\QMETA-INF/cxf/bus-extensions.txt\\E"}, 
     {"pattern":"\\QMETA-INF/io.netty.versions.properties\\E"}, 
-    {"pattern":"\\QMETA-INF/services/javax.ws.rs.client.ClientBuilder\\E"}, 
-    {"pattern":"\\QMETA-INF/services/javax.ws.rs.ext.RuntimeDelegate\\E"}, 
+    {"pattern":"\\QMETA-INF/services/jakarta.ws.rs.client.ClientBuilder\\E"}, 
+    {"pattern":"\\QMETA-INF/services/jakarta.ws.rs.ext.RuntimeDelegate\\E"}, 
     {"pattern":"\\QMETA-INF/services/org.apache.cxf.bus.factory\\E"}, 
     {"pattern":"\\Qadd_customer.xml\\E"}, 
     {"pattern":"\\Qorg/apache/cxf/transport/http/ReferencingAuthenticator.class\\E"}, 

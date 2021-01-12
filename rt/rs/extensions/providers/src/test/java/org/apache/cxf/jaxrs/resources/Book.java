@@ -19,10 +19,10 @@
 
 package org.apache.cxf.jaxrs.resources;
 
-import javax.ws.rs.GET;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSeeAlso;
+import jakarta.ws.rs.GET;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
 
 
 @XmlRootElement(name = "Book")

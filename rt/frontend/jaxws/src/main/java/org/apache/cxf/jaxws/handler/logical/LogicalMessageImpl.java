@@ -24,9 +24,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Logger;
 
-import javax.activation.DataSource;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
+import jakarta.activation.DataSource;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.stream.XMLStreamException;
@@ -35,9 +35,9 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.LogicalMessage;
-import javax.xml.ws.Service;
-import javax.xml.ws.WebServiceException;
+import jakarta.xml.ws.LogicalMessage;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.WebServiceException;
 
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;

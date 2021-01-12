@@ -20,9 +20,9 @@
 package org.apache.cxf.wsdl;
 
 
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
+import jakarta.wsdl.extensions.ExtensibilityElement;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlTransient;
 import javax.xml.namespace.QName;
 
 /**

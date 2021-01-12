@@ -29,7 +29,7 @@ import org.apache.cxf.jaxrs.ext.ContextProvider;
 /**
  * ContextResolved is an internal qualifier used by CXF to differentiate the beans it will manage from
  * beans a user may have provided.  A user should not use this qualifier, but all beans that CXF provides
- * that are from {@link javax.ws.rs.core.Context} objects.
+ * that are from {@link jakarta.ws.rs.core.Context} objects.
  *
  * Likewise, for any field level injections, as well as constructor injections, the CDI instance of the
  * Context object will be used.  Methods annotated {@link javax.inject.Inject} will also delegate to CDI.

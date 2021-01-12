@@ -17,5 +17,5 @@
  * under the License.
  */
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "urn:cxf.apache.org:jsjaxws:data")
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "urn:cxf.apache.org:jsjaxws:data")
 package demo.hw.server.data;

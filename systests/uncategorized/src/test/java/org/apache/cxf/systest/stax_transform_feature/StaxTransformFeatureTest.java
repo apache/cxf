@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.ws.Endpoint;
+import jakarta..Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;

@@ -19,7 +19,7 @@
 package org.apache.cxf.jca.cxf;
 
 
-import javax.security.auth.Subject;
+import jakarta.security.auth.Subject;
 
 import org.apache.cxf.Bus;
 

@@ -33,8 +33,8 @@
     <properties>
         <cxf.module.name>org.apache.cxf.management</cxf.module.name>
         <cxf.osgi.import>
-            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
-            javax.annotation*;version="${cxf.osgi.javax.annotation.version}"
+            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}",
+            jakarta.annotation*;version="${cxf.osgi.jakarta.annotation.version}"
         </cxf.osgi.import>
     </properties>
     <dependencies>

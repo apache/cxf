@@ -21,13 +21,13 @@ package org.apache.cxf.wsdl.binding;
 
 import java.util.Collection;
 
-import javax.wsdl.Binding;
-import javax.wsdl.BindingFault;
-import javax.wsdl.BindingInput;
-import javax.wsdl.BindingOperation;
-import javax.wsdl.BindingOutput;
-import javax.wsdl.extensions.ElementExtensible;
-import javax.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.BindingFault;
+import jakarta.wsdl.BindingInput;
+import jakarta.wsdl.BindingOperation;
+import jakarta.wsdl.BindingOutput;
+import jakarta.wsdl.extensions.ElementExtensible;
+import jakarta.wsdl.extensions.ExtensibilityElement;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;

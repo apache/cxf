@@ -93,7 +93,7 @@ public class SubscriptionManagementTest extends SimpleEventingIntegrationTest {
 
         try {
             client.getStatusOp(new GetStatus());
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             Assert.assertTrue(ex.getFault().getFaultCode().contains(UnknownSubscription.LOCAL_PART));
             Assert.assertTrue(ex.getFault().getTextContent().contains(UnknownSubscription.REASON));
             return;

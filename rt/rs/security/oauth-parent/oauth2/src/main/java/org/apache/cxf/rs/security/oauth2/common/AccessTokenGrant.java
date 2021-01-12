@@ -20,7 +20,7 @@ package org.apache.cxf.rs.security.oauth2.common;
 
 import java.io.Serializable;
 
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 /**
  * Access Token Grant

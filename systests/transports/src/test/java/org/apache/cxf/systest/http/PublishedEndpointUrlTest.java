@@ -23,13 +23,13 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 
-import javax.wsdl.Definition;
-import javax.wsdl.Port;
-import javax.wsdl.Service;
-import javax.wsdl.extensions.soap.SOAPAddress;
-import javax.wsdl.extensions.soap12.SOAP12Address;
-import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLReader;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Port;
+import jakarta.wsdl.Service;
+import jakarta.wsdl.extensions.soap.SOAPAddress;
+import jakarta.wsdl.extensions.soap12.SOAP12Address;
+import jakarta.wsdl.factory.WSDLFactory;
+import jakarta.wsdl.xml.WSDLReader;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -65,7 +65,7 @@ public class PublishedEndpointUrlTest {
         Server server = svrFactory.create();
 
         WSDLReader wsdlReader = WSDLFactory.newInstance().newWSDLReader();
-        wsdlReader.setFeature("javax.wsdl.verbose", false);
+        wsdlReader.setFeature("jakarta.wsdl.verbose", false);
 
         URL url = new URL(svrFactory.getAddress() + "?wsdl=1");
         HttpURLConnection connect = (HttpURLConnection)url.openConnection();

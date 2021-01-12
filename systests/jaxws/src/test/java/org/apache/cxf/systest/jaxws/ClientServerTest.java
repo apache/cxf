@@ -41,15 +41,15 @@ import java.util.zip.GZIPInputStream;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Response;
-import javax.xml.ws.Service;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.soap.SOAPFaultException;
+import jakarta.xml.ws.AsyncHandler;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Response;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Document;
 
@@ -191,7 +191,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
 
         Greeter greeter = service.getPort(portName, Greeter.class);
         updateAddressPort(greeter, PORT);
-        ((javax.xml.ws.BindingProvider)greeter).getRequestContext().put("javax.xml.ws.client.receiveTimeout",
+        ((jakarta.xml.ws.BindingProvider)greeter).getRequestContext().put("jakarta.xml.ws.client.receiveTimeout",
                                                                         "1");
         try {
             greeter.greetMe("test");
@@ -227,7 +227,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     @Test
     public void testAddPortWithSpecifiedSoap12Binding() throws Exception {
         Service service = Service.create(serviceName);
-        service.addPort(fakePortName, javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING,
+        service.addPort(fakePortName, jakarta.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING,
                         "http://localhost:" + PORT + "/SoapContext/SoapPort");
         Greeter greeter = service.getPort(fakePortName, Greeter.class);
 
@@ -247,7 +247,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     @Test
     public void testAddPortWithSpecifiedSoap11Binding() throws Exception {
         Service service = Service.create(serviceName);
-        service.addPort(fakePortName, javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING,
+        service.addPort(fakePortName, jakarta.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING,
             "http://localhost:" + PORT + "/SoapContext/SoapPort");
         Greeter greeter = service.getPort(fakePortName, Greeter.class);
 
@@ -979,7 +979,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     @Test
     public void testServerAsync() throws Exception {
         Service service = Service.create(serviceName);
-        service.addPort(fakePortName, javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING,
+        service.addPort(fakePortName, jakarta.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING,
             "http://localhost:" + PORT + "/SoapContext/AsyncSoapPort");
         Greeter greeter = service.getPort(fakePortName, Greeter.class);
         String resp = greeter.greetMe("World");
@@ -990,7 +990,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     public void testEchoProviderAsync() throws Exception {
         String requestString = "<echo/>";
         Service service = Service.create(serviceName);
-        service.addPort(fakePortName, javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING,
+        service.addPort(fakePortName, jakarta.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING,
                         "http://localhost:" + PORT + "/SoapContext/AsyncEchoProvider");
         Dispatch<StreamSource> dispatcher = service.createDispatch(fakePortName,
                                                                    StreamSource.class,
@@ -1006,7 +1006,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     public void testEchoProviderAsyncDecoupledEndpoints() throws Exception {
         String requestString = "<echo/>";
         Service service = Service.create(serviceName);
-        service.addPort(fakePortName, javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING,
+        service.addPort(fakePortName, jakarta.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING,
                         "http://localhost:" + PORT + "/SoapContext/AsyncEchoProvider");
         Dispatch<StreamSource> dispatcher = service.createDispatch(fakePortName,
                                                                    StreamSource.class,

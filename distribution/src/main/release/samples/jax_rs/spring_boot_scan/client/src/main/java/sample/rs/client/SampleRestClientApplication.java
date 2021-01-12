@@ -21,7 +21,7 @@ package sample.rs.client;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.annotations.Provider.Type;

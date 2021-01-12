@@ -23,12 +23,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import javax.wsdl.Definition;
-import javax.wsdl.Input;
-import javax.wsdl.Message;
-import javax.wsdl.Operation;
-import javax.wsdl.Output;
-import javax.wsdl.Part;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Input;
+import jakarta.wsdl.Message;
+import jakarta.wsdl.Operation;
+import jakarta.wsdl.Output;
+import jakarta.wsdl.Part;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.corba.wsdl.ArgType;

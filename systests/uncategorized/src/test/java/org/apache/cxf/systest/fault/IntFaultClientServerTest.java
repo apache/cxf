@@ -23,7 +23,7 @@ import java.net.URL;
 import java.util.List;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
+import jakarta.xml.ws.BindingProvider;
 
 import org.w3c.dom.Node;
 

@@ -21,10 +21,10 @@ package org.apache.cxf.systest.jaxrs;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MultivaluedMap;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;

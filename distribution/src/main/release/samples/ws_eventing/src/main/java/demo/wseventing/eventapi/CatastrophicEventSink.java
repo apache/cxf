@@ -19,10 +19,10 @@
 
 package demo.wseventing.eventapi;
 
-import javax.jws.Oneway;
-import javax.jws.WebParam;
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
+import jakarta.jws.Oneway;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
 import javax.xml.ws.Action;
 import javax.xml.ws.soap.Addressing;
 

@@ -24,8 +24,8 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.wsdl.Definition;
-import javax.xml.bind.JAXBException;
+import jakarta.wsdl.Definition;
+import jakarta.xml.bind.JAXBException;
 
 
 import org.apache.cxf.common.i18n.Message;

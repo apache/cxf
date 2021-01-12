@@ -19,8 +19,8 @@
 
 package org.apache.cxf.systest.kerberos.jaxrs.kerberos;
 
-import javax.ws.rs.PUT;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.ws.rs.PUT;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;

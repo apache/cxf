@@ -29,7 +29,7 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.logging.LogUtils;

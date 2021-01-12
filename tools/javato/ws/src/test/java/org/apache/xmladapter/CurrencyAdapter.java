@@ -20,7 +20,7 @@ package org.apache.xmladapter;
 
 import java.util.Currency;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 public class CurrencyAdapter extends XmlAdapter<String, Currency> {
     public Currency unmarshal(String val) throws Exception {

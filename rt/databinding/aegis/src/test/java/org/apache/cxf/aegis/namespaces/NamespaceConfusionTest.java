@@ -20,8 +20,8 @@ package org.apache.cxf.aegis.namespaces;
 
 import java.io.StringWriter;
 
-import javax.wsdl.Definition;
-import javax.wsdl.factory.WSDLFactory;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.factory.WSDLFactory;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Attr;

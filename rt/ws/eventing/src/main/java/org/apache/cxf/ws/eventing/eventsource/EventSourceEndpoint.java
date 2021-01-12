@@ -21,12 +21,12 @@ package org.apache.cxf.ws.eventing.eventsource;
 
 import java.io.IOException;
 
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
-import javax.xml.ws.Action;
-import javax.xml.ws.soap.Addressing;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
+import jakarta.xml.ws.Action;
+import jakarta.xml.ws.soap.Addressing;
 
 import org.apache.cxf.ws.eventing.Subscribe;
 import org.apache.cxf.ws.eventing.SubscribeResponse;

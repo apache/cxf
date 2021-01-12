@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.systest.ws.wssec10.server;
 
-import javax.annotation.Resource;
-import javax.xml.ws.WebServiceContext;
+import jakarta.annotation.Resource;
+import jakarta..WebServiceContext;
 
 import wssec.wssec10.IPingService;
 

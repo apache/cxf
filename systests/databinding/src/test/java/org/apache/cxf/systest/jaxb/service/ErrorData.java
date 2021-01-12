@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.jaxb.service;
 
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlType;
 
 @XmlType(name = "ErrorData")
 public class ErrorData implements java.io.Serializable {

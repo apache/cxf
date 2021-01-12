@@ -21,7 +21,7 @@ package org.apache.cxf.rs.security.jose.jwe;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.crypto.SecretKey;
-import javax.security.auth.DestroyFailedException;
+import jakarta.security.auth.DestroyFailedException;
 
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;

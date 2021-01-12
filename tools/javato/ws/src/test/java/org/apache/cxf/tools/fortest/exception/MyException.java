@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.tools.fortest.exception;
 
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlType;
 
 @javax.xml.ws.WebFault
 @XmlType(namespace = "http://cxf.apache.org/test/HelloService",

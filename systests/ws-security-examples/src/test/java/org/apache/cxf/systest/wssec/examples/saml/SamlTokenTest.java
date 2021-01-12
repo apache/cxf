@@ -24,8 +24,8 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Service;
+import jakarta..BindingProvider;
+import jakarta..Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;

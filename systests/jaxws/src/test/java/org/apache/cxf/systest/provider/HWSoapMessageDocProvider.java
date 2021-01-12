@@ -21,7 +21,7 @@ package org.apache.cxf.systest.provider;
 
 import java.io.InputStream;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import javax.xml.namespace.QName;
 import javax.xml.soap.Detail;
 import javax.xml.soap.DetailEntry;
@@ -32,13 +32,13 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFactory;
 import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPMessage;
-import javax.xml.ws.Provider;
-import javax.xml.ws.Service;
-import javax.xml.ws.ServiceMode;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.WebServiceProvider;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.soap.SOAPFaultException;
+import jakarta.xml.ws.Provider;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.ServiceMode;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.WebServiceProvider;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

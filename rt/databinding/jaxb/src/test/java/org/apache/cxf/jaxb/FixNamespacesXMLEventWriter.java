@@ -19,7 +19,7 @@
 
 package org.apache.cxf.jaxb;
 
-import javax.xml.bind.Marshaller;
+import jakarta.xml.bind.Marshaller;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;

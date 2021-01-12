@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-import javax.wsdl.OperationType;
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
+import jakarta.wsdl.OperationType;
+import jakarta.xml.bind.annotation.adapters.HexBinaryAdapter;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.i18n.Message;

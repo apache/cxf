@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 import javax.resource.ResourceException;
 import javax.resource.spi.ConnectionRequestInfo;
 import javax.resource.spi.LocalTransaction;
-import javax.security.auth.Subject;
+import jakarta.security.auth.Subject;
 
 import org.apache.cxf.common.logging.LogUtils;
 

@@ -25,17 +25,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.jws.soap.SOAPBinding;
-import javax.wsdl.Binding;
-import javax.wsdl.BindingOperation;
-import javax.wsdl.Definition;
-import javax.wsdl.Fault;
-import javax.wsdl.Operation;
-import javax.wsdl.Port;
-import javax.wsdl.PortType;
-import javax.wsdl.Service;
-import javax.wsdl.extensions.ExtensionRegistry;
-import javax.wsdl.xml.WSDLReader;
+import jakarta.jws.soap.SOAPBinding;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.BindingOperation;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Fault;
+import jakarta.wsdl.Operation;
+import jakarta.wsdl.Port;
+import jakarta.wsdl.PortType;
+import jakarta.wsdl.Service;
+import jakarta.wsdl.extensions.ExtensionRegistry;
+import jakarta.wsdl.xml.WSDLReader;
 
 import org.w3c.dom.Element;
 
@@ -181,7 +181,7 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder {
 
         WSDLManager mgr = bus.getExtension(WSDLManager.class);
         WSDLReader reader = mgr.getWSDLFactory().newWSDLReader();
-        reader.setFeature("javax.wsdl.verbose", false);
+        reader.setFeature("jakarta.wsdl.verbose", false);
         reader.setExtensionRegistry(mgr.getExtensionRegistry());
 
         Element el = eleMap.get(wsdlLocator.getBaseURI());

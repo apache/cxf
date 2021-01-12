@@ -25,7 +25,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.jws.WebParam;
+import jakarta.jws.WebParam;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.model.MessageInfo;
@@ -97,7 +97,7 @@ public class RequestWrapper extends Wrapper {
     @Override
     public WrapperBeanClass getWrapperBeanClass(final Method method) {
         javax.xml.ws.RequestWrapper reqWrapper = method.getAnnotation(javax.xml.ws.RequestWrapper.class);
-        javax.jws.WebMethod webMethod = method.getAnnotation(javax.jws.WebMethod.class);
+        jakarta.jws.WebMethod webMethod = method.getAnnotation(jakarta.jws.WebMethod.class);
         String methName = webMethod == null ? null : webMethod.operationName();
         if (StringUtils.isEmpty(methName)) {
             methName = method.getName();

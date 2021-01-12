@@ -24,8 +24,8 @@ import java.io.IOException;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
-import javax.annotation.Resource;
-import javax.jws.WebMethod;
+import jakarta.annotation.Resource;
+import jakarta.jws.WebMethod;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Response;

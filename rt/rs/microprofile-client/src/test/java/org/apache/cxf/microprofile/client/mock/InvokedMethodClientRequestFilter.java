@@ -21,11 +21,11 @@ package org.apache.cxf.microprofile.client.mock;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.client.ClientRequestContext;
+import jakarta.ws.rs.client.ClientRequestFilter;
+import jakarta.ws.rs.core.Response;
 
 public class InvokedMethodClientRequestFilter implements ClientRequestFilter {
 

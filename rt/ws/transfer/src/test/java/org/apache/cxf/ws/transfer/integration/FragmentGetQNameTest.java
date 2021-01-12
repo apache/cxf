@@ -19,9 +19,9 @@
 
 package org.apache.cxf.ws.transfer.integration;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.ws.soap.SOAPFaultException;
+import jakarta.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Element;
 

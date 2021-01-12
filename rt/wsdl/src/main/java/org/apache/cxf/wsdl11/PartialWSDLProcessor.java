@@ -23,24 +23,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.wsdl.Binding;
-import javax.wsdl.BindingFault;
-import javax.wsdl.BindingInput;
-import javax.wsdl.BindingOperation;
-import javax.wsdl.BindingOutput;
-import javax.wsdl.Definition;
-import javax.wsdl.Fault;
-import javax.wsdl.Input;
-import javax.wsdl.Operation;
-import javax.wsdl.Output;
-import javax.wsdl.Port;
-import javax.wsdl.PortType;
-import javax.wsdl.extensions.ExtensionRegistry;
-import javax.wsdl.extensions.soap.SOAPAddress;
-import javax.wsdl.extensions.soap.SOAPBinding;
-import javax.wsdl.extensions.soap.SOAPBody;
-import javax.wsdl.extensions.soap.SOAPFault;
-import javax.wsdl.extensions.soap.SOAPOperation;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.BindingFault;
+import jakarta.wsdl.BindingInput;
+import jakarta.wsdl.BindingOperation;
+import jakarta.wsdl.BindingOutput;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Fault;
+import jakarta.wsdl.Input;
+import jakarta.wsdl.Operation;
+import jakarta.wsdl.Output;
+import jakarta.wsdl.Port;
+import jakarta.wsdl.PortType;
+import jakarta.wsdl.extensions.ExtensionRegistry;
+import jakarta.wsdl.extensions.soap.SOAPAddress;
+import jakarta.wsdl.extensions.soap.SOAPBinding;
+import jakarta.wsdl.extensions.soap.SOAPBody;
+import jakarta.wsdl.extensions.soap.SOAPFault;
+import jakarta.wsdl.extensions.soap.SOAPOperation;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.helpers.CastUtils;
@@ -205,10 +205,10 @@ public final class PartialWSDLProcessor  {
         address.setLocationURI("dummy");
         return address;
     }
-    public static javax.wsdl.Service doAppendService(Definition wsdlDefinition,
+    public static jakarta.wsdl.Service doAppendService(Definition wsdlDefinition,
                                                      String existPortName, ExtensionRegistry
                                                      extReg, Binding binding) throws Exception {
-        javax.wsdl.Service wsdlService = wsdlDefinition.createService();
+        jakarta.wsdl.Service wsdlService = wsdlDefinition.createService();
         wsdlService.setQName(new QName(wsdlDefinition.getTargetNamespace(), existPortName + serviceName));
         Port port = wsdlDefinition.createPort();
         port.setName(existPortName + portName);

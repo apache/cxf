@@ -21,7 +21,7 @@ package org.apache.cxf.systest.sts.kerberos;
 import java.net.URL;
 import java.util.Map;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;

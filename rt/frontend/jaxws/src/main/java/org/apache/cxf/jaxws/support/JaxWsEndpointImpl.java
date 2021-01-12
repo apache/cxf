@@ -25,21 +25,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.ExtensionRegistry;
-import javax.wsdl.extensions.UnknownExtensibilityElement;
+import jakarta.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.extensions.ExtensionRegistry;
+import jakarta.wsdl.extensions.UnknownExtensibilityElement;
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.ws.Binding;
-import javax.xml.ws.RespectBindingFeature;
-import javax.xml.ws.Service.Mode;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.WebServiceFeature;
-import javax.xml.ws.soap.Addressing;
-import javax.xml.ws.soap.AddressingFeature;
-import javax.xml.ws.soap.MTOMFeature;
-import javax.xml.ws.soap.SOAPBinding;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
+import jakarta.xml.ws.Binding;
+import jakarta.xml.ws.RespectBindingFeature;
+import jakarta.xml.ws.Service.Mode;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.WebServiceFeature;
+import jakarta.xml.ws.soap.Addressing;
+import jakarta.xml.ws.soap.AddressingFeature;
+import jakarta.xml.ws.soap.MTOMFeature;
+import jakarta.xml.ws.soap.SOAPBinding;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 
 import org.w3c.dom.Element;
 
@@ -343,7 +343,7 @@ public class JaxWsEndpointImpl extends EndpointImpl {
             ExtensionRegistry extensionRegistry
                 = getBus().getExtension(WSDLManager.class).getExtensionRegistry();
             try {
-                ExtensibilityElement el = extensionRegistry.createExtension(javax.wsdl.Binding.class,
+                ExtensibilityElement el = extensionRegistry.createExtension(jakarta.wsdl.Binding.class,
                                                                             JAXWSAConstants.
                                                                             WSAW_USINGADDRESSING_QNAME);
                 el.setRequired(addressing.required());

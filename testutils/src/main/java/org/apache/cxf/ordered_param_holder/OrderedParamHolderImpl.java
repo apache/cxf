@@ -19,7 +19,7 @@
 
 package org.apache.cxf.ordered_param_holder;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 import javax.xml.ws.Holder;
 
 @WebService(serviceName = "ordered_param_holder",

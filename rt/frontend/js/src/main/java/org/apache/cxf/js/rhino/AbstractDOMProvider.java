@@ -22,7 +22,7 @@ package org.apache.cxf.js.rhino;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.ws.Endpoint;
+import jakarta.xml.ws.Endpoint;
 
 import org.w3c.dom.Node;
 

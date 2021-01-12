@@ -25,8 +25,8 @@ import java.util.Iterator;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPFault;
-import javax.xml.ws.Service;
-import javax.xml.ws.soap.SOAPFaultException;
+import jakarta..Service;
+import jakarta..soap.SOAPFaultException;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

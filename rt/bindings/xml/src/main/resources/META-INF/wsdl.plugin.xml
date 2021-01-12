@@ -19,8 +19,8 @@
 -->
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-    <entry key="xml-javax.wsdl.Port">org.apache.cxf.binding.xml.wsdl11.HttpAddressPlugin</entry>
-    <entry key="xml-javax.wsdl.Binding">org.apache.cxf.binding.xml.wsdl11.XmlBindingPlugin</entry>
-    <entry key="xml-javax.wsdl.BindingInput">org.apache.cxf.binding.xml.wsdl11.XmlIoPlugin</entry>
-    <entry key="xml-javax.wsdl.BindingOutput">org.apache.cxf.binding.xml.wsdl11.XmlIoPlugin</entry>
+    <entry key="xml-jakarta.wsdl.Port">org.apache.cxf.binding.xml.wsdl11.HttpAddressPlugin</entry>
+    <entry key="xml-jakarta.wsdl.Binding">org.apache.cxf.binding.xml.wsdl11.XmlBindingPlugin</entry>
+    <entry key="xml-jakarta.wsdl.BindingInput">org.apache.cxf.binding.xml.wsdl11.XmlIoPlugin</entry>
+    <entry key="xml-jakarta.wsdl.BindingOutput">org.apache.cxf.binding.xml.wsdl11.XmlIoPlugin</entry>
 </properties>

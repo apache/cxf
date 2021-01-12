@@ -221,10 +221,10 @@ public final class STSTokenRetriever {
     private static String getAddressingNamespaceURI(Message message) {
         AddressingProperties maps =
             (AddressingProperties)message
-                .get("javax.xml.ws.addressing.context.outbound");
+                .get("jakarta.xml.ws.addressing.context.outbound");
         if (maps == null) {
             maps = (AddressingProperties)message
-                .get("javax.xml.ws.addressing.context");
+                .get("jakarta.xml.ws.addressing.context");
         }
         if (maps != null) {
             return maps.getNamespaceURI();

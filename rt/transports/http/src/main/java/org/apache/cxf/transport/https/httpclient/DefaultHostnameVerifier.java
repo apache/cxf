@@ -50,7 +50,7 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
-import javax.security.auth.x500.X500Principal;
+import jakarta.security.auth.x500.X500Principal;
 
 import org.apache.cxf.common.logging.LogUtils;
 

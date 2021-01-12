@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.security.auth.Subject;
+import jakarta.security.auth.Subject;
 
 import org.apache.cxf.common.security.SimpleGroup;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;

@@ -19,8 +19,8 @@
 
 package org.apache.cxf.common.jaxb;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
 
 import com.ibm.xml.mock.marshaller.MockMarshaller;
 import com.sun.xml.bind.marshaller.MinimumEscapeHandler;

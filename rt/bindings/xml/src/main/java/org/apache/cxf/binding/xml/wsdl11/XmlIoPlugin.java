@@ -21,8 +21,8 @@ package org.apache.cxf.binding.xml.wsdl11;
 
 import java.util.Map;
 
-import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.WSDLException;
+import jakarta.wsdl.extensions.ExtensibilityElement;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.bindings.xformat.XMLBindingMessageFormat;

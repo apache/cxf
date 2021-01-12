@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.activation.DataSource;
+import jakarta.activation.DataSource;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -256,7 +256,7 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
                     parentNode.removeChild(include);
                     String cid = DOMUtils.getAttribute(include, "href");
                     //set the fake base64Binary to validate instead of reading the attachment from message
-                    parentNode.setTextContent(javax.xml.bind.DatatypeConverter.printBase64Binary(cid.getBytes()));
+                    parentNode.setTextContent(jakarta.xml.bind.DatatypeConverter.printBase64Binary(cid.getBytes()));
                 }
             }
             try {

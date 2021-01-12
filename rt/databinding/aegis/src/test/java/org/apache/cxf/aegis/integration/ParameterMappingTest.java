@@ -21,8 +21,8 @@ package org.apache.cxf.aegis.integration;
 
 import java.io.StringWriter;
 
-import javax.wsdl.Definition;
-import javax.wsdl.factory.WSDLFactory;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.factory.WSDLFactory;
 
 import org.w3c.dom.Node;
 

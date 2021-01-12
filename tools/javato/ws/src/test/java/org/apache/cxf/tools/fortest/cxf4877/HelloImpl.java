@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.tools.fortest.cxf4877;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(serviceName = "HelloService",
             portName = "HelloPort",

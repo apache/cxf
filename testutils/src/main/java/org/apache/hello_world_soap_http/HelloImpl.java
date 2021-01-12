@@ -17,7 +17,7 @@
  * under the License.
  */
 package org.apache.hello_world_soap_http;
-@javax.jws.WebService(name = "Hello",
+@jakarta.jws.WebService(name = "Hello",
                       serviceName = "HelloService",
                       portName = "HelloPort",
                       targetNamespace = "http://apache.org/hello_world_soap_http",

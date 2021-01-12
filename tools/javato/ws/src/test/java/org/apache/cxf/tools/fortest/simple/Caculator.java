@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.tools.fortest.simple;
 
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebService;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
 
 @WebService(name = "CalculatorService", targetNamespace = "http://cxf.apache.org/calculator")
 public class Caculator {

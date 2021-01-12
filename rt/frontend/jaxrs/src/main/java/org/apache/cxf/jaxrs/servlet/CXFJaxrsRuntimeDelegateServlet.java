@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.jaxrs.servlet;
 
-import javax.ws.rs.ext.RuntimeDelegate;
+import jakarta.ws.rs.ext.RuntimeDelegate;
 
 public class CXFJaxrsRuntimeDelegateServlet extends CXFNonSpringJaxrsServlet {
 

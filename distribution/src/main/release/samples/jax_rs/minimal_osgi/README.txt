@@ -93,7 +93,7 @@ Bundles
     2|Active     |    4|org.osgi:org.osgi.service.cm (1.6.0.201802012106)|1.6.0.201802012106
     3|Active     |    4|org.osgi:org.osgi.service.event (1.4.0.201802012106)|1.4.0.201802012106
     8|Active     |    1|Jetty :: Websocket :: Client (9.2.6.v20141205)|9.2.6.v20141205
-    9|Active     |    1|javax.annotation API (1.3.1)|1.3.1
+    9|Active     |    1|jakarta.annotation API (1.3.1)|1.3.1
    10|Active     |    1|jcl-over-slf4j (1.7.25)|1.7.25
    11|Active     |    1|Apache Felix Http Bridge (2.3.2)|2.3.2
    12|Active     |    1|Old JAXB Runtime (2.3.0)|2.3.0                                    

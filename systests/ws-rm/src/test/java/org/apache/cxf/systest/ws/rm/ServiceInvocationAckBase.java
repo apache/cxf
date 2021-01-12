@@ -21,7 +21,7 @@ package org.apache.cxf.systest.ws.rm;
 import java.net.MalformedURLException;
 import java.util.logging.Logger;
 
-import javax.xml.ws.Endpoint;
+import jakarta..Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;

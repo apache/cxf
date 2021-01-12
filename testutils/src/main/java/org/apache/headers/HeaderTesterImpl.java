@@ -19,7 +19,7 @@
 
 package org.apache.headers;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 import javax.xml.ws.Holder;
 
 import org.apache.headers.types.InHeader;

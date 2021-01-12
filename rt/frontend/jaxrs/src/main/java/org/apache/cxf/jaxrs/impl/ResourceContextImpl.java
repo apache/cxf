@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.jaxrs.impl;
 
-import javax.ws.rs.container.ResourceContext;
+import jakarta.ws.rs.container.ResourceContext;
 
 import org.apache.cxf.jaxrs.ext.ResourceContextProvider;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;

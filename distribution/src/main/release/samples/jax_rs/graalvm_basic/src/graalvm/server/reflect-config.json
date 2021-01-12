@@ -316,26 +316,26 @@
   "name":"java.security.SecureRandomParameters"
 },
 {
-  "name":"javax.annotation.Priority",
+  "name":"jakarta.annotation.Priority",
   "methods":[{"name":"value","parameterTypes":[] }]
 },
 {
-  "name":"javax.security.auth.login.Configuration"
+  "name":"jakarta.security.auth.login.Configuration"
 },
 {
-  "name":"javax.ws.rs.ext.ExceptionMapper",
+  "name":"jakarta.ws.rs.ext.ExceptionMapper",
   "allPublicMethods":true
 },
 {
-  "name":"javax.ws.rs.ext.MessageBodyReader",
+  "name":"jakarta.ws.rs.ext.MessageBodyReader",
   "allPublicMethods":true
 },
 {
-  "name":"javax.ws.rs.ext.MessageBodyWriter",
+  "name":"jakarta.ws.rs.ext.MessageBodyWriter",
   "allPublicMethods":true
 },
 {
-  "name":"javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter"
+  "name":"jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter"
 },
 {
   "name":"jdk.internal.misc.Unsafe",

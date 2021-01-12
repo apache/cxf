@@ -18,12 +18,12 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import javax.ws.rs.BeanParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
+import jakarta.ws.rs.BeanParam;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 
 @Path("/simplebooks/{id}")
 public class BookStoreSimple {

@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.tools.fortest.inherit;
 
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
 
 @WebService(
     name = "MYJ2WDLSharedEndpoint",
@@ -27,9 +27,9 @@ import javax.jws.soap.SOAPBinding;
 )
 
 @SOAPBinding(
-    style = javax.jws.soap.SOAPBinding.Style.DOCUMENT,
-    use = javax.jws.soap.SOAPBinding.Use.LITERAL,
-    parameterStyle = javax.jws.soap.SOAPBinding.ParameterStyle.WRAPPED
+    style = jakarta.jws.soap.SOAPBinding.Style.DOCUMENT,
+    use = jakarta.jws.soap.SOAPBinding.Use.LITERAL,
+    parameterStyle = jakarta.jws.soap.SOAPBinding.ParameterStyle.WRAPPED
 )
 interface B extends C {
     // An overloaded method helloWorld
@@ -37,7 +37,7 @@ interface B extends C {
 
     // Annotation to disambiguate name of overloaded method helloWorld
     // and to disambiguate name of Wrappers from HelloWorld - > HelloWorld2
-    @javax.jws.WebMethod(operationName = "helloWorld2")
+    @jakarta.jws.WebMethod(operationName = "helloWorld2")
     @javax.xml.ws.RequestWrapper(
         localName = "helloWorld2",
         targetNamespace = "http://doclitservice.org/wsdl",
@@ -50,13 +50,13 @@ interface B extends C {
     )
     java.lang.String helloWorld(String hello);
 
-    @javax.jws.WebMethod
-    @javax.jws.Oneway
+    @jakarta.jws.WebMethod
+    @jakarta.jws.Oneway
     void oneWayOperation();
 
-    @javax.jws.WebMethod
+    @jakarta.jws.WebMethod
     String bye(String bye);
 
-    @javax.jws.WebMethod
+    @jakarta.jws.WebMethod
     String hello(String hello);
 }

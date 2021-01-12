@@ -22,7 +22,7 @@ package org.apache.cxf.systest.jaxrs.security.samlsso;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

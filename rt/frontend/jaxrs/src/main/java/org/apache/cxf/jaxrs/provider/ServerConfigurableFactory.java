@@ -19,8 +19,8 @@
 
 package org.apache.cxf.jaxrs.provider;
 
-import javax.ws.rs.core.Configurable;
-import javax.ws.rs.core.FeatureContext;
+import jakarta.ws.rs.core.Configurable;
+import jakarta.ws.rs.core.FeatureContext;
 
 /**
  * Manages the creation of server-side {@code Configurable<FeatureContext>} depending on 

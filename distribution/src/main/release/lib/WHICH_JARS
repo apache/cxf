@@ -91,7 +91,7 @@ For SAML support in WS-Security
 - cxf-rt-security-saml.jar
 
 For JAX-RS support:
-- javax.ws.rs-api.jar
+- jakarta.ws.rs-api.jar
 - jettison.jar (Needed for JSON services only)
 - oauth*.jar (Needed for OAuth support)
 - cxf-rt-frontend-jaxrs.jar

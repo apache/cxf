@@ -26,7 +26,7 @@ import java.net.MalformedURLException;
 #end
 import java.net.URL;
 #if ($markGenerated == "true")
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 #end
 import javax.xml.namespace.QName;
 import javax.xml.ws.WebEndpoint;

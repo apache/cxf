@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.servlet;
 
-import javax.xml.ws.Endpoint;
+import jakarta.xml.ws.Endpoint;
 
 import org.w3c.dom.Document;
 

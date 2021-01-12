@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.oidc.rp;
 
-import javax.ws.rs.core.SecurityContext;
+import jakarta.ws.rs.core.SecurityContext;
 
 import org.apache.cxf.common.security.SimpleSecurityContext;
 import org.apache.cxf.jaxrs.utils.HttpUtils;

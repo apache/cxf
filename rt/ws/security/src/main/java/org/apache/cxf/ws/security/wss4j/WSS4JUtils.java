@@ -32,7 +32,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.crypto.SecretKey;
-import javax.security.auth.callback.CallbackHandler;
+import jakarta.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapFault;

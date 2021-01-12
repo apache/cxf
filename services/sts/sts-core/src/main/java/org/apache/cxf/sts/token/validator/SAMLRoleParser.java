@@ -21,7 +21,7 @@ package org.apache.cxf.sts.token.validator;
 import java.security.Principal;
 import java.util.Set;
 
-import javax.security.auth.Subject;
+import jakarta.security.auth.Subject;
 
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 

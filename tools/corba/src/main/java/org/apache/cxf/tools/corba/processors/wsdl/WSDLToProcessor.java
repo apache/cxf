@@ -21,8 +21,8 @@ package org.apache.cxf.tools.corba.processors.wsdl;
 
 import java.util.logging.Logger;
 
-import javax.wsdl.Definition;
-import javax.wsdl.WSDLException;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.WSDLException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;

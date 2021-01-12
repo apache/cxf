@@ -23,7 +23,7 @@ package demo.hw.server;
 
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Response;
 

@@ -22,7 +22,7 @@ package org.apache.cxf.systest.jaxb;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
+import jakarta.xml.ws.BindingProvider;
 
 import org.w3c.dom.Document;
 

@@ -20,13 +20,13 @@ package org.apache.cxf.jaxws;
 
 import java.util.Collection;
 
-import javax.jws.WebService;
-import javax.wsdl.Definition;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.jws.WebService;
+import jakarta.wsdl.Definition;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.WebFault;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.WebFault;
 
 import org.w3c.dom.Document;
 
@@ -91,19 +91,19 @@ public class CodeFirstWSDLTest extends AbstractJaxWsTest {
 
         QName serviceName = new QName("http://service.jaxws.cxf.apache.org/", "Hello2Service");
 
-        javax.wsdl.Service service = d.getService(serviceName);
+        jakarta.wsdl.Service service = d.getService(serviceName);
 
         assertNotNull(service);
 
         QName portName = new QName("http://service.jaxws.cxf.apache.org/", "Hello2Port");
 
-        javax.wsdl.Port port = service.getPort(portName.getLocalPart());
+        jakarta.wsdl.Port port = service.getPort(portName.getLocalPart());
 
         assertNotNull(port);
 
         QName portTypeName = new QName("http://service.jaxws.cxf.apache.org/", "HelloInterface");
 
-        javax.wsdl.PortType portType = d.getPortType(portTypeName);
+        jakarta.wsdl.PortType portType = d.getPortType(portTypeName);
 
         assertNotNull(portType);
         assertEquals(5, portType.getOperations().size());
@@ -115,19 +115,19 @@ public class CodeFirstWSDLTest extends AbstractJaxWsTest {
 
         QName serviceName = new QName("http://mynamespace.com/", "MyService");
 
-        javax.wsdl.Service service = d.getService(serviceName);
+        jakarta.wsdl.Service service = d.getService(serviceName);
 
         assertNotNull(service);
 
         QName portName = new QName("http://mynamespace.com/", "MyPort");
 
-        javax.wsdl.Port port = service.getPort(portName.getLocalPart());
+        jakarta.wsdl.Port port = service.getPort(portName.getLocalPart());
 
         assertNotNull(port);
 
         QName portTypeName = new QName("http://service.jaxws.cxf.apache.org/", "HelloInterface");
 
-        javax.wsdl.PortType portType = d.getPortType(portTypeName);
+        jakarta.wsdl.PortType portType = d.getPortType(portTypeName);
 
         assertNotNull(portType);
         assertEquals(5, portType.getOperations().size());

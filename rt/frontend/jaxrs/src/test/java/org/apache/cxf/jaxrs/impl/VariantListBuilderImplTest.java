@@ -22,8 +22,8 @@ package org.apache.cxf.jaxrs.impl;
 import java.util.List;
 import java.util.Locale;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Variant;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Variant;
 
 import org.junit.Test;
 

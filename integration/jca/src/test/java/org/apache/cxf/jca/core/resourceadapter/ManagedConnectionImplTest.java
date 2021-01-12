@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.resource.spi.ConnectionEvent;
 import javax.resource.spi.ConnectionEventListener;
 import javax.resource.spi.ConnectionRequestInfo;
-import javax.security.auth.Subject;
+import jakarta.security.auth.Subject;
 
 
 import org.easymock.EasyMock;

@@ -93,7 +93,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         try {
             echo.echo("test");
             fail("Failure expected on the wrong password type");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
             String error = "The security token could not be authenticated or authorized";
             assertTrue(ex.getMessage().contains(error));
@@ -140,7 +140,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         try {
             echo.echo("test");
             fail("Failure expected on the wrong password type");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
             String error = "The security token could not be authenticated or authorized";
             assertTrue(ex.getMessage().contains(error));
@@ -213,7 +213,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         try {
             echo.echo("test");
             fail("Failure expected as RSA v1.5 is not allowed by default");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
 
@@ -433,7 +433,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         try {
             echo.echo("test");
             fail("Failure expected on a wrong namespace");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
     }

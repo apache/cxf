@@ -23,9 +23,9 @@ import java.security.Principal;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
+import jakarta.security.auth.callback.Callback;
+import jakarta.security.auth.callback.CallbackHandler;
+import jakarta.security.auth.callback.UnsupportedCallbackException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

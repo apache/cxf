@@ -25,8 +25,8 @@ import java.util.concurrent.Executor;
 import java.util.logging.Logger;
 
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Endpoint;
+import jakarta..Dispatch;
+import jakarta..Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;

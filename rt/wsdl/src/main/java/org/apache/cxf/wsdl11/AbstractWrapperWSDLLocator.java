@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.wsdl.xml.WSDLLocator;
+import jakarta.wsdl.xml.WSDLLocator;
 
 import org.xml.sax.InputSource;
 

@@ -27,12 +27,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.wsdl.Definition;
-import javax.wsdl.Import;
-import javax.wsdl.Types;
-import javax.wsdl.extensions.UnknownExtensibilityElement;
-import javax.wsdl.extensions.schema.Schema;
-import javax.wsdl.extensions.schema.SchemaImport;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Import;
+import jakarta.wsdl.Types;
+import jakarta.wsdl.extensions.UnknownExtensibilityElement;
+import jakarta.wsdl.extensions.schema.Schema;
+import jakarta.wsdl.extensions.schema.SchemaImport;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;

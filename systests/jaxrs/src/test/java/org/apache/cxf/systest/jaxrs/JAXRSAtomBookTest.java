@@ -22,7 +22,7 @@ package org.apache.cxf.systest.jaxrs;
 import java.io.InputStream;
 import java.io.StringWriter;
 
-import javax.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBContext;
 
 import org.apache.abdera.Abdera;
 import org.apache.abdera.factory.Factory;

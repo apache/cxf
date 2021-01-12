@@ -23,12 +23,12 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.util.List;
 
-import javax.wsdl.Definition;
-import javax.wsdl.Types;
-import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.schema.Schema;
-import javax.wsdl.xml.WSDLWriter;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Types;
+import jakarta.wsdl.WSDLException;
+import jakarta.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.extensions.schema.Schema;
+import jakarta.wsdl.xml.WSDLWriter;
 import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Document;

@@ -20,8 +20,8 @@ package org.apache.cxf.systest.jaxrs.security;
 
 import java.util.Collections;
 
-import javax.security.auth.login.AppConfigurationEntry;
-import javax.security.auth.login.Configuration;
+import jakarta.security.auth.login.AppConfigurationEntry;
+import jakarta.security.auth.login.Configuration;
 
 public class BookLoginJaasConfiguration extends Configuration {
     public AppConfigurationEntry[]  getAppConfigurationEntry(String name) {

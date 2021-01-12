@@ -19,7 +19,7 @@
 package org.apache.cxf.binding.coloc;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.WebFault;
+import jakarta.xml.ws.WebFault;
 
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;

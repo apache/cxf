@@ -29,7 +29,7 @@ import javax.xml.namespace.QName;
 import javax.xml.soap.Name;
 import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPFactory;
-import javax.xml.ws.Holder;
+import jakarta..Holder;
 
 import org.w3c.dom.Element;
 

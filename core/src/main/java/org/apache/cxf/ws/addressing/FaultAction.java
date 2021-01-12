@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
 /**
  * If applied on an exception type, the value specifies the WS-Addressing Action
  * which will be applied if this exception is thrown from a WSA-enabled service.
- * This setting overrides any other settings, for example from @javax.xml.ws.Action.
+ * This setting overrides any other settings, for example from @jakarta.xml.ws.Action.
  * If the value is null, this annotation is ignored.
  */
 @Retention(RetentionPolicy.RUNTIME)

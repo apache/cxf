@@ -166,8 +166,8 @@
                 <artifactId>asm-commons</artifactId>
               </exclusion>
               <exclusion>
-                <groupId>javax.annotation</groupId>
-                <artifactId>javax.annotation-api</artifactId>
+                <groupId>jakarta.annotation</groupId>
+                <artifactId>jakarta.annotation-api</artifactId>
               </exclusion>
             </exclusions> 
         </dependency>
@@ -345,7 +345,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>javax.annotation</groupId>
+            <groupId>jakarta.annotation</groupId>
             <artifactId>jsr250-api</artifactId>
             <version>${cxf.jsr250.api.version}</version>
             <scope>test</scope>
@@ -486,7 +486,7 @@
                     <artifactId>bcprov-jdk15</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>javax.xml.bind</groupId>
+                    <groupId>jakarta.xml.bind</groupId>
                     <artifactId>jaxb-api</artifactId>
                 </exclusion>
                 <exclusion>
@@ -494,8 +494,8 @@
                     <artifactId>jaxb-core</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>javax.annotation</groupId>
-                    <artifactId>javax.annotation-api</artifactId>
+                    <groupId>jakarta.annotation</groupId>
+                    <artifactId>jakarta.annotation-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -639,8 +639,8 @@
                     <version>${cxf.jetty9.version}</version>
                     <exclusions>
                         <exclusion>
-                            <groupId>javax.servlet</groupId>
-                            <artifactId>javax.servlet-api</artifactId>
+                            <groupId>jakarta.servlet</groupId>
+                            <artifactId>jakarta.servlet-api</artifactId>
                         </exclusion>
                     </exclusions>
                     <scope>test</scope>

@@ -20,8 +20,8 @@ package org.apache.cxf.jaxrs.ext.search;
 
 import java.lang.annotation.Annotation;
 
-import javax.ws.rs.ext.ParamConverter;
-import javax.ws.rs.ext.ParamConverterProvider;
+import jakarta.ws.rs.ext.ParamConverter;
+import jakarta.ws.rs.ext.ParamConverterProvider;
 
 /**
  * Helper class to work with parameter converter providers and parameter converters.

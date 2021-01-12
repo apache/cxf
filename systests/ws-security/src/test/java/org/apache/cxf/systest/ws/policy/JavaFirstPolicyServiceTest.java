@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.ws.soap.SOAPFaultException;
+import jakarta..soap.SOAPFaultException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

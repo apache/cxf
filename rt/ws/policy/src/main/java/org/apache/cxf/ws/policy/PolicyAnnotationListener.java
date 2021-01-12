@@ -28,7 +28,7 @@ import java.util.ListIterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.wsdl.extensions.UnknownExtensibilityElement;
+import jakarta.wsdl.extensions.UnknownExtensibilityElement;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 

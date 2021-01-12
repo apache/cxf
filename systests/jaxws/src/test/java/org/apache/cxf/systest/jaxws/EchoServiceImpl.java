@@ -18,12 +18,12 @@
  */
 package org.apache.cxf.systest.jaxws;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPFactory;
 import javax.xml.soap.SOAPFault;
-import javax.xml.ws.soap.SOAPFaultException;
+import jakarta.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.ext.logging.Logging;
 

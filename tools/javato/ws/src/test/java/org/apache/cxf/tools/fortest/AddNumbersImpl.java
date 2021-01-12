@@ -19,7 +19,7 @@
 
 package org.apache.cxf.tools.fortest;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 import javax.xml.ws.Action;
 import javax.xml.ws.FaultAction;
 import javax.xml.ws.soap.Addressing;

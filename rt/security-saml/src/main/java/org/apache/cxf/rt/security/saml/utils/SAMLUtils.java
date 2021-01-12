@@ -167,8 +167,8 @@ public final class SAMLUtils {
                     audiences.add((String)msg.get(org.apache.cxf.message.Message.REQUEST_URI));
                 }
 
-                if (msg.getContextualProperty("javax.xml.ws.wsdl.service") != null) {
-                    audiences.add(msg.getContextualProperty("javax.xml.ws.wsdl.service").toString());
+                if (msg.getContextualProperty("jakarta.xml.ws.wsdl.service") != null) {
+                    audiences.add(msg.getContextualProperty("jakarta.xml.ws.wsdl.service").toString());
                 }
             }
             return audiences;

@@ -28,7 +28,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import javax.security.auth.callback.CallbackHandler;
+import jakarta.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.xkms.cache.EHCacheXKMSClientCache;

@@ -20,7 +20,7 @@ package org.apache.cxf.systest.sts.jaas;
 
 import java.net.URL;
 
-import javax.ws.rs.WebApplicationException;
+import jakarta.ws.rs.WebApplicationException;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;

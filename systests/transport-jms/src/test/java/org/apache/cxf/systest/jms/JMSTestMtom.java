@@ -21,13 +21,13 @@ package org.apache.cxf.systest.jms;
 import java.io.Closeable;
 import java.net.URL;
 
-import javax.activation.DataHandler;
+import jakarta.xml.bind.DataHandler;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Binding;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Holder;
-import javax.xml.ws.soap.SOAPBinding;
+import jakarta.xml.ws.Binding;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Holder;
+import jakarta.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;

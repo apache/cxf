@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.ws.ut;
 
-import javax.security.auth.Subject;
+import jakarta.security.auth.Subject;
 
 import org.apache.cxf.common.security.SimpleGroup;
 import org.apache.wss4j.common.ext.WSSecurityException;

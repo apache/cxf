@@ -19,7 +19,7 @@
 
 package org.apache.cxf.javascript.fortest;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 /**
  *

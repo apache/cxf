@@ -19,8 +19,8 @@
 
 package org.apache.cxf.jaxrs.ext.search;
 
-import javax.ws.rs.GET;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.ws.rs.GET;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 
 @XmlRootElement(name = "Book")

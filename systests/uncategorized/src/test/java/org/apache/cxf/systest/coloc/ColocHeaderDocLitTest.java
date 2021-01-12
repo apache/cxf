@@ -32,7 +32,7 @@ public class ColocHeaderDocLitTest extends AbstractHeaderServiceDocLitTest {
         return TRANSPORT_URI;
     }
 
-    @javax.jws.WebService(portName = "SoapPort9000", serviceName = "SOAPHeaderService",
+    @jakarta.jws.WebService(portName = "SoapPort9000", serviceName = "SOAPHeaderService",
             targetNamespace = "http://apache.org/headers/doc_lit",
             endpointInterface = "org.apache.headers.doc_lit.HeaderTester")
     class HttpServiceImpl extends BaseHeaderTesterDocLitImpl { }

@@ -20,7 +20,7 @@ package org.apache.cxf.mtom_xop;
 
 import java.io.InputStream;
 
-import javax.activation.DataHandler;
+import jakarta.xml.bind.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
 import javax.xml.soap.AttachmentPart;
 import javax.xml.soap.MessageFactory;

@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.ws.common;
 
-import javax.xml.ws.BindingProvider;
+import jakarta..BindingProvider;
 
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.example.contract.doubleit.DoubleItPortType;

@@ -24,11 +24,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.jws.WebService;
-import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLReader;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.soap.SOAPBinding;
+import jakarta.jws.WebService;
+import jakarta.wsdl.factory.WSDLFactory;
+import jakarta.wsdl.xml.WSDLReader;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.soap.SOAPBinding;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -207,7 +207,7 @@ public class CXFServletTest extends AbstractServletTest {
         Document doc = StaxUtils.read(res.getInputStream());
         assertNotNull(doc);
         WSDLReader wsdlReader = WSDLFactory.newInstance().newWSDLReader();
-        wsdlReader.setFeature("javax.wsdl.verbose", false);
+        wsdlReader.setFeature("jakarta.wsdl.verbose", false);
 
 
         assertValid("//wsdl:service[@name='SOAPService']/wsdl:port[@name='SoapPort']/wsdlsoap:address[@location='"

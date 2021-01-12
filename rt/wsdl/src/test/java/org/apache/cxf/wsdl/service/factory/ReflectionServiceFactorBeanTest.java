@@ -19,7 +19,7 @@
 
 package org.apache.cxf.wsdl.service.factory;
 
-import javax.wsdl.WSDLException;
+import jakarta.wsdl.WSDLException;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;

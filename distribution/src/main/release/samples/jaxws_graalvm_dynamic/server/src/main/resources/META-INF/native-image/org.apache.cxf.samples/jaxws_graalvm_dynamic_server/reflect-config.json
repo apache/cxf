@@ -351,24 +351,24 @@
   "name":"java.security.SecureRandomParameters"
 },
 {
-  "name":"javax.security.auth.login.Configuration"
+  "name":"jakarta.security.auth.login.Configuration"
 },
 {
-  "name":"javax.xml.bind.annotation.XmlAccessorType"
+  "name":"jakarta.xml.bind.annotation.XmlAccessorType"
 },
 {
-  "name":"javax.xml.bind.annotation.XmlElement",
+  "name":"jakarta.xml.bind.annotation.XmlElement",
   "methods":[{"name":"type","parameterTypes":[] }]
 },
 {
-  "name":"javax.xml.bind.annotation.XmlElementDecl",
+  "name":"jakarta.xml.bind.annotation.XmlElementDecl",
   "methods":[{"name":"scope","parameterTypes":[] }]
 },
 {
-  "name":"javax.xml.bind.annotation.XmlRegistry"
+  "name":"jakarta.xml.bind.annotation.XmlRegistry"
 },
 {
-  "name":"javax.xml.bind.annotation.XmlType",
+  "name":"jakarta.xml.bind.annotation.XmlType",
   "methods":[{"name":"factoryClass","parameterTypes":[] }]
 },
 {

@@ -21,8 +21,8 @@ package org.apache.cxf.javascript.fortest;
 
 import java.io.UnsupportedEncodingException;
 
-import javax.xml.bind.annotation.XmlMimeType;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlMimeType;
+import jakarta.xml.bind.annotation.XmlType;
 
 /**
  *

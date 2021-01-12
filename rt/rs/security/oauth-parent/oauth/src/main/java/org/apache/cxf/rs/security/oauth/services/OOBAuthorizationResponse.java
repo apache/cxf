@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth.services;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class OOBAuthorizationResponse {

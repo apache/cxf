@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.jaxrs.security.oauth2.grants;
 
-import javax.security.auth.callback.CallbackHandler;
+import jakarta.security.auth.callback.CallbackHandler;
 
 import org.w3c.dom.Document;
 

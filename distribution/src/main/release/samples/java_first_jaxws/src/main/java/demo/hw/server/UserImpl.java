@@ -18,7 +18,7 @@
  */
 package demo.hw.server;
 
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 @XmlType(name = "User")

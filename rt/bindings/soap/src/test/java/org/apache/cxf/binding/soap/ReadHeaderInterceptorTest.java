@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.activation.DataHandler;
+import jakarta.activation.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
 import javax.xml.stream.XMLStreamReader;
 

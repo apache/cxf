@@ -52,16 +52,16 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.PropertyException;
-import javax.xml.bind.SchemaOutputResolver;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.attachment.AttachmentMarshaller;
-import javax.xml.bind.attachment.AttachmentUnmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.PropertyException;
+import jakarta.xml.bind.SchemaOutputResolver;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.attachment.AttachmentMarshaller;
+import jakarta.xml.bind.attachment.AttachmentUnmarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -569,10 +569,10 @@ public final class JAXBUtils {
         }
 
         if (cls == Object.class || cls == String.class || cls.isPrimitive() || cls.isAnnotation()
-            || "javax.xml.ws.Holder".equals(cls.getName())) {
+            || "jakarta.xml.ws.Holder".equals(cls.getName())) {
             return null;
         } else if (cls.isInterface()
-            || "javax.xml.ws.wsaddressing.W3CEndpointReference".equals(cls.getName())) {
+            || "jakarta.xml.ws.wsaddressing.W3CEndpointReference".equals(cls.getName())) {
             return cls;
         }
 
@@ -829,8 +829,8 @@ public final class JAXBUtils {
     public static String getPackageNamespace(Class<?> cls) {
         Package p = cls.getPackage();
         if (p != null) {
-            javax.xml.bind.annotation.XmlSchema schemaAnn =
-                p.getAnnotation(javax.xml.bind.annotation.XmlSchema.class);
+            jakarta.xml.bind.annotation.XmlSchema schemaAnn =
+                p.getAnnotation(jakarta.xml.bind.annotation.XmlSchema.class);
             if (schemaAnn != null) {
                 return schemaAnn.namespace();
             }

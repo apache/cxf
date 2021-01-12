@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.tools.fortest.cxf1519;
 
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
 
 @SOAPBinding(style = SOAPBinding.Style.DOCUMENT)
 @WebService(name = "Endpoint", targetNamespace = "http://cxf.apache.org/cxf1519")

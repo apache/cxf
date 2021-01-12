@@ -26,16 +26,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.wsdl.Binding;
-import javax.wsdl.Definition;
-import javax.wsdl.Import;
-import javax.wsdl.Message;
-import javax.wsdl.PortType;
-import javax.wsdl.Service;
-import javax.wsdl.Types;
-import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.xml.bind.JAXBException;
+import jakarta.wsdl.Binding;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Import;
+import jakarta.wsdl.Message;
+import jakarta.wsdl.PortType;
+import jakarta.wsdl.Service;
+import jakarta.wsdl.Types;
+import jakarta.wsdl.WSDLException;
+import jakarta.wsdl.extensions.ExtensibilityElement;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import antlr.ASTVisitor;

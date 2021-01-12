@@ -16,6 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://cxf.apache.org/jra",
-                                     elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.activation.annotation.XmlSchema(namespace = "http://cxf.apache.org/jra",
+                                     elementFormDefault = jakarta.activation.annotation.XmlNsForm.QUALIFIED)
 package org.apache.cxf.customer;

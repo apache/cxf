@@ -19,8 +19,8 @@
 
 package org.apache.cxf.systest.ws.addr_fromjava.server;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
 import javax.xml.ws.Action;
 import javax.xml.ws.FaultAction;
 import javax.xml.ws.soap.Addressing;

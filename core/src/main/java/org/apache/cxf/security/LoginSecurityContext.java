@@ -21,7 +21,7 @@ package org.apache.cxf.security;
 import java.security.Principal;
 import java.util.Set;
 
-import javax.security.auth.Subject;
+import jakarta.security.auth.Subject;
 
 /**
  * LoginSecurityContext provides additional information about the

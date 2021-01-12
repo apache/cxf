@@ -29,7 +29,7 @@ import org.apache.cxf.cxf.performance.types.NestedComplexType;
 import org.apache.cxf.cxf.performance.types.NestedComplexTypeSeq;
 
 
-@javax.jws.WebService(portName = "SoapHttpDocLitPort", serviceName = "PerfService",
+@jakarta.jws.WebService(portName = "SoapHttpDocLitPort", serviceName = "PerfService",
                       targetNamespace = "http://cxf.apache.org/cxf/performance",
                       endpointInterface = "org.apache.cxf.cxf.performance.DocPortType",
                       wsdlLocation="/wsdl/perf.wsdl")
@@ -39,7 +39,7 @@ public class ServerImpl implements DocPortType {
         Logger.getLogger("org.apache.xml.security.signature.Reference").setLevel(Level.WARNING);
     }
 
-    public NestedComplexTypeSeq echoComplexTypeDoc(NestedComplexTypeSeq request, int id, javax.xml.ws.Holder<Integer> i) {
+    public NestedComplexTypeSeq echoComplexTypeDoc(NestedComplexTypeSeq request, int id, jakarta.xml.ws.Holder<Integer> i) {
         //System.out.println("Executing operation echoComplexTypeDoc\n");
         //System.out.println("Message received: " + request + "\n");
         i.value = id;

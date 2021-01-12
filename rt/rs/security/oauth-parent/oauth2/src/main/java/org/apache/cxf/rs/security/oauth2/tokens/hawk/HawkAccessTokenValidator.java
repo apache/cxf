@@ -20,7 +20,7 @@ package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 
 import java.util.Map;
 
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;

@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.activation.DataHandler;
+import jakarta.xml.bind.DataHandler;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Attr;

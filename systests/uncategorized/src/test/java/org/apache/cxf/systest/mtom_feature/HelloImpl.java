@@ -21,8 +21,8 @@ package org.apache.cxf.systest.mtom_feature;
 
 import java.awt.Image;
 
-import javax.xml.ws.Holder;
-import javax.xml.ws.soap.MTOM;
+import jakarta.xml.ws.Holder;
+import jakarta.xml.ws.soap.MTOM;
 
 @MTOM
 public class HelloImpl implements Hello {

@@ -21,9 +21,9 @@ package org.apache.cxf.systest.ws.rm;
 
 import java.io.Closeable;
 
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.soap.AddressingFeature;
-import javax.xml.ws.soap.SOAPFaultException;
+import jakarta..Endpoint;
+import jakarta..soap.AddressingFeature;
+import jakarta..soap.SOAPFaultException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;

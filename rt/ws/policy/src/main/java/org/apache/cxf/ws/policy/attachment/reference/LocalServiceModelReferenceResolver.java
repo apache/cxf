@@ -21,7 +21,7 @@ package org.apache.cxf.ws.policy.attachment.reference;
 
 import java.util.List;
 
-import javax.wsdl.extensions.UnknownExtensibilityElement;
+import jakarta.wsdl.extensions.UnknownExtensibilityElement;
 
 import org.apache.cxf.service.model.DescriptionInfo;
 import org.apache.cxf.ws.policy.PolicyBuilder;

@@ -31,7 +31,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 
-import javax.wsdl.Definition;
+import jakarta.wsdl.Definition;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.Message;

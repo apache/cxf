@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.wsn.services;
 
-import javax.jms.ConnectionFactory;
-import javax.jws.WebService;
-import javax.xml.ws.BindingType;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.BindingType;
 
 import org.apache.cxf.wsn.EndpointManager;
 import org.apache.cxf.wsn.jms.JmsNotificationBroker;
@@ -31,7 +31,7 @@ import org.apache.cxf.wsn.jms.JmsSubscription;
             targetNamespace = "http://cxf.apache.org/wsn/jaxws",
             serviceName = "NotificationBrokerService",
             portName = "NotificationBrokerPort")
-@BindingType(javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING)
+@BindingType(jakarta.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING)
 public class JaxwsNotificationBroker extends JmsNotificationBroker
     implements JaxwsNotificationBrokerMBean {
 

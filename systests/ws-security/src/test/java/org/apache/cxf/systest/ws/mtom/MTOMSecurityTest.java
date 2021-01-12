@@ -22,11 +22,11 @@ package org.apache.cxf.systest.ws.mtom;
 import java.io.File;
 import java.net.URL;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
+import jakarta.xml.bind.DataHandler;
+import jakarta.xml.bind.DataSource;
+import jakarta.xml.bind.FileDataSource;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
+import jakarta..Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;

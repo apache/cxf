@@ -371,10 +371,10 @@ s1as.admin.port=${glassfish.admin.port}
 #                             Default to ${web.home}/modules/jersey-container-servlet-core.jar
 #
 # @jaxrs.classes           -- The classes for the JAX-RS api's
-#                             Default to ${web.home}/modules/javax.ws.rs-api.jar
+#                             Default to ${web.home}/modules/jakarta.ws.rs-api.jar
 #
 # @servlet.classes         -- The classes for the Servlet api's
-#                             Default to ${web.home}/modules/javax.servlet.jar
+#                             Default to ${web.home}/modules/jakarta.servlet.jar
 #
 # @servlet_adaptor         -- servlet adaptor class provided by vendor, 
 #                             used to package resource in .war file and

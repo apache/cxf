@@ -31,7 +31,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.Provider;
+import jakarta.xml.ws.Provider;
 
 import org.w3c.dom.Document;
 

@@ -21,8 +21,8 @@ package demo.oauth.client.controllers;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 
 import net.oauth.OAuth;
 import net.oauth.OAuthAccessor;

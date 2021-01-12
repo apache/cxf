@@ -160,15 +160,15 @@
                             org.apache.cxf.sts.*;version=${cxf.osgi.version.clean}
                         </Export-Package>
                         <Import-Package>
-                            javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
+                            jakarta.servlet*;version="${cxf.osgi.jakarta.servlet.version}",
                             org.apache.cxf.sts.provider.*;version=${cxf.osgi.version.clean},
                             !org.apache.cxf.sts.*,
                             org.apache.cxf.*,
-                            javax.xml.ws*;version="[0.0,3)",
+                            jakarta.xml.ws*;version="[0.0,3)",
                             org.springframework.ldap*;resolution:=optional,
                             org.ehcache*;resolution:=optional;version="[3.0.0, 4.0.0)",
                             org.opensaml*;version="${cxf.opensaml.osgi.version.range}",
-                            javax.xml.bind;version="${cxf.osgi.javax.bind.version}",
+                            jakarta.xml.bind;version="${cxf.osgi.jakarta.bind.version}",
                             *
                         </Import-Package>
                         <Bundle-SymbolicName>org.apache.cxf.services.sts.core</Bundle-SymbolicName>

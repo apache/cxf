@@ -19,7 +19,7 @@
 
 package org.apache.cxf.ws.eventing.base;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;

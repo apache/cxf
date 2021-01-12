@@ -19,7 +19,7 @@
 
 package org.apache.cxf.jaxrs;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "CustomerRequest")
 public class CustomerServiceRequest extends BaseRequest {

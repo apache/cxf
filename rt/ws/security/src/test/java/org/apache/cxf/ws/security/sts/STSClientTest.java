@@ -24,13 +24,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.wsdl.Definition;
-import javax.wsdl.Types;
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.schema.Schema;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Unmarshaller;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Types;
+import jakarta.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.extensions.schema.Schema;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;

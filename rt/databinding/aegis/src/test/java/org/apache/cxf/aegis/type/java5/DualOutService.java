@@ -21,10 +21,10 @@ package org.apache.cxf.aegis.type.java5;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebService;
-import javax.xml.ws.Holder;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Holder;
 
 @WebService(serviceName = "DualOutService")
 public class DualOutService {

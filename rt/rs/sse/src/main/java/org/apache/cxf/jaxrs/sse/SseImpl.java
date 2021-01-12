@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.jaxrs.sse;
 
-import javax.ws.rs.sse.OutboundSseEvent.Builder;
-import javax.ws.rs.sse.Sse;
-import javax.ws.rs.sse.SseBroadcaster;
+import jakarta.ws.rs.sse.OutboundSseEvent.Builder;
+import jakarta.ws.rs.sse.Sse;
+import jakarta.ws.rs.sse.SseBroadcaster;
 
 class SseImpl implements Sse {
     SseImpl() {

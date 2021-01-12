@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.tracing.opentracing.jaxrs;
 
-import javax.ws.rs.core.Feature;
-import javax.ws.rs.core.FeatureContext;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.core.Feature;
+import jakarta.ws.rs.core.FeatureContext;
+import jakarta.ws.rs.ext.Provider;
 
 import io.opentracing.Tracer;
 import io.opentracing.util.GlobalTracer;

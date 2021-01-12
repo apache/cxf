@@ -19,14 +19,14 @@
 
 package org.apache.cxf.ws.mex;
 
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.ws.Action;
-import javax.xml.ws.soap.Addressing;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.ws.Action;
+import jakarta.xml.ws.soap.Addressing;
 
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 @Addressing(required = true, enabled = true)

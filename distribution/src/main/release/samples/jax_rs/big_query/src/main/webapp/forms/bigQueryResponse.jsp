@@ -1,4 +1,4 @@
-<%@ page import="javax.servlet.http.HttpServletRequest, demo.jaxrs.server.BigQueryResponse, demo.jaxrs.server.ShakespeareText" %>
+<%@ page import="jakarta.servlet.http.HttpServletRequest, demo.jaxrs.server.BigQueryResponse, demo.jaxrs.server.ShakespeareText" %>
 
 <%
     BigQueryResponse bgResponse = (BigQueryResponse) request.getAttribute("data");

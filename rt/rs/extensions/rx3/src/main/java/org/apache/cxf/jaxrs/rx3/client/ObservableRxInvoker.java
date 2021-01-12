@@ -18,10 +18,10 @@
  */
 package org.apache.cxf.jaxrs.rx3.client;
 
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.RxInvoker;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.RxInvoker;
+import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.Response;
 
 import io.reactivex.rxjava3.core.Observable;
 

@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.samples.failover.jaxws;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService
 public interface SampleService {

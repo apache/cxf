@@ -19,9 +19,9 @@
 
 package org.apache.cxf.javascript.fortest;
 
-import javax.jws.WebParam;
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
 
 /**
  *

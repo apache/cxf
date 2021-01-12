@@ -25,7 +25,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.jws.HandlerChain;
+import jakarta.jws.HandlerChain;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 
@@ -104,7 +104,7 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
                         }
                         if (!existHandlerAnno) {
                             js.addAnnotation(annot);
-                            js.addImport("javax.jws.HandlerChain");
+                            js.addImport("jakarta.jws.HandlerChain");
                         }
                     }
 

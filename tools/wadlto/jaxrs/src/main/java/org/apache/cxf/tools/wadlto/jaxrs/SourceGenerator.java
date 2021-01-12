@@ -42,28 +42,28 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.HEAD;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.MatrixParam;
-import javax.ws.rs.OPTIONS;
-import javax.ws.rs.PATCH;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.Suspended;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.FormParam;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HEAD;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.MatrixParam;
+import jakarta.ws.rs.OPTIONS;
+import jakarta.ws.rs.PATCH;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.container.AsyncResponse;
+import jakarta.ws.rs.container.Suspended;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.PathSegment;
+import jakarta.ws.rs.core.Response;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
@@ -127,7 +127,7 @@ public class SourceGenerator {
     private static final Map<String, Class<?>> PARAM_ANNOTATIONS = new HashMap<>();
     private static final String PLAIN_PARAM_STYLE = "plain";
     private static final String BEAN_VALID_SIMPLE_NAME = "Valid";
-    private static final String BEAN_VALID_FULL_NAME = "javax.validation." + BEAN_VALID_SIMPLE_NAME;
+    private static final String BEAN_VALID_FULL_NAME = "jakarta.validation." + BEAN_VALID_SIMPLE_NAME;
     private static final Set<String> RESOURCE_LEVEL_PARAMS = new HashSet<>(Arrays.asList("template", "matrix"));
     private static final Map<String, String> AUTOBOXED_PRIMITIVES_MAP = new HashMap<>();
     private static final Map<String, String> XSD_SPECIFIC_TYPE_MAP = new HashMap<>();
@@ -897,7 +897,7 @@ public class SourceGenerator {
             .append("@java.lang.annotation.Target({java.lang.annotation.ElementType.METHOD})").append(lineSeparator)
             .append("@java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy.RUNTIME)")
             .append(lineSeparator)
-            .append("@javax.ws.rs.HttpMethod(\"").append(methodName).append("\")").append(lineSeparator)
+            .append("@jakarta.ws.rs.HttpMethod(\"").append(methodName).append("\")").append(lineSeparator)
             .append("public @interface ").append(methodName)
             .append(" {").append(lineSeparator).append(lineSeparator)
             .append('}');

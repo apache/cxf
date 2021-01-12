@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.security.auth.Subject;
+import jakarta.security.auth.Subject;
 import javax.xml.soap.SOAPException;
 import javax.xml.stream.XMLStreamException;
 
@@ -53,7 +53,7 @@ import org.apache.wss4j.dom.validate.UsernameTokenValidator;
 
 /**
  * Base class providing an extensibility point for populating
- * javax.security.auth.Subject from a current UsernameToken.
+ * jakarta.security.auth.Subject from a current UsernameToken.
  *
  * WSS4J requires a password for validating digests which may not be available
  * when external security systems provide for the authentication. This class

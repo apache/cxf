@@ -19,8 +19,8 @@
 
 package org.apache.cxf.binding.soap.wsdl.extensions;
 
-import javax.wsdl.extensions.soap.SOAPBinding;
-import javax.wsdl.extensions.soap12.SOAP12Binding;
+import jakarta.wsdl.extensions.soap.SOAPBinding;
+import jakarta.wsdl.extensions.soap12.SOAP12Binding;
 
 public interface SoapBinding extends SOAPBinding, SOAP12Binding {
 

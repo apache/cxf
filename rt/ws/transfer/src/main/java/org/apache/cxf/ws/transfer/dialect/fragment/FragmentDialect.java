@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import javax.annotation.Resource;
-import javax.xml.bind.JAXBElement;
+import jakarta.annotation.Resource;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.ws.WebServiceContext;
 
 import org.w3c.dom.Attr;

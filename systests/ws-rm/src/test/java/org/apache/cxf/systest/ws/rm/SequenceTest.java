@@ -43,11 +43,11 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Service;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.handler.MessageContext;
+import jakarta..BindingProvider;
+import jakarta..Dispatch;
+import jakarta..Service;
+import jakarta..WebServiceException;
+import jakarta..handler.MessageContext;
 import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;

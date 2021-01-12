@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.transport.jms.util;
 
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Session;
+import jakarta.jms.Destination;
+import jakarta.jms.JMSException;
+import jakarta.jms.Session;
 import javax.naming.NamingException;
 
 public class JMSDestinationResolver implements DestinationResolver {

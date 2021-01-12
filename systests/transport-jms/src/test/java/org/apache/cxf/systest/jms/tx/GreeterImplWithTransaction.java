@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.jms.tx;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 

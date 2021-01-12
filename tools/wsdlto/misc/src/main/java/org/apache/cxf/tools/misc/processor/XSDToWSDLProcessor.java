@@ -27,14 +27,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.logging.Logger;
 
-import javax.wsdl.Definition;
-import javax.wsdl.Types;
-import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.ExtensionRegistry;
-import javax.wsdl.extensions.schema.Schema;
-import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLWriter;
+import jakarta.wsdl.Definition;
+import jakarta.wsdl.Types;
+import jakarta.wsdl.WSDLException;
+import jakarta.wsdl.extensions.ExtensibilityElement;
+import jakarta.wsdl.extensions.ExtensionRegistry;
+import jakarta.wsdl.extensions.schema.Schema;
+import jakarta.wsdl.factory.WSDLFactory;
+import jakarta.wsdl.xml.WSDLWriter;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;

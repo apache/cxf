@@ -20,8 +20,8 @@ package org.apache.cxf.systest.sts.transformation;
 
 import java.util.List;
 
-import javax.annotation.Resource;
-import javax.jws.WebService;
+import jakarta.annotation.Resource;
+import jakarta.jws.WebService;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 

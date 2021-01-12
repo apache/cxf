@@ -19,9 +19,9 @@
 
 package demo.jaxrs.tracing.client;
 
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import io.jaegertracing.Configuration;
 import io.jaegertracing.Configuration.ReporterConfiguration;
@@ -50,7 +50,7 @@ public final class Client {
             .getTracer();
         
         final OpenTracingClientProvider provider = new OpenTracingClientProvider(tracer);
-        final javax.ws.rs.client.Client client = ClientBuilder.newClient().register(provider);
+        final jakarta.ws.rs.client.Client client = ClientBuilder.newClient().register(provider);
         
         final Response response = client
             .target("http://localhost:8084/catalog")

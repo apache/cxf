@@ -21,7 +21,7 @@ package org.apache.cxf.transport.http.netty.server.servlet;
 
 import java.io.IOException;
 
-import javax.servlet.ServletOutputStream;
+import jakarta.servlet.ServletOutputStream;
 
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.handler.codec.http.HttpContent;

@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.logging.Logger;
 
-import javax.activation.DataSource;
+import jakarta.activation.DataSource;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;

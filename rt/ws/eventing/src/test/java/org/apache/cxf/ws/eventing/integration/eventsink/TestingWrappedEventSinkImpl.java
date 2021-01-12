@@ -21,8 +21,8 @@ package org.apache.cxf.ws.eventing.integration.eventsink;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 
 import org.w3c.dom.Node;
 

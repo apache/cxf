@@ -19,7 +19,7 @@
 
 package org.apache.cxf.tools.fortest.exception;
 
-import javax.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlTransient;
 
 /**
  *

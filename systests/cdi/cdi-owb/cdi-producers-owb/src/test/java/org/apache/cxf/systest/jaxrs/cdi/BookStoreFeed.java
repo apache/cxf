@@ -18,11 +18,11 @@
  */
 package org.apache.cxf.systest.jaxrs.cdi;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
 
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.parser.stax.FOMEntry;

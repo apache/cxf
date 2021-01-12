@@ -25,9 +25,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.handler.Handler;
-import javax.xml.ws.handler.HandlerResolver;
-import javax.xml.ws.handler.PortInfo;
+import jakarta.xml.ws.handler.Handler;
+import jakarta.xml.ws.handler.HandlerResolver;
+import jakarta.xml.ws.handler.PortInfo;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.ResourceInjector;
@@ -93,7 +93,7 @@ public class HandlerResolverImpl implements HandlerResolver {
      * requested by the handler, typically via the javax .annotation.Resource
      * annotation. After all the injections have been carried out, including in
      * the case where no injections were requested, the runtime MUST invoke the
-     * method carrying a javax.annotation .PostConstruct annotation, if present.
+     * method carrying a jakarta.annotation .PostConstruct annotation, if present.
      */
     private void configHandler(Handler<?> handler) {
         if (handler != null) {
