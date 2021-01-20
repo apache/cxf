@@ -77,7 +77,7 @@ public abstract class AbstractServletTest extends AbstractCXFTest {
 
     /**
      * Here we expect an errorCode other than 200, and look for it checking for
-     * text is omitted as it doesnt work. It would never work on java1.3, but
+     * text is omitted as it doesn't work. It would never work on java1.3, but
      * one may have expected java1.4+ to have access to the error stream in
      * responses. Clearly not.
      *
@@ -98,7 +98,7 @@ public abstract class AbstractServletTest extends AbstractCXFTest {
         } catch (HttpException e) {
             assertEquals(failureText, errorCode, e.getResponseCode());
             /*
-             * checking for text omitted as it doesnt work. if(errorText!=null) {
+             * checking for text omitted as it doesn't work. if(errorText!=null) {
              * assertTrue( "Failed to find "+errorText+" in "+
              * e.getResponseMessage(), e.getMessage().indexOf(errorText)>=0); }
              */
