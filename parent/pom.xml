@@ -119,8 +119,8 @@
         <cxf.guava.version>30.1-jre</cxf.guava.version>
         <cxf.hamcrest.version>2.2</cxf.hamcrest.version>
         <cxf.hazelcast.version>3.12.9</cxf.hazelcast.version>
-        <cxf.hibernate.em.version>5.4.19.Final</cxf.hibernate.em.version>
-        <cxf.hibernate.validator.version>6.1.6.Final</cxf.hibernate.validator.version>
+        <cxf.hibernate.em.version>5.4.27.Final</cxf.hibernate.em.version>
+        <cxf.hibernate.validator.version>6.2.0.Final</cxf.hibernate.validator.version>
         <cxf.hsqldb.version>2.5.0</cxf.hsqldb.version>
         <cxf.httpcomponents.asyncclient.version.range>[4.0,4.2)</cxf.httpcomponents.asyncclient.version.range>
         <cxf.httpcomponents.asyncclient.version>4.1.4</cxf.httpcomponents.asyncclient.version>
@@ -172,7 +172,7 @@
         <cxf.msv.version>2013.6.1</cxf.msv.version>
         <cxf.neethi.version>3.1.1</cxf.neethi.version>
         <cxf.netty.version.range>[4,5)</cxf.netty.version.range>
-        <cxf.netty.version>4.1.52.Final</cxf.netty.version>
+        <cxf.netty.version>4.1.58.Final</cxf.netty.version>
         <cxf.oauth.version>20100527</cxf.oauth.version>
         <cxf.olingo.version>2.0.11</cxf.olingo.version>
         <cxf.openjpa.version>3.1.2</cxf.openjpa.version>
