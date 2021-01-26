@@ -29,6 +29,7 @@ import java.util.logging.Level;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
@@ -134,7 +135,11 @@ public class OidcImplicitService extends ImplicitGrantService {
                                              getApprovedScope(requestedScope, approvedScope));
         if (idToken != null) {
             sb.append(OidcUtils.ID_TOKEN).append('=').append(idToken);
+        } else if (state.getResponseType().contains(OidcUtils.ID_TOKEN_RESPONSE_TYPE)) {
+            LOG.warning("No IdToken available. Did you configure a IdTokenProvider implementation?");
+            throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
+
         finalizeResponse(sb, state);
         return sb;
     }
@@ -153,6 +158,10 @@ public class OidcImplicitService extends ImplicitGrantService {
         // id_token response type processing
         String idToken = getProcessedIdToken(state, userSubject,
                                              getApprovedScope(requestedScope, approvedScope));
+        if (idToken == null && state.getResponseType().contains(OidcUtils.ID_TOKEN_RESPONSE_TYPE)) {
+            LOG.warning("No IdToken available. Did you configure a IdTokenProvider implementation?");
+            throw ExceptionUtils.toInternalServerErrorException(null, null);
+        }
         FormIdTokenResponse response = new FormIdTokenResponse();
         response.setIdToken(idToken);
         response.setResponseType(state.getResponseType());
