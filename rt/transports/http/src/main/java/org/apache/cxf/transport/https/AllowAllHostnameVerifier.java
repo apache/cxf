@@ -45,7 +45,7 @@ class AllowAllHostnameVerifier implements javax.net.ssl.HostnameVerifier {
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.log(Level.FINE, e.getMessage(), e);
             }
-            throw new RuntimeException("HostnameVerifier, socket reset for TTL");
+            return false;
         }
     }
 
