@@ -94,6 +94,10 @@ public class UndertowHTTPServerEngineFactoryHolder {
                     if (threads.getThreadingParameters().getWorkerIOName() != null) {
                         rThreads.setWorkerIOName(threads.getThreadingParameters().getWorkerIOName());
                     }
+                    if (threads.getThreadingParameters().getWorkerIOThreads() != null) {
+                        rThreads.setWorkerIOThreads(threads.getThreadingParameters().getWorkerIOThreads());
+                    }
+                    
                     rThreads.setWorkerIOThreads(threads.getThreadingParameters().getWorkerIOThreads());
                     threadingParametersMap.put(id, rThreads);
                 }
@@ -158,6 +162,9 @@ public class UndertowHTTPServerEngineFactoryHolder {
                     }
                     if (threads.getWorkerIOThreads() != null) {
                         rThreads.setWorkerIOThreads(threads.getWorkerIOThreads());
+                    }
+                    if (threads.getWorkerIOName() != null) {
+                        rThreads.setWorkerIOName(threads.getWorkerIOName());
                     }
                     eng.setThreadingParameters(rThreads);
                 }
