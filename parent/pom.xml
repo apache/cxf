@@ -2383,7 +2383,7 @@
             </activation>
             <properties>
                 <!-- EasyMock stills uses JDK Internal APIs: see please https://bugs.openjdk.java.net/browse/JDK-8255363 -->
-                <cxf.surefire.fork.vmargs>-ea --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED</cxf.surefire.fork.vmargs>
+                <cxf.surefire.fork.vmargs>-ea --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED</cxf.surefire.fork.vmargs>
             </properties>
         </profile>
     </profiles>
