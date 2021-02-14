@@ -729,10 +729,10 @@ public class DynamicClientFactory {
 
     private URL composeUrl(String s) {
         try {
-            URIResolver resolver = new URIResolver(null, s, getClass());
-
-            if (resolver.isResolved()) {
-                return resolver.getURI().toURL();
+            try (URIResolver resolver = new URIResolver(null, s, getClass())) {
+                if (resolver.isResolved()) {
+                    return resolver.getURI().toURL();
+                }
             }
             throw new ServiceConstructionException(new Message("COULD_NOT_RESOLVE_URL", LOG, s));
         } catch (IOException e) {
@@ -924,9 +924,10 @@ public class DynamicClientFactory {
 
 
         try {
-            URIResolver resolver = new URIResolver(base, target);
-            if (resolver.isResolved()) {
-                target = resolver.getURI().toString();
+            try (URIResolver resolver = new URIResolver(base, target)) {
+                if (resolver.isResolved()) {
+                    target = resolver.getURI().toString();
+                }
             }
         } catch (Exception ex) {
             //ignore

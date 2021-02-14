@@ -20,7 +20,6 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.customization;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -140,39 +139,31 @@ public final class CustomizationParser {
         if (uri.equals(wsdlURL) && wsdlNode != null) {
             return wsdlNode;
         }
-        Document doc = null;
-        InputStream ins = null;
 
-        try {
-            URIResolver resolver = new URIResolver(uri);
-            ins = resolver.getInputStream();
+        Document doc = null;
+        try (URIResolver resolver = new URIResolver(uri)) {
+            if (!resolver.isResolved()) {
+                return null;
+            }
+            
+            XMLStreamReader reader = null;
+            try {   //NOPMD
+                reader = StaxUtils.createXMLStreamReader(uri, resolver.getInputStream());
+                doc = StaxUtils.read(reader, true);
+            } catch (Exception e) {
+                Message msg = new Message("CAN_NOT_READ_AS_ELEMENT", LOG, new Object[] {uri});
+                throw new ToolException(msg, e);
+            } finally {
+                try {
+                    StaxUtils.close(reader);
+                } catch (XMLStreamException e) {
+                    //ignore
+                }
+            }
         } catch (IOException e1) {
             return null;
         }
-
-        if (ins == null) {
-            return null;
-        }
-
-        XMLStreamReader reader = null;
-        try {   //NOPMD
-            reader = StaxUtils.createXMLStreamReader(uri, ins);
-            doc = StaxUtils.read(reader, true);
-        } catch (Exception e) {
-            Message msg = new Message("CAN_NOT_READ_AS_ELEMENT", LOG, new Object[] {uri});
-            throw new ToolException(msg, e);
-        } finally {
-            try {
-                StaxUtils.close(reader);
-            } catch (XMLStreamException e) {
-                //ignore
-            }
-            try {
-                ins.close();
-            } catch (IOException ex) {
-                //ignore
-            }
-        }
+        
         try {
             doc.setDocumentURI(uri);
         } catch (Exception ex) {
@@ -487,10 +478,10 @@ public final class CustomizationParser {
         Element root = null;
         XMLStreamReader xmlReader = null;
         try {
-            URIResolver resolver = new URIResolver(bindingFile);
-            xmlReader = StaxUtils.createXMLStreamReader(resolver.getURI().toString(),
-                                                                     resolver.getInputStream());
-            root = StaxUtils.read(xmlReader, true).getDocumentElement();
+            try (URIResolver resolver = new URIResolver(bindingFile)) {
+                xmlReader = StaxUtils.createXMLStreamReader(resolver.getURI().toString(), resolver.getInputStream());
+                root = StaxUtils.read(xmlReader, true).getDocumentElement();
+            }
         } catch (Exception e1) {
             Message msg = new Message("CAN_NOT_READ_AS_ELEMENT", LOG, new Object[] {bindingFile});
             throw new ToolException(msg, e1);
