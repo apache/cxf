@@ -923,11 +923,9 @@ public class DynamicClientFactory {
         }
 
 
-        try {
-            try (URIResolver resolver = new URIResolver(base, target)) {
-                if (resolver.isResolved()) {
-                    target = resolver.getURI().toString();
-                }
+        try (URIResolver resolver = new URIResolver(base, target)) {
+            if (resolver.isResolved()) {
+                target = resolver.getURI().toString();
             }
         } catch (Exception ex) {
             //ignore

@@ -477,11 +477,9 @@ public final class CustomizationParser {
 
         Element root = null;
         XMLStreamReader xmlReader = null;
-        try {
-            try (URIResolver resolver = new URIResolver(bindingFile)) {
-                xmlReader = StaxUtils.createXMLStreamReader(resolver.getURI().toString(), resolver.getInputStream());
-                root = StaxUtils.read(xmlReader, true).getDocumentElement();
-            }
+        try (URIResolver resolver = new URIResolver(bindingFile)) {
+            xmlReader = StaxUtils.createXMLStreamReader(resolver.getURI().toString(), resolver.getInputStream());
+            root = StaxUtils.read(xmlReader, true).getDocumentElement();
         } catch (Exception e1) {
             Message msg = new Message("CAN_NOT_READ_AS_ELEMENT", LOG, new Object[] {bindingFile});
             throw new ToolException(msg, e1);
