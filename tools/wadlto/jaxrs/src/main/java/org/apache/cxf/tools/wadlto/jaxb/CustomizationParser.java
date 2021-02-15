@@ -117,10 +117,8 @@ public final class CustomizationParser {
     private void addBinding(String bindingFile) throws XMLStreamException {
 
         Element root = null;
-        try {
-            try (URIResolver resolver = new URIResolver(bindingFile)) {
-                root = StaxUtils.read(resolver.getInputStream()).getDocumentElement();
-            }
+        try (URIResolver resolver = new URIResolver(bindingFile)) {
+            root = StaxUtils.read(resolver.getInputStream()).getDocumentElement();
         } catch (Exception e1) {
             Message msg = new Message("CAN_NOT_READ_AS_ELEMENT", LOG, new Object[] {bindingFile});
             throw new ToolException(msg, e1);
