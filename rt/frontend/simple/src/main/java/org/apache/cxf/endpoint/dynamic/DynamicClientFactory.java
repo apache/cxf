@@ -728,16 +728,15 @@ public class DynamicClientFactory {
     }
 
     private URL composeUrl(String s) {
-        try {
-            try (URIResolver resolver = new URIResolver(null, s, getClass())) {
-                if (resolver.isResolved()) {
-                    return resolver.getURI().toURL();
-                }
+        try (URIResolver resolver = new URIResolver(null, s, getClass())) {
+            if (resolver.isResolved()) {
+                return resolver.getURI().toURL();
             }
-            throw new ServiceConstructionException(new Message("COULD_NOT_RESOLVE_URL", LOG, s));
         } catch (IOException e) {
             throw new ServiceConstructionException(new Message("COULD_NOT_RESOLVE_URL", LOG, s), e);
         }
+        
+        throw new ServiceConstructionException(new Message("COULD_NOT_RESOLVE_URL", LOG, s));
     }
 
     static class InnerErrorListener {
