@@ -19,8 +19,8 @@
         <handler>
             <handler-name>lh3</handler-name>
             <handler-class>
-                                org.apache.cxf.jaxws.handler.JavaxAnnotationHandlerChainBuilderTest$TestProtocolHandler
-                        </handler-class>
+              org.apache.cxf.jaxws.handler.JavaxAnnotationHandlerChainBuilderTest$TestProtocolHandler
+            </handler-class>
             <init-param>
                 <param-name>token</param-name>
                 <param-value>String</param-value>
@@ -31,8 +31,8 @@
         <handler>
             <handler-name>lh1</handler-name>
             <handler-class>
-                                org.apache.cxf.jaxws.handler.JavaxAnnotationHandlerChainBuilderTest$TestLogicalHandler
-                        </handler-class>
+              org.apache.cxf.jaxws.handler.JavaxAnnotationHandlerChainBuilderTest$TestLogicalHandler
+            </handler-class>
             <init-param>
                 <param-name>token</param-name>
                 <param-value>String</param-value>
@@ -41,8 +41,8 @@
         <handler>
             <handler-name>lh2</handler-name>
             <handler-class>
-                                org.apache.cxf.jaxws.handler.JavaxAnnotationHandlerChainBuilderTest$TestLogicalHandler
-                        </handler-class>
+              org.apache.cxf.jaxws.handler.JavaxAnnotationHandlerChainBuilderTest$TestLogicalHandler
+            </handler-class>
             <init-param>
                 <param-name>token</param-name>
                 <param-value>String</param-value>
@@ -56,14 +56,14 @@
         <handler>
             <handler-name>Handler1</handler-name>
             <handler-class>
-                                org.apache.cxf.jaxws.handler.JavaxAnnotationHandlerChainBuilderTest$TestLogicalHandler
-                        </handler-class>
+              org.apache.cxf.jaxws.handler.JavaxAnnotationHandlerChainBuilderTest$TestLogicalHandler
+            </handler-class>
         </handler>
         <handler>
             <handler-name>Handler2</handler-name>
             <handler-class>
-                                org.apache.cxf.jaxws.handler.JavaxAnnotationHandlerChainBuilderTest$TestLogicalHandler
-                        </handler-class>
+              org.apache.cxf.jaxws.handler.JavaxAnnotationHandlerChainBuilderTest$TestLogicalHandler
+            </handler-class>
         </handler>
     </handler-chain>
     <handler-chain>
@@ -73,14 +73,14 @@
         <handler>
             <handler-name>Handler1</handler-name>
             <handler-class>
-                                org.apache.cxf.jaxws.handler.JavaxAnnotationHandlerChainBuilderTest$TestLogicalHandler
-                        </handler-class>
+              org.apache.cxf.jaxws.handler.JavaxAnnotationHandlerChainBuilderTest$TestLogicalHandler
+            </handler-class>
         </handler>
         <handler>
             <handler-name>Handler2</handler-name>
             <handler-class>
-                                org.apache.cxf.jaxws.handler.JavaxAnnotationHandlerChainBuilderTest$TestLogicalHandler
-                        </handler-class>
+              org.apache.cxf.jaxws.handler.JavaxAnnotationHandlerChainBuilderTest$TestLogicalHandler
+            </handler-class>
         </handler>
     </handler-chain>
     <!-- ====================== -->
@@ -96,14 +96,14 @@
         <handler>
             <handler-name>Handler7</handler-name>
             <handler-class>
-                                org.apache.cxf.jaxws.handler.JavaxAnnotationHandlerChainBuilderTest$TestLogicalHandler
-                        </handler-class>
+              org.apache.cxf.jaxws.handler.JavaxAnnotationHandlerChainBuilderTest$TestLogicalHandler
+            </handler-class>
         </handler>
         <handler>
             <handler-name>Handler8</handler-name>
             <handler-class>
-                                org.apache.cxf.jaxws.handler.JavaxAnnotationHandlerChainBuilderTest$TestProtocolHandler
-                        </handler-class>
+              org.apache.cxf.jaxws.handler.JavaxAnnotationHandlerChainBuilderTest$TestProtocolHandler
+            </handler-class>
         </handler>
     </handler-chain>
 </handler-chains>

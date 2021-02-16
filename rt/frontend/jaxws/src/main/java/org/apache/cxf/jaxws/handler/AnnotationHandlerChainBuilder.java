@@ -49,7 +49,6 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.jaxws.handler.types.PortComponentHandlerType;
 import org.apache.cxf.staxutils.StaxUtils;
 
 @SuppressWarnings("rawtypes")
@@ -208,7 +207,7 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
                         return;
                     }
                 } else if ("handler".equals(name)) {
-                    processHandlerElement(el, chain);
+                    processHandlerElement(el, chain, isJakartaEENamespace);
                 }
             }
         }
@@ -304,20 +303,31 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
         return buf.toString();
     }
 
-    private void processHandlerElement(Element el, List<Handler> chain) {
+    private void processHandlerElement(Element el, List<Handler> chain, boolean isJakartaEENamespace) {
         try {
             JAXBContext ctx = getContextForPortComponentHandlerType();
-            PortComponentHandlerType pt = JAXBUtils.unmarshall(ctx, el, PortComponentHandlerType.class).getValue();
-            chain.addAll(buildHandlerChain(pt, classLoader));
+            if (isJakartaEENamespace) {
+                org.apache.cxf.jaxws.handler.jakartaee.PortComponentHandlerType pt =
+                    JAXBUtils.unmarshall(ctx, el,
+                        org.apache.cxf.jaxws.handler.jakartaee.PortComponentHandlerType.class).getValue();
+                chain.addAll(buildHandlerChain(JakartaeeToJavaeeAdaptor.of(pt), classLoader));
+            } else {
+                org.apache.cxf.jaxws.handler.types.PortComponentHandlerType pt =
+                    JAXBUtils.unmarshall(ctx, el,
+                        org.apache.cxf.jaxws.handler.types.PortComponentHandlerType.class).getValue();
+                chain.addAll(buildHandlerChain(pt, classLoader));
+            }
         } catch (JAXBException e) {
             throw new IllegalArgumentException("Could not unmarshal handler chain", e);
         }
     }
 
-    private static synchronized JAXBContext getContextForPortComponentHandlerType()
-        throws JAXBException {
+    private static synchronized JAXBContext getContextForPortComponentHandlerType() throws JAXBException {
         if (context == null) {
-            context = JAXBContext.newInstance(PortComponentHandlerType.class);
+            context = JAXBContext.newInstance(
+                    org.apache.cxf.jaxws.handler.jakartaee.PortComponentHandlerType.class,
+                    org.apache.cxf.jaxws.handler.types.PortComponentHandlerType.class
+            );
         }
         return context;
     }
