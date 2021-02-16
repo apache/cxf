@@ -402,12 +402,12 @@ class SchemaResourceResolver implements LSResourceResolver {
             }
         }
 
-        URIResolver resolver;
         try {
             msg = new Message("RESOLVE_FROM_LOCAL", LOG, localFile);
             LOG.log(Level.FINE, msg.toString());
 
-            resolver = new URIResolver(localFile);
+            @SuppressWarnings("resource")
+            final URIResolver resolver = new URIResolver(localFile);
             if (resolver.isResolved()) {
                 lsin = new LSInputImpl();
                 lsin.setSystemId(localFile);

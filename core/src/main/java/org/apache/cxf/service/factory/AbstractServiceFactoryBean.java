@@ -133,16 +133,14 @@ public abstract class AbstractServiceFactoryBean {
         for (String l : schemaLocations) {
             URL url = rr.resolveResource(l, URL.class);
             if (url == null) {
-                URIResolver res;
-                try {
-                    res = new URIResolver(l);
+                try (URIResolver res = new URIResolver(l)) {
+                    if (!res.isResolved()) {
+                        throw new ServiceConstructionException(new Message("INVALID_SCHEMA_URL", LOG, l));
+                    }
+                    url = res.getURL();
                 } catch (IOException e) {
                     throw new ServiceConstructionException(new Message("INVALID_SCHEMA_URL", LOG, l), e);
                 }
-                if (!res.isResolved()) {
-                    throw new ServiceConstructionException(new Message("INVALID_SCHEMA_URL", LOG, l));
-                }
-                url = res.getURL();
             }
             Document d;
             try {
