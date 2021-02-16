@@ -99,10 +99,8 @@ public class OASISCatalogManager {
                 public String getResolvedEntity(String publicId, String systemId) {
                     String s = super.getResolvedEntity(publicId, systemId);
                     if (s != null && s.startsWith("classpath:")) {
-                        try {
-                            URIResolver r = new URIResolver(s);
+                        try (URIResolver r = new URIResolver(s)) {
                             if (r.isResolved()) {
-                                r.getInputStream().close();
                                 return r.getURL().toExternalForm();
                             }
                         } catch (IOException e) {
