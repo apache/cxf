@@ -67,44 +67,46 @@ public final class Client {
         System.out.println("Sent HTTP PUT request to update customer info");
         Client client = new Client();
         String inputFile = client.getClass().getResource("/update_customer.xml").getFile();
-        URIResolver resolver = new URIResolver(inputFile);
-        File input = new File(resolver.getURI());
-
-        HttpPut put = new HttpPut("http://localhost:9000/customerservice/customers");
-        put.setEntity(new FileEntity(input, ContentType.TEXT_XML));
-        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        try {
-            CloseableHttpResponse response = httpClient.execute(put);
-            System.out.println("Response status code: " + response.getStatusLine().getStatusCode());
-            System.out.println("Response body: ");
-            System.out.println(EntityUtils.toString(response.getEntity()));
-        } finally {
-            // Release current connection to the connection pool once you are
-            // done
-            put.releaseConnection();
+        try (URIResolver resolver = new URIResolver(inputFile)) {
+            File input = new File(resolver.getURI());
+    
+            HttpPut put = new HttpPut("http://localhost:9000/customerservice/customers");
+            put.setEntity(new FileEntity(input, ContentType.TEXT_XML));
+            CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+            try {
+                CloseableHttpResponse response = httpClient.execute(put);
+                System.out.println("Response status code: " + response.getStatusLine().getStatusCode());
+                System.out.println("Response body: ");
+                System.out.println(EntityUtils.toString(response.getEntity()));
+            } finally {
+                // Release current connection to the connection pool once you are
+                // done
+                put.releaseConnection();
+            }
         }
 
         // Sent HTTP POST request to add customer
         System.out.println("\n");
         System.out.println("Sent HTTP POST request to add customer");
         inputFile = client.getClass().getResource("/add_customer.xml").getFile();
-        resolver = new URIResolver(inputFile);
-        input = new File(resolver.getURI());
-
-        HttpPost post = new HttpPost("http://localhost:9000/customerservice/customers");
-        post.addHeader("Accept", "text/xml");
-        post.setEntity(new FileEntity(input, ContentType.TEXT_XML));
-        httpClient = HttpClientBuilder.create().build();
-
-        try {
-            CloseableHttpResponse response = httpClient.execute(post);
-            System.out.println("Response status code: " + response.getStatusLine().getStatusCode());
-            System.out.println("Response body: ");
-            System.out.println(EntityUtils.toString(response.getEntity()));
-        } finally {
-            // Release current connection to the connection pool once you are
-            // done
-            post.releaseConnection();
+        try (URIResolver resolver = new URIResolver(inputFile)) {
+            File input = new File(resolver.getURI());
+    
+            HttpPost post = new HttpPost("http://localhost:9000/customerservice/customers");
+            post.addHeader("Accept", "text/xml");
+            post.setEntity(new FileEntity(input, ContentType.TEXT_XML));
+            CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+    
+            try {
+                CloseableHttpResponse response = httpClient.execute(post);
+                System.out.println("Response status code: " + response.getStatusLine().getStatusCode());
+                System.out.println("Response body: ");
+                System.out.println(EntityUtils.toString(response.getEntity()));
+            } finally {
+                // Release current connection to the connection pool once you are
+                // done
+                post.releaseConnection();
+            }
         }
 
         System.out.println("\n");

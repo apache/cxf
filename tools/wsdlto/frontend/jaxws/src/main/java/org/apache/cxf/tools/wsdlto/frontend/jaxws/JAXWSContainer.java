@@ -70,16 +70,14 @@ public class JAXWSContainer extends WSDLToJavaContainer {
         super.validate(env);
         if (env.containsKey(ToolConstants.CFG_BINDING)) {
             String[] bindings = (String[])env.get(ToolConstants.CFG_BINDING);
-            URIResolver resolver = null;
             for (int i = 0; i < bindings.length; i++) {
-                try {
-                    resolver = new URIResolver(bindings[i]);
+                try (URIResolver resolver = new URIResolver(bindings[i])) {
+                    if (!resolver.isResolved()) {
+                        Message msg = new Message("FILE_NOT_EXIST", LOG, bindings[i]);
+                        throw new ToolException(msg);
+                    }
                 } catch (IOException ioe) {
                     throw new ToolException(ioe);
-                }
-                if (!resolver.isResolved()) {
-                    Message msg = new Message("FILE_NOT_EXIST", LOG, bindings[i]);
-                    throw new ToolException(msg);
                 }
             }
             env.put(ToolConstants.CFG_BINDING, bindings);

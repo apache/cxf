@@ -149,42 +149,45 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
     }
     private static final Map<String, DOMResult> BUILT_IN_SCHEMAS = new HashMap<>();
     static {
-        URIResolver resolver = new URIResolver();
-        try {
-            resolver.resolve("", "classpath:/schemas/wsdl/ws-addr-wsdl.xsd", JAXBDataBinding.class);
-            if (resolver.isResolved()) {
-                resolver.getInputStream().close();
-                DOMResult dr = new DelayedDOMResult(resolver.getURL(),
-                                                    "classpath:/schemas/wsdl/ws-addr-wsdl.xsd",
-                                                    "http://www.w3.org/2005/02/addressing/wsdl");
-                BUILT_IN_SCHEMAS.put("http://www.w3.org/2005/02/addressing/wsdl", dr);
-                resolver.unresolve();
+        try (URIResolver resolver = new URIResolver()) {
+            try {
+                resolver.resolve("", "classpath:/schemas/wsdl/ws-addr-wsdl.xsd", JAXBDataBinding.class);
+                if (resolver.isResolved()) {
+                    resolver.getInputStream().close();
+                    DOMResult dr = new DelayedDOMResult(resolver.getURL(),
+                                                        "classpath:/schemas/wsdl/ws-addr-wsdl.xsd",
+                                                        "http://www.w3.org/2005/02/addressing/wsdl");
+                    BUILT_IN_SCHEMAS.put("http://www.w3.org/2005/02/addressing/wsdl", dr);
+                    resolver.unresolve();
+                }
+            } catch (Exception e) {
+                //IGNORE
             }
-        } catch (Exception e) {
-            //IGNORE
-        }
-        try {
-            resolver.resolve("", "classpath:/schemas/wsdl/ws-addr.xsd", JAXBDataBinding.class);
-            if (resolver.isResolved()) {
-                resolver.getInputStream().close();
-                DOMResult dr = new DelayedDOMResult(resolver.getURL(),
-                                                    "classpath:/schemas/wsdl/ws-addr.xsd",
-                                                    "http://www.w3.org/2005/08/addressing");
-                BUILT_IN_SCHEMAS.put("http://www.w3.org/2005/08/addressing", dr);
-                resolver.unresolve();
+            try {
+                resolver.resolve("", "classpath:/schemas/wsdl/ws-addr.xsd", JAXBDataBinding.class);
+                if (resolver.isResolved()) {
+                    resolver.getInputStream().close();
+                    DOMResult dr = new DelayedDOMResult(resolver.getURL(),
+                                                        "classpath:/schemas/wsdl/ws-addr.xsd",
+                                                        "http://www.w3.org/2005/08/addressing");
+                    BUILT_IN_SCHEMAS.put("http://www.w3.org/2005/08/addressing", dr);
+                    resolver.unresolve();
+                }
+            } catch (Exception e) {
+                //IGNORE
             }
-        } catch (Exception e) {
-            //IGNORE
-        }
-        try {
-            resolver.resolve("", "classpath:/schemas/wsdl/wsrm.xsd", JAXBDataBinding.class);
-            if (resolver.isResolved()) {
-                resolver.getInputStream().close();
-                DOMResult dr = new DelayedDOMResult(resolver.getURL(),
-                                                    "classpath:/schemas/wsdl/wsrm.xsd",
-                                                    "http://schemas.xmlsoap.org/ws/2005/02/rm");
-                BUILT_IN_SCHEMAS.put("http://schemas.xmlsoap.org/ws/2005/02/rm", dr);
-                resolver.unresolve();
+            try {
+                resolver.resolve("", "classpath:/schemas/wsdl/wsrm.xsd", JAXBDataBinding.class);
+                if (resolver.isResolved()) {
+                    resolver.getInputStream().close();
+                    DOMResult dr = new DelayedDOMResult(resolver.getURL(),
+                                                        "classpath:/schemas/wsdl/wsrm.xsd",
+                                                        "http://schemas.xmlsoap.org/ws/2005/02/rm");
+                    BUILT_IN_SCHEMAS.put("http://schemas.xmlsoap.org/ws/2005/02/rm", dr);
+                    resolver.unresolve();
+                }
+            } catch (Exception e) {
+                //IGNORE
             }
         } catch (Exception e) {
             //IGNORE
