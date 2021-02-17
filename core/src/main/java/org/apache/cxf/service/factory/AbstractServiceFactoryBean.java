@@ -20,6 +20,7 @@
 package org.apache.cxf.service.factory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -143,8 +144,8 @@ public abstract class AbstractServiceFactoryBean {
                 }
             }
             Document d;
-            try {
-                d = StaxUtils.read(url.openStream());
+            try (InputStream in = url.openStream()) {
+                d = StaxUtils.read(in);
             } catch (Exception e) {
                 throw new ServiceConstructionException(new Message("ERROR_READING_SCHEMA", LOG, l), e);
             }
