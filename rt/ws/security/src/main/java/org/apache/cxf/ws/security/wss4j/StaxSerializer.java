@@ -209,8 +209,17 @@ public class StaxSerializer extends AbstractSerializer {
      * @throws XMLEncryptionException
      */
     private Node deserialize(Node ctx, InputSource inputSource) throws XMLEncryptionException {
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(inputSource);
-        return deserialize(ctx, reader, true);
+        XMLStreamReader reader = null;
+        try {
+            reader = StaxUtils.createXMLStreamReader(inputSource);
+            return deserialize(ctx, reader, true);
+        } finally {
+            try {
+                StaxUtils.close(reader);
+            } catch (final XMLStreamException ex) {
+                throw new XMLEncryptionException(ex);
+            }
+        }
     }
 
     private Node deserialize(Node ctx, XMLStreamReader reader, boolean wrapped) throws XMLEncryptionException {
