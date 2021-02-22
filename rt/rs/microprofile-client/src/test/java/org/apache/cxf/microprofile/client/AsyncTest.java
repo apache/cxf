@@ -19,15 +19,18 @@
 package org.apache.cxf.microprofile.client;
 
 import java.net.URI;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.apache.cxf.microprofile.client.mock.AsyncClient;
+import org.apache.cxf.microprofile.client.mock.NotFoundExceptionMapper;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -52,5 +55,25 @@ public class AsyncTest {
         }).toCompletableFuture().get(10, TimeUnit.SECONDS);
 
         assertTrue("Hello World".equals(combined) || "World Hello".equals(combined));
+    }
+
+    @Test
+    public void testAsyncClientCanMapExceptionResponses() throws Exception {
+        MockWebServer mockWebServer = new MockWebServer();
+        URI uri = mockWebServer.url("/").uri();
+
+        AsyncClient client = RestClientBuilder.newBuilder()
+                                              .baseUri(uri)
+                                              .connectTimeout(5, TimeUnit.SECONDS)
+                                              .readTimeout(5, TimeUnit.SECONDS)
+                                              .register(NotFoundExceptionMapper.class)
+                                              .build(AsyncClient.class);
+        mockWebServer.enqueue(new MockResponse().setResponseCode(404));
+
+        CompletionStage cs = client.get().exceptionally(t -> {
+            Throwable t2 = t.getCause();
+            return t.getClass().getSimpleName() + ":" + (t2 == null ? "null" : t2.getClass().getSimpleName());
+        });
+        assertEquals("CompletionException:NoSuchEntityException", cs.toCompletableFuture().get(10, TimeUnit.SECONDS));
     }
 }

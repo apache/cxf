@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
@@ -194,16 +195,25 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
         for (ResponseExceptionMapper<?> mapper : mappers) {
             if (mapper.handles(r.getStatus(), r.getHeaders())) {
                 Throwable t = mapper.toThrowable(r);
+                if (t == null) {
+                    continue;
+                }
                 if (t instanceof RuntimeException) {
                     throw t;
-                } else if (t != null && m.getExceptionTypes() != null) {
+                } else if (CompletionStage.class.isAssignableFrom(m.getReturnType())) {
+                    throw new CompletionException(t);
+                } else if (m.getExceptionTypes() != null) {
                     // its a checked exception, make sure its declared
                     for (Class<?> c : m.getExceptionTypes()) {
                         if (c.isAssignableFrom(t.getClass())) {
                             throw t;
                         }
                     }
-                    // TODO Log the unhandled declarable
+                    if (LOG.isLoggable(Level.FINEST)) {
+                        LOG.log(Level.FINEST, "ResponseExceptionMapper, " + mapper.getClass().getName() + ", handles " 
+                            + "response, but client method does not declare it's Throwable type, " 
+                            + t.getClass().getName());
+                    }
                 }
             }
         }
