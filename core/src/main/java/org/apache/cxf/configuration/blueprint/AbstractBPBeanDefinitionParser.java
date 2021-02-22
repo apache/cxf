@@ -31,7 +31,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -358,14 +357,10 @@ public abstract class AbstractBPBeanDefinitionParser {
                                             String propertyName,
                                             Class<?> c) {
         try {
-            XMLStreamWriter xmlWriter = null;
             Unmarshaller u = null;
             try {
-                StringWriter writer = new StringWriter();
-                xmlWriter = StaxUtils.createXMLStreamWriter(writer);
-                StaxUtils.copy(data, xmlWriter);
-                xmlWriter.flush();
-
+                final StringWriter writer = new StringWriter();
+                StaxUtils.writeTo(data, writer);
 
                 MutableBeanMetadata factory = ctx.createMetadata(MutableBeanMetadata.class);
                 factory.setClassName(c.getName());
@@ -393,7 +388,6 @@ public abstract class AbstractBPBeanDefinitionParser {
                     bean.addProperty(propertyName, value);
                 }
             } finally {
-                StaxUtils.close(xmlWriter);
                 JAXBUtils.closeUnmarshaller(u);
             }
         } catch (JAXBException e) {
