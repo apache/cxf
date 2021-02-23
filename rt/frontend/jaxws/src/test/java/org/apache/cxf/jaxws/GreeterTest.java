@@ -37,7 +37,45 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class GreeterTest extends AbstractJaxWsTest {
+    @Test
+    public void testEndpointValidate() throws Exception {
+        ReflectionServiceFactoryBean bean = new JaxWsServiceFactoryBean();
+        URL resource = getClass().getResource("/wsdl/hello_world.wsdl");
+        assertNotNull(resource);
+        bean.setWsdlURL(resource.toString());
+        bean.setBus(bus);
+        bean.setServiceClass(GreeterImpl.class);
+        bean.setValidate(true);
+        
+        GreeterImpl greeter = new GreeterImpl();
+        BeanInvoker invoker = new BeanInvoker(greeter);
 
+
+        Service service = bean.create();
+
+        assertEquals("SOAPService", service.getName().getLocalPart());
+        assertEquals("http://apache.org/hello_world_soap_http", service.getName().getNamespaceURI());
+
+        ServerFactoryBean svr = new ServerFactoryBean();
+        svr.setBus(bus);
+        svr.setServiceFactory(bean);
+        svr.setInvoker(invoker);
+
+        svr.create();
+
+        Node response = invoke("http://localhost:9000/SoapContext/SoapPort",
+                           LocalTransportFactory.TRANSPORT_ID,
+                           "GreeterMessage.xml");
+
+        assertEquals(1, greeter.getInvocationCount());
+
+        assertNotNull(response);
+
+        addNamespace("h", "http://apache.org/hello_world_soap_http/types");
+
+        assertValid("/s:Envelope/s:Body", response);
+        assertValid("//h:sayHiResponse", response);
+    }
 
     @Test
     public void testEndpoint() throws Exception {
