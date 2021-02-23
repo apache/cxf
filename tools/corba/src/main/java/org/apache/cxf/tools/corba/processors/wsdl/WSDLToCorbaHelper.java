@@ -1431,7 +1431,7 @@ public class WSDLToCorbaHelper {
                 } else if (fields.size() == 1) {
                     caselist.add("TRUE");
                 } else {
-                    String msg = "Discriminator Type doesnt match number of Choices in Union:" + name;
+                    String msg = "Discriminator Type doesn't match number of Choices in Union:" + name;
                     LOG.log(Level.WARNING, msg);
                 }
             }
