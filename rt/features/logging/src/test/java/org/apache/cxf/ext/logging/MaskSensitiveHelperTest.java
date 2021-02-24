@@ -61,11 +61,11 @@ public class MaskSensitiveHelperTest {
             "\"user\":\"testUser\", \"password\": \"XXX\"";
     
     private static final String SENSITIVE_LOGGING_MULTIPLE_ELEMENT_XML =
-        "<item><user>testUser1</user><password myAttribute=\"test\">my secret password 1</password></item>"+
-            "<item><user>testUser2</user><password>my secret password 2</password></item>";
+        "<item><user>testUser1</user><password myAttribute=\"test\">my secret password 1</password></item>"
+            + "<item><user>testUser2</user><password>my secret password 2</password></item>";
     private static final String MASKED_LOGGING_MULTIPLE_ELEMENT_XML =
-        "<item><user>testUser1</user><password myAttribute=\"test\">XXX</password></item>"+
-            "<item><user>testUser2</user><password>XXX</password></item>";
+        "<item><user>testUser1</user><password myAttribute=\"test\">XXX</password></item>"
+            + "<item><user>testUser2</user><password>XXX</password></item>";
 
     private static final Set<String> SENSITIVE_ELEMENTS = new HashSet(Arrays.asList("password"));
     private static final String APPLICATION_XML = "application/xml";
