@@ -122,6 +122,8 @@ public final class StaxUtils {
         "org.apache.cxf.staxutils.innerElementCountThreshold";
     private static final String INNER_ELEMENT_LEVEL_SYSTEM_PROP =
         "org.apache.cxf.staxutils.innerElementLevelThreshold";
+    private static final String AUTO_CLOSE_INPUT_SOURCE_PROP =
+        "org.apache.cxf.staxutils.autoCloseInputSource";
 
     private static final Logger LOG = LogUtils.getL7dLogger(StaxUtils.class);
 
@@ -145,6 +147,7 @@ public final class StaxUtils {
     private static int minTextSegment = 64; // Same default as woodstox
     private static long maxElementCount = Long.MAX_VALUE;
     private static long maxXMLCharacters = Long.MAX_VALUE;
+    private static final boolean AUTO_CLOSE_INPUT_SOURCE;
 
     private static boolean allowInsecureParser;
 
@@ -170,6 +173,15 @@ public final class StaxUtils {
         String s = SystemPropertyAction.getPropertyOrNull(ALLOW_INSECURE_PARSER);
         if (!StringUtils.isEmpty(s)) {
             allowInsecureParser = "1".equals(s) || Boolean.parseBoolean(s);
+        } else {
+            allowInsecureParser = false;
+        }
+        
+        String autoCloseInputSource = SystemPropertyAction.getPropertyOrNull(AUTO_CLOSE_INPUT_SOURCE_PROP);
+        if (!StringUtils.isEmpty(autoCloseInputSource)) {
+            AUTO_CLOSE_INPUT_SOURCE = "1".equals(autoCloseInputSource) || Boolean.parseBoolean(autoCloseInputSource);
+        } else {
+            AUTO_CLOSE_INPUT_SOURCE = false; /* set 'false' by default */
         }
 
         XMLInputFactory xif = null;
@@ -1157,15 +1169,12 @@ public final class StaxUtils {
         }
     }
     public static Document read(InputSource s) throws XMLStreamException {
-        XMLStreamReader reader = createXMLStreamReader(s);
+        XMLStreamReader reader = null;
         try {
+            reader = createXMLStreamReader(s);
             return read(reader);
         } finally {
-            try {
-                reader.close();
-            } catch (Exception ex) {
-                //ignore
-            }
+            StaxUtils.close(reader);
         }
     }
     public static Document read(XMLStreamReader reader) throws XMLStreamException {
@@ -1683,22 +1692,38 @@ public final class StaxUtils {
         String sysId = src.getSystemId() == null ? null : src.getSystemId();
         String pubId = src.getPublicId() == null ? null : src.getPublicId();
         if (src.getByteStream() != null) {
+            final InputStream is = src.getByteStream();
+
             if (src.getEncoding() == null) {
-                StreamSource ss = new StreamSource(src.getByteStream(), sysId);
+                final StreamSource ss = new StreamSource(is, sysId);
                 ss.setPublicId(pubId);
-                return createXMLStreamReader(ss);
+                
+                final XMLStreamReader xmlStreamReader = createXMLStreamReader(ss);
+                if (AUTO_CLOSE_INPUT_SOURCE) {
+                    return new AutoCloseableXMLStreamReader(xmlStreamReader, is);
+                } else {
+                    return xmlStreamReader;
+                }
             }
-            return createXMLStreamReader(src.getByteStream(), src.getEncoding());
+            
+            return new AutoCloseableXMLStreamReader(createXMLStreamReader(is, src.getEncoding()), is);
         } else if (src.getCharacterStream() != null) {
-            StreamSource ss = new StreamSource(src.getCharacterStream(), sysId);
+            final Reader reader = src.getCharacterStream();
+            final StreamSource ss = new StreamSource(reader, sysId);
             ss.setPublicId(pubId);
-            return createXMLStreamReader(ss);
+            final XMLStreamReader xmlStreamReader = createXMLStreamReader(ss);
+            if (AUTO_CLOSE_INPUT_SOURCE) {
+                return new AutoCloseableXMLStreamReader(xmlStreamReader, reader);
+            } else {
+                return xmlStreamReader;
+            }
         } else {
             try {
-                URL url = new URL(sysId);
-                StreamSource ss = new StreamSource(url.openStream(), sysId);
+                final URL url = new URL(sysId);
+                final InputStream is = url.openStream();
+                final StreamSource ss = new StreamSource(is, sysId);
                 ss.setPublicId(pubId);
-                return createXMLStreamReader(ss);
+                return new AutoCloseableXMLStreamReader(createXMLStreamReader(ss), is);
             } catch (Exception ex) {
                 //ignore - not a valid URL
             }
@@ -2220,4 +2245,5 @@ public final class StaxUtils {
         WoodstoxHelper.setProperty(reader, p, v);
     }
 
+    
 }
