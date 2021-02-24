@@ -103,26 +103,4 @@ pipeline {
       }
     }
   }
-  post {
-    // If this build failed, send an email to the list.
-    failure {
-      script {
-        
-      }
-    }
-
-    // If this build didn't fail, but there were failing tests, send an email to the list.
-    unstable {
-      script {
-        
-      }
-    }
-
-    // Send an email, if the last build was not successful and this one is.
-    fixed {
-      script {
-       
-      }
-    }
-  }
 }
