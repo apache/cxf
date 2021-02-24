@@ -34,7 +34,7 @@ pipeline {
           stage('JDK specific build') {
             tools {
               jdk "${JAVA_VERSION}"
-              maven 'maven_latest'
+              
             }
             environment {
               MAVEN_OPTS = "-Xmx1024m"
