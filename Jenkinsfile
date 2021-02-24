@@ -14,9 +14,6 @@ pipeline {
   }
   stages {
     stage('Prepare') {
-      agent {
-        label 'ubuntu'
-      }
       stages {
         stage('Clean up') {
           steps {
@@ -27,9 +24,6 @@ pipeline {
     }
     stage('Build') {
       matrix {
-        agent {
-          label 'ubuntu'
-        }
         axes {
           axis {
             name 'JAVA_VERSION'
@@ -38,9 +32,6 @@ pipeline {
         }
         stages {
           stage('JDK specific build') {
-            agent {
-              label 'ubuntu'
-            }
             tools {
               jdk "${JAVA_VERSION}"
               maven 'maven_latest'
