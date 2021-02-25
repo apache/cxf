@@ -36,14 +36,12 @@ pipeline {
                   sh 'mvn -B clean install'
                   // step([$class: 'JiraIssueUpdater', issueSelector: [$class: 'DefaultIssueSelector'], scm: scm])
                 }
-                post {
-                  node{
+               /* post {
                     always {
                       junit(testResults: '**/surefire-reports/*.xml', allowEmptyResults: true)
                       junit(testResults: '**/failsafe-reports/*.xml', allowEmptyResults: true)
                     }
-                  }
-                }
+                }*/
              }
           }
         }
