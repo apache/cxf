@@ -13,15 +13,6 @@ pipeline {
     pollSCM 'H/15 * * * *'
   }
   stages {
-    stage('Prepare') {
-      stages {
-        stage('Clean up') {
-          steps {
-            cleanWs deleteDirs: true, patterns: [[pattern: '**/target/**', type: 'INCLUDE']]
-          }
-        }
-      }
-    }
     stage('Build') {
       matrix {
         axes {
@@ -83,11 +74,6 @@ pipeline {
                 }
               }
             } */
-            }
-            post {
-              always {
-                cleanWs deleteDirs: true, patterns: [[pattern: '**/target/**', type: 'INCLUDE']]
-              }
             }
           }
         }
