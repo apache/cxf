@@ -1,7 +1,6 @@
 #!groovy
 
 pipeline {
-  agent none
   options {
     buildDiscarder logRotator(daysToKeepStr: '14', numToKeepStr: '10')
     timeout(140)
