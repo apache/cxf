@@ -6,7 +6,6 @@ pipeline {
     buildDiscarder logRotator(daysToKeepStr: '14', numToKeepStr: '10')
     timeout(140)
     disableConcurrentBuilds()
-    skipStagesAfterUnstable()
     quietPeriod(30)
   }
   triggers {
@@ -18,7 +17,7 @@ pipeline {
         axes {
           axis {
             name 'JAVA_VERSION'
-            values 'jdk_1.8_latest', 'jdk_11_latest', 'jdk_15_latest'
+            values 'jdk_11_latest'
           }
         }
         stages {
@@ -26,9 +25,6 @@ pipeline {
             tools {
               jdk "${JAVA_VERSION}"
               
-            }
-            environment {
-              MAVEN_OPTS = "-Xmx1024m"
             }
             stages {
               stage('Build & Test') {
