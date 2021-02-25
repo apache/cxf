@@ -15,17 +15,10 @@ pipeline {
   stages {
     stage('Build') {
       matrix {
-        axes {
-          axis {
-            name 'JAVA_VERSION'
-            values  'jdk_11_latest'
-          }
-        }
         stages {
           stage('JDK specific build') {
             tools {
-              jdk "${JAVA_VERSION}"
-              
+              jdk "11"
             }
             stages {
               stage('Build & Test') {
