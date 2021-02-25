@@ -6,6 +6,7 @@ pipeline {
     buildDiscarder logRotator(daysToKeepStr: '14', numToKeepStr: '10')
     timeout(140)
     disableConcurrentBuilds()
+    skipStagesAfterUnstable()
     quietPeriod(30)
   }
   triggers {
@@ -17,7 +18,7 @@ pipeline {
         axes {
           axis {
             name 'JAVA_VERSION'
-            values 'jdk_11_latest'
+            values 'jdk_1.8_latest', 'jdk_11_latest', 'jdk_15_latest'
           }
         }
         stages {
@@ -26,6 +27,9 @@ pipeline {
               jdk "${JAVA_VERSION}"
               
             }
+            environment {
+              MAVEN_OPTS = "-Xmx1024m"
+            }
             stages {
               stage('Build & Test') {
                 steps {
@@ -33,44 +37,14 @@ pipeline {
                   // step([$class: 'JiraIssueUpdater', issueSelector: [$class: 'DefaultIssueSelector'], scm: scm])
                 }
                 post {
-                  always {
-                    junit(testResults: '**/surefire-reports/*.xml', allowEmptyResults: true)
-                    junit(testResults: '**/failsafe-reports/*.xml', allowEmptyResults: true)
+                  node{
+                    always {
+                      junit(testResults: '**/surefire-reports/*.xml', allowEmptyResults: true)
+                      junit(testResults: '**/failsafe-reports/*.xml', allowEmptyResults: true)
+                    }
                   }
                 }
-              }
-              /* stage('Build Source & JavaDoc') {
-              when {
-                branch 'master'
-              }
-              steps {
-                dir("local-snapshots-dir/") {
-                  deleteDir()
-                }
-                sh 'mvn -B source:jar javadoc:jar -DskipAssembbly'
-              }
-            }
-            stage('Deploy Snapshot') {
-              when {
-                branch 'master'
-              }
-              steps {
-                withCredentials([file(credentialsId: 'lukaszlenart-repository-access-token', variable: 'CUSTOM_SETTINGS')]) {
-                  sh 'mvn -U -B -e clean install -Pdeploy,everything,nochecks -Dmaven.test.skip.exec=true -V -DobrRepository=NONE'
-                }
-              }
-            }
-            stage('Code Quality') {
-              when {
-                branch 'master'
-              }
-              steps {
-                withCredentials([string(credentialsId: 'asf-cxf-sonarcloud', variable: 'SONARCLOUD_TOKEN')]) {
-                  sh 'mvn sonar:sonar -DskipAssembly -Dsonar.projectKey=cxf -Dsonar.organization=apache -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN}'
-                }
-              }
-            } */
-            }
+             }
           }
         }
       }
