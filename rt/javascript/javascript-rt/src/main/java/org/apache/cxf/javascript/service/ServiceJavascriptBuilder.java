@@ -583,8 +583,11 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
             utils.appendLine("var wrapperObj = new " + inputWrapperClassName + "();");
             int px = 0;
             for (String param : inputParameterNames) {
-                utils.appendLine("wrapperObj.set" + StringUtils.capitalize(param) + "(args[" + px
-                                 + "]);");
+                utils.startIf("typeof wrapperObj.set" + StringUtils.capitalize(param) + " === \"function\"");
+                utils.appendLine("wrapperObj.set" + StringUtils.capitalize(param) + "(args[" + px + "]);");
+                utils.appendElse();
+                utils.appendLine("wrapperObj.add" + StringUtils.capitalize(param) + "(args[" + px + "]);");
+                utils.endBlock();
                 px++;
             }
         } else if (isRPC) {

@@ -291,7 +291,7 @@ public class DocLitBareClientTest extends JavascriptRhinoTest {
         testUtilities.rhinoCallMethod(rv, "setLongItem", testUtilities.javaToJS(b1.longItem));
         testUtilities.rhinoCallMethod(rv, "setBase64Item", testUtilities.javaToJS(b1.base64Item));
         testUtilities.rhinoCallMethod(rv, "setOptionalIntItem", testUtilities.javaToJS(b1.optionalIntItem));
-        testUtilities.rhinoCallMethod(rv, "setOptionalIntArrayItem",
+        testUtilities.rhinoCallMethod(rv, "addOptionalIntArrayItem",
                                       testUtilities.javaToJS(b1.optionalIntArrayItem));
         testUtilities.rhinoCallMethod(rv, "setDoubleItem", testUtilities.javaToJS(b1.doubleItem));
         testUtilities.rhinoCallMethod(rv, "setBeanTwoItem", testBean2ToJS(testUtilities,
