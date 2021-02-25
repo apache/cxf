@@ -2,6 +2,7 @@
 
 pipeline {
   options {
+    agent any
     buildDiscarder logRotator(daysToKeepStr: '14', numToKeepStr: '10')
     timeout(140)
     disableConcurrentBuilds()
