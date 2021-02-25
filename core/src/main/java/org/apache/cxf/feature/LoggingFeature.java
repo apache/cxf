@@ -67,8 +67,12 @@ public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
         super(new Portable(in, out, lim, p));
     }
 
-    public LoggingFeature(String in, String out, int lim, boolean p, boolean showBinary) {
-        super(new Portable(in, out, lim, p, showBinary));
+    public LoggingFeature(String in, String out, int lim, boolean p, boolean r) {
+        super(new Portable(in, out, lim, p, r));
+    }
+
+    public LoggingFeature(String in, String out, int lim, boolean p, boolean r, boolean showBinary) {
+        super(new Portable(in, out, lim, p, r, showBinary));
     }
 
     public LoggingFeature(Logging annotation) {
@@ -87,10 +91,18 @@ public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
         return delegate.isPrettyLogging();
     }
 
+    public boolean isRegexLogging() {
+        return delegate.isRegexLogging();
+    }
+
     public void setPrettyLogging(boolean prettyLogging) {
         delegate.setPrettyLogging(prettyLogging);
     }
 
+    public void setRegexLogging(boolean regexLogging) {
+        delegate.setRegexLogging(regexLogging);
+    }
+   
     public static class Portable implements AbstractPortableFeature {
         private static final int DEFAULT_LIMIT = AbstractLoggingInterceptor.DEFAULT_LIMIT;
         private static final LoggingInInterceptor IN = new LoggingInInterceptor(DEFAULT_LIMIT);
@@ -100,6 +112,7 @@ public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
         String inLocation;
         String outLocation;
         boolean prettyLogging;
+        boolean regexLogging;
         boolean showBinary;
 
         int limit = DEFAULT_LIMIT;
@@ -127,8 +140,16 @@ public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
             prettyLogging = p;
         }
 
-        public Portable(String in, String out, int lim, boolean p, boolean showBinary) {
-            this(in, out, lim, p);
+        public Portable(String in, String out, int lim, boolean p, boolean r) {
+            inLocation = in;
+            outLocation = out;
+            limit = lim;
+            prettyLogging = p;
+            regexLogging = r;
+        }
+
+        public Portable(String in, String out, int lim, boolean p, boolean r, boolean showBinary) {
+            this(in, out, lim, p, r);
             this.showBinary = showBinary;
         }
 
@@ -137,13 +158,14 @@ public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
             outLocation = annotation.outLocation();
             limit = annotation.limit();
             prettyLogging = annotation.pretty();
+            regexLogging = annotation.regex();
             showBinary = annotation.showBinary();
         }
 
         @Override
         public void doInitializeProvider(InterceptorProvider provider, Bus bus) {
             if (limit == DEFAULT_LIMIT && inLocation == null
-                    && outLocation == null && !prettyLogging) {
+                    && outLocation == null && !prettyLogging  && !regexLogging) {
                 provider.getInInterceptors().add(IN);
                 provider.getInFaultInterceptors().add(IN);
                 provider.getOutInterceptors().add(OUT);
@@ -152,10 +174,12 @@ public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
                 LoggingInInterceptor in = new LoggingInInterceptor(limit);
                 in.setOutputLocation(inLocation);
                 in.setPrettyLogging(prettyLogging);
+                in.setRegexLogging(regexLogging);
                 in.setShowBinaryContent(showBinary);
                 LoggingOutInterceptor out = new LoggingOutInterceptor(limit);
                 out.setOutputLocation(outLocation);
                 out.setPrettyLogging(prettyLogging);
+                out.setRegexLogging(regexLogging);
                 out.setShowBinaryContent(showBinary);
 
                 provider.getInInterceptors().add(in);
@@ -185,12 +209,27 @@ public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
         public boolean isPrettyLogging() {
             return prettyLogging;
         }
+
+        /**
+         */
+        public boolean isRegexLogging() {
+            return regexLogging;
+        }
+
         /**
          * Turn pretty logging of XML content on/off
          * @param prettyLogging
          */
         public void setPrettyLogging(boolean prettyLogging) {
             this.prettyLogging = prettyLogging;
+        }
+
+        /**
+         * Turn regex logging on/off
+         * @param regexLogging
+         */
+        public void setRegexLogging(boolean regexLogging) {
+            this.regexLogging = regexLogging;
         }
     }
 }

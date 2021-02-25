@@ -104,6 +104,7 @@ public class OldLoggingFactoryBeanListener implements FactoryBeanListener {
         if (annotation != null) {
             LoggingFeature lf = new LoggingFeature();
             lf.setPrettyLogging(annotation.pretty());
+            lf.setRegexLogging(annotation.regex());
             lf.setLimit(annotation.limit());
             lf.setLogBinary(annotation.showBinary());
             
