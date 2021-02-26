@@ -59,7 +59,7 @@ public @interface Logging {
     /**
      * For XML content, turn on regex printing in the logs
      */
-    boolean regex() default false;
+    boolean regex_() default false;
 
     /**
      * Ignore binary payloads by default
