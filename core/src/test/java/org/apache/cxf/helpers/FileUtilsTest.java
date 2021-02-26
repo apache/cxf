@@ -35,7 +35,6 @@ import static org.junit.Assert.assertTrue;
 
 public class FileUtilsTest {
 
-
     @Test
     public void testTempIODirExists() throws Exception {
 
@@ -57,9 +56,9 @@ public class FileUtilsTest {
             basedir = new File(".").getCanonicalPath();
         }
 
-        Optional<Path> p =
-            Files.find(Paths.get(basedir), 20, (path, attrs) -> path.getFileName().endsWith("FileUtilsTest.java"))
-                .findFirst();
+        Optional<Path> p = Files
+            .find(Paths.get(basedir), 20, (path, attrs) -> path.getFileName().endsWith("FileUtilsTest.java"))
+            .findFirst();
         assertTrue(p.isPresent());
 
         List<String> lines = FileUtils.readLines(p.get().toFile());
@@ -78,5 +77,16 @@ public class FileUtilsTest {
         List<File> foundFiles2 = FileUtils.getFiles(directory, ".*\\.class$");
 
         assertEquals(foundFiles, foundFiles2);
+    }
+
+    @Test
+    public void testStripPath() {
+        String name = "c:\\boo\foo\\file.txt";
+        name = FileUtils.stripPath(name);
+        assertEquals("file.txt", name);
+
+        name = "/opt/java/jre/bin/java";
+        name = FileUtils.stripPath(name);
+        assertEquals("java", name);
     }
 }
