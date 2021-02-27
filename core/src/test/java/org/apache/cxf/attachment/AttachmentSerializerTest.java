@@ -82,9 +82,9 @@ public class AttachmentSerializerTest {
 
         // Set the SOAP content type
         msg.put(Message.CONTENT_TYPE, soapContentType);
-        String soapCtType = null;
-        String soapCtParams = null;
-        String soapCtParamsEscaped = null;
+        final String soapCtType;
+        final String soapCtParams;
+        final String soapCtParamsEscaped;
         int p = soapContentType.indexOf(';');
         if (p != -1) {
             soapCtParams = soapContentType.substring(p);

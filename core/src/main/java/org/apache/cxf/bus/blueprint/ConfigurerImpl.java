@@ -114,14 +114,12 @@ public class ConfigurerImpl implements Configurer {
         }
 
         if (container instanceof ExtendedBlueprintContainer) {
-            ComponentMetadata cm = null;
             try {
-                cm = container.getComponentMetadata(bn);
+                final ComponentMetadata cm = container.getComponentMetadata(bn);
+                if (cm instanceof BeanMetadata) {
+                    ((ExtendedBlueprintContainer)container).injectBeanInstance((BeanMetadata)cm, beanInstance);
+                }
             } catch (NoSuchComponentException nsce) {
-                cm = null;
-            }
-            if (cm instanceof BeanMetadata) {
-                ((ExtendedBlueprintContainer)container).injectBeanInstance((BeanMetadata)cm, beanInstance);
             }
         }
     }

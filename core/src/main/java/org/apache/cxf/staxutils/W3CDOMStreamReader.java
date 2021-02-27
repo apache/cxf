@@ -289,7 +289,6 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
             schemaType = attr.getSchemaTypeInfo();
         } catch (Throwable t) {
             //DOM level 2?
-            schemaType = null;
         }
         return (schemaType == null) ? "CDATA"
             : schemaType.getTypeName() == null ? "CDATA" : schemaType.getTypeName();

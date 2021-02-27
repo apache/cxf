@@ -309,7 +309,7 @@ public final class Base64Utility {
             out[windex++] = base64Table[(i << 4) & 0x3f];
             if (!urlSafe) {
                 out[windex++] = PAD;
-                out[windex++] = PAD;
+                out[windex] = PAD;
             }
         } else if (rest == 2) {
             int i = ((id[rindex] & 0xff) << 8) + (id[rindex + 1] & 0xff);
@@ -317,7 +317,7 @@ public final class Base64Utility {
             out[windex++] = base64Table[(i >> 4) & 0x3f];
             out[windex++] = base64Table[(i << 2) & 0x3f];
             if (!urlSafe) {
-                out[windex++] = PAD;
+                out[windex] = PAD;
             }
         }
         return out;

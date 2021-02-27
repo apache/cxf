@@ -96,9 +96,8 @@ public class AnnotationInterceptors {
     }
 
     private <T> T initializeAnnotationObject(String annObjectName, Class<T> type) {
-        Object object = null;
         try {
-            object = ClassLoaderUtils.loadClass(annObjectName, this.getClass()).newInstance();
+            final Object object = ClassLoaderUtils.loadClass(annObjectName, this.getClass()).newInstance();
             return type.cast(object);
         } catch (Throwable e) {
             throw new Fault(new org.apache.cxf.common.i18n.Message(
@@ -107,10 +106,8 @@ public class AnnotationInterceptors {
         }
     }
     private <T> T initializeAnnotationObject(Class<T> type) {
-        Object object = null;
         try {
-            object = type.newInstance();
-            return type.cast(object);
+            return type.cast(type.newInstance());
         } catch (Throwable e) {
             throw new Fault(new org.apache.cxf.common.i18n.Message(
                                             "COULD_NOT_CREATE_ANNOTATION_OBJECT",

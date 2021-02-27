@@ -700,7 +700,7 @@ public final class JAXBUtils {
     public static SchemaCompiler createSchemaCompiler() throws JAXBException {
         try {
             Class<?> cls;
-            Object sc = null;
+            Object sc;
             try {
                 cls = Class.forName("com.sun.tools.xjc.api.XJC");
                 sc = cls.getMethod("createSchemaCompiler").invoke(null);

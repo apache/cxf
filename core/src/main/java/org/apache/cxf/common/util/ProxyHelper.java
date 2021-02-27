@@ -34,7 +34,7 @@ import org.apache.cxf.common.logging.LogUtils;
 public class ProxyHelper {
     static final ProxyHelper HELPER;
     static {
-        ProxyHelper theHelper = null;
+        ProxyHelper theHelper;
         try {
             theHelper = new CglibProxyHelper();
         } catch (Throwable ex) {

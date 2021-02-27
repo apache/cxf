@@ -174,10 +174,10 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
 
             if (LOG.isLoggable(Level.FINE)) {
                 StringBuilder buf = new StringBuilder(128).append("Constructing automatic work queue with:\n")
-                        .append("max queue size: ").append(maxQueueSize).append("\n")
-                        .append("initialThreads: ").append(initialThreads).append("\n")
-                        .append("lowWaterMark: ").append(lowWaterMark).append("\n")
-                        .append("highWaterMark: ").append(highWaterMark).append("\n");
+                        .append("max queue size: ").append(maxQueueSize).append('\n')
+                        .append("initialThreads: ").append(initialThreads).append('\n')
+                        .append("lowWaterMark: ").append(lowWaterMark).append('\n')
+                        .append("highWaterMark: ").append(highWaterMark).append('\n');
                 LOG.fine(buf.toString());
             }
 
@@ -200,7 +200,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
                 executor.setCorePoolSize(lowWaterMark);
             }
 
-            ReentrantLock l = null;
+            ReentrantLock l;
             try {
                 Field f = ThreadPoolExecutor.class.getDeclaredField("mainLock");
                 ReflectionUtil.setAccessible(f);

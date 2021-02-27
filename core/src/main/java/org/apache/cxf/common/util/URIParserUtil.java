@@ -83,7 +83,7 @@ public final class URIParserUtil {
     }
     public static String normalize(final String uri) {
         URL url = null;
-        String result = null;
+        String result;
         try {
             url = new URL(uri);
             result = escapeChars(url.toURI().normalize().toString().replace('\\', '/'));

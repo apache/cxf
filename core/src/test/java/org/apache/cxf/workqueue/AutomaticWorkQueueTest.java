@@ -95,7 +95,7 @@ public class AutomaticWorkQueueTest {
         int x = 0;
         try {
             synchronized (lock) {
-                for (x = 0; x < 6; x++) {
+                for (; x < 6; x++) {
                     workqueue.execute(new Runnable() {
                         public void run() {
                             synchronized (lock) {
@@ -385,10 +385,9 @@ public class AutomaticWorkQueueTest {
 
     private static void checkCompleted(DeadLockThread dead) throws InterruptedException {
         int oldCompleted = 0;
-        int newCompleted = 0;
         int noProgressCount = 0;
         while (!dead.isFinished()) {
-            newCompleted = dead.getWorkItemCompletedCount();
+            int newCompleted = dead.getWorkItemCompletedCount();
             if (newCompleted > oldCompleted) {
                 oldCompleted = newCompleted;
                 noProgressCount = 0;

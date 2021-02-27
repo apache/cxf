@@ -58,7 +58,7 @@ public class Message implements Serializable {
     }
 
     public String toString() {
-        String fmt = null;
+        final String fmt;
         try {
             if (null == bundle) {
                 return code;

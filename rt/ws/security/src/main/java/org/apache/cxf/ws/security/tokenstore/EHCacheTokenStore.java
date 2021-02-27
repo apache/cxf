@@ -94,7 +94,6 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
         }
     }
 
-    @SuppressWarnings("unchecked")
     public Collection<String> getTokenIdentifiers() {
         if (cache == null) {
             return null;

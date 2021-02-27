@@ -64,7 +64,7 @@ public abstract class AbstractFaultChainInitiatorObserver implements MessageObse
 
             Exchange exchange = message.getExchange();
 
-            Message faultMessage = null;
+            Message faultMessage;
 
             // now that we have switched over to the fault chain,
             // prevent any further operations on the in/out message

@@ -229,7 +229,6 @@ public final class LogUtils {
         }
         String bundleName = name;
         try {
-            Logger logger = null;
             ResourceBundle b = null;
             if (bundleName == null) {
                 //grab the bundle prior to the call to Logger.getLogger(...) so the
@@ -278,6 +277,7 @@ public final class LogUtils {
                 }
             }
 
+            Logger logger;
             try {
                 logger = Logger.getLogger(loggerName, bundleName); //NOPMD
             } catch (IllegalArgumentException iae) {
@@ -285,8 +285,6 @@ public final class LogUtils {
                 logger = Logger.getLogger(loggerName); //NOPMD
             } catch (MissingResourceException rex) {
                 logger = Logger.getLogger(loggerName); //NOPMD
-            } finally {
-                b = null;
             }
             return logger;
         } finally {

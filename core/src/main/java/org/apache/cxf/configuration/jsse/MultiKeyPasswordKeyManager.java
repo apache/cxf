@@ -52,7 +52,7 @@ public class MultiKeyPasswordKeyManager implements X509KeyManager {
         };
     }
     public X509Certificate[] getCertificateChain(String alias) {
-        Certificate[] chain = null;
+        final Certificate[] chain;
         try {
             chain = mKeyStore.getCertificateChain(alias);
         } catch (KeyStoreException kse) {

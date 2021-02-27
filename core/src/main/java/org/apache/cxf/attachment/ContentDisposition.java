@@ -56,7 +56,7 @@ public class ContentDisposition {
         String extendedFilename = null;
         Matcher m = CD_HEADER_PARAMS_PATTERN.matcher(tempValue);
         while (m.find()) {
-            String paramName = null;
+            final String paramName;
             String paramValue = "";
 
             String groupValue = m.group().trim();

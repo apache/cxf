@@ -70,8 +70,7 @@ class SpringClassUnwrapper implements ClassUnwrapper {
             try {
                 TargetSource targetSource = advised.getTargetSource();
 
-                Object target = null;
-
+                final Object target;
                 try {
                     target = targetSource.getTarget();
                 } catch (BeanCreationException ex) {

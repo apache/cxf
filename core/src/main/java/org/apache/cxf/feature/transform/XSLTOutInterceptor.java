@@ -192,9 +192,8 @@ public class XSLTOutInterceptor extends AbstractXSLTInterceptor {
 
         @Override
         protected void doClose() {
-            Reader transformedReader = null;
             try {
-                transformedReader = XSLTUtils.transform(xsltTemplate, getReader());
+                final Reader transformedReader = XSLTUtils.transform(xsltTemplate, getReader());
                 IOUtils.copyAndCloseInput(transformedReader, origWriter, IOUtils.DEFAULT_BUFFER_SIZE);
             } catch (IOException e) {
                 throw new Fault("READER_COPY", LOG, e, e.getMessage());

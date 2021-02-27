@@ -177,10 +177,8 @@ public class Extension {
             } catch (Throwable nex) {
                 notFound = true;
                 if (!optional) {
-                    if (origEx != null) {
-                        ex = origEx;
-                    }
-                    throw new ExtensionException(new Message("PROBLEM_LOADING_EXTENSION_CLASS", LOG, name), ex);
+                    throw new ExtensionException(new Message("PROBLEM_LOADING_EXTENSION_CLASS", LOG, name),
+                        origEx != null ? origEx : ex);
                 }
             }
         }

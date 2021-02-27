@@ -258,7 +258,7 @@ public class AttachmentSerializer {
                 writer.write("\r\n--");
                 writer.write(bodyBoundary);
 
-                Map<String, List<String>> headers = null;
+                final Map<String, List<String>> headers;
                 Iterator<String> it = a.getHeaderNames();
                 if (it.hasNext()) {
                     headers = new LinkedHashMap<>();

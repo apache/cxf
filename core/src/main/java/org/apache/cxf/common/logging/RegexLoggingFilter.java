@@ -28,9 +28,9 @@ public class RegexLoggingFilter {
     public static final String DEFAULT_REPLACEMENT = "*****";
 
     private static class ReplaceRegEx {
-        private Pattern pattern;
-        private int group = 1;
-        private String replacement;
+        private final Pattern pattern;
+        private final int group;
+        private final String replacement;
 
         ReplaceRegEx(String pattern, int group, String replacement) {
             this.pattern = Pattern.compile(pattern);

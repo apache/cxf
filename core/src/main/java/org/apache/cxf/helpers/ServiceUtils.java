@@ -247,7 +247,7 @@ public final class ServiceUtils {
      */
     public static String makePackageName(String namespace) {
 
-        String hostname = null;
+        String hostname;
         String path = "";
 
         // get the target namespace of the document

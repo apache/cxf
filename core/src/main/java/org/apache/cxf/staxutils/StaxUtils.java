@@ -200,7 +200,6 @@ public final class StaxUtils {
             }
         } catch (Throwable t) {
             //ignore, can always drop down to the pooled factories
-            xif = null;
         }
         SAFE_INPUT_FACTORY = xif;
 
@@ -304,7 +303,6 @@ public final class StaxUtils {
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.log(Level.FINE, "XMLInputFactory.newInstance() failed with: ", t);
             }
-            factory = null;
         }
         if (factory == null || !setRestrictionProperties(factory)) {
             try {
