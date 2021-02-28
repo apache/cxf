@@ -91,7 +91,7 @@ public class CommandLineParser {
         Attr attr =
             commandEl.getOwnerDocument().createAttributeNS("http://www.w3.org/2001/XMLSchema-instance",
                                                                    "xsi:schemaLocation");
-        attr.setValue("http://cxf.apache.org/Xutil/Command http://cxf.apache.org/schema/xutil/commnad.xsd");
+        attr.setValue("http://cxf.apache.org/Xutil/Command http://cxf.apache.org/schema/xutil/command.xsd");
         commandEl.setAttributeNodeNS(attr);
         commandEl.setAttribute("xmlns", "http://cxf.apache.org/Xutil/Command");
         commandEl.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
