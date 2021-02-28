@@ -47,7 +47,7 @@
         <site.deploy.url>scp://people.apache.org/www/cxf.apache.org/maven-site</site.deploy.url>
         <maven-owasp-plugin-version>6.0.4</maven-owasp-plugin-version>
         <sonar.projectKey>ayojava_Software-Engineering-Methodologies</sonar.projectKey>
-        <sonar.moduleKey>${artifactId}</sonar.moduleKey>
+        <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
         <sonar.organization>software-engrg-methodologies</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.sources>rt\features\logging</sonar.sources>
