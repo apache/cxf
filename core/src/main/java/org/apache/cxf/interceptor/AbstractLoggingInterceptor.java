@@ -66,6 +66,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     protected long threshold = -1;
     protected PrintWriter writer;
     protected boolean prettyLogging;
+    protected boolean regexLogging;
     private boolean showBinaryContent;
     private boolean showMultipartContent = true;
     private List<String> binaryContentMediaTypes = BINARY_CONTENT_MEDIA_TYPES;
@@ -148,8 +149,16 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         prettyLogging = flag;
     }
 
+    public void setRegexLogging(boolean flag) {
+        regexLogging = flag;
+    }
+
     public boolean isPrettyLogging() {
         return prettyLogging;
+    }
+
+    public boolean isRegexLogging() {
+        return regexLogging;
     }
 
     public void setInMemThreshold(long t) {
@@ -164,7 +173,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
                                 String encoding, String contentType, boolean truncated)
         throws Exception {
         // Just transform the XML message when the cos has content
-        if (!truncated && isPrettyLogging() && contentType != null && contentType.contains("xml")
+        if (!truncated && isPrettyLogging() && isRegexLogging() && contentType != null && contentType.contains("xml")
             && !contentType.toLowerCase().contains("multipart/related") && cos.size() > 0) {
 
             StringWriter swriter = new StringWriter();
@@ -205,6 +214,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
                                 String contentType)
         throws Exception {
         if (isPrettyLogging()
+            && isRegexLogging()
             && contentType != null
             && contentType.contains("xml")
             && stringWriter.getBuffer().length() > 0) {

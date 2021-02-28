@@ -101,7 +101,7 @@ public class TestRegexLoggingFilter {
         };
 
         RegexLoggingFilter regexFilter = new RegexLoggingFilter(dummy, regex);
-        regexFilter.setRegexFilterLogging(true);
+        regexFilter.setRegexLogging(true);
         regexFilter.send(logEvent);
         assertEquals(expected, logEvent.getPayload());
     }
