@@ -57,6 +57,11 @@ public @interface Logging {
     boolean pretty() default false;
 
     /**
+     * For XML content, turn on regex printing in the logs
+     */
+    boolean regex() default false;
+
+    /**
      * Ignore binary payloads by default
      */
     boolean showBinary() default false;

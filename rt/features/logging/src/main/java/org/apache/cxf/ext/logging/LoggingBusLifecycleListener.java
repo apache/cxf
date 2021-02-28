@@ -30,14 +30,23 @@ public class LoggingBusLifecycleListener implements BusLifeCycleListener {
     
     static final boolean FORCE_LOGGING;
     static final boolean FORCE_PRETTY;
+    static final boolean FORCE_REGEX;
     static {
         boolean b = false;
         boolean pretty = false;
+        boolean reg = false;
         try {
             String prop = System.getProperty("org.apache.cxf.logging.enabled", "false");
-            if ("pretty".equals(prop)) {
+            if (("pretty".equals(prop)) && ("regex".equals(prop))) {
                 b = true;
                 pretty = true;
+                reg = true;
+            } else if ("pretty".equals(prop)) {
+                b = true;
+                pretty = true;
+            } else if ("regex".equals(prop)) {
+                b = true;
+                reg = true;
             } else {
                 b = Boolean.parseBoolean(prop);
                 //treat these all the same
@@ -51,6 +60,7 @@ public class LoggingBusLifecycleListener implements BusLifeCycleListener {
         }
         FORCE_LOGGING = b;
         FORCE_PRETTY = pretty;
+        FORCE_REGEX = reg;
     }
 
     private final Bus bus;
@@ -65,6 +75,7 @@ public class LoggingBusLifecycleListener implements BusLifeCycleListener {
         if (FORCE_LOGGING) {
             LoggingFeature feature = new LoggingFeature();
             feature.setPrettyLogging(FORCE_PRETTY);
+            feature.setRegexLogging(FORCE_REGEX);
             bus.getFeatures().add(feature);
             feature.initialize(bus);
         }

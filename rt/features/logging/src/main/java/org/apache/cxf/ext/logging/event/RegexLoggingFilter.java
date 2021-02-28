@@ -43,6 +43,12 @@ public class RegexLoggingFilter implements LogEventSender {
         this.replacer = "";
     }
 
+    public RegexLoggingFilter(LogEventSender next) {
+        this.next = next;
+        this.regexPattern = null;
+        this.replacer = "";
+    }
+
     @Override
     public void send(LogEvent event) {
         if (shouldFilter(event)) {
@@ -77,7 +83,7 @@ public class RegexLoggingFilter implements LogEventSender {
         this.next = next;
     }
 
-    public void setRegexFilterLogging(boolean filterLoggingEnabled) {
+    public void setRegexLogging(boolean filterLoggingEnabled) {
         this.filterLogging = filterLoggingEnabled;
     }
 }

@@ -64,6 +64,7 @@ public class LoggingFactoryBeanListener implements FactoryBeanListener {
             LoggingFeature lf = new LoggingFeature();
             lf.setInMemThreshold(annotation.inMemThresHold());
             lf.setPrettyLogging(annotation.pretty());
+            lf.setRegexLogging(annotation.regex());
             lf.setLimit(annotation.limit());
             lf.setLogBinary(annotation.logBinary());
             lf.setLogMultipart(annotation.logMultipart());

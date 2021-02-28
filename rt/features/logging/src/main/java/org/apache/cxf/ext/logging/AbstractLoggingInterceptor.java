@@ -27,6 +27,7 @@ import org.apache.cxf.ext.logging.event.DefaultLogEventMapper;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.ext.logging.event.LogEventSender;
 import org.apache.cxf.ext.logging.event.PrettyLoggingFilter;
+import org.apache.cxf.ext.logging.event.RegexLoggingFilter;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -90,6 +91,12 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     public void setPrettyLogging(boolean prettyLogging) {
         if (sender instanceof PrettyLoggingFilter) {
             ((PrettyLoggingFilter)this.sender).setPrettyLogging(prettyLogging);
+        }
+    }
+
+    public void setRegexLogging(boolean regexLogging) {
+        if (sender instanceof RegexLoggingFilter) {
+            ((RegexLoggingFilter)this.sender).setRegexLogging(regexLogging);
         }
     }
 
