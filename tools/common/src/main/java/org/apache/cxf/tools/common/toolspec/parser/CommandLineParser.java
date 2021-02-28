@@ -86,14 +86,14 @@ public class CommandLineParser {
 
         final Document resultDoc = DOMUtils.newDocument();
 
-        Element commandEl = resultDoc.createElementNS("http://cxf.apache.org/Xutil/Command", "command");
+        Element commandEl = resultDoc.createElementNS("http://cxf.apache.org/Xpipe/Command", "command");
 
         Attr attr =
             commandEl.getOwnerDocument().createAttributeNS("http://www.w3.org/2001/XMLSchema-instance",
                                                                    "xsi:schemaLocation");
-        attr.setValue("http://cxf.apache.org/Xutil/Command http://cxf.apache.org/schema/xutil/command.xsd");
+        attr.setValue("http://cxf.apache.org/Xpipe/Command http://cxf.apache.org/schema/xpipe/Command.xsd");
         commandEl.setAttributeNodeNS(attr);
-        commandEl.setAttribute("xmlns", "http://cxf.apache.org/Xutil/Command");
+        commandEl.setAttribute("xmlns", "http://cxf.apache.org/Xpipe/Command");
         commandEl.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
         resultDoc.appendChild(commandEl);
 
