@@ -90,4 +90,4 @@ Thank you for using CXF!
 The Apache CXF Team
 http://cxf.apache.org/
 
-Only for school project.
+Only for school project..
