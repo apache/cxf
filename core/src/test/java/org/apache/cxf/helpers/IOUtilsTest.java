@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.helpers;
 
-
-
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 
@@ -29,32 +29,77 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class IOUtilsTest {
 
-
     @Test
     public void testIsEmpty() throws Exception {
-        assertTrue(IOUtils.isEmpty(new ByteArrayInputStream(new byte[]{})));
+        assertTrue(IOUtils.isEmpty(new ByteArrayInputStream(new byte[] {})));
     }
+
     @Test
     public void testNonEmpty() throws Exception {
         InputStream is = new ByteArrayInputStream("Hello".getBytes());
         assertFalse(IOUtils.isEmpty(is));
         assertEquals("Hello", IOUtils.toString(is));
     }
+
     @Test
     public void testNonEmptyWithPushBack() throws Exception {
-        InputStream is = new PushbackInputStream(
-                             new ByteArrayInputStream("Hello".getBytes()));
+        InputStream is = new PushbackInputStream(new ByteArrayInputStream("Hello".getBytes()));
         assertFalse(IOUtils.isEmpty(is));
         assertEquals("Hello", IOUtils.toString(is));
     }
+
     @Test
     public void testInputStreamWithNoMark() throws Exception {
         String data = "this is some data";
         InputStream is = new UnMarkedInputStream(data.getBytes());
         assertFalse(IOUtils.isEmpty(is));
         assertEquals(data, IOUtils.toString(is));
+    }
+
+    @Test
+    public void testCopy() throws IOException {
+        byte[] inBytes = "Foo".getBytes(IOUtils.UTF8_CHARSET);
+        ByteArrayInputStream is = new ByteArrayInputStream(inBytes);
+        ByteArrayOutputStream os = new ByteArrayOutputStream(inBytes.length);
+        IOUtils.copy(is, os);
+        byte[] outBytes = os.toByteArray();
+        String expectedString = new String(outBytes, IOUtils.UTF8_CHARSET);
+        assertEquals("Foo", expectedString);
+    }
+
+    @Test(expected = IOException.class)
+    public void testCopyAndCloseInput() throws IOException {
+        InputStream is = getClass().getResourceAsStream("/wsdl/foo.wsdl");
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        IOUtils.copyAndCloseInput(is, os);
+        is.read();
+        fail("InputStream should be closed");
+    }
+
+    @Test
+    public void testCopyAtLeast() throws IOException {
+        byte[] bytes = "Foo".getBytes(IOUtils.UTF8_CHARSET);
+        ByteArrayInputStream is = new ByteArrayInputStream(bytes);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        int atLeast = 5; // greater than inputStream length
+        IOUtils.copyAtLeast(is, os, atLeast);
+        assertEquals(3, os.toByteArray().length);
+
+        is = new ByteArrayInputStream(bytes);
+        os = new ByteArrayOutputStream(3);
+        atLeast = 3; // equal to inputStream length
+        IOUtils.copyAtLeast(is, os, atLeast);
+        assertEquals(atLeast, os.toByteArray().length);
+
+        is = new ByteArrayInputStream(bytes);
+        os = new ByteArrayOutputStream();
+        atLeast = 2; // less than inpuStream length
+        IOUtils.copyAtLeast(is, os, atLeast);
+        assertEquals(atLeast, os.toByteArray().length);
+
     }
 }
