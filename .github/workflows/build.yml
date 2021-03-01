@@ -9,6 +9,7 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    timeout-minutes: 2880
     steps:
       - uses: actions/checkout@v2
         with:
@@ -33,4 +34,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B -fn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -DskipTests
+        run: mvn -B -fn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
