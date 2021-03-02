@@ -44,7 +44,7 @@ public class JavaxAnnotationHandlerChainBuilderTest {
 
     @Test
     public void testFindHandlerChainAnnotation() {
-        HandlerTestImpl handlerTestImpl = new HandlerTestImpl();
+        JavaxHandlerTestImpl handlerTestImpl = new JavaxHandlerTestImpl();
         AnnotationHandlerChainBuilder chainBuilder = new AnnotationHandlerChainBuilder();
         @SuppressWarnings("rawtypes")
         List<Handler> handlers = chainBuilder
@@ -67,7 +67,7 @@ public class JavaxAnnotationHandlerChainBuilderTest {
 
     @Test
     public void testFindHandlerChainAnnotationPerPortServiceBinding() {
-        HandlerTestImpl handlerTestImpl = new HandlerTestImpl();
+        JavaxHandlerTestImpl handlerTestImpl = new JavaxHandlerTestImpl();
         AnnotationHandlerChainBuilder chainBuilder = new AnnotationHandlerChainBuilder();
         QName portQName = new QName("namespacedoesntsupportyet", "SoapPort1");
         QName serviceQName = new QName("namespacedoesntsupportyet", "SoapService1");
@@ -81,7 +81,7 @@ public class JavaxAnnotationHandlerChainBuilderTest {
 
     @Test
     public void testFindHandlerChainAnnotationPerPortServiceBindingNegative() {
-        HandlerTestImpl handlerTestImpl = new HandlerTestImpl();
+        JavaxHandlerTestImpl handlerTestImpl = new JavaxHandlerTestImpl();
         AnnotationHandlerChainBuilder chainBuilder = new AnnotationHandlerChainBuilder();
         QName portQName = new QName("namespacedoesntsupportyet", "SoapPortUnknown");
         QName serviceQName = new QName("namespacedoesntsupportyet", "SoapServiceUnknown");
@@ -95,7 +95,7 @@ public class JavaxAnnotationHandlerChainBuilderTest {
 
     @Test
     public void testFindHandlerChainAnnotationPerPortServiceBindingWildcard() {
-        HandlerTestImpl handlerTestImpl = new HandlerTestImpl();
+        JavaxHandlerTestImpl handlerTestImpl = new JavaxHandlerTestImpl();
         AnnotationHandlerChainBuilder chainBuilder = new AnnotationHandlerChainBuilder();
         QName portQName = new QName("http://apache.org/handler_test", "SoapPortWildcard");
         QName serviceQName = new QName("http://apache.org/handler_test", "SoapServiceWildcard");
@@ -138,8 +138,7 @@ public class JavaxAnnotationHandlerChainBuilderTest {
 
     @WebService()
     @HandlerChain(file = "./javax-handlers.xml", name = "TestHandlerChain")
-    public class HandlerTestImpl {
+    public class JavaxHandlerTestImpl {
 
     }
-
 }
