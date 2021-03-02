@@ -109,8 +109,7 @@ public final class CustomizationParser {
 
         // Schema Namespace to Package customizations
         for (String ns : env.getNamespacePackageMap().keySet()) {
-            File file = JAXBUtils.getPackageMappingSchemaBindingFile(ns, env.mapPackageName(ns));
-            packageFiles.add(new InputSource(file.toURI().toString()));
+            packageFiles.add(JAXBUtils.getPackageMappingSchemaBinding(ns, env.mapPackageName(ns)));
         }
     }
 

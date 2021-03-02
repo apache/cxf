@@ -468,13 +468,8 @@ public class JAXBDataBinding implements DataBindingProfile {
 
     private void parseSchemas(SchemaCompiler schemaCompiler) {
         for (String ns : context.getNamespacePackageMap().keySet()) {
-            File file = JAXBUtils.getPackageMappingSchemaBindingFile(ns, context.mapPackageName(ns));
-            try {
-                InputSource ins = new InputSource(file.toURI().toString());
-                schemaCompiler.parseSchema(ins);
-            } finally {
-                FileUtils.delete(file);
-            }
+            schemaCompiler.parseSchema(
+                JAXBUtils.getPackageMappingSchemaBinding(ns, context.mapPackageName(ns)));
         }
 
         if (context.getPackageName() != null) {
