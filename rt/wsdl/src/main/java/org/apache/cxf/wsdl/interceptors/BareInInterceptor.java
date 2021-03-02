@@ -103,9 +103,8 @@ public class BareInInterceptor extends AbstractInDatabindingInterceptor {
 
         while (StaxUtils.toNextElement(xmlReader)) {
             QName elName = xmlReader.getName();
-            Object o = null;
 
-            MessagePartInfo p;
+            final MessagePartInfo p;
             if (msgInfo != null && msgInfo.getMessageParts() != null) {
                 assert msgInfo.getMessageParts().size() > paramNum;
                 p = msgInfo.getMessageParts().get(paramNum);
@@ -118,6 +117,7 @@ public class BareInInterceptor extends AbstractInDatabindingInterceptor {
                                 Fault.FAULT_CODE_CLIENT);
             }
 
+            final Object o;
             try {
                 o = dr.read(p, xmlReader);
             } catch (Fault fault) {

@@ -517,7 +517,7 @@ public class WSDLServiceBuilder {
                 if (bop.getBindingOutput() != null) {
                     outName = bop.getBindingOutput().getName();
                 }
-                BindingOperationInfo bop2 = null;
+                final BindingOperationInfo bop2;
                 if (onlyExtensors) {
                     bop2 = bi.getOperation(new QName(binding.getQName().getNamespaceURI(),
                                                        bop.getName()));
@@ -698,9 +698,8 @@ public class WSDLServiceBuilder {
         }
         // RULE No.3:
         // The output message part refers to a global element declaration
-        MessagePartInfo outputPart = null;
         if (outputMessage != null && outputMessage.size() == 1) {
-            outputPart = outputMessage.getMessagePartByIndex(0);
+            final MessagePartInfo outputPart = outputMessage.getMessagePartByIndex(0);
             if (outputPart != null) {
                 if (!outputPart.isElement()
                     || schemas.getElementByQName(outputPart.getElementQName()) == null) {
@@ -727,7 +726,7 @@ public class WSDLServiceBuilder {
                                                      inputMessage.getName());
         MessageInfo unwrappedOutput = null;
 
-        XmlSchemaComplexType xsct = null;
+        XmlSchemaComplexType xsct;
         if (inputEl.getSchemaType() instanceof XmlSchemaComplexType) {
 
             xsct = (XmlSchemaComplexType)inputEl.getSchemaType();

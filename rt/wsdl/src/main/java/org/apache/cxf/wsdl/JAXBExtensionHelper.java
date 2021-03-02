@@ -347,7 +347,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
         try {
             u = createUnmarshaller();
 
-            Object o = null;
+            Object o;
             if (namespace == null) {
                 o = u.unmarshal(element, extensionClass);
             } else {

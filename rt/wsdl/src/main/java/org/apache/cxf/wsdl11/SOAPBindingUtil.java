@@ -79,7 +79,7 @@ public final class SOAPBindingUtil {
         /*
          * If we put proxies into the loader of the proxied class, they'll just pile up.
          */
-        Object proxy = null;
+        Object proxy;
         try {
             proxy = Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
                                               new Class[] {cls}, ih);
@@ -303,7 +303,6 @@ public final class SOAPBindingUtil {
     public static boolean isMixedStyle(Binding binding) {
         String bindingStyle = "";
         String previousOpStyle = "";
-        String style = "";
 
         for (Object obj : binding.getExtensibilityElements()) {
             if (isSOAPBinding(obj)) {
@@ -319,7 +318,7 @@ public final class SOAPBindingUtil {
             for (Object obj : bop.getExtensibilityElements()) {
                 if (isSOAPOperation(obj)) {
                     SOAPOperation soapOperation = getSoapOperation(obj);
-                    style = soapOperation.getStyle();
+                    String style = soapOperation.getStyle();
                     if (style == null) {
                         style = "";
                     }
@@ -372,7 +371,7 @@ public final class SOAPBindingUtil {
 
     public static SOAPAddress createSoapAddress(ExtensionRegistry extReg, boolean isSOAP12)
         throws WSDLException {
-        ExtensibilityElement extElement = null;
+        final ExtensibilityElement extElement;
         if (isSOAP12) {
             extElement = extReg.createExtension(Port.class,
                                                                WSDLConstants.QNAME_SOAP12_BINDING_ADDRESS);
@@ -385,7 +384,7 @@ public final class SOAPBindingUtil {
 
     public static SOAPBody createSoapBody(ExtensionRegistry extReg, Class<?> clz, boolean isSOAP12)
         throws WSDLException {
-        ExtensibilityElement extElement = null;
+        final ExtensibilityElement extElement;
         if (isSOAP12) {
             extElement = extReg.createExtension(clz, new QName(WSDLConstants.NS_SOAP12,
                                                                            "body"));
@@ -398,7 +397,7 @@ public final class SOAPBindingUtil {
 
     public static SOAPBinding createSoapBinding(ExtensionRegistry extReg, boolean isSOAP12)
         throws WSDLException {
-        ExtensibilityElement extElement = null;
+        final ExtensibilityElement extElement;
         if (isSOAP12) {
             extElement = extReg.createExtension(Binding.class,
                                                                new QName(WSDLConstants.NS_SOAP12,
@@ -415,7 +414,7 @@ public final class SOAPBindingUtil {
 
     public static SOAPOperation createSoapOperation(ExtensionRegistry extReg, boolean isSOAP12)
         throws WSDLException {
-        ExtensibilityElement extElement = null;
+        final ExtensibilityElement extElement;
         if (isSOAP12) {
             extElement = extReg.createExtension(BindingOperation.class,
                                                                  new QName(WSDLConstants.NS_SOAP12,
@@ -430,7 +429,7 @@ public final class SOAPBindingUtil {
 
     public static SOAPFault createSoapFault(ExtensionRegistry extReg, boolean isSOAP12)
         throws WSDLException {
-        ExtensibilityElement extElement = null;
+        final ExtensibilityElement extElement;
         if (isSOAP12) {
             extElement = extReg.createExtension(BindingFault.class,
                                                              new QName(WSDLConstants.NS_SOAP12,
@@ -445,7 +444,7 @@ public final class SOAPBindingUtil {
 
     public static SOAPHeader createSoapHeader(ExtensionRegistry extReg, Class<?> clz, boolean isSOAP12)
         throws WSDLException {
-        ExtensibilityElement extElement = null;
+        final ExtensibilityElement extElement;
         if (isSOAP12) {
             extElement = extReg.createExtension(clz,
                                                               new QName(WSDLConstants.NS_SOAP12,

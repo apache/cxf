@@ -145,8 +145,8 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
     public static final String METHOD_ANNOTATIONS = "method.return.annotations";
     public static final String PARAM_ANNOTATION = "parameter.annotations";
     private static final Logger LOG = LogUtils.getL7dLogger(ReflectionServiceFactoryBean.class);
-    private static final boolean DO_VALIDATE = SystemPropertyAction.getProperty("cxf.validateServiceSchemas", "false")
-            .equals("true");
+    private static final boolean DO_VALIDATE = "true".equals(
+        SystemPropertyAction.getProperty("cxf.validateServiceSchemas", "false"));
 
     private static Class<? extends DataBinding> defaultDatabindingClass;
 
@@ -819,7 +819,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
 
         MessagePartInfo part = null;
         if (isIn && !isOut) {
-            QName name = getInPartName(o, method, i);
+            final QName name = getInPartName(o, method, i);
             part = o.getInput().getMessagePart(name);
             if (part == null && isFromWsdl()) {
                 part = o.getInput().getMessagePartByIndex(i);
@@ -832,7 +832,6 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
                     part = o.getInput().getMessagePart(name2);
                     if (part != null) {
                         add = false;
-                        name = name2;
                     }
                 }
                 if (part != null) {
@@ -949,7 +948,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
                     LOG.log(Level.WARNING, message.toString());
                 }
                 for (MessagePartInfo mpi : mpis) {
-                    String ns = null;
+                    final String ns;
                     if (mpi.isElement()) {
                         ns = mpi.getElementQName().getNamespaceURI();
                     } else {
@@ -1197,7 +1196,6 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
         int paraNumber = 0;
         for (MessagePartInfo mpi : messageParts) {
             SchemaInfo schemaInfo = null;
-            XmlSchema schema = null;
 
             QName qname = (QName)mpi.getProperty(ELEMENT_NAME);
             if (messageParts.size() == 1 && qname == null) {
@@ -1225,6 +1223,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
                 }
             }
 
+            final XmlSchema schema;
             if (schemaInfo == null) {
                 schemaInfo = getOrCreateSchema(serviceInfo, qname.getNamespaceURI(), true);
                 schema = schemaInfo.getSchema();

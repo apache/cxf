@@ -223,7 +223,7 @@ public class WSDLManagerImpl implements WSDLManager {
                                                                                 catLocator,
                                                                                 bus);
         InputSource src = wsdlLocator.getBaseInputSource();
-        Definition def = null;
+        final Definition def;
         if (src.getByteStream() != null || src.getCharacterStream() != null) {
             final Document doc;
             XMLStreamReader xmlReader = null;

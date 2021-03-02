@@ -149,9 +149,8 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                     setMessage(message, bop, client, si, msgInfo.getMessageInfo());
                 }
 
-                Collection<OperationInfo> operations = null;
-                operations = new ArrayList<>();
-                operations.addAll(si.getInterface().getOperations());
+                final Collection<OperationInfo> operations = new ArrayList<>(
+                    si.getInterface().getOperations());
 
                 if (xmlReader == null || !StaxUtils.toNextElement(xmlReader)) {
                     // empty input
@@ -165,7 +164,6 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
 
                 do {
                     QName elName = xmlReader.getName();
-                    Object o = null;
 
                     MessagePartInfo p;
                     if (!client && msgInfo != null && msgInfo.getMessageParts() != null
@@ -191,7 +189,7 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                         validatePart(p, elName, message);
                     }
 
-                    o = dr.read(p, xmlReader);
+                    final Object o = dr.read(p, xmlReader);
                     if (forceDocLitBare && parameters.isEmpty()) {
                         // webservice provider does not need to ensure size
                         parameters.add(o);

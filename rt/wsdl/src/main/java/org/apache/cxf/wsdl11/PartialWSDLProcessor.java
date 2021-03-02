@@ -64,11 +64,10 @@ public final class PartialWSDLProcessor  {
         if (portTypes == null || portTypes.isEmpty()) {
             return false;
         }
-        String existPortTypeName = null;
         PortType portType = null;
         try {
             for (Entry<QName, PortType> entry : portTypes.entrySet()) {
-                existPortTypeName = entry.getKey().getLocalPart();
+                String existPortTypeName = entry.getKey().getLocalPart();
                 if (name.getLocalPart().contains(existPortTypeName)) {
                     portType = entry.getValue();
                     break;

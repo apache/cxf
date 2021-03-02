@@ -48,8 +48,8 @@ public class BareOutInterceptor extends AbstractOutDatabindingInterceptor {
             return;
         }
 
-        List<MessagePartInfo> parts = null;
-        BindingMessageInfo bmsg = null;
+        final List<MessagePartInfo> parts;
+        final BindingMessageInfo bmsg;
         boolean client = isRequestor(message);
 
         if (!client) {
