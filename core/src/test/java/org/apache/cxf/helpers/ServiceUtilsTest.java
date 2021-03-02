@@ -17,7 +17,6 @@
  * under the License.
  */
 
-
 package org.apache.cxf.helpers;
 
 import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
@@ -48,7 +47,6 @@ public class ServiceUtilsTest {
         String tns = ServiceUtils.makeNamespaceFromClassName("com.example.ws.Test", "http");
         assertEquals("http://ws.example.com/", tns);
     }
-
 
     @Test
     public void testRequestResponseTypes() {
@@ -172,5 +170,24 @@ public class ServiceUtilsTest {
         EasyMock.expect(msg.get(Message.REQUESTOR_ROLE)).andReturn(isRequestor);
 
         control.replay();
+    }
+
+    @Test
+    public void testMakeNamespaceFromClassName() {
+        String nameSpace = ServiceUtils.makeNamespaceFromClassName("Foo", "http");
+        assertEquals("http://DefaultNamespace", nameSpace);
+
+        nameSpace = ServiceUtils.makeNamespaceFromClassName(this.getClass().getName(), "http");
+        assertEquals("http://helpers.cxf.apache.org/", nameSpace);
+
+    }
+
+    @Test
+    public void testMakePackageName() {
+        String packageName = ServiceUtils.makePackageName("http://www.w3.org/TR/html4/");
+        assertEquals("org.w3.www.TR.html4", packageName);
+
+        packageName = ServiceUtils.makePackageName("http://www.w3.org");
+        assertEquals("org.w3.www", packageName);
     }
 }
