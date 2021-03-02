@@ -23,7 +23,11 @@ import java.util.List;
 
 import javax.jws.HandlerChain;
 import javax.jws.WebService;
+import javax.xml.namespace.QName;
 import javax.xml.ws.handler.Handler;
+import javax.xml.ws.handler.LogicalHandler;
+import javax.xml.ws.handler.LogicalMessageContext;
+import javax.xml.ws.handler.MessageContext;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -39,8 +43,8 @@ public class JakartaAnnotationHandlerChainBuilderTest {
     }
 
     @Test
-    public void testFindJakartaEmptyHandlerChainAnnotation() {
-        HandlerTestImpl handlerTestImpl = new HandlerTestImpl();
+    public void testFindHandlerChainAnnotation() {
+        JakartaHandlerTestImpl handlerTestImpl = new JakartaHandlerTestImpl();
         AnnotationHandlerChainBuilder chainBuilder = new AnnotationHandlerChainBuilder();
         @SuppressWarnings("rawtypes")
         List<Handler> handlers = chainBuilder
@@ -49,13 +53,92 @@ public class JakartaAnnotationHandlerChainBuilderTest {
                                         null,
                                         null);
         assertNotNull(handlers);
-        assertEquals(0, handlers.size());
+        assertEquals(9, handlers.size());
+        assertEquals(TestLogicalHandler.class, handlers.get(0).getClass());
+        assertEquals(TestLogicalHandler.class, handlers.get(1).getClass());
+        assertEquals(TestLogicalHandler.class, handlers.get(2).getClass());
+        assertEquals(TestLogicalHandler.class, handlers.get(3).getClass());
+        assertEquals(TestLogicalHandler.class, handlers.get(4).getClass());
+        assertEquals(TestLogicalHandler.class, handlers.get(5).getClass());
+        assertEquals(TestLogicalHandler.class, handlers.get(6).getClass());
+        assertEquals(TestProtocolHandler.class, handlers.get(7).getClass());
+        assertEquals(TestProtocolHandler.class, handlers.get(8).getClass());
+    }
+
+    @Test
+    public void testFindHandlerChainAnnotationPerPortServiceBinding() {
+        JakartaHandlerTestImpl handlerTestImpl = new JakartaHandlerTestImpl();
+        AnnotationHandlerChainBuilder chainBuilder = new AnnotationHandlerChainBuilder();
+        QName portQName = new QName("namespacedoesntsupportyet", "SoapPort1");
+        QName serviceQName = new QName("namespacedoesntsupportyet", "SoapService1");
+        String bindingID = "http://schemas.xmlsoap.org/wsdl/soap/http";
+        @SuppressWarnings("rawtypes")
+        List<Handler> handlers = chainBuilder
+            .buildHandlerChainFromClass(handlerTestImpl.getClass(), portQName, serviceQName, bindingID);
+        assertNotNull(handlers);
+        assertEquals(5, handlers.size());
+    }
+
+    @Test
+    public void testFindHandlerChainAnnotationPerPortServiceBindingNegative() {
+        JakartaHandlerTestImpl handlerTestImpl = new JakartaHandlerTestImpl();
+        AnnotationHandlerChainBuilder chainBuilder = new AnnotationHandlerChainBuilder();
+        QName portQName = new QName("namespacedoesntsupportyet", "SoapPortUnknown");
+        QName serviceQName = new QName("namespacedoesntsupportyet", "SoapServiceUnknown");
+        String bindingID = "BindingUnknow";
+        @SuppressWarnings("rawtypes")
+        List<Handler> handlers = chainBuilder
+            .buildHandlerChainFromClass(handlerTestImpl.getClass(), portQName, serviceQName, bindingID);
+        assertNotNull(handlers);
+        assertEquals(3, handlers.size());
+    }
+
+    @Test
+    public void testFindHandlerChainAnnotationPerPortServiceBindingWildcard() {
+        JakartaHandlerTestImpl handlerTestImpl = new JakartaHandlerTestImpl();
+        AnnotationHandlerChainBuilder chainBuilder = new AnnotationHandlerChainBuilder();
+        QName portQName = new QName("http://apache.org/handler_test", "SoapPortWildcard");
+        QName serviceQName = new QName("http://apache.org/handler_test", "SoapServiceWildcard");
+        String bindingID = "BindingUnknow";
+        @SuppressWarnings("rawtypes")
+        List<Handler> handlers = chainBuilder
+            .buildHandlerChainFromClass(handlerTestImpl.getClass(), portQName, serviceQName, bindingID);
+        assertNotNull(handlers);
+        assertEquals(7, handlers.size());
+    }
+
+    public static class TestLogicalHandler implements LogicalHandler<LogicalMessageContext> {
+        boolean initCalled;
+
+        public void close(MessageContext arg0) {
+        }
+
+        public boolean handleFault(LogicalMessageContext arg0) {
+            return false;
+        }
+
+        public boolean handleMessage(LogicalMessageContext arg0) {
+            return false;
+        }
+    }
+
+    public static class TestProtocolHandler implements Handler<MessageContext> {
+
+        public void close(MessageContext arg0) {
+        }
+
+        public boolean handleFault(MessageContext arg0) {
+            return false;
+        }
+
+        public boolean handleMessage(MessageContext arg0) {
+            return false;
+        }
     }
 
     @WebService()
     @HandlerChain(file = "./jakarta-handlers.xml", name = "TestHandlerChain")
-    public class HandlerTestImpl {
+    public class JakartaHandlerTestImpl {
 
     }
-
 }

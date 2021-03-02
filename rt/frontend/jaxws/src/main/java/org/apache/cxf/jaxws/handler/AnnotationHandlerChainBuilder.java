@@ -25,44 +25,32 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import javax.jws.HandlerChain;
 import javax.jws.WebService;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import javax.xml.ws.WebServiceException;
 import javax.xml.ws.handler.Handler;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
-import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxws.handler.types.PortComponentHandlerType;
 import org.apache.cxf.staxutils.StaxUtils;
 
+
 @SuppressWarnings("rawtypes")
 public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
-
-    private static final String HANDLER_CHAINS_E = "handler-chains";
-    private static final String HANDLER_CHAIN_E = "handler-chain";
-    private static final String JAKARTAEE_NS = "https://jakarta.ee/xml/ns/jakartaee";
-    private static final String JAVAEE_NS = "http://java.sun.com/xml/ns/javaee";
     private static final Logger LOG = LogUtils.getL7dLogger(AnnotationHandlerChainBuilder.class);
     private static final ResourceBundle BUNDLE = LOG.getResourceBundle();
-    private static JAXBContext context;
-
     private ClassLoader classLoader;
 
     public AnnotationHandlerChainBuilder() {
@@ -101,56 +89,20 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
 
                 Document doc = StaxUtils.read(handlerFileURL.openStream());
                 Element el = doc.getDocumentElement();
-                boolean isJavaEENamespace = JAVAEE_NS.equals(el.getNamespaceURI());
-                boolean isJakartaEENamespace = JAKARTAEE_NS.equals(el.getNamespaceURI());
+                boolean isJavaEENamespace = JavaeeHandlerChainBuilder.JAVAEE_NS.equals(el.getNamespaceURI());
+                boolean isJakartaEENamespace = JakartaeeHandlerChainBuilder.JAKARTAEE_NS.equals(el.getNamespaceURI());
                 if (!isJavaEENamespace && !isJakartaEENamespace) {
                     throw new WebServiceException(
                         BundleUtils.getFormattedString(BUNDLE,
                                                        "NOT_VALID_NAMESPACE",
                                                        el.getNamespaceURI()));
                 }
-                if (isJavaEENamespace && !HANDLER_CHAINS_E.equals(el.getLocalName())) {
-                    String xml = StaxUtils.toString(el);
-                    throw new WebServiceException(
-                        BundleUtils.getFormattedString(BUNDLE,
-                                                       "NOT_VALID_ROOT_ELEMENT",
-                                                       JAVAEE_NS.equals(el.getNamespaceURI()),
-                                                       HANDLER_CHAINS_E.equals(el.getLocalName()),
-                                                       xml, handlerFileURL));
-                }
-                if (isJakartaEENamespace && !HANDLER_CHAINS_E.equals(el.getLocalName())) {
-                    String xml = StaxUtils.toString(el);
-                    throw new WebServiceException(
-                        BundleUtils.getFormattedString(BUNDLE,
-                                                       "NOT_VALID_ROOT_ELEMENT",
-                                                       JAKARTAEE_NS.equals(el.getNamespaceURI()),
-                                                       HANDLER_CHAINS_E.equals(el.getLocalName()),
-                                                       xml, handlerFileURL));
-                }
-                chain = new ArrayList<>();
-                Node node = el.getFirstChild();
-                while (node != null) {
-                    if (node instanceof Element) {
-                        el = (Element)node;
-                        isJavaEENamespace = JAVAEE_NS.equals(el.getNamespaceURI());
-                        isJakartaEENamespace = JAKARTAEE_NS.equals(el.getNamespaceURI());
-                        if (!isJavaEENamespace && !isJakartaEENamespace) {
-                            throw new WebServiceException(
-                                BundleUtils.getFormattedString(BUNDLE,
-                                                               "NOT_VALID_NAMESPACE",
-                                                               el.getNamespaceURI()));
-                        }
-                        if (!HANDLER_CHAIN_E.equals(el.getLocalName())) {
-                            String xml = StaxUtils.toString(el);
-                            throw new WebServiceException(
-                                BundleUtils.getFormattedString(BUNDLE,
-                                                               "NOT_VALID_ELEMENT_IN_HANDLER",
-                                                               xml));
-                        }
-                        processHandlerChainElement(el, chain,
-                                                   portQName, serviceQName, bindingID);
-                    }
-                    node = node.getNextSibling();
+                if (isJavaEENamespace) {
+                    chain = new JavaeeHandlerChainBuilder(BUNDLE, handlerFileURL, this)
+                            .build(el, portQName, serviceQName, bindingID);
+                } else {
+                    chain = new JakartaeeHandlerChainBuilder(BUNDLE, handlerFileURL, this)
+                            .build(el, portQName, serviceQName, bindingID);
                 }
             } catch (WebServiceException e) {
                 throw e;
@@ -177,149 +129,8 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
         return clazz.getClassLoader();
     }
 
-    private void processHandlerChainElement(Element el, List<Handler> chain,
-                                            QName portQName, QName serviceQName, String bindingID) {
-        Node node = el.getFirstChild();
-        while (node != null) {
-            Node cur = node;
-            node = node.getNextSibling();
-            if (cur instanceof Element) {
-                el = (Element)cur;
-                boolean isJavaEENamespace = JAVAEE_NS.equals(el.getNamespaceURI());
-                boolean isJakartaEENamespace = JAKARTAEE_NS.equals(el.getNamespaceURI());
-                if (!isJavaEENamespace && !isJakartaEENamespace) {
-                    String xml = StaxUtils.toString(el);
-                    throw new WebServiceException(
-                        BundleUtils.getFormattedString(BUNDLE,
-                                                       "NOT_VALID_ELEMENT_IN_HANDLER",
-                                                       xml));
-                }
-                String name = el.getLocalName();
-                if ("port-name-pattern".equals(name)) {
-                    if (!patternMatches(el, portQName)) {
-                        return;
-                    }
-                } else if ("service-name-pattern".equals(name)) {
-                    if (!patternMatches(el, serviceQName)) {
-                        return;
-                    }
-                } else if ("protocol-bindings".equals(name)) {
-                    if (!protocolMatches(el, bindingID)) {
-                        return;
-                    }
-                } else if ("handler".equals(name)) {
-                    processHandlerElement(el, chain);
-                }
-            }
-        }
-    }
-    private boolean protocolMatches(Element el, String id) {
-        if (id == null) {
-            return true;
-        }
-        String name = el.getTextContent().trim();
-        StringTokenizer st = new StringTokenizer(name, " ", false);
-        boolean result = false;
-        while (st.hasMoreTokens() && !result) {
-            result = result || singleProtocolMatches(st.nextToken(), id);
-        }
-        return result;
-    }
-    private boolean singleProtocolMatches(String name, String id) {
-        if ("##SOAP11_HTTP".equals(name)) {
-            return "http://schemas.xmlsoap.org/wsdl/soap/http".contains(id)
-                || "http://schemas.xmlsoap.org/soap/".contains(id);
-        } else if ("##SOAP11_HTTP_MTOM".equals(name)) {
-            return "http://schemas.xmlsoap.org/wsdl/soap/http?mtom=true".contains(id)
-                || "http://schemas.xmlsoap.org/soap/?mtom=true".contains(id);
-        } else if ("##SOAP12_HTTP".equals(name)) {
-            return "http://www.w3.org/2003/05/soap/bindings/HTTP/".contains(id)
-                || "http://schemas.xmlsoap.org/wsdl/soap12/".contains(id);
-        } else if ("##SOAP12_HTTP_MTOM".equals(name)) {
-            return "http://www.w3.org/2003/05/soap/bindings/HTTP/?mtom=true".contains(id)
-                || "http://schemas.xmlsoap.org/wsdl/soap12/?mtom=true".contains(id);
-        } else if ("##XML_HTTP".equals(name)) {
-            name = "http://www.w3.org/2004/08/wsdl/http";
-        }
-        return name.contains(id);
-    }
-    private boolean patternMatches(Element el, QName comp) {
-        if (comp == null) {
-            return true;
-        }
-        String namePattern = el.getTextContent().trim();
-        if ("*".equals(namePattern)) {
-            return true;
-        }
-        final int idx = namePattern.indexOf(':');
-        if (idx < 0) {
-            String xml = StaxUtils.toString(el);
-            throw new WebServiceException(
-                BundleUtils.getFormattedString(BUNDLE,
-                                               "NOT_A_QNAME_PATTER",
-                                               namePattern, xml));
-        }
-        String pfx = namePattern.substring(0, idx);
-        String ns = el.lookupNamespaceURI(pfx);
-        if (ns == null) {
-            ns = pfx;
-        }
-        if (!ns.equals(comp.getNamespaceURI())) {
-            return false;
-        }
-        String localPart = namePattern.substring(idx + 1,
-                                                 namePattern.length());
-        if (localPart.contains("*")) {
-            //wildcard pattern matching
-            return Pattern.matches(mapPattern(localPart), comp.getLocalPart());
-        } else if (!localPart.equals(comp.getLocalPart())) {
-            return false;
-        }
-        return true;
-    }
-
-    private String mapPattern(String s) {
-        StringBuilder buf = new StringBuilder(s);
-        for (int x = 0; x < buf.length(); x++) {
-            switch (buf.charAt(x)) {
-            case '*':
-                buf.insert(x, '.');
-                x++;
-                break;
-            case '.':
-            case '\\':
-            case '^':
-            case '$':
-            case '{':
-            case '}':
-            case '(':
-            case ')':
-                buf.insert(x, '\\');
-                x++;
-                break;
-            default:
-                //nothing to do
-            }
-        }
-        return buf.toString();
-    }
-
-    private void processHandlerElement(Element el, List<Handler> chain) {
-        try {
-            JAXBContext ctx = getContextForPortComponentHandlerType();
-            PortComponentHandlerType pt = JAXBUtils.unmarshall(ctx, el, PortComponentHandlerType.class).getValue();
-            chain.addAll(buildHandlerChain(pt, classLoader));
-        } catch (JAXBException e) {
-            throw new IllegalArgumentException("Could not unmarshal handler chain", e);
-        }
-    }
-
-    private static synchronized JAXBContext getContextForPortComponentHandlerType()
-        throws JAXBException {
-        if (context == null) {
-            context = JAXBContext.newInstance(PortComponentHandlerType.class);
-        }
-        return context;
+    List<Handler> buildHandlerChain(PortComponentHandlerType ht) {
+        return buildHandlerChain(ht, classLoader);
     }
 
     public List<Handler> buildHandlerChainFromClass(Class<?> clz, QName portQName, QName serviceQName,
