@@ -18,66 +18,36 @@
  */
 
 package org.apache.cxf.tools.util;
-import java.io.File;
-import java.io.IOException;
 
+import java.io.File;
+import java.io.Writer;
+
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class FileWriterUtilTest {
 
-    private void cleanDir(File dir) {
-        try {
-            for (File fl : dir.listFiles()) {
-                if (fl.isDirectory()) {
-                    cleanDir(fl);
-                } else {
-                    fl.delete();
-                }
-            }
-        } catch (Exception ex) {
-            //ignore
-        }
-        dir.delete();
-    }
+    @Rule
+    public TemporaryFolder targetDir = new TemporaryFolder();
 
     @Test
     public void testGetFile() throws Exception {
-        FileWriterUtil fileWriter = null;
-        String tmpDir = System.getProperty("java.io.tmpdir");
-        File targetDir = new File(tmpDir + File.separator + "target");
-        try {
-            targetDir.mkdirs();
-            fileWriter = new FileWriterUtil(targetDir.getAbsolutePath(), null);
-            fileWriter.getWriter("com.iona.test", "A.java");
-            String packPath = "/com/iona/test/A.java".replace('/', File.separatorChar);
-            String path = targetDir.getAbsolutePath() + packPath;
-            assertNotNull(new File(path).getName());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            cleanDir(targetDir);
+        FileWriterUtil fileWriter = new FileWriterUtil(targetDir.getRoot().getAbsolutePath(), null);
+        try (Writer w = fileWriter.getWriter("com.iona.test", "A.java")) {
+            assertTrue(new File(targetDir.getRoot(), "/com/iona/test/A.java").canWrite());
         }
-
     }
 
     @Test
     public void testGetWriter() throws Exception {
-        FileWriterUtil fileWriter = null;
-        String tmpDir = System.getProperty("java.io.tmpdir");
-        File targetDir = new File(tmpDir + File.separator + "target");
-
-        try {
-            targetDir.mkdirs();
-            fileWriter = new FileWriterUtil(targetDir.getAbsolutePath(), null);
-            assertNotNull(fileWriter.getWriter("com.iona.test.SAMPLE", "A.java"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            cleanDir(targetDir);
+        FileWriterUtil fileWriter = new FileWriterUtil(targetDir.getRoot().getAbsolutePath(), null);
+        try (Writer w = fileWriter.getWriter("com.iona.test.SAMPLE", "A.java")) {
+            assertNotNull(w);
         }
     }
-
 
 }

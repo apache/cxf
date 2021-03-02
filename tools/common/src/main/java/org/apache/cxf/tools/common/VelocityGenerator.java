@@ -23,7 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -55,7 +55,7 @@ public final class VelocityGenerator {
 
     private static String getVelocityLogFile(String logfile) {
         String logdir = System.getProperty("user.home");
-        if (logdir == null || logdir.length() == 0) {
+        if (logdir == null || logdir.isEmpty()) {
             logdir = System.getProperty("user.dir");
         }
         return logdir + File.separator + logfile;
@@ -93,7 +93,7 @@ public final class VelocityGenerator {
     }
 
     public void doWrite(String templateName, Writer outputs) throws ToolException {
-        Template tmpl = null;
+        final Template tmpl;
         try {
             tmpl = Velocity.getTemplate(templateName);
         } catch (Exception e) {
@@ -101,17 +101,11 @@ public final class VelocityGenerator {
             throw new ToolException(msg, e);
         }
 
-        VelocityContext ctx = new VelocityContext();
+        VelocityContext ctx = new VelocityContext(attributes);
 
-        for (Map.Entry<String, Object> entry : attributes.entrySet()) {
-            ctx.put(entry.getKey(), entry.getValue());
-        }
-
-        VelocityWriter writer = new VelocityWriter(outputs);
-        ctx.put("out", writer);
-        try {
+        try (VelocityWriter writer = new VelocityWriter(outputs)) {
+            ctx.put("out", writer);
             tmpl.merge(ctx, writer);
-            writer.close();
         } catch (Exception e) {
             Message msg = new Message("VELOCITY_ENGINE_WRITE_ERRORS", LOG);
             throw new ToolException(msg, e);
@@ -138,7 +132,7 @@ public final class VelocityGenerator {
     }
 
     public void setCommonAttributes() {
-        attributes.put("currentdate", Calendar.getInstance().getTime());
+        attributes.put("currentdate", new Date());
         attributes.put("version", Version.getCurrentVersion());
         attributes.put("name", Version.getName());
         attributes.put("fullversion", Version.getCompleteVersionString());

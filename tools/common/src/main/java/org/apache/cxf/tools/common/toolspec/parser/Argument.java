@@ -86,12 +86,11 @@ public class Argument implements TokenConsumer {
     }
 
     private boolean isAtleastMinimum() {
-        boolean result = true;
-        int minOccurs = 0;
-
+        final boolean result;
         if (!"".equals(element.getAttribute("minOccurs"))) {
             result = numMatches >= Integer.parseInt(element.getAttribute("minOccurs"));
         } else {
+            int minOccurs = 0;
             result = numMatches >= minOccurs;
         }
         return result;

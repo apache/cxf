@@ -76,7 +76,7 @@ public final class ToolRunner {
                                OutputStream os) throws Exception {
         System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
 
-        ToolContainer container = null;
+        final ToolContainer container;
 
         try {
             Constructor<? extends ToolContainer> cons

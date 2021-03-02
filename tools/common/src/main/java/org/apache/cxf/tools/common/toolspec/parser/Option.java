@@ -252,25 +252,23 @@ public class Option implements TokenConsumer {
     }
 
     private boolean isAtleastMinimum() {
-        boolean result = true;
-        int minOccurs = 0;
-
+        final boolean result;
         if (!"".equals(element.getAttribute("minOccurs"))) {
             result = numMatches >= Integer.parseInt(element.getAttribute("minOccurs"));
         } else {
+            int minOccurs = 0;
             result = numMatches >= minOccurs;
         }
         return result;
     }
 
     private boolean isNoGreaterThanMaximum() {
-        boolean result = true;
-        int maxOccurs = 1;
-
+        final boolean result;
         if (!"".equals(element.getAttribute("maxOccurs"))) {
             result = "unbounded".equals(element.getAttribute("maxOccurs"))
                      || numMatches <= Integer.parseInt(element.getAttribute("maxOccurs"));
         } else {
+            int maxOccurs = 1;
             result = numMatches <= maxOccurs;
         }
         return result;

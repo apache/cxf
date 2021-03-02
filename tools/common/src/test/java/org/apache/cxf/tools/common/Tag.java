@@ -104,33 +104,31 @@ public class Tag {
         return sb.toString().trim();
     }
 
-    private String formatTag(Tag tag, int indent) {
-        StringBuilder sb = new StringBuilder();
+    private void formatTag(Tag tag, int indent, StringBuilder sb) {
         sb.append(createIndent(indent));
         sb.append(indent);
         sb.append('<');
         sb.append(formatAttribute(tag));
         sb.append('>');
         if (tag.getParent() != null) {
-            sb.append(" (" + tag.getParent().getName().getLocalPart() + ")");
+            sb.append(" (").append(tag.getParent().getName().getLocalPart()).append(')');
         }
         if (text != null) {
             sb.append(text);
         }
         sb.append('\n');
 
-        if (tag.getTags().size() > 0) {
+        if (!tag.getTags().isEmpty()) {
             indent++;
             for (Tag subTag : tag.getTags()) {
-                sb.append(formatTag(subTag, indent));
+                formatTag(subTag, indent, sb);
             }
         }
-        return sb.toString();
     }
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(formatTag(this, 0));
+        formatTag(this, 0, sb);
         return sb.toString();
     }
 
