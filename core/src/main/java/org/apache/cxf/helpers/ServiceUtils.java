@@ -215,7 +215,7 @@ public final class ServiceUtils {
      * the given class name. <p/> For instance, if the given class name is
      * <code>org.codehaus.xfire.services.Echo</code>, and the protocol is
      * <code>http</code>, the resulting namespace would be
-     * <code>http://services.xfire.codehaus.org</code>.
+     * <code>http://services.xfire.codehaus.org/</code>.
      *
      * @param className the class name
      * @param protocol the protocol (eg. <code>http</code>)
