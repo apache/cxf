@@ -36,18 +36,16 @@ import org.w3c.dom.Node;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 
+@SuppressWarnings("rawtypes")
 abstract class BaseHandlerChainBuilder {
     private static final String HANDLER_CHAINS_E = "handler-chains";
     private static final String HANDLER_CHAIN_E = "handler-chain";
-    final AnnotationHandlerChainBuilder delegate;
     private final ResourceBundle bundle;
     private final URL handlerFileURL;
 
-    protected BaseHandlerChainBuilder(ResourceBundle bundle, URL handlerFileURL,
-                                      AnnotationHandlerChainBuilder delegate) {
+    protected BaseHandlerChainBuilder(ResourceBundle bundle, URL handlerFileURL) {
         this.bundle = bundle;
         this.handlerFileURL = handlerFileURL;
-        this.delegate = delegate;
     }
 
     protected List<Handler> build(String namespace, Element el, QName portQName, QName serviceQName, String bindingID) {

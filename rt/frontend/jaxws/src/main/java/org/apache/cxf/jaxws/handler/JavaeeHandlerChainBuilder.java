@@ -33,14 +33,15 @@ import org.w3c.dom.Element;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.jaxws.handler.types.PortComponentHandlerType;
 
-
+@SuppressWarnings("rawtypes")
 final class JavaeeHandlerChainBuilder extends BaseHandlerChainBuilder {
     static final String JAVAEE_NS = "http://java.sun.com/xml/ns/javaee";
     private static JAXBContext context;
+    private final DelegatingHandlerChainBuilder delegate;
 
-    JavaeeHandlerChainBuilder(ResourceBundle bundle, URL handlerFileURL,
-                                     AnnotationHandlerChainBuilder delegate) {
-        super(bundle, handlerFileURL, delegate);
+    JavaeeHandlerChainBuilder(ResourceBundle bundle, URL handlerFileURL, DelegatingHandlerChainBuilder delegate) {
+        super(bundle, handlerFileURL);
+        this.delegate = delegate;
     }
 
     public List<Handler> build(Element el, QName portQName, QName serviceQName, String bindingID) {
