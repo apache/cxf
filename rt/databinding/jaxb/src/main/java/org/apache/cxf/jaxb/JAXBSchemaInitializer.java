@@ -253,11 +253,10 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
     }
 
     static XmlJavaTypeAdapter findFromTypeAdapter(JAXBContextProxy context, Class<?> clazz, Annotation[] anns) {
-        JAXBBeanInfo ret = null;
         if (anns != null) {
             for (Annotation a : anns) {
                 if (XmlJavaTypeAdapter.class.isAssignableFrom(a.annotationType())) {
-                    ret = findFromTypeAdapter(context, ((XmlJavaTypeAdapter)a).value());
+                    JAXBBeanInfo ret = findFromTypeAdapter(context, ((XmlJavaTypeAdapter)a).value());
                     if (ret != null) {
                         return (XmlJavaTypeAdapter)a;
                     }
@@ -267,7 +266,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         if (clazz != null) {
             XmlJavaTypeAdapter xjta = clazz.getAnnotation(XmlJavaTypeAdapter.class);
             if (xjta != null) {
-                ret = findFromTypeAdapter(context, xjta.value());
+                JAXBBeanInfo ret = findFromTypeAdapter(context, xjta.value());
                 if (ret != null) {
                     return xjta;
                 }
@@ -336,10 +335,9 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
     }
 
     private void createBridgeXsElement(MessagePartInfo part, QName qn, QName typeName) {
-        XmlSchemaElement el = null;
         SchemaInfo schemaInfo = serviceInfo.getSchema(qn.getNamespaceURI());
         if (schemaInfo != null) {
-            el = schemaInfo.getElementByQName(qn);
+            XmlSchemaElement el = schemaInfo.getElementByQName(qn);
             if (el == null) {
                 createXsElement(schemaInfo.getSchema(), part, typeName, schemaInfo);
 
@@ -357,7 +355,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         schemaInfo = new SchemaInfo(qn.getNamespaceURI(), qualifiedSchemas, false);
         schemaInfo.setSchema(schema);
 
-        el = createXsElement(schema, part, typeName, schemaInfo);
+        createXsElement(schema, part, typeName, schemaInfo);
 
         NamespaceMap nsMap = new NamespaceMap();
         nsMap.add(WSDLConstants.CONVENTIONAL_TNS_PREFIX, schema.getTargetNamespace());
@@ -498,7 +496,6 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             //TODO: handle @XmlAccessOrder
         }
 
-        XmlSchema schema = null;
         if (schemaInfo == null) {
             NamespaceMap nsMap = new NamespaceMap();
             nsMap.add(WSDLConstants.CONVENTIONAL_TNS_PREFIX, part.getElementQName().getNamespaceURI());
@@ -506,7 +503,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             schemaInfo = createSchemaIfNeeded(part.getElementQName().getNamespaceURI(), nsMap);
 
         }
-        schema = schemaInfo.getSchema();
+        XmlSchema schema = schemaInfo.getSchema();
 
 
         // Before updating everything, make sure we haven't added this

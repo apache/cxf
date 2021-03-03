@@ -171,7 +171,7 @@ public abstract class JAXBDataBase {
 
     protected ValidationEventHandler getValidationEventHandler(Message m, String property) {
         Object value = m.getContextualProperty(property);
-        ValidationEventHandler veventHandler = null;
+        ValidationEventHandler veventHandler;
         if (value instanceof String) {
             veventHandler = getValidationEventHandler((String)value);
         } else {

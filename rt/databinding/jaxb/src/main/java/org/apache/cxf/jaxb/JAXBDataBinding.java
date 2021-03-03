@@ -349,14 +349,13 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
         }
 
         String tns = getNamespaceToUse(service);
-        CachedContextAndSchemas cachedContextAndSchemas = null;
-        JAXBContext ctx = null;
+        final CachedContextAndSchemas cachedContextAndSchemas;
         try {
             cachedContextAndSchemas = createJAXBContextAndSchemas(contextClasses, tns);
         } catch (JAXBException e1) {
             throw new ServiceConstructionException(e1);
         }
-        ctx = cachedContextAndSchemas.getContext();
+        final JAXBContext ctx = cachedContextAndSchemas.getContext();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.log(Level.FINE, "CREATED_JAXB_CONTEXT", new Object[] {ctx, contextClasses});
         }
@@ -449,8 +448,8 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
         if ("true".equals(service.get("org.apache.cxf.databinding.namespace"))) {
             return null;
         }
-        String tns = null;
-        if (service.getServiceInfos().size() > 0) {
+        final String tns;
+        if (!service.getServiceInfos().isEmpty()) {
             tns = service.getServiceInfos().get(0).getInterface().getName().getNamespaceURI();
         } else {
             tns = service.getName().getNamespaceURI();
@@ -699,7 +698,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
             Field elField = getElField(partName, valueClass);
             if (getMethod == null
                 && elementType != null
-                && "boolean".equals(elementType.toLowerCase())
+                && "boolean".equalsIgnoreCase(elementType)
                 && (elField == null
                     || (!Collection.class.isAssignableFrom(elField.getType())
                     && !elField.getType().isArray()))) {

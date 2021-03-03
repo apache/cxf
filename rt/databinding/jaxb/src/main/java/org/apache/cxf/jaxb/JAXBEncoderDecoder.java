@@ -478,7 +478,7 @@ public final class JAXBEncoderDecoder {
     }
 
     private static String getName(Member m1) {
-        String m1Name = null;
+        final String m1Name;
         if (m1 instanceof Field) {
             m1Name = ((Field)m1).getName();
         } else {
@@ -498,7 +498,7 @@ public final class JAXBEncoderDecoder {
             return;
         }
         Object objArray;
-        Class<?> cls = null;
+        final Class<?> cls;
         if (mObj instanceof List) {
             List<?> l = (List<?>)mObj;
             objArray = l.toArray();
@@ -539,7 +539,7 @@ public final class JAXBEncoderDecoder {
             }
 
             Class<?> cls = part.getTypeClass();
-            Object obj = null;
+            Object obj;
             try {
                 Constructor<?> cons = cls.getConstructor();
                 obj = cons.newInstance();
@@ -584,7 +584,7 @@ public final class JAXBEncoderDecoder {
                         m = Utils.getMethod(cls, accessType, "is" + s);
                     }
                     Type type = m.getGenericReturnType();
-                    Object o = null;
+                    Object o;
                     if (JAXBSchemaInitializer.isArray(type)) {
                         Class<?> compType = JAXBSchemaInitializer
                             .getArrayComponentType(type);
@@ -836,7 +836,7 @@ public final class JAXBEncoderDecoder {
                                       final Class<?> clazz,
                                       final boolean unwrap) throws Exception {
 
-        Object obj = null;
+        final Object obj;
         boolean unmarshalWithClass = true;
 
         if (clazz == null

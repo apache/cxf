@@ -481,7 +481,7 @@ public class JAXBEncoderDecoderTest {
             // unmarshal with schema should raise exception.
             Unmarshaller m = context.createUnmarshaller();
             m.setSchema(schema);
-            obj = JAXBEncoderDecoder.unmarshall(m, elNode, part, true);
+            JAXBEncoderDecoder.unmarshall(m, elNode, part, true);
             fail("Should have thrown a Fault");
         } catch (Fault ex) {
             // expected - schema validation should fail.

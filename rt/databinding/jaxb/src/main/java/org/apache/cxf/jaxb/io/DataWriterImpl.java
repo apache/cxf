@@ -21,7 +21,6 @@ package org.apache.cxf.jaxb.io;
 
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -117,19 +116,19 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
     }
 
     public Marshaller createMarshaller(Object elValue, MessagePartInfo part) {
-        Class<?> cls = null;
-        if (part != null) {
-            cls = part.getTypeClass();
-        }
-
-        if (cls == null) {
-            cls = null != elValue ? elValue.getClass() : null;
-        }
-
-        if (cls != null && cls.isArray() && elValue instanceof Collection) {
-            Collection<?> col = (Collection<?>)elValue;
-            elValue = col.toArray((Object[])Array.newInstance(cls.getComponentType(), col.size()));
-        }
+        //Class<?> cls = null;
+        //if (part != null) {
+        //    cls = part.getTypeClass();
+        //}
+        //
+        //if (cls == null) {
+        //    cls = null != elValue ? elValue.getClass() : null;
+        //}
+        //
+        //if (cls != null && cls.isArray() && elValue instanceof Collection) {
+        //    Collection<?> col = (Collection<?>)elValue;
+        //    elValue = col.toArray((Object[])Array.newInstance(cls.getComponentType(), col.size()));
+        //}
         Marshaller marshaller;
         try {
 

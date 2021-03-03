@@ -316,7 +316,7 @@ public class JAXBDataBindingTest {
         assertEquals(2, classes.size());
     }
 
-    public abstract static class Type2 extends AddressEntity<Type2> {
+    public abstract static class Type2 extends AddressEntity<Type2> { //NOPMD
     }
 
     public abstract static class AddressEntity<T extends AddressEntity<T>> {

@@ -63,10 +63,10 @@ public class FactoryClassGenerator extends ClassGeneratorClassLoader implements 
         mv = cw.visitMethod(opcodes.ACC_PUBLIC, "create" + cls.getSimpleName(),
                 "()L" + StringUtils.periodToSlashes(cls.getName()) + ";", null, null);
         mv.visitCode();
-        String name = cls.getName().replace(".", "/");
+        String name = cls.getName().replace('.', '/');
         mv.visitTypeInsn(opcodes.NEW, name);
         mv.visitInsn(opcodes.DUP);
-        StringBuilder paraString = new StringBuilder(32).append("(");
+        StringBuilder paraString = new StringBuilder(32).append('(');
 
         for (Class<?> paraClass : contructor.getParameterTypes()) {
             mv.visitInsn(opcodes.ACONST_NULL);
