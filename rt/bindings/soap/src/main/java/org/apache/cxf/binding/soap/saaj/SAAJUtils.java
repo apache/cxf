@@ -99,8 +99,8 @@ public final class SAAJUtils {
                 e.setPrefix(prefix);
                 if (e instanceof SOAPElement) {
                     ((SOAPElement)e).removeNamespaceDeclaration(s);
-                } else if (e.getClass().getName().equals(
-                       "com.sun.org.apache.xerces.internal.dom.ElementNSImpl")) {
+                } else if ("com.sun.org.apache.xerces.internal.dom.ElementNSImpl".equals(
+                       e.getClass().getName())) {
                     //since java9 159 SOAPPart1_1Impl.getDocumentElement not return SOAPElement
                     try {
                         Method method = e.getClass().getMethod("removeAttribute", String.class);

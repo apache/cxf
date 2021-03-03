@@ -185,7 +185,7 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
 
                 Node nd = message.getContent(Node.class);
                 W3CDOMStreamWriter writer = message.get(W3CDOMStreamWriter.class);
-                Document doc = null;
+                final Document doc;
                 if (writer != null) {
                     StaxUtils.copy(filteredReader, writer);
                     doc = writer.getDocument();
@@ -227,7 +227,6 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                     List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(element,
                                                                                  header.getNamespaceURI(),
                                                                                  header.getLocalPart());
-                    soapBody = new ArrayList<Element>();      
                     soapBody = DOMUtils.getChildrenWithName(element,
                                                                                  body.getNamespaceURI(),
                                                                                  body.getLocalPart());

@@ -124,7 +124,7 @@ public class ParseBodyTest {
 
         DocumentBuilder db = dbf.newDocumentBuilder();
         db.setEntityResolver(new NullResolver());
-        doc = StaxUtils.read(db, reader, false);
+        StaxUtils.read(db, reader, false);
 
     }
 

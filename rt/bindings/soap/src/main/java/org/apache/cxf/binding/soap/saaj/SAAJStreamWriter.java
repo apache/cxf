@@ -218,7 +218,7 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
             }
         } else if (cur instanceof SOAPElement) {
             try {
-                Element el = null;
+                final Element el;
                 if (StringUtils.isEmpty(pfx) && StringUtils.isEmpty(ns)) {
                     el = ((SOAPElement)cur).addChildElement(local, "", "");
                 } else {

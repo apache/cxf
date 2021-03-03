@@ -90,7 +90,7 @@ public class SoapFault extends Fault {
     }
 
     private String getFaultCodeString(String prefix, String defaultPrefix, QName fCode) {
-        String codePrefix = null;
+        String codePrefix;
         if (StringUtils.isEmpty(prefix)) {
             codePrefix = fCode.getPrefix();
             if (StringUtils.isEmpty(codePrefix)) {
@@ -100,7 +100,7 @@ public class SoapFault extends Fault {
             codePrefix = prefix;
         }
 
-        return codePrefix + ":" + fCode.getLocalPart();
+        return codePrefix + ':' + fCode.getLocalPart();
     }
 
     private QName getRootSubCode() {

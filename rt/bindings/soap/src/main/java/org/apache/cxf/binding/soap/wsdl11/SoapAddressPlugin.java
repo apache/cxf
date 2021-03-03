@@ -39,9 +39,7 @@ public final class SoapAddressPlugin extends AbstractWSDLPlugin {
 
     public ExtensibilityElement createExtension(final boolean isSOAP12,
                                                 final String address) throws WSDLException {
-        SoapAddress soapAddress = null;
-
-        soapAddress = SOAPBindingUtil.createSoapAddress(registry, isSOAP12);
+        SoapAddress soapAddress = SOAPBindingUtil.createSoapAddress(registry, isSOAP12);
 
         soapAddress.setLocationURI(address);
 

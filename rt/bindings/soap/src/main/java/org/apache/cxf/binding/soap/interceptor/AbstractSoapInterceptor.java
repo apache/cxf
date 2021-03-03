@@ -85,16 +85,18 @@ public abstract class AbstractSoapInterceptor extends AbstractPhaseInterceptor<S
             StringBuilder sb = new StringBuilder();
             Throwable throwable = fault.getCause();
             sb.append("Caused by: ").append(throwable.getClass().getCanonicalName())
-                .append(": " + throwable.getMessage() + "\n").append(Message.EXCEPTION_CAUSE_SUFFIX);
+                .append(": ").append(throwable.getMessage()).append('\n').append(Message.EXCEPTION_CAUSE_SUFFIX);
             while (throwable != null) {
                 for (StackTraceElement ste : throwable.getStackTrace()) {
-                    sb.append(ste.getClassName() + "!" + ste.getMethodName() + "!" + ste.getFileName() + "!"
-                          + ste.getLineNumber() + Message.EXCEPTION_CAUSE_SUFFIX);
+                    sb.append(ste.getClassName()).append('!')
+                        .append(ste.getMethodName()).append('!')
+                        .append(ste.getFileName()).append('!')
+                        .append(ste.getLineNumber()).append(Message.EXCEPTION_CAUSE_SUFFIX);
                 }
                 throwable = throwable.getCause();
                 if (throwable != null) {
-                    sb.append("Caused by: " +  throwable.getClass().getCanonicalName()
-                              + " : " + throwable.getMessage() + Message.EXCEPTION_CAUSE_SUFFIX);
+                    sb.append("Caused by: ").append(throwable.getClass().getCanonicalName())
+                        .append(" : ").append(throwable.getMessage()).append(Message.EXCEPTION_CAUSE_SUFFIX);
                 }
             }
             Element detail = fault.getDetail();

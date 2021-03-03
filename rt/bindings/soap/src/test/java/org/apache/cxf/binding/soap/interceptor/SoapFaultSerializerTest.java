@@ -334,7 +334,7 @@ public class SoapFaultSerializerTest {
         new StartBodyInterceptor().handleMessage(m);
         new Soap12FaultInInterceptor().handleMessage(m);
 
-        nd = m.getContent(Node.class);
+        //nd = m.getContent(Node.class);
 
         fault2 = (SoapFault)m.getContent(Exception.class);
         assertNotNull(fault2);
