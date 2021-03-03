@@ -43,15 +43,12 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.jaxws.handler.types.PortComponentHandlerType;
 import org.apache.cxf.staxutils.StaxUtils;
-
 
 @SuppressWarnings("rawtypes")
 public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
     private static final Logger LOG = LogUtils.getL7dLogger(AnnotationHandlerChainBuilder.class);
     private static final ResourceBundle BUNDLE = LOG.getResourceBundle();
-    private ClassLoader classLoader;
 
     public AnnotationHandlerChainBuilder() {
     }
@@ -68,7 +65,7 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
     public List<Handler> buildHandlerChainFromClass(Class<?> clz, List<Handler> existingHandlers,
                                                     QName portQName, QName serviceQName, String bindingID) {
         LOG.fine("building handler chain");
-        classLoader = getClassLoader(clz);
+        
         HandlerChainAnnotation hcAnn = findHandlerChainAnnotation(clz, true);
         List<Handler> chain = null;
         if (hcAnn == null) {
@@ -97,11 +94,14 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
                                                        "NOT_VALID_NAMESPACE",
                                                        el.getNamespaceURI()));
                 }
+                
+                final ClassLoader classLoader = getClassLoader(clz);
+                final DelegatingHandlerChainBuilder delegate = ht -> buildHandlerChain(ht, classLoader);
                 if (isJavaEENamespace) {
-                    chain = new JavaeeHandlerChainBuilder(BUNDLE, handlerFileURL, this)
+                    chain = new JavaeeHandlerChainBuilder(BUNDLE, handlerFileURL, delegate)
                             .build(el, portQName, serviceQName, bindingID);
                 } else {
-                    chain = new JakartaeeHandlerChainBuilder(BUNDLE, handlerFileURL, this)
+                    chain = new JakartaeeHandlerChainBuilder(BUNDLE, handlerFileURL, delegate)
                             .build(el, portQName, serviceQName, bindingID);
                 }
             } catch (WebServiceException e) {
@@ -127,10 +127,6 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
             });
         }
         return clazz.getClassLoader();
-    }
-
-    List<Handler> buildHandlerChain(PortComponentHandlerType ht) {
-        return buildHandlerChain(ht, classLoader);
     }
 
     public List<Handler> buildHandlerChainFromClass(Class<?> clz, QName portQName, QName serviceQName,

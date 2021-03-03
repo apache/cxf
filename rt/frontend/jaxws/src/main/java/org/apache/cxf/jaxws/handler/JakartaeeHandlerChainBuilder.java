@@ -33,13 +33,15 @@ import org.w3c.dom.Element;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.jaxws.handler.jakartaee.PortComponentHandlerType;
 
+@SuppressWarnings("rawtypes")
 final class JakartaeeHandlerChainBuilder extends BaseHandlerChainBuilder {
     static final String JAKARTAEE_NS = "https://jakarta.ee/xml/ns/jakartaee";
     private static JAXBContext context;
+    private final DelegatingHandlerChainBuilder delegate;
 
-    JakartaeeHandlerChainBuilder(ResourceBundle bundle, URL handlerFileURL,
-                                 AnnotationHandlerChainBuilder delegate) {
-        super(bundle, handlerFileURL, delegate);
+    JakartaeeHandlerChainBuilder(ResourceBundle bundle, URL handlerFileURL, DelegatingHandlerChainBuilder delegate) {
+        super(bundle, handlerFileURL);
+        this.delegate = delegate;
     }
 
     public List<Handler> build(Element el, QName portQName, QName serviceQName, String bindingID) {
