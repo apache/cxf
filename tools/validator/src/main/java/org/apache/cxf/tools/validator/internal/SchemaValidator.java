@@ -66,7 +66,7 @@ public class SchemaValidator extends AbstractDefinitionValidator {
 
     protected String[] defaultSchemas;
 
-    protected String schemaLocation = "./";
+    protected final String schemaLocation;
 
     private String wsdlsrc;
 
@@ -178,7 +178,6 @@ public class SchemaValidator extends AbstractDefinitionValidator {
     }
 
     public boolean validate(InputSource wsdlsource, String[] schemas) throws ToolException {
-        boolean isValid = false;
         Schema schema;
         try {
             SAXParserFactory saxFactory = SAXParserFactory.newInstance();
@@ -207,8 +206,6 @@ public class SchemaValidator extends AbstractDefinitionValidator {
                 throw new ToolException(errHandler.getErrorMessages());
             }
 
-            isValid = true;
-
         } catch (IOException ioe) {
             throw new ToolException("Cannot get the wsdl " + wsdlsource.getSystemId(), ioe);
         } catch (SAXException saxEx) {
@@ -216,7 +213,7 @@ public class SchemaValidator extends AbstractDefinitionValidator {
         } catch (ParserConfigurationException e) {
             throw new ToolException(e);
         }
-        return isValid;
+        return true;
     }
 
     private String[] addSchemas(String[] defaults, String[] schemas) {
@@ -376,7 +373,6 @@ class SchemaResourceResolver implements LSResourceResolver {
 
         LSInput lsin = null;
         String resURL = null;
-        String localFile = null;
         if (systemId != null) {
             String schemaLocation = "";
             if (baseURI != null) {
@@ -395,7 +391,7 @@ class SchemaResourceResolver implements LSResourceResolver {
             return null;
         }
 
-        localFile = resURL;
+        String localFile = resURL;
         if (resURL.startsWith("http://")) {
             String filename = NSFILEMAP.get(resURL);
             if (filename != null) {
