@@ -208,7 +208,12 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
                 try {
                     server.start();
                 } catch (RuntimeException re) {
-                    server.destroy(); // prevent resource leak
+                    if (!(re instanceof ServiceConstructionException 
+                        && re.getMessage().startsWith("There is an endpoint already running on"))) {
+                        //avoid destroying another server on the same endpoint url
+                        server.destroy(); // prevent resource leak if server really started by itself
+                        
+                    }
                     throw re;
                 }
             }
