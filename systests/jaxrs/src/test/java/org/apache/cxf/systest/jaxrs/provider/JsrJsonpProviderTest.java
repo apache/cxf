@@ -33,6 +33,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
+import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
@@ -61,6 +62,18 @@ public class JsrJsonpProviderTest extends AbstractBusClientServerTestBase {
             sf.setProvider(new JsrJsonpProvider());
             sf.setAddress("http://localhost:" + PORT + "/");
             sf.create();
+            try {
+                sf.create();
+            } catch (Exception ex) {
+                assertTrue(ex.getCause() instanceof ServiceConstructionException);
+                assertTrue(ex.getCause().getMessage().startsWith("There is an endpoint already running on"));
+            }
+            try {
+                sf.create();
+            } catch (Exception ex) {
+                assertTrue(ex.getCause() instanceof ServiceConstructionException);
+                assertTrue(ex.getCause().getMessage().startsWith("There is an endpoint already running on"));
+            }
         }
 
         public static void main(String[] args) {
