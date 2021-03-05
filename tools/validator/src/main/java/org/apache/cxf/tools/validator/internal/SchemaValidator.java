@@ -51,6 +51,7 @@ import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXParseException;
 
 import org.apache.cxf.common.i18n.Message;
@@ -125,9 +126,15 @@ public class SchemaValidator extends AbstractDefinitionValidator {
 
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         sf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
-        sf.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file,http,https");
-        SchemaResourceResolver resourceResolver = new SchemaResourceResolver();
+        
+        try {
+            // The 'http://javax.xml.XMLConstants/property/accessExternalSchema' is not supported by Xerces
+            sf.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file,http,https");
+        } catch (final SAXNotRecognizedException ex) {
+            LOG.log(Level.WARNING, "The property '" + XMLConstants.ACCESS_EXTERNAL_SCHEMA + "' is not supported.");
+        }
 
+        SchemaResourceResolver resourceResolver = new SchemaResourceResolver();
         sf.setResourceResolver(resourceResolver);
 
         List<Source> sources = new ArrayList<>();
