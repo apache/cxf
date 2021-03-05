@@ -122,7 +122,7 @@
         <profile>
             <id>xerces</id>
             <activation>
-                <jdk>[9,)</jdk>
+                <jdk>[16,)</jdk>
             </activation>
             <dependencies>
                 <dependency>
