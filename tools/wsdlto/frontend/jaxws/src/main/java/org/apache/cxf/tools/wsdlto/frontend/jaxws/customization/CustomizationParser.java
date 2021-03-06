@@ -20,6 +20,7 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.customization;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -475,7 +476,7 @@ public final class CustomizationParser {
 
     private void addBinding(String bindingFile) throws XMLStreamException {
 
-        Element root = null;
+        final Element root;
         XMLStreamReader xmlReader = null;
         try (URIResolver resolver = new URIResolver(bindingFile)) {
             xmlReader = StaxUtils.createXMLStreamReader(resolver.getURI().toString(), resolver.getInputStream());
@@ -491,7 +492,7 @@ public final class CustomizationParser {
         if (isValidJaxwsBindingFile(bindingFile, reader)) {
 
             String wsdlLocation = root.getAttribute("wsdlLocation");
-            Element targetNode = null;
+            Element targetNode;
             if (!StringUtils.isEmpty(wsdlLocation)) {
                 String wsdlURI = getAbsoluteURI(wsdlLocation, bindingFile);
                 targetNode = getTargetNode(wsdlURI);
@@ -518,7 +519,7 @@ public final class CustomizationParser {
             String schemaLocation = root.getAttribute("schemaLocation");
             String resolvedSchemaLocation = resolveByCatalog(schemaLocation);
             if (resolvedSchemaLocation != null) {
-                InputSource tmpIns = null;
+                final InputSource tmpIns;
                 try {
                     tmpIns = convertToTmpInputSource(root, resolvedSchemaLocation);
                 } catch (Exception e1) {
@@ -533,7 +534,7 @@ public final class CustomizationParser {
     }
 
     private String getAbsoluteURI(String  uri, String bindingFile) {
-        URI locURI = null;
+        URI locURI;
         try {
             locURI = new URI(uri);
         } catch (URISyntaxException e) {
@@ -578,13 +579,13 @@ public final class CustomizationParser {
     }
 
     private InputSource convertToTmpInputSource(Element ele, String schemaLoc) throws Exception {
-        InputSource result = null;
         ele.setAttributeNS(null, "schemaLocation", schemaLoc);
         File tmpFile = FileUtils.createTempFile("jaxbbinding", ".xml");
-        StaxUtils.writeTo(ele, Files.newOutputStream(tmpFile.toPath()));
-        result = new InputSource(URIParserUtil.getAbsoluteURI(tmpFile.getAbsolutePath()));
         tmpFile.deleteOnExit();
-        return result;
+        try (Writer w = Files.newBufferedWriter(tmpFile.toPath())) {
+            StaxUtils.writeTo(ele, w);
+        }
+        return new InputSource(URIParserUtil.getAbsoluteURI(tmpFile.getAbsolutePath()));
     }
 
     private boolean isValidJaxbBindingFile(XMLStreamReader reader) {

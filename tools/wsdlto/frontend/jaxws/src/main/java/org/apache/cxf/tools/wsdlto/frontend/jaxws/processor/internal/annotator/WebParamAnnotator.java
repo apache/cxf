@@ -40,7 +40,7 @@ public class WebParamAnnotator implements Annotator {
     }
 
     public void annotate(JavaAnnotatable ja) {
-        JavaParameter parameter = null;
+        final JavaParameter parameter;
         if (ja instanceof JavaParameter) {
             parameter = (JavaParameter) ja;
         } else {

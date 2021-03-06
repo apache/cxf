@@ -31,7 +31,7 @@ import org.apache.cxf.tools.common.model.JavaMethod;
 public class WebMethodAnnotator implements Annotator {
 
     public void annotate(JavaAnnotatable ja) {
-        JavaMethod method = null;
+        final JavaMethod method;
         if (ja instanceof JavaMethod) {
             method = (JavaMethod) ja;
         } else {

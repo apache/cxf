@@ -62,7 +62,7 @@ public class WSDLToJavaProcessor extends WSDLToProcessor implements ClassNamePro
     }
 
     private JavaModel wsdlDefinitionToJavaModel(ServiceInfo serviceInfo) throws ToolException {
-        JavaModel javaModel = null;
+        final JavaModel javaModel;
         Map<QName, JavaModel> map = CastUtils.cast((Map<?, ?>)context.get(MODEL_MAP));
         if (map == null) {
             map = new LinkedHashMap<>();

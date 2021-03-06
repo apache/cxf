@@ -526,9 +526,7 @@ public class ParameterProcessor extends AbstractProcessor {
     private JavaParameter getParameterFromQName(QName wrapperElement, QName item, JavaType.Style style,
                                                 MessagePartInfo part) {
 
-        String fullJavaName = "";
-
-        fullJavaName = this.dataBinding.getWrappedElementType(wrapperElement, item);
+        String fullJavaName = this.dataBinding.getWrappedElementType(wrapperElement, item);
 
         String targetNamespace = item.getNamespaceURI();
 
@@ -556,10 +554,8 @@ public class ParameterProcessor extends AbstractProcessor {
 
     private JavaReturn getReturnFromQName(QName element, MessagePartInfo part) {
 
-        String fullJavaName = "";
-        String simpleJavaName = "";
-        fullJavaName = this.dataBinding.getWrappedElementType(part.getElementQName(), element);
-        simpleJavaName = fullJavaName;
+        String fullJavaName = this.dataBinding.getWrappedElementType(part.getElementQName(), element);
+        String simpleJavaName = fullJavaName;
 
         int index = fullJavaName.lastIndexOf('.');
 
@@ -567,7 +563,7 @@ public class ParameterProcessor extends AbstractProcessor {
             simpleJavaName = fullJavaName.substring(index);
         }
 
-        String targetNamespace = "";
+        final String targetNamespace;
         if (isHeader(part)) {
             targetNamespace = part.getMessageInfo().getOperation().getInterface().
             getService().getTargetNamespace();

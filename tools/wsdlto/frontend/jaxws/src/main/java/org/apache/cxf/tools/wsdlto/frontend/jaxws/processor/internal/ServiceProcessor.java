@@ -679,10 +679,8 @@ public class ServiceProcessor extends AbstractProcessor {
         QName operationName = bop.getName();
         MessageInfo bodyMessage = null;
         QName headerMessage = null;
-        SoapHeader header = null;
         boolean containParts = false;
         boolean isSameMessage = false;
-        boolean isNonWrappable = false;
         boolean allPartsHeader = false;
         int result = NO_HEADER;
 
@@ -696,7 +694,7 @@ public class ServiceProcessor extends AbstractProcessor {
                         bodyMessage = getMessage(operationName, true);
                     }
                     if (SOAPBindingUtil.isSOAPHeader(ext)) {
-                        header = SOAPBindingUtil.getSoapHeader(ext);
+                        SoapHeader header = SOAPBindingUtil.getSoapHeader(ext);
                         headerMessage = header.getMessage();
                         if (header.getPart().length() > 0) {
                             containParts = true;
@@ -711,7 +709,7 @@ public class ServiceProcessor extends AbstractProcessor {
                 isSameMessage = true;
             }
 
-            isNonWrappable = isSameMessage && containParts;
+            boolean isNonWrappable = isSameMessage && containParts;
             // if is nonwrapple then return
             if (isNonWrappable) {
                 result = IN_HEADER;
@@ -729,7 +727,7 @@ public class ServiceProcessor extends AbstractProcessor {
                         bodyMessage = getMessage(operationName, false);
                     }
                     if (SOAPBindingUtil.isSOAPHeader(ext)) {
-                        header = SOAPBindingUtil.getSoapHeader(ext);
+                        SoapHeader header = SOAPBindingUtil.getSoapHeader(ext);
                         headerMessage = header.getMessage();
                         if (header.getPart().length() > 0) {
                             containParts = true;
@@ -746,7 +744,7 @@ public class ServiceProcessor extends AbstractProcessor {
                 }
 
             }
-            isNonWrappable = isSameMessage && containParts;
+            boolean isNonWrappable = isSameMessage && containParts;
             if (isNonWrappable && allPartsHeader) {
                 result = RESULT_HEADER;
             }

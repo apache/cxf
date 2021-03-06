@@ -44,7 +44,7 @@ public final class XmlSeeAlsoAnnotator implements Annotator {
             return;
         }
 
-        JavaInterface intf = null;
+        final JavaInterface intf;
         if (ja instanceof JavaInterface) {
             intf = (JavaInterface) ja;
         } else {

@@ -30,7 +30,7 @@ import org.apache.cxf.tools.common.model.JavaInterface;
 public final class WebServiceAnnotator implements Annotator {
 
     public void annotate(JavaAnnotatable  ja) {
-        JavaInterface intf = null;
+        final JavaInterface intf;
         if (ja instanceof JavaInterface) {
             intf = (JavaInterface) ja;
         } else {

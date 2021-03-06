@@ -76,7 +76,7 @@ public final class ProcessorUtil {
     }
 
     public static String getType(MessagePartInfo part, ToolContext context, boolean fullname) {
-        String type = "";
+        String type;
         DataBindingProfile dataBinding = context.get(DataBindingProfile.class);
         if (part.isElement()) {
             type = dataBinding.getType(getElementName(part), true);
@@ -138,7 +138,7 @@ public final class ProcessorUtil {
             }
             return resolvePartType(part);
         }
-        String name = "";
+        String name;
         if (part.isElement()) {
             name = dataBinding.getType(getElementName(part), true);
         } else {
