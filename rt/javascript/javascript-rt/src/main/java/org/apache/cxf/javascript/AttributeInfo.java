@@ -170,7 +170,7 @@ public final class AttributeInfo implements ItemInfo {
                 if (attributeInfo.type == null
                     && !element.getSchemaTypeName()
                             .getNamespaceURI().equals(Constants.URI_2001_SCHEMA_XSD)) {
-                    JavascriptUtils.unsupportedConstruct("MISSING_TYPE", element.getSchemaTypeName()
+                    throw JavascriptUtils.unsupportedConstruct("MISSING_TYPE", element.getSchemaTypeName()
                             .toString(), element.getQName(), element);
                 }
             }

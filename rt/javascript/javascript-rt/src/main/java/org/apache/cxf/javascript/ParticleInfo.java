@@ -329,7 +329,7 @@ public final class ParticleInfo implements ItemInfo {
                 if (elementInfo.type == null
                     && !element.getSchemaTypeName()
                             .getNamespaceURI().equals(Constants.URI_2001_SCHEMA_XSD)) {
-                    JavascriptUtils.unsupportedConstruct("MISSING_TYPE", element.getSchemaTypeName()
+                    throw JavascriptUtils.unsupportedConstruct("MISSING_TYPE", element.getSchemaTypeName()
                             .toString(), element.getQName(), element);
                 }
             }

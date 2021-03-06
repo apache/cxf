@@ -68,7 +68,7 @@ public class JavascriptGetInterceptor extends AbstractPhaseInterceptor<Message> 
             return;
         }
         String baseUri = (String)message.get(Message.REQUEST_URL);
-        URI uri = null;
+        final URI uri;
 
         try {
             uri = URI.create(baseUri);
