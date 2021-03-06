@@ -129,7 +129,7 @@ public class WSDLDefinitionBuilder implements WSDLBuilder<Definition> {
     }
 
     private void registerWSDLExtensibilityPlugins(ExtensionRegistry registry) {
-        Properties initialExtensions = null;
+        final Properties initialExtensions;
         try {
             initialExtensions = PropertiesLoaderUtils.loadAllProperties(WSDL_PLUGIN_RESOURCE, Thread
                             .currentThread().getContextClassLoader());
