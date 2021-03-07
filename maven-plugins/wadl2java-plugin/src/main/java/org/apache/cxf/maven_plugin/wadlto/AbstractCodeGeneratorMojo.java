@@ -455,7 +455,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
 
         cmd.createArg().setLine(additionalJvmArgs);
 
-        File file = null;
+        final File file;
         try {
             //file = new File("/tmp/test.jar");
             file = FileUtils.createTempFile("cxf-codegen", ".jar");

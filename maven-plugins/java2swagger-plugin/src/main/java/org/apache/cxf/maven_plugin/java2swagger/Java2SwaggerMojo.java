@@ -195,7 +195,7 @@ public class Java2SwaggerMojo extends AbstractMojo {
             // Put the json in target/generated/json
             // put the yaml in target/generated/yaml
 
-            String name = null;
+            final String name;
             if (outputFileName != null) {
                 name = outputFileName;
             } else if (resourceClasses.size() == 1) {

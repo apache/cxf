@@ -124,35 +124,31 @@ public class WSDLValidatorMojo extends AbstractMojo {
             List<String> list = new ArrayList<>();
 
             // verbose arg
-            if (verbose != null && verbose.booleanValue()) {
+            if (verbose != null && verbose) {
                 list.add("-verbose");
             }
 
             // quiet arg
-            if (quiet != null && quiet.booleanValue()) {
+            if (quiet != null && quiet) {
                 list.add("-quiet");
             }
 
             getLog().debug("Calling wsdlvalidator with args: " + list);
-            try {
+            final boolean ok;
+            try (InputStream toolspecStream = WSDLValidator.class .getResourceAsStream("wsdlvalidator.xml")) {
                 list.add(file.getCanonicalPath());
-                String[] pargs = list.toArray(new String[0]);
 
-                ToolSpec spec = null;
-                try (InputStream toolspecStream = WSDLValidator.class .getResourceAsStream("wsdlvalidator.xml")) {
-                    spec = new ToolSpec(toolspecStream, false);
-                }
-                WSDLValidator validator = new WSDLValidator(spec);
-                validator.setArguments(pargs);
-                boolean ok = validator.executeForMaven();
-                if (!ok) {
-                    throw new MojoExecutionException("WSDL failed validation: " + file.getName());
-                }
+                WSDLValidator validator = new WSDLValidator(new ToolSpec(toolspecStream, false));
+                validator.setArguments(list.toArray(new String[0]));
+                ok = validator.executeForMaven();
 
                 doneFile.createNewFile();
             } catch (Throwable e) {
                 throw new MojoExecutionException(file.getName() + ": "
                                                  + e.getMessage(), e);
+            }
+            if (!ok) {
+                throw new MojoExecutionException("WSDL failed validation: " + file.getName());
             }
         }
     }

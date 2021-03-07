@@ -248,10 +248,10 @@ public class Java2WADLMojo extends AbstractMojo {
         if (wadlGenerator == null) {
             wadlGenerator = new WadlGenerator(getBus());
         }
-        DocumentationProvider documentationProvider = null;
         if (docProvider != null) {
             try {
-                documentationProvider = (DocumentationProvider)getClassLoader().loadClass(docProvider).
+                DocumentationProvider documentationProvider =
+                    (DocumentationProvider)getClassLoader().loadClass(docProvider).
                     getConstructor(new Class[] {String.class}).
                     newInstance(new Object[] {project.getBuild().getDirectory()});
                 wadlGenerator.setDocumentationProvider(documentationProvider);
@@ -262,7 +262,9 @@ public class Java2WADLMojo extends AbstractMojo {
         setExtraProperties(wadlGenerator);
 
         StringBuilder sbMain = wadlGenerator.generateWADL(getBaseURI(), classResourceInfos, useJson, null, null);
-        getLog().debug("the wadl is =====> \n" + sbMain.toString());
+        if (getLog().isDebugEnabled()) {
+            getLog().debug("the wadl is =====> \n" + sbMain.toString());
+        }
         generateWadl(resourceClasses, sbMain.toString());
     }
 
@@ -295,7 +297,7 @@ public class Java2WADLMojo extends AbstractMojo {
         if (outputFile == null && project != null) {
             // Put the wadl in target/generated/wadl
 
-            String name = null;
+            final String name;
             if (outputFileName != null) {
                 name = outputFileName;
             } else if (resourceClasses.size() == 1) {
@@ -303,8 +305,8 @@ public class Java2WADLMojo extends AbstractMojo {
             } else {
                 name = "application";
             }
-            outputFile = (project.getBuild().getDirectory() + "/generated/wadl/" + name + "."
-                + outputFileExtension).replace("/", File.separator);
+            outputFile = (project.getBuild().getDirectory() + "/generated/wadl/" + name + '.'
+                + outputFileExtension).replace('/', File.separatorChar);
         }
 
         try {
