@@ -2910,6 +2910,6 @@
                     <version>1.0.6.Final</version>
                 </dependency>
             </dependencies>
-	</profile>
+        </profile>
     </profiles>
 </project>
