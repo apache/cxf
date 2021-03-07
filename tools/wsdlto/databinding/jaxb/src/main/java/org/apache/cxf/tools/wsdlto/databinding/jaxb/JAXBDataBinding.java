@@ -17,6 +17,7 @@
  * under the License.
  */
 package org.apache.cxf.tools.wsdlto.databinding.jaxb;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -352,8 +353,7 @@ public class JAXBDataBinding implements DataBindingProfile {
         Bus bus = context.get(Bus.class);
         OASISCatalogManager catalog = bus.getExtension(OASISCatalogManager.class);
 
-        Options opts = null;
-        opts = getOptions(schemaCompiler);
+        Options opts = getOptions(schemaCompiler);
         hackInNewInternalizationLogic(schemaCompiler, catalog, opts);
 
         ClassCollector classCollector = context.get(ClassCollector.class);
@@ -524,14 +524,13 @@ public class JAXBDataBinding implements DataBindingProfile {
                 }
             };
 
-            Constructor<DOMForest> c = null;
-            DOMForest forest = null;
+            DOMForest forest;
 
             try {
-                c = DOMForest.class.getConstructor(InternalizationLogic.class, Options.class);
+                Constructor<DOMForest> c = DOMForest.class.getConstructor(InternalizationLogic.class, Options.class);
                 forest = c.newInstance(logic, opts);
             } catch (Throwable t) {
-                c = DOMForest.class.getConstructor(InternalizationLogic.class);
+                Constructor<DOMForest> c = DOMForest.class.getConstructor(InternalizationLogic.class);
                 forest = c.newInstance(logic);
             }
             forest.setErrorHandler((ErrorReceiver)schemaCompiler);
@@ -598,13 +597,13 @@ public class JAXBDataBinding implements DataBindingProfile {
         return docs[0].getDocumentElement();
     }
     private InputSource convertToTmpInputSource(Element ele, String schemaLoc) throws Exception {
-        InputSource result = null;
         ele.setAttributeNS(null, "schemaLocation", schemaLoc);
         File tmpFile = FileUtils.createTempFile("jaxbbinding", ".xml");
-        StaxUtils.writeTo(ele, Files.newOutputStream(tmpFile.toPath()));
-        result = new InputSource(URIParserUtil.getAbsoluteURI(tmpFile.getAbsolutePath()));
         tmpFile.deleteOnExit();
-        return result;
+        try (Writer w = Files.newBufferedWriter(tmpFile.toPath())) {
+            StaxUtils.writeTo(ele, w);
+        }
+        return new InputSource(URIParserUtil.getAbsoluteURI(tmpFile.getAbsolutePath()));
     }
 
     private void addSchemas(Options opts,
