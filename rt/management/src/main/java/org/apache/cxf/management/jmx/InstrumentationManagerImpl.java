@@ -298,7 +298,7 @@ public class InstrumentationManagerImpl
 
     private void registerMBeanWithServer(Object obj, ObjectName name, boolean forceRegistration)
         throws JMException {
-        ObjectInstance instance = null;
+        ObjectInstance instance;
         try {
             if (LOG.isLoggable(Level.INFO)) {
                 LOG.info("registering MBean " + name + ": " + obj);

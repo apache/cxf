@@ -32,7 +32,6 @@ import org.apache.cxf.management.jmx.InstrumentationManagerImpl;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -43,13 +42,8 @@ import static org.junit.Assert.assertTrue;
 
 
 public class InstrumentationManagerTest {
-    InstrumentationManager im;
+
     Bus bus;
-
-    @Before
-    public void setUp() throws Exception {
-
-    }
 
     @After
     public void tearDown() throws Exception {
@@ -63,7 +57,7 @@ public class InstrumentationManagerTest {
     public void testInstrumentationNotEnabled() {
         SpringBusFactory factory = new SpringBusFactory();
         bus = factory.createBus();
-        im = bus.getExtension(InstrumentationManager.class);
+        InstrumentationManager im = bus.getExtension(InstrumentationManager.class);
         assertNotNull("Instrumentation Manager should not be null", im);
         MBeanServer mbs = im.getMBeanServer();
         assertNull("MBeanServer should not be available.", mbs);
@@ -73,7 +67,7 @@ public class InstrumentationManagerTest {
     public void testInstrumentationEnabledSetBeforeBusSet() {
         SpringBusFactory factory = new SpringBusFactory();
         bus = factory.createBus("managed-spring3.xml", true);
-        im = bus.getExtension(InstrumentationManager.class);
+        InstrumentationManager im = bus.getExtension(InstrumentationManager.class);
         assertNotNull("Instrumentation Manager should not be null", im);
         MBeanServer mbs = im.getMBeanServer();
         assertNotNull("MBeanServer should be available.", mbs);
@@ -84,7 +78,7 @@ public class InstrumentationManagerTest {
     public void testWorkQueueInstrumentation() throws Exception {
         SpringBusFactory factory = new SpringBusFactory();
         bus = factory.createBus("managed-spring.xml", true);
-        im = bus.getExtension(InstrumentationManager.class);
+        InstrumentationManager im = bus.getExtension(InstrumentationManager.class);
         assertNotNull("Instrumentation Manager should not be null", im);
         WorkQueueManagerImpl wqm = new WorkQueueManagerImpl();
         wqm.setBus(bus);

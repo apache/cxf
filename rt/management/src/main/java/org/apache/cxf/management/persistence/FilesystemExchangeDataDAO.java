@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.management.persistence;
 
-import java.io.OutputStream;
-import java.io.StringWriter;
+import java.io.BufferedWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -41,7 +40,7 @@ public class FilesystemExchangeDataDAO implements ExchangeDataDAO {
     }
 
     public void save(ExchangeData exchange) throws Exception {
-        Path file = null;
+        final Path file;
 
         if (this.directory == null) {
             file = Files.createTempFile("cxf-management-", "." + this.extension);
@@ -49,77 +48,35 @@ public class FilesystemExchangeDataDAO implements ExchangeDataDAO {
             file = Files.createTempFile(Paths.get(this.directory), "cxf-management-", "." + this.extension);
         }
 
-        StringWriter stringWriter = new StringWriter();
+        try (BufferedWriter bw = Files.newBufferedWriter(file)) {
+            bw.append("Service : ").append(exchange.getServiceName()).append('\n');
 
-        stringWriter.append("Service : ");
-        stringWriter.append(exchange.getServiceName());
-        stringWriter.append("\n");
+            bw.append("Operation : ").append(exchange.getOperation()).append('\n');
+            bw.append("Status : ").append(exchange.getStatus()).append('\n');
+            bw.append("URI : ").append(exchange.getUri()).append('\n');
+            bw.append("User agent : ").append(exchange.getUserAgent()).append('\n');
+            bw.append("Encoding : ").append(exchange.getEncoding()).append('\n');
+            bw.append("Date in : ").append(String.valueOf(exchange.getInDate())).append('\n');
+            bw.append("Date out : ").append(String.valueOf(exchange.getOutDate())).append('\n');
+            bw.append("Request size : ").append(String.valueOf(exchange.getRequestSize())).append('\n');
+            bw.append("Response size : ").append(String.valueOf(exchange.getResponseSize())).append('\n');
 
-        stringWriter.append("Operation : ");
-        stringWriter.append(exchange.getOperation());
-        stringWriter.append("\n");
+            bw.append("\n\n\nRequest : \n\n\n").append(exchange.getRequest()).append("\n\n\n\n");
+            bw.append("\n\n\nResponse : \n\n\n").append(exchange.getResponse()).append("\n\n\n\n");
 
-        stringWriter.append("Status : ");
-        stringWriter.append(exchange.getStatus());
-        stringWriter.append("\n");
-
-        stringWriter.append("URI : ");
-        stringWriter.append(exchange.getUri());
-        stringWriter.append("\n");
-
-        stringWriter.append("User agent : ");
-        stringWriter.append(exchange.getUserAgent());
-        stringWriter.append("\n");
-
-        stringWriter.append("Encoding : ");
-        stringWriter.append(exchange.getEncoding());
-        stringWriter.append("\n");
-
-        stringWriter.append("Date in : ");
-        stringWriter.append(exchange.getInDate().toString());
-        stringWriter.append("\n");
-
-        stringWriter.append("Date out : ");
-        stringWriter.append(exchange.getOutDate().toString());
-        stringWriter.append("\n");
-
-        stringWriter.append("Request size : ");
-        stringWriter.append(String.valueOf(exchange.getRequestSize()));
-        stringWriter.append("\n");
-
-        stringWriter.append("Response size : ");
-        stringWriter.append(String.valueOf(exchange.getResponseSize()));
-        stringWriter.append("\n");
-
-        stringWriter.append("\n\n\nRequest : \n\n\n");
-        stringWriter.append(exchange.getRequest());
-        stringWriter.append("\n\n\n\n");
-
-        stringWriter.append("\n\n\nResponse : \n\n\n");
-        stringWriter.append(exchange.getResponse());
-        stringWriter.append("\n\n\n\n");
-
-        if ("ERROR".equals(exchange.getStatus())) {
-            stringWriter.append("\n\n\nExcepttion : ");
-            stringWriter.append(exchange.getExceptionType());
-            stringWriter.append("\nStackTrace : ");
-            stringWriter.append(exchange.getStackTrace());
-            stringWriter.append("\n\n\n\n");
-        }
-
-        stringWriter.append("\n\nProperties : \n");
-
-        if (exchange.getProperties() != null) {
-            for (ExchangeDataProperty exchangeProperty : exchange.getProperties()) {
-                stringWriter.append(exchangeProperty.getName());
-                stringWriter.append(" : ");
-                stringWriter.append(exchangeProperty.getValue());
-                stringWriter.append("\n");
+            if ("ERROR".equals(exchange.getStatus())) {
+                bw.append("\n\n\nExcepttion : ").append(exchange.getExceptionType());
+                bw.append("\nStackTrace : ").append(exchange.getStackTrace());
+                bw.append("\n\n\n\n");
             }
-        }
 
-        try (OutputStream fileOutputStream = Files.newOutputStream(file)) {
-            fileOutputStream.write(stringWriter.getBuffer().toString().getBytes());
+            bw.append("\n\nProperties : \n");
+
+            if (exchange.getProperties() != null) {
+                for (ExchangeDataProperty edp : exchange.getProperties()) {
+                    bw.append(edp.getName()).append(" : ").append(edp.getValue()).append('\n');
+                }
+            }
         }
 
         if (LOG.isLoggable(Level.FINE)) {
@@ -127,4 +84,5 @@ public class FilesystemExchangeDataDAO implements ExchangeDataDAO {
         }
 
     }
+
 }
