@@ -27,6 +27,7 @@ import javax.ws.rs.NotFoundException;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
@@ -36,8 +37,8 @@ import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.metrics.MetricsFeature;
 import org.apache.cxf.metrics.MetricsProvider;
+import org.apache.cxf.systest.jaxrs.applications.LibraryApplication;
 import org.apache.cxf.systest.jaxrs.resources.Book;
-import org.apache.cxf.systest.jaxrs.resources.Library;
 import org.apache.cxf.systest.jaxrs.resources.LibraryApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -46,7 +47,6 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.system.OutputCaptureRule;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -67,9 +67,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = SpringJaxrsTest.TestConfig.class)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = SpringJaxrsApplicationTest.TestConfig.class)
 @ActiveProfiles("jaxrs")
-public class SpringJaxrsTest {
+public class SpringJaxrsApplicationTest {
     @Rule
     public OutputCaptureRule output = new OutputCaptureRule();
 
@@ -84,7 +84,6 @@ public class SpringJaxrsTest {
 
     @Configuration
     @EnableAutoConfiguration
-    @ComponentScan(basePackageClasses = Library.class)
     static class TestConfig {
         @Bean
         public SpringBus cxf() {
@@ -95,13 +94,13 @@ public class SpringJaxrsTest {
         }
         
         @Bean
-        public Feature metricsFeature(MetricsProvider metricsProvider) {
-            return new MetricsFeature(metricsProvider);
+        public Application application() {
+            return new LibraryApplication();
         }
         
         @Bean
-        public JacksonJsonProvider jacksonJsonProvider() {
-            return new JacksonJsonProvider();
+        public Feature metricsFeature(MetricsProvider metricsProvider) {
+            return new MetricsFeature(metricsProvider);
         }
     }
     
@@ -128,7 +127,7 @@ public class SpringJaxrsTest {
                 entry("exception", "None"),
                 entry("method", "GET"),
                 entry("operation", "getBooks"),
-                entry("uri", "/api/library"),
+                entry("uri", "/api/app/library"),
                 entry("outcome", "SUCCESS"),
                 entry("status", "200"));
         
@@ -142,7 +141,44 @@ public class SpringJaxrsTest {
                 entry("exception", "None"),
                 entry("method", "GET"),
                 entry("operation", "UNKNOWN"),
-                entry("uri", "http://localhost:" + port + "/api/library"),
+                entry("uri", "http://localhost:" + port + "/api/app/library"),
+                entry("outcome", "SUCCESS"),
+                entry("status", "200"));
+    }
+    
+    @Test
+    public void testJaxrsSubresourceSuccessMetric() {
+        final WebTarget target = createWebTarget().path("catalog").path("cxf");
+        
+        try (Response r = target.request().get()) {
+            assertThat(r.getStatus()).isEqualTo(200);
+        }
+        
+        RequiredSearch serverRequestMetrics = registry.get("cxf.server.requests");
+
+        Map<Object, Object> serverTags = serverRequestMetrics.timer().getId().getTags().stream()
+                .collect(toMap(Tag::getKey, Tag::getValue));
+
+        assertThat(serverTags)
+            .containsOnly(
+                entry("exception", "None"),
+                entry("method", "GET"),
+                entry("operation", "catalog"),
+                entry("uri", "/api/app/library/catalog/{catalog}"),
+                entry("outcome", "SUCCESS"),
+                entry("status", "200"));
+        
+        RequiredSearch clientRequestMetrics = registry.get("cxf.client.requests");
+
+        Map<Object, Object> clientTags = clientRequestMetrics.timer().getId().getTags().stream()
+                .collect(toMap(Tag::getKey, Tag::getValue));
+
+        assertThat(clientTags)
+            .containsOnly(
+                entry("exception", "None"),
+                entry("method", "GET"),
+                entry("operation", "UNKNOWN"),
+                entry("uri", "http://localhost:" + port + "/api/app/library/catalog/cxf"),
                 entry("outcome", "SUCCESS"),
                 entry("status", "200"));
     }
@@ -165,7 +201,7 @@ public class SpringJaxrsTest {
                 entry("exception", "None"),
                 entry("method", "GET"),
                 entry("operation", "getBook"),
-                entry("uri", "/api/library/{id}"),
+                entry("uri", "/api/app/library/{id}"),
                 entry("outcome", "CLIENT_ERROR"),
                 entry("status", "404"));
         
@@ -179,7 +215,7 @@ public class SpringJaxrsTest {
                 entry("exception", "None"),
                 entry("method", "GET"),
                 entry("operation", "UNKNOWN"),
-                entry("uri", "http://localhost:" + port + "/api/library/100"),
+                entry("uri", "http://localhost:" + port + "/api/app/library/100"),
                 entry("outcome", "CLIENT_ERROR"),
                 entry("status", "404"));
     }
@@ -202,7 +238,7 @@ public class SpringJaxrsTest {
                 entry("exception", "UnsupportedOperationException"),
                 entry("method", "DELETE"),
                 entry("operation", "deleteBooks"),
-                entry("uri", "/api/library"),
+                entry("uri", "/api/app/library"),
                 entry("outcome", "SERVER_ERROR"),
                 entry("status", "500"));
         
@@ -216,7 +252,7 @@ public class SpringJaxrsTest {
                 entry("exception", "None"),
                 entry("method", "DELETE"),
                 entry("operation", "UNKNOWN"),
-                entry("uri", "http://localhost:" + port + "/api/library"),
+                entry("uri", "http://localhost:" + port + "/api/app/library"),
                 entry("outcome", "SERVER_ERROR"),
                 entry("status", "500"));
     }
@@ -271,7 +307,7 @@ public class SpringJaxrsTest {
                 entry("exception", "None"),
                 entry("method", "GET"),
                 entry("operation", "getBooks"),
-                entry("uri", "/api/library"),
+                entry("uri", "/api/app/library"),
                 entry("outcome", "SUCCESS"),
                 entry("status", "200"));
         
@@ -285,7 +321,7 @@ public class SpringJaxrsTest {
                 entry("exception", "None"),
                 entry("method", "GET"),
                 entry("operation", "UNKNOWN"),
-                entry("uri", "http://localhost:" + port + "/api/library"),
+                entry("uri", "http://localhost:" + port + "/api/app/library"),
                 entry("outcome", "SUCCESS"),
                 entry("status", "200"));
     }
@@ -308,7 +344,7 @@ public class SpringJaxrsTest {
                 entry("exception", "UnsupportedOperationException"),
                 entry("method", "DELETE"),
                 entry("operation", "deleteBooks"),
-                entry("uri", "/api/library"),
+                entry("uri", "/api/app/library"),
                 entry("outcome", "SERVER_ERROR"),
                 entry("status", "500"));
         
@@ -322,7 +358,7 @@ public class SpringJaxrsTest {
                 entry("exception", "None"),
                 entry("method", "DELETE"),
                 entry("operation", "UNKNOWN"),
-                entry("uri", "http://localhost:" + port + "/api/library"),
+                entry("uri", "http://localhost:" + port + "/api/app/library"),
                 entry("outcome", "SERVER_ERROR"),
                 entry("status", "500"));
     }
@@ -345,7 +381,7 @@ public class SpringJaxrsTest {
                 entry("exception", "None"),
                 entry("method", "GET"),
                 entry("operation", "getBook"),
-                entry("uri", "/api/library/{id}"),
+                entry("uri", "/api/app/library/{id}"),
                 entry("outcome", "CLIENT_ERROR"),
                 entry("status", "404"));
         
@@ -359,7 +395,7 @@ public class SpringJaxrsTest {
                 entry("exception", "None"),
                 entry("method", "GET"),
                 entry("operation", "UNKNOWN"),
-                entry("uri", "http://localhost:" + port + "/api/library/100"),
+                entry("uri", "http://localhost:" + port + "/api/app/library/100"),
                 entry("outcome", "CLIENT_ERROR"),
                 entry("status", "404"));
     }
@@ -387,14 +423,14 @@ public class SpringJaxrsTest {
                 entry("exception", "None"),
                 entry("method", "DELETE"),
                 entry("operation", "UNKNOWN"),
-                entry("uri", "http://localhost:" + fakePort + "/api/library"),
+                entry("uri", "http://localhost:" + fakePort + "/api/app/library"),
                 entry("outcome", "UNKNOWN"),
                 entry("status", "UNKNOWN"));
     }
     
     private LibraryApi createApi(int portToUse) {
         final JAXRSClientFactoryBean factory = new JAXRSClientFactoryBean();
-        factory.setAddress("http://localhost:" + portToUse + "/api/library");
+        factory.setAddress("http://localhost:" + portToUse + "/api/app/library");
         factory.setFeatures(Arrays.asList(new MetricsFeature(metricsProvider)));
         factory.setResourceClass(LibraryApi.class);
         return factory.create(LibraryApi.class);
@@ -405,7 +441,7 @@ public class SpringJaxrsTest {
             .newClient()
             .register(JacksonJsonProvider.class)
             .register(new MetricsFeature(metricsProvider))
-            .target("http://localhost:" + port + "/api/library");
+            .target("http://localhost:" + port + "/api/app/library");
     }
 
 }
