@@ -122,7 +122,12 @@
         <profile>
             <id>xerces</id>
             <activation>
-                <jdk>[16,)</jdk>
+                <activeByDefault>false</activeByDefault>
+                <jdk>[9,)</jdk>
+                <property>
+                    <name>xerces</name>
+                    <value>true</value>
+                </property>
             </activation>
             <dependencies>
                 <dependency>
