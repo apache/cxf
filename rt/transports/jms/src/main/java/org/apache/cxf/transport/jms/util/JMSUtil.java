@@ -108,7 +108,7 @@ public final class JMSUtil {
      */
     public static Message createAndSetPayload(Object payload, Session session, String messageType)
         throws JMSException {
-        Message message = null;
+        final Message message;
         if (JMSConstants.TEXT_MESSAGE_TYPE.equals(messageType)) {
             message = session.createTextMessage((String)payload);
         } else if (JMSConstants.BYTE_MESSAGE_TYPE.equals(messageType)) {

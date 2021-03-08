@@ -77,7 +77,7 @@ final class JMSMessageUtils {
      */
     private static void retrieveAndSetPayload(org.apache.cxf.message.Message inMessage, Message message)
         throws UnsupportedEncodingException, JMSException {
-        String messageType = null;
+        final String messageType;
         Object converted = new JMSMessageConverter().fromMessage(message);
         if (converted instanceof String) {
             inMessage.setContent(Reader.class, new StringReader((String)converted));

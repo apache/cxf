@@ -69,7 +69,6 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
 
         @Override
         public void run() {
-            Session session = null;
             while (running) {
                 try (ResourceCloser closer = new ResourceCloser()) {
                     closer.register(createInitialContext());
@@ -80,7 +79,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                         connection = PollingMessageListenerContainer.this.connection;
                     }
                     // Create session early to optimize performance
-                    session = closer.register(connection.createSession(transacted, acknowledgeMode));
+                    Session session = closer.register(connection.createSession(transacted, acknowledgeMode));
                     MessageConsumer consumer = closer.register(createConsumer(connection, session));
 
                     while (running) {

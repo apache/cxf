@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.transport.jms.util;
 
-import java.util.concurrent.Executors;
+import java.util.concurrent.CompletableFuture;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -70,7 +70,7 @@ public class TestReceiver {
             connection.start();
             Session session = closer.register(connection.createSession(false, Session.AUTO_ACKNOWLEDGE));
             MessageConsumer consumer = closer.register(session.createConsumer(session.createQueue(receiveQueueName)));
-            javax.jms.Message message = null;
+            javax.jms.Message message;
             do {
                 message = consumer.receive(100);
             } while (message != null);
@@ -112,10 +112,8 @@ public class TestReceiver {
 
     public void runAsync() {
         drainQueue();
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
-                receiveAndRespond();
-            }
+        CompletableFuture.runAsync(() -> {
+            receiveAndRespond();
         });
     }
 
