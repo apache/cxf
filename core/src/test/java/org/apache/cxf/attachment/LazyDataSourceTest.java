@@ -64,4 +64,15 @@ public class LazyDataSourceTest {
         }
     }
 
+    @Test
+    public void testNoAttachmentSameID() throws Exception {
+        DataSource ds = new LazyDataSource(ID_2, Collections.singleton(new AttachmentImpl(ID_2)));
+        try {
+            ds.getName();
+            fail();
+        } catch (IllegalStateException e) {
+            String message = e.getMessage();
+            assertTrue(message, message.contains(ID_2));
+        }
+    }
 }
