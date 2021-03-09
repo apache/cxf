@@ -157,15 +157,14 @@ public class CorbaDSIServant extends DynamicImplementation {
         msg.setCorbaTypeMap(typeMap);
 
         // If there's no output message part in our operation then it's a oneway op
-        BindingMessageInfo bindingMsgOutputInfo = null;
-        BindingOperationInfo bindingOpInfo = null;
+        final BindingOperationInfo bindingOpInfo;
         try {
             bindingOpInfo = this.destination.getEndPointInfo().getBinding().getOperation(requestOperation);
         } catch (Exception ex) {
             throw new CorbaBindingException("Invalid Request. Operation unknown: " + opName);
         }
         if (bindingOpInfo != null) {
-            bindingMsgOutputInfo = bindingOpInfo.getOutput();
+            BindingMessageInfo bindingMsgOutputInfo = bindingOpInfo.getOutput();
             if (bindingMsgOutputInfo == null) {
                 exg.setOneWay(true);
             }

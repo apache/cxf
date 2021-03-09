@@ -82,7 +82,7 @@ public class WebFaultInInterceptor extends AbstractPhaseInterceptor<Message> {
 
         for (FaultInfo faultInfo : op.getFaults()) {
             for (MessagePartInfo mpi : faultInfo.getMessageParts()) {
-                String ns = null;
+                final String ns;
                 if (mpi.isElement()) {
                     ns = mpi.getElementQName().getNamespaceURI();
                 } else {

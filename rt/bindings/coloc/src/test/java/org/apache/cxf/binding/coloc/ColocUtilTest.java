@@ -41,7 +41,6 @@ import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
-import org.apache.headers.coloc.types.FaultDetailT;
 import org.apache.headers.coloc.types.InHeaderT;
 import org.apache.headers.coloc.types.OutHeaderT;
 import org.apache.headers.rpc_lit.PingMeFault;
@@ -185,6 +184,7 @@ public class ColocUtilTest {
 
         List<FaultInfo> fil2 = new ArrayList<>();
         match = ColocUtil.isSameFaultInfo(fil1, fil2);
+        assertTrue("Should find a match", match);
 
         QName fn1 = new QName("A", "B");
         QName fn2 = new QName("C", "D");
@@ -192,8 +192,8 @@ public class ColocUtilTest {
         FaultInfo fi1 = new FaultInfo(fn1, null, oi);
         fi1.setProperty(Class.class.getName(), PingMeFault.class);
         fil1.add(fi1);
-        FaultInfo fi2 = new FaultInfo(fn2, null, oi);
-        fi2.setProperty(Class.class.getName(), FaultDetailT.class);
+        //FaultInfo fi2 = new FaultInfo(fn2, null, oi);
+        //fi2.setProperty(Class.class.getName(), FaultDetailT.class);
         match = ColocUtil.isSameFaultInfo(fil1, fil2);
         assertFalse("Should not find a match", match);
 

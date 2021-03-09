@@ -94,7 +94,7 @@ public class CorbaServerConduit implements Conduit {
     }
 
     public final EndpointReferenceType getTargetReference(EndpointReferenceType t) {
-        EndpointReferenceType ref = null;
+        final EndpointReferenceType ref;
         if (null == t) {
             ref = new EndpointReferenceType();
             AttributedURIType address = new AttributedURIType();

@@ -175,7 +175,7 @@ public class OrbConfig {
                                               URI iorFile)
         throws IOException {
         String ref = orb.object_to_string(obj);
-        File f = null;
+        final File f;
         if (iorFile.isOpaque()) {
             f = new File(iorFile.getSchemeSpecificPart());
         } else {

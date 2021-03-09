@@ -70,7 +70,7 @@ public class CorbaFixedHandlerTest {
         CorbaFixedHandler obj = new CorbaFixedHandler(fixedName, fixedIdlType, fixedTC, fixedType);
         assertNotNull(obj);
 
-        java.math.BigDecimal value = new java.math.BigDecimal(123.45);
+        java.math.BigDecimal value = new java.math.BigDecimal("123.45");
         obj.setValue(value);
 
         assertEquals(value, obj.getValue());

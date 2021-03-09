@@ -131,9 +131,8 @@ public final class CorbaUtils {
                     + (seenTypes.empty() ? "" : ", Enclosing type: " + seenTypes.elementAt(0)));
         }
 
-        TypeCode tc = null;
         // first see if it is a primitive
-        tc = getPrimitiveTypeCode(orb, type);
+        TypeCode tc = getPrimitiveTypeCode(orb, type);
         if (tc == null && type.equals(CorbaConstants.NT_CORBA_ANY)) {
             // Anys are handled in a special way
             tc = orb.get_primitive_tc(TCKind.from_int(TCKind._tk_any));
@@ -619,13 +618,13 @@ public final class CorbaUtils {
     }
 
     public static NVList nvListFromStreamables(ORB orb, CorbaStreamable[] streamables) {
-        NVList list = null;
+        final NVList list;
         if (streamables != null && streamables.length > 0) {
             list = orb.create_list(streamables.length);
-            for (int i = 0; i < streamables.length; ++i) {
+            for (CorbaStreamable streamable : streamables) {
                 Any value = orb.create_any();
-                value.insert_Streamable(streamables[i]);
-                list.add_value(streamables[i].getName(), value, streamables[i].getMode());
+                value.insert_Streamable(streamable);
+                list.add_value(streamable.getName(), value, streamable.getMode());
             }
         } else {
             list = orb.create_list(0);

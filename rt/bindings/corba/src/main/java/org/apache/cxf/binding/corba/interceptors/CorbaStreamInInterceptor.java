@@ -107,7 +107,7 @@ public class CorbaStreamInInterceptor extends AbstractPhaseInterceptor<Message> 
         orb = message.getExchange().get(ORB.class);
         HandlerIterator paramIterator = new HandlerIterator(outMessage, false);
 
-        CorbaTypeEventProducer eventProducer = null;
+        final CorbaTypeEventProducer eventProducer;
         Exchange exchange = message.getExchange();
         BindingOperationInfo bindingOpInfo = exchange.getBindingOperationInfo();
         BindingMessageInfo msgInfo = bindingOpInfo.getOutput();
@@ -182,7 +182,7 @@ public class CorbaStreamInInterceptor extends AbstractPhaseInterceptor<Message> 
 
         HandlerIterator paramIterator = new HandlerIterator(message, true);
 
-        CorbaTypeEventProducer eventProducer = null;
+        final CorbaTypeEventProducer eventProducer;
         BindingMessageInfo msgInfo = bopInfo.getInput();
         boolean wrap = false;
         if (bopInfo.isUnwrappedCapable()) {

@@ -101,14 +101,10 @@ public class CorbaHandlerUtilsTest {
 
     @Test
     public void testCreateTypeHandler() {
-        QName objName = null;
-        QName objIdlType = null;
-        CorbaObjectHandler result = null;
-
         // Test for an array handler
-        objName = new QName("object");
-        objIdlType = new QName(COMPLEX_TYPES_NAMESPACE_URI, "TestArray", COMPLEX_TYPES_PREFIX);
-        result = CorbaHandlerUtils.createTypeHandler(orb, objName, objIdlType, typeMap);
+        QName objName = new QName("object");
+        QName objIdlType = new QName(COMPLEX_TYPES_NAMESPACE_URI, "TestArray", COMPLEX_TYPES_PREFIX);
+        CorbaObjectHandler result = CorbaHandlerUtils.createTypeHandler(orb, objName, objIdlType, typeMap);
         assertTrue(result instanceof CorbaArrayHandler);
 
         // Test for an enum handler
@@ -150,14 +146,11 @@ public class CorbaHandlerUtilsTest {
 
     @Test
     public void testInitializeObjectHandler() {
-        QName objName = null;
-        QName objIdlType = null;
-        CorbaObjectHandler result = null;
-
         // Test for an array handler
-        objName = new QName("object");
-        objIdlType = new QName(COMPLEX_TYPES_NAMESPACE_URI, "TestArray", COMPLEX_TYPES_PREFIX);
-        result = CorbaHandlerUtils.initializeObjectHandler(orb, objName, objIdlType, typeMap, service);
+        QName objName = new QName("object");
+        QName objIdlType = new QName(COMPLEX_TYPES_NAMESPACE_URI, "TestArray", COMPLEX_TYPES_PREFIX);
+        CorbaObjectHandler result =
+            CorbaHandlerUtils.initializeObjectHandler(orb, objName, objIdlType, typeMap, service);
         assertTrue(result instanceof CorbaArrayHandler);
         CorbaArrayHandler arrayHandler = (CorbaArrayHandler)result;
         // WSDL defines the array to have 5 elements

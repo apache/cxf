@@ -115,7 +115,7 @@ public class CorbaStreamFaultOutInterceptor extends AbstractPhaseInterceptor<Mes
             return;
         }
 
-        String exClassName = null;
+        String exClassName;
         if (faultEx == null) {
             //REVISIT, we should not have to depend on WebFault annotation
             //Try changing the fault name to the proper mangled java exception classname.
@@ -185,9 +185,8 @@ public class CorbaStreamFaultOutInterceptor extends AbstractPhaseInterceptor<Mes
     }
 
     protected RaisesType getRaisesType(OperationType opType, String exClassName, Throwable ex) {
-        RaisesType result = null;
         List<RaisesType> exList = opType.getRaises();
-        result = findRaisesType(exList, exClassName);
+        RaisesType result = findRaisesType(exList, exClassName);
 
         if (result == null) {
             //REVISIT, need to find a better way to match the corba binding exception name with the wsdl one
