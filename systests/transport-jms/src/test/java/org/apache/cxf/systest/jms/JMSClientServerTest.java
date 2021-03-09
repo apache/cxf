@@ -61,7 +61,6 @@ import org.apache.cxf.transport.jms.JMSConfigFeature;
 import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
-import org.apache.cxf.transport.jms.util.TestReceiver;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
 import org.apache.hello_world_doc_lit.SOAPService2;
