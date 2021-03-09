@@ -51,12 +51,13 @@ public class DefaultLogEventMapper {
     private static final Set<String> DEFAULT_BINARY_CONTENT_MEDIA_TYPES;
 
     static {
-        Set<String> mediaTypes = new HashSet<>(5);
+        Set<String> mediaTypes = new HashSet<>(6);
         mediaTypes.add("application/octet-stream");
         mediaTypes.add("application/pdf");
         mediaTypes.add("image/png");
         mediaTypes.add("image/jpeg");
         mediaTypes.add("image/gif");
+        mediaTypes.add("image/bmp");
         DEFAULT_BINARY_CONTENT_MEDIA_TYPES = Collections.unmodifiableSet(mediaTypes);
     }
     private static final String MULTIPART_CONTENT_MEDIA_TYPE = "multipart";
@@ -199,6 +200,10 @@ public class DefaultLogEventMapper {
         return contentType != null && binaryContentMediaTypes.contains(contentType);
     }
 
+    public boolean isBinaryContent(String contentType) {
+        return contentType != null && binaryContentMediaTypes.contains(contentType);
+    }
+    
     private boolean isMultipartContent(Message message) {
         String contentType = safeGet(message, Message.CONTENT_TYPE);
         return contentType != null && contentType.startsWith(MULTIPART_CONTENT_MEDIA_TYPE);

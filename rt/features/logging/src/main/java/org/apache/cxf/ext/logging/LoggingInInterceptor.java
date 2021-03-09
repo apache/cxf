@@ -96,7 +96,10 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         } else {
             event.setPayload(AbstractLoggingInterceptor.CONTENT_SUPPRESSED);
         }
-        final String maskedContent = maskSensitiveElements(message, event.getPayload());
+        String maskedContent = maskSensitiveElements(message, event.getPayload());
+        if (!logBinary) {
+            maskedContent = stripBinaryParts(event, maskedContent);
+        }
         event.setPayload(transform(message, maskedContent));
         sender.send(event);
     }

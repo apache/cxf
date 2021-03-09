@@ -39,6 +39,7 @@ import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
@@ -88,16 +89,23 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
                 Endpoint ep = jaxep.getServer().getEndpoint();
                 ep.getInInterceptors().add(new TestMultipartMessageInterceptor());
                 ep.getOutInterceptors().add(new TestAttachmentOutInterceptor());
-                jaxep.getInInterceptors().add(new LoggingInInterceptor());
-                jaxep.getOutInterceptors().add(new LoggingOutInterceptor());
+                LoggingInInterceptor logIn = new LoggingInInterceptor();
+                logIn.setLogBinary(false);
+                logIn.setLogMultipart(true);
+                LoggingOutInterceptor logOut = new LoggingOutInterceptor();
+                logOut.setLogBinary(false);
+                logOut.setLogMultipart(true);
+                jaxep.getInInterceptors().add(logIn);
+                jaxep.getOutInterceptors().add(logOut);
                 SOAPBinding jaxWsSoapBinding = (SOAPBinding) jaxep.getBinding();
                 jaxep.getProperties().put("schema-validation-enabled", "true");
                 jaxWsSoapBinding.setMTOMEnabled(true);
                 EndpointImpl endpoint =
                     (EndpointImpl)javax.xml.ws.Endpoint.publish(addressProvider, new TestMtomProviderImpl());
                 endpoint.getProperties().put("schema-validation-enabled", "true");
-                endpoint.getInInterceptors().add(new LoggingInInterceptor());
-                endpoint.getOutInterceptors().add(new LoggingOutInterceptor());
+                endpoint.getInInterceptors().add(logIn);
+                endpoint.getOutInterceptors().add(logOut);
+                
 
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -421,6 +429,11 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
                                     boolean enableMTOM, boolean installInterceptors) throws Exception {
         ReflectionServiceFactoryBean serviceFactory = new JaxWsServiceFactoryBean();
         Bus bus = getStaticBus();
+        LoggingFeature lf = new LoggingFeature();
+        lf.setPrettyLogging(false);
+        lf.setLogBinary(false);
+        lf.setLogMultipart(true);
+        bus.getFeatures().add(lf);
         serviceFactory.setBus(bus);
         serviceFactory.setServiceName(serviceName);
         serviceFactory.setServiceClass(serviceEndpointInterface);
