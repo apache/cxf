@@ -146,7 +146,10 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             }
 
             String payload = shouldLogContent(event) ? getPayload(event, w2) : CONTENT_SUPPRESSED;
-            final String maskedContent = maskSensitiveElements(message, payload);
+            String maskedContent = maskSensitiveElements(message, payload);
+            if (!logBinary) {
+                maskedContent = stripBinaryParts(event, maskedContent);
+            }
             event.setPayload(transform(message, maskedContent));
             sender.send(event);
             message.setContent(Writer.class, out);
@@ -213,7 +216,10 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
                 String encoding = (String) message.get(Message.ENCODING);
                 StringBuilder payload = new StringBuilder();
                 writePayload(payload, cos, encoding, event.getContentType());
-                final String maskedContent = maskSensitiveElements(message, payload.toString());
+                String maskedContent = maskSensitiveElements(message, payload.toString());
+                if (!logBinary) {
+                    maskedContent = stripBinaryParts(event, maskedContent);
+                }
                 event.setPayload(transform(message, maskedContent));
                 boolean isTruncated = cos.size() > limit && limit != -1;
                 event.setTruncated(isTruncated);
