@@ -261,7 +261,7 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
     }
 
     Policy resolveReference(PolicyReference ref, DescriptionInfo di) {
-        Policy p = null;
+        final Policy p;
         if (isExternal(ref)) {
             String uri = di.getBaseURI();
             if (uri == null) {

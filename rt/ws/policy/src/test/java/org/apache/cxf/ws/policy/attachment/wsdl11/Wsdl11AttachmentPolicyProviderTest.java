@@ -173,7 +173,7 @@ public class Wsdl11AttachmentPolicyProviderTest {
 
         // one extension of type Policy, without assertion builder
         try {
-            p = app.getElementPolicy(services[2]);
+            app.getElementPolicy(services[2]);
             fail("Expected PolicyException not thrown.");
         } catch (PolicyException ex) {
             // expected
@@ -213,7 +213,7 @@ public class Wsdl11AttachmentPolicyProviderTest {
 
         // one extension of type Policy, without assertion builder
         try {
-            ep = app.getEffectivePolicy(services[2], null);
+            app.getEffectivePolicy(services[2], null);
             fail("Expected PolicyException not thrown.");
         } catch (PolicyException ex) {
             // expected

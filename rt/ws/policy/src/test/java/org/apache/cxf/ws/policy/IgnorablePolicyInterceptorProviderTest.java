@@ -140,11 +140,11 @@ public class IgnorablePolicyInterceptorProviderTest {
 
     @Test
     public void testTwoBuses() {
-        ClassPathXmlApplicationContext context = null;
         Bus cxf1 = null;
         Bus cxf2 = null;
         try {
-            context = new ClassPathXmlApplicationContext("/org/apache/cxf/ws/policy/ignorable-policy2.xml");
+            ClassPathXmlApplicationContext context =
+                new ClassPathXmlApplicationContext("/org/apache/cxf/ws/policy/ignorable-policy2.xml");
             cxf1 = (Bus)context.getBean("cxf1");
             assertNotNull(cxf1);
 
@@ -175,8 +175,11 @@ public class IgnorablePolicyInterceptorProviderTest {
         } finally {
             if (null != cxf1) {
                 cxf1.shutdown(true);
-                BusFactory.setDefaultBus(null);
             }
+            if (null != cxf2) {
+                cxf2.shutdown(true);
+            }
+            BusFactory.setDefaultBus(null);
         }
     }
 

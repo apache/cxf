@@ -157,7 +157,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
     }
 
     void chooseAlternative(Message m) {
-        Collection<Assertion> alternative = null;
+        final Collection<Assertion> alternative;
         if (requestor) {
             if (engine.isEnabled()) {
                 alternative = engine.getAlternativeSelector().selectAlternative(policy, engine, assertor, null, m);
@@ -221,7 +221,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         // add assertions for specific inbound (in case of a server endpoint) or outbound
         // (in case of a client endpoint) messages
         for (BindingOperationInfo boi : ei.getBinding().getOperations()) {
-            EffectivePolicy p = null;
+            EffectivePolicy p;
             if (!this.requestor) {
                 p = engine.getEffectiveServerRequestPolicy(ei, boi, m);
                 Collection<Assertion> c = engine.getAssertions(p, false);
@@ -302,7 +302,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
             }
         }
 
-        List<Interceptor<? extends Message>> tmp = null;
+        final List<Interceptor<? extends Message>> tmp;
         if (requestor) {
             tmp = new ArrayList<>(out);
             out.clear();

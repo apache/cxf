@@ -178,19 +178,15 @@ public final class PolicyUtils {
             nl(buf);
             if (pc instanceof PolicyContainingAssertion) {
                 PolicyComponent nested = ((PolicyContainingAssertion)pc).getPolicy();
-                level++;
-                printPolicyComponent(nested, buf, level);
-                level--;
+                printPolicyComponent(nested, buf, level + 1);
             }
         } else {
-            level++;
             List<PolicyComponent> children = CastUtils.cast(((PolicyOperator)pc).getPolicyComponents(),
                 PolicyComponent.class);
             nl(buf);
             for (PolicyComponent child : children) {
-                printPolicyComponent(child, buf, level);
+                printPolicyComponent(child, buf, level + 1);
             }
-            level--;
         }
     }
 

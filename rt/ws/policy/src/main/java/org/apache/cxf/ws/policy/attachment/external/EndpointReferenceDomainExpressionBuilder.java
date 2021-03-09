@@ -59,7 +59,7 @@ public class EndpointReferenceDomainExpressionBuilder implements DomainExpressio
     }
 
     public DomainExpression build(Element e) {
-        Object obj = null;
+        Object obj;
         try {
             obj = JAXBUtils.unmarshall(createJAXBContext(), e);
         } catch (JAXBException ex) {

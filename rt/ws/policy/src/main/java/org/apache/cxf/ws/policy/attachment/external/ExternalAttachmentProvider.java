@@ -160,9 +160,8 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider {
 
         // read the document and build the attachments
         attachments = new ArrayList<>();
-        Document doc = null;
-        try {
-            InputStream is = location.getInputStream();
+        final Document doc;
+        try (InputStream is = location.getInputStream()) {
             if (null == is) {
                 throw new PolicyException(
                                           new org.apache.cxf.common.i18n.Message(
@@ -224,7 +223,7 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider {
     }
 
     Policy resolveReference(PolicyReference ref, Document doc) {
-        Policy p = null;
+        final Policy p;
         if (isExternal(ref)) {
             p = resolveExternal(ref, doc.getBaseURI());
         } else {
