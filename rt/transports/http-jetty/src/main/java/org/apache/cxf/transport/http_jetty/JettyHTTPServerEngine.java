@@ -637,7 +637,6 @@ public class JettyHTTPServerEngine implements ServerEngine {
             };
             decorateCXFJettySslSocketConnector(sslcf);
         }
-        ServerConnector result = null;
 
         int major = 9;
         int minor = 0;
@@ -649,8 +648,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
             // unparsable version
         }
 
-        result = (ServerConnector)createConnectorJetty(sslcf, hosto, porto, major, minor);
-
+        ServerConnector result = (ServerConnector)createConnectorJetty(sslcf, hosto, porto, major, minor);
 
         try {
             result.setPort(porto);
@@ -668,7 +666,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
     }
 
     AbstractConnector createConnectorJetty(SslContextFactory sslcf, String hosto, int porto, int major, int minor) {
-        AbstractConnector result = null;
+        final AbstractConnector result;
         try {
             HttpConfiguration httpConfig = new HttpConfiguration();
             httpConfig.setSendServerVersion(getSendServerVersion());
@@ -887,9 +885,8 @@ public class JettyHTTPServerEngine implements ServerEngine {
 
         if (server != null && server.isRunning()) {
             for (Handler handler : contexts.getChildHandlersByClass(ContextHandler.class)) {
-                ContextHandler contextHandler = null;
                 if (handler instanceof ContextHandler) {
-                    contextHandler = (ContextHandler) handler;
+                    ContextHandler contextHandler = (ContextHandler) handler;
                     Handler jh = contextHandler.getHandler();
                     if (jh instanceof JettyHTTPHandler
                         && (contextName.equals(contextHandler.getContextPath())
@@ -934,9 +931,8 @@ public class JettyHTTPServerEngine implements ServerEngine {
         // operation should return null.
         if (server != null) {
             for (Handler handler : server.getChildHandlersByClass(ContextHandler.class)) {
-                ContextHandler contextHandler = null;
                 if (handler instanceof ContextHandler) {
-                    contextHandler = (ContextHandler) handler;
+                    ContextHandler contextHandler = (ContextHandler) handler;
                     if (contextName.equals(contextHandler.getContextPath())) {
                         ret = contextHandler.getHandler();
                         break;
@@ -960,9 +956,8 @@ public class JettyHTTPServerEngine implements ServerEngine {
         // operation should return null.
         if (server != null) {
             for (Handler handler : server.getChildHandlersByClass(ContextHandler.class)) {
-                ContextHandler contextHandler = null;
                 if (handler instanceof ContextHandler) {
-                    contextHandler = (ContextHandler) handler;
+                    ContextHandler contextHandler = (ContextHandler) handler;
                     if (contextName.equals(contextHandler.getContextPath())) {
                         ret = contextHandler;
                         break;
