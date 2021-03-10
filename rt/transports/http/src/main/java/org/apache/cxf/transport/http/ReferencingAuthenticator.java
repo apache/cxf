@@ -194,7 +194,7 @@ public class ReferencingAuthenticator extends Authenticator {
         if (a == null) {
             return null;
         }
-        Field[] fields = null;
+        final Field[] fields;
         if (SKIPCHECK) {
             fields = Authenticator.class.getDeclaredFields();
         } else {

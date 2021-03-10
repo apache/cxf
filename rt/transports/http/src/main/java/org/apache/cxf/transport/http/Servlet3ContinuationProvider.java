@@ -43,7 +43,7 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 public class Servlet3ContinuationProvider implements ContinuationProvider {
     static final boolean IS_31;
     static {
-        boolean is31 = false;
+        boolean is31;
         try {
             ClassLoaderUtils.loadClass("javax.servlet.WriteListener", HttpServletRequest.class);
             is31 = true;

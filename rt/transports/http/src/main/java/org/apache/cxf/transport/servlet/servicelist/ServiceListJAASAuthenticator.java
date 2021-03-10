@@ -19,7 +19,7 @@
 package org.apache.cxf.transport.servlet.servicelist;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -149,11 +149,10 @@ public class ServiceListJAASAuthenticator {
     }
 
     private static String base64Decode(String srcString) {
-        byte[] transformed = null;
         try {
-            transformed = Base64Utility.decode(srcString);
-            return new String(transformed, "ISO-8859-1");
-        } catch (UnsupportedEncodingException | Base64Exception e) {
+            byte[] transformed = Base64Utility.decode(srcString);
+            return new String(transformed, StandardCharsets.ISO_8859_1);
+        } catch (Base64Exception e) {
             return srcString;
         }
     }

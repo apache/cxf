@@ -40,7 +40,7 @@ public class HttpServletRequestSnapshot extends HttpServletRequestWrapper {
     @SuppressWarnings("rawtypes")
     private Enumeration locals;
     private String localName;
-    private int localPort = -1;
+    private final int localPort;
     private String method;
     private String pathInfo;
     private String pathTranslated;
@@ -48,13 +48,13 @@ public class HttpServletRequestSnapshot extends HttpServletRequestWrapper {
     private String queryString;
     private String remoteAddr;
     private String remoteHost;
-    private int remotePort = -1;
+    private final int remotePort;
     private String remoteUser;
     private String requestURI;
     private StringBuffer requestURL;
     private String schema;
     private String serverName;
-    private int serverPort = -1;
+    private final int serverPort;
     private String servletPath;
     private HttpSession session;
     private Principal principal;

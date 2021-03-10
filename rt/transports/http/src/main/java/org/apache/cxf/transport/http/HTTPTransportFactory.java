@@ -275,7 +275,7 @@ public class HTTPTransportFactory
                         LOG.log(Level.SEVERE, m);
                         throw new IOException(m);
                     }
-                    HttpDestinationFactory factory = null;
+                    final HttpDestinationFactory factory;
                     if (jettyFactory != null && (addr == null || addr.startsWith("http"))) {
                         factory = jettyFactory;
                     } else {

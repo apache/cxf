@@ -55,10 +55,9 @@ public class ClientPolicyCalculatorTest {
         ClientPolicyCalculator calc = new ClientPolicyCalculator();
         HTTPClientPolicy p1 = new HTTPClientPolicy();
         HTTPClientPolicy p2 = new HTTPClientPolicy();
-        HTTPClientPolicy p = null;
 
         p1.setBrowserType("browser");
-        p = calc.intersect(p1, p2);
+        HTTPClientPolicy p = calc.intersect(p1, p2);
         assertEquals("browser", p.getBrowserType());
         p1.setBrowserType(null);
 

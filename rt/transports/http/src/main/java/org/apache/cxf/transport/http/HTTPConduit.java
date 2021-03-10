@@ -1395,14 +1395,13 @@ public abstract class HTTPConduit
 
         private <T extends Exception> T mapException(String msg,
                                                      T ex, Class<T> cls) {
-            T ex2 = ex;
+            T ex2;
             try {
                 ex2 = cls.cast(ex.getClass().getConstructor(String.class).newInstance(msg));
                 ex2.initCause(ex);
             } catch (Throwable e) {
                 ex2 = ex;
             }
-
 
             return ex2;
         }

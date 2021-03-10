@@ -371,7 +371,7 @@ public class Headers {
     }
 
     public String determineContentType() {
-        String ct = null;
+        String ct;
         List<Object> ctList = CastUtils.cast(headers.get(Message.CONTENT_TYPE));
         if (ctList != null && ctList.size() == 1 && ctList.get(0) != null) {
             ct = ctList.get(0).toString();

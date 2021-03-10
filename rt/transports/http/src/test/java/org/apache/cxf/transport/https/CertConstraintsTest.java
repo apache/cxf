@@ -45,11 +45,10 @@ public class CertConstraintsTest {
         final X509Certificate gordyCert =
             loadCertificate("Gordy.jks", "JKS", "password", "gordy");
 
-        CertConstraints tmp = null;
         //
         // bethal matches but gordy doesn't
         //
-        tmp = loadCertConstraints("subject-CN-bethal");
+        CertConstraints tmp = loadCertConstraints("subject-CN-bethal");
         assertTrue(tmp.matches(bethalCert) && !tmp.matches(gordyCert));
         //
         // gordy matches but bethal doesn't

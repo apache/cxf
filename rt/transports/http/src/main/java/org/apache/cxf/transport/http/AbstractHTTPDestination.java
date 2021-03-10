@@ -181,7 +181,7 @@ public abstract class AbstractHTTPDestination
                     ? new String(authBytes, StandardCharsets.ISO_8859_1) : new String(authBytes);
 
                 int idx = authDecoded.indexOf(':');
-                String username = null;
+                final String username;
                 String password = null;
                 if (idx == -1) {
                     username = authDecoded;
@@ -831,7 +831,7 @@ public abstract class AbstractHTTPDestination
      * @see org.apache.cxf.transport.AbstractMultiplexDestination#getAddressWithId(java.lang.String)
      */
     public EndpointReferenceType getAddressWithId(String id) {
-        EndpointReferenceType ref = null;
+        final EndpointReferenceType ref;
 
         if (isMultiplexWithAddress()) {
             String address = EndpointReferenceUtils.getAddress(reference);

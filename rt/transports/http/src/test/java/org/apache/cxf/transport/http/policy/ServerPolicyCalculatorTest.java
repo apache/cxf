@@ -53,10 +53,9 @@ public class ServerPolicyCalculatorTest {
         ServerPolicyCalculator spc = new ServerPolicyCalculator();
         HTTPServerPolicy p1 = new HTTPServerPolicy();
         HTTPServerPolicy p2 = new HTTPServerPolicy();
-        HTTPServerPolicy p = null;
 
         p1.setServerType("server");
-        p = spc.intersect(p1, p2);
+        HTTPServerPolicy p = spc.intersect(p1, p2);
         assertEquals("server", p.getServerType());
         p1.setServerType(null);
         p1.setReceiveTimeout(10000L);

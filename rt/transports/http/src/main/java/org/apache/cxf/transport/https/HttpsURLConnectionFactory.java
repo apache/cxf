@@ -135,7 +135,7 @@ public class HttpsURLConnectionFactory {
 
         } else if (socketFactory == null) {
 
-            SSLContext ctx = null;
+            final SSLContext ctx;
             if (tlsClientParameters.getSslContext() != null) {
                 // Use the SSLContext which was set
                 ctx = tlsClientParameters.getSslContext();

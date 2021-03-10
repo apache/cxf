@@ -92,35 +92,20 @@ public final class HttpAuthHeader {
     private Map<String, String> parseHeader() {
         Map<String, String> map = new HashMap<>();
         try {
-            StreamTokenizer tok = new StreamTokenizer(new StringReader(this.fullContent));
-            tok.quoteChar('"');
-            tok.quoteChar('\'');
+            StreamTokenizer tok = new StreamTokenizer(new StringReader(this.fullContent)) {
+                @Override
+                public void parseNumbers() {
+                    // skip parse numbers
+                    wordChars('0', '9');
+                    wordChars('.', '.');
+                    wordChars('-', '-');
+                }
+            };
             tok.whitespaceChars('=', '=');
             tok.whitespaceChars(',', ',');
 
             while (tok.nextToken() != StreamTokenizer.TT_EOF) {
-                String key = tok.sval;
-                if (tok.nextToken() == StreamTokenizer.TT_EOF) {
-                    map.put(key, null);
-                    return map;
-                }
-                String value = null;
-                if ("nc".equals(key)) {
-                    //nc is a 8 length HEX number so need get it as number
-                    value = String.valueOf(tok.nval);
-                    if (value.indexOf('.') > 0) {
-                        value = value.substring(0, value.indexOf('.'));
-                    }
-                    StringBuilder pad = new StringBuilder();
-                    pad.append("");
-                    for (int i = 0; i < 8 - value.length(); i++) {
-                        pad.append('0');
-                    }
-                    value = pad.toString() + value;
-                } else {
-                    value = tok.sval;
-                }
-                map.put(key, value);
+                map.put(tok.sval, tok.nextToken() != StreamTokenizer.TT_EOF ? tok.sval : null);
             }
         } catch (IOException ex) {
             //ignore can't happen for StringReader
