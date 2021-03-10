@@ -81,7 +81,7 @@ public class IOUtilsTest {
     }
 
     @Test
-    public void testCopyAtLeast() throws IOException {
+    public void testCopyAtLeastGreaterThanStreamSize() throws IOException {
         byte[] bytes = "Foo".getBytes(IOUtils.UTF8_CHARSET);
         ByteArrayInputStream is = new ByteArrayInputStream(bytes);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -89,15 +89,25 @@ public class IOUtilsTest {
         IOUtils.copyAtLeast(is, os, atLeast);
         assertEquals(3, os.toByteArray().length);
 
-        is = new ByteArrayInputStream(bytes);
-        os = new ByteArrayOutputStream(3);
-        atLeast = 3; // equal to inputStream length
+    }
+
+    @Test
+    public void testCopyAtLeastEqualStreamSize() throws IOException {
+        byte[] bytes = "Foo".getBytes(IOUtils.UTF8_CHARSET);
+        ByteArrayInputStream is = new ByteArrayInputStream(bytes);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        int atLeast = 3; // equal than inputStream length
         IOUtils.copyAtLeast(is, os, atLeast);
         assertEquals(atLeast, os.toByteArray().length);
 
-        is = new ByteArrayInputStream(bytes);
-        os = new ByteArrayOutputStream();
-        atLeast = 2; // less than inpuStream length
+    }
+
+    @Test
+    public void testCopyAtLeastLessThanStreamSize() throws IOException {
+        byte[] bytes = "Foo".getBytes(IOUtils.UTF8_CHARSET);
+        ByteArrayInputStream is = new ByteArrayInputStream(bytes);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        int atLeast = 2; // less than inpuStream length
         IOUtils.copyAtLeast(is, os, atLeast);
         assertEquals(atLeast, os.toByteArray().length);
 

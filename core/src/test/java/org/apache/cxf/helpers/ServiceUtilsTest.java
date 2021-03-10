@@ -173,21 +173,28 @@ public class ServiceUtilsTest {
     }
 
     @Test
-    public void testMakeNamespaceFromClassName() {
+    public void testMakeNamespaceFromClassNameCaseOne() {
         String nameSpace = ServiceUtils.makeNamespaceFromClassName("Foo", "http");
         assertEquals("http://DefaultNamespace", nameSpace);
+    }
 
-        nameSpace = ServiceUtils.makeNamespaceFromClassName(this.getClass().getName(), "http");
+    @Test
+    public void testMakeNamespaceFromClassNameCaseTwo() {
+        String nameSpace = ServiceUtils.makeNamespaceFromClassName(this.getClass().getName(), "http");
         assertEquals("http://helpers.cxf.apache.org/", nameSpace);
 
     }
 
     @Test
-    public void testMakePackageName() {
+    public void testMakePackageNameCaseOne() {
         String packageName = ServiceUtils.makePackageName("http://www.w3.org/TR/html4/");
         assertEquals("org.w3.www.TR.html4", packageName);
 
-        packageName = ServiceUtils.makePackageName("http://www.w3.org");
+    }
+
+    @Test
+    public void testMakePackageNameCaseTwo() {
+        String packageName = ServiceUtils.makePackageName("http://www.w3.org");
         assertEquals("org.w3.www", packageName);
     }
 }

@@ -80,12 +80,15 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testStripPath() {
+    public void testStripPathWindowStyle() {
         String name = "c:\\boo\foo\\file.txt";
         name = FileUtils.stripPath(name);
         assertEquals("file.txt", name);
+    }
 
-        name = "/opt/java/jre/bin/java";
+    @Test
+    public void testStripPathUnixStyle() {
+        String name = "/opt/java/jre/bin/java";
         name = FileUtils.stripPath(name);
         assertEquals("java", name);
     }
