@@ -17,31 +17,25 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs.resources;
+package org.apache.cxf.systest.jaxrs.applications;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
-public interface LibraryApi {
-    @Produces({ MediaType.APPLICATION_JSON })
-    @GET
-    Response getBooks(@QueryParam("page") @DefaultValue("1") int page);
+import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.core.Application;
 
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Path("{id}")
-    @GET
-    Response getBook(@PathParam("id") String id);
-    
-    @DELETE
-    void deleteBooks();
-    
-    @Path("/catalog")
-    Catalog catalog(); 
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+
+import org.apache.cxf.systest.jaxrs.resources.Library;
+
+@ApplicationPath("app")
+public class LibraryApplication extends Application {
+    @Override
+    public Set<Object> getSingletons() {
+        return new HashSet<>(Arrays.asList(
+            new Library(), 
+            new JacksonJsonProvider()));
+    }
 }

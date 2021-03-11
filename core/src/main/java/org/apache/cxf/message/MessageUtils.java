@@ -202,6 +202,7 @@ public final class MessageUtils {
             MethodDispatcher md = (MethodDispatcher) m.getExchange().getService().get(MethodDispatcher.class.getName());
             method = md.getMethod(bop);
         } else {
+            // See please JAXRSInInterceptor#RESOURCE_METHOD for the reference
             method = (Method) m.get("org.apache.cxf.resource.method");
         }
         return Optional.ofNullable(method);

@@ -73,12 +73,7 @@ public class StandardTags {
     }
 
     public Tag uri(Message request) {
-        return ofNullable(request)
-                .map(e -> e.get(Message.REQUEST_URI))
-                .filter(e -> e instanceof String)
-                .map(e -> stripQueryString((String) e))
-                .map(e -> Tag.of("uri", e))
-                .orElse(endpoint(request));
+        return template(request).orElse(requestUri(request));
     }
 
     public Tag exception(Class<?> exceptionClass) {
@@ -110,6 +105,14 @@ public class StandardTags {
         return OUTCOME_SERVER_ERROR;
     }
     
+    private Tag requestUri(Message request) {
+        return ofNullable(request)
+                .map(e -> e.get(Message.REQUEST_URI))
+                .filter(e -> e instanceof String)
+                .map(e -> stripQueryString((String) e))
+                .map(e -> Tag.of("uri", e))
+                .orElse(endpoint(request));
+    }
     /**
      * The Request URI endpoint fallback in case of JAX-WS client invocations
      */
@@ -120,6 +123,18 @@ public class StandardTags {
                 .map(e -> stripQueryString((String) e))
                 .map(e -> Tag.of("uri", e))
                 .orElse(URI_UNKNOWN);
+    }
+    
+    /**
+     * The Request URI template in case of JAX-RS invocation
+     */
+    private Optional<Tag> template(Message request) {
+        return ofNullable(request)
+                // See please URITemplate#URI_TEMPLATE for the reference
+                .map(e -> e.get("jaxrs.template.uri"))
+                .filter(e -> e instanceof String)
+                .map(e -> stripQueryString((String) e))
+                .map(e -> Tag.of("uri", e));
     }
     
     /**
