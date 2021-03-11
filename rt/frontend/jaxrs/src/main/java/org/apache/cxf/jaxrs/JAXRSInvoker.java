@@ -268,6 +268,7 @@ public class JAXRSInvoker extends AbstractInvoker {
                                                          acceptContentType);
                 exchange.put(OperationResourceInfo.class, subOri);
                 inMessage.put(URITemplate.TEMPLATE_PARAMETERS, values);
+                inMessage.put(URITemplate.URI_TEMPLATE, JAXRSUtils.getUriTemplate(inMessage, subCri, ori, subOri));
 
                 if (!subOri.isSubResourceLocator()
                     && JAXRSUtils.runContainerRequestFilters(providerFactory,
