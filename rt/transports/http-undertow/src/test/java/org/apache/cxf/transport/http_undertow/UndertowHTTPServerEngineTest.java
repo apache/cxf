@@ -143,9 +143,6 @@ public class UndertowHTTPServerEngineTest {
         UndertowHTTPServerEngineFactory.destroyForPort(PORT3);
     }
 
-
-
-
     @Test
     public void testaddServants() throws Exception {
         String urlStr = "http://localhost:" + PORT1 + "/hello/test";
@@ -156,8 +153,7 @@ public class UndertowHTTPServerEngineTest {
         engine.addServant(new URL(urlStr), new UndertowHTTPTestHandler("string1", true));
         assertEquals("Get the wrong maxIdleTime.", 30000, engine.getMaxIdleTime());
 
-        String response = null;
-        response = getResponse(urlStr);
+        String response = getResponse(urlStr);
         assertEquals("The undertow http handler did not take effect", response, "string1");
 
         try {
@@ -250,21 +246,18 @@ public class UndertowHTTPServerEngineTest {
         UndertowHTTPServerEngineFactory.destroyForPort(PORT2);
     }
 
-
-
-
-    private String getResponse(String target) throws Exception {
+    private static String getResponse(String target) throws Exception {
         URL url = new URL(target);
 
         URLConnection connection = url.openConnection();
 
         assertTrue(connection instanceof HttpURLConnection);
         connection.connect();
-        InputStream in = connection.getInputStream();
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        IOUtils.copy(in, buffer);
-        return buffer.toString();
+        try (InputStream in = connection.getInputStream();
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+            IOUtils.copy(in, buffer);
+            return buffer.toString();
+        }
     }
-
 
 }

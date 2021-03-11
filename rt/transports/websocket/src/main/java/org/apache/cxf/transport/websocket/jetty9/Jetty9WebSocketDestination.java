@@ -177,12 +177,11 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
         executeServiceTask(new Runnable() {
             @Override
             public void run() {
-                HttpServletRequest request = null;
                 HttpServletResponse response = null;
                 try {
                     WebSocketServletHolder holder = new Jetty9WebSocketHolder(session);
                     response = createServletResponse(holder);
-                    request = createServletRequest(data, offset, length, holder, session);
+                    HttpServletRequest request = createServletRequest(data, offset, length, holder, session);
                     String reqid = request.getHeader(REQUEST_ID_KEY);
                     if (reqid != null) {
                         if (WebSocketUtils.isContainingCRLF(reqid)) {
@@ -306,7 +305,7 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
             return session.getUpgradeRequest().getRequestURI().getPath();
         }
         public StringBuffer getRequestURL() {
-            return new StringBuffer(session.getUpgradeRequest().getRequestURI().toString());
+            return new StringBuffer(session.getUpgradeRequest().getRequestURI().toString()); //NOPMD
         }
         public DispatcherType getDispatcherType() {
             return null;

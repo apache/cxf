@@ -105,7 +105,6 @@ public class AsyncHttpTransportFactory extends AbstractTransportFactory implemen
     public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType target, Bus bus)
         throws IOException {
 
-        HTTPConduit conduit = null;
         // need to updated the endpointInfo
         endpointInfo.setAddress(getAddress(endpointInfo));
         
@@ -113,7 +112,7 @@ public class AsyncHttpTransportFactory extends AbstractTransportFactory implemen
         if (fact == null) {
             fact = factory;
         }
-        conduit = fact.createConduit(bus, endpointInfo, target);
+        HTTPConduit conduit = fact.createConduit(bus, endpointInfo, target);
 
         // Spring configure the conduit.
         String address = conduit.getAddress();

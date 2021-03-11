@@ -193,7 +193,6 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         if (StringUtils.isEmpty(uri.getPath())) {
             //hc needs to have the path be "/"
             uri = uri.resolve("/");
-            addressChanged = true;
         }
 
         message.put(USE_ASYNC, Boolean.TRUE);
@@ -900,7 +899,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             return sslContext;
         }
 
-        SSLContext ctx = null;
+        final SSLContext ctx;
         if (tlsClientParameters.getSslContext() != null) {
             ctx = tlsClientParameters.getSslContext();
         } else {

@@ -143,7 +143,7 @@ public class UDPDestination extends AbstractDestination {
 
         try {
             URI uri = new URI(this.getAddress().getAddress().getValue());
-            InetSocketAddress isa = null;
+            final InetSocketAddress isa;
             if (StringUtils.isEmpty(uri.getHost())) {
                 String s = uri.getSchemeSpecificPart();
                 if (s.startsWith("//:")) {

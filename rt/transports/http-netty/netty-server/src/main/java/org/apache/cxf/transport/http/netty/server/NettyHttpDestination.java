@@ -123,7 +123,7 @@ public class NettyHttpDestination extends AbstractHTTPDestination {
     protected void activate() {
         super.activate();
         LOG.log(Level.FINE, "Activating receipt of incoming messages");
-        URL url = null;
+        final URL url;
 
         try {
             url = new URL(getAddress(endpointInfo));
