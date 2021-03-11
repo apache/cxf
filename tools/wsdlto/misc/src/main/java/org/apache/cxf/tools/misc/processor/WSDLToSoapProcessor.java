@@ -186,7 +186,7 @@ public class WSDLToSoapProcessor extends AbstractWSDLToProcessor {
 
         SOAPBindingUtil.addSOAPNamespace(wsdlDefinition, isSOAP12());
 
-        SoapBinding soapBinding = null;
+        final SoapBinding soapBinding;
         try {
             soapBinding = SOAPBindingUtil.createSoapBinding(extReg, isSOAP12());
         } catch (WSDLException wse) {
@@ -232,7 +232,7 @@ public class WSDLToSoapProcessor extends AbstractWSDLToProcessor {
         if (extReg == null) {
             extReg = wsdlFactory.newPopulatedExtensionRegistry();
         }
-        SoapOperation soapOperation = null;
+        final SoapOperation soapOperation;
 
         try {
             soapOperation = SOAPBindingUtil.createSoapOperation(extReg, isSOAP12());
@@ -269,7 +269,7 @@ public class WSDLToSoapProcessor extends AbstractWSDLToProcessor {
         if (extReg == null) {
             extReg = wsdlFactory.newPopulatedExtensionRegistry();
         }
-        SoapBody soapBody = null;
+        final SoapBody soapBody;
         try {
             soapBody = SOAPBindingUtil.createSoapBody(extReg, parent, isSOAP12());
         } catch (WSDLException wse) {
@@ -298,7 +298,7 @@ public class WSDLToSoapProcessor extends AbstractWSDLToProcessor {
         if (extReg == null) {
             extReg = wsdlFactory.newPopulatedExtensionRegistry();
         }
-        SoapFault soapFault = null;
+        final SoapFault soapFault;
         try {
             soapFault = SOAPBindingUtil.createSoapFault(extReg, isSOAP12());
         } catch (WSDLException wse) {

@@ -278,6 +278,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         Class<?> clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_rpclit.GreeterRPCLit");
 
         javax.jws.WebService ws = AnnotationUtil.getPrivClassAnnotation(clz, javax.jws.WebService.class);
+        assertNotNull(ws);
 
         SOAPBinding soapBindingAnno = AnnotationUtil.getPrivClassAnnotation(clz, SOAPBinding.class);
         assertEquals("LITERAL", soapBindingAnno.use().toString());
@@ -416,42 +417,42 @@ public class CodeGenTest extends AbstractCodeGenTest {
         assertEquals(method2.getName() + "()" + " Annotation : WebMethod.operationName ", "greetMeSometime",
                      webMethodAnno2.operationName());
 
-        method1 = clz.getMethod("greetMeSometimeAsync", new Class[] {java.lang.String.class,
-                                                                     javax.xml.ws.AsyncHandler.class});
+        clz.getMethod("greetMeSometimeAsync", new Class[] {java.lang.String.class,
+                                                           javax.xml.ws.AsyncHandler.class});
         try {
-            method1 = clz.getMethod("testIntAsync", new Class[] {Integer.TYPE,
-                                                                 javax.xml.ws.AsyncHandler.class});
+            clz.getMethod("testIntAsync", new Class[] {Integer.TYPE,
+                                                       javax.xml.ws.AsyncHandler.class});
             fail("Should not have generated testIntAsync");
         } catch (NoSuchMethodException ex) {
-            //ignore
+            // expected
         }
 
 
         clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_async_soap_http.GreeterDAsync");
-        method1 = clz.getMethod("greetMeSometimeAsync", new Class[] {java.lang.String.class,
-                                                                     javax.xml.ws.AsyncHandler.class});
+        clz.getMethod("greetMeSometimeAsync", new Class[] {java.lang.String.class,
+                                                           javax.xml.ws.AsyncHandler.class});
 
         clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_async_soap_http.GreeterCAsync");
         try {
-            method1 = clz.getMethod("greetMeSometimeAsync", new Class[] {java.lang.String.class,
-                                                                         javax.xml.ws.AsyncHandler.class});
+            clz.getMethod("greetMeSometimeAsync", new Class[] {java.lang.String.class,
+                                                               javax.xml.ws.AsyncHandler.class});
             fail("Should not have generated greetMeSometimeAsync");
         } catch (NoSuchMethodException ex) {
-            //ignore
+            // expected
         }
-        method1 = clz.getMethod("testIntAsync", new Class[] {Integer.TYPE,
-                                                             javax.xml.ws.AsyncHandler.class});
+        clz.getMethod("testIntAsync", new Class[] {Integer.TYPE,
+                                                   javax.xml.ws.AsyncHandler.class});
 
         clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_async_soap_http.GreeterBAsync");
         try {
-            method1 = clz.getMethod("greetMeSometimeAsync", new Class[] {java.lang.String.class,
-                                                                         javax.xml.ws.AsyncHandler.class});
+            clz.getMethod("greetMeSometimeAsync", new Class[] {java.lang.String.class,
+                                                               javax.xml.ws.AsyncHandler.class});
             fail("Should not have generated greetMeSometimeAsync");
         } catch (NoSuchMethodException ex) {
-            //ignore
+            // expected
         }
-        method1 = clz.getMethod("testIntAsync", new Class[] {Integer.TYPE,
-                                                             javax.xml.ws.AsyncHandler.class});
+        clz.getMethod("testIntAsync", new Class[] {Integer.TYPE,
+                                                   javax.xml.ws.AsyncHandler.class});
     }
 
     @Test
@@ -726,12 +727,11 @@ public class CodeGenTest extends AbstractCodeGenTest {
         assertTrue(cxf.exists());
         File w2j = new File(cxf, "w2j");
         assertTrue(w2j.exists());
-        File[] files = w2j.listFiles();
         File helloworldsoaphttp = new File(w2j, "hello_world_soap_http");
         assertTrue(helloworldsoaphttp.exists());
         File types = new File(helloworldsoaphttp, "types");
         assertTrue(types.exists());
-        files = helloworldsoaphttp.listFiles();
+        File[] files = helloworldsoaphttp.listFiles();
         assertEquals(1, files.length);
         files = types.listFiles();
         assertEquals(files.length, 10);
@@ -809,8 +809,8 @@ public class CodeGenTest extends AbstractCodeGenTest {
         Class<?> clz = classLoader.loadClass("org.apache.Greeter");
         assertTrue("SEI class Greeter modifier should be interface", clz.isInterface());
 
-        clz = classLoader.loadClass("org.apache.Greeter_Exception");
-        clz = classLoader.loadClass("org.apache.Greeter_Service");
+        classLoader.loadClass("org.apache.Greeter_Exception");
+        classLoader.loadClass("org.apache.Greeter_Service");
     }
 
     @Test
@@ -837,7 +837,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         Class<?> clz = classLoader.loadClass("org.apache.HelloWorldServiceImpl");
         assertTrue("SEI class HelloWorldServiceImpl modifier should be interface", clz.isInterface());
 
-        clz = classLoader.loadClass("org.apache.HelloWorldServiceImpl_Service");
+        classLoader.loadClass("org.apache.HelloWorldServiceImpl_Service");
     }
 
     @Test
@@ -912,7 +912,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         webParamAnno = AnnotationUtil.getWebParam(method, "sayHi");
         assertEquals("INOUT", webParamAnno.mode().name());
 
-        method = clz.getMethod("testInOut", Holder.class, Integer.TYPE);
+        clz.getMethod("testInOut", Holder.class, Integer.TYPE);
     }
 
     @Test
@@ -1746,7 +1746,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         List<String> jarEntries = new ArrayList<>();
         JarInputStream jarIns = new JarInputStream(new FileInputStream(clientjarFile));
-        JarEntry entry = null;
+        JarEntry entry;
         while ((entry = jarIns.getNextJarEntry()) != null) {
             if (entry.getName().endsWith(".wsdl") || entry.getName().endsWith(".class")) {
                 jarEntries.add(entry.getName());

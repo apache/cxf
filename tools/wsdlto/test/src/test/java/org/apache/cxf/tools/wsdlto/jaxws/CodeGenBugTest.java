@@ -206,7 +206,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
 
         Class<?> clz = classLoader.loadClass("org.apache.types.GreetMe");
         assertTrue("Generate " + clz.getName() + "error", Modifier.isPublic(clz.getModifiers()));
-        clz = classLoader.loadClass("org.apache.Greeter");
+        classLoader.loadClass("org.apache.Greeter");
     }
 
     @Test
@@ -450,7 +450,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         processor.execute();
         Class<?> cls = classLoader.loadClass("org.apache.cxf.w2j.hello_world1.Greeter");
         assertNotNull(cls);
-        cls = classLoader.loadClass("org.apache.cxf.w2j.hello_world2.Greeter2");
+        classLoader.loadClass("org.apache.cxf.w2j.hello_world2.Greeter2");
     }
 
     @Test
