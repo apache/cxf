@@ -58,4 +58,9 @@ public class Library implements LibraryApi {
     public void deleteBooks() {
         throw new UnsupportedOperationException("Operation is not supported by the server");
     }
+    
+    @Override
+    public Catalog catalog() {
+        return new Catalog();
+    }
 }
