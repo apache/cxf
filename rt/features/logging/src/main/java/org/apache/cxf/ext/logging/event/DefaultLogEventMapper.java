@@ -235,9 +235,7 @@ public class DefaultLogEventMapper {
 
     private String getOperationName(Message message) {
         String operationName = null;
-        BindingOperationInfo boi = null;
-
-        boi = message.getExchange().getBindingOperationInfo();
+        BindingOperationInfo boi = message.getExchange().getBindingOperationInfo();
 
         if (null != boi) {
             operationName = boi.getName().toString();
