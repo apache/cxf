@@ -74,7 +74,7 @@ public class ReactorServer extends AbstractBusTestServerBase {
         server2 = null;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         ReactorServer server = new ReactorServer();
         System.out.println("Go to http://localhost:" + PORT + "/reactor/flux/textJsonImplicitListAsyncStream");
         server.start();

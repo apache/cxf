@@ -78,8 +78,9 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         createStaticBus();
     }
     @AfterClass
-    public static void clearProperty() {
+    public static void clearProperty() throws Exception {
         System.clearProperty("EmbeddedBrokerURL");
+        stopAllServers();
     }
     @Test
     public void testSwa() throws Exception {
