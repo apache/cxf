@@ -550,11 +550,9 @@ public class SOAPHandlerInterceptorTest {
 
     private SOAPMessage prepareSOAPMessage(String resouceName) throws Exception {
         InputStream is = this.getClass().getResourceAsStream(resouceName);
-        SOAPMessage soapMessage = null;
         MessageFactory factory = MessageFactory.newInstance();
         MimeHeaders mhs = null;
-        soapMessage = factory.createMessage(mhs, is);
-        return soapMessage;
+        return factory.createMessage(mhs, is);
     }
 
 

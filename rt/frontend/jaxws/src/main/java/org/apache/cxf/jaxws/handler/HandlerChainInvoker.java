@@ -247,7 +247,7 @@ public class HandlerChainInvoker {
             handlerChain = reverseHandlerChain(handlerChain);
         }
 
-        boolean continueProcessing = true;
+        boolean continueProcessing;
         MessageContext oldCtx = null;
         try {
             oldCtx = WebServiceContextImpl.setMessageContext(ctx);
@@ -304,7 +304,7 @@ public class HandlerChainInvoker {
             handlerChain = reverseHandlerChain(handlerChain);
         }
 
-        boolean continueProcessing = true;
+        boolean continueProcessing;
         MessageContext oldCtx = null;
         try {
             oldCtx = WebServiceContextImpl.setMessageContext(ctx);
@@ -339,7 +339,6 @@ public class HandlerChainInvoker {
             }
         } catch (RuntimeException e) {
             LOG.log(Level.WARNING, "HANDLER_RAISED_RUNTIME_EXCEPTION", e);
-            continueProcessing = false;
             throw e;
         }
         return continueProcessing;
@@ -415,14 +414,12 @@ public class HandlerChainInvoker {
             //observer, we have to call close here.
             if (isRequestor()) {
                 invokeReversedClose();
-                continueProcessing = false;
                 setFault(e);
                 throw e;
             } else if (!responseExpected && !outbound) {
                 invokeReversedClose();
                 continueProcessing = false;
             } else {
-                continueProcessing = false;
                 setFault(e);
                 throw e;
             }
@@ -453,13 +450,11 @@ public class HandlerChainInvoker {
         msg.removeContent(Source.class);
 
         try {
-            SOAPMessage soapMessage = null;
-
             SoapVersion version = null;
             if (msg instanceof SoapMessage) {
                 version = ((SoapMessage)msg).getVersion();
             }
-            soapMessage = SAAJFactoryResolver.createMessageFactory(version).createMessage();
+            SOAPMessage soapMessage = SAAJFactoryResolver.createMessageFactory(version).createMessage();
             msg.setContent(SOAPMessage.class, soapMessage);
 
             SOAPBody body = SAAJUtils.getBody(soapMessage);
@@ -529,7 +524,6 @@ public class HandlerChainInvoker {
         } catch (RuntimeException e) {
             LOG.log(Level.WARNING, "HANDLER_RAISED_RUNTIME_EXCEPTION", e);
             invokeReversedClose();
-            continueProcessing = false;
             closed = true;
 
             throw e;

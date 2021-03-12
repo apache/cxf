@@ -136,7 +136,7 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
         }
         if (cause instanceof Exception && fault != null) {
             Exception ex = (Exception)cause;
-            Object faultInfo = null;
+            Object faultInfo;
             try {
                 Method method = cause.getClass().getMethod("getFaultInfo", new Class[0]);
                 faultInfo = method.invoke(cause, new Object[0]);
@@ -241,7 +241,7 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
     private MessagePartInfo getFaultMessagePart(QName qname, OperationInfo op) {
         for (FaultInfo faultInfo : op.getFaults()) {
             for (MessagePartInfo mpi : faultInfo.getMessageParts()) {
-                String ns = null;
+                final String ns;
                 if (mpi.isElement()) {
                     ns = mpi.getElementQName().getNamespaceURI();
                 } else {

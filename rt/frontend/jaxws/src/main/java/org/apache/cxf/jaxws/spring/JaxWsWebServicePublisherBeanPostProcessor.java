@@ -153,7 +153,7 @@ public class JaxWsWebServicePublisherBeanPostProcessor
     }
 
     private void createAndPublishEndpoint(String url, Object implementor) {
-        ServerFactoryBean serverFactory = null;
+        final ServerFactoryBean serverFactory;
         if (prototypeServerFactoryBeanName != null) {
             if (!beanFactory.isPrototype(prototypeServerFactoryBeanName)) {
                 throw
@@ -171,7 +171,7 @@ public class JaxWsWebServicePublisherBeanPostProcessor
         serverFactory.setServiceClass(ClassHelper.getRealClass(implementor));
         serverFactory.setAddress(url);
 
-        DataBinding dataBinding = null;
+        final DataBinding dataBinding;
         if (prototypeDataBindingBeanName != null) {
             if (!beanFactory.isPrototype(prototypeDataBindingBeanName)) {
                 throw

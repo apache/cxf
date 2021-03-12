@@ -414,8 +414,7 @@ public class CodeFirstTest extends AbstractJaxWsTest {
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
         factory.setServiceBean(new GenericsService2Impl());
         factory.setAddress("local://localhost/test");
-        Server server = null;
-        server = factory.create();
+        Server server = factory.create();
         Document doc = getWSDLDocument(server);
 
         assertXPathEquals("//xsd:schema/xsd:complexType[@name='convert']/xsd:sequence/xsd:element/@type",

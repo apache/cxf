@@ -55,7 +55,7 @@ public final class ServiceDelegateAccessor {
      * @throws WebServiceException if access to the field fails for any reason
      */
     public static ServiceImpl get(Service service) {
-        ServiceImpl delegate = null;
+        ServiceImpl delegate;
         try {
             Field delegateField = Service.class.getDeclaredField(DELEGATE_FIELD_NAME);
             ReflectionUtil.setAccessible(delegateField);

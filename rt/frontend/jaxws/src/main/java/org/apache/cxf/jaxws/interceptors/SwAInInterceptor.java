@@ -88,7 +88,7 @@ public class SwAInInterceptor extends AbstractSoapInterceptor {
                 if (a.getId().startsWith(start)) {
                     DataHandler dh = a.getDataHandler();
                     String ct = dh.getContentType();
-                    Object o = null;
+                    final Object o;
                     Class<?> typeClass = mpi.getTypeClass();
                     if (DataHandler.class.isAssignableFrom(typeClass)) {
                         o = dh;

@@ -205,9 +205,9 @@ public class HandlerChainInvokerTest {
 
         assertTrue(invoker.isOutbound());
 
-        boolean continueProcessing = true;
         invoker.setLogicalMessageContext(lmc);
-        continueProcessing = invoker.invokeLogicalHandlers(false, lmc);
+        boolean continueProcessing = invoker.invokeLogicalHandlers(false, lmc);
+        assertTrue(continueProcessing);
         invoker.setProtocolMessageContext(pmc);
         continueProcessing = invoker.invokeProtocolHandlers(false, pmc);
 
@@ -219,8 +219,10 @@ public class HandlerChainInvokerTest {
         protocolHandlers[2].setHandleMessageRet(true);
         invoker.setProtocolMessageContext(pmc);
         continueProcessing = invoker.invokeProtocolHandlers(false, pmc);
+        assertTrue(continueProcessing);
         invoker.setLogicalMessageContext(lmc);
         continueProcessing = invoker.invokeLogicalHandlers(false, lmc);
+        assertTrue(continueProcessing);
 
 
         assertEquals(2, logicalHandlers[0].getHandleMessageCount());
@@ -269,9 +271,8 @@ public class HandlerChainInvokerTest {
         invoker.setRequestor(true);
         assertTrue(invoker.isOutbound());
 
-        boolean continueProcessing = true;
         invoker.setLogicalMessageContext(lmc);
-        continueProcessing = invoker.invokeLogicalHandlers(false, lmc);
+        boolean continueProcessing = invoker.invokeLogicalHandlers(false, lmc);
         assertTrue(continueProcessing);
 
         //create an empty SOAP body for testing
@@ -286,7 +287,7 @@ public class HandlerChainInvokerTest {
 
         try {
             invoker.setProtocolMessageContext(pmc);
-            continueProcessing = invoker.invokeProtocolHandlers(false, pmc);
+            invoker.invokeProtocolHandlers(false, pmc);
             fail("did not get expected exception");
         } catch (ProtocolException e) {
             assertEquals("banzai", e.getMessage());
@@ -356,14 +357,13 @@ public class HandlerChainInvokerTest {
         invoker.setRequestor(true);
         assertTrue(invoker.isOutbound());
 
-        boolean continueProcessing = true;
         invoker.setLogicalMessageContext(lmc);
-        continueProcessing = invoker.invokeLogicalHandlers(false, lmc);
+        boolean continueProcessing = invoker.invokeLogicalHandlers(false, lmc);
         assertTrue(continueProcessing);
 
         try {
             invoker.setProtocolMessageContext(pmc);
-            continueProcessing = invoker.invokeProtocolHandlers(false, pmc);
+            invoker.invokeProtocolHandlers(false, pmc);
             fail("did not get expected exception");
         } catch (ProtocolException e) {
             assertEquals("banzai", e.getMessage());
@@ -425,8 +425,7 @@ public class HandlerChainInvokerTest {
         logicalHandlers[2].setHandleMessageRet(true);
         logicalHandlers[3].setHandleMessageRet(true);
 
-        boolean continueProcessing = true;
-        continueProcessing = invoker.invokeLogicalHandlers(false, lmc);
+        boolean continueProcessing = invoker.invokeLogicalHandlers(false, lmc);
 
         assertTrue(continueProcessing);
 
@@ -466,9 +465,8 @@ public class HandlerChainInvokerTest {
         logicalHandlers[3].setHandleMessageRet(true);
         invoker.setResponseExpected(true);
 
-        boolean continueProcessing = true;
         invoker.setLogicalMessageContext(lmc);
-        continueProcessing = invoker.invokeLogicalHandlers(false, lmc);
+        boolean continueProcessing = invoker.invokeLogicalHandlers(false, lmc);
 
         assertFalse(continueProcessing);
 
@@ -517,8 +515,7 @@ public class HandlerChainInvokerTest {
         logicalHandlers[3].setHandleMessageRet(true);
         invoker.setResponseExpected(false);
 
-        boolean continueProcessing = true;
-        continueProcessing = invoker.invokeLogicalHandlers(false, lmc);
+        boolean continueProcessing = invoker.invokeLogicalHandlers(false, lmc);
 
         assertFalse(continueProcessing);
 

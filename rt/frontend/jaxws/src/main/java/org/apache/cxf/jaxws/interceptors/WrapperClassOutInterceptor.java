@@ -170,7 +170,7 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
 
             partNames.set(p.getIndex(), p.getName().getLocalPart());
 
-            String elementType = null;
+            final String elementType;
             if (p.getTypeQName() == null) {
                 // handling anonymous complex type
                 elementType = null;

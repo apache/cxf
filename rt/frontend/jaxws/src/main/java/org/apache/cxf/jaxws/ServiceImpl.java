@@ -245,7 +245,7 @@ public class ServiceImpl extends ServiceDelegate {
     private JaxWsClientEndpointImpl getJaxwsEndpoint(QName portName, AbstractServiceFactoryBean sf,
                                       WebServiceFeature...features) {
         Service service = sf.getService();
-        EndpointInfo ei = null;
+        EndpointInfo ei;
         if (portName == null) {
             ei = service.getServiceInfos().get(0).getEndpoints().iterator().next();
         } else {
@@ -286,7 +286,7 @@ public class ServiceImpl extends ServiceDelegate {
     private AbstractServiceFactoryBean createDispatchService(DataBinding db) {
         AbstractServiceFactoryBean serviceFactory;
 
-        Service dispatchService = null;
+        final Service dispatchService;
 
         if (null != wsdlURL) {
             WSDLServiceFactory sf = new WSDLServiceFactory(bus, wsdlURL, serviceName);
@@ -516,7 +516,6 @@ public class ServiceImpl extends ServiceDelegate {
     private EndpointInfo createEndpointInfo(AbstractServiceFactoryBean serviceFactory,
                                             QName portName,
                                             PortInfoImpl portInfo) throws BusException {
-        EndpointInfo ei = null;
         String address = portInfo.getAddress();
         String bindingID = BindingID.getBindingID(portInfo.getBindingID());
 
@@ -530,7 +529,7 @@ public class ServiceImpl extends ServiceDelegate {
         }
         DestinationFactory df = dfm.getDestinationFactoryForUri(address);
 
-        String transportId = null;
+        final String transportId;
         if (df != null && df.getTransportIds() != null && !df.getTransportIds().isEmpty()) {
             transportId = df.getTransportIds().get(0);
         } else {
@@ -548,7 +547,7 @@ public class ServiceImpl extends ServiceDelegate {
         Service service = serviceFactory.getService();
         service.getServiceInfos().get(0).addBinding(bindingInfo);
 
-        ei = new EndpointInfo(service.getServiceInfos().get(0), transportId);
+        EndpointInfo ei = new EndpointInfo(service.getServiceInfos().get(0), transportId);
         ei.setName(portName);
         ei.setAddress(address);
         ei.setBinding(bindingInfo);
@@ -638,7 +637,7 @@ public class ServiceImpl extends ServiceDelegate {
         //Initialize Features.
         configureObject(portName.toString() + ".jaxws-client.proxyFactory", clientFac);
 
-        AbstractServiceFactoryBean sf = null;
+        final AbstractServiceFactoryBean sf;
         try {
             DataBinding db;
             if (context != null) {

@@ -325,8 +325,6 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
         checkPublishPermission();
         checkPublishable();
 
-        ServerImpl serv = null;
-
         ClassLoaderHolder loader = null;
         try {
             if (bus != null) {
@@ -335,7 +333,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
                     loader = ClassLoaderUtils.setThreadContextClassloader(newLoader);
                 }
             }
-            serv = getServer(addr);
+            ServerImpl serv = getServer(addr);
             if (addr != null) {
                 EndpointInfo endpointInfo = serv.getEndpoint().getEndpointInfo();
                 if (endpointInfo.getAddress() == null || !endpointInfo.getAddress().contains(addr)) {

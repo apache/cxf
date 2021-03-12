@@ -197,7 +197,7 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
                     partNames.set(idx, null);
                 }
             } else {
-                String elementType = null;
+                final String elementType;
                 if (p.getTypeQName() == null) {
                     // handling anonymous complex type
                     elementType = null;

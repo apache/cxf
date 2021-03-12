@@ -220,6 +220,7 @@ public class SpringBeansTest {
             }
         }
         assertTrue(saaj);
+        assertTrue(logging);
     }
 
     @Test
@@ -286,6 +287,7 @@ public class SpringBeansTest {
         assertTrue("Not soap version 1.2: " + sbc.getVersion(),  sbc.getVersion() instanceof Soap12);
 
         bean = (JaxWsServerFactoryBean) ctx.getBean("inlineDataBinding");
+        assertNotNull(bean);
 
         boolean found = false;
         String[] names = ctx.getBeanNamesForType(SpringServerFactoryBean.class);

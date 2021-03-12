@@ -64,7 +64,7 @@ public class SOAPMessageContextImpl extends WrappedMessageContext implements SOA
     }
 
     public SOAPMessage getMessage() {
-        SOAPMessage message = null;
+        SOAPMessage message;
         if (getWrappedMessage().getContent(Object.class) instanceof SOAPMessage) {
             message = (SOAPMessage)getWrappedMessage().getContent(Object.class);
         } else {

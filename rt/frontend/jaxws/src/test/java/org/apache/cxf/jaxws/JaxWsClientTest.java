@@ -102,7 +102,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         assertNotNull(s);
 
         try {
-            s = javax.xml.ws.Service.create(new URL("file:/does/not/exist.wsdl"),
+            javax.xml.ws.Service.create(new URL("file:/does/not/exist.wsdl"),
                                             new QName("http://apache.org/hello_world_soap_http", "SoapPort"));
             fail("did not throw exception");
         } catch (WebServiceException sce) {
@@ -117,10 +117,9 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
             .create(url, SERVICE_NAME);
         Greeter greeter = s.getPort(PORT_NAME, Greeter.class);
         InvocationHandler handler = Proxy.getInvocationHandler(greeter);
-        BindingProvider bp = null;
 
         if (handler instanceof BindingProvider) {
-            bp = (BindingProvider)handler;
+            BindingProvider bp = (BindingProvider)handler;
             //System.out.println(bp.toString());
             Map<String, Object> requestContext = bp.getRequestContext();
             String reqAddr =

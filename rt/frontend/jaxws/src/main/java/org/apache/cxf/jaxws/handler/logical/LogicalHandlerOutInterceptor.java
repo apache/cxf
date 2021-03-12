@@ -72,7 +72,7 @@ public class LogicalHandlerOutInterceptor
 
         Node nd = message.getContent(Node.class);
         SOAPMessage m = message.getContent(SOAPMessage.class);
-        Document document = null;
+        final Document document;
 
         if (m != null) {
             document = m.getSOAPPart();

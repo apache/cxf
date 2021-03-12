@@ -290,7 +290,7 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
         public void handleMessage(SoapMessage message) throws Fault {
             MessageContentsList list = (MessageContentsList)message.getContent(List.class);
             Object o = list.remove(0);
-            SOAPMessage soapMessage = null;
+            final SOAPMessage soapMessage;
 
             if (o instanceof SOAPMessage) {
                 soapMessage = (SOAPMessage)o;

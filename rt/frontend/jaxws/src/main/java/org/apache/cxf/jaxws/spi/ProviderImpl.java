@@ -107,11 +107,9 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
     @Override
     public Endpoint createEndpoint(String bindingId, Object implementor) {
 
-        Endpoint ep = null;
         if (EndpointUtils.isValidImplementor(implementor)) {
             Bus bus = BusFactory.getThreadDefaultBus();
-            ep = createEndpointImpl(bus, bindingId, implementor);
-            return ep;
+            return createEndpointImpl(bus, bindingId, implementor);
         }
         throw new WebServiceException(new Message("INVALID_IMPLEMENTOR_EXC", LOG).toString());
     }
@@ -119,11 +117,9 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
     public Endpoint createEndpoint(String bindingId,
                                    Object implementor,
                                    WebServiceFeature ... features) {
-        EndpointImpl ep = null;
         if (EndpointUtils.isValidImplementor(implementor)) {
             Bus bus = BusFactory.getThreadDefaultBus();
-            ep = createEndpointImpl(bus, bindingId, implementor, features);
-            return ep;
+            return createEndpointImpl(bus, bindingId, implementor, features);
         }
         throw new WebServiceException(new Message("INVALID_IMPLEMENTOR_EXC", LOG).toString());
     }
@@ -306,11 +302,8 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                     writer.writeEndElement();
                 }
 
-
-                String serviceNamePrefix = null;
-
                 if (serviceName != null) {
-                    serviceNamePrefix =
+                    String serviceNamePrefix =
                         (serviceName.getPrefix() == null || serviceName.getPrefix().length() == 0)
                         ? "ns2" : serviceName.getPrefix();
 

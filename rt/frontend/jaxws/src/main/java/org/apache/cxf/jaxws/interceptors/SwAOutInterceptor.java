@@ -177,7 +177,7 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
                 continue;
             }
             outObjects.set(idx, null);
-            DataHandler dh = null;
+            DataHandler dh;
 
             // This code could probably be refactored out somewhere...
             if (o instanceof Source) {

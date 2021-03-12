@@ -67,7 +67,7 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
         LOG.fine("building handler chain");
         
         HandlerChainAnnotation hcAnn = findHandlerChainAnnotation(clz, true);
-        List<Handler> chain = null;
+        final List<Handler> chain;
         if (hcAnn == null) {
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("no HandlerChain annotation on " + clz);
@@ -155,7 +155,7 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
                 WebService ws = clz.getAnnotation(WebService.class);
                 if (ws != null && !StringUtils.isEmpty(ws.endpointInterface())) {
                     String seiClassName = ws.endpointInterface().trim();
-                    Class<?> seiClass = null;
+                    final Class<?> seiClass;
                     try {
                         seiClass = ClassLoaderUtils.loadClass(seiClassName, clz);
                     } catch (ClassNotFoundException e) {

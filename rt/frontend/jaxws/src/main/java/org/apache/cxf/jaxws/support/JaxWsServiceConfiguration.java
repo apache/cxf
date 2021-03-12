@@ -312,7 +312,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         }
 
         if (tns == null || tns.length() == 0) {
-            QName wrappername = null;
+            final QName wrappername;
             if (input) {
                 wrappername = getRequestWrapperName(op, method);
             } else {
@@ -342,7 +342,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
 
     private String getDefaultLocalName(OperationInfo op, Method method, int paramNumber,
                                        int partIndex, String prefix) {
-        String paramName = null;
+        final String paramName;
         if (paramNumber != -1) {
             paramName = prefix + partIndex;
         } else {
@@ -622,7 +622,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         Method m = getDeclaredMethod(selected);
 
         ResponseWrapper rw = m.getAnnotation(ResponseWrapper.class);
-        String clsName = "";
+        final String clsName;
         if (rw == null) {
             clsName = getPackageName(selected) + ".jaxws." + StringUtils.capitalize(selected.getName())
                       + "Response";
@@ -630,7 +630,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
             clsName = rw.className();
         }
 
-        if (clsName.length() > 0) {
+        if (!clsName.isEmpty()) {
             cachedClass = responseMethodClassCache.get(clsName);
             if (cachedClass != null) {
                 responseMethodClassCache.put(selected, cachedClass);
@@ -696,14 +696,14 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         Method m = getDeclaredMethod(selected);
 
         RequestWrapper rw = m.getAnnotation(RequestWrapper.class);
-        String clsName = "";
+        final String clsName;
         if (rw == null) {
             clsName = getPackageName(selected) + ".jaxws." + StringUtils.capitalize(selected.getName());
         } else {
             clsName = rw.className();
         }
 
-        if (clsName.length() > 0) {
+        if (!clsName.isEmpty()) {
             cachedClass = requestMethodClassCache.get(clsName);
             if (cachedClass != null) {
                 requestMethodClassCache.put(selected, cachedClass);

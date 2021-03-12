@@ -250,7 +250,7 @@ public class WrappedMessageContext implements MessageContext {
                     //may have to create the out message and add the headers
                     Message tmp = createResponseMessage();
                     if (tmp != null) {
-                        ret = tmp.get(Message.PROTOCOL_HEADERS);
+                        mp = (Map<?, ?>)tmp.get(Message.PROTOCOL_HEADERS);
                     }
                 }
                 ret = mp;
@@ -335,7 +335,7 @@ public class WrappedMessageContext implements MessageContext {
         if (isResponse()) {
             return getWrappedMessage();
         }
-        Message m = null;
+        Message m;
         if (isRequestor()) {
             m = exchange.getInFaultMessage();
             if (m == null) {

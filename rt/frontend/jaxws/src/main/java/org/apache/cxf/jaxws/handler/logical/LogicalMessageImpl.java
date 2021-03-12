@@ -69,7 +69,7 @@ public class LogicalMessageImpl implements LogicalMessage {
     }
 
     public Source getPayload() {
-        Source source = null;
+        Source source;
 
         Service.Mode mode = msgContext.getWrappedMessage().getExchange().get(Service.Mode.class);
 
@@ -277,7 +277,7 @@ public class LogicalMessageImpl implements LogicalMessage {
     }
 
     private SOAPMessage initSOAPMessage(InputStream is) throws SOAPException, IOException {
-        SOAPMessage msg = null;
+        final SOAPMessage msg;
         if (is != null) {
             msg = SAAJFactoryResolver.createMessageFactory(null).createMessage(null, is);
         } else {
