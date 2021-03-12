@@ -43,6 +43,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXSource;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.JAXRSInvoker;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -59,14 +60,13 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -75,10 +75,10 @@ import static org.junit.Assert.assertTrue;
 public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
 
-    @Ignore
-    public static class Server extends AbstractBusTestServerBase {
-        org.apache.cxf.endpoint.Server server;
-        protected void run() {
+    public static class Server extends AbstractServerTestServerBase {
+
+        @Override
+        protected org.apache.cxf.endpoint.Server createServer(Bus bus) throws Exception {
             JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setInvoker(new CustomModelInvoker());
             sf.setProvider(new PreMatchContainerRequestFilter());
@@ -118,25 +118,11 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
 
             sf.setModelBeans(ur);
 
-            server = sf.create();
+            return sf.create();
         }
 
-        @Override
-        public void tearDown() {
-            server.stop();
-            server.destroy();
-            server = null;
-        }
-        public static void main(String[] args) {
-            try {
-                Server s = new Server();
-                s.start();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.exit(-1);
-            } finally {
-                System.out.println("done!");
-            }
+        public static void main(String[] args) throws Exception {
+            new Server().start();
         }
     }
 

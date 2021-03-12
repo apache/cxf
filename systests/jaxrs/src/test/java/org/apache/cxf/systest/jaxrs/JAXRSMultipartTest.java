@@ -80,11 +80,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
@@ -643,8 +643,6 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         Map<String, Object> objects = new LinkedHashMap<>();
 
         MultivaluedMap<String, String> headers = new MetadataMap<>();
-
-        headers = new MetadataMap<>();
         headers.putSingle("Content-Type", "application/json");
         headers.putSingle("Content-ID", "thejson");
         headers.putSingle("Content-Transfer-Encoding", "customjson");

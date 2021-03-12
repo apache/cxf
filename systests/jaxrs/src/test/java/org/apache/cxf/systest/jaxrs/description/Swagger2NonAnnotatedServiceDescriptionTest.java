@@ -22,6 +22,7 @@ import java.util.Arrays;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
@@ -39,7 +40,7 @@ public class Swagger2NonAnnotatedServiceDescriptionTest extends AbstractSwagger2
         }
 
         @Override
-        protected void run() {
+        protected org.apache.cxf.endpoint.Server createServer(Bus bus) throws Exception {
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookStore.class);
             sf.setResourceClasses(BookStoreStylesheetsSwagger2.class);
@@ -53,11 +54,11 @@ public class Swagger2NonAnnotatedServiceDescriptionTest extends AbstractSwagger2
             feature.setScanAllResources(true);
             sf.setFeatures(Arrays.asList(feature));
             sf.setAddress("http://localhost:" + port + "/");
-            sf.create();
+            return sf.create();
         }
 
-        public static void main(String[] args) {
-            start(new SwaggerRegularNonAnnotated());
+        public static void main(String[] args) throws Exception {
+            new SwaggerRegularNonAnnotated().start();
         }
     }
 

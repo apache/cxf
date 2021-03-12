@@ -82,12 +82,12 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
                           + " application/xhtml+xml, image/png, image/jpeg, image/gif,"
                           + " image/x-xbitmap, */*;q=0.1");
 
-        Entry entry = addEntry(endpointAddress);
-        entry = addEntry(endpointAddress + "/relative");
+        addEntry(endpointAddress);
+        addEntry(endpointAddress + "/relative");
 
         endpointAddress =
             "http://localhost:" + PORT + "/bookstore/bookstore/books/subresources/123";
-        entry = getEntry(endpointAddress, null);
+        Entry entry = getEntry(endpointAddress, null);
         assertEquals("CXF in Action", entry.getTitle());
 
         getAndCompareJson("http://localhost:" + PORT + "/bookstore/bookstore/books/entries/123",
@@ -124,7 +124,7 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
         HttpPost post = new HttpPost(endpointAddress);
         post.setEntity(new StringEntity(w.toString(), ContentType.APPLICATION_ATOM_XML));
 
-        String location = null;
+        final String location;
         try {
             CloseableHttpResponse response = client.execute(post);
             assertEquals(201, response.getStatusLine().getStatusCode());

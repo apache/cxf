@@ -19,59 +19,42 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
-import org.apache.cxf.feature.Feature;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 import org.apache.cxf.throttling.ThrottleResponse;
 import org.apache.cxf.throttling.ThrottlingFeature;
 import org.apache.cxf.throttling.ThrottlingManager;
 
 
-public class BookServerThrottled extends AbstractBusTestServerBase {
+public class BookServerThrottled extends AbstractServerTestServerBase {
     public static final String PORT = allocatePort(BookServerThrottled.class);
 
-    org.apache.cxf.endpoint.Server server;
-    public BookServerThrottled() {
-    }
-    protected void run() {
+    @Override
+    protected Server createServer(Bus bus) throws Exception {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(BookStore.class);
-        List<Feature> features = new ArrayList<>();
-        ThrottlingFeature tf = new ThrottlingFeature(new ThrottlingManagerImpl());
-        features.add(tf);
-        sf.setFeatures(features);
+        sf.setFeatures(Collections.singletonList(
+            new ThrottlingFeature(new ThrottlingManagerImpl())));
         sf.setResourceProvider(BookStore.class,
                                new SingletonResourceProvider(new BookStore(), true));
         sf.setAddress("http://localhost:" + PORT + "/");
-        server = sf.create();
+        return sf.create();
     }
 
-    public void tearDown() throws Exception {
-        server.stop();
-        server.destroy();
-        server = null;
+    public static void main(String[] args) throws Exception {
+        new BookServerThrottled().start();
     }
 
-    public static void main(String[] args) {
-        try {
-            BookServerThrottled s = new BookServerThrottled();
-            s.start();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
-        } finally {
-            System.out.println("done!");
-        }
-    }
     private static class ThrottlingManagerImpl implements ThrottlingManager {
 
         @Override

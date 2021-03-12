@@ -117,11 +117,9 @@ public class JAXRSUriInfoTest extends AbstractClientServerTestBase {
         @Path("/{path:.*}")
         @Produces("text/plain")
         public String getBasePathAndPathParam(@PathParam("path") String path) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(uriInfo.getBaseUri());
-            sb.append(",\"" + path + "\"");
-            sb.append(',').append(uriInfo.getPath());
-            return sb.toString();
+            return  new StringBuilder(uriInfo.getBaseUri().toString())
+                .append(",\"").append(path).append('"')
+                .append(',').append(uriInfo.getPath()).toString();
         }
 
     }

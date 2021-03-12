@@ -20,16 +20,19 @@
 package org.apache.cxf.systest.jaxrs.logging;
 
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.systest.jaxrs.BookStore;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
-public class LoggingServer extends AbstractBusTestServerBase {
+public class LoggingServer extends AbstractServerTestServerBase {
     static final String PORT = allocatePort(LoggingServer.class);
 
-    protected void run() {
+    @Override
+    protected Server createServer(Bus bus) throws Exception {
         final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
 
         sf.setResourceClasses(BookStore.class);
@@ -38,18 +41,10 @@ public class LoggingServer extends AbstractBusTestServerBase {
 
         sf.getFeatures().add(new LoggingFeature());
 
-        sf.create();
+        return sf.create();
     }
 
-    public static void main(String[] args) {
-        try {
-            final LoggingServer s = new LoggingServer();
-            s.start();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
-        } finally {
-            System.out.println("done!");
-        }
+    public static void main(String[] args) throws Exception {
+        new LoggingServer().start();
     }
 }

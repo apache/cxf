@@ -79,9 +79,7 @@ public class AsyncResource {
     }
 
     protected static AsyncResponse takeAsyncResponse(int stageId) {
-        AsyncResponse asyncResponse = null;
-        asyncResponse = ASYNC_RESPONSES[stageId].take();
-        return asyncResponse;
+        return ASYNC_RESPONSES[stageId].take();
     }
 
     protected static final void addResponse(AsyncResponse response, String stageId) {

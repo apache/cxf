@@ -17,17 +17,35 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs;
+package org.apache.cxf.testutil.common;
 
-public class BookServerResourceCreatedSpringProviders extends AbstractSpringServer {
-    public static final String PORT = allocatePort(BookServerResourceCreatedSpringProviders.class);
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.endpoint.Server;
 
-    public BookServerResourceCreatedSpringProviders() {
-        super("/jaxrs_spring_providers", "/webapp", Integer.parseInt(PORT));
+public abstract class AbstractServerTestServerBase extends AbstractTestServerBase {
+
+    private Bus b;
+    private Server server;
+
+    @Override
+    protected final void run() throws Exception {
+        b = BusFactory.getDefaultBus();
+        server = createServer(b);
+        BusFactory.setDefaultBus(null);
+        BusFactory.setThreadDefaultBus(null);
     }
 
-    public static void main(String[] args) throws Exception {
-        new BookServerResourceCreatedSpringProviders().start();
+    protected abstract Server createServer(Bus bus) throws Exception;
+
+    @Override
+    public void tearDown() throws Exception {
+        server.stop();
+        server.destroy();
+        server = null;
+
+        b.shutdown(true);
+        b = null;
     }
 
 }

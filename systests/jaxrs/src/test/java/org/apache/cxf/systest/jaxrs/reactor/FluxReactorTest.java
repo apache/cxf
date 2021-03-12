@@ -59,7 +59,7 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
                 .request(MediaType.APPLICATION_JSON)
                 .rx(ReactorInvoker.class)
                 .get(HelloWorldBean.class))
-            .expectNextMatches(bean -> bean.getGreeting().equals("Hello") && bean.getAudience().equals("World"))
+            .expectNextMatches(bean -> "Hello".equals(bean.getGreeting()) && "World".equals(bean.getAudience()))
             .expectComplete()
             .verify();
     }
@@ -76,11 +76,11 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
                 .request(MediaType.APPLICATION_JSON)
                 .rx(ReactorInvoker.class)
                 .getFlux(HelloWorldBean.class))
-            .expectNextMatches(bean -> bean.getGreeting().equals("Hello 1") && bean.getAudience().equals("World"))
-            .expectNextMatches(bean -> bean.getGreeting().equals("Hello 2") && bean.getAudience().equals("World"))
-            .expectNextMatches(bean -> bean.getGreeting().equals("Hello 3") && bean.getAudience().equals("World"))
-            .expectNextMatches(bean -> bean.getGreeting().equals("Hello 4") && bean.getAudience().equals("World"))
-            .expectNextMatches(bean -> bean.getGreeting().equals("Hello 5") && bean.getAudience().equals("World"))
+            .expectNextMatches(bean -> "Hello 1".equals(bean.getGreeting()) && "World".equals(bean.getAudience()))
+            .expectNextMatches(bean -> "Hello 2".equals(bean.getGreeting()) && "World".equals(bean.getAudience()))
+            .expectNextMatches(bean -> "Hello 3".equals(bean.getGreeting()) && "World".equals(bean.getAudience()))
+            .expectNextMatches(bean -> "Hello 4".equals(bean.getGreeting()) && "World".equals(bean.getAudience()))
+            .expectNextMatches(bean -> "Hello 5".equals(bean.getGreeting()) && "World".equals(bean.getAudience()))
             .expectComplete()
             .verify();
     }
@@ -143,7 +143,7 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
                 .request(MediaType.APPLICATION_JSON)
                 .rx(ReactorInvoker.class)
                 .getFlux(HelloWorldBean.class))
-            .expectNextMatches(b -> b.getGreeting().equalsIgnoreCase("Person 1"))
+            .expectNextMatches(b -> "Person 1".equalsIgnoreCase(b.getGreeting()))
             .expectComplete()
             .verify();
     }
@@ -307,8 +307,8 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
                 .request(MediaType.APPLICATION_JSON)
                 .rx(ReactorInvoker.class)
                 .getFlux(HelloWorldBean.class))
-            .expectNextMatches(bean -> bean.getGreeting().equals("Hello") && bean.getAudience().equals("World"))
-            .expectNextMatches(bean -> bean.getGreeting().equals("Ciao") && bean.getAudience().equals("World"))
+            .expectNextMatches(bean -> "Hello".equals(bean.getGreeting()) && "World".equals(bean.getAudience()))
+            .expectNextMatches(bean -> "Ciao".equals(bean.getGreeting()) && "World".equals(bean.getAudience()))
             .expectComplete()
             .verify();
     }

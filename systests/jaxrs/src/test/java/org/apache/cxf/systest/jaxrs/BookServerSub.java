@@ -19,41 +19,28 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
-public class BookServerSub extends AbstractBusTestServerBase {
+public class BookServerSub extends AbstractServerTestServerBase {
     public static final String PORT = allocatePort(BookServerSub.class);
 
-    org.apache.cxf.endpoint.Server server;
-    
-    protected void run() {
+    @Override
+    protected Server createServer(Bus bus) throws Exception {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setStaticSubresourceResolution(true);
         sf.setResourceClasses(BookStoreSubObject.class);
         sf.setResourceProvider(BookStoreSubObject.class,
                                new SingletonResourceProvider(new BookStoreSubObject(), true));
         sf.setAddress("http://localhost:" + PORT + "/");
-        server = sf.create();
+        return sf.create();
     }
 
-    public void tearDown() throws Exception {
-        server.stop();
-        server.destroy();
-        server = null;
-    }
-
-    public static void main(String[] args) {
-        try {
-            BookServerSub s = new BookServerSub();
-            s.start();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
-        } finally {
-            System.out.println("done!");
-        }
+    public static void main(String[] args) throws Exception {
+        new BookServerSub().start();
     }
 
 }

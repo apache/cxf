@@ -19,8 +19,6 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
@@ -62,7 +60,7 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
-import org.apache.http.entity.FileEntity;
+import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -843,27 +841,13 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
 
     @Test
     public void testRetrieveBookAegis3() throws Exception {
+        try (Socket s = new Socket("localhost", Integer.parseInt(PORT))) {
+            IOUtils.copy(getClass().getResourceAsStream("resources/retrieveRequest.txt"), s.getOutputStream());
 
-        try (Socket s = new Socket("localhost", Integer.parseInt(PORT));
-            InputStream is = this.getClass().getResourceAsStream("resources/retrieveRequest.txt")) {
-
-            byte[] bytes = IOUtils.readBytesFromStream(is);
-            s.getOutputStream().write(bytes);
-            s.getOutputStream().flush();
-
-            BufferedReader r = new BufferedReader(new InputStreamReader(s.getInputStream()));
-            StringBuilder sb = new StringBuilder();
-            String str = null;
-            while ((str = r.readLine()) != null) {
-                sb.append(str);
+            try (InputStream is = s.getInputStream()) {
+                assertTrue(IOUtils.toString(is).contains("CXF in Action - 2"));
             }
-
-            String aegisData = sb.toString();
-            s.getInputStream().close();
-            s.close();
-            assertTrue(aegisData.contains("CXF in Action - 2"));
         }
-
     }
 
     @Test
@@ -981,11 +965,10 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     private void doPost(String endpointAddress, int expectedStatus, String contentType,
                         String inResource, String expectedResource) throws Exception {
 
-        File input = new File(getClass().getResource(inResource).toURI());
         CloseableHttpClient client = HttpClientBuilder.create().build();
         HttpPost post = new HttpPost(endpointAddress);
         post.setHeader("Content-Type", contentType);
-        post.setEntity(new FileEntity(input, ContentType.TEXT_XML));
+        post.setEntity(new InputStreamEntity(getClass().getResourceAsStream(inResource), ContentType.TEXT_XML));
 
         try {
             CloseableHttpResponse response = client.execute(post);

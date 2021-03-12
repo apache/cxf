@@ -65,24 +65,20 @@ import javax.ws.rs.ext.WriterInterceptorContext;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
-public class BookServer20 extends AbstractBusTestServerBase {
+public class BookServer20 extends AbstractServerTestServerBase {
     public static final String PORT = allocatePort(BookServer20.class);
 
-    org.apache.cxf.endpoint.Server server;
-
-    protected void run() {
-        Bus bus = BusFactory.getDefaultBus();
-        setBus(bus);
+    @Override
+    protected Server createServer(Bus bus) throws Exception {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        sf.setBus(bus);
         sf.setResourceClasses(BookStore.class);
 
         List<Object> providers = new ArrayList<>();
@@ -111,27 +107,11 @@ public class BookServer20 extends AbstractBusTestServerBase {
         sf.setResourceProvider(BookStore.class,
                                new SingletonResourceProvider(new BookStore(), true));
         sf.setAddress("http://localhost:" + PORT + "/");
-        server = sf.create();
-        BusFactory.setDefaultBus(null);
-        BusFactory.setThreadDefaultBus(null);
+        return sf.create();
     }
 
-    public void tearDown() throws Exception {
-        server.stop();
-        server.destroy();
-        server = null;
-    }
-
-    public static void main(String[] args) {
-        try {
-            BookServer20 s = new BookServer20();
-            s.start();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
-        } finally {
-            System.out.println("done!");
-        }
+    public static void main(String[] args) throws Exception {
+        new BookServer20().start();
     }
 
     @PreMatching

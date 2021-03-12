@@ -25,6 +25,7 @@ import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
@@ -32,7 +33,7 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
 import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiConfig;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractTestServerBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -45,12 +46,10 @@ import static org.junit.Assert.assertTrue;
 public class SwaggerUiConfigurationTest extends AbstractClientServerTestBase {
     private static final String PORT = allocatePort(SwaggerUiConfigurationTest.class);
 
-    public static class Server extends AbstractTestServerBase {
-
-        private org.apache.cxf.endpoint.Server server;
+    public static class Server extends AbstractServerTestServerBase {
 
         @Override
-        protected void run() {
+        protected org.apache.cxf.endpoint.Server createServer(Bus bus) throws Exception {
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookStoreSwagger2.class);
             sf.setResourceProvider(BookStoreSwagger2.class,
@@ -61,14 +60,7 @@ public class SwaggerUiConfigurationTest extends AbstractClientServerTestBase {
             feature.setSwaggerUiConfig(new SwaggerUiConfig().url("/swagger.json"));
             sf.setFeatures(Arrays.asList(feature));
             sf.setAddress("http://localhost:" + PORT + "/");
-            server = sf.create();
-        }
-
-        @Override
-        public void tearDown() throws Exception {
-            server.stop();
-            server.destroy();
-            server = null;
+            return sf.create();
         }
 
         public static void main(String[] args) throws Exception {

@@ -57,7 +57,7 @@ public class MonoReactorTest extends AbstractBusClientServerTestBase {
                 .request(MediaType.APPLICATION_JSON)
                 .rx(ReactorInvoker.class)
                 .get(HelloWorldBean.class))
-            .expectNextMatches(r -> r.getGreeting().equals("Hello") && r.getAudience().equals("World"))
+            .expectNextMatches(r -> "Hello".equals(r.getGreeting()) && "World".equals(r.getAudience()))
             .expectComplete()
             .verify();
     }
@@ -75,7 +75,7 @@ public class MonoReactorTest extends AbstractBusClientServerTestBase {
                 .request(MediaType.APPLICATION_JSON)
                 .rx(ReactorInvoker.class)
                 .get(HelloWorldBean.class))
-            .expectNextMatches(r -> r.getGreeting().equals("Hello") && r.getAudience().equals("World"))
+            .expectNextMatches(r -> "Hello".equals(r.getGreeting()) && "World".equals(r.getAudience()))
             .expectComplete()
             .verify();
     }

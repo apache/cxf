@@ -32,6 +32,7 @@ import javax.ws.rs.core.Response.Status;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.IOUtils;
@@ -46,8 +47,8 @@ import org.apache.cxf.jaxrs.model.UserOperation;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
 import org.apache.cxf.jaxrs.swagger.parse.SwaggerParseUtils;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 import org.hamcrest.CoreMatchers;
 import org.yaml.snakeyaml.Yaml;
 
@@ -62,7 +63,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBusClientServerTestBase {
+public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractClientServerTestBase {
     static final String SECURITY_DEFINITION_NAME = "basicAuth";
 
     protected enum XForwarded {
@@ -81,8 +82,7 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
     private static final String LICENSE = "API License";
     private static final String LICENSE_URL = "API License URL";
 
-    @Ignore
-    public abstract static class Server extends AbstractBusTestServerBase {
+    public abstract static class Server extends AbstractServerTestServerBase {
         protected final String port;
         protected final boolean runAsFilter;
 
@@ -92,7 +92,7 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
         }
 
         @Override
-        protected void run() {
+        protected org.apache.cxf.endpoint.Server createServer(Bus bus) throws Exception {
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookStoreSwagger2.class);
             sf.setResourceClasses(BookStoreStylesheetsSwagger2.class);
@@ -104,7 +104,7 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
             sf.setAddress("http://localhost:" + port + "/");
             sf.setExtensionMappings(
                  Collections.singletonMap("json", "application/json;charset=UTF-8"));
-            sf.create();
+            return sf.create();
         }
 
         protected Swagger2Feature createSwagger2Feature() {
@@ -119,24 +119,12 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
                new io.swagger.models.auth.BasicAuthDefinition()));
             return feature;
         }
-
-        protected static void start(final Server s) {
-            try {
-                s.start();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.exit(-1);
-            } finally {
-                System.out.println("done!");
-            }
-        }
     }
 
     protected static void startServers(final Class< ? extends Server> serverClass) throws Exception {
         AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
         assertTrue("server did not launch correctly", launchServer(serverClass, false));
-        createStaticBus();
     }
 
     protected abstract String getPort();

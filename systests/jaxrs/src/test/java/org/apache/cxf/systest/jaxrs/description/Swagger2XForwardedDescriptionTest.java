@@ -32,7 +32,6 @@ public class Swagger2XForwardedDescriptionTest extends AbstractSwagger2ServiceDe
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly", launchServer(Swagger2Server.class));
-        createStaticBus();
     }
 
     @Test

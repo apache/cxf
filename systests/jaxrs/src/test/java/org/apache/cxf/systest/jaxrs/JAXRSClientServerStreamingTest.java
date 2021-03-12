@@ -37,14 +37,15 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.staxutils.CachingXmlEventWriter;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -57,13 +58,13 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestBase {
+public class JAXRSClientServerStreamingTest extends AbstractClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
 
-    @Ignore
-    public static class Server extends AbstractBusTestServerBase {
+    public static class Server extends AbstractServerTestServerBase {
 
-        protected void run() {
+        @Override
+        protected org.apache.cxf.endpoint.Server createServer(Bus bus) throws Exception {
             JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookStore.class);
             sf.setResourceProvider(BookStore.class,
@@ -83,20 +84,11 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
             Map<String, Object> properties = new HashMap<>();
             properties.put("org.apache.cxf.serviceloader-context", "true");
             sf.setProperties(properties);
-            sf.create();
-
+            return sf.create();
         }
 
-        public static void main(String[] args) {
-            try {
-                Server s = new Server();
-                s.start();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.exit(-1);
-            } finally {
-                System.out.println("done!");
-            }
+        public static void main(String[] args) throws Exception {
+            new Server().start();
         }
     }
 
@@ -106,7 +98,6 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
         //keep out of process due to stack traces testing failures
         assertTrue("server did not launch correctly",
                    launchServer(Server.class));
-        createStaticBus();
     }
 
     @Test

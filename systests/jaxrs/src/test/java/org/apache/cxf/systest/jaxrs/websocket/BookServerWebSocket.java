@@ -20,23 +20,21 @@
 package org.apache.cxf.systest.jaxrs.websocket;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.StreamingResponseProvider;
 import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.systest.jaxrs.BookStorePerRequest;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
-public class BookServerWebSocket extends AbstractBusTestServerBase {
+public class BookServerWebSocket extends AbstractServerTestServerBase {
     public static final String PORT = allocatePort(BookServerWebSocket.class, 1);
     public static final String PORT_SPRING = allocatePort(BookServerWebSocket.class, 2);
     public static final String PORT_WAR = allocatePort(BookServerWebSocket.class, 3);
     public static final String PORT2 = allocatePort(BookServerWebSocket.class, 4);
     public static final String PORT2_SPRING = allocatePort(BookServerWebSocket.class, 5);
     public static final String PORT2_WAR = allocatePort(BookServerWebSocket.class, 6);
-
-    org.apache.cxf.endpoint.Server server;
 
     private String port;
 
@@ -48,38 +46,19 @@ public class BookServerWebSocket extends AbstractBusTestServerBase {
         this.port = port;
     }
 
-    protected void run() {
-        Bus bus = BusFactory.getDefaultBus();
-        setBus(bus);
+    @Override
+    protected Server createServer(Bus bus) throws Exception {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        sf.setBus(bus);
         sf.setResourceClasses(BookStoreWebSocket.class, BookStorePerRequest.class);
         sf.setProvider(new StreamingResponseProvider<Book>());
         sf.setResourceProvider(BookStoreWebSocket.class,
                                new SingletonResourceProvider(new BookStoreWebSocket(), true));
         sf.setAddress("ws://localhost:" + port + "/websocket");
-        server = sf.create();
-
-        BusFactory.setDefaultBus(null);
-        BusFactory.setThreadDefaultBus(null);
+        return sf.create();
     }
 
-    public void tearDown() throws Exception {
-        server.stop();
-        server.destroy();
-        server = null;
-    }
-
-    public static void main(String[] args) {
-        try {
-            BookServerWebSocket s = new BookServerWebSocket();
-            s.start();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
-        } finally {
-            System.out.println("done!");
-        }
+    public static void main(String[] args) throws Exception {
+        new BookServerWebSocket().start();
     }
 
 }

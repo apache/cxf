@@ -34,49 +34,29 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
-public class BookServerAsyncClient extends AbstractBusTestServerBase {
+public class BookServerAsyncClient extends AbstractServerTestServerBase {
     public static final String PORT = allocatePort(BookServerAsyncClient.class);
 
-    org.apache.cxf.endpoint.Server server;
-
-    protected void run() {
-        Bus bus = BusFactory.getDefaultBus();
-        setBus(bus);
+    @Override
+    protected Server createServer(Bus bus) throws Exception {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        sf.setBus(bus);
         sf.setResourceClasses(BookStore.class);
         sf.setResourceProvider(BookStore.class,
                                new SingletonResourceProvider(new BookStore(), true));
         sf.setAddress("http://localhost:" + PORT + "/");
         sf.setProvider(new BooleanReaderWriter());
         sf.getProperties(true).put("default.content.type", "*/*");
-        server = sf.create();
-        BusFactory.setDefaultBus(null);
-        BusFactory.setThreadDefaultBus(null);
+        return sf.create();
     }
 
-    public void tearDown() throws Exception {
-        server.stop();
-        server.destroy();
-        server = null;
-    }
-
-    public static void main(String[] args) {
-        try {
-            BookServerAsyncClient s = new BookServerAsyncClient();
-            s.start();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
-        } finally {
-            System.out.println("done!");
-        }
+    public static void main(String[] args) throws Exception {
+        new BookServerAsyncClient().start();
     }
 
     @Consumes("text/boolean")

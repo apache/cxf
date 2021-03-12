@@ -21,9 +21,9 @@ package org.apache.cxf.systest.jaxrs.validation;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 
-public abstract class AbstractJAXRSValidationTest extends AbstractBusClientServerTestBase {
+public abstract class AbstractJAXRSValidationTest extends AbstractClientServerTestBase {
     protected WebClient createWebClient(final String url) {
         WebClient wc = WebClient
             .create("http://localhost:" + getPort() + url)

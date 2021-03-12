@@ -24,9 +24,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,13 +49,12 @@ import javax.ws.rs.ext.ParamConverterProvider;
 import javax.ws.rs.ext.Providers;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.PropertyUtils;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.ResponseExceptionMapper;
 import org.apache.cxf.jaxrs.ext.search.QueryContextProvider;
@@ -72,16 +70,15 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.systest.jaxrs.BookStore.BookNotReturnedException;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
-public class BookServer extends AbstractBusTestServerBase {
+public class BookServer extends AbstractServerTestServerBase {
     public static final String PORT = allocatePort(BookServer.class);
 
-    org.apache.cxf.endpoint.Server server;
     private Map< ? extends String, ? extends Object > properties;
 
     public BookServer() {
-        this(Collections.< String, Object >emptyMap());
+        this(Collections.emptyMap());
     }
 
     /**
@@ -91,53 +88,51 @@ public class BookServer extends AbstractBusTestServerBase {
         this.properties = properties;
     }
 
-    protected void run() {
-        Bus bus = BusFactory.getDefaultBus();
+    @Override
+    protected Server createServer(Bus bus) throws Exception {
         bus.setProperty(ExceptionMapper.class.getName(), new BusMapperExceptionMapper());
-        setBus(bus);
+
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        sf.setBus(bus);
         sf.setResourceClasses(BookStore.class, SimpleBookStore.class, BookStorePerRequest.class);
-        List<Object> providers = new ArrayList<>();
 
         //default lifecycle is per-request, change it to singleton
-        BinaryDataProvider<Object> p = new BinaryDataProvider<>();
+        final BinaryDataProvider<Object> p = new BinaryDataProvider<>();
         p.setProduceMediaTypes(Collections.singletonList("application/bar"));
         p.setEnableBuffering(true);
         p.setReportByteArraySize(true);
-        providers.add(p);
-        providers.add(new BookStore.PrimitiveIntArrayReaderWriter());
-        providers.add(new BookStore.PrimitiveDoubleArrayReaderWriter());
-        providers.add(new BookStore.StringArrayBodyReaderWriter());
-        providers.add(new BookStore.StringListBodyReaderWriter());
-        providers.add(new StreamingResponseProvider<Object>());
-        providers.add(new ContentTypeModifyingMBW());
-        JAXBElementProvider<?> jaxbProvider = new JAXBElementProvider<>();
-        Map<String, String> jaxbElementClassMap = new HashMap<>();
-        jaxbElementClassMap.put(BookNoXmlRootElement.class.getName(), "BookNoXmlRootElement");
-        jaxbProvider.setJaxbElementClassMap(jaxbElementClassMap);
-        providers.add(jaxbProvider);
-        providers.add(new FormatResponseHandler());
-        providers.add(new GenericHandlerWriter());
-        providers.add(new FaultyRequestHandler());
-        providers.add(new SearchContextProvider());
-        providers.add(new QueryContextProvider());
-        providers.add(new BlockingRequestFilter());
-        providers.add(new FaultyResponseFilter());
-        providers.add(new BlockedExceptionMapper());
-        providers.add(new ParamConverterImpl());
-        sf.setProviders(providers);
-        List<Interceptor<? extends Message>> inInts = new ArrayList<>();
-        inInts.add(new CustomInFaultyInterceptor());
-        inInts.add(new LoggingInInterceptor());
-        sf.setInInterceptors(inInts);
-        List<Interceptor<? extends Message>> outInts = new ArrayList<>();
-        outInts.add(new CustomOutInterceptor());
-        outInts.add(new LoggingOutInterceptor());
-        sf.setOutInterceptors(outInts);
-        List<Interceptor<? extends Message>> outFaultInts = new ArrayList<>();
-        outFaultInts.add(new CustomOutFaultInterceptor());
-        sf.setOutFaultInterceptors(outFaultInts);
+        final JAXBElementProvider<?> jaxbProvider = new JAXBElementProvider<>();
+        jaxbProvider.setJaxbElementClassMap(
+            Collections.singletonMap(BookNoXmlRootElement.class.getName(), "BookNoXmlRootElement"));
+        sf.setProviders(Arrays.asList(
+            p,
+            new BookStore.PrimitiveIntArrayReaderWriter(),
+            new BookStore.PrimitiveDoubleArrayReaderWriter(),
+            new BookStore.StringArrayBodyReaderWriter(),
+            new BookStore.StringListBodyReaderWriter(),
+            new StreamingResponseProvider<Object>(),
+            new ContentTypeModifyingMBW(),
+            jaxbProvider,
+            new FormatResponseHandler(),
+            new GenericHandlerWriter(),
+            new FaultyRequestHandler(),
+            new SearchContextProvider(),
+            new QueryContextProvider(),
+            new BlockingRequestFilter(),
+            new FaultyResponseFilter(),
+            new BlockedExceptionMapper(),
+            new ParamConverterImpl()
+        ));
+        sf.setInInterceptors(Arrays.asList(
+            new CustomInFaultyInterceptor(),
+            new LoggingInInterceptor()
+        ));
+        sf.setOutInterceptors(Arrays.asList(
+            new CustomOutInterceptor(),
+            new LoggingOutInterceptor()
+        ));
+        sf.setOutFaultInterceptors(Arrays.asList(
+            new CustomOutFaultInterceptor()
+        ));
         sf.setResourceProvider(BookStore.class,
                                new SingletonResourceProvider(new BookStore(), true));
         sf.setAddress("http://localhost:" + PORT + "/");
@@ -147,27 +142,11 @@ public class BookServer extends AbstractBusTestServerBase {
         sf.getProperties().put("org.apache.cxf.http.header.split", true);
         sf.getProperties().put("default.content.type", "*/*");
         sf.getProperties().putAll(properties);
-        server = sf.create();
-        BusFactory.setDefaultBus(null);
-        BusFactory.setThreadDefaultBus(null);
+        return sf.create();
     }
 
-    public void tearDown() throws Exception {
-        server.stop();
-        server.destroy();
-        server = null;
-    }
-
-    public static void main(String[] args) {
-        try {
-            BookServer s = new BookServer();
-            s.start();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
-        } finally {
-            System.out.println("done!");
-        }
+    public static void main(String[] args) throws Exception {
+        new BookServer().start();
     }
 
     private static class BusMapperExceptionMapper implements ExceptionMapper<BusMapperException> {

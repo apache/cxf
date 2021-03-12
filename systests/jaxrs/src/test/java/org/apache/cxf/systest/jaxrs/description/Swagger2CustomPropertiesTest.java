@@ -33,10 +33,10 @@ public class Swagger2CustomPropertiesTest extends AbstractSwagger2ServiceDescrip
             super(PORT, false);
         }
 
-        public static void main(String[] args) {
-            start(new SwaggerRegular());
+        public static void main(String[] args) throws Exception {
+            new SwaggerRegular().start();
         }
-        
+
         protected Swagger2Feature createSwagger2Feature() {
             final Swagger2Feature feature = new Swagger2Feature();
             feature.setRunAsFilter(runAsFilter);

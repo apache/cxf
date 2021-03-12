@@ -41,12 +41,13 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.ehcache.impl.internal.concurrent.ConcurrentHashMap;
 
 @Path("/bookstore")
 public class BookCxfContinuationStore {
 
     private Map<String, String> books = new HashMap<>();
-    private Map<String, Continuation> suspended = new HashMap<>();
+    private Map<String, Continuation> suspended = new ConcurrentHashMap<>();
     private Executor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
                                         new ArrayBlockingQueue<Runnable>(10));
 
@@ -97,12 +98,7 @@ public class BookCxfContinuationStore {
     }
 
     private void resumeRequest(final String name) {
-
-        Continuation suspendedCont = null;
-        synchronized (suspended) {
-            suspendedCont = suspended.get(name);
-        }
-
+        Continuation suspendedCont = suspended.get(name);
         if (suspendedCont != null) {
             synchronized (suspendedCont) {
                 suspendedCont.resume();
@@ -117,9 +113,7 @@ public class BookCxfContinuationStore {
         try {
             cont.suspend(500000);
         } finally {
-            synchronized (suspended) {
-                suspended.put(name, cont);
-            }
+            suspended.put(name, cont);
             executor.execute(new Runnable() {
                 public void run() {
                     try {

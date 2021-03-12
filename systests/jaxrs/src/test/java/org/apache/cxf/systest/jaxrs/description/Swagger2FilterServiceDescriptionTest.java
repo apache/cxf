@@ -29,8 +29,8 @@ public class Swagger2FilterServiceDescriptionTest extends AbstractSwagger2Servic
             super(PORT, true);
         }
 
-        public static void main(String[] args) {
-            start(new SwaggerFilter());
+        public static void main(String[] args) throws Exception {
+            new SwaggerFilter().start();
         }
     }
 

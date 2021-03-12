@@ -68,7 +68,7 @@ public class JAXRSRxJava2MaybeTest extends AbstractBusClientServerTestBase {
 
         subscriber.await(3, TimeUnit.SECONDS);
         subscriber
-            .assertValue(r -> r.getGreeting().equals("Hello") && r.getAudience().equals("World"))
+            .assertValue(r -> "Hello".equals(r.getGreeting()) && "World".equals(r.getAudience()))
             .assertComplete();
     }
 

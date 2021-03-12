@@ -22,23 +22,19 @@ package org.apache.cxf.systest.jaxrs.reactive;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.rx2.server.ReactiveIOCustomizer;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
 
-public class RxJava2SingleServer extends AbstractBusTestServerBase {
+public class RxJava2SingleServer extends AbstractServerTestServerBase {
     public static final String PORT = allocatePort(RxJava2SingleServer.class);
 
-    org.apache.cxf.endpoint.Server server;
-    public RxJava2SingleServer() {
-    }
-
-    protected void run() {
-        Bus bus = BusFactory.getDefaultBus();
+    @Override
+    protected Server createServer(Bus bus) throws Exception {
         // Make sure default JSONProvider is not loaded
         bus.setProperty("skip.default.json.provider.registration", true);
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
@@ -49,25 +45,11 @@ public class RxJava2SingleServer extends AbstractBusTestServerBase {
         sf.setResourceProvider(RxJava2SingleService.class,
                                new SingletonResourceProvider(new RxJava2SingleService(), true));
         sf.setAddress("http://localhost:" + PORT + "/");
-        server = sf.create();
+        return sf.create();
     }
 
-    public void tearDown() throws Exception {
-        server.stop();
-        server.destroy();
-        server = null;
-    }
-
-    public static void main(String[] args) {
-        try {
-            RxJava2SingleServer s = new RxJava2SingleServer();
-            s.start();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
-        } finally {
-            System.out.println("done!");
-        }
+    public static void main(String[] args) throws Exception {
+        new RxJava2SingleServer().start();
     }
 
 }

@@ -26,42 +26,34 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
-public class JAXBProviderTest extends AbstractBusClientServerTestBase {
+public class JAXBProviderTest extends AbstractClientServerTestBase {
     public static final String PORT = allocatePort(JAXBProviderTest.class);
 
-    @Ignore
-    public static class Server extends AbstractBusTestServerBase {
-        protected void run() {
+    public static class Server extends AbstractServerTestServerBase {
+        @Override
+        protected org.apache.cxf.endpoint.Server createServer(Bus bus) throws Exception {
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(CXFResource.class);
             sf.setProvider(new CXFJaxbProvider());
             sf.setAddress("http://localhost:" + PORT + "/");
-            sf.create();
+            return sf.create();
         }
 
-        public static void main(String[] args) {
-            try {
-                Server s = new Server();
-                s.start();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.exit(-1);
-            } finally {
-                System.out.println("done!");
-            }
+        public static void main(String[] args) throws Exception {
+            new Server().start();
         }
     }
 
@@ -70,7 +62,6 @@ public class JAXBProviderTest extends AbstractBusClientServerTestBase {
         AbstractResourceInfo.clearAllMaps();
         // keep out of process due to stack traces testing failures
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
-        createStaticBus();
     }
 
     @Test

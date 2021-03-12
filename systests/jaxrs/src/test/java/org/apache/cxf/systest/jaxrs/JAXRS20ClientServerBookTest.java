@@ -931,7 +931,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         @Override
         public void filter(ClientRequestContext rc) throws IOException {
             String method = rc.getMethod();
-            String expectedMethod = null;
+            final String expectedMethod;
             if (rc.getAcceptableMediaTypes().contains(MediaType.valueOf("text/mistypedxml"))
                 && rc.getHeaders().getFirst("THEMETHOD") != null) {
                 expectedMethod = MediaType.TEXT_XML_TYPE.equals(rc.getMediaType()) ? "DELETE" : "GET";

@@ -25,6 +25,7 @@ import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObject;
@@ -34,8 +35,8 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
 import org.apache.cxf.jaxrs.swagger.openapi.SwaggerToOpenApiConversionFilter;
 import org.apache.cxf.systest.jaxrs.description.AbstractSwagger2ServiceDescriptionTest.XForwarded;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -44,7 +45,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class SwaggerToOpenApiConversionTest extends AbstractBusClientServerTestBase {
+public class SwaggerToOpenApiConversionTest extends AbstractClientServerTestBase {
     static final String PORT = allocatePort(SwaggerToOpenApiConversionTest.class);
     static final String SECURITY_DEFINITION_NAME = "basicAuth";
 
@@ -55,9 +56,9 @@ public class SwaggerToOpenApiConversionTest extends AbstractBusClientServerTestB
     private static final String LICENSE_URL = "API License URL";
 
     @Ignore
-    public static class Server extends AbstractBusTestServerBase {
+    public static class Server extends AbstractServerTestServerBase {
         @Override
-        protected void run() {
+        protected org.apache.cxf.endpoint.Server createServer(Bus bus) throws Exception {
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookStoreSwagger2.class);
             sf.setResourceProvider(BookStoreSwagger2.class,
@@ -66,7 +67,7 @@ public class SwaggerToOpenApiConversionTest extends AbstractBusClientServerTestB
             final Swagger2Feature feature = createSwagger2Feature();
             sf.setFeatures(Arrays.asList(feature));
             sf.setAddress("http://localhost:" + PORT + "/");
-            sf.create();
+            return sf.create();
         }
 
         protected Swagger2Feature createSwagger2Feature() {
@@ -80,17 +81,6 @@ public class SwaggerToOpenApiConversionTest extends AbstractBusClientServerTestB
                new io.swagger.models.auth.BasicAuthDefinition()));
             return feature;
         }
-
-        protected static void start(final Server s) {
-            try {
-                s.start();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.exit(-1);
-            } finally {
-                System.out.println("done!");
-            }
-        }
     }
 
     @BeforeClass
@@ -98,7 +88,6 @@ public class SwaggerToOpenApiConversionTest extends AbstractBusClientServerTestB
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly",
                    launchServer(Server.class, true));
-        createStaticBus();
     }
 
 

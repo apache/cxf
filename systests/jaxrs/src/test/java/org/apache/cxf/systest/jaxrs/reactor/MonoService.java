@@ -47,7 +47,7 @@ public class MonoService {
     public void getJsonImplicitListStreamingAsync(@Suspended AsyncResponse ar) {
         Mono.just("Hello")
                 .map(HelloWorldBean::new)
-                .subscribeOn(Schedulers.elastic())
+                .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(new JsonStreamingAsyncSubscriber<>(ar, null, null, null, 1000L, 0L));
     }
 

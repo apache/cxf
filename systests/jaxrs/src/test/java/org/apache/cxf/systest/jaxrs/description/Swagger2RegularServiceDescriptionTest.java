@@ -29,8 +29,8 @@ public class Swagger2RegularServiceDescriptionTest extends AbstractSwagger2Servi
             super(PORT, false);
         }
 
-        public static void main(String[] args) {
-            start(new SwaggerRegular());
+        public static void main(String[] args) throws Exception {
+            new SwaggerRegular().start();
         }
     }
 

@@ -18,13 +18,8 @@
  */
 package org.apache.cxf.systest.jaxrs.description.openapi;
 
-import java.util.Arrays;
 import java.util.Collections;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-
-import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.doc.JavaDocProvider;
 import org.apache.cxf.jaxrs.openapi.OpenApiCustomizer;
 import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
@@ -42,25 +37,10 @@ public class OpenApiCustomizerSubclassTest extends AbstractOpenApiServiceDescrip
             super(PORT, false);
         }
 
-        public static void main(String[] args) {
-            start(new OpenApiRegular());
-        }
-        
-        @Override
-        protected void run() {
-            final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-            sf.setResourceClasses(BookStoreOpenApi.class);
-            sf.setResourceClasses(BookStoreStylesheetsOpenApi.class);
-            sf.setResourceProvider(BookStoreOpenApi.class,
-                new SingletonResourceProvider(new BookStoreOpenApi()));
-            sf.setProvider(new JacksonJsonProvider());
-            final OpenApiFeature feature = createOpenApiFeature();
-            sf.setFeatures(Arrays.asList(feature));
-            sf.setAddress("http://localhost:" + port + "/");
-            sf.create();
+        public static void main(String[] args) throws Exception {
+            new OpenApiRegular().start();
         }
 
-        
         @Override
         protected OpenApiFeature createOpenApiFeature() {
             final OpenApiCustomizer customizer = new OpenApiCustomizer() {
