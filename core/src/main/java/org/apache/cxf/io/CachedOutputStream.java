@@ -48,7 +48,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 
 public class CachedOutputStream extends OutputStream {
-
+    private static final String UNKNOWN_FORMAT = "Unknown format of currentStream";
     private static final File DEFAULT_TEMP_DIR;
     private static int defaultThreshold;
     private static long defaultMaxSize;
@@ -167,6 +167,7 @@ public class CachedOutputStream extends OutputStream {
 
     }
 
+    @Override
     public void flush() throws IOException {
         currentStream.flush();
         if (null != callbacks) {
@@ -211,6 +212,7 @@ public class CachedOutputStream extends OutputStream {
         streamList.remove(currentStream);
     }
 
+    @Override
     public void close() throws IOException {
         currentStream.flush();
         outputLocked = true;
@@ -267,7 +269,7 @@ public class CachedOutputStream extends OutputStream {
                         byteOut.writeTo(out);
                     }
                 } else {
-                    throw new IOException("Unknown format of currentStream");
+                    throw new IOException(UNKNOWN_FORMAT);
                 }
             } else {
                 // read the file
@@ -302,7 +304,7 @@ public class CachedOutputStream extends OutputStream {
             if (currentStream instanceof ByteArrayOutputStream) {
                 return ((ByteArrayOutputStream)currentStream).toByteArray();
             }
-            throw new IOException("Unknown format of currentStream");
+            throw new IOException(UNKNOWN_FORMAT);
         }
         // read the file
         try (InputStream fin = createInputStream(tempFile)) {
@@ -316,7 +318,7 @@ public class CachedOutputStream extends OutputStream {
             if (currentStream instanceof ByteArrayOutputStream) {
                 ((ByteArrayOutputStream)currentStream).writeTo(out);
             } else {
-                throw new IOException("Unknown format of currentStream");
+                throw new IOException(UNKNOWN_FORMAT);
             }
         } else {
             // read the file
@@ -346,7 +348,7 @@ public class CachedOutputStream extends OutputStream {
                 byte[] bytes = ((ByteArrayOutputStream)currentStream).toByteArray();
                 out.append(IOUtils.newStringFromBytes(bytes, charsetName, 0, (int)limit));
             } else {
-                throw new IOException("Unknown format of currentStream");
+                throw new IOException(UNKNOWN_FORMAT);
             }
         } else {
             // read the file
@@ -385,7 +387,7 @@ public class CachedOutputStream extends OutputStream {
                 byte[] bytes = ((ByteArrayOutputStream)currentStream).toByteArray();
                 out.append(IOUtils.newStringFromBytes(bytes, charsetName));
             } else {
-                throw new IOException("Unknown format of currentStream");
+                throw new IOException(UNKNOWN_FORMAT);
             }
         } else {
             // read the file
@@ -438,6 +440,7 @@ public class CachedOutputStream extends OutputStream {
         }
     }
 
+    @Override
     public void write(byte[] b, int off, int len) throws IOException {
         if (!outputLocked) {
             onWrite();
@@ -447,6 +450,7 @@ public class CachedOutputStream extends OutputStream {
         }
     }
 
+    @Override
     public void write(byte[] b) throws IOException {
         if (!outputLocked) {
             onWrite();
@@ -515,6 +519,7 @@ public class CachedOutputStream extends OutputStream {
             if (cipherTransformation != null) {
                 fileInputStream = new CipherInputStream(fileInputStream, ciphers.getDecryptor()) {
                     boolean closed;
+                    @Override
                     public void close() throws IOException {
                         if (!closed) {
                             super.close();
@@ -557,7 +562,7 @@ public class CachedOutputStream extends OutputStream {
         return postClosedInvoked;
     }
 
-    public void setOutputDir(File outputDir) throws IOException {
+    public void setOutputDir(File outputDir) {
         this.outputDir = outputDir;
     }
 
@@ -622,6 +627,7 @@ public class CachedOutputStream extends OutputStream {
             }
             out = new CipherOutputStream(out, ciphers.getEncryptor()) {
                 boolean closed;
+                @Override
                 public void close() throws IOException {
                     if (!closed) {
                         super.close();
@@ -638,6 +644,7 @@ public class CachedOutputStream extends OutputStream {
         if (cipherTransformation != null) {
             in = new CipherInputStream(in, ciphers.getDecryptor()) {
                 boolean closed;
+                @Override
                 public void close() throws IOException {
                     if (!closed) {
                         super.close();
@@ -658,6 +665,7 @@ public class CachedOutputStream extends OutputStream {
             this.sourceFile = sourceFile;
         }
 
+        @Override
         public void close() throws IOException {
             if (!closed) {
                 super.close();
