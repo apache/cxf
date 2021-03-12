@@ -88,7 +88,7 @@ public class SpringJaxrsApplicationTest {
         @Bean
         public SpringBus cxf() {
             final SpringBus bus = new SpringBus();
-            // Bye default, the exception are propagated and out fault interceptors are not called 
+            // By default, the exception are propagated and out fault interceptors are not called 
             bus.setProperty("org.apache.cxf.propagate.exception", Boolean.FALSE);
             return bus;
         }
