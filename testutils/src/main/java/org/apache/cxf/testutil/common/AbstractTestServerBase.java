@@ -83,6 +83,8 @@ public abstract class AbstractTestServerBase {
             }
             System.out.println("server stopped");
         }
+        // still required for some standalone servers
+        System.exit(0); //NOPMD
     }
 
     public void setUp() throws Exception {

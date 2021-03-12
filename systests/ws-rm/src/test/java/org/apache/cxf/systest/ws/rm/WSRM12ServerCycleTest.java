@@ -89,7 +89,7 @@ public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
             ep.stop();
             ep = null;
         }
-        public static void main(String[] args) {
+        public static void main(String[] args) throws Exception {
             new Server(args).start();
         }
     }

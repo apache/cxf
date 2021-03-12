@@ -39,7 +39,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 
 public class ServerLauncher {
-    public static final long DEFAULT_TIMEOUT = TimeUnit.MINUTES.toMillis(3L);
+    public static final long DEFAULT_TIMEOUT = TimeUnit.MINUTES.toMillis(1L);
 
     protected static final String SERVER_FAILED =
         "server startup failed (not a log message)";

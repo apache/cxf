@@ -105,7 +105,7 @@ public abstract class AbstractServerPersistenceTest extends AbstractBusClientSer
             ep.stop();
             ep = null;
         }
-        public static void main(String[] args) {
+        public static void main(String[] args) throws Exception {
             new Server(args).start();
         }
     }

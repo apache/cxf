@@ -59,14 +59,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
-    protected static boolean serversStarted;
     static final String JMS_PORT = EmbeddedJMSBrokerLauncher.PORT;
 
     @BeforeClass
     public static void startServers() throws Exception {
-        if (serversStarted) {
-            return;
-        }
         AbstractResourceInfo.clearAllMaps();
         Map<String, String> props = new HashMap<>();
         if (System.getProperty("org.apache.activemq.default.directory.prefix") != null) {
@@ -80,7 +76,6 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
                    launchServer(EmbeddedJMSBrokerLauncher.class, props, null, false));
         assertTrue("server did not launch correctly",
                    launchServer(JMSServer.class, true));
-        serversStarted = true;
     }
 
     @Test

@@ -44,10 +44,10 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
     private final String brokerUrl1;
 
     public EmbeddedJMSBrokerLauncher() {
-        this("tcp://localhost:" + PORT);
+        this(null);
     }
     public EmbeddedJMSBrokerLauncher(String url) {
-        brokerUrl1 = url;
+        brokerUrl1 = url != null ? url : "tcp://localhost:" + PORT;
     }
     public void setBrokerName(String s) {
         brokerName = s;

@@ -31,11 +31,10 @@ import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
 import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiConfig;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractTestServerBase;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -43,11 +42,13 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-public class SwaggerUiConfigurationTest extends AbstractBusClientServerTestBase {
+public class SwaggerUiConfigurationTest extends AbstractClientServerTestBase {
     private static final String PORT = allocatePort(SwaggerUiConfigurationTest.class);
 
-    @Ignore
-    public static class Server extends AbstractBusTestServerBase {
+    public static class Server extends AbstractTestServerBase {
+
+        private org.apache.cxf.endpoint.Server server;
+
         @Override
         protected void run() {
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
@@ -60,19 +61,18 @@ public class SwaggerUiConfigurationTest extends AbstractBusClientServerTestBase 
             feature.setSwaggerUiConfig(new SwaggerUiConfig().url("/swagger.json"));
             sf.setFeatures(Arrays.asList(feature));
             sf.setAddress("http://localhost:" + PORT + "/");
-            sf.create();
+            server = sf.create();
         }
 
-        public static void main(String[] args) {
-            try {
-                Server s = new Server();
-                s.start();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.exit(-1);
-            } finally {
-                System.out.println("done!");
-            }
+        @Override
+        public void tearDown() throws Exception {
+            server.stop();
+            server.destroy();
+            server = null;
+        }
+
+        public static void main(String[] args) throws Exception {
+            new Server().start();
         }
     }
 
@@ -81,7 +81,6 @@ public class SwaggerUiConfigurationTest extends AbstractBusClientServerTestBase 
         AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
         assertTrue("server did not launch correctly", launchServer(Server.class, false));
-        createStaticBus();
     }
 
     @Test
