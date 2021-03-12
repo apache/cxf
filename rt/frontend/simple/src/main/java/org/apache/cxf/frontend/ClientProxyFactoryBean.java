@@ -124,10 +124,9 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
      */
     public synchronized Object create() {
         ClassLoaderHolder orig = null;
-        ClassLoader loader = null;
         try {
             if (getBus() != null) {
-                loader = getBus().getExtension(ClassLoader.class);
+                ClassLoader loader = getBus().getExtension(ClassLoader.class);
                 if (loader != null) {
                     orig = ClassLoaderUtils.setThreadContextClassloader(loader);
                 }

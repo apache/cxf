@@ -59,12 +59,12 @@ public class ClientServerTest extends AbstractSimpleFrontendSpringTest {
         TestInterceptor out = new TestInterceptor();
         TestInterceptor in = new TestInterceptor();
         c.getRequestContext().put(Message.OUT_INTERCEPTORS, Arrays.asList(new Interceptor[] {out}));
-        result = greeter.sayHello();
+        greeter.sayHello();
         assertTrue(out.wasCalled());
         out.reset();
 
         c.getRequestContext().put(Message.IN_INTERCEPTORS, Arrays.asList(new Interceptor[] {in}));
-        result = greeter.sayHello();
+        greeter.sayHello();
         assertTrue(out.wasCalled());
         assertTrue(in.wasCalled());
         ctx.close();

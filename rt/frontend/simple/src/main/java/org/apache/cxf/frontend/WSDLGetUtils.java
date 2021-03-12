@@ -243,10 +243,9 @@ public class WSDLGetUtils {
                              Message message,
                              String xsdWsdlPar) {
         Bus bus = message.getExchange().getBus();
-        List<Element> elementList = null;
 
         try {
-            elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
+            List<Element> elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
                                                               "http://www.w3.org/2001/XMLSchema", "import");
             for (Element el : elementList) {
                 String sl = el.getAttribute("schemaLocation");
@@ -314,7 +313,7 @@ public class WSDLGetUtils {
             for (Element serviceEl : serviceList) {
                 String serviceName = serviceEl.getAttribute("name");
                 if (serviceName.equals(message.getExchange().getService().getName().getLocalPart())) {
-                    elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
+                    List<Element> elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
                                                                       "http://schemas.xmlsoap.org/wsdl/",
                                                                       "port");
                     for (Element el : elementList) {
@@ -743,7 +742,7 @@ public class WSDLGetUtils {
                                        String xsd,
                                        Map<String, SchemaReference> smp,
                                        String base) throws XMLStreamException {
-        Document doc = null;
+        final Document doc;
         SchemaReference si = lookupSchemaReference(bus, xsd, smp, base);
 
         String uri = si.getReferencedSchema().getDocumentBaseURI();

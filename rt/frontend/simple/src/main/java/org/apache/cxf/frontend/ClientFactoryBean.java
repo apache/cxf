@@ -85,8 +85,8 @@ public class ClientFactoryBean extends AbstractWSDLBasedEndpointFactory {
         } else if (properties != null) {
             getServiceFactory().getProperties().putAll(properties);
         }
-        Client client = null;
-        Endpoint ep = null;
+        final Client client;
+        final Endpoint ep;
         try {
             ep = createEndpoint();
             this.getServiceFactory().sendEvent(FactoryBeanListener.Event.PRE_CLIENT_CREATE, ep);

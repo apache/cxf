@@ -392,7 +392,7 @@ public class DynamicClientFactory {
             LOG.log(Level.SEVERE, new Message("COULD_NOT_COMPILE_SRC", LOG, wsdlUrl).toString());
         }
         FileUtils.removeDir(src);
-        URL[] urls = null;
+        final URL[] urls;
         try {
             urls = new URL[] {classes.toURI().toURL()};
         } catch (MalformedURLException mue) {
@@ -764,11 +764,11 @@ public class DynamicClientFactory {
                 errors.append('\n');
             }
             if (arg0.getLineNumber() > 0) {
-                errors.append(arg0.getLocalizedMessage() + "\n"
-                    + " at line " + arg0.getLineNumber()
-                    + " column " + arg0.getColumnNumber()
-                    + " of schema " + arg0.getSystemId()
-                    + "\n");
+                errors.append(arg0.getLocalizedMessage()).append('\n')
+                    .append(" at line ").append(arg0.getLineNumber())
+                    .append(" column ").append(arg0.getColumnNumber())
+                    .append(" of schema ").append(arg0.getSystemId())
+                    .append('\n');
             } else {
                 errors.append(arg0.getMessage());
                 errors.append('\n');
