@@ -30,6 +30,7 @@ import org.apache.cxf.interceptor.AbstractLoggingInterceptor;
 
 /**
  * Enables message Logging
+ * @deprecated use the logging module rt/features/logging instead
  */
 @Deprecated
 @Documented
