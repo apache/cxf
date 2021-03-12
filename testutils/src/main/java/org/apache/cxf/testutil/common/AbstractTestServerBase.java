@@ -31,7 +31,7 @@ public abstract class AbstractTestServerBase {
      * servants and publish endpoints etc.
      *
      */
-    protected abstract void run();
+    protected abstract void run() throws Exception;
 
     protected Logger getLog() {
         return LogUtils.getLogger(this.getClass());
@@ -59,7 +59,7 @@ public abstract class AbstractTestServerBase {
         return ret;
     }
 
-    public void start() {
+    public void start() throws Exception {
         try {
             System.out.println("running server");
             run();
@@ -73,8 +73,8 @@ public abstract class AbstractTestServerBase {
             System.out.println("stopping bus");
             tearDown();
         } catch (Throwable ex) {
-            ex.printStackTrace();
             startFailed();
+            throw ex;
         } finally {
             if (verify(getLog())) {
                 System.out.println("server passed");
@@ -82,7 +82,6 @@ public abstract class AbstractTestServerBase {
                 System.out.println(ServerLauncher.SERVER_FAILED);
             }
             System.out.println("server stopped");
-            System.exit(0);
         }
     }
 
@@ -102,7 +101,6 @@ public abstract class AbstractTestServerBase {
 
     protected void startFailed() {
         System.out.println(ServerLauncher.SERVER_FAILED);
-        System.exit(-1);
     }
 
     /**

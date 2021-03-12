@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Constructor;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -51,13 +50,15 @@ public class ServerLauncher {
 
     private static final boolean DEBUG = false;
 
+    private static final String JAVA_EXE =
+        System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
+
     boolean serverPassed;
     final String className;
 
     private boolean inProcess = DEFAULT_IN_PROCESS;
     private AbstractTestServerBase inProcessServer;
 
-    private final String javaExe;
     private Process process;
     private boolean serverIsReady;
     private boolean serverIsStopped;
@@ -73,13 +74,11 @@ public class ServerLauncher {
     public ServerLauncher(AbstractTestServerBase b) {
         inProcess = true;
         inProcessServer = b;
-        javaExe = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
         className = null;
     }
     public ServerLauncher(String theClassName, boolean inprocess) {
         inProcess = inprocess;
         className = theClassName;
-        javaExe = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
     }
     public ServerLauncher(String theClassName, Map<String, String> p, String[] args) {
         this(theClassName, p, args, false);
@@ -89,7 +88,6 @@ public class ServerLauncher {
         properties = p;
         serverArgs = args;
         inProcess = inprocess;
-        javaExe = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
     }
 
     private boolean waitForServerToStop() {
@@ -208,14 +206,7 @@ public class ServerLauncher {
 
             }
         } else {
-            List<String> cmd;
-            try {
-                cmd = getCommand();
-            } catch (URISyntaxException e1) {
-                IOException ex = new IOException();
-                ex.initCause(e1);
-                throw ex;
-            }
+            List<String> cmd = getCommand();
 
             LOG.fine("CMD: " + cmd);
             if (DEBUG) {
@@ -343,10 +334,10 @@ public class ServerLauncher {
         }
     }
 
-    private List<String> getCommand() throws URISyntaxException {
+    private List<String> getCommand() {
 
         List<String> cmd = new ArrayList<>();
-        cmd.add(javaExe);
+        cmd.add(JAVA_EXE);
 
         if (null != properties) {
             for (Map.Entry<String, String> entry : properties.entrySet()) {

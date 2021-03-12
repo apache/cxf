@@ -39,17 +39,14 @@ import org.apache.cxf.wsdl.WSDLManager;
 public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(EmbeddedJMSBrokerLauncher.class);
 
-    String brokerUrl1;
     BrokerService broker;
     String brokerName;
+    private final String brokerUrl1;
 
     public EmbeddedJMSBrokerLauncher() {
-        this(null);
+        this("tcp://localhost:" + PORT);
     }
     public EmbeddedJMSBrokerLauncher(String url) {
-        if (url == null) {
-            url = "tcp://localhost:" + PORT;
-        }
         brokerUrl1 = url;
     }
     public void setBrokerName(String s) {
@@ -59,17 +56,9 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
     public String getBrokerURL() {
         return brokerUrl1;
     }
+
     public String getEncodedBrokerURL() {
-        StringBuilder b = new StringBuilder(brokerUrl1.length());
-        for (int x = 0; x < brokerUrl1.length(); x++) {
-            char c = brokerUrl1.charAt(x);
-            if (c == '?') {
-                b.append("%3F");
-            } else {
-                b.append(c);
-            }
-        }
-        return b.toString();
+        return brokerUrl1.replace("?", "%3F");
     }
 
     public void updateWsdl(Bus b, URL wsdlLocation) {
@@ -167,25 +156,21 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
     }
 
     //START SNIPPET: broker
-    public final void run() {
-        try {
-            broker = new BrokerService();
-            broker.setPersistent(false);
-            broker.setPersistenceAdapter(new MemoryPersistenceAdapter());
-            broker.setTmpDataDirectory(new File("./target"));
-            broker.setUseJmx(false);
-            if (brokerName != null) {
-                broker.setBrokerName(brokerName);
-            }
-            broker.addConnector(brokerUrl1);
-            broker.start();
-        } catch (Exception e) {
-            e.printStackTrace();
+    public final void run() throws Exception {
+        broker = new BrokerService();
+        broker.setPersistent(false);
+        broker.setPersistenceAdapter(new MemoryPersistenceAdapter());
+        broker.setTmpDataDirectory(new File("./target"));
+        broker.setUseJmx(false);
+        if (brokerName != null) {
+            broker.setBrokerName(brokerName);
         }
+        broker.addConnector(brokerUrl1);
+        broker.start();
     }
     //END SNIPPET: broker
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         try {
             String url = null;
             if (args.length > 0) {
@@ -193,9 +178,6 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
             }
             EmbeddedJMSBrokerLauncher s = new EmbeddedJMSBrokerLauncher(url);
             s.start();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
         } finally {
             System.out.println("done!");
         }
