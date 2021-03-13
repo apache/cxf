@@ -41,7 +41,7 @@ public class BookStore<T extends Closeable> {
     @Path("/books")
     @Produces(MediaType.APPLICATION_JSON)
     public Collection< Book > getBooks() throws IOException {
-        try (T span = tracer.startSpan("Get Books")) {
+        try (T span = tracer.startSpan("get books")) {
             return Arrays.asList(
                 new Book("Apache CXF in Action", UUID.randomUUID().toString()),
                 new Book("Mastering Apache CXF", UUID.randomUUID().toString())

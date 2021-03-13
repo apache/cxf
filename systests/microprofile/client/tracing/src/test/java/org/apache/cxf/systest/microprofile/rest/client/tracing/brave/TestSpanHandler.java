@@ -22,18 +22,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import zipkin2.Span;
-import zipkin2.reporter.Reporter;
+import brave.handler.MutableSpan;
+import brave.handler.SpanHandler;
+import brave.propagation.TraceContext;
 
-public class TestSpanReporter implements Reporter<Span> {
-    private static List<Span> spans = Collections.synchronizedList(new ArrayList<>());
+public class TestSpanHandler extends SpanHandler {
+    private static List<MutableSpan> spans = Collections.synchronizedList(new ArrayList<>());
 
     @Override
-    public void report(Span span) {
+    public boolean end(TraceContext context, MutableSpan span, Cause cause) {
         spans.add(span);
+        return true;
     }
 
-    public static List<Span> getAllSpans() {
+    public static List<MutableSpan> getAllSpans() {
         return spans;
     }
 

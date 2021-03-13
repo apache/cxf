@@ -20,16 +20,16 @@ package org.apache.cxf.systest.microprofile.rest.client.regex;
 
 import java.net.URI;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -39,32 +39,25 @@ import static org.junit.Assert.fail;
 /**
  * Testing: @Path("/echoxmlbookregex/{id : [5-9]{3,4}}")
  */
-public class JaxrsPathRegexTest extends AbstractBusClientServerTestBase {
+public class JaxrsPathRegexTest extends AbstractClientServerTestBase {
     public static final String PORT = allocatePort(JaxrsPathRegexTest.class);
 
     WebClient client;
-    @Ignore
-    public static class Server extends AbstractBusTestServerBase {
-        protected void run() {
+
+    public static class Server extends AbstractServerTestServerBase {
+        @Override
+        protected org.apache.cxf.endpoint.Server createServer(Bus bus) throws Exception {
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookStore.class);
             sf.setResourceProvider(BookStore.class,
                 new SingletonResourceProvider(new BookStore()));
             sf.setAddress("http://localhost:" + PORT + "/");
             sf.setPublishedEndpointUrl("/");
-            sf.create();
+            return sf.create();
         }
 
-        public static void main(String[] args) {
-            try {
-                Server s = new Server();
-                s.start();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.exit(-1);
-            } finally {
-                System.out.println("done!");
-            }
+        public static void main(String[] args) throws Exception {
+            new Server().start();
         }
     }
 
@@ -74,7 +67,6 @@ public class JaxrsPathRegexTest extends AbstractBusClientServerTestBase {
         AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
-        createStaticBus();
         System.out.println("Listening on port " + PORT);
     }
 
