@@ -21,7 +21,6 @@ package org.apache.cxf.jaxrs.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -467,18 +466,95 @@ public final class HttpUtils {
 
     public static String getBaseAddress(Message m) {
         String endpointAddress = getEndpointAddress(m);
-        try {
-            URI uri = new URI(endpointAddress);
-            String path = uri.getRawPath();
-            String scheme = uri.getScheme();
-            if (scheme != null && !scheme.startsWith(HttpUtils.HTTP_SCHEME)
-                && HttpUtils.isHttpRequest(m)) {
-                path = HttpUtils.toAbsoluteUri(path, m).getRawPath();
-            }
-            return (path == null || path.length() == 0) ? "/" : path;
-        } catch (URISyntaxException ex) {
+
+        String[] addr = parseURI(endpointAddress, false);
+        if (addr == null) {
             return endpointAddress;
         }
+        String scheme = addr[0];
+        String path = addr[1];
+        if (scheme != null && !scheme.startsWith(HttpUtils.HTTP_SCHEME)
+                && HttpUtils.isHttpRequest(m)) {
+            path = HttpUtils.toAbsoluteUri(path, m).getRawPath();
+        }
+        return (path == null || path.length() == 0) ? "/" : path;
+    }
+
+    public static String[] parseURI(String addr, boolean parseAuthority) {
+        String scheme = null;
+        String parsedAuthorityOrRawPath = null;
+        int n = addr.length();
+        int p = scan(addr, 0, n, "/?#", ":");
+        try {
+            if ((p >= 0) && at(addr, p, n, ':')) {
+                if (p == 0) {
+                    return null;
+                }    
+                scheme = addr.substring(0, p);
+                p++;
+                if (at(addr, p, n, '/')) {
+                    parsedAuthorityOrRawPath = postSchemeParse(addr, p, n, parseAuthority);
+                } else {
+                    int q = scan(addr, p, n, null, "#");
+                    if (q <= p) {
+                        return null;
+                    }    
+                }
+            } else {
+                parsedAuthorityOrRawPath = postSchemeParse(addr, 0, n, parseAuthority);
+            }
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+        return new String[] {scheme, parsedAuthorityOrRawPath };
+    }
+
+    private static String postSchemeParse(String addr, int start, int n, boolean parseAuthority) {
+        int p = start;
+        int q = -1;
+        if (at(addr, p, n, '/') && at(addr, p + 1, n, '/')) {
+            p += 2;
+            q = scan(addr, p, n, null, "/");
+            if (q > p) {
+                if (!parseAuthority) {
+                    p = q;
+                }
+            } else if (q >= n) {
+                if (parseAuthority || p == n) {
+                    throw new IllegalArgumentException();
+                } else {
+                    return null;
+                }
+            }    
+        }
+        
+        if (!parseAuthority) {
+            q = scan(addr, p, n, null, "?#");
+        } else if (p >= q) {
+            // empty authority should be null
+            return null;
+        }
+        
+        return addr.substring(p, q);
+    }
+    
+    private static boolean at(String addr, int start, int end, char c) {
+        return (start < end) && (addr.charAt(start) == c);
+    }
+    
+    private static int scan(String addr, int start, int end, String err, String stop) {
+        int p = start;
+        while (p < end) {
+            char c = addr.charAt(p);
+            if (err != null && err.indexOf(c) >= 0) {
+                return -1;
+            }
+            if (stop.indexOf(c) >= 0) {
+                break;
+            }    
+            p++;
+        }
+        return p;
     }
 
     public static String getEndpointAddress(Message m) {
@@ -492,11 +568,11 @@ public final class HttpUtils {
                     ? request.getAttribute("org.apache.cxf.transport.endpoint.address") : null;
                 address = property != null ? property.toString() : ei.getAddress();
             } else {
-                address = m.containsKey(Message.BASE_PATH)
-                    ? (String)m.get(Message.BASE_PATH) : d.getAddress().getAddress().getValue();
+                String basePath = (String) m.get(Message.BASE_PATH);
+                address = (basePath != null) ? basePath : d.getAddress().getAddress().getValue();
             }
         } else {
-            address = (String)m.get(Message.ENDPOINT_ADDRESS);
+            address = (String) m.get(Message.ENDPOINT_ADDRESS);
         }
         if (address.startsWith("http") && address.endsWith("//")) {
             address = address.substring(0, address.length() - 1);
@@ -521,6 +597,8 @@ public final class HttpUtils {
 
     public static String getPathToMatch(String path, String address, boolean addSlash) {
 
+        String origPath = path;
+
         int ind = path.indexOf(address);
         if (ind == -1 && address.equals(path + "/")) {
             path += "/";
@@ -533,6 +611,21 @@ public final class HttpUtils {
             path = "/" + path;
         }
 
+        if (path.equals(origPath) && origPath.contains("%")) {
+            address = UriEncoder.encodeString(address).replace("%2F", "/");
+            path = origPath;
+            ind = path.indexOf(address);
+            if (ind == -1 && address.equals(path + "/")) {
+                path += "/";
+                ind = 0;
+            }
+            if (ind == 0) {
+                path = path.substring(address.length());
+            }
+            if (addSlash && !path.startsWith("/")) {
+                path = "/" + path;
+            }
+        }
         return path;
     }
 
