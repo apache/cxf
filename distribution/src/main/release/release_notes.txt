@@ -1,4 +1,4 @@
-Apache CXF 3.3.9 Release Notes
+Apache CXF 3.3.10 Release Notes
 
 1. Overview
 
@@ -23,7 +23,7 @@ http://cxf.apache.org/docs/33-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
-3.3.9 fixes over 12 JIRA issues reported by users and the community.
+3.3.10 fixes over 15 JIRA issues reported by users and the community.
 
 
 
@@ -66,20 +66,26 @@ for caveats when upgrading.
 
 7. Specific issues, features, and improvements fixed in this version
 
+
+** Sub-task
+    * [CXF-8394] - Fix org.apache.cxf.systest.jaxrs.JAXRSContinuationsServlet3Test.testCancelVoidOnResumedTest
+
 ** Bug
-    * [CXF-8340] - Graalvm native image fails to run
-    * [CXF-8356] - JAXRS Multipart-Handling broken for InputStream/Datasource parameters
     * [CXF-8361] - Support for Jakarta EE9 namespace in AnnotationHandlerChainBuilder
-    * [CXF-8367] - Micrometer always reports outcome=UNKNOWN on success cases
-    * [CXF-8376] - Misleading Error Message From UriBuilder.path(Method)
-    * [CXF-8378] - NoClassDefFoundError: org/apache/cxf/common/util/ReflectionUtil from ReferencingAuthenticator
-    * [CXF-8380] - MultipartProvider:ensure contentType is specified when initializing ByteDataSource
+    * [CXF-8403] - stax2-api version conflict in cxf-rt-ws-security
+    * [CXF-8415] - DefaultHostnameVerifier fails with HttpCore NIO
+    * [CXF-8416] - Using fine-grained Import-Package for com.sun to avoid uncessary imported package
+    * [CXF-8422] - Unclosed input streams after using org.apache.cxf.tools.wsdlto.WSDLToJava
+    * [CXF-8429] - Illegal reflective access in XercesSchemaValidationUtils
+    * [CXF-8431] - NullPointerException in HTTPJettyTransportActivator
+    * [CXF-8433] - JAXRSServerFactoryBean remove existing path from destinations on create
 
 ** Improvement
-    * [CXF-7988] - SSE sink warning on tomcat
-    * [CXF-8363] - Jetty certificate hot reload throws exception due to usage of depreciated SslContextFactory
-
+    * [CXF-8405] - add RequestLimitingHandler for http-undertow transport
+    * [CXF-8411] - Improve FastInfoset interceptors' compatibility with GraalVM native compilation
+    * [CXF-8412] - introduce EnableRecordRequestStartTime propery so that request process duration time can be logged for http-undertow transport
+    * [CXF-8418] - be able to configure Undertow workerIOName from blueprint/OSGi
+    * [CXF-8424] - Use template URL instead of actual path values for JAX-RS micrometer metrics
+    
 ** Task
-    * [CXF-8357] - RxJava2/RxJava3: Add support of MayBe type
-    * [CXF-8362] - Add Micrometer metric support for JAX-RS / JAX-WS (Client)
-    * [CXF-8386] - Upgrade BouncyCastle to 1.67
+    * [CXF-8343] - Add JSON-B support
