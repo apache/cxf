@@ -1,4 +1,4 @@
-Apache CXF 3.4.2 Release Notes
+Apache CXF 3.4.3 Release Notes
 
 1. Overview
 
@@ -23,7 +23,7 @@ http://cxf.apache.org/docs/34-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
-3.4.2 fixes over 19 JIRA issues reported by users and the community.
+3.4.3 fixes over 22 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -65,27 +65,33 @@ for caveats when upgrading.
 
 7. Specific issues, features, and improvements fixed in this version
 
+** Sub-task
+    * [CXF-8394] - Fix org.apache.cxf.systest.jaxrs.JAXRSContinuationsServlet3Test.testCancelVoidOnResumedTest
+
 ** Bug
-    * [CXF-8340] - Graalvm native image fails to run
-    * [CXF-8356] - JAXRS Multipart-Handling broken for InputStream/Datasource parameters
+    * [CXF-7666] - Binary multipart payload are shown even if logBinary Flag is set to false
+    * [CXF-8341] - LoggingFeature always prints out binary contents
     * [CXF-8361] - Support for Jakarta EE9 namespace in AnnotationHandlerChainBuilder
-    * [CXF-8367] - Micrometer always reports outcome=UNKNOWN on success cases
-    * [CXF-8368] - org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService#createAuthorizationData wrongly sets code_challenge
-    * [CXF-8369] - [oauth2] code_challenge_method not forwarded
-    * [CXF-8370] - org.apache.cxf.rs.security.oauth2.services.RedirectionBasedGrantService#startAuthorization(javax.ws.rs.core.MultivaluedMap<java.lang.String,java.lang.String>) shouldn't require an user
-    * [CXF-8376] - Misleading Error Message From UriBuilder.path(Method)
-    * [CXF-8378] - NoClassDefFoundError: org/apache/cxf/common/util/ReflectionUtil from ReferencingAuthenticator
-    * [CXF-8380] - MultipartProvider:ensure contentType is specified when initializing ByteDataSource
+    * [CXF-8391] - Regex for addSensitiveElementNames is replace only the last element
+    * [CXF-8401] - "tried to access protected method" exception after updating Java 14 to 15
+    * [CXF-8402] - JwkUtils::fromECPublicKey returns key coordinates without leading zero
+    * [CXF-8403] - stax2-api version conflict in cxf-rt-ws-security
+    * [CXF-8415] - DefaultHostnameVerifier fails with HttpCore NIO
+    * [CXF-8416] - Using fine-grained Import-Package for com.sun to avoid uncessary imported package
+    * [CXF-8422] - Unclosed input streams after using org.apache.cxf.tools.wsdlto.WSDLToJava
+    * [CXF-8427] - Response exception mappers not invoked on MP async methods
+    * [CXF-8429] - Illegal reflective access in XercesSchemaValidationUtils
+    * [CXF-8431] - NullPointerException in HTTPJettyTransportActivator
+    * [CXF-8433] - JAXRSServerFactoryBean remove existing path from destinations on create
 
 ** Improvement
-    * [CXF-7988] - SSE sink warning on tomcat
-    * [CXF-8363] - Jetty certificate hot reload throws exception due to usage of depreciated SslContextFactory
-    * [CXF-8388] - Revert OidcUserSubject "blob" changes in 3.4.0
-
-** Test
-    * [CXF-8385] - a test to verify http-undertow transport access log
+    * [CXF-8405] - add RequestLimitingHandler for http-undertow transport
+    * [CXF-8411] - Improve FastInfoset interceptors' compatibility with GraalVM native compilation
+    * [CXF-8412] - introduce EnableRecordRequestStartTime propery so that request process duration time can be logged for http-undertow transport
+    * [CXF-8417] - upgrade to undertow 2.2.3
+    * [CXF-8418] - be able to configure Undertow workerIOName from blueprint/OSGi
+    * [CXF-8424] - Use template URL instead of actual path values for JAX-RS micrometer metrics
 
 ** Task
-    * [CXF-8357] - RxJava2/RxJava3: Add support of MayBe type
-    * [CXF-8362] - Add Micrometer metric support for JAX-RS / JAX-WS (Client)
-    * [CXF-8386] - Upgrade BouncyCastle to 1.67
+    * [CXF-8343] - Add JSON-B support
+
