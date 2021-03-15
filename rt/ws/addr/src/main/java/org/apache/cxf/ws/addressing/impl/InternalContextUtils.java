@@ -375,7 +375,7 @@ final class InternalContextUtils {
      * @return the Action URI
      */
     public static AttributedURIType getAction(Message message) {
-        String action = null;
+        final String action;
         LOG.fine("Determining action");
         Exception fault = message.getContent(Exception.class);
 

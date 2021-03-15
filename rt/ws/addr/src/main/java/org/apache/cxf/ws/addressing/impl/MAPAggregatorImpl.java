@@ -1061,8 +1061,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
                                              boolean isProviderContext,
                                              boolean isOutbound) {
 
-        AddressingProperties maps = null;
-        maps = ContextUtils.retrieveMAPs(message,
+        AddressingProperties maps = ContextUtils.retrieveMAPs(message,
                                          isProviderContext,
                                          isOutbound);
         LOG.log(Level.FINE, "MAPs retrieved from message {0}", maps);

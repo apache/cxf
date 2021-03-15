@@ -612,7 +612,7 @@ public class MAPCodecTest {
     }
 
     private boolean isReply(boolean exposedAsNative) {
-        boolean isReply = false;
+        final boolean isReply;
         if (exposedAsNative) {
             isReply =
                 Names.WSA_RELATIONSHIP_REPLY.equals(
