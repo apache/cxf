@@ -19,8 +19,6 @@
 package org.apache.cxf.systest.sts.transport;
 
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,7 +36,6 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
@@ -47,7 +44,9 @@ import org.apache.cxf.systest.sts.TLSClientParametersUtils;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
+import org.apache.cxf.systest.sts.deployment.DoubleItServer;
 import org.apache.cxf.systest.sts.deployment.STSServer;
+import org.apache.cxf.systest.sts.deployment.StaxDoubleItServer;
 import org.apache.cxf.systest.sts.deployment.StaxSTSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
@@ -80,8 +79,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
-    private static final String PORT = allocatePort(Server.class);
-    private static final String STAX_PORT = allocatePort(StaxServer.class);
+    private static final String PORT = allocatePort(DoubleItServer.class);
+    private static final String STAX_PORT = allocatePort(StaxDoubleItServer.class);
 
     final TestParam test;
 
@@ -91,56 +90,33 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(Server.class, true)
+        assertTrue(launchServer(new DoubleItServer(
+            TransportBindingTest.class.getResource("cxf-service.xml"),
+            TransportBindingTest.class.getResource("cxf-stax-service.xml")))
         );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(StaxServer.class, true)
-        );
-        STSServer stsServer = new STSServer();
-        stsServer.setContext("cxf-transport.xml");
-        assertTrue(launchServer(stsServer));
-
-        StaxSTSServer staxStsServer = new StaxSTSServer();
-        staxStsServer.setContext("stax-cxf-transport.xml");
-        assertTrue(launchServer(staxStsServer));
+        assertTrue(launchServer(new STSServer(
+            "cxf-transport.xml",
+            "stax-cxf-transport.xml"
+        )));
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam> data() {
+    public static TestParam[] data() {
+        return new TestParam[] {new TestParam(PORT, false, STSPORT),
+                                new TestParam(PORT, true, STSPORT),
+                                new TestParam(STAX_PORT, false, STSPORT),
+                                new TestParam(STAX_PORT, true, STSPORT),
 
-        return Arrays.asList(new TestParam[] {new TestParam(PORT, false, STSPORT),
-                                              new TestParam(PORT, true, STSPORT),
-                                              new TestParam(STAX_PORT, false, STSPORT),
-                                              new TestParam(STAX_PORT, true, STSPORT),
-
-                                              new TestParam(PORT, false, STAX_STSPORT),
-                                              new TestParam(PORT, true, STAX_STSPORT),
-                                              new TestParam(STAX_PORT, false, STAX_STSPORT),
-                                              new TestParam(STAX_PORT, true, STAX_STSPORT),
-        });
-    }
-
-    @org.junit.AfterClass
-    public static void cleanup() throws Exception {
-        stopAllServers();
+                                new TestParam(PORT, false, STAX_STSPORT),
+                                new TestParam(PORT, true, STAX_STSPORT),
+                                new TestParam(STAX_PORT, false, STAX_STSPORT),
+                                new TestParam(STAX_PORT, true, STAX_STSPORT),
+        };
     }
 
     @org.junit.Test
     public void testSAML1() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -158,18 +134,11 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         doubleIt(transportSaml1Port, 25);
 
         ((java.io.Closeable)transportSaml1Port).close();
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testSAML2() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -187,7 +156,6 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         doubleIt(transportSaml2Port, 25);
 
         ((java.io.Closeable)transportSaml2Port).close();
-        bus.shutdown(true);
     }
 
     @org.junit.Test
@@ -252,13 +220,7 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
      */
     @org.junit.Test
     public void testUnknownClient() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = TransportBindingTest.class.getResource("cxf-bad-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-bad-client.xml").toString());
 
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -281,18 +243,11 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         }
 
         ((java.io.Closeable)transportSaml1Port).close();
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testSAML1Endorsing() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -310,7 +265,6 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         doubleIt(transportSaml1Port, 25);
 
         ((java.io.Closeable)transportSaml1Port).close();
-        bus.shutdown(true);
     }
 
     /**
@@ -320,13 +274,7 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
      */
     @org.junit.Test
     public void testUnknownAddress() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = TransportBindingTest.class.getResource("cxf-bad-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-bad-client.xml").toString());
 
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -349,7 +297,6 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         }
 
         ((java.io.Closeable)transportSaml1Port).close();
-        bus.shutdown(true);
     }
 
     @org.junit.Test
@@ -360,12 +307,7 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
             System.setProperty("https.protocols", "TLSv1");
         }
 
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -395,8 +337,6 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
 
         DOMSource response = dispatch.invoke(request);
         assertNotNull(response);
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
@@ -407,12 +347,7 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
             System.setProperty("https.protocols", "TLSv1");
         }
 
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -443,8 +378,6 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
 
         DOMSource response = dispatch.invoke(request);
         assertNotNull(response);
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
@@ -455,12 +388,7 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
             return;
         }
 
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -478,18 +406,11 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         doubleIt(transportSaml1Port, 25);
 
         ((java.io.Closeable)transportSaml1Port).close();
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testSAML2SymmetricEndorsing() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -507,7 +428,6 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         doubleIt(transportSaml1Port, 25);
 
         ((java.io.Closeable)transportSaml1Port).close();
-        bus.shutdown(true);
     }
 
     @org.junit.Test
@@ -518,12 +438,7 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
             return;
         }
 
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -541,7 +456,6 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         doubleIt(transportSaml1Port, 25);
 
         ((java.io.Closeable)transportSaml1Port).close();
-        bus.shutdown(true);
     }
 
     private DOMSource createDOMRequest() throws ParserConfigurationException {

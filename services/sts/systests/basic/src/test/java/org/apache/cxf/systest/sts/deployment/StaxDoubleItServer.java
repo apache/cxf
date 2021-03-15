@@ -16,31 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.sts.template;
+package org.apache.cxf.systest.sts.deployment;
 
 import java.net.URL;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+public class StaxDoubleItServer extends DoubleItServer {
 
-public class StaxServer extends AbstractBusTestServerBase {
-
-    public StaxServer() {
-
+    public StaxDoubleItServer(URL contexts) {
+        super(contexts);
     }
 
-    protected void run()  {
-        URL busFile = StaxServer.class.getResource("cxf-stax-service.xml");
-        Bus busLocal = new SpringBusFactory().createBus(busFile);
-        BusFactory.setDefaultBus(busLocal);
-        setBus(busLocal);
-
-        try {
-            new StaxServer();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

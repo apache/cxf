@@ -24,12 +24,10 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
+import org.apache.cxf.systest.sts.deployment.DoubleItServer;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -59,24 +57,16 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
-    private static final String PORT = allocatePort(Server.class);
+    private static final String PORT = allocatePort(DoubleItServer.class);
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-            "Server failed to launch",
-            // run the server in the same process
-            // set this to false to fork
-            launchServer(Server.class, true)
-        );
-        STSServer stsServer = new STSServer();
-        stsServer.setContext("cxf-x509.xml");
-        assertTrue(launchServer(stsServer));
-    }
-
-    @org.junit.AfterClass
-    public static void cleanup() throws Exception {
-        stopAllServers();
+        assertTrue(launchServer(new DoubleItServer(
+            UsernameOnBehalfOfCachingTest.class.getResource("cxf-service.xml")
+        )));
+        assertTrue(launchServer(new STSServer(
+            "cxf-x509.xml"
+        )));
     }
 
     /**
@@ -84,13 +74,7 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
      */
     @org.junit.Test
     public void testUsernameOnBehalfOfCaching() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameOnBehalfOfCachingTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = UsernameOnBehalfOfCachingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -163,7 +147,6 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
         }
 
         ((java.io.Closeable)port2).close();
-        bus.shutdown(true);
     }
 
     /**
@@ -171,13 +154,7 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
      */
     @org.junit.Test
     public void testDifferentUsersCaching() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameOnBehalfOfCachingTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = UsernameOnBehalfOfCachingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -253,7 +230,6 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
         }
 
         ((java.io.Closeable)port).close();
-        bus.shutdown(true);
     }
 
     /**
@@ -261,13 +237,7 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
      */
     @org.junit.Test
     public void testAppliesToCaching() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameOnBehalfOfCachingTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = UsernameOnBehalfOfCachingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -344,7 +314,6 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
         }
 
         ((java.io.Closeable)port).close();
-        bus.shutdown(true);
     }
 
     /**
@@ -352,13 +321,7 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
      */
     @org.junit.Test
     public void testNoAppliesToCaching() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameOnBehalfOfCachingTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = UsernameOnBehalfOfCachingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -406,7 +369,6 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
         }
 
         ((java.io.Closeable)port).close();
-        bus.shutdown(true);
     }
 
     private void clearSTSClient(BindingProvider p) throws BusException, EndpointException {

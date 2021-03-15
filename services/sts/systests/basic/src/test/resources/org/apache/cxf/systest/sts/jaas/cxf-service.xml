@@ -28,10 +28,10 @@
     xsi:schemaLocation="http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     
-   <bean id="roleClaimsCallbackHandler" 
+    <bean id="roleClaimsCallbackHandler" 
          class="org.apache.cxf.ws.security.trust.claims.RoleClaimsCallbackHandler" />
-    
-   <bean id="stsClient" class="org.apache.cxf.ws.security.trust.STSClient">
+
+    <bean id="stsClient" class="org.apache.cxf.ws.security.trust.STSClient">
         <constructor-arg ref="cxf"/>
         <property name="wsdlLocation" value="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/Transport?wsdl"/>
         <property name="serviceName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
@@ -47,8 +47,8 @@
                   value="http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0"/>
         <property name="keyType"
                   value="http://docs.oasis-open.org/ws-sx/ws-trust/200512/Bearer"/>
-   </bean>
-    
+    </bean>
+
     <bean id="authorizationInterceptor" 
          class="org.apache.cxf.interceptor.security.SimpleAuthorizingInterceptor">
        <property name="methodRolesMap">
@@ -63,7 +63,7 @@
     </bean>
     
     <!-- JAX-WS service -->
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleitut" implementor="org.apache.cxf.systest.sts.jaas.DoubleItPortTypeImpl" endpointName="s:DoubleItUTPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.jaas.Server}/doubleit/services/doubleitut" wsdlLocation="org/apache/cxf/systest/sts/jaas/DoubleIt.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" implementor="org.apache.cxf.systest.sts.jaas.DoubleItPortTypeImpl" endpointName="s:DoubleItUTPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.DoubleItServer}/doubleit/services/doubleitut" wsdlLocation="org/apache/cxf/systest/sts/jaas/DoubleIt.wsdl">
         <jaxws:properties>
             <entry key="ws-security.validate.token" value="false"/>
             <entry key="security.sts.client" value-ref="stsClient"/>
@@ -78,7 +78,7 @@
         <property name="contextName" value="sts_standalone"/>
     </bean>
     
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleitut2" implementor="org.apache.cxf.systest.sts.jaas.DoubleItPortTypeImpl" endpointName="s:DoubleItUTPort2" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.jaas.Server}/doubleit/services/doubleitut2" wsdlLocation="org/apache/cxf/systest/sts/jaas/DoubleIt.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" implementor="org.apache.cxf.systest.sts.jaas.DoubleItPortTypeImpl" endpointName="s:DoubleItUTPort2" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.DoubleItServer}/doubleit/services/doubleitut2" wsdlLocation="org/apache/cxf/systest/sts/jaas/DoubleIt.wsdl">
         <jaxws:properties>
             <entry key="ws-security.validate.token" value="false"/>
         </jaxws:properties>
@@ -92,7 +92,7 @@
         <property name="contextName" value="sts_standalone_passthrough"/>
     </bean>
     
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleitut3" implementor="org.apache.cxf.systest.sts.jaas.DoubleItPortTypeImpl" endpointName="s:DoubleItUTPort3" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.jaas.Server}/doubleit/services/doubleitut3" wsdlLocation="org/apache/cxf/systest/sts/jaas/DoubleIt.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" implementor="org.apache.cxf.systest.sts.jaas.DoubleItPortTypeImpl" endpointName="s:DoubleItUTPort3" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.DoubleItServer}/doubleit/services/doubleitut3" wsdlLocation="org/apache/cxf/systest/sts/jaas/DoubleIt.wsdl">
         <jaxws:properties>
             <entry key="ws-security.validate.token" value="false"/>
         </jaxws:properties>
@@ -103,7 +103,7 @@
     </jaxws:endpoint>
     
     <!-- JAX-RS service -->
-    <jaxrs:server modelRef="classpath:org/apache/cxf/systest/sts/jaas/jaxrs.xml" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.jaas.Server}/doubleit/services/doubleit-rs">
+    <jaxrs:server modelRef="classpath:org/apache/cxf/systest/sts/jaas/jaxrs.xml" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.DoubleItServer}/doubleit/services/doubleit-rs">
         <jaxrs:properties>
             <entry key="security.sts.client" value-ref="stsClient"/>
         </jaxrs:properties>
@@ -113,7 +113,7 @@
         </jaxrs:inInterceptors>
     </jaxrs:server>
     
-    <jaxrs:server modelRef="classpath:org/apache/cxf/systest/sts/jaas/jaxrs.xml" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.jaas.Server}/doubleit/services/doubleit-rs3">
+    <jaxrs:server modelRef="classpath:org/apache/cxf/systest/sts/jaas/jaxrs.xml" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.DoubleItServer}/doubleit/services/doubleit-rs3">
         <jaxrs:inInterceptors>
             <ref bean="authenticationInterceptor3"/>
             <ref bean="authorizationInterceptor"/>
@@ -121,7 +121,7 @@
     </jaxrs:server>
     
     <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
-        <httpj:engine port="${testutil.ports.jaas.Server}">
+        <httpj:engine port="${testutil.ports.DoubleItServer}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="skpass">
                     <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>

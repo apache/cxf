@@ -19,17 +19,14 @@
 package org.apache.cxf.systest.sts.sendervouches;
 
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
+import org.apache.cxf.systest.sts.deployment.DoubleItServer;
+import org.apache.cxf.systest.sts.deployment.StaxDoubleItServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
 
@@ -48,14 +45,14 @@ import static org.junit.Assert.assertTrue;
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class SenderVouchesTest extends AbstractBusClientServerTestBase {
 
-    static final String PORT2 = allocatePort(Server.class, 2);
-    static final String STAX_PORT2 = allocatePort(StaxServer.class, 2);
+    static final String PORT2 = allocatePort(DoubleItServer.class, 2);
+    static final String STAX_PORT2 = allocatePort(StaxDoubleItServer.class, 2);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
-    private static final String PORT = allocatePort(Intermediary.class);
-    private static final String STAX_PORT = allocatePort(StaxIntermediary.class);
+    private static final String PORT = allocatePort(DoubleItServer.class);
+    private static final String STAX_PORT = allocatePort(StaxDoubleItServer.class);
 
     final TestParam test;
 
@@ -65,56 +62,27 @@ public class SenderVouchesTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-            "Server failed to launch",
-            // run the server in the same process
-            // set this to false to fork
-            launchServer(Server.class, true)
-        );
-        assertTrue(
-            "Server failed to launch",
-            // run the server in the same process
-            // set this to false to fork
-            launchServer(Intermediary.class, true)
-        );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(StaxServer.class, true)
-        );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(StaxIntermediary.class, true)
-        );
+        assertTrue(launchServer(new DoubleItServer(
+            SenderVouchesTest.class.getResource("cxf-service.xml"),
+            SenderVouchesTest.class.getResource("cxf-stax-service.xml")
+            )));
+        assertTrue(launchServer(new DoubleItServer(
+            SenderVouchesTest.class.getResource("cxf-intermediary.xml"),
+            SenderVouchesTest.class.getResource("cxf-stax-intermediary.xml")
+            )));
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam> data() {
-
-        return Arrays.asList(new TestParam[] {new TestParam(PORT, false),
-                                              new TestParam(PORT, true),
-                                              new TestParam(STAX_PORT, false),
-                                              new TestParam(STAX_PORT, true),
-        });
+    public static TestParam[] data() {
+        return new TestParam[] {new TestParam(PORT, false),
+                                new TestParam(PORT, true),
+                                new TestParam(STAX_PORT, false),
+                                new TestParam(STAX_PORT, true),
+        };
     }
-
-    @org.junit.AfterClass
-    public static void cleanup() throws Exception {
-        stopAllServers();
-    }
-
     @org.junit.Test
     public void testSenderVouches() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SenderVouchesTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = SenderVouchesTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -130,7 +98,6 @@ public class SenderVouchesTest extends AbstractBusClientServerTestBase {
         doubleIt(transportUTPort, 25);
 
         ((java.io.Closeable)transportUTPort).close();
-        bus.shutdown(true);
     }
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {

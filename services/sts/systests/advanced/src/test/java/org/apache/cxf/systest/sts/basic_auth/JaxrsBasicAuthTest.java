@@ -83,7 +83,7 @@ public class JaxrsBasicAuthTest extends AbstractBusClientServerTestBase {
         final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs";
         final int numToDouble = 25;
 
-        WebClient client = null;
+        final WebClient client;
         if (username != null && password != null) {
             client = WebClient.create(address, username, password, configLocation);
         } else {

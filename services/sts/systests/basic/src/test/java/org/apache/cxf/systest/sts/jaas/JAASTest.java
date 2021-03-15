@@ -25,10 +25,8 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.systest.sts.deployment.DoubleItServer;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -56,43 +54,22 @@ public class JAASTest extends AbstractBusClientServerTestBase {
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
-    private static final String PORT = allocatePort(Server.class);
-    private static final String PORT2 = allocatePort(Server2.class);
+    private static final String PORT = allocatePort(DoubleItServer.class);
+    private static final String PORT2 = allocatePort(DoubleItServer.class, 2);
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(Server.class, true)
-        );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(Server2.class, true)
-        );
+        assertTrue(launchServer(new DoubleItServer(
+            JAASTest.class.getResource("cxf-service.xml"),
+            JAASTest.class.getResource("cxf-service2.xml")
+        )));
 
-        STSServer stsServer = new STSServer();
-        stsServer.setContext("cxf-transport.xml");
-        assertTrue(launchServer(stsServer));
-    }
-
-    @org.junit.AfterClass
-    public static void cleanup() throws Exception {
-        stopAllServers();
+        assertTrue(launchServer(new STSServer("cxf-transport.xml")));
     }
 
     @org.junit.Test
     public void testSuccessfulInvocation() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = JAASTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = JAASTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -112,18 +89,11 @@ public class JAASTest extends AbstractBusClientServerTestBase {
         doubleIt(utPort, 35);
 
         ((java.io.Closeable)utPort).close();
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testSuccessfulInvocationWithProperties() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = JAASTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = JAASTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -143,18 +113,11 @@ public class JAASTest extends AbstractBusClientServerTestBase {
         doubleIt(utPort, 35);
 
         ((java.io.Closeable)utPort).close();
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testUnsuccessfulAuthentication() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = JAASTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = JAASTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -176,18 +139,11 @@ public class JAASTest extends AbstractBusClientServerTestBase {
         }
 
         ((java.io.Closeable)utPort).close();
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testUnsuccessfulAuthorization() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = JAASTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = JAASTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -209,18 +165,11 @@ public class JAASTest extends AbstractBusClientServerTestBase {
         }
 
         ((java.io.Closeable)utPort).close();
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testSuccessfulPassthroughInvocation() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = JAASTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = JAASTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -240,18 +189,11 @@ public class JAASTest extends AbstractBusClientServerTestBase {
         doubleIt(utPort, 35);
 
         ((java.io.Closeable)utPort).close();
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testUnsuccessfulAuthenticationPassthroughInvocation() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = JAASTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = JAASTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -273,18 +215,11 @@ public class JAASTest extends AbstractBusClientServerTestBase {
         }
 
         ((java.io.Closeable)utPort).close();
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testUnsuccessfulAuthorizationPassthroughInvocation() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = JAASTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = JAASTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -306,21 +241,13 @@ public class JAASTest extends AbstractBusClientServerTestBase {
         }
 
         ((java.io.Closeable)utPort).close();
-        bus.shutdown(true);
     }
 
     // Here the service config has no TLS settings for the call to the STS...it's configured
     // separately via the JAAS configuration
     @org.junit.Test
-    @org.junit.Ignore
     public void testSuccessfulInvocationConfig() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = JAASTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = JAASTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -337,7 +264,6 @@ public class JAASTest extends AbstractBusClientServerTestBase {
         doubleIt(utPort, 25);
 
         ((java.io.Closeable)utPort).close();
-        bus.shutdown(true);
     }
 
     @org.junit.Test
@@ -393,7 +319,7 @@ public class JAASTest extends AbstractBusClientServerTestBase {
         final String configLocation = "org/apache/cxf/systest/sts/jaas/cxf-client.xml";
         final int numToDouble = 25;
 
-        WebClient client = null;
+        final WebClient client;
         if (username != null && password != null) {
             client = WebClient.create(address, username, password, configLocation);
         } else {

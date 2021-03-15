@@ -19,20 +19,16 @@
 package org.apache.cxf.systest.sts.username_actas;
 
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
+import org.apache.cxf.systest.sts.deployment.DoubleItServer;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.systest.sts.deployment.StaxSTSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -64,7 +60,7 @@ public class UsernameActAsTest extends AbstractBusClientServerTestBase {
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
-    private static final String PORT = allocatePort(Server2.class);
+    private static final String PORT = allocatePort(DoubleItServer.class, 2);
 
     final TestParam test;
 
@@ -74,45 +70,27 @@ public class UsernameActAsTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-            "Server failed to launch",
-            // run the server in the same process
-            // set this to false to fork
-            launchServer(Server2.class, true)
-        );
-        STSServer stsServer = new STSServer();
-        stsServer.setContext("cxf-x509.xml");
-        assertTrue(launchServer(stsServer));
-
-        StaxSTSServer staxStsServer = new StaxSTSServer();
-        staxStsServer.setContext("stax-cxf-x509.xml");
-        assertTrue(launchServer(staxStsServer));
+        assertTrue(launchServer(new DoubleItServer(
+            UsernameActAsTest.class.getResource("cxf-service2.xml")
+        )));
+        assertTrue(launchServer(new STSServer(
+            "cxf-x509.xml",
+            "stax-cxf-x509.xml"
+        )));
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam> data() {
-
-        return Arrays.asList(new TestParam[] {new TestParam(PORT, false, STSPORT2),
-                                              new TestParam(PORT, true, STSPORT2),
-                                              new TestParam(PORT, false, STAX_STSPORT2),
-                                              new TestParam(PORT, true, STAX_STSPORT2),
-        });
-    }
-
-    @org.junit.AfterClass
-    public static void cleanup() throws Exception {
-        stopAllServers();
+    public static TestParam[] data() {
+        return new TestParam[] {new TestParam(PORT, false, STSPORT2),
+                                new TestParam(PORT, true, STSPORT2),
+                                new TestParam(PORT, false, STAX_STSPORT2),
+                                new TestParam(PORT, true, STAX_STSPORT2),
+        };
     }
 
     @org.junit.Test
     public void testUsernameActAs() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameActAsTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = UsernameActAsTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -160,7 +138,6 @@ public class UsernameActAsTest extends AbstractBusClientServerTestBase {
         }
 
         ((java.io.Closeable)port2).close();
-        bus.shutdown(true);
     }
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {

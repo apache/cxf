@@ -24,10 +24,8 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
+import org.apache.cxf.systest.sts.deployment.DoubleItServer;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
@@ -51,35 +49,21 @@ public class X509AsymmetricBindingTest extends AbstractBusClientServerTestBase {
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
-    private static final String PORT = allocatePort(AsymmetricServer.class);
+    private static final String PORT = allocatePort(DoubleItPortType.class);
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(AsymmetricServer.class, true)
-        );
-        STSServer stsServer = new STSServer();
-        stsServer.setContext("cxf-x509.xml");
-        assertTrue(launchServer(stsServer));
-    }
-
-    @org.junit.AfterClass
-    public static void cleanup() throws Exception {
-        stopAllServers();
+        assertTrue(launchServer(new DoubleItServer(
+            X509AsymmetricBindingTest.class.getResource("cxf-asymmetric-service.xml")
+        )));
+        assertTrue(launchServer(new STSServer(
+            "cxf-x509.xml"
+        )));
     }
 
     @org.junit.Test
     public void testX509SAML2() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509AsymmetricBindingTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = X509AsymmetricBindingTest.class.getResource("DoubleItAsymmetric.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -93,7 +77,6 @@ public class X509AsymmetricBindingTest extends AbstractBusClientServerTestBase {
         doubleIt(port, 30);
 
         ((java.io.Closeable)port).close();
-        bus.shutdown(true);
     }
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {

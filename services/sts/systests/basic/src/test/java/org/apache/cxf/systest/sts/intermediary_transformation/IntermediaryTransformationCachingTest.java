@@ -25,10 +25,8 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 import javax.xml.ws.soap.SOAPFaultException;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
+import org.apache.cxf.systest.sts.deployment.DoubleItServer;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -53,46 +51,26 @@ public class IntermediaryTransformationCachingTest extends AbstractBusClientServ
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STSPORT2 = allocatePort(STSServer.class, 2);
 
-    static final String PORT2 = allocatePort(Server.class, 2);
+    static final String PORT2 = allocatePort(DoubleItServer.class, 2);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
-    private static final String PORT = allocatePort(IntermediaryCaching.class);
+    private static final String PORT = allocatePort(DoubleItServer.class);
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-            "Intermediary failed to launch",
-            // run the Intermediary in the same process
-            // set this to false to fork
-            launchServer(IntermediaryCaching.class, true)
+        assertTrue(launchServer(new DoubleItServer(
+            IntermediaryTransformationCachingTest.class.getResource("cxf-service.xml"),
+            IntermediaryTransformationCachingTest.class.getResource("cxf-intermediary-caching.xml")))
         );
-        assertTrue(
-            "Server failed to launch",
-            // run the server in the same process
-            // set this to false to fork
-            launchServer(Server.class, true)
-        );
-        STSServer stsServer = new STSServer();
-        stsServer.setContext("cxf-transport.xml");
-        assertTrue(launchServer(stsServer));
-    }
 
-    @org.junit.AfterClass
-    public static void cleanup() throws Exception {
-        stopAllServers();
+        assertTrue(launchServer(new STSServer("cxf-transport.xml")));
     }
 
     @org.junit.Test
     public void testIntermediaryTransformationCaching() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = IntermediaryTransformationCachingTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = IntermediaryTransformationCachingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -142,7 +120,6 @@ public class IntermediaryTransformationCachingTest extends AbstractBusClientServ
         ((java.io.Closeable)alicePort).close();
         ((java.io.Closeable)bobPort).close();
         ((java.io.Closeable)servicePort).close();
-        bus.shutdown(true);
     }
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {

@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.systest.sts.issueunit;
 
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,9 +30,7 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
-import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
@@ -100,25 +97,12 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        STSServer stsServer = new STSServer();
-        stsServer.setContext("cxf-transport.xml");
-        assertTrue(launchServer(stsServer));
-    }
-
-    @org.junit.AfterClass
-    public static void cleanup() throws Exception {
-        stopAllServers();
+        assertTrue(launchServer(new STSServer("cxf-transport.xml")));
     }
 
     @org.junit.Test
     public void testRetrieveWSMEX() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         // Get Metadata
         JaxWsProxyFactoryBean proxyFac = new JaxWsProxyFactoryBean();
@@ -144,12 +128,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
      */
     @org.junit.Test
     public void testSymmetricKeySaml1() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         // Get a token
         SecurityToken token =
@@ -176,8 +155,6 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         assertTrue(OpenSAMLUtil.isMethodHolderOfKey(confirmMethod));
         SAMLKeyInfo subjectKeyInfo = assertion.getSubjectKeyInfo();
         assertNotNull(subjectKeyInfo.getSecret());
-
-        bus.shutdown(true);
     }
 
     /**
@@ -185,12 +162,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
      */
     @org.junit.Test
     public void testPublicKeySaml2() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         // Get a token
         SecurityToken token =
@@ -216,8 +188,6 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         assertTrue(OpenSAMLUtil.isMethodHolderOfKey(confirmMethod));
         SAMLKeyInfo subjectKeyInfo = assertion.getSubjectKeyInfo();
         assertNotNull(subjectKeyInfo.getCerts());
-
-        bus.shutdown(true);
     }
 
     /**
@@ -225,12 +195,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
      */
     @org.junit.Test
     public void testBearerSaml1() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         // Get a token
         SecurityToken token =
@@ -253,8 +218,6 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
             confirmMethod = methods.get(0);
         }
         assertTrue(confirmMethod != null && confirmMethod.contains("bearer"));
-
-        bus.shutdown(true);
     }
 
     /**
@@ -262,12 +225,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
      */
     @org.junit.Test
     public void testBearerSVSaml2() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         // Get a token
         SecurityToken token =
@@ -292,8 +250,6 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
             confirmMethod = methods.get(0);
         }
         assertNotNull(confirmMethod);
-
-        bus.shutdown(true);
     }
 
     /**
@@ -301,12 +257,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
      */
     @org.junit.Test
     public void testNoAppliesTo() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         try {
             requestSecurityToken(SAML1_TOKEN_TYPE, BEARER_KEYTYPE, bus, null);
@@ -314,8 +265,6 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             // expected
         }
-
-        bus.shutdown(true);
     }
 
     /**
@@ -323,12 +272,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
      */
     @org.junit.Test
     public void testBearerSaml1Context() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         // Get a token
         String context = "AuthenticationContext";
@@ -352,8 +296,6 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
             confirmMethod = methods.get(0);
         }
         assertTrue(confirmMethod != null && confirmMethod.contains("bearer"));
-
-        bus.shutdown(true);
     }
 
     /**
@@ -361,12 +303,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
      */
     @org.junit.Test
     public void testBearerSaml1Lifetime() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         // Get a token
         SecurityToken token =
@@ -390,17 +327,11 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         }
         assertTrue(confirmMethod != null && confirmMethod.contains("bearer"));
 
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testSAMLinWSSecToOtherRealm() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         CallbackHandler callbackHandler = new CommonCallbackHandler();

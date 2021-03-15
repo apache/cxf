@@ -16,31 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.sts.username_actas;
+package org.apache.cxf.systest.sts.deployment;
 
 import java.net.URL;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
-public class Server extends AbstractBusTestServerBase {
+public class DoubleItServer extends AbstractBusTestServerBase {
 
-    public Server() {
+    private final URL[] contexts;
 
+    public DoubleItServer(URL... contexts) {
+        this.contexts = contexts;
     }
 
     protected void run()  {
-        URL busFile = Server.class.getResource("cxf-service.xml");
-        Bus busLocal = new SpringBusFactory().createBus(busFile);
-        BusFactory.setDefaultBus(busLocal);
-        setBus(busLocal);
-
-        try {
-            new Server();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        setBus(new SpringBusFactory().createBus(contexts));
     }
+
 }

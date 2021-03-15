@@ -86,7 +86,6 @@ public class SCTSAMLTokenProvider implements TokenProvider {
      */
     public TokenProviderResponse createToken(TokenProviderParameters tokenParameters) {
         testKeyType(tokenParameters);
-        byte[] secret = null;
         byte[] entropyBytes = null;
         long keySize = 0;
         boolean computedKey = false;
@@ -95,7 +94,7 @@ public class SCTSAMLTokenProvider implements TokenProvider {
         LOG.fine("Handling token of type: " + tokenRequirements.getTokenType());
 
         keyRequirements.setKeyType(STSConstants.SYMMETRIC_KEY_KEYTYPE);
-        secret = (byte[])tokenParameters.getAdditionalProperties().get(SCTValidator.SCT_VALIDATOR_SECRET);
+        byte[] secret = (byte[])tokenParameters.getAdditionalProperties().get(SCTValidator.SCT_VALIDATOR_SECRET);
 
         try {
             Document doc = DOMUtils.createDocument();

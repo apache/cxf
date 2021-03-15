@@ -45,20 +45,19 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.systest.sts.TLSClientParametersUtils;
 import org.apache.cxf.systest.sts.deployment.STSServer;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.transport.https.SSLUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
 
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public abstract class AbstractSTSTokenTest extends AbstractBusClientServerTestBase {
+public abstract class AbstractSTSTokenTest extends AbstractClientServerTestBase {
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STSPORT2 = allocatePort(STSServer.class, 2);
 
@@ -81,18 +80,10 @@ public abstract class AbstractSTSTokenTest extends AbstractBusClientServerTestBa
 
     @BeforeClass
     public static void startServers() throws Exception {
-        STSServer stsServer = new STSServer();
-        stsServer.setContext("cxf-transport.xml");
-        assertTrue(launchServer(stsServer));
-
-        stsServer = new STSServer();
-        stsServer.setContext("cxf-x509.xml");
-        assertTrue(launchServer(stsServer));
-    }
-
-    @AfterClass
-    public static void cleanup() throws Exception {
-        stopAllServers();
+        assertTrue(launchServer(new STSServer(
+            "cxf-transport.xml",
+            "cxf-x509.xml"
+        )));
     }
 
     static STSClient initStsClientAsymmeticBinding(Bus bus) {
