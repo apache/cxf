@@ -46,7 +46,7 @@ public class TimestampType extends AegisType {
         try {
             synchronized (format) {
                 Calendar c = (Calendar)format.parseObject(value.trim());
-                return new Timestamp(c.getTimeInMillis());
+                return new Timestamp(c.getTimeInMillis()); //NOPMD
             }
         } catch (ParseException e) {
             throw new DatabindingException("Could not parse xs:dateTime: " + e.getMessage(), e);

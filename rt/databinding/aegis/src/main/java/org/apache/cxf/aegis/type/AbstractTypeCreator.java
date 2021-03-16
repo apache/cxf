@@ -107,7 +107,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
     public AegisType createTypeForClass(TypeClassInfo info) {
 
         Class<?> javaClass = TypeUtil.getTypeRelatedClass(info.getType());
-        AegisType result = null;
+        final AegisType result;
         boolean newType = true;
         if (info.getType() instanceof TypeVariable) {
             //it's the generic type

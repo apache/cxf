@@ -45,7 +45,7 @@ public class BigDecimalType extends AegisType {
 
     @Override
     public void writeObject(final Object object, final MessageWriter writer, final Context context) {
-        BigDecimal d = null;
+        final BigDecimal d;
         if (object instanceof BigDecimal) {
             d = (BigDecimal)object;
         } else if (object instanceof BigInteger) {

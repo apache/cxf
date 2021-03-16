@@ -236,7 +236,7 @@ public class ArrayType extends AegisType {
             forceXsiWrite = true;
         }
 
-        String ns = null;
+        String ns;
         if (type.isAbstract()) {
             ns = getSchemaType().getNamespaceURI();
         } else {

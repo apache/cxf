@@ -429,8 +429,7 @@ public class BeanType extends AegisType {
                                 AegisType type, MessageWriter writer, Context context) {
 
         if (!type.isFlatArray()) {
-            MessageWriter cwriter = null;
-            cwriter = getWriter(writer, name, type);
+            MessageWriter cwriter = getWriter(writer, name, type);
             type.writeObject(value, cwriter, context);
             cwriter.close();
         } else {

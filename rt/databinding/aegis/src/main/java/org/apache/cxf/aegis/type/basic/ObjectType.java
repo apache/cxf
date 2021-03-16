@@ -89,8 +89,7 @@ public class ObjectType extends AegisType {
             throw new DatabindingException("Missing 'xsi:type' attribute value");
         }
 
-        AegisType type = null;
-        QName typeQName = null;
+        final QName typeQName;
 
         if (typeName != null) {
             typeName = typeName.trim();
@@ -104,7 +103,7 @@ public class ObjectType extends AegisType {
             tm = getTypeMapping();
         }
 
-        type = tm.getType(typeQName);
+        AegisType type = tm.getType(typeQName);
 
         if (type == null) {
             type = tm.getType(getSchemaType());

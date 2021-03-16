@@ -84,7 +84,7 @@ public class SourceType extends AegisType {
         if (object instanceof DOMSource) {
             DOMSource ds = (DOMSource)object;
 
-            Element element = null;
+            final Element element;
             if (ds.getNode() instanceof Element) {
                 element = (Element)ds.getNode();
             } else if (ds.getNode() instanceof Document) {
