@@ -37,7 +37,7 @@ import org.apache.cxf.tools.common.model.JavaField;
 public class WrapperBeanFieldAnnotator implements Annotator {
 
     public void annotate(final JavaAnnotatable field) {
-        JavaField jField = null;
+        final JavaField jField;
         if (field instanceof JavaField) {
             jField = (JavaField) field;
         } else {

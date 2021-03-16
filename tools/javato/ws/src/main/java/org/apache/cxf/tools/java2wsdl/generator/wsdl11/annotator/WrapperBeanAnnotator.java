@@ -45,7 +45,7 @@ public class WrapperBeanAnnotator implements Annotator {
     }
 
     public void annotate(final JavaAnnotatable clz) {
-        WrapperBeanClass beanClass = null;
+        final WrapperBeanClass beanClass;
         if (clz instanceof WrapperBeanClass) {
             beanClass = (WrapperBeanClass) clz;
         } else {

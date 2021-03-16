@@ -48,7 +48,7 @@ public final class DefaultServiceBuilderFactory extends ServiceBuilderFactory {
         } else {
             throw new ToolException("Unsupported databinding: " + dbn);
         }
-        AbstractServiceFactory builder = null;
+        final AbstractServiceFactory builder;
         if (Style.Jaxws.equals(s)) {
             builder = new JaxwsServiceBuilder();
         } else if (Style.Simple.equals(s)) {

@@ -45,7 +45,7 @@
     <bean id="customSecurityContextCreator" 
           class="org.apache.cxf.systest.sts.x509.CustomWSS4JSecurityContextCreator" />
     
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleitasymmetricsaml2" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItAsymmetricSAML2Port" serviceName="s:DoubleItService" address="http://localhost:${testutil.ports.DoubleItPortType}/doubleit/services/doubleitasymmetricsaml2" wsdlLocation="org/apache/cxf/systest/sts/x509/DoubleItAsymmetric.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleitasymmetricsaml2" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItAsymmetricSAML2Port" serviceName="s:DoubleItService" address="http://localhost:${testutil.ports.DoubleItServer}/doubleit/services/doubleitasymmetricsaml2" wsdlLocation="org/apache/cxf/systest/sts/x509/DoubleItAsymmetric.wsdl">
         <jaxws:properties>
             <entry key="security.signature.username" value="myservicekey"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>

@@ -68,6 +68,6 @@ public class OrderItem {
     }
 
     public BigDecimal getTotalPrice() {
-        return new BigDecimal(pricePerUnit).multiply(new BigDecimal(count));
+        return BigDecimal.valueOf(pricePerUnit).multiply(BigDecimal.valueOf(count));
     }
 }

@@ -49,7 +49,7 @@ public class X509AsymmetricBindingTest extends AbstractBusClientServerTestBase {
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
-    private static final String PORT = allocatePort(DoubleItPortType.class);
+    private static final String PORT = allocatePort(DoubleItServer.class);
 
     @BeforeClass
     public static void startServers() throws Exception {
