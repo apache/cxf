@@ -110,11 +110,6 @@ public final class PackageUtils {
         }
 
         String domain = tokens.remove(0);
-        // comma was removed by tokenize
-//        idx = domain.indexOf(':');
-//        if (idx >= 0) {
-//            domain = domain.substring(0, idx);
-//        }
         List<String> r = tokenize(domain, urnScheme ? ".-" : ".");
         Collections.reverse(r);
         if ("www".equalsIgnoreCase(r.get(r.size() - 1))) {

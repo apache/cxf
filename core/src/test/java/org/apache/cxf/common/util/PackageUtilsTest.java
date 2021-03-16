@@ -132,8 +132,8 @@ public class PackageUtilsTest {
                 PackageUtils.getPackageNameByNameSpaceURI("uri:cxf.apache.org:jstest"));
         assertEquals("soapinterface.ems.esendex.com",
                 PackageUtils.getPackageNameByNameSpaceURI("com.esendex.ems.soapinterface"));
-        assertEquals("ddd.cc.bb.aa.eee.fff_v01_00",
-                PackageUtils.getPackageNameByNameSpaceURI("http://aa.bb.cc.ddd/eee/fff_v01.00"));
+        assertEquals("ddd.cc.bb.aa._int.fff_v01_00",
+                PackageUtils.getPackageNameByNameSpaceURI("http://aa.bb.cc.ddd/Int/fff-v01.00"));
         assertEquals("org.apache.cxf._case",
                 PackageUtils.getPackageNameByNameSpaceURI("http://www.case.cxf.apache.org"));
         assertEquals("org.apache.cxf._case",

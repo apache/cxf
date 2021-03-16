@@ -34,8 +34,8 @@ import org.apache.cxf.aegis.type.basic.ObjectType;
 import org.apache.cxf.aegis.type.collection.CollectionType;
 import org.apache.cxf.aegis.type.collection.MapType;
 import org.apache.cxf.aegis.util.NamespaceHelper;
-import org.apache.cxf.aegis.util.ServiceUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.ServiceUtils;
 import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.ws.commons.schema.constants.Constants;
 
