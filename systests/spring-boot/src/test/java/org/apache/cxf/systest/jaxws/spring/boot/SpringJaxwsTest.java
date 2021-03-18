@@ -47,23 +47,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.system.OutputCaptureRule;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.SocketUtils;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.search.RequiredSearch;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 
 import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -71,11 +70,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.assertj.core.api.Assertions.entry;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT,
-        classes = SpringJaxwsTest.TestConfig.class)
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(
+        webEnvironment = WebEnvironment.RANDOM_PORT,
+        classes = SpringJaxwsTest.TestConfig.class,
+        properties = {
+            "cxf.metrics.server.max-uri-tags=2"
+        })
 @ActiveProfiles("jaxws")
-@TestPropertySource(properties = {"cxf.metrics.server.max-uri-tags=2"})
 public class SpringJaxwsTest {
 
     private static final String DUMMY_REQUEST_BODY = "<q0:sayHello xmlns:q0=\"http://service.ws.sample/\">"
@@ -84,9 +86,6 @@ public class SpringJaxwsTest {
     private static final String HELLO_SERVICE_NAME_V1 = "HelloV1";
     private static final String HELLO_SERVICE_NAME_V2 = "HelloV2";
     private static final String HELLO_SERVICE_NAME_V3 = "HelloV3";
-
-    @Rule
-    public OutputCaptureRule output = new OutputCaptureRule();
 
     @Autowired
     private MeterRegistry registry;
@@ -97,7 +96,6 @@ public class SpringJaxwsTest {
     @LocalServerPort
     private int port;
 
-    @Configuration
     @EnableAutoConfiguration
     static class TestConfig {
         @Autowired
@@ -134,9 +132,9 @@ public class SpringJaxwsTest {
         }
     }
 
-    @Before
-    public void setUp() {
-        this.registry.getMeters().forEach(meter -> registry.remove(meter));
+    @AfterEach
+    public void clear() {
+        registry.clear();
     }
 
     @Test
@@ -229,7 +227,8 @@ public class SpringJaxwsTest {
     }
 
     @Test
-    public void testAfterMaxUrisReachedFurtherUrisAreDenied() throws MalformedURLException {
+    @ExtendWith(OutputCaptureExtension.class)
+    public void testAfterMaxUrisReachedFurtherUrisAreDenied(CapturedOutput output) throws MalformedURLException {
         // given in setUp
 
         // when
@@ -239,11 +238,12 @@ public class SpringJaxwsTest {
 
         // then
         assertThat(registry.get("cxf.server.requests").meters()).hasSize(2);
-        assertThat(this.output).contains("Reached the maximum number of URI tags " + "for 'cxf.server.requests'");
+        assertThat(output).contains("Reached the maximum number of URI tags for 'cxf.server.requests'");
     }
 
     @Test
-    public void testDoesNotDenyNorLogIfMaxUrisIsNotReached() throws MalformedURLException {
+    @ExtendWith(OutputCaptureExtension.class)
+    public void testDoesNotDenyNorLogIfMaxUrisIsNotReached(CapturedOutput output) throws MalformedURLException {
         // given in setUp
 
         // when
@@ -251,10 +251,9 @@ public class SpringJaxwsTest {
 
         // then
         assertThat(registry.get("cxf.server.requests").meters()).hasSize(1);
-        assertThat(this.output).doesNotContain("Reached the maximum number of URI tags " + "for 'cxf.server.requests'");
-
+        assertThat(output).doesNotContain("Reached the maximum number of URI tags for 'cxf.server.requests'");
     }
-    
+
     @Test
     public void testJaxwsProxySuccessMetric() throws MalformedURLException {
         final HelloService api = createApi(port, HELLO_SERVICE_NAME_V1); 
@@ -342,7 +341,7 @@ public class SpringJaxwsTest {
 
         // no server meters
         assertThat(registry.getMeters())
-            .noneMatch(m -> m.getId().getName().equals("cxf.server.requests"));
+            .noneMatch(m -> "cxf.server.requests".equals(m.getId().getName()));
         
         RequiredSearch clientRequestMetrics = registry.get("cxf.client.requests");
 
@@ -375,7 +374,7 @@ public class SpringJaxwsTest {
         Service service = Service.create(new URL(address + "?wsdl"),
                 new QName("http://service.ws.sample/", "HelloService"), new MetricsFeature(metricsProvider));
         Dispatch<Source> dispatch = service.createDispatch(new QName("http://service.ws.sample/", "HelloPort"),
-                Source.class, Mode.PAYLOAD);
+            Source.class, Mode.PAYLOAD);
 
         Source result = dispatch.invoke(source);
         return StaxUtils.toString(result);

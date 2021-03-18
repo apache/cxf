@@ -28,16 +28,15 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT,
         classes = SpringJaxrsComponentScanningTest.TestConfig.class)
 @ActiveProfiles("jaxrs-component-scan")
@@ -45,7 +44,6 @@ public class SpringJaxrsComponentScanningTest {
     @Autowired
     private AbstractSpringComponentScanServer scanner;
 
-    @Configuration
     @EnableAutoConfiguration
     @ComponentScan(basePackageClasses = Library.class)
     static class TestConfig {

@@ -32,7 +32,7 @@ import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
-import org.apache.cxf.bus.spring.SpringBus;
+import org.apache.cxf.Bus;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.metrics.MetricsFeature;
@@ -44,34 +44,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.system.OutputCaptureRule;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.SocketUtils;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.search.RequiredSearch;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = SpringJaxrsApplicationTest.TestConfig.class)
 @ActiveProfiles("jaxrs")
 public class SpringJaxrsApplicationTest {
-    @Rule
-    public OutputCaptureRule output = new OutputCaptureRule();
 
     @Autowired
     private MeterRegistry registry;
@@ -82,17 +77,8 @@ public class SpringJaxrsApplicationTest {
     @LocalServerPort
     private int port;
 
-    @Configuration
     @EnableAutoConfiguration
     static class TestConfig {
-        @Bean
-        public SpringBus cxf() {
-            final SpringBus bus = new SpringBus();
-            // By default, the exception are propagated and out fault interceptors are not called 
-            bus.setProperty("org.apache.cxf.propagate.exception", Boolean.FALSE);
-            return bus;
-        }
-        
         @Bean
         public Application application() {
             return new LibraryApplication();
@@ -103,10 +89,16 @@ public class SpringJaxrsApplicationTest {
             return new MetricsFeature(metricsProvider);
         }
     }
-    
-    @Before
-    public void setUp() {
-        this.registry.getMeters().forEach(meter -> registry.remove(meter));
+
+    @Autowired
+    public void setBus(Bus bus) {
+        // By default, the exception are propagated and out fault interceptors are not called 
+        bus.setProperty("org.apache.cxf.propagate.exception", Boolean.FALSE);
+    }
+
+    @AfterEach
+    public void clear() {
+        registry.clear();
     }
 
     @Test
@@ -272,7 +264,7 @@ public class SpringJaxrsApplicationTest {
 
         // no server meters
         assertThat(registry.getMeters())
-            .noneMatch(m -> m.getId().getName().equals("cxf.server.requests"));
+            .noneMatch(m -> "cxf.server.requests".equals(m.getId().getName()));
         
         RequiredSearch clientRequestMetrics = registry.get("cxf.client.requests");
 
@@ -411,7 +403,7 @@ public class SpringJaxrsApplicationTest {
 
         // no server meters
         assertThat(registry.getMeters())
-            .noneMatch(m -> m.getId().getName().equals("cxf.server.requests"));
+            .noneMatch(m -> "cxf.server.requests".equals(m.getId().getName()));
         
         RequiredSearch clientRequestMetrics = registry.get("cxf.client.requests");
 
