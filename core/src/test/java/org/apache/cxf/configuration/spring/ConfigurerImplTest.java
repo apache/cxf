@@ -36,12 +36,11 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
-
 
 
 public class ConfigurerImplTest {
@@ -100,16 +99,10 @@ public class ConfigurerImplTest {
                      "http://www.w3.org/2001/XMLSchema", qn.getNamespaceURI());
         byte[] expected = DatatypeConverter.parseBase64Binary("abcd");
         byte[] val = sb.getBase64BinaryAttr();
-        assertEquals("Unexpected value for attribute base64BinaryAttrNoDefault", expected.length, val.length);
-        for (int i = 0; i < expected.length; i++) {
-            assertEquals("Unexpected value for attribute base64BinaryAttrNoDefault", expected[i], val[i]);
-        }
+        assertArrayEquals("Unexpected value for attribute base64BinaryAttrNoDefault", expected, val);
         expected = new HexBinaryAdapter().unmarshal("aaaa");
         val = sb.getHexBinaryAttr();
-        assertEquals("Unexpected value for attribute hexBinaryAttrNoDefault", expected.length, val.length);
-        for (int i = 0; i < expected.length; i++) {
-            assertEquals("Unexpected value for attribute hexBinaryAttrNoDefault", expected[i], val[i]);
-        }
+        assertArrayEquals("Unexpected value for attribute hexBinaryAttrNoDefault", expected, val);
 
         assertEquals("Unexpected value for attribute unsignedIntAttrNoDefault",
                      Long.valueOf(9L), sb.getUnsignedIntAttr());
@@ -243,7 +236,7 @@ public class ConfigurerImplTest {
         assertTrue("The conetxts' contains a wrong application context", contexts.contains(context2));
     }
 
-    class SimpleBean implements Configurable {
+    static class SimpleBean implements Configurable {
 
         private String beanName;
 
@@ -406,7 +399,7 @@ public class ConfigurerImplTest {
         }
     }
 
-    class ChildBean extends SimpleBean {
+    static class ChildBean extends SimpleBean {
 
         ChildBean(String bn) {
             super(bn);
