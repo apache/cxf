@@ -1489,7 +1489,7 @@ public class ProviderFactoryTest {
             return null;
         }
     }
-    public abstract static class BadParentExceptionMapper<T extends Throwable> implements ExceptionMapper<T> {
+    public abstract static class BadParentExceptionMapper<T extends Throwable> implements ExceptionMapper<T> { // NOPMD
     }
     public static class BadExceptionMapperA extends BadParentExceptionMapper<RuntimeExceptionA> {
 

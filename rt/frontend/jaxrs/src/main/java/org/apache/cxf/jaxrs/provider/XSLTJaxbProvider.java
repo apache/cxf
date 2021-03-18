@@ -264,7 +264,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
                 t.newTransformer().transform(reader, dom);
                 return unmarshaller.unmarshal(dom.getNode());
             }
-            XMLFilter filter = null;
+            XMLFilter filter;
             try {
                 filter = factory.newXMLFilter(t);
             } catch (TransformerConfigurationException ex) {
@@ -352,7 +352,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             return;
         }
         org.apache.cxf.common.jaxb.JAXBUtils.setMinimumEscapeHandler(ms);
-        TransformerHandler th = null;
+        TransformerHandler th;
         try {
             th = factory.newTransformerHandler(t);
         } catch (TransformerConfigurationException ex) {

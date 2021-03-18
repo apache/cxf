@@ -37,7 +37,7 @@ public class EntityTagHeaderProvider implements HeaderDelegate<EntityTag> {
             return new EntityTag("*");
         }
 
-        String tag = null;
+        String tag;
         boolean weak = false;
         int i = header.indexOf(WEAK_PREFIX);
         if (i != -1) {

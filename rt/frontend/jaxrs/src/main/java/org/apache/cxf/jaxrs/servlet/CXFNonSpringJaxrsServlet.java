@@ -437,7 +437,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         }
         boolean isApplication = Application.class.isAssignableFrom(c.getDeclaringClass());
         try {
-            ProviderInfo<? extends Object> provider = null;
+            final ProviderInfo<? extends Object> provider;
             if (c.getParameterTypes().length == 0) {
                 if (isApplication) {
                     provider = new ApplicationInfo((Application)c.newInstance(), getBus());
@@ -608,8 +608,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
 
     protected Class<?> loadClass(String cName, String classType) throws ServletException {
         try {
-
-            Class<?> cls = null;
+            final Class<?> cls;
             if (classLoader == null) {
                 cls = ClassLoaderUtils.loadClass(cName, CXFNonSpringJaxrsServlet.class);
             } else {

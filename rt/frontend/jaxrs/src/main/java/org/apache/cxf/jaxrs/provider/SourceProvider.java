@@ -187,7 +187,7 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
 
         String encoding = HttpUtils.getSetEncoding(mt, headers, StandardCharsets.UTF_8.name());
 
-        XMLStreamReader reader = null;
+        final XMLStreamReader reader;
         if (source instanceof Source) {
             reader = StaxUtils.createXMLStreamReader((Source)source);
         } else if (source instanceof Document) {

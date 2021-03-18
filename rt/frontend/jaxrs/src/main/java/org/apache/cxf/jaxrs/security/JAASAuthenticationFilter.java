@@ -117,7 +117,7 @@ public class JAASAuthenticationFilter implements ContainerRequestFilter {
         HttpHeaders headers = new HttpHeadersImpl(m);
         if (redirectURI != null && isRedirectPossible(headers)) {
 
-            URI finalRedirectURI = null;
+            final URI finalRedirectURI;
 
             if (!redirectURI.isAbsolute()) {
                 String endpointAddress = HttpUtils.getEndpointAddress(m);

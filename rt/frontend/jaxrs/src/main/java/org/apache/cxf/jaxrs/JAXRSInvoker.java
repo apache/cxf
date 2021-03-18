@@ -239,7 +239,7 @@ public class JAXRSInvoker extends AbstractInvoker {
 
                 result = checkSubResultObject(result, subResourcePath);
 
-                Class<?> subResponseType = null;
+                final Class<?> subResponseType;
                 if (result.getClass() == Class.class) {
                     ResourceContext rc = new ResourceContextImpl(inMessage, ori);
                     result = rc.getResource((Class<?>)result);
@@ -325,7 +325,7 @@ public class JAXRSInvoker extends AbstractInvoker {
     protected Method getMethodToInvoke(ClassResourceInfo cri, OperationResourceInfo ori, Object resourceObject) {
         Method resourceMethod = cri.getMethodDispatcher().getMethod(ori);
 
-        Method methodToInvoke = null;
+        Method methodToInvoke;
         if (Proxy.class.isInstance(resourceObject)) {
             methodToInvoke = cri.getMethodDispatcher().getProxyMethod(resourceMethod);
             if (methodToInvoke == null) {

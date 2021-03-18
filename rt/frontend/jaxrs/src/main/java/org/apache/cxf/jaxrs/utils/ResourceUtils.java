@@ -566,7 +566,7 @@ public final class ResourceUtils {
     }
 
     public static URL getResourceURL(String loc, Bus bus) throws IOException {
-        URL url = null;
+        URL url;
         if (loc.startsWith(CLASSPATH_PREFIX)) {
             String path = loc.substring(CLASSPATH_PREFIX.length());
             url = ResourceUtils.getClasspathResourceURL(path, ResourceUtils.class, bus);

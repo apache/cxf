@@ -205,7 +205,7 @@ public class FormEncodingProvider<T> extends AbstractConfigurableProvider
 
     private static boolean isSupported(Class<?> type, MediaType mt) {
         return (MultivaluedMap.class.isAssignableFrom(type) || Form.class.isAssignableFrom(type))
-            || (mt.getType().equalsIgnoreCase("multipart")
+            || ("multipart".equalsIgnoreCase(mt.getType())
             && mt.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)
             && (MultivaluedMap.class.isAssignableFrom(type) || Form.class.isAssignableFrom(type)));
     }

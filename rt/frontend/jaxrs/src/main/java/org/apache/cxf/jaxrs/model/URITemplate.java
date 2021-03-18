@@ -196,19 +196,19 @@ public final class URITemplate {
                 List<PathSegment> uList = JAXRSUtils.getPathSegments(uri, false);
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < uList.size(); i++) {
-                    String segment = null;
+                    final String segment;
                     if (pList.size() > i && pList.get(i).getPath().indexOf('{') == -1) {
                         segment = uList.get(i).getPath();
                     } else {
                         segment = HttpUtils.fromPathSegment(uList.get(i));
                     }
-                    if (segment.length() > 0) {
+                    if (!segment.isEmpty()) {
                         sb.append(SLASH);
                     }
                     sb.append(segment);
                 }
                 uri = sb.toString();
-                if (uri.length() == 0) {
+                if (uri.isEmpty()) {
                     uri = SLASH;
                 }
                 m = templateRegexPattern.matcher(uri);

@@ -200,7 +200,7 @@ public final class JAXRSUtils {
     private static String[] getUserMediaTypes(Object provider, boolean consumes) {
         String[] values = null;
         if (AbstractConfigurableProvider.class.isAssignableFrom(provider.getClass())) {
-            List<String> types = null;
+            final List<String> types;
             if (consumes) {
                 types = ((AbstractConfigurableProvider)provider).getConsumeMediaTypes();
             } else {
@@ -280,7 +280,7 @@ public final class JAXRSUtils {
         for (Field f : bri.getParameterFields()) {
             Parameter p = ResourceUtils.getParameter(0, f.getAnnotations(),
                                                      f.getType());
-            Object o = null;
+            final Object o;
 
             if (p.getType() == ParameterType.BEAN) {
                 o = createBeanParamValue(message, f.getType(), ori);
@@ -1449,8 +1449,8 @@ public final class JAXRSUtils {
         throws WebApplicationException, IOException {
 
         OutputStream entityStream = message.getContent(OutputStream.class);
-        if (entity.getClass().getName().equals(
-            "org.apache.cxf.jaxrs.reactivestreams.server.StreamingAsyncSubscriber$StreamingResponseImpl")) {
+        if ("org.apache.cxf.jaxrs.reactivestreams.server.StreamingAsyncSubscriber$StreamingResponseImpl".equals(
+            entity.getClass().getName())) {
             //cache the OutputStream when it's reactive response
             entityStream = new CacheAndWriteOutputStream(entityStream);
         }
@@ -1863,7 +1863,7 @@ public final class JAXRSUtils {
         }
 
 
-        List<String> values = null;
+        final List<String> values;
         if (params.size() <= 1) {
             values = Collections.emptyList();
         } else {

@@ -303,7 +303,7 @@ public final class HttpUtils {
         if (value == null) {
             return null;
         }
-        String language = null;
+        final String language;
         String locale = null;
         int index = value.indexOf('-');
         if (index == 0 || index == value.length() - 1) {
@@ -482,7 +482,7 @@ public final class HttpUtils {
     }
 
     public static String getEndpointAddress(Message m) {
-        String address = null;
+        String address;
         Destination d = m.getExchange().getDestination();
         if (d != null) {
             if (d instanceof AbstractHTTPDestination) {

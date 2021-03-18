@@ -270,7 +270,7 @@ public class RequestImpl implements Request {
         SimpleDateFormat dateFormat = HttpUtils.getHttpDateFormat();
 
         dateFormat.setLenient(false);
-        Date dateSince = null;
+        final Date dateSince;
         try {
             dateSince = dateFormat.parse(ifModifiedSince.get(0));
         } catch (ParseException ex) {
@@ -296,7 +296,7 @@ public class RequestImpl implements Request {
         SimpleDateFormat dateFormat = HttpUtils.getHttpDateFormat();
 
         dateFormat.setLenient(false);
-        Date dateSince = null;
+        final Date dateSince;
         try {
             dateSince = dateFormat.parse(ifNotModifiedSince.get(0));
         } catch (ParseException ex) {

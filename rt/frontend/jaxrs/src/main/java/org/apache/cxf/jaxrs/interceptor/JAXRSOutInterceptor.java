@@ -102,7 +102,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
 
         Object responseObj = objs.get(0);
 
-        Response response = null;
+        final Response response;
         if (responseObj instanceof Response) {
             response = (Response)responseObj;
             if (response.getStatus() == 500
@@ -151,7 +151,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         Method invoked = ori == null ? null : ori.getAnnotatedMethod() != null
             ? ori.getAnnotatedMethod() : ori.getMethodToInvoke();
 
-        Annotation[] annotations = null;
+        Annotation[] annotations;
         Annotation[] staticAnns = ori != null ? ori.getOutAnnotations() : new Annotation[]{};
         Annotation[] responseAnns = response.getEntityAnnotations();
         if (responseAnns != null) {
@@ -345,7 +345,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     }
 
     private void checkCachedStream(Message m, OutputStream osOriginal, boolean enabled) throws Exception {
-        XMLStreamWriter writer = null;
+        final XMLStreamWriter writer;
         if (enabled) {
             writer = m.getContent(XMLStreamWriter.class);
         } else {
@@ -353,7 +353,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         }
         if (writer instanceof CachingXmlEventWriter) {
             CachingXmlEventWriter cache = (CachingXmlEventWriter)writer;
-            if (cache.getEvents().size() != 0) {
+            if (!cache.getEvents().isEmpty()) {
                 XMLStreamWriter origWriter = null;
                 try {
                     origWriter = StaxUtils.createXMLStreamWriter(osOriginal);

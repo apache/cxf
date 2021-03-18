@@ -41,7 +41,7 @@ public class ResourceContextImpl implements ResourceContext {
 
     @Override
     public <T> T getResource(Class<T> cls) {
-        ResourceProvider rp = null;
+        final ResourceProvider rp;
 
         Object propValue = m.getContextualProperty(CONTEXT_PROVIDER_PROP);
         if (propValue instanceof ResourceContextProvider) {

@@ -149,7 +149,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                 message.put(Message.ACCEPT_CONTENT_TYPE, acceptTypes);
             }
         }
-        List<MediaType> acceptContentTypes = null;
+        final List<MediaType> acceptContentTypes;
         try {
             acceptContentTypes = JAXRSUtils.sortMediaTypes(acceptTypes, JAXRSUtils.MEDIA_TYPE_Q_PARAM);
         } catch (IllegalArgumentException ex) {
@@ -176,7 +176,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
 
         MultivaluedMap<String, String> matchedValues = new MetadataMap<>();
 
-        OperationResourceInfo ori = null;
+        final OperationResourceInfo ori;
 
         try {
             ori = JAXRSUtils.findTargetMethod(matchedResources, message,

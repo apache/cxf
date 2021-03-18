@@ -20,7 +20,6 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -142,9 +141,7 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
 
         Map<String, String> params = type.getParameters();
         if (params != null) {
-            for (Iterator<Map.Entry<String, String>> iter = params.entrySet().iterator();
-                iter.hasNext();) {
-                Map.Entry<String, String> entry = iter.next();
+            for (Map.Entry<String, String> entry : params.entrySet()) {
                 if (ignoreParams != null && ignoreParams.contains(entry.getKey())) {
                     continue;
                 }
@@ -177,7 +174,7 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
         Message message = PhaseInterceptorChain.getCurrentMessage();
         if (message != null
             && !MessageUtils.getContextualBoolean(message, STRICT_MEDIA_TYPE_CHECK, false)) {
-            MediaType mt = null;
+            final MediaType mt;
             if (mType.equals(MediaType.TEXT_PLAIN_TYPE.getType())) {
                 mt = MediaType.TEXT_PLAIN_TYPE;
             } else if (mType.equals(MediaType.APPLICATION_XML_TYPE.getSubtype())) {

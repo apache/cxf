@@ -333,7 +333,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
                                          String mimeType,
                                          String mainMediaType,
                                          int id) throws IOException {
-        DataHandler dh = null;
+        final DataHandler dh;
         if (InputStream.class.isAssignableFrom(obj.getClass())) {
             dh = createInputStreamDH((InputStream)obj, mimeType);
         } else if (DataHandler.class.isAssignableFrom(obj.getClass())) {
@@ -383,7 +383,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
         MediaType mt = JAXRSUtils.toMediaType(mimeType);
         mc.put(ProviderFactory.ACTIVE_JAXRS_PROVIDER_KEY, this);
 
-        MessageBodyWriter<T> r = null;
+        final MessageBodyWriter<T> r;
         try {
             r = mc.getProviders().getMessageBodyWriter(cls, genericType, anns, mt);
         } finally {

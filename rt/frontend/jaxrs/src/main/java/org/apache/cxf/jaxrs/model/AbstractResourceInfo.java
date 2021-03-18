@@ -184,7 +184,7 @@ public abstract class AbstractResourceInfo {
             );
         }
 
-        Object property = null;
+        Object property;
         synchronized (bus) {
             property = bus.getProperty(prop);
             if (property == null && create) {

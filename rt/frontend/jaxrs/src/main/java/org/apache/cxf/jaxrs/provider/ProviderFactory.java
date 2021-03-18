@@ -253,7 +253,7 @@ public abstract class ProviderFactory {
 
         Message responseMessage = isRequestor ? m.getExchange().getInMessage()
                                               : m.getExchange().getOutMessage();
-        Object ctProperty = null;
+        final Object ctProperty;
         if (responseMessage != null) {
             ctProperty = responseMessage.get(Message.CONTENT_TYPE);
         } else {
@@ -436,7 +436,7 @@ public abstract class ProviderFactory {
         if (mr != null || size > 0) {
             ReaderInterceptor mbrReader = new ReaderInterceptorMBR(mr, getResponseMessage(m));
 
-            List<ReaderInterceptor> interceptors = null;
+            final List<ReaderInterceptor> interceptors;
             if (size > 0) {
                 interceptors = new ArrayList<>(size + 1);
                 List<ProviderInfo<ReaderInterceptor>> readers =
@@ -474,7 +474,7 @@ public abstract class ProviderFactory {
             })
             WriterInterceptor mbwWriter = new WriterInterceptorMBW((MessageBodyWriter)mw, m);
 
-            List<WriterInterceptor> interceptors = null;
+            final List<WriterInterceptor> interceptors;
             if (size > 0) {
                 interceptors = new ArrayList<>(size + 1);
                 List<ProviderInfo<WriterInterceptor>> writers =
@@ -1237,7 +1237,7 @@ public abstract class ProviderFactory {
                 }
             }
         }
-        Object instance = null;
+        final Object instance;
         try {
             instance = c.newInstance(cArgs);
         } catch (Throwable ex) {

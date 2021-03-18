@@ -72,7 +72,7 @@ public class CachingMessageBodyWriter<T> extends AbstractCachingMessageProvider<
         if (delegatingWriters != null) {
             return getDelegatingWriter(type, gType, anns, mt);
         }
-        MessageBodyWriter<T> w = null;
+        MessageBodyWriter<T> w;
 
         mc.put(ACTIVE_JAXRS_PROVIDER_KEY, this);
         try {

@@ -322,7 +322,7 @@ public final class InjectionUtils {
             } else if (genericType instanceof GenericArrayType) {
                 genericType = ((GenericArrayType)genericType).getGenericComponentType();
             }
-            Class<?> cls = null;
+            final Class<?> cls;
             if (!(genericType instanceof ParameterizedType)) {
                 cls = (Class<?>)genericType;
             } else {
@@ -446,7 +446,7 @@ public final class InjectionUtils {
             throw createParamConversionException(pType, nfe);
         }
         if (result != null) {
-            T theResult = null;
+            final T theResult;
             if (pClass.isPrimitive()) {
                 theResult = (T)result;
             } else {
@@ -666,11 +666,11 @@ public final class InjectionUtils {
             new HashMap<>();
         for (Map.Entry<String, List<String>> entry : values.entrySet()) {
             String memberKey = entry.getKey();
-            String beanKey = null;
+            final String beanKey;
 
             int idx = memberKey.indexOf('.');
             if (idx == -1) {
-                beanKey = "." + memberKey;
+                beanKey = '.' + memberKey;
             } else {
                 beanKey = memberKey.substring(0, idx);
                 memberKey = memberKey.substring(idx + 1);
@@ -721,7 +721,7 @@ public final class InjectionUtils {
                 if (setter != null && getter != null) {
                     final Class<?> type;
                     final Type genericType;
-                    Object paramValue = null;
+                    Object paramValue;
                     if (setter instanceof Method) {
                         type = Method.class.cast(setter).getParameterTypes()[0];
                         genericType = Method.class.cast(setter).getGenericParameterTypes()[0];
@@ -1526,7 +1526,7 @@ public final class InjectionUtils {
         if (targetObject == null) {
             return null;
         }
-        Type type = null;
+        final Type type;
         if (GenericEntity.class.isAssignableFrom(targetObject.getClass())) {
             type = processGenericTypeIfNeeded(serviceCls, targetType, ((GenericEntity<?>)targetObject).getType());
         } else if (invoked == null

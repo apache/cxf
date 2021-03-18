@@ -666,7 +666,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     }
 
     protected Class<?> getActualType(Class<?> type, Type genericType, Annotation[] anns) {
-        Class<?> theType = null;
+        Class<?> theType;
         if (JAXBElement.class.isAssignableFrom(type)) {
             theType = InjectionUtils.getActualType(genericType);
         } else {

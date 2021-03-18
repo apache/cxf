@@ -564,7 +564,6 @@ public class JAXRSUtilsTest {
         List<MediaType> methodMimeTypes = new ArrayList<>(
              JAXRSUtils.parseMediaTypes("application/mytype,application/xml,application/json"));
 
-        MediaType acceptContentType = MediaType.valueOf("application/json");
         List <MediaType> candidateList = JAXRSUtils.intersectMimeTypes(methodMimeTypes,
                                                  MediaType.valueOf("application/json"));
 
@@ -588,7 +587,7 @@ public class JAXRSUtilsTest {
 
         //test accept wild card application/*
         methodMimeTypes = JAXRSUtils.parseMediaTypes("text/html,text/xml,application/xml");
-        acceptContentType = MediaType.valueOf("text/*");
+        MediaType acceptContentType = MediaType.valueOf("text/*");
         candidateList = JAXRSUtils.intersectMimeTypes(methodMimeTypes, acceptContentType);
 
         assertEquals(2, candidateList.size());

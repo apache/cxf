@@ -271,7 +271,7 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
             if (serviceClassAnnotation != null && clazz.getAnnotation(serviceClassAnnotation) == null) {
                 continue;
             }
-            Object bean = null;
+            Object bean;
             try {
                 bean = beanFactory.createBean(clazz, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
             } catch (Exception ex) {

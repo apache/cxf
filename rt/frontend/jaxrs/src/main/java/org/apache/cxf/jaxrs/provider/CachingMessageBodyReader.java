@@ -69,7 +69,7 @@ public class CachingMessageBodyReader<T> extends AbstractCachingMessageProvider<
         if (delegatingReaders != null) {
             return getDelegatingReader(type, gType, anns, mt);
         }
-        MessageBodyReader<T> r = null;
+        final MessageBodyReader<T> r;
 
         mc.put(ACTIVE_JAXRS_PROVIDER_KEY, this);
         try {

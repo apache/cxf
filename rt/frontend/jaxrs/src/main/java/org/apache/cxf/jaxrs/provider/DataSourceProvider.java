@@ -57,7 +57,7 @@ public class DataSourceProvider<T> implements MessageBodyReader<T>, MessageBodyW
                                MultivaluedMap<String, String> headers, InputStream is)
         throws IOException {
 
-        DataSource ds = null;
+        final DataSource ds;
         if (cls == FileDataSource.class) {
             File file = new BinaryDataProvider<File>().readFrom(File.class, File.class, annotations, type, headers, is);
             ds = new FileDataSource(file);

@@ -32,7 +32,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.Consumes;
@@ -86,16 +85,17 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
     private static final String XML_PI_PROPERTY_RI = "com.sun.xml.bind.xmlHeaders";
     private static final String XML_PI_PROPERTY_RI_INT = "com.sun.xml.internal.bind.xmlHeaders";
 
-    private static final List<String> MARSHALLER_PROPERTIES =
-        Arrays.asList(new String[] {Marshaller.JAXB_ENCODING,
-                                    Marshaller.JAXB_FORMATTED_OUTPUT,
-                                    Marshaller.JAXB_FRAGMENT,
-                                    Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,
-                                    Marshaller.JAXB_SCHEMA_LOCATION,
-                                    NS_MAPPER_PROPERTY_RI,
-                                    NS_MAPPER_PROPERTY_RI_INT,
-                                    XML_PI_PROPERTY_RI,
-                                    XML_PI_PROPERTY_RI_INT});
+    private static final String[] MARSHALLER_PROPERTIES = {
+        Marshaller.JAXB_ENCODING,
+        Marshaller.JAXB_FORMATTED_OUTPUT,
+        Marshaller.JAXB_FRAGMENT,
+        Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,
+        Marshaller.JAXB_SCHEMA_LOCATION,
+        NS_MAPPER_PROPERTY_RI,
+        NS_MAPPER_PROPERTY_RI_INT,
+        XML_PI_PROPERTY_RI,
+        XML_PI_PROPERTY_RI_INT
+    };
 
     private Map<String, Object> mProperties = Collections.emptyMap();
     private Map<String, String> nsPrefixes = Collections.emptyMap();
@@ -165,7 +165,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
 
             unmarshaller = createUnmarshaller(theType, genericType, isCollection);
             addAttachmentUnmarshaller(unmarshaller);
-            Object response = null;
+            Object response;
             if (JAXBElement.class.isAssignableFrom(type)
                 || !isCollection && (unmarshalAsJaxbElement
                 || jaxbElementClassMap != null && jaxbElementClassMap.containsKey(theType.getName()))) {
@@ -331,7 +331,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
 
         Object firstObj = it.hasNext() ? it.next() : null;
 
-        QName qname = null;
+        final QName qname;
         if (firstObj instanceof JAXBElement) {
             JAXBElement<?> el = (JAXBElement<?>)firstObj;
             qname = el.getName();
@@ -346,20 +346,18 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
                                               .entity(message).build());
         }
 
-        StringBuilder pi = new StringBuilder();
-        pi.append(XML_PI_START + (enc == null ? StandardCharsets.UTF_8.name() : enc) + "\"?>");
-        os.write(pi.toString().getBytes());
-        String startTag = null;
-        String endTag = null;
+        os.write((XML_PI_START + (enc == null ? StandardCharsets.UTF_8.name() : enc) + "\"?>").getBytes());
 
-        if (qname.getNamespaceURI().length() > 0) {
+        final String startTag;
+        final String endTag;
+        if (!qname.getNamespaceURI().isEmpty()) {
             String prefix = nsPrefixes.get(qname.getNamespaceURI());
             if (prefix == null) {
                 prefix = "ns1";
             }
-            startTag = "<" + prefix + ":" + qname.getLocalPart() + " xmlns:" + prefix + "=\""
+            startTag = "<" + prefix + ':' + qname.getLocalPart() + " xmlns:" + prefix + "=\""
                 + qname.getNamespaceURI() + "\">";
-            endTag = "</" + prefix + ":" + qname.getLocalPart() + ">";
+            endTag = "</" + prefix + ':' + qname.getLocalPart() + ">";
         } else {
             startTag = "<" + qname.getLocalPart() + ">";
             endTag = "</" + qname.getLocalPart() + ">";
@@ -489,7 +487,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         MessageContext mc = getContext();
         if (mc != null) {
             String httpBasePath = (String)mc.get("http.base.path");
-            UriBuilder builder = null;
+            final UriBuilder builder;
             if (httpBasePath != null) {
                 builder = UriBuilder.fromPath(httpBasePath);
             } else {

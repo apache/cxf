@@ -110,7 +110,6 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
 
             if (!gssContext.getCredDelegState()) {
                 gssContext.dispose();
-                gssContext = null;
             }
 
         } catch (LoginException e) {
@@ -152,7 +151,7 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
         //   meaning that a process which runs this code has the
         //   user identity
 
-        LoginContext lc = null;
+        final LoginContext lc;
         if (!StringUtils.isEmpty(loginContextName) || loginConfig != null) {
             lc = new LoginContext(loginContextName, null, callbackHandler, loginConfig);
         } else {
