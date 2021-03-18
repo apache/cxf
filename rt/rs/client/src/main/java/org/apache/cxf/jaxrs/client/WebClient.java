@@ -302,7 +302,7 @@ public class WebClient extends AbstractClient {
      */
     public static WebClient fromClient(Client client, boolean inheritHeaders) {
 
-        WebClient webClient = null;
+        final WebClient webClient;
 
         ClientState clientState = getClientState(client);
         if (clientState == null) {
@@ -927,7 +927,7 @@ public class WebClient extends AbstractClient {
         }
         MultivaluedMap<String, String> headers = prepareHeaders(responseClass, body);
         resetResponse();
-        Response r = null;
+        final Response r;
         try {
             r = doChainedInvocation(httpMethod, headers, body, requestClass, inGenericType,
                                              inAnns, responseClass, outGenericType, null, null);

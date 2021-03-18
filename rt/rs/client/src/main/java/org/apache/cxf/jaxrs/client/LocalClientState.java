@@ -152,7 +152,7 @@ public class LocalClientState implements ClientState {
     
     public ClientState newState(URI currentURI, MultivaluedMap<String, String> headers,
             MultivaluedMap<String, String> templatesMap, Map<String, Object> props) {
-        ClientState state = null;
+        final ClientState state;
         if (isSupportedScheme(currentURI)) {
             state = new LocalClientState(currentURI, props);
         } else {

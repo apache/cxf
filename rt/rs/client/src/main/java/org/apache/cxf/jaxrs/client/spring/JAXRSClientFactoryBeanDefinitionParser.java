@@ -135,7 +135,7 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
                     }
                     AutowireCapableBeanFactory beanFactory = ctx.getAutowireCapableBeanFactory();
                     for (final Class< ? > providerClass: classes.get(Provider.class)) {
-                        Object bean = null;
+                        Object bean;
                         try {
                             bean = beanFactory.createBean(providerClass,
                                                    AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
@@ -173,7 +173,7 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
         List<Object> providers = new LinkedList<>();
         AutowireCapableBeanFactory beanFactory = context.getAutowireCapableBeanFactory();
         for (final Class< ? > providerClass: providerClasses) {
-            Object bean = null;
+            Object bean;
             try {
                 bean = beanFactory.createBean(providerClass,
                                        AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);

@@ -382,7 +382,7 @@ public final class JAXRSClientFactory {
 
         ClientState clientState = WebClient.getClientState(client);
 
-        T proxy = null;
+        final T proxy;
         if (clientState == null) {
             proxy = bean.create(cls);
             if (inheritHeaders) {

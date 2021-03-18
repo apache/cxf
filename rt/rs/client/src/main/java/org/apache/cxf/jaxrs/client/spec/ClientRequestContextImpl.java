@@ -132,8 +132,8 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
         Object actualEntity = InjectionUtils.getEntity(entity);
         m.setContent(List.class, actualEntity == null ? new MessageContentsList()
             : new MessageContentsList(actualEntity));
-        Type type = null;
         if (entity != null) {
+            final Type type;
             if (GenericEntity.class.isAssignableFrom(entity.getClass())) {
                 type = ((GenericEntity<?>)entity).getType();
             } else {
