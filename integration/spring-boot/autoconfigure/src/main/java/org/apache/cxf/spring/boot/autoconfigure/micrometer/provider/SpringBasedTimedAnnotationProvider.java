@@ -43,8 +43,8 @@ public class SpringBasedTimedAnnotationProvider implements TimedAnnotationProvid
     private final ConcurrentHashMap<HandlerMethod, Set<Timed>> timedAnnotationCache = new ConcurrentHashMap<>();
 
     @Override
-    public Set<Timed> getTimedAnnotations(Exchange ex) {
-        HandlerMethod handlerMethod = HandlerMethod.create(ex);
+    public Set<Timed> getTimedAnnotations(Exchange ex, boolean client) {
+        HandlerMethod handlerMethod = HandlerMethod.create(ex, client);
         if (handlerMethod == null) {
             return emptySet();
         }
@@ -80,14 +80,16 @@ public class SpringBasedTimedAnnotationProvider implements TimedAnnotationProvid
             this.method = method;
         }
 
-        private static HandlerMethod create(Exchange exchange) {
+        private static HandlerMethod create(Exchange exchange, boolean client) {
             final Service service = exchange.getService();
             if (service != null) {
                 final BindingOperationInfo bop = exchange.getBindingOperationInfo();
                 if (bop != null) { /* JAX-WS call */
                     final MethodDispatcher md = (MethodDispatcher) service.get(MethodDispatcher.class.getName());
-                    final Method method = md.getMethod(bop);
-                    return new HandlerMethod(method.getDeclaringClass(), method);
+                    if (md != null) { /* may be 'null' on client side */
+                        final Method method = md.getMethod(bop);
+                        return new HandlerMethod(method.getDeclaringClass(), method);
+                    }
                 } else { /* JAX-RS call */
                     final OperationResourceInfo ori = exchange.get(OperationResourceInfo.class);
                     if (ori != null) {

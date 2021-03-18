@@ -21,7 +21,7 @@
     <parent>
         <artifactId>cxf-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
-        <version>3.4.1-SNAPSHOT</version>
+        <version>3.4.4-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -500,9 +500,9 @@
             </exclusions>
         </dependency>
         <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk15on</artifactId>
-                <scope>test</scope>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
            <groupId>org.yaml</groupId>
@@ -554,7 +554,16 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
+        <dependency>
+            <groupId>jakarta.json.bind</groupId>
+            <artifactId>jakarta.json.bind-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.johnzon</groupId>
+            <artifactId>johnzon-jsonb</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

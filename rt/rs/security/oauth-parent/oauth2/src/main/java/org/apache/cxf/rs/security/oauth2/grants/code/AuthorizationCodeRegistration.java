@@ -40,6 +40,7 @@ public class AuthorizationCodeRegistration {
     private String nonce;
     private String responseType;
     private String clientCodeChallenge;
+    private String clientCodeChallengeMethod;
     private boolean preauthorizedTokenAvailable;
     private Map<String, String> extraProperties = new LinkedHashMap<>();
     /**
@@ -154,5 +155,13 @@ public class AuthorizationCodeRegistration {
     }
     public void setResponseType(String responseType) {
         this.responseType = responseType;
+    }
+
+    public String getClientCodeChallengeMethod() {
+        return clientCodeChallengeMethod;
+    }
+
+    public void setClientCodeChallengeMethod(String clientCodeChallengeMethod) {
+        this.clientCodeChallengeMethod = clientCodeChallengeMethod;
     }
 }

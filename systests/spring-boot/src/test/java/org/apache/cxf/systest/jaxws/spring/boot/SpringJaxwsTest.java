@@ -22,6 +22,7 @@ package org.apache.cxf.systest.jaxws.spring.boot;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -31,13 +32,16 @@ import javax.xml.ws.Dispatch;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Service;
 import javax.xml.ws.Service.Mode;
+import javax.xml.ws.WebServiceException;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.jaxws.EndpointImpl;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.metrics.MetricsFeature;
 import org.apache.cxf.metrics.MetricsProvider;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.systest.jaxws.resources.HelloService;
 import org.apache.cxf.systest.jaxws.resources.HelloServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -50,6 +54,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.SocketUtils;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -62,6 +67,7 @@ import org.junit.runner.RunWith;
 
 import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.assertj.core.api.Assertions.entry;
 
@@ -83,7 +89,10 @@ public class SpringJaxwsTest {
     public OutputCaptureRule output = new OutputCaptureRule();
 
     @Autowired
-    MeterRegistry registry;
+    private MeterRegistry registry;
+    
+    @Autowired
+    private MetricsProvider metricsProvider;
 
     @LocalServerPort
     private int port;
@@ -143,20 +152,35 @@ public class SpringJaxwsTest {
                         + "<return>Hello, Elan</return>"
                         + "</ns2:sayHelloResponse>");
 
-        RequiredSearch requestMetrics = registry.get("cxf.server.requests");
+        RequiredSearch serverRequestMetrics = registry.get("cxf.server.requests");
 
-        Map<Object, Object> tags = requestMetrics.timer().getId().getTags().stream()
+        Map<Object, Object> serverTags = serverRequestMetrics.timer().getId().getTags().stream()
                 .collect(toMap(Tag::getKey, Tag::getValue));
 
-        assertThat(tags)
-                .containsOnly(
-                        entry("exception", "None"),
-                        entry("faultCode", "None"),
-                        entry("method", "POST"),
-                        entry("operation", "sayHello"),
-                        entry("uri", "/Service/" + HELLO_SERVICE_NAME_V1),
-                        entry("outcome", "SUCCESS"),
-                        entry("status", "200"));
+        assertThat(serverTags)
+            .containsOnly(
+                entry("exception", "None"),
+                entry("faultCode", "None"),
+                entry("method", "POST"),
+                entry("operation", "sayHello"),
+                entry("uri", "/Service/" + HELLO_SERVICE_NAME_V1),
+                entry("outcome", "SUCCESS"),
+                entry("status", "200"));
+        
+        RequiredSearch clientRequestMetrics = registry.get("cxf.client.requests");
+
+        Map<Object, Object> clientTags = clientRequestMetrics.timer().getId().getTags().stream()
+                .collect(toMap(Tag::getKey, Tag::getValue));
+
+        assertThat(clientTags)
+            .containsOnly(
+                entry("exception", "None"),
+                entry("faultCode", "None"),
+                entry("method", "POST"),
+                entry("operation", "Invoke"),
+                entry("uri", "http://localhost:" + port + "/Service/" + HELLO_SERVICE_NAME_V1),
+                entry("outcome", "SUCCESS"),
+                entry("status", "200"));
     }
 
     @Test
@@ -169,24 +193,39 @@ public class SpringJaxwsTest {
 
         // then
         assertThat(throwable)
-                .isInstanceOf(SOAPFaultException.class)
-                .hasMessageContaining("Fault occurred while processing");
+            .isInstanceOf(SOAPFaultException.class)
+            .hasMessageContaining("Fault occurred while processing");
 
 
-        RequiredSearch requestMetrics = registry.get("cxf.server.requests");
+        RequiredSearch serverRequestMetrics = registry.get("cxf.server.requests");
 
-        Map<Object, Object> tags = requestMetrics.timer().getId().getTags().stream()
+        Map<Object, Object> serverTags = serverRequestMetrics.timer().getId().getTags().stream()
                 .collect(toMap(Tag::getKey, Tag::getValue));
 
-        assertThat(tags)
-                .containsOnly(
-                        entry("exception", "NullPointerException"),
-                        entry("faultCode", "UNCHECKED_APPLICATION_FAULT"),
-                        entry("method", "POST"),
-                        entry("operation", "sayHello"),
-                        entry("uri", "/Service/" + HELLO_SERVICE_NAME_V1),
-                        entry("outcome", "SERVER_ERROR"),
-                        entry("status", "500"));
+        assertThat(serverTags)
+            .containsOnly(
+                entry("exception", "NullPointerException"),
+                entry("faultCode", "UNCHECKED_APPLICATION_FAULT"),
+                entry("method", "POST"),
+                entry("operation", "sayHello"),
+                entry("uri", "/Service/" + HELLO_SERVICE_NAME_V1),
+                entry("outcome", "SERVER_ERROR"),
+                entry("status", "500"));
+        
+        RequiredSearch clientRequestMetrics = registry.get("cxf.client.requests");
+
+        Map<Object, Object> clientTags = clientRequestMetrics.timer().getId().getTags().stream()
+                .collect(toMap(Tag::getKey, Tag::getValue));
+
+        assertThat(clientTags)
+            .containsOnly(
+                entry("exception", "None"),
+                entry("faultCode", "UNCHECKED_APPLICATION_FAULT"),
+                entry("method", "POST"),
+                entry("operation", "Invoke"),
+                entry("uri", "http://localhost:" + port + "/Service/" + HELLO_SERVICE_NAME_V1),
+                entry("outcome", "SERVER_ERROR"),
+                entry("status", "500"));
     }
 
     @Test
@@ -215,13 +254,126 @@ public class SpringJaxwsTest {
         assertThat(this.output).doesNotContain("Reached the maximum number of URI tags " + "for 'cxf.server.requests'");
 
     }
+    
+    @Test
+    public void testJaxwsProxySuccessMetric() throws MalformedURLException {
+        final HelloService api = createApi(port, HELLO_SERVICE_NAME_V1); 
+        assertThat(api.sayHello("Elan")).isEqualTo("Hello, Elan");
+
+        RequiredSearch serverRequestMetrics = registry.get("cxf.server.requests");
+
+        Map<Object, Object> serverTags = serverRequestMetrics.timer().getId().getTags().stream()
+                .collect(toMap(Tag::getKey, Tag::getValue));
+
+        assertThat(serverTags)
+            .containsOnly(
+                entry("exception", "None"),
+                entry("faultCode", "None"),
+                entry("method", "POST"),
+                entry("operation", "sayHello"),
+                entry("uri", "/Service/" + HELLO_SERVICE_NAME_V1),
+                entry("outcome", "SUCCESS"),
+                entry("status", "200"));
+        
+        RequiredSearch clientRequestMetrics = registry.get("cxf.client.requests");
+
+        Map<Object, Object> clientTags = clientRequestMetrics.timer().getId().getTags().stream()
+                .collect(toMap(Tag::getKey, Tag::getValue));
+
+        assertThat(clientTags)
+            .containsOnly(
+                entry("exception", "None"),
+                entry("faultCode", "None"),
+                entry("method", "POST"),
+                entry("operation", "sayHello"),
+                entry("uri", "http://localhost:" + port + "/Service/" + HELLO_SERVICE_NAME_V1),
+                entry("outcome", "SUCCESS"),
+                entry("status", "200"));
+    }
+    
+    @Test
+    public void testJaxwsProxyFailedMetric() {
+        final HelloService api = createApi(port, HELLO_SERVICE_NAME_V1); 
+
+        // then
+        assertThatThrownBy(() -> api.sayHello(null))
+            .isInstanceOf(SOAPFaultException.class)
+            .hasMessageContaining("Fault occurred while processing");
+
+        RequiredSearch serverRequestMetrics = registry.get("cxf.server.requests");
+
+        Map<Object, Object> serverTags = serverRequestMetrics.timer().getId().getTags().stream()
+                .collect(toMap(Tag::getKey, Tag::getValue));
+
+        assertThat(serverTags)
+            .containsOnly(
+                entry("exception", "NullPointerException"),
+                entry("faultCode", "UNCHECKED_APPLICATION_FAULT"),
+                entry("method", "POST"),
+                entry("operation", "sayHello"),
+                entry("uri", "/Service/" + HELLO_SERVICE_NAME_V1),
+                entry("outcome", "SERVER_ERROR"),
+                entry("status", "500"));
+        
+        RequiredSearch clientRequestMetrics = registry.get("cxf.client.requests");
+
+        Map<Object, Object> clientTags = clientRequestMetrics.timer().getId().getTags().stream()
+                .collect(toMap(Tag::getKey, Tag::getValue));
+
+        assertThat(clientTags)
+            .containsOnly(
+                entry("exception", "None"),
+                entry("faultCode", "UNCHECKED_APPLICATION_FAULT"),
+                entry("method", "POST"),
+                entry("operation", "sayHello"),
+                entry("uri", "http://localhost:" + port + "/Service/" + HELLO_SERVICE_NAME_V1),
+                entry("outcome", "SERVER_ERROR"),
+                entry("status", "500"));
+    }
+
+    @Test
+    public void testJaxwsProxyClientExceptionMetric() throws MalformedURLException {
+        final int fakePort = SocketUtils.findAvailableTcpPort();
+        final HelloService api = createApi(fakePort, HELLO_SERVICE_NAME_V1); 
+        
+        assertThatThrownBy(() -> api.sayHello("Elan"))
+            .isInstanceOf(WebServiceException.class)
+            .hasMessageContaining("Could not send Message");
+
+        // no server meters
+        assertThat(registry.getMeters())
+            .noneMatch(m -> m.getId().getName().equals("cxf.server.requests"));
+        
+        RequiredSearch clientRequestMetrics = registry.get("cxf.client.requests");
+
+        Map<Object, Object> clientTags = clientRequestMetrics.timer().getId().getTags().stream()
+                .collect(toMap(Tag::getKey, Tag::getValue));
+
+        assertThat(clientTags)
+            .containsOnly(
+                entry("exception", "None"),
+                entry("faultCode", "RUNTIME_FAULT"),
+                entry("method", "POST"),
+                entry("operation", "sayHello"),
+                entry("uri", "http://localhost:" + fakePort + "/Service/" + HELLO_SERVICE_NAME_V1),
+                entry("outcome", "UNKNOWN"),
+                entry("status", "UNKNOWN"));
+    }
+    
+    private HelloService createApi(final int portToUse, final String serviceName) {
+        final JaxWsProxyFactoryBean  factory = new JaxWsProxyFactoryBean();
+        factory.setServiceClass(HelloService.class);
+        factory.setFeatures(Arrays.asList(new MetricsFeature(metricsProvider)));
+        factory.setAddress("http://localhost:" + portToUse + "/Service/" + serviceName);
+        return factory.create(HelloService.class);
+    }
 
     private String sendSoapRequest(String requestBody, final String serviceName) throws MalformedURLException {
         String address = "http://localhost:" + port + "/Service/" + serviceName;
 
         StreamSource source = new StreamSource(new StringReader(requestBody));
         Service service = Service.create(new URL(address + "?wsdl"),
-                new QName("http://service.ws.sample/", "HelloService"));
+                new QName("http://service.ws.sample/", "HelloService"), new MetricsFeature(metricsProvider));
         Dispatch<Source> dispatch = service.createDispatch(new QName("http://service.ws.sample/", "HelloPort"),
                 Source.class, Mode.PAYLOAD);
 

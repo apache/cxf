@@ -33,7 +33,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 public class JaxwsFaultCodeProviderTest {
 
@@ -48,7 +48,7 @@ public class JaxwsFaultCodeProviderTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
         underTest = new JaxwsFaultCodeProvider();
     }
 
@@ -58,7 +58,7 @@ public class JaxwsFaultCodeProviderTest {
         doReturn(RUNTIME_FAULT).when(ex).get(FaultMode.class);
 
         // when
-        String actual = underTest.getFaultCode(ex);
+        String actual = underTest.getFaultCode(ex, false);
 
         // then
         assertThat(actual, equalTo(RUNTIME_FAULT_STRING));
@@ -72,11 +72,26 @@ public class JaxwsFaultCodeProviderTest {
         doReturn(RUNTIME_FAULT).when(message).get(FaultMode.class);
 
         // when
-        String actual = underTest.getFaultCode(ex);
+        String actual = underTest.getFaultCode(ex, false);
 
         // then
         assertThat(actual, equalTo(RUNTIME_FAULT_STRING));
     }
+    
+    @Test
+    public void testFaultModeIsNotPresentButInFaultModeIsPresentThenShouldReturnThat() {
+        // given
+        doReturn(null).when(ex).get(FaultMode.class);
+        doReturn(message).when(ex).getInFaultMessage();
+        doReturn(RUNTIME_FAULT).when(message).get(FaultMode.class);
+
+        // when
+        String actual = underTest.getFaultCode(ex, true);
+
+        // then
+        assertThat(actual, equalTo(RUNTIME_FAULT_STRING));
+    }
+
 
     @Test
     public void testFaultModeIsNotPresentButOutFaultModeIsMissingThenShouldReturnNull() {
@@ -85,14 +100,14 @@ public class JaxwsFaultCodeProviderTest {
         doReturn(message).when(ex).getOutFaultMessage();
 
         // when
-        String actual = underTest.getFaultCode(ex);
+        String actual = underTest.getFaultCode(ex, false);
 
         // then
         assertThat(actual, is(nullValue()));
     }
 
     @Test
-    public void testNeitherFaultModeNorOutFaultModePresentsThenShouldReturnInMessagesFaultMode() {
+    public void testNeitherFaultModeNorOutFaultModePresentsThenShouldNotReturnInMessageFaultMode() {
         // given
         doReturn(null).when(ex).get(FaultMode.class);
         doReturn(null).when(ex).getOutFaultMessage();
@@ -100,10 +115,25 @@ public class JaxwsFaultCodeProviderTest {
         doReturn(RUNTIME_FAULT).when(message).get(FaultMode.class);
 
         // when
-        String actual = underTest.getFaultCode(ex);
+        String actual = underTest.getFaultCode(ex, false);
 
         // then
-        assertThat(actual, equalTo(RUNTIME_FAULT_STRING));
+        assertThat(actual, is(nullValue()));
+    }
+    
+    @Test
+    public void testNeitherFaultModeNorOutFaultModePresentsThenShouldNotReturnOutMessageFaultMode() {
+        // given
+        doReturn(null).when(ex).get(FaultMode.class);
+        doReturn(null).when(ex).getInFaultMessage();
+        doReturn(message).when(ex).getOutMessage();
+        doReturn(RUNTIME_FAULT).when(message).get(FaultMode.class);
+
+        // when
+        String actual = underTest.getFaultCode(ex, true);
+
+        // then
+        assertThat(actual, is(nullValue()));
     }
 
     @Test
@@ -114,7 +144,7 @@ public class JaxwsFaultCodeProviderTest {
         doReturn(message).when(ex).getInMessage();
 
         // when
-        String actual = underTest.getFaultCode(ex);
+        String actual = underTest.getFaultCode(ex, false);
 
         // then
         assertThat(actual, is(nullValue()));
@@ -128,7 +158,7 @@ public class JaxwsFaultCodeProviderTest {
         doReturn(null).when(ex).getInMessage();
 
         // when
-        String actual = underTest.getFaultCode(ex);
+        String actual = underTest.getFaultCode(ex, false);
 
         // then
         assertThat(actual, is(nullValue()));

@@ -27,5 +27,5 @@ import io.micrometer.core.annotation.Timed;
 
 public interface TimedAnnotationProvider {
 
-    Set<Timed> getTimedAnnotations(Exchange ex);
+    Set<Timed> getTimedAnnotations(Exchange ex, boolean client);
 }

@@ -152,6 +152,9 @@ public final class OAuth2TestUtils {
         if (authzData.getClientCodeChallenge() != null) {
             form.param("code_challenge", authzData.getClientCodeChallenge());
         }
+        if (authzData.getClientCodeChallengeMethod() != null) {
+            form.param("code_challenge_method", authzData.getClientCodeChallengeMethod());
+        }
         form.param("response_type", authzData.getResponseType());
         form.param("oauthDecision", "allow");
 

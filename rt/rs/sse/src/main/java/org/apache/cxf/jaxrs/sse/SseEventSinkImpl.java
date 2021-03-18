@@ -146,7 +146,7 @@ public class SseEventSinkImpl implements SseEventSink {
                         ctx.complete();
                     }
                 } catch (final IllegalStateException ex) {
-                    LOG.warning("Failed to close the AsyncContext cleanly: " + ex.getMessage());
+                    LOG.fine("Failed to close the AsyncContext cleanly: " + ex.getMessage());
                 }
             }
             
@@ -264,17 +264,19 @@ public class SseEventSinkImpl implements SseEventSink {
             // it inside the onError() callback. However, most of the servlet containers
             // do not handle this case properly (and onError() is not called). 
             if (shouldComplete && completed.compareAndSet(false, true)) {
-                LOG.warning("Prematurely completing the AsyncContext due to error encountered: " + error);
+                LOG.fine("Prematurely completing the AsyncContext due to error encountered: " + error);
                 // In case of Tomcat, the context is closed automatically when client closes
                 // the connection and onError callback will be called (in this case request 
                 // is set to null).
-                if (ctx.getRequest() != null) {
+                try {
                     LOG.fine("Completing the AsyncContext");
-                    try {
+                    // Older versions of Tomcat returned 'null', now the getRequest() throws
+                    // IllegalStateException if it is 'null'.
+                    if (ctx.getRequest() != null) {
                         ctx.complete();
-                    } catch (final IllegalStateException ex) {
-                        LOG.warning("Failed to close the AsyncContext cleanly: " + ex.getMessage());
                     }
+                } catch (final IllegalStateException ex) {
+                    LOG.fine("Failed to close the AsyncContext cleanly: " + ex.getMessage());
                 }
             }
         }

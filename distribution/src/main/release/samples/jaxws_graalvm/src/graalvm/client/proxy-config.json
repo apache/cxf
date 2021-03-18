@@ -1,0 +1,15 @@
+[
+  ["com.sun.xml.bind.marshaller.CharacterEscapeHandler"],
+  ["javax.xml.bind.annotation.XmlAccessorType","com.sun.xml.bind.v2.model.annotation.Locatable"],
+  ["javax.xml.bind.annotation.XmlRegistry","com.sun.xml.bind.v2.model.annotation.Locatable"],
+  ["org.apache.cxf.binding.soap.wsdl.extensions.SoapAddress"],
+  ["org.apache.cxf.binding.soap.wsdl.extensions.SoapBinding"],
+  ["org.apache.cxf.binding.soap.wsdl.extensions.SoapBody"],
+  ["org.apache.cxf.binding.soap.wsdl.extensions.SoapOperation"],
+  ["org.apache.cxf.common.jaxb.JAXBContextProxy"],
+  ["org.apache.cxf.common.util.ASMHelper$AnnotationVisitor"],
+  ["org.apache.cxf.common.util.ASMHelper$ClassWriter"],
+  ["org.apache.cxf.common.util.ASMHelper$FieldVisitor"],
+  ["org.apache.cxf.common.util.ASMHelper$MethodVisitor"],
+  ["org.apache.handlers.AddNumbers","javax.xml.ws.BindingProvider","java.io.Closeable","org.apache.cxf.endpoint.Client"]
+]

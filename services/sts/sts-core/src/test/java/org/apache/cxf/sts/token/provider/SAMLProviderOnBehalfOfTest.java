@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.sts.token.provider;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -160,8 +160,7 @@ public class SAMLProviderOnBehalfOfTest {
 
         assertFalse(tokenString.contains("CustomOnBehalfOf"));
 
-        List<AttributeStatementProvider> customProviderList = new ArrayList<>();
-        customProviderList.add(new CustomAttributeProvider());
+        List<AttributeStatementProvider> customProviderList = Collections.singletonList(new CustomAttributeProvider());
         ((SAMLTokenProvider)samlTokenProvider).setAttributeStatementProviders(customProviderList);
 
         providerResponse = samlTokenProvider.createToken(providerParameters);

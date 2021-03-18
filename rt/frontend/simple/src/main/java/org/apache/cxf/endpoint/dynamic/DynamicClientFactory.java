@@ -431,7 +431,7 @@ public class DynamicClientFactory {
         // Setup the new classloader!
         ClassLoaderUtils.setThreadContextClassloader(cl);
 
-        TypeClassInitializer visitor = new TypeClassInitializer(svcfo,
+        TypeClassInitializer visitor = new TypeClassInitializer(bus, svcfo,
                                                                 intermediateModel,
                                                                 allowWrapperOps());
         visitor.walk();
@@ -728,16 +728,15 @@ public class DynamicClientFactory {
     }
 
     private URL composeUrl(String s) {
-        try {
-            URIResolver resolver = new URIResolver(null, s, getClass());
-
+        try (URIResolver resolver = new URIResolver(null, s, getClass())) {
             if (resolver.isResolved()) {
                 return resolver.getURI().toURL();
             }
-            throw new ServiceConstructionException(new Message("COULD_NOT_RESOLVE_URL", LOG, s));
         } catch (IOException e) {
             throw new ServiceConstructionException(new Message("COULD_NOT_RESOLVE_URL", LOG, s), e);
         }
+        
+        throw new ServiceConstructionException(new Message("COULD_NOT_RESOLVE_URL", LOG, s));
     }
 
     static class InnerErrorListener {
@@ -923,8 +922,7 @@ public class DynamicClientFactory {
         }
 
 
-        try {
-            URIResolver resolver = new URIResolver(base, target);
+        try (URIResolver resolver = new URIResolver(base, target)) {
             if (resolver.isResolved()) {
                 target = resolver.getURI().toString();
             }

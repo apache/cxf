@@ -23,5 +23,5 @@ import org.apache.cxf.message.Exchange;
 
 public interface ExceptionClassProvider {
 
-    Class<?> getExceptionClass(Exchange ex);
+    Class<?> getExceptionClass(Exchange ex, boolean client);
 }

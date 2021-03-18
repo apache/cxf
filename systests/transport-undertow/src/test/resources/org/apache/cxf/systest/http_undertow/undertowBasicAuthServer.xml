@@ -20,12 +20,26 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:httpu="http://cxf.apache.org/transports/http-undertow/configuration"
-    xsi:schemaLocation="http://cxf.apache.org/transports/http-undertow/configuration http://cxf.apache.org/schemas/configuration/http-undertow.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    xmlns:cxf="http://cxf.apache.org/core"
+    xsi:schemaLocation="http://cxf.apache.org/transports/http-undertow/configuration http://cxf.apache.org/schemas/configuration/http-undertow.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
     <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
+    <cxf:bus name="cxf" id="cxf">
+       <cxf:properties>
+           <entry key="org.apache.cxf.transports.http_undertow.EnableRecordRequestStartTime" value="true"/>
+       </cxf:properties>
+    </cxf:bus>    
     <httpu:engine-factory bus="cxf">
         <httpu:engine port="${testutil.ports.UndertowBasicAuthServer}">
             <httpu:handlers>
                 <bean class="org.apache.cxf.systest.http_undertow.UndertowBasicAuthHandler"/>
+                <bean class="org.apache.cxf.transport.http_undertow.handlers.CxfRequestLimitingHandler">
+                    <property name="maximumConcurrentRequests" value="1" />
+                    <property name="queueSize" value="1"/>
+                </bean>
+                <bean class="org.apache.cxf.transport.http_undertow.handlers.CxfUndertowLogHandler">
+                    <property name="pattern" value="Time Taken: %T %D %h %l %u %t %r %s %b %I"/>
+                    <property name="outPutDirectory" value="target"/>
+                </bean>
             </httpu:handlers>
         </httpu:engine>
     </httpu:engine-factory>

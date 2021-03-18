@@ -20,6 +20,7 @@
 package org.apache.cxf.workqueue;
 
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -32,6 +33,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeNoException;
 
 public class AutomaticWorkQueueTest {
 
@@ -151,11 +153,19 @@ public class AutomaticWorkQueueTest {
     }
     @Test
     public void testEnqueueImmediate() throws InterruptedException {
+        // Check if JDK internals could be accessed, see please:
+        // - https://issues.apache.org/jira/browse/CXF-8407
+        // - https://openjdk.java.net/jeps/396
+        try {
+            ThreadPoolExecutor.class.getDeclaredField("mainLock").setAccessible(true);
+        } catch (final Exception ex) {
+            assumeNoException("The module has no access to JDK internals", ex);
+        }
+        
         workqueue = new AutomaticWorkQueueImpl(DEFAULT_MAX_QUEUE_SIZE, INITIAL_SIZE,
                                                DEFAULT_HIGH_WATER_MARK,
                                                DEFAULT_LOW_WATER_MARK,
                                                DEFAULT_DEQUEUE_TIMEOUT);
-
         Thread.sleep(100L);
 
         // We haven't enqueued anything yet, so should there shouldn't be
@@ -176,6 +186,8 @@ public class AutomaticWorkQueueTest {
                 workItems[i] = new BlockingWorkItem();
                 try {
                     workqueue.execute(workItems[i]);
+                    //wait some time to allow worker to be created and work to be assigned
+                    Thread.sleep(100L);
                 } catch (RejectedExecutionException ex) {
                     fail("failed on item[" + i + "] with: " + ex);
                 }
@@ -191,7 +203,9 @@ public class AutomaticWorkQueueTest {
                 Thread.sleep(100L);
                 numRun = numRunning(workItems);
             }
+
             numRun = numRunning(workItems);
+            assertEquals(0, workqueue.getSize());
             assertEquals(DEFAULT_HIGH_WATER_MARK, numRun);
 
             for (int i = 0; i < DEFAULT_MAX_QUEUE_SIZE; i++) {

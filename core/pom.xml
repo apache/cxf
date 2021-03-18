@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.4.1-SNAPSHOT</version>
+        <version>3.4.4-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
     <properties>
@@ -43,7 +43,9 @@
             com.sun.xml.internal.messaging.saaj.soap;resolution:=optional,
             com.ctc.wstx*;resolution:=optional,
             org.codehaus.stax2*;resolution:=optional,
-            com.sun*;resolution:=optional,
+            com.sun.msv*;resolution:=optional,
+            com.sun.tools*;resolution:=optional,
+            com.sun.xml*;resolution:=optional,
             org.slf4j*;resolution:=optional;version="${cxf.osgi.slf4j.version}",
             net.sf.cglib*;resolution:=optional;version="${cxf.cglib.osgi.version}",
             org.springframework.osgi.io;resolution:=optional;version="${cxf.osgi.spring.osgi.version}",
@@ -63,7 +65,8 @@
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
             org.apache.karaf.jaas.boot.principal;resolution:=optional,
             org.apache.commons.logging;resolution:=optional,
-            !sun.misc
+            !sun.misc,
+            !com.sun.codemodel.writer
         </cxf.osgi.import>
         <cxf.osgi.dynamic.import>
             org.apache.cxf.bus,org.apache.cxf.*,com.ctc.wstx.*,org.apache.karaf.jaas.boot.principal.*
@@ -205,6 +208,11 @@
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>

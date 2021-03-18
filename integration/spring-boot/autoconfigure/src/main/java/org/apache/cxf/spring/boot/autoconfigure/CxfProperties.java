@@ -95,6 +95,7 @@ public class CxfProperties {
 
     public static class Metrics {
         private final Server server = new Server();
+        private final Client client = new Client();
         
         /**
          * Enables or disables metrics instrumentation
@@ -103,6 +104,10 @@ public class CxfProperties {
 
         public Server getServer() {
             return this.server;
+        }
+        
+        public Client getClient() {
+            return this.client;
         }
 
         public static class Server {
@@ -141,6 +146,35 @@ public class CxfProperties {
                 this.requestsMetricName = requestsMetricName;
             }
 
+            public int getMaxUriTags() {
+                return this.maxUriTags;
+            }
+
+            public void setMaxUriTags(int maxUriTags) {
+                this.maxUriTags = maxUriTags;
+            }
+        }
+        
+        public static class Client {
+            /**
+             * Name of the metric for sent requests.
+             */
+            private String requestsMetricName = "cxf.client.requests";
+            
+            /**
+             * Maximum number of unique URI tag values allowed. After the max number of tag values is
+             * reached, metrics with additional tag values are denied by filter.
+             */
+            private int maxUriTags = 100;
+
+            public String getRequestsMetricName() {
+                return this.requestsMetricName;
+            }
+
+            public void setRequestsMetricName(String requestsMetricName) {
+                this.requestsMetricName = requestsMetricName;
+            }
+            
             public int getMaxUriTags() {
                 return this.maxUriTags;
             }

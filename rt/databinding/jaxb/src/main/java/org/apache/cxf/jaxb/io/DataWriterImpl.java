@@ -39,6 +39,7 @@ import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.attachment.AttachmentMarshaller;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -61,14 +62,16 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
     boolean setEventHandler = true;
     boolean noEscape;
     private JAXBDataBinding databinding;
+    private Bus bus;
 
-    public DataWriterImpl(JAXBDataBinding binding) {
-        this(binding, false);
+    public DataWriterImpl(Bus bus, JAXBDataBinding binding) {
+        this(bus, binding, false);
     }
-    public DataWriterImpl(JAXBDataBinding binding, boolean noEsc) {
+    public DataWriterImpl(Bus bus, JAXBDataBinding binding, boolean noEsc) {
         super(binding.getContext());
         databinding = binding;
         noEscape = noEsc;
+        this.bus = bus;
     }
 
     public void write(Object obj, T output) {
@@ -154,7 +157,7 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
             final Map<String, String> nsctxt = databinding.getContextualNamespaceMap();
             // set the prefix mapper if either of the prefix map is configured
             if (nspref != null || nsctxt != null) {
-                Object mapper = JAXBUtils.setNamespaceMapper(nspref != null ? nspref : nsctxt, marshaller);
+                Object mapper = JAXBUtils.setNamespaceMapper(bus, nspref != null ? nspref : nsctxt, marshaller);
                 if (nsctxt != null) {
                     setContextualNamespaceDecls(mapper, nsctxt);
                 }

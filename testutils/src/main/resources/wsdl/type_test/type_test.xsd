@@ -99,16 +99,16 @@
   <itst:it_test_group ID="1">
 
     <!-- Nillable elements -->
-    <element name="NillableString" type="string" nillable="true"/>
+    <element name="NillableString" type="xsd:string" nillable="true"/>
     <element name="NillableStruct" type="x1:SimpleStruct" nillable="true"/>
 
     <!-- Anonymous type elements -->
     <element name="AnonTypeElement">
         <complexType>
             <sequence>
-                <element name="varFloat" type="float"/>
-                <element name="varInt" type="int"/>
-                <element name="varString" type="string"/>
+                <element name="varFloat" type="xsd:float"/>
+                <element name="varInt" type="xsd:int"/>
+                <element name="varString" type="xsd:string"/>
             </sequence>
         </complexType>
     </element>
@@ -118,9 +118,9 @@
     <element itst:it_no_test="true" name="AnonTypeElementQualified">
         <complexType>
             <sequence>
-                <element name="varFloat" type="float"/>
-                <element name="varInt" type="int"/>
-                <element name="varString" type="string"/>
+                <element name="varFloat" type="xsd:float"/>
+                <element name="varInt" type="xsd:int"/>
+                <element name="varString" type="xsd:string"/>
             </sequence>
         </complexType>
     </element>
@@ -686,9 +686,9 @@
 
     <complexType name="SimpleChoice">
         <choice>
-            <element name="varFloat" type="float"/>
-            <element name="varInt" type="int"/>
-            <element name="varString" type="string"/>
+            <element name="varFloat" type="xsd:float"/>
+            <element name="varInt" type="xsd:int"/>
+            <element name="varString" type="xsd:string"/>
         </choice>
         <!--CORBA MAPPING BROKEN-->
         <!--attribute name="varAttrString" type="string"/-->

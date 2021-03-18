@@ -18,8 +18,9 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
-import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -97,7 +98,7 @@ public class AsyncResource {
     }
 
     private static class AsyncResponseQueue {
-        Queue<AsyncResponse> queue = new ArrayBlockingQueue<>(1);
+        BlockingQueue<AsyncResponse> queue = new ArrayBlockingQueue<>(1);
 
         public void add(AsyncResponse asyncResponse) {
             queue.add(asyncResponse);
@@ -105,7 +106,11 @@ public class AsyncResource {
         }
 
         public AsyncResponse take() {
-            return queue.remove();
+            try {
+                return queue.poll(50, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException ex) {
+                return null;
+            }
         }
 
     }

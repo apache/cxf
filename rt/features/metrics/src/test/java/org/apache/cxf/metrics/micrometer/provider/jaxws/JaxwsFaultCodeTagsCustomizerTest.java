@@ -32,7 +32,7 @@ import org.mockito.Mock;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 public class JaxwsFaultCodeTagsCustomizerTest {
 
@@ -51,18 +51,18 @@ public class JaxwsFaultCodeTagsCustomizerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
         underTest = new JaxwsFaultCodeTagsCustomizer(jaxwsTags, jaxwsFaultCodeProvider);
     }
 
     @Test
     public void testAdditionalTagsShouldReturnFaultCodeAsTags() {
         // given
-        doReturn(DUMMY_FAULT_CODE).when(jaxwsFaultCodeProvider).getFaultCode(ex);
+        doReturn(DUMMY_FAULT_CODE).when(jaxwsFaultCodeProvider).getFaultCode(ex, false);
         doReturn(DUMMY_TAG).when(jaxwsTags).faultCode(DUMMY_FAULT_CODE);
 
         // when
-        Iterable<Tag> actual = underTest.getAdditionalTags(ex);
+        Iterable<Tag> actual = underTest.getAdditionalTags(ex, false);
 
         // then
         assertThat(actual, equalTo(Tags.of(DUMMY_TAG)));

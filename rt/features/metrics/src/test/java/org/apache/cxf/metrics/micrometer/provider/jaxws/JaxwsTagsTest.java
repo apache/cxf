@@ -34,7 +34,7 @@ import org.mockito.Mock;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 
 public class JaxwsTagsTest {
@@ -56,7 +56,7 @@ public class JaxwsTagsTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
 
         doReturn(exchange).when(request).getExchange();
         doReturn(bindingOperationInfo).when(exchange).getBindingOperationInfo();

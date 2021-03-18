@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 
 import io.micrometer.core.instrument.Tag;
 
@@ -65,21 +66,14 @@ public class StandardTags {
 
     public Tag status(Message response) {
         return ofNullable(response)
-                .map(e -> e.get(Message.RESPONSE_CODE))
-                .filter(e -> e instanceof Integer)
-                .map(e -> (Integer) e)
-                .map(String::valueOf)
+                .map(e -> MessageUtils.getReponseCodeFromMessage(response))
+                .map(code -> Integer.toString(code))
                 .map(status -> Tag.of("status", status))
                 .orElse(STATUS_UNKNOWN);
     }
 
     public Tag uri(Message request) {
-        return ofNullable(request)
-                .map(e -> e.get(Message.REQUEST_URI))
-                .filter(e -> e instanceof String)
-                .map(e -> (String) e)
-                .map(e -> Tag.of("uri", e))
-                .orElse(URI_UNKNOWN);
+        return template(request).orElse(requestUri(request));
     }
 
     public Tag exception(Class<?> exceptionClass) {
@@ -90,11 +84,8 @@ public class StandardTags {
     }
 
     public Tag outcome(Message response) {
-        Optional<Integer> statusCode =
-                ofNullable(response)
-                        .map(e -> e.get(Message.RESPONSE_CODE))
-                        .filter(e -> e instanceof Integer)
-                        .map(e -> (Integer) e);
+        Optional<Integer> statusCode = ofNullable(response)
+           .map(e -> MessageUtils.getReponseCodeFromMessage(response));
         if (!statusCode.isPresent()) {
             return OUTCOME_UNKNOWN;
         }
@@ -112,5 +103,50 @@ public class StandardTags {
             return OUTCOME_CLIENT_ERROR;
         }
         return OUTCOME_SERVER_ERROR;
+    }
+    
+    private Tag requestUri(Message request) {
+        return ofNullable(request)
+                .map(e -> e.get(Message.REQUEST_URI))
+                .filter(e -> e instanceof String)
+                .map(e -> stripQueryString((String) e))
+                .map(e -> Tag.of("uri", e))
+                .orElse(endpoint(request));
+    }
+    /**
+     * The Request URI endpoint fallback in case of JAX-WS client invocations
+     */
+    private Tag endpoint(Message request) {
+        return ofNullable(request)
+                .map(e -> e.get(Message.ENDPOINT_ADDRESS))
+                .filter(e -> e instanceof String)
+                .map(e -> stripQueryString((String) e))
+                .map(e -> Tag.of("uri", e))
+                .orElse(URI_UNKNOWN);
+    }
+    
+    /**
+     * The Request URI template in case of JAX-RS invocation
+     */
+    private Optional<Tag> template(Message request) {
+        return ofNullable(request)
+                // See please URITemplate#URI_TEMPLATE for the reference
+                .map(e -> e.get("jaxrs.template.uri"))
+                .filter(e -> e instanceof String)
+                .map(e -> stripQueryString((String) e))
+                .map(e -> Tag.of("uri", e));
+    }
+    
+    /**
+     * Strips the query string from the request URI
+     */
+    private String stripQueryString(String uri) {
+        final int index = uri.indexOf('?');
+        
+        if (index != -1) {
+            return uri.substring(0, index);
+        }
+        
+        return uri;
     }
 }

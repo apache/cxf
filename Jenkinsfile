@@ -33,7 +33,7 @@ pipeline {
         axes {
           axis {
             name 'JAVA_VERSION'
-            values 'JDK 1.8 (latest)', 'JDK 11 (latest)'
+            values 'jdk_1.8_latest', 'jdk_11_latest', 'jdk_15_latest'
           }
         }
         stages {
@@ -43,7 +43,7 @@ pipeline {
             }
             tools {
               jdk "${JAVA_VERSION}"
-              maven 'Maven (latest)'
+              maven 'maven_latest'
             }
             environment {
               MAVEN_OPTS = "-Xmx1024m"

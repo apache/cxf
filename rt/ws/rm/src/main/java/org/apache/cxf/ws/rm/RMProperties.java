@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.rm;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -97,7 +96,7 @@ public class RMProperties {
 
     public void addAck(DestinationSequence seq) {
         if (null == acks) {
-            acks = new ArrayList<>();
+            acks = new CopyOnWriteArrayList<>();
         }
         SequenceAcknowledgement ack = seq.getAcknowledgment();
         acks.add(ack);

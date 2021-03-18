@@ -38,6 +38,8 @@ import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -47,26 +49,46 @@ import static org.junit.Assert.fail;
 /**
  * Some tests for public clients.
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class PublicClientTest extends AbstractClientServerTestBase {
     public static final String JCACHE_PORT = TestUtil.getPortNumber("jaxrs-oauth2-grants-jcache-public");
     public static final String JCACHE_PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-grants2-jcache-public");
 
-    // services2 doesn't require basic auth
-    private static final String TOKEN_SERVICE_ADDRESS_PLAIN = "https://localhost:" + JCACHE_PORT + "/services2/";
-    // services3 doesn't require basic auth
-    private static final String TOKEN_SERVICE_ADDRESS_DIGEST = "https://localhost:" + JCACHE_PORT + "/services3/";
+    public static final String JCACHE_PORT_SESSION =
+            TestUtil.getPortNumber("jaxrs-oauth2-grants-jcache-public-session");
+    public static final String JCACHE_PORT_SESSION2 =
+            TestUtil.getPortNumber("jaxrs-oauth2-grants2-jcache-public-session");
+
+    final String port;
+
+    private final String tokenServiceAddress;
+
+    public PublicClientTest(String port) {
+        this.port = port;
+        // services2 doesn't require basic auth
+        tokenServiceAddress = "https://localhost:" + port + "/services2/";
+    }
 
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(BookServerOAuth2GrantsJCache.class, true));
+                launchServer(BookServerOAuth2GrantsJCache.class, true));
+        assertTrue("server did not launch correctly",
+                launchServer(BookServerOAuth2GrantsJCacheSession.class, true));
+    }
+
+    @Parameterized.Parameters(name = "{0}")
+    public static String[] data() {
+        return new String[] {
+            JCACHE_PORT,
+            JCACHE_PORT_SESSION};
     }
 
     @org.junit.Test
     public void testAuthorizationCodeGrant() throws Exception {
         URL busFile = PublicClientTest.class.getResource("publicclient.xml");
 
-        String address = "https://localhost:" + JCACHE_PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -78,7 +100,7 @@ public class PublicClientTest extends AbstractClientServerTestBase {
         assertNotNull(code);
 
         // Now get the access token - note services2 doesn't require basic auth
-        String address2 = "https://localhost:" + JCACHE_PORT + "/services2/";
+        String address2 = "https://localhost:" + port + "/services2/";
         client = WebClient.create(address2, busFile.toString());
 
         ClientAccessToken accessToken =
@@ -90,7 +112,7 @@ public class PublicClientTest extends AbstractClientServerTestBase {
     public void testAuthorizationCodeGrantNoRedirectURI() throws Exception {
         URL busFile = PublicClientTest.class.getResource("publicclient.xml");
 
-        String address = "https://localhost:" + JCACHE_PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -108,38 +130,38 @@ public class PublicClientTest extends AbstractClientServerTestBase {
 
     @org.junit.Test
     public void testPKCEPlain() throws Exception {
-        testPKCE(new PlainCodeVerifier(), TOKEN_SERVICE_ADDRESS_PLAIN);
+        testPKCE(new PlainCodeVerifier());
     }
 
     @org.junit.Test
     public void testPKCEPlainMissingVerifier() throws Exception {
-        testPKCEMissingVerifier(new PlainCodeVerifier(), TOKEN_SERVICE_ADDRESS_PLAIN);
+        testPKCEMissingVerifier(new PlainCodeVerifier());
     }
 
     @org.junit.Test
     public void testPKCEPlainDifferentVerifier() throws Exception {
-        testPKCEDifferentVerifier(new PlainCodeVerifier(), TOKEN_SERVICE_ADDRESS_PLAIN);
+        testPKCEDifferentVerifier(new PlainCodeVerifier());
     }
 
     @org.junit.Test
     public void testPKCEDigest() {
-        testPKCE(new DigestCodeVerifier(), TOKEN_SERVICE_ADDRESS_DIGEST);
+        testPKCE(new DigestCodeVerifier());
     }
 
     @org.junit.Test
     public void testPKCEDigestMissingVerifier() {
-        testPKCEMissingVerifier(new DigestCodeVerifier(), TOKEN_SERVICE_ADDRESS_DIGEST);
+        testPKCEMissingVerifier(new DigestCodeVerifier());
     }
 
     @org.junit.Test
     public void testPKCEDigestDifferentVerifier() {
-        testPKCEDifferentVerifier(new DigestCodeVerifier(), TOKEN_SERVICE_ADDRESS_DIGEST);
+        testPKCEDifferentVerifier(new DigestCodeVerifier());
     }
 
-    private void testPKCE(CodeVerifierTransformer transformer, String tokenServiceAddress) {
+    private void testPKCE(CodeVerifierTransformer transformer) {
         URL busFile = PublicClientTest.class.getResource("publicclient.xml");
 
-        String address = "https://localhost:" + JCACHE_PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -166,10 +188,10 @@ public class PublicClientTest extends AbstractClientServerTestBase {
         assertNotNull(accessToken.getTokenKey());
     }
 
-    private void testPKCEMissingVerifier(CodeVerifierTransformer transformer, String tokenServiceAddress) {
+    private void testPKCEMissingVerifier(CodeVerifierTransformer transformer) {
         URL busFile = PublicClientTest.class.getResource("publicclient.xml");
 
-        String address = "https://localhost:" + JCACHE_PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -199,10 +221,10 @@ public class PublicClientTest extends AbstractClientServerTestBase {
         }
     }
 
-    private void testPKCEDifferentVerifier(CodeVerifierTransformer transformer, String tokenServiceAddress) {
+    private void testPKCEDifferentVerifier(CodeVerifierTransformer transformer) {
         URL busFile = PublicClientTest.class.getResource("publicclient.xml");
 
-        String address = "https://localhost:" + JCACHE_PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -240,6 +262,12 @@ public class PublicClientTest extends AbstractClientServerTestBase {
     public static class BookServerOAuth2GrantsJCache extends AbstractBusTestServerBase {
         protected void run() {
             setBus(new SpringBusFactory().createBus(getClass().getResource("grants-server-public.xml")));
+        }
+    }
+
+    public static class BookServerOAuth2GrantsJCacheSession extends AbstractBusTestServerBase {
+        protected void run() {
+            setBus(new SpringBusFactory().createBus(getClass().getResource("grants-server-public-session.xml")));
         }
     }
 

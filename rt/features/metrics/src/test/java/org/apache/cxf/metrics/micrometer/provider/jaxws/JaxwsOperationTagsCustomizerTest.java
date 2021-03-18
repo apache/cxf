@@ -33,7 +33,7 @@ import org.mockito.Mock;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 public class JaxwsOperationTagsCustomizerTest {
 
@@ -51,7 +51,7 @@ public class JaxwsOperationTagsCustomizerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
         underTest = new JaxwsOperationTagsCustomizer(jaxwsTags);
     }
 
@@ -62,7 +62,7 @@ public class JaxwsOperationTagsCustomizerTest {
         doReturn(DUMMY_TAG).when(jaxwsTags).operation(request);
 
         // when
-        Iterable<Tag> actual = underTest.getAdditionalTags(ex);
+        Iterable<Tag> actual = underTest.getAdditionalTags(ex, false);
 
         // then
         assertThat(actual, equalTo(Tags.of(DUMMY_TAG)));
@@ -75,7 +75,7 @@ public class JaxwsOperationTagsCustomizerTest {
         doReturn(DUMMY_TAG).when(jaxwsTags).operation(request);
 
         // when
-        Iterable<Tag> actual = underTest.getAdditionalTags(ex);
+        Iterable<Tag> actual = underTest.getAdditionalTags(ex, false);
 
         // then
         assertThat(actual, equalTo(Tags.of(DUMMY_TAG)));

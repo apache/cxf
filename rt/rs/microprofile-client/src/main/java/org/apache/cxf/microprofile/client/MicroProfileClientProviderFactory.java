@@ -88,7 +88,7 @@ public final class MicroProfileClientProviderFactory extends ProviderFactory {
     }
 
     static Comparator<ProviderInfo<?>> createComparator(MicroProfileClientFactoryBean bean) {
-        Comparator<ProviderInfo<?>> parent = ProviderFactory::compareCustomStatus;
+        Comparator<ProviderInfo<?>> parent = (o1, o2) -> compareCustomStatus(o1, o2);
         return new ContractComparator(bean, parent);
     }
 

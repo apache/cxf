@@ -54,8 +54,10 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.BindingFactoryManager;
+import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ASMHelper;
+import org.apache.cxf.common.util.ASMHelperImpl;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
@@ -247,10 +249,15 @@ public class JAXBDataBindingTest {
                 return;
             }
         }
+        Bus b = new ExtensionManagerBus();
+        ASMHelper helper = new ASMHelperImpl();
+        b.setExtension(helper, ASMHelper.class);
+        FactoryClassCreator extr = new FactoryClassProxyService(b);
+        b.setExtension(extr, FactoryClassCreator.class);
         try {
             if (!asm) {
-                ReflectionUtil.setAccessible(ReflectionUtil.getDeclaredField(ASMHelper.class, "badASM"))
-                    .set(null, Boolean.TRUE);
+                ReflectionUtil.setAccessible(ReflectionUtil.getDeclaredField(ASMHelperImpl.class, "badASM"))
+                    .set(helper, Boolean.TRUE);
             }
 
             JAXBDataBinding db = createJaxbContext(internal);
@@ -267,8 +274,8 @@ public class JAXBDataBindingTest {
             assertTrue("Failed to map namespace " + xml, xml.contains("greenland=\"uri:ultima:thule"));
         } finally {
             if (!asm) {
-                ReflectionUtil.setAccessible(ReflectionUtil.getDeclaredField(ASMHelper.class, "badASM"))
-                    .set(null, Boolean.FALSE);
+                ReflectionUtil.setAccessible(ReflectionUtil.getDeclaredField(ASMHelperImpl.class, "badASM"))
+                    .set(helper, Boolean.FALSE);
             }
         }
     }
@@ -300,7 +307,11 @@ public class JAXBDataBindingTest {
         Set<Class<?>> classes = new HashSet<>();
         Collection<Object> typeReferences = new ArrayList<>();
         Map<String, Object> props = new HashMap<>();
-        JAXBContextInitializer init = new JAXBContextInitializer(null, classes, typeReferences, props);
+        Bus b = new ExtensionManagerBus();
+        b.setExtension(new ASMHelperImpl(), ASMHelper.class);
+        FactoryClassCreator extr = new FactoryClassProxyService(b);
+        b.setExtension(extr, FactoryClassCreator.class);
+        JAXBContextInitializer init = new JAXBContextInitializer(b, null, classes, typeReferences, props);
         init.addClass(Type2.class);
         assertEquals(2, classes.size());
     }
@@ -344,7 +355,11 @@ public class JAXBDataBindingTest {
         Set<Class<?>> classes = new HashSet<>();
         Collection<Object> typeReferences = new ArrayList<>();
         Map<String, Object> props = new HashMap<>();
-        JAXBContextInitializer init = new JAXBContextInitializer(null, classes, typeReferences, props);
+        Bus b = new ExtensionManagerBus();
+        b.setExtension(new ASMHelperImpl(), ASMHelper.class);
+        FactoryClassCreator extr = new FactoryClassProxyService(b);
+        b.setExtension(extr, FactoryClassCreator.class);
+        JAXBContextInitializer init = new JAXBContextInitializer(b, null, classes, typeReferences, props);
         init.addClass(sampleClassInDefaultPackage);
         assertEquals(1, classes.size());
     }

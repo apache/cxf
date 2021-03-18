@@ -26,18 +26,29 @@ import org.apache.cxf.message.Exchange;
 public class DefaultExceptionClassProvider implements ExceptionClassProvider {
 
     @Override
-    public Class<?> getExceptionClass(Exchange ex) {
-        return getFault(ex).map(Throwable::getCause).map(Throwable::getClass).orElse(null);
+    public Class<?> getExceptionClass(Exchange ex, boolean client) {
+        return getFault(ex, client).map(Throwable::getCause).map(Throwable::getClass).orElse(null);
     }
 
-    private Optional<Throwable> getFault(Exchange ex) {
+    private Optional<Throwable> getFault(Exchange ex, boolean client) {
         Exception exception = ex.get(Exception.class);
-        if (exception == null && ex.getOutFaultMessage() != null) {
-            exception = ex.getOutFaultMessage().get(Exception.class);
+        
+        if (client) {
+            if (exception == null && ex.getInFaultMessage() != null) {
+                exception = ex.getInFaultMessage().get(Exception.class);
+            }
+            if (exception == null && ex.getOutMessage() != null) {
+                exception = ex.getOutMessage().get(Exception.class);
+            }
+        } else {
+            if (exception == null && ex.getOutFaultMessage() != null) {
+                exception = ex.getOutFaultMessage().get(Exception.class);
+            }
+            if (exception == null && ex.getInMessage() != null) {
+                exception = ex.getInMessage().get(Exception.class);
+            }
         }
-        if (exception == null && ex.getInMessage() != null) {
-            exception = ex.getInMessage().get(Exception.class);
-        }
+        
         return Optional.ofNullable(exception);
     }
 }

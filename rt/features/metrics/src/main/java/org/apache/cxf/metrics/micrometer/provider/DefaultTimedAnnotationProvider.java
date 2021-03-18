@@ -43,8 +43,8 @@ public class DefaultTimedAnnotationProvider implements TimedAnnotationProvider {
     private final ConcurrentHashMap<HandlerMethod, Set<Timed>> timedAnnotationCache = new ConcurrentHashMap<>();
 
     @Override
-    public Set<Timed> getTimedAnnotations(Exchange ex) {
-        final HandlerMethod handlerMethod = HandlerMethod.create(ex);
+    public Set<Timed> getTimedAnnotations(Exchange ex, boolean client) {
+        final HandlerMethod handlerMethod = HandlerMethod.create(ex, client);
         if (handlerMethod == null) {
             return emptySet();
         }
@@ -103,9 +103,9 @@ public class DefaultTimedAnnotationProvider implements TimedAnnotationProvider {
             this.beanType = beanType;
         }
         
-        private static HandlerMethod create(Exchange exchange) {
+        private static HandlerMethod create(Exchange exchange, boolean client) {
             return MessageUtils
-                .getTargetMethod(exchange.getInMessage())
+                .getTargetMethod(client ? exchange.getOutMessage() : exchange.getInMessage())
                 .map(method -> new HandlerMethod(method.getDeclaringClass(), method))
                 .orElse(null);
         }

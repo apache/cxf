@@ -63,7 +63,7 @@ public class DefaultExceptionClassProviderTest {
         doReturn(FAULT_EXCEPTION).when(exchange).get(Exception.class);
 
         // when
-        Class<?> actual = underTest.getExceptionClass(exchange);
+        Class<?> actual = underTest.getExceptionClass(exchange, false);
 
         // then
         assertThat(actual, equalTo(expected));
@@ -72,13 +72,13 @@ public class DefaultExceptionClassProviderTest {
     @Test
     public void testGetExceptionClassReturnCauseExceptionFromOutFaultMessage() {
         // given
-        Class expected = CauseException.class;
+        Class<?> expected = CauseException.class;
 
         doReturn(faultResponse).when(exchange).getOutFaultMessage();
         doReturn(FAULT_EXCEPTION).when(faultResponse).get(Exception.class);
 
         // when
-        Class<?> actual = underTest.getExceptionClass(exchange);
+        Class<?> actual = underTest.getExceptionClass(exchange, false);
 
         // then
         assertThat(actual, equalTo(expected));
@@ -87,13 +87,13 @@ public class DefaultExceptionClassProviderTest {
     @Test
     public void testGetExceptionClassReturnCauseExceptionFromInMessage() {
         // given
-        Class expected = CauseException.class;
+        Class<?> expected = CauseException.class;
 
         doReturn(request).when(exchange).getInMessage();
         doReturn(FAULT_EXCEPTION).when(request).get(Exception.class);
 
         // when
-        Class<?> actual = underTest.getExceptionClass(exchange);
+        Class<?> actual = underTest.getExceptionClass(exchange, false);
 
         // then
         assertThat(actual, equalTo(expected));
@@ -105,7 +105,7 @@ public class DefaultExceptionClassProviderTest {
         doReturn(new RuntimeException()).when(exchange).get(Exception.class);
 
         // when
-        Class<?> actual = underTest.getExceptionClass(exchange);
+        Class<?> actual = underTest.getExceptionClass(exchange, false);
 
         // then
         assertThat(actual, is(nullValue()));
@@ -116,12 +116,13 @@ public class DefaultExceptionClassProviderTest {
         // given
 
         // when
-        Class<?> actual = underTest.getExceptionClass(exchange);
+        Class<?> actual = underTest.getExceptionClass(exchange, false);
 
         // then
         assertThat(actual, is(nullValue()));
     }
 
     private static class CauseException extends RuntimeException {
+        private static final long serialVersionUID = 5321136931639340427L;
     }
 }

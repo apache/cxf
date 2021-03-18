@@ -620,12 +620,12 @@ public class JettyHTTPServerEngine implements ServerEngine {
         }
     }
 
-    @SuppressWarnings("deprecation")
+    
     private Connector createConnector(String hosto, int porto) {
         // now we just use the SelectChannelConnector as the default connector
         SslContextFactory sslcf = null;
         if (tlsServerParameters != null) {
-            sslcf = new SslContextFactory() {
+            sslcf = new SslContextFactory.Server() {
                 protected void doStart() throws Exception {
                     setSslContext(createSSLContext(this));
                     super.doStart();

@@ -25,5 +25,5 @@ import io.micrometer.core.instrument.Tag;
 
 public interface TagsProvider {
 
-    Iterable<Tag> getTags(Exchange ex);
+    Iterable<Tag> getTags(Exchange ex, boolean client);
 }

@@ -33,6 +33,7 @@ public class OAuthRedirectionState implements Serializable {
     private String audience;
     private String nonce;
     private String clientCodeChallenge;
+    private String clientCodeChallengeMethod;
     private String responseType;
     private Map<String, String> extraProperties = new LinkedHashMap<>();
 
@@ -146,5 +147,12 @@ public class OAuthRedirectionState implements Serializable {
         this.extraProperties = extraProperties;
     }
 
+    public String getClientCodeChallengeMethod() {
+        return clientCodeChallengeMethod;
+    }
+
+    public void setClientCodeChallengeMethod(String clientCodeChallengeMethod) {
+        this.clientCodeChallengeMethod = clientCodeChallengeMethod;
+    }
 
 }

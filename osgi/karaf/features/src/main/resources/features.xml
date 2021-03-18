@@ -527,8 +527,8 @@
             cxf.wsn.activemq = vm:localhost
             cxf.wsn.rootUrl = http://0.0.0.0:8182
             cxf.wsn.context = /wsn
-            cxf.wsn.activemq.username = karaf
-            cxf.wsn.activemq.password = karaf
+            cxf.wsn.activemq.username =
+            cxf.wsn.activemq.password =
         </config>
         <feature>spring</feature>
         <feature>aries-blueprint</feature>

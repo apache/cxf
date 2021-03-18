@@ -72,10 +72,6 @@ public class HTTPJettyTransportActivator
 
     public void start(BundleContext ctx) throws Exception {
         this.context = ctx;
-        reg = context.registerService(ManagedServiceFactory.class,
-                                      this,
-                                      CollectionUtils.singletonDictionary(Constants.SERVICE_PID, FACTORY_PID));
-
         mbeanServerTracker = new ServiceTracker<>(ctx, MBeanServer.class, null);
         try {
             BlueprintNameSpaceHandlerFactory nsHandlerFactory = new BlueprintNameSpaceHandlerFactory() {
@@ -90,6 +86,10 @@ public class HTTPJettyTransportActivator
         } catch (NoClassDefFoundError e) {
             // Blueprint not available, ignore
         }
+        reg = context.registerService(ManagedServiceFactory.class,
+                                      this,
+                                      CollectionUtils.singletonDictionary(Constants.SERVICE_PID, FACTORY_PID));
+
     }
 
     public void stop(BundleContext ctx) throws Exception {

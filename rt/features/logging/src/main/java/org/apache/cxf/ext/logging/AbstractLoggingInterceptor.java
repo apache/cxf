@@ -21,6 +21,8 @@ package org.apache.cxf.ext.logging;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.ext.logging.event.DefaultLogEventMapper;
@@ -37,6 +39,11 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     public static final int DEFAULT_THRESHOLD = -1;
     public static final String CONTENT_SUPPRESSED = "--- Content suppressed ---";
     protected static final String  LIVE_LOGGING_PROP = "org.apache.cxf.logging.enable";
+    private static final Pattern BOUNDARY_PATTERN =
+        Pattern.compile("^--(\\S*)$", Pattern.MULTILINE);
+    private static final Pattern CONTENT_TYPE_PATTERN =
+        Pattern.compile("Content-Type:.*?$", 
+                        Pattern.DOTALL | Pattern.MULTILINE);
     protected int limit = DEFAULT_LIMIT;
     protected long threshold = DEFAULT_THRESHOLD;
     protected boolean logBinary;
@@ -122,5 +129,44 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
 
     protected String maskSensitiveElements(final Message message, String originalLogString) {
         return maskSensitiveHelper.maskSensitiveElements(message, originalLogString);
+    }
+    
+    protected String stripBinaryParts(LogEvent event, String originalLogString) {
+        try {
+            if (!this.logBinary && findBoundary(originalLogString) != null) {
+                String boundary = findBoundary(originalLogString);
+                String[] parts = originalLogString.split(Pattern.quote(boundary));
+                String payload = "";
+                for (String str : parts) {
+                    if (findContentType(str) != null
+                        && eventMapper.isBinaryContent(
+                           findContentType(str).substring("Content-Type:".length()).trim())) {
+                        payload = payload + "\r\n" + CONTENT_SUPPRESSED + "\r\n";
+                    } else {
+                        payload = payload + str;
+                        payload = payload + boundary;
+                    }
+                }
+            
+                originalLogString = payload;
+            }
+        } catch (Exception ex) {
+            //
+        } 
+        return originalLogString;
+        
+    }
+    
+    private String findContentType(String payload) {
+        // Use regex to get the Content-Type and return null if it's not found
+        Matcher m = CONTENT_TYPE_PATTERN.matcher(payload);
+        return m.find() ? m.group(0) : null;
+    }
+    
+    private String findBoundary(String payload) {
+        
+        // Use regex to get the boundary and return null if it's not found
+        Matcher m = BOUNDARY_PATTERN.matcher(payload);
+        return m.find() ? "--" + m.group(1) : null;
     }
 }

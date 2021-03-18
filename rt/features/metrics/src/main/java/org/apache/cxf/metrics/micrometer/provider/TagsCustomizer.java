@@ -24,5 +24,5 @@ import org.apache.cxf.message.Exchange;
 import io.micrometer.core.instrument.Tag;
 
 public interface TagsCustomizer {
-    Iterable<Tag> getAdditionalTags(Exchange ex);
+    Iterable<Tag> getAdditionalTags(Exchange ex, boolean client);
 }

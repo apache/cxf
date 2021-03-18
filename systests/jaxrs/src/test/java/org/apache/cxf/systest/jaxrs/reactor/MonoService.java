@@ -57,7 +57,6 @@ public class MonoService {
     public void getTextAsync(@Suspended final AsyncResponse ar) {
         Mono.just("Hello, ").map(s -> s + "world!")
                 .subscribe(new StringAsyncSubscriber(ar));
-
     }
     
     @GET
@@ -67,6 +66,12 @@ public class MonoService {
         return Mono.empty(); 
     }
 
+    @GET
+    @Produces("application/json")
+    @Path("error")
+    public Mono<HelloWorldBean> getError() {
+        return Mono.error(new RuntimeException("Oops"));
+    }
 
     private static class StringAsyncSubscriber extends AbstractSubscriber<String> {
         StringAsyncSubscriber(AsyncResponse ar) {

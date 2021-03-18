@@ -321,7 +321,6 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
             assertTrue(o instanceof Integer);
         }
         assertTrue("No queued message " + o, o instanceof Integer && 0 == ((Integer)o).intValue());
-        assertEquals(2L, listener.getLastAcknowledgement());
 
         o = mbs.invoke(clientEndpointName, "getSourceSequenceAcknowledgedRange",
                        new Object[]{sseqId}, ONESTRING_SIGNATURE);
@@ -334,6 +333,8 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         o = mbs.invoke(clientEndpointName, "getUnAcknowledgedMessageIdentifiers",
                        new Object[]{sseqId}, ONESTRING_SIGNATURE);
         assertTrue("No unacknowledged message", o instanceof Long[] && 0 == ((Long[])o).length);
+        
+        assertEquals(2L, listener.getLastAcknowledgement());
     }
 
     private String getSingleDestinationSequenceId(MBeanServer mbs, ObjectName clientEndpointName)

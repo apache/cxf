@@ -69,6 +69,9 @@ public class UndertowHTTPServerEngine implements ServerEngine {
     public static final String DO_NOT_CHECK_URL_PROP = "org.apache.cxf.transports.http_undertow.DontCheckUrl";
     
     public static final String ENABLE_HTTP2_PROP = "org.apache.cxf.transports.http_undertow.EnableHttp2";
+    
+    public static final String ENABLE_RECORD_REQUEST_START_TIME_PROP = 
+        "org.apache.cxf.transports.http_undertow.EnableRecordRequestStartTime";
 
     private static final Logger LOG = LogUtils.getL7dLogger(UndertowHTTPServerEngine.class);
 
@@ -203,6 +206,9 @@ public class UndertowHTTPServerEngine implements ServerEngine {
         if (this.shouldEnableHttp2(undertowHTTPHandler.getBus())) {
             result.setServerOption(UndertowOptions.ENABLE_HTTP2, Boolean.TRUE);
         }
+        if (this.shouldEnableRecordRequestStartTime(undertowHTTPHandler.getBus())) {
+            result.setServerOption(UndertowOptions.RECORD_REQUEST_START_TIME, Boolean.TRUE);
+        }
         if (tlsServerParameters != null) {
             if (this.sslContext == null) {
                 this.sslContext = createSSLContext();
@@ -315,6 +321,18 @@ public class UndertowHTTPServerEngine implements ServerEngine {
         }
         if (prop == null) {
             prop = SystemPropertyAction.getPropertyOrNull(ENABLE_HTTP2_PROP);
+        }
+        return PropertyUtils.isTrue(prop);
+    }
+    
+    private boolean shouldEnableRecordRequestStartTime(Bus bus) {
+
+        Object prop = null;
+        if (bus != null) {
+            prop = bus.getProperty(ENABLE_RECORD_REQUEST_START_TIME_PROP);
+        }
+        if (prop == null) {
+            prop = SystemPropertyAction.getPropertyOrNull(ENABLE_RECORD_REQUEST_START_TIME_PROP);
         }
         return PropertyUtils.isTrue(prop);
     }

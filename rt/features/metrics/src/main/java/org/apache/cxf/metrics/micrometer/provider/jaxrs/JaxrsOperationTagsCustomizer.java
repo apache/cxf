@@ -36,8 +36,16 @@ public class JaxrsOperationTagsCustomizer implements TagsCustomizer {
     }
 
     @Override
-    public Iterable<Tag> getAdditionalTags(Exchange ex) {
-        Message request = ofNullable(ex.getInMessage()).orElseGet(ex::getInFaultMessage);
+    public Iterable<Tag> getAdditionalTags(Exchange ex, boolean client) {
+        Message request = getRequest(ex, client);
         return Tags.of(jaxrsTags.operation(request));
+    }
+
+    private Message getRequest(Exchange ex, boolean client) {
+        if (client) {
+            return ofNullable(ex.getOutMessage()).orElseGet(ex::getOutFaultMessage);
+        } else {
+            return ofNullable(ex.getInMessage()).orElseGet(ex::getInFaultMessage);
+        }
     }
 }

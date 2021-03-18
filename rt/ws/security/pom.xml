@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.4.1-SNAPSHOT</version>
+        <version>3.4.4-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
@@ -109,6 +109,12 @@
         <dependency>
             <groupId>org.apache.wss4j</groupId>
             <artifactId>wss4j-policy</artifactId>
+            <exclusions>
+                 <exclusion>
+                     <groupId>org.codehaus.woodstox</groupId>
+                     <artifactId>woodstox-core-asl</artifactId>
+                 </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.wss4j</groupId>

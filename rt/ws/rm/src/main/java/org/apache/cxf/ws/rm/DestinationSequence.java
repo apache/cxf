@@ -60,7 +60,7 @@ public class DestinationSequence extends AbstractSequence {
     private EndpointReferenceType acksTo;
     private long lastMessageNumber;
     private SequenceMonitor monitor;
-    private boolean acknowledgeOnNextOccasion;
+    private volatile boolean acknowledgeOnNextOccasion;
     private boolean terminated;
     private List<DeferredAcknowledgment> deferredAcknowledgments;
     private SequenceTermination scheduledTermination;

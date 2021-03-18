@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.4.1-SNAPSHOT</version>
+        <version>3.4.4-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     
@@ -131,6 +131,11 @@
         <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymock</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

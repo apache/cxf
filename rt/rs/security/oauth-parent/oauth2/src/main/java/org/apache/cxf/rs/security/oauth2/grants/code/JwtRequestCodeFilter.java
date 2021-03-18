@@ -21,9 +21,11 @@ package org.apache.cxf.rs.security.oauth2.grants.code;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -42,22 +44,31 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 public class JwtRequestCodeFilter extends OAuthJoseJwtConsumer implements AuthorizationRequestFilter {
+    protected static final Logger LOG = LogUtils.getL7dLogger(JwtRequestCodeFilter.class);
+    private static final String REQUEST_URI_CONTENT_TYPE = "application/oauth-authz-req+jwt";
     private static final String REQUEST_PARAM = "request";
     private static final String REQUEST_URI_PARAM = "request_uri";
+
     private boolean verifyWithClientCertificates;
     private String issuer;
     private JsonMapObjectReaderWriter jsonHandler = new JsonMapObjectReaderWriter();
+
     @Override
     public MultivaluedMap<String, String> process(MultivaluedMap<String, String> params,
                                                   UserSubject endUser,
                                                   Client client) {
         String requestToken = params.getFirst(REQUEST_PARAM);
+        String requestUri = params.getFirst(REQUEST_URI_PARAM);
+
         if (requestToken == null) {
-            String requestUri = params.getFirst(REQUEST_URI_PARAM);
             if (isRequestUriValid(client, requestUri)) {
-                requestToken = WebClient.create(requestUri).get(String.class);
+                requestToken = WebClient.create(requestUri).accept(REQUEST_URI_CONTENT_TYPE).get(String.class);
             }
+        } else if (requestUri != null) {
+            LOG.warning("It is not valid to specify both a request and request_uri value");
+            throw new SecurityException();
         }
+
         if (requestToken != null) {
             JweDecryptionProvider theDecryptor = super.getInitializedDecryptionProvider(client.getClientSecret());
             JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier(client);
@@ -101,9 +112,17 @@ public class JwtRequestCodeFilter extends OAuthJoseJwtConsumer implements Author
         }
         return params;
     }
-    private boolean isRequestUriValid(Client client, String requestUri) {
-        //TODO: consider restricting to specific hosts
-        return requestUri != null && requestUri.startsWith("https://");
+
+    /**
+     * This method must be overridden to support request_uri. Take care to validate the request_uri properly,
+     * as otherwise it could lead to a security problem
+     * (https://tools.ietf.org/html/draft-ietf-oauth-jwsreq-30#section-10.4)
+     * @param client the Client object
+     * @param requestUri the request_uri parameter to validate
+     * @return whether the requestUri is permitted or not
+     */
+    protected boolean isRequestUriValid(Client client, String requestUri) {
+        return false;
     }
     protected JwsSignatureVerifier getInitializedSigVerifier(Client c) {
         if (verifyWithClientCertificates) {
