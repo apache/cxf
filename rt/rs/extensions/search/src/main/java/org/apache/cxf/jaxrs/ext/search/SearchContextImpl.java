@@ -21,7 +21,7 @@ package org.apache.cxf.jaxrs.ext.search;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -155,7 +155,7 @@ public class SearchContextImpl implements SearchContext {
     private CompleteCondition getOrCondition(SearchConditionBuilder builder,
                                              Map.Entry<String, List<String>> entry) {
         String key = entry.getKey();
-        ConditionType ct = null;
+        final ConditionType ct;
         if (key.endsWith("From")) {
             ct = ConditionType.GREATER_OR_EQUALS;
             key = key.substring(0, key.length() - 4);
@@ -184,9 +184,9 @@ public class SearchContextImpl implements SearchContext {
             return getCustomParser(parserProp);
         }
 
-        Map<String, String> props = null;
+        final Map<String, String> props;
         if (parserProperties == null) {
-            props = new LinkedHashMap<>(4);
+            props = new HashMap<>(5);
             props.put(SearchUtils.DATE_FORMAT_PROPERTY,
                       (String)message.getContextualProperty(SearchUtils.DATE_FORMAT_PROPERTY));
             props.put(SearchUtils.TIMEZONE_SUPPORT_PROPERTY,
@@ -202,7 +202,7 @@ public class SearchContextImpl implements SearchContext {
             props = parserProperties;
         }
 
-        Map<String, String> beanProps = null;
+        final Map<String, String> beanProps;
 
         if (beanProperties == null) {
             beanProps = CastUtils.cast((Map<?, ?>)message.getContextualProperty(SearchUtils.BEAN_PROPERTY_MAP));

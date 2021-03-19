@@ -60,8 +60,8 @@ public class SseSubscription implements Subscription {
         }
         requested.addAndGet(n);
         synchronized (buffer) {
-            InboundSseEvent bufferedEvent = null;
             synchronized (delivered) {
+                InboundSseEvent bufferedEvent;
                 while (delivered.get() < requested.get()
                        && (bufferedEvent = buffer.pollFirst()) != null) {
 

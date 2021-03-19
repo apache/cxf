@@ -58,7 +58,7 @@ public class TomitribeSignatureCreator implements SignatureCreator {
             throw new IllegalArgumentException("message headers cannot be null");
         }
 
-        List<String> headers = null;
+        final List<String> headers;
         // If we have explicit headers to sign then use these.
         // Otherwise sign all headers including "(request-target)" (if on an outbound service request)
         if (headersToSign.isEmpty()) {

@@ -113,9 +113,8 @@ public class JwaSpecTestCasesTest {
         JweHeaders headers = new JweHeaders(KeyAlgorithm.A128KW, contentEncryptionAlgo);
 
         headers.asMap().remove("alg");
-        JweEncryptionProvider jwe = null;
         SecretKey cekKey = CryptoUtils.createSecretKeySpec(cek, "AES");
-        jwe = JweUtils.getDirectKeyJweEncryption(cekKey, contentEncryptionAlgo);
+        JweEncryptionProvider jwe = JweUtils.getDirectKeyJweEncryption(cekKey, contentEncryptionAlgo);
         JweJsonProducer p = new JweJsonProducer(headers, Hex.decode(text.getBytes())) {
             protected JweEncryptionInput createEncryptionInput(JweHeaders jsonHeaders) {
                 JweEncryptionInput input = super.createEncryptionInput(jsonHeaders);

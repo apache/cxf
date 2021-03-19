@@ -63,10 +63,9 @@ import org.apache.cxf.security.SecurityContext;
 public class AuthorizationRequestHandler {
 
     private static final Logger LOG = LogUtils.getL7dLogger(AuthorizationRequestHandler.class);
-    private static final String[] REQUIRED_PARAMETERS =
-        new String[] {
-            OAuth.OAUTH_TOKEN
-        };
+    private static final String[] REQUIRED_PARAMETERS = {
+        OAuth.OAUTH_TOKEN
+    };
 
     public Response handle(MessageContext mc, OAuthDataProvider dataProvider) {
         HttpServletRequest request = mc.getHttpServletRequest();
@@ -227,7 +226,7 @@ public class AuthorizationRequestHandler {
     private boolean compareRequestSessionTokens(HttpServletRequest request,
             OAuthMessage oAuthMessage) {
         HttpSession session = request.getSession();
-        String requestToken = null;
+        final String requestToken;
         try {
             requestToken = oAuthMessage.getParameter(OAuthConstants.AUTHENTICITY_TOKEN);
         } catch (IOException ex) {

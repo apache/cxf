@@ -196,7 +196,7 @@ public final class KeyManagementUtils {
     }
 
     private static URL getResourceURL(String loc, Bus bus) throws Exception {
-        URL url = null;
+        URL url;
         if (loc.startsWith(CLASSPATH_PREFIX)) {
             String path = loc.substring(CLASSPATH_PREFIX.length());
             url = getClasspathResourceURL(path, KeyManagementUtils.class, bus);

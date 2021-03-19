@@ -31,7 +31,7 @@ public final class SwaggerUi {
     private static final SwaggerUiResolver HELPER;
     
     static {
-        SwaggerUiResolver theHelper = null;
+        SwaggerUiResolver theHelper;
         try {
             theHelper = new OsgiSwaggerUiResolver(OpenAPIDefinition.class);
         } catch (Throwable ex) {

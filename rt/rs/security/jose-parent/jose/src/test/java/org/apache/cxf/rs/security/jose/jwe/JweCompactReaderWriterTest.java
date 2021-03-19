@@ -275,7 +275,7 @@ public class JweCompactReaderWriterTest {
         RSAPublicKey publicKey = CryptoUtils.getRSAPublicKey(RSA_MODULUS_ENCODED_A1,
                                                              RSA_PUBLIC_EXPONENT_ENCODED_A1);
         SecretKey key = createSecretKey(createIfException);
-        String jwtKeyName = null;
+        final String jwtKeyName;
         if (key == null) {
             // the encryptor will generate it
             jwtKeyName = ContentAlgorithm.A128GCM.getJwaName();

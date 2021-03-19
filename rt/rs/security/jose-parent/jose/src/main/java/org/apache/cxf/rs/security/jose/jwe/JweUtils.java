@@ -133,7 +133,7 @@ public final class JweUtils {
     public static KeyEncryptionProvider getKeyEncryptionProvider(JsonWebKey jwk, KeyAlgorithm defaultAlgorithm) {
         KeyAlgorithm keyAlgo = jwk.getAlgorithm() == null ? defaultAlgorithm
             : KeyAlgorithm.getAlgorithm(jwk.getAlgorithm());
-        KeyEncryptionProvider keyEncryptionProvider = null;
+        final KeyEncryptionProvider keyEncryptionProvider;
         KeyType keyType = jwk.getKeyType();
         if (KeyType.RSA == keyType) {
             keyEncryptionProvider = getPublicKeyEncryptionProvider(JwkUtils.toRSAPublicKey(jwk, true),
@@ -217,7 +217,7 @@ public final class JweUtils {
     public static KeyDecryptionProvider getKeyDecryptionProvider(JsonWebKey jwk, KeyAlgorithm defaultAlgorithm) {
         KeyAlgorithm keyAlgo = jwk.getAlgorithm() == null ? defaultAlgorithm
             : KeyAlgorithm.getAlgorithm(jwk.getAlgorithm());
-        KeyDecryptionProvider keyDecryptionProvider = null;
+        final KeyDecryptionProvider keyDecryptionProvider;
         KeyType keyType = jwk.getKeyType();
         if (KeyType.RSA == keyType) {
             keyDecryptionProvider = getPrivateKeyDecryptionProvider(JwkUtils.toRSAPrivateKey(jwk),

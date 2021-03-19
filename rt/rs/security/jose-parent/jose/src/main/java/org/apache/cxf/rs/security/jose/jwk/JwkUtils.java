@@ -269,7 +269,7 @@ public final class JwkUtils {
         return loadJwkSet(props, bus, decryption);
     }
     public static JsonWebKeys loadJwkSet(Properties props, Bus bus, JweDecryptionProvider jwe) {
-        String keyContent = null;
+        String keyContent;
         String keyStoreLoc = props.getProperty(JoseConstants.RSSEC_KEY_STORE_FILE);
         if (keyStoreLoc != null) {
             try (InputStream isResource = JoseUtils.getResourceStream(keyStoreLoc, bus)) {
@@ -303,7 +303,7 @@ public final class JwkUtils {
     public static JsonWebKey loadJsonWebKey(Message m, Properties props, KeyOperation keyOper, String inHeaderKid) {
         PrivateKeyPasswordProvider cb = KeyManagementUtils.loadPasswordProvider(m, props, keyOper);
         JsonWebKeys jwkSet = loadJwkSet(m, props, cb);
-        String kid = null;
+        final String kid;
         if (inHeaderKid != null
             && MessageUtils.getContextualBoolean(m, JoseConstants.RSSEC_ACCEPT_PUBLIC_KEY, false)) {
             kid = inHeaderKid;

@@ -137,7 +137,7 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
                                                      UserSubject userSubject,
                                                      ServerAccessToken preAuthorizedToken) {
 
-        ServerAccessToken token = null;
+        final ServerAccessToken token;
         if (preAuthorizedToken == null) {
             AccessTokenRegistration reg = createTokenRegistration(state,
                                                                   client,

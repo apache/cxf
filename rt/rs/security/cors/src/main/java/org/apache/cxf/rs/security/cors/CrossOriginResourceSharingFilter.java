@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.regex.Pattern;
 
 import javax.annotation.Priority;
 import javax.ws.rs.HttpMethod;
@@ -76,8 +75,8 @@ import org.apache.cxf.phase.Phase;
 @Priority(Priorities.AUTHENTICATION - 1)
 public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
     ContainerResponseFilter {
-    private static final Pattern SPACE_PATTERN = Pattern.compile(" ");
-    private static final Pattern FIELD_COMMA_PATTERN = Pattern.compile(",");
+    private static final String SPACE_PATTERN = " ";
+    private static final String FIELD_COMMA_PATTERN = ",";
 
     private static final String LOCAL_PREFLIGHT = "local_preflight";
     private static final String LOCAL_PREFLIGHT_ORIGIN = "local_preflight.origin";
@@ -428,26 +427,13 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
         if (effectiveAllowAnyHeaders(ann)) {
             return true;
         }
-        List<String> actualHeaders = null;
-        if (ann != null) {
-            actualHeaders = Arrays.asList(ann.allowHeaders());
-        } else {
-            actualHeaders = allowHeaders;
-        }
         Set<String> actualHeadersSet = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
-        actualHeadersSet.addAll(actualHeaders);
+        actualHeadersSet.addAll(ann != null ? Arrays.asList(ann.allowHeaders()) : allowHeaders);
         return actualHeadersSet.containsAll(aHeaders);
     }
 
     private List<String> effectiveExposeHeaders(CrossOriginResourceSharing ann) {
-        List<String> actualExposeHeaders = null;
-        if (ann != null) {
-            actualExposeHeaders = Arrays.asList(ann.exposeHeaders());
-        } else {
-            actualExposeHeaders = exposeHeaders;
-        }
-
-        return actualExposeHeaders;
+        return ann != null ? Arrays.asList(ann.exposeHeaders()) : exposeHeaders;
     }
 
     private Integer effectiveMaxAge(CrossOriginResourceSharing ann) {
@@ -485,20 +471,22 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
      */
     private List<String> getHeaderValues(String key, boolean spaceSeparated) {
         List<String> values = headers.getRequestHeader(key);
-        Pattern splitPattern;
+        String splitPattern;
         if (spaceSeparated) {
             splitPattern = SPACE_PATTERN;
         } else {
             splitPattern = FIELD_COMMA_PATTERN;
         }
-        List<String> results = new ArrayList<>();
+        final List<String> results;
         if (values != null) {
+            results = new ArrayList<>();
             for (String value : values) {
-                String[] items = splitPattern.split(value);
-                for (String item : items) {
+                for (String item : value.split(splitPattern)) {
                     results.add(item.trim());
                 }
             }
+        } else {
+            results = Collections.emptyList();
         }
         return results;
     }

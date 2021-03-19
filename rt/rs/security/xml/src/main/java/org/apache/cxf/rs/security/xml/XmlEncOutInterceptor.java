@@ -109,7 +109,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
         Document encryptedDataDoc = DOMUtils.createDocument();
         Element encryptedDataElement = createEncryptedDataElement(encryptedDataDoc, symEncAlgo);
         if (encryptSymmetricKey) {
-            X509Certificate receiverCert = null;
+            X509Certificate receiverCert;
 
             String userName =
                 (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_USERNAME, message);
@@ -202,7 +202,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
                 new Object[] {message}
             );
         }
-        byte[] encryptedEphemeralKey = null;
+        final byte[] encryptedEphemeralKey;
         try {
             encryptedEphemeralKey = cipher.doFinal(keyBytes);
         } catch (IllegalStateException | IllegalBlockSizeException | BadPaddingException ex) {
@@ -264,9 +264,9 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
         String keyIdType = encProps.getEncryptionKeyIdType() == null
             ? RSSecurityUtils.X509_CERT : encProps.getEncryptionKeyIdType();
 
-        Node keyIdentifierNode = null;
+        final Node keyIdentifierNode;
         if (keyIdType.equals(RSSecurityUtils.X509_CERT)) {
-            byte[] data = null;
+            final byte[] data;
             try {
                 data = remoteCert.getEncoded();
             } catch (CertificateEncodingException e) {

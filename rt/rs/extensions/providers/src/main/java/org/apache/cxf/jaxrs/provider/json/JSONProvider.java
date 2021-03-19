@@ -221,7 +221,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
             unmarshaller = createUnmarshaller(theType, genericType, isCollection);
             XMLStreamReader xsr = createReader(type, realStream, isCollection, enc);
 
-            Object response = null;
+            Object response;
             if (JAXBElement.class.isAssignableFrom(type)
                 || !isCollection && (unmarshalAsJaxbElement
                 || jaxbElementClassMap != null && jaxbElementClassMap.containsKey(theType.getName()))) {
@@ -272,7 +272,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
 
     protected XMLStreamReader createReader(Class<?> type, InputStream is, String enc)
         throws Exception {
-        XMLStreamReader reader = null;
+        final XMLStreamReader reader;
         if (BADGER_FISH_CONVENTION.equals(convention)) {
             reader = JSONUtils.createBadgerFishReader(is, enc);
         } else {
@@ -284,9 +284,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
                                                   getDepthProperties(),
                                                   enc);
         }
-        reader = createTransformReaderIfNeeded(reader, is);
-
-        return reader;
+        return createTransformReaderIfNeeded(reader, is);
     }
 
     protected InputStream getInputStream(Class<T> cls, Type type, InputStream is) throws Exception {
@@ -412,10 +410,10 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
 
         Object firstObj = it.hasNext() ? it.next() : null;
 
-        String startTag = null;
-        String endTag = null;
+        final String startTag;
+        final String endTag;
         if (!dropCollectionWrapperElement) {
-            QName qname = null;
+            final QName qname;
             if (firstObj instanceof JAXBElement) {
                 JAXBElement<?> el = (JAXBElement<?>)firstObj;
                 qname = el.getName();
@@ -427,10 +425,10 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
             if (!ignoreNamespaces) {
                 prefix = namespaceMap.get(qname.getNamespaceURI());
                 if (prefix != null) {
-                    if (prefix.length() > 0) {
+                    if (!prefix.isEmpty()) {
                         prefix += ".";
                     }
-                } else if (qname.getNamespaceURI().length() > 0) {
+                } else if (!qname.getNamespaceURI().isEmpty()) {
                     prefix = "ns1.";
                 }
             }
@@ -452,7 +450,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
             marshalCollectionMember(JAXBUtils.useAdapter(firstObj, adapter, true),
                                     actualClass, genericType, encoding, os);
             while (it.hasNext()) {
-                os.write(",".getBytes());
+                os.write(',');
                 marshalCollectionMember(JAXBUtils.useAdapter(it.next(), adapter, true),
                                         actualClass, genericType, encoding, os);
             }

@@ -365,7 +365,7 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
                     LOG.log(Level.FINEST, "Caught exception invoking compute method", t);
                 }
                 if (t instanceof InvocationTargetException) {
-                    t = t.getCause();
+                    throw t.getCause();
                 }
                 throw t;
             }

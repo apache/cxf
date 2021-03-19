@@ -122,8 +122,8 @@ public class ODataParser<T> extends AbstractSearchConditionParser<T> {
 
             // Property could be either on left side (Name eq 'Tom') or
             // right side ('Tom' eq Name)
-            TypedValue value = null;
-            TypedProperty property = null;
+            final TypedValue value;
+            final TypedProperty property;
 
             if (leftSide instanceof TypedProperty && rightSide instanceof TypedValue) {
                 property = (TypedProperty)leftSide;
@@ -161,7 +161,7 @@ public class ODataParser<T> extends AbstractSearchConditionParser<T> {
                 throw new SearchParseException("Unsupported binary operation: " + operator);
             }
 
-            Object typedValue = null;
+            final Object typedValue;
             // If property type and value type are compatible, just use them
             if (property.typeInfo.getWrappedTypeClass().isAssignableFrom(value.typeClass)) {
                 typedValue = value.value;

@@ -155,8 +155,8 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
     private void configureDecryptionKeys(Message message, XMLSecurityProperties properties)
         throws IOException,
         UnsupportedCallbackException, WSSecurityException {
-        String cryptoKey = null;
-        String propKey = null;
+        final String cryptoKey;
+        final String propKey;
         if (RSSecurityUtils.isSignedAndEncryptedTwoWay(message)) {
             cryptoKey = SecurityConstants.SIGNATURE_CRYPTO;
             propKey = SecurityConstants.SIGNATURE_PROPERTIES;
@@ -190,8 +190,8 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
     }
 
     private Crypto getSignatureCrypto(Message message) {
-        String cryptoKey = null;
-        String propKey = null;
+        final String cryptoKey;
+        final String propKey;
         if (RSSecurityUtils.isSignedAndEncryptedTwoWay(message)) {
             cryptoKey = SecurityConstants.ENCRYPT_CRYPTO;
             propKey = SecurityConstants.ENCRYPT_PROPERTIES;

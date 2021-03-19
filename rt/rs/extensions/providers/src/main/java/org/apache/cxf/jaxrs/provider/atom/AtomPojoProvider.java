@@ -128,7 +128,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
     }
 
     protected void tryInjectMessageContext(Object handler) {
-        Method m = null;
+        final Method m;
         try {
             m = handler.getClass().getMethod("setMessageContext", new Class[]{MessageContext.class});
         } catch (Throwable t) {
@@ -450,7 +450,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
 
     protected void createEntryContent(Factory factory, Entry e, Object o, Class<?> cls) throws Exception {
 
-        String content = null;
+        final String content;
 
         if (useJaxbForContent) {
             JAXBContext jc = jaxbProvider.getJAXBContext(cls, cls);

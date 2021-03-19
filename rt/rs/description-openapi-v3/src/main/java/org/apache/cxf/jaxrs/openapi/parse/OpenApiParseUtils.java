@@ -176,7 +176,7 @@ public final class OpenApiParseUtils {
                         String name = (String)param.get("name");
                         //"query", "header", "path" or "cookie".
                         String paramType = (String)param.get("in");
-                        ParameterType pType = null;
+                        final ParameterType pType;
                         
                         if ("query".equals(paramType)) {
                             pType = ParameterType.QUERY;

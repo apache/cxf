@@ -548,7 +548,7 @@ public class SseEventSourceImplTest {
 
     public static class DynamicServer {
         private final Function<HttpHeaders, String> function;
-        private volatile boolean fail = true; 
+        private volatile boolean fail; 
 
         public DynamicServer(Function<HttpHeaders, String> function, boolean fail) {
             this.function = function;

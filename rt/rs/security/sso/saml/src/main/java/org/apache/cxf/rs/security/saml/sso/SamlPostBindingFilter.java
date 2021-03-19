@@ -94,7 +94,7 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
     protected String encodeAuthnRequest(Element authnRequest) throws IOException {
         String requestMessage = DOM2Writer.nodeToString(authnRequest);
 
-        byte[] deflatedBytes = null;
+        final byte[] deflatedBytes;
         // Not correct according to the spec but required by some IDPs.
         if (useDeflateEncoding) {
             DeflateEncoderDecoder encoder = new DeflateEncoderDecoder();

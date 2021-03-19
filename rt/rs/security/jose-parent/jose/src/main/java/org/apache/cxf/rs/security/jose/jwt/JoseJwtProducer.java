@@ -34,7 +34,7 @@ public class JoseJwtProducer extends AbstractJoseProducer {
                                 JweEncryptionProvider theEncProvider,
                                 JwsSignatureProvider theSigProvider) {
         super.checkProcessRequirements();
-        String data = null;
+        String data;
 
         if (isJweRequired() && theEncProvider == null) {
             theEncProvider = getInitializedEncryptionProvider(jwt.getJweHeaders());

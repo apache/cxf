@@ -24,7 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
@@ -60,7 +60,6 @@ public class MetadataWriter {
     private static final XMLSignatureFactory XML_SIGNATURE_FACTORY = XMLSignatureFactory.getInstance("DOM");
 
 
-    //CHECKSTYLE:OFF
     public Document getMetaData(
         String serviceURL,
         String assertionConsumerServiceURL,
@@ -191,7 +190,7 @@ public class MetadataWriter {
     private static Document signMetaInfo(X509Certificate signingCert, Key signingKey,
                                          Document doc, String referenceID
     ) throws Exception {
-        String signatureMethod = null;
+        final String signatureMethod;
         if ("SHA1withDSA".equals(signingCert.getSigAlgName())) {
             signatureMethod = SignatureMethod.DSA_SHA1;
         } else if ("SHA1withRSA".equals(signingCert.getSigAlgName())) {
@@ -203,9 +202,9 @@ public class MetadataWriter {
             throw new RuntimeException("Unsupported signature method: " + signingCert.getSigAlgName());
         }
 
-        List<Transform> transformList = new ArrayList<>();
-        transformList.add(XML_SIGNATURE_FACTORY.newTransform(Transform.ENVELOPED, (TransformParameterSpec)null));
-        transformList.add(XML_SIGNATURE_FACTORY.newCanonicalizationMethod(CanonicalizationMethod.EXCLUSIVE,
+        List<Transform> transformList = Arrays.asList(
+            XML_SIGNATURE_FACTORY.newTransform(Transform.ENVELOPED, (TransformParameterSpec)null),
+            XML_SIGNATURE_FACTORY.newCanonicalizationMethod(CanonicalizationMethod.EXCLUSIVE,
                                                                           (C14NMethodParameterSpec)null));
 
         // Create a Reference to the enveloped document (in this case,
@@ -229,9 +228,9 @@ public class MetadataWriter {
 
         // Create the KeyInfo containing the X509Data.
         KeyInfoFactory kif = XML_SIGNATURE_FACTORY.getKeyInfoFactory();
-        List<Object> x509Content = new ArrayList<>();
-        x509Content.add(signingCert.getSubjectX500Principal().getName());
-        x509Content.add(signingCert);
+        List<Object> x509Content = Arrays.asList(
+            signingCert.getSubjectX500Principal().getName(),
+            signingCert);
         X509Data xd = kif.newX509Data(x509Content);
         KeyInfo ki = kif.newKeyInfo(Collections.singletonList(xd));
 

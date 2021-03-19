@@ -188,7 +188,7 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
                 ? Proxy.newProxyInstance(this.getClass().getClassLoader(),
                                          new Class[]{actualType},
                                          new InterfaceProxy())
-                : actualType.newInstance();
+                : actualType.getDeclaredConstructor().newInstance();
             Object nextObject;
 
             if (lastTry) {
@@ -205,12 +205,12 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
                     }
                 }
             } else if (!returnCollection) {
-                nextObject = returnType.newInstance();
+                nextObject = returnType.getDeclaredConstructor().newInstance();
             } else {
-                nextObject = actualReturnType.newInstance();
+                nextObject = actualReturnType.getDeclaredConstructor().newInstance();
             }
             Method setterM = actualType.getMethod("set" + nextPart, new Class[]{returnType});
-            Object valueObjectValue = null;
+            final Object valueObjectValue;
             if (lastTry || !returnCollection) {
                 valueObjectValue = nextObject;
             } else {

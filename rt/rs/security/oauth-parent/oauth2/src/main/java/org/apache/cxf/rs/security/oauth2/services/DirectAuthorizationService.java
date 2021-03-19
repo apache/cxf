@@ -85,7 +85,7 @@ public class DirectAuthorizationService extends AbstractOAuthService {
     }
     protected UserSubject createUserSubject(SecurityContext securityContext,
                                             MultivaluedMap<String, String> params) {
-        UserSubject subject = null;
+        UserSubject subject;
         if (subjectCreator != null) {
             subject = subjectCreator.createUserSubject(getMessageContext(), params);
             if (subject != null) {

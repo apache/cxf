@@ -91,15 +91,11 @@ public class JweWriterInterceptor implements WriterInterceptor {
                 LOG.warning("JWE encryption error");
                 throw new JweException(JweException.Error.CONTENT_ENCRYPTION_FAILURE, ex);
             }
-            OutputStream wrappedStream = null;
             JweOutputStream jweOutputStream = new JweOutputStream(actualOs, encryption.getCipher(),
                                                          encryption.getAuthTagProducer());
-            wrappedStream = jweOutputStream;
-            if (encryption.isCompressionSupported()) {
-                wrappedStream = new DeflaterOutputStream(jweOutputStream);
-            }
 
-            ctx.setOutputStream(wrappedStream);
+            ctx.setOutputStream(
+                encryption.isCompressionSupported() ? new DeflaterOutputStream(jweOutputStream) : jweOutputStream);
             ctx.proceed();
             setJoseMediaType(ctx);
             jweOutputStream.finalFlush();

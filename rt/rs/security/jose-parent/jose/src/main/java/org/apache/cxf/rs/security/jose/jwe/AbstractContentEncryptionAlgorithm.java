@@ -50,7 +50,7 @@ public abstract class AbstractContentEncryptionAlgorithm extends AbstractContent
     }
 
     public byte[] getContentEncryptionKey(JweHeaders headers) {
-        byte[] theCek = null;
+        final byte[] theCek;
         if (cek == null) {
             String algoJava = getAlgorithm().getJavaName();
             SecretKey secretKey = CryptoUtils.getSecretKey(AlgorithmUtils.stripAlgoProperties(algoJava),

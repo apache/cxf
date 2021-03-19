@@ -181,14 +181,13 @@ public final class SwaggerToOpenApiConversionUtils {
         List<String> sw2PathVerbProduces =
             CastUtils.cast((List<?>)sw2PathVerbProps.removeProperty("produces"));
         
-        JsonMapObject sw3PathVerbResps = null;
         JsonMapObject sw2PathVerbResps = sw2PathVerbProps.getJsonMapProperty("responses");
         if (sw2PathVerbResps != null) {
-            sw3PathVerbResps = new JsonMapObject();
+            JsonMapObject sw3PathVerbResps = new JsonMapObject();
             
-            JsonMapObject okResp = null;
             if (sw2PathVerbResps.containsProperty("200")) {
-                okResp = new JsonMapObject(CastUtils.cast((Map<?, ?>)sw2PathVerbResps.removeProperty("200")));
+                JsonMapObject okResp =
+                    new JsonMapObject(CastUtils.cast((Map<?, ?>)sw2PathVerbResps.removeProperty("200")));
                 JsonMapObject newOkResp = new JsonMapObject();
                 String description = okResp.getStringProperty("description");
                 if (description != null) {
@@ -350,7 +349,7 @@ public final class SwaggerToOpenApiConversionUtils {
         String modelName = null;
         boolean isArray = false;
         if (!"object".equals(type) || !"string".equals(type)) {
-            String ref = null;
+            final String ref;
             JsonMapObject items = null;
             if ("array".equals(type)) {
                 isArray = true;
@@ -403,7 +402,7 @@ public final class SwaggerToOpenApiConversionUtils {
 
         String sw2Host = sw2.getStringProperty("host");
         if (sw2Host == null && requestURI != null) {
-            sw2Host = requestURI.getHost() + ":" + requestURI.getPort();
+            sw2Host = requestURI.getHost() + ':' + requestURI.getPort();
         }
 
         String sw2BasePath = sw2.getStringProperty("basePath");

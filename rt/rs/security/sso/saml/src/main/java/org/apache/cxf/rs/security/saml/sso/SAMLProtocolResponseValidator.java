@@ -343,7 +343,7 @@ public class SAMLProtocolResponseValidator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
 
-        BasicCredential credential = null;
+        final BasicCredential credential;
         if (samlKeyInfo.getCerts() != null) {
             credential = new BasicX509Credential(samlKeyInfo.getCerts()[0]);
         } else if (samlKeyInfo.getPublicKey() != null) {
@@ -469,7 +469,7 @@ public class SAMLProtocolResponseValidator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
 
-        PrivateKey key = null;
+        final PrivateKey key;
         try {
             key = sigCrypto.getPrivateKey(cert, callbackHandler);
         } catch (Exception ex) {
@@ -478,7 +478,7 @@ public class SAMLProtocolResponseValidator {
         }
         Cipher cipher =
                 EncryptionUtils.initCipherWithKey(keyEncAlgo, digestAlgo, Cipher.DECRYPT_MODE, key);
-        byte[] decryptedBytes = null;
+        final byte[] decryptedBytes;
         try {
             byte[] encryptedBytes = Base64Utility.decode(cipherValue.getTextContent().trim());
             decryptedBytes = cipher.doFinal(encryptedBytes);
@@ -492,7 +492,7 @@ public class SAMLProtocolResponseValidator {
 
         String symKeyAlgo = getEncodingMethodAlgorithm(encryptedDataDOM);
 
-        byte[] decryptedPayload = null;
+        final byte[] decryptedPayload;
         try {
             decryptedPayload = decryptPayload(encryptedDataDOM, decryptedBytes, symKeyAlgo);
         } catch (Exception ex) {
@@ -503,9 +503,8 @@ public class SAMLProtocolResponseValidator {
         // Clean the symmetric key from memory now that we're done with it
         Arrays.fill(decryptedBytes, (byte) 0);
 
-        Document payloadDoc = null;
         try {
-            payloadDoc = StaxUtils.read(new InputStreamReader(new ByteArrayInputStream(decryptedPayload),
+            Document payloadDoc = StaxUtils.read(new InputStreamReader(new ByteArrayInputStream(decryptedPayload),
                                                StandardCharsets.UTF_8));
             return payloadDoc.getDocumentElement();
         } catch (Exception ex) {

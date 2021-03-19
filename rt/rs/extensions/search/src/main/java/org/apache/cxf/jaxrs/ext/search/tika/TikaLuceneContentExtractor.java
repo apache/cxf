@@ -236,7 +236,7 @@ public class TikaLuceneContentExtractor {
                 return;
             } else if (Date.class.isAssignableFrom(type)) {
                 final Date date = ParamConverterUtils.getValue(Date.class, provider, value);
-                Field field = null;
+                final Field field;
 
                 if (date != null) {
                     field = new StringField(name,

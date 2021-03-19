@@ -833,8 +833,8 @@ public class JSONProviderTest {
                        new Annotation[0], MediaType.APPLICATION_JSON_TYPE,
                        new MetadataMap<String, String>(), is);
         assertNotNull(o);
-        Book b1 = null;
-        Book b2 = null;
+        final Book b1;
+        final Book b2;
         if (type.isArray()) {
             assertEquals(2, ((Book[])o).length);
             b1 = ((Book[])o)[0];
@@ -879,7 +879,7 @@ public class JSONProviderTest {
         namespaceMap.put("http://tags", "ns1");
         provider.setNamespaceMap(namespaceMap);
 
-        Method m = null;
+        final Method m;
         if (!isArray) {
             m = CollectionsResource.class.getMethod("setTags", new Class[]{List.class});
         } else {
@@ -892,8 +892,8 @@ public class JSONProviderTest {
                        new Annotation[0], MediaType.APPLICATION_JSON_TYPE,
                        new MetadataMap<String, String>(), is);
         assertNotNull(o);
-        TagVO2 t1 = null;
-        TagVO2 t2 = null;
+        final TagVO2 t1;
+        final TagVO2 t2;
         if (!isArray) {
             assertEquals(2, ((List<?>)o).size());
             t1 = (TagVO2)((List<?>)o).get(0);

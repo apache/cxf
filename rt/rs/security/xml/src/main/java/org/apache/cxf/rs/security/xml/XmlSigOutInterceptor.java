@@ -127,7 +127,7 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
         if ("DSA".equalsIgnoreCase(pubKeyAlgo)) {
             sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_DSA;
         }
-        PrivateKey privateKey = null;
+        final PrivateKey privateKey;
         try {
             privateKey = crypto.getPrivateKey(user, password);
         } catch (Exception ex) {
@@ -142,7 +142,7 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
         String digestAlgo = sigProps.getSignatureDigestAlgo() == null
             ? Constants.ALGO_ID_DIGEST_SHA1 : sigProps.getSignatureDigestAlgo();
 
-        XMLSignature sig = null;
+        final XMLSignature sig;
         if (ENVELOPING_SIG.equals(sigStyle)) {
             sig = prepareEnvelopingSignature(doc, id, referenceId, sigAlgo, digestAlgo);
         } else if (DETACHED_SIG.equals(sigStyle)) {

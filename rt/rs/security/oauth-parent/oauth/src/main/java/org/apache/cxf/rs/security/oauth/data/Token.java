@@ -28,8 +28,8 @@ public abstract class Token {
 
     private String tokenString;
     private String tokenSecret;
-    private long issuedAt = -1;
-    private long lifetime = -1;
+    private final long issuedAt;
+    private final long lifetime;
     private Client client;
     private List<OAuthPermission> scopes = Collections.emptyList();
     private UserSubject subject;

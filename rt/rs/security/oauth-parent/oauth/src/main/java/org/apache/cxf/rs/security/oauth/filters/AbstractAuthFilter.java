@@ -114,7 +114,7 @@ public class AbstractAuthFilter {
             LOG.log(Level.FINE, "OAuth security filter for url: {0}", req.getRequestURL());
         }
 
-        AccessToken accessToken = null;
+        final AccessToken accessToken;
         Client client = null;
 
         OAuthMessage oAuthMessage = OAuthServlet.getMessage(new CustomHttpServletWrapper(req),
@@ -247,7 +247,7 @@ public class AbstractAuthFilter {
             }
 
             public boolean isUserInRole(String role) {
-                List<String> roles = null;
+                final List<String> roles;
                 if (AbstractAuthFilter.this.useUserSubject && theSubject != null) {
                     roles = theSubject.getRoles();
                 } else {

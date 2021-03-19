@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -153,7 +154,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     private static final String DEFAULT_NS_PREFIX = "prefix";
     private static final Map<ParameterType, Class<? extends Annotation>> PARAMETER_TYPE_MAP;
     static {
-        PARAMETER_TYPE_MAP = new HashMap<>();
+        PARAMETER_TYPE_MAP = new EnumMap<>(ParameterType.class);
         PARAMETER_TYPE_MAP.put(ParameterType.FORM, FormParam.class);
         PARAMETER_TYPE_MAP.put(ParameterType.QUERY, QueryParam.class);
         PARAMETER_TYPE_MAP.put(ParameterType.HEADER, HeaderParam.class);
@@ -238,7 +239,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         if (!ui.getQueryParameters().containsKey(WADL_QUERY)) {
             if (stylesheetReference != null || !docLocationMap.isEmpty()) {
                 String path = ui.getPath(false);
-                if (path.startsWith("/") && path.length() > 0) {
+                if (path.startsWith("/") && !path.isEmpty()) {
                     path = path.substring(1);
                 }
                 if (stylesheetReference != null && path.endsWith(".xsl")
@@ -257,7 +258,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         if (allowList != null && !allowList.isEmpty()) {
             ServletRequest servletRequest = (ServletRequest)m.getContextualProperty(
                 "HTTP.REQUEST");
-            String remoteAddress = null;
+            final String remoteAddress;
             if (servletRequest != null) {
                 remoteAddress = servletRequest.getRemoteAddr();
             } else {
@@ -1878,8 +1879,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     public void setSchemaLocations(List<String> locations) {
         externalQnamesMap = new HashMap<>();
         externalSchemasCache = new ArrayList<>(locations.size());
-        for (int i = 0; i < locations.size(); i++) {
-            String loc = locations.get(i);
+        for (String loc : locations) {
             try {
                 loadSchemasIntoCache(loc);
             } catch (Exception ex) {

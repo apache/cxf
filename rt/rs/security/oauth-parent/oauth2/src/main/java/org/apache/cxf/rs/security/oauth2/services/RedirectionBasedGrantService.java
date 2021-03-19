@@ -213,7 +213,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
                 OAuthUtils.convertPermissionsToScopeList(alreadyAuthorizedPerms).containsAll(requestedScope);
         }
 
-        Response finalResponse = null;
+        Response finalResponse;
         try {
             final boolean authorizationCanBeSkipped = preAuthorizationComplete
                 || canAuthorizationBeSkipped(params, client, userSubject, requestedScope, requestedPermissions);

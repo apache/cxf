@@ -206,7 +206,7 @@ public class OidcImplicitService extends ImplicitGrantService {
         if (code != null) {
             // this service is invoked as part of the hybrid flow
             Properties props = JwsUtils.loadSignatureOutProperties(false);
-            SignatureAlgorithm sigAlgo = null;
+            final SignatureAlgorithm sigAlgo;
             if (processor.isSignWithClientSecret()) {
                 sigAlgo = OAuthUtils.getClientSecretSignatureAlgorithm(props);
             } else {
