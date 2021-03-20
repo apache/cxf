@@ -39,6 +39,7 @@ import org.apache.cxf.io.Transferable;
 public final class IOUtils {
     public static final Charset UTF8_CHARSET = java.nio.charset.StandardCharsets.UTF_8;
     public static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
+    private static final String ERR_MSG = "0 bytes read in violation of InputStream.read(byte[])";
 
     private IOUtils() {
 
@@ -188,7 +189,7 @@ public final class IOUtils {
         int total = 0;
         while (-1 != n) {
             if (n == 0) {
-                throw new IOException("0 bytes read in violation of InputStream.read(byte[])");
+                throw new IOException(ERR_MSG);
             }
             output.write(buffer, 0, n);
             total += n;
@@ -213,7 +214,7 @@ public final class IOUtils {
         n = input.read(buffer, 0, n);
         while (-1 != n) {
             if (n == 0) {
-                throw new IOException("0 bytes read in violation of InputStream.read(byte[])");
+                throw new IOException(ERR_MSG);
             }
             output.write(buffer, 0, n);
             atLeast -= n;
@@ -301,7 +302,7 @@ public final class IOUtils {
             int n = r.read(buffer);
             while (-1 != n) {
                 if (n == 0) {
-                    throw new IOException("0 bytes read in violation of InputStream.read(byte[])");
+                    throw new IOException(ERR_MSG);
                 }
                 buf.append(buffer, 0, n);
                 n = r.read(buffer);
@@ -371,7 +372,7 @@ public final class IOUtils {
         n = input.read(buffer, 0, n);
         while (-1 != n) {
             if (n == 0) {
-                throw new IOException("0 bytes read in violation of InputStream.read(byte[])");
+                throw new IOException(ERR_MSG);
             }
             atLeast -= n;
             if (atLeast <= 0) {
