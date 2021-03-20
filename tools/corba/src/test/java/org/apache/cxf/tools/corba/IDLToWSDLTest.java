@@ -19,16 +19,11 @@
 
 package org.apache.cxf.tools.corba;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -38,137 +33,78 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.tools.common.ToolTestBase;
 import org.apache.cxf.tools.corba.common.ToolCorbaConstants;
-import org.apache.cxf.tools.corba.common.ToolTestBase;
 import org.apache.cxf.tools.corba.utils.TestUtils;
 import org.apache.cxf.tools.corba.utils.WSDLGenerationTester;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class IDLToWSDLTest extends ToolTestBase {
 
-    private static StringBuffer usageBuf;
-    private static int noError;
-    private static int error = -1;
-    ByteArrayOutputStream bout;
-    PrintStream newOut;
-    private File output;
+    @Rule
+    public TemporaryFolder output = new TemporaryFolder();
+
     private WSDLGenerationTester wsdlGenTester;
 
     public IDLToWSDLTest() {
         wsdlGenTester = new WSDLGenerationTester();
     }
 
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        try {
-            TestUtils utils = new TestUtils(IDLToWSDL.TOOL_NAME, IDLToWSDL.class
-                .getResourceAsStream("/toolspecs/idl2wsdl.xml"));
-            usageBuf = new StringBuffer(utils.getUsage());
-            bout = new ByteArrayOutputStream();
-            newOut = new PrintStream(bout);
-            System.setOut(newOut);
-            System.setErr(newOut);
-        } catch (Exception e) {
-            // complete
-        }
-
-        try {
-            output = new File(getClass().getResource(".").toURI());
-            output = new File(output, "generated-wsdl");
-            FileUtils.mkDir(output);
-        } catch (Exception e) {
-            // complete
-        }
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        // super.tearDown();
-        try {
-            FileUtils.removeDir(output);
-        } catch (Exception e) {
-            //ignore
-        }
-        output = null;
-    }
-
-    private int execute(String[] args) {
+    private static String execute(String[] args) {
         try {
             IDLToWSDL.run(args);
         } catch (Throwable t) {
-            return error;
+            return t.getMessage();
         }
 
-        return noError;
-    }
-
-    private void checkStrings(byte[] orig, byte[] generated) throws Exception {
-        try (BufferedReader origReader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(orig)));
-                BufferedReader genReader = new BufferedReader(
-                        new InputStreamReader(new ByteArrayInputStream(generated)))) {
-
-            String sorig = origReader.readLine();
-            String sgen = genReader.readLine();
-    
-            while (sorig != null && sgen != null) {
-                if (!sorig.equals(sgen)) {
-                    //assertEquals(sorig, sgen);
-                    //sorig = origReader.readLine();
-                    sgen = genReader.readLine();
-                } else {
-                    assertEquals(sorig, sgen);
-                    sorig = null;
-                    sgen = null;
-                    break;
-                }
-            }
-        }
+        return null;
     }
 
     @Test
     public void testNoArgs() throws Exception {
         String[] cmdArgs = {};
-        int exc = execute(cmdArgs);
-        assertEquals("IDLToWSDL Failed", error, exc);
-        StringBuilder strBuf = new StringBuilder(64);
-        strBuf.append("Missing argument: idl\n\n");
-        strBuf.append(usageBuf.toString());
-        checkStrings(strBuf.toString().getBytes(), bout.toByteArray());
+        String error = execute(cmdArgs);
+        assertNotNull("IDLToWSDL Failed", error);
+
+        String generated = new String(errOut.toByteArray());
+        assertTrue(generated.contains("Missing argument: idl"));
+        TestUtils utils = new TestUtils(IDLToWSDL.TOOL_NAME, IDLToWSDL.class
+            .getResourceAsStream(ToolCorbaConstants.TOOLSPECS_BASE + "idl2wsdl.xml"));
+        assertTrue(generated.contains(utils.getUsage()));
     }
 
     @Test
     public void testDetailOutput() throws Exception {
         String[] args = new String[] {"-?"};
-        int exc = execute(args);
-        assertEquals("IDLToWSDL Failed", noError, exc);
-        assertNotNull(bout.toByteArray());
+        String error = execute(args);
+        assertNull("IDLToWSDL Failed", error);
+        assertNotNull(errOut.toByteArray());
     }
 
     @Test
     public void testVersionOutput() throws Exception {
         String[] args = new String[] {"-v"};
-        int exc = execute(args);
-        assertEquals("IDLToWSDL Failed", noError, exc);
-        assertNotNull(bout.toByteArray());
+        String error = execute(args);
+        assertNull("IDLToWSDL Failed", error);
+        assertNotNull(errOut.toByteArray());
     }
 
     @Test
     public void testHelpOutput() throws Exception {
         String[] args = new String[] {"-help"};
-        int exc = execute(args);
-        assertEquals("IDLToWSDL Failed", noError, exc);
-        assertNotNull(bout.toByteArray());
+        String error = execute(args);
+        assertNull("IDLToWSDL Failed", error);
+        assertNotNull(errOut.toByteArray());
     }
 
     @Test
@@ -184,24 +120,24 @@ public class IDLToWSDLTest extends ToolTestBase {
     // test "-s base64Binary" and "-s hexBinary" options
     public void doTestSequenceOctetMappingOption(String encoding) throws Exception {
         File input = new File(getClass().getResource("/idl/sequence_octet.idl").toURI());
-        File actual = new File(output, "sequence_octet.wsdl");
+        File actual = new File(output.getRoot(), "sequence_octet.wsdl");
         File expected = new File(getClass().getResource("/idl/expected_"
                                                         + encoding + "_sequence_octet.wsdl").toURI());
 
         String[] args = new String[] {"-s", encoding,
-                                      "-o", output.toString(),
+                                      "-o", output.getRoot().toString(),
                                       input.toString()
         };
-        int exc = execute(args);
-        assertEquals("IDLToWSDL Failed", noError, exc);
+        String error = execute(args);
+        assertNull("IDLToWSDL Failed", error);
         doTestGeneratedWsdl(expected, actual);
     }
 
     private void doTestGeneratedWsdl(File expected, File actual)
         throws FileNotFoundException, XMLStreamException, Exception {
         //For testing, esp. in AIX, we need to write out both the defn & schema to see if it matches
-        File expectedWsdlFile = wsdlGenTester.writeDefinition(output, expected);
-        File actualWsdlFile = wsdlGenTester.writeDefinition(output, actual);
+        File expectedWsdlFile = wsdlGenTester.writeDefinition(output.getRoot(), expected);
+        File actualWsdlFile = wsdlGenTester.writeDefinition(output.getRoot(), actual);
 
         try (InputStream actualFileStream = new FileInputStream(actualWsdlFile);
             InputStream expectedFileStream = new FileInputStream(expectedWsdlFile)) {
@@ -219,16 +155,16 @@ public class IDLToWSDLTest extends ToolTestBase {
     @Test
     public void testSchemaNamespace() throws Exception {
         File input = new File(getClass().getResource("/idl/HelloWorld.idl").toURI());
-        File actual = new File(output, "HelloWorld.wsdl");
+        File actual = new File(output.getRoot(), "HelloWorld.wsdl");
         File expected =
             new File(getClass().getResource("/idl/expected_HelloWorld_schema_namespace.wsdl").toURI());
 
         String[] args = new String[] {"-x", "http://cxf.apache.org/foobar/schema",
-                                      "-o", output.toString(),
+                                      "-o", output.getRoot().toString(),
                                       input.toString()
         };
-        int exc = execute(args);
-        assertEquals("IDLToWSDL Failed", noError, exc);
+        String error = execute(args);
+        assertNull("IDLToWSDL Failed", error);
         doTestGeneratedWsdl(expected, actual);
     }
 
@@ -236,12 +172,12 @@ public class IDLToWSDLTest extends ToolTestBase {
     @Test
     public void testCorbaAddressFile() throws Exception {
         File input = new File(getClass().getResource("/idl/HelloWorld.idl").toURI());
-        File actual = new File(output, "HelloWorld.wsdl");
+        File actual = new File(output.getRoot(), "HelloWorld.wsdl");
         File expected =
             new File(getClass().getResource("/idl/expected_HelloWorld_corba_address_file.wsdl").toURI());
 
         // create temporary file containing ior
-        File addressFile = new File(output, "HelloWorld.idl");
+        File addressFile = new File(output.getRoot(), "HelloWorld.idl");
         try (FileWriter addressFileWriter = new FileWriter(addressFile)) {
             addressFileWriter.write(
                 "IOR:010000001400000049444c3a48656c6c6f576f726c64493a312e300002"
@@ -256,11 +192,11 @@ public class IDLToWSDLTest extends ToolTestBase {
         addressFile.deleteOnExit();
 
         String[] args = new String[] {"-f", addressFile.toString(),
-                                      "-o", output.toString(),
+                                      "-o", output.getRoot().toString(),
                                       input.toString()
         };
-        int exc = execute(args);
-        assertEquals("IDLToWSDL Failed", noError, exc);
+        String error = execute(args);
+        assertNull("IDLToWSDL Failed", error);
         doTestGeneratedWsdl(expected, actual);
     }
 
@@ -268,16 +204,16 @@ public class IDLToWSDLTest extends ToolTestBase {
     @Test
     public void testCorbaTypeMapTargetNamespace() throws Exception {
         File input = new File(getClass().getResource("/idl/sequence_octet.idl").toURI());
-        File actual = new File(output, "sequence_octet.wsdl");
+        File actual = new File(output.getRoot(), "sequence_octet.wsdl");
         File expected =
             new File(getClass().getResource("/idl/expected_sequence_octet_corba_typemap_tns.wsdl").toURI());
 
         String[] args = new String[] {"-t", "http://cxf.apache.org/foobar/typemap",
-                                      "-o", output.toString(),
+                                      "-o", output.getRoot().toString(),
                                       input.toString()
         };
-        int exc = execute(args);
-        assertEquals("IDLToWSDL Failed", noError, exc);
+        String error = execute(args);
+        assertNull("IDLToWSDL Failed", error);
         doTestGeneratedWsdl(expected, actual);
     }
 
@@ -285,15 +221,15 @@ public class IDLToWSDLTest extends ToolTestBase {
     @Test
     public void testTreatBoundedStringsAsUnbounded() throws Exception {
         File input = new File(getClass().getResource("/idl/String.idl").toURI());
-        File actual = new File(output, "String.wsdl");
+        File actual = new File(output.getRoot(), "String.wsdl");
         File expected = new File(getClass().getResource("/idl/expected_String_unbounded.wsdl").toURI());
 
         String[] args = new String[] {"-b",
-                                      "-o", output.toString(),
+                                      "-o", output.getRoot().toString(),
                                       input.toString()
         };
-        int exc = execute(args);
-        assertEquals("IDLToWSDL Failed", noError, exc);
+        String error = execute(args);
+        assertNull("IDLToWSDL Failed", error);
         doTestGeneratedWsdl(expected, actual);
     }
 
@@ -301,53 +237,53 @@ public class IDLToWSDLTest extends ToolTestBase {
     @Test
     public void testTreatBoundedAnonStringsAsUnbounded() throws Exception {
         File input = new File(getClass().getResource("/idl/Anonstring.idl").toURI());
-        File actual = new File(output, "Anonstring.wsdl");
+        File actual = new File(output.getRoot(), "Anonstring.wsdl");
         File expected = new File(getClass().getResource("/idl/expected_Anonstring_unbounded.wsdl").toURI());
 
         String[] args = new String[] {"-b",
-                                      "-o", output.toString(),
+                                      "-o", output.getRoot().toString(),
                                       input.toString()
         };
-        int exc = execute(args);
-        assertEquals("IDLToWSDL Failed", noError, exc);
+        String error = execute(args);
+        assertNull("IDLToWSDL Failed", error);
         doTestGeneratedWsdl(expected, actual);
     }
 
     @Test
     public void testExceptionsWithSchemasInDifferentNS() throws Exception {
         File input = new File(getClass().getResource("/idl/Exception.idl").toURI());
-        File actual = new File(output, "Exception.wsdl");
+        File actual = new File(output.getRoot(), "Exception.wsdl");
         File expected = new File(getClass().getResource("/idl/expected_Exception_DiffNS.wsdl").toURI());
 
         String[] args = new String[] {"-x", "http://cxf.apache.org/bindings/corba/idl/Exception/types",
-                                      "-o", output.toString(),
+                                      "-o", output.getRoot().toString(),
                                       input.toString()
         };
-        int exc = execute(args);
-        assertEquals("IDLToWSDL Failed", noError, exc);
+        String error = execute(args);
+        assertNull("IDLToWSDL Failed", error);
         doTestGeneratedWsdl(expected, actual);
     }
 
     @Test
     public void testOutputWSDLFileName() throws Exception {
         File input = new File(getClass().getResource("/idl/HelloWorld.idl").toURI());
-        File actual = new File(output, "ArtixHelloWorld.wsdl");
+        File actual = new File(output.getRoot(), "ArtixHelloWorld.wsdl");
         File expected =
             new File(getClass().getResource("/idl/expected_HelloWorld.wsdl").toURI());
 
         String[] args = new String[] {"-ow", "ArtixHelloWorld.wsdl",
-                                      "-o", output.toString(),
+                                      "-o", output.getRoot().toString(),
                                       input.toString()
         };
-        int exc = execute(args);
-        assertEquals("IDLToWSDL Failed", noError, exc);
+        String error = execute(args);
+        assertNull("IDLToWSDL Failed", error);
         doTestGeneratedWsdl(expected, actual);
     }
 
     @Test
     public void testMultipleIncludes() throws Exception {
         File input = new File(getClass().getResource("/idl/Parent.idl").toURI());
-        File actual = new File(output, "Parent.wsdl");
+        File actual = new File(output.getRoot(), "Parent.wsdl");
         File expected =
             new File(getClass().getResource("/idl/expected_Parent.wsdl").toURI());
         File include0Dir = new File(getClass().getResource("/idl").toURI());
@@ -355,21 +291,21 @@ public class IDLToWSDLTest extends ToolTestBase {
         File include2Dir = new File(getClass().getResource("/idl/subdir2").toURI());
 
         String[] args = new String[] {"-ow", "Parent.wsdl",
-                                      "-o", output.toString(),
+                                      "-o", output.getRoot().toString(),
                                       "-I", include0Dir.toString(),
                                       "-I", include1Dir.toString(),
                                       "-I", include2Dir.toString(),
                                       input.toString()
         };
-        int exc = execute(args);
-        assertEquals("IDLToWSDL Failed", noError, exc);
+        String error = execute(args);
+        assertNull("IDLToWSDL Failed", error);
         doTestGeneratedWsdl(expected, actual);
     }
 
     @Test
     public void testExternalInterfaceRef() throws Exception {
         File input = new File(getClass().getResource("/idl/ExternalInterfaceRef.idl").toURI());
-        File actual = new File(output, "ExternalInterfaceRef.wsdl");
+        File actual = new File(output.getRoot(), "ExternalInterfaceRef.wsdl");
         File expected =
             new File(getClass().getResource("/idl/expected_ExternalInterfaceRef.wsdl").toURI());
 
@@ -377,13 +313,13 @@ public class IDLToWSDLTest extends ToolTestBase {
         File include1Dir = new File(getClass().getResource("/idl").toURI());
 
         String[] args = new String[] {"-ow", "ExternalInterfaceRef.wsdl",
-                                      "-o", output.toString(),
+                                      "-o", output.getRoot().toString(),
                                       "-I", include1Dir.toString(),
                                       "-verbose",
                                       input.toString()
         };
-        int exc = execute(args);
-        assertEquals("IDLToWSDL Failed", noError, exc);
+        String error = execute(args);
+        assertNull("IDLToWSDL Failed", error);
         doTestGeneratedWsdl(expected, actual);
     }
 
@@ -394,14 +330,14 @@ public class IDLToWSDLTest extends ToolTestBase {
             new File(getClass().getResource("/idl/expected_duplicateAttribute.wsdl").toURI());
 
         String[] args = new String[] {"-ow", "duplicateAttribute.wsdl",
-                                      "-o", output.toString(),
+                                      "-o", output.getRoot().toString(),
                                       "-verbose",
                                       input.toString()
         };
-        int exc = execute(args);
-        File actual = new File(output, "duplicateAttribute.wsdl");
+        String error = execute(args);
+        assertNull("IDLToWSDL Failed", error);
 
-        assertEquals("IDLToWSDL Failed", noError, exc);
+        File actual = new File(output.getRoot(), "duplicateAttribute.wsdl");
         doTestGeneratedWsdl(expected, actual);
     }
 
@@ -411,7 +347,7 @@ public class IDLToWSDLTest extends ToolTestBase {
         File include1Dir = new File(getClass().getResource("/idl").toURI());
 
         String[] args = new String[] {"-ow", "ExternalInterfaceRef.wsdl",
-                                      "-o", output.toString(),
+                                      "-o", output.getRoot().toString(),
                                       "-I", include1Dir.toString(),
                                       "-verbose",
                                       input.toString()
@@ -429,11 +365,11 @@ public class IDLToWSDLTest extends ToolTestBase {
         File input = new File(getClass().getResource("/idl/missing_struct_member.idl").toURI());
         String[] args = new String[] {
             "-mns[org::bash=http://www.bash.org]",
-            "-o", output.toString(),
+            "-o", output.getRoot().toString(),
             input.toString()
         };
         IDLToWSDL.run(args);
-        File fs = new File(output, "org_bash.xsd");
+        File fs = new File(output.getRoot(), "org_bash.xsd");
         assertTrue(fs.getName() + " was not created.", fs.exists());
         Document doc = StaxUtils.read(new FileInputStream(fs));
         NodeList l = doc.getDocumentElement().getElementsByTagNameNS("http://www.w3.org/2001/XMLSchema", "element");
@@ -450,11 +386,11 @@ public class IDLToWSDLTest extends ToolTestBase {
     public void testCXF3329() throws Exception {
         File input = new File(getClass().getResource("/idl/CXF3329.idl").toURI());
         String[] args = new String[] {
-            "-o", output.toString(),
+            "-o", output.getRoot().toString(),
             input.toString()
         };
         IDLToWSDL.run(args);
-        File fs = new File(output, "CXF3329.wsdl");
+        File fs = new File(output.getRoot(), "CXF3329.wsdl");
         assertTrue(fs.getName() + " was not created.", fs.exists());
         Document doc = StaxUtils.read(new FileInputStream(fs));
         String s = StaxUtils.toString(doc.getDocumentElement());
@@ -465,12 +401,12 @@ public class IDLToWSDLTest extends ToolTestBase {
     public void testCXF5340() throws Exception {
         File input = new File(getClass().getResource("/idl/CXF5340.idl").toURI());
         String[] args = new String[] {
-            "-o", output.toString(),
+            "-o", output.getRoot().toString(),
             "-verbose", "-qualified",
             input.toString()
         };
         IDLToWSDL.run(args);
-        File fs = new File(output, "CXF5340.wsdl");
+        File fs = new File(output.getRoot(), "CXF5340.wsdl");
         assertTrue(fs.getName() + " was not created.", fs.exists());
 
         String corbaNs = "http://cxf.apache.org/bindings/corba";

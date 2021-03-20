@@ -151,7 +151,7 @@ public class ScopedNameVisitor extends VisitorBase {
                                                     TypeMappingType typeMap,
                                                     XmlSchemaType stype,
                                                     Scope scopedName) {
-        CorbaType ctype = null;
+        final CorbaType ctype;
         if (stype.getQName().equals(Constants.XSD_STRING)) {
             ctype = new CorbaType();
             ctype.setName(CorbaConstants.NT_CORBA_STRING.getLocalPart());
@@ -177,7 +177,7 @@ public class ScopedNameVisitor extends VisitorBase {
         if ((node.getFirstChild() == null)
             || (node.getFirstChild() != null && node.getFirstChild().getType() != IDLTokenTypes.SCOPEOP)) {
             while (!isForward && currentScope != currentScope.getParent()) {
-                Scope scopedName = null;
+                final Scope scopedName;
                 if (isFullyScopedName(node)) {
                     scopedName = getFullyScopedName(currentScope, node);
                 } else {
@@ -194,7 +194,7 @@ public class ScopedNameVisitor extends VisitorBase {
         }
         // Check for forward declaration in global scope
         if (!isForward) {
-            Scope scopedName = null;
+            final Scope scopedName;
             if (isFullyScopedName(node)) {
                 scopedName = getFullyScopedName(new Scope(), node);
             } else {
@@ -224,7 +224,7 @@ public class ScopedNameVisitor extends VisitorBase {
         if ((node.getFirstChild() == null)
             || (node.getFirstChild() != null && node.getFirstChild().getType() != IDLTokenTypes.SCOPEOP)) {
             while (result == null && currentScope != currentScope.getParent()) {
-                Scope scopedName = null;
+                final Scope scopedName;
                 if (isFullyScopedName(node)) {
                     scopedName = getFullyScopedName(currentScope, node);
                 } else {
@@ -249,7 +249,7 @@ public class ScopedNameVisitor extends VisitorBase {
         }
         // Check for forward declaration in global scope
         if (result == null) {
-            Scope scopedName = null;
+            final Scope scopedName;
             if (isFullyScopedName(node)) {
                 scopedName = getFullyScopedName(new Scope(), node);
             } else {
@@ -300,7 +300,7 @@ public class ScopedNameVisitor extends VisitorBase {
                 // it will be resolved by successvely n searching farther out in
                 // enclosing scopes, while taking into consideration
                 // inheritance relationships among interfaces.
-                Scope scopedName = null;
+                final Scope scopedName;
                 if (isFullyScopedName(node)) {
                     scopedName = getFullyScopedName(currentScope, node);
                 } else {
@@ -467,7 +467,6 @@ public class ScopedNameVisitor extends VisitorBase {
 
         boolean result = findNonSchemaType(scopedName.toString(), wsdlVisitor, holder);
         if (!result) {
-            QName qname = null;
             XmlSchema xmlSchema = schemaRef;
             String tns = wsdlVisitor.getModuleToNSMapper().map(scopedName.getParent());
             if (tns != null) {
@@ -481,13 +480,14 @@ public class ScopedNameVisitor extends VisitorBase {
                 // so the name
                 // and the typename will be different.
 
-                String scopedNameString = null;
+                final String scopedNameString;
                 if (mapper.isDefaultMapping()) {
                     scopedNameString = scopedName.toString();
                 } else {
                     scopedNameString = scopedName.tail();
                 }
 
+                final QName qname;
                 if (exceptionMode) {
                     qname = new QName(xmlSchema.getTargetNamespace(), scopedNameString + "Type");
                 } else {

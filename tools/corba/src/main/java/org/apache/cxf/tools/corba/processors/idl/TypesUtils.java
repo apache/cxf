@@ -84,8 +84,8 @@ public final class TypesUtils {
     }
 
     public static Scope generateAnonymousScopedName(Scope scope, XmlSchema schema) {
-        Scope scopedName = null;
-        XmlSchemaType anonSchemaType = null;
+        Scope scopedName;
+        XmlSchemaType anonSchemaType;
         int id = 0;
         do {
             id++;

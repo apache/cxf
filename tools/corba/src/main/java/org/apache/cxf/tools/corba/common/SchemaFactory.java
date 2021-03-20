@@ -108,11 +108,9 @@ public abstract class SchemaFactory {
     public abstract ExtensionRegistry newPopulatedExtensionRegistry();
 
     private static String findFactoryImplName() {
-        String factoryImplName = null;
-
         // First, check the system property.
         try {
-            factoryImplName = System.getProperty(PROPERTY_NAME);
+            String factoryImplName = System.getProperty(PROPERTY_NAME);
 
             if (factoryImplName != null) {
                 return factoryImplName;
@@ -131,7 +129,7 @@ public abstract class SchemaFactory {
                     properties.load(is);
                 }
 
-                factoryImplName = properties.getProperty(PROPERTY_NAME);
+                String factoryImplName = properties.getProperty(PROPERTY_NAME);
 
                 if (factoryImplName != null) {
                     return factoryImplName;

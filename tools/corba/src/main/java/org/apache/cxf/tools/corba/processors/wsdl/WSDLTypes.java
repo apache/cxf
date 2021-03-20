@@ -175,7 +175,7 @@ public final class WSDLTypes {
 
     public static CorbaType mapToArray(QName name, QName schematypeName, QName arrayType,
                                            QName elName, int bound, boolean anonymous) {
-        CorbaType corbatype = null;
+        final CorbaType corbatype;
 
         //schematypeName = checkPrefix(schematypeName);
 
@@ -208,7 +208,7 @@ public final class WSDLTypes {
 
     public static CorbaType mapToSequence(QName name, QName schematypeName, QName arrayType,
                                               QName elName, int bound, boolean anonymous) {
-        CorbaType corbaTypeImpl = null;
+        final CorbaType corbaTypeImpl;
 
         //schematypeName = checkPrefix(schematypeName);
         if (!anonymous) {

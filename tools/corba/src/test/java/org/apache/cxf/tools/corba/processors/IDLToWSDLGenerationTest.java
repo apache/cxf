@@ -107,7 +107,6 @@ public class IDLToWSDLGenerationTest extends ProcessorTestBase {
         URL orig = getClass().getResource(expectedWsdlFilename);
         InputStream actualStream = new ByteArrayInputStream(out.toString().getBytes());
 
-        System.out.println(out.toString());
         assertWsdlEquals(orig.openStream(), actualStream, DEFAULT_IGNORE_ATTR, DEFAULT_IGNORE_TAG);
     }
 

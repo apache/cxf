@@ -81,7 +81,6 @@ public class ParamDeferredAction implements SchemaDeferredAction {
             }
 
             // Now we need to make sure we are importing any types we need
-            XmlSchema importedSchema = null;
             if (stype.getQName().getNamespaceURI().equals(ReferenceConstants.WSADDRESSING_NAMESPACE)) {
                 boolean alreadyImported = false;
                 for (XmlSchemaExternal ext : schema.getExternals()) {
@@ -101,14 +100,10 @@ public class ParamDeferredAction implements SchemaDeferredAction {
                     wsaImport.setSchemaLocation(ReferenceConstants.WSADDRESSING_LOCATION);
                 }
             } else if (!stype.getQName().getNamespaceURI().equals(schema.getTargetNamespace())) {
-                importedSchema = manager.getXmlSchema(mapper.map(typeScope));
+                XmlSchema importedSchema = manager.getXmlSchema(mapper.map(typeScope));
                 manager.addXmlSchemaImport(schema, importedSchema, typeScope.toString("_"));
             }
         }
     }
 
 }
-
-
-
-

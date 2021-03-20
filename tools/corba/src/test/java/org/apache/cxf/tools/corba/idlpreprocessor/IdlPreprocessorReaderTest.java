@@ -26,7 +26,7 @@ import java.io.LineNumberReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.regex.Pattern;
 
 import org.junit.Test;
@@ -112,7 +112,7 @@ public class IdlPreprocessorReaderTest {
         final File dir = new File(origFile.getAbsolutePath()
                                   .substring(0, origFile.getAbsolutePath().indexOf(location)));
         final DefaultIncludeResolver includeResolver = new DefaultIncludeResolver(dir);
-        final DefineState defineState = new DefineState(new HashMap<String, String>());
+        final DefineState defineState = new DefineState(Collections.emptyMap());
 
         final IdlPreprocessorReader includeReader = new IdlPreprocessorReader(orig,
                                                                              location,
@@ -125,7 +125,7 @@ public class IdlPreprocessorReaderTest {
     private IdlPreprocessorReader createPreprocessorReader(final String location) throws IOException {
         final URL orig = findTestResource(location);
         final ClassPathIncludeResolver includeResolver = new ClassPathIncludeResolver();
-        final DefineState defineState = new DefineState(new HashMap<String, String>());
+        final DefineState defineState = new DefineState(Collections.emptyMap());
         return new IdlPreprocessorReader(orig, location, includeResolver, defineState);
     }
 
@@ -136,7 +136,7 @@ public class IdlPreprocessorReaderTest {
         InputStream resolved = findTestResource(expectedResultLocation).openStream();
         try (LineNumberReader rReader
             = new LineNumberReader(new InputStreamReader(resolved, "ISO-8859-1"))) {
-            boolean eof = false;
+            boolean eof;
             do {
                 int line = rReader.getLineNumber() + 1;
                 String actualLine = oReader.readLine();
@@ -147,11 +147,6 @@ public class IdlPreprocessorReaderTest {
         }
     }
 
-    private void consumeReader(final Reader includeReader) throws IOException {
-        LineNumberReader oReader = new LineNumberReader(includeReader);
-        String line = null;
-        do {
-            line = oReader.readLine();
-        } while (line != null);
+    private static void consumeReader(final Reader includeReader) throws IOException {
     }
 }

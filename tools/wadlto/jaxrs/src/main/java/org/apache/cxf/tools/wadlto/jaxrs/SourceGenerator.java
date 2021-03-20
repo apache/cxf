@@ -517,8 +517,8 @@ public class SourceGenerator {
         }
     }
 
-    private QName convertToQName(String resourceId, boolean expandedQName) {
-        QName qname = null;
+    private static QName convertToQName(String resourceId, boolean expandedQName) {
+        final QName qname;
         if (expandedQName) {
             qname = JAXRSUtils.convertStringToQName(resourceId);
         } else {
@@ -535,7 +535,7 @@ public class SourceGenerator {
     }
 
     private String getClassName(String clsName, boolean interfaceIsGenerated, Set<String> typeClassNames) {
-        String name = null;
+        String name;
         if (interfaceIsGenerated) {
             name = clsName;
         } else {

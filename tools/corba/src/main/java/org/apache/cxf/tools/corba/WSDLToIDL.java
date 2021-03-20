@@ -20,7 +20,7 @@
 package org.apache.cxf.tools.corba;
 
 import java.io.File;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
 
 import org.apache.cxf.common.i18n.Message;
@@ -53,17 +53,14 @@ public class WSDLToIDL extends AbstractCXFToolContainer {
     }
 
     private Set<String> getArrayKeys() {
-        return new HashSet<>();
+        return Collections.emptySet();
     }
 
     public void execute(boolean exitOnFinish) {
-        WSDLToCorbaProcessor corbaProcessor = new WSDLToCorbaProcessor();
-        ProcessorEnvironment env = null;
-
         try {
             super.execute(exitOnFinish);
             if (!hasInfoOption()) {
-                env = new ProcessorEnvironment();
+                ProcessorEnvironment env = new ProcessorEnvironment();
                 env.setParameters(getParametersMap(getArrayKeys()));
                 if (isVerboseOn()) {
                     env.put(ToolConstants.CFG_VERBOSE, Boolean.TRUE);
@@ -80,6 +77,8 @@ public class WSDLToIDL extends AbstractCXFToolContainer {
 
                 initialise(env);
                 validate(env);
+
+                WSDLToCorbaProcessor corbaProcessor = new WSDLToCorbaProcessor();
                 corbaProcessor.setEnvironment(env);
                 corbaProcessor.process();
             }

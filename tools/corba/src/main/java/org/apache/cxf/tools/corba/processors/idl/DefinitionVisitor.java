@@ -46,7 +46,7 @@ public class DefinitionVisitor extends VisitorBase {
         case IDLTokenTypes.LITERAL_custom:
         case IDLTokenTypes.LITERAL_valuetype: {
             System.out.println("Valuetypes not supported");
-            System.exit(1);
+            System.exit(1); //NOPMD
             break;
         }
         case IDLTokenTypes.LITERAL_module: {

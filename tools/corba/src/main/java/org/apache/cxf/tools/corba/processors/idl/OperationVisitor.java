@@ -129,7 +129,7 @@ public class OperationVisitor extends VisitorBase {
 
         Operation operation = generateOperation(operationQName.getLocalPart(), isDuplicate);
 
-        BindingOperation bindingOperation = null;
+        final BindingOperation bindingOperation;
         if (isDuplicate) {
             bindingOperation = generateBindingOperation(binding, operation, operationQName.getLocalPart());
         } else {
@@ -146,7 +146,6 @@ public class OperationVisitor extends VisitorBase {
         // <op_attribute>
         node = node.getFirstChild();
         XmlSchemaSequence outputWrappingSequence = null;
-        XmlSchemaElement outputElement = null;
         if (node != null && (node.getType() == IDLTokenTypes.LITERAL_oneway)) {
             // oneway operations map to operations with only input message
             // no outputMsg nor outputPart need be created
@@ -155,7 +154,7 @@ public class OperationVisitor extends VisitorBase {
             // normal operations map to request-response operations
             // with input and output messages
             outputWrappingSequence = new XmlSchemaSequence();
-            outputElement = generateWrapper(new QName(schema.getTargetNamespace(),
+            XmlSchemaElement outputElement = generateWrapper(new QName(schema.getTargetNamespace(),
                                                       operation.getName() + RESPONSE_SUFFIX),
                                             outputWrappingSequence);
             outputMsg = generateOutputMessage(operation, bindingOperation);

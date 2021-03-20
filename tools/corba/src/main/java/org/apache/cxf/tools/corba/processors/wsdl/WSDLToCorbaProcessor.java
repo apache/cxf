@@ -155,9 +155,8 @@ public class WSDLToCorbaProcessor extends WSDLToProcessor {
             idlAction.setBindingName(env.get("binding").toString());
         } else {
             if (wsdlToCorbaBinding != null) {
-                String portType = null;
                 if (env.optionSet(ToolConstants.CFG_PORTTYPE)) {
-                    portType = env.get("porttype").toString();
+                    String portType = env.get("porttype").toString();
                     if (portType != null) {
                         String bindingName = wsdlToCorbaBinding.getMappedBindingName(portType);
                         if (bindingName != null) {

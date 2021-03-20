@@ -20,13 +20,12 @@
 package org.apache.cxf.tools.corba.utils;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.Writer;
+import java.nio.file.Files;
 
 import javax.wsdl.Definition;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
-import javax.wsdl.xml.WSDLWriter;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
@@ -34,14 +33,10 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.CatalogWSDLLocator;
-import org.apache.ws.commons.schema.XmlSchema;
-import org.apache.ws.commons.schema.XmlSchemaCollection;
 
 import org.junit.Assert;
 
 public class WSDLGenerationTester {
-
-    private XmlSchemaCollection schemaCol = new XmlSchemaCollection();
 
     public WSDLGenerationTester() {
     }
@@ -129,7 +124,7 @@ public class WSDLGenerationTester {
 
     private String mapToQName(XMLStreamReader reader, String s2) {
         int idx = s2.indexOf(':');
-        String ns = null;
+        String ns;
         if (idx == -1) {
             ns = reader.getNamespaceURI("");
         } else {
@@ -156,8 +151,6 @@ public class WSDLGenerationTester {
 
     public File writeDefinition(File targetDir, File defnFile) throws Exception {
         WSDLManager wm = BusFactory.getThreadDefaultBus().getExtension(WSDLManager.class);
-        File bkFile = new File(targetDir, "bk_" + defnFile.getName());
-        FileWriter writer = new FileWriter(bkFile);
         WSDLFactory factory
             = WSDLFactory.newInstance("org.apache.cxf.tools.corba.utils.TestWSDLCorbaFactoryImpl");
         WSDLReader reader = factory.newWSDLReader();
@@ -168,24 +161,11 @@ public class WSDLGenerationTester {
 
         Definition wsdlDefn = reader.readWSDL(locator);
 
-        WSDLWriter wsdlWriter = factory.newWSDLWriter();
-        wsdlWriter.writeWSDL(wsdlDefn, writer);
-        writer.close();
-        writer = null;
-        reader = null;
+        File bkFile = new File(targetDir, "bk_" + defnFile.getName());
+        try (Writer writer = Files.newBufferedWriter(bkFile.toPath())) {
+            factory.newWSDLWriter().writeWSDL(wsdlDefn, writer);
+        }
         return bkFile;
     }
 
-    public File writeSchema(File targetDir, File schemaFile) throws Exception {
-        File bkFile = new File(targetDir, "bk_" + schemaFile.getName());
-        FileWriter writer = new FileWriter(bkFile);
-        FileReader reader = new FileReader(schemaFile);
-        XmlSchema schema = schemaCol.read(reader);
-        schema.write(writer);
-        reader.close();
-        writer.close();
-        writer = null;
-        reader = null;
-        return bkFile;
-    }
 }

@@ -110,9 +110,9 @@ public class StructVisitor extends VisitorBase {
         while (memberTypeNode != null) {
             AST memberNode = TypesUtils.getCorbaTypeNameNode(memberTypeNode);
 
-            XmlSchemaType schemaType = null;
-            CorbaType corbaType = null;
-            Scope fqName = null;
+            final XmlSchemaType schemaType;
+            final CorbaType corbaType;
+            Scope fqName;
             try {
                 TypesVisitor visitor = new TypesVisitor(structScope,
                                                         definition,

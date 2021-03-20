@@ -121,7 +121,7 @@ public class PortTypeVisitor extends VisitorBase {
                 specNode = specNode.getNextSibling();
             }
 
-            AST exportNode = null;
+            AST exportNode;
             if (specNode.getType() == IDLTokenTypes.RCURLY) {
                 exportNode = specNode.getNextSibling();
             } else if (specNode.getType() == IDLTokenTypes.COLON) {

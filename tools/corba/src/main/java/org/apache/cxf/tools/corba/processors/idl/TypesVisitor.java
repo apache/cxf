@@ -51,8 +51,7 @@ public class TypesVisitor extends VisitorBase {
         // <type_spec> ::= <simple_type_spec>
         //               | <constr_type_spec>
 
-        Visitor visitor = null;
-
+        final Visitor visitor;
 
         if (ConstrTypeSpecVisitor.accept(node)) {
             // type_spec - constr_type_spec

@@ -228,7 +228,7 @@ public final class WSDLASTVisitor implements ASTVisitor {
     }
 
     public void setSequenceOctetType(String type) throws Exception {
-        XmlSchemaType stype = null;
+        final XmlSchemaType stype;
         if (type.equals(ToolCorbaConstants.CFG_SEQUENCE_OCTET_TYPE_BASE64BINARY)) {
             stype = schemas.getTypeByQName(Constants.XSD_BASE64);
         } else if (type.equals(ToolCorbaConstants.CFG_SEQUENCE_OCTET_TYPE_HEXBINARY)) {
@@ -301,7 +301,7 @@ public final class WSDLASTVisitor implements ASTVisitor {
                                     String physicalFile) throws Exception {
 
         Definition logicalDef = getLogicalDefinition(schemaFilename, schemaWriter);
-        Definition physicalDef = null;
+        final Definition physicalDef;
         // schema only
         if ((schemaFilename != null || importSchemaFilename != null)
             && (logicalFile == null && physicalFile == null)) {
@@ -403,7 +403,7 @@ public final class WSDLASTVisitor implements ASTVisitor {
     private Definition getPhysicalDefinition(Definition logicalDef, boolean schemaOnly)
         throws WSDLException, JAXBException {
 
-        Definition def = null;
+        final Definition def;
         if (schemaOnly) {
             def = logicalDef;
         } else {
