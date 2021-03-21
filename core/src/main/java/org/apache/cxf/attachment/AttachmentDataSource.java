@@ -38,7 +38,7 @@ public class AttachmentDataSource implements DataSource {
     private DelegatingInputStream delegate;
     private String name;
 
-    public AttachmentDataSource(String ctParam, InputStream inParam) throws IOException {
+    public AttachmentDataSource(String ctParam, InputStream inParam) {
         this.ct = ctParam;
         ins = inParam;
     }
