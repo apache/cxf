@@ -73,7 +73,7 @@ public @interface Policy {
 
         SERVICE,
         SERVICE_PORT,
-    };
+    }
 
     final class DEFAULT { }
 }
