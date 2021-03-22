@@ -456,7 +456,6 @@ public class AttachmentDeserializer {
             value = line.substring(separator);
         }
         List<String> v = heads.computeIfAbsent(name, k -> new ArrayList<>(1));
-        heads.put(name, v);
         v.add(value);
     }
 
