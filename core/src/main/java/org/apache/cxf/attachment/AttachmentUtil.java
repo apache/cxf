@@ -75,6 +75,9 @@ public final class AttachmentUtil {
     private static final Random BOUND_RANDOM = new Random();
     private static final CommandMap DEFAULT_COMMAND_MAP = CommandMap.getDefaultCommandMap();
     private static final MailcapCommandMap COMMAND_MAP = new EnhancedMailcapCommandMap();
+    
+    private static final String ERROR_MSG = "The value set as ";
+    private static final String BINARY = "binary";
 
     static final class EnhancedMailcapCommandMap extends MailcapCommandMap {
         @Override
@@ -173,7 +176,7 @@ public final class AttachmentUtil {
             } else if (directory instanceof String) {
                 bos.setOutputDir(new File((String) directory));
             } else {
-                throw new IOException("The value set as " + AttachmentDeserializer.ATTACHMENT_DIRECTORY
+                throw new IOException(ERROR_MSG + AttachmentDeserializer.ATTACHMENT_DIRECTORY
                         + " should be either an instance of File or String");
             }
         }
@@ -195,7 +198,7 @@ public final class AttachmentUtil {
                     throw new IOException("Provided threshold String is not a number", e);
                 }
             } else {
-                throw new IOException("The value set as " + AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD
+                throw new IOException(ERROR_MSG + AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD
                         + " should be either an instance of Number or String");
             }
         } else if (!CachedOutputStream.isThresholdSysPropSet()) {
@@ -219,7 +222,7 @@ public final class AttachmentUtil {
                     throw new IOException("Provided threshold String is not a number", e);
                 }
             } else {
-                throw new IOException("The value set as " + AttachmentDeserializer.ATTACHMENT_MAX_SIZE
+                throw new IOException(ERROR_MSG + AttachmentDeserializer.ATTACHMENT_MAX_SIZE
                         + " should be either an instance of Number or String");
             }
         }
@@ -277,7 +280,7 @@ public final class AttachmentUtil {
                 dataHandlers = new DHMap(attachments);
             }
         }
-        return dataHandlers == null ? new LinkedHashMap<String, DataHandler>() : dataHandlers;
+        return dataHandlers == null ? new LinkedHashMap<>() : dataHandlers;
     }
 
     static class DHMap extends AbstractMap<String, DataHandler> {
@@ -313,6 +316,7 @@ public final class AttachmentUtil {
                                 }
                             };
                         }
+                        @Override
                         public void remove() {
                             it.remove();
                         }
@@ -325,6 +329,8 @@ public final class AttachmentUtil {
                 }
             };
         }
+        
+        @Override
         public DataHandler put(String key, DataHandler value) {
             Iterator<Attachment> i = list.iterator();
             DataHandler ret = null;
@@ -360,7 +366,7 @@ public final class AttachmentUtil {
         }
         if (id == null) {
             //no Content-ID, set cxf default ID
-            id = "root.message@cxf.apache.org";
+            id =  BODY_ATTACHMENT_ID;
         }
         return id;
     }
@@ -400,14 +406,14 @@ public final class AttachmentUtil {
             String name = e.getKey();
             if ("Content-Transfer-Encoding".equalsIgnoreCase(name)) {
                 encoding = getHeader(headers, name);
-                if ("binary".equalsIgnoreCase(encoding)) {
+                if (BINARY.equalsIgnoreCase(encoding)) {
                     att.setXOP(true);
                 }
             }
             att.setHeader(name, getHeaderValue(e.getValue()));
         }
         if (encoding == null) {
-            encoding = "binary";
+            encoding = BINARY;
         }
         InputStream ins = decode(stream, encoding);
         if (ins != stream) {
@@ -440,7 +446,7 @@ public final class AttachmentUtil {
         encoding = encoding.toLowerCase();
 
         // some encodings are just pass-throughs, with no real decoding.
-        if ("binary".equals(encoding)
+        if (BINARY.equals(encoding)
             || "7bit".equals(encoding)
             || "8bit".equals(encoding)) {
             return in;

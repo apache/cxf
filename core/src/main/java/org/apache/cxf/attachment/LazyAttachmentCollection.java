@@ -110,6 +110,7 @@ public class LazyAttachmentCollection
                 }
             }
 
+            @Override
             public Attachment next() {
                 Attachment a = attachments.get(current);
                 current++;
@@ -117,6 +118,7 @@ public class LazyAttachmentCollection
                 return a;
             }
 
+            @Override
             public void remove() {
                 if (removed) {
                     throw new IllegalStateException();
@@ -291,6 +293,7 @@ public class LazyAttachmentCollection
                                 }
                             };
                         }
+                        @Override
                         public void remove() {
                             it.remove();
                         }
@@ -315,6 +318,7 @@ public class LazyAttachmentCollection
                             return it.next().getId();
                         }
 
+                        @Override
                         public void remove() {
                             it.remove();
                         }
@@ -339,6 +343,7 @@ public class LazyAttachmentCollection
                         public DataHandler next() {
                             return it.next().getDataHandler();
                         }
+                        @Override
                         public void remove() {
                             it.remove();
                         }
