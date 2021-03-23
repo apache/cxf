@@ -46,7 +46,7 @@ public class AttachmentSerializer {
     // http://tools.ietf.org/html/rfc2387
     private static final String DEFAULT_MULTIPART_TYPE = "multipart/related";
 
-    private String contentTransferEncoding = "binary";
+    private String contentTransferEncoding = AttachmentUtil.BINARY;
 
     private Message message;
     private String bodyBoundary;

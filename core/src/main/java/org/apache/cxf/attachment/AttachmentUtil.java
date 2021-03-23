@@ -67,6 +67,8 @@ import org.apache.cxf.message.MessageUtils;
 public final class AttachmentUtil {
     public static final String BODY_ATTACHMENT_ID = "root.message@cxf.apache.org";
 
+    static final String BINARY = "binary";
+    
     private static final Logger LOG = LogUtils.getL7dLogger(AttachmentUtil.class);
 
     private static final AtomicInteger COUNTER = new AtomicInteger();
@@ -76,8 +78,7 @@ public final class AttachmentUtil {
     private static final CommandMap DEFAULT_COMMAND_MAP = CommandMap.getDefaultCommandMap();
     private static final MailcapCommandMap COMMAND_MAP = new EnhancedMailcapCommandMap();
     
-    private static final String BINARY = "binary";
-
+    
     static final class EnhancedMailcapCommandMap extends MailcapCommandMap {
         @Override
         public synchronized DataContentHandler createDataContentHandler(
