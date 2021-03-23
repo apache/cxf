@@ -76,7 +76,6 @@ public final class AttachmentUtil {
     private static final CommandMap DEFAULT_COMMAND_MAP = CommandMap.getDefaultCommandMap();
     private static final MailcapCommandMap COMMAND_MAP = new EnhancedMailcapCommandMap();
     
-    private static final String ERROR_MSG = "The value set as ";
     private static final String BINARY = "binary";
 
     static final class EnhancedMailcapCommandMap extends MailcapCommandMap {
@@ -176,7 +175,7 @@ public final class AttachmentUtil {
             } else if (directory instanceof String) {
                 bos.setOutputDir(new File((String) directory));
             } else {
-                throw new IOException(ERROR_MSG + AttachmentDeserializer.ATTACHMENT_DIRECTORY
+                throw new IOException("The value set as " + AttachmentDeserializer.ATTACHMENT_DIRECTORY
                         + " should be either an instance of File or String");
             }
         }
@@ -198,7 +197,7 @@ public final class AttachmentUtil {
                     throw new IOException("Provided threshold String is not a number", e);
                 }
             } else {
-                throw new IOException(ERROR_MSG + AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD
+                throw new IOException("The value set as " + AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD
                         + " should be either an instance of Number or String");
             }
         } else if (!CachedOutputStream.isThresholdSysPropSet()) {
@@ -222,7 +221,7 @@ public final class AttachmentUtil {
                     throw new IOException("Provided threshold String is not a number", e);
                 }
             } else {
-                throw new IOException(ERROR_MSG + AttachmentDeserializer.ATTACHMENT_MAX_SIZE
+                throw new IOException("The value set as " + AttachmentDeserializer.ATTACHMENT_MAX_SIZE
                         + " should be either an instance of Number or String");
             }
         }
