@@ -202,7 +202,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         }
 
         Crypto encrCrypto = getEncryptionCrypto(e, message, data);
-        Crypto signCrypto = null;
+        final Crypto signCrypto;
         if (e != null && e.equals(s)) {
             signCrypto = encrCrypto;
         } else {
@@ -243,7 +243,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         }
 
         Crypto encrCrypto = getEncryptionCrypto(e, message, data);
-        Crypto signCrypto = null;
+        final Crypto signCrypto;
         if (e != null && e.equals(s)) {
             signCrypto = encrCrypto;
         } else {
@@ -352,7 +352,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         }
 
         Crypto encrCrypto = getEncryptionCrypto(e, message, data);
-        Crypto signCrypto = null;
+        final Crypto signCrypto;
         if (e != null && e.equals(s)) {
             signCrypto = encrCrypto;
         } else {

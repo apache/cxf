@@ -140,7 +140,7 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
 
             if (binding != null) {
                 WSSecHeader secHeader = new WSSecHeader(actor, mustUnderstand, saaj.getSOAPPart());
-                Element el = null;
+                final Element el;
                 try {
                     el = secHeader.insertSecurityHeader();
                 } catch (WSSecurityException e) {

@@ -63,7 +63,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         doc = saajMsg.getSOAPPart();
 
         byte[] docbytes = getMessageBytes(doc);
-        doc = StaxUtils.read(new ByteArrayInputStream(docbytes));
+        StaxUtils.read(new ByteArrayInputStream(docbytes));
 
         WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
 
@@ -112,7 +112,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         assertValid("//wsse:Security", doc);
 
         byte[] docbytes = getMessageBytes(doc);
-        doc = StaxUtils.read(new ByteArrayInputStream(docbytes));
+        StaxUtils.read(new ByteArrayInputStream(docbytes));
 
         WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
 
@@ -161,7 +161,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         assertValid("//wsse:Security", doc);
 
         byte[] docbytes = getMessageBytes(doc);
-        doc = StaxUtils.read(new ByteArrayInputStream(docbytes));
+        StaxUtils.read(new ByteArrayInputStream(docbytes));
 
         WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
 
@@ -197,7 +197,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         doc = saajMsg.getSOAPPart();
 
         byte[] docbytes = getMessageBytes(doc);
-        doc = StaxUtils.read(new ByteArrayInputStream(docbytes));
+        StaxUtils.read(new ByteArrayInputStream(docbytes));
 
         WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
 

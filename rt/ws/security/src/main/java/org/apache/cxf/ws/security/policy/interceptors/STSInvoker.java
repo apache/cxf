@@ -78,7 +78,7 @@ abstract class STSInvoker implements Invoker {
         MessageContentsList lst = (MessageContentsList)o;
         DOMSource src = (DOMSource)lst.get(0);
         Node nd = src.getNode();
-        Element requestEl = null;
+        final Element requestEl;
         if (nd instanceof Document) {
             requestEl = ((Document)nd).getDocumentElement();
         } else {
@@ -204,7 +204,7 @@ abstract class STSInvoker implements Invoker {
         byte[] clientEntropy,
         int keySize
     ) throws NoSuchAlgorithmException, WSSecurityException, XMLStreamException {
-        byte[] secret = null;
+        final byte[] secret;
         writer.writeStartElement(prefix, "RequestedProofToken", namespace);
         if (clientEntropy == null) {
             secret = WSSecurityUtil.generateNonce(keySize / 8);

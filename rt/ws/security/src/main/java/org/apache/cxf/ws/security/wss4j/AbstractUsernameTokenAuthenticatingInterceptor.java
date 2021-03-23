@@ -156,7 +156,7 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
         if (msg == null) {
             throw new IllegalStateException("Current message is not available");
         }
-        Subject subject = null;
+        final Subject subject;
         try {
             subject = createSubject(name, password, isDigest, nonce, created);
         } catch (Exception ex) {

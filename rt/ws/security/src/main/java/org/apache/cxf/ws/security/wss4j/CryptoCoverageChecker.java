@@ -121,15 +121,14 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
             throw new SoapFault("Error obtaining SOAP document", Fault.FAULT_CODE_CLIENT);
         }
 
-        Element documentElement = null;
+        final Element documentElement;
         try {
             SOAPMessage saajDoc = message.getContent(SOAPMessage.class);
             SOAPEnvelope envelope = saajDoc.getSOAPPart().getEnvelope();
             if (!checkFaults && envelope.getBody().hasFault()) {
                 return;
             }
-            documentElement = envelope;
-            documentElement = (Element)DOMUtils.getDomElement(documentElement);
+            documentElement = (Element)DOMUtils.getDomElement(envelope);
         } catch (SOAPException e) {
             throw new SoapFault("Error obtaining SOAP document", Fault.FAULT_CODE_CLIENT);
         }

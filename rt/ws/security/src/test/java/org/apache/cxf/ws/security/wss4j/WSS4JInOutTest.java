@@ -293,7 +293,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         assertValid("//wsse:Security/ds:Signature", doc);
 
         byte[] docbytes = getMessageBytes(doc);
-        doc = StaxUtils.read(new ByteArrayInputStream(docbytes));
+        StaxUtils.read(new ByteArrayInputStream(docbytes));
 
         final Map<String, Object> properties = new HashMap<>();
         properties.put(
@@ -341,7 +341,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         assertValid("//wsse:Security/ds:Signature", doc);
 
         byte[] docbytes = getMessageBytes(doc);
-        doc = StaxUtils.read(new ByteArrayInputStream(docbytes));
+        StaxUtils.read(new ByteArrayInputStream(docbytes));
 
         final Map<String, Object> properties = new HashMap<>();
         final Map<QName, Object> customMap = new HashMap<>();

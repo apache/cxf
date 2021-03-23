@@ -129,8 +129,6 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
                     break;
                 } else if (p != null) {
 
-                    Object receivedAssertion = null;
-
                     if (desiredEvent == WSSecurityEventConstants.SAML_TOKEN) {
                         String roleAttributeName = (String)SecurityUtils.getSecurityPropertyValue(
                                 SecurityConstants.SAML_ROLE_ATTRIBUTENAME, msg);
@@ -138,7 +136,7 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
                             roleAttributeName = SAML_ROLE_ATTRIBUTENAME_DEFAULT;
                         }
 
-                        receivedAssertion = ((SAMLTokenPrincipal)token.getPrincipal()).getToken();
+                        Object receivedAssertion = ((SAMLTokenPrincipal)token.getPrincipal()).getToken();
                         if (receivedAssertion != null) {
                             ClaimCollection claims =
                                 SAMLUtils.getClaims((SamlAssertionWrapper)receivedAssertion);

@@ -180,7 +180,7 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
     protected String getPassword(String userName, AbstractToken info,
                                  int usage, SoapMessage message) {
         //Then try to get the password from the given callback handler
-        CallbackHandler handler = null;
+        final CallbackHandler handler;
         try {
             Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, message);
             handler = SecurityUtils.getCallbackHandler(o);

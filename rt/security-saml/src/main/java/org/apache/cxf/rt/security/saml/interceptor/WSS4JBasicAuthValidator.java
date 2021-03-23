@@ -83,7 +83,7 @@ public abstract class WSS4JBasicAuthValidator {
         credential = getValidator().validate(credential, data);
 
         // Create a Principal/SecurityContext
-        SecurityContext sc = null;
+        final SecurityContext sc;
         if (credential != null && credential.getPrincipal() != null) {
             sc = createSecurityContext(message, credential);
         } else {

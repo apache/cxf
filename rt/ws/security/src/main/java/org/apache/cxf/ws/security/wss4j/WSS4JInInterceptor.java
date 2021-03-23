@@ -384,8 +384,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             throw new SoapFault(new Message("STAX_EX", LOG), e, version.getSender());
         } catch (SOAPException e) {
             throw new SoapFault(new Message("SAAJ_EX", LOG), e, version.getSender());
-        } finally {
-            reqData = null;
         }
     }
     private void importNewDomToSAAJ(SOAPMessage doc, Element elem,
@@ -405,9 +403,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     getDocumentElement().getFirstChild().getNextSibling().getFirstChild();
             }
             if (document != null && node != null) {
-                Node newNode = null;
                 try {
-                    newNode = DOMUtils.getDomElement(document.importNode(node, true));
+                    Node newNode = DOMUtils.getDomElement(document.importNode(node, true));
                     elem.getOwnerDocument().getDocumentElement().getFirstChild().
                         getNextSibling().replaceChild(newNode, node);
                     List<WSSecurityEngineResult> encryptResults = wsResult.getActionResults().get(WSConstants.ENCR);
@@ -638,7 +635,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         Object o =
             SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER,
                                                    (SoapMessage)reqData.getMsgContext());
-        CallbackHandler cbHandler = null;
+        CallbackHandler cbHandler;
         try {
             cbHandler = SecurityUtils.getCallbackHandler(o);
         } catch (Exception ex) {

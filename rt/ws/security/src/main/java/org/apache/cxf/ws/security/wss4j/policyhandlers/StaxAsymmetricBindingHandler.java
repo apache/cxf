@@ -276,8 +276,8 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 }
             }
 
-            List<SecurePart> encrParts = null;
-            List<SecurePart> sigParts = null;
+            final List<SecurePart> encrParts;
+            final List<SecurePart> sigParts;
             try {
                 encrParts = getEncryptedParts();
                 //Signed parts are determined before encryption because encrypted signed headers

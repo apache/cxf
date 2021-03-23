@@ -139,7 +139,7 @@ public final class WSS4JUtils {
                     }
                     if (WSS4JCacheUtil.isEhCacheInstalled()) {
                         Bus bus = message.getExchange().getBus();
-                        Path diskstoreParent = null;
+                        final Path diskstoreParent;
                         try {
                             diskstoreParent = Files.createTempDirectory("cxf");
                         } catch (IOException ex) {
@@ -221,8 +221,8 @@ public final class WSS4JUtils {
     ) {
         SoapFault fault;
 
-        String errorMessage = null;
-        javax.xml.namespace.QName faultCode = null;
+        final String errorMessage;
+        final javax.xml.namespace.QName faultCode;
 
         boolean returnSecurityError =
             MessageUtils.getContextualBoolean(message, SecurityConstants.RETURN_SECURITY_ERROR, false);

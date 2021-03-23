@@ -89,7 +89,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         assertFalse(sigv.isEmpty());
 
         byte[] docbytes = getMessageBytes(doc);
-        doc = StaxUtils.read(new ByteArrayInputStream(docbytes));
+        StaxUtils.read(new ByteArrayInputStream(docbytes));
 
         WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
 
@@ -139,7 +139,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         // assertValid("//wsse:Security/wsse11:SignatureConfirmation", doc);
 
         byte[] docbytes = getMessageBytes(doc);
-        doc = StaxUtils.read(new ByteArrayInputStream(docbytes));
+        StaxUtils.read(new ByteArrayInputStream(docbytes));
 
         WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
 
