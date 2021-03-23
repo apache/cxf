@@ -46,10 +46,14 @@ public class BusDefinitionParser
         }
         return cxfBean;
     }
+    
+    @Override
     protected void processBusAttribute(Element element, ParserContext ctx,
                                        MutableBeanMetadata bean, String val) {
         //nothing
     }
+    
+    @Override
     protected boolean hasBusProperty() {
         return false;
     }
