@@ -19,6 +19,7 @@
 package org.apache.cxf.jaxrs.sse.client;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -53,6 +54,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -195,7 +197,10 @@ public class SseEventSourceImplTest {
             Thread.sleep(150L);
         }
 
-        assertThat(events.size(), equalTo(1));
+        await()
+            .atMost(Duration.ofMillis(500L))
+            .untilAsserted(() -> assertThat(events.size(), equalTo(1)));
+
         assertThat(events.get(0).getId(), equalTo("1"));
         assertThat(events.get(0).getReconnectDelay(), equalTo(10000L));
         assertThat(events.get(0).getComment(), equalTo("test comment"));
@@ -213,7 +218,10 @@ public class SseEventSourceImplTest {
             Thread.sleep(150L);
         }
 
-        assertThat(events.size(), equalTo(1));
+        await()
+            .atMost(Duration.ofMillis(500L))
+            .untilAsserted(() -> assertThat(events.size(), equalTo(1)));
+
         assertThat(events.get(0).getName(), nullValue());
         assertThat(events.get(0).readData(), equalTo("just test data"));
     }
@@ -229,7 +237,10 @@ public class SseEventSourceImplTest {
             Thread.sleep(150L);
         }
 
-        assertThat(events.size(), equalTo(1));
+        await()
+            .atMost(Duration.ofMillis(500L))
+            .untilAsserted(() -> assertThat(events.size(), equalTo(1)));
+
         assertThat(events.get(0).getName(), nullValue());
         assertThat(events.get(0).readData(), equalTo("just test data\nin multiple lines"));
     }
@@ -245,7 +256,10 @@ public class SseEventSourceImplTest {
             Thread.sleep(150L);
         }
 
-        assertThat(events.size(), equalTo(1));
+        await()
+            .atMost(Duration.ofMillis(500L))
+            .untilAsserted(() -> assertThat(events.size(), equalTo(1)));
+
         assertThat(events.get(0).getName(), equalTo("just name"));
     }
 
@@ -260,7 +274,10 @@ public class SseEventSourceImplTest {
             Thread.sleep(150L);
         }
 
-        assertThat(events.size(), equalTo(2));
+        await()
+            .atMost(Duration.ofMillis(500L))
+            .untilAsserted(() -> assertThat(events.size(), equalTo(2)));
+
         assertThat(events.get(0).getName(), nullValue());
         assertThat(events.get(0).readData(), equalTo("just test data"));
         assertThat(events.get(1).getId(), equalTo("1"));
@@ -294,7 +311,10 @@ public class SseEventSourceImplTest {
             Thread.sleep(150L);
         }
 
-        assertThat(events.size(), equalTo(2));
+        await()
+            .atMost(Duration.ofMillis(500L))
+            .untilAsserted(() -> assertThat(events.size(), equalTo(2)));
+
         assertThat(events.get(0).getId(), equalTo("1"));
         assertThat(events.get(0).getComment(), equalTo("test comment"));
         assertThat(events.get(0).readData(), equalTo("test data"));
@@ -314,7 +334,10 @@ public class SseEventSourceImplTest {
             Thread.sleep(150L);
         }
         
-        assertThat(errors.size(), equalTo(2));
+        await()
+            .atMost(Duration.ofMillis(500L))
+            .untilAsserted(() -> assertThat(errors.size(), equalTo(2)));
+
         assertThat(events.size(), equalTo(0));
     }
 
@@ -329,7 +352,10 @@ public class SseEventSourceImplTest {
             Thread.sleep(150L);
         }
         
-        assertThat(errors.size(), equalTo(1));
+        await()
+            .atMost(Duration.ofMillis(500L))
+            .untilAsserted(() -> assertThat(errors.size(), equalTo(1)));
+
         assertThat(events.size(), equalTo(0));
     }
 
@@ -358,7 +384,10 @@ public class SseEventSourceImplTest {
             Thread.sleep(150L);
         }
 
-        assertThat(events.size(), equalTo(1));
+        await()
+            .atMost(Duration.ofMillis(500L))
+            .untilAsserted(() -> assertThat(events.size(), equalTo(1)));
+
         assertThat(events.get(0).getId(), equalTo("1"));
         assertThat(events.get(0).getReconnectDelay(), equalTo(-1L));
         assertThat(events.get(0).getComment(), equalTo("test comment"));
@@ -389,7 +418,10 @@ public class SseEventSourceImplTest {
             Thread.sleep(150L);
         }
 
-        assertThat(events.size(), equalTo(1));
+        await()
+            .atMost(Duration.ofMillis(500L))
+            .untilAsserted(() -> assertThat(events.size(), equalTo(1)));
+        
         assertThat(events.get(0).getId(), equalTo("10"));
         assertThat(events.get(0).getReconnectDelay(), equalTo(10000L));
         assertThat(events.get(0).getComment(), equalTo("test comment"));
@@ -407,7 +439,10 @@ public class SseEventSourceImplTest {
             Thread.sleep(150L);
         }
 
-        assertThat(events.size(), equalTo(1));
+        await()
+            .atMost(Duration.ofMillis(500L))
+            .untilAsserted(() -> assertThat(events.size(), equalTo(1)));
+        
         assertThat(events.get(0).getId(), equalTo("10"));
         assertThat(events.get(0).getReconnectDelay(), equalTo(10000L));
         assertThat(events.get(0).getComment(), equalTo("test comment"));
