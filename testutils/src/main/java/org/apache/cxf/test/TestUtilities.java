@@ -37,9 +37,6 @@ import javax.wsdl.WSDLException;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLWriter;
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -74,7 +71,6 @@ public class TestUtilities {
     private static String basedirPath;
     protected Bus bus;
     protected Class<?> classpathAnchor;
-    private XMLInputFactory xmlInputFactory;
 
     /**
      * Namespaces for the XPath expressions.
@@ -91,7 +87,6 @@ public class TestUtilities {
      */
     public TestUtilities(Class<?> classpathReference) {
         classpathAnchor = classpathReference;
-        xmlInputFactory = XMLInputFactory.newInstance();
     }
 
     public static void setKeepAliveSystemProperty(boolean setAlive) {
@@ -232,38 +227,7 @@ public class TestUtilities {
         return obs.getResponseStream().toByteArray();
     }
 
-    public byte[] invokeBytes(String address, String transport, byte[] message) throws Exception {
-        EndpointInfo ei = new EndpointInfo(null, "http://schemas.xmlsoap.org/soap/http");
-        ei.setAddress(address);
-
-        ConduitInitiatorManager conduitMgr = getBus().getExtension(ConduitInitiatorManager.class);
-        ConduitInitiator conduitInit = conduitMgr.getConduitInitiator(transport);
-        Conduit conduit = conduitInit.getConduit(ei, getBus());
-
-        TestMessageObserver obs = new TestMessageObserver();
-        conduit.setMessageObserver(obs);
-
-        Message m = new MessageImpl();
-        conduit.prepare(m);
-
-        OutputStream os = m.getContent(OutputStream.class);
-        os.write(message);
-
-        // TODO: shouldn't have to do this. IO caching needs cleaning
-        // up or possibly removal...
-        os.flush();
-        os.close();
-
-        return obs.getResponseStream().toByteArray();
-    }
-
     public Node invoke(String address, String transport, String message) throws Exception {
-        byte[] bs = invokeBytes(address, transport, message);
-
-        ByteArrayInputStream input = new ByteArrayInputStream(bs);
-        return StaxUtils.read(input);
-    }
-    public Node invoke(String address, String transport, byte[] message) throws Exception {
         byte[] bs = invokeBytes(address, transport, message);
 
         ByteArrayInputStream input = new ByteArrayInputStream(bs);
@@ -276,10 +240,6 @@ public class TestUtilities {
 
     public Reader getResourceAsReader(String resource) {
         return new InputStreamReader(getResourceAsStream(resource), UTF_8);
-    }
-
-    public XMLStreamReader getResourceAsXMLStreamReader(String resource) throws XMLStreamException {
-        return xmlInputFactory.createXMLStreamReader(getResourceAsStream(resource));
     }
 
     public File getTestFile(String relativePath) {
