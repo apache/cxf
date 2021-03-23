@@ -223,14 +223,13 @@ public class StaxSerializer extends AbstractSerializer {
     }
 
     private Node deserialize(Node ctx, XMLStreamReader reader, boolean wrapped) throws XMLEncryptionException {
-        Document contextDocument = null;
+        final Document contextDocument;
         if (Node.DOCUMENT_NODE == ctx.getNodeType()) {
             contextDocument = (Document)ctx;
         } else {
             contextDocument = ctx.getOwnerDocument();
         }
 
-        XMLStreamWriter writer = null;
         try {
             if (ctx instanceof SOAPElement) {
                 SOAPElement el = (SOAPElement)ctx;
@@ -240,19 +239,19 @@ public class StaxSerializer extends AbstractSerializer {
                 //cannot load into fragment due to a ClassCastException within SAAJ addChildElement
                 //which only checks for Document as parent, not DocumentFragment
                 Element element = ctx.getOwnerDocument().createElementNS("dummy", "dummy");
-                writer = new SAAJStreamWriter((SOAPEnvelope)el, element);
+                XMLStreamWriter writer = new SAAJStreamWriter((SOAPEnvelope)el, element);
                 return appendNewChild(reader, wrapped, contextDocument, writer, element);
             }
             if (DOMUtils.isJava9SAAJ()) {
                 //cannot load into fragment due to a ClassCastException within SAAJ addChildElement
                 //which only checks for Document as parent, not DocumentFragment
                 Element element = ctx.getOwnerDocument().createElementNS("dummy", "dummy");
-                writer = new OverlayW3CDOMStreamWriter(ctx.getOwnerDocument(), element);
+                XMLStreamWriter writer = new OverlayW3CDOMStreamWriter(ctx.getOwnerDocument(), element);
                 return appendNewChild(reader, wrapped, contextDocument, writer, element);
             }
             // Import to a dummy fragment
             DocumentFragment dummyFragment = contextDocument.createDocumentFragment();
-            writer = StaxUtils.createXMLStreamWriter(new DOMResult(dummyFragment));
+            XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(new DOMResult(dummyFragment));
             StaxUtils.copy(reader, writer);
 
             // Remove the "dummy" wrapper

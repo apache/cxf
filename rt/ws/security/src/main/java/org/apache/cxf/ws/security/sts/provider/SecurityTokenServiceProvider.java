@@ -212,7 +212,7 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
 
 
     public Source invoke(Source request) {
-        Source response = null;
+        final Source response;
         try {
             Object obj = convertToJAXBObject(request);
             Object operationImpl = null;

@@ -276,7 +276,7 @@ public class STSLoginModule implements LoginModule {
     }
 
     private STSClient configureSTSClient(Message msg) throws BusException, EndpointException {
-        STSClient c = null;
+        final STSClient c;
         if (cxfSpringCfg != null) {
             SpringBusFactory bf = new SpringBusFactory();
             URL busFile = Loader.getResource(cxfSpringCfg);

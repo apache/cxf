@@ -104,7 +104,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         }
 
         Crypto encrCrypto = getEncryptionCrypto(e, message, securityProperties);
-        Crypto signCrypto = null;
+        final Crypto signCrypto;
         if (e != null && e.equals(s)) {
             signCrypto = encrCrypto;
         } else {
@@ -161,7 +161,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         }
 
         Crypto encrCrypto = getEncryptionCrypto(e, message, securityProperties);
-        Crypto signCrypto = null;
+        final Crypto signCrypto;
         if (e != null && e.equals(s)) {
             signCrypto = encrCrypto;
         } else {
@@ -209,7 +209,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         }
 
         Crypto encrCrypto = getEncryptionCrypto(e, message, securityProperties);
-        Crypto signCrypto = null;
+        final Crypto signCrypto;
         if (e != null && e.equals(s)) {
             signCrypto = encrCrypto;
         } else {

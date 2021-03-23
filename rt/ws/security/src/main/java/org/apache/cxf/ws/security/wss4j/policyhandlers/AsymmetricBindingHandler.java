@@ -235,8 +235,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             }
 
             if (encToken != null) {
-                WSSecBase encr = null;
                 if (encToken.getToken() != null && !enc.isEmpty()) {
+                    final WSSecBase encr;
                     if (encToken.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
                         encr = doEncryptionDerived(encToken, enc);
                     } else {
@@ -342,7 +342,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             unassertPolicy(encryptionToken, ex);
         }
 
-        List<WSEncryptionPart> encrParts = null;
+        final List<WSEncryptionPart> encrParts;
         try {
             encrParts = getEncryptedParts();
             //Signed parts are determined before encryption because encrypted signed headers
@@ -492,7 +492,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
 
             Crypto crypto = getEncryptionCrypto();
 
-            SecurityToken securityToken = null;
+            final SecurityToken securityToken;
             try {
                 securityToken = getSecurityToken();
                 if (!isRequestor() && securityToken != null

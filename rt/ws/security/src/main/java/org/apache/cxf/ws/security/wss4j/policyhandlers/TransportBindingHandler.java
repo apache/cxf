@@ -577,7 +577,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                 sig.setCustomTokenValueType(tokenType);
             }
         }
-        Crypto crypto = null;
+        Crypto crypto;
         if (secTok.getSecret() == null) {
             sig.setX509Certificate(secTok.getX509Certificate());
 

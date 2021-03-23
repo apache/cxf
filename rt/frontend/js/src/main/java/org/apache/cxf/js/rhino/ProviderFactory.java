@@ -75,12 +75,8 @@ public class ProviderFactory {
         boolean isE4X = f.getName().endsWith(".jsx");
         StringBuilder sb = new StringBuilder();
         try (BufferedReader bufrd = new BufferedReader(new FileReader(f))) {
-            String line = null;
-            for (;;) {
-                line = bufrd.readLine();
-                if (line == null) {
-                    break;
-                }
+            String line;
+            while (null != (line = bufrd.readLine())) {
                 sb.append(line).append('\n');
             }
         }

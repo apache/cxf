@@ -52,7 +52,7 @@ public class WSSUsernameCallbackHandler implements CallbackHandler {
                     (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.USERNAME, message);
                 if (username != null) {
                     Node contentNode = message.getContent(Node.class);
-                    Document doc = null;
+                    final Document doc;
                     if (contentNode != null) {
                         doc = contentNode.getOwnerDocument();
                     } else {

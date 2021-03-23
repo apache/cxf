@@ -101,7 +101,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
                 try {
                     boolean bspCompliant = isWsiBSPCompliant(message);
                     boolean allowNSPasswdTypes = allowNamespaceQualifiedPWDTypes(message);
-                    Principal principal = null;
+                    Principal principal;
                     Subject subject = null;
                     Object transformedToken = null;
 

@@ -1333,7 +1333,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         writer.writeEndElement();
 
         writer.writeStartElement("wst", "CancelTarget", namespace);
-        Element el = null;
+        Element el;
         if (attachTokenDirectly) {
             el = token.getToken();
         } else {

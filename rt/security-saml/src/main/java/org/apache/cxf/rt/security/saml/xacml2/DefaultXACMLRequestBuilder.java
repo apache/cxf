@@ -86,14 +86,14 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
         List<AttributeType> attributes = new ArrayList<>();
 
         // Resource-id
-        String resourceId = null;
+        String resourceId;
         boolean isSoapService = messageParser.isSOAPService();
         if (isSoapService) {
             QName serviceName = messageParser.getWSDLService();
             QName operationName = messageParser.getWSDLOperation();
 
             if (serviceName != null) {
-                resourceId = serviceName.toString() + "#";
+                resourceId = serviceName.toString() + '#';
                 if (serviceName.getNamespaceURI() != null
                     && serviceName.getNamespaceURI().equals(operationName.getNamespaceURI())) {
                     resourceId += operationName.getLocalPart();

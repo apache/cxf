@@ -586,7 +586,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         sig.setSigCanonicalization(binding.getAlgorithmSuite().getC14n().getValue());
 
         Crypto crypto = secToken.getCrypto();
-        String uname = null;
+        final String uname;
         try {
             uname = crypto.getX509Identifier(secToken.getX509Certificate());
         } catch (WSSecurityException e1) {
@@ -798,7 +798,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             secRefSaml.setReference(ref);
         } else {
             Element keyId = doc.createElementNS(WSS4JConstants.WSSE_NS, "wsse:KeyIdentifier");
-            String valueType = null;
+            final String valueType;
             if (saml1) {
                 valueType = WSS4JConstants.WSS_SAML_KI_VALUE_TYPE;
                 secRefSaml.addTokenType(WSS4JConstants.WSS_SAML_TOKEN_TYPE);
@@ -1020,7 +1020,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     protected String getPassword(String userName, Assertion info, int usage) {
         //Then try to get the password from the given callback handler
         Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, message);
-        CallbackHandler handler = null;
+        final CallbackHandler handler;
         try {
             handler = SecurityUtils.getCallbackHandler(o);
             if (handler == null) {
@@ -1078,7 +1078,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         } else {
             //Add an id
             id = wssConfig.getIdAllocator().createId("_", element);
-            String pfx = null;
+            String pfx;
             try {
                 pfx = element.lookupPrefix(PolicyConstants.WSU_NAMESPACE_URI);
             } catch (Throwable t) {
@@ -1454,7 +1454,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
 
                         if (!found.contains(el)) {
                             found.add(el);
-                            WSEncryptionPart part = null;
+                            final WSEncryptionPart part;
                             boolean saml1 = WSS4JConstants.SAML_NS.equals(el.getNamespaceURI())
                                 && "Assertion".equals(el.getLocalName());
                             boolean saml2 = WSS4JConstants.SAML2_NS.equals(el.getNamespaceURI())

@@ -647,7 +647,7 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
 
         if (parts.isBody()) {
             SOAPMessage soapMessage = message.getContent(SOAPMessage.class);
-            Element soapBody = null;
+            final Element soapBody;
             try {
                 soapBody = soapMessage.getSOAPBody();
             } catch (SOAPException ex) {
@@ -662,7 +662,7 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
 
         for (Header h : parts.getHeaders()) {
             SOAPMessage soapMessage = message.getContent(SOAPMessage.class);
-            Element soapHeader = null;
+            final Element soapHeader;
             try {
                 soapHeader = soapMessage.getSOAPHeader();
             } catch (SOAPException ex) {
