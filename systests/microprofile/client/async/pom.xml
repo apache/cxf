@@ -117,6 +117,12 @@
                 <artifactId>microprofile-rest-client-tck</artifactId>
                 <version>${cxf.microprofile.rest.client.version}</version>
                 <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.testng</groupId>
+                        <artifactId>testng</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>com.github.tomakehurst</groupId>

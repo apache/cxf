@@ -1127,6 +1127,11 @@
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-servlets</artifactId>
+                <version>${cxf.jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-util</artifactId>
                 <version>${cxf.jetty.version}</version>
             </dependency>
