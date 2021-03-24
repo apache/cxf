@@ -94,12 +94,6 @@ public abstract class AbstractCXFTest {
         return testUtilities.invoke(address, transport, message);
     }
 
-    protected Node invoke(String address,
-                          String transport,
-                          byte[] message) throws Exception {
-        return testUtilities.invoke(address, transport, message);
-    }
-
     /**
      * Assert that the following XPath query selects one or more nodes.
      *
@@ -200,10 +194,4 @@ public abstract class AbstractCXFTest {
         return testUtilities.getWSDLDocument(server);
     }
 
-    public static class TestMessageObserver extends TestUtilities.TestMessageObserver {
-
-        public TestMessageObserver() {
-            super();
-        }
-    }
 }

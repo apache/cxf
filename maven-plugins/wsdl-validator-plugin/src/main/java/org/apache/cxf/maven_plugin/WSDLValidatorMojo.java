@@ -26,68 +26,56 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.tools.common.toolspec.ToolSpec;
 import org.apache.cxf.tools.validator.WSDLValidator;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
-/**
- * @goal wsdlvalidator
- * @description CXF WSDL Validation
- * @threadSafe
- */
+@Mojo(name = "wsdlvalidator", threadSafe = true)
 public class WSDLValidatorMojo extends AbstractMojo {
-    /**
-     * @parameter
-     */
+
+    @Parameter
     private Boolean verbose;
 
-    /**
-     * @parameter
-     */
+    @Parameter
     private Boolean quiet;
 
-
-    /**
-     * @parameter expression="${cxf.wsdlRoot}" default-value="${basedir}/src/main/resources/wsdl"
-     */
+    @Parameter(property = "cxf.wsdlRoot", defaultValue = "${basedir}/src/main/resources/wsdl")
     private File wsdlRoot;
 
-    /**
-     * @parameter expression="${cxf.testWsdlRoot}" default-value="${basedir}/src/test/resources/wsdl"
-     */
+    @Parameter(property = "cxf.testWsdlRoot", defaultValue = "${basedir}/src/test/resources/wsdl")
     private File testWsdlRoot;
 
     /**
      * Directory in which the "DONE" markers are saved that
-     * @parameter expression="${cxf.markerDirectory}"
-     *            default-value="${project.build.directory}/cxf-wsdl-validator-markers"
      */
+    @Parameter(property = "cxf.markerDirectory", defaultValue = "${project.build.directory}/cxf-wsdl-validator-markers")
     private File markerDirectory;
+
     /**
-     * A list of wsdl files to include. Can contain ant-style wildcards and double wildcards. Defaults to
-     * *.wsdl
-     *
-     * @parameter
+     * A list of wsdl files to include. Can contain ant-style wildcards and double wildcards. Defaults to *.wsdl
      */
-    private String[] includes;
+    @Parameter
+    private String[] includes = {
+        "*.wsdl"
+    };
+
     /**
      * A list of wsdl files to exclude. Can contain ant-style wildcards and double wildcards.
-     *
-     * @parameter
      */
+    @Parameter
     private String[] excludes;
 
-    private String getIncludeExcludeString(String[] arr) {
+    private static String getIncludeExcludeString(String[] arr) {
         if (arr == null || arr.length == 0) {
             return "";
         }
         return String.join(",", arr);
     }
 
-    private List<File> getWsdlFiles(File dir)
-        throws MojoExecutionException {
+    private List<File> getWsdlFiles(File dir) throws MojoExecutionException {
 
         List<String> exList = new ArrayList<>();
         if (excludes != null) {
@@ -99,8 +87,7 @@ public class WSDLValidatorMojo extends AbstractMojo {
         String ex = getIncludeExcludeString(exList.toArray(new String[0]));
 
         try {
-            List<?> newfiles = org.codehaus.plexus.util.FileUtils.getFiles(dir, inc, ex);
-            return CastUtils.cast(newfiles);
+            return org.codehaus.plexus.util.FileUtils.getFiles(dir, inc, ex);
         } catch (IOException exc) {
             throw new MojoExecutionException(exc.getMessage(), exc);
         }
@@ -110,7 +97,7 @@ public class WSDLValidatorMojo extends AbstractMojo {
 
         // If URL to WSDL, replace ? and & since they're invalid chars for file names
         File doneFile =
-            new File(markerDirectory, "." + file.getName().replace('?', '_').replace('&', '_') + ".DONE");
+            new File(markerDirectory, '.' + file.getName().replace('?', '_').replace('&', '_') + ".DONE");
         boolean doWork = false;
         if (!doneFile.exists()) {
             doWork = true;
@@ -155,11 +142,6 @@ public class WSDLValidatorMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException {
         System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
-        if (includes == null) {
-            includes = new String[] {
-                "*.wsdl"
-            };
-        }
 
         markerDirectory.mkdirs();
 
@@ -174,7 +156,5 @@ public class WSDLValidatorMojo extends AbstractMojo {
         for (File wsdl : wsdls) {
             processWsdl(wsdl);
         }
-
-
     }
 }

@@ -109,11 +109,6 @@ public final class SAMLUtils {
         String name,
         String nameFormat
     ) {
-//        String roleAttributeName = name;
-//        if (roleAttributeName == null) {
-//            roleAttributeName = SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT;
-//        }
-
         Set<Principal> roles = new HashSet<>();
 
         for (Claim claim : claims) {

@@ -152,23 +152,19 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
+            <!--plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-wsdl-validator-plugin</artifactId>
                 <version>${project.version}</version>
-                <configuration>
-                    <wsdlRoot>${basedir}/src/main/resources/wsdl</wsdlRoot>
-                </configuration>
                 <executions>
-                    <!-- execution>
-                        <id>validate</id>
+                    <execution>
                         <phase>validate</phase>
                         <goals>
-                          <goal>wsdlvalidator</goal>
+                            <goal>wsdlvalidator</goal>
                         </goals>
-                    </execution -->
+                    </execution>
                 </executions>
-            </plugin>
+            </plugin-->
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
