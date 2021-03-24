@@ -52,6 +52,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
         setBeanClass(BusConfig.class);
     }
 
+    @Override
     protected void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
         String bus = element.getAttribute("bus");
         if (StringUtils.isEmpty(bus)) {
@@ -91,11 +92,14 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             bean.addConstructorArgValue(bus);
         }
     }
+    
+    @Override
     protected boolean processBusAttribute(Element element, ParserContext ctx,
                                           BeanDefinitionBuilder bean,
                                           String val) {
         return false;
     }
+    
     private void copyProps(BeanDefinitionBuilder src, BeanDefinition def) {
         for (PropertyValue v : src.getBeanDefinition().getPropertyValues().getPropertyValues()) {
             if (!"bus".equals(v.getName())) {
@@ -199,6 +203,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             }
         }
 
+        @Override
         public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
             if (bus != null) {
                 return bus.getOutFaultInterceptors();
@@ -206,6 +211,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             return super.getOutFaultInterceptors();
         }
 
+        @Override
         public List<Interceptor<? extends Message>> getInFaultInterceptors() {
             if (bus != null) {
                 return bus.getInFaultInterceptors();
@@ -213,6 +219,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             return super.getInFaultInterceptors();
         }
 
+        @Override
         public List<Interceptor<? extends Message>> getInInterceptors() {
             if (bus != null) {
                 return bus.getInInterceptors();
@@ -220,6 +227,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             return super.getInInterceptors();
         }
 
+        @Override
         public List<Interceptor<? extends Message>> getOutInterceptors() {
             if (bus != null) {
                 return bus.getOutInterceptors();
@@ -227,6 +235,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             return super.getOutInterceptors();
         }
 
+        @Override
         public void setInInterceptors(List<Interceptor<? extends Message>> interceptors) {
             if (bus != null) {
                 bus.getInInterceptors().addAll(interceptors);
@@ -235,6 +244,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             }
         }
 
+        @Override
         public void setInFaultInterceptors(List<Interceptor<? extends Message>> interceptors) {
             if (bus != null) {
                 bus.getInFaultInterceptors().addAll(interceptors);
@@ -243,6 +253,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             }
         }
 
+        @Override
         public void setOutInterceptors(List<Interceptor<? extends Message>> interceptors) {
             if (bus != null) {
                 bus.getOutInterceptors().addAll(interceptors);
@@ -251,6 +262,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             }
         }
 
+        @Override
         public void setOutFaultInterceptors(List<Interceptor<? extends Message>> interceptors) {
             if (bus != null) {
                 bus.getOutFaultInterceptors().addAll(interceptors);

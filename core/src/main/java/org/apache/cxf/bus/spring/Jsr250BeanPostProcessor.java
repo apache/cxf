@@ -102,6 +102,8 @@ public class Jsr250BeanPostProcessor
         }
         return resourceManager;
     }
+    
+    @Override
     public Object postProcessAfterInitialization(Object bean, String beanId) {
         if (!isProcessing) {
             if (resourceManager == null && bean instanceof ResourceManager) {
@@ -117,6 +119,7 @@ public class Jsr250BeanPostProcessor
         return bean;
     }
 
+    @Override
     public Object postProcessBeforeInitialization(Object bean, String beanId) {
         if (!isProcessing) {
             return bean;
@@ -153,6 +156,7 @@ public class Jsr250BeanPostProcessor
         }
     }
 
+    @Override
     public boolean requiresDestruction(Object bean) {
         return isProcessing;
     }

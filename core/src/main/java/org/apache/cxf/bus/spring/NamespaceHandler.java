@@ -40,6 +40,7 @@ public class NamespaceHandler extends NamespaceHandlerSupport {
         registerBeanDefinitionParser("workqueue",
                                      new SimpleBeanDefinitionParser(AutomaticWorkQueueImpl.class) {
 
+                @Override
                 protected void processNameAttribute(Element element,
                                                 ParserContext ctx,
                                                 BeanDefinitionBuilder bean,
