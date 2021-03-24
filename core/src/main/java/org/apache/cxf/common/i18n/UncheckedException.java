@@ -74,6 +74,7 @@ public class UncheckedException extends java.lang.RuntimeException {
         return null;
     }
 
+    @Override
     public String getMessage() {
         if (null != message) {
             return message.toString();
