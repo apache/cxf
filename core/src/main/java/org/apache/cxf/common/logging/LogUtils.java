@@ -280,12 +280,11 @@ public final class LogUtils {
             Logger logger;
             try {
                 logger = Logger.getLogger(loggerName, bundleName); //NOPMD
-            } catch (IllegalArgumentException iae) {
+            } catch (IllegalArgumentException | MissingResourceException ex) {
                 //likely a mismatch on the bundle name, just return the default
                 logger = Logger.getLogger(loggerName); //NOPMD
-            } catch (MissingResourceException rex) {
-                logger = Logger.getLogger(loggerName); //NOPMD
             }
+            
             return logger;
         } finally {
             if (n != orig) {

@@ -41,12 +41,14 @@ public abstract class AbstractDelegatingLogger extends Logger {
         super(name, resourceBundleName);
     }
 
+    @Override
     public void log(LogRecord record) {
         if (isLoggable(record.getLevel())) {
             doLog(record);
         }
     }
 
+    @Override
     public void log(Level level, String msg) {
         if (isLoggable(level)) {
             LogRecord lr = new LogRecord(level, msg);
@@ -54,6 +56,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Override
     public void log(Level level, String msg, Object param1) {
         if (isLoggable(level)) {
             LogRecord lr = new LogRecord(level, msg);
@@ -63,6 +66,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Override
     public void log(Level level, String msg, Object[] params) {
         if (isLoggable(level)) {
             LogRecord lr = new LogRecord(level, msg);
@@ -71,6 +75,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Override
     public void log(Level level, String msg, Throwable thrown) {
         if (isLoggable(level)) {
             LogRecord lr = new LogRecord(level, msg);
@@ -79,6 +84,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Override
     public void logp(Level level, String sourceClass, String sourceMethod, String msg) {
         if (isLoggable(level)) {
             LogRecord lr = new LogRecord(level, msg);
@@ -88,6 +94,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Override
     public void logp(Level level, String sourceClass, String sourceMethod, String msg, Object param1) {
         if (isLoggable(level)) {
             LogRecord lr = new LogRecord(level, msg);
@@ -99,6 +106,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Override
     public void logp(Level level, String sourceClass, String sourceMethod, String msg, Object[] params) {
         if (isLoggable(level)) {
             LogRecord lr = new LogRecord(level, msg);
@@ -109,6 +117,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Override
     public void logp(Level level, String sourceClass, String sourceMethod, String msg, Throwable thrown) {
         if (isLoggable(level)) {
             LogRecord lr = new LogRecord(level, msg);
@@ -119,6 +128,11 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * @deprecated
+     */
+    @Override
     @Deprecated
     public void logrb(Level level, String sourceClass, String sourceMethod, String bundleName, String msg) {
         if (isLoggable(level)) {
@@ -129,6 +143,11 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * @deprecated
+     */
+    @Override
     @Deprecated
     public void logrb(Level level, String sourceClass, String sourceMethod,
                       String bundleName, String msg, Object param1) {
@@ -142,6 +161,11 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * @deprecated
+     */
+    @Override
     @Deprecated
     public void logrb(Level level, String sourceClass, String sourceMethod,
                       String bundleName, String msg, Object[] params) {
@@ -154,6 +178,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Override
     @Deprecated
     public void logrb(Level level, String sourceClass, String sourceMethod,
                       String bundleName, String msg, Throwable thrown) {
@@ -166,12 +191,14 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Override
     public void entering(String sourceClass, String sourceMethod) {
         if (isLoggable(Level.FINER)) {
             logp(Level.FINER, sourceClass, sourceMethod, "ENTRY");
         }
     }
 
+    @Override
     public void entering(String sourceClass, String sourceMethod, Object param1) {
         if (isLoggable(Level.FINER)) {
             Object[] params = {param1 };
@@ -179,6 +206,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Override
     public void entering(String sourceClass, String sourceMethod, Object[] params) {
         if (isLoggable(Level.FINER)) {
             String msg = "ENTRY";
@@ -196,12 +224,14 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Override
     public void exiting(String sourceClass, String sourceMethod) {
         if (isLoggable(Level.FINER)) {
             logp(Level.FINER, sourceClass, sourceMethod, "RETURN");
         }
     }
 
+    @Override
     public void exiting(String sourceClass, String sourceMethod, Object result) {
         if (isLoggable(Level.FINER)) {
             Object[] params = {result };
@@ -209,6 +239,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Override
     public void throwing(String sourceClass, String sourceMethod, Throwable thrown) {
         if (isLoggable(Level.FINER)) {
             LogRecord lr = new LogRecord(Level.FINER, "THROW");
@@ -219,6 +250,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Override
     public void severe(String msg) {
         if (isLoggable(Level.SEVERE)) {
             LogRecord lr = new LogRecord(Level.SEVERE, msg);
@@ -226,6 +258,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Override
     public void warning(String msg) {
         if (isLoggable(Level.WARNING)) {
             LogRecord lr = new LogRecord(Level.WARNING, msg);
@@ -233,6 +266,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Override
     public void info(String msg) {
         if (isLoggable(Level.INFO)) {
             LogRecord lr = new LogRecord(Level.INFO, msg);
@@ -240,6 +274,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Override
     public void config(String msg) {
         if (isLoggable(Level.CONFIG)) {
             LogRecord lr = new LogRecord(Level.CONFIG, msg);
@@ -247,6 +282,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Override
     public void fine(String msg) {
         if (isLoggable(Level.FINE)) {
             LogRecord lr = new LogRecord(Level.FINE, msg);
@@ -254,6 +290,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Override
     public void finer(String msg) {
         if (isLoggable(Level.FINER)) {
             LogRecord lr = new LogRecord(Level.FINER, msg);
@@ -261,6 +298,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Override
     public void finest(String msg) {
         if (isLoggable(Level.FINEST)) {
             LogRecord lr = new LogRecord(Level.FINEST, msg);
@@ -268,12 +306,15 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Override
     public void setLevel(Level newLevel) {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public abstract Level getLevel();
 
+    @Override
     public boolean isLoggable(Level level) {
         Level l = getLevel();
         return level.intValue() >= l.intValue() && l != Level.OFF;
@@ -283,6 +324,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         return false;
     }
 
+    @Override
     public synchronized void addHandler(Handler handler) {
         if (supportsHandlers()) {
             super.addHandler(handler);
@@ -291,6 +333,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public synchronized void removeHandler(Handler handler) {
         if (supportsHandlers()) {
             super.removeHandler(handler);
@@ -299,6 +342,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public synchronized Handler[] getHandlers() {
         if (supportsHandlers()) {
             return super.getHandlers();
@@ -306,6 +350,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public synchronized void setUseParentHandlers(boolean useParentHandlers) {
         if (supportsHandlers()) {
             super.setUseParentHandlers(useParentHandlers);
@@ -314,6 +359,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public synchronized boolean getUseParentHandlers() {
         if (supportsHandlers()) {
             return super.getUseParentHandlers();
@@ -321,10 +367,12 @@ public abstract class AbstractDelegatingLogger extends Logger {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public Logger getParent() {
         return null;
     }
 
+    @Override
     public void setParent(Logger parent) {
         throw new UnsupportedOperationException();
     }
