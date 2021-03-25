@@ -86,7 +86,7 @@ public class ClassGeneratorClassLoader {
         TypeHelperClassLoader ret;
         if (ref == null || ref.get() == null) {
             ret = new TypeHelperClassLoader(cls.getClassLoader());
-            CLASS_MAP.put(cls, new WeakReference<TypeHelperClassLoader>(ret));
+            CLASS_MAP.put(cls, new WeakReference<>(ret));
         } else {
             ret = ref.get();
         }
@@ -98,7 +98,7 @@ public class ClassGeneratorClassLoader {
         TypeHelperClassLoader ret;
         if (ref == null || ref.get() == null) {
             ret = new TypeHelperClassLoader(l);
-            LOADER_MAP.put(l, new WeakReference<TypeHelperClassLoader>(ret));
+            LOADER_MAP.put(l, new WeakReference<>(ret));
         } else {
             ret = ref.get();
         }

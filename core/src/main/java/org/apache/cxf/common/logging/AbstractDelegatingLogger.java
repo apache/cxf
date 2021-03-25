@@ -128,10 +128,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * @deprecated
-     */
+  
     @Override
     @Deprecated
     public void logrb(Level level, String sourceClass, String sourceMethod, String bundleName, String msg) {
@@ -143,10 +140,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * @deprecated
-     */
+   
     @Override
     @Deprecated
     public void logrb(Level level, String sourceClass, String sourceMethod,
@@ -161,10 +155,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * @deprecated
-     */
+  
     @Override
     @Deprecated
     public void logrb(Level level, String sourceClass, String sourceMethod,
