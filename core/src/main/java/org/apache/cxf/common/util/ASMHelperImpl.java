@@ -209,11 +209,10 @@ public class ASMHelperImpl implements ASMHelper {
             }
             // ASM >= 3.x (since cxf is java 8 min we don't care of asm 1/2)
             try {
-                Constructor<?> cons
-                        = cwClass.getConstructor(new Class<?>[] {Integer.TYPE});
+                Constructor<?> cons = cwClass.getConstructor(Integer.TYPE);
                 int i = cwClass.getField("COMPUTE_MAXS").getInt(null);
                 i |= cwClass.getField("COMPUTE_FRAMES").getInt(null);
-                newCw = cons.newInstance(new Object[] {Integer.valueOf(i)});
+                newCw = cons.newInstance(Integer.valueOf(i));
             } catch (Throwable e1) {
                 // ignore
             }

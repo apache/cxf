@@ -21,17 +21,17 @@ package org.apache.cxf.common.util;
 import java.lang.ref.WeakReference;
 
 public class CachedClass {
-    private WeakReference<Class<?>> cachedClass;
+    private WeakReference<Class<?>> cachedClazz;
 
     public CachedClass(Class<?> cachedClass) {
-        this.cachedClass = new WeakReference<>(cachedClass);
+        this.cachedClazz = new WeakReference<>(cachedClass);
     }
 
     public Class<?> getCachedClass() {
-        return cachedClass == null ? null : cachedClass.get();
+        return cachedClazz == null ? null : cachedClazz.get();
     }
 
     public void setCachedClass(Class<?> cachedClass) {
-        this.cachedClass = new WeakReference<>(cachedClass);
+        this.cachedClazz = new WeakReference<>(cachedClass);
     }
 }
