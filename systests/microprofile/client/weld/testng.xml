@@ -1,6 +1,9 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
  
 <suite name="MPRestClientTCK1.3">
+    <listeners>
+        <listener class-name="org.apache.cxf.microprofile.AnnotationTransformer"/>
+    </listeners>
     <test name="All TCK Tests">
         <packages>
             <package name="org.eclipse.microprofile.rest.client.tck" />
