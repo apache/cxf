@@ -99,7 +99,7 @@ public class ManagedConnectionImpl
 
     public Object getConnection(Subject subject, ConnectionRequestInfo crInfo) throws ResourceException {
 
-        Object connection = null;
+        final Object connection;
 
         if (getCXFService() == null) {
             initializeCXFConnection(crInfo, subject);
@@ -122,7 +122,7 @@ public class ManagedConnectionImpl
         Class<?> serviceInterface = requestInfo.getInterface();
         ClassLoader orig = Thread.currentThread().getContextClassLoader();
         try {
-            ClientProxyFactoryBean factoryBean = null;
+            final ClientProxyFactoryBean factoryBean;
             if (isJaxWsServiceInterface(serviceInterface)) {
                 factoryBean = new JaxWsProxyFactoryBean();
             } else {

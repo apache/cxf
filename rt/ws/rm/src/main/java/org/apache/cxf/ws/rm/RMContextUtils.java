@@ -73,7 +73,7 @@ public final class RMContextUtils {
         if (outbound) {
             return (RMProperties)message.get(getRMPropertiesKey(true));
         }
-        Message m = null;
+        Message m;
         if (MessageUtils.isOutbound(message)) {
             // the in properties are only available on the in message
             m = message.getExchange().getInMessage();

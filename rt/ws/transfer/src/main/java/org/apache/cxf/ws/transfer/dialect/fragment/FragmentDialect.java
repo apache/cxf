@@ -63,30 +63,17 @@ public class FragmentDialect implements Dialect {
     @Resource
     WebServiceContext context;
 
-    private final Map<String, FragmentDialectLanguage> languages;
+    private final Map<String, FragmentDialectLanguage> languages = new HashMap<>();
 
-    private Pattern badXPathPattern;
+    private final Pattern badXPathPattern =
+        Pattern.compile("//@?" + FragmentDialectLanguageQName.getQNamePatternString() + '$');
 
-    private Pattern goodXPathPattern;
+    private final Pattern goodXPathPattern =
+        Pattern.compile("/@?" + FragmentDialectLanguageQName.getQNamePatternString() + '$');
 
     public FragmentDialect() {
-        languages = new HashMap<>();
         languages.put(FragmentDialectConstants.QNAME_LANGUAGE_IRI, new FragmentDialectLanguageQName());
         languages.put(FragmentDialectConstants.XPATH10_LANGUAGE_IRI, new FragmentDialectLanguageXPath10());
-        if (badXPathPattern == null) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("//@?");
-            sb.append(FragmentDialectLanguageQName.getQNamePatternString());
-            sb.append('$');
-            badXPathPattern = Pattern.compile(sb.toString());
-        }
-        if (goodXPathPattern == null) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("/@?");
-            sb.append(FragmentDialectLanguageQName.getQNamePatternString());
-            sb.append('$');
-            goodXPathPattern = Pattern.compile(sb.toString());
-        }
     }
 
     @Override
@@ -491,7 +478,7 @@ public class FragmentDialect implements Dialect {
      * @return Parent of removed Node.
      */
     private Node removeNode(Node resourceFragment) {
-        Node parent = null;
+        Node parent;
         if (resourceFragment.getNodeType() == Node.ATTRIBUTE_NODE) {
             parent = ((Attr)resourceFragment).getOwnerElement();
         } else {

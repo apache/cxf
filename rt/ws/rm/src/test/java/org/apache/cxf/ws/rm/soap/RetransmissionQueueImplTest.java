@@ -153,7 +153,7 @@ public class RetransmissionQueueImplTest {
         RetransmissionQueueImpl.ResendCandidate candidate = queue.createResendCandidate(message);
 
         assertEquals(3, candidate.getMaxRetries());
-        Date next = null;
+        Date next;
         for (int i = 1; i < 3; i++) {
             next = candidate.getNext();
             candidate.attempted();

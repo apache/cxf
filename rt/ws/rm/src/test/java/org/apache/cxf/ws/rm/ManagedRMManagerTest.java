@@ -216,7 +216,7 @@ public class ManagedRMManagerTest {
 
         managedEndpoint.removeSourceSequence("seq3");
         try {
-            cd = managedEndpoint.getSourceSequence("seq3");
+            managedEndpoint.getSourceSequence("seq3");
             fail("sequnce not removed");
         } catch (Exception e) {
             // ok
@@ -239,7 +239,7 @@ public class ManagedRMManagerTest {
         managedEndpoint.removeSourceSequence("seq1");
 
         try {
-            cd = managedEndpoint.getSourceSequence("seq1");
+            managedEndpoint.getSourceSequence("seq1");
             fail("sequnce not removed");
         } catch (Exception e) {
             // ok

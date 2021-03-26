@@ -122,7 +122,7 @@ public class EJBEndpoint {
     }
 
     public String getDefaultEJBServantBaseURL() throws Exception {
-        String hostName = "";
+        String hostName;
         try {
             InetAddress addr = InetAddress.getLocalHost();
             hostName = addr.getCanonicalHostName();

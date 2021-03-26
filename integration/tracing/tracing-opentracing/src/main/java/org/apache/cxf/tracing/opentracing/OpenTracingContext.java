@@ -109,7 +109,7 @@ public class OpenTracingContext implements TracerContext {
     }
     
     private Scope newOrChildSpan(final String description, final Span parent) {
-        Span span = null;
+        final Span span;
         
         if (parent == null) {
             span = tracer.buildSpan(description).start(); 

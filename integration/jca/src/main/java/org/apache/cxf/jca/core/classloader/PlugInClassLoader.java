@@ -43,7 +43,7 @@ public class PlugInClassLoader extends SecureClassLoader {
     private static final String JARS_PROPS_FILE = "jars.properties";
     private static final String FILTERS_PROPS_FILE = "filters.properties";
     private static final String NEFILTERS_PROPS_FILE = "negativefilters.properties";
-    private String[] jarUrls = new String[0];
+    private final String[] jarUrls;
     private final ProtectionDomain protectionDomain;
 
     private final ClassLoader ploader;

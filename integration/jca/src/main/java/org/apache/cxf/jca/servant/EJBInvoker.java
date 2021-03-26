@@ -50,13 +50,11 @@ public class EJBInvoker extends AbstractInvoker {
 
     @Override
     public Object getServiceObject(Exchange context) {
-        Object ejbObject = null;
         try {
-            ejbObject = createMethod.invoke(home, EMPTY_OBJECT);
+            return createMethod.invoke(home, EMPTY_OBJECT);
         } catch (Exception e) {
             throw new RuntimeException("Error in creating EJB Object");
         }
-        return ejbObject;
     }
 
 }

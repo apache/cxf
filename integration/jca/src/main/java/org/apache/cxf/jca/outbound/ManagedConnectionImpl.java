@@ -253,7 +253,7 @@ public class ManagedConnectionImpl implements ManagedConnection {
     private synchronized Object createClientProxy(final CXFConnectionSpec spec) {
         if (clientProxy == null) {
             validateConnectionSpec(spec);
-            ClientProxyFactoryBean factory = null;
+            final ClientProxyFactoryBean factory;
 
             if (EndpointUtils.hasWebServiceAnnotation(spec.getServiceClass())) {
                 factory = new JaxWsProxyFactoryBean();

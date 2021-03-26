@@ -437,9 +437,9 @@ public class RMManager {
         RMConfiguration config = getEffectiveConfiguration(message);
         if (null == seq || seq.isExpired()) {
             // TODO: better error handling
-            EndpointReferenceType to = null;
+            final EndpointReferenceType to;
             boolean isServer = RMContextUtils.isServerSide(message);
-            EndpointReferenceType acksTo = null;
+            EndpointReferenceType acksTo;
             RelatesToType relatesTo = null;
             if (isServer) {
                 AddressingProperties inMaps = RMContextUtils.retrieveMAPs(message, false, false);

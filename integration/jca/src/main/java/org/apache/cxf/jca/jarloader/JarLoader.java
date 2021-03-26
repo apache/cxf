@@ -130,7 +130,7 @@ public final class JarLoader {
 
     private static void readArchive(String name) throws MalformedURLException, IOException {
         List<String> nameComponents = tokenizePathComponents(name);
-        Map<String, Object> map = null;
+        final Map<String, Object> map;
 
         if (nameComponents.size() == 1) {
             map = readZipStream((new URL(getRootArchiveName(name))).openStream());

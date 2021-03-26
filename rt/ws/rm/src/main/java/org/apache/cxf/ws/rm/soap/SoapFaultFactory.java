@@ -57,7 +57,7 @@ public class SoapFaultFactory implements BindingFaultFactory {
     }
 
     public Fault createFault(SequenceFault sf, Message msg) {
-        Fault f = null;
+        final Fault f;
         if (version == Soap11.getInstance()) {
             f = createSoap11Fault(sf);
             // so we can encode the SequenceFault as header

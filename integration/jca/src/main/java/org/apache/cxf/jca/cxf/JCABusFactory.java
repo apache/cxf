@@ -180,12 +180,11 @@ public class JCABusFactory {
     }
 
     protected Properties loadProperties(URL propsUrl) throws ResourceException {
-        Properties props = null;
+        Properties props = new Properties();
 
         LOG.info("loadProperties, url=" + propsUrl);
 
         try (InputStream istream = propsUrl.openStream()) {
-            props = new Properties();
             props.load(istream);
         } catch (IOException e) {
             throw new ResourceAdapterInternalException(
