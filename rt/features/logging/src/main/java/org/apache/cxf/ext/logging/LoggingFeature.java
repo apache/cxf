@@ -26,6 +26,7 @@ import org.apache.cxf.annotations.Provider.Type;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.ext.logging.event.LogEventSender;
 import org.apache.cxf.ext.logging.event.PrettyLoggingFilter;
+import org.apache.cxf.ext.logging.event.RegexLoggingFilter;
 import org.apache.cxf.ext.logging.slf4j.Slf4jEventSender;
 import org.apache.cxf.ext.logging.slf4j.Slf4jVerboseEventSender;
 import org.apache.cxf.feature.AbstractPortableFeature;
@@ -76,6 +77,10 @@ public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
 
     public void setPrettyLogging(boolean prettyLogging) {
         delegate.setPrettyLogging(prettyLogging);
+    }
+
+    public void setRegexLogging(boolean regexLogging) {
+        delegate.setRegexLogging(regexLogging);
     }
 
     public void setLogBinary(boolean logBinary) {
@@ -172,13 +177,18 @@ public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
         private LoggingOutInterceptor out;
         private PrettyLoggingFilter inPrettyFilter;
         private PrettyLoggingFilter outPrettyFilter;
+        private RegexLoggingFilter inRegexFilter;
+        private RegexLoggingFilter outRegexFilter;
+        
 
         public Portable() {
             LogEventSender sender = new Slf4jVerboseEventSender();
             inPrettyFilter = new PrettyLoggingFilter(sender);
             outPrettyFilter = new PrettyLoggingFilter(sender);
-            in = new LoggingInInterceptor(inPrettyFilter);
-            out = new LoggingOutInterceptor(outPrettyFilter);
+            inRegexFilter = new RegexLoggingFilter(inPrettyFilter);
+            outRegexFilter = new RegexLoggingFilter(outPrettyFilter);
+            in = new LoggingInInterceptor(inRegexFilter);
+            out = new LoggingOutInterceptor(outRegexFilter);
         }
 
         @Override
@@ -215,6 +225,11 @@ public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
         public void setPrettyLogging(boolean prettyLogging) {
             this.inPrettyFilter.setPrettyLogging(prettyLogging);
             this.outPrettyFilter.setPrettyLogging(prettyLogging);
+        }
+
+        public void setRegexLogging(boolean regexLogging) {
+            this.inRegexFilter.setRegexLogging(regexLogging);
+            this.outRegexFilter.setRegexLogging(regexLogging);
         }
 
         /**
