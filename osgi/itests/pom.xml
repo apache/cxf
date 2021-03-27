@@ -102,14 +102,6 @@
                </exclusion>
             </exclusions>
         </dependency>
-        <!-- TODO: remove it when 5.16.1 is released, https://issues.apache.org/jira/browse/AMQ-8009 -->
-        <dependency>
-            <groupId>org.apache.karaf.features</groupId>
-            <artifactId>spring-legacy</artifactId>
-            <version>${cxf.karaf.version}</version>
-            <classifier>features</classifier>
-            <type>xml</type>
-        </dependency>
         
         <dependency>
             <groupId>org.apache.karaf.features</groupId>
@@ -133,11 +125,10 @@
             <artifactId>org.osgi.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-atinject_1.0_spec</artifactId>
-            <version>${cxf.geronimo.inject.version}</version>
-            <scope>provided</scope>
-        </dependency>
+            <groupId>jakarta.inject</groupId>
+            <artifactId>jakarta.inject-api</artifactId>
+            <version>${cxf.jakarta.injectapi.version}</version>
+        </dependency> 
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

@@ -103,11 +103,11 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-atinject_1.0_spec</artifactId>
-            <version>${cxf.geronimo.inject.version}</version>
+            <groupId>jakarta.inject</groupId>
+            <artifactId>jakarta.inject-api</artifactId>
+            <version>${cxf.jakarta.injectapi.version}</version>
             <scope>provided</scope>
-        </dependency>
+        </dependency> 
         <dependency>
              <groupId>jakarta.xml.bind</groupId>
              <artifactId>jakarta.xml.bind-api</artifactId>
