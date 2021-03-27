@@ -138,10 +138,12 @@ public final class ModCountCopyOnWriteArrayList<T> extends CopyOnWriteArrayList<
         return false;
     }
 
+    @Override
     public int hashCode() {
         return super.hashCode() + modCount.get();
     }
 
+    @Override
     public boolean equals(Object o) {
         if (o instanceof ModCountCopyOnWriteArrayList) {
             return super.equals(o) && modCount.get()

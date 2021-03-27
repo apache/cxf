@@ -60,7 +60,7 @@ import org.apache.ws.commons.schema.utils.XmlSchemaObjectBase;
  */
 public class SchemaCollection {
 
-    private XmlSchemaCollection schemaCollection;
+    private XmlSchemaCollection xmlSchemaCollection;
     private Map<XmlSchema, Set<XmlSchemaType>> xmlTypesCheckedForCrossImportsPerSchema
         = new HashMap<>();
 
@@ -69,88 +69,88 @@ public class SchemaCollection {
     }
 
     public SchemaCollection(XmlSchemaCollection col) {
-        schemaCollection = col;
-        if (schemaCollection.getNamespaceContext() == null) {
+        xmlSchemaCollection = col;
+        if (xmlSchemaCollection.getNamespaceContext() == null) {
             // an empty prefix map avoids extra checks for null.
-            schemaCollection.setNamespaceContext(new NamespaceMap());
+            xmlSchemaCollection.setNamespaceContext(new NamespaceMap());
         }
     }
 
     public XmlSchemaCollection getXmlSchemaCollection() {
-        return schemaCollection;
+        return xmlSchemaCollection;
     }
 
     public boolean equals(Object obj) {
         if (obj instanceof SchemaCollection) {
-            return schemaCollection.equals(((SchemaCollection)obj).schemaCollection);
+            return xmlSchemaCollection.equals(((SchemaCollection)obj).xmlSchemaCollection);
         } else if (obj instanceof XmlSchemaCollection) {
-            return schemaCollection.equals(obj);
+            return xmlSchemaCollection.equals(obj);
         }
         return false;
     }
 
     public XmlSchemaElement getElementByQName(QName qname) {
-        return schemaCollection.getElementByQName(qname);
+        return xmlSchemaCollection.getElementByQName(qname);
     }
 
     public XmlSchemaAttribute getAttributeByQName(QName qname) {
-        return schemaCollection.getAttributeByQName(qname);
+        return xmlSchemaCollection.getAttributeByQName(qname);
     }
 
     public ExtensionRegistry getExtReg() {
-        return schemaCollection.getExtReg();
+        return xmlSchemaCollection.getExtReg();
     }
 
     public NamespacePrefixList getNamespaceContext() {
-        return schemaCollection.getNamespaceContext();
+        return xmlSchemaCollection.getNamespaceContext();
     }
 
     public XmlSchemaType getTypeByQName(QName schemaTypeName) {
-        return schemaCollection.getTypeByQName(schemaTypeName);
+        return xmlSchemaCollection.getTypeByQName(schemaTypeName);
     }
 
     public XmlSchema[] getXmlSchema(String systemId) {
-        return schemaCollection.getXmlSchema(systemId);
+        return xmlSchemaCollection.getXmlSchema(systemId);
     }
 
     public XmlSchema[] getXmlSchemas() {
-        return schemaCollection.getXmlSchemas();
+        return xmlSchemaCollection.getXmlSchemas();
     }
 
     public int hashCode() {
-        return schemaCollection.hashCode();
+        return xmlSchemaCollection.hashCode();
     }
 
     public void init() {
-        schemaCollection.init();
+        xmlSchemaCollection.init();
     }
 
     public XmlSchema read(Element elem, String uri) {
-        return schemaCollection.read(elem, uri);
+        return xmlSchemaCollection.read(elem, uri);
     }
 
     public XmlSchema read(Document d, String uri) {
-        return schemaCollection.read(d, uri);
+        return xmlSchemaCollection.read(d, uri);
     }
 
     public XmlSchema read(Element elem) {
-        return schemaCollection.read(elem);
+        return xmlSchemaCollection.read(elem);
     }
 
     public void setBaseUri(String baseUri) {
-        schemaCollection.setBaseUri(baseUri);
+        xmlSchemaCollection.setBaseUri(baseUri);
     }
 
     public void setExtReg(ExtensionRegistry extReg) {
-        schemaCollection.setExtReg(extReg);
+        xmlSchemaCollection.setExtReg(extReg);
     }
 
     public void setNamespaceContext(NamespacePrefixList namespaceContext) {
-        schemaCollection.setNamespaceContext(namespaceContext);
+        xmlSchemaCollection.setNamespaceContext(namespaceContext);
     }
 
     public void setSchemaResolver(URIResolver schemaResolver) {
-        schemaCollection.setSchemaResolver(schemaResolver);
+        xmlSchemaCollection.setSchemaResolver(schemaResolver);
     }
 
     /**
@@ -160,7 +160,7 @@ public class SchemaCollection {
      * @return schema, or null.
      */
     public XmlSchema getSchemaByTargetNamespace(String namespaceURI) {
-        for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
+        for (XmlSchema schema : xmlSchemaCollection.getXmlSchemas()) {
             if (namespaceURI != null && namespaceURI.equals(schema.getTargetNamespace())
                 || namespaceURI == null && schema.getTargetNamespace() == null) {
                 return schema;
@@ -170,7 +170,7 @@ public class SchemaCollection {
     }
 
     public XmlSchema getSchemaForElement(QName name) {
-        for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
+        for (XmlSchema schema : xmlSchemaCollection.getXmlSchemas()) {
             if (name.getNamespaceURI().equals(schema.getTargetNamespace())) {
 
                 if (schema.getElementByName(name.getLocalPart()) != null) {
@@ -192,7 +192,7 @@ public class SchemaCollection {
      */
 
     public XmlSchema newXmlSchemaInCollection(String namespaceURI) {
-        return new XmlSchema(namespaceURI, schemaCollection);
+        return new XmlSchema(namespaceURI, xmlSchemaCollection);
     }
 
     /**
@@ -205,7 +205,7 @@ public class SchemaCollection {
         if ("".equals(qname.getNamespaceURI())) {
             return; // references to the 'unqualified' namespace are OK even if there is no schema for it.
         }
-        for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
+        for (XmlSchema schema : xmlSchemaCollection.getXmlSchemas()) {
             if (schema.getTargetNamespace().equals(qname.getNamespaceURI())) {
                 return;
             }
@@ -214,7 +214,7 @@ public class SchemaCollection {
     }
 
     public void validateElementName(QName referrer, QName elementQName) {
-        XmlSchemaElement element = schemaCollection.getElementByQName(elementQName);
+        XmlSchemaElement element = xmlSchemaCollection.getElementByQName(elementQName);
         if (element == null) {
             throw new InvalidXmlSchemaReferenceException(referrer + " references non-existent element "
                                                          + elementQName);
@@ -222,7 +222,7 @@ public class SchemaCollection {
     }
 
     public void validateTypeName(QName referrer, QName typeQName) {
-        XmlSchemaType type = schemaCollection.getTypeByQName(typeQName);
+        XmlSchemaType type = xmlSchemaCollection.getTypeByQName(typeQName);
         if (type == null) {
             throw new InvalidXmlSchemaReferenceException(referrer + " references non-existent type "
                                                          + typeQName);
@@ -233,7 +233,7 @@ public class SchemaCollection {
         /*
          * We need to inventory all the cross-imports to see if any are missing.
          */
-        for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
+        for (XmlSchema schema : xmlSchemaCollection.getXmlSchemas()) {
             addOneSchemaCrossImports(schema);
         }
     }

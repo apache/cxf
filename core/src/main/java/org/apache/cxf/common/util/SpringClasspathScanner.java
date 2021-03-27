@@ -58,6 +58,7 @@ class SpringClasspathScanner extends ClasspathScanner {
         }
     }
 
+    @Override
     protected Map< Class< ? extends Annotation >, Collection< Class< ? > > > findClassesInternal(
         Collection< String > basePackages,
         List<Class< ? extends Annotation > > annotations,
@@ -74,8 +75,8 @@ class SpringClasspathScanner extends ClasspathScanner {
         final Map<String, String[]> nonMatchingClasses = new HashMap<>();
 
         for (Class< ? extends Annotation > annotation: annotations) {
-            classes.put(annotation, new HashSet< Class < ? > >());
-            matchingInterfaces.put(annotation, new HashSet< String >());
+            classes.put(annotation, new HashSet<>());
+            matchingInterfaces.put(annotation, new HashSet<>());
         }
 
         if (basePackages == null || basePackages.isEmpty()) {
@@ -137,6 +138,7 @@ class SpringClasspathScanner extends ClasspathScanner {
         return classes;
     }
 
+    @Override
     protected List<URL> findResourcesInternal(Collection<String> basePackages,
                                               String extension,
                                               ClassLoader loader)
@@ -170,7 +172,7 @@ class SpringClasspathScanner extends ClasspathScanner {
 
     private ResourcePatternResolver getResolver(ClassLoader loader) {
         ResourcePatternResolver resolver = null;
-        if (IN_OSGI) {
+        if (IN_OSGI != null && IN_OSGI.booleanValue()) {
             resolver = SpringOsgiUtil.getResolver(loader);
         }
         if (resolver == null) {

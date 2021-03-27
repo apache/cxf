@@ -57,7 +57,7 @@ public final class SortedArraySet<T> implements SortedSet<T> {
     }
 
     public Iterator<T> iterator() {
-        return new SASIterator<T>(data.get());
+        return new SASIterator<>(data.get());
     }
 
     public int size() {
@@ -222,6 +222,7 @@ public final class SortedArraySet<T> implements SortedSet<T> {
             return data[idx++];
         }
 
+        @Override
         public void remove() {
             if (idx > 0) {
                 SortedArraySet.this.remove((Object)data[idx - 1]);

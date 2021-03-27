@@ -37,6 +37,7 @@ class StreamPrinter extends Thread {
         os = redirect;
     }
 
+    @Override
     public void run() {
         try {
             PrintWriter pw = null;
