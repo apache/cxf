@@ -42,7 +42,7 @@ import org.apache.cxf.message.Message;
  * </ol>
  */
 public class ClientCallback implements Future<Object[]> {
-    protected final CompletableFuture<Object[]> delegate = new CompletableFuture<Object[]>();
+    protected final CompletableFuture<Object[]> delegate = new CompletableFuture<>();
     protected Map<String, Object> context;
     protected boolean started;
 

@@ -316,8 +316,7 @@ public final class DOMUtils {
         }
 
         for (Node node = first; node != null; node = node.getNextSibling()) {
-            // System.out.println("getNode: " + name + " " +
-            // node.getNodeName());
+            
             if (node.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
@@ -424,8 +423,7 @@ public final class DOMUtils {
             return null;
         }
         for (Node node = first; node != null; node = node.getNextSibling()) {
-            // System.out.println("getNode: " + name + " " +
-            // node.getNodeName());
+          
             if (name.equals(node.getNodeName())) {
                 return getRawContent(node);
             }

@@ -90,6 +90,8 @@ public class StaxDataBinding extends AbstractInterceptorProvidingDataBinding {
                 continue;
             }
             new ServiceModelVisitor(serviceInfo) {
+                
+                @Override
                 public void begin(MessagePartInfo part) {
                     if (part.getTypeQName() != null || part.getElementQName() != null) {
                         return;
