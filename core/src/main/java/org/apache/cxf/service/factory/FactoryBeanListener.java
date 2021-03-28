@@ -138,7 +138,7 @@ public interface FactoryBeanListener {
          * Class[], InvokationHandler, Proxy
          */
         PROXY_CREATED,
-    };
+    }
 
 
     void handleEvent(Event ev, AbstractServiceFactoryBean factory, Object ... args);
