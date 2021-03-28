@@ -507,6 +507,8 @@ public class CachedWriter extends Writer {
         try {
             InputStream fileInputStream = new FileInputStream(tempFile) {
                 boolean closed;
+                
+                @Override
                 public void close() throws IOException {
                     if (!closed) {
                         super.close();
@@ -519,6 +521,8 @@ public class CachedWriter extends Writer {
             if (cipherTransformation != null) {
                 fileInputStream = new CipherInputStream(fileInputStream, ciphers.getDecryptor()) {
                     boolean closed;
+                    
+                    @Override
                     public void close() throws IOException {
                         if (!closed) {
                             super.close();
@@ -618,6 +622,8 @@ public class CachedWriter extends Writer {
                 throw new IOException(e.getMessage(), e);
             }
             out = new CipherOutputStream(out, ciphers.getEncryptor()) {
+                
+                @Override
                 public void close() throws IOException {
                     if (!cosClosed) {
                         super.close();
@@ -627,6 +633,8 @@ public class CachedWriter extends Writer {
             };
         }
         return new OutputStreamWriter(out, UTF_8) {
+            
+            @Override
             public void close() throws IOException {
                 if (!cosClosed) {
                     super.close();
@@ -641,6 +649,8 @@ public class CachedWriter extends Writer {
         if (cipherTransformation != null) {
             in = new CipherInputStream(in, ciphers.getDecryptor()) {
                 boolean closed;
+                
+                @Override
                 public void close() throws IOException {
                     if (!closed) {
                         super.close();

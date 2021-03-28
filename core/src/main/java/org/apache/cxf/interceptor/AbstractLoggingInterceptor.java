@@ -51,6 +51,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 /**
  * A simple logging handler which outputs the bytes of the message to the
  * Logger.
+ * @deprecated
  */
 @Deprecated
 public abstract class AbstractLoggingInterceptor extends AbstractPhaseInterceptor<Message> {
