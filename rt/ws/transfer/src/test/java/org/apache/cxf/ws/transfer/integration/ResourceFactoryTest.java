@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.transfer.integration;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.endpoint.Server;
@@ -52,7 +53,8 @@ public class ResourceFactoryTest extends IntegrationBaseTest {
         return refParam;
     }
 
-    private Element createXMLRepresentation() {
+    private static Element createXMLRepresentation() {
+        Document document = DOMUtils.getEmptyDocument();
         Element root = document.createElement("root");
         Element child1 = document.createElement("child1");
         Element child2 = document.createElement("child2");

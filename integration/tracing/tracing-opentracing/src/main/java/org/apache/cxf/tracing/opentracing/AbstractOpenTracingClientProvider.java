@@ -50,8 +50,8 @@ public abstract class AbstractOpenTracingClientProvider extends AbstractTracingP
 
         final Span parent = tracer.activeSpan();
         
-        Span activeSpan = null; 
-        Scope scope = null; 
+        final Span activeSpan;
+        final Scope scope;
         if (parent == null) {
             activeSpan = tracer.buildSpan(buildSpanDescription(uri.toString(), method)).start(); 
             scope = tracer.scopeManager().activate(activeSpan);

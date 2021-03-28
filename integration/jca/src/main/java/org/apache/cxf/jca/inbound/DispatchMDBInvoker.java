@@ -50,7 +50,7 @@ public class DispatchMDBInvoker extends MDBInvoker {
 
     @Override
     public Object getServiceObject(Exchange context) {
-        MessageEndpoint ep = null;
+        final MessageEndpoint ep;
         MessageEndpoint epFromMessage = null;
 
         if (context != null) {

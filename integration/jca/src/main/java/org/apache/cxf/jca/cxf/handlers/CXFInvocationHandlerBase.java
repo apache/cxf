@@ -67,7 +67,7 @@ abstract class CXFInvocationHandlerBase implements CXFInvocationHandler {
     protected Throwable getExceptionToThrow(InvocationTargetException ex, Method targetMethod)
         throws Throwable {
         Throwable targetException = ex.getTargetException();
-        Throwable ret = null;
+        Throwable ret;
 
         if (isOkToThrow(targetMethod, targetException)) {
             ret = targetException;

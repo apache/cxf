@@ -61,15 +61,11 @@ public class InvokingInvocationHandler extends CXFInvocationHandlerBase {
     }
 
     private Object invokeTargetMethod(Object proxy, Method method, Object[] args) throws Throwable {
-
-        Object ret = null;
-
         try {
-            ret = method.invoke(getData().getTarget(), args);
+            return method.invoke(getData().getTarget(), args);
         } catch (InvocationTargetException ite) {
             throw ite.getTargetException();
         }
-        return ret;
     }
 
 }

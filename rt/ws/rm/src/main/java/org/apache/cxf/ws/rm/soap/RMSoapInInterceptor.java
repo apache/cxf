@@ -174,7 +174,7 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
                     }
                     if (rmUri != null && rmUri.equals(ns)) {
                         if (codec == null) {
-                            String wsauri = null;
+                            final String wsauri;
                             AddressingProperties maps = ContextUtils.retrieveMAPs(message, false, false, false);
                             if (maps == null) {
                                 RMConfiguration config = getManager(message).getEffectiveConfiguration(message);
@@ -248,7 +248,7 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
         RMManager manager = getManager(message);
         assert manager != null;
 
-        RMEndpoint rme = null;
+        final RMEndpoint rme;
         try {
             rme = manager.getReliableEndpoint(message);
         } catch (RMException e) {

@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -67,9 +67,9 @@ public abstract class RMTxStoreTestBase {
     private static final String NON_ANON_ACKS_TO =
         "http://localhost:9999/decoupled_endpoint";
 
-    private static final Long ZERO = Long.valueOf(0);
-    private static final Long ONE = Long.valueOf(1);
-    private static final Long TEN = Long.valueOf(10);
+    private static final long ZERO = 0L;
+    private static final long ONE = 1L;
+    private static final long TEN = 10L;
 
     private static SequenceAcknowledgement ack1;
     private static SequenceAcknowledgement ack2;
@@ -289,11 +289,8 @@ public abstract class RMTxStoreTestBase {
         }
         control.verify();
 
-        Collection<Long> messageNrs = new ArrayList<>();
-        messageNrs.add(ZERO);
-        messageNrs.add(TEN);
-        messageNrs.add(ONE);
-        messageNrs.add(TEN);
+        Collection<Long> messageNrs = Arrays.asList(
+            ZERO, TEN, ONE, TEN);
 
         store.removeMessages(sid1, messageNrs, true);
         store.removeMessages(sid1, messageNrs, false);
@@ -540,7 +537,7 @@ public abstract class RMTxStoreTestBase {
         Collection<RMMessage> out = store.getMessages(sid1, true);
         assertEquals(0, out.size());
         Collection<RMMessage> in = store.getMessages(sid1, false);
-        assertEquals(0, out.size());
+        assertEquals(0, in.size());
 
         try {
             setupMessage(sid1, ONE, null, true);
@@ -565,9 +562,8 @@ public abstract class RMTxStoreTestBase {
             assertEquals(2, in.size());
             checkRecoveredMessages(in);
         } finally {
-            Collection<Long> msgNrs = new ArrayList<>();
-            msgNrs.add(ONE);
-            msgNrs.add(TEN);
+            Collection<Long> msgNrs = Arrays.asList(
+                ONE, TEN);
 
             store.removeMessages(sid1, msgNrs, true);
             store.removeMessages(sid1, msgNrs, false);
@@ -633,8 +629,8 @@ public abstract class RMTxStoreTestBase {
             if (null != sid1) {
                 store.removeSourceSequence(sid1);
             }
-            Collection<Long> msgNrs = new ArrayList<>();
-            msgNrs.add(ONE);
+            Collection<Long> msgNrs = Arrays.asList(
+                ONE);
             store.removeMessages(sid1, msgNrs, true);
         }
     }
@@ -697,8 +693,8 @@ public abstract class RMTxStoreTestBase {
             if (null != sid1) {
                 store.removeDestinationSequence(sid1);
             }
-            Collection<Long> msgNrs = new ArrayList<>();
-            msgNrs.add(ONE);
+            Collection<Long> msgNrs = Arrays.asList(
+                ONE);
             store.removeMessages(sid1, msgNrs, false);
         }
     }
@@ -897,19 +893,19 @@ public abstract class RMTxStoreTestBase {
                 assertEquals(1, recovered.getAcknowledgment().getAcknowledgementRange().size());
                 SequenceAcknowledgement.AcknowledgementRange r =
                     recovered.getAcknowledgment().getAcknowledgementRange().get(0);
-                assertEquals(ONE, r.getLower());
-                assertEquals(ONE, r.getUpper());
+                assertEquals(ONE, r.getLower().longValue());
+                assertEquals(ONE, r.getUpper().longValue());
                 assertEquals(ProtocolVariation.RM10WSA200408, recovered.getProtocol());
             } else {
                 assertEquals(10, recovered.getLastMessageNumber());
                 assertEquals(2, recovered.getAcknowledgment().getAcknowledgementRange().size());
                 SequenceAcknowledgement.AcknowledgementRange r =
                     recovered.getAcknowledgment().getAcknowledgementRange().get(0);
-                assertEquals(ONE, r.getLower());
-                assertEquals(ONE, r.getUpper());
+                assertEquals(ONE, r.getLower().longValue());
+                assertEquals(ONE, r.getUpper().longValue());
                 r = recovered.getAcknowledgment().getAcknowledgementRange().get(1);
                 assertEquals(Long.valueOf(3), r.getLower());
-                assertEquals(TEN, r.getUpper());
+                assertEquals(TEN, r.getUpper().longValue());
                 assertEquals(ProtocolVariation.RM11WSA200508, recovered.getProtocol());
             }
         }

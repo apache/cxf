@@ -56,14 +56,10 @@ public class MemoryResourceManager implements ResourceManager {
 
     private static final Logger LOG = LogUtils.getL7dLogger(MemoryResourceManager.class);
 
-    protected Map<String, String> storage;
+    protected final Map<String, String> storage = new HashMap<>();
 
     @Resource
     private WebServiceContext context;
-
-    public MemoryResourceManager() {
-        storage = new HashMap<>();
-    }
 
     @Override
     public Representation get(ReferenceParametersType ref) {
@@ -75,7 +71,7 @@ public class MemoryResourceManager implements ResourceManager {
         if (resource.isEmpty()) {
             return new Representation();
         }
-        Document doc = null;
+        final Document doc;
         try {
             doc = StaxUtils.read(new StringReader(storage.get(uuid)));
         } catch (XMLStreamException e) {
