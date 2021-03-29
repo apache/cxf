@@ -84,6 +84,16 @@
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
             <optional>true</optional>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.activation</groupId>
+                    <artifactId>activation</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
@@ -92,15 +102,15 @@
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.poi</groupId>
-                    <artifactId>poi-ooxml</artifactId>                
+                    <artifactId>poi-ooxml</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>javax.xml.bind</groupId>
                     <artifactId>jaxb-api</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-core</artifactId>
+                    <groupId>javax.activation</groupId>
+                    <artifactId>javax.activation-api</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>javax.annotation</groupId>
