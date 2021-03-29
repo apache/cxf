@@ -36,28 +36,34 @@ public class UnwrappedOperationInfo extends OperationInfo {
         return wrappedOp;
     }
 
+    @Override
     public boolean isUnwrapped() {
         return true;
     }
 
+    @Override
     public FaultInfo addFault(QName name, QName message) {
         return wrappedOp.addFault(name, message);
     }
 
+    @Override
     public FaultInfo getFault(QName name) {
         return wrappedOp.getFault(name);
     }
 
+    @Override
     public Collection<FaultInfo> getFaults() {
         return wrappedOp.getFaults();
     }
 
 
+    @Override
     public void setOutput(String nm, MessageInfo out) {
         super.setOutput(nm, out);
         out.setDelegate(wrappedOp.getOutput(), false);
     }
 
+    @Override
     public void setInput(String nm, MessageInfo in) {
         super.setInput(nm, in);
         in.setDelegate(wrappedOp.getInput(), false);

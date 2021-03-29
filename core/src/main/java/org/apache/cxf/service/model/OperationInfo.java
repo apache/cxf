@@ -145,7 +145,7 @@ public class OperationInfo extends AbstractPropertiesHolder implements NamedItem
         }
         if (faults != null && faults.containsKey(name)) {
             throw new IllegalArgumentException(
-                new Message("DUPLICATED.FAULT.NAME", LOG, new Object[] {name}).toString());
+                new Message("DUPLICATED.FAULT.NAME", LOG, name).toString());
         }
         FaultInfo fault = new FaultInfo(name, message, this);
         addFault(fault);

@@ -75,7 +75,7 @@ public class InterfaceInfo extends AbstractDescriptionElement implements NamedIt
         }
         if (operations.containsKey(oname)) {
             throw new IllegalArgumentException(
-                new Message("DUPLICATED.OPERATION.NAME", LOG, new Object[]{oname}).toString());
+                new Message("DUPLICATED.OPERATION.NAME", LOG, oname).toString());
         }
 
         OperationInfo operation = new OperationInfo(this, oname);
