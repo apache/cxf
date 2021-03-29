@@ -120,8 +120,8 @@
                     <artifactId>jaxb-api</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-core</artifactId>
+                    <groupId>javax.activation</groupId>
+                    <artifactId>javax.activation-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
