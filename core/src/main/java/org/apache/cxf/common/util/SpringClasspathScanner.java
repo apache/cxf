@@ -40,10 +40,8 @@ import org.springframework.util.ClassUtils;
 
 class SpringClasspathScanner extends ClasspathScanner {
 
-    private static final Boolean IN_OSGI;
-    static {
-        IN_OSGI = isSpringInOsgi();
-    }
+    private static boolean inOSGI;
+    
     SpringClasspathScanner() throws Exception {
         Class.forName("org.springframework.core.io.support.PathMatchingResourcePatternResolver");
         Class.forName("org.springframework.core.type.classreading.CachingMetadataReaderFactory");
@@ -172,7 +170,8 @@ class SpringClasspathScanner extends ClasspathScanner {
 
     private ResourcePatternResolver getResolver(ClassLoader loader) {
         ResourcePatternResolver resolver = null;
-        if (IN_OSGI != null && IN_OSGI.booleanValue()) {
+        inOSGI = isSpringInOsgi();
+        if (inOSGI) {
             resolver = SpringOsgiUtil.getResolver(loader);
         }
         if (resolver == null) {
