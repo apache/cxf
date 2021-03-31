@@ -96,8 +96,8 @@ public class AttachmentDeserializer {
     private int closedCount;
     private boolean closed;
 
-    private byte[] boundary;
 
+    private byte[] boundary;
     private LazyAttachmentCollection attachments;
 
     private Message message;
@@ -166,26 +166,31 @@ public class AttachmentDeserializer {
                 throw new IOException("Couldn't find MIME boundary: " + boundaryString);
             }
 
-            Map<String, List<String>> ih = loadPartHeaders(stream);
-            message.put(ATTACHMENT_PART_HEADERS, ih);
-            String val = AttachmentUtil.getHeader(ih, "Content-Type", "; ");
-            if (!StringUtils.isEmpty(val)) {
-                String cs = HttpHeaderHelper.findCharset(val);
-                if (!StringUtils.isEmpty(cs)) {
-                    message.put(Message.ENCODING, HttpHeaderHelper.mapCharset(cs));
-                }
-            }
-            val = AttachmentUtil.getHeader(ih, "Content-Transfer-Encoding");
-
-            MimeBodyPartInputStream mmps = new MimeBodyPartInputStream(stream, boundary, PUSHBACK_AMOUNT);
-            InputStream ins = AttachmentUtil.decode(mmps, val);
-            if (ins != mmps) {
-                ih.remove("Content-Transfer-Encoding");
-            }
-            body = new DelegatingInputStream(ins, this);
+            body = createBody(stream, boundary);
             createCount++;
             message.setContent(InputStream.class, body);
         }
+    }
+    
+    private InputStream createBody(PushbackInputStream pushbackInputStream, byte[] messageBoundary) throws IOException {
+        Map<String, List<String>> ih = loadPartHeaders(pushbackInputStream);
+        message.put(ATTACHMENT_PART_HEADERS, ih);
+        String val = AttachmentUtil.getHeader(ih, "Content-Type", "; ");
+        if (!StringUtils.isEmpty(val)) {
+            String cs = HttpHeaderHelper.findCharset(val);
+            if (!StringUtils.isEmpty(cs)) {
+                message.put(Message.ENCODING, HttpHeaderHelper.mapCharset(cs));
+            }
+        }
+        val = AttachmentUtil.getHeader(ih, "Content-Transfer-Encoding");
+
+        MimeBodyPartInputStream mmps = new MimeBodyPartInputStream(stream, messageBoundary, PUSHBACK_AMOUNT);
+        InputStream ins = AttachmentUtil.decode(mmps, val);
+        if (ins != mmps) {
+            ih.remove("Content-Transfer-Encoding");
+        }
+
+        return new DelegatingInputStream(ins, this);
     }
 
     private String findBoundaryFromContentType(String ct) {
