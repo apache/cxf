@@ -119,7 +119,6 @@ public class ReaderInputStream extends InputStream {
         this.reader = reader;
         this.encoder = encoder;
         this.encoderIn = CharBuffer.allocate(bufferSize);
-        (this.encoderIn).flip();
         this.encoderOut = ByteBuffer.allocate(128);
     }
 
