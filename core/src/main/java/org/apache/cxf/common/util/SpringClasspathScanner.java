@@ -42,6 +42,10 @@ class SpringClasspathScanner extends ClasspathScanner {
 
     private static boolean inOSGI;
     
+    static {
+        inOSGI = isSpringInOsgi();
+    }
+    
     SpringClasspathScanner() throws Exception {
         Class.forName("org.springframework.core.io.support.PathMatchingResourcePatternResolver");
         Class.forName("org.springframework.core.type.classreading.CachingMetadataReaderFactory");
@@ -170,7 +174,7 @@ class SpringClasspathScanner extends ClasspathScanner {
 
     private ResourcePatternResolver getResolver(ClassLoader loader) {
         ResourcePatternResolver resolver = null;
-        inOSGI = isSpringInOsgi();
+        
         if (inOSGI) {
             resolver = SpringOsgiUtil.getResolver(loader);
         }
