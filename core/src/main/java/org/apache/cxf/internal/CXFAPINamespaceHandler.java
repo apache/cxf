@@ -94,6 +94,8 @@ public class CXFAPINamespaceHandler implements NamespaceHandler {
             return new SimpleBPBeanDefinitionParser(FastInfosetFeature.class).parse(element, context);
         } else if ("workqueue".equals(s)) {
             return new SimpleBPBeanDefinitionParser(AutomaticWorkQueueImpl.class) {
+                
+                @Override
                 public String getId(Element element, ParserContext context) {
                     String id = element.hasAttribute("id") ? element.getAttribute("id") : null;
                     if (id == null) {
@@ -103,6 +105,7 @@ public class CXFAPINamespaceHandler implements NamespaceHandler {
                     return id;
                 }
 
+                @Override
                 protected void processNameAttribute(Element element, ParserContext ctx,
                                                     MutableBeanMetadata bean, String val) {
                     bean.addProperty("name", createValue(ctx, val));

@@ -67,6 +67,8 @@ import org.apache.cxf.message.MessageUtils;
 public final class AttachmentUtil {
     public static final String BODY_ATTACHMENT_ID = "root.message@cxf.apache.org";
 
+    static final String BINARY = "binary";
+    
     private static final Logger LOG = LogUtils.getL7dLogger(AttachmentUtil.class);
 
     private static final AtomicInteger COUNTER = new AtomicInteger();
@@ -75,7 +77,8 @@ public final class AttachmentUtil {
     private static final Random BOUND_RANDOM = new Random();
     private static final CommandMap DEFAULT_COMMAND_MAP = CommandMap.getDefaultCommandMap();
     private static final MailcapCommandMap COMMAND_MAP = new EnhancedMailcapCommandMap();
-
+    
+    
     static final class EnhancedMailcapCommandMap extends MailcapCommandMap {
         @Override
         public synchronized DataContentHandler createDataContentHandler(
@@ -277,7 +280,7 @@ public final class AttachmentUtil {
                 dataHandlers = new DHMap(attachments);
             }
         }
-        return dataHandlers == null ? new LinkedHashMap<String, DataHandler>() : dataHandlers;
+        return dataHandlers == null ? new LinkedHashMap<>() : dataHandlers;
     }
 
     static class DHMap extends AbstractMap<String, DataHandler> {
@@ -313,6 +316,7 @@ public final class AttachmentUtil {
                                 }
                             };
                         }
+                        @Override
                         public void remove() {
                             it.remove();
                         }
@@ -325,6 +329,8 @@ public final class AttachmentUtil {
                 }
             };
         }
+        
+        @Override
         public DataHandler put(String key, DataHandler value) {
             Iterator<Attachment> i = list.iterator();
             DataHandler ret = null;
@@ -360,7 +366,7 @@ public final class AttachmentUtil {
         }
         if (id == null) {
             //no Content-ID, set cxf default ID
-            id = "root.message@cxf.apache.org";
+            id =  BODY_ATTACHMENT_ID;
         }
         return id;
     }
@@ -400,14 +406,14 @@ public final class AttachmentUtil {
             String name = e.getKey();
             if ("Content-Transfer-Encoding".equalsIgnoreCase(name)) {
                 encoding = getHeader(headers, name);
-                if ("binary".equalsIgnoreCase(encoding)) {
+                if (BINARY.equalsIgnoreCase(encoding)) {
                     att.setXOP(true);
                 }
             }
             att.setHeader(name, getHeaderValue(e.getValue()));
         }
         if (encoding == null) {
-            encoding = "binary";
+            encoding = BINARY;
         }
         InputStream ins = decode(stream, encoding);
         if (ins != stream) {
@@ -440,7 +446,7 @@ public final class AttachmentUtil {
         encoding = encoding.toLowerCase();
 
         // some encodings are just pass-throughs, with no real decoding.
-        if ("binary".equals(encoding)
+        if (BINARY.equals(encoding)
             || "7bit".equals(encoding)
             || "8bit".equals(encoding)) {
             return in;

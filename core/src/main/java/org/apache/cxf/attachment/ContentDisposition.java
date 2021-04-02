@@ -37,6 +37,8 @@ public class ContentDisposition {
     private static final Pattern CD_HEADER_EXT_PARAMS_PATTERN =
             Pattern.compile(CD_HEADER_EXT_PARAMS_EXPRESSION);
     private static final Pattern CODEPOINT_ENCODED_VALUE_PATTERN = Pattern.compile("&#[0-9]{4};|\\S");
+    
+    private static final String FILE_NAME = "filename";
 
     private String value;
     private String type;
@@ -97,7 +99,7 @@ public class ContentDisposition {
                 } catch (UnsupportedEncodingException e) {
                     // would be odd not to support UTF-8 or 8859-1
                 }
-            } else if ("filename".equalsIgnoreCase(paramName) && paramValue.contains("&#")) {
+            } else if (FILE_NAME.equalsIgnoreCase(paramName) && paramValue.contains("&#")) {
                 Matcher matcher = CODEPOINT_ENCODED_VALUE_PATTERN.matcher(paramValue);
                 StringBuilder sb = new StringBuilder();
                 while (matcher.find()) {
@@ -116,7 +118,7 @@ public class ContentDisposition {
             params.put(paramName.toLowerCase(), paramValue);
         }
         if (extendedFilename != null) {
-            params.put("filename", extendedFilename);
+            params.put(FILE_NAME, extendedFilename);
         }
     }
 
@@ -125,7 +127,7 @@ public class ContentDisposition {
     }
 
     public String getFilename() {
-        return params.get("filename");
+        return params.get(FILE_NAME);
     }
 
     public String getParameter(String name) {

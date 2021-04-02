@@ -21,7 +21,6 @@ package org.apache.cxf.io;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -120,9 +119,7 @@ public class ReaderInputStream extends InputStream {
         this.reader = reader;
         this.encoder = encoder;
         this.encoderIn = CharBuffer.allocate(bufferSize);
-        ((Buffer)this.encoderIn).flip();
         this.encoderOut = ByteBuffer.allocate(128);
-        ((Buffer)this.encoderOut).flip();
     }
 
     /**
@@ -192,7 +189,7 @@ public class ReaderInputStream extends InputStream {
     private void fillBuffer() throws IOException {
         if (!endOfInput && (lastCoderResult == null || lastCoderResult.isUnderflow())) {
             encoderIn.compact();
-            int position = ((Buffer)encoderIn).position();
+            int position = encoderIn.position();
             // We don't use Reader#read(CharBuffer) here because it is more efficient
             // to write directly to the underlying char array (the default implementation
             // copies data to a temporary char array).
@@ -200,13 +197,13 @@ public class ReaderInputStream extends InputStream {
             if (c == -1) {
                 endOfInput = true;
             } else {
-                ((Buffer)encoderIn).position(position + c);
+                encoderIn.position(position + c);
             }
-            ((Buffer)encoderIn).flip();
+            encoderIn.flip();
         }
         encoderOut.compact();
         lastCoderResult = encoder.encode(encoderIn, encoderOut, endOfInput);
-        ((Buffer)encoderOut).flip();
+        encoderOut.flip();
     }
 
     /**

@@ -133,6 +133,7 @@ public final class MessageUtils {
      * Returns true if a value is either the String "true" (regardless of case)  or Boolean.TRUE.
      * @param value
      * @return true if value is either the String "true" or Boolean.TRUE
+     * @deprecated replaced by {@link #PropertyUtils#isTrue(Object)}
      */
     @Deprecated
     public static boolean isTrue(Object value) {

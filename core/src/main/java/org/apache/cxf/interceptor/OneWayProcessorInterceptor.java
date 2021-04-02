@@ -52,6 +52,8 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
     public OneWayProcessorInterceptor(String phase) {
         super(phase);
     }
+    
+    @Override
     public void handleFault(Message message) {
         if (message.getExchange().isOneWay()
             && !isRequestor(message)) {

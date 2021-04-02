@@ -38,18 +38,22 @@ public class WrappedFeature extends AbstractFeature {
         wrapped = f;
     }
 
+    @Override
     public void initialize(Server server, Bus bus) {
         wrapped.initialize(server, bus);
     }
 
+    @Override
     public void initialize(Client client, Bus bus) {
         wrapped.initialize(client, bus);
     }
 
+    @Override
     public void initialize(InterceptorProvider interceptorProvider, Bus bus) {
         wrapped.initialize(interceptorProvider, bus);
     }
 
+    @Override
     public void initialize(Bus bus) {
         wrapped.initialize(bus);
     }

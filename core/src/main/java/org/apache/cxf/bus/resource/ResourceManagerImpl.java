@@ -44,6 +44,8 @@ public class ResourceManagerImpl extends DefaultResourceManager implements BusEx
         super();
         setBus(b);
     }
+    
+    @Override
     protected void onFirstResolve() {
         super.onFirstResolve();
         if (bus != null) {

@@ -41,7 +41,7 @@ public interface InterceptorChain extends Iterable<Interceptor<? extends Message
         EXECUTING,
         COMPLETE,
         ABORTED,
-    };
+    }
 
     String STARTING_AFTER_INTERCEPTOR_ID = "starting_after_interceptor_id";
     String STARTING_AT_INTERCEPTOR_ID = "starting_at_interceptor_id";

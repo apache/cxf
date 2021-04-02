@@ -169,10 +169,13 @@ public class OSGIBusListener implements BusLifeCycleListener {
 
     private boolean isPrivate(ServiceReference<?> ref) {
         Object o = ref.getProperty(SERVICE_PROPERTY_PRIVATE);
-        Boolean pvt = Boolean.FALSE;
+        
         if (o == null) {
-            pvt = Boolean.FALSE;
-        } else if (o instanceof String) {
+            return false;
+        }
+        
+        Boolean pvt = Boolean.FALSE;
+        if (o instanceof String) {
             pvt = Boolean.parseBoolean((String)o);
         } else if (o instanceof Boolean) {
             pvt = (Boolean)o;

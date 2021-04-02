@@ -48,6 +48,7 @@ public class Exception extends java.lang.Exception {
         return null;
     }
 
+    @Override
     public String getMessage() {
         if (null != message) {
             return message.toString();

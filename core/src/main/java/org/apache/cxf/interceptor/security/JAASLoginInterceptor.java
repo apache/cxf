@@ -77,6 +77,10 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
         return contextName;
     }
 
+    /**
+     * @deprecated replaced by {@link #setRoleClassifier(String)}
+     * @param name
+     */
     @Deprecated
     public void setRolePrefix(String name) {
         setRoleClassifier(name);

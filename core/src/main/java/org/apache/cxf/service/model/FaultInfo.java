@@ -38,10 +38,12 @@ public class FaultInfo extends AbstractMessageContainer {
 
 
 
+    @Override
     public int hashCode() {
         return faultName == null ? -1 : faultName.hashCode();
     }
 
+    @Override
     public boolean equals(Object o) {
         if (o == this) {
             return true;

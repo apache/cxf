@@ -43,6 +43,7 @@ public class MimeBodyPartInputStream extends InputStream {
         this.pbAmount = pbsize;
     }
 
+    @Override
     public int read(byte[] buf, int origOff, int origLen) throws IOException {
         byte[] b = buf;
         int off = origOff;
@@ -267,6 +268,7 @@ public class MimeBodyPartInputStream extends InputStream {
         return value;
     }
 
+    @Override
     public void close() throws IOException {
         this.closed = true;
     }

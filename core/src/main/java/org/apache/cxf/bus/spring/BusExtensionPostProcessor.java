@@ -42,10 +42,12 @@ public class BusExtensionPostProcessor implements BeanPostProcessor, Application
     }
 
 
+    @Override
     public Object postProcessAfterInitialization(Object bean, String beanId) {
         return bean;
     }
 
+    @Override
     public Object postProcessBeforeInitialization(Object bean, String beanId) {
         if (bean instanceof BusExtension && null != getBus()) {
             Class<? extends Object> cls = ((BusExtension)bean).getRegistrationType();

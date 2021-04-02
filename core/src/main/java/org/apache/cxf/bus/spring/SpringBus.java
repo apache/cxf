@@ -110,6 +110,7 @@ public class SpringBus extends ExtensionManagerBus
         }
     }
 
+    @Override
     public void destroyBeans() {
         if (closeContext) {
             ctx.close();
@@ -117,6 +118,7 @@ public class SpringBus extends ExtensionManagerBus
         super.destroyBeans();
     }
 
+    @Override
     public String getId() {
         if (id == null) {
             try {

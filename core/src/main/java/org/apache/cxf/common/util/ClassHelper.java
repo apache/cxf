@@ -123,8 +123,7 @@ public class ClassHelper {
 
     private static ClassUnwrapper getContextClassUnwrapper(Bus bus) {
         if (bus != null && bus.getProperty(ClassUnwrapper.class.getName()) != null) {
-            ClassUnwrapper unwrapper = (ClassUnwrapper) bus.getProperty(ClassUnwrapper.class.getName());
-            return unwrapper;
+            return  (ClassUnwrapper) bus.getProperty(ClassUnwrapper.class.getName());
         }
 
         return (DEFAULT_UNWRAPPER == UNWRAPPER || checkUseDefaultClassHelper(bus)) ? DEFAULT_UNWRAPPER : UNWRAPPER;

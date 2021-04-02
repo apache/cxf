@@ -148,6 +148,7 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
 
     // Implementation of org.apache.cxf.common.annotation.AnnotationVisitor
 
+    @Override
     public final void visitClass(final Class<?> clz, final Annotation annotation) { //NOPMD
 
         assert annotation instanceof Resource || annotation instanceof Resources : annotation;
@@ -294,9 +295,7 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
             }
         } catch (IllegalAccessException e) {
             LOG.log(Level.SEVERE, "INJECTION_SETTER_NOT_VISIBLE", method);
-        } catch (InvocationTargetException e) {
-            LogUtils.log(LOG, Level.SEVERE, "INJECTION_SETTER_RAISED_EXCEPTION", e, method);
-        } catch (SecurityException e) {
+        } catch (InvocationTargetException | SecurityException e) {
             LogUtils.log(LOG, Level.SEVERE, "INJECTION_SETTER_RAISED_EXCEPTION", e, method);
         } catch (NoSuchMethodException e) {
             LOG.log(Level.SEVERE, "INJECTION_SETTER_METHOD_NOT_FOUND", new Object[] {method.getName()});

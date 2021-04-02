@@ -108,10 +108,13 @@ public class CXFActivator implements BundleActivator {
 
     private static Extension createManagedWorkQueueListExtension(final ManagedWorkQueueList workQueues) {
         return new Extension(ManagedWorkQueueList.class) {
+            
+            @Override
             public Object getLoadedObject() {
                 return workQueues;
             }
 
+            @Override
             public Extension cloneNoObject() {
                 return this;
             }

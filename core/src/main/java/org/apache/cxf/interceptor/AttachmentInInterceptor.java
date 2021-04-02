@@ -62,6 +62,7 @@ public class AttachmentInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
     }
 
+    @Override
     public void handleFault(Message messageParam) {
     }
 

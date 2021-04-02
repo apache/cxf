@@ -27,7 +27,7 @@ public class Header {
         DIRECTION_IN,
         DIRECTION_OUT,
         DIRECTION_INOUT
-    };
+    }
 
     public static final String HEADER_LIST = Header.class.getName() + ".list";
 

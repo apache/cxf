@@ -47,6 +47,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
         this.classLoader = classLoader;
     }
 
+    @Override
     protected Class<?> findClass(final String name) throws ClassNotFoundException {
         try {
             return AccessController.doPrivileged(new PrivilegedExceptionAction<Class<?>>() {
@@ -64,6 +65,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
         }
     }
 
+    @Override
     protected URL findResource(final String name) {
         URL resource = AccessController.doPrivileged(new PrivilegedAction<URL>() {
             public URL run() {
@@ -76,6 +78,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
         return resource;
     }
 
+    @Override
     protected Enumeration<URL> findResources(final String name) throws IOException {
         Enumeration<URL> urls;
         try {
@@ -101,6 +104,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
         return urls;
     }
 
+    @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         Class<?> clazz;
         try {

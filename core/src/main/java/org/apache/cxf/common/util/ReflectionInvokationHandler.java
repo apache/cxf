@@ -190,6 +190,8 @@ public class ReflectionInvokationHandler implements InvocationHandler {
             Object obj = internal.next();
             return createProxyWrapper(obj, cls);
         }
+        
+        @Override
         public void remove() {
             internal.remove();
         }

@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.bus.osgi;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -51,7 +50,7 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
         this.id = bundleId;
     }
 
-    public void registerExistingBundles(BundleContext context) throws IOException {
+    public void registerExistingBundles(BundleContext context) {
         for (Bundle bundle : context.getBundles()) {
             if ((bundle.getState() == Bundle.RESOLVED
                 || bundle.getState() == Bundle.STARTING
@@ -132,6 +131,8 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
             serviceObject = o;
             obj = o;
         }
+        
+        @Override
         public Object load(ClassLoader cl, Bus b) {
             if (interfaceName == null && bundle.getBundleContext() != null) {
                 ServiceReference<?> ref = bundle.getBundleContext().getServiceReference(className);
@@ -144,6 +145,8 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
             }
             return super.load(cl, b);
         }
+        
+        @Override
         protected Class<?> tryClass(String name, ClassLoader cl) {
             Class<?> c = null;
             Throwable origExc = null;
@@ -167,6 +170,7 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
             return c;
         }
 
+        @Override
         public Extension cloneNoObject() {
             OSGiExtension ext = new OSGiExtension(this, bundle);
             ext.obj = serviceObject;

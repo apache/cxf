@@ -191,6 +191,7 @@ public class TLSClientParameters extends TLSParameterBase {
         return i;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (o == this) {
             return true;

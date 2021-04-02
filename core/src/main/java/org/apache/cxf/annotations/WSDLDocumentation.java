@@ -81,7 +81,7 @@ public @interface WSDLDocumentation {
         SERVICE,
         SERVICE_PORT,
 
-    };
+    }
 
 
     final class DEFAULT { }
