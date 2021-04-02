@@ -60,8 +60,8 @@ import org.apache.ws.commons.schema.utils.XmlSchemaObjectBase;
  */
 public class SchemaCollection {
 
-    private XmlSchemaCollection xmlSchemaCollection;
-    private Map<XmlSchema, Set<XmlSchemaType>> xmlTypesCheckedForCrossImportsPerSchema
+    private final XmlSchemaCollection xmlSchemaCollection;
+    private final Map<XmlSchema, Set<XmlSchemaType>> xmlTypesCheckedForCrossImportsPerSchema
         = new HashMap<>();
 
     public SchemaCollection() {
