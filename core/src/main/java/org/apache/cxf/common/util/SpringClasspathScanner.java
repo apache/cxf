@@ -172,11 +172,7 @@ class SpringClasspathScanner extends ClasspathScanner {
     private ResourcePatternResolver getResolver(ClassLoader loader) {
         ResourcePatternResolver resolver = null;
         
-<<<<<<< HEAD
-        if (inOSGI) {
-=======
         if (IN_OSGI) {
->>>>>>> 2c89d63ad40544c7b346d252398f010ba3b50a66
             resolver = SpringOsgiUtil.getResolver(loader);
         }
         if (resolver == null) {
