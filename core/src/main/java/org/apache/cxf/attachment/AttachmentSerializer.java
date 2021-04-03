@@ -308,7 +308,7 @@ public class AttachmentSerializer {
             bufferSize = avail;
         }
         final byte[] buffer = new byte[bufferSize];
-        return this.getTotalReadBytes(input, output, buffer);
+        return getTotalReadBytes(input, output, buffer);
        
     }
     
