@@ -331,6 +331,12 @@ public class WebClientTest {
         assertEquals(auth, wc.getHeaders().getFirst(HttpHeaders.AUTHORIZATION));
     }
 
+    @Test
+    public void testLanguageHeader() {
+        WebClient wc = WebClient.create("http://foo").language("en_CA");
+        assertEquals("en_CA", wc.getHeaders().getFirst(HttpHeaders.CONTENT_LANGUAGE));
+    }
+
     private static class ParamConverterProviderImpl implements ParamConverterProvider {
 
         @SuppressWarnings("unchecked")
