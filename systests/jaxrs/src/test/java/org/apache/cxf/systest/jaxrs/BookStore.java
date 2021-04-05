@@ -351,6 +351,13 @@ public class BookStore {
     public Book echoXmlBook(Book book) {
         return book;
     }
+    
+    @POST
+    @Path("/echoxmlbook-i18n")
+    @Produces("application/xml")
+    public Response echoXmlBooki18n(Book book, @HeaderParam(HttpHeaders.CONTENT_LANGUAGE) String language) {
+        return Response.ok(new Book(book.getName() + "-" + language, book.getId())).build();
+    }
 
     // Only books with id consisting of 3 or 4 digits of the numbers between 5 and 9 are accepted
     @POST

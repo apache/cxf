@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
@@ -44,6 +45,7 @@ import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
@@ -53,6 +55,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Variant;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
@@ -2014,6 +2017,24 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertEquals("book", r.readEntity(String.class));
     }
     @Test
+    public void testEchoBookWithLanguage() throws Exception {
+        final Book book = new Book("CXF in Action", 100);
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/echoxmlbook-i18n");
+        wc.type("application/xml").accept("application/xml").language("en_CA");
+        Response r = wc.post(book);
+        assertEquals(200, r.getStatus());
+        assertEquals(book.getName() + "-en_CA", r.readEntity(Book.class).getName());
+    }
+    @Test
+    public void testEchoBookEntityWithLocale() throws Exception {
+        final Book book = new Book("CXF in Action", 100);
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/echoxmlbook-i18n");
+        wc.type("application/xml").accept("application/xml").language("en_CA");
+        Response r = wc.post(Entity.entity(book, new Variant(MediaType.APPLICATION_XML_TYPE, Locale.UK, null)));
+        assertEquals(200, r.getStatus());
+        assertEquals(book.getName() + "-en_GB", r.readEntity(Book.class).getName());
+    }
+    @Test
     public void testEmpty202() throws Exception {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/empty202");
         WebClient.getConfig(wc).getRequestContext().put(Message.PROCESS_202_RESPONSE_ONEWAY_OR_PARTIAL, false);
@@ -2924,11 +2945,8 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
 
 
-    private static void getAndCompareAsStrings(String address,
-                                        String resourcePath,
-                                        String acceptType,
-                                        String expectedContentType,
-                                        int status) throws Exception {
+    private static void getAndCompareAsStrings(String address, String resourcePath, String acceptType,
+            String expectedContentType, int status) throws Exception {
         String expected = IOUtils.toString(
             JAXRSClientServerBookTest.class.getResourceAsStream(resourcePath));
         getAndCompare(address,
@@ -2938,11 +2956,8 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                       status);
     }
 
-    private static void getAndCompare(String address,
-                               String expectedValue,
-                               String acceptType,
-                               String expectedContentType,
-                               int expectedStatus) throws Exception {
+    private static void getAndCompare(String address, String expectedValue, String acceptType, 
+            String expectedContentType, int expectedStatus) throws Exception {
         CloseableHttpClient client = HttpClientBuilder.create().build();
         HttpGet get = new HttpGet(address);
         get.addHeader("Accept", acceptType);
