@@ -184,7 +184,9 @@ public final class AttachmentUtil {
             if (directory instanceof File) {
                 bos.setOutputDir((File)directory);
             } else if (directory instanceof String) {
-                bos.setOutputDir(new File((String)directory));
+                String directoryStr  = (String)directory;
+                directoryStr = directoryStr.replace("..", "");
+                bos.setOutputDir(new File(directoryStr));
             } else {
                 throw new IOException("The value set as " + AttachmentDeserializer.ATTACHMENT_DIRECTORY
                                       + " should be either an instance of File or String");
