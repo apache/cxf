@@ -19,8 +19,6 @@
 package org.apache.cxf.systest.sts.soap12;
 
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,13 +29,12 @@ import javax.xml.ws.Service;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.SoapFault;
-import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
-import org.apache.cxf.systest.sts.common.TokenTestUtils;
+import org.apache.cxf.systest.sts.deployment.DoubleItServer;
 import org.apache.cxf.systest.sts.deployment.STSServer;
+import org.apache.cxf.systest.sts.deployment.StaxDoubleItServer;
 import org.apache.cxf.systest.sts.deployment.StaxSTSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -73,8 +70,8 @@ public class Soap12Test extends AbstractBusClientServerTestBase {
     private static final String BEARER_KEYTYPE =
         "http://docs.oasis-open.org/ws-sx/ws-trust/200512/Bearer";
 
-    private static final String PORT = allocatePort(Server.class);
-    private static final String STAX_PORT = allocatePort(StaxServer.class);
+    private static final String PORT = allocatePort(DoubleItServer.class);
+    private static final String STAX_PORT = allocatePort(StaxDoubleItServer.class);
 
     final TestParam test;
 
@@ -84,61 +81,30 @@ public class Soap12Test extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-                "Server failed to launch",
-                // run the server in the same process
-                // set this to false to fork
-                launchServer(Server.class, true)
-        );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(StaxServer.class, true)
-        );
-        assertTrue(
-                "Server failed to launch",
-                // run the server in the same process
-                // set this to false to fork
-                launchServer(STSServer.class, true)
-        );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(StaxSTSServer.class, true)
-        );
+        assertTrue(launchServer(new StaxDoubleItServer(
+            Soap12Test.class.getResource("cxf-service.xml"),
+            Soap12Test.class.getResource("stax-cxf-service.xml")
+        )));
+        assertTrue(launchServer(new StaxSTSServer()));
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam> data() {
+    public static TestParam[] data() {
+        return new TestParam[] {new TestParam(PORT, false, STSPORT),
+                                new TestParam(PORT, true, STSPORT),
+                                new TestParam(STAX_PORT, false, STSPORT),
+                                new TestParam(STAX_PORT, true, STSPORT),
 
-        return Arrays.asList(new TestParam[] {new TestParam(PORT, false, STSPORT),
-                                              new TestParam(PORT, true, STSPORT),
-                                              new TestParam(STAX_PORT, false, STSPORT),
-                                              new TestParam(STAX_PORT, true, STSPORT),
-
-                                              new TestParam(PORT, false, STAX_STSPORT),
-                                              new TestParam(PORT, true, STAX_STSPORT),
-                                              new TestParam(STAX_PORT, false, STAX_STSPORT),
-                                              new TestParam(STAX_PORT, true, STAX_STSPORT),
-        });
-    }
-
-    @org.junit.AfterClass
-    public static void cleanup() throws Exception {
-        stopAllServers();
+                                new TestParam(PORT, false, STAX_STSPORT),
+                                new TestParam(PORT, true, STAX_STSPORT),
+                                new TestParam(STAX_PORT, false, STAX_STSPORT),
+                                new TestParam(STAX_PORT, true, STAX_STSPORT),
+        };
     }
 
     @org.junit.Test
     public void testSAML2() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = Soap12Test.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = Soap12Test.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -147,7 +113,7 @@ public class Soap12Test extends AbstractBusClientServerTestBase {
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportSaml2Port, test.getPort());
 
-        TokenTestUtils.updateSTSPort((BindingProvider)transportSaml2Port, test.getStsPort());
+        SecurityTestUtil.updateSTSPort((BindingProvider)transportSaml2Port, test.getStsPort());
 
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(transportSaml2Port);
@@ -156,7 +122,6 @@ public class Soap12Test extends AbstractBusClientServerTestBase {
         doubleIt(transportSaml2Port, 30);
 
         ((java.io.Closeable)transportSaml2Port).close();
-        bus.shutdown(true);
     }
 
     /**
@@ -165,12 +130,7 @@ public class Soap12Test extends AbstractBusClientServerTestBase {
      */
     @org.junit.Test
     public void testFaultCode() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = Soap12Test.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         try {
             String badAddress =
@@ -180,8 +140,6 @@ public class Soap12Test extends AbstractBusClientServerTestBase {
         } catch (SoapFault ex) {
             // expected
         }
-
-        bus.shutdown(true);
     }
 
     private SecurityToken requestSecurityToken(

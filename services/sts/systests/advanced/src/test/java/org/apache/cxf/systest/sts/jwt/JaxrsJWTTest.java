@@ -19,7 +19,6 @@
 package org.apache.cxf.systest.sts.jwt;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -30,12 +29,11 @@ import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.core.HttpHeaders;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.systest.sts.deployment.DoubleItServer;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -57,38 +55,18 @@ public class JaxrsJWTTest extends AbstractBusClientServerTestBase {
     public static final String JWT_TOKEN_TYPE = "urn:ietf:params:oauth:token-type:jwt";
     static final String STSPORT = allocatePort(STSServer.class);
 
-    private static final String PORT = allocatePort(Server.class);
+    private static final String PORT = allocatePort(DoubleItServer.class);
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(Server.class, true)
-        );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(STSServer.class, true)
-        );
-    }
-
-    @org.junit.AfterClass
-    public static void cleanup() throws Exception {
-        stopAllServers();
+        assertTrue(launchServer(new DoubleItServer(
+            JaxrsJWTTest.class.getResource("cxf-service.xml"))));
+        assertTrue(launchServer(new STSServer()));
     }
 
     @org.junit.Test
     public void testSuccessfulInvocation() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = JaxrsJWTTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs";
         final int numToDouble = 25;
@@ -106,8 +84,6 @@ public class JaxrsJWTTest extends AbstractBusClientServerTestBase {
 
         int resp = client.post(numToDouble, Integer.class);
         org.junit.Assert.assertEquals(2 * numToDouble, resp);
-
-        bus.shutdown(true);
     }
 
     private STSClient getSTSClient(

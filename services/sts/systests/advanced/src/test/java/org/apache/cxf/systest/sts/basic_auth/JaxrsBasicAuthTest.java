@@ -21,6 +21,7 @@ package org.apache.cxf.systest.sts.basic_auth;
 import javax.ws.rs.InternalServerErrorException;
 
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.systest.sts.deployment.DoubleItServer;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -37,27 +38,14 @@ public class JaxrsBasicAuthTest extends AbstractBusClientServerTestBase {
 
     static final String STSPORT = allocatePort(STSServer.class);
 
-    private static final String PORT = allocatePort(Server.class);
+    private static final String PORT = allocatePort(DoubleItServer.class);
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(Server.class, true)
-        );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(STSServer.class, true)
-        );
-    }
-
-    @org.junit.AfterClass
-    public static void cleanup() throws Exception {
-        stopAllServers();
+        assertTrue(launchServer(new DoubleItServer(
+            JaxwsBasicAuthTest.class.getResource("cxf-service.xml")
+        )));
+        assertTrue(launchServer(new STSServer()));
     }
 
     @org.junit.Test

@@ -19,19 +19,16 @@
 package org.apache.cxf.systest.sts.sts_sender_vouches;
 
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
-import org.apache.cxf.systest.sts.common.TokenTestUtils;
+import org.apache.cxf.systest.sts.deployment.DoubleItServer;
+import org.apache.cxf.systest.sts.deployment.STSServer;
+import org.apache.cxf.systest.sts.deployment.StaxSTSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
 
@@ -54,7 +51,7 @@ public class STSSenderVouchesTest extends AbstractBusClientServerTestBase {
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
-    private static final String PORT = allocatePort(Server.class);
+    private static final String PORT = allocatePort(DoubleItServer.class);
 
     final TestParam test;
 
@@ -64,48 +61,25 @@ public class STSSenderVouchesTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(Server.class, true)
-        );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(STSServer.class, true)
-        );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(StaxSTSServer.class, true)
-        );
+        assertTrue(launchServer(new DoubleItServer(
+            STSSenderVouchesTest.class.getResource("cxf-service.xml")
+        )));
+        assertTrue(launchServer(new StaxSTSServer(
+            STSSenderVouchesTest.class.getResource("cxf-sts.xml"),
+            STSSenderVouchesTest.class.getResource("stax-cxf-sts.xml")
+        )));
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam> data() {
-
-        return Arrays.asList(new TestParam[] {new TestParam(PORT, false, STSPORT),
-                                              new TestParam(PORT, false, STAX_STSPORT),
-        });
-    }
-
-    @org.junit.AfterClass
-    public static void cleanup() throws Exception {
-        stopAllServers();
+    public static TestParam[] data() {
+        return new TestParam[] {new TestParam(PORT, false, STSPORT),
+                                new TestParam(PORT, false, STAX_STSPORT),
+        };
     }
 
     @org.junit.Test
     public void testSAML2SenderVouches() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = STSSenderVouchesTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = STSSenderVouchesTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -114,7 +88,7 @@ public class STSSenderVouchesTest extends AbstractBusClientServerTestBase {
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
 
-        TokenTestUtils.updateSTSPort((BindingProvider)port, test.getStsPort());
+        SecurityTestUtil.updateSTSPort((BindingProvider)port, test.getStsPort());
 
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
@@ -123,7 +97,6 @@ public class STSSenderVouchesTest extends AbstractBusClientServerTestBase {
         doubleIt(port, 25);
 
         ((java.io.Closeable)port).close();
-        bus.shutdown(true);
     }
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {

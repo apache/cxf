@@ -25,11 +25,9 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.systest.sts.common.TokenTestUtils;
+import org.apache.cxf.systest.sts.common.SecurityTestUtil;
+import org.apache.cxf.systest.sts.deployment.DoubleItServer;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.auth.SpnegoAuthSupplier;
@@ -55,7 +53,7 @@ import static org.junit.Assert.assertTrue;
 public class KerberosDelegationTokenTest extends AbstractBusClientServerTestBase {
 
     static final String STSPORT = allocatePort(STSServer.class);
-    static final String PORT = allocatePort(Server.class);
+    static final String PORT = allocatePort(DoubleItServer.class);
     static final String INTERMEDIARY_PORT = allocatePort(Intermediary.class);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
@@ -63,18 +61,10 @@ public class KerberosDelegationTokenTest extends AbstractBusClientServerTestBase
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(Server.class, true)
-        );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(STSServer.class, true)
-        );
+        assertTrue(launchServer(new DoubleItServer(
+            KerberosDelegationTokenTest.class.getResource("cxf-service.xml")
+        )));
+        assertTrue(launchServer(new STSServer()));
         assertTrue(
                    "Server failed to launch",
                    // run the server in the same process
@@ -83,20 +73,9 @@ public class KerberosDelegationTokenTest extends AbstractBusClientServerTestBase
         );
     }
 
-    @org.junit.AfterClass
-    public static void cleanup() throws Exception {
-        stopAllServers();
-    }
-
     @org.junit.Test
     public void testKerberosToken() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = KerberosDelegationTokenTest.class.getResource("cxf-intermediary-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-intermediary-client.xml").toString());
 
         URL wsdl = KerberosDelegationTokenTest.class.getResource("DoubleItIntermediary.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -105,12 +84,11 @@ public class KerberosDelegationTokenTest extends AbstractBusClientServerTestBase
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportSaml2Port, INTERMEDIARY_PORT);
 
-        TokenTestUtils.updateSTSPort((BindingProvider)transportSaml2Port, STSPORT);
+        SecurityTestUtil.updateSTSPort((BindingProvider)transportSaml2Port, STSPORT);
 
         doubleIt(transportSaml2Port, 25);
 
         ((java.io.Closeable)transportSaml2Port).close();
-        bus.shutdown(true);
     }
 
     @org.junit.Test

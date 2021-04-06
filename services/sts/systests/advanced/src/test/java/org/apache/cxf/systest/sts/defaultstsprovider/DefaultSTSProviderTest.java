@@ -18,14 +18,12 @@
  */
 package org.apache.cxf.systest.sts.defaultstsprovider;
 
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -46,27 +44,13 @@ public class DefaultSTSProviderTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(STSServer.class, true)
-        );
-    }
-
-    @org.junit.AfterClass
-    public static void cleanup() throws Exception {
-        stopAllServers();
+        assertTrue(launchServer(new STSServer(
+            DefaultSTSProviderTest.class.getResource("cxf-sts.xml"))));
     }
 
     @org.junit.Test
     public void testIssueSAML2Token() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = DefaultSTSProviderTest.class.getResource("cxf-client-unit.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client-unit.xml").toString());
 
         String wsdlLocation =
             "https://localhost:" + STSPORT + "/SecurityTokenService/Transport?wsdl";
@@ -78,8 +62,6 @@ public class DefaultSTSProviderTest extends AbstractBusClientServerTestBase {
 
         // Validate the token
         validateSecurityToken(bus, wsdlLocation, token);
-
-        bus.shutdown(true);
     }
 
     private SecurityToken requestSecurityToken(
