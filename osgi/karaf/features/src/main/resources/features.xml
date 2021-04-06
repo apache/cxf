@@ -216,9 +216,8 @@
         </capability>
     </feature>
     <feature name="cxf-http-undertow" version="${project.version}">
-        <feature version="${project.version}">cxf-core</feature>
+        <feature version="${project.version}">cxf-http</feature>
         <feature>pax-http-undertow</feature>
-        <bundle dependency="true" start-level="40">mvn:org.apache.cxf/cxf-rt-transports-http/${project.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-transports-http-undertow/${project.version}</bundle>
         <capability>
             cxf.http.provider;name=undertow
