@@ -102,6 +102,11 @@
             <artifactId>cxf-rt-ws-security</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-servlet-compatible</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <resources>
@@ -158,6 +163,7 @@
                             <goal>verify</goal>
                         </goals>
                         <configuration>
+                            <featureProcessingInstructions>${project.build.directory}/classes/org.apache.karaf.features.xml</featureProcessingInstructions>
                             <descriptors>
                                 <descriptor>mvn:org.apache.karaf.features/framework/${cxf.karaf.version}/xml/features</descriptor>
                                 <descriptor>mvn:org.apache.karaf.features/standard/${cxf.karaf.version}/xml/features</descriptor>
