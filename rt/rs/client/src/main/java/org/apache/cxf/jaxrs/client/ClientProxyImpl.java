@@ -1085,8 +1085,9 @@ public class ClientProxyImpl extends AbstractClient implements
             Annotation[] anns = customAnns != null ? customAnns
                 : getMethodAnnotations(ori.getAnnotatedMethod(), bodyIndex);
             try {
-                if (bodyIndex != -1) {
-                    Class<?> paramClass = method.getParameterTypes()[bodyIndex];
+                Class<?>[] parameterTypes = method.getParameterTypes();
+                if (bodyIndex >= 0 && bodyIndex < parameterTypes.length) {
+                    Class<?> paramClass = parameterTypes[bodyIndex];
                     Class<?> bodyClass =
                         paramClass.isAssignableFrom(body.getClass()) ? paramClass : body.getClass();
                     Type genericType = bodyType;
