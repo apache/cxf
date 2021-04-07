@@ -248,7 +248,11 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
         this();
         setContext(context);
     }
-    
+
+    protected boolean getQualifiedSchemas() {
+        return qualifiedSchemas;
+    }
+
     public JAXBContext getContext() {
         return context;
     }
@@ -386,7 +390,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
                 try {
                     for (DOMResult r : generateJaxbSchemas()) {
                         DOMSource src = new DOMSource(r.getNode(), r.getSystemId());
-                        if (BUILT_IN_SCHEMAS.containsValue(r)) {
+                        if (isInBuiltInSchemas(r)) {
                             bi.add(src);
                         } else {
                             schemas.add(src);
@@ -423,7 +427,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
         }
     }
 
-    private void justCheckForJAXBAnnotations(ServiceInfo serviceInfo) {
+    protected void justCheckForJAXBAnnotations(ServiceInfo serviceInfo) {
         for (MessageInfo mi: serviceInfo.getMessages().values()) {
             for (MessagePartInfo mpi : mi.getMessageParts()) {
                 checkForJAXBAnnotations(mpi, serviceInfo.getXmlSchemaCollection(), serviceInfo.getTargetNamespace());
@@ -444,7 +448,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
         }
     }
 
-    private String getNamespaceToUse(Service service) {
+    protected String getNamespaceToUse(Service service) {
         if ("true".equals(service.get("org.apache.cxf.databinding.namespace"))) {
             return null;
         }
@@ -810,6 +814,10 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
                                  jaxbMethods.toArray(new Method[0]),
                                  fields.toArray(new Field[0]),
                                  objectFactory);
+    }
+
+    public static boolean isInBuiltInSchemas(DOMResult schema) {
+        return BUILT_IN_SCHEMAS.containsValue(schema);
     }
 
     private static Field getElField(String partName, final Class<?> wrapperType) {
