@@ -128,7 +128,7 @@
         <cxf.jackson.version>2.12.1</cxf.jackson.version>
         <cxf.jackson.databind.version>2.12.1</cxf.jackson.databind.version>
         <cxf.jacorb.version>3.9</cxf.jacorb.version>
-        <cxf.jaeger.version>1.5.0</cxf.jaeger.version>
+        <cxf.jaeger.version>1.6.0</cxf.jaeger.version>
         <cxf.jakarta.activation.version>1.2.2</cxf.jakarta.activation.version>
         <cxf.jakarta.injectapi.version>1.0.3</cxf.jakarta.injectapi.version>
         <cxf.jakarta.jwsapi.version>2.1.0</cxf.jakarta.jwsapi.version>
