@@ -20,7 +20,7 @@ package org.apache.cxf.systest.sts.jaas;
 
 import java.net.URL;
 
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.InternalServerErrorException;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
@@ -269,43 +269,43 @@ public class JAASTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testJAXRSSuccessfulInvocation() throws Exception {
         final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs";
-        doubleIt("alice", "clarinet", address, false);
+        doubleIt("alice", "clarinet", address);
     }
 
-    @org.junit.Test(expected = RuntimeException.class)
+    @org.junit.Test(expected = InternalServerErrorException.class)
     public void testJAXRSUnsuccessfulAuthentication() throws Exception {
         final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs";
-        doubleIt("alice", "clarinet2", address, true);
+        doubleIt("alice", "clarinet2", address);
     }
 
-    @org.junit.Test(expected = RuntimeException.class)
+    @org.junit.Test(expected = InternalServerErrorException.class)
     public void testJAXRSUnsuccessfulAuthorization() throws Exception {
         final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs";
-        doubleIt("bob", "trombone", address, true);
+        doubleIt("bob", "trombone", address);
     }
 
     @org.junit.Test
     public void testJAXRSSuccessfulPassthroughInvocation() throws Exception {
         final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs3";
-        doubleIt("alice", "clarinet", address, false);
+        doubleIt("alice", "clarinet", address);
     }
 
-    @org.junit.Test(expected = RuntimeException.class)
+    @org.junit.Test(expected = InternalServerErrorException.class)
     public void testJAXRSUnsuccessfulAuthenticationPassthroughInvocation() throws Exception {
         final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs3";
-        doubleIt("alice", "clarinet2", address, true);
+        doubleIt("alice", "clarinet2", address);
     }
 
-    @org.junit.Test(expected = RuntimeException.class)
+    @org.junit.Test(expected = InternalServerErrorException.class)
     public void testJAXRSUnsuccessfulAuthorizationPassthroughInvocation() throws Exception {
         final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs3";
-        doubleIt("bob", "trombone", address, true);
+        doubleIt("bob", "trombone", address);
     }
 
     @org.junit.Test
     public void testJAXRSSuccessfulInvocationConfig() throws Exception {
         final String address = "https://localhost:" + PORT2 + "/doubleit/services/doubleit-rs";
-        doubleIt("alice", "clarinet", address, false);
+        doubleIt("alice", "clarinet", address);
     }
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
@@ -313,9 +313,7 @@ public class JAASTest extends AbstractBusClientServerTestBase {
         assertEquals(numToDouble * 2L, resp);
     }
 
-    private static void doubleIt(String username, String password,
-                                 String address,
-                                 boolean authFailureExpected) {
+    private static void doubleIt(String username, String password, String address) {
         final String configLocation = "org/apache/cxf/systest/sts/jaas/cxf-client.xml";
         final int numToDouble = 25;
 
@@ -326,18 +324,8 @@ public class JAASTest extends AbstractBusClientServerTestBase {
             client = WebClient.create(address, configLocation);
         }
         client.type("text/plain").accept("text/plain");
-        try {
-            int resp = client.post(numToDouble, Integer.class);
-            if (authFailureExpected) {
-                throw new RuntimeException("Exception expected");
-            }
-            assertEquals(2 * numToDouble, resp);
-        } catch (WebApplicationException ex) {
-            if (!authFailureExpected) {
-                throw new RuntimeException("Unexpected exception");
-            }
-            assertEquals(500, ex.getResponse().getStatus());
-        }
+        int resp = client.post(numToDouble, Integer.class);
+        assertEquals(2 * numToDouble, resp);
     }
 
 }

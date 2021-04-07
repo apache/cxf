@@ -237,7 +237,7 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
                     throw new BeanCreationException("Failed to create bean from classfile", ex);
                 }
             } else if (serviceAnnotationClass != null
-                || !serviceBeansAvailable && !providerBeansAvailable && !resourceProvidersAvailable) {
+                && !serviceBeansAvailable && !providerBeansAvailable && !resourceProvidersAvailable) {
                 discoverContextResources(serviceAnnotationClass);
             }
             if (bus == null) {

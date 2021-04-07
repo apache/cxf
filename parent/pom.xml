@@ -218,7 +218,7 @@
         <cxf.validation.api.version>2.0.2</cxf.validation.api.version>
         <cxf.velocity.version>2.3</cxf.velocity.version>
         <cxf.wiremock.version>2.23.2</cxf.wiremock.version>
-        <cxf.woodstox.core.version>6.2.4</cxf.woodstox.core.version>
+        <cxf.woodstox.core.version>6.2.5</cxf.woodstox.core.version>
         <cxf.woodstox.stax2-api.version>4.2.1</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
         <cxf.wss4j.version>2.3.1</cxf.wss4j.version>
@@ -244,7 +244,7 @@
         <cxf.jaxb.bundle.version>2.3.2_1</cxf.jaxb.bundle.version>
         <cxf.jaxb.context.class.property>none</cxf.jaxb.context.class.property>
         <cxf.jdom.bundle.version>1.1_4</cxf.jdom.bundle.version>
-        <cxf.karaf.version>4.2.11</cxf.karaf.version>
+        <cxf.karaf.version>4.3.1</cxf.karaf.version>
         <cxf.oauth.bundle.version>20100527_1</cxf.oauth.bundle.version>
         <cxf.oro.bundle.version>2.0.8_6</cxf.oro.bundle.version>
         <cxf.osgi.saaj.version>[1.4,2)</cxf.osgi.saaj.version>
