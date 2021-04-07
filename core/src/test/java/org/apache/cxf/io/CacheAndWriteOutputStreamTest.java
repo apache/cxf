@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.io;
 
+import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
@@ -37,5 +39,15 @@ public class CacheAndWriteOutputStreamTest extends CachedOutputStreamTest {
     @Override
     protected Object createCache() {
         return new CacheAndWriteOutputStream(baos);
+    }
+
+    @Test
+    public void testCloseMultipleTimes() throws IOException {
+        CacheAndWriteOutputStream cacheAndWriteOutputStream = new CacheAndWriteOutputStream(baos);
+        cacheAndWriteOutputStream.close();
+        cacheAndWriteOutputStream.close();
+        cacheAndWriteOutputStream.close();
+        cacheAndWriteOutputStream.close();
+
     }
 }
