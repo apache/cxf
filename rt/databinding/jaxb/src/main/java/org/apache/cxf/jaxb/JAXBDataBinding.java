@@ -147,7 +147,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
             return nd;
         }
     }
-    private static final Map<String, DOMResult> BUILT_IN_SCHEMAS = new HashMap<>();
+    protected static final Map<String, DOMResult> BUILT_IN_SCHEMAS = new HashMap<>();
     static {
         try (URIResolver resolver = new URIResolver()) {
             try {
@@ -214,7 +214,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
 
     private boolean unwrapJAXBElement = true;
     private boolean scanPackages = true;
-    private boolean qualifiedSchemas;
+    protected boolean qualifiedSchemas;
 
     public JAXBDataBinding() {
     }
@@ -248,7 +248,11 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
         this();
         setContext(context);
     }
-    
+
+    protected boolean getQualifiedSchemas() {
+        return qualifiedSchemas;
+    }
+
     public JAXBContext getContext() {
         return context;
     }
@@ -423,7 +427,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
         }
     }
 
-    private void justCheckForJAXBAnnotations(ServiceInfo serviceInfo) {
+    protected void justCheckForJAXBAnnotations(ServiceInfo serviceInfo) {
         for (MessageInfo mi: serviceInfo.getMessages().values()) {
             for (MessagePartInfo mpi : mi.getMessageParts()) {
                 checkForJAXBAnnotations(mpi, serviceInfo.getXmlSchemaCollection(), serviceInfo.getTargetNamespace());
@@ -444,7 +448,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
         }
     }
 
-    private String getNamespaceToUse(Service service) {
+    protected String getNamespaceToUse(Service service) {
         if ("true".equals(service.get("org.apache.cxf.databinding.namespace"))) {
             return null;
         }
