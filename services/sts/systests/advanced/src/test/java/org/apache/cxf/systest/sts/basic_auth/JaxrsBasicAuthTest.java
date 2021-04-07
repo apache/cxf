@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.sts.basic_auth;
 
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.InternalServerErrorException;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.systest.sts.deployment.STSServer;
@@ -62,23 +62,20 @@ public class JaxrsBasicAuthTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testBasicAuth() throws Exception {
-
-        doubleIt("alice", "clarinet", false);
+        doubleIt("alice", "clarinet");
     }
 
-    @org.junit.Test(expected = RuntimeException.class)
+    @org.junit.Test(expected = InternalServerErrorException.class)
     public void testBadBasicAuth() throws Exception {
-
-        doubleIt("alice", "trombon", true);
+        doubleIt("alice", "trombon");
     }
 
-    @org.junit.Test(expected = RuntimeException.class)
+    @org.junit.Test(expected = InternalServerErrorException.class)
     public void testNoBasicAuth() throws Exception {
-
-        doubleIt(null, null, true);
+        doubleIt(null, null);
     }
 
-    private static void doubleIt(String username, String password, boolean authFailureExpected) {
+    private static void doubleIt(String username, String password) {
         final String configLocation = "org/apache/cxf/systest/sts/basic_auth/cxf-client.xml";
         final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs";
         final int numToDouble = 25;
@@ -90,17 +87,7 @@ public class JaxrsBasicAuthTest extends AbstractBusClientServerTestBase {
             client = WebClient.create(address, configLocation);
         }
         client.type("text/plain").accept("text/plain");
-        try {
-            int resp = client.post(numToDouble, Integer.class);
-            if (authFailureExpected) {
-                throw new RuntimeException("Exception expected");
-            }
-            org.junit.Assert.assertEquals(2 * numToDouble, resp);
-        } catch (WebApplicationException ex) {
-            if (!authFailureExpected) {
-                throw new RuntimeException("Unexpected exception");
-            }
-            org.junit.Assert.assertEquals(500, ex.getResponse().getStatus());
-        }
+        int resp = client.post(numToDouble, Integer.class);
+        org.junit.Assert.assertEquals(2 * numToDouble, resp);
     }
 }
