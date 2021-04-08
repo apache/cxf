@@ -29,7 +29,7 @@ import java.io.OutputStream;
  *
  */
 public class CacheAndWriteOutputStream extends CachedOutputStream {
-
+    private boolean isClosed = false;
     OutputStream flowThroughStream;
     long count;
     long limit = Long.MAX_VALUE;
@@ -47,19 +47,32 @@ public class CacheAndWriteOutputStream extends CachedOutputStream {
     }
 
     public void closeFlowthroughStream() throws IOException {
-        flowThroughStream.flush();
-        flowThroughStream.close();
+        postClose();
     }
 
     protected void postClose() throws IOException {
-        flowThroughStream.flush();
-        flowThroughStream.close();
+        if (!isClosed) {
+            flowThroughStream.flush();
+            flowThroughStream.close();
+            isClosed = true;
+        }
     }
 
     public OutputStream getFlowThroughStream() {
         return flowThroughStream;
     }
 
+    @Override
+    protected void doClose() throws IOException {
+        super.doClose();
+        isClosed = true;
+    }
+
+    @Override
+    public void close() throws IOException {
+        super.close();
+        isClosed = true;
+    }
 
     @Override
     protected void onWrite() throws IOException {
