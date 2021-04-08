@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs.json.basic;
 
+import java.io.UncheckedIOException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -138,6 +139,13 @@ public class JsonMapObjectReaderWriterTest {
         String kid = (String)map.get("kid");
         String expectedKid = "4pZbe4shQQGzZXHbeIlbDvmHOc1/H6jH6oBk3nUrcZE=";
         assertEquals(expectedKid, kid);
+    }
+
+    @Test(expected = UncheckedIOException.class)
+    public void testMalformedInput() throws Exception {
+        JsonMapObjectReaderWriter jsonMapObjectReaderWriter = new JsonMapObjectReaderWriter();
+        String s = "{\"nonce\":\"\",:V\"'";
+        jsonMapObjectReaderWriter.fromJson(s);
     }
 
 }
