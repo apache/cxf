@@ -29,7 +29,7 @@ import java.io.OutputStream;
  *
  */
 public class CacheAndWriteOutputStream extends CachedOutputStream {
-    private boolean isClosed = true;
+    private boolean isClosed = false;
     OutputStream flowThroughStream;
     long count;
     long limit = Long.MAX_VALUE;
