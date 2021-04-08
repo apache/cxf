@@ -29,10 +29,10 @@ import java.io.OutputStream;
  *
  */
 public class CacheAndWriteOutputStream extends CachedOutputStream {
-    private boolean isClosed = false;
     OutputStream flowThroughStream;
     long count;
     long limit = Long.MAX_VALUE;
+    private boolean isClosed;
 
     public CacheAndWriteOutputStream(OutputStream stream) {
         super();
