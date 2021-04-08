@@ -18,10 +18,10 @@
  */
 package org.apache.cxf.io;
 
-import org.junit.Test;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+
+import org.junit.Test;
 
 public class CacheAndWriteOutputStreamTest extends CachedOutputStreamTest {
 
