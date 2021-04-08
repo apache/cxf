@@ -20,6 +20,7 @@
 package org.apache.cxf.rs.security.saml.sso;
 
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 
@@ -48,7 +49,6 @@ import org.apache.wss4j.common.saml.bean.SubjectLocalityBean;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
-import org.joda.time.DateTime;
 
 /**
  * A base implementation of a Callback Handler for a SAML assertion. By default it creates an
@@ -75,22 +75,22 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     protected List<Object> customAttributeValues;
     protected ConditionsBean conditions;
     protected SubjectConfirmationDataBean subjectConfirmationData;
-    protected DateTime authnInstant;
-    protected DateTime sessionNotOnOrAfter;
+    protected Instant authnInstant;
+    protected Instant sessionNotOnOrAfter;
 
-    public DateTime getSessionNotOnOrAfter() {
+    public Instant getSessionNotOnOrAfter() {
         return sessionNotOnOrAfter;
     }
 
-    public void setSessionNotOnOrAfter(DateTime sessionNotOnOrAfter) {
+    public void setSessionNotOnOrAfter(Instant sessionNotOnOrAfter) {
         this.sessionNotOnOrAfter = sessionNotOnOrAfter;
     }
 
-    public DateTime getAuthnInstant() {
+    public Instant getAuthnInstant() {
         return authnInstant;
     }
 
-    public void setAuthnInstant(DateTime authnInstant) {
+    public void setAuthnInstant(Instant authnInstant) {
         this.authnInstant = authnInstant;
     }
 
