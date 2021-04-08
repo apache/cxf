@@ -1,0 +1,12 @@
+install:
+  - java -version; mvn --show-version clean
+script: |
+
+language: java
+jdk:
+  - openjdk8
+  - openjdk11
+
+cache:
+ directories:
+  - $HOME/.m2
