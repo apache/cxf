@@ -19,7 +19,6 @@
 
 package org.apache.cxf.jaxrs.json.basic;
 
-import java.io.UncheckedIOException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -141,7 +140,7 @@ public class JsonMapObjectReaderWriterTest {
         assertEquals(expectedKid, kid);
     }
 
-    @Test(expected = UncheckedIOException.class)
+    @Test(expected = RuntimeException.class)
     public void testMalformedInput() throws Exception {
         JsonMapObjectReaderWriter jsonMapObjectReaderWriter = new JsonMapObjectReaderWriter();
         String s = "{\"nonce\":\"\",:V\"'";

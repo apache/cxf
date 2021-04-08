@@ -181,7 +181,7 @@ public class JsonMapObjectReaderWriter {
             String name = json.substring(from, closingQuote);
             int sepIndex = json.indexOf(COLON, closingQuote + 1);
             if (sepIndex == -1) {
-                throw new UncheckedIOException(new IOException("Error in parsing json"));
+                throw new RuntimeException(new IOException("Error in parsing json"));
             }
 
             int j = 1;
