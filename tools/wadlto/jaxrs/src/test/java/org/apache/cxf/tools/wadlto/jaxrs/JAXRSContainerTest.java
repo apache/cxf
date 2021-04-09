@@ -830,6 +830,29 @@ public class JAXRSContainerTest extends ProcessorTestBase {
         assertTrue(checkContains(files, "generated" + ".TestCompositeObject.class"));
         assertTrue(checkContains(files, "generated" + ".ObjectFactory.class"));
     }
+    
+    @Test
+    public void testCodeGenDigit() throws Exception {
+        JAXRSContainer container = new JAXRSContainer(null);
+
+        ToolContext context = new ToolContext();
+        context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+        context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstoreDigit.xml"));
+        context.put(WadlToolConstants.CFG_IMPL, "true");
+        context.put(WadlToolConstants.CFG_COMPILE, "true");
+
+        container.setContext(context);
+        container.execute();
+
+        assertNotNull(output.list());
+
+        List<File> files = FileUtils.getFilesRecurseUsingSuffix(output, ".class");
+        assertEquals(4, files.size());
+        assertTrue(checkContains(files, "Api1" + ".BookstoreResource.class"));
+        assertTrue(checkContains(files, "application" + ".BookstoreResource.class"));
+        assertTrue(checkContains(files, "generated" + ".TestCompositeObject.class"));
+        assertTrue(checkContains(files, "generated" + ".ObjectFactory.class"));
+    }
 
     @Test
     public void testCodeGenTypesOnly() throws Exception {
