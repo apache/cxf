@@ -61,19 +61,7 @@ public class CacheAndWriteOutputStream extends CachedOutputStream {
     public OutputStream getFlowThroughStream() {
         return flowThroughStream;
     }
-
-    @Override
-    protected void doClose() throws IOException {
-        super.doClose();
-        isClosed = true;
-    }
-
-    @Override
-    public void close() throws IOException {
-        super.close();
-        isClosed = true;
-    }
-
+    
     @Override
     protected void onWrite() throws IOException {
         // does nothing
