@@ -450,6 +450,7 @@ public class SourceGenerator {
                     }
                 }
                 resourceId = builder.toString();
+                
             }
             resourceId += DEFAULT_RESOURCE_NAME;
         }
@@ -464,12 +465,12 @@ public class SourceGenerator {
         }
 
         final String className = getClassName(qname.getLocalPart(),
-                info.isInterfaceGenerated(), info.getTypeClassNames());
+                info.isInterfaceGenerated(), info.getTypeClassNames()).replaceFirst("^[- 0-9]*", "");
         if (info.getResourceClassNames().contains(className)) {
             return;
         }
         info.getResourceClassNames().add(className);
-        final String classPackage = getClassPackageName(namespaceURI);
+        final String classPackage = getClassPackageName(namespaceURI.replaceFirst("^[- 0-9]*", ""));
 
         StringBuilder sbCode = new StringBuilder();
         Set<String> imports = createImports();
