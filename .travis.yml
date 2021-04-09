@@ -5,7 +5,15 @@ language: java
 jdk:
   - openjdk8
   - openjdk11
-
+  
+addons:
+  sonarcloud:
+    organization: "semsonar" 
+    token: "1120a4ba09d725ae0aaadacda6247891db2dd393" 
+script:
+  # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
+  - mvn clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=myorg_myrepo
+  
 script: mvn test
 
 cache:
