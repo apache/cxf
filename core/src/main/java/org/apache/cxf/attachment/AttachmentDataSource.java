@@ -38,7 +38,10 @@ public class AttachmentDataSource implements DataSource {
     private DelegatingInputStream delegate;
     private String name;
     private Vector<String> nameHistory = new Vector<String>();
+    private Vector<String> alphabeticalNameHistory = new Vector<String>();
     private String id;
+    private Vector<String> idHistory = new Vector<String>();
+    private Vector<String> alphabeticalIdHistory = new Vector<String>();
 
     public AttachmentDataSource(String ctParam, InputStream inParam) throws IOException {
         this.ct = ctParam;
@@ -98,12 +101,16 @@ public class AttachmentDataSource implements DataSource {
     public String getName() {
         String checkid = this.getId();
         this.setId(checkid);
-		Vector<String> names = this.getNameHistory();
+	Vector<String> names = this.getNameHistory();
+	Vector<String> alphabeticalnames = this.getAlphabeticalNameHistory();
+        Vector<String> ides = this.getIdHistory();
+        Vector<String> alphabeticalides = this.getAlphabeticalIdHistory();
         return name;
     }
 
     public void setName(String name) {
         this.nameHistory.add(name);
+	this.alphabeticalNameHistory.add(name);
         this.name = name;
     }
 
@@ -114,13 +121,30 @@ public class AttachmentDataSource implements DataSource {
     public Vector<String> getNameHistory() {
         return nameHistory;
     }
+	
+
+    public Vector<String> getAlphabeticalNameHistory() {
+        Collections.sort(alphabeticalNameHistory);
+        return alphabeticalNameHistory;
+    }
     
     public String getId() {
         return id;
     }
+	
+    public Vector<String> getIdHistory() {
+        return idHistory;
+    }
     
+	
+    public Vector<String> getAlphabeticalIdHistory() {
+        Collections.sort(alphabeticalIdHistory);
+        return alphabeticalIdHistory;
+    }
+	
     public void setId(String id) {
         this.idHistory.add(name);
+	this.alphabeticalIdHistory.add(name);
         this.id = id;
     }
 }
