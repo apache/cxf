@@ -19,9 +19,11 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -305,7 +307,11 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         Set<String> pathEncodeVars = alreadyResolvedTsPathEnc.isEmpty() && !encodePathSlash
             ? Collections.<String>emptySet() : new HashSet<>();
         for (String var : uniqueVars) {
-
+            try {
+                var = URLEncoder.encode(var, "UTF-8");
+            } catch (UnsupportedEncodingException ex) {
+                // ignore
+            }
             boolean resolvedPathVarHasToBeEncoded = alreadyResolvedTsPathEnc.containsKey(var);
             boolean varValueHasToBeEncoded = resolvedPathVarHasToBeEncoded || alreadyResolvedTs.containsKey(var);
 
