@@ -11,7 +11,7 @@ addons:
     organization: "semsonar" 
     token: "$SONAR_TOKEN" 
     
-script: mvn clean verify -Dcheckstyle.skip sonar:sonar -Pcoverage -Dsonar.projectKey=$SONAR_TOKEN
+script: mvn clean verify -Dcheckstyle.skip -Dpmd.skip=true sonar:sonar -Pcoverage -Dsonar.projectKey=$SONAR_TOKEN
   
 #script: mvn test
 
