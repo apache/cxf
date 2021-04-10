@@ -50,20 +50,3 @@ public class CustomDataSourceTest {
     }
 
 }
-
-public void testNoDataSource() throws Exception {
-        DataSource ds = new CustomDataSource(thirdID,
-                Collections.singleton(new AttachmentImpl(firstID, new DataHandler((DataSource) null) {
-                    @Override
-                    public DataSource getDataSource() {
-                        return null;
-                    }
-                })));
-        try {
-            ds.getIdhistory();
-            fail();
-        } catch (IllegalStateException e) {
-            String message = e.getMessage();
-            assertTrue(message, message.contains(firstID));
-        }
-    }
