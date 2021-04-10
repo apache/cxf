@@ -101,8 +101,8 @@ public class AttachmentDataSource implements DataSource {
     public String getName() {
         String checkid = this.getId();
         this.setId(checkid);
-	Vector<String> names = this.getNameHistory();
-	Vector<String> alphabeticalnames = this.getAlphabeticalNameHistory();
+        Vector<String> names = this.getNameHistory();
+        Vector<String> alphabeticalnames = this.getAlphabeticalNameHistory();
         Vector<String> ides = this.getIdHistory();
         Vector<String> alphabeticalides = this.getAlphabeticalIdHistory();
         return name;
@@ -110,7 +110,7 @@ public class AttachmentDataSource implements DataSource {
 
     public void setName(String name) {
         this.nameHistory.add(name);
-	this.alphabeticalNameHistory.add(name);
+        this.alphabeticalNameHistory.add(name);
         this.name = name;
     }
 
@@ -120,8 +120,7 @@ public class AttachmentDataSource implements DataSource {
     
     public Vector<String> getNameHistory() {
         return nameHistory;
-    }
-	
+    }	
 
     public Vector<String> getAlphabeticalNameHistory() {
         Collections.sort(alphabeticalNameHistory);
@@ -144,7 +143,7 @@ public class AttachmentDataSource implements DataSource {
 	
     public void setId(String id) {
         this.idHistory.add(name);
-	this.alphabeticalIdHistory.add(name);
+        this.alphabeticalIdHistory.add(name);
         this.id = id;
     }
 }
