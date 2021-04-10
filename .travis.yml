@@ -16,7 +16,7 @@ script:
   mvn [target] 
   - mvn clean verify -Dcheckstyle.skip sonar:sonar -Pcoverage -Dsonar.projectKey=$SONAR_TOKEN
   
-script: mvn test
+//script: mvn test
 
 cache:
  directories:
