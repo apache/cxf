@@ -37,11 +37,11 @@ public class AttachmentDataSource implements DataSource {
     private InputStream ins;
     private DelegatingInputStream delegate;
     private String name;
-    private Vector<String> nameHistory = new Vector<String>();
-    private Vector<String> alphabeticalNameHistory = new Vector<String>();
+    private List<String> nameHistory = new ArrayList<String>();
+    private List<String> alphabeticalNameHistory = new ArrayList<String>();
     private String id;
-    private Vector<String> idHistory = new Vector<String>();
-    private Vector<String> alphabeticalIdHistory = new Vector<String>();
+    private List<String> idHistory = new ArrayList<String>();
+    private List<String> alphabeticalIdHistory = new ArrayList<String>();
 
     public AttachmentDataSource(String ctParam, InputStream inParam) throws IOException {
         this.ct = ctParam;
@@ -101,10 +101,10 @@ public class AttachmentDataSource implements DataSource {
     public String getName() {
         String checkid = this.getId();
         this.setId(checkid);
-        Vector<String> names = this.getNameHistory();
-        Vector<String> alphabeticalnames = this.getAlphabeticalNameHistory();
-        Vector<String> ides = this.getIdHistory();
-        Vector<String> alphabeticalides = this.getAlphabeticalIdHistory();
+        List<String> names = this.getNameHistory();
+        List<String> alphabeticalnames = this.getAlphabeticalNameHistory();
+        List<String> ides = this.getIdHistory();
+        List<String> alphabeticalides = this.getAlphabeticalIdHistory();
         return name;
     }
 
@@ -118,11 +118,11 @@ public class AttachmentDataSource implements DataSource {
         throw new UnsupportedOperationException();
     }
     
-    public Vector<String> getNameHistory() {
+    public List<String> getNameHistory() {
         return nameHistory;
     }	
 
-    public Vector<String> getAlphabeticalNameHistory() {
+    public List<String> getAlphabeticalNameHistory() {
         Collections.sort(alphabeticalNameHistory);
         return alphabeticalNameHistory;
     }
@@ -131,12 +131,12 @@ public class AttachmentDataSource implements DataSource {
         return id;
     }
 	
-    public Vector<String> getIdHistory() {
+    public List<String> getIdHistory() {
         return idHistory;
     }
     
 	
-    public Vector<String> getAlphabeticalIdHistory() {
+    public List<String> getAlphabeticalIdHistory() {
         Collections.sort(alphabeticalIdHistory);
         return alphabeticalIdHistory;
     }
