@@ -11,12 +11,9 @@ addons:
     organization: "semsonar" 
     token: "$SONAR_TOKEN" 
     
-script:
-  # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
-  mvn [target] 
-  - mvn clean verify -Dcheckstyle.skip sonar:sonar -Pcoverage -Dsonar.projectKey=$SONAR_TOKEN
+script:mvn clean verify -Dcheckstyle.skip sonar:sonar -Pcoverage -Dsonar.projectKey=$SONAR_TOKEN
   
-//script: mvn test
+#script: mvn test
 
 cache:
  directories:
