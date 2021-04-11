@@ -18,77 +18,44 @@
  */
 package org.apache.cxf.systests.cdi.base;
 
-import java.util.Collection;
-
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.systests.cdi.base.bindings.Logged;
+import org.apache.cxf.systests.cdi.base.scope.CustomScoped;
 
-@Path("/bookstore/")
-public class BookStore {
+@Path("/bookstore/request")
+@CustomScoped
+@Logged
+public class PerRequestBookStore {
     private BookStoreService service;
-    private BookStoreVersion bookStoreVersion;
     private UriInfo uriInfo;
-    private Injections injections;
 
-    public BookStore() {
+    public PerRequestBookStore() {
     }
 
     @Inject
-    public BookStore(BookStoreService service, BookStoreVersion bookStoreVersion, UriInfo uriInfo,
-                     Injections injections) {
+    public PerRequestBookStore(BookStoreService service, UriInfo uriInfo) {
         this.service = service;
-        this.bookStoreVersion = bookStoreVersion;
         this.uriInfo = uriInfo;
-        this.injections = injections;
-    }
-
-    @GET
-    @Path("injections")
-    public String injections() {
-        return injections.state();
-    }
-
-    @Path("/version")
-    public BookStoreVersion getVersion() {
-        return bookStoreVersion;
-    }
-
-    @GET
-    @Path("/books/{bookId}")
-    @NotNull
-    @Produces(MediaType.APPLICATION_JSON)
-    public Book getBook(@PathParam("bookId") String id) {
-        return service.get(id);
     }
 
     @GET
     @Path("/books")
     @NotNull @Valid
     @Produces(MediaType.APPLICATION_JSON)
-    @Logged
-    public Collection< Book > getBooks() {
-        return service.all();
-    }
-
-    @POST
-    @Path("/books")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response addBook(@NotNull @Size(min = 1, max = 50) @FormParam("id") String id,
-                            @NotNull @FormParam("name") String name) {
-        final Book book = service.store(id, name);
-        return Response.created(uriInfo.getRequestUriBuilder().path(id).build()).entity(book).build();
+    public Response getBooks() {
+        return Response
+          .ok()
+          .entity(service.all())
+          .contentLocation(uriInfo.getAbsolutePath())
+          .build();
     }
 }

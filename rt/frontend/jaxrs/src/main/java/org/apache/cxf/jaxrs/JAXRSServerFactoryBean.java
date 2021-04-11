@@ -100,11 +100,10 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
 
     public void setApplicationInfo(ApplicationInfo provider) {
         appProvider = provider;
-        Set<String> appNameBindings = AnnotationUtils.getNameBindings(provider.getProvider()
-                                                                      .getClass().getAnnotations());
+        Set<String> appNameBindings = AnnotationUtils.getNameBindings(bus, provider.getProvider().getClass());
         for (ClassResourceInfo cri : getServiceFactory().getClassResourceInfo()) {
             Set<String> clsNameBindings = new LinkedHashSet<>(appNameBindings);
-            clsNameBindings.addAll(AnnotationUtils.getNameBindings(cri.getServiceClass().getAnnotations()));
+            clsNameBindings.addAll(AnnotationUtils.getNameBindings(bus, cri.getServiceClass()));
             cri.setNameBindings(clsNameBindings);
         }
     }

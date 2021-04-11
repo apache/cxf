@@ -89,7 +89,7 @@ public class ClassResourceInfo extends BeanResourceInfo {
         super(theResourceClass, theServiceClass, theRoot, theRoot || enableStatic, bus);
         this.enableStatic = enableStatic;
         if (resourceClass != null) {
-            nameBindings = AnnotationUtils.getNameBindings(serviceClass.getAnnotations());
+            nameBindings = AnnotationUtils.getNameBindings(bus, serviceClass);
         }
     }
     //CHECKSTYLE:OFF
