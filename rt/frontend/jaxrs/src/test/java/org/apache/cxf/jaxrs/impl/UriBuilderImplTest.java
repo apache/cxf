@@ -1721,6 +1721,52 @@ public class UriBuilderImplTest {
         assertEquals("foo[]=v1&foo[]=v2&foo[]=v3", uri.getQuery());
     }
 
+    @Test
+    public void testURIWithSpecialCharacters() {
+        String expected = "http://localhost:8080/xy\"";
+        URI uri = UriBuilder.fromUri("http://localhost:8080").path("xy\"").build();
+        assertEquals(expected, uri.toString());
+    }
+
+    @Test
+    public void testURIWithSpecialCharacters2() {
+        String expected = "http://localhost:8080/xy\t";
+        URI uri = UriBuilder.fromUri("http://localhost:8080").path("xy\t").buildFromEncoded();
+        assertEquals(expected, uri.toString());
+    }
+
+    @Test
+    public void testURIWithSpecialCharactersPreservePath() {
+        String expected = "http://localhost:8080/xy/\"/abc";
+        URI uri = UriBuilder.fromPath("")
+            .replacePath("http://localhost:8080")
+            .path("/{a}/{b}")
+            .buildFromEncoded("xy", "\"", "abc");
+        assertEquals(expected, uri.toString());
+    }
+
+    @Test
+    public void testURIWithSpecialCharactersPreservePath2() {
+      
+        String expected = "http://localhost:8080/xy/\t/abc";
+        URI uri = UriBuilder.fromPath("")
+            .replacePath("http://localhost:8080")
+            .path("/{a}/{b}")
+            .buildFromEncoded("xy", "\t", "abc");
+        assertEquals(expected, uri.toString());
+    }
+
+    @Test
+    public void testIllegalURI() {
+        String path = "invalidpath";
+        try {
+            URI uri = UriBuilder.fromPath(path).build();
+            assertEquals(null, uri.toString());
+        } catch (Exception ex) {
+            //or exception Expected
+        }
+    }
+
     @Path(value = "/TestPath")
     public static class TestPath {
 
