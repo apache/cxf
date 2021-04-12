@@ -32,6 +32,9 @@ import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationFeature;
 import org.apache.cxf.jaxrs.validation.ValidationExceptionMapper;
 import org.apache.cxf.systests.cdi.base.BookStore;
 import org.apache.cxf.systests.cdi.base.BookStoreByIds;
+import org.apache.cxf.systests.cdi.base.CustomScopedBookStore;
+import org.apache.cxf.systests.cdi.base.RequestScopedBookStore;
+import org.apache.cxf.systests.cdi.base.bindings.LoggingFilter;
 
 @ApplicationPath("/v2")
 public class BookStoreCustomApplication extends Application {
@@ -41,11 +44,13 @@ public class BookStoreCustomApplication extends Application {
         singletons.add(new JacksonJsonProvider());
         singletons.add(new ValidationExceptionMapper());
         singletons.add(new JAXRSBeanValidationFeature());
+        singletons.add(new LoggingFilter());
         return singletons;
     }
 
     @Override
     public Set<Class<?>> getClasses() {
-        return new LinkedHashSet<>(Arrays.asList(BookStore.class, BookStoreByIds.class));
+        return new LinkedHashSet<>(Arrays.asList(BookStore.class, BookStoreByIds.class, 
+             CustomScopedBookStore.class, RequestScopedBookStore.class));
     }
 }

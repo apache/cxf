@@ -34,6 +34,7 @@ import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -47,6 +48,7 @@ public abstract class AbstractCdiMultiAppTest extends AbstractCdiSingleAppTest {
                 new Form()
                         .param("id", id));
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), r.getStatus());
+        assertThat(r.getHeaderString("X-Logged"), nullValue());
     }
 
     @Test
@@ -62,6 +64,27 @@ public abstract class AbstractCdiMultiAppTest extends AbstractCdiSingleAppTest {
         assertThat(r2.readEntity(String.class), not(equalTo(r1.readEntity(String.class))));
     }
 
+    @Test
+    public void testResponseHasBeenReceivedWhenQueringRequestScopedBookstore() {
+        Response r = createWebClient("/rest/v2/bookstore/request/books").get();
+        assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
+        assertThat(r.getHeaderString("X-Logged"), equalTo("true"));
+    }
+    
+    @Test
+    public void testResponseHasBeenReceivedWhenQueringCustomScopedBookstore() {
+        Response r = createWebClient("/rest/v2/bookstore/custom/books").get();
+        assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
+        assertThat(r.getHeaderString("X-Logged"), equalTo("true"));
+    }
+    
+    @Test
+    public void testResponseHasBeenReceivedWhenQueringMethodWithNameBinding() {
+        Response r = createWebClient("/rest/v2/bookstore/books").get();
+        assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
+        assertThat(r.getHeaderString("X-Logged"), equalTo("true"));
+    }
+    
     protected WebClient createWebClient(final String url) {
         return createWebClient(url, MediaType.APPLICATION_JSON);
     }

@@ -1354,8 +1354,7 @@ public abstract class ProviderFactory {
 
     }
     protected static Set<String> getFilterNameBindings(Bus bus, Object provider) {
-        Class<?> pClass = ClassHelper.getRealClass(bus, provider);
-        Set<String> names = AnnotationUtils.getNameBindings(pClass.getAnnotations());
+        Set<String> names = AnnotationUtils.getInstanceNameBindings(bus, provider);
         if (names.isEmpty()) {
             names = Collections.singleton(DEFAULT_FILTER_NAME_BINDING);
         }
