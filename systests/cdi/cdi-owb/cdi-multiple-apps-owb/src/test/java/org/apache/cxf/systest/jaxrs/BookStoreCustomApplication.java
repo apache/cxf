@@ -32,7 +32,8 @@ import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationFeature;
 import org.apache.cxf.jaxrs.validation.ValidationExceptionMapper;
 import org.apache.cxf.systests.cdi.base.BookStore;
 import org.apache.cxf.systests.cdi.base.BookStoreByIds;
-import org.apache.cxf.systests.cdi.base.PerRequestBookStore;
+import org.apache.cxf.systests.cdi.base.CustomScopedBookStore;
+import org.apache.cxf.systests.cdi.base.RequestScopedBookStore;
 import org.apache.cxf.systests.cdi.base.bindings.LoggingFilter;
 
 @ApplicationPath("/v2")
@@ -49,6 +50,7 @@ public class BookStoreCustomApplication extends Application {
 
     @Override
     public Set<Class<?>> getClasses() {
-        return new LinkedHashSet<>(Arrays.asList(BookStore.class, BookStoreByIds.class, PerRequestBookStore.class));
+        return new LinkedHashSet<>(Arrays.asList(BookStore.class, BookStoreByIds.class, 
+             CustomScopedBookStore.class, RequestScopedBookStore.class));
     }
 }

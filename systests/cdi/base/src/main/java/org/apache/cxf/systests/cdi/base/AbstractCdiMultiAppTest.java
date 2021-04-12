@@ -67,8 +67,15 @@ public abstract class AbstractCdiMultiAppTest extends AbstractCdiSingleAppTest {
     }
 
     @Test
-    public void testResponseHasBeenReceivedWhenQueringCustomScopedBookstore() {
+    public void testResponseHasBeenReceivedWhenQueringRequestScopedBookstore() {
         Response r = createWebClient("/rest/v2/bookstore/request/books").get();
+        assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
+        assertThat(r.getHeaderString("X-Logged"), equalTo("true"));
+    }
+    
+    @Test
+    public void testResponseHasBeenReceivedWhenQueringCustomScopedBookstore() {
+        Response r = createWebClient("/rest/v2/bookstore/custom/books").get();
         assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
         assertThat(r.getHeaderString("X-Logged"), equalTo("true"));
     }

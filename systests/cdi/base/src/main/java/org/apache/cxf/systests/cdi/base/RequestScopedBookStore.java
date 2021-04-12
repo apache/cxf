@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.systests.cdi.base;
 
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -29,20 +30,19 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.systests.cdi.base.bindings.Logged;
-import org.apache.cxf.systests.cdi.base.scope.CustomScoped;
 
 @Path("/bookstore/request")
-@CustomScoped
+@RequestScoped
 @Logged
-public class PerRequestBookStore {
+public class RequestScopedBookStore {
     private BookStoreService service;
     private UriInfo uriInfo;
 
-    public PerRequestBookStore() {
+    public RequestScopedBookStore() {
     }
 
     @Inject
-    public PerRequestBookStore(BookStoreService service, UriInfo uriInfo) {
+    public RequestScopedBookStore(BookStoreService service, UriInfo uriInfo) {
         this.service = service;
         this.uriInfo = uriInfo;
     }
