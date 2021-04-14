@@ -1029,15 +1029,15 @@ public final class JAXRSUtils {
         MultivaluedMap<String, String> params =
             (MultivaluedMap<String, String>)m.get(FormUtils.FORM_PARAM_MAP);
 
+        String enc = HttpUtils.getEncoding(mt, StandardCharsets.UTF_8.name());
         if (params == null) {
             params = new MetadataMap<>();
             m.put(FormUtils.FORM_PARAM_MAP, params);
 
             if (mt == null || mt.isCompatible(MediaType.APPLICATION_FORM_URLENCODED_TYPE)) {
                 InputStream entityStream = copyAndGetEntityStream(m);
-                String enc = HttpUtils.getEncoding(mt, StandardCharsets.UTF_8.name());
                 String body = FormUtils.readBody(entityStream, enc);
-                FormUtils.populateMapFromStringOrHttpRequest(params, m, body, enc, decode);
+                FormUtils.populateMapFromStringOrHttpRequest(params, m, body, enc, false);
             } else {
                 if ("multipart".equalsIgnoreCase(mt.getType())
                     && MediaType.MULTIPART_FORM_DATA_TYPE.isCompatible(mt)) {
@@ -1051,6 +1051,14 @@ public final class JAXRSUtils {
                     LOG.warning(errorMsg.toString());
                     throw ExceptionUtils.toNotSupportedException(null, null);
                 }
+            }
+        }
+
+        if (decode) {
+            List<String> values = params.get(key);
+            if (values != null) {
+                values = values.stream().map(value -> HttpUtils.urlDecode(value, enc)).collect(Collectors.toList());
+                params.replace(key, values);
             }
         }
 
