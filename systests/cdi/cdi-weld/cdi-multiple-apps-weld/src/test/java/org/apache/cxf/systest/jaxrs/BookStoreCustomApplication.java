@@ -34,6 +34,7 @@ import org.apache.cxf.systests.cdi.base.BookStore;
 import org.apache.cxf.systests.cdi.base.CustomScopedBookStore;
 import org.apache.cxf.systests.cdi.base.RequestScopedBookStore;
 import org.apache.cxf.systests.cdi.base.bindings.LoggingFilter;
+import org.apache.cxf.systests.cdi.base.contract.BookStoreImpl;
 
 @ApplicationPath("/v2")
 public class BookStoreCustomApplication extends Application {
@@ -50,6 +51,6 @@ public class BookStoreCustomApplication extends Application {
     @Override
     public Set<Class<?>> getClasses() {
         return new LinkedHashSet<>(Arrays.asList(BookStore.class, RequestScopedBookStore.class, 
-            CustomScopedBookStore.class));
+            CustomScopedBookStore.class, BookStoreImpl.class));
     }
 }
