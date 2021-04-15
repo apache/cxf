@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.cdi;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,12 +29,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.AfterDeploymentValidation;
+import javax.enterprise.inject.spi.Annotated;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
@@ -188,12 +191,13 @@ public class JAXRSCdiResourceExtension implements Extension {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> void collect(@Observes final ProcessBean< T > event) {
-        if (event.getAnnotated().isAnnotationPresent(ApplicationPath.class)) {
+    public <T> void collect(@Observes final ProcessBean< T > event, final BeanManager beanManager) {
+        final Annotated annotated = event.getAnnotated();
+        if (isAnnotationPresent(beanManager, annotated, ApplicationPath.class)) {
             applicationBeans.add(event.getBean());
-        } else if (event.getAnnotated().isAnnotationPresent(Path.class)) {
+        } else if (isAnnotationPresent(beanManager, annotated, Path.class)) {
             serviceBeans.add(event.getBean());
-        } else if (event.getAnnotated().isAnnotationPresent(Provider.class)) {
+        } else if (isAnnotationPresent(beanManager, annotated, Provider.class)) {
             providerBeans.add(event.getBean());
         } else if (event.getBean().getTypes().contains(javax.ws.rs.core.Feature.class)) {
             providerBeans.add(event.getBean());
@@ -573,5 +577,23 @@ public class JAXRSCdiResourceExtension implements Extension {
             customContextClasses.add(classProvider.getContextClass());
         }
         return Collections.unmodifiableSet(customContextClasses);
+    }
+    
+    @SuppressWarnings("unchecked")
+    private static boolean isAnnotationPresent(final BeanManager beanManager, final Annotated annotated, 
+            final Class<? extends Annotation> annotationType) {
+
+        if (annotated.isAnnotationPresent(annotationType)) {
+            return true;
+        }
+        
+        final Stream<AnnotatedType<?>> annotatedTypes = annotated
+            .getTypeClosure()
+            .stream()
+            .filter(Class.class::isInstance)
+            .map(Class.class::cast)
+            .map(cls -> (AnnotatedType<?>)beanManager.createAnnotatedType(cls));
+        
+        return annotatedTypes.anyMatch(at -> at.isAnnotationPresent(annotationType));
     }
 }
