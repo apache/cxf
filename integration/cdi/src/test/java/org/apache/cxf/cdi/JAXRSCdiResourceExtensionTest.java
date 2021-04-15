@@ -67,7 +67,7 @@ public class JAXRSCdiResourceExtensionTest {
         Class cls = Bus.class;
         when(busBean.getBeanClass()).thenReturn(cls);
         when(busBean.getName()).thenReturn(CdiBusBean.CXF);
-        extension.collect(processBean);
+        extension.collect(processBean, beanManager);
 
         extension.injectBus(event, beanManager);
 
@@ -79,7 +79,7 @@ public class JAXRSCdiResourceExtensionTest {
         when(processBean.getBean()).thenReturn(busBean);
         when(processBean.getAnnotated()).thenReturn(annotated);
         when(annotated.isAnnotationPresent(Path.class)).thenReturn(true);
-        extension.collect(processBean);
+        extension.collect(processBean, beanManager);
 
         extension.injectBus(event, beanManager);
 
