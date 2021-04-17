@@ -1038,8 +1038,7 @@ public final class JAXRSUtils {
                 InputStream entityStream = copyAndGetEntityStream(m);
                 String body = FormUtils.readBody(entityStream, enc);
                 // Do not decode unless the key is empty value, fe @FormParam("")
-                FormUtils.populateMapFromStringOrHttpRequest(params, m, body, enc, 
-                    StringUtils.isEmpty(key) ? decode : false);
+                FormUtils.populateMapFromStringOrHttpRequest(params, m, body, enc, StringUtils.isEmpty(key) && decode);
             } else {
                 if ("multipart".equalsIgnoreCase(mt.getType())
                     && MediaType.MULTIPART_FORM_DATA_TYPE.isCompatible(mt)) {
