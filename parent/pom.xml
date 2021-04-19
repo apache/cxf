@@ -382,11 +382,11 @@
                             <artifactId>cxf-buildtools</artifactId>
                             <version>${cxf.build-utils.version}</version>
                         </dependency>
-                        <!--<dependency>
+                        <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>8.35</version>
-                        </dependency>-->
+                            <version>8.41.1</version>
+                        </dependency>
                     </dependencies>
                     <configuration>
                         <encoding>UTF-8</encoding>
