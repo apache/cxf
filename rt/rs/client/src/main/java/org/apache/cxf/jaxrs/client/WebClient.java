@@ -1309,7 +1309,7 @@ public class WebClient extends AbstractClient {
     }
 
     @SuppressWarnings({
-     "rawtypes", "unchecked"
+        "rawtypes", "unchecked"
     })
     public <T extends RxInvoker> T rx(Class<T> rxCls, ExecutorService executorService) {
         if (CompletionStageRxInvoker.class.isAssignableFrom(rxCls)) {
