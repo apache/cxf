@@ -53,26 +53,27 @@ import static org.junit.Assert.assertNull;
 
 //Define the DirectoryService
 @CreateDS(name = "LDAPCertificateRepoTest-class",
-        enableAccessControl = false,
-        allowAnonAccess = false,
-        enableChangeLog = true,
-        partitions = {
-      @CreatePartition(
-          name = "example",
-          suffix = "dc=example,dc=com",
-          indexes = {
-              @CreateIndex(attribute = "objectClass"),
-              @CreateIndex(attribute = "dc"),
-              @CreateIndex(attribute = "ou")
-          }
-      ) }
-  )
+    enableAccessControl = false,
+    allowAnonAccess = false,
+    enableChangeLog = true,
+    partitions = {
+        @CreatePartition(
+            name = "example",
+            suffix = "dc=example,dc=com",
+            indexes = {
+                @CreateIndex(attribute = "objectClass"),
+                @CreateIndex(attribute = "dc"),
+                @CreateIndex(attribute = "ou")
+            }
+        ) 
+    }
+)
 
 @CreateLdapServer(
-  transports = {
-      @CreateTransport(protocol = "LDAP", address = "localhost")
-      }
-  )
+    transports = {
+        @CreateTransport(protocol = "LDAP", address = "localhost")
+    }
+)
 
 //Inject an file containing entries
 @ApplyLdifFiles("ldap.ldif")
