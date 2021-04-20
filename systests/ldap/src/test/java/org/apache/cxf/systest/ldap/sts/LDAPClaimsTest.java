@@ -65,10 +65,10 @@ import org.junit.runner.RunWith;
 
 //Define the DirectoryService
 @CreateDS(name = "LDAPClaimsTest-class",
-          enableAccessControl = false,
-          allowAnonAccess = false,
-          enableChangeLog = true,
-          partitions = {
+    enableAccessControl = false,
+    allowAnonAccess = false,
+    enableChangeLog = true,
+    partitions = {
         @CreatePartition(
             name = "example",
             suffix = "dc=example,dc=com",
@@ -77,14 +77,15 @@ import org.junit.runner.RunWith;
                 @CreateIndex(attribute = "dc"),
                 @CreateIndex(attribute = "ou")
             }
-        ) }
-    )
+        ) 
+    }
+)
 
 @CreateLdapServer(
     transports = {
         @CreateTransport(protocol = "LDAP", address = "localhost")
-        }
-    )
+    }
+)
 
 //Inject an file containing entries
 @ApplyLdifFiles("ldap.ldif")

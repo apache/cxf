@@ -29,12 +29,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "xopType", namespace = "http://xop/jaxrs")
-@XmlType(name = "XopType", propOrder = {
+@XmlType(name = "XopType", 
+    propOrder = {
         "name",
         "attachinfo",
         "attachinfo2",
         "attachInfoRef",
-        "image" })
+        "image" 
+    })
 public class XopType {
 
     private String name;

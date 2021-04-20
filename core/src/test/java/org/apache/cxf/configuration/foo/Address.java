@@ -50,12 +50,12 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "address",
-         propOrder = {
-                      "city",
-                      "zip",
-                      "street",
-                      "nr"
-          })
+    propOrder = {
+        "city",
+        "zip",
+        "street",
+        "nr"
+    })
 public class Address {
 
     @XmlElement(required = true)
