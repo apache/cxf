@@ -29,12 +29,12 @@ import org.apache.cxf.rt.security.SecurityConstants;
 
 @WebService(name = "HelloPolicyService", serviceName = "HelloPolicyService")
 @EndpointProperties(value = {
-        @EndpointProperty(key = SecurityConstants.CALLBACK_HANDLER,
-        value = "org.apache.cxf.systest.ws.policy.handler.CommonPasswordCallback"),
-        @EndpointProperty(key = "ws-security.is-bsp-compliant", value = "false"),
-        @EndpointProperty(key = SecurityConstants.SIGNATURE_PROPERTIES, value = "alice.properties"),
-        @EndpointProperty(key = SecurityConstants.SIGNATURE_USERNAME, value = "alice")
-        })
+    @EndpointProperty(key = SecurityConstants.CALLBACK_HANDLER,
+                      value = "org.apache.cxf.systest.ws.policy.handler.CommonPasswordCallback"),
+    @EndpointProperty(key = "ws-security.is-bsp-compliant", value = "false"),
+    @EndpointProperty(key = SecurityConstants.SIGNATURE_PROPERTIES, value = "alice.properties"),
+    @EndpointProperty(key = SecurityConstants.SIGNATURE_USERNAME, value = "alice")
+})
 @HandlerChain(file = "handlers.xml")
 public class HelloServiceImpl implements HelloService {
     @Override

@@ -54,8 +54,12 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "param-valueType", propOrder = {
-        "description", "paramName", "paramValue" })
+@XmlType(name = "param-valueType",
+    propOrder = {
+        "description", 
+        "paramName", 
+        "paramValue" 
+    })
 public class ParamValueType {
 
     protected List<DescriptionType> description;

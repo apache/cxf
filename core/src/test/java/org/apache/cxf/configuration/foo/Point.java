@@ -46,10 +46,10 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "point",
-         propOrder = {
-                      "x",
-                      "y"
-        })
+    propOrder = {
+        "x",
+        "y"
+    })
 public class Point {
 
     protected int x;

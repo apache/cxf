@@ -155,24 +155,22 @@ public class JMSSharedQueueTest extends AbstractVmJMSTest {
         HelloWorldServiceAppCorrelationID service = new HelloWorldServiceAppCorrelationID(wsdl, serviceName);
 
         HelloWorldPortType portEng = markForClose(service.getPort(portNameEng, HelloWorldPortType.class, cff));
-        ClientRunnable engClient =
-            new ClientRunnable(portEng,
-                new CorrelationIDFactory() {
-                    private int counter;
-                    public String createCorrealtionID() {
-                        return "com.mycompany.eng:" + counter++;
-                    }
-                });
+        ClientRunnable engClient = new ClientRunnable(portEng,
+            new CorrelationIDFactory() {
+                private int counter;
+                public String createCorrealtionID() {
+                    return "com.mycompany.eng:" + counter++;
+                }
+            });
 
         HelloWorldPortType portSales = markForClose(service.getPort(portNameSales, HelloWorldPortType.class, cff));
-        ClientRunnable salesClient =
-             new ClientRunnable(portSales,
-                new CorrelationIDFactory() {
-                    private int counter;
-                    public String createCorrealtionID() {
-                        return "com.mycompany.sales:" + counter++;
-                    }
-                });
+        ClientRunnable salesClient = new ClientRunnable(portSales,
+            new CorrelationIDFactory() {
+                private int counter;
+                public String createCorrealtionID() {
+                    return "com.mycompany.sales:" + counter++;
+                }
+            });
 
         executeAsync(new ClientRunnable[]{engClient, salesClient});
     }

@@ -374,9 +374,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         assertTrue(booleanHolder.value);
     }
 
-    @SuppressWarnings({
-     "unchecked", "rawtypes"
-    })
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private static <T> InvocationCallback<T> createGenericInvocationCallback() {
         return new GenericInvocationCallback();
     }
