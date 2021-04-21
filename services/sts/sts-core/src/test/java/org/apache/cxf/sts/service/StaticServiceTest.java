@@ -49,12 +49,12 @@ public class StaticServiceTest {
         service.setEndpoints(endpoints);
 
         StringBuilder sb = new StringBuilder("https://localhost:12345/sts");
-        IntStream.range(0, 1000).forEach(i -> sb.append("1"));
+        IntStream.range(0, 1000).forEach(i -> sb.append('1'));
 
         // This should be allowed
         assertTrue(service.isAddressInEndpoints(sb.toString()));
 
-        IntStream.range(0, 7000).forEach(i -> sb.append("1"));
+        IntStream.range(0, 7000).forEach(i -> sb.append('1'));
 
         // This address is too long
         try {

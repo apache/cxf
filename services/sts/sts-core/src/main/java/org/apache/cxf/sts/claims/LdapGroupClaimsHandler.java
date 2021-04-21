@@ -278,7 +278,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
                 //  Demo_User -> Role=User
                 //  Demo_Admin -> Role=Admin
                 String filter = this.groupNameScopedFilter;
-                String role = null;
+                final String role;
                 if (isUseFullGroupNameAsValue()) {
                     role = group;
                 } else {
@@ -291,7 +291,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
                     //ex. (default groupNameGlobalFilter)
                     //  User -> Role=User
                     //  Admin -> Role=Admin
-                    String role = null;
+                    final String role;
                     if (isUseFullGroupNameAsValue()) {
                         role = group;
                     } else {

@@ -76,16 +76,15 @@ public final class LdapUtils {
                 }
             };
 
-        List<?> result = null;
         AndFilter filter = new AndFilter();
         filter.and(
                 new EqualsFilter("objectclass", objectClass)).and(
                         new EqualsFilter(filterAttributeName, filterAttributeValue));
 
-        result = ldapTemplate.search((baseDN == null) ? "" : baseDN, filter.toString(),
+        List<Map<String, Attribute>> result = ldapTemplate.search((baseDN == null) ? "" : baseDN, filter.toString(),
             SearchControls.SUBTREE_SCOPE, searchAttributes, mapper);
         if (result != null && !result.isEmpty()) {
-            ldapAttributes = CastUtils.cast((Map<?, ?>)result.get(0));
+            ldapAttributes = result.get(0);
         }
 
         return ldapAttributes;
@@ -121,7 +120,6 @@ public final class LdapUtils {
 
         String[] searchAttributes = new String[] {searchAttribute};
 
-        List<?> result = null;
         AndFilter filter = new AndFilter();
         filter.and(new EqualsFilter("objectclass", objectClass));
         if (filters != null) {
@@ -130,7 +128,7 @@ public final class LdapUtils {
             }
         }
 
-        result = ldapTemplate.search((baseDN == null) ? "" : baseDN, filter.toString(),
+        List<?> result = ldapTemplate.search((baseDN == null) ? "" : baseDN, filter.toString(),
             SearchControls.SUBTREE_SCOPE, searchAttributes, mapper);
         if (result != null && !result.isEmpty()) {
             ldapAttributes = CastUtils.cast((List<?>)result);

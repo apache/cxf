@@ -123,7 +123,7 @@ public class HazelCastTokenStore implements TokenStore {
     }
 
     private int getTTL(SecurityToken token) {
-        int parsedTTL = 0;
+        int parsedTTL;
         if (token.getExpires() != null) {
             Instant expires = token.getExpires();
             Instant now = Instant.now();

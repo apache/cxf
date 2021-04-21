@@ -51,7 +51,7 @@ public class DefaultJWTRoleParser extends DefaultSubjectRoleParser implements JW
             return super.parseRolesFromSubject(principal, subject);
         }
 
-        Set<Principal> roles = null;
+        final Set<Principal> roles;
         if (roleClaim != null && token != null && token.getClaims().containsProperty(roleClaim)) {
             roles = new HashSet<>();
             String role = token.getClaims().getStringProperty(roleClaim).trim();

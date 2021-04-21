@@ -181,8 +181,8 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
         Lifetime tokenLifetime = providerParameters.getTokenRequirements().getLifetime();
         if (lifetime > 0 && acceptClientLifetime && tokenLifetime != null
             && tokenLifetime.getCreated() != null && tokenLifetime.getExpires() != null) {
-            Instant creationTime = null;
-            Instant expirationTime = null;
+            final Instant creationTime;
+            Instant expirationTime;
             try {
                 creationTime = ZonedDateTime.parse(tokenLifetime.getCreated()).toInstant();
                 expirationTime = ZonedDateTime.parse(tokenLifetime.getExpires()).toInstant();
