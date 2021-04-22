@@ -112,10 +112,9 @@ public class ListEndpointsCommand extends CXFController implements Action {
     private String toFullAddress(String address) throws IOException, InvalidSyntaxException {
         ConfigurationAdmin configAdmin = getConfigAdmin();
         if (address.startsWith("/") && configAdmin != null) {
-            String httpPort = null;
-            String cxfContext = null;
-            httpPort = extractConfigProperty(configAdmin, "org.ops4j.pax.web", "org.osgi.service.http.port");
-            cxfContext = extractConfigProperty(configAdmin, "org.apache.cxf.osgi", "org.apache.cxf.servlet.context");
+            String httpPort = extractConfigProperty(configAdmin, "org.ops4j.pax.web", "org.osgi.service.http.port");
+            String cxfContext =
+                extractConfigProperty(configAdmin, "org.apache.cxf.osgi", "org.apache.cxf.servlet.context");
             if (StringUtils.isEmpty(cxfContext)) {
                 cxfContext = getCXFOSGiServletContext();
             }
