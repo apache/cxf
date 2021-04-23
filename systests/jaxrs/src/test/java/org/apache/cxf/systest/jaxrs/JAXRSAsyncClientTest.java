@@ -35,6 +35,7 @@ import javax.annotation.Priority;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.ProcessingException;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -493,6 +494,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         };
     }
 
+    @Produces("application/xml")
     private static class FaultyBookWriter implements MessageBodyWriter<Book> {
 
         @Override

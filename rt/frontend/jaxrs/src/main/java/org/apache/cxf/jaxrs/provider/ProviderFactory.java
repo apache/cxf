@@ -890,19 +890,21 @@ public abstract class ProviderFactory {
             MessageBodyWriter<?> e1 = p1.getProvider();
             MessageBodyWriter<?> e2 = p2.getProvider();
 
-            int result = compareClasses(e1, e2);
-            if (result != 0) {
-                return result;
-            }
             List<MediaType> types1 =
                 JAXRSUtils.sortMediaTypes(JAXRSUtils.getProviderProduceTypes(e1), JAXRSUtils.MEDIA_TYPE_QS_PARAM);
             List<MediaType> types2 =
                 JAXRSUtils.sortMediaTypes(JAXRSUtils.getProviderProduceTypes(e2), JAXRSUtils.MEDIA_TYPE_QS_PARAM);
 
-            result = JAXRSUtils.compareSortedMediaTypes(types1, types2, JAXRSUtils.MEDIA_TYPE_QS_PARAM);
+            int result = JAXRSUtils.compareSortedMediaTypes(types1, types2, JAXRSUtils.MEDIA_TYPE_QS_PARAM);
             if (result != 0) {
                 return result;
             }
+            
+            result = compareClasses(e1, e2);
+            if (result != 0) {
+                return result;
+            }
+
             result = compareCustomStatus(p1, p2);
             if (result != 0) {
                 return result;
