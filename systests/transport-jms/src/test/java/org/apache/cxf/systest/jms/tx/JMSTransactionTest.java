@@ -122,19 +122,19 @@ public class JMSTransactionTest extends AbstractVmJMSTest {
         Connection conn = cf.createConnection();
         conn.start();
         Queue queue = JMSUtil.createQueue(conn, "ActiveMQ.DLQ");
-        assertNumMessagesInQueue("DLQ should be empty", conn, queue, 0, 1000);
+        assertNumMessagesInQueue("DLQ should be empty", conn, queue, 0, 2000);
 
         Greeter greeter = markForClose(createGreeterProxy());
         // Should be processed normally
         greeter.greetMeOneWay(GreeterImplWithTransaction.GOOD_GUY);
 
 
-        assertNumMessagesInQueue("DLQ should be empty", conn, queue, 0, 1000);
+        assertNumMessagesInQueue("DLQ should be empty", conn, queue, 0, 2000);
 
         // Should cause rollback, redelivery and in the end the message should go to the dead letter queue
         greeter.greetMeOneWay(GreeterImplWithTransaction.BAD_GUY);
 
-        assertNumMessagesInQueue("Request should be put into DLQ", conn, queue, 1, 2000);
+        assertNumMessagesInQueue("Request should be put into DLQ", conn, queue, 1, 5000);
         conn.close();
     }
 
