@@ -26,12 +26,11 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -43,14 +42,14 @@ import static org.junit.Assert.assertTrue;
 public class JAXBContextResolverTest extends AbstractClientServerTestBase {
     public static final String PORT = allocatePort(JAXBContextResolverTest.class);
 
-    public static class Server extends AbstractServerTestServerBase {
+    public static class Server extends AbstractBusTestServerBase {
         @Override
-        protected org.apache.cxf.endpoint.Server createServer(Bus bus) throws Exception {
+        protected void run() {
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(CXFResource.class);
             sf.setProvider(new CXFJaxbContextResolver());
             sf.setAddress("http://localhost:" + PORT + "/");
-            return sf.create();
+            sf.create();
         }
 
         public static void main(String[] args) throws Exception {
