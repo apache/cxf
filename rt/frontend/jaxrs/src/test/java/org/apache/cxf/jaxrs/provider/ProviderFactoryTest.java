@@ -56,6 +56,7 @@ import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.validation.Schema;
 
@@ -82,12 +83,14 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class ProviderFactoryTest {
@@ -424,6 +427,21 @@ public class ProviderFactoryTest {
         MessageBodyWriter<Book> customJaxbWriter = pf.createMessageBodyWriter(Book.class, null, null,
                                                               MediaType.TEXT_XML_TYPE, new MessageImpl());
         assertSame(customJaxbWriter, provider);
+    }
+    
+    @Test
+    public void testCustomProviderAndJaxbProvider() {
+        ProviderFactory pf = ServerProviderFactory.getInstance();
+        CustomJaxbProvider provider = new CustomJaxbProvider();
+        pf.registerUserProvider(provider);
+        
+        MessageBodyReader<JAXBElement> customJaxbReader = pf.createMessageBodyReader(JAXBElement.class, 
+            String.class, null, MediaType.TEXT_XML_TYPE, new MessageImpl());
+        assertThat(customJaxbReader, instanceOf(JAXBElementTypedProvider.class));
+
+        MessageBodyWriter<JAXBElement> customJaxbWriter = pf.createMessageBodyWriter(JAXBElement.class, 
+            String.class, null, MediaType.TEXT_XML_TYPE, new MessageImpl());
+        assertThat(customJaxbWriter, instanceOf(JAXBElementTypedProvider.class));
     }
 
     @Test

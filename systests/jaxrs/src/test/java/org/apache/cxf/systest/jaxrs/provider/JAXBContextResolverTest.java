@@ -47,7 +47,9 @@ public class JAXBContextResolverTest extends AbstractClientServerTestBase {
         protected void run() {
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(CXFResource.class);
+            sf.setProvider(new CXFJaxbElementProvider());
             sf.setProvider(new CXFJaxbContextResolver());
+            sf.setProvider(new CXFJaxbProvider());
             sf.setAddress("http://localhost:" + PORT + "/");
             sf.create();
         }
