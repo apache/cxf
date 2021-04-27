@@ -903,6 +903,7 @@ public abstract class ProviderFactory {
             if (result != 0) {
                 return result;
             }
+            
             result = compareCustomStatus(p1, p2);
             if (result != 0) {
                 return result;
@@ -1131,8 +1132,13 @@ public abstract class ProviderFactory {
         if (realClass1.isAssignableFrom(realClass2)) {
             // subclass should go first
             return 1;
+        } else if (realClass2.isAssignableFrom(realClass1)) {
+            // superclass should go last
+            return -1;
         }
-        return -1;
+        
+        // there is no relation between the types returned by the providers
+        return 0;
     }
 
     private static Type[] getGenericInterfaces(Class<?> cls, Class<?> expectedClass) {
