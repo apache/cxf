@@ -853,8 +853,10 @@ public abstract class ProviderFactory {
         setProviders(true, false, userProviders.toArray());
     }
 
-    private static class MessageBodyReaderComparator
+    static class MessageBodyReaderComparator
         implements Comparator<ProviderInfo<MessageBodyReader<?>>> {
+
+        private final GenericArgumentComparator classComparator = new GenericArgumentComparator(MessageBodyReader.class);
 
         public int compare(ProviderInfo<MessageBodyReader<?>> p1,
                            ProviderInfo<MessageBodyReader<?>> p2) {
@@ -870,7 +872,10 @@ public abstract class ProviderFactory {
             if (result != 0) {
                 return result;
             }
-            result = compareClasses(e1, e2);
+
+            final Class<?> class1 = ClassHelper.getRealClass(e1);
+            final Class<?> class2 = ClassHelper.getRealClass(e2);
+            result = classComparator.compare(class1, class2);
             if (result != 0) {
                 return result;
             }
@@ -878,19 +883,29 @@ public abstract class ProviderFactory {
             if (result != 0) {
                 return result;
             }
-            return comparePriorityStatus(p1.getProvider().getClass(), p2.getProvider().getClass());
+
+            result = comparePriorityStatus(p1.getProvider().getClass(), p2.getProvider().getClass());
+            if (result != 0) {
+                return result;
+            }
+
+            return p1.getProvider().getClass().getName().compareTo(p2.getProvider().getClass().getName());
         }
     }
 
-    private static class MessageBodyWriterComparator
+    static class MessageBodyWriterComparator
         implements Comparator<ProviderInfo<MessageBodyWriter<?>>> {
+
+        private final GenericArgumentComparator classComparator = new GenericArgumentComparator(MessageBodyWriter.class);
 
         public int compare(ProviderInfo<MessageBodyWriter<?>> p1,
                            ProviderInfo<MessageBodyWriter<?>> p2) {
             MessageBodyWriter<?> e1 = p1.getProvider();
             MessageBodyWriter<?> e2 = p2.getProvider();
 
-            int result = compareClasses(e1, e2);
+            final Class<?> class1 = ClassHelper.getRealClass(e1);
+            final Class<?> class2 = ClassHelper.getRealClass(e2);
+            int result = classComparator.compare(class1, class2);
             if (result != 0) {
                 return result;
             }
@@ -909,7 +924,12 @@ public abstract class ProviderFactory {
                 return result;
             }
 
-            return comparePriorityStatus(p1.getProvider().getClass(), p2.getProvider().getClass());
+            result = comparePriorityStatus(p1.getProvider().getClass(), p2.getProvider().getClass());
+            if (result != 0) {
+                return result;
+            }
+
+            return p1.getProvider().getClass().getName().compareTo(p2.getProvider().getClass().getName());
         }
     }
 
