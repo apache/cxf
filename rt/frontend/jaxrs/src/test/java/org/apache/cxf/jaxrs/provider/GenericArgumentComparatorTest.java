@@ -231,6 +231,47 @@ public class GenericArgumentComparatorTest {
                 + "ObjectWriter");
     }
 
+    /**
+     * Don't just grab the first generics we see, they must map directly or
+     * indirectly back to the interface we are interested in
+     */
+    @Test
+    public void unrelatedGenericsAreIgnored() throws Exception {
+        class Color {
+        }
+        class Red extends Color {
+        }
+        class Crimson extends Red {
+        }
+
+        class Shape {
+        }
+        class Circle extends Shape {
+        }
+
+        abstract class Writer<T> implements MessageBodyWriter<Consumer<T>> {
+        }
+        abstract class ShapeWriter<T> extends Writer<Shape>  implements ContextResolver<T> {
+        }
+        abstract class CircleWriter extends Writer<Circle> {
+        }
+        abstract class ObjectWriter extends Writer<Object> {
+        }
+
+        abstract class SpecialCircleWriter extends CircleWriter implements ContextResolver<Color> {
+        }
+        abstract class SpecialShapeWriter extends ShapeWriter<Red> {
+        }
+        abstract class SpecialObjectWriter extends ObjectWriter implements ContextResolver<Crimson> {
+        }
+
+        final List<Class<?>> classes = classes(SpecialObjectWriter.class, SpecialCircleWriter.class, SpecialShapeWriter.class);
+
+        assertOrder(MessageBodyWriter.class, classes, "SpecialCircleWriter\n"
+                + "SpecialShapeWriter\n"
+                + "SpecialObjectWriter");
+    }
+
     public static List<Class<?>> classes(final Class<?>... classes) {
         final List<Class<?>> list = new ArrayList<Class<?>>(asList(classes));
         Collections.shuffle(list);
