@@ -184,7 +184,9 @@ public class MessageBodyWriterComparatorTest {
         }
 
         @Override
-        public void writeTo(T t, Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> multivaluedMap, OutputStream outputStream) throws IOException, WebApplicationException {
+        public void writeTo(T t, Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType,
+                            MultivaluedMap<String, Object> multivaluedMap, OutputStream outputStream)
+                throws IOException, WebApplicationException {
             throw new UnsupportedOperationException();
         }
     }

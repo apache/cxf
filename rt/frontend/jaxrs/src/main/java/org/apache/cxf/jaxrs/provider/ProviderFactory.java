@@ -856,7 +856,8 @@ public abstract class ProviderFactory {
     static class MessageBodyReaderComparator
         implements Comparator<ProviderInfo<MessageBodyReader<?>>> {
 
-        private final GenericArgumentComparator classComparator = new GenericArgumentComparator(MessageBodyReader.class);
+        private final GenericArgumentComparator classComparator =
+                new GenericArgumentComparator(MessageBodyReader.class);
 
         public int compare(ProviderInfo<MessageBodyReader<?>> p1,
                            ProviderInfo<MessageBodyReader<?>> p2) {
@@ -896,7 +897,8 @@ public abstract class ProviderFactory {
     static class MessageBodyWriterComparator
         implements Comparator<ProviderInfo<MessageBodyWriter<?>>> {
 
-        private final GenericArgumentComparator classComparator = new GenericArgumentComparator(MessageBodyWriter.class);
+        private final GenericArgumentComparator classComparator =
+                new GenericArgumentComparator(MessageBodyWriter.class);
 
         public int compare(ProviderInfo<MessageBodyWriter<?>> p1,
                            ProviderInfo<MessageBodyWriter<?>> p2) {
