@@ -537,15 +537,19 @@ public final class InjectionUtils {
     }
 
     private static RuntimeException createParamConversionException(ParameterType pType, Exception ex) {
-        //
-        //  For path, query & matrix parameters this is 404,
-        //  for others 400...
-        //
-        if (pType == ParameterType.PATH || pType == ParameterType.QUERY
-            || pType == ParameterType.MATRIX) {
-            return ExceptionUtils.toNotFoundException(ex, null);
-        }
-        return ExceptionUtils.toBadRequestException(ex, null);
+        /*
+         * Loosely related to the following section of the Jakarta REST specification:
+         *
+         * At least one of the acceptable response entity body media types is a supported output data
+         * format (see Section 3.5). If no methods support one of the acceptable response entity body
+         * media types an implementation MUST generate a NotAcceptableException (406 status)
+         * and no entity.
+         *
+         * Tested by:
+         * com.sun.ts.tests.jaxrs.ee.rs.ext.paramconverter.JAXRSClient
+         * atomicIntegerIsLazyDeployableAndThrowsErrorTest_from_standalone
+         */
+        return ExceptionUtils.toNotAcceptableException(ex, null);
     }
     
     public static <T> Optional<ParamConverter<T>> getParamConverter(Class<T> pClass,
