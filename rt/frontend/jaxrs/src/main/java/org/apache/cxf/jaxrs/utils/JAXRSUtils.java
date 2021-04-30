@@ -1190,7 +1190,10 @@ public final class JAXRSUtils {
         } else if (ResourceInfo.class.isAssignableFrom(clazz)) {
             o = new ResourceInfoImpl(contextMessage);
         } else if (ResourceContext.class.isAssignableFrom(clazz)) {
-            o = new ResourceContextImpl(contextMessage, contextMessage.getExchange().get(OperationResourceInfo.class));
+            OperationResourceInfo operationResourceInfo = contextMessage.getExchange().get(OperationResourceInfo.class);
+            if (operationResourceInfo != null) {
+                o = new ResourceContextImpl(contextMessage, operationResourceInfo);
+            }
         } else if (Request.class.isAssignableFrom(clazz)) {
             o = new RequestImpl(contextMessage);
         } else if (Providers.class.isAssignableFrom(clazz)) {
