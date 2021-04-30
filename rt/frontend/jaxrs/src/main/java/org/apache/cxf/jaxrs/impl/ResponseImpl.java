@@ -405,7 +405,7 @@ public final class ResponseImpl extends Response {
 
     @Override
     public <T> T readEntity(Class<T> cls, Annotation[] anns) throws ProcessingException, IllegalStateException {
-        return doReadEntity(cls, cls, anns, true);
+        return doReadEntity(cls, cls, anns);
     }
 
     @Override
@@ -413,20 +413,15 @@ public final class ResponseImpl extends Response {
     public <T> T readEntity(GenericType<T> genType, Annotation[] anns)
         throws ProcessingException, IllegalStateException {
         return doReadEntity((Class<T>) genType.getRawType(),
-                            genType.getType(), anns, true);
+                            genType.getType(), anns);
     }
 
     public <T> T doReadEntity(Class<T> cls, Type t, Annotation[] anns)
         throws ProcessingException, IllegalStateException {
-        return doReadEntity(cls, t, anns, false);
-    }
-
-    public <T> T doReadEntity(Class<T> cls, Type t, Annotation[] anns, boolean closeAfterRead)
-        throws ProcessingException, IllegalStateException {
 
         checkEntityIsClosed();
         //according to javadoc, should close when is not buffered.
-        boolean shouldClose = !this.entityBufferred;
+        boolean shouldClose = !entityBufferred && !JAXRSUtils.isStreamingOutType(cls);
 
         if (lastEntity != null && cls.isAssignableFrom(lastEntity.getClass())
             && !(lastEntity instanceof InputStream)) {
@@ -478,7 +473,7 @@ public final class ResponseImpl extends Response {
                 T tCastLastEntity = castLastEntity();
                 shouldClose = shouldClose && !(tCastLastEntity instanceof AutoCloseable)
                     && !(tCastLastEntity instanceof Source);
-                if (closeAfterRead && shouldClose) {
+                if (shouldClose) {
                     close();
                 }
                 return tCastLastEntity;
@@ -489,7 +484,7 @@ public final class ResponseImpl extends Response {
                     autoClose(cls, true);
                     reportMessageHandlerProblem("MSG_READER_PROBLEM", cls, mediaType, ex);
                 } else {
-                    if (closeAfterRead && shouldClose) {
+                    if (shouldClose) {
                         close();
                     }
                     return null;

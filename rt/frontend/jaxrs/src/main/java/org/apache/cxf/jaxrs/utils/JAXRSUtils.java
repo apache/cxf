@@ -47,6 +47,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import javax.activation.DataSource;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.HttpMethod;
@@ -168,7 +169,7 @@ public final class JAXRSUtils {
     private static final String HTTP_CHARSET_PARAM = "charset";
     private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
     private static final Set<Class<?>> STREAMING_OUT_TYPES = new HashSet<>(
-        Arrays.asList(InputStream.class, Reader.class, StreamingOutput.class));
+        Arrays.asList(InputStream.class, Reader.class, StreamingOutput.class, DataSource.class));
 
     private JAXRSUtils() {
     }
