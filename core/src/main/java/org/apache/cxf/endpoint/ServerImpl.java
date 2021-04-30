@@ -52,6 +52,7 @@ public class ServerImpl implements Server {
     private InstrumentationManager iMgr;
     private ManagedEndpoint mep;
     private boolean stopped = true;
+    private boolean destoryDest = true;
 
     public ServerImpl(Bus bus,
                       Endpoint endpoint,
@@ -124,8 +125,17 @@ public class ServerImpl implements Server {
             return;
         }
         LOG.fine("Server is starting.");
-
-        bindingFactory.addListener(destination, endpoint);
+        
+        try {
+            bindingFactory.addListener(destination, endpoint);
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("endpoint already registered on address")) {
+                //this destination is used by another endpoint with same endpoint address
+                //so shouldn't be destoried by this server
+                this.destoryDest = false;
+            }
+            throw e;
+        }
 
         // register the active server to run
         if (null != serverRegistry) {
@@ -183,8 +193,10 @@ public class ServerImpl implements Server {
 
     public void destroy() {
         stop();
-        // we should shutdown the destination here
-        getDestination().shutdown();
+        if (this.destoryDest) {
+            //we should shutdown the destination here
+            getDestination().shutdown();
+        }
 
         if (null != serverRegistry) {
             LOG.fine("unregister the server to serverRegistry ");
