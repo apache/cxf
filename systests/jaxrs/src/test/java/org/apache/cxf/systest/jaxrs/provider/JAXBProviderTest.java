@@ -21,6 +21,7 @@ package org.apache.cxf.systest.jaxrs.provider;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
@@ -37,6 +38,8 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class JAXBProviderTest extends AbstractBusClientServerTestBase {
@@ -87,5 +90,22 @@ public class JAXBProviderTest extends AbstractBusClientServerTestBase {
         String result = response.readEntity(String.class);
         assertTrue(result.contains("<jaxbelement xmlns=\"org.apache.cxf\">test</jaxbelement>"));
         Assert.assertFalse(result.contains("WriteInCXFJaxbProvider"));
+    }
+    
+    @Test
+    public void testNoContentIsReturned() throws Exception {
+        WebClient client = WebClient.create("http://localhost:" + PORT + "/resource/null");
+        WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(3000000);
+
+        List<String> values = new ArrayList<>();
+        values.add(MediaType.APPLICATION_XML);
+        client.getHeaders().put("content-type", values);
+        JAXBElement<String> test = new JAXBElement<>(new QName("org.apache.cxf", "jaxbelement"),
+                                                           String.class, "test");
+        Response response = client.post(test);
+        GenericType<JAXBElement<String>> type = new GenericType<JAXBElement<String>>() {
+        };
+        JAXBElement<String> result = response.readEntity(type);
+        assertThat(result, nullValue());
     }
 }
