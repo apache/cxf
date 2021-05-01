@@ -66,6 +66,7 @@ import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.NoContentException;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -165,7 +166,7 @@ public final class JAXRSUtils {
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSUtils.class);
     private static final String PATH_SEGMENT_SEP = "/";
     private static final String REPORT_FAULT_MESSAGE_PROPERTY = "org.apache.cxf.jaxrs.report-fault-message";
-    private static final String NO_CONTENT_EXCEPTION = "javax.ws.rs.core.NoContentException";
+    private static final String NO_CONTENT_EXCEPTION = NoContentException.class.getName();
     private static final String HTTP_CHARSET_PARAM = "charset";
     private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
     private static final Set<Class<?>> STREAMING_OUT_TYPES = new HashSet<>(
