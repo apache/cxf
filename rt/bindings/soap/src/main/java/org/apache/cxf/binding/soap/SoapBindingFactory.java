@@ -76,6 +76,7 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.endpoint.ListenerRegistrationException;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.AttachmentInInterceptor;
@@ -916,7 +917,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
                         .equals(((org.apache.cxf.binding.soap.SoapBinding)b2).getSoapVersion())
                     && Boolean.FALSE.equals(o)) {
 
-                    throw new RuntimeException("Soap "
+                    throw new ListenerRegistrationException("Soap "
                                                + ((org.apache.cxf.binding.soap.SoapBinding)b)
                                                    .getSoapVersion().getVersion()
                                                + " endpoint already registered on address "
