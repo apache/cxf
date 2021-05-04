@@ -125,15 +125,13 @@ public class ServerImpl implements Server {
             return;
         }
         LOG.fine("Server is starting.");
-        
+
         try {
             bindingFactory.addListener(destination, endpoint);
-        } catch (RuntimeException e) {
-            if (e.getMessage().contains("endpoint already registered on address")) {
-                //this destination is used by another endpoint with same endpoint address
-                //so shouldn't be destroyed by this server
-                this.destroyDest = false;
-            }
+        } catch (ListenerRegistrationException e) {
+            //this destination is used by another endpoint with same endpoint address
+            //so shouldn't be destroyed by this server
+            this.destroyDest = false;
             throw e;
         }
 
