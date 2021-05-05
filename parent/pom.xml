@@ -2349,6 +2349,21 @@
                     <scope>test</scope>
                 </dependency>
             </dependencies>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>xerces</groupId>
+                        <artifactId>xercesImpl</artifactId>
+                        <version>${cxf.xerces.version}</version>
+                        <exclusions>
+                            <exclusion>
+                                <artifactId>xml-apis</artifactId>
+                                <groupId>xml-apis</groupId>
+                            </exclusion>
+                        </exclusions>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
         </profile>
         <profile>
             <id>jdk13</id>
