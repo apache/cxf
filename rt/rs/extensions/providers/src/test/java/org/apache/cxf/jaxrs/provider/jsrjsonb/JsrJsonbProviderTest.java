@@ -102,7 +102,7 @@ public class JsrJsonbProviderTest {
         books.add(new Book("CXF 2", 2));
 
         final Method m = CollectionsResource.class.getMethod("setBooksArray", new Class[]{Book[].class});
-        final String payload = write(books, Book.class, m.getGenericParameterTypes()[0]);
+        final String payload = write(books, List.class, m.getGenericParameterTypes()[0]);
         
         assertThat(payload,
             equalTo("[{\"id\":1,\"name\":\"CXF 1\",\"state\":\"\"},{\"id\":2,\"name\":\"CXF 2\",\"state\":\"\"}]"));
