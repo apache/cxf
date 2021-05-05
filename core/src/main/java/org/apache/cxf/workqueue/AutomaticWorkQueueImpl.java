@@ -21,7 +21,6 @@ package org.apache.cxf.workqueue;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -202,9 +201,11 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
 
             ReentrantLock l = null;
             try {
-                Field f = ThreadPoolExecutor.class.getDeclaredField("mainLock");
-                ReflectionUtil.setAccessible(f);
-                l = (ReentrantLock)f.get(executor);
+                l = ReflectionUtil.accessDeclaredField("mainLock", ThreadPoolExecutor.class,
+                                                       executor, ReentrantLock.class);
+                if (l == null) {
+                    l = new ReentrantLock();
+                }
             } catch (Throwable t) {
                 l = new ReentrantLock();
             }
