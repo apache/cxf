@@ -1997,7 +1997,7 @@ public final class JAXRSUtils {
             return parent;
         } else if (parent.endsWith("/")) {
             // Remove only last slash
-            return parent.replaceAll("/$", "") + child;
+            return parent.substring(0, parent.length() - 1) + child;
         } else {
             return parent + child;
         }
