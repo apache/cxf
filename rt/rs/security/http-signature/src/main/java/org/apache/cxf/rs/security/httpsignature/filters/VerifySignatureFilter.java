@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.rs.security.httpsignature.filters;
 
+import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
+
 import java.io.ByteArrayInputStream;
 
 import javax.annotation.Priority;
@@ -43,7 +45,7 @@ public class VerifySignatureFilter extends AbstractSignatureInFilter implements 
         }
 
         verifySignature(requestCtx.getHeaders(),
-                        requestCtx.getUriInfo().getAbsolutePath().getPath(),
+                SignatureHeaderUtils.createRequestTarget(requestCtx.getUriInfo().getAbsolutePath()),
                         requestCtx.getMethod());
     }
 
