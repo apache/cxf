@@ -59,6 +59,7 @@ public class SseEventSourceImpl implements SseEventSource {
     private volatile InboundSseEventProcessor processor; 
     private volatile TimeUnit unit;
     private volatile long delay;
+    private volatile boolean open;
 
     private class InboundSseEventListenerDelegate implements InboundSseEventListener {
         private String lastEventId;
@@ -163,7 +164,7 @@ public class SseEventSourceImpl implements SseEventSource {
 
     @Override
     public void open() {
-        if (!state.compareAndSet(SseSourceState.CLOSED, SseSourceState.CONNECTING)) {
+        if (!tryChangeState(SseSourceState.CLOSED, SseSourceState.CONNECTING)) {
             throw new IllegalStateException("The SseEventSource is already in " + state.get() + " state");
         }
 
@@ -199,7 +200,7 @@ public class SseEventSourceImpl implements SseEventSource {
             final int status = response.getStatus();
             if (status == 204) {
                 LOG.fine("SSE endpoint " + target.getUri() + " returns no data, disconnecting");
-                state.set(SseSourceState.CLOSED);
+                changeState(SseSourceState.CLOSED);
                 response.close();
                 return;
             }
@@ -229,7 +230,7 @@ public class SseEventSourceImpl implements SseEventSource {
             processor.run(response);
             LOG.fine("SSE event processor has been started ...");
             
-            if (!state.compareAndSet(SseSourceState.CONNECTING, SseSourceState.OPEN)) {
+            if (!tryChangeState(SseSourceState.CONNECTING, SseSourceState.OPEN)) {
                 throw new IllegalStateException("The SseEventSource is already in " + state.get() + " state");
             }
             
@@ -252,7 +253,7 @@ public class SseEventSourceImpl implements SseEventSource {
 
     @Override
     public boolean isOpen() {
-        return state.get() == SseSourceState.OPEN;
+        return open;
     }
 
     @Override
@@ -261,9 +262,9 @@ public class SseEventSourceImpl implements SseEventSource {
             return true;
         }
         
-        if (state.compareAndSet(SseSourceState.CONNECTING, SseSourceState.CLOSED)) {
+        if (tryChangeState(SseSourceState.CONNECTING, SseSourceState.CLOSED)) {
             LOG.fine("The SseEventSource was not connected, closing anyway");
-        } else if (!state.compareAndSet(SseSourceState.OPEN, SseSourceState.CLOSED)) {
+        } else if (!tryChangeState(SseSourceState.OPEN, SseSourceState.CLOSED)) {
             throw new IllegalStateException("The SseEventSource is not opened, but in " + state.get() + " state");
         }
         
@@ -299,7 +300,7 @@ public class SseEventSourceImpl implements SseEventSource {
         // If the connection was still on connecting state, just try to reconnect
         if (state.get() != SseSourceState.CONNECTING) { 
             LOG.fine("The SseEventSource is still opened, moving it to connecting state");
-            if (!state.compareAndSet(SseSourceState.OPEN, SseSourceState.CONNECTING)) {
+            if (!tryChangeState(SseSourceState.OPEN, SseSourceState.CONNECTING)) {
                 throw new IllegalStateException("The SseEventSource is not opened, but in " + state.get()
                     + " state, unable to reconnect");
             }
@@ -315,5 +316,28 @@ public class SseEventSourceImpl implements SseEventSource {
         
         LOG.fine("The reconnection attempt to " + target.getUri() + " is scheduled in "
             + tunit.toMillis(tdelay) + "ms");
+    }
+    
+    private void changeState(SseSourceState updated) {
+        state.set(updated);
+        onStateChanged(updated);
+    }
+    
+    private boolean tryChangeState(SseSourceState expected, SseSourceState updated) {
+        final boolean result = state.compareAndSet(expected, updated);
+        
+        if (result) {
+            onStateChanged(updated);
+        }
+        
+        return result;
+    }
+
+    private void onStateChanged(SseSourceState updated) {
+        if (state.get() == SseSourceState.OPEN) {
+            open = true;
+        } else if (state.get() == SseSourceState.CLOSED) {
+            open = false;
+        }
     }
 }
