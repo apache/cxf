@@ -20,6 +20,7 @@ package org.apache.cxf.jaxrs.sse.client;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
@@ -41,6 +42,7 @@ import javax.ws.rs.sse.SseEventSource;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.impl.RetryAfterHeaderProvider;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 
 /**
@@ -203,6 +205,28 @@ public class SseEventSourceImpl implements SseEventSource {
                 changeState(SseSourceState.CLOSED);
                 response.close();
                 return;
+            }
+            
+            // In addition to handling the standard connection loss failures, JAX-RS SseEventSource automatically 
+            // deals with any HTTP 503 Service Unavailable responses from an SSE endpoint, that contain a "Retry-After" 
+            // HTTP header with a valid value. The HTTP 503 + "Retry-After" technique is often used by HTTP endpoints 
+            // as a means of connection and traffic throttling. In case a HTTP 503 + "Retry-After" response is received 
+            // in return to a connection request, JAX-RS SSE event source will automatically schedule a new reconnect 
+            // attempt and use the received "Retry-After" HTTP header value as a one-time override of the reconnect 
+            // delay.
+            if (status == 503) {
+                final Object retryAfterHeader = response.getHeaders().getFirst(HttpHeaders.RETRY_AFTER);
+                if (retryAfterHeader != null) {
+                    final Duration retryAfter = RetryAfterHeaderProvider.valueOf(retryAfterHeader.toString()); 
+                    final long retryAfterMillis = retryAfter.toMillis();
+                    if (retryAfterMillis >= 0) {
+                        LOG.fine("SSE endpoint " + target.getUri() + " is unavailable, retrying after " 
+                            + retryAfterMillis + "ms");
+                        scheduleReconnect(retryAfterMillis, TimeUnit.MILLISECONDS, lastEventId);
+                        response.close();
+                        return;
+                    }
+                }
             }
 
             // Convert unsuccessful responses to instances of WebApplicationException

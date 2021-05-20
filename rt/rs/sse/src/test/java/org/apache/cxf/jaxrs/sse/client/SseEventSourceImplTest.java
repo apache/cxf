@@ -64,7 +64,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class SseEventSourceImplTest {
 
     enum Type {
-        NO_CONTENT, NO_SERVER, BUSY,
+        NO_CONTENT, NO_SERVER, BUSY, UNAVAILABLE, RETRY_AFTER,
         EVENT, EVENT_JUST_DATA, EVENT_JUST_NAME, EVENT_MULTILINE_DATA, EVENT_NO_RETRY, EVENT_BAD_RETRY, EVENT_MIXED,
         EVENT_BAD_NEW_LINES, EVENT_NOT_AUTHORIZED, EVENT_LAST_EVENT_ID, EVENT_RETRY_LAST_EVENT_ID;
     }
@@ -129,6 +129,34 @@ public class SseEventSourceImplTest {
             assertThat(eventSource.isOpen(), equalTo(false));
 
             assertThat(events.size(), equalTo(0));
+        }
+    }
+    
+    @Test
+    public void testNoReconnectWhenUnavailableIsReturned() {
+        try (SseEventSource eventSource = withNoReconnect(Type.UNAVAILABLE)) {
+            eventSource.open();
+            assertThat(eventSource.isOpen(), equalTo(false));
+
+            await()
+                .during(Duration.ofMillis(3000L))
+                .untilAsserted(() -> assertThat(eventSource.isOpen(), equalTo(false)));
+
+            assertThat(events.size(), equalTo(0));
+        }
+    }
+    
+    @Test
+    public void testNoReconnectWhenRetryAfterIsReturned() {
+        try (SseEventSource eventSource = withNoReconnect(Type.RETRY_AFTER)) {
+            eventSource.open();
+            assertThat(eventSource.isOpen(), equalTo(false));
+
+            await()
+                .atMost(Duration.ofMillis(3000L))
+                .untilAsserted(() -> assertThat(eventSource.isOpen(), equalTo(true)));
+
+            assertThat(events.size(), equalTo(1));
         }
     }
 
@@ -486,6 +514,8 @@ public class SseEventSourceImplTest {
 
         startBusyServer(Type.BUSY);
         startNotAuthorizedServer(Type.EVENT_NOT_AUTHORIZED);
+        startUnavailableServer(Type.UNAVAILABLE);
+        startUnavailableServer(Type.RETRY_AFTER);
 
         startServer(Type.EVENT, EVENT);
         startServer(Type.EVENT_JUST_DATA, EVENT_JUST_DATA);
@@ -522,7 +552,15 @@ public class SseEventSourceImplTest {
         sf.setServiceBean(new BusyEventServer());
         SERVERS.put(type, sf.create());
     }
+    
+    private static void startUnavailableServer(Type type) {
+        JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
+        sf.setAddress(LOCAL_ADDRESS + type.name());
+        sf.setServiceBean(new StatusServer(503, type));
+        SERVERS.put(type, sf.create());
+    }
 
+    
     private static void startServer(Type type, String payload) {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setAddress(LOCAL_ADDRESS + type.name());
@@ -542,6 +580,42 @@ public class SseEventSourceImplTest {
         for (Server server : SERVERS.values()) {
             server.stop();
             server.destroy();
+        }
+    }
+    
+    public static class StatusServer {
+        private final int status;
+        private final Type type;
+        private volatile boolean triggered;
+
+        public StatusServer(int status, Type type) {
+            this.status = status;
+            this.type = type;
+        }
+
+        @GET
+        @Produces(MediaType.SERVER_SENT_EVENTS)
+        public Response event() {
+            try {
+                if (triggered) {
+                    return Response.ok(EVENT).build();
+                } else if (status == 503) {
+                    if (type == Type.RETRY_AFTER) {
+                        return Response
+                           .status(status)
+                           .header(HttpHeaders.RETRY_AFTER, "2")
+                           .build();
+                    } else {
+                        return Response
+                            .status(status)
+                            .build();
+                    }
+                } else {
+                    return Response.status(status).build();
+                }
+            } finally {
+                triggered = true;
+            }
         }
     }
 
