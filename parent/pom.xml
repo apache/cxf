@@ -228,7 +228,7 @@
         <cxf.aries.api.version>1.0.1</cxf.aries.api.version>
         <cxf.aries.core.version>1.10.2</cxf.aries.core.version>
         <cxf.aries.fly.version>1.2</cxf.aries.fly.version>
-        <cxf.aries.parser.version>1.6.0</cxf.aries.parser.version> 
+        <cxf.aries.parser.version>1.6.1</cxf.aries.parser.version>
         <cxf.aries.version.range>[1.0,2)</cxf.aries.version.range>
         <cxf.bcel.bundle.version>5.2_4</cxf.bcel.bundle.version>
         <cxf.cglib.osgi.version>[2.2.2,3.4)</cxf.cglib.osgi.version>
