@@ -162,7 +162,7 @@
         <cxf.logback.classic.version>1.2.3</cxf.logback.classic.version>
         <cxf.lucene.version>8.2.0</cxf.lucene.version>
         <cxf.maven.core.version>3.6.3</cxf.maven.core.version>
-        <cxf.micrometer.version>1.6.7</cxf.micrometer.version>
+        <cxf.micrometer.version>1.7.0</cxf.micrometer.version>
         <cxf.microprofile.config.version>2.0</cxf.microprofile.config.version>
         <cxf.microprofile.rest.client.version>2.0</cxf.microprofile.rest.client.version>
         <cxf.microprofile.openapi.version>2.0</cxf.microprofile.openapi.version>
@@ -194,11 +194,11 @@
         <cxf.slf4j.version>1.7.30</cxf.slf4j.version>
         <cxf.snakeyaml.version>1.27</cxf.snakeyaml.version>
         <cxf.specs.jaxws.api.version>2.3_2</cxf.specs.jaxws.api.version>
-        <cxf.spring.boot.version>2.4.6</cxf.spring.boot.version>
+        <cxf.spring.boot.version>2.5.0</cxf.spring.boot.version>
         <cxf.spring.ldap.version>2.3.4.RELEASE</cxf.spring.ldap.version>
         <cxf.spring.mock>spring-test</cxf.spring.mock>
         <cxf.spring.osgi.version>1.2.1</cxf.spring.osgi.version>
-        <cxf.spring.security.version>5.4.6</cxf.spring.security.version>
+        <cxf.spring.security.version>5.5.0</cxf.spring.security.version>
         <cxf.spring.version>5.3.7</cxf.spring.version>
         <cxf.stax-ex.version>1.8.3</cxf.stax-ex.version>
         <cxf.swagger.ui.version>3.38.0</cxf.swagger.ui.version>
