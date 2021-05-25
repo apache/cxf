@@ -309,10 +309,10 @@ public class DefaultLogEventMapper {
      */
     private boolean isRESTFault(Message message) {
         Object opName = message.getExchange().get("org.apache.cxf.resource.operation.name");
-        if (opName == null) {
+        Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
+        if (opName == null && responseCode == null) {
             return true;
         }
-        Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
         return (responseCode != null) && (responseCode >= 400);
     }
 
