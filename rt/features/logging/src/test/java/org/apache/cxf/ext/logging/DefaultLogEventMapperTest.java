@@ -29,6 +29,8 @@ import org.apache.cxf.message.MessageImpl;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class DefaultLogEventMapperTest {
 
     @Test
@@ -55,7 +57,7 @@ public class DefaultLogEventMapperTest {
         exchange.put("org.apache.cxf.rs.security.cors.CrossOriginResourceSharingFilter", "preflight_passed");
         message.setExchange(exchange);
         exchange.setOutMessage(message);
-        LogEvent event = mapper.map(message, Collections.emptySet());
+        LogEvent event = mapper.map(message);
         assertEquals(EventType.RESP_OUT, event.getType());
     }
 
