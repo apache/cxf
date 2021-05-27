@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.httpsignature.utils;
 
-import java.net.URI;
+import java.net.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Clock;
@@ -27,7 +27,6 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Stream;
-
 import org.apache.cxf.rs.security.httpsignature.exception.DigestFailureException;
 
 public final class SignatureHeaderUtils {
@@ -106,7 +105,7 @@ public final class SignatureHeaderUtils {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(uri.getPath());
 
-        if(uri.getRawQuery() != null) {
+        if (uri.getRawQuery() != null) {
             stringBuilder.append("?");
             stringBuilder.append(uri.getRawQuery());
         }

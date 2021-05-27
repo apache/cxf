@@ -18,17 +18,8 @@
  */
 package org.apache.cxf.rs.security.httpsignature.filters;
 
-import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.io.CachedOutputStream;
-import org.apache.cxf.jaxrs.utils.HttpUtils;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.cxf.rs.security.httpsignature.HTTPSignatureConstants;
-import org.apache.cxf.rs.security.httpsignature.utils.DefaultSignatureConstants;
-import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
-
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.client.ClientRequestContext;
@@ -42,9 +33,16 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
+import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.rs.security.httpsignature.HTTPSignatureConstants;
+import org.apache.cxf.rs.security.httpsignature.utils.DefaultSignatureConstants;
+import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 
 /**
  * RS WriterInterceptor + ClientRequestFilter for outbound HTTP Signature. For requests with no Body
@@ -84,7 +82,8 @@ public class CreateSignatureInterceptor extends AbstractSignatureOutFilter
         // Only sign the request if we have no Body.
         if (requestContext.getEntity() == null) {
             String method = requestContext.getMethod();
-            performSignature(requestContext.getHeaders(), SignatureHeaderUtils.createRequestTarget(requestContext.getUri()), method);
+            performSignature(requestContext.getHeaders(),
+                SignatureHeaderUtils.createRequestTarget(requestContext.getUri()), method);
         }
     }
 
@@ -105,7 +104,7 @@ public class CreateSignatureInterceptor extends AbstractSignatureOutFilter
         // We don't pass the HTTP method + URI for the response case
         if (MessageUtils.isRequestor(m)) {
             method = HttpUtils.getProtocolHeader(JAXRSUtils.getCurrentMessage(),
-                                                 Message.HTTP_REQUEST_METHOD, "");
+                Message.HTTP_REQUEST_METHOD, "");
             path = SignatureHeaderUtils.createRequestTarget(uriInfo.getRequestUri());
         }
 
