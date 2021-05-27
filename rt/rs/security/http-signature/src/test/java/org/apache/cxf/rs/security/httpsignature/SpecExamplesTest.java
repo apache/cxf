@@ -32,11 +32,13 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
+
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
+
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -45,11 +47,11 @@ import org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureFilter;
 import org.apache.cxf.rs.security.httpsignature.provider.KeyProvider;
 import org.apache.cxf.rs.security.httpsignature.provider.MockAlgorithmProvider;
 import org.apache.cxf.rs.security.httpsignature.provider.MockSecurityProvider;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+
 import static org.junit.Assert.assertEquals;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -58,8 +60,8 @@ import static org.powermock.api.mockito.PowerMockito.when;
 /**
  * Some examples from the Appendix C of the spec.
  */
-@PrepareForTest(PhaseInterceptorChain.class)
-@RunWith(PowerMockRunner.class)
+@org.powermock.core.classloader.annotations.PrepareForTest(PhaseInterceptorChain.class)
+@RunWith(org.powermock.modules.junit4.PowerMockRunner.class)
 public class SpecExamplesTest {
 
     private static KeyProvider keyProvider;
