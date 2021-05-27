@@ -27,6 +27,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Stream;
+
 import org.apache.cxf.rs.security.httpsignature.exception.DigestFailureException;
 
 public final class SignatureHeaderUtils {
@@ -106,7 +107,7 @@ public final class SignatureHeaderUtils {
         stringBuilder.append(uri.getPath());
 
         if (uri.getRawQuery() != null) {
-            stringBuilder.append("?");
+            stringBuilder.append('?');
             stringBuilder.append(uri.getRawQuery());
         }
         return stringBuilder.toString();
