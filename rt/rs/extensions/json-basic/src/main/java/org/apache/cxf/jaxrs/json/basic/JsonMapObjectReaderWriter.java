@@ -81,7 +81,7 @@ public class JsonMapObjectReaderWriter {
         out.append(OBJECT_START);
         for (Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator(); it.hasNext();) {
             Map.Entry<String, Object> entry = it.next();
-            out.append(DQUOTE).append(entry.getKey()).append(DQUOTE);
+            out.append(DQUOTE).append(escapeJson(entry.getKey())).append(DQUOTE);
             out.append(COLON);
             toJsonInternal(out, entry.getValue(), it.hasNext());
         }
@@ -119,7 +119,12 @@ public class JsonMapObjectReaderWriter {
             if (quotesNeeded) {
                 out.append(DQUOTE);
             }
-            out.append(value.toString());
+            String valueStr = value.toString();
+            if (value instanceof String) {
+                // If the value is a String, make sure to escape quotes
+                valueStr = escapeJson(valueStr);
+            }
+            out.append(valueStr);
             if (quotesNeeded) {
                 out.append(DQUOTE);
             }
@@ -361,6 +366,11 @@ public class JsonMapObjectReaderWriter {
             return this;
         }
 
+    }
+
+    private String escapeJson(String value) {
+        return value.replace("\"", "\\\"")
+                .replace("\\", "\\\\");
     }
 
 }
