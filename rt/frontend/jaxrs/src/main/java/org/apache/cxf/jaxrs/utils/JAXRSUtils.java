@@ -47,6 +47,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import javax.activation.DataSource;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.HttpMethod;
@@ -65,6 +66,7 @@ import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.NoContentException;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -164,11 +166,11 @@ public final class JAXRSUtils {
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSUtils.class);
     private static final String PATH_SEGMENT_SEP = "/";
     private static final String REPORT_FAULT_MESSAGE_PROPERTY = "org.apache.cxf.jaxrs.report-fault-message";
-    private static final String NO_CONTENT_EXCEPTION = "javax.ws.rs.core.NoContentException";
+    private static final String NO_CONTENT_EXCEPTION = NoContentException.class.getName();
     private static final String HTTP_CHARSET_PARAM = "charset";
     private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
     private static final Set<Class<?>> STREAMING_OUT_TYPES = new HashSet<>(
-        Arrays.asList(InputStream.class, Reader.class, StreamingOutput.class));
+        Arrays.asList(InputStream.class, Reader.class, StreamingOutput.class, DataSource.class));
 
     private JAXRSUtils() {
     }
@@ -394,6 +396,8 @@ public final class JAXRSUtils {
         int methodMatched = 0;
         int consumeMatched = 0;
 
+        boolean resourceMethodsAdded = false;
+        boolean generateOptionsResponse = false;
         List<OperationResourceInfo> finalPathSubresources = null;
         for (Map.Entry<ClassResourceInfo, MultivaluedMap<String, String>> rEntry : matchedResources.entrySet()) {
             ClassResourceInfo resource = rEntry.getKey();
@@ -433,18 +437,21 @@ public final class JAXRSUtils {
                                     if (matchProduceTypes(acceptType, ori)) {
                                         candidateList.put(ori, map);
                                         added = true;
+                                        resourceMethodsAdded = true;
                                         break;
                                     }
                                 }
                             }
                             //CHECKSTYLE:ON
+                        } else if ("OPTIONS".equalsIgnoreCase(httpMethod)) {
+                            generateOptionsResponse = true;
                         }
                     }
                 }
                 LOG.fine(matchMessageLogSupplier(ori, path, httpMethod, requestType, acceptContentTypes, added));
             }
         }
-        if (finalPathSubresources != null && pathMatched > 0
+        if (finalPathSubresources != null && (resourceMethodsAdded || generateOptionsResponse)
             && !MessageUtils.getContextualBoolean(message, KEEP_SUBRESOURCE_CANDIDATES, false)) {
             for (OperationResourceInfo key : finalPathSubresources) {
                 candidateList.remove(key);
@@ -1184,7 +1191,10 @@ public final class JAXRSUtils {
         } else if (ResourceInfo.class.isAssignableFrom(clazz)) {
             o = new ResourceInfoImpl(contextMessage);
         } else if (ResourceContext.class.isAssignableFrom(clazz)) {
-            o = new ResourceContextImpl(contextMessage, contextMessage.getExchange().get(OperationResourceInfo.class));
+            OperationResourceInfo operationResourceInfo = contextMessage.getExchange().get(OperationResourceInfo.class);
+            if (operationResourceInfo != null) {
+                o = new ResourceContextImpl(contextMessage, operationResourceInfo);
+            }
         } else if (Request.class.isAssignableFrom(clazz)) {
             o = new RequestImpl(contextMessage);
         } else if (Providers.class.isAssignableFrom(clazz)) {

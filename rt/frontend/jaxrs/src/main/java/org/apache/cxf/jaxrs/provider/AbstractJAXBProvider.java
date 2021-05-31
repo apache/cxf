@@ -42,6 +42,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.NoContentException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.ext.ContextResolver;
@@ -67,6 +68,8 @@ import javax.xml.validation.Schema;
 import org.w3c.dom.Element;
 
 import org.xml.sax.helpers.DefaultHandler;
+
+import com.ctc.wstx.exc.WstxEOFException;
 
 import org.apache.cxf.annotations.SchemaValidation;
 import org.apache.cxf.common.jaxb.JAXBUtils;
@@ -719,7 +722,12 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         return sb;
     }
 
-    protected static void handleExceptionEnd(Throwable t, String message, boolean read) {
+    protected static void handleExceptionEnd(Throwable t, String message, boolean read) throws NoContentException {
+        if (t instanceof WstxEOFException && t.getMessage().startsWith("Unexpected EOF in prolog")){
+            String noContent = new org.apache.cxf.common.i18n.Message("EMPTY_BODY", BUNDLE).toString();
+            LOG.warning(noContent);
+            throw new NoContentException(noContent);
+        }
         Response.Status status = read
             ? Response.Status.BAD_REQUEST : Response.Status.INTERNAL_SERVER_ERROR;
         Response r = JAXRSUtils.toResponseBuilder(status)
@@ -728,7 +736,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
             : ExceptionUtils.toInternalServerErrorException(t, r);
     }
 
-    protected void handleJAXBException(JAXBException e, boolean read) {
+    protected void handleJAXBException(JAXBException e, boolean read) throws NoContentException {
         StringBuilder sb = handleExceptionStart(e);
         Throwable linked = e.getLinkedException();
         if (linked != null && linked.getMessage() != null) {
@@ -753,7 +761,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         handleExceptionEnd(t, message, read);
     }
 
-    protected void handleXMLStreamException(XMLStreamException e, boolean read) {
+    protected void handleXMLStreamException(XMLStreamException e, boolean read) throws NoContentException {
         StringBuilder sb = handleExceptionStart(e);
         handleExceptionEnd(e, sb.toString(), read);
     }
