@@ -68,6 +68,7 @@ import org.apache.cxf.jaxrs.Customer;
 import org.apache.cxf.jaxrs.CustomerParameterHandler;
 import org.apache.cxf.jaxrs.JAXBContextProvider;
 import org.apache.cxf.jaxrs.JAXBContextProvider2;
+import org.apache.cxf.jaxrs.PriorityCustomerParameterHandler;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
@@ -687,7 +688,51 @@ public class ProviderFactoryTest {
                                                                 new MessageImpl());
         assertSame(h2, h);
     }
+    
+    @Test
+    public void testParameterHandlerProviderWithPriority() throws Exception {
+        ProviderFactory pf = ServerProviderFactory.getInstance();
+        ParamConverterProvider h = new CustomerParameterHandler();
+        ParamConverterProvider hp = new PriorityCustomerParameterHandler();
+        pf.registerUserProvider(h);
+        pf.registerUserProvider(hp);
+        ParamConverter<Customer> h2 = pf.createParameterHandler(Customer.class, Customer.class, null,
+                                                                new MessageImpl());
+        assertSame(h2, hp);
+    }
 
+    @Test
+    public void testCustomProviderSortingParamConverterProvider() {
+        ParamConverterProvider h = new CustomerParameterHandler();
+        ParamConverterProvider hp = new PriorityCustomerParameterHandler();
+        
+        ProviderFactory pf = ServerProviderFactory.getInstance();
+        pf.setUserProviders(Arrays.asList(h, hp));
+
+        Comparator<ProviderInfo<ParamConverterProvider>> comp =
+            new Comparator<ProviderInfo<ParamConverterProvider>>() {
+
+                @Override
+                public int compare(
+                    ProviderInfo<ParamConverterProvider> o1,
+                    ProviderInfo<ParamConverterProvider> o2) {
+
+                    ParamConverterProvider provider1 = o1.getProvider();
+                    ParamConverterProvider provider2 = o2.getProvider();
+
+                    return provider1.getClass().getName().compareTo(
+                        provider2.getClass().getName());
+                }
+
+            };
+
+        pf.setProviderComparator(comp);
+
+        ParamConverter<Customer> h2 = pf.createParameterHandler(Customer.class, Customer.class, null,
+                new MessageImpl());
+        assertSame(h2, h);
+    }
+    
     @Test
     public void testGetStringProvider() throws Exception {
         verifyProvider(String.class, StringTextProvider.class, "text/plain");
