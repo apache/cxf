@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -1744,5 +1745,88 @@ public class UriBuilderImplTest {
             return Response.ok(test).build();
         }
 
+    }
+    
+    @Test
+    public void testURIWithSpecialCharacters() {
+        final String expected = "http://localhost:8080/xy%22";
+        
+        final URI uri = UriBuilder
+            .fromUri("http://localhost:8080")
+            .path(URLEncoder.encode("xy\"")).build();
+        
+        assertEquals(expected, uri.toString());
+    }
+
+    @Test
+    public void testURIWithSpecialCharacters2() {
+        final String expected = "http://localhost:8080/xy%09";
+        
+        final URI uri = UriBuilder
+            .fromUri("http://localhost:8080")
+            .path(URLEncoder.encode("xy\t"))
+            .buildFromEncoded();
+        
+        assertEquals(expected, uri.toString());
+    }
+
+    @Test
+    public void testURIWithSpecialCharactersPreservePath() {
+        final String expected = "http://localhost:8080/xy/%22/abc";
+        
+        final URI uri = UriBuilder.fromPath("")
+            .replacePath("http://localhost:8080")
+            .path("/{a}/{b}/{c}")
+            .buildFromEncoded("xy", "\"", "abc");
+        
+        assertEquals(expected, uri.toString());
+    }
+
+    @Test
+    public void testURIWithSpecialCharactersPreservePath2() {
+        final String expected = "http://localhost:8080/xy/%09/abc";
+        
+        final URI uri = UriBuilder.fromPath("")
+            .replacePath("http://localhost:8080")
+            .path("/{a}/{b}/{c}")
+            .buildFromEncoded("xy", "\t", "abc");
+        
+        assertEquals(expected, uri.toString());
+    }
+
+    @Test
+    public void testIllegalURI() {
+        final String path = "invalidpath";
+        
+        final URI uri = UriBuilder
+            .fromPath(path)
+            .build();
+        
+        assertEquals(path, uri.toString());
+    }
+    
+    @Test
+    @SuppressWarnings({"checkstyle:linelength"})
+    public void queryParamSpecialCharacters() {
+        final String expected = "http://localhost:8080?%2F%3FabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._%7E%251A%21%24%27%28%29*%2B%2C%3B%3A%40=apiKeyQueryParam1Value";
+        
+        final URI uri = UriBuilder
+            .fromUri("http://localhost:8080")
+            .queryParam(URLEncoder.encode("/?abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~%1A!$'()*+,;:@"), "apiKeyQueryParam1Value")
+            .build();
+        
+        assertEquals(expected, uri.toString());
+    }
+    @Test
+    @SuppressWarnings({"checkstyle:linelength"})
+    public void queryParamSpecialCharactersFromEncoded() {
+        final String expected = "http://localhost:8080?%2F%3FabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._%7E%251A%21%24%27%28%29*%2B%2C%3B%3A%40=apiKeyQueryParam1Value";
+        
+        final URI uri = UriBuilder
+            .fromUri("http://localhost:8080")
+            .queryParam(URLEncoder.encode("/?abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~%1A!$'()*+,;:@"), "apiKeyQueryParam1Value")
+            .buildFromEncoded();
+        
+        assertEquals(expected, uri.toString());
     }
 }
