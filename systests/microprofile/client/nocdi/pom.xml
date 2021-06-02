@@ -26,7 +26,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.systests</groupId>
-    <artifactId>cxf-systests-microprofile-async</artifactId>
+    <artifactId>cxf-systests-microprofile-nocdi</artifactId>
     <name>Apache CXF MicroProfile No-CDI/Config Sys Tests</name>
     <description>Apache CXF System Tests - MicroProfile Rest Client No-CDI/Config Tests</description>
     <url>https://cxf.apache.org</url>
@@ -62,6 +62,12 @@
                 <groupId>org.apache.johnzon</groupId>
                 <artifactId>johnzon-core</artifactId>
                 <version>${cxf.johnzon.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>javax.json.bind</groupId>
+                <artifactId>javax.json.bind-api</artifactId>
+                <version>${cxf.json.bind.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
