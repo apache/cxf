@@ -1798,6 +1798,17 @@ public class BookStore {
     public Response echoEntity(String entity) {
         return Response.ok().entity(entity).build();
     }
+    
+    @GET
+    @Path("/queryParamSpecialCharacters")
+    @Produces("text/plain")
+    @SuppressWarnings({"checkstyle:linelength"})
+    public Response queryParamSpecialCharacters(@QueryParam("/?abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~%1A!$'()*+,;:@") String queryParm1) {
+        return Response
+            .ok(queryParm1)
+            .type(MediaType.TEXT_PLAIN)
+            .build();
+    }
 
     public final String init() {
         books.clear();
