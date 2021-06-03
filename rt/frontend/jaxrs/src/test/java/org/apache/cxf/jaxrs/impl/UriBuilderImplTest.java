@@ -1817,6 +1817,7 @@ public class UriBuilderImplTest {
         
         assertEquals(expected, uri.toString());
     }
+    
     @Test
     @SuppressWarnings({"checkstyle:linelength"})
     public void queryParamSpecialCharactersFromEncoded() {
@@ -1826,6 +1827,32 @@ public class UriBuilderImplTest {
             .fromUri("http://localhost:8080")
             .queryParam(URLEncoder.encode("/?abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~%1A!$'()*+,;:@"), "apiKeyQueryParam1Value")
             .buildFromEncoded();
+        
+        assertEquals(expected, uri.toString());
+    }
+    
+    @Test
+    @SuppressWarnings({"checkstyle:linelength"})
+    public void queryParamSpecialCharactersFromEncodedTemplate() {
+        final String expected = "http://localhost:8080?%2F%3FabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._%7E%251A%21%24%27%28%29*%2B%2C%3B%3A%40=apiKeyQueryParam1Value";
+        
+        final URI uri = UriBuilder
+            .fromUri("http://localhost:8080")
+            .queryParam("{a}", "{b}")
+            .buildFromEncoded(URLEncoder.encode("/?abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~%1A!$'()*+,;:@"), "apiKeyQueryParam1Value");
+        
+        assertEquals(expected, uri.toString());
+    }
+    
+    @Test
+    @SuppressWarnings({"checkstyle:linelength"})
+    public void queryParamSpecialCharactersFromTemplate() {
+        final String expected = "http://localhost:8080?/?abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._%7E%251A%21%24%27%28%29*%2B,%3B%3A%40=apiKeyQueryParam1Value";
+        
+        final URI uri = UriBuilder
+            .fromUri("http://localhost:8080")
+            .queryParam("{a}", "{b}")
+            .build("/?abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~%1A!$'()*+,;:@", "apiKeyQueryParam1Value");
         
         assertEquals(expected, uri.toString());
     }
