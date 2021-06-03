@@ -71,13 +71,13 @@ public class AsyncMethodTest {
         try {
             Class.forName("org.eclipse.microprofile.config.ConfigProvider");
             fail("ConfigProvider API class is on the classpath - results from this test project are not valid");
-        } catch (Throwable t) {
+        } catch (ClassNotFoundException expected) {
             // expected
         }
         try {
             Class.forName("javax.enterprise.inject.spi.BeanManager");
             fail("BeanManager API class is on the classpath - results from this test project are not valid");
-        } catch (Throwable t) {
+        } catch (ClassNotFoundException expected) {
             //expected
         }
     }
