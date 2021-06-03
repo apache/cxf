@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -925,6 +926,28 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
             assertThat(response.getStatus(), equalTo(404));
         }
     }
+
+    @Test
+    @SuppressWarnings({"checkstyle:linelength"})
+    public void testQueryParamSpecialCharactersEncoded() throws Exception {
+        final String address = "http://localhost:" + PORT + "/bookstore/queryParamSpecialCharacters";
+
+        try (Response response = ClientBuilder.newClient()
+                .register(AddHeaderClientResponseFilter.class)
+                .target(address)
+                .queryParam(URLEncoder.encode("/?abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~%1A!$'()*+,;:@"), 
+                    "apiKeyQueryParam1Value")
+                .request(MediaType.TEXT_PLAIN)
+                .get()) {
+            assertEquals(200, response.getStatus());
+            
+            final String actual = response.readEntity(String.class);
+            final String expected = "apiKeyQueryParam1Value";
+            
+            assertEquals(expected, actual);
+        }
+    }
+
 
     private static class ReplaceBodyFilter implements ClientRequestFilter {
 

@@ -1368,7 +1368,11 @@ public final class JAXRSUtils {
             }
         }
 
-        queries.add(HttpUtils.urlDecode(name), value);
+        if (decode) {
+            queries.add(HttpUtils.urlDecode(name), value);
+        } else {
+            queries.add(name, value);
+        }
     }
 
     private static Object readFromMessageBody(Class<?> targetTypeClass,
