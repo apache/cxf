@@ -1,4 +1,4 @@
-Apache CXF 3.4.3 Release Notes
+Apache CXF 3.4.4 Release Notes
 
 1. Overview
 
@@ -23,7 +23,7 @@ http://cxf.apache.org/docs/34-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
-3.4.3 fixes over 22 JIRA issues reported by users and the community.
+3.4.4 fixes over 26 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -66,32 +66,36 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Sub-task
-    * [CXF-8394] - Fix org.apache.cxf.systest.jaxrs.JAXRSContinuationsServlet3Test.testCancelVoidOnResumedTest
+    * [CXF-8404] - Fix org.apache.cxf.transport.jms.util.MessageListenerTest.testNoTransaction
+    * [CXF-8428] - Fix org.apache.cxf.jaxrs.sse.client.SseEventSourceImplTest.testReconnectAndTwoEventsReceived
+    * [CXF-8461] - jaxrs.ee.rs.beanparam.form.plain formFieldParamEntityWithEncodedTest
+    * [CXF-8462] - jaxrs.ee.rs.beanparam.form.plain formParamEntityWithEncodedTest
+    * [CXF-8504] - jaxrs.jaxrs21.ee.sse.sseeventsource defaultWaiting1s
+    * [CXF-8506] - jaxrs.jaxrs21.ee.sse.sseeventsource reconnectByEventMethodTest
+    * [CXF-8508] - jaxrs.jaxrs21.ee.sse.sseeventsource userReconnectByEventMethodTest
+    * [CXF-8509] - jaxrs.jaxrs21.ee.sse.sseeventsource wait2Seconds
+    * [CXF-8516] - jaxrs.spec.provider.jaxbcontext readWriteProviderTest
+    * [CXF-8518] - jaxrs.spec.provider.standardnotnull clientJaxbProviderTest
+    * [CXF-8529] - Fix org.apache.cxf.systest.jms.tx.JMSTransactionTest.testTransactionOneWay
 
 ** Bug
-    * [CXF-7666] - Binary multipart payload are shown even if logBinary Flag is set to false
-    * [CXF-8341] - LoggingFeature always prints out binary contents
-    * [CXF-8361] - Support for Jakarta EE9 namespace in AnnotationHandlerChainBuilder
-    * [CXF-8391] - Regex for addSensitiveElementNames is replace only the last element
-    * [CXF-8401] - "tried to access protected method" exception after updating Java 14 to 15
-    * [CXF-8402] - JwkUtils::fromECPublicKey returns key coordinates without leading zero
-    * [CXF-8403] - stax2-api version conflict in cxf-rt-ws-security
-    * [CXF-8415] - DefaultHostnameVerifier fails with HttpCore NIO
-    * [CXF-8416] - Using fine-grained Import-Package for com.sun to avoid uncessary imported package
-    * [CXF-8422] - Unclosed input streams after using org.apache.cxf.tools.wsdlto.WSDLToJava
-    * [CXF-8427] - Response exception mappers not invoked on MP async methods
-    * [CXF-8429] - Illegal reflective access in XercesSchemaValidationUtils
-    * [CXF-8431] - NullPointerException in HTTPJettyTransportActivator
-    * [CXF-8433] - JAXRSServerFactoryBean remove existing path from destinations on create
+    * [CXF-7921] - JAXRS CDI extension ignores interfaces annotations
+    * [CXF-8344] - org.apache.cxf.jaxrs.utils.AnnotationUtils#getNameBindings does not use ClassUnwrapper
+    * [CXF-8387] - Allow special characters to be used for a queryParam name.
+    * [CXF-8435] - JsonMapObjectReaderWriter doesn't escape double quotes
+    * [CXF-8442] - java.io.IOException: closed when compiled and run with Java 16
+    * [CXF-8454] - DOS vulnerability in bearer token parsing
+    * [CXF-8456] - wadl2java plugin generates classes names with invalid identifiers
+    * [CXF-8533] - ensure an endpoint destination which is still in use won't be shutdown inproperly
+    * [CXF-8535] - Query missing from signature request-target
+    * [CXF-8536] - Incorrect log message "Could not create a NamespaceMapper compatible with Marshaller class com.sun.xml.bind.v2.runtime.MarshallerImpl"
+    * [CXF-8540] - FAULT_OUT logged by CORS preflight requests
+    * [CXF-8546] - introduce a property so that we can configure writeOptionalTypeParameters
+
+** New Feature
+    * [CXF-8532] - @Priority support for ParamConverterProvider
 
 ** Improvement
-    * [CXF-8405] - add RequestLimitingHandler for http-undertow transport
-    * [CXF-8411] - Improve FastInfoset interceptors' compatibility with GraalVM native compilation
-    * [CXF-8412] - introduce EnableRecordRequestStartTime propery so that request process duration time can be logged for http-undertow transport
-    * [CXF-8417] - upgrade to undertow 2.2.3
-    * [CXF-8418] - be able to configure Undertow workerIOName from blueprint/OSGi
-    * [CXF-8424] - Use template URL instead of actual path values for JAX-RS micrometer metrics
-
-** Task
-    * [CXF-8343] - Add JSON-B support
+    * [CXF-8450] - Make JAXBDatabinding extendable
+    * [CXF-8537] - Replace String.replaceAll with substring for better throughput performance
 
