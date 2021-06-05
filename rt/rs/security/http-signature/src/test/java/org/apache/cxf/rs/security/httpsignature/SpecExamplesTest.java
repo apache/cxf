@@ -39,34 +39,37 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.phase.Phase;
+import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.phase.PhaseManager;
 import org.apache.cxf.rs.security.httpsignature.filters.CreateSignatureInterceptor;
 import org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureFilter;
 import org.apache.cxf.rs.security.httpsignature.provider.KeyProvider;
 import org.apache.cxf.rs.security.httpsignature.provider.MockAlgorithmProvider;
 import org.apache.cxf.rs.security.httpsignature.provider.MockSecurityProvider;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 
 import static org.junit.Assert.assertEquals;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Some examples from the Appendix C of the spec.
  */
-@org.powermock.core.classloader.annotations.PrepareForTest(PhaseInterceptorChain.class)
-@RunWith(org.powermock.modules.junit4.PowerMockRunner.class)
 public class SpecExamplesTest {
 
     private static KeyProvider keyProvider;
     private static PublicKey publicKey;
-
+    private Bus bus;
+    
     @BeforeClass
     public static void setUp() throws IOException, InvalidKeySpecException {
         try {
@@ -92,6 +95,11 @@ public class SpecExamplesTest {
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
+    }
+    
+    @Before
+    public void setUpBus() {
+        bus = BusFactory.getDefaultBus();
     }
 
     @Test
@@ -136,38 +144,37 @@ public class SpecExamplesTest {
             requestStringHeaders.add(header, value.get(0));
         });
 
-        mockStatic(PhaseInterceptorChain.class);
-        Message message = mock(Message.class);
-        when(PhaseInterceptorChain.getCurrentMessage()).thenReturn(message);
+        final Message message = new MessageImpl();
+        doInPhaseInterceptor(message, () -> {
+            ClientRequestContext requestContext = getClientRequestContextMock(uri, method, requestHeaders);
+            interceptor.filter(requestContext);
 
-        ClientRequestContext requestContext = getClientRequestContextMock(uri, method, requestHeaders);
-
-        interceptor.filter(requestContext);
-
-        String signatureHeader = (String) requestHeaders.get("Signature").get(0);
-        requestStringHeaders.add("Signature", signatureHeader);
-
-        String expectedHeader = "keyId=\"Test\",algorithm=\"rsa-sha256\","
-            + "signature=\"SjWJWbWN7i0wzBvtPl8rbASWz5xQW6mcJmn+ibttBqtifLN7Sazz"
-            + "6m79cNfwwb8DMJ5cou1s7uEGKKCs+FLEEaDV5lp7q25WqS+lavg7T8hc0GppauB"
-            + "6hbgEKTwblDHYGEtbGmtdHgVCk9SuS13F0hZ8FD0k/5OxEPXe5WozsbM=\"";
-
-        assertEquals(signatureHeader.replaceAll("headers=\"date\",", ""), expectedHeader);
-
-        // Verify that the request signature can be verified by the filter
-        MessageVerifier messageVerifier = new MessageVerifier(keyId -> publicKey);
-        messageVerifier.setAddDefaultRequiredHeaders(false);
-        messageVerifier.setSecurityProvider(new MockSecurityProvider());
-        messageVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
-
-        VerifySignatureFilter verifySignatureFilter = new VerifySignatureFilter();
-        verifySignatureFilter.setMessageVerifier(messageVerifier);
-
-        ContainerRequestContext containerRequestContext =
-            getContainerRequestContextMock(uri, method, requestStringHeaders);
-
-        verifySignatureFilter.filter(containerRequestContext);
+            String signatureHeader = (String) requestHeaders.get("Signature").get(0);
+            requestStringHeaders.add("Signature", signatureHeader);
+    
+            String expectedHeader = "keyId=\"Test\",algorithm=\"rsa-sha256\","
+                + "signature=\"SjWJWbWN7i0wzBvtPl8rbASWz5xQW6mcJmn+ibttBqtifLN7Sazz"
+                + "6m79cNfwwb8DMJ5cou1s7uEGKKCs+FLEEaDV5lp7q25WqS+lavg7T8hc0GppauB"
+                + "6hbgEKTwblDHYGEtbGmtdHgVCk9SuS13F0hZ8FD0k/5OxEPXe5WozsbM=\"";
+    
+            assertEquals(signatureHeader.replaceAll("headers=\"date\",", ""), expectedHeader);
+    
+            // Verify that the request signature can be verified by the filter
+            MessageVerifier messageVerifier = new MessageVerifier(keyId -> publicKey);
+            messageVerifier.setAddDefaultRequiredHeaders(false);
+            messageVerifier.setSecurityProvider(new MockSecurityProvider());
+            messageVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
+    
+            VerifySignatureFilter verifySignatureFilter = new VerifySignatureFilter();
+            verifySignatureFilter.setMessageVerifier(messageVerifier);
+    
+            ContainerRequestContext containerRequestContext =
+                getContainerRequestContextMock(uri, method, requestStringHeaders);
+    
+            verifySignatureFilter.filter(containerRequestContext);
+        });
     }
+
 
     @Test
     public void basicTest() throws IOException {
@@ -211,38 +218,37 @@ public class SpecExamplesTest {
             requestStringHeaders.add(header, value.get(0));
         });
 
-        mockStatic(PhaseInterceptorChain.class);
-        Message message = mock(Message.class);
-        when(PhaseInterceptorChain.getCurrentMessage()).thenReturn(message);
-
-        ClientRequestContext requestContext = getClientRequestContextMock(uri, method, requestHeaders);
-
-        interceptor.filter(requestContext);
-
-        String signatureHeader = (String) requestHeaders.get("Signature").get(0);
-        requestStringHeaders.add("Signature", signatureHeader);
-
-        String expectedHeader = "keyId=\"Test\",algorithm=\"rsa-sha256\","
-            + "headers=\"(request-target) host date\",signature=\"qdx+H7PHHDZgy4"
-            + "y/Ahn9Tny9V3GP6YgBPyUXMmoxWtLbHpUnXS2mg2+SbrQDMCJypxBLSPQR2aAjn"
-            + "7ndmw2iicw3HMbe8VfEdKFYRqzic+efkb3nndiv/x1xSHDJWeSWkx3ButlYSuBs"
-            + "kLu6kd9Fswtemr3lgdDEmn04swr2Os0=\"";
-
-        assertEquals(signatureHeader, expectedHeader);
-
-        // Verify that the request signature can be verified by the filter
-        MessageVerifier messageVerifier = new MessageVerifier(keyId -> publicKey);
-        messageVerifier.setAddDefaultRequiredHeaders(false);
-        messageVerifier.setSecurityProvider(new MockSecurityProvider());
-        messageVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
-
-        VerifySignatureFilter verifySignatureFilter = new VerifySignatureFilter();
-        verifySignatureFilter.setMessageVerifier(messageVerifier);
-
-        ContainerRequestContext containerRequestContext =
-            getContainerRequestContextMock(uri, method, requestStringHeaders);
-
-        verifySignatureFilter.filter(containerRequestContext);
+        final Message message = new MessageImpl();
+        doInPhaseInterceptor(message, () -> {
+            ClientRequestContext requestContext = getClientRequestContextMock(uri, method, requestHeaders);
+    
+            interceptor.filter(requestContext);
+    
+            String signatureHeader = (String) requestHeaders.get("Signature").get(0);
+            requestStringHeaders.add("Signature", signatureHeader);
+    
+            String expectedHeader = "keyId=\"Test\",algorithm=\"rsa-sha256\","
+                + "headers=\"(request-target) host date\",signature=\"qdx+H7PHHDZgy4"
+                + "y/Ahn9Tny9V3GP6YgBPyUXMmoxWtLbHpUnXS2mg2+SbrQDMCJypxBLSPQR2aAjn"
+                + "7ndmw2iicw3HMbe8VfEdKFYRqzic+efkb3nndiv/x1xSHDJWeSWkx3ButlYSuBs"
+                + "kLu6kd9Fswtemr3lgdDEmn04swr2Os0=\"";
+    
+            assertEquals(signatureHeader, expectedHeader);
+    
+            // Verify that the request signature can be verified by the filter
+            MessageVerifier messageVerifier = new MessageVerifier(keyId -> publicKey);
+            messageVerifier.setAddDefaultRequiredHeaders(false);
+            messageVerifier.setSecurityProvider(new MockSecurityProvider());
+            messageVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
+    
+            VerifySignatureFilter verifySignatureFilter = new VerifySignatureFilter();
+            verifySignatureFilter.setMessageVerifier(messageVerifier);
+    
+            ContainerRequestContext containerRequestContext =
+                getContainerRequestContextMock(uri, method, requestStringHeaders);
+    
+            verifySignatureFilter.filter(containerRequestContext);
+        });
     }
 
     @Test
@@ -289,61 +295,59 @@ public class SpecExamplesTest {
             requestStringHeaders.add(header, value.get(0));
         });
 
-        ClientRequestContext requestContext = getClientRequestContextMock(uri, method, requestHeaders);
-
-        mockStatic(PhaseInterceptorChain.class);
-        Message message = mock(Message.class);
-        when(PhaseInterceptorChain.getCurrentMessage()).thenReturn(message);
-
-        interceptor.filter(requestContext);
-
-        String signatureHeader = (String) requestHeaders.get("Signature").get(0);
-        requestStringHeaders.add("Signature", signatureHeader);
-
-        String expectedHeader = "keyId=\"Test\",algorithm=\"rsa-sha256\","
-            + "headers=\"(request-target) host date content-type digest content-length\","
-            + "signature=\"vSdrb+dS3EceC9bcwHSo4MlyKS59iFIrhgYkz8+oVLEEzmYZZvRs"
-            + "8rgOp+63LEM3v+MFHB32NfpB2bEKBIvB1q52LaEUHFv120V01IL+TAD48XaERZF"
-            + "ukWgHoBTLMhYS2Gb51gWxpeIq8knRmPnYePbF5MOkR0Zkly4zKH7s1dE=\"";
-
-        assertEquals(signatureHeader, expectedHeader);
-
-        // Verify that the request signature can be verified by the filter
-        MessageVerifier messageVerifier = new MessageVerifier(keyId -> publicKey);
-        messageVerifier.setAddDefaultRequiredHeaders(false);
-        messageVerifier.setSecurityProvider(new MockSecurityProvider());
-        messageVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
-
-        VerifySignatureFilter verifySignatureFilter = new VerifySignatureFilter();
-        verifySignatureFilter.setMessageVerifier(messageVerifier);
-
-        ContainerRequestContext containerRequestContext =
-            getContainerRequestContextMock(uri, method, requestStringHeaders);
-        InputStream stream = new ByteArrayInputStream("{\"hello\": \"world\"}".getBytes(StandardCharsets.UTF_8));
-        when(containerRequestContext.getEntityStream()).thenReturn(stream);
-
-        verifySignatureFilter.filter(containerRequestContext);
+        final Message message = new MessageImpl();
+        doInPhaseInterceptor(message, () -> {
+            ClientRequestContext requestContext = getClientRequestContextMock(uri, method, requestHeaders);
+            interceptor.filter(requestContext);
+    
+            String signatureHeader = (String) requestHeaders.get("Signature").get(0);
+            requestStringHeaders.add("Signature", signatureHeader);
+    
+            String expectedHeader = "keyId=\"Test\",algorithm=\"rsa-sha256\","
+                + "headers=\"(request-target) host date content-type digest content-length\","
+                + "signature=\"vSdrb+dS3EceC9bcwHSo4MlyKS59iFIrhgYkz8+oVLEEzmYZZvRs"
+                + "8rgOp+63LEM3v+MFHB32NfpB2bEKBIvB1q52LaEUHFv120V01IL+TAD48XaERZF"
+                + "ukWgHoBTLMhYS2Gb51gWxpeIq8knRmPnYePbF5MOkR0Zkly4zKH7s1dE=\"";
+    
+            assertEquals(signatureHeader, expectedHeader);
+    
+            // Verify that the request signature can be verified by the filter
+            MessageVerifier messageVerifier = new MessageVerifier(keyId -> publicKey);
+            messageVerifier.setAddDefaultRequiredHeaders(false);
+            messageVerifier.setSecurityProvider(new MockSecurityProvider());
+            messageVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
+    
+            VerifySignatureFilter verifySignatureFilter = new VerifySignatureFilter();
+            verifySignatureFilter.setMessageVerifier(messageVerifier);
+    
+            ContainerRequestContext containerRequestContext =
+                getContainerRequestContextMock(uri, method, requestStringHeaders);
+            InputStream stream = new ByteArrayInputStream("{\"hello\": \"world\"}".getBytes(StandardCharsets.UTF_8));
+            Mockito.when(containerRequestContext.getEntityStream()).thenReturn(stream);
+    
+            verifySignatureFilter.filter(containerRequestContext);
+        });
     }
 
     private ClientRequestContext getClientRequestContextMock(URI uri, String method,
                                                              MultivaluedMap<String, Object> requestHeaders) {
-        ClientRequestContext requestContext = mock(ClientRequestContext.class);
-        when(requestContext.getEntity()).thenReturn(null);
-        when(requestContext.getMethod()).thenReturn(method);
-        when(requestContext.getHeaders()).thenReturn(requestHeaders);
-        when(requestContext.getUri()).thenReturn(uri);
+        ClientRequestContext requestContext = Mockito.mock(ClientRequestContext.class);
+        Mockito.when(requestContext.getEntity()).thenReturn(null);
+        Mockito.when(requestContext.getMethod()).thenReturn(method);
+        Mockito.when(requestContext.getHeaders()).thenReturn(requestHeaders);
+        Mockito.when(requestContext.getUri()).thenReturn(uri);
         return requestContext;
     }
 
     private ContainerRequestContext getContainerRequestContextMock(URI uri, String method,
                                                                    MultivaluedMap<String, String>
                                                                        requestStringHeaders) {
-        ContainerRequestContext containerRequestContext = mock(ContainerRequestContext.class);
-        UriInfo uriInfo = mock(UriInfo.class);
-        when(uriInfo.getAbsolutePath()).thenReturn(uri);
-        when(containerRequestContext.getUriInfo()).thenReturn(uriInfo);
-        when(containerRequestContext.getMethod()).thenReturn(method);
-        when(containerRequestContext.getHeaders()).thenReturn(requestStringHeaders);
+        ContainerRequestContext containerRequestContext = Mockito.mock(ContainerRequestContext.class);
+        UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        Mockito.when(uriInfo.getAbsolutePath()).thenReturn(uri);
+        Mockito.when(containerRequestContext.getUriInfo()).thenReturn(uriInfo);
+        Mockito.when(containerRequestContext.getMethod()).thenReturn(method);
+        Mockito.when(containerRequestContext.getHeaders()).thenReturn(requestStringHeaders);
         return containerRequestContext;
     }
 
@@ -357,4 +361,48 @@ public class SpecExamplesTest {
         return headers;
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private void doInPhaseInterceptor(Message message, Runnable r) {
+        final PhaseManager phaseManager = bus.getExtension(PhaseManager.class);
+        final PhaseInterceptorChain chain = new PhaseInterceptorChain(phaseManager.getInPhases());
+        
+        chain.add(new PhaseInterceptor<Message>() {
+            @Override
+            public void handleMessage(Message message) throws Fault {
+                r.run();
+            }
+
+            @Override
+            public void handleFault(Message message) {
+            }
+
+            @Override
+            public Set getAfter() {
+                return Collections.emptySet();
+            }
+
+            @Override
+            public Set getBefore() {
+                return Collections.emptySet();
+            }
+
+            @Override
+            public String getId() {
+                return "test-signature-verify";
+            }
+
+            @Override
+            public String getPhase() {
+                return Phase.INVOKE;
+            }
+
+            @Override
+            public Collection getAdditionalInterceptors() {
+                return Collections.emptyList();
+            }
+        });
+        
+        message.setInterceptorChain(chain);
+        chain.doIntercept(message);
+    }
 }

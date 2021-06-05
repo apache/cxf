@@ -181,7 +181,6 @@
         <cxf.persistence-api.version>2.2.3</cxf.persistence-api.version>
         <cxf.plexus-archiver.version>4.2.0</cxf.plexus-archiver.version>
         <cxf.plexus-utils.version>3.2.0</cxf.plexus-utils.version>
-        <cxf.powermock.version>2.0.9</cxf.powermock.version>
         <cxf.reactivestreams.version>1.0.3</cxf.reactivestreams.version>
         <cxf.reactor.version>3.4.6</cxf.reactor.version>
         <cxf.rhino.version>1.7.13</cxf.rhino.version>
