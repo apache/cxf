@@ -58,7 +58,7 @@ public class JmsCreatePullPoint extends AbstractCreatePullPoint {
 
     @Override
     protected String createPullPointName(CreatePullPoint createPullPointRequest) {
-        String name = null;
+        String name;
         if (createPullPointRequest.getOtherAttributes().get(
             NotificationBroker.QNAME_PULLPOINT_QUEUE_NAME) != null) {
             //try use the sepcified pullpoint queue instead a generated one

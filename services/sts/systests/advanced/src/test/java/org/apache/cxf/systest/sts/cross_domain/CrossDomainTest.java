@@ -18,17 +18,20 @@
  */
 package org.apache.cxf.systest.sts.cross_domain;
 
-import java.io.IOException;
-import java.net.ServerSocket;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStreamReader;
+import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 import javax.xml.ws.soap.SOAPFaultException;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.systest.sts.deployment.DoubleItServer;
+import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
 
@@ -50,66 +53,40 @@ public class CrossDomainTest extends AbstractBusClientServerTestBase {
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
-    private static final String PORT = allocatePort(Server.class);
+    private static final String PORT = allocatePort(DoubleItServer.class);
 
-    // These tests require port numbers in the WSDLs and so we can't easily do variable substitution
-    private static boolean portFree = true;
+    private static final String WSDL_FILTERED = "DoubleItFiltered.wsdl";
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(Server.class, true)
-        );
-        try {
-            ServerSocket sock = new ServerSocket(30101);
-            sock.close();
+        try (
+            BufferedReader r = new BufferedReader(
+                new InputStreamReader(CrossDomainTest.class.getResourceAsStream("DoubleIt.wsdl")));
+            BufferedWriter w = Files.newBufferedWriter(Paths.get(URI.create(CrossDomainTest.class
+                .getResource("DoubleIt.wsdl").toString().replace("DoubleIt.wsdl", WSDL_FILTERED))))) {
 
-            assertTrue(
-                       "Server failed to launch",
-                       // run the server in the same process
-                       // set this to false to fork
-                       launchServer(STSServer.class, true)
-            );
-
-            sock = new ServerSocket(30102);
-            sock.close();
-
-            assertTrue(
-                       "Server failed to launch",
-                       // run the server in the same process
-                       // set this to false to fork
-                       launchServer(STSServer2.class, true)
-            );
-        } catch (IOException ex) {
-            portFree = false;
-            // portFree is set to false + the test won't run
+            String s;
+            while ((s = r.readLine()) != null) {
+                w.write(s.replace("${testutil.ports.STSServer.2}", STSPORT2));
+            }
         }
-    }
 
-    @org.junit.AfterClass
-    public static void cleanup() throws Exception {
-        stopAllServers();
+        assertTrue(launchServer(new DoubleItServer(
+            CrossDomainTest.class.getResource("cxf-service.xml"))));
+
+        assertTrue(launchServer(new STSServer(
+            CrossDomainTest.class.getResource("cxf-sts-saml1.xml"))));
+        assertTrue(launchServer(new STSServer(
+            CrossDomainTest.class.getResource("cxf-sts-saml2.xml"))));
     }
 
     // In this test, the CXF client has two STSClients configured. The "default" STSClient config points to
     // STS "b". This STS has an IssuedToken policy that requires a token from STS "a".
     @org.junit.Test
     public void testCrossDomain() throws Exception {
-        if (!portFree) {
-            return;
-        }
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CrossDomainTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        URL wsdl = CrossDomainTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = CrossDomainTest.class.getResource(WSDL_FILTERED);
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItCrossDomainPort");
         DoubleItPortType transportPort =
@@ -120,7 +97,6 @@ public class CrossDomainTest extends AbstractBusClientServerTestBase {
         doubleIt(transportPort, 25);
 
         ((java.io.Closeable)transportPort).close();
-        bus.shutdown(true);
     }
 
     // The Service references STS "b". The WSDL of STS "b" has an IssuedToken that references STS "a".
@@ -129,19 +105,9 @@ public class CrossDomainTest extends AbstractBusClientServerTestBase {
     // turn to use the returned token to get a token from "b", to access the service.
     @org.junit.Test
     public void testCrossDomainMEX() throws Exception {
+        createBus(getClass().getResource("cxf-client-mex.xml").toString());
 
-        if (!portFree) {
-            return;
-        }
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CrossDomainTest.class.getResource("cxf-client-mex.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        URL wsdl = CrossDomainTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = CrossDomainTest.class.getResource(WSDL_FILTERED);
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItCrossDomainMEXPort");
         DoubleItPortType transportPort =
@@ -152,7 +118,6 @@ public class CrossDomainTest extends AbstractBusClientServerTestBase {
         doubleIt(transportPort, 25);
 
         ((java.io.Closeable)transportPort).close();
-        bus.shutdown(true);
     }
 
     // Here the service references STS "b". The WSDL of STS "b" has an IssuedToken. However our STS
@@ -160,19 +125,9 @@ public class CrossDomainTest extends AbstractBusClientServerTestBase {
     // sure that this doesn't happen.
     @org.junit.Test
     public void testIssuedTokenPointingToSameSTS() throws Exception {
+        createBus(getClass().getResource("cxf-client-b.xml").toString());
 
-        if (!portFree) {
-            return;
-        }
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CrossDomainTest.class.getResource("cxf-client-b.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        URL wsdl = CrossDomainTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = CrossDomainTest.class.getResource(WSDL_FILTERED);
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItCrossDomainMEXPort");
         DoubleItPortType transportPort =
@@ -190,7 +145,6 @@ public class CrossDomainTest extends AbstractBusClientServerTestBase {
         }
 
         ((java.io.Closeable)transportPort).close();
-        bus.shutdown(true);
     }
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {

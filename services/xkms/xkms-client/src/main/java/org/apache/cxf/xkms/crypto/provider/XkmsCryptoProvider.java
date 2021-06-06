@@ -186,9 +186,8 @@ public class XkmsCryptoProvider extends CryptoBase {
         } else if (type == TYPE.ENDPOINT) {
             return getX509FromXKMSByEndpoint(cryptoType.getEndpoint());
         } else if (type == TYPE.ALIAS) {
-            Applications appId = null;
-            boolean isServiceName = isServiceName(cryptoType);
-            if (!isServiceName) {
+            final Applications appId;
+            if (!isServiceName(cryptoType)) {
                 appId = Applications.PKIX;
             } else {
                 appId = Applications.SERVICE_NAME;

@@ -30,4 +30,10 @@ public class CXFResource {
     public JAXBElement<String> jaxb(JAXBElement<String> jaxb) {
         return jaxb;
     }
+    
+    @Path("null")
+    @POST
+    public JAXBElement<String> jaxbnull(JAXBElement<String> jaxb) {
+        return null;
+    }
 }

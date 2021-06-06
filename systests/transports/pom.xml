@@ -306,8 +306,15 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.mozilla</groupId>
+            <artifactId>rhino</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <!-- This needs to be here as httpunit requires some classes that are only in 1.7R2 or lower -->
             <groupId>rhino</groupId>
             <artifactId>js</artifactId>
+            <version>1.7R2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -339,4 +346,15 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>jdk16</id>
+            <activation>
+                <jdk>[16,)</jdk>
+            </activation>
+            <properties>
+                <cxf.surefire.fork.vmargs>--add-opens java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED -Djdk.http.auth.tunneling.disabledSchemes=""</cxf.surefire.fork.vmargs>
+            </properties>
+        </profile>
+    </profiles>
 </project>

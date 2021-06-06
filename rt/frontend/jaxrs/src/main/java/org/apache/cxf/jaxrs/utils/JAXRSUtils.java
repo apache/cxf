@@ -1029,15 +1029,16 @@ public final class JAXRSUtils {
         MultivaluedMap<String, String> params =
             (MultivaluedMap<String, String>)m.get(FormUtils.FORM_PARAM_MAP);
 
+        String enc = HttpUtils.getEncoding(mt, StandardCharsets.UTF_8.name());
         if (params == null) {
             params = new MetadataMap<>();
             m.put(FormUtils.FORM_PARAM_MAP, params);
 
             if (mt == null || mt.isCompatible(MediaType.APPLICATION_FORM_URLENCODED_TYPE)) {
                 InputStream entityStream = copyAndGetEntityStream(m);
-                String enc = HttpUtils.getEncoding(mt, StandardCharsets.UTF_8.name());
                 String body = FormUtils.readBody(entityStream, enc);
-                FormUtils.populateMapFromStringOrHttpRequest(params, m, body, enc, decode);
+                // Do not decode unless the key is empty value, fe @FormParam("")
+                FormUtils.populateMapFromStringOrHttpRequest(params, m, body, enc, StringUtils.isEmpty(key) && decode);
             } else {
                 if ("multipart".equalsIgnoreCase(mt.getType())
                     && MediaType.MULTIPART_FORM_DATA_TYPE.isCompatible(mt)) {
@@ -1051,6 +1052,14 @@ public final class JAXRSUtils {
                     LOG.warning(errorMsg.toString());
                     throw ExceptionUtils.toNotSupportedException(null, null);
                 }
+            }
+        }
+
+        if (decode) {
+            List<String> values = params.get(key);
+            if (values != null) {
+                values = values.stream().map(value -> HttpUtils.urlDecode(value, enc)).collect(Collectors.toList());
+                params.replace(key, values);
             }
         }
 
@@ -1359,7 +1368,11 @@ public final class JAXRSUtils {
             }
         }
 
-        queries.add(HttpUtils.urlDecode(name), value);
+        if (decode) {
+            queries.add(HttpUtils.urlDecode(name), value);
+        } else {
+            queries.add(name, value);
+        }
     }
 
     private static Object readFromMessageBody(Class<?> targetTypeClass,
@@ -1988,7 +2001,7 @@ public final class JAXRSUtils {
             return parent;
         } else if (parent.endsWith("/")) {
             // Remove only last slash
-            return parent.replaceAll("/$", "") + child;
+            return parent.substring(0, parent.length() - 1) + child;
         } else {
             return parent + child;
         }

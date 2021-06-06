@@ -153,8 +153,8 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
             }
             response.setToken(token);
 
-            DateTime validFrom = null;
-            DateTime validTill = null;
+            final DateTime validFrom;
+            final DateTime validTill;
             if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
                 validFrom = assertion.getSaml2().getConditions().getNotBefore();
                 validTill = assertion.getSaml2().getConditions().getNotOnOrAfter();
@@ -394,7 +394,7 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
         // Also handle "ActAs" via the ActAsAttributeStatementProvider
         if (!statementAdded) {
             attrBeanList = new ArrayList<>();
-            AttributeStatementProvider attributeProvider = null;
+            AttributeStatementProvider attributeProvider;
             if (combineClaimAttributes) {
                 attributeProvider = new CombinedClaimsAttributeStatementProvider();
             } else {

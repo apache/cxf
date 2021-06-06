@@ -662,6 +662,7 @@ public abstract class ProviderFactory {
         sortReaders();
         sortWriters();
         sortContextResolvers();
+        sortParamConverterProviders();
 
         mapInterceptorFilters(readerInterceptors, readInts, ReaderInterceptor.class, true);
         mapInterceptorFilters(writerInterceptors, writeInts, WriterInterceptor.class, true);
@@ -740,6 +741,14 @@ public abstract class ProviderFactory {
             messageWriters.sort(new MessageBodyWriterComparator());
         } else {
             doCustomSort(messageWriters);
+        }
+    }
+    
+    private <T> void sortParamConverterProviders() {
+        if (!customComparatorAvailable(ParamConverterProvider.class)) {
+            paramConverters.sort(new ParamConverterProviderComparator(bus));
+        } else {
+            doCustomSort(paramConverters);
         }
     }
 
@@ -903,12 +912,34 @@ public abstract class ProviderFactory {
             if (result != 0) {
                 return result;
             }
+            
             result = compareCustomStatus(p1, p2);
             if (result != 0) {
                 return result;
             }
 
             return comparePriorityStatus(p1.getProvider().getClass(), p2.getProvider().getClass());
+        }
+    }
+
+    private static class ParamConverterProviderComparator implements Comparator<ProviderInfo<ParamConverterProvider>> {
+        private final Bus bus;
+        
+        ParamConverterProviderComparator(Bus bus) {
+            this.bus = bus;
+        }
+        
+        @Override
+        public int compare(ProviderInfo<ParamConverterProvider> p1, ProviderInfo<ParamConverterProvider> p2) {
+            final int result = compareCustomStatus(p1, p2);
+            if (result != 0) {
+                return result;
+            }
+
+            final Class<?> cl1 = ClassHelper.getRealClass(bus, p1.getProvider());
+            final Class<?> cl2 = ClassHelper.getRealClass(bus, p2.getProvider());
+
+            return comparePriorityStatus(cl1, cl2);
         }
     }
 
@@ -1131,8 +1162,13 @@ public abstract class ProviderFactory {
         if (realClass1.isAssignableFrom(realClass2)) {
             // subclass should go first
             return 1;
+        } else if (realClass2.isAssignableFrom(realClass1)) {
+            // superclass should go last
+            return -1;
         }
-        return -1;
+        
+        // there is no relation between the types returned by the providers
+        return 0;
     }
 
     private static Type[] getGenericInterfaces(Class<?> cls, Class<?> expectedClass) {
@@ -1349,8 +1385,7 @@ public abstract class ProviderFactory {
 
     }
     protected static Set<String> getFilterNameBindings(Bus bus, Object provider) {
-        Class<?> pClass = ClassHelper.getRealClass(bus, provider);
-        Set<String> names = AnnotationUtils.getNameBindings(pClass.getAnnotations());
+        Set<String> names = AnnotationUtils.getInstanceNameBindings(bus, provider);
         if (names.isEmpty()) {
             names = Collections.singleton(DEFAULT_FILTER_NAME_BINDING);
         }
@@ -1476,7 +1511,8 @@ public abstract class ProviderFactory {
 
         sortReaders();
         sortWriters();
-
+        sortParamConverterProviders();
+        
         NameKeyMap<ProviderInfo<ReaderInterceptor>> sortedReaderInterceptors =
             new NameKeyMap<>(
                 (Comparator<ProviderInfo<?>>) providerComparator, true);

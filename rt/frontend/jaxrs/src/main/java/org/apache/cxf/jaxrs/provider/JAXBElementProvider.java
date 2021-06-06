@@ -59,6 +59,7 @@ import javax.xml.transform.Source;
 import org.w3c.dom.Document;
 
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.Nullable;
 import org.apache.cxf.jaxrs.ext.xml.XMLInstruction;
@@ -165,20 +166,29 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
 
             unmarshaller = createUnmarshaller(theType, genericType, isCollection);
             addAttachmentUnmarshaller(unmarshaller);
-            Object response;
+            Object response = null;
             if (JAXBElement.class.isAssignableFrom(type)
                 || !isCollection && (unmarshalAsJaxbElement
                 || jaxbElementClassMap != null && jaxbElementClassMap.containsKey(theType.getName()))) {
-                reader = getStreamReader(is, type, mt);
-                reader = TransformUtils.createNewReaderIfNeeded(reader, is);
-                if (JAXBElement.class.isAssignableFrom(type) && type == theType) {
-                    response = unmarshaller.unmarshal(reader);
-                } else {
-                    response = unmarshaller.unmarshal(reader, theType);
+                try (InputStream in = IOUtils.nullOrNotEmptyStream(is)) {
+                    // The return value might be "null" in case of empty stream, in this
+                    // case the unmarshaller fails with javax.xml.bind.UnmarshalException instead
+                    // of returning empty response.
+                    if (in != null) {
+                        reader = getStreamReader(in, type, mt);
+                        reader = TransformUtils.createNewReaderIfNeeded(reader, in);
+                        
+                        if (JAXBElement.class.isAssignableFrom(type) && type == theType) {
+                            response = unmarshaller.unmarshal(reader);
+                        } else {
+                            response = unmarshaller.unmarshal(reader, theType);
+                        }
+                    }
                 }
             } else {
                 response = doUnmarshal(unmarshaller, type, is, anns, mt);
             }
+            
             if (response instanceof JAXBElement && !JAXBElement.class.isAssignableFrom(type)) {
                 response = ((JAXBElement<?>)response).getValue();
             }

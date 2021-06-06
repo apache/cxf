@@ -342,8 +342,7 @@ public class PolicyAnnotationTest {
     @WebService()
     @Policies({
         @Policy(placement = Policy.Placement.BINDING, uri = "annotationpolicies/TestImplPolicy.xml")
-     }
-    )
+    })
     public static class TestImplWithPoliciesNoInterface {
         @WebMethod
         public int echoInt(int i) {

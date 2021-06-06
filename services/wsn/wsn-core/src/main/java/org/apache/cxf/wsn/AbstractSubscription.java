@@ -375,10 +375,8 @@ public abstract class AbstractSubscription extends AbstractEndpoint implements P
         // Check policy
         if (subscribeRequest.getSubscriptionPolicy() != null) {
             for (Object p : subscribeRequest.getSubscriptionPolicy().getAny()) {
-                JAXBElement<?> e = null;
                 if (p instanceof JAXBElement) {
-                    e = (JAXBElement<?>) p;
-                    p = e.getValue();
+                    p = ((JAXBElement<?>) p).getValue();
                 }
                 if (p instanceof UseRaw) {
                     useRaw = true;

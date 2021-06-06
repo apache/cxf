@@ -1634,6 +1634,24 @@ public class JAXRSUtilsTest {
         assertEquals("3", list.get(1));
     }
 
+    @Test
+    public void testEncodedFormParameters() throws Exception {
+        Class<?>[] argType = {String.class, String.class};
+        Method m = Customer.class.getMethod("testEncodedFormParams", argType);
+        final Message messageImpl = createMessage();
+        String body = "p1=yay&p2=%21";
+        messageImpl.put(Message.REQUEST_URI, "/foo");
+        messageImpl.put("Content-Type", MediaType.APPLICATION_FORM_URLENCODED);
+        messageImpl.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes()));
+
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m,
+                                                               new ClassResourceInfo(Customer.class)),
+                                                           new MetadataMap<String, String>(), messageImpl);
+        assertEquals("2 params should've been identified", 2, params.size());
+        assertEquals("yay", (String)params.get(0));
+        assertEquals("%21", (String)params.get(1)); // if decoded, this will return "!" instead of "%21"
+    }
+
     private static Map<ClassResourceInfo, MultivaluedMap<String, String>> getMap(ClassResourceInfo cri) {
         return Collections.singletonMap(cri, new MetadataMap<String, String>());
     }

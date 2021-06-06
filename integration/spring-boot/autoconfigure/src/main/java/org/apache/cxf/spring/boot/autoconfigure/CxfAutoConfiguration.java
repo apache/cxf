@@ -49,8 +49,8 @@ import org.springframework.context.annotation.ImportResource;
 @ConditionalOnClass({ SpringBus.class, CXFServlet.class })
 @EnableConfigurationProperties(CxfProperties.class)
 @AutoConfigureAfter(name = {
-        "org.springframework.boot.autoconfigure.web.EmbeddedServletContainerAutoConfiguration", // Spring Boot 1.x
-        "org.springframework.boot.autoconfigure.web.servlet.ServletWebServerFactoryAutoConfiguration" // Spring Boot 2.x
+    "org.springframework.boot.autoconfigure.web.EmbeddedServletContainerAutoConfiguration", // Spring Boot 1.x
+    "org.springframework.boot.autoconfigure.web.servlet.ServletWebServerFactoryAutoConfiguration" // Spring Boot 2.x
 })
 public class CxfAutoConfiguration {
 

@@ -36,13 +36,20 @@ import org.apache.cxf.rs.security.cors.CorsHeaderConstants;
 import org.apache.cxf.rs.security.cors.CrossOriginResourceSharing;
 import org.apache.cxf.rs.security.cors.LocalPreflight;
 
-@CrossOriginResourceSharing(allowOrigins = {
-        "http://area51.mil:31415"
-        }, allowCredentials = true, maxAge = 1, allowHeaders = {
-        "X-custom-1", "X-custom-2"
-        }, exposeHeaders = {
-        "X-custom-3", "X-custom-4"
-        }
+@CrossOriginResourceSharing(
+    allowOrigins = {
+        "http://area51.mil:31415" 
+    }, 
+    allowCredentials = true, 
+    maxAge = 1, 
+    allowHeaders = {
+        "X-custom-1", 
+        "X-custom-2"
+    }, 
+    exposeHeaders = {
+        "X-custom-3", 
+        "X-custom-4"
+    }
 )
 public class AnnotatedCorsServer {
     @Context

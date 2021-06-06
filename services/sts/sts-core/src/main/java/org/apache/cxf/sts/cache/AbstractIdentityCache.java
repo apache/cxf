@@ -51,7 +51,7 @@ public abstract class AbstractIdentityCache implements IdentityCache, IdentityMa
     public Principal mapPrincipal(String sourceRealm,
             Principal sourcePrincipal, String targetRealm) {
 
-        Principal targetPrincipal = null;
+        final Principal targetPrincipal;
         Map<String, String> identities = this.get(sourcePrincipal.getName(), sourceRealm);
         if (identities != null) {
             if (LOG.isLoggable(Level.FINE)) {

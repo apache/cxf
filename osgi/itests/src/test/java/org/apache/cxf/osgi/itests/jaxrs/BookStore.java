@@ -100,15 +100,15 @@ public class BookStore {
         assertInjections();
 
         BeanValidationProvider prov = new BeanValidationProvider(
-                new ValidationProviderResolver() {
-                    @Override
-                    public List<ValidationProvider<?>> getValidationProviders() {
-                        ValidationProvider<HibernateValidatorConfiguration> prov = new HibernateValidator();
-                        List<ValidationProvider<?>> provs = new ArrayList<>();
-                        provs.add(prov);
-                        return provs;
-                    }
-                }, HibernateValidator.class);
+            new ValidationProviderResolver() {
+                @Override
+                public List<ValidationProvider<?>> getValidationProviders() {
+                    ValidationProvider<HibernateValidatorConfiguration> prov = new HibernateValidator();
+                    List<ValidationProvider<?>> provs = new ArrayList<>();
+                    provs.add(prov);
+                    return provs;
+                }
+            }, HibernateValidator.class);
         try {
             prov.validateBean(book);
         } catch (ConstraintViolationException cve) {

@@ -137,7 +137,7 @@ public class JmsPullPoint extends AbstractPullPoint {
             initSession();
             List<NotificationMessageHolderType> messages = new ArrayList<>();
             for (int i = 0; i < max; i++) {
-                Message msg = null;
+                final Message msg;
                 synchronized (consumerSession) {
                     msg = consumer.receiveNoWait();
                 }

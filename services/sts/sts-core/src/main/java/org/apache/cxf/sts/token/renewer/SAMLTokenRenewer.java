@@ -218,8 +218,8 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
             response.setToken(token);
             response.setTokenId(renewedAssertion.getId());
 
-            DateTime validFrom = null;
-            DateTime validTill = null;
+            final DateTime validFrom;
+            final DateTime validTill;
             if (renewedAssertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
                 validFrom = renewedAssertion.getSaml2().getConditions().getNotBefore();
                 validTill = renewedAssertion.getSaml2().getConditions().getNotOnOrAfter();
@@ -431,7 +431,7 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
             STSPropertiesMBean stsProperties = tokenParameters.getStsProperties();
             String realm = tokenParameters.getRealm();
             RealmProperties samlRealm = null;
-            if (realm != null && realmMap.containsKey(realm)) {
+            if (realm != null) {
                 samlRealm = realmMap.get(realm);
             }
 

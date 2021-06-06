@@ -43,16 +43,48 @@ public final class IOUtils {
     private IOUtils() {
 
     }
+    
+    /**
+     * Checks if input stream is empty. If the standard InputStream means do not provide
+     * such details, the stream might be wrapped into PushbackInputStream and is going
+     * to be returned instead of original one.
+     * @param is input stream to check
+     * @return "null" if original input stream is empty, otherwise original stream or 
+     * original stream wrapped into PushbackInputStream.
+     * @throws IOException
+     */
+    public static InputStream nullOrNotEmptyStream(InputStream is) throws IOException {
+        if (isEmpty(is)) {
+            return null;
+        } else if (!(is instanceof PushbackInputStream)) {
+            final byte[] bytes = new byte[1];
+            
+            final PushbackInputStream pbStream = new PushbackInputStream(is);
+            boolean isEmpty = isEof(pbStream.read(bytes));
+            
+            if (!isEmpty) {
+                pbStream.unread(bytes);
+                return pbStream;
+            }
+            
+            return null;
+        }
+        
+        return is;
+    }
 
     public static boolean isEmpty(InputStream is) throws IOException {
         if (is == null) {
             return true;
         }
-        // if available is 0 it does not mean it is empty
-        if (is.available() > 0) {
-            return false;
+        try {
+            // if available is 0 it does not mean it is empty
+            if (is.available() > 0) {
+                return false;
+            }
+        } catch (IOException ioe) {
+            //Do nothing
         }
-        
         final byte[] bytes = new byte[1];
         if (is.markSupported()) {
             is.mark(1);

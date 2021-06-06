@@ -18,8 +18,14 @@
  */
 package org.apache.cxf.osgi.itests;
 
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+
+import javax.crypto.NoSuchPaddingException;
+import javax.net.ssl.SSLContext;
 
 import org.apache.cxf.helpers.JavaUtils;
+import org.apache.http.ssl.SSLContextBuilder;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,12 +36,14 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
 import static org.ops4j.pax.exam.CoreOptions.junitBundles;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.systemPackages;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.CoreOptions.when;
-
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
@@ -53,13 +61,14 @@ public class NoAriesBlueprintTest extends OSGiTestSupport {
     }
 
     @Configuration
-    public Option[] config() {
+    public Option[] config() throws NoSuchAlgorithmException, NoSuchPaddingException, KeyManagementException {
         String localRepo = System.getProperty("localRepository");
         if (localRepo == null) {
             localRepo = "";
         }
 
         final Option[] basicOptions = new Option[] {
+            junitBundles(),
             systemProperty("java.awt.headless").value("true"),
             when(!"".equals(localRepo))
                 .useOptions(systemProperty("org.ops4j.pax.url.mvn.localRepository").value(localRepo)),
@@ -82,6 +91,10 @@ public class NoAriesBlueprintTest extends OSGiTestSupport {
             )
         };
         if (JavaUtils.isJava9Compatible()) {
+            // Pre-create SSL context (on JDK16+, the HTTP/HTTPS URL handlers are not registered for some reason)
+            final SSLContext sslContext = new SSLContextBuilder().setProtocol("TLS").build();
+            assertThat(sslContext, not(nullValue()));
+
             return OptionUtils.combine(basicOptions,
                 mavenBundle("jakarta.annotation", "jakarta.annotation-api").versionAsInProject(),
                 mavenBundle("com.sun.activation", "jakarta.activation").versionAsInProject(),

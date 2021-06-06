@@ -132,11 +132,11 @@ public class MessageListenerTest {
         assertNumMessagesInQueue("At the start the queue should be empty", connection, dest, 0, 0L);
 
         sendMessage(connection, dest, TestMessage.OK);
-        assertNumMessagesInQueue("This message should be committed", connection, dest, 0, 1000L);
+        assertNumMessagesInQueue("This message should be committed", connection, dest, 0, 3500L);
 
         sendMessage(connection, dest, TestMessage.FAIL);
         assertNumMessagesInQueue("Even when an exception occurs the message should be committed", connection,
-                                 dest, 0, 1000L);
+                                 dest, 0, 3500L);
 
         container.stop();
         connection.close();

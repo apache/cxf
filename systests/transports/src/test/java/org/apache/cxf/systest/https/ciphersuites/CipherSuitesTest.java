@@ -22,6 +22,7 @@ package org.apache.cxf.systest.https.ciphersuites;
 import java.io.InputStream;
 import java.net.URL;
 import java.security.KeyStore;
+import java.security.Security;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -55,10 +56,12 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeThat;
 
 /**
  * A set of tests for TLS ciphersuites
@@ -455,6 +458,9 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
             return;
         }
+        
+        // Since JDK16, TLS 1.0 and 1.1 are disabled 
+        assumeThat("TLSv1.1 is enabled", isProtocolDisabled("TLSv1.1"), is(false));
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = CipherSuitesTest.class.getResource("ciphersuites-client-noconfig.xml");
@@ -501,6 +507,9 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
             return;
         }
+        
+        // Since JDK16, TLS 1.0 and 1.1 are disabled 
+        assumeThat("TLSv1.1 is enabled", isProtocolDisabled("TLSv1.1"), is(false));
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = CipherSuitesTest.class.getResource("ciphersuites-client-noconfig.xml");
@@ -550,10 +559,12 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
-
     // Both client + server include AES, client is TLSv1.0
     @org.junit.Test
     public void testAESIncludedTLSv10() throws Exception {
+        // Since JDK16, TLS 1.0 and 1.1 are disabled 
+        assumeThat("TLSv1.0 is enabled", isProtocolDisabled("TLSv1"), is(false));
+
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = CipherSuitesTest.class.getResource("ciphersuites-client-noconfig.xml");
 
@@ -627,4 +638,8 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
+    private static boolean isProtocolDisabled(String proto) {
+        final String disabledAlgorithms = Security.getProperty("jdk.tls.disabledAlgorithms");
+        return disabledAlgorithms != null && disabledAlgorithms.contains(proto);
+    }
 }

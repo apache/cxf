@@ -289,9 +289,9 @@ public class SAMLTokenValidator implements TokenValidator {
     protected boolean validateConditions(
         SamlAssertionWrapper assertion, ReceivedToken validateTarget
     ) {
-        DateTime validFrom = null;
-        DateTime validTill = null;
-        DateTime issueInstant = null;
+        final DateTime validFrom;
+        final DateTime validTill;
+        final DateTime issueInstant;
         if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
             validFrom = assertion.getSaml2().getConditions().getNotBefore();
             validTill = assertion.getSaml2().getConditions().getNotOnOrAfter();
