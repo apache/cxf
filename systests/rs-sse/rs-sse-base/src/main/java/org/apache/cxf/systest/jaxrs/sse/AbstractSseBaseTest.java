@@ -58,7 +58,7 @@ public abstract class AbstractSseBaseTest extends AbstractBusClientServerTestBas
     protected WebTarget createWebTarget(final String url) {
         return ClientBuilder
             .newClient()
-            .property("http.receive.timeout", 8000)
+            .property("http.receive.timeout", 8000000)
             .register(JacksonJsonProvider.class)
             .target("http://localhost:" + getPort() + url);
     }
