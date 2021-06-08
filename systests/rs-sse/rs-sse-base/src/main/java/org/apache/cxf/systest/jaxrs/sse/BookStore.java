@@ -24,6 +24,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -72,6 +73,34 @@ public class BookStore extends BookStoreClientCloseable {
     public void forBook(@Context SseEventSink sink, @PathParam("id") final String id,
             @HeaderParam(HttpHeaders.LAST_EVENT_ID_HEADER) @DefaultValue("0") final String lastEventId) {
 
+        new Thread() {
+            public void run() {
+                try {
+                    final Integer id = Integer.valueOf(lastEventId);
+                    final Builder builder = sse.newEventBuilder();
+
+                    sink.send(createEvent(builder.name("book"), id + 1));
+                    Thread.sleep(200);
+                    sink.send(createEvent(builder.name("book"), id + 2));
+                    Thread.sleep(200);
+                    sink.send(createEvent(builder.name("book"), id + 3));
+                    Thread.sleep(200);
+                    sink.send(createEvent(builder.name("book"), id + 4));
+                    Thread.sleep(200);
+                    sink.close();
+                } catch (final InterruptedException ex) {
+                    LOG.error("Communication error", ex);
+                }
+            }
+        }.start();
+    }
+    
+    @POST
+    @Path("sse/{id}")
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    @Consumes(MediaType.TEXT_PLAIN)
+    public void forBookPOST(@Context SseEventSink sink, @PathParam("id") final String id,
+            final String lastEventId) {
         new Thread() {
             public void run() {
                 try {
