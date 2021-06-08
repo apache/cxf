@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Configuration;
@@ -41,6 +42,7 @@ import javax.ws.rs.sse.SseEventSource;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.jaxrs.client.ClientProperties;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.impl.RetryAfterHeaderProvider;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
@@ -195,7 +197,19 @@ public class SseEventSourceImpl implements SseEventSource {
             if (lastEventId != null) {
                 builder.header(HttpHeaders.LAST_EVENT_ID_HEADER, lastEventId);
             }
-            response = builder.get();
+            
+            Object o = target.getConfiguration().getProperty(ClientProperties.SSE_REQUEST_ENTITY);
+            
+            if (o == null) {
+                response = builder.get();
+            } else if (o instanceof Entity) {
+                LOG.fine("Using POST for SSE endpoint " + target.getUri() + " with entity " + o);
+                response = builder.post((Entity<?>) o);
+            } else {
+                throw new IllegalArgumentException("The " + ClientProperties.SSE_REQUEST_ENTITY
+                        + " property is not an entity " + o.getClass());
+            }
+            
 
             // A client can be told to stop reconnecting using the HTTP 204 No Content 
             // response code. In this case, we should give up.

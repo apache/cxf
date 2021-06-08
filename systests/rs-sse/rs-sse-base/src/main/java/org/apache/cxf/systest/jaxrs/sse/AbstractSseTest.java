@@ -18,12 +18,7 @@
  */
 package org.apache.cxf.systest.jaxrs.sse;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -38,13 +33,13 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.sse.InboundSseEvent;
 import javax.ws.rs.sse.SseEventSource;
 import javax.ws.rs.sse.SseEventSource.Builder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+
+import org.apache.cxf.jaxrs.client.ClientProperties;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -54,9 +49,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 
 public abstract class AbstractSseTest extends AbstractSseBaseTest {
@@ -115,52 +108,17 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
         );
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testBooksStreamIsReturnedFromInboundSseEventsWithPOST() throws InterruptedException, IOException {
-        final WebTarget target = createWebTarget("/rest/api/bookstore/sse/0");
+        final WebTarget target = createWebTarget("/rest/api/bookstore/sse/0")
+                .property(ClientProperties.SSE_REQUEST_ENTITY, Entity.text("42"));
         final Collection<Book> books = new ArrayList<>();
         
-        @SuppressWarnings("rawtypes")
-        MessageBodyReader mbr = new JacksonJsonProvider();
-        
-        Response response = target.request(MediaType.SERVER_SENT_EVENTS)
-            .post(Entity.entity(42, MediaType.TEXT_PLAIN));
-        
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(response.readEntity(InputStream.class)))) {
-            String s;
-            Integer id = null;
-            Book book = null;
-            
-            while ((s = br.readLine()) != null) {
-                if (s.trim().isEmpty()) {
-                    if (id == null && book == null) {
-                        continue;
-                    } else if (id != null && book != null) {
-                        books.add(book);
-                        id = null;
-                        book = null;
-                        continue;
-                    }
-                    fail("The event did not contain both an id " + id + " and a book " + book);
-                }
-                if (s.startsWith("event:")) {
-                    assertEquals("Not a book event", "event: book", s.trim());
-                    continue;
-                }
-                if (s.startsWith("id:")) {
-                    assertNull("There was an existing id " + id, id);
-                    id = Integer.parseInt(s.substring(3).trim());
-                    continue;
-                }
-                if (s.startsWith("data:")) {
-                    assertNull("There was an existing book " + book, book);
-                    book = (Book) mbr.readFrom(Book.class, Book.class, null, MediaType.APPLICATION_JSON_TYPE, null, 
-                            new ByteArrayInputStream(s.substring(5).trim().getBytes(StandardCharsets.UTF_8)));
-                    continue;
-                }
-                fail("Unexpected String content returned by SSE POST " + s);
-            }
+        try (SseEventSource eventSource = SseEventSource.target(target).build()) {
+            eventSource.register(collect(books), System.out::println);
+            eventSource.open();
+            // Give the SSE stream some time to collect all events
+            awaitEvents(5000, books, 4);
         }
     
         // Easing the test verification here, it does not work well for Atm + Jetty
