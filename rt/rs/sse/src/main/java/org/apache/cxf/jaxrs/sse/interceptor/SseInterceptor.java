@@ -73,16 +73,6 @@ public class SseInterceptor extends AbstractPhaseInterceptor<Message> {
                     servletResponse = (HttpServletResponse)response;
                     builder = Response.status(servletResponse.getStatus());
                     
-                    @SuppressWarnings("unchecked")
-                    final Map<String, List<Object>> userHeaders = (Map<String, List<Object>>)message
-                        .get(Message.PROTOCOL_HEADERS);
-
-                    if (userHeaders != null) {
-                        for (Map.Entry<String, List<Object>> entry: userHeaders.entrySet()) {
-                            addHeader(builder, entry);
-                        }
-                    }
-                    
                     for (final String header: servletResponse.getHeaderNames()) {
                         final Collection<String> headers = servletResponse.getHeaders(header);
                         addHeader(builder, header, headers);
