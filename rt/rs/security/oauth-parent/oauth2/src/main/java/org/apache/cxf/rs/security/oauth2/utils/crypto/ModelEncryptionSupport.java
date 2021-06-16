@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.oauth2.utils.crypto;
 
 import java.security.Key;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -40,6 +41,7 @@ import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.cxf.rt.security.crypto.KeyProperties;
 
+import static java.util.stream.Collectors.toList;
 
 /**
  * Default Model Encryption helpers
@@ -279,7 +281,7 @@ public final class ModelEncryptionSupport {
         // Permissions
         if (!parts[9].trim().isEmpty()) {
             List<OAuthPermission> perms = new LinkedList<>();
-            String[] allPermParts = parts[9].split("\\.");
+            String[] allPermParts = parts[9].split("\\.", -1);
             for (int i = 0; i + 4 < allPermParts.length; i = i + 5) {
                 OAuthPermission perm = new OAuthPermission(allPermParts[i], allPermParts[i + 1]);
                 perm.setDefaultPermission(Boolean.parseBoolean(allPermParts[i + 2]));
@@ -328,16 +330,14 @@ public final class ModelEncryptionSupport {
         state.append(tokenizeString(token.getGrantType()));
         // 7: audience
         state.append(SEP);
-        state.append(token.getAudiences().toString());
+        state.append(tokenizeCollection(token.getAudiences()));
         // 8: other parameters
         state.append(SEP);
         // {key=value, key=value}
-        state.append(token.getParameters().toString());
+        state.append(tokenizeMap(token.getParameters()));
         // 9: permissions
         state.append(SEP);
-        if (token.getScopes().isEmpty()) {
-            state.append(' ');
-        } else {
+        if (!token.getScopes().isEmpty()) {
             for (OAuthPermission p : token.getScopes()) {
                 // 9.1
                 state.append(tokenizeString(p.getPermission()));
@@ -349,10 +349,10 @@ public final class ModelEncryptionSupport {
                 state.append(p.isDefaultPermission());
                 state.append('.');
                 // 9.4
-                state.append(p.getHttpVerbs().toString());
+                state.append(tokenizeCollection(p.getHttpVerbs()));
                 state.append('.');
                 // 9.5
-                state.append(p.getUris().toString());
+                state.append(tokenizeCollection(p.getUris()));
             }
         }
         state.append(SEP);
@@ -364,15 +364,15 @@ public final class ModelEncryptionSupport {
         // 13: extra properties
         state.append(SEP);
         // {key=value, key=value}
-        state.append(token.getExtraProperties().toString());
+        state.append(tokenizeMap(token.getExtraProperties()));
         return state.toString();
     }
 
 
     private static Client recreateClientInternal(String sequence) {
         String[] parts = getParts(sequence);
-        Client c = new Client(parts[0],
-                              parts[1],
+        Client c = new Client(getStringPart(parts[0]),
+                              getStringPart(parts[1]),
                               Boolean.parseBoolean(parts[2]),
                               getStringPart(parts[3]), getStringPart(parts[4]));
         c.setApplicationDescription(getStringPart(parts[5]));
@@ -410,22 +410,22 @@ public final class ModelEncryptionSupport {
         state.append(tokenizeString(client.getApplicationLogoUri()));
         state.append(SEP);
         // 7: app certificates
-        state.append(client.getApplicationCertificates());
+        state.append(tokenizeCollection(client.getApplicationCertificates()));
         state.append(SEP);
         // 8: grants
-        state.append(client.getAllowedGrantTypes().toString());
+        state.append(tokenizeCollection(client.getAllowedGrantTypes()));
         state.append(SEP);
         // 9: redirect URIs
-        state.append(client.getRedirectUris().toString());
+        state.append(tokenizeCollection(client.getRedirectUris()));
         state.append(SEP);
         // 10: registered scopes
-        state.append(client.getRegisteredScopes().toString());
+        state.append(tokenizeCollection(client.getRegisteredScopes()));
         state.append(SEP);
         // 11: registered audiences
-        state.append(client.getRegisteredAudiences().toString());
+        state.append(tokenizeCollection(client.getRegisteredAudiences()));
         state.append(SEP);
         // 12: properties
-        state.append(client.getProperties().toString());
+        state.append(tokenizeMap(client.getProperties()));
         state.append(SEP);
         // 13: subject
         tokenizeUserSubject(state, client.getSubject());
@@ -478,24 +478,19 @@ public final class ModelEncryptionSupport {
         // 9: extra properties
         state.append(SEP);
         // {key=value, key=value}
-        state.append(grant.getExtraProperties().toString());
+        state.append(tokenizeMap(grant.getExtraProperties()));
         return state.toString();
     }
 
     public static String getStringPart(String str) {
-        return " ".equals(str) ? null : str;
-    }
-
-    private static String prepareSimpleString(String str) {
-        return str.trim().isEmpty() ? "" : str.substring(1, str.length() - 1);
+        return "".equals(str) ? null : str;
     }
 
     private static List<String> parseSimpleList(String listStr) {
-        String pureStringList = prepareSimpleString(listStr);
-        if (pureStringList.isEmpty()) {
+        if (listStr.isEmpty()) {
             return Collections.emptyList();
         }
-        return Arrays.asList(pureStringList.split(","));
+        return Arrays.asList(listStr.split(",", -1));
     }
 
     public static Map<String, String> parseSimpleMap(String mapStr) {
@@ -509,13 +504,13 @@ public final class ModelEncryptionSupport {
     }
 
     public static String[] getParts(String sequence) {
-        return sequence.split("\\" + SEP);
+        return sequence.split("\\" + SEP, -1);
     }
 
     private static UserSubject recreateUserSubject(String sequence) {
         UserSubject subject = null;
         if (!sequence.trim().isEmpty()) {
-            String[] subjectParts = sequence.split("\\.");
+            String[] subjectParts = sequence.split("\\.", -1);
             subject = new UserSubject(getStringPart(subjectParts[0]), getStringPart(subjectParts[1]));
             subject.setRoles(parseSimpleList(subjectParts[2]));
             subject.setProperties(parseSimpleMap(subjectParts[3]));
@@ -534,16 +529,23 @@ public final class ModelEncryptionSupport {
             state.append(tokenizeString(subject.getId()));
             state.append('.');
             // 3
-            state.append(subject.getRoles().toString());
+            state.append(tokenizeCollection(subject.getRoles()));
             state.append('.');
             // 4
-            state.append(subject.getProperties().toString());
-        } else {
-            state.append(' ');
+            state.append(tokenizeMap(subject.getProperties()));
         }
     }
 
     public static String tokenizeString(String str) {
-        return str != null ? str : " ";
+        return str != null ? str : "";
+    }
+
+    public static String tokenizeCollection(Collection<? extends String> col) {
+        return col != null ? String.join(",", col) : "";
+    }
+
+    public static String tokenizeMap(Map<String, String> map) {
+        List<String> entryStrings = map.entrySet().stream().map(String::valueOf).collect(toList());
+        return map != null ? String.join(",", entryStrings) : "";
     }
 }

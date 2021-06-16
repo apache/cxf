@@ -50,6 +50,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -191,6 +192,20 @@ public class CryptoUtilsTest {
         assertEquals("id", c2.getSubject().getId());
     }
 
+    @Test
+    public void testPublicClient() throws Exception {
+        Client c = new Client("client", null, false);
+        c.setSubject(new UserSubject("subject", "id"));
+
+        String encryptedClient = ModelEncryptionSupport.encryptClient(c, p.key);
+        Client c2 = ModelEncryptionSupport.decryptClient(encryptedClient, p.key);
+
+        assertEquals(c.getClientId(), c2.getClientId());
+        assertEquals(c.getClientSecret(), c2.getClientSecret());
+        assertFalse(c2.isConfidential());
+        assertEquals("subject", c2.getSubject().getLogin());
+        assertEquals("id", c2.getSubject().getId());
+    }
 
     @Test
     public void testCodeGrantJSON() throws Exception {
