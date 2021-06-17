@@ -5,7 +5,7 @@ pipeline {
    
     tools { 
         ant 'ant_1.10.6'
-        maven 'maven_3.6.2' 
+        maven 'maven_3.6.3' 
         jdk 'jdk_1.8.0_241' 
     }
     
