@@ -62,31 +62,48 @@ public class RESTLoggingTest {
         LoggingFeature loggingFeature = new LoggingFeature();
         TestEventSender sender = new TestEventSender();
         loggingFeature.setSender(sender);
+        loggingFeature.setLogBinary(true);
+
         Server server = createService(SERVICE_URI_BINARY, new TestServiceRestBinary(), loggingFeature);
         server.start();
         WebClient client = createClient(SERVICE_URI_BINARY, loggingFeature);
         client.get(InputStream.class).close();
-        loggingFeature.setLogBinary(true);
-        client.get(InputStream.class).close();
         client.close();
+
         List<LogEvent> events = sender.getEvents();
-        await().until(() -> events.size(), is(8));
+        await().until(() -> events.size(), is(4));
         server.stop();
         server.destroy();
 
-        Assert.assertEquals(8, events.size());
+        Assert.assertEquals(4, events.size());
         
-        // First call with binary logging false
+        assertContentLogged(events.get(0));
+        assertContentLogged(events.get(1));
+        assertContentLogged(events.get(2));
+        assertContentLogged(events.get(3));
+    }
+    
+    @Test
+    public void testNonBinary() throws IOException, InterruptedException {
+        LoggingFeature loggingFeature = new LoggingFeature();
+        TestEventSender sender = new TestEventSender();
+        loggingFeature.setSender(sender);
+        Server server = createService(SERVICE_URI_BINARY, new TestServiceRestBinary(), loggingFeature);
+        server.start();
+        WebClient client = createClient(SERVICE_URI_BINARY, loggingFeature);
+        client.get(InputStream.class).close();
+        client.close();
+        List<LogEvent> events = sender.getEvents();
+        await().until(() -> events.size(), is(4));
+        server.stop();
+        server.destroy();
+
+        Assert.assertEquals(4, events.size());
+        
         assertContentLogged(events.get(0));
         assertContentLogged(events.get(1));
         assertContentNotLogged(events.get(2));
         assertContentNotLogged(events.get(3));
-        
-        // Second call with binary logging true
-        assertContentLogged(events.get(4));
-        assertContentLogged(events.get(5));
-        assertContentLogged(events.get(6));
-        assertContentLogged(events.get(7));
     }
 
     @Test
