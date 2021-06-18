@@ -1832,4 +1832,23 @@ public class UriBuilderImplTest {
         
         assertEquals(expected, uri.toString());
     }
+    
+    @Test
+    public void queryParamToTemplatePartiallyEncoded() {
+        final String template = UriBuilder
+            .fromUri("my/path")
+            .queryParam("p", "%250%")
+            .toTemplate();
+        assertEquals("my/path?p=%250%25", template);
+    }
+    
+    @Test
+    public void queryParamToTemplateNotEncoded() {
+        final String template = UriBuilder
+            .fromUri("my/path")
+            .queryParam("p", "{p}")
+            .resolveTemplate("p", "%250%")
+            .toTemplate();
+        assertEquals("my/path?p=%25250%25", template);
+    }
 }
