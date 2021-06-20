@@ -31,7 +31,6 @@
     <properties>
         <cxf.version>${project.version}</cxf.version>
         <wsdl.file>${basedir}/src/main/resources/addNumbers.wsdl</wsdl.file>
-        <graalvm.version>20.3.0</graalvm.version>
     </properties>
 
     <build>
