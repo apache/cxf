@@ -47,6 +47,10 @@
   "fields":[{"name":"theInstance"}]
 },
 {
+  "name":"com.sun.xml.bind.v2.ContextFactory",
+  "methods":[{"name":"createContext","parameterTypes":["java.lang.Class[]", "java.util.Map"]}]
+},
+{
   "name":"com.sun.xml.bind.v2.model.nav.ReflectionNavigator",
   "methods":[{"name":"getInstance","parameterTypes":[] }]
 },
