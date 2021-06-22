@@ -54,4 +54,9 @@
             <entry key="expand.query.value.as.collection" value="true" />
         </jaxrs:properties>
     </jaxrs:client>
+    <jaxrs:client id="client3" serviceClass="org.apache.cxf.jaxrs.resources.BookStore" address="http://localhost:9000/foo" threadSafe="true">
+        <jaxrs:properties>
+            <entry key="expand.query.value.as.collection" value="true" />
+        </jaxrs:properties>
+    </jaxrs:client>
 </beans>
