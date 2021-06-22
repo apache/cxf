@@ -344,7 +344,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
                                     inheritHeaders, getProperties(), varValues);
         } else {
             return new ClientProxyImpl(actualState, proxyLoader, cri, isRoot,
-                                    inheritHeaders, getProperties(), varValues);
+                                    inheritHeaders, varValues);
         }
     }
 
