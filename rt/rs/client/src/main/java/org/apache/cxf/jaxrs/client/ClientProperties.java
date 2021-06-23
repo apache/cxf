@@ -35,6 +35,7 @@ public interface ClientProperties {
         Boolean.parseBoolean(SystemPropertyAction.getPropertyOrNull(THREAD_SAFE_CLIENT_PROP));
     Integer THREAD_SAFE_CLIENT_STATE_CLEANUP_PERIOD =
         getIntValue(SystemPropertyAction.getPropertyOrNull(THREAD_SAFE_CLIENT_STATE_CLEANUP_PROP));
+    String SSE_REQUEST_ENTITY = "sse.request.entity";
 
     static Integer getIntValue(Object o) {
         return o instanceof Integer ? (Integer)o : o instanceof String ? Integer.valueOf(o.toString()) : null;

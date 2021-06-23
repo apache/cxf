@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.systest.jaxrs.sse;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,6 +27,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -37,6 +39,8 @@ import javax.ws.rs.sse.SseEventSource.Builder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import org.apache.cxf.jaxrs.client.ClientProperties;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,6 +50,7 @@ import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 
 public abstract class AbstractSseTest extends AbstractSseBaseTest {
     @Before
@@ -100,6 +105,30 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
                 new Book("New Book #3", 3),
                 new Book("New Book #4", 4)
             )
+        );
+    }
+
+    @Test
+    public void testBooksStreamIsReturnedFromInboundSseEventsWithPOST() throws InterruptedException, IOException {
+        final WebTarget target = createWebTarget("/rest/api/bookstore/sse/0")
+                .property(ClientProperties.SSE_REQUEST_ENTITY, Entity.text("42"));
+        final Collection<Book> books = new ArrayList<>();
+        
+        try (SseEventSource eventSource = SseEventSource.target(target).build()) {
+            eventSource.register(collect(books), System.out::println);
+            eventSource.open();
+            // Give the SSE stream some time to collect all events
+            awaitEvents(5000, books, 4);
+        }
+    
+        // Easing the test verification here, it does not work well for Atm + Jetty
+        assertThat(books,
+                hasItems(
+                        new Book("New Book #43", 43),
+                        new Book("New Book #44", 44),
+                        new Book("New Book #45", 45),
+                        new Book("New Book #46", 46)
+                        )
         );
     }
 
