@@ -32,6 +32,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class JsonMapObjectReaderWriterTest {
 
@@ -126,7 +127,7 @@ public class JsonMapObjectReaderWriterTest {
         assertEquals(1, map.size());
         Map<String, Object> xMap = CastUtils.cast((Map<?, ?>)map.get("x"));
         assertEquals(1, xMap.size());
-        assertEquals("{\\\"}", xMap.get("y"));
+        assertEquals("{\"}", xMap.get("y"));
     }
 
     @Test
@@ -153,12 +154,60 @@ public class JsonMapObjectReaderWriterTest {
     public void testEscapeDoubleQuotes() throws Exception {
         JsonMapObjectReaderWriter jsonMapObjectReaderWriter = new JsonMapObjectReaderWriter();
         Map<String, Object> content = new HashMap<>();
-        content.put("userInput", "a\",\"exp\":9999999999,\"b\":\"x");
+        content.put("userInput", "a\"");
         String json = jsonMapObjectReaderWriter.toJson(content);
+        assertTrue(json.contains("a\\\""));
 
         Map<String, Object> map = jsonMapObjectReaderWriter.fromJson(json);
         assertEquals(1, map.size());
-        assertEquals("userInput", map.keySet().iterator().next());
+        Map.Entry<String, Object> entry = map.entrySet().iterator().next();
+        assertEquals("userInput", entry.getKey());
+        assertEquals("a\"", entry.getValue());
+    }
+
+    @Test
+    public void testAlreadyEscapedDoubleQuotes() throws Exception {
+        JsonMapObjectReaderWriter jsonMapObjectReaderWriter = new JsonMapObjectReaderWriter();
+        Map<String, Object> content = new HashMap<>();
+        content.put("userInput", "a\\\"");
+        String json = jsonMapObjectReaderWriter.toJson(content);
+        assertTrue(json.contains("a\\\""));
+
+        Map<String, Object> map = jsonMapObjectReaderWriter.fromJson(json);
+        assertEquals(1, map.size());
+        Map.Entry<String, Object> entry = map.entrySet().iterator().next();
+        assertEquals("userInput", entry.getKey());
+        assertEquals("a\"", entry.getValue());
+    }
+
+    @Test
+    public void testEscapeBackslash() throws Exception {
+        JsonMapObjectReaderWriter jsonMapObjectReaderWriter = new JsonMapObjectReaderWriter();
+        Map<String, Object> content = new HashMap<>();
+        content.put("userInput", "a\\");
+        String json = jsonMapObjectReaderWriter.toJson(content);
+        assertTrue(json.contains("a\\\\"));
+
+        Map<String, Object> map = jsonMapObjectReaderWriter.fromJson(json);
+        assertEquals(1, map.size());
+        Map.Entry<String, Object> entry = map.entrySet().iterator().next();
+        assertEquals("userInput", entry.getKey());
+        assertEquals("a\\", entry.getValue());
+    }
+
+    @Test
+    public void testAlreadyEscapedBackslash() throws Exception {
+        JsonMapObjectReaderWriter jsonMapObjectReaderWriter = new JsonMapObjectReaderWriter();
+        Map<String, Object> content = new HashMap<>();
+        content.put("userInput", "a\\\\");
+        String json = jsonMapObjectReaderWriter.toJson(content);
+        assertTrue(json.contains("a\\\\"));
+
+        Map<String, Object> map = jsonMapObjectReaderWriter.fromJson(json);
+        assertEquals(1, map.size());
+        Map.Entry<String, Object> entry = map.entrySet().iterator().next();
+        assertEquals("userInput", entry.getKey());
+        assertEquals("a\\", entry.getValue());
     }
 
 }
