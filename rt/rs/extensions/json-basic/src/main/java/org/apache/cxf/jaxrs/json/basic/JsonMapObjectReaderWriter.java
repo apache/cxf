@@ -21,13 +21,8 @@ package org.apache.cxf.jaxrs.json.basic;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.io.UncheckedIOException;
+import java.util.*;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
@@ -35,6 +30,7 @@ import org.apache.cxf.helpers.IOUtils;
 
 
 public class JsonMapObjectReaderWriter {
+    private static final Set<Character> ESCAPED_CHARS;
     private static final char DQUOTE = '"';
     private static final char COMMA = ',';
     private static final char COLON = ':';
@@ -45,6 +41,19 @@ public class JsonMapObjectReaderWriter {
     private static final char ESCAPE = '\\';
     private static final String NULL_VALUE = "null";
     private boolean format;
+
+    static {
+        Set<Character> chars = new HashSet<>();
+        chars.add('"');
+        chars.add('\\');
+        chars.add('/');
+        chars.add('b');
+        chars.add('f');
+        chars.add('h');
+        chars.add('r');
+        chars.add('t');
+        ESCAPED_CHARS = Collections.unmodifiableSet(chars);
+    }
 
     public JsonMapObjectReaderWriter() {
 
@@ -253,9 +262,19 @@ public class JsonMapObjectReaderWriter {
             }
         }
 
-        if (value instanceof String && ((String)value).contains("\\/")) {
-            // Escape an encoded forward slash
-            value = ((String) value).replace("\\/", "/");
+        if (value instanceof String) {
+            if (((String) value).contains("\\/")) {
+                // Escape an encoded forward slash
+                value = ((String) value).replace("\\/", "/");
+            }
+            if (((String) value).contains("\\\"")) {
+                // Escape an encoded quotation mark
+                value = ((String) value).replace("\\\"", "\"");
+            }
+            if (((String) value).contains("\\\\")) {
+                // Escape an encoded backslash
+                value = ((String) value).replace("\\\\", "\\");
+            }
         }
         return value;
     }
@@ -369,8 +388,25 @@ public class JsonMapObjectReaderWriter {
     }
 
     private String escapeJson(String value) {
-        return value.replace("\"", "\\\"")
-                .replace("\\", "\\\\");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            // If we have " and the previous char was not \ then escape it
+            if (c == '"' && (i == 0 || value.charAt(i - 1) != '\\')) {
+                sb.append('\\').append(c);
+            // If we have \ and the previous char was not \ and the next char is not an escaped char, then escape it
+            } else if (c == '\\' && (i == 0 || value.charAt(i - 1) != '\\')
+                    && (i == value.length() - 1 || !isEscapedChar(value.charAt(i + 1)))) {
+                sb.append('\\').append(c);
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
+    private boolean isEscapedChar(char c) {
+        return ESCAPED_CHARS.contains(Character.valueOf(c));
     }
 
 }
