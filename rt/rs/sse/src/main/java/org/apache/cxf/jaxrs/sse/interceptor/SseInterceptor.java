@@ -31,6 +31,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.sse.SseEventSink;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.impl.ResponseImpl;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
@@ -38,6 +40,7 @@ import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
@@ -72,17 +75,7 @@ public class SseInterceptor extends AbstractPhaseInterceptor<Message> {
                 if (response instanceof HttpServletResponse) {
                     servletResponse = (HttpServletResponse)response;
                     builder = Response.status(servletResponse.getStatus());
-                    
-                    @SuppressWarnings("unchecked")
-                    final Map<String, List<Object>> userHeaders = (Map<String, List<Object>>)message
-                        .get(Message.PROTOCOL_HEADERS);
 
-                    if (userHeaders != null) {
-                        for (Map.Entry<String, List<Object>> entry: userHeaders.entrySet()) {
-                            addHeader(builder, entry);
-                        }
-                    }
-                    
                     for (final String header: servletResponse.getHeaderNames()) {
                         final Collection<String> headers = servletResponse.getHeaders(header);
                         addHeader(builder, header, headers);
@@ -92,13 +85,23 @@ public class SseInterceptor extends AbstractPhaseInterceptor<Message> {
                 // Run the filters
                 try {
                     final ResponseImpl responseImpl = (ResponseImpl)builder.build();
+                    final Message outMessage = getOutMessage(message);
 
                     JAXRSUtils.runContainerResponseFilters(providerFactory, responseImpl, 
-                        message, ori, ori.getAnnotatedMethod());
+                        outMessage, ori, ori.getAnnotatedMethod());
 
                     if (servletResponse != null) {
-                        final MultivaluedMap<String, String> headers = responseImpl.getStringHeaders();
                         servletResponse.setStatus(responseImpl.getStatus());
+                        
+                        final Map<String, List<String>> userHeaders =  CastUtils.cast((Map<?, ?>)outMessage
+                            .get(Message.PROTOCOL_HEADERS));
+                        if (userHeaders != null) {
+                            for (Map.Entry<String, List<String>> entry: userHeaders.entrySet()) {
+                                setHeader(servletResponse, entry);
+                            }
+                        }
+                        
+                        final MultivaluedMap<String, String> headers = responseImpl.getStringHeaders();
                         if (headers != null) {
                             for (Map.Entry<String, List<String>> entry: headers.entrySet()) {
                                 setHeader(servletResponse, entry);
@@ -113,13 +116,20 @@ public class SseInterceptor extends AbstractPhaseInterceptor<Message> {
             }
         }
     }
-  
-    private void addHeader(Response.ResponseBuilder builder, Map.Entry<String, List<Object>> entry) {
-        if (entry.getValue() != null) {
-            for (Object value: entry.getValue()) {
-                builder.header(entry.getKey(), value);
-            }
+    
+    private Message getOutMessage(final Message message) {
+        final Exchange exchange = message.getExchange();
+        Message outMessage = message.getExchange().getOutMessage();
+        
+        if (outMessage == null) {
+            final Endpoint ep = exchange.getEndpoint();
+            outMessage = new MessageImpl();
+            outMessage.setExchange(exchange);
+            outMessage = ep.getBinding().createMessage(outMessage);
+            message.getExchange().setOutMessage(outMessage);
         }
+
+        return outMessage;
     }
     
     private void addHeader(Response.ResponseBuilder builder, final String header, final Collection<String> headers) {
