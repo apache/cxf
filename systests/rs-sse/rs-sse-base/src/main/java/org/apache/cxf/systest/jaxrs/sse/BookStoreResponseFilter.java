@@ -20,6 +20,9 @@
 package org.apache.cxf.systest.jaxrs.sse;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.ws.rs.container.ContainerRequestContext;
@@ -28,6 +31,10 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Provider;
+
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.transport.http.Headers;
 
 @Provider
 public class BookStoreResponseFilter implements ContainerResponseFilter {
@@ -40,9 +47,20 @@ public class BookStoreResponseFilter implements ContainerResponseFilter {
 
     @Override
     public void filter(ContainerRequestContext reqContext, ContainerResponseContext rspContext) throws IOException {
-        if (!uriInfo.getRequestUri().getPath().endsWith("/filtered/stats")) {
+        final String path = uriInfo.getRequestUri().getPath();
+        
+        if (!path.endsWith("/filtered/stats")) {
             counter.incrementAndGet();
-        }
+            
+            if (path.endsWith("/headers/sse")) {
+                rspContext.setStatus(202);
+                rspContext.getHeaders().add("X-My-Header", "headers");
+                
+                final Message message = JAXRSUtils.getCurrentMessage().getExchange().getOutMessage();
+                final Map<String, List<String>> headers = Headers.getSetProtocolHeaders(message);
+                headers.put("X-My-ProtocolHeader", Collections.singletonList("protocol-headers"));
+            }
+        } 
     }
     
     public static int getInvocations() {
