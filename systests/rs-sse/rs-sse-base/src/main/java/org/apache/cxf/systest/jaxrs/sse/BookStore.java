@@ -183,7 +183,23 @@ public class BookStore extends BookStoreClientCloseable {
             }
         }.start();
     }
-    
+
+    @GET
+    @Path("/headers/sse")
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    public void headers(@Context SseEventSink sink) {
+        new Thread() {
+            public void run() {
+                try {
+                    Thread.sleep(200);
+                    sink.close();
+                } catch (final InterruptedException ex) {
+                    LOG.error("Communication error", ex);
+                }
+            }
+        }.start();
+    }
+
     @GET
     @Path("/filtered/stats")
     @Produces(MediaType.TEXT_PLAIN)

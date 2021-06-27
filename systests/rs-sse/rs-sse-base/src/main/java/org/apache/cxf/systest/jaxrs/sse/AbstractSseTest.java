@@ -325,6 +325,16 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
         assertTrue(stats.getCompleted() == 2 || stats.getCompleted() == 1);
     }
 
+    @Test
+    public void testBooksSseContainerResponseAddedHeaders() throws InterruptedException {
+        final WebTarget target = createWebTarget("/rest/api/bookstore/headers/sse");
+        try (Response response = target.request(MediaType.SERVER_SENT_EVENTS).get()) {
+            assertThat(response.getStatus(), equalTo(202));
+            assertThat(response.getHeaderString("X-My-Header"), equalTo("headers"));
+            assertThat(response.getHeaderString("X-My-ProtocolHeader"), equalTo("protocol-headers"));
+        }
+    }
+
     /**
      * Jetty / Undertow do not propagate errors from the runnable passed to
      * AsyncContext::start() up to the AsyncEventListener::onError(). Tomcat however
