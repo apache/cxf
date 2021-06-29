@@ -181,20 +181,51 @@ public final class JAXRSUtils {
         return getPathSegments(thePath, decode, true);
     }
 
+    /**
+     * Parses path segments taking into account the URI templates and template regexes. Per RFC-3986, 
+     * "A path consists of a sequence of path segments separated by a slash ("/") character.", however
+     * it is possible to include slash ("/") inside template regex, for example {a:b/c}. In this case,
+     * the whole template definition is extracted as a path segment, without breaking it.
+     * @param thePath path
+     * @param decode should the path segments be decoded or not
+     * @param ignoreLastSlash should the last slash be ignored or not
+     * @return
+     */
     public static List<PathSegment> getPathSegments(String thePath, boolean decode,
                                                     boolean ignoreLastSlash) {
-        List<PathSegment> theList =
-            Arrays.asList(thePath.split("/")).stream()
-            .filter(StringUtils.notEmpty())
-            .map(p -> new PathSegmentImpl(p, decode))
-            .collect(Collectors.toList());
-
-        int len = thePath.length();
-        if (len > 0 && thePath.charAt(len - 1) == '/') {
-            String value = ignoreLastSlash ? "" : "/";
-            theList.add(new PathSegmentImpl(value, false));
+        
+        final List<PathSegment> segments = new ArrayList<>();
+        int depth = 0;
+        int start = 0;
+        for (int i = 0; i < thePath.length(); ++i) {
+            if (thePath.charAt(i) == '/') {
+                // The '/' is in template (regex) definition
+                if (depth > 0) {
+                    continue;
+                } else if (start != i) {
+                    final String segment = thePath.substring(start, i);
+                    segments.add(new PathSegmentImpl(segment, decode));
+                }
+                
+                // advance the positions, empty path segments
+                start = i + 1;
+            } else if (thePath.charAt(i) == '{') {
+                ++depth;
+            } else if (thePath.charAt(i) == '}') {
+                --depth; // could go negative, since the template could be unbalanced
+            }
         }
-        return theList;
+
+        // the last symbol is slash
+        if (start == thePath.length() && start > 0 && thePath.charAt(start - 1) == '/') {
+            String value = ignoreLastSlash ? "" : "/";
+            segments.add(new PathSegmentImpl(value, false));
+        } else if (!thePath.isEmpty()) {
+            final String segment = thePath.substring(start);
+            segments.add(new PathSegmentImpl(segment, decode));
+        }
+        
+        return segments;
     }
 
     private static String[] getUserMediaTypes(Object provider, boolean consumes) {
