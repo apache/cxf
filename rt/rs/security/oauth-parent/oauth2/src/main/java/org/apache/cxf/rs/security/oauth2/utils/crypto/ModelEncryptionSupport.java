@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import javax.crypto.SecretKey;
 import javax.security.auth.DestroyFailedException;
@@ -56,7 +57,7 @@ public final class ModelEncryptionSupport {
     }
 
     public static String encryptClient(Client client, Key secretKey,
-                                       KeyProperties props) throws SecurityException {
+            KeyProperties props) throws SecurityException {
         String tokenSequence = tokenizeClient(client);
         return CryptoUtils.encryptSequence(tokenSequence, secretKey, props);
     }
@@ -66,7 +67,7 @@ public final class ModelEncryptionSupport {
     }
 
     public static String encryptAccessToken(ServerAccessToken token, Key secretKey,
-                                            KeyProperties props) throws SecurityException {
+            KeyProperties props) throws SecurityException {
         String tokenSequence = tokenizeServerToken(token);
         return CryptoUtils.encryptSequence(tokenSequence, secretKey, props);
     }
@@ -76,31 +77,31 @@ public final class ModelEncryptionSupport {
     }
 
     public static String encryptRefreshToken(RefreshToken token, Key secretKey,
-                                             KeyProperties props) throws SecurityException {
+            KeyProperties props) throws SecurityException {
         String tokenSequence = tokenizeRefreshToken(token);
 
         return CryptoUtils.encryptSequence(tokenSequence, secretKey, props);
     }
 
     public static String encryptCodeGrant(ServerAuthorizationCodeGrant grant, Key secretKey)
-        throws SecurityException {
+            throws SecurityException {
         return encryptCodeGrant(grant, secretKey, null);
     }
 
     public static String encryptCodeGrant(ServerAuthorizationCodeGrant grant, Key secretKey,
-                                          KeyProperties props) throws SecurityException {
+            KeyProperties props) throws SecurityException {
         String tokenSequence = tokenizeCodeGrant(grant);
 
         return CryptoUtils.encryptSequence(tokenSequence, secretKey, props);
     }
 
     public static Client decryptClient(String encodedSequence, String encodedSecretKey)
-        throws SecurityException {
+            throws SecurityException {
         return decryptClient(encodedSequence, encodedSecretKey, new KeyProperties("AES"));
     }
 
     public static Client decryptClient(String encodedSequence, String encodedSecretKey,
-                                       KeyProperties props) throws SecurityException {
+            KeyProperties props) throws SecurityException {
         SecretKey key = CryptoUtils.decodeSecretKey(encodedSecretKey, props.getKeyAlgo());
         Client client = decryptClient(encodedSequence, key, props);
 
@@ -119,21 +120,21 @@ public final class ModelEncryptionSupport {
     }
 
     public static Client decryptClient(String encodedData, Key secretKey,
-                                       KeyProperties props) throws SecurityException {
+            KeyProperties props) throws SecurityException {
         String decryptedSequence = CryptoUtils.decryptSequence(encodedData, secretKey, props);
         return recreateClient(decryptedSequence);
     }
 
     public static ServerAccessToken decryptAccessToken(OAuthDataProvider provider,
-                                                 String encodedToken,
-                                                 String encodedSecretKey) throws SecurityException {
+            String encodedToken,
+            String encodedSecretKey) throws SecurityException {
         return decryptAccessToken(provider, encodedToken, encodedSecretKey, new KeyProperties("AES"));
     }
 
     public static ServerAccessToken decryptAccessToken(OAuthDataProvider provider,
-                                                 String encodedToken,
-                                                 String encodedSecretKey,
-                                                 KeyProperties props) throws SecurityException {
+            String encodedToken,
+            String encodedSecretKey,
+            KeyProperties props) throws SecurityException {
         SecretKey key = CryptoUtils.decodeSecretKey(encodedSecretKey, props.getKeyAlgo());
         ServerAccessToken serverAccessToken = decryptAccessToken(provider, encodedToken, key, props);
 
@@ -148,29 +149,29 @@ public final class ModelEncryptionSupport {
     }
 
     public static ServerAccessToken decryptAccessToken(OAuthDataProvider provider,
-                                                 String encodedToken,
-                                                 Key secretKey) throws SecurityException {
+            String encodedToken,
+            Key secretKey) throws SecurityException {
         return decryptAccessToken(provider, encodedToken, secretKey, null);
     }
 
     public static ServerAccessToken decryptAccessToken(OAuthDataProvider provider,
-                                                 String encodedData,
-                                                 Key secretKey,
-                                                 KeyProperties props) throws SecurityException {
+            String encodedData,
+            Key secretKey,
+            KeyProperties props) throws SecurityException {
         String decryptedSequence = CryptoUtils.decryptSequence(encodedData, secretKey, props);
         return recreateAccessToken(provider, encodedData, decryptedSequence);
     }
 
     public static RefreshToken decryptRefreshToken(OAuthDataProvider provider,
-                                                   String encodedToken,
-                                                   String encodedSecretKey) throws SecurityException {
+            String encodedToken,
+            String encodedSecretKey) throws SecurityException {
         return decryptRefreshToken(provider, encodedToken, encodedSecretKey, new KeyProperties("AES"));
     }
 
     public static RefreshToken decryptRefreshToken(OAuthDataProvider provider,
-                                                  String encodedToken,
-                                                  String encodedSecretKey,
-                                                  KeyProperties props) throws SecurityException {
+            String encodedToken,
+            String encodedSecretKey,
+            KeyProperties props) throws SecurityException {
         SecretKey key = CryptoUtils.decodeSecretKey(encodedSecretKey, props.getKeyAlgo());
         RefreshToken refreshToken = decryptRefreshToken(provider, encodedToken, key, props);
 
@@ -185,29 +186,29 @@ public final class ModelEncryptionSupport {
     }
 
     public static RefreshToken decryptRefreshToken(OAuthDataProvider provider,
-                                                   String encodedToken,
-                                                   Key key) throws SecurityException {
+            String encodedToken,
+            Key key) throws SecurityException {
         return decryptRefreshToken(provider, encodedToken, key, null);
     }
 
     public static RefreshToken decryptRefreshToken(OAuthDataProvider provider,
-                                                   String encodedData,
-                                                   Key key,
-                                                   KeyProperties props) throws SecurityException {
+            String encodedData,
+            Key key,
+            KeyProperties props) throws SecurityException {
         String decryptedSequence = CryptoUtils.decryptSequence(encodedData, key, props);
         return recreateRefreshToken(provider, encodedData, decryptedSequence);
     }
 
     public static ServerAuthorizationCodeGrant decryptCodeGrant(OAuthDataProvider provider,
-                                                   String encodedToken,
-                                                   String encodedSecretKey) throws SecurityException {
+            String encodedToken,
+            String encodedSecretKey) throws SecurityException {
         return decryptCodeGrant(provider, encodedToken, encodedSecretKey, new KeyProperties("AES"));
     }
 
     public static ServerAuthorizationCodeGrant decryptCodeGrant(OAuthDataProvider provider,
-                                                  String encodedToken,
-                                                  String encodedSecretKey,
-                                                  KeyProperties props) throws SecurityException {
+            String encodedToken,
+            String encodedSecretKey,
+            KeyProperties props) throws SecurityException {
         SecretKey key = CryptoUtils.decodeSecretKey(encodedSecretKey, props.getKeyAlgo());
         ServerAuthorizationCodeGrant authzCodeGrant = decryptCodeGrant(provider, encodedToken, key, props);
 
@@ -222,37 +223,37 @@ public final class ModelEncryptionSupport {
     }
 
     public static ServerAuthorizationCodeGrant decryptCodeGrant(OAuthDataProvider provider,
-                                                   String encodedToken,
-                                                   Key key) throws SecurityException {
+            String encodedToken,
+            Key key) throws SecurityException {
         return decryptCodeGrant(provider, encodedToken, key, null);
     }
 
     public static ServerAuthorizationCodeGrant decryptCodeGrant(OAuthDataProvider provider,
-                                                   String encodedData,
-                                                   Key key,
-                                                   KeyProperties props) throws SecurityException {
+            String encodedData,
+            Key key,
+            KeyProperties props) throws SecurityException {
         String decryptedSequence = CryptoUtils.decryptSequence(encodedData, key, props);
         return recreateCodeGrant(provider, decryptedSequence);
     }
 
     public static ServerAccessToken recreateAccessToken(OAuthDataProvider provider,
-                                                  String newTokenKey,
-                                                  String decryptedSequence) throws SecurityException {
+            String newTokenKey,
+            String decryptedSequence) throws SecurityException {
         return recreateAccessToken(provider, newTokenKey, getParts(decryptedSequence));
     }
 
     public static RefreshToken recreateRefreshToken(OAuthDataProvider provider,
-                                                    String newTokenKey,
-                                                    String decryptedSequence) throws SecurityException {
+            String newTokenKey,
+            String decryptedSequence) throws SecurityException {
         String[] parts = getParts(decryptedSequence);
         ServerAccessToken token = recreateAccessToken(provider, newTokenKey, parts);
         return new RefreshToken(token,
-                                newTokenKey,
-                                parseSimpleList(parts[parts.length - 1]));
+                newTokenKey,
+                parseSimpleList(parts[parts.length - 1]));
     }
 
     public static ServerAuthorizationCodeGrant recreateCodeGrant(OAuthDataProvider provider,
-        String decryptedSequence) throws SecurityException {
+            String decryptedSequence) throws SecurityException {
         return recreateCodeGrantInternal(provider, decryptedSequence);
     }
 
@@ -261,16 +262,16 @@ public final class ModelEncryptionSupport {
     }
 
     private static ServerAccessToken recreateAccessToken(OAuthDataProvider provider,
-                                                  String newTokenKey,
-                                                  String[] parts) {
+            String newTokenKey,
+            String[] parts) {
 
 
         @SuppressWarnings("serial")
         final ServerAccessToken newToken = new ServerAccessToken(provider.getClient(parts[4]),
-                                                                 parts[1],
-                                                                 newTokenKey == null ? parts[0] : newTokenKey,
-                                                                 Long.parseLong(parts[2]),
-                                                                 Long.parseLong(parts[3])) {
+                parts[1],
+                newTokenKey == null ? parts[0] : newTokenKey,
+                Long.parseLong(parts[2]),
+                Long.parseLong(parts[3])) {
         };
 
         newToken.setRefreshToken(getStringPart(parts[5]));
@@ -303,7 +304,7 @@ public final class ModelEncryptionSupport {
 
     private static String tokenizeRefreshToken(RefreshToken token) {
         String seq = tokenizeServerToken(token);
-        return seq + SEP + token.getAccessTokens().toString();
+        return seq + SEP + tokenizeCollection(token.getAccessTokens());
     }
 
     private static String tokenizeServerToken(ServerAccessToken token) {
@@ -338,22 +339,7 @@ public final class ModelEncryptionSupport {
         // 9: permissions
         state.append(SEP);
         if (!token.getScopes().isEmpty()) {
-            for (OAuthPermission p : token.getScopes()) {
-                // 9.1
-                state.append(tokenizeString(p.getPermission()));
-                state.append('.');
-                // 9.2
-                state.append(tokenizeString(p.getDescription()));
-                state.append('.');
-                // 9.3
-                state.append(p.isDefaultPermission());
-                state.append('.');
-                // 9.4
-                state.append(tokenizeCollection(p.getHttpVerbs()));
-                state.append('.');
-                // 9.5
-                state.append(tokenizeCollection(p.getUris()));
-            }
+            state.append(tokenizePermissions(token.getScopes()));
         }
         state.append(SEP);
         // 10: code verifier
@@ -368,13 +354,35 @@ public final class ModelEncryptionSupport {
         return state.toString();
     }
 
+    private static String tokenizePermissions(List<OAuthPermission> perms) {
+        StringJoiner joiner = new StringJoiner(".");
+        for (OAuthPermission p : perms) {
+            StringBuilder sb = new StringBuilder();
+            // 9.1
+            sb.append(tokenizeString(p.getPermission()));
+            sb.append('.');
+            // 9.2
+            sb.append(tokenizeString(p.getDescription()));
+            sb.append('.');
+            // 9.3
+            sb.append(p.isDefaultPermission());
+            sb.append('.');
+            // 9.4
+            sb.append(tokenizeCollection(p.getHttpVerbs()));
+            sb.append('.');
+            // 9.5
+            sb.append(tokenizeCollection(p.getUris()));
+            joiner.add(sb);
+        }
+        return joiner.toString();
+    }
 
     private static Client recreateClientInternal(String sequence) {
         String[] parts = getParts(sequence);
         Client c = new Client(getStringPart(parts[0]),
-                              getStringPart(parts[1]),
-                              Boolean.parseBoolean(parts[2]),
-                              getStringPart(parts[3]), getStringPart(parts[4]));
+                getStringPart(parts[1]),
+                Boolean.parseBoolean(parts[2]),
+                getStringPart(parts[3]), getStringPart(parts[4]));
         c.setApplicationDescription(getStringPart(parts[5]));
         c.setApplicationLogoUri(getStringPart(parts[6]));
         c.setApplicationCertificates(parseSimpleList(parts[7]));
@@ -386,6 +394,7 @@ public final class ModelEncryptionSupport {
         c.setSubject(recreateUserSubject(parts[13]));
         return c;
     }
+
     private static String tokenizeClient(Client client) {
         StringBuilder state = new StringBuilder();
         // 0: id
@@ -432,13 +441,14 @@ public final class ModelEncryptionSupport {
 
         return state.toString();
     }
+
     private static ServerAuthorizationCodeGrant recreateCodeGrantInternal(OAuthDataProvider provider,
-                                                                          String sequence) {
+            String sequence) {
         String[] parts = getParts(sequence);
         ServerAuthorizationCodeGrant grant = new ServerAuthorizationCodeGrant(provider.getClient(parts[0]),
-                                                                              parts[1],
-                                                                              Long.parseLong(parts[2]),
-                                                                              Long.parseLong(parts[3]));
+                parts[1],
+                Long.parseLong(parts[2]),
+                Long.parseLong(parts[3]));
         grant.setRedirectUri(getStringPart(parts[4]));
         grant.setAudience(getStringPart(parts[5]));
         grant.setClientCodeChallenge(getStringPart(parts[6]));
@@ -447,6 +457,7 @@ public final class ModelEncryptionSupport {
         grant.setExtraProperties(parseSimpleMap(parts[9]));
         return grant;
     }
+
     private static String tokenizeCodeGrant(ServerAuthorizationCodeGrant grant) {
         StringBuilder state = new StringBuilder();
         // 0: client id
@@ -516,8 +527,6 @@ public final class ModelEncryptionSupport {
             subject.setProperties(parseSimpleMap(subjectParts[3]));
         }
         return subject;
-
-
     }
 
     private static void tokenizeUserSubject(StringBuilder state, UserSubject subject) {
