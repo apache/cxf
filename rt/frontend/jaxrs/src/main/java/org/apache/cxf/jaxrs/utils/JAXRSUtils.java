@@ -184,8 +184,9 @@ public final class JAXRSUtils {
     /**
      * Parses path segments taking into account the URI templates and template regexes. Per RFC-3986, 
      * "A path consists of a sequence of path segments separated by a slash ("/") character.", however
-     * it is possible to include slash ("/") inside template regex, for example {a:b/c}. In this case,
-     * the whole template definition is extracted as a path segment, without breaking it.
+     * it is possible to include slash ("/") inside template regex, for example "/my/path/{a:b/c}", see 
+     * please {@link URITemplate}. In this case, the whole template definition is extracted as a path 
+     * segment, without breaking it.
      * @param thePath path
      * @param decode should the path segments be decoded or not
      * @param ignoreLastSlash should the last slash be ignored or not
@@ -195,12 +196,12 @@ public final class JAXRSUtils {
                                                     boolean ignoreLastSlash) {
         
         final List<PathSegment> segments = new ArrayList<>();
-        int depth = 0;
+        int templateDepth = 0;
         int start = 0;
         for (int i = 0; i < thePath.length(); ++i) {
             if (thePath.charAt(i) == '/') {
-                // The '/' is in template (regex) definition
-                if (depth > 0) {
+                // The '/' is in template (possibly, with arbitrary regex) definition
+                if (templateDepth != 0) {
                     continue;
                 } else if (start != i) {
                     final String segment = thePath.substring(start, i);
@@ -210,19 +211,36 @@ public final class JAXRSUtils {
                 // advance the positions, empty path segments
                 start = i + 1;
             } else if (thePath.charAt(i) == '{') {
-                ++depth;
+                ++templateDepth;
             } else if (thePath.charAt(i) == '}') {
-                --depth; // could go negative, since the template could be unbalanced
+                --templateDepth; // could go negative, since the template could be unbalanced
             }
         }
+        
+        // the URI has unbalanced curly braces, backtrack to the last seen position of the path
+        // segment separator and just split segments as-is from there
+        if (templateDepth != 0) {
+            segments.addAll(
+                Arrays
+                    .stream(thePath.substring(start).split("/"))
+                    .filter(StringUtils.notEmpty())
+                    .map(p -> new PathSegmentImpl(p, decode))
+                    .collect(Collectors.toList()));
 
-        // the last symbol is slash
-        if (start == thePath.length() && start > 0 && thePath.charAt(start - 1) == '/') {
-            String value = ignoreLastSlash ? "" : "/";
-            segments.add(new PathSegmentImpl(value, false));
-        } else if (!thePath.isEmpty()) {
-            final String segment = thePath.substring(start);
-            segments.add(new PathSegmentImpl(segment, decode));
+            int len = thePath.length();
+            if (len > 0 && thePath.charAt(len - 1) == '/') {
+                String value = ignoreLastSlash ? "" : "/";
+                segments.add(new PathSegmentImpl(value, false));
+            }
+        } else {
+            // the last symbol is slash
+            if (start == thePath.length() && start > 0 && thePath.charAt(start - 1) == '/') {
+                String value = ignoreLastSlash ? "" : "/";
+                segments.add(new PathSegmentImpl(value, false));
+            } else if (!thePath.isEmpty()) {
+                final String segment = thePath.substring(start);
+                segments.add(new PathSegmentImpl(segment, decode));
+            }
         }
         
         return segments;

@@ -1895,6 +1895,16 @@ public class UriBuilderImplTest {
     }
     
     @Test
+    public void pathParamFromNestedTemplateWithRegex() {
+        // The nested templates are not supported and are not detected 
+        final URI uri = UriBuilder
+            .fromUri("my/path")
+            .path("{{p:his/him}}")
+            .build();
+        assertEquals("my/path/%7B%7Bp:his/him%7D%7D", uri.toString());
+    }
+    
+    @Test
     public void pathParamFromBadTemplateNested() {
         final URI uri = UriBuilder
             .fromUri("my/path")
@@ -1918,7 +1928,7 @@ public class UriBuilderImplTest {
             .fromUri("my/path")
             .path("{p/{d}")
             .build("my");
-        assertEquals("my/path/%7Bp/%7Bd%7D", uri.toString());
+        assertEquals("my/path/%7Bp/my", uri.toString());
     }
     
     @Test
@@ -1937,5 +1947,32 @@ public class UriBuilderImplTest {
             .path("   /   ")
             .build();
         assertEquals("/%20%20%20/%20%20%20", uri.toString());
+    }
+    
+    @Test
+    public void pathParamFromBadTemplateUnopenedAndEnclosedSlash() {
+        final URI uri = UriBuilder
+            .fromUri("my/path")
+            .path("p{d:my/day}/}")
+            .buildFromEncoded("my/day");
+        assertEquals("my/path/pmy/day/%7D", uri.toString());
+    }
+    
+    @Test
+    public void pathParamFromBadTemplateUnclosedAndEnclosedSlash() {
+        final URI uri = UriBuilder
+            .fromUri("my/path")
+            .path("{p/{d:my/day}")
+            .build();
+        assertEquals("my/path/%7Bp/%7Bd:my/day%7D", uri.toString());
+    }
+    
+    @Test
+    public void pathParamFromBadTemplate() {
+        final URI uri = UriBuilder
+            .fromUri("/")
+            .path("{")
+            .build();
+        assertEquals("/%7B", uri.toString());
     }
 }
