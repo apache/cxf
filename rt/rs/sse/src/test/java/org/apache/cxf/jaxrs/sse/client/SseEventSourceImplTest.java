@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.sse.client;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ import java.util.function.Function;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
+import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Context;
@@ -272,10 +274,13 @@ public class SseEventSourceImplTest {
         assertThat(events.get(0).getName(), nullValue());
         assertThat(events.get(0).readData(), equalTo("just test data\nin multiple lines"));
     }
-
+    
     @Test
     public void testNoReconnectAndJustEventNameIsReceived() throws InterruptedException, IOException {
-        try (SseEventSource eventSource = withNoReconnect(Type.EVENT_JUST_NAME)) {
+        final Map<String, Object> properties = Collections
+            .singletonMap(SseEventSourceImpl.DISCARD_INCOMPLETE_EVENTS, false);
+        
+        try (SseEventSource eventSource = withNoReconnect(Type.EVENT_JUST_NAME, properties)) {
             eventSource.open();
 
             assertThat(eventSource.isOpen(), equalTo(true));
@@ -289,6 +294,25 @@ public class SseEventSourceImplTest {
             .untilAsserted(() -> assertThat(events.size(), equalTo(1)));
 
         assertThat(events.get(0).getName(), equalTo("just name"));
+    }
+
+    @Test
+    public void testNoReconnectAndIncompleteEventIsDiscarded() throws InterruptedException, IOException {
+        try (SseEventSource eventSource = withNoReconnect(Type.EVENT_JUST_NAME)) {
+            eventSource.open();
+
+            assertThat(eventSource.isOpen(), equalTo(true));
+
+            // Allow the event processor to pull for events (150ms)
+            Thread.sleep(150L);
+        }
+
+        // incomplete event should be discarded
+        await()
+            .during(Duration.ofMillis(500L))
+            .until(events::isEmpty);
+
+        assertThat(events.size(), equalTo(0));
     }
 
     @Test
@@ -478,11 +502,19 @@ public class SseEventSourceImplTest {
     }
     
     private SseEventSource withNoReconnect(Type type) {
-        return withNoReconnect(type, null);
+        return withNoReconnect(type, null, Collections.emptyMap());
+    }
+    
+    private SseEventSource withNoReconnect(Type type, Map<String, Object> properties) {
+        return withNoReconnect(type, null, properties);
     }
     
     private SseEventSource withNoReconnect(Type type, String lastEventId) {
-        SseEventSource eventSource = SseEventSource.target(target(type, lastEventId)).build();
+        return withNoReconnect(type, lastEventId, Collections.emptyMap());
+    }
+    
+    private SseEventSource withNoReconnect(Type type, String lastEventId, Map<String, Object> properties) {
+        SseEventSource eventSource = SseEventSource.target(target(type, lastEventId, properties)).build();
         eventSource.register(events::add, errors::add);
         return eventSource;
     }
@@ -500,7 +532,16 @@ public class SseEventSourceImplTest {
     }
 
     private static WebTarget target(Type type, String lastEventId) {
-        final WebTarget target = ClientBuilder.newClient().target(LOCAL_ADDRESS + type.name());
+        return target(type, lastEventId, Collections.emptyMap());
+    }
+    
+    private static WebTarget target(Type type, String lastEventId, Map<String, Object> properties) {
+        final Client client = ClientBuilder.newClient();
+        if (properties != null) {
+            properties.forEach(client::property);
+        }
+        
+        final WebTarget target = client.target(LOCAL_ADDRESS + type.name());
         if (lastEventId != null) {
             target.property(HttpHeaders.LAST_EVENT_ID_HEADER, lastEventId);
         }
