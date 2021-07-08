@@ -1851,4 +1851,104 @@ public class UriBuilderImplTest {
             .toTemplate();
         assertEquals("my/path?p=%25250%25", template);
     }
+    
+    @Test
+    public void pathParamFromTemplateWithOrRegex() {
+        final URI uri = UriBuilder
+            .fromUri("my/path")
+            .path("{p:my|his}")
+            .build("my");
+        assertEquals("my/path/my", uri.toString());
+    }
+    
+    @Test
+    public void pathParamFromTemplateWithRegex() {
+        final URI uri = UriBuilder
+            .fromUri("my/path")
+            .path("{p:his/him}")
+            .buildFromEncoded("his/him");
+        assertEquals("my/path/his/him", uri.toString());
+    }
+    
+    @Test
+    public void pathParamFromNestedTemplateWithRegex() {
+        // The nested templates are not supported and are not detected 
+        final URI uri = UriBuilder
+            .fromUri("my/path")
+            .path("{{p:his/him}}")
+            .build();
+        assertEquals("my/path/%7B%7Bp:his/him%7D%7D", uri.toString());
+    }
+    
+    @Test
+    public void pathParamFromBadTemplateNested() {
+        final URI uri = UriBuilder
+            .fromUri("my/path")
+            .path("{p{d}}")
+            .build("my");
+        assertEquals("my/path/%7Bp%7Bd%7D%7D", uri.toString());
+    }
+    
+    @Test
+    public void pathParamFromBadTemplateUnopened() {
+        final URI uri = UriBuilder
+            .fromUri("my/path")
+            .path("p{d}/}")
+            .build("my");
+        assertEquals("my/path/pmy/%7D", uri.toString());
+    }
+    
+    @Test
+    public void pathParamFromBadTemplateUnclosed() {
+        final URI uri = UriBuilder
+            .fromUri("my/path")
+            .path("{p/{d}")
+            .build("my");
+        assertEquals("my/path/%7Bp/my", uri.toString());
+    }
+    
+    @Test
+    public void pathParamFromEmpty() {
+        final URI uri = UriBuilder
+            .fromUri("/")
+            .path("/")
+            .build();
+        assertEquals("/", uri.toString());
+    }
+    
+    @Test
+    public void pathParamFromEmptyWithSpaces() {
+        final URI uri = UriBuilder
+            .fromUri("/")
+            .path("   /   ")
+            .build();
+        assertEquals("/%20%20%20/%20%20%20", uri.toString());
+    }
+    
+    @Test
+    public void pathParamFromBadTemplateUnopenedAndEnclosedSlash() {
+        final URI uri = UriBuilder
+            .fromUri("my/path")
+            .path("p{d:my/day}/}")
+            .buildFromEncoded("my/day");
+        assertEquals("my/path/pmy/day/%7D", uri.toString());
+    }
+    
+    @Test
+    public void pathParamFromBadTemplateUnclosedAndEnclosedSlash() {
+        final URI uri = UriBuilder
+            .fromUri("my/path")
+            .path("{p/{d:my/day}")
+            .build();
+        assertEquals("my/path/%7Bp/%7Bd:my/day%7D", uri.toString());
+    }
+    
+    @Test
+    public void pathParamFromBadTemplate() {
+        final URI uri = UriBuilder
+            .fromUri("/")
+            .path("{")
+            .build();
+        assertEquals("/%7B", uri.toString());
+    }
 }
