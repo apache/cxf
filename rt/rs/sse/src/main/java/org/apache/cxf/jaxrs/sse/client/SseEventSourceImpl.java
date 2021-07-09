@@ -49,6 +49,9 @@ import org.apache.cxf.jaxrs.utils.ExceptionUtils;
  * SSE Event Source implementation 
  */
 public class SseEventSourceImpl implements SseEventSource {
+    // Whether or not incomplete SSE events should be discarded (by default, they will be discarded)
+    public static final String DISCARD_INCOMPLETE_EVENTS = "org.apache.cxf.sse.discard.incomplete.events";
+
     private static final Logger LOG = LogUtils.getL7dLogger(SseEventSourceImpl.class);
     
     private final WebTarget target;
@@ -246,8 +249,10 @@ public class SseEventSourceImpl implements SseEventSource {
             final Endpoint endpoint = WebClient.getConfig(target).getEndpoint();
             // Create new processor if this is the first time or the old one has been closed 
             if (processor == null || processor.isClosed()) {
-                LOG.fine("Creating new instance of SSE event processor ...");
-                processor = new InboundSseEventProcessor(endpoint, delegate);
+                final boolean discardIncomplete = getConfigurationProperty(DISCARD_INCOMPLETE_EVENTS, true);
+                LOG.fine("Creating new instance of SSE event processor (discard incomplete events is set to '" 
+                    + discardIncomplete + "') ...");
+                processor = new InboundSseEventProcessor(endpoint, delegate, discardIncomplete);
             }
             
             // Start consuming events
@@ -363,5 +368,20 @@ public class SseEventSourceImpl implements SseEventSource {
         } else if (state.get() == SseSourceState.CLOSED) {
             open = false;
         }
+    }
+    
+    private boolean getConfigurationProperty(String name, boolean defaultValue) {
+        final Configuration configuration = target.getConfiguration();
+        
+        if (configuration != null) {
+            final Object value = configuration.getProperty(name);
+            if (value instanceof Boolean) {
+                return (Boolean)value;
+            } else if (value != null) {
+                return Boolean.valueOf(value.toString());
+            }
+        }
+        
+        return defaultValue;
     }
 }
