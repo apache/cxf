@@ -56,12 +56,18 @@ public class InboundSseEventProcessor {
     private final Endpoint endpoint;
     private final InboundSseEventListener listener;
     private final ExecutorService executor;
+    private final boolean discardIncomplete;
     
     private volatile boolean closed;
     
     protected InboundSseEventProcessor(Endpoint endpoint, InboundSseEventListener listener) {
+        this(endpoint, listener, true);
+    }
+    
+    protected InboundSseEventProcessor(Endpoint endpoint, InboundSseEventListener listener, boolean discardIncomplete) {
         this.endpoint = endpoint;
         this.listener = listener;
+        this.discardIncomplete = discardIncomplete;
         this.executor = Executors.newSingleThreadScheduledExecutor();
     }
     
@@ -116,7 +122,17 @@ public class InboundSseEventProcessor {
                 }
                 
                 if (builder != null) {
-                    listener.onNext(builder.build(factory, message));
+                    // As per https://www.w3.org/TR/2021/SPSD-eventsource-20210128/#event-stream-interpretation:
+                    //
+                    //   ... Once the end of the file is reached, any pending data must be discarded. 
+                    //   (If the file ends in the middle of an event, before the final empty line, 
+                    //   the incomplete event is not dispatched.) ...
+                    //
+                    if (discardIncomplete /* default */) {
+                        LOG.fine("Discarding incomplete SSE event");
+                    } else {
+                        listener.onNext(builder.build(factory, message));
+                    }
                 }
 
                 // complete the stream
