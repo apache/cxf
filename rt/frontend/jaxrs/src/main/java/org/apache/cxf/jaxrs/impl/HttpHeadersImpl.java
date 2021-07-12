@@ -169,8 +169,7 @@ public class HttpHeadersImpl implements HttpHeaders {
     }
 
     public MultivaluedMap<String, String> getRequestHeaders() {
-        boolean splitIndividualValue
-            = MessageUtils.getContextualBoolean(message, HEADER_SPLIT_PROPERTY, false);
+        boolean splitIndividualValue = shouldSplitHeaders();
         if (splitIndividualValue) {
             Map<String, List<String>> newHeaders =
                 new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
@@ -217,8 +216,7 @@ public class HttpHeadersImpl implements HttpHeaders {
     }
 
     public List<String> getRequestHeader(String name) {
-        boolean splitIndividualValue
-            = MessageUtils.getContextualBoolean(message, HEADER_SPLIT_PROPERTY, false);
+        boolean splitIndividualValue = shouldSplitHeaders();
 
         List<String> values = headers.get(name);
         if (!splitIndividualValue
@@ -236,6 +234,10 @@ public class HttpHeadersImpl implements HttpHeaders {
             ls.addAll(getHeaderValues(name, value, sep));
         }
         return ls;
+    }
+
+    private boolean shouldSplitHeaders() {
+        return MessageUtils.getContextualBoolean(message, HEADER_SPLIT_PROPERTY, true);
     }
 
     private List<String> getListValues(String headerName) {
