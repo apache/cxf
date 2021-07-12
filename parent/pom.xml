@@ -2909,11 +2909,6 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-jta_1.1_spec</artifactId>
                 </dependency>
-                <dependency>
-                    <groupId>org.jboss.spec.javax.rmi</groupId>
-                    <artifactId>jboss-rmi-api_1.0_spec</artifactId>
-                    <version>1.0.6.Final</version>
-                </dependency>
             </dependencies>
         </profile>
     </profiles>
