@@ -97,8 +97,7 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
 
     @Override
     public MultivaluedMap<String, String> getHeaders() {
-        h = null;
-        return HttpUtils.getModifiableStringHeaders(m);
+        return h.getRequestHeaders();
     }
 
 
