@@ -49,6 +49,11 @@ public class LazyDataSource implements DataSource {
         if (dataSource == null) {
             for (Attachment a : attachments) {
                 if (a.getId().equals(id)) {
+                    if (a.getDataHandler() == null) {
+                        throw new IllegalStateException("Could not get DataHandler for attachment of id "
+                                                        + id);
+                    }
+                    
                     this.dataSource = a.getDataHandler().getDataSource();
                     if (dataSource == null) {
                         throw new IllegalStateException("Could not get DataSource for "

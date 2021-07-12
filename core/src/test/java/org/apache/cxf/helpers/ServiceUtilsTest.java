@@ -164,6 +164,19 @@ public class ServiceUtilsTest {
             assertEquals(type, ServiceUtils.getSchemaValidationType(msg));
         }
     }
+    
+    @Test
+    public void testMakeNamespaceFromClassNameCaseOne() {
+        String nameSpace = ServiceUtils.makeNamespaceFromClassName("Foo", "http");
+        assertEquals("http://DefaultNamespace", nameSpace);
+    }
+
+    @Test
+    public void testMakeNamespaceFromClassNameCaseTwo() {
+        String nameSpace = ServiceUtils.makeNamespaceFromClassName(this.getClass().getName(), "http");
+        assertEquals("http://helpers.cxf.apache.org/", nameSpace);
+
+    }
 
     private void setupSchemaValidationValue(Object value, boolean isRequestor) {
         control.reset();

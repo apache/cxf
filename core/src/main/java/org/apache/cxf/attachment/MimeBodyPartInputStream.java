@@ -51,15 +51,14 @@ public class MimeBodyPartInputStream extends InputStream {
         if (boundaryFound || closed) {
             return -1;
         }
-        if ((off < 0) || (off > b.length) || (len < 0)
-            || ((off + len) > b.length) || ((off + len) < 0)) {
-
-            throw new IndexOutOfBoundsException();
-        }
+       
+        checkIndexBound(b, off, len);
+        
         if (len == 0) {
             return 0;
         }
         boolean bufferCreated = false;
+        
         if (len < boundary.length * 2) {
             //buffer is too short to detect boundaries with it.  We'll need to create a larger buffer
             bufferCreated = true;
@@ -73,19 +72,11 @@ public class MimeBodyPartInputStream extends InputStream {
         if (len > pbAmount) {
             len = pbAmount;  //can only pushback that much so make sure we can
         }
-        int read = 0;
-        int idx = 0;
-        while (read >= 0 && idx < len && idx < (boundary.length * 2)) {
-            //make sure we read enough to detect the boundary
-            read = inStream.read(b, off + idx, len - idx);
-            if (read != -1) {
-                idx += read;
-            }
+        
+        len = detectBoundary(b, off, len);
+        if (len == -1) {
+            return len;
         }
-        if (read == -1 && idx == 0) {
-            return -1;
-        }
-        len = idx;
 
         int i = processBuffer(b, off, len);
         if (bufferCreated && i > 0) {
@@ -102,6 +93,30 @@ public class MimeBodyPartInputStream extends InputStream {
         }
 
         return i;
+    }
+    
+    private void checkIndexBound(byte[] b, int off, int len) {
+        if ((off < 0) || (off > b.length) || (len < 0) || ((off + len) > b.length) || ((off + len) < 0)) {
+
+            throw new IndexOutOfBoundsException();
+        }
+    }
+    
+    private int detectBoundary(byte[] b, int off, int len) throws IOException {
+        int read = 0;
+        int idx = 0;
+        while (read >= 0 && idx < len && idx < (boundary.length * 2)) {
+            // make sure we read enough to detect the boundary
+            read = inStream.read(b, off + idx, len - idx);
+            if (read != -1) {
+                idx += read;
+            }
+        }
+        if (read == -1 && idx == 0) {
+            return -1;
+        } else {
+            return idx;
+        }
     }
 
     //Has Data after encountering CRLF
