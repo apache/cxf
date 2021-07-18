@@ -59,6 +59,7 @@
         <cxf.easymock.version>4.3</cxf.easymock.version>
         <!-- OSGi related properties -->
         <cxf.fragment.host />
+        <cxf.bundle.activation.policy>lazy</cxf.bundle.activation.policy>
         <cxf.bundle.activator />
         <cxf.osgi.import />
         <cxf.osgi.symbolic.name>${project.groupId}.${project.artifactId}</cxf.osgi.symbolic.name>
@@ -646,7 +647,7 @@
                     <obrRepository>NONE</obrRepository>
                     <instructions>
                         <Bundle-SymbolicName>${cxf.osgi.symbolic.name}</Bundle-SymbolicName>
-                        <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
+                        <Bundle-ActivationPolicy>${cxf.bundle.activation.policy}</Bundle-ActivationPolicy>
                         <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
                         <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>
                         <Implementation-Version>${cxf.osgi.version.clean}</Implementation-Version>
