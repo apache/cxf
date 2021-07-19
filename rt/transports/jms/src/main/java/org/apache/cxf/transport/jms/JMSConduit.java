@@ -36,6 +36,7 @@ import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.MessageListener;
 import javax.jms.Session;
+import javax.jms.TemporaryQueue;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
@@ -282,6 +283,9 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                                                                      jmsConfig.getReceiveTimeout(),
                                                                      jmsConfig.isPubSubNoLocal(),
                                                                      exchange);
+                    if (replyDestination instanceof TemporaryQueue) {
+                        ((TemporaryQueue) replyDestination).delete();
+                    }
                     processReplyMessage(exchange, replyMessage);
                 } else {
                     try {
