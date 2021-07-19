@@ -185,6 +185,26 @@
           <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <_removeheaders>Bundle-ActivationPolicy</_removeheaders>
+                        <Require-Capability>osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"; resolution:=optional</Require-Capability>
+                        <Provide-Capability>
+                            osgi.serviceloader; osgi.serviceloader=org.eclipse.microprofile.rest.client.spi.RestClientBuilderResolver;
+                            register:=org.apache.cxf.microprofile.client.spi.CxfRestClientBuilderResolver
+                        </Provide-Capability>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <profiles>
         <profile>
             <id>setup.eclipse</id>
