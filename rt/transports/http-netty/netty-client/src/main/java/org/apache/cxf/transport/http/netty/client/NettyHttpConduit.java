@@ -32,6 +32,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Principal;
 import java.security.cert.Certificate;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -78,6 +80,9 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
     public static final String MAX_RESPONSE_CONTENT_LENGTH =
         "org.apache.cxf.transport.http.netty.maxResponseContentLength";
     static final Integer DEFAULT_MAX_RESPONSE_CONTENT_LENGTH = 1048576;
+    private static final Set<String> KNOWN_HTTP_VERBS_WITH_NO_CONTENT =
+            new HashSet<>(Arrays.asList(new String[]{"GET", "HEAD", "OPTIONS", "TRACE"}));
+    
     final NettyHttpConduitFactory factory;
     private Bootstrap bootstrap;
 
@@ -197,7 +202,10 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
             entity.createRequest(out.getOutBuffer());
             // TODO need to check how to set the Chunked feature
             //request.getRequest().setChunked(true);
-            entity.getRequest().headers().set(Message.CONTENT_TYPE, message.get(Message.CONTENT_TYPE));
+            Object contentType = message.get(Message.CONTENT_TYPE);
+            if (contentType != null) {
+                entity.getRequest().headers().set(Message.CONTENT_TYPE, contentType);
+            }
             return out;
         }
         return super.createOutputStream(message, needToCacheRequest, isChunking, chunkThreshold);
@@ -314,7 +322,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
                     
                     synchronized (entity) {
                         Channel syncChannel = getChannel();
-                        ChannelFuture channelFuture = syncChannel.write(entity);
+                        ChannelFuture channelFuture = syncChannel.writeAndFlush(entity);
                         channelFuture.addListener(listener);
                         outputStream.close();
                     }
@@ -327,6 +335,11 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
                 cachedStream = new CacheAndWriteOutputStream(wrappedStream);
                 wrappedStream = cachedStream;
             }
+        }
+        
+        @Override
+        protected void handleNoOutput() throws IOException {
+            connect(false);
         }
 
         protected TLSClientParameters findTLSClientParameters() {
@@ -378,11 +391,6 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
 
             connFuture.addListener(listener);
 
-            if (!output) {
-                entity.getRequest().headers().remove("Transfer-Encoding");
-                entity.getRequest().headers().remove("Content-Type");
-                entity.getRequest().headers().remove(null);
-            }
 
             // setup the CxfResponseCallBack
             CxfResponseCallBack callBack = new CxfResponseCallBack() {
@@ -398,6 +406,29 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
             };
             entity.setCxfResponseCallback(callBack);
 
+            if (!output) {
+                entity.getRequest().headers().remove("Transfer-Encoding");
+                entity.getRequest().headers().remove("Content-Type");
+                
+                ChannelFutureListener writeFailureListener = new ChannelFutureListener() {
+                    @Override
+                    public void operationComplete(ChannelFuture future) throws Exception {
+                        if (!future.isSuccess()) {
+                            setException(future.cause());
+                        }
+                    }
+                };
+                
+                connFuture.addListener(new ChannelFutureListener() {
+                        @Override
+                        public void operationComplete(ChannelFuture future) throws Exception {
+                            if (future.isSuccess()) {
+                                ChannelFuture channelFuture = future.channel().writeAndFlush(entity);
+                                channelFuture.addListener(writeFailureListener);
+                            }
+                        }
+                    });
+            }
         }
 
         @Override
@@ -434,7 +465,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         @Override
         protected void setProtocolHeaders() throws IOException {
             Headers h = new Headers(outMessage);
-            entity.getRequest().headers().set(Message.CONTENT_TYPE, h.determineContentType());
+            setContentTypeHeader(h);
             boolean addHeaders = MessageUtils.getContextualBoolean(outMessage, Headers.ADD_HEADERS_PROPERTY, false);
 
             for (Map.Entry<String, List<String>> header : h.headerMap().entrySet()) {
@@ -458,6 +489,21 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
                 if (!entity.getRequest().headers().contains("User-Agent")) {
                     entity.getRequest().headers().set("User-Agent", Version.getCompleteVersionString());
                 }
+            }
+        }
+        
+        private void setContentTypeHeader(Headers headers) {
+            if (outMessage.get(Message.CONTENT_TYPE) == null) {
+                // if no content type is set then check for a request body
+                Object requestMethod = outMessage.get(Message.HTTP_REQUEST_METHOD);
+                boolean emptyRequest = KNOWN_HTTP_VERBS_WITH_NO_CONTENT.contains(requestMethod) 
+                        || PropertyUtils.isTrue(outMessage.get(Headers.EMPTY_REQUEST_PROPERTY));
+                // If it is not an empty request then add a content type
+                if (!emptyRequest) {
+                    entity.getRequest().headers().set(Message.CONTENT_TYPE, headers.determineContentType());
+                }
+            } else {
+                entity.getRequest().headers().set(Message.CONTENT_TYPE, headers.determineContentType());
             }
         }
 
