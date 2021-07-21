@@ -57,9 +57,11 @@ import javax.xml.ws.Holder;
 
 import org.apache.cxf.jaxrs.client.ClientConfiguration;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.http.netty.client.NettyHttpTransportFactory;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 import org.junit.Before;
@@ -476,6 +478,51 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
              .put(null)
              .get(10, TimeUnit.SECONDS)) {
             assertThat(response.getStatus(), equalTo(404));
+        }
+    }
+
+    @Test
+    public void testNettyClientGet() throws Exception {
+        final String address = "http://localhost:" + PORT + "/bookstore/books/wildcard";
+        
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setTransportId(NettyHttpTransportFactory.DEFAULT_NAMESPACES.get(0));
+        bean.setAddress(address);
+        
+        WebClient webClient = bean.createWebClient();
+        
+        try (Response response = webClient
+                .to(address, false)
+                .accept("text/plain")
+                .async()
+                .get()
+                .get(10, TimeUnit.SECONDS)) {
+            assertThat(response.getStatus(), equalTo(200));
+        } finally {
+            webClient.close();
+        }
+    }
+    
+    @Test
+    public void testNettyClientDeleteWithBody() throws Exception {
+        final String address = "http://localhost:" + PORT + "/bookstore/deletebody";
+        
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setTransportId(NettyHttpTransportFactory.DEFAULT_NAMESPACES.get(0));
+        bean.setAddress(address);
+        
+        WebClient webClient = bean.createWebClient();
+        
+        try {
+            Book book = webClient
+                .to(address, false)
+                .accept("application/xml")
+                .async()
+                .method("DELETE", Entity.entity(new Book("Delete", 123L), "application/xml"), Book.class)
+                .get(20, TimeUnit.SECONDS);
+            assertEquals("Delete", book.getName());
+        } finally {
+            webClient.close();
         }
     }
     
