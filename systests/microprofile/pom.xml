@@ -178,5 +178,6 @@
         <module>client/jaxrs</module>
         <module>client/tracing</module>
         <module>client/weld</module>
+        <module>client/nocdi</module>
     </modules>
 </project>
