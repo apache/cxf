@@ -72,6 +72,10 @@ public class DefaultLogEventMapper {
         }
     }
 
+    public LogEvent map(final Message message) {
+        return this.map(message, Collections.emptySet());
+    }
+
     public LogEvent map(final Message message, final Set<String> sensitiveProtocolHeaders) {
         final LogEvent event = new LogEvent();
         event.setMessageId(getMessageId(message));
@@ -90,7 +94,9 @@ public class DefaultLogEventMapper {
         event.setContentType(safeGet(message, Message.CONTENT_TYPE));
 
         Map<String, String> headerMap = getHeaders(message);
-        maskSensitiveHelper.maskHeaders(headerMap, sensitiveProtocolHeaders);
+        if (sensitiveProtocolHeaders != null && !sensitiveProtocolHeaders.isEmpty()) {
+            maskSensitiveHelper.maskHeaders(headerMap, sensitiveProtocolHeaders);
+        }
         event.setHeaders(headerMap);
 
         event.setAddress(getAddress(message, event));

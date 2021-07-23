@@ -119,4 +119,32 @@ public class DefaultLogEventMapperTest {
         assertEquals(MASKED_HEADER_VALUE, event.getHeaders().get(TEST_HEADER_NAME));
     }
 
+    @Test
+    public void testMapNullSensitiveProtocolHeaders() {
+        DefaultLogEventMapper mapper = new DefaultLogEventMapper();
+        Message message = new MessageImpl();
+        message.put(Message.HTTP_REQUEST_METHOD, "POST");
+        message.put(Message.REQUEST_URI, "nullTest");
+        Exchange exchange = new ExchangeImpl();
+        message.setExchange(exchange);
+
+        LogEvent event = mapper.map(message, null);
+
+        assertEquals("POST[nullTest]", event.getOperationName());
+    }
+
+    @Test
+    public void testMap() {
+        DefaultLogEventMapper mapper = new DefaultLogEventMapper();
+        Message message = new MessageImpl();
+        message.put(Message.HTTP_REQUEST_METHOD, "PUT");
+        message.put(Message.REQUEST_URI, "test");
+        Exchange exchange = new ExchangeImpl();
+        message.setExchange(exchange);
+
+        LogEvent event = mapper.map(message);
+
+        assertEquals("PUT[test]", event.getOperationName());
+    }
+
 }
