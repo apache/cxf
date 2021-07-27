@@ -461,10 +461,10 @@ public class UndertowHTTPServerEngine implements ServerEngine {
      * remove it from the factory's cache.
      */
     public void shutdown() {
-        registedPaths.clear();
         if (shouldDestroyPort()) {
             if (servantCount == 0) {
                 UndertowHTTPServerEngineFactory.destroyForPort(port);
+                registedPaths.clear();
             } else {
                 LOG.log(Level.WARNING, "FAILED_TO_SHUTDOWN_ENGINE_MSG", port);
             }
