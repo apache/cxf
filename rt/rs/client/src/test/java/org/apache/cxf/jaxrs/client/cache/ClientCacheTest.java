@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.client.cache;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.Collections;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -33,9 +34,12 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.transport.local.LocalConduit;
@@ -135,6 +139,23 @@ public class ClientCacheTest {
             waitABit();
             // CassCastException would occur without a cached stream support
             InputStream is = cached.get().readEntity(InputStream.class);
+            final String r2 = IOUtils.readStringFromStream(is);
+            assertEquals(r1, r2);
+        } finally {
+            feature.close();
+        }
+    }
+    
+    @Test
+    public void testGetTimeStringAsStringAndInputStreamWithJAXRSClientFactoryBean() throws Exception {
+        CXFCacheControlFeature feature = new CXFCacheControlFeature(true);
+        try {
+            WebClient client = createClient(feature);
+            final Response r = client.get();
+            assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
+            final String r1 = r.readEntity(String.class);
+            waitABit();
+            InputStream is = client.get(InputStream.class);
             final String r2 = IOUtils.readStringFromStream(is);
             assertEquals(r1, r2);
         } finally {
@@ -248,6 +269,23 @@ public class ClientCacheTest {
             }
             return false;
         }
+    }
+    
+    private WebClient createClient(CXFCacheControlFeature feature) {
+        Bus bus = BusFactory.newInstance().createBus();
+        JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
+        sf.setBus(bus);
+        sf.setResourceClasses(TheServer.class);
+        sf.setResourceProvider(TheServer.class, new SingletonResourceProvider(new TheServer(), false));
+        sf.setTransportId(LocalTransportFactory.TRANSPORT_ID);
+        sf.setAddress(ADDRESS);
+        sf.create();
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setBus(bus);
+        bean.setAddress(ADDRESS);
+        bean.setFeatures(Collections.singletonList(feature));
+        bean.setTransportId(LocalTransportFactory.TRANSPORT_ID);
+        return bean.createWebClient().accept("text/plain").header(HttpHeaders.CACHE_CONTROL, "public");
     }
 
 }
