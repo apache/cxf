@@ -50,6 +50,7 @@ import org.apache.cxf.jaxrs.client.ClientProxyImpl;
 import org.apache.cxf.jaxrs.client.ClientState;
 import org.apache.cxf.jaxrs.client.JaxrsClientCallback;
 import org.apache.cxf.jaxrs.client.LocalClientState;
+import org.apache.cxf.jaxrs.client.spec.TLSConfiguration;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.Parameter;
@@ -105,15 +106,18 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
     private Map<Class<ClientHeadersFactory>, ProviderInfo<ClientHeadersFactory>> clientHeaderFactories = 
         new WeakHashMap<>();
     private List<Instance<?>> cdiInstances = new LinkedList<>();
+    private final TLSConfiguration tlsConfig;
 
     //CHECKSTYLE:OFF
+    @SuppressWarnings("PMD.ExcessiveParameterList")
     public MicroProfileClientProxyImpl(URI baseURI, ClassLoader loader, ClassResourceInfo cri,
                                        boolean isRoot, boolean inheritHeaders, ExecutorService executorService,
-                                       Configuration configuration, CDIInterceptorWrapper interceptorWrapper, 
-                                       Object... varValues) {
+                                       Configuration configuration, CDIInterceptorWrapper interceptorWrapper,
+                                       TLSConfiguration tlsConfig, Object... varValues) {
         super(new LocalClientState(baseURI, configuration.getProperties()), loader, cri,
             isRoot, inheritHeaders, varValues);
         this.interceptorWrapper = interceptorWrapper;
+        this.tlsConfig = tlsConfig;
         
         if (executorService == null) {
             throw new IllegalArgumentException("The executorService is required and must be provided");
@@ -122,12 +126,14 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
         init(executorService, configuration);
     }
 
+    @SuppressWarnings("PMD.ExcessiveParameterList")
     public MicroProfileClientProxyImpl(ClientState initialState, ClassLoader loader, ClassResourceInfo cri,
                                        boolean isRoot, boolean inheritHeaders, ExecutorService executorService,
                                        Configuration configuration, CDIInterceptorWrapper interceptorWrapper,
-                                       Object... varValues) {
+                                       TLSConfiguration tlsConfig, Object... varValues) {
         super(initialState, loader, cri, isRoot, inheritHeaders, varValues);
         this.interceptorWrapper = interceptorWrapper;
+        this.tlsConfig = tlsConfig;
         init(executorService, configuration);
     }
     //CHECKSTYLE:ON
@@ -533,5 +539,9 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
     public void close() {
         cdiInstances.forEach(Instance::release);
         super.close();
+    }
+    
+    public TLSConfiguration getTlsConfig() {
+        return tlsConfig;
     }
 }

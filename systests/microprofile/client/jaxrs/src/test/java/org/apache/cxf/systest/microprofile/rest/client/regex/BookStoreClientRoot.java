@@ -25,18 +25,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
-@Path("/bookstore")
-public interface BookStoreClient {
-
-    // Only books with id consisting of 3 or 4 digits of the numbers between 5 and 9 are accepted
+@Path("/bookstore/echoxmlbookregex/{id : [5-9]{3,4}}/{language:en|fr}/{format:pdf|epub|mobi}")
+public interface BookStoreClientRoot {
     @POST
-    @Path("/echoxmlbookregex/{id : [5-9]{3,4}}")
-    @Consumes("application/xml")
-    @Produces("application/xml")
-    Book echoXmlBookregex(Book book, @PathParam("id") String id);
-    
-    @POST
-    @Path("/echoxmlbookregex/{id : [5-9]{3,4}}/{language:en|fr}/{format:pdf|epub|mobi}/many")
+    @Path("/many")
     @Consumes("application/xml")
     @Produces("application/xml")
     Book echoXmlBookregexMany(Book book, @PathParam("id") String id, 
