@@ -26,4 +26,9 @@ public class BookStore implements BookStoreClient {
         return book;
     }
 
+    @Override
+    public Book echoXmlBookregexMany(Book book, String id, String language, String format) {
+        return book;
+    }
+
 }
