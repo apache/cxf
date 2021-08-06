@@ -122,5 +122,42 @@ public class JaxrsPathRegexTest extends AbstractBusClientServerTestBase {
         echoedBook = bookStoreClient.echoXmlBookregex(book, "8667");
         assertEquals(id, echoedBook.getId());
     }
+    
+    @Test
+    public void testPathRegularExpressionMany() throws Exception {
+
+        String endpointAddress = "http://localhost:" + PORT + "/";
+        long id = 5678;
+        Book book = new Book();
+        book.setId(id);
+
+        // Successful
+        BookStoreClientRoot bookStoreClient = RestClientBuilder.newBuilder()
+            .baseUri(URI.create(endpointAddress))
+            .build(BookStoreClientRoot.class);
+
+        Book echoedBook = bookStoreClient.echoXmlBookregexMany(book, String.valueOf(id), "en", "pdf");
+        assertEquals(id, echoedBook.getId());
+
+        // Wrong language
+        try {
+            bookStoreClient.echoXmlBookregexMany(book, String.valueOf(id), "ru", "pdf");
+            fail("Failure expected on a failing regex");
+        } catch (IllegalArgumentException ex) {
+            // expected
+        }
+
+        // Wrong format
+        try {
+            bookStoreClient.echoXmlBookregexMany(book, String.valueOf(id), "en", "doc");
+            fail("Failure expected on a failing regex");
+        } catch (IllegalArgumentException ex) {
+            // expected
+        }
+
+        // Finally try another successful call
+        echoedBook = bookStoreClient.echoXmlBookregexMany(book, "8667", "fr", "epub");
+        assertEquals(id, echoedBook.getId());
+    }
 
 }
