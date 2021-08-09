@@ -23,6 +23,9 @@
             <feature name="pax-http-undertow" version="7.3.18">
                 <f:bundle start-level="35">mvn:org.apache.cxf/cxf-servlet-compatible/${project.version}</f:bundle>
             </feature>
+            <feature name="pax-http-undertow" version="7.3.19">
+                <f:bundle start-level="35">mvn:org.apache.cxf/cxf-servlet-compatible/${project.version}</f:bundle>
+            </feature>
         </replacement>
     </featureReplacements>
 </featuresProcessing>
