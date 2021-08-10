@@ -44,7 +44,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ClassHelper;
 
 public final class AnnotationUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(AnnotationUtils.class);
@@ -115,6 +117,17 @@ public final class AnnotationUtils {
             return Priorities.USER;
         }
     }
+    
+    public static Set<String> getInstanceNameBindings(Bus bus, Object obj) {
+        final Class<?> realClazz = ClassHelper.getRealClass(bus, obj);
+        return getNameBindings(realClazz.getAnnotations());
+    }
+    
+    public static Set<String> getNameBindings(Bus bus, Class<?> clazz) {
+        final Class<?> realClazz = ClassHelper.getRealClassFromClass(bus, clazz);
+        return getNameBindings(realClazz.getAnnotations());
+    }
+    
     public static Set<String> getNameBindings(Annotation[] targetAnns) {
         if (targetAnns.length == 0) {
             return Collections.emptySet();

@@ -431,7 +431,7 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
             STSPropertiesMBean stsProperties = tokenParameters.getStsProperties();
             String realm = tokenParameters.getRealm();
             RealmProperties samlRealm = null;
-            if (realm != null && realmMap.containsKey(realm)) {
+            if (realm != null) {
                 samlRealm = realmMap.get(realm);
             }
 

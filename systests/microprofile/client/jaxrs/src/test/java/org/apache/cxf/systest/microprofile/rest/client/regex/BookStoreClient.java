@@ -34,5 +34,12 @@ public interface BookStoreClient {
     @Consumes("application/xml")
     @Produces("application/xml")
     Book echoXmlBookregex(Book book, @PathParam("id") String id);
+    
+    @POST
+    @Path("/echoxmlbookregex/{id : [5-9]{3,4}}/{language:en|fr}/{format:pdf|epub|mobi}/many")
+    @Consumes("application/xml")
+    @Produces("application/xml")
+    Book echoXmlBookregexMany(Book book, @PathParam("id") String id, 
+        @PathParam("language") String language, @PathParam("format") String format);
 
 }

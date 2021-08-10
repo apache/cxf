@@ -49,9 +49,14 @@ public class UnannotatedCorsServer {
     }
 
     @GET
-    @CrossOriginResourceSharing(allowOrigins = {
-            "http://area51.mil:31415" },
-             exposeHeaders = {"X-custom-3", "X-custom-4" })
+    @CrossOriginResourceSharing(
+        allowOrigins = {
+            "http://area51.mil:31415" 
+        },
+        exposeHeaders = {
+            "X-custom-3", 
+            "X-custom-4" 
+        })
     @Produces("text/plain")
     @Path("/annotatedGet/{echo}")
     public String annotatedGet(@PathParam("echo") String echo) {

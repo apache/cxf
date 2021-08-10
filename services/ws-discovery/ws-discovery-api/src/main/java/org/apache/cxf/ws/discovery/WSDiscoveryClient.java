@@ -214,8 +214,7 @@ public class WSDiscoveryClient implements Closeable {
             if (StringUtils.isEmpty(uri.getHost())) {
                 adHoc = true;
             } else {
-                InetSocketAddress isa = null;
-                isa = new InetSocketAddress(uri.getHost(), uri.getPort());
+                InetSocketAddress isa = new InetSocketAddress(uri.getHost(), uri.getPort());
                 if (isa.getAddress().isMulticastAddress()) {
                     adHoc = true;
                 }

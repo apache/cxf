@@ -38,9 +38,9 @@ import org.apache.cxf.annotations.EndpointProperty;
 @WebServiceProvider(targetNamespace = "http://cxf.apache.org/", serviceName = "HelloWS", portName = "hello")
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 @EndpointProperties(value = {
-                             @EndpointProperty(key = "schema-validation-enabled", value = "true"),
-                             @EndpointProperty(key = "mtom-enabled", value = "true")
-                    })
+    @EndpointProperty(key = "schema-validation-enabled", value = "true"),
+    @EndpointProperty(key = "mtom-enabled", value = "true")
+})
 public class TestProvider implements Provider<SAXSource> {
 
     private String successRsp = "<ns2:helloResponse xmlns:ns2=\"http://cxf.apache.org/\">"

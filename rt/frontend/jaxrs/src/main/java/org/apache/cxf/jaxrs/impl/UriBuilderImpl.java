@@ -46,6 +46,15 @@ import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
+/**
+ * Implements the {@link UriBuilder} abstract class. A few notes with respect to CXF specifics:
+ * <ul>
+ *   <li>it uses standard {@link URI} internally, so it does not conform to 
+ *   RFC-3986 which {@link UriBuilder} mandates</li>
+ *   <li>it encodes URI components if it encounters '%XX' pattern within name (if applicable) or value (those
+ *   are treated as partially encoded)</li>
+ *  </ul
+ */
 public class UriBuilderImpl extends UriBuilder implements Cloneable {
     private static final String EXPAND_QUERY_VALUE_AS_COLLECTION = "expand.query.value.as.collection";
     private static final String USE_ARRAY_SYNTAX_FOR_QUERY_VALUES = "use.array.syntax.for.query.values";

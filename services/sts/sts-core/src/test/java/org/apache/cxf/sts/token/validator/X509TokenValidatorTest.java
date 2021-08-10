@@ -85,8 +85,7 @@ public class X509TokenValidatorTest {
         assertTrue(x509TokenValidator.canHandleToken(validateTarget));
 
         // This will fail as the encoding type is not set
-        TokenValidatorResponse validatorResponse = null;
-        validatorResponse = x509TokenValidator.validateToken(validatorParameters);
+        TokenValidatorResponse validatorResponse = x509TokenValidator.validateToken(validatorParameters);
         assertNotNull(validatorResponse);
         assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);

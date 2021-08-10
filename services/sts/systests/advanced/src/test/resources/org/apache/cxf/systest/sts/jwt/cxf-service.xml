@@ -35,7 +35,7 @@
     
     <bean id="jwtFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwtAuthenticationFilter" />
     
-    <jaxrs:server modelRef="classpath:org/apache/cxf/systest/sts/jwt/jaxrs.xml" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.jwt.Server}/doubleit/services/doubleit-rs">
+    <jaxrs:server modelRef="classpath:org/apache/cxf/systest/sts/jwt/jaxrs.xml" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.DoubleItServer}/doubleit/services/doubleit-rs">
         <jaxrs:providers>
             <ref bean="jwtFilter"/>
        </jaxrs:providers>
@@ -49,7 +49,7 @@
     </jaxrs:server>
     
     <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
-        <httpj:engine port="${testutil.ports.jwt.Server}">
+        <httpj:engine port="${testutil.ports.DoubleItServer}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="skpass">
                     <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>

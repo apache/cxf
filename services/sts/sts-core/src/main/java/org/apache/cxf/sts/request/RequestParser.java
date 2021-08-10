@@ -446,7 +446,7 @@ public class RequestParser {
      * public key.
      */
     private static ReceivedCredential parseKeyInfoElement(Element keyInfoElement) throws STSException {
-        KeyInfoFactory keyInfoFactory = null;
+        KeyInfoFactory keyInfoFactory;
         try {
             keyInfoFactory = KeyInfoFactory.getInstance("DOM", "ApacheXMLDSig");
         } catch (NoSuchProviderException ex) {

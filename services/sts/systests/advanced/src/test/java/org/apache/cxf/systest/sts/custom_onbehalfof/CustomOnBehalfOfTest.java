@@ -24,10 +24,9 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.rt.security.SecurityConstants;
+import org.apache.cxf.systest.sts.deployment.DoubleItServer;
+import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
 
@@ -53,37 +52,19 @@ public class CustomOnBehalfOfTest extends AbstractBusClientServerTestBase {
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
-    private static final String PORT = allocatePort(Server.class);
+    private static final String PORT = allocatePort(DoubleItServer.class);
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(Server.class, true)
-        );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(STSServer.class, true)
-        );
-    }
-
-    @org.junit.AfterClass
-    public static void cleanup() throws Exception {
-        stopAllServers();
+        assertTrue(launchServer(new DoubleItServer(
+            CustomOnBehalfOfTest.class.getResource("cxf-service.xml"))));
+        assertTrue(launchServer(new STSServer(
+            CustomOnBehalfOfTest.class.getResource("cxf-sts.xml"))));
     }
 
     @org.junit.Test
     public void testUsernameOnBehalfOfSTS() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CustomOnBehalfOfTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = CustomOnBehalfOfTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -99,17 +80,11 @@ public class CustomOnBehalfOfTest extends AbstractBusClientServerTestBase {
         doubleIt(transportPort, 25);
 
         ((java.io.Closeable)transportPort).close();
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testUsernameOnBehalfOfLocal() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CustomOnBehalfOfTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = CustomOnBehalfOfTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -125,7 +100,6 @@ public class CustomOnBehalfOfTest extends AbstractBusClientServerTestBase {
         doubleIt(transportPort, 25);
 
         ((java.io.Closeable)transportPort).close();
-        bus.shutdown(true);
     }
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {

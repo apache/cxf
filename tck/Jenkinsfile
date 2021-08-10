@@ -4,8 +4,8 @@ pipeline {
    }
    
     tools { 
-        ant 'ant_1.10.6'
-        maven 'maven_3.6.2' 
+        ant 'ant_1.10.10'
+        maven 'maven_3.6.3' 
         jdk 'jdk_1.8.0_241' 
     }
     
@@ -41,7 +41,7 @@ pipeline {
        stage('Download JakartaEE TCK') {
            steps {
                checkout([$class: 'GitSCM',
-	           branches: [[name: 'refs/tags/8.0.0']],
+	           branches: [[name: 'refs/tags/8.0.2']],
                    userRemoteConfigs: [[url: 'https://github.com/eclipse-ee4j/jakartaee-tck']],
                    extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'jakartaee-tck']]
                ])
@@ -66,6 +66,7 @@ pipeline {
                sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-rt-transports-http:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
                echo "Including additional dependencies (woodstox, ...)"
                sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=com.fasterxml.woodstox:woodstox-core:5.2.1:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
+               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.codehaus.woodstox:stax2-api:4.2:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
            }
        }
        

@@ -49,13 +49,13 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "foo",
-         propOrder = {
-                      "position",
-                      "address",
-                      "name",
-                      "intDefault",
-                      "intNoDefault"
-        })
+    propOrder = {
+        "position",
+        "address",
+        "name",
+        "intDefault",
+        "intNoDefault"
+    })
 public class Foo {
 
     protected Point position;

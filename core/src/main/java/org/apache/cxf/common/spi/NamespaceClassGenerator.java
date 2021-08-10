@@ -75,7 +75,10 @@ public class NamespaceClassGenerator extends ClassGeneratorClassLoader implement
                 t = ex2;
             }
         }
-        LOG.log(Level.INFO, "Could not create a NamespaceMapper compatible with Marshaller class " + mcls.getName(), t);
+        if (cls == null) {
+            LOG.log(Level.INFO, "Could not create a NamespaceMapper compatible with Marshaller class " 
+                + mcls.getName(), t);
+        }
         return cls;
     }
 

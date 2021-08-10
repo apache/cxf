@@ -37,6 +37,7 @@ import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -262,6 +263,11 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     public void testBeanParam(@BeanParam CustomerBean cb) {
 
     }
+
+    public void testEncodedFormParams(@FormParam("p1") String p1, @FormParam("p2") @Encoded String p2) {
+
+    }
+
     public Application getApplication1() {
         return application1;
     }

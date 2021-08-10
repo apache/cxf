@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,6 +45,8 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.container.ResourceContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.core.GenericEntity;
@@ -234,6 +237,17 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders";
         Client client = ClientBuilder.newClient();
         client.register(new BookInfoReader());
+        BookInfo book = client.target(address).path("simple")
+            .request("application/xml").get(BookInfo.class);
+        assertEquals(124L, book.getId());
+
+    }
+    
+    @Test
+    public void testGetBookWebTargetInjectableProvider() {
+        String address = "http://localhost:" + PORT + "/bookstore/bookheaders";
+        Client client = ClientBuilder.newClient();
+        client.register(new BookInfoInjectableReader());
         BookInfo book = client.target(address).path("simple")
             .request("application/xml").get(BookInfo.class);
         assertEquals(124L, book.getId());
@@ -926,6 +940,28 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         }
     }
 
+    @Test
+    @SuppressWarnings({"checkstyle:linelength"})
+    public void testQueryParamSpecialCharactersEncoded() throws Exception {
+        final String address = "http://localhost:" + PORT + "/bookstore/queryParamSpecialCharacters";
+
+        try (Response response = ClientBuilder.newClient()
+                .register(AddHeaderClientResponseFilter.class)
+                .target(address)
+                .queryParam(URLEncoder.encode("/?abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~%1A!$'()*+,;:@"), 
+                    "apiKeyQueryParam1Value")
+                .request(MediaType.TEXT_PLAIN)
+                .get()) {
+            assertEquals(200, response.getStatus());
+            
+            final String actual = response.readEntity(String.class);
+            final String expected = "apiKeyQueryParam1Value";
+            
+            assertEquals(expected, actual);
+        }
+    }
+
+
     private static class ReplaceBodyFilter implements ClientRequestFilter {
 
         @Override
@@ -1038,8 +1074,30 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
 
     }
 
-    private static class BookInfoReader implements MessageBodyReader<BookInfo> {
+    private static class BookInfoInjectableReader implements MessageBodyReader<BookInfo> {
+        @Context private ResourceContext resourceContext;
 
+        @Override
+        public boolean isReadable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType arg3) {
+            return true;
+        }
+
+        @Override
+        public BookInfo readFrom(Class<BookInfo> arg0, Type arg1, Annotation[] anns, MediaType mt,
+                                 MultivaluedMap<String, String> headers, InputStream is) throws IOException,
+            WebApplicationException {
+            
+            if (resourceContext == null) {
+                throw new WebApplicationException("The resourceContext should not be null");
+            }
+            
+            Book book = new JAXBElementProvider<Book>().readFrom(Book.class, Book.class, anns, mt, headers, is);
+            return new BookInfo(book);
+        }
+
+    }
+    
+    private static class BookInfoReader implements MessageBodyReader<BookInfo> {
         @Override
         public boolean isReadable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType arg3) {
             return true;
@@ -1054,6 +1112,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         }
 
     }
+
     private static class ClientTestFeature implements Feature {
 
         @Override

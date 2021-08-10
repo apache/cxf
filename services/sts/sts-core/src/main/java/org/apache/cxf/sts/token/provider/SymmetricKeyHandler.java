@@ -42,7 +42,7 @@ public class SymmetricKeyHandler {
 
     private static final Logger LOG = LogUtils.getL7dLogger(SymmetricKeyHandler.class);
 
-    private int keySize = 256;
+    private int keySize;
     private Entropy clientEntropy;
     private byte[] entropyBytes;
     private byte[] secret;

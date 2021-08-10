@@ -21,6 +21,8 @@ package org.apache.cxf.io;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import org.junit.Test;
+
 public class CacheAndWriteOutputStreamTest extends CachedOutputStreamTest {
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream() {
@@ -37,5 +39,15 @@ public class CacheAndWriteOutputStreamTest extends CachedOutputStreamTest {
     @Override
     protected Object createCache() {
         return new CacheAndWriteOutputStream(baos);
+    }
+
+    @Test
+    public void testCloseMultipleTimes() throws IOException {
+        CacheAndWriteOutputStream cacheAndWriteOutputStream = new CacheAndWriteOutputStream(baos);
+        cacheAndWriteOutputStream.close();
+        cacheAndWriteOutputStream.close();
+        cacheAndWriteOutputStream.close();
+        cacheAndWriteOutputStream.close();
+
     }
 }

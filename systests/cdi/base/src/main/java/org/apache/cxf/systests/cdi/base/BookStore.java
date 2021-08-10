@@ -34,6 +34,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.cxf.systests.cdi.base.bindings.Logged;
+
 @Path("/bookstore/")
 public class BookStore {
     private BookStoreService service;
@@ -76,6 +78,7 @@ public class BookStore {
     @Path("/books")
     @NotNull @Valid
     @Produces(MediaType.APPLICATION_JSON)
+    @Logged
     public Collection< Book > getBooks() {
         return service.all();
     }

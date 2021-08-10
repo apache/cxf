@@ -20,31 +20,13 @@ package org.apache.cxf.systest.sts.deployment;
 
 import java.net.URL;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+public class StaxSTSServer extends STSServer {
 
-public class StaxSTSServer extends AbstractBusTestServerBase {
-
-    public StaxSTSServer() {
-
+    public StaxSTSServer(URL... contexts) {
+        super(contexts.length > 0 ? contexts : new URL[] {
+            StaxSTSServer.class.getResource("cxf-sts.xml"),
+            StaxSTSServer.class.getResource("stax-cxf-sts.xml"),
+        });
     }
 
-    protected void run()  {
-        URL busFile = StaxSTSServer.class.getResource("stax-cxf-sts.xml");
-        Bus busLocal = new SpringBusFactory().createBus(busFile);
-        BusFactory.setDefaultBus(busLocal);
-        setBus(busLocal);
-
-        try {
-            new StaxSTSServer();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void main(String[] args) {
-        new StaxSTSServer().run();
-    }
 }

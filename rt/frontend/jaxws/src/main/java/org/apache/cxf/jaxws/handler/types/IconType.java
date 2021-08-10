@@ -52,8 +52,11 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "iconType", propOrder = {
-        "smallIcon", "largeIcon" })
+@XmlType(name = "iconType",
+    propOrder = {
+        "smallIcon", 
+        "largeIcon" 
+    })
 public class IconType {
 
     @XmlElement(name = "small-icon")

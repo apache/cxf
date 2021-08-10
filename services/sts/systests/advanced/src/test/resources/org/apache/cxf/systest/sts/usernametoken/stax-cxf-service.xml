@@ -31,7 +31,7 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportut" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItTransportUTPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.usernametoken.StaxServer}/doubleit/services/doubleittransportut" wsdlLocation="org/apache/cxf/systest/sts/usernametoken/DoubleIt.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItTransportUTPort" serviceName="s:DoubleItService" depends-on="StaxClientAuthHttpsSettings" address="https://localhost:${testutil.ports.StaxDoubleItServer}/doubleit/services/doubleittransportut" wsdlLocation="org/apache/cxf/systest/sts/usernametoken/DoubleIt.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.ut.validator">
@@ -55,8 +55,8 @@
             </entry>
         </jaxws:properties>
     </jaxws:endpoint>
-    <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
-        <httpj:engine port="${testutil.ports.usernametoken.StaxServer}">
+    <httpj:engine-factory id="StaxClientAuthHttpsSettings" bus="cxf">
+        <httpj:engine port="${testutil.ports.StaxDoubleItServer}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="skpass">
                     <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>

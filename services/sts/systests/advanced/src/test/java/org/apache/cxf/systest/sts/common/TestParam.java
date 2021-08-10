@@ -37,7 +37,7 @@ public final class TestParam {
     }
 
     public String toString() {
-        return port + ":" + (streaming ? "streaming" : "dom") + ":" + stsPort;
+        return port + ':' + (streaming ? "streaming" : "dom") + ':' + stsPort;
     }
 
     public String getPort() {

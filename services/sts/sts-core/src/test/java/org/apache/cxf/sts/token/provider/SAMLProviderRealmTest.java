@@ -111,7 +111,6 @@ public class SAMLProviderRealmTest {
         assertTrue(tokenString.contains("Issuer=\"STS\""));
     }
 
-    @SuppressWarnings("deprecation")
     @org.junit.Test
     public void testRealmsUsingOldRealmClass() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();

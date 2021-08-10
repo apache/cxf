@@ -20,6 +20,7 @@ package org.apache.cxf.jaxrs.sse.client;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
@@ -41,12 +42,16 @@ import javax.ws.rs.sse.SseEventSource;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.impl.RetryAfterHeaderProvider;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 
 /**
  * SSE Event Source implementation 
  */
 public class SseEventSourceImpl implements SseEventSource {
+    // Whether or not incomplete SSE events should be discarded (by default, they will be discarded)
+    public static final String DISCARD_INCOMPLETE_EVENTS = "org.apache.cxf.sse.discard.incomplete.events";
+
     private static final Logger LOG = LogUtils.getL7dLogger(SseEventSourceImpl.class);
     
     private final WebTarget target;
@@ -59,6 +64,7 @@ public class SseEventSourceImpl implements SseEventSource {
     private volatile InboundSseEventProcessor processor; 
     private volatile TimeUnit unit;
     private volatile long delay;
+    private volatile boolean open;
 
     private class InboundSseEventListenerDelegate implements InboundSseEventListener {
         private String lastEventId;
@@ -163,7 +169,7 @@ public class SseEventSourceImpl implements SseEventSource {
 
     @Override
     public void open() {
-        if (!state.compareAndSet(SseSourceState.CLOSED, SseSourceState.CONNECTING)) {
+        if (!tryChangeState(SseSourceState.CLOSED, SseSourceState.CONNECTING)) {
             throw new IllegalStateException("The SseEventSource is already in " + state.get() + " state");
         }
 
@@ -199,9 +205,31 @@ public class SseEventSourceImpl implements SseEventSource {
             final int status = response.getStatus();
             if (status == 204) {
                 LOG.fine("SSE endpoint " + target.getUri() + " returns no data, disconnecting");
-                state.set(SseSourceState.CLOSED);
+                changeState(SseSourceState.CLOSED);
                 response.close();
                 return;
+            }
+            
+            // In addition to handling the standard connection loss failures, JAX-RS SseEventSource automatically 
+            // deals with any HTTP 503 Service Unavailable responses from an SSE endpoint, that contain a "Retry-After" 
+            // HTTP header with a valid value. The HTTP 503 + "Retry-After" technique is often used by HTTP endpoints 
+            // as a means of connection and traffic throttling. In case a HTTP 503 + "Retry-After" response is received 
+            // in return to a connection request, JAX-RS SSE event source will automatically schedule a new reconnect 
+            // attempt and use the received "Retry-After" HTTP header value as a one-time override of the reconnect 
+            // delay.
+            if (status == 503) {
+                final Object retryAfterHeader = response.getHeaders().getFirst(HttpHeaders.RETRY_AFTER);
+                if (retryAfterHeader != null) {
+                    final Duration retryAfter = RetryAfterHeaderProvider.valueOf(retryAfterHeader.toString()); 
+                    final long retryAfterMillis = retryAfter.toMillis();
+                    if (retryAfterMillis >= 0) {
+                        LOG.fine("SSE endpoint " + target.getUri() + " is unavailable, retrying after " 
+                            + retryAfterMillis + "ms");
+                        scheduleReconnect(retryAfterMillis, TimeUnit.MILLISECONDS, lastEventId);
+                        response.close();
+                        return;
+                    }
+                }
             }
 
             // Convert unsuccessful responses to instances of WebApplicationException
@@ -221,15 +249,17 @@ public class SseEventSourceImpl implements SseEventSource {
             final Endpoint endpoint = WebClient.getConfig(target).getEndpoint();
             // Create new processor if this is the first time or the old one has been closed 
             if (processor == null || processor.isClosed()) {
-                LOG.fine("Creating new instance of SSE event processor ...");
-                processor = new InboundSseEventProcessor(endpoint, delegate);
+                final boolean discardIncomplete = getConfigurationProperty(DISCARD_INCOMPLETE_EVENTS, true);
+                LOG.fine("Creating new instance of SSE event processor (discard incomplete events is set to '" 
+                    + discardIncomplete + "') ...");
+                processor = new InboundSseEventProcessor(endpoint, delegate, discardIncomplete);
             }
             
             // Start consuming events
             processor.run(response);
             LOG.fine("SSE event processor has been started ...");
             
-            if (!state.compareAndSet(SseSourceState.CONNECTING, SseSourceState.OPEN)) {
+            if (!tryChangeState(SseSourceState.CONNECTING, SseSourceState.OPEN)) {
                 throw new IllegalStateException("The SseEventSource is already in " + state.get() + " state");
             }
             
@@ -252,7 +282,7 @@ public class SseEventSourceImpl implements SseEventSource {
 
     @Override
     public boolean isOpen() {
-        return state.get() == SseSourceState.OPEN;
+        return open;
     }
 
     @Override
@@ -261,9 +291,9 @@ public class SseEventSourceImpl implements SseEventSource {
             return true;
         }
         
-        if (state.compareAndSet(SseSourceState.CONNECTING, SseSourceState.CLOSED)) {
+        if (tryChangeState(SseSourceState.CONNECTING, SseSourceState.CLOSED)) {
             LOG.fine("The SseEventSource was not connected, closing anyway");
-        } else if (!state.compareAndSet(SseSourceState.OPEN, SseSourceState.CLOSED)) {
+        } else if (!tryChangeState(SseSourceState.OPEN, SseSourceState.CLOSED)) {
             throw new IllegalStateException("The SseEventSource is not opened, but in " + state.get() + " state");
         }
         
@@ -299,7 +329,7 @@ public class SseEventSourceImpl implements SseEventSource {
         // If the connection was still on connecting state, just try to reconnect
         if (state.get() != SseSourceState.CONNECTING) { 
             LOG.fine("The SseEventSource is still opened, moving it to connecting state");
-            if (!state.compareAndSet(SseSourceState.OPEN, SseSourceState.CONNECTING)) {
+            if (!tryChangeState(SseSourceState.OPEN, SseSourceState.CONNECTING)) {
                 throw new IllegalStateException("The SseEventSource is not opened, but in " + state.get()
                     + " state, unable to reconnect");
             }
@@ -315,5 +345,43 @@ public class SseEventSourceImpl implements SseEventSource {
         
         LOG.fine("The reconnection attempt to " + target.getUri() + " is scheduled in "
             + tunit.toMillis(tdelay) + "ms");
+    }
+    
+    private void changeState(SseSourceState updated) {
+        state.set(updated);
+        onStateChanged(updated);
+    }
+    
+    private boolean tryChangeState(SseSourceState expected, SseSourceState updated) {
+        final boolean result = state.compareAndSet(expected, updated);
+        
+        if (result) {
+            onStateChanged(updated);
+        }
+        
+        return result;
+    }
+
+    private void onStateChanged(SseSourceState updated) {
+        if (state.get() == SseSourceState.OPEN) {
+            open = true;
+        } else if (state.get() == SseSourceState.CLOSED) {
+            open = false;
+        }
+    }
+    
+    private boolean getConfigurationProperty(String name, boolean defaultValue) {
+        final Configuration configuration = target.getConfiguration();
+        
+        if (configuration != null) {
+            final Object value = configuration.getProperty(name);
+            if (value instanceof Boolean) {
+                return (Boolean)value;
+            } else if (value != null) {
+                return Boolean.valueOf(value.toString());
+            }
+        }
+        
+        return defaultValue;
     }
 }

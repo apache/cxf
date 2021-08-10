@@ -94,4 +94,20 @@ public class JAXRSClientFactoryBeanTest {
                 endsWith("?list=1&list=2"));
         }
     }
+    
+    @Test
+    public void testClientPropertiesWithState() throws Exception {
+        try (ClassPathXmlApplicationContext ctx =
+                new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/jaxrs/client/spring/clients.xml"})) {
+            Client bean = (Client) ctx.getBean("client3");
+            assertNotNull(bean);
+            assertThat(bean.query("list", "1").query("list", "2").getCurrentURI().toString(),
+                endsWith("?list=1,2"));
+            
+            bean = (Client) ctx.getBean("client1");
+            assertNotNull(bean);
+            assertThat(bean.query("list", "1").query("list", "2").getCurrentURI().toString(),
+                endsWith("?list=1&list=2"));
+        }
+    }
 }

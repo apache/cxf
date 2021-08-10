@@ -39,7 +39,9 @@ public class EntityTagHeaderProviderTest {
         tag = EntityTag.valueOf("W/\"12345\"");
         assertTrue(tag.isWeak() && "12345".equals(tag.getValue()));
         tag = EntityTag.valueOf("\"12345\"");
-        assertFalse(tag.isWeak() && "12345".equals(tag.getValue()));
+        assertTrue(!tag.isWeak() && "12345".equals(tag.getValue()));
+        tag = EntityTag.valueOf("\"wyoBLW/ye71RgN/0LNyj4eA5rfE1ovtlM03aakuGr2Y=\"");
+        assertTrue(!tag.isWeak() && "wyoBLW/ye71RgN/0LNyj4eA5rfE1ovtlM03aakuGr2Y=".equals(tag.getValue()));
     }
 
     @Test

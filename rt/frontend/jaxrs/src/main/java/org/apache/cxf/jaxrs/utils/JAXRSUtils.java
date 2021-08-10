@@ -181,20 +181,69 @@ public final class JAXRSUtils {
         return getPathSegments(thePath, decode, true);
     }
 
+    /**
+     * Parses path segments taking into account the URI templates and template regexes. Per RFC-3986, 
+     * "A path consists of a sequence of path segments separated by a slash ("/") character.", however
+     * it is possible to include slash ("/") inside template regex, for example "/my/path/{a:b/c}", see 
+     * please {@link URITemplate}. In this case, the whole template definition is extracted as a path 
+     * segment, without breaking it.
+     * @param thePath path
+     * @param decode should the path segments be decoded or not
+     * @param ignoreLastSlash should the last slash be ignored or not
+     * @return
+     */
     public static List<PathSegment> getPathSegments(String thePath, boolean decode,
                                                     boolean ignoreLastSlash) {
-        List<PathSegment> theList =
-            Arrays.asList(thePath.split("/")).stream()
-            .filter(StringUtils.notEmpty())
-            .map(p -> new PathSegmentImpl(p, decode))
-            .collect(Collectors.toList());
-
-        int len = thePath.length();
-        if (len > 0 && thePath.charAt(len - 1) == '/') {
-            String value = ignoreLastSlash ? "" : "/";
-            theList.add(new PathSegmentImpl(value, false));
+        
+        final List<PathSegment> segments = new ArrayList<>();
+        int templateDepth = 0;
+        int start = 0;
+        for (int i = 0; i < thePath.length(); ++i) {
+            if (thePath.charAt(i) == '/') {
+                // The '/' is in template (possibly, with arbitrary regex) definition
+                if (templateDepth != 0) {
+                    continue;
+                } else if (start != i) {
+                    final String segment = thePath.substring(start, i);
+                    segments.add(new PathSegmentImpl(segment, decode));
+                }
+                
+                // advance the positions, empty path segments
+                start = i + 1;
+            } else if (thePath.charAt(i) == '{') {
+                ++templateDepth;
+            } else if (thePath.charAt(i) == '}') {
+                --templateDepth; // could go negative, since the template could be unbalanced
+            }
         }
-        return theList;
+        
+        // the URI has unbalanced curly braces, backtrack to the last seen position of the path
+        // segment separator and just split segments as-is from there
+        if (templateDepth != 0) {
+            segments.addAll(
+                Arrays
+                    .stream(thePath.substring(start).split("/"))
+                    .filter(StringUtils.notEmpty())
+                    .map(p -> new PathSegmentImpl(p, decode))
+                    .collect(Collectors.toList()));
+
+            int len = thePath.length();
+            if (len > 0 && thePath.charAt(len - 1) == '/') {
+                String value = ignoreLastSlash ? "" : "/";
+                segments.add(new PathSegmentImpl(value, false));
+            }
+        } else {
+            // the last symbol is slash
+            if (start == thePath.length() && start > 0 && thePath.charAt(start - 1) == '/') {
+                String value = ignoreLastSlash ? "" : "/";
+                segments.add(new PathSegmentImpl(value, false));
+            } else if (!thePath.isEmpty()) {
+                final String segment = thePath.substring(start);
+                segments.add(new PathSegmentImpl(segment, decode));
+            }
+        }
+        
+        return segments;
     }
 
     private static String[] getUserMediaTypes(Object provider, boolean consumes) {
@@ -1029,15 +1078,16 @@ public final class JAXRSUtils {
         MultivaluedMap<String, String> params =
             (MultivaluedMap<String, String>)m.get(FormUtils.FORM_PARAM_MAP);
 
+        String enc = HttpUtils.getEncoding(mt, StandardCharsets.UTF_8.name());
         if (params == null) {
             params = new MetadataMap<>();
             m.put(FormUtils.FORM_PARAM_MAP, params);
 
             if (mt == null || mt.isCompatible(MediaType.APPLICATION_FORM_URLENCODED_TYPE)) {
                 InputStream entityStream = copyAndGetEntityStream(m);
-                String enc = HttpUtils.getEncoding(mt, StandardCharsets.UTF_8.name());
                 String body = FormUtils.readBody(entityStream, enc);
-                FormUtils.populateMapFromStringOrHttpRequest(params, m, body, enc, decode);
+                // Do not decode unless the key is empty value, fe @FormParam("")
+                FormUtils.populateMapFromStringOrHttpRequest(params, m, body, enc, StringUtils.isEmpty(key) && decode);
             } else {
                 if ("multipart".equalsIgnoreCase(mt.getType())
                     && MediaType.MULTIPART_FORM_DATA_TYPE.isCompatible(mt)) {
@@ -1051,6 +1101,14 @@ public final class JAXRSUtils {
                     LOG.warning(errorMsg.toString());
                     throw ExceptionUtils.toNotSupportedException(null, null);
                 }
+            }
+        }
+
+        if (decode) {
+            List<String> values = params.get(key);
+            if (values != null) {
+                values = values.stream().map(value -> HttpUtils.urlDecode(value, enc)).collect(Collectors.toList());
+                params.replace(key, values);
             }
         }
 
@@ -1175,7 +1233,10 @@ public final class JAXRSUtils {
         } else if (ResourceInfo.class.isAssignableFrom(clazz)) {
             o = new ResourceInfoImpl(contextMessage);
         } else if (ResourceContext.class.isAssignableFrom(clazz)) {
-            o = new ResourceContextImpl(contextMessage, contextMessage.getExchange().get(OperationResourceInfo.class));
+            final OperationResourceInfo ori = contextMessage.getExchange().get(OperationResourceInfo.class);
+            if (ori != null) {
+                o = new ResourceContextImpl(contextMessage, ori);
+            }
         } else if (Request.class.isAssignableFrom(clazz)) {
             o = new RequestImpl(contextMessage);
         } else if (Providers.class.isAssignableFrom(clazz)) {
@@ -1359,7 +1420,11 @@ public final class JAXRSUtils {
             }
         }
 
-        queries.add(HttpUtils.urlDecode(name), value);
+        if (decode) {
+            queries.add(HttpUtils.urlDecode(name), value);
+        } else {
+            queries.add(name, value);
+        }
     }
 
     private static Object readFromMessageBody(Class<?> targetTypeClass,
@@ -1988,7 +2053,7 @@ public final class JAXRSUtils {
             return parent;
         } else if (parent.endsWith("/")) {
             // Remove only last slash
-            return parent.replaceAll("/$", "") + child;
+            return parent.substring(0, parent.length() - 1) + child;
         } else {
             return parent + child;
         }

@@ -101,7 +101,7 @@ public class JWTTokenProvider implements TokenProvider {
 
         String realm = tokenParameters.getRealm();
         RealmProperties jwtRealm = null;
-        if (realm != null && realmMap.containsKey(realm)) {
+        if (realm != null) {
             jwtRealm = realmMap.get(realm);
         }
 
@@ -131,9 +131,8 @@ public class JWTTokenProvider implements TokenProvider {
             if (claims.getIssuedAt() > 0) {
                 response.setCreated(Instant.ofEpochMilli(claims.getIssuedAt() * 1000L));
             }
-            Instant expires = null;
             if (claims.getExpiryTime() > 0) {
-                expires = Instant.ofEpochMilli(claims.getExpiryTime() * 1000L);
+                Instant expires = Instant.ofEpochMilli(claims.getExpiryTime() * 1000L);
                 response.setExpires(expires);
             }
 

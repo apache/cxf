@@ -47,10 +47,11 @@ import javax.xml.bind.annotation.XmlType;
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "hello", propOrder = {
-                "arg0",
-                "file"
-         })
+@XmlType(name = "hello", 
+    propOrder = {
+        "arg0",
+        "file"
+    })
 public class Hello {
 
     protected String arg0;

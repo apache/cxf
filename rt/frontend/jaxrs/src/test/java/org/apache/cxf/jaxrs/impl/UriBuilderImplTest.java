@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -1744,5 +1745,234 @@ public class UriBuilderImplTest {
             return Response.ok(test).build();
         }
 
+    }
+    
+    @Test
+    public void testURIWithSpecialCharacters() {
+        final String expected = "http://localhost:8080/xy%22";
+        
+        final URI uri = UriBuilder
+            .fromUri("http://localhost:8080")
+            .path(URLEncoder.encode("xy\"")).build();
+        
+        assertEquals(expected, uri.toString());
+    }
+
+    @Test
+    public void testURIWithSpecialCharacters2() {
+        final String expected = "http://localhost:8080/xy%09";
+        
+        final URI uri = UriBuilder
+            .fromUri("http://localhost:8080")
+            .path(URLEncoder.encode("xy\t"))
+            .buildFromEncoded();
+        
+        assertEquals(expected, uri.toString());
+    }
+
+    @Test
+    public void testURIWithSpecialCharactersPreservePath() {
+        final String expected = "http://localhost:8080/xy/%22/abc";
+        
+        final URI uri = UriBuilder.fromPath("")
+            .replacePath("http://localhost:8080")
+            .path("/{a}/{b}/{c}")
+            .buildFromEncoded("xy", "\"", "abc");
+        
+        assertEquals(expected, uri.toString());
+    }
+
+    @Test
+    public void testURIWithSpecialCharactersPreservePath2() {
+        final String expected = "http://localhost:8080/xy/%09/abc";
+        
+        final URI uri = UriBuilder.fromPath("")
+            .replacePath("http://localhost:8080")
+            .path("/{a}/{b}/{c}")
+            .buildFromEncoded("xy", "\t", "abc");
+        
+        assertEquals(expected, uri.toString());
+    }
+
+    @Test
+    public void testIllegalURI() {
+        final String path = "invalidpath";
+        
+        final URI uri = UriBuilder
+            .fromPath(path)
+            .build();
+        
+        assertEquals(path, uri.toString());
+    }
+    
+    @Test
+    @SuppressWarnings({"checkstyle:linelength"})
+    public void queryParamSpecialCharacters() {
+        final String expected = "http://localhost:8080?%2F%3FabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._%7E%251A%21%24%27%28%29*%2B%2C%3B%3A%40=apiKeyQueryParam1Value";
+        
+        final URI uri = UriBuilder
+            .fromUri("http://localhost:8080")
+            .queryParam(URLEncoder.encode("/?abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~%1A!$'()*+,;:@"), "apiKeyQueryParam1Value")
+            .build();
+        
+        assertEquals(expected, uri.toString());
+    }
+    
+    @Test
+    @SuppressWarnings({"checkstyle:linelength"})
+    public void queryParamSpecialCharactersFromEncoded() {
+        final String expected = "http://localhost:8080?%2F%3FabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._%7E%251A%21%24%27%28%29*%2B%2C%3B%3A%40=apiKeyQueryParam1Value";
+        
+        final URI uri = UriBuilder
+            .fromUri("http://localhost:8080")
+            .queryParam(URLEncoder.encode("/?abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~%1A!$'()*+,;:@"), "apiKeyQueryParam1Value")
+            .buildFromEncoded();
+        
+        assertEquals(expected, uri.toString());
+    }
+    
+    @Test
+    @SuppressWarnings({"checkstyle:linelength"})
+    public void queryParamSpecialCharactersFromEncodedTemplate() {
+        final String expected = "http://localhost:8080?%2F%3FabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._%7E%251A%21%24%27%28%29*%2B%2C%3B%3A%40=apiKeyQueryParam1Value";
+        
+        final URI uri = UriBuilder
+            .fromUri("http://localhost:8080")
+            .queryParam("{a}", "{b}")
+            .buildFromEncoded(URLEncoder.encode("/?abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~%1A!$'()*+,;:@"), "apiKeyQueryParam1Value");
+        
+        assertEquals(expected, uri.toString());
+    }
+    
+    @Test
+    @SuppressWarnings({"checkstyle:linelength"})
+    public void queryParamSpecialCharactersFromTemplate() {
+        final String expected = "http://localhost:8080?/?abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._%7E%251A%21%24%27%28%29*%2B,%3B%3A%40=apiKeyQueryParam1Value";
+        
+        final URI uri = UriBuilder
+            .fromUri("http://localhost:8080")
+            .queryParam("{a}", "{b}")
+            .build("/?abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~%1A!$'()*+,;:@", "apiKeyQueryParam1Value");
+        
+        assertEquals(expected, uri.toString());
+    }
+    
+    @Test
+    public void queryParamToTemplatePartiallyEncoded() {
+        final String template = UriBuilder
+            .fromUri("my/path")
+            .queryParam("p", "%250%")
+            .toTemplate();
+        assertEquals("my/path?p=%250%25", template);
+    }
+    
+    @Test
+    public void queryParamToTemplateNotEncoded() {
+        final String template = UriBuilder
+            .fromUri("my/path")
+            .queryParam("p", "{p}")
+            .resolveTemplate("p", "%250%")
+            .toTemplate();
+        assertEquals("my/path?p=%25250%25", template);
+    }
+    
+    @Test
+    public void pathParamFromTemplateWithOrRegex() {
+        final URI uri = UriBuilder
+            .fromUri("my/path")
+            .path("{p:my|his}")
+            .build("my");
+        assertEquals("my/path/my", uri.toString());
+    }
+    
+    @Test
+    public void pathParamFromTemplateWithRegex() {
+        final URI uri = UriBuilder
+            .fromUri("my/path")
+            .path("{p:his/him}")
+            .buildFromEncoded("his/him");
+        assertEquals("my/path/his/him", uri.toString());
+    }
+    
+    @Test
+    public void pathParamFromNestedTemplateWithRegex() {
+        // The nested templates are not supported and are not detected 
+        final URI uri = UriBuilder
+            .fromUri("my/path")
+            .path("{{p:his/him}}")
+            .build();
+        assertEquals("my/path/%7B%7Bp:his/him%7D%7D", uri.toString());
+    }
+    
+    @Test
+    public void pathParamFromBadTemplateNested() {
+        final URI uri = UriBuilder
+            .fromUri("my/path")
+            .path("{p{d}}")
+            .build("my");
+        assertEquals("my/path/%7Bp%7Bd%7D%7D", uri.toString());
+    }
+    
+    @Test
+    public void pathParamFromBadTemplateUnopened() {
+        final URI uri = UriBuilder
+            .fromUri("my/path")
+            .path("p{d}/}")
+            .build("my");
+        assertEquals("my/path/pmy/%7D", uri.toString());
+    }
+    
+    @Test
+    public void pathParamFromBadTemplateUnclosed() {
+        final URI uri = UriBuilder
+            .fromUri("my/path")
+            .path("{p/{d}")
+            .build("my");
+        assertEquals("my/path/%7Bp/my", uri.toString());
+    }
+    
+    @Test
+    public void pathParamFromEmpty() {
+        final URI uri = UriBuilder
+            .fromUri("/")
+            .path("/")
+            .build();
+        assertEquals("/", uri.toString());
+    }
+    
+    @Test
+    public void pathParamFromEmptyWithSpaces() {
+        final URI uri = UriBuilder
+            .fromUri("/")
+            .path("   /   ")
+            .build();
+        assertEquals("/%20%20%20/%20%20%20", uri.toString());
+    }
+    
+    @Test
+    public void pathParamFromBadTemplateUnopenedAndEnclosedSlash() {
+        final URI uri = UriBuilder
+            .fromUri("my/path")
+            .path("p{d:my/day}/}")
+            .buildFromEncoded("my/day");
+        assertEquals("my/path/pmy/day/%7D", uri.toString());
+    }
+    
+    @Test
+    public void pathParamFromBadTemplateUnclosedAndEnclosedSlash() {
+        final URI uri = UriBuilder
+            .fromUri("my/path")
+            .path("{p/{d:my/day}")
+            .build();
+        assertEquals("my/path/%7Bp/%7Bd:my/day%7D", uri.toString());
+    }
+    
+    @Test
+    public void pathParamFromBadTemplate() {
+        final URI uri = UriBuilder
+            .fromUri("/")
+            .path("{")
+            .build();
+        assertEquals("/%7B", uri.toString());
     }
 }

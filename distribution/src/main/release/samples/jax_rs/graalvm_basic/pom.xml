@@ -30,7 +30,6 @@
     </parent>
      <properties>
         <cxf.version>${project.version}</cxf.version>
-        <graalvm.version>20.3.0</graalvm.version>
     </properties>
     <profiles>
         <profile>

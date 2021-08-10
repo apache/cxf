@@ -39,10 +39,14 @@ public class AttachmentOutInterceptor extends AbstractPhaseInterceptor<Message> 
     public static final String WRITE_ATTACHMENTS = "write.attachments";
     
     public static final String ATTACHMENT_OUT_CHECKED = "attachment.out.checked";
+    
+    public static final String WRITE_OPTIONAL_TYPE_PARAMETERS = "write.optional.type.parameters";
 
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AttachmentOutInterceptor.class);
 
     private AttachmentOutEndingInterceptor ending = new AttachmentOutEndingInterceptor();
+    
+    private boolean writeOptionalTypeParameters = true;
 
     public AttachmentOutInterceptor() {
         super(Phase.PRE_STREAM);
@@ -63,6 +67,7 @@ public class AttachmentOutInterceptor extends AbstractPhaseInterceptor<Message> 
         boolean writeAtts = MessageUtils.getContextualBoolean(message, WRITE_ATTACHMENTS, false)
             || (message.getAttachments() != null && !message.getAttachments().isEmpty());
 
+        writeOptionalTypeParameters = MessageUtils.getContextualBoolean(message, WRITE_OPTIONAL_TYPE_PARAMETERS, true);
         if (!mtomEnabled && !writeAtts) {
             return;
         }
@@ -98,7 +103,7 @@ public class AttachmentOutInterceptor extends AbstractPhaseInterceptor<Message> 
     }
 
     protected boolean writeOptionalTypeParameters() {
-        return true;
+        return writeOptionalTypeParameters;
     }
 
     protected Map<String, List<String>> getRootHeaders() {

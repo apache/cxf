@@ -394,7 +394,7 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
         // Also handle "ActAs" via the ActAsAttributeStatementProvider
         if (!statementAdded) {
             attrBeanList = new ArrayList<>();
-            AttributeStatementProvider attributeProvider = null;
+            AttributeStatementProvider attributeProvider;
             if (combineClaimAttributes) {
                 attributeProvider = new CombinedClaimsAttributeStatementProvider();
             } else {

@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.rs.security.httpsignature.filters;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 import javax.annotation.Priority;
@@ -85,9 +84,8 @@ public class CreateSignatureInterceptor extends AbstractSignatureOutFilter
         // Only sign the request if we have no Body.
         if (requestContext.getEntity() == null) {
             String method = requestContext.getMethod();
-            String path = requestContext.getUri().getPath();
-
-            performSignature(requestContext.getHeaders(), path, method);
+            performSignature(requestContext.getHeaders(),
+                SignatureHeaderUtils.createRequestTarget(requestContext.getUri()), method);
         }
     }
 
@@ -108,8 +106,8 @@ public class CreateSignatureInterceptor extends AbstractSignatureOutFilter
         // We don't pass the HTTP method + URI for the response case
         if (MessageUtils.isRequestor(m)) {
             method = HttpUtils.getProtocolHeader(JAXRSUtils.getCurrentMessage(),
-                                                 Message.HTTP_REQUEST_METHOD, "");
-            path = uriInfo.getRequestUri().getPath();
+                Message.HTTP_REQUEST_METHOD, "");
+            path = SignatureHeaderUtils.createRequestTarget(uriInfo.getRequestUri());
         }
 
         performSignature(writerInterceptorContext.getHeaders(), path, method);

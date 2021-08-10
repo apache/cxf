@@ -149,7 +149,7 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
 
             realm = tokenResponse.getTokenRealm();
             for (TokenRenewer tokenRenewer : tokenRenewers) {
-                boolean canHandle = false;
+                final boolean canHandle;
                 if (realm == null) {
                     canHandle = tokenRenewer.canHandleToken(tokenResponse.getToken());
                 } else {
@@ -233,7 +233,7 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
         if (returnReferences) {
             // RequestedAttachedReference
             TokenReference attachedReference = tokenRenewerResponse.getAttachedReference();
-            RequestedReferenceType requestedAttachedReferenceType = null;
+            final RequestedReferenceType requestedAttachedReferenceType;
             if (attachedReference != null) {
                 requestedAttachedReferenceType = createRequestedReference(attachedReference, true);
             } else {
@@ -251,7 +251,7 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
 
             // RequestedUnattachedReference
             TokenReference unAttachedReference = tokenRenewerResponse.getUnAttachedReference();
-            RequestedReferenceType requestedUnattachedReferenceType = null;
+            final RequestedReferenceType requestedUnattachedReferenceType;
             if (unAttachedReference != null) {
                 requestedUnattachedReferenceType = createRequestedReference(unAttachedReference, false);
             } else {

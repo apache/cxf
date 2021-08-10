@@ -136,7 +136,7 @@ public class UsernameTokenValidator implements TokenValidator {
         UsernameTokenType usernameTokenType = (UsernameTokenType)validateTarget.getToken();
 
         // Marshall the received JAXB object into a DOM Element
-        Element usernameTokenElement = null;
+        final Element usernameTokenElement;
         try {
             Set<Class<?>> classes = new HashSet<>();
             classes.add(ObjectFactory.class);

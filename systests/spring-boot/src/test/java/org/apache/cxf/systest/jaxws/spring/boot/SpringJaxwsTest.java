@@ -22,6 +22,7 @@ package org.apache.cxf.systest.jaxws.spring.boot;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -57,6 +58,7 @@ import org.springframework.util.SocketUtils;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.search.MeterNotFoundException;
 import io.micrometer.core.instrument.search.RequiredSearch;
 
 import org.junit.jupiter.api.AfterEach;
@@ -69,6 +71,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.assertj.core.api.Assertions.entry;
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.Matchers.empty;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
@@ -150,6 +155,10 @@ public class SpringJaxwsTest {
                         + "<return>Hello, Elan</return>"
                         + "</ns2:sayHelloResponse>");
 
+        await()
+            .atMost(Duration.ofSeconds(1))
+            .ignoreException(MeterNotFoundException.class)
+            .until(() -> registry.get("cxf.server.requests").timers(), not(empty()));
         RequiredSearch serverRequestMetrics = registry.get("cxf.server.requests");
 
         Map<Object, Object> serverTags = serverRequestMetrics.timer().getId().getTags().stream()
@@ -195,6 +204,10 @@ public class SpringJaxwsTest {
             .hasMessageContaining("Fault occurred while processing");
 
 
+        await()
+            .atMost(Duration.ofSeconds(1))
+            .ignoreException(MeterNotFoundException.class)
+            .until(() -> registry.get("cxf.server.requests").timers(), not(empty()));
         RequiredSearch serverRequestMetrics = registry.get("cxf.server.requests");
 
         Map<Object, Object> serverTags = serverRequestMetrics.timer().getId().getTags().stream()
@@ -259,6 +272,10 @@ public class SpringJaxwsTest {
         final HelloService api = createApi(port, HELLO_SERVICE_NAME_V1); 
         assertThat(api.sayHello("Elan")).isEqualTo("Hello, Elan");
 
+        await()
+            .atMost(Duration.ofSeconds(1))
+            .ignoreException(MeterNotFoundException.class)
+            .until(() -> registry.get("cxf.server.requests").timers(), not(empty()));
         RequiredSearch serverRequestMetrics = registry.get("cxf.server.requests");
 
         Map<Object, Object> serverTags = serverRequestMetrics.timer().getId().getTags().stream()
@@ -299,6 +316,10 @@ public class SpringJaxwsTest {
             .isInstanceOf(SOAPFaultException.class)
             .hasMessageContaining("Fault occurred while processing");
 
+        await()
+            .atMost(Duration.ofSeconds(1))
+            .ignoreException(MeterNotFoundException.class)
+            .until(() -> registry.get("cxf.server.requests").timers(), not(empty()));
         RequiredSearch serverRequestMetrics = registry.get("cxf.server.requests");
 
         Map<Object, Object> serverTags = serverRequestMetrics.timer().getId().getTags().stream()

@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.httpsignature.utils;
 
+import java.net.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Clock;
@@ -101,4 +102,14 @@ public final class SignatureHeaderUtils {
         });
     }
 
+    public static String createRequestTarget(URI uri) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(uri.getPath());
+
+        if (uri.getRawQuery() != null) {
+            stringBuilder.append('?');
+            stringBuilder.append(uri.getRawQuery());
+        }
+        return stringBuilder.toString();
+    }
 }

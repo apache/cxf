@@ -33,7 +33,7 @@ import org.example.contract.doubleit.DoubleItPortType;
 @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
             serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")
+@Features(classes = org.apache.cxf.ext.logging.LoggingFeature.class)
 public class DoubleItPortTypeImpl implements DoubleItPortType {
 
     @Resource

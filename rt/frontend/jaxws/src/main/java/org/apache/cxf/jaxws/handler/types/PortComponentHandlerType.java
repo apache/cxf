@@ -60,9 +60,17 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "port-component_handlerType", propOrder = {
-        "description", "displayName", "icon", "handlerName", "handlerClass", "initParam", "soapHeader",
-        "soapRole" })
+@XmlType(name = "port-component_handlerType", 
+    propOrder = {
+        "description", 
+        "displayName", 
+        "icon", 
+        "handlerName", 
+        "handlerClass", 
+        "initParam", 
+        "soapHeader",
+        "soapRole" 
+    })
 public class PortComponentHandlerType {
 
     protected List<DescriptionType> description;

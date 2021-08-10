@@ -128,7 +128,7 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
 
     public ProcessedClaimCollection retrieveClaimValues(
             ClaimCollection claims, ClaimsParameters parameters) {
-        String user = null;
+        final String user;
         boolean useLdapLookup = false;
 
         Principal principal = parameters.getPrincipal();

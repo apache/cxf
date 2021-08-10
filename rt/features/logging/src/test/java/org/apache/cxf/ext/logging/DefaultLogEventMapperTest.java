@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.cxf.ext.logging.event.DefaultLogEventMapper;
+import org.apache.cxf.ext.logging.event.EventType;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -52,6 +53,22 @@ public class DefaultLogEventMapperTest {
         message.setExchange(exchange);
         LogEvent event = mapper.map(message, Collections.emptySet());
         assertEquals("GET[test]", event.getOperationName());
+    }
+
+    @Test
+    public void testPreflightRequestEventType() {
+        DefaultLogEventMapper mapper = new DefaultLogEventMapper();
+        Message message = new MessageImpl();
+        message.put(Message.HTTP_REQUEST_METHOD, "OPTIONS");
+        message.put(Message.REQUEST_URI, "test");
+        message.put(Message.RESPONSE_CODE, 200);
+        Exchange exchange = new ExchangeImpl();
+        // operation name not included
+        exchange.put("org.apache.cxf.rs.security.cors.CrossOriginResourceSharingFilter", "preflight_passed");
+        message.setExchange(exchange);
+        exchange.setOutMessage(message);
+        LogEvent event = mapper.map(message, Collections.emptySet());
+        assertEquals(EventType.RESP_OUT, event.getType());
     }
 
     /**
@@ -100,6 +117,34 @@ public class DefaultLogEventMapperTest {
 
         LogEvent event = mapper.map(message, sensitiveHeaders);
         assertEquals(MASKED_HEADER_VALUE, event.getHeaders().get(TEST_HEADER_NAME));
+    }
+
+    @Test
+    public void testMapNullSensitiveProtocolHeaders() {
+        DefaultLogEventMapper mapper = new DefaultLogEventMapper();
+        Message message = new MessageImpl();
+        message.put(Message.HTTP_REQUEST_METHOD, "POST");
+        message.put(Message.REQUEST_URI, "nullTest");
+        Exchange exchange = new ExchangeImpl();
+        message.setExchange(exchange);
+
+        LogEvent event = mapper.map(message, null);
+
+        assertEquals("POST[nullTest]", event.getOperationName());
+    }
+
+    @Test
+    public void testMap() {
+        DefaultLogEventMapper mapper = new DefaultLogEventMapper();
+        Message message = new MessageImpl();
+        message.put(Message.HTTP_REQUEST_METHOD, "PUT");
+        message.put(Message.REQUEST_URI, "test");
+        Exchange exchange = new ExchangeImpl();
+        message.setExchange(exchange);
+
+        LogEvent event = mapper.map(message);
+
+        assertEquals("PUT[test]", event.getOperationName());
     }
 
 }

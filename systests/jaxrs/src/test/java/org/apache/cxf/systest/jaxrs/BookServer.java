@@ -93,7 +93,7 @@ public class BookServer extends AbstractServerTestServerBase {
         bus.setProperty(ExceptionMapper.class.getName(), new BusMapperExceptionMapper());
 
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        sf.setResourceClasses(BookStore.class, SimpleBookStore.class, BookStorePerRequest.class);
+        sf.setResourceClasses(BookStore.class, SimpleBookStore.class, BookStorePerRequest.class, BookStoreRegex.class);
 
         //default lifecycle is per-request, change it to singleton
         final BinaryDataProvider<Object> p = new BinaryDataProvider<>();
