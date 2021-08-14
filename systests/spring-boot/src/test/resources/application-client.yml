@@ -1,0 +1,10 @@
+cxf:
+  path: /api
+  servlet:
+    enabled: false
+  jaxrs:
+    component-scan: false
+    classes-scan: false
+  metrics:
+    jaxws:
+      enabled: false

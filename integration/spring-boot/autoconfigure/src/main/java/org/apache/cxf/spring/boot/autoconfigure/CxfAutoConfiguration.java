@@ -31,6 +31,7 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -59,6 +60,7 @@ public class CxfAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(name = "cxfServletRegistration")
+    @ConditionalOnProperty(prefix = "cxf", name = "servlet.enabled", matchIfMissing = true)
     public ServletRegistrationBean<CXFServlet> cxfServletRegistration() {
         String path = this.properties.getPath();
         String urlMapping = path.endsWith("/") ? path + "*" : path + "/*";
