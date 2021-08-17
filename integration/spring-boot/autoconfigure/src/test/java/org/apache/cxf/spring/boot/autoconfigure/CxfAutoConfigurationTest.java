@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerImpl;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.spring.boot.jaxrs.CustomJaxRSServer;
 import org.hamcrest.Matcher;
 import org.springframework.beans.factory.UnsatisfiedDependencyException;
@@ -47,6 +48,7 @@ import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -112,6 +114,14 @@ public class CxfAutoConfigurationTest {
                 .getBean(ServletRegistrationBean.class);
         assertThat(ReflectionTestUtils.getField(registrationBean, "loadOnStartup"),
                 equalTo(1));
+    }
+    
+    @Test
+    public void disableServlet() {
+        load(CxfAutoConfiguration.class, "cxf.servlet.enabled=false");
+        Map<String, ServletRegistrationBean<?>> registrationBeans = CastUtils.cast(this.context
+                .getBeansOfType(ServletRegistrationBean.class));
+        assertThat(registrationBeans.keySet(), empty());
     }
 
     @Test
