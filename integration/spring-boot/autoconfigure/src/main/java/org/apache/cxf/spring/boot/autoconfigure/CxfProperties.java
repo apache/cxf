@@ -74,6 +74,11 @@ public class CxfProperties {
          * Load on startup priority of the Apache CXF servlet.
          */
         private int loadOnStartup = -1;
+        
+        /**
+         * Enables or disables the servlet registration
+         */
+        private boolean enabled = true;
 
         public Map<String, String> getInit() {
             return this.init;
@@ -91,6 +96,13 @@ public class CxfProperties {
             this.loadOnStartup = loadOnStartup;
         }
 
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
     }
 
     public static class Metrics {
