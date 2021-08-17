@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.jaxws;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -53,6 +54,8 @@ import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Document;
 
+import com.google.common.io.Files;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
@@ -61,6 +64,8 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.dynamic.DynamicClientFactory;
 import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.helpers.FileUtils;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -1000,6 +1005,70 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         StreamSource response = dispatcher.invoke(request);
 
         assertEquals(requestString, StaxUtils.toString(response));
+    }
+    
+    @Test
+    public void testEchoProviderThresholdAsync() throws Exception {
+        final File f = Files.createTempDir();
+        LOG.info("Using temp folder: " + f.getAbsolutePath());
+        
+        System.setProperty("org.apache.cxf.io.CachedOutputStream.OutputDirectory", f.getAbsolutePath());
+        CachedOutputStream.setDefaultThreshold(5);
+        
+        String requestString = "<echo/>";
+        Service service = Service.create(serviceName);
+        service.addPort(fakePortName, javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING,
+                        "http://localhost:" + PORT + "/SoapContext/AsyncEchoProvider");
+        Dispatch<StreamSource> dispatcher = service.createDispatch(fakePortName,
+                                                                   StreamSource.class,
+                                                                   Service.Mode.PAYLOAD);
+        dispatcher.getRequestContext().put("javax.xml.ws.client.receiveTimeout", "5000");
+        
+        StreamSource request = new StreamSource(new ByteArrayInputStream(requestString.getBytes()));
+        StreamSource response = dispatcher.invoke(request);
+
+        assertEquals(requestString, StaxUtils.toString(response));
+        
+        //give the server side a little time to process it's part and close the files
+        if (f.list().length > 0) {
+            Thread.sleep(500);
+        }
+        
+        assertEquals("Expected no files but there is at list one", 0, f.list().length);
+        FileUtils.removeDir(f);
+    }
+    
+    @Test
+    public void testEchoProviderThresholdAsyncThrows() throws Exception {
+        final File f = Files.createTempDir();
+        LOG.info("Using temp folder: " + f.getAbsolutePath());
+        
+        System.setProperty("org.apache.cxf.io.CachedOutputStream.OutputDirectory", f.getAbsolutePath());
+        CachedOutputStream.setDefaultThreshold(5);
+        
+        String requestString = "<echo/>";
+        Service service = Service.create(serviceName);
+        service.addPort(fakePortName, javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING,
+                        "http://localhost:" + PORT + "/SoapContext/AsyncEchoProvider");
+        Dispatch<StreamSource> dispatcher = service.createDispatch(fakePortName,
+                                                                   StreamSource.class,
+                                                                   Service.Mode.PAYLOAD);
+        dispatcher.getRequestContext().put("javax.xml.ws.client.receiveTimeout", "500");
+        
+        try {
+            StreamSource request = new StreamSource(new ByteArrayInputStream(requestString.getBytes()));
+            StreamSource response = dispatcher.invoke(request);
+            assertEquals(requestString, StaxUtils.toString(response));
+        } catch (final WebServiceException ex) {
+            ((DispatchImpl<StreamSource>)dispatcher).getClient().close();
+        }
+        //give the server side a little time to process it's part and close the files
+        if (f.list().length > 0) {
+            Thread.sleep(500);
+        }
+        
+        assertEquals("Expected no files but there is at list one", 0, f.list().length);
+        FileUtils.removeDir(f);
     }
 
     @Test

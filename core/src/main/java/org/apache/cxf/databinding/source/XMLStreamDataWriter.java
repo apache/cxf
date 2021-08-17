@@ -18,7 +18,9 @@
  */
 package org.apache.cxf.databinding.source;
 
+import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.logging.Logger;
 
@@ -28,6 +30,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.Validator;
 
@@ -67,22 +70,24 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
 
     @SuppressWarnings("PMD.UseTryWithResources")
     public void write(Object obj, XMLStreamWriter writer) {
-        try {
+        Closeable toClose = null;
+        try {            
             if (obj instanceof DataSource) {
                 DataSource ds = (DataSource)obj;
+                InputStream is = ds.getInputStream();
+                toClose = is;                    
                 if (schema != null) {
-                    DOMSource domSource = new DOMSource(StaxUtils.read(ds.getInputStream()));
+                    DOMSource domSource = new DOMSource(StaxUtils.read(is));
                     Validator schemaValidator = schema.newValidator();
                     schemaValidator.setErrorHandler(
                         new MtomValidationErrorHandler(schemaValidator.getErrorHandler(), domSource.getNode()));
                     schemaValidator.validate(domSource);
                     StaxUtils.copy(domSource, writer);
                 } else {
-                    XMLStreamReader reader = StaxUtils.createXMLStreamReader(ds.getInputStream());
+                    XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
                     StaxUtils.copy(reader, writer);
                     reader.close();
                 }
-
             } else if (obj instanceof Node) {
                 if (obj instanceof DocumentFragment) {
                     obj = org.apache.cxf.helpers.DOMUtils.getDomDocumentFragment((DocumentFragment)obj);
@@ -111,6 +116,14 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
                     && ((DOMSource) s).getNode() == null) {
                     return;
                 }
+                if (s instanceof StreamSource) {
+                    StreamSource ss = (StreamSource)s;
+                    if (ss.getInputStream() != null) {
+                        toClose = ss.getInputStream();
+                    } else {
+                        toClose = ss.getReader();
+                    }
+                }
                 StaxUtils.copy(s, writer);
             }
         } catch (XMLStreamException e) {
@@ -121,6 +134,14 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
         } catch (SAXException e) {
             throw new Fault("COULD_NOT_WRITE_XML_STREAM_CAUSED_BY", LOG, e,
                             e.getClass().getCanonicalName(), e.getMessage());
+        } finally {
+            if (toClose != null) {
+                try {
+                    toClose.close();
+                } catch (IOException ex) {
+                    //likely already closed, not something we need to worry about
+                }
+            }
         }
     }
 
