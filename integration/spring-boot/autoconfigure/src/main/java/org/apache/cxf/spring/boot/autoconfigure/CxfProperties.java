@@ -44,6 +44,8 @@ public class CxfProperties {
     private final Servlet servlet = new Servlet();
 
     private final Metrics metrics = new Metrics();
+    
+    private final JaxrsScan jaxrs = new JaxrsScan();
 
     @NotNull
     @Pattern(regexp = "/[^?#]*", message = "Path must start with /")
@@ -61,6 +63,10 @@ public class CxfProperties {
 
     public Metrics getMetrics() {
         return this.metrics;
+    }
+    
+    public JaxrsScan getJaxrs() {
+        return this.jaxrs;
     }
 
     public static class Servlet {
@@ -204,6 +210,94 @@ public class CxfProperties {
             this.enabled = enabled;
         }
 
+    }
+    
+    public static class JaxrsScan {
+
+        
+        
+        /**
+         * property to create a JAX-RS endpoint from the auto-discovered JAX-RS 
+         * root resources and provider classes. Such classes do not have to be 
+         * annotated with Spring @Component. This property needs to be accompanied 
+         * by a "cxf.jaxrs.classes-scan-packages" property which sets a comma-separated 
+         * list of the packages to scan.
+         */
+        private boolean classesScan;
+        
+        /**
+         * property to create a JAX-RS endpoint from the auto-discovered 
+         * JAX-RS root resources and providers which are marked as Spring 
+         * Components (annotated with Spring @Component or created and 
+         * returned from @Bean methods).
+         */
+        private boolean componentScan;
+        
+        /**
+         * property to restrict which of the auto-discovered Spring components
+         * are accepted as JAX-RS resource or provider classes. It sets a 
+         * comma-separated list of the packages that a given bean instance's 
+         * class must be in. Note, this property, if set, is only effective
+         * if a given bean is a singleton. It can be used alongside or as
+         * an alternative to the "cxf.jaxrs.component-scan-beans" property. 
+         */
+        private String componentScanPackages;
+        
+        /**
+         * property to restrict which of the auto-discovered Spring components 
+         * are accepted as JAX-RS resource or provider classes. It sets a 
+         * comma-separated list of the accepted bean names - the auto-discovered 
+         * component will only be accepted if its bean name is in this list. 
+         * It can be used alongside or as an alternative to the 
+         * "cxf.jaxrs.component-scan-packages" property.  
+         */
+        private String componentScanBeans;
+        
+        private String classesScanPackages;
+        
+
+        public boolean isComponentScan() {
+            return componentScan;
+        }
+
+        public void setComponentScan(boolean componentScan) {
+            this.componentScan = componentScan;
+        }
+
+        public String getComponentScanPackages() {
+            return componentScanPackages;
+        }
+
+        public void setComponentScanPackages(String componentScanPackages) {
+            this.componentScanPackages = componentScanPackages;
+        }
+
+        public String getComponentScanBeans() {
+            return componentScanBeans;
+        }
+
+        public void setComponentScanBeans(String componentScanBeans) {
+            this.componentScanBeans = componentScanBeans;
+        }
+
+        public boolean isClassesScan() {
+            return classesScan;
+        }
+
+        public void setClassesScan(boolean classesScan) {
+            this.classesScan = classesScan;
+        }
+
+        public String getClassesScanPackages() {
+            return classesScanPackages;
+        }
+
+        public void setClassesScanPackages(String classesScanPackages) {
+            this.classesScanPackages = classesScanPackages;
+        }
+
+        
+        
     }
 
 }
