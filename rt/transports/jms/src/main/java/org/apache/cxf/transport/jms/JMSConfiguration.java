@@ -25,6 +25,7 @@ import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
+import javax.jms.TemporaryQueue;
 import javax.naming.NamingException;
 import javax.transaction.TransactionManager;
 
@@ -487,8 +488,11 @@ public class JMSConfiguration {
             : destinationResolver.resolveDestinationName(session, replyDestination, replyPubSubDomain);
     }
 
-    public void resetCachedReplyDestination() {
+    public void resetCachedReplyDestination() throws JMSException {
         synchronized (this) {
+            if (replyDestinationDest instanceof TemporaryQueue) {
+                ((TemporaryQueue) replyDestinationDest).delete();
+            }
             this.replyDestinationDest = null;
         }
     }

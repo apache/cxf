@@ -36,7 +36,6 @@ import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.MessageListener;
 import javax.jms.Session;
-import javax.jms.TemporaryQueue;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
@@ -128,10 +127,14 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
     private void trySetExListener(Connection conn) {
         try {
             conn.setExceptionListener(new ExceptionListener() {
-                
+
                 @Override
                 public void onException(JMSException exception) {
-                    jmsConfig.resetCachedReplyDestination();
+                    try {
+                        jmsConfig.resetCachedReplyDestination();
+                    } catch (JMSException e) {
+                        // setException is not supported on all providers
+                    }
                     staticReplyDestination = null;
                 }
             });
@@ -189,7 +192,11 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                 }
                 ResourceCloser.close(connection);
                 this.connection = null;
-                jmsConfig.resetCachedReplyDestination();
+                try {
+                    jmsConfig.resetCachedReplyDestination();
+                } catch (JMSException jmsException) {
+                    // Ignore
+                }
             }
             this.staticReplyDestination = null;
             try {
@@ -283,9 +290,6 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                                                                      jmsConfig.getReceiveTimeout(),
                                                                      jmsConfig.isPubSubNoLocal(),
                                                                      exchange);
-                    if (replyDestination instanceof TemporaryQueue) {
-                        ((TemporaryQueue) replyDestination).delete();
-                    }
                     processReplyMessage(exchange, replyMessage);
                 } else {
                     try {
@@ -514,6 +518,11 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         }
     }
     public synchronized void close() {
+        try {
+            jmsConfig.resetCachedReplyDestination();
+        } catch (JMSException e) {
+            // do nothing
+        }
         shutdownListeners();
         ResourceCloser.close(connection);
         connection = null;
