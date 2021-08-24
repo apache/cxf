@@ -19,6 +19,8 @@
 package org.apache.cxf.transport.jms;
 
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
@@ -30,12 +32,16 @@ import javax.naming.NamingException;
 import javax.transaction.TransactionManager;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.transport.jms.util.DestinationResolver;
 import org.apache.cxf.transport.jms.util.JMSDestinationResolver;
 import org.apache.cxf.transport.jms.util.JndiHelper;
 
 @NoJSR250Annotations
 public class JMSConfiguration {
+
+    private static final Logger LOG = LogUtils.getL7dLogger(JMSConfiguration.class);
+
     /**
      * Default value to mark as unset
      */
@@ -488,10 +494,14 @@ public class JMSConfiguration {
             : destinationResolver.resolveDestinationName(session, replyDestination, replyPubSubDomain);
     }
 
-    public void resetCachedReplyDestination() throws JMSException {
+    public void resetCachedReplyDestination() {
         synchronized (this) {
             if (replyDestinationDest instanceof TemporaryQueue) {
-                ((TemporaryQueue) replyDestinationDest).delete();
+                try {
+                    ((TemporaryQueue) replyDestinationDest).delete();
+                } catch (JMSException exception) {
+                    LOG.log(Level.WARNING, "Exception on temporary queue deletion", exception);
+                }
             }
             this.replyDestinationDest = null;
         }

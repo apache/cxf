@@ -130,11 +130,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
 
                 @Override
                 public void onException(JMSException exception) {
-                    try {
-                        jmsConfig.resetCachedReplyDestination();
-                    } catch (JMSException e) {
-                        // setException is not supported on all providers
-                    }
+                    jmsConfig.resetCachedReplyDestination();
                     staticReplyDestination = null;
                 }
             });
@@ -192,11 +188,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                 }
                 ResourceCloser.close(connection);
                 this.connection = null;
-                try {
-                    jmsConfig.resetCachedReplyDestination();
-                } catch (JMSException jmsException) {
-                    // Ignore
-                }
+                jmsConfig.resetCachedReplyDestination();
             }
             this.staticReplyDestination = null;
             try {
@@ -518,11 +510,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         }
     }
     public synchronized void close() {
-        try {
-            jmsConfig.resetCachedReplyDestination();
-        } catch (JMSException e) {
-            // do nothing
-        }
+        jmsConfig.resetCachedReplyDestination();
         shutdownListeners();
         ResourceCloser.close(connection);
         connection = null;
