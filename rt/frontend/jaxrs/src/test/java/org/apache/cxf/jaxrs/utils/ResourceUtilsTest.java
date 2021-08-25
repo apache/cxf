@@ -40,6 +40,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.Customer;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.model.MethodDispatcher;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
@@ -208,6 +209,57 @@ public class ResourceUtilsTest {
         assertEquals("there must be only one method, which is the getById(String)",
                 1,
                 cri.getMethodDispatcher().getOperationResourceInfos().size());
+    }
+
+    @Path("/bridge-example")
+    private interface BridgeExample<T> {
+        @GET
+        @Path("/foo")
+        T foo();
+    }
+
+    private static class BridgeExampleImpl implements BridgeExample<String> {
+        public String foo() {
+            return "Hello World!";
+        }
+    }
+
+    @Test
+    public void testClassResourceInfoSecondaryBinds() {
+        ClassResourceInfo cri = ResourceUtils.createClassResourceInfo(
+                BridgeExampleImpl.class,
+                BridgeExampleImpl.class,
+                true,
+                false);
+
+        MethodDispatcher md = cri.getMethodDispatcher();
+
+        Method bridge = null;
+        Method real = null;
+
+        for (Method candidate : BridgeExampleImpl.class.getDeclaredMethods()) {
+            if (candidate.isBridge()) {
+                bridge = candidate;
+            } else {
+                real = candidate;
+            }
+            if (bridge != null && real != null) {
+                break;
+            }
+        }
+
+        assertNotNull(bridge);
+        assertNotNull(real);
+
+        // Only one ori-to-method mapping should exist, to the real foo()
+        Set<OperationResourceInfo> oris =  md.getOperationResourceInfos();
+        assertEquals(1, oris.size());
+        OperationResourceInfo ori = oris.iterator().next();
+        assertEquals(real, md.getMethod(ori));
+
+        // Both the bridge and real method should have a method-to-ori mapping
+        assertEquals(ori, md.getOperationResourceInfo(bridge));
+        assertEquals(ori, md.getOperationResourceInfo(real));
     }
 
     protected interface OverriddenInterface<T> {

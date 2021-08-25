@@ -58,3 +58,5 @@ This product includes code from the Nimbus JOSE + JWT project, under the Apache
 license 2.0 (https://github.com/felx/nimbus-jose-jwt). Copyright 2012-2017,
 Connect2id Ltd.
 
+Portions of this software were developed at
+Cloudera, Inc (https://www.cloudera.com/).

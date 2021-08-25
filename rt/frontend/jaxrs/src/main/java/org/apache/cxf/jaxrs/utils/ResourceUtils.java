@@ -78,6 +78,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.CastUtils;
@@ -357,7 +358,14 @@ public final class ResourceUtils {
                 return;
             }
 
-            md.bind(createOperationInfo(m, annotatedMethod, cri, path, httpMethod), m);
+            // Binding the bridge methods here as secondary methods allows them to work in client proxies
+            // without reintroducing CXF-7670.
+            List<Method> boundMethods = new ArrayList<>();
+            boundMethods.add(m);
+            boundMethods.addAll(ReflectionUtil.findBridges(m));
+            md.bind(
+                createOperationInfo(m, annotatedMethod, cri, path, httpMethod),
+                boundMethods.toArray(new Method[]{}));
             if (httpMethod == null) {
                 // subresource locator
                 Class<?> subClass = m.getReturnType();

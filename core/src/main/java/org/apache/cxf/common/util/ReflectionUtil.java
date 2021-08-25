@@ -32,7 +32,11 @@ import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 
@@ -286,4 +290,29 @@ public final class ReflectionUtil {
         }
         return null;
     }
+
+    /**
+     * Find all bridge methods corresponding to the real method {@param m}.
+     * @param m A real method.
+     * @return The bridge methods as a Collection.
+     */
+    public static Collection<Method> findBridges(Method m) {
+        Set<Method> bridges = new HashSet<>();
+
+        if (m.isBridge() || m.isSynthetic()) {
+            return bridges;
+        }
+
+        Class<?> c = m.getDeclaringClass();
+        for (Method candidate : c.getMethods()) {
+            if (candidate.isBridge()
+                && candidate.getName().equals(m.getName())
+                && Arrays.equals(candidate.getParameterTypes(), m.getParameterTypes())) {
+                bridges.add(candidate);
+            }
+        }
+
+        return bridges;
+    }
+
 }
