@@ -22,7 +22,9 @@ package org.apache.cxf.ws.security.tokenstore;
 import java.io.Closeable;
 import java.net.URL;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.cxf.Bus;
@@ -34,6 +36,7 @@ import org.ehcache.CacheManager;
 import org.ehcache.Status;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.core.util.ClassLoading;
 import org.ehcache.xml.XmlConfiguration;
 
 /**
@@ -54,13 +57,17 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
 
         this.key = key;
         try {
-            XmlConfiguration xmlConfig = new XmlConfiguration(configFileURL);
-
             // Exclude the endpoint info bit added in TokenStoreUtils when getting the template name
             String template = key;
             if (template.contains("-")) {
                 template = key.substring(0, key.lastIndexOf('-'));
             }
+
+            // Set class loader cache of template object to SecurityToken classloader
+            Map<String, ClassLoader> cacheClassLoaders = new HashMap<>();
+            cacheClassLoaders.put(template, SecurityToken.class.getClassLoader());
+            XmlConfiguration xmlConfig = new XmlConfiguration(configFileURL, ClassLoading.getDefaultClassLoader(),
+                    cacheClassLoaders);
 
             CacheConfigurationBuilder<String, SecurityToken> configurationBuilder =
                     xmlConfig.newCacheConfigurationBuilderFromTemplate(template,
