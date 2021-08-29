@@ -322,15 +322,15 @@ public final class ResourceUtils {
         MethodDispatcher md = new MethodDispatcher();
         Class<?> serviceClass = cri.getServiceClass();
 
-        final Set<Method> annotatedMethods = new HashSet<>();
+        final Map<Method, Method> annotatedMethods = new HashMap<>();
 
         for (Method m : serviceClass.getMethods()) {
             if (!m.isBridge() && !m.isSynthetic()) {
                 //do real methods first
                 Method annotatedMethod = AnnotationUtils.getAnnotatedMethod(serviceClass, m);
-                if (!annotatedMethods.contains(annotatedMethod)) {
+                if (!annotatedMethods.containsKey(annotatedMethod)) {
                     evaluateResourceMethod(cri, enableStatic, md, m, annotatedMethod);
-                    annotatedMethods.add(annotatedMethod);
+                    annotatedMethods.put(annotatedMethod, m);
                 }
             }
         }
@@ -338,13 +338,25 @@ public final class ResourceUtils {
             if (m.isBridge() || m.isSynthetic()) {
                 //if a bridge/synthetic method isn't already mapped to something, go ahead and do it
                 Method annotatedMethod = AnnotationUtils.getAnnotatedMethod(serviceClass, m);
-                if (!annotatedMethods.contains(annotatedMethod)) {
+                if (!annotatedMethods.containsKey(annotatedMethod)) {
                     evaluateResourceMethod(cri, enableStatic, md, m, annotatedMethod);
-                    annotatedMethods.add(annotatedMethod);
+                    annotatedMethods.put(annotatedMethod, m);
+                } else {
+                    // Certain synthetic / bridge methods could be quite useful to handle
+                    // methods with co-variant return types, especially when used with client proxies,
+                    // see please: https://blogs.oracle.com/sundararajan/covariant-return-types-in-java
+                    bindResourceMethod(md, m, annotatedMethods.get(annotatedMethod));
                 }
             }
         }
         cri.setMethodDispatcher(md);
+    }
+    
+    private static void bindResourceMethod(MethodDispatcher md, Method m, Method bound) {
+        final OperationResourceInfo ori = md.getOperationResourceInfo(bound);
+        if (ori != null && !ori.getMethodToInvoke().equals(m)) {
+            md.bind(ori, bound, m);
+        }
     }
 
     private static void evaluateResourceMethod(ClassResourceInfo cri, boolean enableStatic, MethodDispatcher md,
