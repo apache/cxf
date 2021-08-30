@@ -898,7 +898,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
      */
     public Element getCustomContent() throws Exception {
         if (customContent != null) {
-            // We can also support a CallbackHandler her as per getDelegationSecurityToken if required
+            // We can also support a CallbackHandler here as per getDelegationSecurityToken if required
             final boolean isString = customContent instanceof String;
             final boolean isElement = customContent instanceof Element;
             if (isString) {

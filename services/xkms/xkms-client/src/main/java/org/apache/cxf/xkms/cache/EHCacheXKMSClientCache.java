@@ -68,7 +68,7 @@ public class EHCacheXKMSClientCache implements XKMSClientCache, BusLifeCycleList
 
     public EHCacheXKMSClientCache(Bus cxfBus, Path diskstorePath, long diskSize,
                                   long heapEntries, boolean persistent) throws XKMSClientCacheException {
-        // Do some sanity checking on the arguments
+        // Do some checking on the arguments
         if (persistent && diskstorePath == null) {
             throw new NullPointerException();
         }
