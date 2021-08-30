@@ -108,10 +108,26 @@ public class SoapHeaderInterceptor extends AbstractInDatabindingInterceptor {
         boolean supportsNode = this.supportsDataReader(message, Node.class);
         Service service = ServiceModelUtil.getService(message.getExchange());
 
-        validateHeaders(message, headers, service);
+        Schema schema = null;
+        final boolean schemaValidationEnabled
+                = ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, message);
+        if (schemaValidationEnabled) {
+            schema = EndpointReferenceUtils.getSchema(service.getServiceInfos().get(0),
+                    message.getExchange().getBus());
+        }
 
         for (SoapHeaderInfo header : headers) {
             MessagePartInfo mpi = header.getPart();
+            try {
+                if (schemaValidationEnabled && schema != null) {
+                    validateHeader(message, mpi, schema);
+                }
+            } catch (Fault f) {
+                if (!isRequestor(message)) {
+                    f.setFaultCode(Fault.FAULT_CODE_CLIENT);
+                }
+                throw f;
+            }
 
             if (mpi.getTypeClass() != null) {
 
@@ -154,28 +170,6 @@ public class SoapHeaderInterceptor extends AbstractInDatabindingInterceptor {
         }
         if (!parameters.isEmpty()) {
             message.setContent(List.class, parameters);
-        }
-    }
-
-    private void validateHeaders(SoapMessage message, List<SoapHeaderInfo> headers, Service service) {
-        boolean validationEnabled = ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, message);
-
-        if (validationEnabled) {
-            Schema schema = EndpointReferenceUtils.getSchema(
-                    service.getServiceInfos().get(0),
-                    message.getExchange().getBus()
-            );
-
-            for (SoapHeaderInfo header : headers) {
-                try {
-                    validateHeader(message, header.getPart(), schema);
-                } catch (Fault f) {
-                    if (!isRequestor(message)) {
-                        f.setFaultCode(Fault.FAULT_CODE_CLIENT);
-                    }
-                    throw f;
-                }
-            }
         }
     }
 
