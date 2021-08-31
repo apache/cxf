@@ -510,8 +510,8 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         }
     }
     public synchronized void close() {
-        jmsConfig.resetCachedReplyDestination();
         shutdownListeners();
+        jmsConfig.resetCachedReplyDestination();
         ResourceCloser.close(connection);
         connection = null;
         LOG.log(Level.FINE, "JMSConduit closed ");
