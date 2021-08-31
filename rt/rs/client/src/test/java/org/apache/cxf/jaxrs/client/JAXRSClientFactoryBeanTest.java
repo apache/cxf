@@ -44,6 +44,9 @@ import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.BookInterface;
 import org.apache.cxf.jaxrs.resources.BookStore;
 import org.apache.cxf.jaxrs.resources.BookStoreSubresourcesOnly;
+import org.apache.cxf.jaxrs.resources.BookSuperClass;
+import org.apache.cxf.jaxrs.resources.SuperBook;
+import org.apache.cxf.jaxrs.resources.SuperBookStore;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -202,6 +205,19 @@ public class JAXRSClientFactoryBeanTest {
         assertNotNull(parts);
         IProductResource productResourceElement = parts.elementAt("1");
         assertNotNull(productResourceElement);
+    }
+    
+    @Test
+    public void testBookAndBridgeMethods() throws Exception {
+        SuperBookStore superBookResource = JAXRSClientFactory.create("http://localhost:9000",
+                SuperBookStore.class);
+        assertNotNull(superBookResource);
+        
+        Book book = ((BookSuperClass)superBookResource).getNewBook("id4", true);
+        assertNotNull(book);
+        
+        SuperBook superBook = (SuperBook)superBookResource.getNewBook("id4", true);
+        assertNotNull(superBook);
     }
 
     @Test
