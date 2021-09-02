@@ -39,13 +39,12 @@ import org.apache.cxf.transport.jms.util.JndiHelper;
 
 @NoJSR250Annotations
 public class JMSConfiguration {
-
-    private static final Logger LOG = LogUtils.getL7dLogger(JMSConfiguration.class);
-
     /**
      * Default value to mark as unset
      */
     public static final int DEFAULT_VALUE = -1;
+
+    private static final Logger LOG = LogUtils.getL7dLogger(JMSConfiguration.class);
 
     private volatile ConnectionFactory connectionFactory;
     private Properties jndiEnvironment;
