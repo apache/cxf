@@ -252,8 +252,10 @@ public class ServiceWSDLBuilder {
             for (ExtensibilityElement element : extensibilityElements) {
                 if (element instanceof UnknownExtensibilityElement) {
                     UnknownExtensibilityElement uee = (UnknownExtensibilityElement)element;
-                    String pfx = uee.getElement().getPrefix();
-                    addNamespace(pfx, element.getElementType().getNamespaceURI(), def);
+                    synchronized (uee.getElement().getOwnerDocument()) {
+                        String pfx = uee.getElement().getPrefix();
+                        addNamespace(pfx, element.getElementType().getNamespaceURI(), def);
+                    }
                 } else {
                     QName qn = element.getElementType();
                     addNamespace(qn.getNamespaceURI(), def);
