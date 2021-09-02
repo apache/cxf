@@ -297,12 +297,15 @@ public class JaxWsEndpointImpl extends EndpointImpl {
             while (extensionElements.hasNext()) {
                 ExtensibilityElement ext = extensionElements.next();
                 if (ext instanceof UnknownExtensibilityElement && wsaEpr.equals(ext.getElementType())) {
-                    DOMSource domSource = new DOMSource(((UnknownExtensibilityElement)ext).getElement());
-                    W3CEndpointReference w3cEPR = new W3CEndpointReference(domSource);
-                    EndpointReferenceType ref = ProviderImpl.convertToInternal(w3cEPR);
-                    endpoint.getTarget().setMetadata(ref.getMetadata());
-                    endpoint.getTarget().setReferenceParameters(ref.getReferenceParameters());
-                    endpoint.getTarget().getOtherAttributes().putAll(ref.getOtherAttributes());
+                    final Element element = ((UnknownExtensibilityElement) ext).getElement();
+                    synchronized (element.getOwnerDocument()) {
+                        DOMSource domSource = new DOMSource(element);
+                        W3CEndpointReference w3cEPR = new W3CEndpointReference(domSource);
+                        EndpointReferenceType ref = ProviderImpl.convertToInternal(w3cEPR);
+                        endpoint.getTarget().setMetadata(ref.getMetadata());
+                        endpoint.getTarget().setReferenceParameters(ref.getReferenceParameters());
+                        endpoint.getTarget().getOtherAttributes().putAll(ref.getOtherAttributes());
+                    }
                 }
 
             }

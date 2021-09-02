@@ -424,9 +424,12 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
         for (Object o : exts) {
             if (o instanceof UnknownExtensibilityElement) {
                 UnknownExtensibilityElement uee = (UnknownExtensibilityElement)o;
-                String uri2 = getPolicyId(uee.getElement());
-                if (uri.equals(uri2)) {
-                    return true;
+                final Element element = uee.getElement();
+                synchronized (element.getOwnerDocument()) {
+                    String uri2 = getPolicyId(element);
+                    if (uri.equals(uri2)) {
+                        return true;
+                    }
                 }
             }
         }
@@ -438,9 +441,12 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
         for (Object o : exts) {
             if (o instanceof UnknownExtensibilityElement) {
                 UnknownExtensibilityElement uee = (UnknownExtensibilityElement)o;
-                String uri2 = getPolicyRefURI(uee.getElement());
-                if (uri.equals(uri2)) {
-                    return true;
+                final Element element = uee.getElement();
+                synchronized (element.getOwnerDocument()) {
+                    String uri2 = getPolicyRefURI(element);
+                    if (uri.equals(uri2)) {
+                        return true;
+                    }
                 }
             }
         }
