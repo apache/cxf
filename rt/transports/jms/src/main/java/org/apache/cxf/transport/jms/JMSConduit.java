@@ -186,9 +186,9 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                 if (exchange.get(JMSUtil.JMS_MESSAGE_CONSUMER) != null) {
                     ResourceCloser.close(exchange.get(JMSUtil.JMS_MESSAGE_CONSUMER));
                 }
+                jmsConfig.resetCachedReplyDestination();
                 ResourceCloser.close(connection);
                 this.connection = null;
-                jmsConfig.resetCachedReplyDestination();
             }
             this.staticReplyDestination = null;
             try {
