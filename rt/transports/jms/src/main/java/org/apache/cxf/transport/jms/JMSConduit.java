@@ -127,7 +127,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
     private void trySetExListener(Connection conn) {
         try {
             conn.setExceptionListener(new ExceptionListener() {
-                
+
                 @Override
                 public void onException(JMSException exception) {
                     jmsConfig.resetCachedReplyDestination();
@@ -186,9 +186,9 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                 if (exchange.get(JMSUtil.JMS_MESSAGE_CONSUMER) != null) {
                     ResourceCloser.close(exchange.get(JMSUtil.JMS_MESSAGE_CONSUMER));
                 }
+                jmsConfig.resetCachedReplyDestination();
                 ResourceCloser.close(connection);
                 this.connection = null;
-                jmsConfig.resetCachedReplyDestination();
             }
             this.staticReplyDestination = null;
             try {
@@ -511,6 +511,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
     }
     public synchronized void close() {
         shutdownListeners();
+        jmsConfig.resetCachedReplyDestination();
         ResourceCloser.close(connection);
         connection = null;
         LOG.log(Level.FINE, "JMSConduit closed ");
