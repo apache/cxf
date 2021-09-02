@@ -337,7 +337,7 @@ public class SpringJaxrsApplicationTest {
             .containsOnly(
                 entry("exception", "None"),
                 entry("method", "GET"),
-                entry("operation", "UNKNOWN"),
+                entry("operation", "getBooks"),
                 entry("uri", "http://localhost:" + port + "/api/app/library"),
                 entry("outcome", "SUCCESS"),
                 entry("status", "200"));
@@ -378,7 +378,7 @@ public class SpringJaxrsApplicationTest {
             .containsOnly(
                 entry("exception", "None"),
                 entry("method", "DELETE"),
-                entry("operation", "UNKNOWN"),
+                entry("operation", "deleteBooks"),
                 entry("uri", "http://localhost:" + port + "/api/app/library"),
                 entry("outcome", "SERVER_ERROR"),
                 entry("status", "500"));
@@ -419,7 +419,7 @@ public class SpringJaxrsApplicationTest {
             .containsOnly(
                 entry("exception", "None"),
                 entry("method", "GET"),
-                entry("operation", "UNKNOWN"),
+                entry("operation", "getBook"),
                 entry("uri", "http://localhost:" + port + "/api/app/library/100"),
                 entry("outcome", "CLIENT_ERROR"),
                 entry("status", "404"));
@@ -447,7 +447,7 @@ public class SpringJaxrsApplicationTest {
             .containsOnly(
                 entry("exception", "None"),
                 entry("method", "DELETE"),
-                entry("operation", "UNKNOWN"),
+                entry("operation", "deleteBooks"),
                 entry("uri", "http://localhost:" + fakePort + "/api/app/library"),
                 entry("outcome", "UNKNOWN"),
                 entry("status", "UNKNOWN"));
