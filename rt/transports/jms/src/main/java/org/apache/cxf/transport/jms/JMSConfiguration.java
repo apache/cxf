@@ -19,16 +19,20 @@
 package org.apache.cxf.transport.jms;
 
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
+import javax.jms.TemporaryQueue;
 import javax.naming.NamingException;
 import javax.transaction.TransactionManager;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.transport.jms.util.DestinationResolver;
 import org.apache.cxf.transport.jms.util.JMSDestinationResolver;
 import org.apache.cxf.transport.jms.util.JndiHelper;
@@ -39,6 +43,8 @@ public class JMSConfiguration {
      * Default value to mark as unset
      */
     public static final int DEFAULT_VALUE = -1;
+
+    private static final Logger LOG = LogUtils.getL7dLogger(JMSConfiguration.class);
 
     private volatile ConnectionFactory connectionFactory;
     private Properties jndiEnvironment;
@@ -489,6 +495,13 @@ public class JMSConfiguration {
 
     public void resetCachedReplyDestination() {
         synchronized (this) {
+            if (replyDestinationDest instanceof TemporaryQueue) {
+                try {
+                    ((TemporaryQueue) replyDestinationDest).delete();
+                } catch (JMSException exception) {
+                    LOG.log(Level.WARNING, "Exception on temporary queue deletion", exception);
+                }
+            }
             this.replyDestinationDest = null;
         }
     }
