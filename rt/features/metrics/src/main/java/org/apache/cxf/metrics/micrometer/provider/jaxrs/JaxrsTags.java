@@ -39,6 +39,15 @@ public class JaxrsTags {
             .flatMap(MessageUtils::getTargetMethod)
             .map(Method::getName)
             .map(operation -> Tag.of("operation", operation))
+            .orElseGet(() -> method(request));
+    }
+    
+    public Tag method(Message request) {
+        return ofNullable(request)
+            .map(Message::getExchange)
+            .map(ex -> ex.get(Method.class))
+            .map(Method::getName)
+            .map(operation -> Tag.of("operation", operation))
             .orElse(OPERATION_UNKNOWN);
     }
 }
