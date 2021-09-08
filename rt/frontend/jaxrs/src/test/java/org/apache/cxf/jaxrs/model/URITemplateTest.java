@@ -28,6 +28,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.URITemplate.CurlyBraceTokenizer;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -789,4 +790,11 @@ public class URITemplateTest {
                 -Integer.signum(URITemplate.compareTemplates(t2, t1)));
     }
 
+    @Test
+    public void testNonCapturingGroup() {
+        URITemplate t1 = new URITemplate("/{name: (?:cxf|CXF)}");
+        MultivaluedMap<String, String> values = new MetadataMap<>();
+        assertTrue("should match '/cxf' url", t1.match("/cxf", values));
+        Assert.assertEquals("cxf", values.get("name").get(0));
+    }
 }

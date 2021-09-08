@@ -83,7 +83,7 @@ public final class URITemplate {
                     // however do not add them if they already exist since that will cause the Matcher
                     // to create extraneous values.  Parens identify a group so multiple parens would
                     // indicate multiple groups.
-                    if (pattern.startsWith("(") && pattern.endsWith(")")) {
+                    if (pattern.startsWith("(") && pattern.endsWith(")") && !pattern.startsWith("(?:")) {
                         patternBuilder.append(pattern);
                     } else {
                         patternBuilder.append('(');
