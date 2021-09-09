@@ -792,9 +792,12 @@ public class URITemplateTest {
 
     @Test
     public void testNonCapturingGroup() {
-        URITemplate t1 = new URITemplate("/{name: (?:cxf|CXF)}");
         MultivaluedMap<String, String> values = new MetadataMap<>();
+        URITemplate t1 = new URITemplate("/{name: (?:cxf|CXF)}");
         assertTrue("should match '/cxf' url", t1.match("/cxf", values));
         Assert.assertEquals("cxf", values.get("name").get(0));
+        URITemplate t2 = new URITemplate("/{project: (?>cxf|apache)}");
+        assertTrue("should match '/cxf' url", t2.match("/cxf", values));
+        Assert.assertEquals("cxf", values.get("project").get(0));
     }
 }
