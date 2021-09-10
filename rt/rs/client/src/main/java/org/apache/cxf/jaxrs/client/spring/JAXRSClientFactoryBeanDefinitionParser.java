@@ -20,12 +20,14 @@ package org.apache.cxf.jaxrs.client.spring;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Configurable;
 import javax.ws.rs.ext.Provider;
 import javax.xml.namespace.QName;
 
@@ -35,6 +37,7 @@ import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.common.util.ClasspathScanner;
 import org.apache.cxf.configuration.spring.AbstractFactoryBeanDefinitionParser;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
+import org.apache.cxf.jaxrs.impl.ConfigurableImpl;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.springframework.beans.BeansException;
@@ -109,11 +112,50 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
             setFirstChildAsProperty(el, ctx, bean, name);
         }
     }
+    
+    /**
+     * Instantiate newly registered provider instances using {@link AutowireCapableBeanFactory} 
+     */
+    private static class SpringInstantiator implements ConfigurableImpl.Instantiator {
+        private final AutowireCapableBeanFactory beanFactory;
+        
+        SpringInstantiator(final AutowireCapableBeanFactory beanFactory) {
+            this.beanFactory = beanFactory;
+        }
+
+        @Override
+        public <T> Object create(Class<T> cls) {
+            return beanFactory.createBean(cls, resolveAutowireMode(cls), true);
+        }
+        
+        @Override
+        public void release(Object instance) {
+            beanFactory.destroyBean(instance);
+        }
+        
+        /**
+         * Return the resolved autowire mode (AUTOWIRE_CONSTRUCTOR or AUTOWIRE_BY_TYPE).
+         */
+        private <T> int resolveAutowireMode(Class<T> cls) {
+            final Constructor<?>[] constructors = cls.getConstructors();
+            
+            for (Constructor<?> constructor: constructors) {
+                // If there is a default constructor, we are good to go with
+                // autowiring by type, otherwise we need construction injection.
+                if (constructor.getParameterCount() == 0) {
+                    return AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE;
+                }
+            }
+
+            return AutowireCapableBeanFactory.AUTOWIRE_CONSTRUCTOR;
+        }
+    }
 
     public static class JAXRSSpringClientFactoryBean extends JAXRSClientFactoryBean
         implements ApplicationContextAware {
 
         private List<String> basePackages;
+        private SpringInstantiator instantiator;
 
         public JAXRSSpringClientFactoryBean() {
             super();
@@ -125,6 +167,10 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
 
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
             try {
+                if (instantiator == null) {
+                    instantiator = new SpringInstantiator(ctx.getAutowireCapableBeanFactory());
+                }
+                
                 if (basePackages != null) {
                     final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes =
                         ClasspathScanner.findClasses(basePackages, Path.class, Provider.class);
@@ -159,6 +205,17 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
                 setBus(BusWiringBeanFactoryPostProcessor.addDefaultBus(ctx));
             }
         }
+        
+        @Override
+        protected <C extends Configurable<C>> Configurable<?> getConfigurableFor(C context) {
+            final Configurable<?> configurable = super.getConfigurableFor(context);
+            
+            if (instantiator != null) {
+                configurable.register(instantiator);
+            }
+            
+            return configurable;
+        }
     }
 
     static Class<?> getServiceClass(Collection<Class<?>> rootClasses) {
@@ -184,4 +241,6 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
         }
         return providers;
     }
+    
+    
 }

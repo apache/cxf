@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutorService;
 
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.ClientResponseFilter;
+import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
 
 import org.apache.cxf.common.util.ClassHelper;
@@ -51,17 +52,19 @@ import org.eclipse.microprofile.rest.client.RestClientBuilder;
 public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
     private final Comparator<ProviderInfo<?>> comparator;
     private final List<Object> registeredProviders;
+    private final Configurable<RestClientBuilder> configurable;
     private final Configuration configuration;
     private ClassLoader proxyLoader;
     private boolean inheritHeaders;
     private ExecutorService executorService;
     private TLSConfiguration secConfig;
 
-    public MicroProfileClientFactoryBean(MicroProfileClientConfigurableImpl<RestClientBuilder> configuration,
+    public MicroProfileClientFactoryBean(MicroProfileClientConfigurableImpl<RestClientBuilder> configurable,
                                          String baseUri, Class<?> aClass, ExecutorService executorService,
                                          TLSConfiguration secConfig) {
         super(new MicroProfileServiceFactoryBean());
-        this.configuration = configuration.getConfiguration();
+        this.configurable = configurable;
+        this.configuration = configurable.getConfiguration();
         this.comparator = MicroProfileClientProviderFactory.createComparator(this);
         this.executorService = (executorService == null) ? Utils.defaultExecutorService() : executorService; 
         this.secConfig = secConfig;
@@ -71,7 +74,7 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
         super.setProperties(this.configuration.getProperties());
         registeredProviders = new ArrayList<>();
         registeredProviders.addAll(processProviders());
-        if (!configuration.isDefaultExceptionMapperDisabled()) {
+        if (!configurable.isDefaultExceptionMapperDisabled()) {
             registeredProviders.add(new ProviderInfo<>(new DefaultResponseExceptionMapper(), getBus(), false));
         }
         registeredProviders.add(new ProviderInfo<>(new JsrJsonpProvider(), getBus(), false));
@@ -133,6 +136,11 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
             return new MicroProfileClientProxyImpl(actualState, proxyLoader, cri, isRoot,
                     inheritHeaders, executorService, configuration, interceptorWrapper, secConfig, varValues);
         }
+    }
+    
+    @Override
+    protected <C extends Configurable<C>> Configurable<?> getConfigurableFor(C context) {
+        return configurable;
     }
 
     Configuration getConfiguration() {
