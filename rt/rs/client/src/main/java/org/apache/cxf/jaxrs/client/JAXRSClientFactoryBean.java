@@ -24,12 +24,19 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.RuntimeType;
+import javax.ws.rs.core.Configurable;
+import javax.ws.rs.core.Configuration;
+import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.ParamConverter;
 import javax.ws.rs.ext.ParamConverterProvider;
@@ -45,6 +52,8 @@ import org.apache.cxf.endpoint.UpfrontConduitSelector;
 import org.apache.cxf.jaxrs.AbstractJAXRSFactoryBean;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
+import org.apache.cxf.jaxrs.impl.ConfigurableImpl;
+import org.apache.cxf.jaxrs.impl.FeatureContextImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
@@ -403,12 +412,44 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             });
         }
     }
+    
+    protected <C extends Configurable<C>> Configurable<?> getConfigurableFor(C context) {
+        return new ConfigurableImpl<>(context, RuntimeType.CLIENT);
+    }
 
     protected void applyFeatures(AbstractClient client) {
         if (getFeatures() != null) {
             getFeatures().forEach(feature -> {
                 feature.initialize(client.getConfiguration(), getBus());
             });
+        }
+        
+        // Process JAX-RS features which are passed through as providers 
+        final Set<Object> providers = new HashSet<>();
+        for (final Object provider: getProviders()) {
+            if (provider instanceof Feature) {
+                final Feature feature = (Feature)provider;
+                final FeatureContextImpl context = new FeatureContextImpl();
+                final Configurable<?> configurable = getConfigurableFor(context);
+                final Configuration configuration = configurable.getConfiguration();
+                final Set<Object> registered = configuration.getInstances();
+                
+                if (!configuration.isRegistered(feature)) {
+                    configurable.register(feature);
+                    
+                    // Disregarding if the feature is enabled or disabled, register only newly added providers,
+                    // excluding pre-existing ones and the feature instance itself.
+                    final Set<Object> added = new HashSet<Object>(configuration.getInstances());
+                    added.remove(feature);
+                    added.removeAll(registered);
+                    
+                    providers.addAll(added);
+                }
+            }
+        }
+        
+        if (!providers.isEmpty()) {
+            setProviders(Arrays.asList(providers));
         }
     }
 
