@@ -24,6 +24,8 @@ import java.net.URL;
 
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Feature;
+import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.client.WebClientUtil;
@@ -116,6 +118,30 @@ public class CxfTypeSafeClientBuilderTest {
         // TODO: add a test for writer interceptors - possibly in systests
         //assertEquals(TestWriterInterceptor.getAndResetValue(), 1);
     }
+    
+    @Test
+    public void testInvokesPostOperationWithRegisteredFeature() throws Exception {
+        String inputBody = "input body will be removed";
+        String expectedResponseBody = TestMessageBodyReader.REPLACED_BODY;
+
+        InterfaceWithoutProvidersDefined api = new CxfTypeSafeClientBuilder()
+                .register(SomeFeature.class)
+                .property("microprofile.rest.client.disable.default.mapper", true)
+                .baseUrl(new URL("http://localhost/null"))
+                .build(InterfaceWithoutProvidersDefined.class);
+
+        Response response = api.executePost(inputBody);
+
+        String body = response.readEntity(String.class);
+
+        response.close();
+
+        assertEquals(expectedResponseBody, body);
+
+        assertEquals(TestClientResponseFilter.getAndResetValue(), 1);
+        assertEquals(TestClientRequestFilter.getAndResetValue(), 1);
+        assertEquals(TestReaderInterceptor.getAndResetValue(), 1);
+    }
 
     @Test(expected = NoSuchEntityException.class)
     public void testResponseExceptionMapper() throws Exception {
@@ -191,4 +217,19 @@ public class CxfTypeSafeClientBuilderTest {
         Assert.fail(failureMessage);
     }
 
+    public static class SomeFeature implements Feature {
+        @Override
+        public boolean configure(FeatureContext context) {
+            context
+                .register(TestClientRequestFilter.class)
+                .register(TestClientResponseFilter.class)
+                .register(TestMessageBodyReader.class, 4999)
+                .register(TestMessageBodyWriter.class)
+                .register(TestParamConverterProvider.class)
+                .register(TestReaderInterceptor.class)
+                .register(TestWriterInterceptor.class)
+                .register(EchoClientReqFilter.class);
+            return true;
+        }
+    }
 }
