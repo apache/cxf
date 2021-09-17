@@ -89,6 +89,29 @@ public class ClientCacheTest {
     }
 
     @Test
+    public void testGetTimeStringUsingClientFactory() {
+        CacheControlFeature feature = new CacheControlFeature();
+        try {
+            JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+            bean.setAddress(ADDRESS);
+            bean.setProviders(Collections.singletonList(feature));
+            bean.setTransportId(LocalTransportFactory.TRANSPORT_ID);
+            
+            final WebClient cached = bean.createWebClient()
+                .accept("text/plain")
+                .header(HttpHeaders.CACHE_CONTROL, "public");
+            
+            final Response r = cached.get();
+            assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
+            final String r1 = r.readEntity(String.class);
+            waitABit();
+            assertEquals(r1, cached.get().readEntity(String.class));
+        } finally {
+            feature.close();
+        }
+    }
+
+    @Test
     public void testGetTimeStringAsInputStream() throws Exception {
         CacheControlFeature feature = new CacheControlFeature();
         try {
