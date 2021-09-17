@@ -55,7 +55,6 @@ import javax.ws.rs.core.Response.Status.Family;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.Source;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.ReaderInputStream;
@@ -405,7 +404,7 @@ public final class ResponseImpl extends Response {
 
     @Override
     public <T> T readEntity(Class<T> cls, Annotation[] anns) throws ProcessingException, IllegalStateException {
-        return doReadEntity(cls, cls, anns, true);
+        return doReadEntity(cls, cls, anns);
     }
 
     @Override
@@ -413,20 +412,13 @@ public final class ResponseImpl extends Response {
     public <T> T readEntity(GenericType<T> genType, Annotation[] anns)
         throws ProcessingException, IllegalStateException {
         return doReadEntity((Class<T>) genType.getRawType(),
-                            genType.getType(), anns, true);
+                            genType.getType(), anns);
     }
 
     public <T> T doReadEntity(Class<T> cls, Type t, Annotation[] anns)
         throws ProcessingException, IllegalStateException {
-        return doReadEntity(cls, t, anns, false);
-    }
-
-    public <T> T doReadEntity(Class<T> cls, Type t, Annotation[] anns, boolean closeAfterRead)
-        throws ProcessingException, IllegalStateException {
 
         checkEntityIsClosed();
-        //according to javadoc, should close when is not buffered.
-        boolean shouldClose = !this.entityBufferred;
 
         if (lastEntity != null && cls.isAssignableFrom(lastEntity.getClass())
             && !(lastEntity instanceof InputStream)) {
@@ -476,11 +468,7 @@ public final class ResponseImpl extends Response {
                                                                   responseMessage);
                 // close the entity after readEntity is called.
                 T tCastLastEntity = castLastEntity();
-                shouldClose = shouldClose && !(tCastLastEntity instanceof AutoCloseable)
-                    && !(tCastLastEntity instanceof Source);
-                if (closeAfterRead && shouldClose) {
-                    close();
-                }
+                autoClose(cls, false);
                 return tCastLastEntity;
             } catch (NoContentException ex) {
                 //when content is empty, return null instead of throw exception to pass TCK
@@ -489,9 +477,7 @@ public final class ResponseImpl extends Response {
                     autoClose(cls, true);
                     reportMessageHandlerProblem("MSG_READER_PROBLEM", cls, mediaType, ex);
                 } else {
-                    if (closeAfterRead && shouldClose) {
-                        close();
-                    }
+                    autoClose(cls, false);
                     return null;
                 }
             } catch (Exception ex) {
