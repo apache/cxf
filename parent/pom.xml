@@ -149,7 +149,7 @@
         <cxf.jetty9.version>9.4.43.v20210629</cxf.jetty9.version>
         <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
         <cxf.jexl.version>2.1.1</cxf.jexl.version>
-        <cxf.joda.time.version>2.9.4</cxf.joda.time.version>
+        <cxf.joda.time.version>2.10.10</cxf.joda.time.version>
         <cxf.johnzon.version>1.1.13</cxf.johnzon.version>
         <cxf.json.api.version>1.1.4</cxf.json.api.version>
         <cxf.json.bind.version>1.0</cxf.json.bind.version>
@@ -219,7 +219,7 @@
         <cxf.woodstox.core.version>5.0.3</cxf.woodstox.core.version>
         <cxf.woodstox.stax2-api.version>3.1.4</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
-        <cxf.wss4j.version>2.2.6</cxf.wss4j.version>
+        <cxf.wss4j.version>2.2.7</cxf.wss4j.version>
         <cxf.xalan.version>2.7.2</cxf.xalan.version>
         <cxf.xerces.version>2.12.0</cxf.xerces.version>
         <cxf.xmlschema.version>2.2.5</cxf.xmlschema.version>
@@ -264,7 +264,7 @@
         <cxf.xalan.bundle.version>2.7.2_3</cxf.xalan.bundle.version>
         <cxf.xerces.bundle.version>2.12.0_1</cxf.xerces.bundle.version>
         <cxf.xmlresolver.bundle.version>1.2_5</cxf.xmlresolver.bundle.version>
-        <cxf.xmlsec.bundle.version>2.1.6</cxf.xmlsec.bundle.version>
+        <cxf.xmlsec.bundle.version>2.1.7</cxf.xmlsec.bundle.version>
         <cxf.xpp3.bundle.version>1.1.4c_6</cxf.xpp3.bundle.version>
     </properties>
     <build>
