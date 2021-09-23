@@ -39,11 +39,14 @@ public class CXF7990Test extends AbstractClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
 
     public static class Server extends AbstractBusTestServerBase {
-
         protected void run() {
             Object implementor = new EchoServiceImpl();
             String address = "http://localhost:" + PORT + "/echo/service";
             Endpoint.publish(address, implementor);
+
+            Object proxyImpl = new EchoProxyServiceImpl();
+            String address2 = "http://localhost:" + PORT + "/proxy/service";
+            Endpoint.publish(address2, proxyImpl);
         }
 
         public static void main(String[] args) {
@@ -70,14 +73,29 @@ public class CXF7990Test extends AbstractClientServerTestBase {
         QName portName = new QName("urn:echo", "MyEchoServicePort");
         URL wsdlURL = new URL("http://localhost:" + PORT + "/echo/service?wsdl");
         Service service = Service.create(wsdlURL, serviceName);
-        service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:" + PORT
-                                                                  + "/echo/service");
         EchoService echoService = service.getPort(portName, EchoService.class);
         try {
             echoService.echoException("test");
             fail("SOAPException is expected");
         } catch (SOAPFaultException e) {
             assertTrue(e.getMessage().equals("TestSOAPFaultException"));
+        }
+    }
+
+    @Test
+    public void testProxySOAPFaultException() throws Exception {
+        QName serviceName = new QName("urn:echo", "EchoProxyServiceImplService");
+        QName portName = new QName("urn:echo", "MyEchoProxyServicePort");
+        URL wsdlURL = new URL("http://localhost:" + PORT + "/proxy/service?wsdl");
+        Service service = Service.create(wsdlURL, serviceName);
+        service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:" + PORT
+                + "/proxy/service");
+        EchoService echoService = service.getPort(portName, EchoService.class);
+        try {
+            echoService.echoProxy("http://localhost:" + PORT + "/echo/service?wsdl");
+            fail("SOAPException is expected");
+        } catch (SOAPFaultException e) {
+            assertTrue(e.getMessage(), e.getMessage().equals("SOAPFaultString"));
         }
     }
 
