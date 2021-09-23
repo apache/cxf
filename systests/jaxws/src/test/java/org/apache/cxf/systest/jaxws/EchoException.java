@@ -18,12 +18,22 @@
  */
 package org.apache.cxf.systest.jaxws;
 
-import javax.jws.WebService;
-import javax.xml.ws.soap.SOAPFaultException;
+public class EchoException extends Exception {
 
-@WebService(name = "MyEchoService", targetNamespace = "urn:echo")
-public interface EchoService {
-    String echoException(String input) throws SOAPFaultException;
-    String echoProxy(String input) throws SOAPFaultException;
-    String proxyException(String input) throws SOAPFaultException;
+    private static final long serialVersionUID = -6610080738935731882L;
+    private String code;
+
+    public EchoException(String code) {
+        this.code = code;
+        fillInStackTrace();
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
 }
+

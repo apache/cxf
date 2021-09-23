@@ -188,6 +188,9 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
             }
         } else if (cause instanceof SOAPFaultException && ((SOAPFaultException)cause).getFault().hasDetail()) {
             return;
+        } else if (f instanceof SoapFault && f.getCause() instanceof SOAPFaultException
+                && ((SOAPFaultException)f.getCause()).getFault().hasDetail()) {
+            return;
         } else {
             FaultMode mode = message.get(FaultMode.class);
             if (mode == FaultMode.CHECKED_APPLICATION_FAULT) {
