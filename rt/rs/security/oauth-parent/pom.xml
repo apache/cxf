@@ -31,7 +31,6 @@
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
     <modules>
-        <module>oauth</module>
         <module>oauth2</module>
         <module>oauth2-saml</module>
     </modules>

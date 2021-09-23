@@ -120,8 +120,6 @@
         <module>js_client</module>
         <module>js_provider</module>
         <module>mtom</module>
-        <module>oauth/client</module>
-        <module>oauth/server</module>
         <module>restful_dispatch</module>
         <module>ruby_spring_support</module>
         <module>soap_header</module>
