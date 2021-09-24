@@ -184,6 +184,12 @@
             </modules>
         </profile>
         <profile>
+            <id>ee9</id>
+            <modules>
+                <module>ee9</module>
+            </modules>
+        </profile>
+        <profile>
             <!-- default profile enables checkstyle and Xlint stuff -->
             <id>rat</id>
             <build>
