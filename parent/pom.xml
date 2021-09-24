@@ -224,7 +224,7 @@
         <cxf.wss4j.version>2.3.3</cxf.wss4j.version>
         <cxf.xalan.version>2.7.2</cxf.xalan.version>
         <cxf.xerces.version>2.12.1</cxf.xerces.version>
-        <cxf.xmlschema.version>2.3.0-SNAPSHOT</cxf.xmlschema.version>
+        <cxf.xmlschema.version>2.3.0</cxf.xmlschema.version>
         <cxf.zest.version>2.1</cxf.zest.version>
 
         <!-- various OSGi related versions -->
