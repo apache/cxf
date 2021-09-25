@@ -61,6 +61,8 @@ public class SwaggerUiConfig {
     private Boolean showCommonExtensions;
     // Set a different validator URL, for example for locally deployed validators
     private String validatorUrl;
+    // Controls whether the "Try it out" section should be enabled by default.
+    private Boolean tryItOutEnabled;
     
     public String getConfigUrl() {
         return configUrl;
@@ -245,6 +247,11 @@ public class SwaggerUiConfig {
         return this;
     }
 
+    public SwaggerUiConfig tryItOutEnabled(boolean tryItOut) {
+        setTryItOutEnabled(tryItOut);
+        return this;
+    }
+
     public Map<String, String> getConfigParameters() {
         final Map<String, String> params = new TreeMap<>();
         
@@ -262,6 +269,7 @@ public class SwaggerUiConfig {
         put("showExtensions", getShowExtensions(), params);
         put("showCommonExtensions", getShowCommonExtensions(), params);
         put("validatorUrl", getValidatorUrl(), params);
+        put("tryItOutEnabled", isTryItOutEnabled(), params);
 
         return params;
     }
@@ -282,5 +290,13 @@ public class SwaggerUiConfig {
         if (!StringUtils.isEmpty(value)) {
             params.put(name, value);
         }
+    }
+
+    public Boolean isTryItOutEnabled() {
+        return tryItOutEnabled;
+    }
+
+    public void setTryItOutEnabled(Boolean tryItOutEnabled) {
+        this.tryItOutEnabled = tryItOutEnabled;
     }
 }
