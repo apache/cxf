@@ -1,4 +1,4 @@
-Apache CXF 3.4.4 Release Notes
+Apache CXF 3.4.5 Release Notes
 
 1. Overview
 
@@ -23,7 +23,7 @@ http://cxf.apache.org/docs/34-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
-3.4.4 fixes over 26 JIRA issues reported by users and the community.
+3.4.5 fixes over 34 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -66,36 +66,45 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Sub-task
-    * [CXF-8404] - Fix org.apache.cxf.transport.jms.util.MessageListenerTest.testNoTransaction
-    * [CXF-8428] - Fix org.apache.cxf.jaxrs.sse.client.SseEventSourceImplTest.testReconnectAndTwoEventsReceived
-    * [CXF-8461] - jaxrs.ee.rs.beanparam.form.plain formFieldParamEntityWithEncodedTest
-    * [CXF-8462] - jaxrs.ee.rs.beanparam.form.plain formParamEntityWithEncodedTest
-    * [CXF-8504] - jaxrs.jaxrs21.ee.sse.sseeventsource defaultWaiting1s
-    * [CXF-8506] - jaxrs.jaxrs21.ee.sse.sseeventsource reconnectByEventMethodTest
-    * [CXF-8508] - jaxrs.jaxrs21.ee.sse.sseeventsource userReconnectByEventMethodTest
-    * [CXF-8509] - jaxrs.jaxrs21.ee.sse.sseeventsource wait2Seconds
-    * [CXF-8516] - jaxrs.spec.provider.jaxbcontext readWriteProviderTest
-    * [CXF-8518] - jaxrs.spec.provider.standardnotnull clientJaxbProviderTest
-    * [CXF-8529] - Fix org.apache.cxf.systest.jms.tx.JMSTransactionTest.testTransactionOneWay
+    * [CXF-8514] - jaxrs.spec.context.client clientReaderTest
+    * [CXF-8515] - jaxrs.spec.context.client clientWriterTest
+    * [CXF-8534] - Fix org.apache.cxf.jaxrs.client.logging.RESTLoggingTest.testBinary
+    * [CXF-8548] - Get rid of Powermock usage
+    * [CXF-8573] - Fix org.apache.cxf.systest.jaxrs.spring.boot.SpringJaxrsTest.testJaxrsSuccessMetric
 
 ** Bug
-    * [CXF-7921] - JAXRS CDI extension ignores interfaces annotations
-    * [CXF-8344] - org.apache.cxf.jaxrs.utils.AnnotationUtils#getNameBindings does not use ClassUnwrapper
-    * [CXF-8387] - Allow special characters to be used for a queryParam name.
-    * [CXF-8435] - JsonMapObjectReaderWriter doesn't escape double quotes
-    * [CXF-8442] - java.io.IOException: closed when compiled and run with Java 16
-    * [CXF-8454] - DOS vulnerability in bearer token parsing
-    * [CXF-8456] - wadl2java plugin generates classes names with invalid identifiers
-    * [CXF-8533] - ensure an endpoint destination which is still in use won't be shutdown inproperly
-    * [CXF-8535] - Query missing from signature request-target
-    * [CXF-8536] - Incorrect log message "Could not create a NamespaceMapper compatible with Marshaller class com.sun.xml.bind.v2.runtime.MarshallerImpl"
-    * [CXF-8540] - FAULT_OUT logged by CORS preflight requests
-    * [CXF-8546] - introduce a property so that we can configure writeOptionalTypeParameters
-
-** New Feature
-    * [CXF-8532] - @Priority support for ParamConverterProvider
+    * [CXF-7543] - JAX-RS Features not used in proxies or WebClients
+    * [CXF-8544] - SseEventSink cannot be used in a @POST resource method
+    * [CXF-8551] - wsdl2java: NoClassDefFoundError: javax/jws/soap/SOAPBinding$Style with Java 11
+    * [CXF-8555] - JsonMapObjectReaderWriter escapes now any back slash
+    * [CXF-8556] - Null AbstractEndpointFactory Properties Interferes with Class-Level PathParam When Creating Proxies with Defined ClientState
+    * [CXF-8557] - Incorrect Proxy Path Segmenting when @Path Annotation Regex Expression Contains "/"
+    * [CXF-8559] - SseInterceptor uses PROTOCOL_HEADERS from request (in) message, not from response (out) one
+    * [CXF-8561] - SseEventSource sometimes sends partial events when being closed
+    * [CXF-8565] - Unable to use transport-http-petty-client with JAX-RS due to NPE
+    * [CXF-8566] - cxf-ws-rt-security & ehcache: OSGi classloading
+    * [CXF-8568] - DefaultLogEventMapper map() Method Signature Breaking Change
+    * [CXF-8569] - http-undertow: ensure clear registered paths until destory an undertow server(Port)
+    * [CXF-8572] - Incorrectly parsed ETag when contains 'W/' as part of the content
+    * [CXF-8574] - Rest call on jax-rs interface with long @Path and 3 pathparams causes error since cxf-rt-rs-mp-client 3.3.3
+    * [CXF-8578] - Bridge methods for covariant return types cannot be invoked on client proxies
+    * [CXF-8585] - cxf-specs feature should use stax2-api 4.2 and flag bundle with dependency=true
+    * [CXF-8588] - Micrometer operation UNKNOWN for clients
+    * [CXF-8590] - First invocation of method causes NPE failure in neethi.PolicyBuilder
+    * [CXF-8591] - Temporary queues are never deleted when the are used
+    * [CXF-8593] - Error when installing CXF OpenAPI v3 under Karaf 4.2.11
+    * [CXF-8594] - Regular expression parameter with non-capturing group doesn't work
+    * [CXF-8596] - WebFaultOutInterceptor goes into infinite loop when it tries to write SoapFaultException with detail
+    * [CXF-8597] - CXF JAXRS client not closing HTTP connections
 
 ** Improvement
-    * [CXF-8450] - Make JAXBDatabinding extendable
-    * [CXF-8537] - Replace String.replaceAll with substring for better throughput performance
+    * [CXF-8117] - Make dependencies optional
+    * [CXF-8539] - Allow client-only Spring Boot autoconfiguration
+    * [CXF-8587] - Don't check the validation flag and get the schema on every iteration for SoapHeader
+    * [CXF-8600] - Swagger2Feature : Upgrade SwaggerUiConfig to add more configs
 
+** Test
+    * [CXF-8570] - a test to demonstrate how to configure JAXRSClientFactoryBean with org.apache.cxf.feature.Feature to enable Client Cache
+
+** Wish
+    * [CXF-8582] - Add "CXF Additional Configuration" properties also as part of spring-configuration-metadata.json in cxf-spring-boot-autoconfigure.
