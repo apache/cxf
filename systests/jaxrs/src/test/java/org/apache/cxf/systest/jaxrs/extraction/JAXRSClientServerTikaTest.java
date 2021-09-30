@@ -104,7 +104,7 @@ public class JAXRSClientServerTikaTest extends AbstractClientServerTestBase {
             getClass().getResourceAsStream("/files/testPDF.pdf"), disposition);
         wc.post(new MultipartBody(attachment));
 
-        final Collection<ScoreDoc> hits = search("modified=le=2007-09-16T09:00:00");
+        final Collection<ScoreDoc> hits = search("dcterms:modified=le=2007-09-16T09:00:00");
         assertEquals(hits.size(), 1);
     }
 
@@ -118,7 +118,7 @@ public class JAXRSClientServerTikaTest extends AbstractClientServerTestBase {
         wc.post(new MultipartBody(attachment));
 
         // Use user-defined date pattern
-        final Collection<ScoreDoc> hits = search("modified=le=2007/09/16");
+        final Collection<ScoreDoc> hits = search("dcterms:modified=le=2007/09/16");
         assertEquals(hits.size(), 1);
     }
 

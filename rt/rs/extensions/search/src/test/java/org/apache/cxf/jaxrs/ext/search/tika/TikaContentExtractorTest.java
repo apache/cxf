@@ -46,7 +46,7 @@ public class TikaContentExtractorTest {
 
     @Test
     public void testExtractedTextContentMatchesSearchCriteria() throws Exception {
-        SearchCondition<SearchBean> sc = parser.parse("Author==Bertrand*");
+        SearchCondition<SearchBean> sc = parser.parse("dc:creator==Bertrand*");
         final SearchBean bean = extractor.extractMetadataToSearchBean(
             getClass().getResourceAsStream("/files/testPDF.pdf"));
         assertNotNull("Document should not be null", bean);
@@ -54,7 +54,7 @@ public class TikaContentExtractorTest {
     }
     @Test
     public void testExtractedTextContentDoesNotMatchSearchCriteria() throws Exception {
-        SearchCondition<SearchBean> sc = parser.parse("Author==Barry*");
+        SearchCondition<SearchBean> sc = parser.parse("dc:creator==Barry*");
         final SearchBean bean = extractor.extractMetadataToSearchBean(
             getClass().getResourceAsStream("/files/testPDF.pdf"));
         assertNotNull("Document should not be null", bean);

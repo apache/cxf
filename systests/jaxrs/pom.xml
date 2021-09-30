@@ -462,6 +462,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <scope>test</scope>
+            <version>${cxf.httpcomponents.client.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.asynchttpclient</groupId>
             <artifactId>async-http-client</artifactId>
             <scope>test</scope>
@@ -480,30 +486,14 @@
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
-            <artifactId>tika-parsers</artifactId>
+            <artifactId>tika-core</artifactId>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.poi</groupId>
-                    <artifactId>poi-ooxml</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcprov-jdk15</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.xml.bind</groupId>
-                    <artifactId>jaxb-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.annotation</groupId>
-                    <artifactId>javax.annotation-api</artifactId>
-                </exclusion>
-            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-parser-pdf-module</artifactId>
+            <scope>test</scope>
+            <version>${cxf.tika.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>

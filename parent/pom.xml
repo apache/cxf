@@ -205,7 +205,7 @@
         <cxf.swagger.v3.version>2.1.11</cxf.swagger.v3.version>
         <cxf.swagger2.version>1.6.3</cxf.swagger2.version>
         <cxf.swagger2.guava.version>27.0-jre</cxf.swagger2.guava.version>
-        <cxf.tika.version>1.27</cxf.tika.version>
+        <cxf.tika.version>2.1.0</cxf.tika.version>
         <cxf.tomcat.version>9.0.53</cxf.tomcat.version>
         <cxf.tomitribe.http.signature.version>1.7</cxf.tomitribe.http.signature.version>
         <cxf.undertow.osgi.version>[1.4,3.0)</cxf.undertow.osgi.version>
@@ -1879,17 +1879,6 @@
                 <groupId>org.apache.tika</groupId>
                 <artifactId>tika-core</artifactId>
                 <version>${cxf.tika.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.tika</groupId>
-                <artifactId>tika-parsers</artifactId>
-                <version>${cxf.tika.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.json</groupId>
-                        <artifactId>json</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>

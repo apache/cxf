@@ -74,8 +74,9 @@ public class BookCatalog {
             if (handler != null) {
                 final String source = handler.getName();
                 final LuceneDocumentMetadata metadata = new LuceneDocumentMetadata()
-                    .withSource(source)
-                    .withField("modified", Date.class);
+                        .withSource(source)
+                        .withField("modified", Date.class)
+                        .withField("dcterms:modified", Date.class);
 
                 final Document document = extractor.extract(handler.getInputStream(), metadata);
                 if (document != null) {
@@ -117,6 +118,7 @@ public class BookCatalog {
     private static LuceneQueryVisitor< SearchBean > createVisitor() {
         final Map< String, Class< ? > > fieldTypes = new HashMap<>();
         fieldTypes.put("modified", Date.class);
+        fieldTypes.put("dcterms:modified", Date.class);
 
         LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<>("ct", "contents");
         visitor.setPrimitiveFieldTypeMap(fieldTypes);
