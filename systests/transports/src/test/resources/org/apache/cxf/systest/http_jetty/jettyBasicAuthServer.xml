@@ -26,6 +26,7 @@
         <httpj:engine port="${testutil.ports.JettyBasicAuthServer}">
             <httpj:handlers>
                 <bean class="org.eclipse.jetty.security.ConstraintSecurityHandler">
+                    <property name="authMethod" value="BASIC"/>
                     <property name="loginService" ref="securityLoginService"/>
                     <property name="constraintMappings">
                         <list>
