@@ -70,7 +70,7 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
 
     public void write(Object obj, XMLStreamWriter writer) {
         Closeable toClose = null;
-        try {            
+        try { //NOPMD           
             if (obj instanceof DataSource) {
                 DataSource ds = (DataSource)obj;
                 InputStream is = ds.getInputStream();
