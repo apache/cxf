@@ -31,7 +31,7 @@
         <relativePath>../parent</relativePath>
     </parent>
     <properties>
-        <transformer.verison>0.2.0</transformer.verison>
+        <transformer.version>0.2.0</transformer.version>
         <cxf.version>${project.version}</cxf.version>
         <jakarta.suffix>jakarta</jakarta.suffix>
     </properties>
@@ -960,7 +960,7 @@
                     <dependency>
                         <groupId>org.eclipse.transformer</groupId>
                         <artifactId>org.eclipse.transformer.cli</artifactId>
-                        <version>${transformer.verison}</version>
+                        <version>${transformer.version}</version>
                     </dependency>
                     <dependency>
                         <groupId>ant-contrib</groupId>
