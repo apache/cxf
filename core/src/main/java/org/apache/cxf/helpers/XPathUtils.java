@@ -69,8 +69,11 @@ public class XPathUtils {
     }
 
     public Object getValue(String xpathExpression, Node node, QName type) {
-        ClassLoaderHolder loader
-            = ClassLoaderUtils.setThreadContextClassloader(getClassLoader(xpath.getClass()));
+        ClassLoader currentLoader = getClassLoader(xpath.getClass());
+        ClassLoaderHolder loader = null;
+        if (currentLoader != null) {
+            loader = ClassLoaderUtils.setThreadContextClassloader(currentLoader);
+        }
         try {
             return xpath.evaluate(xpathExpression, node, type);
         } catch (Exception e) {
