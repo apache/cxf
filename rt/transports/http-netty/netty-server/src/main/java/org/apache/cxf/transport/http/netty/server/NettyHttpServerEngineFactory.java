@@ -151,7 +151,7 @@ public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
 
         NettyHttpServerEngine ref = portMap.get(port);
         if (ref == null) {
-            ref = new NettyHttpServerEngine(host, port);
+            ref = new NettyHttpServerEngine(host, port, factory.getBus());
             if (tlsParams != null) {
                 ref.setTlsServerParameters(tlsParams);
             }
