@@ -45,6 +45,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.common.util.ReflectionUtil;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -290,8 +291,21 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
                                                       String httpMethod,
                                                       MultivaluedMap<String, String> values,
                                                       Message m) {
-        final String contentType = MediaType.WILDCARD;
-        final MediaType acceptType = MediaType.WILDCARD_TYPE;
+        Map<String, List<String>> protocolHeaders = CastUtils.cast((Map<?, ?>)m.get(Message.PROTOCOL_HEADERS));
+        String contentType;
+        List<String> ctHeaderValues = protocolHeaders.get(Message.CONTENT_TYPE);
+        if (ctHeaderValues != null && !ctHeaderValues.isEmpty()) {
+            contentType = ctHeaderValues.get(0);
+        } else {
+            contentType = MediaType.WILDCARD;
+        }
+        String acceptType;
+        List<String> acceptHeaderValues = protocolHeaders.get(Message.ACCEPT_CONTENT_TYPE);
+        if (acceptHeaderValues != null && !acceptHeaderValues.isEmpty()) {
+            acceptType = acceptHeaderValues.get(0);
+        } else {
+            acceptType = MediaType.WILDCARD;
+        }
         OperationResourceInfo ori = JAXRSUtils.findTargetMethod(matchedResources,
                                     m, httpMethod, values,
                                     contentType,
