@@ -120,6 +120,7 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
     @Parameters(name = "{0}")
     public static Collection<TestParam> data() {
         return Arrays.asList(new TestParam[] {
+            new TestParam("SecureConversation_UserNameOverTransport_IPingService", STAX_PORT2, true),
             new TestParam("SecureConversation_UserNameOverTransport_IPingService", PORT2, false),
             new TestParam("SecureConversation_MutualCertificate10SignEncrypt_IPingService", PORT, false),
             new TestParam("AC_IPingService", PORT, false),
@@ -200,7 +201,6 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
             new TestParam("_XD-SEES_IPingService", STAX_PORT, false),
             new TestParam("_XD-ES_IPingService", STAX_PORT, false),
 
-            new TestParam("SecureConversation_UserNameOverTransport_IPingService", STAX_PORT2, true),
             // TODO Endorsing derived keys not supported.
             // new TestParam("SecureConversation_MutualCertificate10SignEncrypt_IPingService",
             //               STAX_PORT, true),
