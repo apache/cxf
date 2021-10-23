@@ -554,7 +554,7 @@ public abstract class AbstractClient implements Client {
 
     protected boolean responseStreamCanBeClosed(Message outMessage, Class<?> cls) {
         return !JAXRSUtils.isStreamingOutType(cls)
-            && MessageUtils.getContextualBoolean(outMessage, "response.stream.auto.close");
+            && MessageUtils.getContextualBoolean(outMessage, ResponseImpl.RESPONSE_STREAM_AUTO_CLOSE);
     }
 
     protected void completeExchange(Exchange exchange, boolean proxy) {

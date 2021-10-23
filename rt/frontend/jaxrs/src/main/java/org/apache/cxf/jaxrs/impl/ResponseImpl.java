@@ -66,7 +66,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 
 public final class ResponseImpl extends Response {
-
+    public static final String RESPONSE_STREAM_AUTO_CLOSE = "response.stream.auto.close";
     private static final Pattern LINK_DELIMITER = Pattern.compile(",\\s*(?=\\<|$)");
 
     private StatusType status;
@@ -453,6 +453,13 @@ public final class ResponseImpl extends Response {
             .createMessageBodyReaderInterceptor(cls, t, anns, mediaType, outMessage, entityStreamAvailable, null);
 
         if (readers != null) {
+            // By default, the response entity was never closed automatically which is not compliant
+            // with JAX-RS specification and TCK. The auto-close behavior is controlled by 
+            // ResponseImpl#RESPONSE_STREAM_AUTO_CLOSE property which is set to "false" by default. 
+            // The autoCloseHint alters the default value of this property to be "true" for all 
+            // non-streaming and non-streaming like responses (to minimize the impact of the change
+            // as much as possible) in order to follow the specification.
+            final boolean autoCloseHint = !JAXRSUtils.isStreamingLikeOutType(cls, t);
             try {
                 if (entityBufferred) {
                     InputStream.class.cast(entity).reset();
@@ -468,7 +475,7 @@ public final class ResponseImpl extends Response {
                                                                   responseMessage);
                 // close the entity after readEntity is called.
                 T tCastLastEntity = castLastEntity();
-                autoClose(cls, false);
+                autoCloseWithHint(cls, autoCloseHint, false);
                 return tCastLastEntity;
             } catch (NoContentException ex) {
                 //when content is empty, return null instead of throw exception to pass TCK
@@ -477,7 +484,7 @@ public final class ResponseImpl extends Response {
                     autoClose(cls, true);
                     reportMessageHandlerProblem("MSG_READER_PROBLEM", cls, mediaType, ex);
                 } else {
-                    autoClose(cls, false);
+                    autoCloseWithHint(cls, autoCloseHint, false);
                     return null;
                 }
             } catch (Exception ex) {
@@ -544,8 +551,13 @@ public final class ResponseImpl extends Response {
     }
 
     protected void autoClose(Class<?> cls, boolean exception) {
+        autoCloseWithHint(cls, false, exception);
+    }
+    
+    protected void autoCloseWithHint(Class<?> cls, boolean autoCloseHint, boolean exception) {
         if (!entityBufferred && !JAXRSUtils.isStreamingOutType(cls)
-            && (exception || MessageUtils.getContextualBoolean(outMessage, "response.stream.auto.close"))) {
+            && (exception || MessageUtils.getContextualBoolean(outMessage, 
+                RESPONSE_STREAM_AUTO_CLOSE, autoCloseHint))) {
             close();
         }
     }

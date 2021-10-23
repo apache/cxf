@@ -21,6 +21,8 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.Reader;
+import java.lang.annotation.Annotation;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
@@ -71,6 +73,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 
@@ -598,6 +601,42 @@ public class ResponseImplTest {
         }
     }
 
+    @Test
+    public void testReadEntityAndGetEntityAfter() {
+        final String str = "ouch";
+
+        final ResponseImpl response = new ResponseImpl(500, str);
+        final Message outMessage = createMessage();
+        outMessage.put(Message.REQUEST_URI, "http://localhost");
+        response.setOutMessage(outMessage);
+
+        final MultivaluedMap<String, Object> headers = new MetadataMap<>();
+        headers.putSingle("Content-Type", "text/xml");
+        response.addMetadata(headers);
+
+        assertEquals(str, response.readEntity(String.class));
+        assertThrows(IllegalStateException.class, () -> response.getEntity());
+    }
+    
+    @Test
+    public void testReadEntityWithAnnotations() {
+        final String str = "ouch";
+
+        final ResponseImpl response = new ResponseImpl(500, str);
+        final Message outMessage = createMessage();
+        outMessage.put(Message.REQUEST_URI, "http://localhost");
+        response.setOutMessage(outMessage);
+
+        final MultivaluedMap<String, Object> headers = new MetadataMap<>();
+        headers.putSingle("Content-Type", "text/xml");
+        response.addMetadata(headers);
+
+        final Annotation[] annotations = String.class.getAnnotations();
+        assertEquals(str, response.readEntity(String.class, annotations));
+        assertThrows(IllegalStateException.class, 
+            () -> response.readEntity(Reader.class, annotations));
+    }
+    
     public static class StringBean {
         private String header;
 
