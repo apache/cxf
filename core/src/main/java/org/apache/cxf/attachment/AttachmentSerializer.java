@@ -160,12 +160,17 @@ public class AttachmentSerializer {
         writer.write("\r\n");
         writer.write("--");
         writer.write(bodyBoundary);
-
+       
+        StringBuilder mimeBodyCt = buildMimeBodyCt(bodyCt, bodyCtParamsEscaped, bodyCtParams);
+        writeHeaders(mimeBodyCt.toString(), rootContentId, rootHeaders, writer);
+        out.write(writer.getBuffer().toString().getBytes(encoding));
+    }
+    
+    private StringBuilder buildMimeBodyCt(String bodyCt, String bodyCtParamsEscaped, String bodyCtParams) {
         StringBuilder mimeBodyCt = new StringBuilder();
         String bodyType = getHeaderValue("Content-Type", null);
         if (bodyType == null) {
-            mimeBodyCt.append(xop ? "application/xop+xml" : bodyCt)
-                .append("; charset=").append(encoding);
+            mimeBodyCt.append(xop ? "application/xop+xml" : bodyCt).append("; charset=").append(encoding);
             if (xop) {
                 mimeBodyCt.append("; type=\"").append(bodyCt);
                 if (bodyCtParamsEscaped != null) {
@@ -179,8 +184,7 @@ public class AttachmentSerializer {
             mimeBodyCt.append(bodyType);
         }
 
-        writeHeaders(mimeBodyCt.toString(), rootContentId, rootHeaders, writer);
-        out.write(writer.getBuffer().toString().getBytes(encoding));
+        return mimeBodyCt;
     }
 
     private static String escapeQuotes(String s) {
@@ -304,6 +308,11 @@ public class AttachmentSerializer {
             bufferSize = avail;
         }
         final byte[] buffer = new byte[bufferSize];
+        return getTotalReadBytes(input, output, buffer);
+       
+    }
+    
+    private int getTotalReadBytes(InputStream input, OutputStream output, byte[] buffer) throws IOException {
         int n = input.read(buffer);
         int total = 0;
         while (-1 != n) {

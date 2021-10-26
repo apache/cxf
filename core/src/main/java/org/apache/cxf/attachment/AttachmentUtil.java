@@ -170,18 +170,29 @@ public final class AttachmentUtil {
     public static void setStreamedAttachmentProperties(Message message, CachedOutputStream bos)
         throws IOException {
         Object directory = message.getContextualProperty(AttachmentDeserializer.ATTACHMENT_DIRECTORY);
-        if (directory != null) {
-            if (directory instanceof File) {
-                bos.setOutputDir((File) directory);
-            } else if (directory instanceof String) {
-                bos.setOutputDir(new File((String) directory));
-            } else {
-                throw new IOException("The value set as " + AttachmentDeserializer.ATTACHMENT_DIRECTORY
-                        + " should be either an instance of File or String");
-            }
-        }
+        setOutputDirectory(directory, bos);
 
         Object threshold = message.getContextualProperty(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD);
+        setThreshold(threshold, bos);
+
+        Object maxSize = message.getContextualProperty(AttachmentDeserializer.ATTACHMENT_MAX_SIZE);
+        setMaxSize(maxSize, bos);
+    }
+    
+    private static void setOutputDirectory(Object directory, CachedOutputStream bos) throws IOException {
+        if (directory != null) {
+            if (directory instanceof File) {
+                bos.setOutputDir((File)directory);
+            } else if (directory instanceof String) {
+                bos.setOutputDir(new File((String)directory));
+            } else {
+                throw new IOException("The value set as " + AttachmentDeserializer.ATTACHMENT_DIRECTORY
+                                      + " should be either an instance of File or String");
+            }
+        }
+    }
+    
+    private static void setThreshold(Object threshold, CachedOutputStream bos) throws IOException {
         if (threshold != null) {
             if (threshold instanceof Number) {
                 long t = ((Number) threshold).longValue();
@@ -204,12 +215,13 @@ public final class AttachmentUtil {
         } else if (!CachedOutputStream.isThresholdSysPropSet()) {
             // Use the default AttachmentDeserializer Threshold only if there is no system property defined
             bos.setThreshold(AttachmentDeserializer.THRESHOLD);
-        }
-
-        Object maxSize = message.getContextualProperty(AttachmentDeserializer.ATTACHMENT_MAX_SIZE);
+        } 
+    }
+    
+    private static void setMaxSize(Object maxSize, CachedOutputStream bos) throws IOException {
         if (maxSize != null) {
             if (maxSize instanceof Number) {
-                long size = ((Number) maxSize).longValue();
+                long size = ((Number)maxSize).longValue();
                 if (size >= 0) {
                     bos.setMaxSize(size);
                 } else {
@@ -217,13 +229,13 @@ public final class AttachmentUtil {
                 }
             } else if (maxSize instanceof String) {
                 try {
-                    bos.setMaxSize(Long.parseLong((String) maxSize));
+                    bos.setMaxSize(Long.parseLong((String)maxSize));
                 } catch (NumberFormatException e) {
                     throw new IOException("Provided threshold String is not a number", e);
                 }
             } else {
                 throw new IOException("The value set as " + AttachmentDeserializer.ATTACHMENT_MAX_SIZE
-                        + " should be either an instance of Number or String");
+                                      + " should be either an instance of Number or String");
             }
         }
     }
@@ -530,6 +542,12 @@ public final class AttachmentUtil {
         } catch (UnsupportedEncodingException e) {
             throw new Fault(e);
         }
+        
+        return  doCreateMtomAttachmentFromDH(isXop, id, handler);
+        
+    }
+    
+    private static Attachment doCreateMtomAttachmentFromDH(boolean isXop, String id, DataHandler handler) {
         AttachmentImpl att = new AttachmentImpl(id, handler);
         if (!StringUtils.isEmpty(handler.getName())) {
             //set Content-Disposition attachment header if filename isn't null
@@ -541,7 +559,7 @@ public final class AttachmentUtil {
             att.setHeader("Content-Disposition", "attachment;name=\"" + file + "\"");
         }
         att.setXOP(isXop);
-        return att;
+        return att;  
     }
 
     public static DataSource getAttachmentDataSource(String contentId, Collection<Attachment> atts) {

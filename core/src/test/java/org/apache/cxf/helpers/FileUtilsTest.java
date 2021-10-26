@@ -79,4 +79,18 @@ public class FileUtilsTest {
 
         assertEquals(foundFiles, foundFiles2);
     }
+    
+    @Test
+    public void testStripPathWindowStyle() {
+        String name = "c:\\boo\foo\\file.txt";
+        name = FileUtils.stripPath(name);
+        assertEquals("file.txt", name);
+    }
+
+    @Test
+    public void testStripPathUnixStyle() {
+        String name = "/opt/java/jre/bin/java";
+        name = FileUtils.stripPath(name);
+        assertEquals("java", name);
+    }
 }
