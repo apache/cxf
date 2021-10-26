@@ -208,6 +208,10 @@ public final class IOUtils {
 
     public static int copy(final InputStream input, final OutputStream output,
             int bufferSize) throws IOException {
+        // if input or output is null, a null pointer exception would be occurred!
+        if (input == null || output == null) {
+            return 0;
+        }
         int avail = input.available();
         if (avail > 262144) {
             avail = 262144;
@@ -240,6 +244,9 @@ public final class IOUtils {
     public static void copyAtLeast(final InputStream input,
                                final OutputStream output,
                                int atLeast) throws IOException {
+        if (input == null || output == null ) {
+            throw new IOException("The inputStream or outputStream is null,I/O operations cannot be performed!");
+        }
         final byte[] buffer = new byte[4096];
         int n = atLeast > buffer.length ? buffer.length : atLeast;
         n = input.read(buffer, 0, n);
@@ -260,6 +267,9 @@ public final class IOUtils {
     public static void copyAtLeast(final Reader input,
                                    final Writer output,
                                    int atLeast) throws IOException {
+        if ( input == null || output == null ) {
+            throw new IOException("The reader or writer is null,I/O operations cannot be performed!");
+        }
         final char[] buffer = new char[4096];
         int n = atLeast > buffer.length ? buffer.length : atLeast;
         n = input.read(buffer, 0, n);
@@ -280,6 +290,9 @@ public final class IOUtils {
 
     public static void copy(final Reader input, final Writer output,
             final int bufferSize) throws IOException {
+        if ( input == null || output == null ) {
+            throw new IOException("The reader or writer is null,I/O operations cannot be performed!");
+        }
         final char[] buffer = new char[bufferSize];
         int n = input.read(buffer);
         while (-1 != n) {
@@ -289,6 +302,12 @@ public final class IOUtils {
     }
 
     public static void transferTo(InputStream inputStream, File destinationFile) throws IOException {
+        if ( inputStream == null ) {
+            throw new IOException("The inputStream is null,I/O operations cannot be performed!");
+        }
+        if ( destinationFile == null ){
+            throw new IOException("The destinationFile is null,transfer operation cannot be performed!");
+        }
         if (Transferable.class.isAssignableFrom(inputStream.getClass())) {
             ((Transferable)inputStream).transferTo(destinationFile);
         } else {
@@ -311,8 +330,9 @@ public final class IOUtils {
     }
     public static String toString(final InputStream input, int bufferSize, String charset)
         throws IOException {
-
-
+        if ( input == null ) {
+            throw new IOException("The inputStream is null,,I/O operations cannot be performed!");
+        }
         int avail = input.available();
         if (avail > bufferSize) {
             bufferSize = avail;
@@ -326,7 +346,9 @@ public final class IOUtils {
         return toString(input, DEFAULT_BUFFER_SIZE);
     }
     public static String toString(final Reader input, int bufSize) throws IOException {
-
+        if ( input == null ) {
+            throw new IOException("The inputReader is null,I/O operations cannot be performed!");
+        }
         StringBuilder buf = new StringBuilder();
         final char[] buffer = new char[bufSize];
         try (Reader r = input) {
@@ -356,6 +378,9 @@ public final class IOUtils {
      */
     public static ByteArrayInputStream loadIntoBAIS(InputStream in)
         throws IOException {
+        if ( in == null ) {
+            throw new IOException("The inputStream is null,I/O operations cannot be performed!");
+        }
         int i = in.available();
         if (i < DEFAULT_BUFFER_SIZE) {
             i = DEFAULT_BUFFER_SIZE;
@@ -367,6 +392,9 @@ public final class IOUtils {
     }
 
     public static void consume(InputStream in) throws IOException {
+        if ( in == null ) {
+            throw new IOException("The inputStream is null,I/O operations cannot be performed!");
+        }
         int i = in.available();
         if (i == 0) {
             //if i is 0, then we MAY have already hit the end of the stream
@@ -398,6 +426,9 @@ public final class IOUtils {
      */
     public static void consume(final InputStream input,
                                int atLeast) throws IOException {
+        if ( input == null ) {
+            throw new IOException("The inputStream is null,I/O operations cannot be performed!");
+        }
         final byte[] buffer = new byte[4096];
         int n = atLeast > buffer.length ? buffer.length : atLeast;
         n = input.read(buffer, 0, n);
@@ -415,6 +446,9 @@ public final class IOUtils {
     }
 
     public static byte[] readBytesFromStream(InputStream in) throws IOException {
+        if ( in == null ) {
+            throw new IOException("The inputStream is null,I/O operations cannot be performed!");
+        }
         int i = in.available();
         if (i < DEFAULT_BUFFER_SIZE) {
             i = DEFAULT_BUFFER_SIZE;
