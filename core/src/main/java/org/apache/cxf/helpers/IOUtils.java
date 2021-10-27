@@ -32,6 +32,7 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.util.Objects;
 
 import org.apache.cxf.io.CopyingOutputStream;
 import org.apache.cxf.io.Transferable;
@@ -208,6 +209,8 @@ public final class IOUtils {
 
     public static int copy(final InputStream input, final OutputStream output,
             int bufferSize) throws IOException {
+        Objects.requireNonNull(input, "The inputStream is required but null value was provided");
+        Objects.requireNonNull(output, "The outputStream is required but null value was provided");
         int avail = input.available();
         if (avail > 262144) {
             avail = 262144;
@@ -240,6 +243,8 @@ public final class IOUtils {
     public static void copyAtLeast(final InputStream input,
                                final OutputStream output,
                                int atLeast) throws IOException {
+        Objects.requireNonNull(input, "The inputStream is required but null value was provided");
+        Objects.requireNonNull(output, "The outputStream is required but null value was provided");
         final byte[] buffer = new byte[4096];
         int n = atLeast > buffer.length ? buffer.length : atLeast;
         n = input.read(buffer, 0, n);
@@ -260,6 +265,8 @@ public final class IOUtils {
     public static void copyAtLeast(final Reader input,
                                    final Writer output,
                                    int atLeast) throws IOException {
+        Objects.requireNonNull(input, "The reader is required but null value was provided");
+        Objects.requireNonNull(output, "The writer is required but null value was provided");
         final char[] buffer = new char[4096];
         int n = atLeast > buffer.length ? buffer.length : atLeast;
         n = input.read(buffer, 0, n);
@@ -280,6 +287,8 @@ public final class IOUtils {
 
     public static void copy(final Reader input, final Writer output,
             final int bufferSize) throws IOException {
+        Objects.requireNonNull(input, "The reader is required but null value was provided");
+        Objects.requireNonNull(output, "The writer is required but null value was provided");
         final char[] buffer = new char[bufferSize];
         int n = input.read(buffer);
         while (-1 != n) {
@@ -289,6 +298,8 @@ public final class IOUtils {
     }
 
     public static void transferTo(InputStream inputStream, File destinationFile) throws IOException {
+        Objects.requireNonNull(inputStream, "The inputStream is required but null value was provided");
+        Objects.requireNonNull(destinationFile, "The destinationFile is required but null value was provided");
         if (Transferable.class.isAssignableFrom(inputStream.getClass())) {
             ((Transferable)inputStream).transferTo(destinationFile);
         } else {
@@ -311,8 +322,7 @@ public final class IOUtils {
     }
     public static String toString(final InputStream input, int bufferSize, String charset)
         throws IOException {
-
-
+        Objects.requireNonNull(input, "The inputStream is required but null value was provided");
         int avail = input.available();
         if (avail > bufferSize) {
             bufferSize = avail;
@@ -326,7 +336,7 @@ public final class IOUtils {
         return toString(input, DEFAULT_BUFFER_SIZE);
     }
     public static String toString(final Reader input, int bufSize) throws IOException {
-
+        Objects.requireNonNull(input, "The reader is required but null value was provided");
         StringBuilder buf = new StringBuilder();
         final char[] buffer = new char[bufSize];
         try (Reader r = input) {
@@ -356,6 +366,7 @@ public final class IOUtils {
      */
     public static ByteArrayInputStream loadIntoBAIS(InputStream in)
         throws IOException {
+        Objects.requireNonNull(in, "The inputStream is required but null value was provided");
         int i = in.available();
         if (i < DEFAULT_BUFFER_SIZE) {
             i = DEFAULT_BUFFER_SIZE;
@@ -367,6 +378,7 @@ public final class IOUtils {
     }
 
     public static void consume(InputStream in) throws IOException {
+        Objects.requireNonNull(in, "The inputStream is required but null value was provided");
         int i = in.available();
         if (i == 0) {
             //if i is 0, then we MAY have already hit the end of the stream
@@ -398,6 +410,7 @@ public final class IOUtils {
      */
     public static void consume(final InputStream input,
                                int atLeast) throws IOException {
+        Objects.requireNonNull(input, "The inputStream is required but null value was provided");
         final byte[] buffer = new byte[4096];
         int n = atLeast > buffer.length ? buffer.length : atLeast;
         n = input.read(buffer, 0, n);
@@ -415,6 +428,7 @@ public final class IOUtils {
     }
 
     public static byte[] readBytesFromStream(InputStream in) throws IOException {
+        Objects.requireNonNull(in, "The inputStream is required but null value was provided");
         int i = in.available();
         if (i < DEFAULT_BUFFER_SIZE) {
             i = DEFAULT_BUFFER_SIZE;
