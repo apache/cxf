@@ -21,6 +21,7 @@ package org.apache.cxf.helpers;
 
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 
@@ -28,6 +29,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class IOUtilsTest {
@@ -56,5 +58,20 @@ public class IOUtilsTest {
         InputStream is = new UnMarkedInputStream(data.getBytes());
         assertFalse(IOUtils.isEmpty(is));
         assertEquals(data, IOUtils.toString(is));
+    }
+
+    /**
+     * add a new test when destinationFile is null
+     */
+    @Test
+    public void testTransferToWhenEmptyFile() throws Exception {
+        InputStream is = new ByteArrayInputStream("Hello".getBytes());
+        File destinationFile = null;
+        Exception exception = assertThrows(Exception.class, () -> { 
+            IOUtils.transferTo(is, destinationFile);
+        });
+        String expectedMessage = "The destinationFile is required";
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 }
