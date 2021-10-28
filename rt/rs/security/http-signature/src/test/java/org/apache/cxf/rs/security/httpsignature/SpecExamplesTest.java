@@ -344,7 +344,7 @@ public class SpecExamplesTest {
                                                                        requestStringHeaders) {
         ContainerRequestContext containerRequestContext = Mockito.mock(ContainerRequestContext.class);
         UriInfo uriInfo = Mockito.mock(UriInfo.class);
-        Mockito.when(uriInfo.getAbsolutePath()).thenReturn(uri);
+        Mockito.when(uriInfo.getRequestUri()).thenReturn(uri);
         Mockito.when(containerRequestContext.getUriInfo()).thenReturn(uriInfo);
         Mockito.when(containerRequestContext.getMethod()).thenReturn(method);
         Mockito.when(containerRequestContext.getHeaders()).thenReturn(requestStringHeaders);
