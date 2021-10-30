@@ -55,5 +55,6 @@
         <module>rs-sse</module>
         <module>microprofile</module>
         <module>spring-boot</module>
+        <module>transport-netty</module>
     </modules>
 </project>
