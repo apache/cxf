@@ -85,7 +85,6 @@
                     <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-alpn-openjdk8-server</artifactId>
                     <version>${cxf.jetty9.version}</version>
-                    <scope>test</scope>
                 </dependency>
             </dependencies>
         </profile>
@@ -99,7 +98,6 @@
                     <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-alpn-java-server</artifactId>
                     <version>${cxf.jetty9.version}</version>
-                    <scope>test</scope>
                 </dependency>
             </dependencies>
         </profile>
