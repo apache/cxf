@@ -229,7 +229,6 @@ public class NettyHttpServerEngineBeanDefinitionParser extends AbstractBeanDefin
 
         String threadingRef;
         String tlsRef;
-        Bus bus;
         NettyHttpServerEngineFactory factory;
 
         public SpringNettyHttpServerEngine(
@@ -237,8 +236,7 @@ public class NettyHttpServerEngineBeanDefinitionParser extends AbstractBeanDefin
             Bus b,
             String host,
             int port) {
-            super(host, port);
-            bus = b;
+            super(host, port, b);
             factory = fac;
         }
 
@@ -247,15 +245,15 @@ public class NettyHttpServerEngineBeanDefinitionParser extends AbstractBeanDefin
         }
 
         public void setBus(Bus b) {
-            bus = b;
-            if (null != bus && null == factory) {
-                factory = bus.getExtension(NettyHttpServerEngineFactory.class);
+            super.setBus(b);
+            if (null != getBus() && null == factory) {
+                factory = getBus().getExtension(NettyHttpServerEngineFactory.class);
             }
         }
 
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
-            if (bus == null) {
-                bus = BusWiringBeanFactoryPostProcessor.addDefaultBus(ctx);
+            if (getBus() == null) {
+                setBus(BusWiringBeanFactoryPostProcessor.addDefaultBus(ctx));
             }
         }
 

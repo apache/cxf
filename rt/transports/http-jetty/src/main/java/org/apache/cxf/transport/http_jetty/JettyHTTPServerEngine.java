@@ -54,7 +54,11 @@ import org.apache.cxf.configuration.security.ClientAuthentication;
 import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.transport.HttpUriMapper;
+import org.apache.cxf.transport.http.HttpServerEngineSupport;
+import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
 import org.eclipse.jetty.http.HttpStatus;
+import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory;
+import org.eclipse.jetty.http2.server.HTTP2ServerConnectionFactory;
 import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.server.AbstractConnector;
 import org.eclipse.jetty.server.ConnectionFactory;
@@ -84,7 +88,7 @@ import org.eclipse.jetty.util.thread.ThreadPool;
  * work off of a designated port. The port will be enabled for
  * "http" or "https" depending upon its successful configuration.
  */
-public class JettyHTTPServerEngine implements ServerEngine {
+public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupport {
     public static final String DO_NOT_CHECK_URL_PROP = "org.apache.cxf.transports.http_jetty.DontCheckUrl";
 
     private static final Logger LOG = LogUtils.getL7dLogger(JettyHTTPServerEngine.class);
@@ -145,15 +149,12 @@ public class JettyHTTPServerEngine implements ServerEngine {
     /**
      * This constructor is called by the JettyHTTPServerEngineFactory.
      */
-    public JettyHTTPServerEngine(
-        Container.Listener mBeanContainer,
-        String host,
-        int port) {
+    public JettyHTTPServerEngine(Container.Listener mBeanContainer, String host, int port) {
         this.host = host;
         this.port = port;
         this.mBeanContainer = mBeanContainer;
     }
-
+    
     public JettyHTTPServerEngine() {
 
     }
@@ -398,7 +399,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
             addServerMBean();
 
             if (connector == null) {
-                connector = createConnector(getHost(), getPort());
+                connector = createConnector(getHost(), getPort(), handler.getBus());
                 if (LOG.isLoggable(Level.FINER)) {
                     logConnector((ServerConnector)connector);
                 }
@@ -621,7 +622,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
     }
 
     
-    private Connector createConnector(String hosto, int porto) {
+    private Connector createConnector(String hosto, int porto, final Bus bus) {
         // now we just use the SelectChannelConnector as the default connector
         SslContextFactory sslcf = null;
         if (tlsServerParameters != null) {
@@ -649,8 +650,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
             // unparsable version
         }
 
-        result = (ServerConnector)createConnectorJetty(sslcf, hosto, porto, major, minor);
-
+        result = (ServerConnector)createConnectorJetty(sslcf, hosto, porto, major, minor, bus);
 
         try {
             result.setPort(porto);
@@ -667,7 +667,8 @@ public class JettyHTTPServerEngine implements ServerEngine {
         return result;
     }
 
-    AbstractConnector createConnectorJetty(SslContextFactory sslcf, String hosto, int porto, int major, int minor) {
+    AbstractConnector createConnectorJetty(SslContextFactory sslcf, String hosto, int porto, 
+            int major, int minor, final Bus bus) {
         AbstractConnector result = null;
         try {
             HttpConfiguration httpConfig = new HttpConfiguration();
@@ -680,10 +681,26 @@ public class JettyHTTPServerEngine implements ServerEngine {
 
             if (tlsServerParameters != null) {
                 httpConfig.addCustomizer(new org.eclipse.jetty.server.SecureRequestCustomizer());
-                SslConnectionFactory scf = new SslConnectionFactory(sslcf, "HTTP/1.1");
-                connectionFactories.add(scf);
+
+                if (!isHttp2Enabled(bus)) {
+                    final SslConnectionFactory scf = new SslConnectionFactory(sslcf, httpFactory.getProtocol());
+                    connectionFactories.add(scf);
+                } else {
+                    // The ALPN processors are application specific (as per Jetty docs) and are pluggable as
+                    // additional dependency.
+                    final ALPNServerConnectionFactory alpn = new ALPNServerConnectionFactory();
+                    alpn.setDefaultProtocol(httpFactory.getProtocol());
+                    
+                    final SslConnectionFactory scf = new SslConnectionFactory(sslcf, alpn.getProtocol());
+                    connectionFactories.add(scf);
+                    connectionFactories.add(alpn);
+                    connectionFactories.add(new HTTP2ServerConnectionFactory(httpConfig));
+                }
+
                 String proto = (major > 9 || (major == 9 && minor >= 3)) ? "SSL" : "SSL-HTTP/1.1";
                 result.setDefaultProtocol(proto);
+            } else if (isHttp2Enabled(bus)) {
+                connectionFactories.add(new HTTP2CServerConnectionFactory(httpConfig));
             }
             connectionFactories.add(httpFactory);
             result.setConnectionFactories(connectionFactories);
