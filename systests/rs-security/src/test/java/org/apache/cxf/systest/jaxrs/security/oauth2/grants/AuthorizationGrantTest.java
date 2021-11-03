@@ -539,10 +539,6 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         assertNotNull(jwtClaims.getIssuedAt());
         assertNotNull(jwtClaims.getExpiryTime());
         assertEquals(ISSUER, jwtClaims.getIssuer());
-        final Object scope = jwtClaims.getClaim(OAuthConstants.SCOPE);
-        if (null != scope) {
-            assertEquals(String.class, scope.getClass());
-        }
 
         KeyStore keystore = KeyStore.getInstance("JKS");
         keystore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", AuthorizationGrantTest.class),
