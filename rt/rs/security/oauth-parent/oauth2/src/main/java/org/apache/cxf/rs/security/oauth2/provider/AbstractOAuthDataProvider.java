@@ -139,9 +139,9 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         if (at.getIssuer() != null) {
             claims.setIssuer(at.getIssuer());
         }
-        if (!at.getScopes().isEmpty()) {
+        if (!at.getScopes().isEmpty()) { // rfc8693, section 4.2
             claims.setClaim(OAuthConstants.SCOPE,
-                            OAuthUtils.convertPermissionsToScopeList(at.getScopes()));
+                OAuthUtils.convertListOfScopesToString(OAuthUtils.convertPermissionsToScopeList(at.getScopes())));
         }
         // OAuth2 resource indicators (resource server audience)
         if (!at.getAudiences().isEmpty()) {
