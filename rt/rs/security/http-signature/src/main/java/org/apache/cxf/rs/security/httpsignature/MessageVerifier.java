@@ -18,14 +18,11 @@
  */
 package org.apache.cxf.rs.security.httpsignature;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.httpsignature.exception.MissingSignatureHeaderException;
@@ -100,7 +97,8 @@ public class MessageVerifier {
         this.algorithmProvider = Objects.requireNonNull(algorithmProvider, "algorithm provider cannot be null");
     }
 
-    public void verifyMessage(Map<String, List<String>> messageHeaders, String method, String uri, Message m) {
+    public void verifyMessage(Map<String, List<String>> messageHeaders, String method,
+                              String uri, Message m, byte[] messageBody) {
         SignatureHeaderUtils.inspectMessageHeaders(messageHeaders);
         inspectMissingSignatureHeader(messageHeaders);
 
@@ -118,23 +116,12 @@ public class MessageVerifier {
 
         // Add the default required headers
         boolean requestor = MessageUtils.isRequestor(m);
-        byte[] payload = null;
         if (addDefaultRequiredHeaders) {
             if (!(requestor || signedHeaders.contains(HTTPSignatureConstants.REQUEST_TARGET))) {
                 signedHeaders.add(HTTPSignatureConstants.REQUEST_TARGET);
             }
 
-            InputStream is = m.getContent(InputStream.class);
-            try {
-                if (is != null) {
-                    payload = IOUtils.readBytesFromStream(is);
-                }
-            } catch (IOException e) {
-                LOG.warning("Exception caught while reading bytes from stream to add digest");
-            }
-
-
-            if (!signedHeaders.contains("digest") && payload != null && payload.length > 0) {
+            if (!signedHeaders.contains("digest") && messageBody != null && messageBody.length > 0) {
                 signedHeaders.add("digest");
             }
         }

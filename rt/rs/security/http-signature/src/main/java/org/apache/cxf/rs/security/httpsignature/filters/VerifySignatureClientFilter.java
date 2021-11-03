@@ -44,7 +44,7 @@ public class VerifySignatureClientFilter extends AbstractSignatureInFilter imple
             responseContext.setEntityStream(new ByteArrayInputStream(messageBody));
         }
 
-        verifySignature(responseContext.getHeaders(), "", "");
+        verifySignature(responseContext.getHeaders(), "", "", messageBody);
     }
 
     @Override

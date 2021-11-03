@@ -99,7 +99,7 @@ abstract class AbstractSignatureInFilter {
     }
 
     protected void verifySignature(MultivaluedMap<String, String> headers, String uriPath,
-                                   String httpMethod) {
+                                   String httpMethod, byte[] messageBody) {
         if (!enabled) {
             LOG.fine("Verify signature filter is disabled");
             return;
@@ -111,7 +111,9 @@ abstract class AbstractSignatureInFilter {
 
         LOG.fine("Starting filter message verification process");
         try {
-            messageVerifier.verifyMessage(headers, httpMethod, uriPath, PhaseInterceptorChain.getCurrentMessage());
+            messageVerifier.verifyMessage(headers, httpMethod, uriPath,
+                    PhaseInterceptorChain.getCurrentMessage(),
+                    messageBody);
         } catch (DifferentAlgorithmsException | InvalidSignatureHeaderException
             | InvalidDataToVerifySignatureException | InvalidSignatureException
             | MultipleSignatureHeaderException | MissingSignatureHeaderException ex) {

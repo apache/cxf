@@ -43,7 +43,7 @@ public class VerifySignatureFilter extends AbstractSignatureInFilter implements 
         }
         verifySignature(requestCtx.getHeaders(),
                 SignatureHeaderUtils.createRequestTarget(requestCtx.getUriInfo().getRequestUri()),
-                        requestCtx.getMethod());
+                        requestCtx.getMethod(), messageBody);
     }
 
     @Override

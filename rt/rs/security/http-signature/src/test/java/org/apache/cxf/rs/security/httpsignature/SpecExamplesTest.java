@@ -66,6 +66,8 @@ import static org.junit.Assert.assertEquals;
  */
 public class SpecExamplesTest {
 
+    private static final String MESSAGE_BODY = "Hello";
+
     private static KeyProvider keyProvider;
     private static PublicKey publicKey;
     private Bus bus;
@@ -124,7 +126,8 @@ public class SpecExamplesTest {
         messageVerifier.setAddDefaultRequiredHeaders(false);
         messageVerifier.setSecurityProvider(new MockSecurityProvider());
         messageVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
-        messageVerifier.verifyMessage(headers, "POST", "/foo?param=value&pet=dog", new MessageImpl());
+        messageVerifier.verifyMessage(headers, "POST", "/foo?param=value&pet=dog",
+                new MessageImpl(), MESSAGE_BODY.getBytes());
     }
 
     @Test
@@ -197,7 +200,8 @@ public class SpecExamplesTest {
         messageVerifier.setAddDefaultRequiredHeaders(false);
         messageVerifier.setSecurityProvider(new MockSecurityProvider());
         messageVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
-        messageVerifier.verifyMessage(headers, "POST", "/foo?param=value&pet=dog", new MessageImpl());
+        messageVerifier.verifyMessage(headers, "POST", "/foo?param=value&pet=dog",
+                new MessageImpl(), MESSAGE_BODY.getBytes());
     }
 
     @Test
@@ -272,7 +276,8 @@ public class SpecExamplesTest {
         MessageVerifier messageVerifier = new MessageVerifier(keyId -> publicKey);
         messageVerifier.setSecurityProvider(new MockSecurityProvider());
         messageVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
-        messageVerifier.verifyMessage(headers, "POST", "/foo?param=value&pet=dog", new MessageImpl());
+        messageVerifier.verifyMessage(headers, "POST", "/foo?param=value&pet=dog",
+                new MessageImpl(), MESSAGE_BODY.getBytes());
     }
 
     @Test
