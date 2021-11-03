@@ -46,6 +46,7 @@
             com.sun.msv*;resolution:=optional,
             com.sun.tools*;resolution:=optional,
             com.sun.xml*;resolution:=optional,
+            com.sun.codemodel.writer;resolution:=optional,
             org.slf4j*;resolution:=optional;version="${cxf.osgi.slf4j.version}",
             net.sf.cglib*;resolution:=optional;version="${cxf.cglib.osgi.version}",
             org.springframework.osgi.io;resolution:=optional;version="${cxf.osgi.spring.osgi.version}",
@@ -65,8 +66,7 @@
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
             org.apache.karaf.jaas.boot.principal;resolution:=optional,
             org.apache.commons.logging;resolution:=optional,
-            !sun.misc,
-            !com.sun.codemodel.writer
+            !sun.misc
         </cxf.osgi.import>
         <cxf.osgi.dynamic.import>
             org.apache.cxf.bus,org.apache.cxf.*,com.ctc.wstx.*,org.apache.karaf.jaas.boot.principal.*

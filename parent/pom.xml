@@ -1159,6 +1159,16 @@
                 <version>${cxf.jetty.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.eclipse.jetty.http2</groupId>
+                <artifactId>http2-server</artifactId>
+                <version>${cxf.jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-alpn-server</artifactId>
+                <version>${cxf.jetty.version}</version>
+            </dependency>
+            <dependency>
                  <groupId>io.undertow</groupId>
                  <artifactId>undertow-core</artifactId>
                  <version>${cxf.undertow.version}</version>

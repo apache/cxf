@@ -59,16 +59,11 @@ public final class SSLUtils {
         }
         return verifier;
     }
-
-    public static SSLContext getSSLContext(TLSParameterBase parameters) throws GeneralSecurityException {
-        // TODO do we need to cache the context
-        String provider = parameters.getJsseProvider();
-
-        String protocol = parameters.getSecureSocketProtocol() != null ? parameters
-            .getSecureSocketProtocol() : "TLS";
-
-        SSLContext ctx = provider == null ? SSLContext.getInstance(protocol) : SSLContext
-            .getInstance(protocol, provider);
+    
+    public static SSLContextInitParameters getSSLContextInitParameters(TLSParameterBase parameters) 
+            throws GeneralSecurityException {
+        
+        final SSLContextInitParameters contextParameters = new SSLContextInitParameters();
 
         KeyManager[] keyManagers = parameters.getKeyManagers();
         if (keyManagers == null && parameters instanceof TLSClientParameters) {
@@ -80,8 +75,25 @@ public final class SSLUtils {
         if (trustManagers == null && parameters instanceof TLSClientParameters) {
             trustManagers = org.apache.cxf.configuration.jsse.SSLUtils.getDefaultTrustStoreManagers(LOG);
         }
+        
+        contextParameters.setKeyManagers(configuredKeyManagers);
+        contextParameters.setTrustManagers(trustManagers);
+        
+        return contextParameters;
+    }
 
-        ctx.init(configuredKeyManagers, trustManagers, parameters.getSecureRandom());
+    public static SSLContext getSSLContext(TLSParameterBase parameters) throws GeneralSecurityException {
+        // TODO do we need to cache the context
+        String provider = parameters.getJsseProvider();
+
+        String protocol = parameters.getSecureSocketProtocol() != null ? parameters
+            .getSecureSocketProtocol() : "TLS";
+
+        SSLContext ctx = provider == null ? SSLContext.getInstance(protocol) : SSLContext
+            .getInstance(protocol, provider);
+
+        final SSLContextInitParameters initParams = getSSLContextInitParameters(parameters);
+        ctx.init(initParams.getKeyManagers(), initParams.getTrustManagers(), parameters.getSecureRandom());
 
         if (parameters instanceof TLSClientParameters && ctx.getClientSessionContext() != null) {
             ctx.getClientSessionContext().setSessionTimeout(((TLSClientParameters)parameters).getSslCacheTimeout());
