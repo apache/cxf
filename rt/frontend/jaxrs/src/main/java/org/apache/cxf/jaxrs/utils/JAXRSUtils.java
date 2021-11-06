@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs.utils;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -81,6 +82,7 @@ import javax.ws.rs.ext.ReaderInterceptorContext;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -101,7 +103,10 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.ext.ProtocolHeaders;
 import org.apache.cxf.jaxrs.ext.ProtocolHeadersImpl;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.InputStreamDataSource;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
+import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.jaxrs.impl.ContainerRequestContextImpl;
 import org.apache.cxf.jaxrs.impl.ContainerResponseContextImpl;
@@ -169,12 +174,72 @@ public final class JAXRSUtils {
     private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
     private static final Set<Class<?>> STREAMING_OUT_TYPES = new HashSet<>(
         Arrays.asList(InputStream.class, Reader.class, StreamingOutput.class));
+    private static final Set<Class<?>> STREAMING_LIKE_OUT_TYPES = new HashSet<>(
+        Arrays.asList(XMLSource.class, InputStreamDataSource.class, 
+            MultipartBody.class, Attachment.class));
+    private static final Set<String> REACTIVE_OUT_TYPES = new HashSet<>(
+        Arrays.asList(
+            // Reactive Streams
+            "org.reactivestreams.Publisher",
+            // Project Reactor
+            "reactor.core.publisher.Mono",
+            "reactor.core.publisher.Flux",
+            // RxJava
+            "rx.Observable",
+            // RxJava2
+            "io.reactivex.Flowable",
+            "io.reactivex.Maybe",
+            "io.reactivex.Observable",
+            "io.reactivex.Single",
+            // RxJava3
+            "io.reactivex.rxjava3.core.Flowable",
+            "io.reactivex.rxjava3.core.Maybe",
+            "io.reactivex.rxjava3.core.Observable",
+            "io.reactivex.rxjava3.core.Single",
+            // JDK
+            "java.util.concurrent.CompletableFuture",
+            "java.util.concurrent.CompletionStage"
+        ));
 
     private JAXRSUtils() {
     }
 
+    /**
+     * Consider additional types as stream-like and returns if the class and corresponding type
+     * refer to one of those. 
+     * @param cls class to check
+     * @param type type to check
+     * @return "true" is the class and corresponding type could be considered streaming-like, 
+     * "false" otherwise.
+     */
+    public static boolean isStreamingLikeOutType(Class<?> cls, Type type) {
+        if (cls != null && (isStreamingOutType(cls) 
+                || STREAMING_LIKE_OUT_TYPES.contains(cls) 
+                || REACTIVE_OUT_TYPES.contains(cls.getName()))) {
+            return true;
+        }
+
+        if (type instanceof ParameterizedType) {
+            final ParameterizedType parameterizedType = (ParameterizedType)type;
+            for (Type arg: parameterizedType.getActualTypeArguments()) {
+                if (isStreamingLikeOutType(null, arg)) {
+                    return true;
+                }
+            }
+        }
+        
+        if (type instanceof Class) {
+            final Class<?> typeCls = (Class<?>)type;
+            return isStreamingOutType(typeCls) || STREAMING_LIKE_OUT_TYPES.contains(typeCls);
+        }
+        
+        return false;
+    }
+    
     public static boolean isStreamingOutType(Class<?> type) {
-        return STREAMING_OUT_TYPES.contains(type);
+        return STREAMING_OUT_TYPES.contains(type) 
+            || Closeable.class.isAssignableFrom(type)
+            || Source.class.isAssignableFrom(type);
     }
 
     public static List<PathSegment> getPathSegments(String thePath, boolean decode) {
