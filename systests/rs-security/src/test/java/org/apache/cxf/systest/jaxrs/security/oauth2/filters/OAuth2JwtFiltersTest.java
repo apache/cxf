@@ -136,7 +136,7 @@ public class OAuth2JwtFiltersTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = jwtConsumer.getJwtClaims();
         assertEquals("consumer-id", claims.getStringProperty(OAuthConstants.CLIENT_ID));
         assertEquals("alice", claims.getStringProperty("username"));
-        assertTrue(claims.getListStringProperty(OAuthConstants.SCOPE).contains(scope));
+        assertTrue(claims.getStringProperty(OAuthConstants.SCOPE).contains(scope));
         // Now invoke on the service with the access token
         WebClient client = WebClient.create(rsAddress, OAuth2TestUtils.setupProviders())
             .authorization(new ClientAccessToken(BEARER_AUTHORIZATION_SCHEME, accessToken.getTokenKey()));
