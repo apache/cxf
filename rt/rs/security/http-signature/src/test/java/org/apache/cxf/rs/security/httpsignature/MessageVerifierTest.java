@@ -49,6 +49,7 @@ import org.junit.Test;
 public class MessageVerifierTest {
     private static final String KEY_ID = "testVerifier";
     private static final String METHOD = "GET";
+    private static final String DELETE_METHOD = "DELETE";
     private static final String URI = "/test/signature";
     private static final String KEY_PAIR_GENERATOR_ALGORITHM = "RSA";
     private static final String MESSAGE_BODY = "Hello";
@@ -80,6 +81,13 @@ public class MessageVerifierTest {
         Map<String, List<String>> headers = createMockHeaders();
         createAndAddSignature(headers);
         messageVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), MESSAGE_BODY.getBytes());
+    }
+
+    @Test
+    public void nullBodyRequest() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        createAndAddSignature(headers);
+        messageVerifier.verifyMessage(headers, DELETE_METHOD, URI, new MessageImpl(), null);
     }
 
     @Test
@@ -238,6 +246,20 @@ public class MessageVerifierTest {
         headerVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), MESSAGE_BODY.getBytes());
     }
 
+    @Test
+    public void nullBodyDelMethodShouldNotThrowInvalidDataToVerifySignatureException() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Test", Collections.singletonList("value"));
+        headers.put(HTTPSignatureConstants.REQUEST_TARGET, Collections.singletonList("12345"));
+        createAndAddSignatureDeleteMethod(headers);
+
+        MessageVerifier headerVerifier = new MessageVerifier(keyId -> keyPair.getPublic());
+        headerVerifier.setAddDefaultRequiredHeaders(true);
+        headerVerifier.setSecurityProvider(new MockSecurityProvider());
+        headerVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
+        headerVerifier.verifyMessage(headers, DELETE_METHOD, URI, new MessageImpl(), null);
+    }
+
     @Test(expected = InvalidDataToVerifySignatureException.class)
     public void defaultRequiredHeaderNotPresent() throws IOException {
         Map<String, List<String>> headers = createMockHeaders();
@@ -265,6 +287,10 @@ public class MessageVerifierTest {
 
     private static void createAndAddSignature(Map<String, List<String>> headers) throws IOException {
         messageSigner.sign(headers, URI, METHOD);
+    }
+
+    private static void createAndAddSignatureDeleteMethod(Map<String, List<String>> headers) throws IOException {
+        messageSigner.sign(headers, URI, DELETE_METHOD);
     }
 
     private static Map<String, List<String>> createMockHeaders() {
