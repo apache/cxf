@@ -1544,6 +1544,11 @@ public class BookStore {
     }
 
     @POST
+    @Path("/no-content")
+    public void noContent() {
+    }
+
+    @POST
     @Path("/books/customstatus")
     @Produces("application/xml")
     @Consumes("text/xml")
