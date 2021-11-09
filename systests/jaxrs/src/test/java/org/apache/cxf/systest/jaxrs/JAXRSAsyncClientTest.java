@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -52,6 +53,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Provider;
 import javax.xml.ws.Holder;
 
 import org.apache.cxf.jaxrs.client.ClientConfiguration;
@@ -68,6 +70,7 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -477,9 +480,73 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             assertThat(response.getStatus(), equalTo(404));
         }
     }
+
+    @Test
+    public void testNettyClientGet() throws Exception {
+        final String address = "http://localhost:" + PORT + "/bookstore/books/wildcard";
+        
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setTransportId(NettyHttpTransportFactory.DEFAULT_NAMESPACES.get(0));
+        bean.setAddress(address);
+        
+        WebClient webClient = bean.createWebClient();
+        
+        try (Response response = webClient
+                .to(address, false)
+                .accept("text/plain")
+                .async()
+                .get()
+                .get(10, TimeUnit.SECONDS)) {
+            assertThat(response.getStatus(), equalTo(200));
+        } finally {
+            webClient.close();
+        }
+    }
     
-    private WebClient createWebClient(String address) {
-        return WebClient.create(address);
+    @Test
+    public void testNettyClientDeleteWithBody() throws Exception {
+        final String address = "http://localhost:" + PORT + "/bookstore/deletebody";
+        
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setTransportId(NettyHttpTransportFactory.DEFAULT_NAMESPACES.get(0));
+        bean.setAddress(address);
+        
+        WebClient webClient = bean.createWebClient();
+        
+        try {
+            Book book = webClient
+                .to(address, false)
+                .accept("application/xml")
+                .async()
+                .method("DELETE", Entity.entity(new Book("Delete", 123L), "application/xml"), Book.class)
+                .get(20, TimeUnit.SECONDS);
+            assertEquals("Delete", book.getName());
+        } finally {
+            webClient.close();
+        }
+    }
+
+    @Test
+    public void testBookNoContent() throws Exception {
+        final String address = "http://localhost:" + PORT + "/bookstore/no-content";
+        WebClient client = createWebClient(address);
+        Response r = client.type("*/*").async().post(null).get();
+        assertEquals(204, r.getStatus());
+        assertThat(r.readEntity(String.class), equalTo(""));
+    }
+    
+    @Test
+    public void testBookOneway() throws Exception {
+        final String address = "http://localhost:" + PORT + "/bookstore/oneway";
+        WebClient client = createWebClient(address, new TestResponseFilter());
+        Response r = client.type("*/*").async().post(null).get();
+        assertEquals(202, r.getStatus());
+        assertThat(r.getEntity(), is(nullValue()));
+        assertThat(r.getHeaderString("X-Filter"), equalTo("true"));
+    }
+
+    private WebClient createWebClient(String address, Object ... providers) {
+        return WebClient.create(address, Arrays.asList(providers));
     }
 
     private InvocationCallback<Object> createCallback(final Holder<Object> holder) {
@@ -512,8 +579,8 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             throw new RuntimeException();
 
         }
-
     }
+    
     @Consumes("application/xml")
     private static class FaultyBookReader implements MessageBodyReader<Book> {
 
@@ -528,19 +595,18 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             WebApplicationException {
             throw new RuntimeException();
         }
-
-
     }
-
+    
+    @Provider
     public static class TestResponseFilter implements ClientResponseFilter {
 
         @Override
         public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext)
             throws IOException {
-
+            responseContext.getHeaders().add("X-Filter", "true");
         }
-
     }
+    
     private static class GenericInvocationCallback<T> implements InvocationCallback<T> {
         private Object result;
 

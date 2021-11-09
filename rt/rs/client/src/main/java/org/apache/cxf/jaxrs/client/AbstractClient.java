@@ -978,6 +978,8 @@ public abstract class AbstractClient implements Client {
     }
 
     protected void setSupportOnewayResponseProperty(Message outMessage) {
+        // Do propagate the response down to observer chain
+        outMessage.put(Message.PROPAGATE_202_RESPONSE_ONEWAY_OR_PARTIAL, true);
         if (!outMessage.getExchange().isOneWay()) {
             outMessage.put(Message.PROCESS_ONEWAY_RESPONSE, true);
         }
