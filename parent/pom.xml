@@ -117,8 +117,8 @@
         <cxf.glassfish.json.version>1.1.4</cxf.glassfish.json.version>
         <cxf.guava.version>30.1-jre</cxf.guava.version>
         <cxf.hamcrest.version>2.2</cxf.hamcrest.version>
-        <cxf.hazelcast.version>4.1.1</cxf.hazelcast.version>
-        <cxf.hibernate.em.version>5.4.27.Final</cxf.hibernate.em.version>
+        <cxf.hazelcast.version>4.2.2</cxf.hazelcast.version>
+        <cxf.hibernate.em.version>5.6.1.Final</cxf.hibernate.em.version>
         <cxf.hibernate.validator.version>6.2.0.Final</cxf.hibernate.validator.version>
         <cxf.hsqldb.version>2.5.0</cxf.hsqldb.version>
         <cxf.httpcomponents.asyncclient.version.range>[4.0,4.2)</cxf.httpcomponents.asyncclient.version.range>
@@ -142,7 +142,8 @@
         <cxf.jaxb.runtime.version>2.3.4</cxf.jaxb.runtime.version>
         <cxf.jaxb.version>2.3.3</cxf.jaxb.version>
         <cxf.jaxb.xjc.version>${cxf.jaxb.runtime.version}</cxf.jaxb.xjc.version>
-        <cxf.jboss.logging.version>3.3.0.Final</cxf.jboss.logging.version>
+        <cxf.jboss.logging.version>3.4.1.Final</cxf.jboss.logging.version>
+        <cxf.wildfly.common.version>1.5.4.Final</cxf.wildfly.common.version>
         <cxf.jboss.weld.version>3.1.7.SP1</cxf.jboss.weld.version>
         <cxf.jcache.version>1.1.1</cxf.jcache.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
@@ -180,7 +181,7 @@
         <cxf.opentracing.version>0.33.0</cxf.opentracing.version>
         <cxf.persistence-api.version>2.2.3</cxf.persistence-api.version>
         <cxf.plexus-archiver.version>4.2.0</cxf.plexus-archiver.version>
-        <cxf.plexus-utils.version>3.2.0</cxf.plexus-utils.version>
+        <cxf.plexus-utils.version>3.3.0</cxf.plexus-utils.version>
         <cxf.reactivestreams.version>1.0.3</cxf.reactivestreams.version>
         <cxf.reactor.version>3.4.11</cxf.reactor.version>
         <cxf.rhino.version>1.7.13</cxf.rhino.version>
@@ -268,6 +269,7 @@
         <cxf.xmlsec.bundle.version>2.2.3</cxf.xmlsec.bundle.version>
         <cxf.xpp3.bundle.version>1.1.4c_6</cxf.xpp3.bundle.version>
         <cxf.awaitility.version>4.1.1</cxf.awaitility.version>
+        <cxf.jaxen.version>1.1.4</cxf.jaxen.version>
     </properties>
     <build>
         <resources>
@@ -917,6 +919,11 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>${cxf.httpcomponents.core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpasyncclient</artifactId>
                 <version>${cxf.httpcomponents.asyncclient.version}</version>
                 <exclusions>
@@ -1177,6 +1184,16 @@
                  <groupId>io.undertow</groupId>
                  <artifactId>undertow-servlet</artifactId>
                  <version>${cxf.undertow.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.logging</groupId>
+                <artifactId>jboss-logging</artifactId>
+                <version>${cxf.jboss.logging.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wildfly.common</groupId>
+                <artifactId>wildfly-common</artifactId>
+                <version>${cxf.wildfly.common.version}</version>
             </dependency>
             <dependency>
                 <groupId>xalan</groupId>
@@ -1828,6 +1845,11 @@
                 </exclusions>
             </dependency>
             <dependency>
+                <groupId>jaxen</groupId>
+                <artifactId>jaxen</artifactId>
+                <version>${cxf.jaxen.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>xerces</groupId>
                 <artifactId>xercesImpl</artifactId>
                 <version>${cxf.xerces.version}</version>
@@ -1982,6 +2004,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.2.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ehcache</groupId>
+                <artifactId>ehcache</artifactId>
+                <version>${cxf.ehcache3.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
