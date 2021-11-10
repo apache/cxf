@@ -142,8 +142,8 @@
         <cxf.jaxb.runtime.version>2.3.4</cxf.jaxb.runtime.version>
         <cxf.jaxb.version>2.3.3</cxf.jaxb.version>
         <cxf.jaxb.xjc.version>${cxf.jaxb.runtime.version}</cxf.jaxb.xjc.version>
+        <cxf.jaxen.version>1.1.4</cxf.jaxen.version>
         <cxf.jboss.logging.version>3.4.1.Final</cxf.jboss.logging.version>
-        <cxf.wildfly.common.version>1.5.4.Final</cxf.wildfly.common.version>
         <cxf.jboss.weld.version>3.1.7.SP1</cxf.jboss.weld.version>
         <cxf.jcache.version>1.1.1</cxf.jcache.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
@@ -218,6 +218,7 @@
         <cxf.validation.api.package.version>[1.0.0,3)</cxf.validation.api.package.version>
         <cxf.validation.api.version>2.0.2</cxf.validation.api.version>
         <cxf.velocity.version>2.3</cxf.velocity.version>
+        <cxf.wildfly.common.version>1.5.4.Final</cxf.wildfly.common.version>
         <cxf.wiremock.version>2.23.2</cxf.wiremock.version>
         <cxf.woodstox.core.version>6.2.6</cxf.woodstox.core.version>
         <cxf.woodstox.stax2-api.version>4.2.1</cxf.woodstox.stax2-api.version>
@@ -269,7 +270,6 @@
         <cxf.xmlsec.bundle.version>2.2.3</cxf.xmlsec.bundle.version>
         <cxf.xpp3.bundle.version>1.1.4c_6</cxf.xpp3.bundle.version>
         <cxf.awaitility.version>4.1.1</cxf.awaitility.version>
-        <cxf.jaxen.version>1.1.4</cxf.jaxen.version>
     </properties>
     <build>
         <resources>
