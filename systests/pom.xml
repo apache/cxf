@@ -56,5 +56,6 @@
         <module>microprofile</module>
         <module>spring-boot</module>
         <module>transport-netty</module>
+        <module>transport-hc5</module>
     </modules>
 </project>
