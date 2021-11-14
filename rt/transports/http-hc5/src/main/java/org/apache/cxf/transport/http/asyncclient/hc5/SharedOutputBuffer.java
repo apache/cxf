@@ -119,10 +119,9 @@ public class SharedOutputBuffer extends ExpandableBuffer {
                     bytesWritten = channel.write(buffer());
                 }
             }
-            if ((largeWrapper == null || !largeWrapper.hasRemaining()) && !super.hasData()) {
+            if ((largeWrapper == null || !largeWrapper.hasRemaining()) && !super.hasData() && this.endOfStream) {
                 // No more buffered content
                 // If at the end of the stream, terminate
-                this.endOfStream = true;
                 channel.endStream();
             }
             // no need to signal if the large wrapper is present and has data remaining
