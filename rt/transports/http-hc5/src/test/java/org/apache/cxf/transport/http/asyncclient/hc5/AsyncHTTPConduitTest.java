@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.xml.ws.AsyncHandler;
@@ -320,7 +321,10 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
                     } else {
                         Thread.sleep(50);
                     }
-                    initialThreadsLatch.await();
+                    if (!initialThreadsLatch.await(30, TimeUnit.SECONDS)) {
+                        throw new TimeoutException("The initial threads latch timeout exceeded,"
+                            + " exception in JaxwsClientCallback?");
+                    }
                     doneLatch.countDown();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
