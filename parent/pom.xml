@@ -111,14 +111,13 @@
         <cxf.geronimo.jms.version>1.1.1</cxf.geronimo.jms.version>
         <cxf.geronimo.json.version>1.4</cxf.geronimo.json.version>
         <cxf.geronimo.jta.version>1.1.1</cxf.geronimo.jta.version>
-        <cxf.geronimo.servlet25.version>1.2</cxf.geronimo.servlet25.version>
         <cxf.geronimo.transaction.version>3.1.4</cxf.geronimo.transaction.version>
         <cxf.geronimo.openapi.version>1.0.14</cxf.geronimo.openapi.version>
         <cxf.glassfish.json.version>1.1.4</cxf.glassfish.json.version>
         <cxf.guava.version>30.1-jre</cxf.guava.version>
         <cxf.hamcrest.version>2.2</cxf.hamcrest.version>
-        <cxf.hazelcast.version>4.1.1</cxf.hazelcast.version>
-        <cxf.hibernate.em.version>5.4.27.Final</cxf.hibernate.em.version>
+        <cxf.hazelcast.version>4.2.2</cxf.hazelcast.version>
+        <cxf.hibernate.em.version>5.6.1.Final</cxf.hibernate.em.version>
         <cxf.hibernate.validator.version>6.2.0.Final</cxf.hibernate.validator.version>
         <cxf.hsqldb.version>2.5.0</cxf.hsqldb.version>
         <cxf.httpcomponents.asyncclient.version.range>[4.0,4.2)</cxf.httpcomponents.asyncclient.version.range>
@@ -126,6 +125,7 @@
         <cxf.httpcomponents.client.version>4.5.13</cxf.httpcomponents.client.version>
         <cxf.httpcomponents.core.version.range>[4.3,4.5.0)</cxf.httpcomponents.core.version.range>
         <cxf.httpcomponents.core.version>4.4.14</cxf.httpcomponents.core.version>
+        <cxf.httpcomponents.client5.version>5.1.1</cxf.httpcomponents.client5.version>
         <cxf.jackson.version>2.12.5</cxf.jackson.version>
         <cxf.jackson.databind.version>2.12.5</cxf.jackson.databind.version>
         <cxf.jacorb.version>3.9</cxf.jacorb.version>
@@ -142,7 +142,8 @@
         <cxf.jaxb.runtime.version>2.3.4</cxf.jaxb.runtime.version>
         <cxf.jaxb.version>2.3.3</cxf.jaxb.version>
         <cxf.jaxb.xjc.version>${cxf.jaxb.runtime.version}</cxf.jaxb.xjc.version>
-        <cxf.jboss.logging.version>3.3.0.Final</cxf.jboss.logging.version>
+        <cxf.jaxen.version>1.1.4</cxf.jaxen.version>
+        <cxf.jboss.logging.version>3.4.1.Final</cxf.jboss.logging.version>
         <cxf.jboss.weld.version>3.1.7.SP1</cxf.jboss.weld.version>
         <cxf.jcache.version>1.1.1</cxf.jcache.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
@@ -163,7 +164,7 @@
         <cxf.logback.classic.version>1.2.3</cxf.logback.classic.version>
         <cxf.lucene.version>8.2.0</cxf.lucene.version>
         <cxf.maven.core.version>3.6.3</cxf.maven.core.version>
-        <cxf.micrometer.version>1.7.5</cxf.micrometer.version>
+        <cxf.micrometer.version>1.7.6</cxf.micrometer.version>
         <cxf.microprofile.config.version>2.0</cxf.microprofile.config.version>
         <cxf.microprofile.rest.client.version>2.0</cxf.microprofile.rest.client.version>
         <cxf.microprofile.openapi.version>2.0</cxf.microprofile.openapi.version>
@@ -180,9 +181,9 @@
         <cxf.opentracing.version>0.33.0</cxf.opentracing.version>
         <cxf.persistence-api.version>2.2.3</cxf.persistence-api.version>
         <cxf.plexus-archiver.version>4.2.0</cxf.plexus-archiver.version>
-        <cxf.plexus-utils.version>3.2.0</cxf.plexus-utils.version>
+        <cxf.plexus-utils.version>3.3.0</cxf.plexus-utils.version>
         <cxf.reactivestreams.version>1.0.3</cxf.reactivestreams.version>
-        <cxf.reactor.version>3.4.11</cxf.reactor.version>
+        <cxf.reactor.version>3.4.12</cxf.reactor.version>
         <cxf.rhino.version>1.7.13</cxf.rhino.version>
         <cxf.rxjava.version>1.3.8</cxf.rxjava.version>
         <cxf.rxjava2.version>2.2.21</cxf.rxjava2.version>
@@ -199,7 +200,7 @@
         <cxf.spring.mock>spring-test</cxf.spring.mock>
         <cxf.spring.osgi.version>1.2.1</cxf.spring.osgi.version>
         <cxf.spring.security.version>5.5.3</cxf.spring.security.version>
-        <cxf.spring.version>5.3.12</cxf.spring.version>
+        <cxf.spring.version>5.3.13</cxf.spring.version>
         <cxf.stax-ex.version>1.8.3</cxf.stax-ex.version>
         <cxf.swagger.ui.version>3.52.1</cxf.swagger.ui.version>
         <cxf.swagger.v3.version>2.1.11</cxf.swagger.v3.version>
@@ -217,11 +218,12 @@
         <cxf.validation.api.package.version>[1.0.0,3)</cxf.validation.api.package.version>
         <cxf.validation.api.version>2.0.2</cxf.validation.api.version>
         <cxf.velocity.version>2.3</cxf.velocity.version>
+        <cxf.wildfly.common.version>1.5.4.Final</cxf.wildfly.common.version>
         <cxf.wiremock.version>2.23.2</cxf.wiremock.version>
         <cxf.woodstox.core.version>6.2.6</cxf.woodstox.core.version>
         <cxf.woodstox.stax2-api.version>4.2.1</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
-        <cxf.wss4j.version>2.3.3</cxf.wss4j.version>
+        <cxf.wss4j.version>2.4.0</cxf.wss4j.version>
         <cxf.xalan.version>2.7.2</cxf.xalan.version>
         <cxf.xerces.version>2.12.1</cxf.xerces.version>
         <cxf.xmlschema.version>2.3.0</cxf.xmlschema.version>
@@ -265,7 +267,7 @@
         <cxf.xalan.bundle.version>2.7.2_3</cxf.xalan.bundle.version>
         <cxf.xerces.bundle.version>2.12.0_1</cxf.xerces.bundle.version>
         <cxf.xmlresolver.bundle.version>1.2_5</cxf.xmlresolver.bundle.version>
-        <cxf.xmlsec.bundle.version>2.2.3</cxf.xmlsec.bundle.version>
+        <cxf.xmlsec.bundle.version>2.3.0</cxf.xmlsec.bundle.version>
         <cxf.xpp3.bundle.version>1.1.4c_6</cxf.xpp3.bundle.version>
         <cxf.awaitility.version>4.1.1</cxf.awaitility.version>
     </properties>
@@ -917,6 +919,11 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>${cxf.httpcomponents.core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpasyncclient</artifactId>
                 <version>${cxf.httpcomponents.asyncclient.version}</version>
                 <exclusions>
@@ -936,6 +943,11 @@
                         <artifactId>javax.activation</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.client5</groupId>
+                <artifactId>httpclient5</artifactId>
+                <version>${cxf.httpcomponents.client5.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.maven</groupId>
@@ -970,10 +982,6 @@
                 <version>${cxf.neethi.version}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>servlet-api</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>org.apache.ws.commons.axiom</groupId>
                         <artifactId>axiom-impl</artifactId>
                     </exclusion>
@@ -992,10 +1000,6 @@
                     <exclusion>
                         <groupId>woodstox</groupId>
                         <artifactId>wstx-asl</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>wsdl4j</groupId>
-                        <artifactId>wsdl4j</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>org.codehaus.woodstox</groupId>
@@ -1179,6 +1183,16 @@
                  <version>${cxf.undertow.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.jboss.logging</groupId>
+                <artifactId>jboss-logging</artifactId>
+                <version>${cxf.jboss.logging.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wildfly.common</groupId>
+                <artifactId>wildfly-common</artifactId>
+                <version>${cxf.wildfly.common.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>xalan</groupId>
                 <artifactId>xalan</artifactId>
                 <version>${cxf.xalan.version}</version>
@@ -1227,10 +1241,6 @@
                 <version>${cxf.spring.version}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>servlet-api</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>logkit</groupId>
                         <artifactId>logkit</artifactId>
                     </exclusion>
@@ -1249,10 +1259,6 @@
                 <artifactId>spring-beans</artifactId>
                 <version>${cxf.spring.version}</version>
                 <exclusions>
-                    <exclusion>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>servlet-api</artifactId>
-                    </exclusion>
                     <exclusion>
                         <groupId>logkit</groupId>
                         <artifactId>logkit</artifactId>
@@ -1273,10 +1279,6 @@
                 <version>${cxf.spring.version}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>servlet-api</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>logkit</groupId>
                         <artifactId>logkit</artifactId>
                     </exclusion>
@@ -1295,10 +1297,6 @@
                 <artifactId>spring-web</artifactId>
                 <version>${cxf.spring.version}</version>
                 <exclusions>
-                    <exclusion>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>servlet-api</artifactId>
-                    </exclusion>
                     <exclusion>
                         <groupId>logkit</groupId>
                         <artifactId>logkit</artifactId>
@@ -1319,10 +1317,6 @@
                 <version>${cxf.spring.version}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>servlet-api</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>logkit</groupId>
                         <artifactId>logkit</artifactId>
                     </exclusion>
@@ -1341,10 +1335,6 @@
                 <artifactId>spring-aop</artifactId>
                 <version>${cxf.spring.version}</version>
                 <exclusions>
-                    <exclusion>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>servlet-api</artifactId>
-                    </exclusion>
                     <exclusion>
                         <groupId>logkit</groupId>
                         <artifactId>logkit</artifactId>
@@ -1828,6 +1818,11 @@
                 </exclusions>
             </dependency>
             <dependency>
+                <groupId>jaxen</groupId>
+                <artifactId>jaxen</artifactId>
+                <version>${cxf.jaxen.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>xerces</groupId>
                 <artifactId>xercesImpl</artifactId>
                 <version>${cxf.xerces.version}</version>
@@ -1982,6 +1977,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.2.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ehcache</groupId>
+                <artifactId>ehcache</artifactId>
+                <version>${cxf.ehcache3.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
