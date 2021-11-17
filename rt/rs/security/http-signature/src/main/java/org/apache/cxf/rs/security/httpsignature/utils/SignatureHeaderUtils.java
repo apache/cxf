@@ -104,7 +104,7 @@ public final class SignatureHeaderUtils {
 
     public static String createRequestTarget(URI uri) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(uri.getPath());
+        stringBuilder.append(uri.getRawPath());
 
         if (uri.getRawQuery() != null) {
             stringBuilder.append('?');
