@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.HttpMethod;
@@ -175,8 +176,20 @@ public final class FormUtils {
             && MessageUtils.getContextualBoolean(m, FORM_PARAMS_FROM_HTTP_PARAMS, true)) {
             for (Enumeration<String> en = request.getParameterNames(); en.hasMoreElements();) {
                 String paramName = en.nextElement();
-                String[] values = request.getParameterValues(paramName);
-                params.put(HttpUtils.urlDecode(paramName), Arrays.asList(values));
+                String[] parameterValues = request.getParameterValues(paramName);
+
+                // these parameters will already be URLdecoded by the servlet container on the
+                // request.getParameterValues() call above
+
+                List<String> values = Arrays.asList(parameterValues);
+
+                if (!decode) {
+                    values = values.stream()
+                            .map(s -> HttpUtils.urlEncode(s, enc))
+                            .collect(Collectors.toList());
+                }
+
+                params.put(HttpUtils.urlDecode(paramName), values);
             }
             logRequestParametersIfNeeded(params, enc);
         }

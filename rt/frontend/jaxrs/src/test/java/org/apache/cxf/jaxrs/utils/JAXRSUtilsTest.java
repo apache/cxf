@@ -1572,7 +1572,7 @@ public class JAXRSUtilsTest {
         Class<?>[] argType = {String.class, List.class};
         Method m = Customer.class.getMethod("testFormParam", argType);
         Message messageImpl = createMessage();
-        String body = "p1=1&p2=2&p2=3";
+        String body = "p1=hello%2bworld&p2=2&p2=3";
         messageImpl.put(Message.REQUEST_URI, "/foo");
         MultivaluedMap<String, String> headers = new MetadataMap<>();
         if (useMediaType) {
@@ -1586,7 +1586,7 @@ public class JAXRSUtilsTest {
         assertEquals("2 form params should've been identified", 2, params.size());
 
         assertEquals("First Form Parameter not matched correctly",
-                     "1", params.get(0));
+                     "hello+world", params.get(0));
         List<String> list = (List<String>)params.get(1);
         assertEquals(2, list.size());
         assertEquals("2", list.get(0));
