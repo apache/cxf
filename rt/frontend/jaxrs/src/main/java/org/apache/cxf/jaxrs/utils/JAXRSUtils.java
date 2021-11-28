@@ -1153,17 +1153,6 @@ public final class JAXRSUtils {
                 String body = FormUtils.readBody(entityStream, enc);
                 // Do not decode unless the key is empty value, fe @FormParam("")
                 FormUtils.populateMapFromStringOrHttpRequest(params, m, body, enc, StringUtils.isEmpty(key) && decode);
-
-                if (!StringUtils.isEmpty(key) && decode) {
-                    List<String> values = params.get(key);
-                    if (values != null) {
-                        values = values
-                                .stream()
-                                .map(value -> HttpUtils.urlDecode(value, enc)).collect(Collectors.toList());
-
-                        params.replace(key, values);
-                    }
-                }
             } else {
                 if ("multipart".equalsIgnoreCase(mt.getType())
                     && MediaType.MULTIPART_FORM_DATA_TYPE.isCompatible(mt)) {
@@ -1180,6 +1169,13 @@ public final class JAXRSUtils {
             }
         }
 
+        if (decode && !MessageUtils.getContextualBoolean(m, FormUtils.FORM_PARAM_MAP_DECODED, false)) {
+            List<String> values = params.get(key);
+            if (values != null) {
+                values = values.stream().map(value -> HttpUtils.urlDecode(value, enc)).collect(Collectors.toList());
+                params.replace(key, values);
+            }
+        }
 
         if ("".equals(key)) {
             return InjectionUtils.handleBean(pClass, paramAnns, params, ParameterType.FORM, m, false);

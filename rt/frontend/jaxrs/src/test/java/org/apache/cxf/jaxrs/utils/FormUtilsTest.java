@@ -97,7 +97,9 @@ public class FormUtilsTest {
         EasyMock.expect(mockMessage.getContextualProperty(FormUtils.FORM_PARAMS_FROM_HTTP_PARAMS))
             .andReturn(formPropertyValue).anyTimes();
         EasyMock.expect(mockMessage.getExchange()).andReturn(null).anyTimes();
-
+        EasyMock.expect(mockMessage.put(FormUtils.FORM_PARAM_MAP_DECODED, true))
+            .andReturn(null).anyTimes();
+        
         mockRequest = EasyMock.createMock(HttpServletRequest.class);
         String[] httpParamNames = {HTTP_PARAM1, HTTP_PARAM2};
         Enumeration<String> httpParamsEnum = Collections.enumeration(Arrays.asList(httpParamNames));
