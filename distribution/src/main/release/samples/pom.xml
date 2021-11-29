@@ -30,14 +30,14 @@
         <!-- don't deploy the samples, kind of pointless -->
         <maven.deploy.skip>true</maven.deploy.skip>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.boot.version>2.5.5</spring.boot.version>
-        <spring.cloud.eureka.version>3.0.3</spring.cloud.eureka.version>
+        <spring.boot.version>2.6.0</spring.boot.version>
+        <spring.cloud.eureka.version>3.1.0-M3</spring.cloud.eureka.version>
         <cxf.jetty9.version>9.4.44.v20210927</cxf.jetty9.version>
-        <cxf.netty.version>4.1.69.Final</cxf.netty.version>
+        <cxf.netty.version>4.1.70.Final</cxf.netty.version>
         <cxf.httpcomponents.client.version>4.5.13</cxf.httpcomponents.client.version>
         <cxf.swagger.ui.version>3.52.1</cxf.swagger.ui.version>
         <cxf.tika.version>2.1.0</cxf.tika.version>
-        <cxf.tomcat.version>9.0.54</cxf.tomcat.version>
+        <cxf.tomcat.version>9.0.55</cxf.tomcat.version>
         <graalvm.version>21.1.0</graalvm.version>
     </properties>
     <dependencies>
