@@ -121,7 +121,9 @@ public class MessageVerifier {
                 signedHeaders.add(HTTPSignatureConstants.REQUEST_TARGET);
             }
 
-            if (!signedHeaders.contains("digest") && messageBody != null && messageBody.length > 0) {
+            if (!signedHeaders.contains("digest") && ((messageBody != null && messageBody.length > 0)
+                    || ("POST".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method)
+                    || "PATCH".equalsIgnoreCase(method)))) {
                 signedHeaders.add("digest");
             }
         }
