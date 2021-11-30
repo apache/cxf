@@ -245,6 +245,12 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
         throws ServletException, IOException {
         handleRequest(request, response);
     }
+    
+    @Override
+    protected void doTrace(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+        handleRequest(request, response);
+    }
 
     /**
      * {@inheritDoc}
