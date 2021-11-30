@@ -28,7 +28,6 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
-
 /**
  * RS CXF container Filter which verifies the Digest header, and then extracts signature data from the context
  * and sends it to the message verifier
@@ -36,17 +35,15 @@ import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class VerifySignatureFilter extends AbstractSignatureInFilter implements ContainerRequestFilter {
-
     @Override
     public void filter(ContainerRequestContext requestCtx) {
         byte[] messageBody = verifyDigest(requestCtx.getHeaders(), requestCtx.getEntityStream());
         if (messageBody != null) {
             requestCtx.setEntityStream(new ByteArrayInputStream(messageBody));
         }
-
         verifySignature(requestCtx.getHeaders(),
-                SignatureHeaderUtils.createRequestTarget(requestCtx.getUriInfo().getAbsolutePath()),
-                        requestCtx.getMethod());
+                SignatureHeaderUtils.createRequestTarget(requestCtx.getUriInfo().getRequestUri()),
+                        requestCtx.getMethod(), messageBody);
     }
 
     @Override
