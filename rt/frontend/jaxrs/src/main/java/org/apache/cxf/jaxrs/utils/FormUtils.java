@@ -56,6 +56,7 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 public final class FormUtils {
     public static final String FORM_PARAMS_FROM_HTTP_PARAMS = "set.form.parameters.from.http.parameters";
     public static final String FORM_PARAM_MAP = "org.apache.cxf.form_data";
+    public static final String FORM_PARAM_MAP_DECODED = "org.apache.cxf.form_data.decoded";
 
     private static final Logger LOG = LogUtils.getL7dLogger(FormUtils.class);
     private static final String MULTIPART_FORM_DATA_TYPE = "form-data";
@@ -179,6 +180,8 @@ public final class FormUtils {
                 params.put(HttpUtils.urlDecode(paramName), Arrays.asList(values));
             }
             logRequestParametersIfNeeded(params, enc);
+            // The form params extracted from the HttpServelRequest are already decoded
+            m.put(FORM_PARAM_MAP_DECODED, true);
         }
     }
 

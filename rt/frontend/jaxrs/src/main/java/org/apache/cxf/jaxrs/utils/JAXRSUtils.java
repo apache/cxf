@@ -1169,7 +1169,7 @@ public final class JAXRSUtils {
             }
         }
 
-        if (decode) {
+        if (decode && !MessageUtils.getContextualBoolean(m, FormUtils.FORM_PARAM_MAP_DECODED, false)) {
             List<String> values = params.get(key);
             if (values != null) {
                 values = values.stream().map(value -> HttpUtils.urlDecode(value, enc)).collect(Collectors.toList());
