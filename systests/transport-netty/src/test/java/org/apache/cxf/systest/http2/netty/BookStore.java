@@ -23,11 +23,15 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.cxf.jaxrs.ext.StreamingResponse;
+import org.apache.cxf.jaxrs.ext.TRACE;
 
 @Path("/web/bookstore")
 public class BookStore {
@@ -62,6 +66,14 @@ public class BookStore {
                 });
             }
         };
+    }
+    
+    @TRACE
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    @Path("/trace")
+    public Response traceBook() {
+        return Response.status(Status.NOT_ACCEPTABLE).build();
     }
 }
 
