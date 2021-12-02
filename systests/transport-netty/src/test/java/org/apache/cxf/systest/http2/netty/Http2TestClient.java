@@ -163,6 +163,10 @@ public class Http2TestClient implements AutoCloseable {
         public ClientResponse get() throws Exception {
             return request(address, path, version, HttpMethod.GET, accept);
         }
+        
+        public ClientResponse trace() throws Exception {
+            return request(address, path, version, HttpMethod.TRACE, accept);
+        }
     }
     
     public RequestBuilder request(final String address) throws IOException {

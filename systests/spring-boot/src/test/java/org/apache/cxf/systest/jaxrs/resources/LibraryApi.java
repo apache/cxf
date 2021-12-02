@@ -29,6 +29,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.jaxrs.ext.TRACE;
+
 public interface LibraryApi {
     @Produces({ MediaType.APPLICATION_JSON })
     @GET
@@ -44,4 +46,8 @@ public interface LibraryApi {
     
     @Path("/catalog")
     Catalog catalog(); 
+    
+    @TRACE
+    @Produces({ MediaType.APPLICATION_JSON })
+    Response traceBooks();
 }
