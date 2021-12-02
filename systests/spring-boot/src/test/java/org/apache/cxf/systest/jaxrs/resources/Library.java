@@ -63,4 +63,9 @@ public class Library implements LibraryApi {
     public Catalog catalog() {
         return new Catalog();
     }
+    
+    @Override
+    public Response traceBooks() {
+        return Response.status(Status.NOT_ACCEPTABLE).build();
+    }
 }
