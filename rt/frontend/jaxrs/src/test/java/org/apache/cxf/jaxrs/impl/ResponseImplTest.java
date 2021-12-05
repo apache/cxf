@@ -20,15 +20,20 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.net.URI;
+import java.nio.CharBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.activation.DataSource;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.GenericEntity;
@@ -616,6 +621,48 @@ public class ResponseImplTest {
 
         assertEquals(str, response.readEntity(String.class));
         assertThrows(IllegalStateException.class, () -> response.getEntity());
+    }
+    
+    @Test
+    public void testReadInputStream() {
+        final String str = "ouch";
+
+        final ResponseImpl response = new ResponseImpl(500, str);
+        final Message outMessage = createMessage();
+        outMessage.put(Message.REQUEST_URI, "http://localhost");
+        response.setOutMessage(outMessage);
+
+        final MultivaluedMap<String, Object> headers = new MetadataMap<>();
+        headers.putSingle("Content-Type", "text/xml");
+        response.addMetadata(headers);
+
+        assertNotNull(response.readEntity(InputStream.class));
+        assertNotNull(response.getEntity());
+        
+        response.close();
+    }
+    
+    @Test
+    public void testReadDataSource() throws IOException {
+        final String str = "ouch";
+        final ResponseImpl response = new ResponseImpl(500, str);
+        final Message outMessage = createMessage();
+        outMessage.put(Message.REQUEST_URI, "http://localhost");
+        response.setOutMessage(outMessage);
+
+        final MultivaluedMap<String, Object> headers = new MetadataMap<>();
+        headers.putSingle("Content-Type", "text/xml");
+        response.addMetadata(headers);
+
+        final DataSource ds = response.readEntity(DataSource.class);
+        assertNotNull(ds);
+        try (Reader reader = new InputStreamReader(ds.getInputStream(), StandardCharsets.UTF_8)) {
+            final CharBuffer buffer = CharBuffer.allocate(str.length());
+            reader.read(buffer);
+            assertEquals(str, buffer.flip().toString());
+        }
+        
+        response.close();
     }
     
     @Test
