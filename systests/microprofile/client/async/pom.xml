@@ -122,6 +122,10 @@
                         <groupId>org.testng</groupId>
                         <artifactId>testng</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>com.github.tomakehurst</groupId>
+                        <artifactId>wiremock</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -135,6 +139,11 @@
                         <artifactId>xmlunit-core</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <scope>test</scope>
             </dependency>
         </dependencies>
 </project>

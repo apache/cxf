@@ -170,6 +170,7 @@
         <cxf.microprofile.openapi.version>2.0</cxf.microprofile.openapi.version>
         <cxf.mina.version>2.1.3</cxf.mina.version>
         <cxf.mockito.version>4.1.0</cxf.mockito.version>
+        <cxf.mockwebserver.version>4.9.3</cxf.mockwebserver.version>
         <cxf.msv.version>2013.6.1</cxf.msv.version>
         <cxf.neethi.version>3.2.0</cxf.neethi.version>
         <cxf.netty.version.range>[4,5)</cxf.netty.version.range>
@@ -219,7 +220,7 @@
         <cxf.validation.api.version>2.0.2</cxf.validation.api.version>
         <cxf.velocity.version>2.3</cxf.velocity.version>
         <cxf.wildfly.common.version>1.5.4.Final</cxf.wildfly.common.version>
-        <cxf.wiremock.version>2.23.2</cxf.wiremock.version>
+        <cxf.wiremock.version>2.27.2</cxf.wiremock.version>
         <cxf.woodstox.core.version>6.2.6</cxf.woodstox.core.version>
         <cxf.woodstox.stax2-api.version>4.2.1</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
@@ -1028,6 +1029,12 @@
                 <groupId>jakarta.enterprise</groupId>
                 <artifactId>jakarta.enterprise.cdi-api</artifactId>
                 <version>${cxf.cdi.api.version}</version>
+                <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.inject</groupId>
+                <artifactId>jakarta.inject-api</artifactId>
+                <version>${cxf.jakarta.injectapi.version}</version>
                 <optional>true</optional>
             </dependency>
             <dependency>
