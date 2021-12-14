@@ -188,6 +188,32 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void testRetransmitAsync() throws Exception {
+                
+        updateAddressPort(g, PORT);
+        HTTPConduit c = (HTTPConduit)ClientProxy.getClient(g).getConduit();
+        HTTPClientPolicy cp = new HTTPClientPolicy();
+        cp.setMaxRetransmits(2);
+        cp.setChunkLength(20);
+        c.setClient(cp);
+        GreetMeResponse resp = (GreetMeResponse)g.greetMeAsync(request, new AsyncHandler<GreetMeResponse>() {
+            public void handleResponse(Response<GreetMeResponse> res) {
+                try {
+                    res.get().getResponseType();
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).get();
+        assertEquals("Hello " + request, resp.getResponseType());
+
+        g.greetMeLaterAsync(1000, new AsyncHandler<GreetMeLaterResponse>() {
+            public void handleResponse(Response<GreetMeLaterResponse> res) {
+            }
+        }).get();
+    }
+    
+    @Test
     public void testTimeoutAsyncWithPropertySetting() throws Exception {
         updateAddressPort(g, PORT);
         ((javax.xml.ws.BindingProvider)g).getRequestContext().put("javax.xml.ws.client.receiveTimeout",
