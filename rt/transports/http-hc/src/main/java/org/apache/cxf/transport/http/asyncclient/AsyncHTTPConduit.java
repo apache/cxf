@@ -674,7 +674,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         }
 
         protected void handleResponseAsync() throws IOException {
-            isAsync = true;
+            
         }
 
         protected void closeInputStream() throws IOException {
