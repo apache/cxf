@@ -1,30 +1,30 @@
-Apache CXF 3.4.1 Release Notes
+Apache CXF 3.5.0 Release Notes
 
 1. Overview
 
-The 3.4.x versions of Apache CXF is a significant new version of CXF
+The 3.5.x versions of Apache CXF is a significant new version of CXF
 that provides several new features and enhancements.  
 
-New features include: 
-* New cxf-bom artifactId for importing all the CXF artifacts
-* New support for Microprofile OpenAPI (as alternative to Swagger Core 2.0)
-* New samples to show WS-Transaction usage, OpenAPI v3.0 with Microprofile
-* Ability in Logging feature to mask sensitive information
-* New support for SSEs in Microprofile Rest Client
-* OAuth 2.0 Authorization Server Metadata / OpenID Provider Metadata
+New features include:
+* Support for Java 17
+* Many updated dependencies (too many to list).  We've updated to the latest
+  versions of most dependencies.  Some may be incompatible with previous versions.
+  Some notables that may impact applications include:
+    * ehcache upgraded to 3.9.0
+    * jackson to 2.12.0
+    * much newer (and incompatible) version of Mozilla Rhino
+    * WSS4j 2.4.0
+  
 
 Important notes:
-* Many dependencies have been upgraded to newer versions.  Check
-  the migration guide.
-
+* 3.5 is the last branch of CXF that will support Java 8.   Future
+  non-patch releases of CXF will require Java 11 or newer.
+* The old OATH 1.0 module was removed
 
 Users are encouraged to review the migration guide at:
 http://cxf.apache.org/docs/34-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
-
-3.4.1 fixes over 15 JIRA issues reported by users and the community.
-
 
 
 2. Installation Prerequisites 
@@ -61,31 +61,5 @@ http://issues.apache.org/jira/browse/CXF
 6. Migration notes:
 
 See the migration guide at:
-http://cxf.apache.org/docs/34-migration-guide.html
+http://cxf.apache.org/docs/35-migration-guide.html
 for caveats when upgrading.
-
-7. Specific issues, features, and improvements fixed in this version
-
-** Bug
-    * [CXF-8227] - Failure to comply with JAX-RS spec with ContainerRequestContext and WriterInterceptorContext
-    * [CXF-8325] - Schema validation allows invalid SOAP header
-    * [CXF-8329] - NPE with empty query parameters and collections
-    * [CXF-8331] - Reverse proxy url is not reflected when use-x-forwarded-headers is true
-    * [CXF-8337] - wsdl2java generates exceptions which do not follow naming convention
-    * [CXF-8346] - JAX-RS TCK: Resolve test cases where empty entities are checked
-    * [CXF-8349] - Flux Returns Mixed Response on Errors and Mono Hangs when Empty
-    * [CXF-8354] - Logs not redirecting to Log4J
-
-** New Feature
-    * [CXF-8213] - Add Micrometer metric support for JAX-WS Spring Boot
-    * [CXF-8252] - Add Micrometer metric support for JAX-RS (Spring Boot)
-
-** Improvement
-    * [CXF-8338] - Add getters for iv, cypherBytes and authTag to JweJsonConsumer
-    * [CXF-8345] - Improve Performance by avoiding MessageImpl resizing
-    * [CXF-8359] - Masking sensitive elements does not work if the element has a property
-    * [CXF-8360] - Configurable property for Apache Velocity logs
-
-** Task
-    * [CXF-8355] - RxJava3: Observable / Flowable Returns Mixed Response on Errors and Hangs when Empty
-    * [CXF-8358] - RxJava2: Observable / Flowable Returns Mixed Response on Errors and Hangs when Empty
