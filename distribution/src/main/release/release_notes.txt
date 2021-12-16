@@ -7,14 +7,18 @@ that provides several new features and enhancements.
 
 New features include:
 * Support for Java 17
-* Many updated dependencies (too many to list).  We've updated to the latest
-  versions of most dependencies.  Some may be incompatible with previous versions.
+* Many updated dependencies.  We've updated to the latest versions of most
+  dependencies.  Some may be incompatible with previous versions.
   Some notables that may impact applications include:
-    * ehcache upgraded to 3.9.0
-    * jackson to 2.12.0
-    * much newer (and incompatible) version of Mozilla Rhino
-    * WSS4j 2.4.0
-  
+    * ehCache upgraded to 3.9.x
+    * Jackson to 2.13.x
+    * Mozilla Rhino upgraded to 1.7.13 (groupId/artifactId changed, be careful)
+    * WSS4j 2.4.x
+    * Spring Boot 2.6.x / Spring Framework 5.3.x base line
+    * Apache Karaf 4.3.x base line
+    * Apache HttpClient 5 support (Asynchronous Client HTTP Transport)
+    * HTTP/2 support (server-side only)
+    * JUnit 5 support
 
 Important notes:
 * 3.5 is the last branch of CXF that will support Java 8.   Future
