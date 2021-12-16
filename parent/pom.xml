@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf</artifactId>
-        <version>3.5.0-SNAPSHOT</version>
+        <version>3.5.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-parent</artifactId>
@@ -483,7 +483,7 @@
                         <argLine>${cxf.surefire.fork.vmargs} -D${cxf.jaxb.context.class.property}=${cxf.jaxb.context.class}</argLine>
                         <enableAssertions>${cxf.surefire.enable.assertions}</enableAssertions>
                         <parallel>${cxf.surefire.parallel.mode}</parallel>
-                        <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory"/>
+                        <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory" />
                         <systemPropertyVariables>
                             <java.io.tmpdir>${basedir}/target</java.io.tmpdir>
                             <cxf.useRandomFirstPort>true</cxf.useRandomFirstPort>
