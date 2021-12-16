@@ -265,11 +265,6 @@
         <feature version="${project.version}">cxf-jaxrs</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-rs-security-cors/${project.version}</bundle>
     </feature>
-    <feature name="cxf-rs-security-oauth" version="${project.version}">
-        <feature version="${project.version}">cxf-jaxrs</feature>
-        <bundle start-level="30" dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.oauth-provider/${cxf.oauth.bundle.version}</bundle>
-        <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-rs-security-oauth/${project.version}</bundle>
-    </feature>
     <feature name="cxf-rs-security-jose" version="${project.version}">
         <feature version="${project.version}">cxf-jaxrs</feature>
         <feature version="${project.version}">cxf-rt-security</feature>
