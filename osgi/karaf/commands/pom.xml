@@ -73,7 +73,6 @@
                         <Karaf-Commands>*</Karaf-Commands>
                         <Import-Package>
               !org.apache.cxf.karaf.commands,
-              org.apache.cxf*;version="[3,4)",
               org.apache.karaf.shell*;version="[4,5)",
               *
                         </Import-Package>
