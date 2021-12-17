@@ -156,8 +156,8 @@
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>javax.servlet-api</artifactId>
+                    <groupId>jakarta.servlet</groupId>
+                    <artifactId>jakarta.servlet-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -235,7 +235,7 @@
             <scope>test</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>javax.servlet</groupId>
+                    <groupId>jakarta.servlet</groupId>
                     <artifactId>servlet-api</artifactId>
                 </exclusion>
                 <exclusion>
@@ -296,8 +296,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
+            <groupId>jakarta.resource</groupId>
+            <artifactId>jakarta.resource-api</artifactId>
         </dependency>
         <!-- make http://java.sun.com/dtd/web-app_2_3.dtd et al locally available during the tests -->
         <dependency>
@@ -357,7 +357,7 @@
         <dependency>
             <groupId>org.eclipse.jetty.http2</groupId>
             <artifactId>http2-client</artifactId>
-            <version>${cxf.jetty9.version}</version>
+            <version>${cxf.jetty11.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -372,13 +372,13 @@
                 <dependency>
                     <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-alpn-openjdk8-server</artifactId>
-                    <version>${cxf.jetty9.version}</version>
+                    <version>${cxf.jetty11.version}</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-alpn-openjdk8-client</artifactId>
-                    <version>${cxf.jetty9.version}</version>
+                    <version>${cxf.jetty11.version}</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -392,13 +392,13 @@
                 <dependency>
                     <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-alpn-java-server</artifactId>
-                    <version>${cxf.jetty9.version}</version>
+                    <version>${cxf.jetty11.version}</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-alpn-java-client</artifactId>
-                    <version>${cxf.jetty9.version}</version>
+                    <version>${cxf.jetty11.version}</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>

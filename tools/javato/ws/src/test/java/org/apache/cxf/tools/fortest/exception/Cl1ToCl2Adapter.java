@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.tools.fortest.exception;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 public class Cl1ToCl2Adapter extends XmlAdapter<MyClass2, MyClass1> {
     @Override

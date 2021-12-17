@@ -22,7 +22,7 @@ package org.apache.cxf.customer.book;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 
 @WebService(endpointInterface = "org.apache.cxf.customer.book.BookService")

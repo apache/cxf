@@ -21,12 +21,11 @@ package org.apache.cxf.rs.security.jose.jaxrs.multipart;
 import java.io.IOException;
 import java.util.List;
 
-import javax.annotation.Priority;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.core.MediaType;
-
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.rs.security.jose.jaxrs.Priorities;
 
 @Priority(Priorities.JWS_WRITE_PRIORITY)

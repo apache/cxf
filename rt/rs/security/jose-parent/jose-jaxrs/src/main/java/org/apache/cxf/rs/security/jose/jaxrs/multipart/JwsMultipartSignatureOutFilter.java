@@ -21,8 +21,7 @@ package org.apache.cxf.rs.security.jose.jaxrs.multipart;
 import java.io.OutputStream;
 import java.util.List;
 
-import javax.activation.DataHandler;
-
+import jakarta.activation.DataHandler;
 import org.apache.cxf.attachment.ByteDataSource;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartOutputFilter;

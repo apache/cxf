@@ -22,11 +22,10 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import javax.validation.ValidationException;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.ext.Provider;
-
+import jakarta.validation.ValidationException;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.ext.Provider;
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.logging.FaultListener;
 import org.apache.cxf.logging.NoOpFaultListener;

@@ -20,8 +20,8 @@ package org.apache.cxf.tools.fortest;
 
 import java.awt.Image;
 
-import javax.xml.bind.annotation.XmlMimeType;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlMimeType;
+import jakarta.xml.bind.annotation.XmlType;
 
 @XmlType(name = "myImage", namespace = "http://fortest.tools.cxf.apache.org/")
 public class MyImage {

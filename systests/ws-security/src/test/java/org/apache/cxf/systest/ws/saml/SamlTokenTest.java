@@ -27,9 +27,9 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Service;
 
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -137,7 +137,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         try {
             saml1Port.doubleIt(25);
             fail("Expected failure on an invocation with no SAML Assertion");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().contains("No SAML CallbackHandler available"));
         }
 
@@ -147,7 +147,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         try {
             saml1Port.doubleIt(25);
             fail("Expected failure on an invocation with a SAML2 Assertion");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().contains("Wrong SAML Version")
                        || ex.getMessage().contains("enforces SamlVersion11Profile11 but we got 2.0"));
         }
@@ -170,7 +170,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         try {
             saml1Port.doubleIt(25);
             fail("Failure expected on no token");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error = "The received token does not match the token inclusion requirement";
             assertTrue(ex.getMessage().contains(error));
         }
@@ -295,7 +295,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         try {
             saml1Port.doubleIt(25);
             fail("Expected failure on an invocation with no SAML Assertion");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().contains("No SAML CallbackHandler available"));
         }
 
@@ -333,7 +333,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         try {
             saml2Port.doubleIt(25);
             fail("Expected failure on an invocation with no SAML Assertion");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().contains("No SAML CallbackHandler available"));
         }
 
@@ -343,7 +343,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         try {
             saml2Port.doubleIt(25);
             fail("Expected failure on an invocation with a SAML1 Assertion");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().contains("Wrong SAML Version")
                        || ex.getMessage().contains("enforces SamlVersion20Profile11 but we got 1.1"));
         }
@@ -386,7 +386,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         try {
             saml2Port.doubleIt(25);
             fail("Expected failure on an invocation with no SAML Assertion");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().contains("No SAML CallbackHandler available"));
         }
 
@@ -396,7 +396,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         try {
             saml2Port.doubleIt(25);
             fail("Expected failure on an invocation with a SAML1 Assertion");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().contains("Wrong SAML Version")
                        || ex.getMessage().contains("enforces SamlVersion20Profile11 but we got 1.1"));
         }
@@ -444,7 +444,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         try {
             saml2Port.doubleIt(25);
             fail("Expected failure on an invocation with an unsigned SAML SV Assertion");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().contains("SamlToken not satisfied")
                        || ex.getMessage().equals(WSSecurityException.UNIFIED_SECURITY_ERR));
         }
@@ -477,7 +477,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         try {
             saml2Port.doubleIt(25);
             fail("Expected failure on an invocation with no SAML Assertion");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().contains("No SAML CallbackHandler available"));
         }
 
@@ -487,7 +487,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         try {
             saml2Port.doubleIt(25);
             fail("Expected failure on an invocation with a SAML1 Assertion");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().contains("Wrong SAML Version")
                        || ex.getMessage().contains("enforces SamlVersion20Profile11 but we got 1.1"));
         }
@@ -510,7 +510,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         try {
             saml2Port.doubleIt(25);
             fail("Failure expected on no token");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error = "The received token does not match the token inclusion requirement";
             assertTrue(ex.getMessage().contains(error));
         }
@@ -975,7 +975,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         try {
             saml2Port.doubleIt(25);
             fail("Failure expected on no SamlToken");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error = "The received token does not match the token inclusion requirement";
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("SamlToken not satisfied"));
@@ -1007,7 +1007,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         try {
             saml2Port.doubleIt(25);
             fail("Failure expected as Assertion doesn't contain Role information");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
 
@@ -1027,7 +1027,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         try {
             saml2Port.doubleIt(25);
             fail("Failure expected as Assertion doesn't contain correct role");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
 
@@ -1092,7 +1092,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         try {
             saml2Port.doubleIt(25);
             fail("Failure expected on a replayed SAML Assertion");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().contains(WSSecurityException.UNIFIED_SECURITY_ERR));
         }
 
@@ -1150,7 +1150,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
 
             saml2Port.doubleIt(25);
             fail("Failure expected on unknown AudienceRestriction");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
     }
@@ -1234,7 +1234,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         try {
             saml2Port.doubleIt(25);
             fail("Failure expected on unknown AudienceRestriction");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
 

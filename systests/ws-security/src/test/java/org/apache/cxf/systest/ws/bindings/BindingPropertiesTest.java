@@ -24,8 +24,8 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
 
+import jakarta.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -127,7 +127,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
         try {
             port.doubleIt(25);
             fail("Failure expected on OnlySignEntireHeadersAndBody property");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error = "OnlySignEntireHeadersAndBody";
             assertTrue(ex.getMessage().contains(error));
         }
@@ -172,7 +172,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
         try {
             port.doubleIt(25);
             fail("Failure expected on not encrypting the signature property");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error = "The signature is not protected";
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("Signature must be encrypted"));
@@ -218,7 +218,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
         try {
             port.doubleIt(25);
             fail("Failure expected on not sending a Timestamp");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error = "Received Timestamp does not match the requirements";
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("Timestamp must be present"));
@@ -264,7 +264,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
         try {
             port.doubleIt(25);
             fail("Failure expected on not encrypting before signing");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error = "Not encrypted before signed";
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("EncryptBeforeSigning"));
@@ -311,7 +311,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
         try {
             port.doubleIt(25);
             fail("Failure expected on not signing before encrypting");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error = "Not signed before encrypted";
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("SignBeforeEncrypting"));
@@ -363,7 +363,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
                 port.doubleIt(25);
                 fail("Failure expected on on sending the timestamp last");
             }
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error = "Layout does not match the requirements";
             assertTrue(ex.getMessage().contains(error));
         }
@@ -414,7 +414,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
                 port.doubleIt(25);
                 fail("Failure expected on sending the timestamp first");
             }
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error = "Layout does not match the requirements";
             assertTrue(ex.getMessage().contains(error));
         }
@@ -465,7 +465,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
                 port.doubleIt(25);
                 fail("Failure expected on sending the timestamp last");
             }
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error = "Layout does not match the requirements";
             assertTrue(ex.getMessage().contains(error));
         }
@@ -516,7 +516,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
                 port.doubleIt(25);
                 fail("Failure expected on not protecting the token");
             }
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // String error = "Layout does not match the requirements";
             // assertTrue(ex.getMessage().contains(error));
         }
@@ -562,7 +562,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
         try {
             port.doubleIt(25);
             fail("Failure expected on not enabling SignatureConfirmation");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
 

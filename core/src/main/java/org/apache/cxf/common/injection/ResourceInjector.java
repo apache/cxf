@@ -31,12 +31,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.annotation.Resource;
-import javax.annotation.Resources;
-
-
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import jakarta.annotation.Resource;
+import jakarta.annotation.Resources;
 import org.apache.cxf.common.annotation.AbstractAnnotationVisitor;
 import org.apache.cxf.common.annotation.AnnotationProcessor;
 import org.apache.cxf.common.logging.LogUtils;
@@ -92,7 +90,7 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
 
     public static boolean processable(Class<?> cls, Object o) {
         if (cls.getName().startsWith("java.")
-            || cls.getName().startsWith("javax.")) {
+            || cls.getName().startsWith("jakarta.")) {
             return false;
         }
         NoJSR250Annotations njsr = cls.getAnnotation(NoJSR250Annotations.class);

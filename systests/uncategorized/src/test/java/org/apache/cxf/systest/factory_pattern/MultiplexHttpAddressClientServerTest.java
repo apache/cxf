@@ -27,11 +27,10 @@ import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
 
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Service;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
-
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.factory_pattern.IsEvenResponse;
 import org.apache.cxf.factory_pattern.Number;

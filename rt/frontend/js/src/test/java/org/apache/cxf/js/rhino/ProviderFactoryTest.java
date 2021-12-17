@@ -21,8 +21,7 @@ package org.apache.cxf.js.rhino;
 
 import java.io.File;
 
-import javax.xml.ws.Service;
-
+import jakarta.xml.ws.Service;
 import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.Scriptable;
 

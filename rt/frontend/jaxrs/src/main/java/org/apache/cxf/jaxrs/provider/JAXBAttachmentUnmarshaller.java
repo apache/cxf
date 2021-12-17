@@ -25,9 +25,8 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.logging.Logger;
 
-import javax.activation.DataHandler;
-import javax.xml.bind.attachment.AttachmentUnmarshaller;
-
+import jakarta.activation.DataHandler;
+import jakarta.xml.bind.attachment.AttachmentUnmarshaller;
 import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.IOUtils;

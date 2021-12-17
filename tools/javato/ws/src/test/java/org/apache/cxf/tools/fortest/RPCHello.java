@@ -18,10 +18,10 @@
  */
 package org.apache.cxf.tools.fortest;
 
-import javax.jws.soap.SOAPBinding;
+import jakarta.jws.soap.SOAPBinding;
 
-@javax.jws.WebService(targetNamespace = "http://cxf.apache.org/rpc")
-@javax.jws.soap.SOAPBinding(style = SOAPBinding.Style.RPC,
+@jakarta.jws.WebService(targetNamespace = "http://cxf.apache.org/rpc")
+@jakarta.jws.soap.SOAPBinding(style = SOAPBinding.Style.RPC,
                             use = SOAPBinding.Use.LITERAL,
                             parameterStyle = SOAPBinding.ParameterStyle.WRAPPED)
 public interface RPCHello {

@@ -21,7 +21,7 @@ package org.apache.cxf.javascript.fortest;
 
 import java.util.concurrent.CountDownLatch;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 /**
  *

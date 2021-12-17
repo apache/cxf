@@ -25,9 +25,9 @@ import java.util.concurrent.Executor;
 import java.util.logging.Logger;
 
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Endpoint;
 
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.Endpoint;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.SoapFault;

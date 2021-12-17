@@ -22,9 +22,8 @@ package org.apache.cxf.rs.security.oauth2.services;
 import java.util.List;
 import java.util.Set;
 
-import javax.ws.rs.Path;
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;

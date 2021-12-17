@@ -22,8 +22,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import javax.xml.bind.JAXBElement;
-
+import jakarta.xml.bind.JAXBElement;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.spi.ClassGeneratorClassLoader;
 import org.apache.cxf.common.util.ASMHelper;
@@ -408,7 +407,7 @@ public final class WrapperHelperClassGenerator extends ClassGeneratorClassLoader
                     mv.visitJumpInsn(opCodes.IFNULL, jumpOverLabel);
 
                     mv.visitMethodInsn(opCodes.INVOKEVIRTUAL,
-                                       "javax/xml/bind/JAXBElement",
+                                       "jakarta/xml/bind/JAXBElement",
                                        "getValue", "()Ljava/lang/Object;", false);
                     mv.visitLabel(jumpOverLabel);
                 }

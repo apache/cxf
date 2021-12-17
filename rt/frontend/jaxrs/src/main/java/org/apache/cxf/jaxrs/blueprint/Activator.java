@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.jaxrs.blueprint;
 
-import javax.ws.rs.ext.RuntimeDelegate;
-
+import jakarta.ws.rs.ext.RuntimeDelegate;
 import org.apache.cxf.bus.blueprint.BlueprintNameSpaceHandlerFactory;
 import org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer;
 import org.osgi.framework.BundleActivator;

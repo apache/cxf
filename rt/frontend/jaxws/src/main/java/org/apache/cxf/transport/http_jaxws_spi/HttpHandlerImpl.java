@@ -20,15 +20,14 @@ package org.apache.cxf.transport.http_jaxws_spi;
 
 import java.io.IOException;
 
-import javax.xml.ws.spi.http.HttpExchange;
-import javax.xml.ws.spi.http.HttpHandler;
-
+import jakarta.xml.ws.spi.http.HttpExchange;
+import jakarta.xml.ws.spi.http.HttpHandler;
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapAddress;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.wsdl.http.AddressType;
 
 /**
- * A javax.xml.ws.spi.http.HttpHandler implementation that uses
+ * A jakarta.xml.ws.spi.http.HttpHandler implementation that uses
  * a JAXWSHttpSpiDestination instance for message processing
  */
 public class HttpHandlerImpl extends HttpHandler {

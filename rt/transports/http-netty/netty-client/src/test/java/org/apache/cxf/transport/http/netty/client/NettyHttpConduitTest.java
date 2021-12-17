@@ -24,10 +24,9 @@ import java.util.Collections;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Response;
-
+import jakarta.xml.ws.AsyncHandler;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Response;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.continuations.Continuation;
@@ -148,7 +147,7 @@ public class NettyHttpConduitTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testTimeoutWithPropertySetting() throws Exception {
-        ((javax.xml.ws.BindingProvider)g).getRequestContext().put("javax.xml.ws.client.receiveTimeout",
+        ((jakarta.xml.ws.BindingProvider)g).getRequestContext().put("jakarta.xml.ws.client.receiveTimeout",
             "3000");
         updateAddressPort(g, PORT);
 
@@ -194,7 +193,7 @@ public class NettyHttpConduitTest extends AbstractBusClientServerTestBase {
     @Test
     public void testTimeoutAsyncWithPropertySetting() throws Exception {
         updateAddressPort(g, PORT);
-        ((javax.xml.ws.BindingProvider)g).getRequestContext().put("javax.xml.ws.client.receiveTimeout",
+        ((jakarta.xml.ws.BindingProvider)g).getRequestContext().put("jakarta.xml.ws.client.receiveTimeout",
             "3000");
         try {
             Response<GreetMeLaterResponse> future = g.greetMeLaterAsync(-5000L);

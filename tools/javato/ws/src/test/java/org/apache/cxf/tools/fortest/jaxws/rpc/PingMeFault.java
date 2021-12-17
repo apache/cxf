@@ -19,7 +19,7 @@
 
 package org.apache.cxf.tools.fortest.jaxws.rpc;
 
-import javax.xml.ws.WebFault;
+import jakarta.xml.ws.WebFault;
 
 
 @WebFault(name = "faultDetail",

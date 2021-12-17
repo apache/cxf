@@ -24,9 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.jms.ConnectionFactory;
-import javax.jms.Message;
-
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.Message;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;

@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.tools.java2ws.fortest;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService
 public class Calculator {

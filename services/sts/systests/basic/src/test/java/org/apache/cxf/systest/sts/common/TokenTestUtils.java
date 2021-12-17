@@ -20,10 +20,10 @@ package org.apache.cxf.systest.sts.common;
 
 import java.util.List;
 
-import javax.xml.ws.BindingProvider;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.ws.BindingProvider;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.ClientProxy;

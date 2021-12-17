@@ -19,12 +19,11 @@
 
 package org.apache.cxf.systest.jaxrs.reactor;
 
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.MediaType;
-
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.reactor.client.ReactorInvoker;
 import org.apache.cxf.jaxrs.reactor.client.ReactorInvokerProvider;

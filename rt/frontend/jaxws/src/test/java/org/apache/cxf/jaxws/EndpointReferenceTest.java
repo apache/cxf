@@ -26,15 +26,15 @@ import java.util.List;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Result;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.EndpointReference;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.WebServiceFeature;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.EndpointReference;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.WebServiceFeature;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.spi.ProviderImpl;
@@ -61,7 +61,7 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
 
     @Test
     public void testBindingProviderSOAPBinding() throws Exception {
-        javax.xml.ws.Service s = javax.xml.ws.Service
+        jakarta.xml.ws.Service s = jakarta.xml.ws.Service
             .create(new QName("http://apache.org/hello_world_soap_http", "SoapPort"));
         assertNotNull(s);
 
@@ -128,7 +128,7 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
         try (EndpointImpl endpoint = new EndpointImpl(getBus(), greeter1, (String)null)) {
             endpoint.publish("http://localhost:8080/test");
 
-            javax.xml.ws.Service s = javax.xml.ws.Service
+            jakarta.xml.ws.Service s = jakarta.xml.ws.Service
                 .create(new QName("http://apache.org/hello_world_soap_http", "SoapPort"));
 
             InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");

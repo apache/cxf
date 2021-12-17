@@ -46,14 +46,6 @@ import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.ExtensionDeserializer;
 import javax.wsdl.extensions.ExtensionRegistry;
 import javax.wsdl.extensions.ExtensionSerializer;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlElementDecl;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSchema;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -63,6 +55,14 @@ import javax.xml.stream.util.StreamReaderDelegate;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlElementDecl;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlSchema;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
@@ -276,9 +276,9 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
     }
 
     /* (non-Javadoc)
-     * @see javax.wsdl.extensions.ExtensionSerializer#marshall(java.lang.Class,
-     *  javax.xml.namespace.QName, javax.wsdl.extensions.ExtensibilityElement,
-     *   java.io.PrintWriter, javax.wsdl.Definition, javax.wsdl.extensions.ExtensionRegistry)
+     * @see jakarta.wsdl.extensions.ExtensionSerializer#marshall(java.lang.Class,
+     *  javax.xml.namespace.QName, jakarta.wsdl.extensions.ExtensibilityElement,
+     *   java.io.PrintWriter, jakarta.wsdl.Definition, jakarta.wsdl.extensions.ExtensionRegistry)
      */
     public void marshall(@SuppressWarnings("rawtypes") Class parent, QName qname,
                          ExtensibilityElement obj, PrintWriter pw,
@@ -334,10 +334,10 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
     }
 
     /* (non-Javadoc)
-     * @see javax.wsdl.extensions.ExtensionDeserializer#unmarshall(java.lang.Class,
+     * @see jakarta.wsdl.extensions.ExtensionDeserializer#unmarshall(java.lang.Class,
      *  javax.xml.namespace.QName, org.w3c.dom.Element,
-     *   javax.wsdl.Definition,
-     *   javax.wsdl.extensions.ExtensionRegistry)
+     *   jakarta.wsdl.Definition,
+     *   jakarta.wsdl.extensions.ExtensionRegistry)
      */
     public ExtensibilityElement unmarshall(@SuppressWarnings("rawtypes") Class parent,
                                            QName qname, Element element, Definition wsdl,

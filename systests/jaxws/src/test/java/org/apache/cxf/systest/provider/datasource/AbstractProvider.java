@@ -21,11 +21,10 @@ package org.apache.cxf.systest.provider.datasource;
 
 import java.util.logging.Logger;
 
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.http.HTTPBinding;
-
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.http.HTTPBinding;
 import org.apache.cxf.common.logging.LogUtils;
 
 public abstract class AbstractProvider<T> implements WebProvider {

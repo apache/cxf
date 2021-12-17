@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.jaxws.holder;
 
-import javax.jws.WebService;
-import javax.xml.ws.Holder;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Holder;
 
 
 @WebService(endpointInterface = "org.apache.cxf.jaxws.holder.HolderService")

@@ -21,7 +21,7 @@ package org.apache.cxf.tools.fortest.date;
 
 import java.util.Date;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService
 public class EchoDate {

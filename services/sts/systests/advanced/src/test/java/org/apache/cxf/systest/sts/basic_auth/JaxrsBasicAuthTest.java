@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.systest.sts.basic_auth;
 
-import javax.ws.rs.InternalServerErrorException;
-
+import jakarta.ws.rs.InternalServerErrorException;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.systest.sts.deployment.DoubleItServer;
 import org.apache.cxf.systest.sts.deployment.STSServer;

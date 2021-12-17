@@ -19,7 +19,7 @@
 
 package org.apache.cxf.jaxws.service;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService
 public class EchoFoo {

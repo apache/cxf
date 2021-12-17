@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.transport.servlet.blueprint;
 
-import javax.servlet.ServletConfig;
-
+import jakarta.servlet.ServletConfig;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;

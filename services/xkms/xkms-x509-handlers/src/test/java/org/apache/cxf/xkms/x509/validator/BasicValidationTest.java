@@ -19,10 +19,9 @@
 
 package org.apache.cxf.xkms.x509.validator;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import org.apache.cxf.xkms.model.xkms.MessageAbstractType;
 
 import org.junit.Before;

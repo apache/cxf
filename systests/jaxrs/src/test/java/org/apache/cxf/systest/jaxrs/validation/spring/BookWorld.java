@@ -18,13 +18,12 @@
  */
 package org.apache.cxf.systest.jaxrs.validation.spring;
 
-import javax.jws.WebService;
-import javax.validation.Valid;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-
+import jakarta.jws.WebService;
+import jakarta.validation.Valid;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
 import org.apache.cxf.systest.jaxrs.validation.BookWithValidation;
 
 @WebService(targetNamespace = "http://bookworld.com")

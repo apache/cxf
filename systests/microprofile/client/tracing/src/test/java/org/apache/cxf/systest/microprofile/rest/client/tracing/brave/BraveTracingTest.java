@@ -20,7 +20,7 @@ package org.apache.cxf.systest.microprofile.rest.client.tracing.brave;
 
 import java.net.URI;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import brave.ScopedSpan;
 import brave.Tracing;

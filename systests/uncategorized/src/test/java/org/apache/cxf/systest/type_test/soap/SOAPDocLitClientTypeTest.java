@@ -21,9 +21,9 @@ package org.apache.cxf.systest.type_test.soap;
 import java.util.Collections;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Holder;
-import javax.xml.ws.soap.SOAPFaultException;
 
+import jakarta.xml.ws.Holder;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.systest.type_test.AbstractTypeTestClient5;
 import org.apache.type_test.types1.FixedArray;
 

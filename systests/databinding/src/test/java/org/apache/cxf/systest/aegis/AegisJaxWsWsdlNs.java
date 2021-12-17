@@ -21,9 +21,8 @@ package org.apache.cxf.systest.aegis;
 
 import java.util.List;
 
-import javax.jws.WebParam;
-import javax.jws.WebService;
-
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
 import org.apache.cxf.aegis.type.java5.XmlType;
 
 

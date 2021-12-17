@@ -19,7 +19,7 @@
 
 package org.apache.handlers;
 
-import javax.xml.ws.WebFault;
+import jakarta.xml.ws.WebFault;
 
 @WebFault(name = "FaultDetail", targetNamespace = "http://apache.org/handlers/types")
 public class AddNumbersFault extends Exception {

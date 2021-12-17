@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.tools.fortest.cxf2941;
 
-import javax.jws.WebMethod;
-import javax.jws.WebResult;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebResult;
 
 public class WebResultService {
     @WebMethod(operationName = "helloString", action = "urn:HelloString")

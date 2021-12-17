@@ -25,8 +25,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 
-import javax.xml.bind.annotation.XmlList;
-
+import jakarta.xml.bind.annotation.XmlList;
 import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ProcessorTestBase;

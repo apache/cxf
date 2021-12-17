@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
-import javax.ws.rs.WebApplicationException;
-
+import jakarta.ws.rs.WebApplicationException;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;

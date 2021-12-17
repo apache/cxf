@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.jaxrs.provider;
 
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 public interface FormValidator {
     void validate(MultivaluedMap<String, ? extends Object> params);

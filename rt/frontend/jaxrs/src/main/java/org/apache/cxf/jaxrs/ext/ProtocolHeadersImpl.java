@@ -20,8 +20,7 @@ package org.apache.cxf.jaxrs.ext;
 
 import java.util.List;
 
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.message.Message;
 

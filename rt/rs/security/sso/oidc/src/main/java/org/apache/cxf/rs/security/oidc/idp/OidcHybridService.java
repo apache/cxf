@@ -24,8 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.ws.rs.Path;
-
+import jakarta.ws.rs.Path;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.oauth2.common.AbstractFormImplicitResponse;
 import org.apache.cxf.rs.security.oauth2.common.Client;

@@ -29,25 +29,25 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.wsdl.Definition;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMResult;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.EndpointReference;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.WebServiceFeature;
-import javax.xml.ws.spi.Invoker;
-import javax.xml.ws.spi.ServiceDelegate;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.EndpointReference;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.WebServiceFeature;
+import jakarta.xml.ws.spi.Invoker;
+import jakarta.xml.ws.spi.ServiceDelegate;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.i18n.Message;
@@ -71,7 +71,7 @@ import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.cxf.wsdl.WSDLManager;
 
-public class ProviderImpl extends javax.xml.ws.spi.Provider {
+public class ProviderImpl extends jakarta.xml.ws.spi.Provider {
     public static final String JAXWS_PROVIDER = ProviderImpl.class.getName();
     protected static final Logger LOG = LogUtils.getL7dLogger(ProviderImpl.class);
     private static JAXBContext jaxbContext;
@@ -87,7 +87,7 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                                                  @SuppressWarnings("rawtypes") Class serviceClass,
                                                  WebServiceFeature ... features) {
         for (WebServiceFeature f : features) {
-            if (!f.getClass().getName().startsWith("javax.xml.ws")
+            if (!f.getClass().getName().startsWith("jakarta.xml.ws")
                 && !(f instanceof Feature)) {
                 throw new WebServiceException("Unknown feature error: " + f.getClass().getName());
             }
@@ -178,7 +178,7 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
     /**
      * Convert from EndpointReference to CXF internal 2005/08 EndpointReferenceType
      *
-     * @param external the javax.xml.ws.EndpointReference
+     * @param external the jakarta.xml.ws.EndpointReference
      * @return CXF internal 2005/08 EndpointReferenceType
      */
     public static EndpointReferenceType convertToInternal(EndpointReference external) {

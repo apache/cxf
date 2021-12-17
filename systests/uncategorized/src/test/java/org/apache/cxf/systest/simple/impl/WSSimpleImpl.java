@@ -19,8 +19,7 @@
 
 package org.apache.cxf.systest.simple.impl;
 
-import javax.jws.WebService;
-
+import jakarta.jws.WebService;
 import org.apache.cxf.systest.simple.intf.WSSimple;
 
 @WebService(name = "WSSimpleImpl123", targetNamespace = "http://systest.cxf.apache.org")

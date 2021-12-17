@@ -24,9 +24,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.ReflectionUtil;

@@ -19,8 +19,8 @@
 
 package demo.hw.client;
 
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.Response;
+import jakarta.xml.ws.AsyncHandler;
+import jakarta.xml.ws.Response;
 
 import org.apache.hello_world_async_soap_http.types.GreetMeSometimeResponse;
 

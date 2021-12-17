@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.jws.soap.SOAPBinding;
 import javax.wsdl.OperationType;
 
+import jakarta.jws.soap.SOAPBinding;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.tools.common.ToolException;

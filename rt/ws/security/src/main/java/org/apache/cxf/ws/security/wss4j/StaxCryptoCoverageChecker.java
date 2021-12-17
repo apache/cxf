@@ -114,7 +114,7 @@ public class StaxCryptoCoverageChecker extends AbstractPhaseInterceptor<SoapMess
 
             if (signAddressingHeaders) {
                 AddressingProperties addressingProperties =
-                    (AddressingProperties)soapMessage.get("javax.xml.ws.addressing.context.inbound");
+                    (AddressingProperties)soapMessage.get("jakarta.xml.ws.addressing.context.inbound");
                 checkSignedAddressing(results, addressingProperties);
             }
 

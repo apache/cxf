@@ -21,7 +21,7 @@ package org.apache.cxf.systest.type_substitution;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(endpointInterface = "org.apache.cxf.systest.type_substitution.AppleFinder",
             serviceName = "AppleFinder")

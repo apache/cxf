@@ -18,10 +18,9 @@
  */
 package org.apache.cxf.systest.jms.tx;
 
-import javax.jws.WebService;
-import javax.transaction.SystemException;
-import javax.transaction.TransactionManager;
-
+import jakarta.jws.WebService;
+import jakarta.transaction.SystemException;
+import jakarta.transaction.TransactionManager;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.hello_world_doc_lit.Greeter;

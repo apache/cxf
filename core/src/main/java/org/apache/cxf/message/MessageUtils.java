@@ -188,7 +188,7 @@ public final class MessageUtils {
         return m != null && m.getContent(Node.class) != null;
         /*
         for (Class c : m.getContentFormats()) {
-            if (c.equals(Node.class) || "javax.xml.soap.SOAPMessage".equals(c.getName())) {
+            if (c.equals(Node.class) || "jakarta.xml.soap.SOAPMessage".equals(c.getName())) {
                 return true;
             }
         }

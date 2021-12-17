@@ -29,14 +29,14 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-import javax.jws.WebService;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Action;
-import javax.xml.ws.WebFault;
-import javax.xml.ws.WebServiceClient;
 
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Action;
+import jakarta.xml.ws.WebFault;
+import jakarta.xml.ws.WebServiceClient;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.IOUtils;
@@ -591,7 +591,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         w2j.run(new ToolContext());
 
         String str1 = "SOAPBinding.ParameterStyle.BARE";
-        String str2 = "javax.xml.ws.Holder";
+        String str2 = "jakarta.xml.ws.Holder";
         String str3 = "org.apache.cxf.mime.Address";
         String str4 = "http://cxf.apache.org/w2j/hello_world_mime/types";
 
@@ -868,7 +868,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         Class<?> clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.Greeter");
 
         Method method1 = clz.getMethod("greetMeSometimeAsync", new Class[] {java.lang.String.class,
-                                                                            javax.xml.ws.AsyncHandler.class});
+                                                                            jakarta.xml.ws.AsyncHandler.class});
 
         assertNotNull("jaxws binding file does not take effect for hello_world.wsdl", method1);
 
@@ -880,7 +880,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
 
         Method method2 = clz.getMethod("echoDateAsync",
                                        new Class[] {javax.xml.datatype.XMLGregorianCalendar.class,
-                                                    javax.xml.ws.AsyncHandler.class});
+                                                    jakarta.xml.ws.AsyncHandler.class});
         assertNotNull("jaxws binding file does not take effect for echo_date.wsdl", method2);
 
     }

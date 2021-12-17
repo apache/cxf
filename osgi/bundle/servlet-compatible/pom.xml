@@ -51,12 +51,12 @@
                         <Specification-Title>Apache CXF Servlet Compatibility Bundle</Specification-Title>
                         <Specification-Vendor>The Apache Software Foundation</Specification-Vendor>
                         <Specification-Version>${cxf.osgi.version.clean}</Specification-Version>
-                        <Fragment-Host>javax.servlet-api</Fragment-Host>
+                        <Fragment-Host>jakarta.servlet-api</Fragment-Host>
                         <Export-Package>
-                            javax.servlet;uses:="javax.servlet.annotation,javax.servlet.descriptor";version=3.1.0,
-                            javax.servlet.annotation;uses:=javax.servlet;version=3.1.0,
-                            javax.servlet.http;uses:=javax.servlet;version=3.1.0,
-                            javax.servlet.descriptor;version=3.1.0
+                            jakarta.servlet;uses:="jakarta.servlet.annotation,jakarta.servlet.descriptor";version=5.0.0,
+                            jakarta.servlet.annotation;uses:=jakarta.servlet;version=5.0.0,
+                            jakarta.servlet.http;uses:=jakarta.servlet;version=5.0.0,
+                            jakarta.servlet.descriptor;version=5.0.0
                         </Export-Package>
                     </instructions>
                 </configuration>

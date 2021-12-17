@@ -20,9 +20,8 @@
 package org.apache.cxf.transport.http_undertow;
 
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.cxf.Bus;
 
 import io.undertow.io.Sender;
@@ -39,8 +38,8 @@ import io.undertow.util.Headers;
 
 public class UndertowHTTPHandler implements HttpHandler {
 
-    private static final String SSL_CIPHER_SUITE_ATTRIBUTE = "javax.servlet.request.cipher_suite";
-    private static final String SSL_PEER_CERT_CHAIN_ATTRIBUTE = "javax.servlet.request.X509Certificate";
+    private static final String SSL_CIPHER_SUITE_ATTRIBUTE = "jakarta.servlet.request.cipher_suite";
+    private static final String SSL_PEER_CERT_CHAIN_ATTRIBUTE = "jakarta.servlet.request.X509Certificate";
     private static final String METHOD_TRACE = "TRACE";
 
     protected UndertowHTTPDestination undertowHTTPDestination;

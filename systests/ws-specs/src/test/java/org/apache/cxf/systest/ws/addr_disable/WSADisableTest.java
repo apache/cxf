@@ -24,13 +24,13 @@ import java.io.InputStream;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.soap.AddressingFeature;
 
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.soap.AddressingFeature;
 import org.apache.cxf.systest.ws.AbstractWSATestBase;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersPortType;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersService;
@@ -106,7 +106,7 @@ public class WSADisableTest extends AbstractWSATestBase {
 
         QName port = new QName("http://apache.org/cxf/systest/ws/addr_feature/", "AddNumbersPort");
         Dispatch<SOAPMessage> disptch = getService().createDispatch(port, SOAPMessage.class,
-                                                                    javax.xml.ws.Service.Mode.MESSAGE,
+                                                                    jakarta.xml.ws.Service.Mode.MESSAGE,
                                                                     new AddressingFeature(false));
         ((BindingProvider)disptch).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                                                            "http://localhost:"
@@ -118,7 +118,7 @@ public class WSADisableTest extends AbstractWSATestBase {
         try {
             disptch.invoke(soapReqMsg);
             fail("The MAPcodec ate the SOAPFaultException");
-        } catch (javax.xml.ws.soap.SOAPFaultException e) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException e) {
             //expected
         }
     }

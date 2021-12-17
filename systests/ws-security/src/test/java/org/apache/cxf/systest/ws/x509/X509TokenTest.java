@@ -29,21 +29,21 @@ import java.util.List;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPMessage;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Service;
-import javax.xml.ws.Service.Mode;
-import javax.xml.ws.handler.MessageContext;
 import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.Service.Mode;
+import jakarta.xml.ws.handler.MessageContext;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -157,7 +157,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         try {
             x509Port.doubleIt(25);
             fail("Failure expected on an incorrect key");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error = "No certificates were found for decryption";
             if (STAX_PORT.equals(test.getPort())) {
                 error = "Referenced security token could not be retrieved";
@@ -1382,7 +1382,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         try {
             x509Port.doubleIt(25);
             fail("Failure expected on a replayed Timestamp");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().contains(WSSecurityException.UNIFIED_SECURITY_ERR));
         }
 
@@ -1570,7 +1570,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         try {
             port.doubleIt(25);
             fail("Failure expected on not sending an X.509 Supporting Token");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error = "These policy alternatives can not be satisfied";
             assertTrue(ex.getMessage().contains(error));
         }
@@ -1583,7 +1583,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         try {
             port.doubleIt(25);
             fail("Failure expected on not sending a PKI token");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error = "These policy alternatives can not be satisfied";
             assertTrue(ex.getMessage().contains(error));
         }
@@ -1632,7 +1632,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         try {
             x509Port.doubleIt(25);
             fail("Failure expected on not endorsing the token");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error = "These policy alternatives can not be satisfied";
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("X509Token not satisfied"));

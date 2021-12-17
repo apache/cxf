@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.jca.cxf;
 
-import javax.resource.ResourceException;
-import javax.resource.spi.ManagedConnection;
+import jakarta.resource.ResourceException;
+import jakarta.resource.spi.ManagedConnection;
 
 public interface CXFManagedConnection extends ManagedConnection {
 

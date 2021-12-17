@@ -30,45 +30,28 @@
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <cxf.jetty8.version>8.1.22.v20160922</cxf.jetty8.version>
-        <cxf.jetty.version>${cxf.jetty8.version}</cxf.jetty.version>
+        <cxf.jetty.version>${cxf.jetty11.version}</cxf.jetty.version>
     </properties>
     <profiles>
         <profile>
-            <id>jetty8</id>
-            <properties>
-                <cxf.jetty.version>${cxf.jetty8.version}</cxf.jetty.version>
-            </properties>
-            <dependencies>
-                <!-- jetty8 websocket -->
-                <dependency>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-websocket</artifactId>
-                    <version>${cxf.jetty8.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>jetty9</id>
+            <id>jetty11</id>
             <!-- activate it by default -->
             <activation>
-                <property>
-                    <name>!jetty8</name>
-                </property>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
+                <cxf.jetty.version>${cxf.jetty11.version}</cxf.jetty.version>
             </properties>
             <dependencies>
-                <!-- jetty9 websocket -->
+                <!-- jetty11 websocket -->
                 <dependency>
                     <groupId>org.eclipse.jetty.websocket</groupId>
-                    <artifactId>websocket-server</artifactId>
-                    <version>${cxf.jetty9.version}</version>
+                    <artifactId>websocket-jakarta-server</artifactId>
+                    <version>${cxf.jetty11.version}</version>
                     <exclusions>
                         <exclusion>
-                            <groupId>javax.servlet</groupId>
-                            <artifactId>javax.servlet-api</artifactId>
+                            <groupId>jakarta.servlet</groupId>
+                            <artifactId>jakarta.servlet-api</artifactId>
                         </exclusion>
                     </exclusions>
                 </dependency>

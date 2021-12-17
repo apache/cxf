@@ -19,10 +19,9 @@
 
 package org.apache.cxf.systest.aegis.mtom.fortest;
 
-import javax.jws.WebParam;
-import javax.jws.WebService;
-import javax.xml.ws.soap.MTOM;
-
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.soap.MTOM;
 import org.apache.cxf.aegis.type.java5.XmlParamType;
 import org.apache.cxf.aegis.type.java5.XmlReturnType;
 

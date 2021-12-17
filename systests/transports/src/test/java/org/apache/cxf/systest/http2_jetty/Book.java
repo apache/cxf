@@ -19,13 +19,14 @@
 
 package org.apache.cxf.systest.http2_jetty;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PUT;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 @JsonTypeInfo(use = Id.CLASS, include = As.PROPERTY, property = "class")
 @XmlRootElement(name = "Book")

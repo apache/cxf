@@ -22,8 +22,7 @@ package org.apache.cxf.systest.schema_validation;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.jws.WebService;
-
+import jakarta.jws.WebService;
 import org.apache.schema_validation.DoSomethingFault;
 import org.apache.schema_validation.SchemaValidation;
 import org.apache.schema_validation.types.ComplexStruct;

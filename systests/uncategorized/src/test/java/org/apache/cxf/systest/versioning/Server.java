@@ -19,8 +19,7 @@
 
 package org.apache.cxf.systest.versioning;
 
-import javax.xml.ws.Endpoint;
-
+import jakarta.xml.ws.Endpoint;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;

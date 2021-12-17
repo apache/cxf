@@ -20,9 +20,8 @@ package org.apache.cxf.transport.jms;
 
 import java.security.Principal;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
 import org.apache.cxf.security.SecurityContext;
 
 public final class SecurityContextFactory {

@@ -19,8 +19,8 @@
 
 package org.apache.cxf.systest.http_jetty;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
 
 @WebService
 public class Dummy implements DummyInterface {

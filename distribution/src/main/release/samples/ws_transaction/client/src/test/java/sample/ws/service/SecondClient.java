@@ -19,16 +19,18 @@
 
 package sample.ws.service;
 
-import com.arjuna.mw.wst11.client.EnabledWSTXHandler;
-import org.jboss.jbossts.txbridge.outbound.JaxWSTxOutboundBridgeHandler;
-
-import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Service;
-import javax.xml.ws.handler.Handler;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.namespace.QName;
+
+import com.arjuna.mw.wst11.client.EnabledWSTXHandler;
+
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.handler.Handler;
+import org.jboss.jbossts.txbridge.outbound.JaxWSTxOutboundBridgeHandler;
 
 public class SecondClient {
     public static SecondServiceAT newInstance() throws Exception {

@@ -21,20 +21,20 @@ package org.apache.cxf.systest.provider;
 
 import java.io.InputStream;
 
-import javax.annotation.Resource;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.ws.Provider;
-import javax.xml.ws.Service;
-import javax.xml.ws.ServiceMode;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.WebServiceProvider;
-import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Document;
 
+import jakarta.annotation.Resource;
+import jakarta.xml.ws.Provider;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.ServiceMode;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.WebServiceProvider;
+import jakarta.xml.ws.handler.MessageContext;
 
 //The following wsdl file is used.
 //wsdlLocation = "/trunk/testutils/src/main/resources/wsdl/hello_world_rpc_lit.wsdl"
@@ -43,7 +43,7 @@ import org.w3c.dom.Document;
         targetNamespace = "http://apache.org/hello_world_xml_http/wrapped",
         wsdlLocation = "/wsdl/hello_world_xml_wrapped.wsdl")
 @ServiceMode(value = Service.Mode.PAYLOAD)
-@javax.xml.ws.BindingType(value = "http://cxf.apache.org/bindings/xformat")
+@jakarta.xml.ws.BindingType(value = "http://cxf.apache.org/bindings/xformat")
 public class HWDOMSourcePayloadXMLBindingProvider implements
         Provider<DOMSource> {
     @Resource

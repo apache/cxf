@@ -22,8 +22,8 @@ package org.apache.cxf.samples.discovery;
 import java.util.List;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.EndpointReference;
 
+import jakarta.xml.ws.EndpointReference;
 import org.apache.cxf.hello_world.discovery.Greeter;
 import org.apache.cxf.hello_world.discovery.GreeterService;
 import org.apache.cxf.ws.discovery.WSDiscoveryClient;

@@ -19,7 +19,7 @@
 -->
 <wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/hello_world_soap_http/any" xmlns:x1="http://apache.org/hello_world_soap_http/any_types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/hello_world_soap_http/any" name="HelloWorld">
     <wsdl:types>
-        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/hello_world_soap_http/any_types" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" targetNamespace="http://apache.org/hello_world_soap_http/any_types" elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/hello_world_soap_http/any_types" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xjc="https://jakarta.ee/xml/ns/jaxb/xjc" targetNamespace="http://apache.org/hello_world_soap_http/any_types" elementFormDefault="qualified">
             <element name="sayHi">
                 <xs:complexType>
                     <xs:sequence>

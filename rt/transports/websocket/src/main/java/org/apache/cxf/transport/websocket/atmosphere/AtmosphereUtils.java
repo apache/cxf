@@ -21,8 +21,7 @@ package org.apache.cxf.transport.websocket.atmosphere;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.cxf.Bus;
 import org.apache.cxf.helpers.CastUtils;
 import org.atmosphere.cpr.AtmosphereFramework;

@@ -20,7 +20,7 @@ package org.apache.cxf.jaxb;
 
 import java.lang.reflect.Method;
 
-import javax.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessType;
 
 import org.junit.Test;
 

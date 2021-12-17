@@ -21,8 +21,7 @@ package org.apache.cxf.jaxws;
 
 import java.lang.reflect.Method;
 
-import javax.xml.ws.Provider;
-
+import jakarta.xml.ws.Provider;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxws.support.JaxWsImplementorInfo;

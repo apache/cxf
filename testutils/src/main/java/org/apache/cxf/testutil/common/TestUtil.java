@@ -33,8 +33,7 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.logging.Logger;
 
-import javax.xml.ws.BindingProvider;
-
+import jakarta.xml.ws.BindingProvider;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.endpoint.Client;

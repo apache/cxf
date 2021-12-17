@@ -33,7 +33,7 @@
     <xsl:template match="/xsd:schema">
       <xsl:text>package org.apache.cxf.systest.type_test;&#10;&#10;</xsl:text>
       <xsl:text>import java.util.List;&#10;</xsl:text>
-      <xsl:text>import javax.xml.ws.Holder;&#10;&#10;</xsl:text>
+      <xsl:text>import jakarta.xml.ws.Holder;&#10;&#10;</xsl:text>
       <xsl:apply-templates select="itst:it_test_group[@ID]" mode="imports"/>
 <![CDATA[/**
  * org.apache.cxf.systest.type_test.TypeTestImpl

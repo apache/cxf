@@ -21,9 +21,9 @@ package org.apache.cxf.systest.sts.username_onbehalfof;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Service;
 
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Service;
 import org.apache.cxf.BusException;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;

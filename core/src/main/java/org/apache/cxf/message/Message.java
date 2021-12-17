@@ -194,8 +194,8 @@ public interface Message extends StringMap {
     /*
      * The properties to allow configure the client timeout
      */
-    String CONNECTION_TIMEOUT = "javax.xml.ws.client.connectionTimeout";
-    String RECEIVE_TIMEOUT = "javax.xml.ws.client.receiveTimeout";
+    String CONNECTION_TIMEOUT = "jakarta.xml.ws.client.connectionTimeout";
+    String RECEIVE_TIMEOUT = "jakarta.xml.ws.client.receiveTimeout";
 
     /**
      * Boolean property to indicate whether application-defined StAX-factories (stored as contextual property in the

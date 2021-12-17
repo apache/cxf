@@ -21,18 +21,19 @@ package demo.restful.server;
 
 import java.io.InputStream;
 
-import javax.annotation.Resource;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.ws.Provider;
-import javax.xml.ws.Service;
-import javax.xml.ws.ServiceMode;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.WebServiceProvider;
-import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Document;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.StaxUtils;
+
+import jakarta.annotation.Resource;
+import jakarta.xml.ws.Provider;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.ServiceMode;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.WebServiceProvider;
+import jakarta.xml.ws.handler.MessageContext;
 
 @WebServiceProvider()
 @ServiceMode(value = Service.Mode.PAYLOAD)

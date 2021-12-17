@@ -22,10 +22,9 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.generators;
 import java.io.Writer;
 import java.util.List;
 
-import javax.jws.HandlerChain;
-
 import org.w3c.dom.Element;
 
+import jakarta.jws.HandlerChain;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ToolConstants;

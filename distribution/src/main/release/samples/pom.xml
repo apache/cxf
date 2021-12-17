@@ -30,14 +30,14 @@
         <!-- don't deploy the samples, kind of pointless -->
         <maven.deploy.skip>true</maven.deploy.skip>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.boot.version>2.6.3</spring.boot.version>
+        <spring.boot.version>3.0.0-M1</spring.boot.version>
         <spring.cloud.eureka.version>3.1.0</spring.cloud.eureka.version>
-        <cxf.jetty9.version>9.4.45.v20220203</cxf.jetty9.version>
+        <cxf.jetty11.version>11.0.8</cxf.jetty11.version>
         <cxf.netty.version>4.1.74.Final</cxf.netty.version>
         <cxf.httpcomponents.client.version>4.5.13</cxf.httpcomponents.client.version>
         <cxf.swagger.ui.version>4.1.2</cxf.swagger.ui.version>
         <cxf.tika.version>2.2.1</cxf.tika.version>
-        <cxf.tomcat.version>9.0.58</cxf.tomcat.version>
+        <cxf.tomcat.version>10.1.0-M10</cxf.tomcat.version>
         <graalvm.version>21.1.0</graalvm.version>
     </properties>
     <dependencies>
@@ -185,8 +185,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.8.1</version>
                     <configuration>
-                        <source>1.8</source>
-                        <target>1.8</target>
+                        <source>17</source>
+                        <target>17</target>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -207,7 +207,7 @@
                 <plugin>
                     <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-maven-plugin</artifactId>
-                    <version>${cxf.jetty9.version}</version>
+                    <version>${cxf.jetty11.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -273,7 +273,7 @@
                 <dependency>
                     <groupId>jakarta.activation</groupId>
                     <artifactId>jakarta.activation-api</artifactId>
-                    <version>1.2.2</version>
+                    <version>2.0.1</version>
                 </dependency>
                 <dependency>
                     <groupId>jakarta.jws</groupId>
@@ -282,12 +282,8 @@
                 <dependency>
                     <groupId>com.sun.xml.messaging.saaj</groupId>
                     <artifactId>saaj-impl</artifactId>
-                    <version>1.5.3</version>
+                    <version>2.0.1</version>
                     <scope>runtime</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>geronimo-jta_1.1_spec</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>org.glassfish.jaxb</groupId>
@@ -303,6 +299,48 @@
                     <version>4.2.2</version>
                 </dependency>
             </dependencies>
+        </profile>
+        
+        <!-- 
+            TODO: Please remove, temporary repository settings in order to enable snapshots for
+            Spring Boot 3.0.0
+        -->
+        <profile>
+            <id>jakarta</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <repositories>
+                <repository>
+                    <id>spring.snapshots</id>
+                    <url>https://repo.spring.io/snapshot/</url>
+                    <name>Spring Snapshot Repo</name>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                </repository>
+                <repository>
+                    <id>spring.milestone</id>
+                    <url>https://repo.spring.io/milestone/</url>
+                    <name>Spring Milestone Repo</name>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>spring.snapshots</id>
+                    <url>https://repo.spring.io/snapshot/</url>
+                    <name>Spring Snapshot Repo</name>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                </pluginRepository>
+            </pluginRepositories>
         </profile>
     </profiles>
     <!--
@@ -322,16 +360,4 @@
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
     </distributionManagement>
-    
-    <!-- 
-        TODO: Please remove, temporary repository settings in order to enable milestones for
-        Spring Cloud Netflix (3.0.0-M4 at the moment).
-    -->
-    <repositories>
-        <repository>
-            <id>spring-milestones</id>
-            <snapshots><enabled>false</enabled></snapshots>
-            <url>https://repo.spring.io/milestone</url>
-        </repository>
-    </repositories>
 </project>

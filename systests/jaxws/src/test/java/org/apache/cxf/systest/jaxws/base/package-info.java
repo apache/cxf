@@ -16,8 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-@javax.xml.bind.annotation.XmlSchema(
+@jakarta.xml.bind.annotation.XmlSchema(
                 namespace = "http://cxf.apache.org/systest/jaxws/base",
-                attributeFormDefault = javax.xml.bind.annotation.XmlNsForm.UNQUALIFIED,
-                elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+                attributeFormDefault = jakarta.xml.bind.annotation.XmlNsForm.UNQUALIFIED,
+                elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package org.apache.cxf.systest.jaxws.base;

@@ -27,10 +27,10 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
 
 import com.codahale.metrics.MetricRegistry;
 
+import jakarta.xml.ws.BindingProvider;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.metrics.MetricsFeature;
@@ -69,7 +69,7 @@ public final class Client implements Runnable {
                     port.greetMe(username + "-" + x);
                     x++;
                 } while (x < 10000);
-            } catch (javax.xml.ws.WebServiceException wse) {
+            } catch (jakarta.xml.ws.WebServiceException wse) {
                 if (wse.getCause().getMessage().contains("429")) {
                     //exceeded are allowable number of requests
                     exceeded = true;

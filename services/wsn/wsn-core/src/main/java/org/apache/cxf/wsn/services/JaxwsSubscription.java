@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.wsn.services;
 
-import javax.jws.WebService;
-
+import jakarta.jws.WebService;
 import org.apache.cxf.wsn.jms.JmsSubscription;
 import org.apache.cxf.wsn.util.WSNHelper;
 import org.oasis_open.docs.wsn.b_2.Notify;

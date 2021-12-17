@@ -22,12 +22,12 @@ package org.apache.cxf.javascript.fortest;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Resource;
-import javax.jws.WebService;
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
-import javax.xml.ws.WebServiceContext;
 
+import jakarta.annotation.Resource;
+import jakarta.jws.WebService;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.ws.WebServiceContext;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 

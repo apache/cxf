@@ -20,11 +20,10 @@ package org.apache.cxf.rs.security.jose.jaxrs.multipart;
 
 import java.io.IOException;
 
-import javax.annotation.Priority;
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientResponseContext;
-import javax.ws.rs.client.ClientResponseFilter;
-
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.client.ClientRequestContext;
+import jakarta.ws.rs.client.ClientResponseContext;
+import jakarta.ws.rs.client.ClientResponseFilter;
 import org.apache.cxf.rs.security.jose.jaxrs.Priorities;
 
 @Priority(Priorities.JWS_CLIENT_READ_PRIORITY)

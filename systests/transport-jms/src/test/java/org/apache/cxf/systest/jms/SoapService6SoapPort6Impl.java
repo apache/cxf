@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.jms;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(serviceName = "SOAPService6",
             portName = "SoapPort6",

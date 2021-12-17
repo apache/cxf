@@ -29,10 +29,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.activation.DataHandler;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.handler.MessageContext;
-
+import jakarta.activation.DataHandler;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.handler.MessageContext;
 import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;

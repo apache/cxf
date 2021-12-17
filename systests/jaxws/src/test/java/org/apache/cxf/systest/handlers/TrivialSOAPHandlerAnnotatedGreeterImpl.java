@@ -19,9 +19,8 @@
 
 package org.apache.cxf.systest.handlers;
 
-import javax.jws.HandlerChain;
-import javax.jws.WebService;
-
+import jakarta.jws.HandlerChain;
+import jakarta.jws.WebService;
 import org.apache.cxf.greeter_control.AbstractGreeterImpl;
 
 /**

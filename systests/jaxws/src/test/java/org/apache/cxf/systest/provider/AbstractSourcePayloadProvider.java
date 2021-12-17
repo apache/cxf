@@ -22,8 +22,6 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import javax.annotation.Resource;
-import javax.jws.HandlerChain;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.OutputKeys;
@@ -35,15 +33,17 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.ServiceMode;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.WebServiceProvider;
-import javax.xml.ws.handler.MessageContext;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import jakarta.annotation.Resource;
+import jakarta.jws.HandlerChain;
+import jakarta.xml.ws.ServiceMode;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.WebServiceProvider;
+import jakarta.xml.ws.handler.MessageContext;
 import org.apache.cxf.staxutils.StaxSource;
 import org.apache.cxf.staxutils.StaxUtils;
 
@@ -53,7 +53,7 @@ import org.apache.cxf.staxutils.StaxUtils;
                     serviceName = "SOAPServiceProviderRPCLit",
                     targetNamespace = "http://apache.org/hello_world_rpclit",
                     wsdlLocation = "/wsdl/hello_world_rpc_lit.wsdl")
-@ServiceMode (value = javax.xml.ws.Service.Mode.PAYLOAD)
+@ServiceMode (value = jakarta.xml.ws.Service.Mode.PAYLOAD)
 @HandlerChain(file = "./handlers_invocation.xml", name = "TestHandlerChain")
 public abstract class AbstractSourcePayloadProvider implements SourceProvider {
     boolean doneStax;

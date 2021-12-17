@@ -25,8 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.xml.ws.handler.MessageContext;
-
+import jakarta.xml.ws.handler.MessageContext;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.handler_test.PingException;

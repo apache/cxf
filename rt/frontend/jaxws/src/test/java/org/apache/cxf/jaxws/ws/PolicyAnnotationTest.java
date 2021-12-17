@@ -25,14 +25,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
 import javax.wsdl.Definition;
 import javax.wsdl.xml.WSDLWriter;
 import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Element;
 
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.annotations.Policies;

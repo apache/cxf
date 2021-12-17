@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.jaxrs.impl;
 
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
+import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 public class CookieHeaderProvider implements HeaderDelegate<Cookie> {
 

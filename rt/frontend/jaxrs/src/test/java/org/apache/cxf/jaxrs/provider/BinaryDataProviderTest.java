@@ -29,11 +29,10 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.lang.annotation.Annotation;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.StreamingOutput;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
-
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.StreamingOutput;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.ext.MessageBodyWriter;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 

@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.transport.jms;
 
-import javax.jms.ConnectionFactory;
-
+import jakarta.jms.ConnectionFactory;
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.message.Exchange;

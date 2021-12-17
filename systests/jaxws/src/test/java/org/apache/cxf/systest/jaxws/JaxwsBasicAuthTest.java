@@ -22,13 +22,12 @@ package org.apache.cxf.systest.jaxws;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
-import javax.jws.WebService;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.handler.MessageContext;
-
+import jakarta.annotation.Resource;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.handler.MessageContext;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.greeter_control.AbstractGreeterImpl;
@@ -56,7 +55,7 @@ public class JaxwsBasicAuthTest extends AbstractBusClientServerTestBase {
         protected void run()  {
             GreeterImpl implementor = new GreeterImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
-            javax.xml.ws.Endpoint.publish(address, implementor);
+            jakarta.xml.ws.Endpoint.publish(address, implementor);
         }
 
 

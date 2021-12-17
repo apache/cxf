@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.tools.fortest.inherit;
 
-import javax.jws.WebMethod;
+import jakarta.jws.WebMethod;
 
 public interface C {
     String hello(String hello);

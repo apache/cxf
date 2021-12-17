@@ -27,12 +27,12 @@ import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.handler.Handler;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.handler.Handler;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 

@@ -16,5 +16,5 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-@javax.xml.bind.annotation.XmlSchema(namespace = "urn:cxf.apache.org:jsjaxws")
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "urn:cxf.apache.org:jsjaxws")
 package demo.hw.server;

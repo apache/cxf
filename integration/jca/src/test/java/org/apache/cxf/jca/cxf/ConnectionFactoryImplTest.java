@@ -24,11 +24,12 @@ import java.io.Serializable;
 import java.net.URL;
 
 import javax.naming.Reference;
-import javax.resource.Referenceable;
-import javax.resource.ResourceException;
-import javax.resource.spi.ConnectionManager;
-import javax.resource.spi.ManagedConnectionFactory;
 import javax.xml.namespace.QName;
+
+import jakarta.resource.Referenceable;
+import jakarta.resource.ResourceException;
+import jakarta.resource.spi.ConnectionManager;
+import jakarta.resource.spi.ManagedConnectionFactory;
 
 import org.easymock.EasyMock;
 import org.junit.Before;

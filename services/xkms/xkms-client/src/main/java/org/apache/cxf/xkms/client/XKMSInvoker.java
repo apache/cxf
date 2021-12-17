@@ -29,9 +29,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
+import jakarta.xml.bind.JAXBElement;
 import org.apache.cxf.xkms.exception.ExceptionMapper;
 import org.apache.cxf.xkms.exception.XKMSException;
 import org.apache.cxf.xkms.exception.XKMSLocateException;

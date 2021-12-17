@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
 import javax.wsdl.BindingInput;
 import javax.wsdl.Definition;
 import javax.wsdl.Types;
@@ -47,6 +46,7 @@ import org.w3c.dom.Element;
 
 import org.xml.sax.InputSource;
 
+import jakarta.annotation.Resource;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.common.injection.NoJSR250Annotations;

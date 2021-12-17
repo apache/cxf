@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.systest.soapfault;
 
-import javax.xml.ws.Endpoint;
-
+import jakarta.xml.ws.Endpoint;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 

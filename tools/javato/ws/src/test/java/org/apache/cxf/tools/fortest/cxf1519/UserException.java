@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.tools.fortest.cxf1519;
 
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.ws.WebFault;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.ws.WebFault;
 
 @WebFault(name = "UserExceptionFault", targetNamespace = "http://cxf.apache.org/cxf1519/faults")
 @XmlType(name = "UserException",

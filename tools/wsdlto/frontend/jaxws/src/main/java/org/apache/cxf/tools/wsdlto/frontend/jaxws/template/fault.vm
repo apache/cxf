@@ -18,9 +18,9 @@
 package $expClass.PackageName;
 
 #if ($markGenerated == "true")
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 #end
-import javax.xml.ws.WebFault;
+import jakarta.xml.ws.WebFault;
 #foreach ($import in $expClass.Imports)
 import ${import};
 #end

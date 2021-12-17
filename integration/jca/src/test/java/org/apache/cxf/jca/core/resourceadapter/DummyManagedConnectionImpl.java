@@ -22,11 +22,11 @@ package org.apache.cxf.jca.core.resourceadapter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.resource.ResourceException;
-import javax.resource.spi.ConnectionRequestInfo;
-import javax.resource.spi.LocalTransaction;
 import javax.security.auth.Subject;
 
+import jakarta.resource.ResourceException;
+import jakarta.resource.spi.ConnectionRequestInfo;
+import jakarta.resource.spi.LocalTransaction;
 import org.apache.cxf.common.logging.LogUtils;
 
 

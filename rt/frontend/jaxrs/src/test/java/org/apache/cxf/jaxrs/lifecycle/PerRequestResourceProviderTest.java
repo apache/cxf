@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.jaxrs.lifecycle;
 
-import javax.ws.rs.core.Application;
-
+import jakarta.ws.rs.core.Application;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.Customer;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;

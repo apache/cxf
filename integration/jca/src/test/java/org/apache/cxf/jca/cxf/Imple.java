@@ -19,7 +19,7 @@
 package org.apache.cxf.jca.cxf;
 
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 
 

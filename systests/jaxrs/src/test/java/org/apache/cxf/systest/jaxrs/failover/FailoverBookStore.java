@@ -20,11 +20,10 @@
 package org.apache.cxf.systest.jaxrs.failover;
 
 
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.Path;
-import javax.ws.rs.ServiceUnavailableException;
-
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.ServiceUnavailableException;
 import org.apache.cxf.systest.jaxrs.Book;
 
 /**

@@ -23,9 +23,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.sse.InboundSseEvent;
-
+import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.sse.InboundSseEvent;
 import org.apache.cxf.common.logging.LogUtils;
 import org.reactivestreams.Processor;
 import org.reactivestreams.Subscriber;

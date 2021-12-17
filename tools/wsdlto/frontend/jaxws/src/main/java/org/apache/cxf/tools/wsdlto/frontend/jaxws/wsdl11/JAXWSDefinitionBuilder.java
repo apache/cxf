@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.jws.soap.SOAPBinding;
 import javax.wsdl.Binding;
 import javax.wsdl.BindingOperation;
 import javax.wsdl.Definition;
@@ -41,6 +40,7 @@ import org.w3c.dom.Element;
 
 import org.xml.sax.InputSource;
 
+import jakarta.jws.soap.SOAPBinding;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SOAPBindingUtil;
 import org.apache.cxf.catalog.OASISCatalogManager;

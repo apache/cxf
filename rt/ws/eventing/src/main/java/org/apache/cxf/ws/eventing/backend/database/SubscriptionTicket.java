@@ -22,9 +22,9 @@ package org.apache.cxf.ws.eventing.backend.database;
 import java.util.GregorianCalendar;
 import java.util.UUID;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import jakarta.xml.bind.JAXBElement;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.eventing.DeliveryType;

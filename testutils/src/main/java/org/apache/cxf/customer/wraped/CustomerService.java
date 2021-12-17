@@ -21,11 +21,10 @@ package org.apache.cxf.customer.wraped;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-import javax.jws.WebService;
-
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
+import jakarta.jws.WebService;
 import org.apache.cxf.customer.Customer;
 import org.apache.cxf.customer.Customers;
 

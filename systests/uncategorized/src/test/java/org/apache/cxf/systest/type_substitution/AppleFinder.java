@@ -21,8 +21,8 @@ package org.apache.cxf.systest.type_substitution;
 
 import java.util.List;
 
-import javax.jws.WebService;
-import javax.xml.bind.annotation.XmlSeeAlso;
+import jakarta.jws.WebService;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
 
 @WebService
 @XmlSeeAlso({ Apple.class, Fuji.class })

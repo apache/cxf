@@ -19,8 +19,7 @@
 
 package org.apache.cxf.rs.security.oauth2.services;
 
-import javax.ws.rs.Path;
-
+import jakarta.ws.rs.Path;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 

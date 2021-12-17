@@ -29,10 +29,10 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Document;
 
+import jakarta.xml.soap.SOAPMessage;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;

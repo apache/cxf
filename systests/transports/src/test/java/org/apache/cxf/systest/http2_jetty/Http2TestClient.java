@@ -27,9 +27,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import javax.ws.rs.ClientErrorException;
-import javax.ws.rs.core.MediaType;
-
+import jakarta.ws.rs.ClientErrorException;
+import jakarta.ws.rs.core.MediaType;
 import org.eclipse.jetty.http.HttpFields;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpURI;

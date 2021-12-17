@@ -18,10 +18,10 @@
  */
 package org.apache.cxf.tools.java2wsdl.processor;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
-import javax.jws.soap.SOAPBinding.ParameterStyle;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
+import jakarta.jws.soap.SOAPBinding.ParameterStyle;
 
 @SOAPBinding(parameterStyle = ParameterStyle.BARE)
 @WebService

@@ -127,10 +127,10 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
         STSClient client = STSUtils.getClient(message, "sct");
         AddressingProperties maps =
             (AddressingProperties)message
-                .get("javax.xml.ws.addressing.context.outbound");
+                .get("jakarta.xml.ws.addressing.context.outbound");
         if (maps == null) {
             maps = (AddressingProperties)message
-                .get("javax.xml.ws.addressing.context");
+                .get("jakarta.xml.ws.addressing.context");
         } else if (maps.getAction().getValue().endsWith("Renew")) {
             return tok;
         }
@@ -184,10 +184,10 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
         STSClient client = STSUtils.getClient(message, "sct");
         AddressingProperties maps =
             (AddressingProperties)message
-                .get("javax.xml.ws.addressing.context.outbound");
+                .get("jakarta.xml.ws.addressing.context.outbound");
         if (maps == null) {
             maps = (AddressingProperties)message
-                .get("javax.xml.ws.addressing.context");
+                .get("jakarta.xml.ws.addressing.context");
         }
         synchronized (client) {
             try {

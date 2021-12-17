@@ -18,7 +18,7 @@
  */
 package demo.service.impl;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 import demo.service.HelloWorld;
 

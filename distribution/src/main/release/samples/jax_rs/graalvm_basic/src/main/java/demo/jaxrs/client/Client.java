@@ -20,9 +20,9 @@
 package demo.jaxrs.client;
 
 
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Response;
 
 public final class Client {
 
@@ -32,7 +32,7 @@ public final class Client {
     public static void main(String[] args) throws Exception {
         // Sent HTTP GET request to query customer info
         System.out.println("Sent HTTP GET request to query customer info");
-        javax.ws.rs.client.Client client = ClientBuilder.newClient();
+        jakarta.ws.rs.client.Client client = ClientBuilder.newClient();
         
         String response = client
             .target("http://localhost:9000/customerservice/customers/123")

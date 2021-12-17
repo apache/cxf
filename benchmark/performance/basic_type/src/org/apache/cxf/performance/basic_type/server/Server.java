@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.performance.basic_type.server;
 
-import javax.xml.ws.Endpoint;
+import jakarta.xml.ws.Endpoint;
 
 
 public class Server implements Runnable {

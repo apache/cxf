@@ -24,9 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.ws.spi.http.HttpContext;
-import javax.xml.ws.spi.http.HttpExchange;
-
+import jakarta.xml.ws.spi.http.HttpContext;
+import jakarta.xml.ws.spi.http.HttpExchange;
 import org.apache.cxf.Bus;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;

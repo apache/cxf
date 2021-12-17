@@ -18,8 +18,7 @@
  */
 package org.apache.hello_world_doc_lit;
 
-import javax.jws.WebService;
-
+import jakarta.jws.WebService;
 import org.apache.hello_world_doc_lit.types.FaultDetail;
 
 

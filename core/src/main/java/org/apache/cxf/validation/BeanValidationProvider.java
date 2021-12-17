@@ -26,19 +26,18 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-import javax.validation.Configuration;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.ParameterNameProvider;
-import javax.validation.Validation;
-import javax.validation.ValidationException;
-import javax.validation.ValidationProviderResolver;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import javax.validation.executable.ExecutableValidator;
-import javax.validation.metadata.MethodDescriptor;
-import javax.validation.spi.ValidationProvider;
-
+import jakarta.validation.Configuration;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.ParameterNameProvider;
+import jakarta.validation.Validation;
+import jakarta.validation.ValidationException;
+import jakarta.validation.ValidationProviderResolver;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+import jakarta.validation.executable.ExecutableValidator;
+import jakarta.validation.metadata.MethodDescriptor;
+import jakarta.validation.spi.ValidationProvider;
 import org.apache.cxf.common.logging.LogUtils;
 
 import static java.util.Collections.emptySet;

@@ -21,10 +21,9 @@ package org.apache.cxf.wsn.services;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jws.WebService;
-import javax.xml.bind.JAXBElement;
-import javax.xml.ws.BindingType;
-
+import jakarta.jws.WebService;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.ws.BindingType;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.wsn.AbstractSubscription;
 import org.apache.cxf.wsn.jms.JmsPublisher;
@@ -42,7 +41,7 @@ import org.oasis_open.docs.wsn.bw_2.SubscriptionManager;
             targetNamespace = "http://cxf.apache.org/wsn/jaxws",
             serviceName = "PublisherRegistrationManagerService",
             portName = "PublisherRegistrationManagerPort")
-@BindingType(javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING)
+@BindingType(jakarta.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING)
 public class JaxwsPublisher extends JmsPublisher {
 
     private static final Logger LOGGER = LogUtils.getL7dLogger(JaxwsPublisher.class);

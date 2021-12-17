@@ -27,7 +27,7 @@ import java.util.concurrent.TimeoutException;
 /**
  *
  */
-public class ServerAsyncResponse<T> implements javax.xml.ws.Response<T> {
+public class ServerAsyncResponse<T> implements jakarta.xml.ws.Response<T> {
     T value;
     boolean done;
     Throwable throwable;

@@ -24,10 +24,9 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
 
-import javax.jws.soap.SOAPBinding;
-
 import org.w3c.dom.Element;
 
+import jakarta.jws.soap.SOAPBinding;
 import org.apache.cxf.tools.common.ToolException;
 
 public class JavaInterface implements JavaAnnotatable {

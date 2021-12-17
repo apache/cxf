@@ -21,11 +21,10 @@ package org.apache.cxf.ws.eventing.integration.eventsink;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-
 import org.w3c.dom.Node;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 import org.apache.cxf.ws.eventing.EventType;
 import org.apache.cxf.ws.eventing.backend.notification.WrappedSink;
 import org.apache.cxf.ws.eventing.integration.notificationapi.EarthquakeEvent;

@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.jca.cxf;
 
-import javax.resource.spi.ManagedConnectionFactory;
+import jakarta.resource.spi.ManagedConnectionFactory;
 
 public interface CXFManagedConnectionFactory extends ManagedConnectionFactory {
 

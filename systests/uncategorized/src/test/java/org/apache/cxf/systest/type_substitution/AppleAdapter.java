@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.type_substitution;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 public class AppleAdapter extends XmlAdapter<Apple, Fruit> {
     public Fruit unmarshal(Apple v) throws Exception {

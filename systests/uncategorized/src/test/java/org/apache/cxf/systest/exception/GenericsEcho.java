@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.systest.exception;
 
-import javax.jws.WebService;
-
+import jakarta.jws.WebService;
 import org.apache.cxf.ext.logging.Logging;
 
 @WebService(targetNamespace = "http://cxf.apache.org/test/HelloService", name = "HelloService")

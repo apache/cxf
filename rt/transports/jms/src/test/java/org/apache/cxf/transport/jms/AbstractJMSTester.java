@@ -27,10 +27,10 @@ import java.net.URL;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
-import javax.jms.ConnectionFactory;
-import javax.jms.DeliveryMode;
 import javax.xml.namespace.QName;
 
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.DeliveryMode;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.store.memory.MemoryPersistenceAdapter;

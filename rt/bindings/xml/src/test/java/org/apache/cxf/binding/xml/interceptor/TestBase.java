@@ -22,9 +22,9 @@ package org.apache.cxf.binding.xml.interceptor;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
 
+import jakarta.xml.bind.JAXBContext;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.xml.wsdl11.XMLWSDLExtensionLoader;

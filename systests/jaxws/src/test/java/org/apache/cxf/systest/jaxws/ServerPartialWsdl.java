@@ -19,10 +19,7 @@
 
 package org.apache.cxf.systest.jaxws;
 
-import javax.xml.ws.Endpoint;
-
-
-//import org.apache.cxf.greeter_control.GreeterImplBase;
+import jakarta.xml.ws.Endpoint;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class ServerPartialWsdl extends AbstractBusTestServerBase {

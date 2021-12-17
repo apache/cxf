@@ -21,11 +21,11 @@ package org.apache.cxf.systest.sts.kerberos;
 import java.net.URL;
 import java.util.Map;
 
-import javax.jws.WebService;
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Service;
 
+import jakarta.jws.WebService;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Service;
 import org.apache.cxf.feature.Features;
 import org.apache.cxf.jaxrs.security.KerberosAuthenticationFilter.KerberosSecurityContext;
 import org.apache.cxf.phase.PhaseInterceptorChain;

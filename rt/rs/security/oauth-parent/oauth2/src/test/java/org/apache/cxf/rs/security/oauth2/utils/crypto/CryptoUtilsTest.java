@@ -29,8 +29,8 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.crypto.SecretKey;
-import javax.ws.rs.core.MediaType;
 
+import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.provider.json.JSONProvider;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;

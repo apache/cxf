@@ -25,15 +25,15 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import javax.annotation.Resource;
-import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.ws.WebServiceContext;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import jakarta.annotation.Resource;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.ws.WebServiceContext;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;

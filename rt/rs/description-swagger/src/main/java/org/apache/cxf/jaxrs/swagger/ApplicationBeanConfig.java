@@ -21,7 +21,7 @@ package org.apache.cxf.jaxrs.swagger;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.core.Application;
 
 import io.swagger.jaxrs.config.BeanConfig;
 

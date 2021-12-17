@@ -19,8 +19,8 @@
 
 package org.apache.cxf.ordered_param_holder;
 
-import javax.jws.WebService;
-import javax.xml.ws.Holder;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Holder;
 
 @WebService(serviceName = "ordered_param_holder",
         portName = "ordered_param_holderSOAP",

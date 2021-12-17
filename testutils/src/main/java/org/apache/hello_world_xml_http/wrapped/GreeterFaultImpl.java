@@ -24,13 +24,13 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 
 
-@javax.jws.WebService(serviceName = "XMLService",
+@jakarta.jws.WebService(serviceName = "XMLService",
                       portName = "XMLFaultPort",
                       endpointInterface = "org.apache.hello_world_xml_http.wrapped.Greeter",
                       targetNamespace = "http://apache.org/hello_world_xml_http/wrapped",
                       wsdlLocation = "testutils/hello_world_xml_wrapped.wsdl")
 
-@javax.xml.ws.BindingType(value = "http://cxf.apache.org/bindings/xformat")
+@jakarta.xml.ws.BindingType(value = "http://cxf.apache.org/bindings/xformat")
 
 public class GreeterFaultImpl implements Greeter {
     public static final String RUNTIME_EXCEPTION_MESSAGE = "test throw out runtime exception";

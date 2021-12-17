@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.http_undertow.websocket;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 
 @XmlRootElement(name = "SuperBook")

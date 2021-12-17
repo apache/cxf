@@ -19,9 +19,9 @@
 
 package org.apache.cxf.systest.aegis.mtom.fortest;
 
-import javax.activation.DataHandler;
-import javax.jws.WebService;
-import javax.xml.ws.soap.MTOM;
+import jakarta.activation.DataHandler;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.soap.MTOM;
 
 /**
  *

@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.connector;
 
-import javax.resource.ResourceException;
+import jakarta.resource.ResourceException;
 
 /**
  * Interface implemented by the Web service client proxy returned by

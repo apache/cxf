@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.jaxrs.resources.jaxb;
 
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlType;
 
 @XmlType(name = "book2")
 public class Book2NoRootElement {

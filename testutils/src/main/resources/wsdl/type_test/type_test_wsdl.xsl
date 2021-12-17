@@ -97,8 +97,8 @@
                   xmlns:x1="http://apache.org/type_test/types1"
                   xmlns:x2="http://apache.org/type_test/types2"
                   xmlns:x3="http://apache.org/type_test/types3"
-                  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-                  jaxb:version="2.0">
+                  xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
+                  jaxb:version="3.0">
         <xsl:attribute name="targetNamespace">
           <xsl:if test="$tns_suffix='doc'">
             <xsl:value-of select="'http://apache.org/type_test/doc'"/>

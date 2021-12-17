@@ -24,8 +24,8 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
 
+import jakarta.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -116,7 +116,7 @@ public class EndorsingSupportingTokenTest extends AbstractBusClientServerTestBas
         try {
             port.doubleIt(25);
             fail("Failure expected on not endorsing the X.509 token");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error =
                 "The received token does not match the endorsing supporting token requirement";
             assertTrue(ex.getMessage().contains(error)
@@ -131,7 +131,7 @@ public class EndorsingSupportingTokenTest extends AbstractBusClientServerTestBas
         try {
             port.doubleIt(25);
             fail("Failure expected on not endorsing the X.509 token");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error =
                 "The received token does not match the endorsing supporting token requirement";
             assertTrue(ex.getMessage().contains(error)
@@ -170,7 +170,7 @@ public class EndorsingSupportingTokenTest extends AbstractBusClientServerTestBas
         try {
             port.doubleIt(25);
             fail("Failure expected on not endorsing the X.509 token");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error =
                 "The received token does not match the signed endorsing supporting token requirement";
             assertTrue(ex.getMessage().contains(error)
@@ -185,7 +185,7 @@ public class EndorsingSupportingTokenTest extends AbstractBusClientServerTestBas
         try {
             port.doubleIt(25);
             fail("Failure expected on not signing the X.509 token");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error =
                 "The received token does not match the signed endorsing supporting token requirement";
             assertTrue(ex.getMessage().contains(error)

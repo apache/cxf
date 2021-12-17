@@ -47,7 +47,7 @@ public class FilteringInterceptor  extends AbstractPhaseInterceptor<SoapMessage>
             LOG.info("No filter for this subscription");
             return;
         }
-        javax.xml.soap.SOAPMessage msg = message.getContent(javax.xml.soap.SOAPMessage.class);
+        jakarta.xml.soap.SOAPMessage msg = message.getContent(jakarta.xml.soap.SOAPMessage.class);
         if (!FilteringUtil.runFilterOnMessage(msg, filter)) {
             message.getInterceptorChain().abort();
         }

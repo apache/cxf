@@ -23,11 +23,11 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Service;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.SoapBindingFactory;
 import org.apache.cxf.factory_pattern.IsEvenResponse;

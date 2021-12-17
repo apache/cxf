@@ -33,12 +33,12 @@
     <properties>
         <cxf.module.name>org.apache.cxf.binding.soap</cxf.module.name>
         <cxf.osgi.import>
-            javax.xml.soap;version="${cxf.osgi.saaj.version}",
-            javax.jws*;version="${cxf.osgi.jws.version}",
-            javax.activation;version="${cxf.osgi.javax.activation.version}",
+            jakarta.xml.soap;version="${cxf.osgi.saaj.version}",
+            jakarta.jws*;version="${cxf.osgi.jws.version}",
+            jakarta.activation;version="${cxf.osgi.jakarta.activation.version}",
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
-            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}"
+            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}"
         </cxf.osgi.import>
         <cxf.bundle.activator>org.apache.cxf.binding.soap.blueprint.Activator</cxf.bundle.activator>
         <!-- keep in sync with services exported in activator -->

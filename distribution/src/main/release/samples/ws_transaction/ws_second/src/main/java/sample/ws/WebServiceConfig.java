@@ -18,7 +18,7 @@
  */
 package sample.ws;
 
-import javax.xml.ws.Endpoint;
+import jakarta.xml.ws.Endpoint;
 
 import com.arjuna.webservices11.wsat.sei.ParticipantPortTypeImpl;
 import org.apache.cxf.Bus;

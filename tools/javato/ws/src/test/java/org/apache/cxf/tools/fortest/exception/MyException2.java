@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.tools.fortest.exception;
 
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlType;
 
-@javax.xml.ws.WebFault
+@jakarta.xml.ws.WebFault
 @XmlType(namespace = "http://cxf.apache.org/test/HelloService",
     name = "MyException2",
     propOrder = { "summary", "from", "id", "message" })

@@ -21,8 +21,7 @@ package org.apache.cxf.xkms.itests;
 import java.io.File;
 import java.util.Iterator;
 
-import javax.inject.Inject;
-
+import jakarta.inject.Inject;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.xkms.model.extensions.ResultDetails;
 import org.apache.cxf.xkms.model.xkms.LocateResultType;

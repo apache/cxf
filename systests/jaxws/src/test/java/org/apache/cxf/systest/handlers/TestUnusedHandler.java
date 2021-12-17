@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.systest.handlers;
 
-import javax.xml.ws.handler.LogicalHandler;
-import javax.xml.ws.handler.LogicalMessageContext;
-import javax.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.handler.LogicalHandler;
+import jakarta.xml.ws.handler.LogicalMessageContext;
+import jakarta.xml.ws.handler.MessageContext;
 
 
 public class TestUnusedHandler<T extends LogicalMessageContext>

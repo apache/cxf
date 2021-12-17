@@ -19,9 +19,8 @@
 
 package org.apache.cxf.jaxrs.ext.multipart;
 
-import javax.activation.DataHandler;
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.activation.DataHandler;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 
 /**

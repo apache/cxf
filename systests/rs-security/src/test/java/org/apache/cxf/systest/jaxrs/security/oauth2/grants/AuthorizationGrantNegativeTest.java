@@ -26,10 +26,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Properties;
 
-import javax.ws.rs.client.ResponseProcessingException;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.client.ResponseProcessingException;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;

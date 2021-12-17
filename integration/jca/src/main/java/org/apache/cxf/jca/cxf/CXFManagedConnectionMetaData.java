@@ -19,8 +19,8 @@
 
 package org.apache.cxf.jca.cxf;
 
-import javax.resource.ResourceException;
-import javax.resource.spi.ManagedConnectionMetaData;
+import jakarta.resource.ResourceException;
+import jakarta.resource.spi.ManagedConnectionMetaData;
 
 
 public class CXFManagedConnectionMetaData implements ManagedConnectionMetaData {

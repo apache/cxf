@@ -19,7 +19,7 @@
 
 package org.apache.cxf.samples.discovery;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 
 import org.apache.cxf.hello_world.discovery.Greeter;

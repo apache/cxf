@@ -21,8 +21,8 @@ package org.apache.cxf.systest.sts.basic_auth;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
 
+import jakarta.xml.ws.Service;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
 import org.apache.cxf.systest.sts.deployment.DoubleItServer;
@@ -119,7 +119,7 @@ public class JaxwsBasicAuthTest extends AbstractBusClientServerTestBase {
         try {
             doubleIt(port, 30);
             fail("Expected failure on a bad password");
-        } catch (javax.xml.ws.soap.SOAPFaultException fault) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException fault) {
             String message = fault.getMessage();
             assertTrue(message.contains("STS Authentication failed")
                 || message.contains("Validation of security token failed"));

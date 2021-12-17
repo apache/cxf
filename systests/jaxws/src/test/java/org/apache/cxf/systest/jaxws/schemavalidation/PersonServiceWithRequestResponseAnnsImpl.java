@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.jaxws.schemavalidation;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(endpointInterface = "org.apache.cxf.systest.jaxws.schemavalidation.PersonServiceWithRequestResponseAnns",
     serviceName = "PersonServiceWithRequestResponseAnns",

@@ -104,12 +104,12 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
                         <Import-Package>
-                            javax.ws.rs,
-                            javax.ws.rs.core,
-                            javax.ws.rs.container,
+                            jakarta.ws.rs,
+                            jakarta.ws.rs.core,
+                            jakarta.ws.rs.container,
                             org.apache.cxf.tracing.brave,
                             org.osgi.service.blueprint,
-                            javax.xml.ws;version="[2,3)",
+                            jakarta.xml.ws;version="[3,4)",
                             brave,
                             *
                         </Import-Package>

@@ -23,12 +23,11 @@ import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.SecurityContext;
-
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
+import jakarta.ws.rs.core.SecurityContext;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -240,7 +239,7 @@ public class AbstractTokenService extends AbstractOAuthService {
      * Get the {@link Client} reference
      * @param clientId the provided client id
      * @return Client the client reference
-     * @throws {@link javax.ws.rs.WebApplicationException} if no matching Client is found
+     * @throws {@link jakarta.ws.rs.WebApplicationException} if no matching Client is found
      */
     protected Client getClient(String clientId, MultivaluedMap<String, String> params) {
         return getClient(clientId, params.getFirst(OAuthConstants.CLIENT_SECRET), params);

@@ -32,16 +32,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.handler.Handler;
-import javax.xml.ws.handler.LogicalHandler;
-import javax.xml.ws.handler.LogicalMessageContext;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.soap.SOAPHandler;
-import javax.xml.ws.handler.soap.SOAPMessageContext;
 
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.handler.Handler;
+import jakarta.xml.ws.handler.LogicalHandler;
+import jakarta.xml.ws.handler.LogicalMessageContext;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.handler.soap.SOAPHandler;
+import jakarta.xml.ws.handler.soap.SOAPMessageContext;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.frontend.ClientProxy;
@@ -97,12 +97,12 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
 
     @Test
     public void testCreate() throws Exception {
-        javax.xml.ws.Service s = javax.xml.ws.Service
+        jakarta.xml.ws.Service s = jakarta.xml.ws.Service
             .create(new QName("http://apache.org/hello_world_soap_http", "SoapPort"));
         assertNotNull(s);
 
         try {
-            javax.xml.ws.Service.create(new URL("file:/does/not/exist.wsdl"),
+            jakarta.xml.ws.Service.create(new URL("file:/does/not/exist.wsdl"),
                                             new QName("http://apache.org/hello_world_soap_http", "SoapPort"));
             fail("did not throw exception");
         } catch (WebServiceException sce) {
@@ -113,7 +113,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
     @Test
     public void testRequestContext() throws Exception {
         URL url = getClass().getResource("/wsdl/hello_world.wsdl");
-        javax.xml.ws.Service s = javax.xml.ws.Service
+        jakarta.xml.ws.Service s = jakarta.xml.ws.Service
             .create(url, SERVICE_NAME);
         Greeter greeter = s.getPort(PORT_NAME, Greeter.class);
         InvocationHandler handler = Proxy.getInvocationHandler(greeter);
@@ -134,7 +134,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
     @Test
     public void testRequestContextPutAndRemoveEcho() throws Exception {
         URL url = getClass().getResource("/wsdl/hello_world.wsdl");
-        javax.xml.ws.Service s = javax.xml.ws.Service
+        jakarta.xml.ws.Service s = jakarta.xml.ws.Service
             .create(url, SERVICE_NAME);
         final Greeter handler = s.getPort(PORT_NAME, Greeter.class);
 
@@ -171,11 +171,11 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
     @Test
     public void testRequestContextPutAndRemoveEchoDispatch() throws Exception {
         URL url = getClass().getResource("/wsdl/hello_world.wsdl");
-        javax.xml.ws.Service s = javax.xml.ws.Service
+        jakarta.xml.ws.Service s = jakarta.xml.ws.Service
             .create(url, SERVICE_NAME);
 
         final Dispatch<DOMSource> disp = s.createDispatch(PORT_NAME, DOMSource.class,
-                                                    javax.xml.ws.Service.Mode.PAYLOAD);
+                                                    jakarta.xml.ws.Service.Mode.PAYLOAD);
 
 
         Map<String, Object> requestContext = disp.getRequestContext();
@@ -212,7 +212,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
     @Test
     public void testThreadLocalRequestContextIsIsolated() throws InterruptedException {
         URL url = getClass().getResource("/wsdl/hello_world.wsdl");
-        javax.xml.ws.Service s = javax.xml.ws.Service.create(url, SERVICE_NAME);
+        jakarta.xml.ws.Service s = jakarta.xml.ws.Service.create(url, SERVICE_NAME);
         final Greeter handler = s.getPort(PORT_NAME, Greeter.class);
         final AtomicBoolean isPropertyAPresent = new AtomicBoolean(false);
         // Makes request context thread local
@@ -342,7 +342,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
     @Test
     public void testLogicalHandler() {
         URL url = getClass().getResource("/wsdl/hello_world.wsdl");
-        javax.xml.ws.Service s = javax.xml.ws.Service
+        jakarta.xml.ws.Service s = jakarta.xml.ws.Service
             .create(url, SERVICE_NAME);
         Greeter greeter = s.getPort(PORT_NAME, Greeter.class);
         d.setMessageObserver(new MessageReplayObserver("sayHiResponse.xml"));
@@ -382,7 +382,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
     @Test
     public void testSoapHandler() {
         URL url = getClass().getResource("/wsdl/hello_world.wsdl");
-        javax.xml.ws.Service s = javax.xml.ws.Service
+        jakarta.xml.ws.Service s = jakarta.xml.ws.Service
             .create(url, SERVICE_NAME);
         Greeter greeter = s.getPort(PORT_NAME, Greeter.class);
         d.setMessageObserver(new MessageReplayObserver("sayHiResponse.xml"));

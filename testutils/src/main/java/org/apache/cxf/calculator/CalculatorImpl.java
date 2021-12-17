@@ -19,8 +19,7 @@
 
 package org.apache.cxf.calculator;
 
-import javax.jws.WebService;
-
+import jakarta.jws.WebService;
 import org.apache.cxf.calculator.types.CalculatorFault;
 
 @WebService(serviceName = "CalculatorService",

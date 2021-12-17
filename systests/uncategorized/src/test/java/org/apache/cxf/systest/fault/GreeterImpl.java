@@ -21,16 +21,17 @@ package org.apache.cxf.systest.fault;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Resource;
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
-import javax.xml.ws.WebServiceContext;
 
+import jakarta.annotation.Resource;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.ws.WebServiceContext;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.intfault.BadRecordLitFault;
 import org.apache.intfault.types.BareDocumentResponse;
-@javax.jws.WebService(portName = "SoapPort", serviceName = "SOAPService",
+
+@jakarta.jws.WebService(portName = "SoapPort", serviceName = "SOAPService",
                       targetNamespace = "http://apache.org/intfault",
                       endpointInterface = "org.apache.intfault.Greeter",
                       wsdlLocation = "wsdl/hello_world_fault.wsdl")

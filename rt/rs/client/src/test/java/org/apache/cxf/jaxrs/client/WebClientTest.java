@@ -24,10 +24,9 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Collections;
 
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.ext.ParamConverter;
-import javax.ws.rs.ext.ParamConverterProvider;
-
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.ext.ParamConverter;
+import jakarta.ws.rs.ext.ParamConverterProvider;
 import org.apache.cxf.jaxrs.resources.BookInterface;
 import org.apache.cxf.jaxrs.resources.BookStore;
 

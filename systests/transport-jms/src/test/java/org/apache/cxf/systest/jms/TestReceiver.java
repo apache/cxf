@@ -20,15 +20,14 @@ package org.apache.cxf.systest.jms;
 
 import java.util.concurrent.CompletableFuture;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-
+import jakarta.jms.Connection;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.Destination;
+import jakarta.jms.JMSException;
+import jakarta.jms.MessageConsumer;
+import jakarta.jms.MessageProducer;
+import jakarta.jms.Session;
+import jakarta.jms.TextMessage;
 import org.apache.cxf.transport.jms.util.JMSUtil;
 import org.apache.cxf.transport.jms.util.ResourceCloser;
 
@@ -74,7 +73,7 @@ public class TestReceiver {
             connection.start();
             Session session = closer.register(connection.createSession(false, Session.AUTO_ACKNOWLEDGE));
             MessageConsumer consumer = closer.register(session.createConsumer(session.createQueue(receiveQueueName)));
-            javax.jms.Message message;
+            jakarta.jms.Message message;
             do {
                 message = consumer.receive(100);
             } while (message != null);
@@ -90,7 +89,7 @@ public class TestReceiver {
             Session session = closer.register(connection.createSession(false, Session.AUTO_ACKNOWLEDGE));
             MessageConsumer consumer = closer.register(session.createConsumer(session
                 .createQueue(receiveQueueName)));
-            final javax.jms.Message inMessage = consumer.receive(10000);
+            final jakarta.jms.Message inMessage = consumer.receive(10000);
             if (inMessage == null) {
                 //System.out.println("TestReceiver timed out");
                 throw new RuntimeException("No message received on destination " + receiveQueueName);

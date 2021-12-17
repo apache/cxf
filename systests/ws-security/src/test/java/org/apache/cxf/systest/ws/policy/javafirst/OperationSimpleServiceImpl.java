@@ -19,8 +19,7 @@
 
 package org.apache.cxf.systest.ws.policy.javafirst;
 
-import javax.jws.WebService;
-
+import jakarta.jws.WebService;
 import org.apache.cxf.annotations.Policy;
 import org.apache.cxf.annotations.Policy.Placement;
 

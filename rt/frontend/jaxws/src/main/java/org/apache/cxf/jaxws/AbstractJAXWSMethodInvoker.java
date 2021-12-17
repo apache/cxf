@@ -28,13 +28,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.Provider;
-import javax.xml.ws.Response;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.MessageContext.Scope;
-import javax.xml.ws.soap.SOAPFaultException;
-
+import jakarta.xml.ws.AsyncHandler;
+import jakarta.xml.ws.Provider;
+import jakarta.xml.ws.Response;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.handler.MessageContext.Scope;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.annotations.UseAsyncMethod;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;

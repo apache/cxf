@@ -25,8 +25,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import javax.ws.rs.InternalServerErrorException;
-
+import jakarta.ws.rs.InternalServerErrorException;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.directory.server.annotations.CreateLdapServer;

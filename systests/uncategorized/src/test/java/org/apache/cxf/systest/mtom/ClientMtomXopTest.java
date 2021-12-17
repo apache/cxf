@@ -25,13 +25,13 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-import javax.activation.DataHandler;
-import javax.mail.util.ByteArrayDataSource;
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Holder;
-import javax.xml.ws.soap.SOAPBinding;
 
+import jakarta.activation.DataHandler;
+import jakarta.mail.util.ByteArrayDataSource;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Holder;
+import jakarta.xml.ws.soap.SOAPBinding;
 import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
@@ -85,7 +85,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
             String address = "http://localhost:" + PORT + "/mime-test";
             String addressProvider = "http://localhost:" + PORT + "/mime-test-provider";
             try {
-                jaxep = (EndpointImpl) javax.xml.ws.Endpoint.publish(address, implementor);
+                jaxep = (EndpointImpl) jakarta.xml.ws.Endpoint.publish(address, implementor);
                 Endpoint ep = jaxep.getServer().getEndpoint();
                 ep.getInInterceptors().add(new TestMultipartMessageInterceptor());
                 ep.getOutInterceptors().add(new TestAttachmentOutInterceptor());
@@ -101,7 +101,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
                 jaxep.getProperties().put("schema-validation-enabled", "true");
                 jaxWsSoapBinding.setMTOMEnabled(true);
                 EndpointImpl endpoint =
-                    (EndpointImpl)javax.xml.ws.Endpoint.publish(addressProvider, new TestMtomProviderImpl());
+                    (EndpointImpl)jakarta.xml.ws.Endpoint.publish(addressProvider, new TestMtomProviderImpl());
                 endpoint.getProperties().put("schema-validation-enabled", "true");
                 endpoint.getInInterceptors().add(logIn);
                 endpoint.getOutInterceptors().add(logOut);
@@ -248,12 +248,12 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
             ClientProxy.getClient(mtomPort).getOutInterceptors().add(new LoggingOutInterceptor());
             ((HTTPConduit)ClientProxy.getClient(mtomPort).getConduit()).getClient().setReceiveTimeout(60000);
             mtomPort.testXop(name, param);
-            fail("should throw javax.xml.ws.soap.SOAPFaultException");
+            fail("should throw jakarta.xml.ws.soap.SOAPFaultException");
             
-        } catch (javax.xml.ws.soap.SOAPFaultException  ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException  ex) {
             assertTrue(ex.getMessage().contains("cvc-maxLength-valid"));
         } catch (Exception ex) {
-            fail("should throw javax.xml.ws.soap.SOAPFaultException");
+            fail("should throw jakarta.xml.ws.soap.SOAPFaultException");
         }
     }
 

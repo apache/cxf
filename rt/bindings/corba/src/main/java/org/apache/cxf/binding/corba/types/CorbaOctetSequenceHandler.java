@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.binding.corba.types;
 
-import javax.xml.bind.DatatypeConverter;
 import javax.xml.namespace.QName;
 
+import jakarta.xml.bind.DatatypeConverter;
 import org.apache.cxf.binding.corba.CorbaBindingException;
 import org.apache.cxf.binding.corba.wsdl.W3CConstants;
 import org.omg.CORBA.TypeCode;

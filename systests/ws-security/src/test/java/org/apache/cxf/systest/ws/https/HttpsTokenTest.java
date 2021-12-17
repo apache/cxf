@@ -24,8 +24,8 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
 
+import jakarta.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -125,7 +125,7 @@ public class HttpsTokenTest extends AbstractBusClientServerTestBase {
         try {
             port.doubleIt(25);
             fail("Failure expected on not using a client cert");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             if (!STAX_PORT.equals(test.getPort())) {
                 String error = "HttpsToken";
                 assertTrue(ex.getMessage().contains(error));
@@ -215,7 +215,7 @@ public class HttpsTokenTest extends AbstractBusClientServerTestBase {
         try {
             port.doubleIt(25);
             fail("Failure expected on not sending a UsernamePassword");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             if (!STAX_PORT.equals(test.getPort())) {
                 String error = "HttpsToken";
                 assertTrue(ex.getMessage().contains(error));

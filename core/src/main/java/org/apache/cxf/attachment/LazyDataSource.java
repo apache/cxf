@@ -25,8 +25,7 @@ import java.io.OutputStream;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import javax.activation.DataSource;
-
+import jakarta.activation.DataSource;
 import org.apache.cxf.message.Attachment;
 
 /**

@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.systest.sts.jaas;
 
-import javax.jws.WebService;
-
+import jakarta.jws.WebService;
 import org.apache.cxf.feature.Features;
 import org.example.contract.doubleit.DoubleItPortType;
 

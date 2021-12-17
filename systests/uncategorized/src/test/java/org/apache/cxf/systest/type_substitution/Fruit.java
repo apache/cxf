@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.type_substitution;
 
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @XmlJavaTypeAdapter(AppleAdapter.class)
 public interface Fruit {

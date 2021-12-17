@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.microprofile.client.spi;
 
-import javax.enterprise.inject.Vetoed;
-
+import jakarta.enterprise.inject.Vetoed;
 import org.apache.cxf.microprofile.client.CxfTypeSafeClientBuilder;
 import org.eclipse.microprofile.rest.client.spi.RestClientBuilderResolver;
 

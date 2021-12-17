@@ -60,7 +60,7 @@ public class AegisTest extends ToolTestBase {
         assertTrue("wsdl is not generated", wsdlFile.exists());
 
         WSDLReader reader = WSDLFactory.newInstance().newWSDLReader();
-        reader.setFeature("javax.wsdl.verbose", false);
+        reader.setFeature("jakarta.wsdl.verbose", false);
         Definition def = reader.readWSDL(wsdlFile.toURI().toURL().toString());
         Document wsdl = WSDLFactory.newInstance().newWSDLWriter().getDocument(def);
         assertValid("//xsd:element[@type='ns0:Something']", wsdl);
@@ -80,7 +80,7 @@ public class AegisTest extends ToolTestBase {
         assertTrue("wsdl is not generated " + getStdErr(), wsdlFile.exists());
 
         WSDLReader reader = WSDLFactory.newInstance().newWSDLReader();
-        reader.setFeature("javax.wsdl.verbose", false);
+        reader.setFeature("jakarta.wsdl.verbose", false);
         Definition def = reader.readWSDL(wsdlFile.toURI().toURL().toString());
         Document wsdl = WSDLFactory.newInstance().newWSDLWriter().getDocument(def);
         assertValid("//xsd:element[@type='ns0:Something']", wsdl);

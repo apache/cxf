@@ -21,11 +21,10 @@ package org.apache.cxf.rs.security.oauth2.services;
 
 import java.util.List;
 
-import javax.ws.rs.Path;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.FormAuthorizationResponse;
 import org.apache.cxf.rs.security.oauth2.common.OAuthRedirectionState;

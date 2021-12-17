@@ -19,7 +19,7 @@
 
 package org.apache.cxf.greeter_control;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(serviceName = "GreeterService",
             portName = "GreeterPort",

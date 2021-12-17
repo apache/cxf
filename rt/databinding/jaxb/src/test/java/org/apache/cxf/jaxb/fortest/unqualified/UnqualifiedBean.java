@@ -19,7 +19,7 @@
 
 package org.apache.cxf.jaxb.fortest.unqualified;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 /**
  * Test class that is not in any namespace, for testing JAXB context properties.

@@ -21,10 +21,10 @@ package org.apache.cxf.systest.ws.addr_feature;
 
 import java.util.concurrent.Future;
 
-import javax.jws.WebService;
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.Response;
-import javax.xml.ws.soap.Addressing;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.AsyncHandler;
+import jakarta.xml.ws.Response;
+import jakarta.xml.ws.soap.Addressing;
 
 // Jax-WS 2.1 WS-Addressing FromJava
 

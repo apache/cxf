@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.systest.grizzly;
 
-import javax.activation.DataHandler;
-import javax.xml.bind.annotation.XmlMimeType;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.activation.DataHandler;
+import jakarta.xml.bind.annotation.XmlMimeType;
+import jakarta.xml.bind.annotation.XmlType;
 
 @XmlType(name = "dataRequest", namespace = "http://org.apache.cxf/jaxws/endpoint/")
 public class DHRequest {

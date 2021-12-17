@@ -26,13 +26,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.Providers;
-
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.ext.Providers;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.Transferable;
 import org.apache.cxf.jaxrs.impl.MetadataMap;

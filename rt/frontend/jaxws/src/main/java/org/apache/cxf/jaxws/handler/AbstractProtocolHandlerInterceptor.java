@@ -19,10 +19,9 @@
 
 package org.apache.cxf.jaxws.handler;
 
-import javax.xml.ws.Binding;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.MessageContext.Scope;
-
+import jakarta.xml.ws.Binding;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.handler.MessageContext.Scope;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;

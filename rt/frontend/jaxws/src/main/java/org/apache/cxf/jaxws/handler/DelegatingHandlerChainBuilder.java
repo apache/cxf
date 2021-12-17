@@ -21,8 +21,7 @@ package org.apache.cxf.jaxws.handler;
 
 import java.util.List;
 
-import javax.xml.ws.handler.Handler;
-
+import jakarta.xml.ws.handler.Handler;
 import org.apache.cxf.jaxws.handler.types.PortComponentHandlerType;
 
 @SuppressWarnings("rawtypes")

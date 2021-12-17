@@ -48,8 +48,8 @@
   <!-- 0 - root schema node -->
   <xsl:template match="/xsd:schema">
     <xsd:schema xmlns="http://www.w3.org/2001/XMLSchema"
-                xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-                jaxb:version="2.0">
+                xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
+                jaxb:version="3.0">
       <xsl:attribute name="targetNamespace">
         <xsl:value-of select="concat('http://apache.org/type_test/types', $groupID)"/>
       </xsl:attribute>

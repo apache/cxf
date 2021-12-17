@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.systest.servlet;
 
-import javax.xml.ws.Endpoint;
-
 import org.w3c.dom.Document;
 
 import com.meterware.httpunit.HttpNotFoundException;
@@ -28,6 +26,7 @@ import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
 import com.meterware.servletunit.ServletUnitClient;
 
+import jakarta.xml.ws.Endpoint;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.staxutils.StaxUtils;

@@ -91,13 +91,13 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
                         <Import-Package>
-                            javax.ws.rs,
-                            javax.ws.rs.core,
-                            javax.ws.rs.container,
+                            jakarta.ws.rs,
+                            jakarta.ws.rs.core,
+                            jakarta.ws.rs.container,
                             org.apache.cxf.jaxrs.provider,
                             org.apache.cxf.tracing.brave.jaxrs,
                             org.osgi.service.blueprint,
-                            javax.annotation;version="[1.2,2)",
+                            jakarta.annotation;version="[2,3)",
                             org.apache.johnzon.core,
                             *
                         </Import-Package>

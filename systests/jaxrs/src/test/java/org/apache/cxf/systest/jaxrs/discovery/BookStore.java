@@ -18,14 +18,13 @@
  */
 package org.apache.cxf.systest.jaxrs.discovery;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.FormParam;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import org.apache.cxf.systest.jaxrs.discovery.sub.BookStoreInterface;
 import org.apache.cxf.systest.jaxrs.validation.BookWithValidation;
 

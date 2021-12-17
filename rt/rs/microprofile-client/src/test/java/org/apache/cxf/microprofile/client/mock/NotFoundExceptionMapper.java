@@ -19,9 +19,8 @@
 
 package org.apache.cxf.microprofile.client.mock;
 
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.rest.client.ext.ResponseExceptionMapper;
 
 public class NotFoundExceptionMapper implements ResponseExceptionMapper<NoSuchEntityException> {

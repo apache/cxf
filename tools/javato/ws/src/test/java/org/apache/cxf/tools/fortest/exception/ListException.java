@@ -20,7 +20,7 @@ package org.apache.cxf.tools.fortest.exception;
 
 import java.util.List;
 
-import javax.xml.ws.WebFault;
+import jakarta.xml.ws.WebFault;
 
 @WebFault
 public class ListException extends Exception {

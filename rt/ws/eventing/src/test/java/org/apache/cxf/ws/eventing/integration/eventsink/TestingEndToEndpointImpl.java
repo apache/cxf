@@ -22,8 +22,7 @@ package org.apache.cxf.ws.eventing.integration.eventsink;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
-import javax.jws.WebParam;
-
+import jakarta.jws.WebParam;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.ws.eventing.SubscriptionEnd;
 import org.apache.cxf.ws.eventing.client.EndToEndpoint;

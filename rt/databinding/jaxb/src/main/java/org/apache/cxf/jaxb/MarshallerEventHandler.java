@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.jaxb;
 
-import javax.xml.bind.MarshalException;
+import jakarta.xml.bind.MarshalException;
 
 public interface MarshallerEventHandler {
     void onMarshalComplete() throws MarshalException;

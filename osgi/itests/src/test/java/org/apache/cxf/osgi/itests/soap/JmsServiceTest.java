@@ -21,8 +21,7 @@ package org.apache.cxf.osgi.itests.soap;
 import java.io.InputStream;
 import java.util.Collections;
 
-import javax.jms.ConnectionFactory;
-
+import jakarta.jms.ConnectionFactory;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;

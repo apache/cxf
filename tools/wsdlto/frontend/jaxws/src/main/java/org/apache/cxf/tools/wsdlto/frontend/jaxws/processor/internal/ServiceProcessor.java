@@ -353,13 +353,13 @@ public class ServiceProcessor extends AbstractProcessor {
         if (isSoapBinding()) {
             SoapBinding soapBinding = (SoapBinding)bindingObj;
             if (SOAPBindingUtil.getSoapStyle(soapBinding.getStyle()) == null) {
-                jf.setSOAPStyle(javax.jws.soap.SOAPBinding.Style.DOCUMENT);
+                jf.setSOAPStyle(jakarta.jws.soap.SOAPBinding.Style.DOCUMENT);
             } else {
                 jf.setSOAPStyle(SOAPBindingUtil.getSoapStyle(soapBinding.getStyle()));
             }
         } else {
             // REVISIT: fix for xml binding
-            jf.setSOAPStyle(javax.jws.soap.SOAPBinding.Style.DOCUMENT);
+            jf.setSOAPStyle(jakarta.jws.soap.SOAPBinding.Style.DOCUMENT);
         }
 
         Object[] methods = jf.getMethods().toArray();
@@ -390,7 +390,7 @@ public class ServiceProcessor extends AbstractProcessor {
                     jm.setSoapStyle(jf.getSOAPStyle());
                 }
 
-                if (jm.getSoapStyle().equals(javax.jws.soap.SOAPBinding.Style.RPC)) {
+                if (jm.getSoapStyle().equals(jakarta.jws.soap.SOAPBinding.Style.RPC)) {
                     jm.getAnnotationMap().remove("SOAPBinding");
                 }
 
@@ -526,16 +526,16 @@ public class ServiceProcessor extends AbstractProcessor {
         }
 
         jm.setSoapUse(SOAPBindingUtil.getSoapUse(use));
-        if (javax.jws.soap.SOAPBinding.Style.RPC == jm.getSoapStyle()
-            && javax.jws.soap.SOAPBinding.Use.ENCODED == jm.getSoapUse()) {
+        if (jakarta.jws.soap.SOAPBinding.Style.RPC == jm.getSoapStyle()
+            && jakarta.jws.soap.SOAPBinding.Use.ENCODED == jm.getSoapUse()) {
             System.err.println("** Unsupported RPC-Encoded Style Use **");
         }
-        if (javax.jws.soap.SOAPBinding.Style.RPC == jm.getSoapStyle()
-            && javax.jws.soap.SOAPBinding.Use.LITERAL == jm.getSoapUse()) {
+        if (jakarta.jws.soap.SOAPBinding.Style.RPC == jm.getSoapStyle()
+            && jakarta.jws.soap.SOAPBinding.Use.LITERAL == jm.getSoapUse()) {
             return;
         }
-        if (javax.jws.soap.SOAPBinding.Style.DOCUMENT == jm.getSoapStyle()
-            && javax.jws.soap.SOAPBinding.Use.LITERAL == jm.getSoapUse()) {
+        if (jakarta.jws.soap.SOAPBinding.Style.DOCUMENT == jm.getSoapStyle()
+            && jakarta.jws.soap.SOAPBinding.Use.LITERAL == jm.getSoapUse()) {
             return;
         }
     }
@@ -561,7 +561,7 @@ public class ServiceProcessor extends AbstractProcessor {
 
     private static String getJavaTypeForMimeType(MIMEPart mPart) {
         if (mPart.getExtensibilityElements().size() > 1) {
-            return "javax.activation.DataHandler";
+            return "jakarta.activation.DataHandler";
         }
         ExtensibilityElement extElement = (ExtensibilityElement)mPart.getExtensibilityElements().get(0);
         if (extElement instanceof MIMEContent) {
@@ -572,10 +572,10 @@ public class ServiceProcessor extends AbstractProcessor {
                        || "application/xml".equals(mimeContent.getType())) {
                 return "javax.xml.transform.Source";
             }  else {
-                return "javax.activation.DataHandler";
+                return "jakarta.activation.DataHandler";
             }
         }
-        return "javax.activation.DataHandler";
+        return "jakarta.activation.DataHandler";
     }
 
     public void processMultipart(JavaMethod jm, BindingOperationInfo operation,

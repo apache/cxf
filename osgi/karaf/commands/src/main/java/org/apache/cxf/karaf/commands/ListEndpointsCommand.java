@@ -144,7 +144,7 @@ public class ListEndpointsCommand extends CXFController implements Action {
 
     private String getCXFOSGiServletContext() throws InvalidSyntaxException {
         String ret = null;
-        String filter = "(&(" + "objectclass=" + "javax.servlet.Servlet"
+        String filter = "(&(" + "objectclass=" + "jakarta.servlet.Servlet"
             + ")(servlet-name=cxf-osgi-transport-servlet))";
 
         ServiceReference<?> ref = getBundleContext().getServiceReferences((String)null, filter)[0];

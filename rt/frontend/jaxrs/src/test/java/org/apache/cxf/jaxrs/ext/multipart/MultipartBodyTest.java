@@ -22,9 +22,8 @@ package org.apache.cxf.jaxrs.ext.multipart;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.activation.DataHandler;
-import javax.mail.util.ByteArrayDataSource;
-
+import jakarta.activation.DataHandler;
+import jakarta.mail.util.ByteArrayDataSource;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 
 import org.junit.Test;

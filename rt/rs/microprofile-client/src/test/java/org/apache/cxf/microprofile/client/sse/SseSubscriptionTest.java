@@ -21,10 +21,9 @@ package org.apache.cxf.microprofile.client.sse;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.sse.InboundSseEvent;
-
+import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.sse.InboundSseEvent;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 

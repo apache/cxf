@@ -19,7 +19,7 @@
 
 package org.apache.cxf.jaxrs.fortest;
 
-import javax.ws.rs.POST;
+import jakarta.ws.rs.POST;
 
 
 public interface GenericEntity<T> {

@@ -20,8 +20,7 @@ package org.apache.cxf.rs.security.oauth2.grants.jwt;
 
 import java.util.Arrays;
 
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.oauth2.common.Client;

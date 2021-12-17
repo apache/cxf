@@ -18,10 +18,8 @@
  */
 package org.apache.cxf.systest.handlers;
 
-import javax.jws.HandlerChain;
-import javax.jws.WebService;
-
-
+import jakarta.jws.HandlerChain;
+import jakarta.jws.WebService;
 import org.apache.handlers.AddNumbers;
 import org.apache.handlers.AddNumbersFault;
 //import org.apache.handlers.types.FaultDetail;

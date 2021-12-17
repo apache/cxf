@@ -24,16 +24,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.annotation.Resource;
-import javax.jws.HandlerChain;
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-import javax.xml.ws.RequestWrapper;
-import javax.xml.ws.ResponseWrapper;
-import javax.xml.ws.WebServiceContext;
+import jakarta.annotation.Resource;
+import jakarta.jws.HandlerChain;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
+import jakarta.xml.ws.RequestWrapper;
+import jakarta.xml.ws.ResponseWrapper;
+import jakarta.xml.ws.WebServiceContext;
 
-@javax.jws.WebService(name = "Greeter", serviceName = "SOAPService",
+@jakarta.jws.WebService(name = "Greeter", serviceName = "SOAPService",
                       targetNamespace = "http://apache.org/hello_world_soap_http")
 @HandlerChain(name = "TestHandlerChain", file = "handlers.xml")
 public class AnnotatedGreeterImpl {

@@ -24,14 +24,13 @@ import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jms.Connection;
-import javax.jms.Destination;
-import javax.jms.ExceptionListener;
-import javax.jms.InvalidClientIDException;
-import javax.jms.JMSException;
-import javax.jms.MessageListener;
-import javax.jms.Session;
-
+import jakarta.jms.Connection;
+import jakarta.jms.Destination;
+import jakarta.jms.ExceptionListener;
+import jakarta.jms.InvalidClientIDException;
+import jakarta.jms.JMSException;
+import jakarta.jms.MessageListener;
+import jakarta.jms.Session;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
@@ -219,7 +218,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
      * using the BackChannelConduit
      *
      */
-    public void onMessage(javax.jms.Message message) {
+    public void onMessage(jakarta.jms.Message message) {
         ClassLoaderHolder origLoader = null;
         Bus origBus = null;
         try {

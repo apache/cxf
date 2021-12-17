@@ -21,8 +21,7 @@ package org.apache.cxf.testutils.header_test.rpc;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
-import javax.jws.WebParam;
-
+import jakarta.jws.WebParam;
 import org.apache.header_test.rpc.TestRPCHeader;
 
 import org.junit.Test;

@@ -20,8 +20,7 @@
 package org.apache.cxf.osgi.itests;
 
 
-import javax.inject.Inject;
-
+import jakarta.inject.Inject;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;

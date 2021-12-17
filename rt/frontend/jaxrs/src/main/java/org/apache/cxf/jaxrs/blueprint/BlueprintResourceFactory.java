@@ -24,8 +24,7 @@ import java.lang.reflect.Proxy;
 import java.util.Collections;
 import java.util.Map;
 
-import javax.ws.rs.core.Application;
-
+import jakarta.ws.rs.core.Application;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;

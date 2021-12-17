@@ -18,7 +18,7 @@
  */
 package cxf.server;
 
-import javax.xml.ws.Endpoint;
+import jakarta.xml.ws.Endpoint;
 
 public class Server {
 

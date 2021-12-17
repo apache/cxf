@@ -19,9 +19,8 @@
 
 package org.apache.cxf.systest.local_transport;
 
-import javax.jws.WebService;
-import javax.xml.ws.Endpoint;
-
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Endpoint;
 import org.apache.cxf.annotations.GZIP;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.hello_world_soap_http.BaseGreeterImpl;

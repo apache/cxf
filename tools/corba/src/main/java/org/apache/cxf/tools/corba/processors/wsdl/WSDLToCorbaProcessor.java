@@ -25,9 +25,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.wsdl.Definition;
-import javax.xml.bind.JAXBException;
 
-
+import jakarta.xml.bind.JAXBException;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.tools.common.ToolConstants;

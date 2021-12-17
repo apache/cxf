@@ -21,11 +21,11 @@ package org.apache.cxf.ws.security.wss4j;
 import java.io.ByteArrayInputStream;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPConstants;
-import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Document;
 
+import jakarta.xml.soap.SOAPConstants;
+import jakarta.xml.soap.SOAPMessage;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.message.Exchange;

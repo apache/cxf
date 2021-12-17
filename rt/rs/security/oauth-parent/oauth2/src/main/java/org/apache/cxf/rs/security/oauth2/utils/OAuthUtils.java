@@ -30,9 +30,9 @@ import java.util.List;
 import java.util.Properties;
 
 import javax.security.auth.x500.X500Principal;
-import javax.servlet.http.HttpSession;
-import javax.ws.rs.core.MultivaluedMap;
 
+import jakarta.servlet.http.HttpSession;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
@@ -120,7 +120,7 @@ public final class OAuthUtils {
         return false;
     }
 
-    public static boolean isMutualTls(javax.ws.rs.core.SecurityContext sc, TLSSessionInfo tlsSessionInfo) {
+    public static boolean isMutualTls(jakarta.ws.rs.core.SecurityContext sc, TLSSessionInfo tlsSessionInfo) {
         // Pure 2-way TLS authentication
         return tlsSessionInfo != null
             && StringUtils.isEmpty(sc.getAuthenticationScheme())

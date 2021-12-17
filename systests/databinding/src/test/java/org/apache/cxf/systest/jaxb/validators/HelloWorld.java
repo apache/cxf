@@ -18,10 +18,10 @@
  */
 package org.apache.cxf.systest.jaxb.validators;
 
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
 
-@javax.jws.WebService(targetNamespace = "aNamespace")
+@jakarta.jws.WebService(targetNamespace = "aNamespace")
 public interface HelloWorld {
 
     @WebMethod(operationName = "sayHi")

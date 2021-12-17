@@ -19,9 +19,7 @@
 
 package org.apache.cxf.ws.policy;
 
-import javax.annotation.Resource;
-
-
+import jakarta.annotation.Resource;
 import org.apache.cxf.Bus;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;

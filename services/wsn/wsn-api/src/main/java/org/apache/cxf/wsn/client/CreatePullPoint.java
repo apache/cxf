@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.wsn.client;
 
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
-
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 import org.apache.cxf.wsn.util.WSNHelper;
 import org.oasis_open.docs.wsn.b_2.CreatePullPointResponse;
 import org.oasis_open.docs.wsn.bw_2.UnableToCreatePullPointFault;

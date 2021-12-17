@@ -23,8 +23,7 @@ import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.Properties;
 
-import javax.xml.bind.JAXBElement;
-
+import jakarta.xml.bind.JAXBElement;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.sts.QNameConstants;

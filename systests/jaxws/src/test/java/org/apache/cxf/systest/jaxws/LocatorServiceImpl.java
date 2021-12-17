@@ -28,8 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
-
+import jakarta.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -45,7 +44,7 @@ import org.apache.locator.types.QueryEndpointsResponse;
  *
  */
 
-@javax.jws.WebService(name = "LocatorService",
+@jakarta.jws.WebService(name = "LocatorService",
                       serviceName = "LocatorService",
                       portName = "LocatorServicePort",
                       targetNamespace = "http://apache.org/locator",
@@ -56,11 +55,11 @@ public class LocatorServiceImpl implements LocatorService {
     static final Logger LOG = LogUtils.getL7dLogger(LocatorServiceImpl.class);
 
     public void registerPeerManager(
-                                    javax.xml.ws.wsaddressing.W3CEndpointReference peerManager,
-                                    javax.xml.ws.Holder<
-                                    javax.xml.ws.wsaddressing.W3CEndpointReference>
+                                    jakarta.xml.ws.wsaddressing.W3CEndpointReference peerManager,
+                                    jakarta.xml.ws.Holder<
+                                    jakarta.xml.ws.wsaddressing.W3CEndpointReference>
                                             peerManagerReference,
-                                    javax.xml.ws.Holder<java.lang.String> nodeId) {
+                                    jakarta.xml.ws.Holder<java.lang.String> nodeId) {
         LOG.info("Executing operation registerPeerManager");
     }
 
@@ -69,16 +68,16 @@ public class LocatorServiceImpl implements LocatorService {
     }
 
     public void registerEndpoint(EndpointIdentity endpointId,
-                                 javax.xml.ws.wsaddressing.W3CEndpointReference endpointReference) {
+                                 jakarta.xml.ws.wsaddressing.W3CEndpointReference endpointReference) {
         LOG.info("Executing operation registerEndpoint");
     }
 
     public void deregisterEndpoint(EndpointIdentity endpointId,
-                                   javax.xml.ws.wsaddressing.W3CEndpointReference endpointReference) {
+                                   jakarta.xml.ws.wsaddressing.W3CEndpointReference endpointReference) {
         LOG.info("Executing operation deregisterEndpoint");
     }
 
-    public javax.xml.ws.wsaddressing.W3CEndpointReference lookupEndpoint(
+    public jakarta.xml.ws.wsaddressing.W3CEndpointReference lookupEndpoint(
         javax.xml.namespace.QName serviceQname)
         throws EndpointNotExistFault {
         LOG.info("Executing operation lookupEndpoint");

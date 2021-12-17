@@ -28,12 +28,12 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
 import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
+import jakarta.xml.soap.SOAPException;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.i18n.Message;

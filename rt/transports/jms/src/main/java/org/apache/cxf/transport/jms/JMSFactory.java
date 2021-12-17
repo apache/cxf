@@ -21,10 +21,9 @@ package org.apache.cxf.transport.jms;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
-
+import jakarta.jms.Connection;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.JMSException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.transport.jms.util.JMSSender;
 import org.apache.cxf.workqueue.AutomaticWorkQueue;

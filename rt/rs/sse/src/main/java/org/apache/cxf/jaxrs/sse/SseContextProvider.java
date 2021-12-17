@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.jaxrs.sse;
 
-import javax.ws.rs.sse.Sse;
-
+import jakarta.ws.rs.sse.Sse;
 import org.apache.cxf.jaxrs.ext.ContextProvider;
 import org.apache.cxf.message.Message;
 

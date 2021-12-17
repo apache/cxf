@@ -35,12 +35,12 @@ import javax.wsdl.Service;
 import javax.wsdl.Types;
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensibilityElement;
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import antlr.ASTVisitor;
 import antlr.collections.AST;
 
+import jakarta.xml.bind.JAXBException;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.binding.corba.wsdl.TypeMappingType;
 import org.apache.cxf.helpers.CastUtils;

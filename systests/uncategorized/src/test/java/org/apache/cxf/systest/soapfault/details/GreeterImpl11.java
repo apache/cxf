@@ -22,10 +22,9 @@ package org.apache.cxf.systest.soapfault.details;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
-import javax.jws.WebService;
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.Response;
-
+import jakarta.jws.WebService;
+import jakarta.xml.ws.AsyncHandler;
+import jakarta.xml.ws.Response;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.greeter_control.PingMeFault;
 import org.apache.cxf.greeter_control.types.FaultDetail;

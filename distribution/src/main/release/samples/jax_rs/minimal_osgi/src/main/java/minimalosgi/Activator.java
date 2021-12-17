@@ -52,7 +52,7 @@ public class Activator implements BundleActivator {
                     try {
                         HttpService service = (HttpService)_context.getService(serviceReference);
                         Dictionary<String, String> initParams = new Hashtable<>();
-                        initParams.put("javax.ws.rs.Application", SampleApplication.class.getName());
+                        initParams.put("jakarta.ws.rs.Application", SampleApplication.class.getName());
                         service.registerServlet(_path, new SampleServlet(), initParams, null);
                         return service;
                     } catch (Exception ex) {

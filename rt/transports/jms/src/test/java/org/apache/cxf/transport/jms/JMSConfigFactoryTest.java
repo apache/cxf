@@ -20,9 +20,9 @@
 package org.apache.cxf.transport.jms;
 
 import javax.naming.NamingException;
-import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAException;
 
+import jakarta.transaction.TransactionManager;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;

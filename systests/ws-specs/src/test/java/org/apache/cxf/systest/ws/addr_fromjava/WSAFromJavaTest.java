@@ -23,10 +23,8 @@ import java.io.ByteArrayOutputStream;
 import java.net.URL;
 import java.util.List;
 
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.soap.SOAPFaultException;
-
-
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor;

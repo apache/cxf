@@ -44,7 +44,7 @@ public abstract class AbstractServerActivator implements BundleActivator {
 
     private static void awaitCxfServlet(BundleContext bundleContext)
             throws InvalidSyntaxException, InterruptedException {
-        awaitService(bundleContext, "(" + Constants.OBJECTCLASS + "=javax.servlet.ServletContext)", 60000L);
+        awaitService(bundleContext, "(" + Constants.OBJECTCLASS + "=jakarta.servlet.ServletContext)", 60000L);
     }
 
     @Override

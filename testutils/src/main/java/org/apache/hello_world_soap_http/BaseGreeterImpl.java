@@ -24,14 +24,13 @@ import java.io.IOException;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
-import javax.annotation.Resource;
-import javax.jws.WebMethod;
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Response;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.handler.MessageContext;
-
+import jakarta.annotation.Resource;
+import jakarta.jws.WebMethod;
+import jakarta.xml.ws.AsyncHandler;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Response;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.handler.MessageContext;
 import org.apache.hello_world_soap_http.types.BareDocumentResponse;
 import org.apache.hello_world_soap_http.types.ErrorCode;
 import org.apache.hello_world_soap_http.types.GreetMeLaterResponse;

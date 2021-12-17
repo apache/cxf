@@ -22,7 +22,7 @@ package demo.hw.server;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(endpointInterface = "demo.hw.server.HelloWorld",
             serviceName = "HelloWorld")

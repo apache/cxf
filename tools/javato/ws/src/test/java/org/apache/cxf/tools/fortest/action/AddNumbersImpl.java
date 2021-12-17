@@ -19,9 +19,9 @@
 
 package org.apache.cxf.tools.fortest.action;
 
-import javax.jws.WebService;
-import javax.xml.ws.BindingType;
-import javax.xml.ws.soap.SOAPBinding;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.BindingType;
+import jakarta.xml.ws.soap.SOAPBinding;
 
 @WebService(
     name = "AddNumbers",

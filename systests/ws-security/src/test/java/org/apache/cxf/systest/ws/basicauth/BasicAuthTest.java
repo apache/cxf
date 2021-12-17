@@ -22,8 +22,8 @@ package org.apache.cxf.systest.ws.basicauth;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
 
+import jakarta.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -140,7 +140,7 @@ public class BasicAuthTest extends AbstractBusClientServerTestBase {
         try {
             utPort.doubleIt(25);
             fail("Failure expected on no basic auth creds");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
 

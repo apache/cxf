@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.systest.ws.rm;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
 
 @WebService(name = "RMEndpoint", targetNamespace = "http://cxf.apache.org/wsrm", serviceName = "RMService")
 public class BasicDocEndpointImpl implements BasicDocEndpoint {

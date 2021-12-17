@@ -19,17 +19,17 @@
 
 package org.apache.cxf.systest.jms.swa;
 
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
 
 /**
  *
  */
 
 @WebService(targetNamespace = "http://cxf.apache.org/swa", name = "SwAServiceInterface")
-//@javax.xml.bind.annotation.XmlSeeAlso({ org.apache.cxf.swa.types.ObjectFactory.class })
+//@jakarta.xml.bind.annotation.XmlSeeAlso({ org.apache.cxf.swa.types.ObjectFactory.class })
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 public interface SwAService {
 
@@ -37,8 +37,8 @@ public interface SwAService {
     void echoData(
         @WebParam(partName = "text", mode = WebParam.Mode.INOUT, name = "text",
             targetNamespace = "http://cxf.apache.org/swa/types")
-        javax.xml.ws.Holder<java.lang.String> text,
+        jakarta.xml.ws.Holder<java.lang.String> text,
         @WebParam(partName = "data", mode = WebParam.Mode.INOUT, name = "data", targetNamespace = "")
-        javax.xml.ws.Holder<javax.activation.DataHandler> data
+        jakarta.xml.ws.Holder<jakarta.activation.DataHandler> data
     );
 }

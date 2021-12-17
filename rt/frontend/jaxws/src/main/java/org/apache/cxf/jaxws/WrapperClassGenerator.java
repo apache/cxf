@@ -30,17 +30,17 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.xml.bind.annotation.XmlAttachmentRef;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlList;
-import javax.xml.bind.annotation.XmlMimeType;
-import javax.xml.bind.annotation.XmlNsForm;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapters;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Holder;
 
+import jakarta.xml.bind.annotation.XmlAttachmentRef;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlList;
+import jakarta.xml.bind.annotation.XmlMimeType;
+import jakarta.xml.bind.annotation.XmlNsForm;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapters;
+import jakarta.xml.ws.Holder;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -201,16 +201,16 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
         cw.visit(opCodes.V1_5, opCodes.ACC_PUBLIC + opCodes.ACC_SUPER, classFileName, null,
                  "java/lang/Object", null);
 
-        ASMHelper.AnnotationVisitor av0 = cw.visitAnnotation("Ljavax/xml/bind/annotation/XmlRootElement;", true);
+        ASMHelper.AnnotationVisitor av0 = cw.visitAnnotation("Ljakarta/xml/bind/annotation/XmlRootElement;", true);
         av0.visit("name", wrapperElement.getLocalPart());
         av0.visit("namespace", wrapperElement.getNamespaceURI());
         av0.visitEnd();
 
-        av0 = cw.visitAnnotation("Ljavax/xml/bind/annotation/XmlAccessorType;", true);
-        av0.visitEnum("value", "Ljavax/xml/bind/annotation/XmlAccessType;", "FIELD");
+        av0 = cw.visitAnnotation("Ljakarta/xml/bind/annotation/XmlAccessorType;", true);
+        av0.visitEnum("value", "Ljakarta/xml/bind/annotation/XmlAccessType;", "FIELD");
         av0.visitEnd();
 
-        av0 = cw.visitAnnotation("Ljavax/xml/bind/annotation/XmlType;", true);
+        av0 = cw.visitAnnotation("Ljakarta/xml/bind/annotation/XmlType;", true);
         if (!anonymous) {
             av0.visit("name", wrapperElement.getLocalPart());
             av0.visit("namespace", wrapperElement.getNamespaceURI());
@@ -257,7 +257,7 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
         if (si != null) {
             q = si.isElementFormQualified();
         }
-        ASMHelper.AnnotationVisitor av0 = cw.visitAnnotation("Ljavax/xml/bind/annotation/XmlSchema;", true);
+        ASMHelper.AnnotationVisitor av0 = cw.visitAnnotation("Ljakarta/xml/bind/annotation/XmlSchema;", true);
         av0.visit("namespace", ns);
         av0.visitEnum("elementFormDefault",
                 helper.getClassCode(XmlNsForm.class),
@@ -267,11 +267,11 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
         if (clz.getPackage() != null && clz.getPackage().getAnnotations() != null) {
             for (Annotation ann : clz.getPackage().getAnnotations()) {
                 if (ann instanceof XmlJavaTypeAdapters) {
-                    av0 = cw.visitAnnotation("Ljavax/xml/bind/annotation/adapters/XmlJavaTypeAdapters;", true);
+                    av0 = cw.visitAnnotation("Ljakarta/xml/bind/annotation/adapters/XmlJavaTypeAdapters;", true);
                     generateXmlJavaTypeAdapters(av0, (XmlJavaTypeAdapters)ann);
                     av0.visitEnd();
                 } else if (ann instanceof XmlJavaTypeAdapter) {
-                    av0 = cw.visitAnnotation("Ljavax/xml/bind/annotation/adapters/XmlJavaTypeAdapter;", true);
+                    av0 = cw.visitAnnotation("Ljakarta/xml/bind/annotation/adapters/XmlJavaTypeAdapter;", true);
                     generateXmlJavaTypeAdapter(av0, (XmlJavaTypeAdapter)ann);
                     av0.visitEnd();
                 }
@@ -287,7 +287,7 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
 
         for (XmlJavaTypeAdapter adapter : adapters.value()) {
             ASMHelper.AnnotationVisitor av2
-                = av1.visitAnnotation(null, "Ljavax/xml/bind/annotation/adapters/XmlJavaTypeAdapter;");
+                = av1.visitAnnotation(null, "Ljakarta/xml/bind/annotation/adapters/XmlJavaTypeAdapter;");
             generateXmlJavaTypeAdapter(av2, adapter);
             av2.visitEnd();
         }
@@ -297,7 +297,7 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
         if (adapter.value() != null) {
             av.visit("value", helper.getType(helper.getClassCode(adapter.value())));
         }
-        if (adapter.type() != javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter.DEFAULT.class) {
+        if (adapter.type() != jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter.DEFAULT.class) {
             av.visit("type", helper.getType(helper.getClassCode(adapter.type())));
         }
     }
@@ -360,7 +360,7 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
 
         List<Annotation> jaxbAnnos = getJaxbAnnos(mpi);
         if (!addJAXBAnnotations(fv, jaxbAnnos, name)) {
-            ASMHelper.AnnotationVisitor av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/XmlElement;", true);
+            ASMHelper.AnnotationVisitor av0 = fv.visitAnnotation("Ljakarta/xml/bind/annotation/XmlElement;", true);
             av0.visit("name", name);
             if (Boolean.TRUE.equals(factory.isWrapperPartQualified(mpi))) {
                 av0.visit("namespace", mpi.getConcreteName().getNamespaceURI());
@@ -408,23 +408,23 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
         boolean addedEl = false;
         for (Annotation ann : jaxbAnnos) {
             if (ann instanceof XmlMimeType) {
-                av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/XmlMimeType;", true);
+                av0 = fv.visitAnnotation("Ljakarta/xml/bind/annotation/XmlMimeType;", true);
                 av0.visit("value", ((XmlMimeType)ann).value());
                 av0.visitEnd();
             } else if (ann instanceof XmlJavaTypeAdapter) {
-                av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/adapters/XmlJavaTypeAdapter;", true);
+                av0 = fv.visitAnnotation("Ljakarta/xml/bind/annotation/adapters/XmlJavaTypeAdapter;", true);
                 generateXmlJavaTypeAdapter(av0, (XmlJavaTypeAdapter)ann);
                 av0.visitEnd();
             } else if (ann instanceof XmlAttachmentRef) {
-                av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/XmlAttachmentRef;", true);
+                av0 = fv.visitAnnotation("Ljakarta/xml/bind/annotation/XmlAttachmentRef;", true);
                 av0.visitEnd();
             } else if (ann instanceof XmlList) {
-                av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/XmlList;", true);
+                av0 = fv.visitAnnotation("Ljakarta/xml/bind/annotation/XmlList;", true);
                 av0.visitEnd();
             } else if (ann instanceof XmlElement) {
                 addedEl = true;
                 XmlElement el = (XmlElement)ann;
-                av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/XmlElement;", true);
+                av0 = fv.visitAnnotation("Ljakarta/xml/bind/annotation/XmlElement;", true);
                 if ("##default".equals(el.name())) {
                     av0.visit("name", name);
                 } else {
@@ -440,7 +440,7 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
                 av0.visitEnd();
             } else if (ann instanceof XmlElementWrapper) {
                 XmlElementWrapper el = (XmlElementWrapper)ann;
-                av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/XmlElementWrapper;", true);
+                av0 = fv.visitAnnotation("Ljakarta/xml/bind/annotation/XmlElementWrapper;", true);
                 av0.visit("name", el.name());
                 av0.visit("nillable", el.nillable());
                 av0.visit("required", el.required());

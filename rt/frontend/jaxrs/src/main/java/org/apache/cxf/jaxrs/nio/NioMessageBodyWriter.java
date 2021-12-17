@@ -23,14 +23,13 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-import javax.servlet.WriteListener;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.Provider;
-
+import jakarta.servlet.WriteListener;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.ext.MessageBodyWriter;
+import jakarta.ws.rs.ext.Provider;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
@@ -43,7 +42,7 @@ public class NioMessageBodyWriter implements MessageBodyWriter<NioWriteEntity> {
     
     public NioMessageBodyWriter() {
         try {
-            ClassLoaderUtils.loadClass("javax.servlet.WriteListener", HttpServletRequest.class);
+            ClassLoaderUtils.loadClass("jakarta.servlet.WriteListener", HttpServletRequest.class);
             is31 = true;
         } catch (Throwable t) {
             is31 = false;

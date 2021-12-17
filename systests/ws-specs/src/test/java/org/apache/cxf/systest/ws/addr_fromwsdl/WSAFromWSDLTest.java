@@ -23,10 +23,10 @@ import java.io.ByteArrayOutputStream;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.soap.AddressingFeature;
-import javax.xml.ws.soap.SOAPFaultException;
 
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.soap.AddressingFeature;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.systest.ws.AbstractWSATestBase;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersFault_Exception;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersPortType;
@@ -190,7 +190,7 @@ public class WSAFromWSDLTest extends AbstractWSATestBase {
             maps.setFaultTo(ref);
 
             port.getRequestContext()
-                .put("javax.xml.ws.addressing.context", maps);
+                .put("jakarta.xml.ws.addressing.context", maps);
 
             try {
                 port.addNumbers3(-1, 2);

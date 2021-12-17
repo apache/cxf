@@ -36,7 +36,7 @@ import org.apache.cxf.common.util.ClassHelper;
 public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
 
     private static final Logger LOG = LogUtils.getL7dLogger(SecureAnnotationsInterceptor.class);
-    private static final String DEFAULT_ANNOTATION_CLASS_NAME = "javax.annotation.security.RolesAllowed";
+    private static final String DEFAULT_ANNOTATION_CLASS_NAME = "jakarta.annotation.security.RolesAllowed";
 
     private static final Set<String> SKIP_METHODS = new HashSet<>(
             Arrays.asList("wait", "notify", "notifyAll", "equals", "toString", "hashCode"));

@@ -19,7 +19,7 @@
 
 package org.apache.cxf.jaxrs.fortest.jaxb;
 
-import javax.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
 
 @XmlSeeAlso({SuperBook.class })
 public class Book {

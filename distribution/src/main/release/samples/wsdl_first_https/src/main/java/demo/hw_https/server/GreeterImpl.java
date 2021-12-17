@@ -22,7 +22,7 @@ package demo.hw_https.server;
 import java.util.logging.Logger;
 import org.apache.hello_world_soap_http.Greeter;
 
-@javax.jws.WebService(name = "Greeter", serviceName = "SOAPService",
+@jakarta.jws.WebService(name = "Greeter", serviceName = "SOAPService",
                       targetNamespace = "http://apache.org/hello_world_soap_http",
                       wsdlLocation = "file:./src/main/config/hello_world.wsdl")
 

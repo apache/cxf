@@ -20,9 +20,8 @@ package org.apache.cxf.systest.jaxrs.cdi;
 
 import java.util.UUID;
 
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.systests.cdi.base.AbstractCdiSingleAppTest;
 
 import org.junit.Test;

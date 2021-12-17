@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.annotator;
 
-import javax.xml.bind.annotation.XmlList;
-
+import jakarta.xml.bind.annotation.XmlList;
 import org.apache.cxf.tools.common.model.Annotator;
 import org.apache.cxf.tools.common.model.JAnnotation;
 import org.apache.cxf.tools.common.model.JavaAnnotatable;

@@ -18,9 +18,7 @@
  */
 package org.apache.cxf.systest.handlers;
 
-import javax.jws.WebService;
-
-
+import jakarta.jws.WebService;
 import org.apache.handlers.AddNumbers;
 import org.apache.handlers.AddNumbersFault;
 

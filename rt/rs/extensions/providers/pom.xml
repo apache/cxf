@@ -33,8 +33,8 @@
     <properties>
         <cxf.module.name>org.apache.cxf.rs.providers</cxf.module.name>
         <cxf.osgi.import>
-            javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
-            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}"
+            jakarta.servlet*;version="${cxf.osgi.jakarta.servlet.version}",
+            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}"
         </cxf.osgi.import>
     </properties>
     <dependencies>
@@ -99,7 +99,7 @@
         </dependency>
         <dependency>
             <groupId>org.glassfish</groupId>
-            <artifactId>javax.json</artifactId>
+            <artifactId>jakarta.json</artifactId>
             <optional>true</optional>
         </dependency>
         <dependency>

@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.ldap.jaxrs;
 
-import javax.xml.ws.WebFault;
+import jakarta.xml.ws.WebFault;
 
 @WebFault
 public class UserNotFoundFault extends Exception {

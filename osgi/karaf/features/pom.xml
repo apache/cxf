@@ -39,11 +39,11 @@
             <exclusions>
                 <exclusion>
                     <groupId>com.sun.activation</groupId>
-                    <artifactId>javax.activation</artifactId>
+                    <artifactId>jakarta.activation</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>javax.annotation</groupId>
-                    <artifactId>javax.annotation-api</artifactId>
+                    <groupId>jakarta.annotation</groupId>
+                    <artifactId>jakarta.annotation-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

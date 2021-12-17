@@ -21,9 +21,9 @@ package org.apache.cxf.jca.cxf;
 
 import java.net.URL;
 
-import javax.resource.spi.ConnectionRequestInfo;
 import javax.xml.namespace.QName;
 
+import jakarta.resource.spi.ConnectionRequestInfo;
 import org.apache.cxf.connector.CXFConnectionParam;
 
 

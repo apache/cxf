@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.transport.http.osgi;
 
-import javax.servlet.Servlet;
-
+import jakarta.servlet.Servlet;
 import org.apache.cxf.common.util.CollectionUtils;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;

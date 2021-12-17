@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 
-public class ResourceAdapterInternalException extends javax.resource.spi.ResourceAdapterInternalException {
+public class ResourceAdapterInternalException extends jakarta.resource.spi.ResourceAdapterInternalException {
 
     private static final long serialVersionUID = 6769505138041263456L;
     private static final String REASON_PREFIX = ", reason: ";

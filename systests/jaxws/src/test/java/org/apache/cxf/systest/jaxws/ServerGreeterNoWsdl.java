@@ -22,8 +22,7 @@ package org.apache.cxf.systest.jaxws;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.ws.Endpoint;
-
+import jakarta.xml.ws.Endpoint;
 import org.apache.cxf.frontend.WSDLGetUtils;
 import org.apache.cxf.greeter_control.GreeterImplNoWsdl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;

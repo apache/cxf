@@ -32,12 +32,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.xml.bind.JAXBElement;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
@@ -707,11 +707,11 @@ public class JettyHTTPDestinationTest {
                     response.flushBuffer();
                     EasyMock.expectLastCall();
                 }
-                request.getAttribute("javax.servlet.request.cipher_suite");
+                request.getAttribute("jakarta.servlet.request.cipher_suite");
                 EasyMock.expectLastCall().andReturn("anythingwilldoreally");
                 request.getAttribute("javax.net.ssl.session");
                 EasyMock.expectLastCall().andReturn(null);
-                request.getAttribute("javax.servlet.request.X509Certificate");
+                request.getAttribute("jakarta.servlet.request.X509Certificate");
                 EasyMock.expectLastCall().andReturn(null);
             }
         }

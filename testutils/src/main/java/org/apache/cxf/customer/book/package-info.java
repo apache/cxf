@@ -18,8 +18,8 @@
  */
 
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://book.acme.com",
-                                     elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://book.acme.com",
+                                     elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package org.apache.cxf.customer.book;
 
 

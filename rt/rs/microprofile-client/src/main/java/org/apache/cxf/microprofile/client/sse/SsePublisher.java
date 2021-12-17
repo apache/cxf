@@ -27,9 +27,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.ws.rs.ext.Providers;
-import javax.ws.rs.sse.InboundSseEvent;
-
+import jakarta.ws.rs.ext.Providers;
+import jakarta.ws.rs.sse.InboundSseEvent;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 

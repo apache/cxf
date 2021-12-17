@@ -19,12 +19,12 @@
 
 package org.apache.cxf.tools.fortest.withannotation.doc;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
-import javax.xml.ws.BindingType;
-import javax.xml.ws.RequestWrapper;
-import javax.xml.ws.ResponseWrapper;
-import javax.xml.ws.soap.SOAPBinding;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.BindingType;
+import jakarta.xml.ws.RequestWrapper;
+import jakarta.xml.ws.ResponseWrapper;
+import jakarta.xml.ws.soap.SOAPBinding;
 
 @WebService
 @BindingType (value = SOAPBinding.SOAP12HTTP_BINDING)

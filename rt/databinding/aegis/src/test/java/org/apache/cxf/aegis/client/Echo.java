@@ -18,10 +18,10 @@
  */
 package org.apache.cxf.aegis.client;
 
-import javax.jws.WebParam;
-import javax.jws.WebParam.Mode;
-import javax.jws.WebService;
-import javax.xml.ws.Holder;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebParam.Mode;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Holder;
 
 @WebService
 public interface Echo {

@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.binding.corba;
 
-import javax.xml.ws.ProtocolException;
+import jakarta.xml.ws.ProtocolException;
 
 // NOTE: This exception provides basic functionality for throwing exceptions within the binding.
 // At the momemnt, we just want to support the ability to throw a message (and accompanying

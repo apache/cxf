@@ -19,7 +19,7 @@
 
 package org.apache.cxf.tools.java2wsdl.processor;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService
 public interface Hello extends java.rmi.Remote {

@@ -23,9 +23,8 @@ import java.io.InputStream;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 import org.apache.cxf.xkms.exception.XKMSRequestException;
 import org.apache.cxf.xkms.model.xkms.ValidateRequestType;
 import org.apache.cxf.xkms.x509.validator.BasicValidationTest;

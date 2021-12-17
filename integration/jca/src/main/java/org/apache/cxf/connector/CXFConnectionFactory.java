@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.connector;
 
-import javax.resource.ResourceException;
+import jakarta.resource.ResourceException;
 
 /**
  * Provides methods to create a {@link Connection} object that represents a Web

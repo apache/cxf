@@ -21,9 +21,9 @@ package org.apache.cxf.wsn;
 import java.net.URL;
 
 import javax.management.ObjectName;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 import org.oasis_open.docs.wsn.bw_2.CreatePullPoint;
 
 public abstract class AbstractEndpoint implements EndpointMBean {

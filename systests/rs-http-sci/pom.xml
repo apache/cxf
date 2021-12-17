@@ -31,7 +31,7 @@
     <description>Apache CXF Servlet Container Initializer Integration System Tests</description>
     <url>https://cxf.apache.org</url>
     <properties>
-        <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
+        <cxf.jetty.version>${cxf.jetty11.version}</cxf.jetty.version>
         <cxf.module.name>org.apache.cxf.systests.rs.sci</cxf.module.name>
     </properties>
     <dependencies>
@@ -41,8 +41,8 @@
             <version>${cxf.jetty.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>javax.annotation</groupId>
-                    <artifactId>javax.annotation-api</artifactId>
+                    <groupId>jakarta.annotation</groupId>
+                    <artifactId>jakarta.annotation-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>    
@@ -111,8 +111,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.jaxrs</groupId>
-            <artifactId>jackson-jaxrs-json-provider</artifactId>
+            <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+            <artifactId>jackson-jakarta-rs-json-provider</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>

@@ -22,11 +22,11 @@ import java.net.URL;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Resource;
-import javax.jws.WebService;
 import javax.xml.namespace.QName;
-import javax.xml.ws.WebServiceContext;
 
+import jakarta.annotation.Resource;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.WebServiceContext;
 import org.apache.cxf.hello_world_jms.HelloWorldOneWayPort;
 import org.apache.cxf.hello_world_jms.HelloWorldQueueDecoupledOneWaysService;
 import org.apache.cxf.transport.jms.JMSConstants;

@@ -18,14 +18,13 @@
  */
 package org.apache.cxf.systest.jaxrs.validation.spring;
 
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.FormParam;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
 import org.apache.cxf.systest.jaxrs.validation.BookWithValidation;
 import org.apache.cxf.validation.BeanValidationProvider;
 

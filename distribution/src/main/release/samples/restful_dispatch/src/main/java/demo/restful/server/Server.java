@@ -19,8 +19,8 @@
 
 package demo.restful.server;
 
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.http.HTTPBinding;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.http.HTTPBinding;
 
 public class Server {
 

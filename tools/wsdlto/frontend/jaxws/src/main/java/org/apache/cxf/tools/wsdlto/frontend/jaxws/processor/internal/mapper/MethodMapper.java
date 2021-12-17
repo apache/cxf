@@ -31,7 +31,7 @@ public final class MethodMapper {
     public JavaMethod map(OperationInfo operation) {
         JavaMethod method = new JavaMethod();
         // set default Document Bare style
-        method.setSoapStyle(javax.jws.soap.SOAPBinding.Style.DOCUMENT);
+        method.setSoapStyle(jakarta.jws.soap.SOAPBinding.Style.DOCUMENT);
 
         String operationName = operation.getName().getLocalPart();
 

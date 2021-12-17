@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.tokens.bearer;
 
-import javax.persistence.Entity;
-
+import jakarta.persistence.Entity;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;

@@ -21,10 +21,9 @@ package org.apache.cxf.jaxrs.nio;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import javax.servlet.ReadListener;
-import javax.servlet.ServletInputStream;
-import javax.ws.rs.container.AsyncResponse;
-
+import jakarta.servlet.ReadListener;
+import jakarta.servlet.ServletInputStream;
+import jakarta.ws.rs.container.AsyncResponse;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;

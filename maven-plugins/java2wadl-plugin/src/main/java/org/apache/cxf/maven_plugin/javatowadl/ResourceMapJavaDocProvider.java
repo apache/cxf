@@ -25,8 +25,7 @@ import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.ws.rs.Path;
-
+import jakarta.ws.rs.Path;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;

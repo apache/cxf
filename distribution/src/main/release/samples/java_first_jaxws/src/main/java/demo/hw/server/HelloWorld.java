@@ -20,8 +20,8 @@ package demo.hw.server;
 
 import java.util.Map;
 
-import javax.jws.WebService;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.jws.WebService;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 // START SNIPPET: service
 

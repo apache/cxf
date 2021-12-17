@@ -46,7 +46,7 @@ public class MethodMapperTest {
         JavaMethod method = new MethodMapper().map(getOperation());
         assertNotNull(method);
 
-        assertEquals(javax.jws.soap.SOAPBinding.Style.DOCUMENT, method.getSoapStyle());
+        assertEquals(jakarta.jws.soap.SOAPBinding.Style.DOCUMENT, method.getSoapStyle());
         assertEquals("operationTest", method.getName());
         assertEquals("OperationTest", method.getOperationName());
         assertEquals(OperationType.REQUEST_RESPONSE, method.getStyle());

@@ -21,15 +21,14 @@ package org.apache.cxf.microprofile.client;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.client.ClientRequestContext;
+import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.eclipse.microprofile.rest.client.RestClientDefinitionException;
 import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
@@ -177,8 +176,8 @@ public class ValidatorTest {
 
     @Test
     public void testMethodWithMultipleVerbs() {
-        test(MultiVerbMethod.class, "more than one HTTP method", "postAndDelete", "javax.ws.rs.POST",
-            "javax.ws.rs.DELETE");
+        test(MultiVerbMethod.class, "more than one HTTP method", "postAndDelete", "jakarta.ws.rs.POST",
+            "jakarta.ws.rs.DELETE");
     }
 
     @Test

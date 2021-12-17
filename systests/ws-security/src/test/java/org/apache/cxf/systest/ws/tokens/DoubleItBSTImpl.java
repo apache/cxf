@@ -20,10 +20,9 @@ package org.apache.cxf.systest.ws.tokens;
 
 import java.util.List;
 
-import javax.annotation.Resource;
-import javax.jws.WebService;
-import javax.xml.ws.WebServiceContext;
-
+import jakarta.annotation.Resource;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.WebServiceContext;
 import org.apache.cxf.feature.Features;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.wss4j.common.token.BinarySecurity;

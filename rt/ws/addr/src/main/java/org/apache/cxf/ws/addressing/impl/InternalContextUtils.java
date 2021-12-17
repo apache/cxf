@@ -28,8 +28,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.WebFault;
 
+import jakarta.xml.ws.WebFault;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
@@ -210,10 +210,10 @@ final class InternalContextUtils {
                     partialResponse.put(org.apache.cxf.message.Message.ENCODING,
                                         inMessage.get(Message.ENCODING));
                     partialResponse.put(ContextUtils.ACTION, inMessage.get(ContextUtils.ACTION));
-                    partialResponse.put("javax.xml.ws.addressing.context.inbound",
-                                        inMessage.get("javax.xml.ws.addressing.context.inbound"));
-                    partialResponse.put("javax.xml.ws.addressing.context.outbound",
-                                        inMessage.get("javax.xml.ws.addressing.context.outbound"));
+                    partialResponse.put("jakarta.xml.ws.addressing.context.inbound",
+                                        inMessage.get("jakarta.xml.ws.addressing.context.inbound"));
+                    partialResponse.put("jakarta.xml.ws.addressing.context.outbound",
+                                        inMessage.get("jakarta.xml.ws.addressing.context.outbound"));
                     exchange.setOutMessage(partialResponse);
                     PhaseInterceptorChain newChian = ((PhaseInterceptorChain)inMessage.getInterceptorChain())
                         .cloneChain();

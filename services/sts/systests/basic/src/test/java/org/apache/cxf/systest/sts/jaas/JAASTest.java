@@ -20,11 +20,11 @@ package org.apache.cxf.systest.sts.jaas;
 
 import java.net.URL;
 
-import javax.ws.rs.InternalServerErrorException;
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Service;
 
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Service;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.systest.sts.deployment.DoubleItServer;
 import org.apache.cxf.systest.sts.deployment.STSServer;

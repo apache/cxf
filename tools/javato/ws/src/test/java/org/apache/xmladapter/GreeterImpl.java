@@ -20,7 +20,7 @@ package org.apache.xmladapter;
 
 import java.util.Currency;
 
-@javax.jws.WebService(endpointInterface = "org.apache.xmladapter.Greeter")
+@jakarta.jws.WebService(endpointInterface = "org.apache.xmladapter.Greeter")
 public class GreeterImpl implements Greeter {
     public int sayHi(Currency tickerSymbol) {
         return 100;

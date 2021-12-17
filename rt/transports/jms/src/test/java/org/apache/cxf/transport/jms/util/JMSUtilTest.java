@@ -24,11 +24,10 @@ import java.nio.charset.Charset;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.jms.BytesMessage;
-import javax.jms.Connection;
-import javax.jms.JMSException;
-import javax.jms.Session;
-
+import jakarta.jms.BytesMessage;
+import jakarta.jms.Connection;
+import jakarta.jms.JMSException;
+import jakarta.jms.Session;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.apache.cxf.transport.jms.JMSConstants;
@@ -79,7 +78,7 @@ public class JMSUtilTest {
         try (ResourceCloser closer = new ResourceCloser()) {
             Connection connection = JMSFactory.createConnection(jmsConfig);
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            javax.jms.Message jmsMessage =
+            jakarta.jms.Message jmsMessage =
                 JMSUtil.createAndSetPayload(testBytes, session, JMSConstants.BYTE_MESSAGE_TYPE);
             assertTrue("Message should have been of type BytesMessage ", jmsMessage instanceof BytesMessage);
         }

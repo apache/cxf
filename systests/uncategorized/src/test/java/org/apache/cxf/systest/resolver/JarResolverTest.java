@@ -22,8 +22,8 @@ package org.apache.cxf.systest.resolver;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
 
+import jakarta.xml.ws.Service;
 import org.apache.cxf.bus.managers.ServiceContractResolverRegistryImpl;
 import org.apache.cxf.endpoint.ServiceContractResolverRegistry;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;

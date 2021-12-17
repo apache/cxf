@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.provider;
 
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;

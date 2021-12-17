@@ -21,8 +21,7 @@ package org.apache.cxf.rs.security.oauth2.saml;
 
 import java.util.List;
 
-import javax.ws.rs.core.UriBuilder;
-
+import jakarta.ws.rs.core.UriBuilder;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.message.Message;
