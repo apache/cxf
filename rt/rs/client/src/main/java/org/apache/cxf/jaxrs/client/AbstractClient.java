@@ -102,6 +102,7 @@ import org.apache.cxf.phase.PhaseManager;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.transport.http.HTTPConduit;
 
 /**
  * Common proxy and http-centric client implementation
@@ -438,6 +439,12 @@ public abstract class AbstractClient implements Client {
         if (responseMessage == null) {
             return currentResponseBuilder;
         }
+        
+        String reasonPhrase = (String)MessageUtils.getContextualProperty(
+                   responseMessage, HTTPConduit.HTTP_RESPONSE_MESSAGE, null);
+        if (reasonPhrase != null) {
+            currentResponseBuilder.status(status, reasonPhrase);
+        }
 
         Map<String, List<Object>> protocolHeaders =
             CastUtils.cast((Map<?, ?>)responseMessage.get(Message.PROTOCOL_HEADERS));
@@ -485,6 +492,7 @@ public abstract class AbstractClient implements Client {
         }
         InputStream mStream = responseMessage.getContent(InputStream.class);
         currentResponseBuilder.entity(mStream);
+        
 
         return currentResponseBuilder;
     }
