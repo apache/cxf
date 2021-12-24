@@ -69,6 +69,116 @@ public class InTransformReaderTest {
         String value = bos.toString();
         assertEquals("<ns:test xmlns:ns=\"http://bar\"><ns:a>1 2 3</ns:a></ns:test>", value);
     }
+    
+    @Test
+    public void testDropComplexElement() throws Exception {
+        InputStream is = new ByteArrayInputStream(new String(
+              "<emp:EmployeeByNameRequest xmlns:emp=\"http://www.jpworks.com/employee\">"
+            + "<emp:firstname>Alex</emp:firstname>"
+            + "<emp:lastname>Just</emp:lastname>"
+            + "<emp:skippedElement>"
+            + "<age>35</age>"
+            + "</emp:skippedElement>"
+            + "<emp:email>alex.just@nowhere</emp:email>"
+            + "</emp:EmployeeByNameRequest>").getBytes());
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
+        reader = new InTransformReader(reader,
+                                        null,
+                                        null,
+                                        Collections.singletonList("{http://www.jpworks.com/employee}skippedElement"),
+                                        null, false);
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        StaxUtils.copy(reader, bos);
+        String value = bos.toString();
+        assertEquals("<emp:EmployeeByNameRequest xmlns:emp=\"http://www.jpworks.com/employee\">"
+                + "<emp:firstname>Alex</emp:firstname>"
+                + "<emp:lastname>Just</emp:lastname>"
+                + "<age>35</age>"
+                + "<emp:email>alex.just@nowhere</emp:email>"
+                + "</emp:EmployeeByNameRequest>", value);
+    }
+    
+    @Test
+    public void testDropComplexElementByReplacement() throws Exception {
+        InputStream is = new ByteArrayInputStream(new String(
+              "<emp:EmployeeByNameRequest xmlns:emp=\"http://www.jpworks.com/employee\">"
+            + "<emp:firstname>Alex</emp:firstname>"
+            + "<emp:lastname>Just</emp:lastname>"
+            + "<emp:skippedElement>"
+            + "<age>35</age>"
+            + "</emp:skippedElement>"
+            + "<emp:email>alex.just@nowhere</emp:email>"
+            + "</emp:EmployeeByNameRequest>").getBytes());
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
+        reader = new InTransformReader(reader,
+                                        Collections.singletonMap("{http://www.jpworks.com/employee}skippedElement", ""),
+                                        null,
+                                        null,
+                                        null, false);
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        StaxUtils.copy(reader, bos);
+        String value = bos.toString();
+        assertEquals("<emp:EmployeeByNameRequest xmlns:emp=\"http://www.jpworks.com/employee\">"
+                + "<emp:firstname>Alex</emp:firstname>"
+                + "<emp:lastname>Just</emp:lastname>"
+                + "<emp:email>alex.just@nowhere</emp:email>"
+                + "</emp:EmployeeByNameRequest>", value);
+    }
+
+    @Test
+    public void testDropComplexElementLastByReplacement() throws Exception {
+        InputStream is = new ByteArrayInputStream(new String(
+              "<emp:EmployeeByNameRequest xmlns:emp=\"http://www.jpworks.com/employee\">"
+            + "<emp:firstname>Alex</emp:firstname>"
+            + "<emp:lastname>Just</emp:lastname>"
+            + "<emp:skippedElement>"
+            + "<age>35</age>"
+            + "</emp:skippedElement>"
+            + "</emp:EmployeeByNameRequest>").getBytes());
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
+        reader = new InTransformReader(reader,
+                                        Collections.singletonMap("{http://www.jpworks.com/employee}skippedElement", ""),
+                                        null,
+                                        null,
+                                        null, false);
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        StaxUtils.copy(reader, bos);
+        String value = bos.toString();
+        assertEquals("<emp:EmployeeByNameRequest xmlns:emp=\"http://www.jpworks.com/employee\">"
+                + "<emp:firstname>Alex</emp:firstname>"
+                + "<emp:lastname>Just</emp:lastname>"
+                + "</emp:EmployeeByNameRequest>", value);
+    }
+
+    @Test
+    public void testDropSimpleElementByReplacement() throws Exception {
+        InputStream is = new ByteArrayInputStream(new String(
+              "<emp:EmployeeByNameRequest xmlns:emp=\"http://www.jpworks.com/employee\">"
+            + "<emp:firstname>Alex</emp:firstname>"
+            + "<emp:lastname>Just</emp:lastname>"
+            + "<emp:skippedElement>"
+            + "<age>35</age>"
+            + "</emp:skippedElement>"
+            + "</emp:EmployeeByNameRequest>").getBytes());
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
+        reader = new InTransformReader(reader,
+                                        Collections.singletonMap("age", ""),
+                                        null,
+                                        null,
+                                        null, false);
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        StaxUtils.copy(reader, bos);
+        String value = bos.toString();
+        assertEquals("<emp:EmployeeByNameRequest xmlns:emp=\"http://www.jpworks.com/employee\">"
+                + "<emp:firstname>Alex</emp:firstname>"
+                + "<emp:lastname>Just</emp:lastname>"
+                + "<emp:skippedElement/>"
+                + "</emp:EmployeeByNameRequest>", value);
+    }
 
     @Test
     public void testTransformAndReplaceSimpleElement() throws Exception {
