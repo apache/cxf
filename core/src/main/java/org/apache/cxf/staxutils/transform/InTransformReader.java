@@ -261,9 +261,8 @@ public class InTransformReader extends DepthXMLStreamReader {
     }
 
     private void handleDeepDrop() throws XMLStreamException {
-        final int depth = getDepth();
         int read = 0;
-        while (depth != getDepth() || hasNext()) {
+        while (hasNext()) {
             // get to the matching end element event (accounting for all inner elements)
             final int event = super.next();
             if (event == XMLStreamConstants.START_ELEMENT) {
