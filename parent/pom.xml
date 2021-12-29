@@ -254,7 +254,7 @@
         <cxf.osgi.saaj.version>[1.4,2)</cxf.osgi.saaj.version>
         <cxf.osgi.jws.version>[0,3)</cxf.osgi.jws.version>
         <cxf.osgi.version>6.0.0</cxf.osgi.version>
-        <cxf.pax.exam.version>4.13.4</cxf.pax.exam.version>
+        <cxf.pax.exam.version>4.13.5</cxf.pax.exam.version>
         <cxf.reflections.bundle.version>0.9.11_2</cxf.reflections.bundle.version>
         <cxf.rhino.bundle.version>1.7.13_1</cxf.rhino.bundle.version>
         <cxf.servicemix.aspectj.version>1.9.1_1</cxf.servicemix.aspectj.version>
