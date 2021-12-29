@@ -20,10 +20,10 @@
 <featuresProcessing xmlns="http://karaf.apache.org/xmlns/features-processing/v1.0.0" xmlns:f="http://karaf.apache.org/xmlns/features/v1.6.0">
    <featureReplacements>
         <replacement mode="merge">
-            <feature name="pax-http-undertow" version="7.2.23">
+            <feature name="pax-http-undertow" version="7.2.29">
                 <f:bundle start-level="35">mvn:org.apache.cxf/cxf-servlet-compatible/${project.version}</f:bundle>
             </feature>
-            <feature name="pax-http-jetty" version="7.2.23">
+            <feature name="pax-http-jetty" version="7.2.29">
                 <f:bundle start-level="35">mvn:org.apache.cxf/cxf-servlet-compatible/${project.version}</f:bundle>
             </feature>
         </replacement>
