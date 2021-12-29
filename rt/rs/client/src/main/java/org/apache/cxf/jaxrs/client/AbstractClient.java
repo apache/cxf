@@ -440,8 +440,7 @@ public abstract class AbstractClient implements Client {
             return currentResponseBuilder;
         }
         
-        String reasonPhrase = (String)MessageUtils.getContextualProperty(
-                   responseMessage, HTTPConduit.HTTP_RESPONSE_MESSAGE, null);
+        final String reasonPhrase = (String)responseMessage.get(HTTPConduit.HTTP_RESPONSE_MESSAGE);
         if (reasonPhrase != null) {
             currentResponseBuilder.status(status, reasonPhrase);
         }
