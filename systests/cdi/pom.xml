@@ -31,10 +31,6 @@
     <name>Apache CXF CDI Integration System Tests</name>
     <description>Apache CXF CDI Integration System Tests</description>
     <url>https://cxf.apache.org</url>
-    <properties>
-        <cxf.glassfish.el.version>3.0.1-b11</cxf.glassfish.el.version>
-        <cxf.openwebbeans.version>2.0.14</cxf.openwebbeans.version>
-    </properties>
     <modules>
         <module>base</module>
         <module>cdi-weld</module>
