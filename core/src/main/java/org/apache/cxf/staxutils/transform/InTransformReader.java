@@ -170,7 +170,7 @@ public class InTransformReader extends DepthXMLStreamReader {
 
             namespaceContext.up();
             final boolean dropped = inDropSet.contains(theName);
-            if (!dropped) {
+            if (!dropped && !pushedAheadEvents.isEmpty()) {
                 List<ParsingEvent> pe = pushedAheadEvents.remove(0);
                 if (null != pe) {
                     if (doDebug) {
@@ -261,12 +261,21 @@ public class InTransformReader extends DepthXMLStreamReader {
     }
 
     private void handleDeepDrop() throws XMLStreamException {
-        final int depth = getDepth();
-        while (depth != getDepth() || super.next() != XMLStreamConstants.END_ELEMENT) {
-            // get to the matching end element event
+        int read = 0;
+        while (hasNext()) {
+            // get to the matching end element event (accounting for all inner elements)
+            final int event = super.next();
+            if (event == XMLStreamConstants.START_ELEMENT) {
+                ++read;
+            } else if (event == XMLStreamConstants.END_ELEMENT) {
+                if (read == 0) {
+                    break; 
+                } else {
+                    --read;
+                }
+            }
         }
     }
-
 
     public Object getProperty(String name) {
         if (INTERN_NAMES.equals(name) || INTERN_NS.equals(name)) {
