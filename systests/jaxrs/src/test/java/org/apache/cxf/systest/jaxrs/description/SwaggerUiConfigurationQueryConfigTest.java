@@ -43,8 +43,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-public class SwaggerUiConfigurationTest extends AbstractClientServerTestBase {
-    private static final String PORT = allocatePort(SwaggerUiConfigurationTest.class);
+public class SwaggerUiConfigurationQueryConfigTest extends AbstractClientServerTestBase {
+    private static final String PORT = allocatePort(SwaggerUiConfigurationQueryConfigTest.class);
 
     public static class Server extends AbstractServerTestServerBase {
 
@@ -57,7 +57,7 @@ public class SwaggerUiConfigurationTest extends AbstractClientServerTestBase {
             sf.setProvider(new JacksonJsonProvider());
             final Swagger2Feature feature = new Swagger2Feature();
             feature.setRunAsFilter(false);
-            feature.setSwaggerUiConfig(new SwaggerUiConfig().url("/swagger.json"));
+            feature.setSwaggerUiConfig(new SwaggerUiConfig().url("/swagger.json").queryConfigEnabled(true));
             sf.setFeatures(Arrays.asList(feature));
             sf.setAddress("http://localhost:" + PORT + "/");
             return sf.create();
@@ -76,22 +76,6 @@ public class SwaggerUiConfigurationTest extends AbstractClientServerTestBase {
     }
 
     @Test
-    public void testUiRootResourceRedirect() {
-        // Test that Swagger UI resources do not interfere with
-        // application-specific ones and are accessible.
-        final String url = "http://localhost:" + getPort() + "/api-docs";
-
-        WebClient uiClient = WebClient
-            .create(url)
-            .accept("*/*");
-
-        try (Response response = uiClient.get()) {
-            assertThat(response.getStatus(), equalTo(Response.Status.TEMPORARY_REDIRECT.getStatusCode()));
-            assertThat(response.getHeaderString("Location"), equalTo(url + "?url=/swagger.json"));
-        }
-    }
-
-    @Test
     public void testUiRootResource() {
         // Test that Swagger UI resources do not interfere with
         // application-specific ones and are accessible.
@@ -103,24 +87,7 @@ public class SwaggerUiConfigurationTest extends AbstractClientServerTestBase {
         try (Response response = uiClient.get()) {
             String html = response.readEntity(String.class);
             assertThat(html, containsString("<!-- HTML"));
-            assertThat(html, containsString("url: \"/swagger.json\","));
-            assertThat(response.getMediaType(), equalTo(MediaType.TEXT_HTML_TYPE));
-        }
-    }
-
-    @Test
-    public void testUiRootResourcePicksUrlFromConfigurationOnly() {
-        // Test that Swagger UI URL is picked from configuration only and 
-        // never from the query string (when query config is disabled).
-        WebClient uiClient = WebClient
-            .create("http://localhost:" + getPort() + "/api-docs")
-            .query("url", "http://malicious.site/swagger.json")
-            .accept("*/*");
-
-        try (Response response = uiClient.get()) {
-            String html = response.readEntity(String.class);
-            assertThat(html, containsString("<!-- HTML"));
-            assertThat(html, containsString("url: \"/swagger.json\","));
+            assertThat(html, containsString("url: \"https://petstore.swagger.io/v2/swagger.json\","));
             assertThat(response.getMediaType(), equalTo(MediaType.TEXT_HTML_TYPE));
         }
     }
