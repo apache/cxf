@@ -72,12 +72,13 @@ public class ServiceListJAASAuthenticator {
         try {
             Subject subject = new Subject();
             LoginContext loginContext = new LoginContext(realm, subject, new CallbackHandler() {
-                public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+                public void handle(Callback[] callbacks) throws UnsupportedCallbackException {
                     for (int i = 0; i < callbacks.length; i++) {
                         if (callbacks[i] instanceof NameCallback) {
                             ((NameCallback)callbacks[i]).setName(username);
                         } else if (callbacks[i] instanceof PasswordCallback) {
-                            ((PasswordCallback)callbacks[i]).setPassword(password.toCharArray());
+                            ((PasswordCallback)callbacks[i]).setPassword(
+                                password == null ? null : password.toCharArray());
                         } else {
                             throw new UnsupportedCallbackException(callbacks[i]);
                         }
