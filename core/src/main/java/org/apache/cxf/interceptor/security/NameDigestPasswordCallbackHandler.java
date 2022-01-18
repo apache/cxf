@@ -72,7 +72,7 @@ public class NameDigestPasswordCallbackHandler implements CallbackHandler {
                 ((NameCallback) callback).setName(username);
             } else if (callback instanceof PasswordCallback) {
                 PasswordCallback pwCallback = (PasswordCallback) callback;
-                pwCallback.setPassword(password.toCharArray());
+                pwCallback.setPassword(password == null ? null : password.toCharArray());
             } else if (!invokePasswordCallback(callback)) {
                 org.apache.cxf.common.i18n.Message errorMsg =
                     new org.apache.cxf.common.i18n.Message("UNSUPPORTED_CALLBACK_TYPE",
