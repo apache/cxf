@@ -84,6 +84,7 @@
         <cxf.arquillian.version>1.1.14.Final</cxf.arquillian.version>
         <cxf.arquillian.weld.container.version>2.0.1.Final</cxf.arquillian.weld.container.version>
         <cxf.aspectj.version>1.9.1</cxf.aspectj.version>
+        <cxf.assertj.version>3.22.0</cxf.assertj.version>
         <cxf.atmosphere.version.range>[2.4,3.0)</cxf.atmosphere.version.range>
         <cxf.atmosphere.version>2.6.1</cxf.atmosphere.version>
         <cxf.bcprov.version>1.70</cxf.bcprov.version>
@@ -834,6 +835,12 @@
                 <groupId>org.awaitility</groupId>
                 <artifactId>awaitility</artifactId>
                 <version>${cxf.awaitility.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${cxf.assertj.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
