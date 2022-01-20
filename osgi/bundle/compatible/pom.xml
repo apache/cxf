@@ -162,7 +162,6 @@
                             javax.xml.soap,
                             junit.framework*;resolution:=optional,
                             net.sf.cglib*;resolution:=optional;version="${cxf.cglib.osgi.version}",
-                            org.apache.abdera*;resolution:=optional;version="[1.0,2)",
                             org.apache.aries*;resolution:=optional;version="${cxf.aries.version.range}",
                             org.apache.commons.lang3*;resolution:=optional;version="[3,4)",
                             org.apache.commons.codec*;resolution:=optional,
