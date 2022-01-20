@@ -16,22 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.systests.cdi.base;
 
+public class AtomFeedEntry {
+    private String link;
 
-package org.apache.cxf.systest.jaxrs;
-
-
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
-
-@Path("/atom")
-public class AtomBookStore3 extends AtomBookStore {
-
-    @Context
-    public void setUriInfo(UriInfo ui) {
-        super.uField = ui;
+    public void addLink(String l) {
+        this.link = l;
+    }
+    
+    public String getLink() {
+        return link;
     }
 }
-
-

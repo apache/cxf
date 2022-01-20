@@ -16,26 +16,44 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.systests.cdi.base;
 
-package org.apache.cxf.systest.jaxrs;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 
-public class AtomBookServer extends AbstractSpringServer {
+public class AtomFeed implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    public static final String PORT = allocatePort(AtomBookServer.class);
+    private String id;
+    private String language;
+    private Collection<AtomFeedEntry> entries = new ArrayList<>();
 
-    public AtomBookServer() {
-        super("/jaxrs_atom", Integer.parseInt(PORT));
+    public AtomFeed() {
     }
 
-    public static void main(String[] args) {
-        try {
-            AtomBookServer s = new AtomBookServer();
-            s.start();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
-        } finally {
-            System.out.println("done!");
-        }
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(final String language) {
+        this.language = language;
+    }
+    
+    public void setId(String id) {
+        this.id = id;
+    }
+    
+    public String getId() {
+        return id;
+    }
+
+    public void addEntry(AtomFeedEntry entry) {
+        entries.add(entry);
+    }
+    
+    public Collection<AtomFeedEntry> getEntries() {
+        return entries;
     }
 }
+
