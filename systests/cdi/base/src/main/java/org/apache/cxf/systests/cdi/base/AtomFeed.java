@@ -16,35 +16,44 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.systests.cdi.base;
 
-package org.apache.cxf.systest.jaxrs;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Produces;
+public class AtomFeed implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-import org.apache.abdera.model.Entry;
+    private String id;
+    private String language;
+    private Collection<AtomFeedEntry> entries = new ArrayList<>();
 
-
-public class AtomBook {
-    private Book book;
-
-    public AtomBook(Book book) {
-        this.book = book;
+    public AtomFeed() {
     }
 
-
-
-    @GET
-    @Produces("application/atom+xml")
-    public Entry getAsEntry() {
-        try {
-            return AtomUtils.createBookEntry(book);
-        } catch (Exception ex) {
-            // common, it's just a test
-        }
-        return null;
+    public String getLanguage() {
+        return language;
     }
 
+    public void setLanguage(final String language) {
+        this.language = language;
+    }
+    
+    public void setId(String id) {
+        this.id = id;
+    }
+    
+    public String getId() {
+        return id;
+    }
 
-
+    public void addEntry(AtomFeedEntry entry) {
+        entries.add(entry);
+    }
+    
+    public Collection<AtomFeedEntry> getEntries() {
+        return entries;
+    }
 }
+

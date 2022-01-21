@@ -26,9 +26,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import org.apache.abdera.model.Feed;
-import org.apache.abdera.parser.stax.FOMEntry;
-import org.apache.abdera.parser.stax.FOMFeed;
+import org.apache.cxf.systests.cdi.base.AtomFeed;
+import org.apache.cxf.systests.cdi.base.AtomFeedEntry;
 import org.apache.cxf.systests.cdi.base.Book;
 import org.apache.cxf.systests.cdi.base.BookStoreService;
 
@@ -47,11 +46,11 @@ public class BookStoreFeed {
     @Path("/books/feed")
     @NotNull @Valid
     @Produces("application/atom+xml")
-    public Feed getBooks() {
-        final FOMFeed feed = new FOMFeed();
+    public AtomFeed getBooks() {
+        final AtomFeed feed = new AtomFeed();
 
         for (final Book book: service.all()) {
-            final FOMEntry entry = new FOMEntry();
+            final AtomFeedEntry entry = new AtomFeedEntry();
             entry.addLink("/bookstore/books/" + book.getId());
             feed.addEntry(entry);
         }
