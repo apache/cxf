@@ -152,6 +152,9 @@ public final class ResponseImpl extends Response {
         Object actualEntity = getActualEntity();
         if (actualEntity == null) {
             return false;
+        } else if (entityBufferred) {
+            // if actualEntity is not null and entity was buffered, the response definitely has entity
+            return true;
         } else if (actualEntity instanceof InputStream) {
             final InputStream is = (InputStream) actualEntity;
             try {
