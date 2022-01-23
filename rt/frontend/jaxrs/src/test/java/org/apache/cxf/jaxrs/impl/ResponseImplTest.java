@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
@@ -34,6 +35,9 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.activation.DataSource;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.GenericEntity;
@@ -50,6 +54,8 @@ import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Variant;
 import javax.ws.rs.core.Variant.VariantListBuilder;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.RuntimeDelegate;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 import javax.xml.transform.Source;
@@ -60,6 +66,7 @@ import javax.xml.transform.dom.DOMResult;
 import org.w3c.dom.Document;
 
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.resources.Book;
@@ -641,7 +648,7 @@ public class ResponseImplTest {
         
         response.close();
     }
-    
+
     @Test
     public void testReadDataSource() throws IOException {
         final String str = "ouch";
@@ -682,6 +689,80 @@ public class ResponseImplTest {
         assertEquals(str, response.readEntity(String.class, annotations));
         assertThrows(IllegalStateException.class, 
             () -> response.readEntity(Reader.class, annotations));
+    }
+
+    @Test
+    public void testBufferAndReadInputStream() throws IOException {
+        final String str = "ouch";
+
+        try (ByteArrayInputStream out = new ByteArrayInputStream(str.getBytes())) {
+            final ResponseImpl response = new ResponseImpl(500, out);
+            final Message outMessage = createMessage();
+            outMessage.put(Message.REQUEST_URI, "http://localhost");
+            response.setOutMessage(outMessage);
+
+            final MultivaluedMap<String, Object> headers = new MetadataMap<>();
+            headers.putSingle("Content-Type", "text/rdf");
+            response.addMetadata(headers);
+            
+            assertTrue(response.bufferEntity());
+            assertNotNull(response.readEntity(InputStream.class));
+            assertNotNull(response.getEntity());
+            assertTrue(response.hasEntity());
+    
+            assertNotNull(response.readEntity(InputStream.class));
+            assertNotNull(response.getEntity());
+            assertTrue(response.hasEntity());
+    
+            response.close();
+        }
+    }
+    
+    @Test
+    public void testBufferAndReadInputStreamWithException() throws IOException {
+        final String str = "ouch";
+
+        try (ByteArrayInputStream out = new ByteArrayInputStream(str.getBytes())) {
+            final ResponseImpl response = new ResponseImpl(500, out);
+            final Message outMessage = createMessage();
+            outMessage.put(Message.REQUEST_URI, "http://localhost");
+            response.setOutMessage(outMessage);
+
+            ProviderFactory factory = ProviderFactory.getInstance(outMessage);
+            factory.registerUserProvider(new FaultyMessageBodyReader<InputStream>());
+
+            final MultivaluedMap<String, Object> headers = new MetadataMap<>();
+            headers.putSingle("Content-Type", "text/rdf");
+            response.addMetadata(headers);
+            
+            assertTrue(response.bufferEntity());
+            assertThrows(ResponseProcessingException.class, () -> response.readEntity(InputStream.class));
+            assertNotNull(response.getEntity());
+            assertTrue(response.hasEntity());
+    
+            assertThrows(ResponseProcessingException.class, () -> response.readEntity(InputStream.class));
+            assertNotNull(response.getEntity());
+            assertTrue(response.hasEntity());
+    
+            response.close();
+        }
+    }
+    
+    @Provider
+    @Consumes("text/rdf")
+    public static class FaultyMessageBodyReader<T> implements MessageBodyReader<T> {
+        @Override
+        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+            return true;
+        }
+        
+        @Override
+        public T readFrom(Class<T> type, Type genericType, Annotation[] annotations, MediaType mediaType,
+                MultivaluedMap<String, String> httpHeaders, InputStream entityStream) 
+                    throws IOException, WebApplicationException {
+            IOUtils.consume(entityStream);
+            throw new IOException();
+        }
     }
     
     public static class StringBean {
