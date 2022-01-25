@@ -101,6 +101,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     protected Set<Class<?>> collectionContextClasses = ConcurrentHashMap.newKeySet();
 
     protected Map<String, String> jaxbElementClassMap = Collections.emptyMap();
+    protected Map<String, Boolean> objectFactoryOrIndexMap = new ConcurrentHashMap<>();
     protected boolean unmarshalAsJaxbElement;
     protected boolean marshalAsJaxbElement;
     protected boolean xmlTypeAsJaxbElementOnly;
@@ -594,8 +595,15 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     }
 
     protected boolean objectFactoryOrIndexAvailable(Class<?> type) {
-        return type.getResource("ObjectFactory.class") != null
+        if (this.objectFactoryOrIndexMap.get(type.getName()) != null) {
+            return this.objectFactoryOrIndexMap.get(type.getName());
+        } else {
+            boolean ret = type.getResource("ObjectFactory.class") != null
                || type.getResource("jaxb.index") != null;
+            this.objectFactoryOrIndexMap.put(type.getName(), ret);
+            return ret;
+        }
+        
     }
 
     private boolean objectFactoryForType(Type genericType) {
@@ -704,6 +712,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     public void clearContexts() {
         classContexts.clear();
         packageContexts.clear();
+        objectFactoryOrIndexMap.clear();
     }
 
     //TODO: move these methods into the dedicated utility class
