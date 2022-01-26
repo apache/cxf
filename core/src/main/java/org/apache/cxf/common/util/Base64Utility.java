@@ -251,7 +251,7 @@ public final class Base64Utility {
     }
 
     public static String encode(byte[] id, boolean urlSafe) {
-        char[] cd = encodeChunk(id, 0, id.length);
+        char[] cd = encodeChunk(id, 0, id.length, urlSafe);
         return new String(cd, 0, cd.length);
     }
 
