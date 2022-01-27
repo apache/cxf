@@ -46,6 +46,7 @@ import org.junit.BeforeClass;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests thread pool config.
@@ -53,10 +54,12 @@ import static org.junit.Assert.assertTrue;
 
 public class UndertowBasicAuthTest extends AbstractClientServerTestBase {
     private static final String ADDRESS = UndertowBasicAuthServer.ADDRESS;
+    private static final String ADDRESS1 = UndertowBasicAuthServer.ADDRESS1;
     private static final QName SERVICE_NAME =
         new QName("http://apache.org/hello_world_soap_http", "SOAPServiceAddressing");
 
     private Greeter greeter;
+    private Greeter greeter1;
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -75,11 +78,30 @@ public class UndertowBasicAuthTest extends AbstractClientServerTestBase {
                                    ADDRESS);
         bp.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, "ffang");
         bp.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, "pswd");
+        
+        greeter1 = new SOAPService(wsdl, SERVICE_NAME).getPort(Greeter.class);
+        bp = (BindingProvider)greeter1;
+        ClientProxy.getClient(greeter1).getInInterceptors().add(new LoggingInInterceptor());
+        ClientProxy.getClient(greeter1).getOutInterceptors().add(new LoggingOutInterceptor());
+        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                                   ADDRESS1);
+        bp.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, "ffang");
+        bp.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, "pswd");
     }
 
     @org.junit.Test
     public void testBasicAuth() throws Exception {
         assertEquals("Hello Alice", greeter.greetMe("Alice"));
+    }
+    
+    @org.junit.Test
+    public void testDisalloowMethodHandler() throws Exception {
+        try {
+            greeter1.greetMe("Alice");
+            fail("should catch '405: Method Not Allowed' exception");
+        } catch (Exception ex) {
+            assertTrue(ex.getCause().getMessage().contains("405: Method Not Allowed"));
+        }
     }
     
     @org.junit.Test
