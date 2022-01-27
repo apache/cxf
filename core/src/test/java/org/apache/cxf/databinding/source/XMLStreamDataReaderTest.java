@@ -26,6 +26,7 @@ import java.io.InputStream;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -40,6 +41,8 @@ import static org.junit.Assert.assertTrue;
  */
 public class XMLStreamDataReaderTest {
     private static final byte[] DUMMY_DATA = "<ns:dummy xmlns:ns='http://www.apache.org/cxf'/>".getBytes();
+    private static final byte[] DUMMY_DATA_NULL_BYTE =
+        "<ns:dummy xmlns:ns='http://www.apache.org/cxf&#x00;'/>".getBytes();
 
     @Test
     public void testCloseOriginalInputStream() throws Exception {
@@ -61,6 +64,32 @@ public class XMLStreamDataReaderTest {
         ((XMLStreamReader)obj).close();
 
         assertTrue(in1.isClosed());
+    }
+
+    // Parse some XML with a null byte and check we don't return internal Woodstox package names in the error message
+    @Test
+    public void testParseNullByte() throws Exception {
+        XMLStreamDataReader reader = new XMLStreamDataReader();
+        Message msg = new MessageImpl();
+
+        TestInputStream in1 = new TestInputStream(DUMMY_DATA_NULL_BYTE);
+
+        msg.setContent(InputStream.class, in1);
+
+        reader.setProperty(Message.class.getName(), msg);
+
+        Object obj = reader.read(new QName("http://www.apache.org/cxf", "dummy"),
+                StaxUtils.createXMLStreamReader(in1), XMLStreamReader.class);
+
+        assertTrue(obj instanceof XMLStreamReader);
+
+        try {
+            reader.read((XMLStreamReader) obj);
+        } catch (Fault f) {
+            assertFalse(f.getMessage().contains("com.ctc.wstx"));
+        }
+
+        ((XMLStreamReader)obj).close();
     }
 
     private static class TestInputStream extends ByteArrayInputStream {
