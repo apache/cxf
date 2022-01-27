@@ -42,5 +42,17 @@
                 </bean>
             </httpu:handlers>
         </httpu:engine>
+        <httpu:engine port="${testutil.ports.UndertowBasicAuthServer1}">
+            <httpu:handlers>
+                <bean class="org.apache.cxf.transport.http_undertow.handlers.CxfDisallowedMethodsHandler">
+                    <constructor-arg>
+                        <array>
+                            <value>POST</value>
+                            <value>GET</value>
+                        </array>
+                    </constructor-arg>
+                </bean>
+            </httpu:handlers>
+        </httpu:engine>
     </httpu:engine-factory>
 </beans>
