@@ -6,7 +6,7 @@ pipeline {
     tools { 
         ant 'ant_1.10.10'
         maven 'maven_3.6.3' 
-        jdk 'jdk_1.8.0_241' 
+        jdk 'jdk_1.8_latest' 
     }
     
     environment {
@@ -16,7 +16,9 @@ pipeline {
     stages {
         stage("Initialization") {
             steps {
-                buildName "#${BUILD_NUMBER} CXF ${params.Version} JAX-RS 2.1 TCK"
+                script {
+                    currentBuild.displayName = "#${BUILD_NUMBER} CXF ${params.Version} JAX-RS 2.1 TCK"
+                }
             }
         }
 
@@ -41,7 +43,7 @@ pipeline {
        stage('Download JakartaEE TCK') {
            steps {
                checkout([$class: 'GitSCM',
-	           branches: [[name: 'refs/tags/8.0.2']],
+	               branches: [[name: 'refs/tags/8.0.2']],
                    userRemoteConfigs: [[url: 'https://github.com/eclipse-ee4j/jakartaee-tck']],
                    extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'jakartaee-tck']]
                ])
@@ -59,12 +61,14 @@ pipeline {
        stage('Download Apache CXF bits') {
            steps {
                echo "Using Apache CXF version: " + params.Version
-               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-core:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
-               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-rt-frontend-jaxrs:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
-               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-rt-rs-client:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
-               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-rt-rs-sse:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
-               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-rt-transports-http:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
-               echo "Including additional dependencies (woodstox, ...)"
+               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-core:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/modules"
+               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-rt-frontend-jaxrs:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/modules"
+               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-rt-rs-client:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/modules"
+               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-rt-rs-sse:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/modules"
+               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-rt-transports-http:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/modules"
+               sh "cp glassfish5/glassfish/modules/cxf-* glassfish5/glassfish/lib"
+
+               echo "Including additional dependencies (woodstox, stax2, ...)"
                sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=com.fasterxml.woodstox:woodstox-core:5.2.1:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
                sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.codehaus.woodstox:stax2-api:4.2:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
            }
@@ -73,7 +77,7 @@ pipeline {
        stage('Prepare JAX-RS TCK build configuration') {
            steps {
               withEnv(["WORKSPACE = ${PWD}"]) {
-                sh "wget https://raw.githubusercontent.com/apache/cxf/master/tck/ts.jte.template"
+                sh "wget https://raw.githubusercontent.com/apache/cxf/3.5.x-fixes/tck/ts.jte.template"
                 sh "sed -i '" + 's/${version}/' + params.Version + "/g' ts.jte.template"
                 sh "sed -i '" + 's#${GF_HOME}#' + "${WORKSPACE}/glassfish5/glassfish" + "#g' ts.jte.template"
                 sh "cp jakartaee-tck/bin/xml/impl/glassfish/jersey.xml jakartaee-tck/bin/xml/impl/glassfish/cxf.xml"
