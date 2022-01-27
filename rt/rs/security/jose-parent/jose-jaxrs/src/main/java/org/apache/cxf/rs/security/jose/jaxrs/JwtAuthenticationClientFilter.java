@@ -43,7 +43,7 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 public class JwtAuthenticationClientFilter extends JoseJwtProducer
     implements ClientRequestFilter {
 
-    private static final String DEFAULT_AUTH_SCHEME = "JWT";
+    private static final String DEFAULT_AUTH_SCHEME = "Bearer";
     private String authScheme = DEFAULT_AUTH_SCHEME;
     @Override
     public void filter(ClientRequestContext requestContext) throws IOException {
