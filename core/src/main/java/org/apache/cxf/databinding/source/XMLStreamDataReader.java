@@ -160,7 +160,7 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
             throw new Fault("COULD_NOT_READ_XML_STREAM", LOG, e);
         } catch (XMLStreamException e) {
             throw new Fault("COULD_NOT_READ_XML_STREAM_CAUSED_BY", LOG, e,
-                            e.getClass().getCanonicalName(), e.getMessage());
+                            e.getMessage());
         }
     }
 
@@ -298,7 +298,7 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
             return new DOMSource(document);
         } catch (XMLStreamException e) {
             throw new Fault("COULD_NOT_READ_XML_STREAM_CAUSED_BY", LOG, e,
-                            e.getClass().getCanonicalName(), e.getMessage());
+                            e.getMessage());
         }
     }
 
