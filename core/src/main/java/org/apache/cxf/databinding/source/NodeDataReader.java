@@ -64,7 +64,7 @@ public class NodeDataReader implements DataReader<Node> {
                 throw new Fault("COULD_NOT_READ_XML_STREAM", LOG, e);
             } catch (XMLStreamException e) {
                 throw new Fault("COULD_NOT_READ_XML_STREAM_CAUSED_BY", LOG, e,
-                                e.getClass().getCanonicalName(), e.getMessage());
+                                e.getMessage());
             }
         }
         return read(input);
