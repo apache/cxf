@@ -123,7 +123,7 @@ public class JaxrsJWTTest extends AbstractBusClientServerTestBase {
 
             if (token != null && token.getToken() != null) {
                 requestContext.getHeaders().putSingle(HttpHeaders.AUTHORIZATION,
-                                                      "JWT" + " " + token.getToken().getTextContent());
+                                                      "Bearer" + " " + token.getToken().getTextContent());
             }
         }
     }
