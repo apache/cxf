@@ -961,7 +961,19 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         }
     }
 
-
+    @Test
+    public void testGetBookDateAnnotated() throws Exception {
+        final String response = ClientBuilder
+            .newClient()
+            .target("http://localhost:" + PORT + "/bookstore/annotated/123")
+            .request(MediaType.TEXT_PLAIN)
+            .get()
+            .readEntity(String.class);
+            
+        assertThat(response, equalTo("2020-01-01{javax.ws.rs.GET,javax.ws.rs.Path,javax.ws.rs.Produces,"
+            + "javax.ws.rs.ext.Provider,javax.ws.rs.Consumes}"));
+    }
+    
     private static class ReplaceBodyFilter implements ClientRequestFilter {
 
         @Override
