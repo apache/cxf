@@ -82,6 +82,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -1815,6 +1816,19 @@ public class BookStore {
             .build();
     }
 
+    @GET
+    @Path("/annotated/{bookId}/")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response getGenericBookDate(@PathParam("bookId") String id) {
+        @Provider
+        @Consumes
+        class AnnotatedClass {
+        }
+        
+        return Response.ok().entity(new GregorianCalendar(2020, 00, 01),
+            AnnotatedClass.class.getAnnotations()).build();
+    }
+    
     public final String init() {
         books.clear();
         cds.clear();

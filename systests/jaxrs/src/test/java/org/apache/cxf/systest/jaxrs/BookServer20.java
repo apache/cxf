@@ -22,6 +22,7 @@ package org.apache.cxf.systest.jaxrs;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -30,10 +31,14 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.Priority;
 import javax.servlet.http.HttpServletRequest;
@@ -54,9 +59,12 @@ import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
 import javax.ws.rs.ext.WriterInterceptor;
@@ -102,6 +110,7 @@ public class BookServer20 extends AbstractServerTestServerBase {
         providers.add(new ServerTestFeature());
         providers.add(new JacksonJaxbJsonProvider());
         providers.add(new IOExceptionMapper());
+        providers.add(new GregorianCalendarMessageBodyWriter());
         sf.setApplication(new Application());
         sf.setProviders(providers);
         sf.setResourceProvider(BookStore.class,
@@ -537,5 +546,28 @@ public class BookServer20 extends AbstractServerTestServerBase {
                 .entity("Prematch filter error").header("IOException", "true").build();
         }
 
+    }
+    
+    @Provider
+    private class GregorianCalendarMessageBodyWriter implements MessageBodyWriter<GregorianCalendar> {
+        @Override
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+            return GregorianCalendar.class.equals(type);
+        }
+
+        @Override
+        public void writeTo(GregorianCalendar t, Class<?> type, Type genericType, Annotation[] annotations, 
+                MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) 
+                    throws IOException, WebApplicationException {
+            // Write in the following format: yyyy-MM-dd{ann1,ann2,...}
+            final String str = new SimpleDateFormat("yyyy-MM-dd").format(t.getTime())
+                + "{"
+                + Arrays
+                    .stream(annotations)
+                    .map(a -> a.annotationType().getName())
+                    .collect(Collectors.joining(","))
+                + "}";
+            entityStream.write(str.getBytes());
+        }
     }
 }
