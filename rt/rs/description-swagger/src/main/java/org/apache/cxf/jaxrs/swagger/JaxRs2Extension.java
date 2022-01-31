@@ -99,7 +99,7 @@ public class JaxRs2Extension extends AbstractSwaggerExtension {
 
                     // Gather the field's details
                     if (field != null) {
-                        paramType = field.getAnnotated().getGenericType();
+                        paramType = field.getAnnotated().getType();
 
                         for (final Annotation fieldAnnotation : field.annotations()) {
                             if (!paramAnnotations.contains(fieldAnnotation)) {
