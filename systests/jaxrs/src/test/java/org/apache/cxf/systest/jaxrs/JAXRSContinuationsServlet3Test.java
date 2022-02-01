@@ -87,7 +87,6 @@ public class JAXRSContinuationsServlet3Test extends AbstractJAXRSContinuationsTe
     }
 
     @Test
-    // FIXME: standalone test run failed, eg -Dtest=JAXRSContinuationsServlet3Test#testSuspendSetTimeout
     public void testSuspendSetTimeout() throws Exception {
         final String base = "http://localhost:" + getPort() + "/async/resource2/";
         Future<Response> suspend = invokeRequest(base + "suspend");
