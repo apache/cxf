@@ -48,8 +48,11 @@ under the License.
     <bean id="serviceBean" class="org.apache.cxf.systest.jaxrs.security.saml.SecureBookStore"/>
     <bean id="serviceBeanClaims" class="org.apache.cxf.systest.jaxrs.security.saml.SecureClaimBookStore"/>
     <bean id="samlEnvHandler" class="org.apache.cxf.rs.security.saml.SamlEnvelopedInHandler"/>
-    <bean id="claimsHandler" class="org.apache.cxf.jaxrs.security.ClaimsAuthorizingFilter">
+    <bean id="claimsInterceptor" class="org.apache.cxf.rt.security.claims.interceptor.ClaimsAuthorizingInterceptor">
         <property name="securedObject" ref="serviceBeanClaims"/>
+    </bean>
+    <bean id="claimsHandler" class="org.apache.cxf.jaxrs.security.ClaimsAuthorizingFilter">
+        <constructor-arg ref="claimsInterceptor"/>
     </bean>
     <bean id="authorizationInterceptor" class="org.apache.cxf.interceptor.security.SecureAnnotationsInterceptor">
         <property name="securedObject" ref="serviceBean"/>

@@ -33,7 +33,15 @@ import org.apache.cxf.rt.security.claims.interceptor.ClaimsAuthorizingIntercepto
 
 public class ClaimsAuthorizingFilter implements ContainerRequestFilter {
 
-    private ClaimsAuthorizingInterceptor interceptor = new ClaimsAuthorizingInterceptor();
+    private ClaimsAuthorizingInterceptor interceptor;
+
+    public ClaimsAuthorizingFilter() {
+        this.interceptor = new ClaimsAuthorizingInterceptor();
+    }
+
+    public ClaimsAuthorizingFilter(ClaimsAuthorizingInterceptor interceptor) {
+        this.interceptor = interceptor;
+    }
 
     @Override
     public void filter(ContainerRequestContext context) {
@@ -45,13 +53,14 @@ public class ClaimsAuthorizingFilter implements ContainerRequestFilter {
         }
     }
 
+    @Deprecated()
     public void setClaims(Map<String, List<ClaimBean>> claimsMap) {
         interceptor.setClaims(claimsMap);
     }
 
+    @Deprecated()
     public void setSecuredObject(Object securedObject) {
         interceptor.setSecuredObject(securedObject);
     }
-
 
 }
