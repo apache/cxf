@@ -223,7 +223,7 @@ public class ReaderInputStream extends InputStream {
         if (b == null) {
             throw new NullPointerException("Byte array must not be null");
         }
-        if (len < 0 || off < 0 || (off + len) > b.length) {
+        if (len < 0 || off < 0 || Math.addExact(off, len) > b.length) {
             throw new IndexOutOfBoundsException("Array Size=" + b.length
                     + ", offset=" + off + ", length=" + len);
         }

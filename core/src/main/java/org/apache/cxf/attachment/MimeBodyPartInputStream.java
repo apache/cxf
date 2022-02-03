@@ -60,11 +60,11 @@ public class MimeBodyPartInputStream extends InputStream {
             return 0;
         }
         boolean bufferCreated = false;
-        if (len < boundary.length * 2) {
+        if (len < Math.addExact(boundary.length, boundary.length)) {
             //buffer is too short to detect boundaries with it.  We'll need to create a larger buffer
             bufferCreated = true;
             if (boundaryBuffer == null) {
-                boundaryBuffer = new byte[boundary.length * 2];
+                boundaryBuffer = new byte[Math.addExact(boundary.length, boundary.length)];
             }
             b = boundaryBuffer;
             off = 0;
@@ -75,7 +75,7 @@ public class MimeBodyPartInputStream extends InputStream {
         }
         int read = 0;
         int idx = 0;
-        while (read >= 0 && idx < len && idx < (boundary.length * 2)) {
+        while (read >= 0 && idx < len && idx < Math.addExact(boundary.length, boundary.length)) {
             //make sure we read enough to detect the boundary
             read = inStream.read(b, off + idx, len - idx);
             if (read != -1) {

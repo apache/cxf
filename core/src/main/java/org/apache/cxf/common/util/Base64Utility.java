@@ -161,7 +161,7 @@ public final class Base64Utility {
         byte[] ob = new byte[octetCount];
         int obcount = 0;
 
-        for (int i = o;  i < o + l && i < id.length;  i++) {
+        for (int i = o;  i < Math.addExact(o, l) && i < id.length;  i++) {
             if (id[i] == PAD
                 || id[i] < BDT.length
                 && BDT[id[i]] != Byte.MAX_VALUE) {
