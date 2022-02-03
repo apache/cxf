@@ -169,7 +169,7 @@ public final class WebSocketUtils {
      */
     public static byte[] buildResponse(byte[] headers, byte[] data, int offset, int length) {
         final int hlen = headers != null ? headers.length : 0;
-        byte[] longdata = new byte[length + 2 + hlen];
+        byte[] longdata = new byte[Math.addExact(length, hlen) + 2];
 
         if (hlen > 0) {
             System.arraycopy(headers, 0, longdata, 0, hlen);

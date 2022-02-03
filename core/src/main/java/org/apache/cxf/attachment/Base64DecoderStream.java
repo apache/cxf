@@ -187,6 +187,6 @@ public class Base64DecoderStream extends FilterInputStream {
 
 
     public int available() throws IOException {
-        return ((in.available() / 4) * 3) + decodedCount;
+        return Math.addExact((in.available() / 4) * 3, decodedCount);
     }
 }

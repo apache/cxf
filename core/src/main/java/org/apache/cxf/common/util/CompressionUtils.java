@@ -70,7 +70,8 @@ public final class CompressionUtils {
         compresser.setInput(tokenBytes);
         compresser.finish();
 
-        byte[] output = new byte[tokenBytes.length * 2];
+        int tokenBytesLength = tokenBytes.length;
+        byte[] output = new byte[Math.addExact(tokenBytesLength, tokenBytesLength)];
 
         int compressedDataLength = compresser.deflate(output);
 
