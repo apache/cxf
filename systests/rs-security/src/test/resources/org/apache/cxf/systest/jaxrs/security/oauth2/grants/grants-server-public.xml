@@ -130,6 +130,7 @@ under the License.
    <bean id="plainVerifier" class="org.apache.cxf.rs.security.oauth2.grants.code.PlainCodeVerifier" />
    <bean id="codeGrantHandler" class="org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrantHandler">
       <property name="dataProvider" ref="oauthProvider"/>
+       <property name="requireCodeVerifier" value="true"/>
       <property name="codeVerifierTransformers">
           <list>
               <ref bean="digestVerifier"/>
