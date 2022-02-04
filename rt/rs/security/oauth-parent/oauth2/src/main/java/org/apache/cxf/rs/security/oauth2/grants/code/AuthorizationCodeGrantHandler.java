@@ -42,6 +42,7 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
 
     private List<CodeVerifierTransformer> codeVerifierTransformers = Collections.emptyList();
     private boolean expectCodeVerifierForPublicClients;
+    private boolean requireCodeVerifier;
 
     public AuthorizationCodeGrantHandler() {
         super(OAuthConstants.AUTHORIZATION_CODE_GRANT);
@@ -153,9 +154,11 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
 
     private boolean compareCodeVerifierWithChallenge(Client c, String clientCodeVerifier,
                                                      String clientCodeChallenge, String clientCodeChallengeMethod) {
-        if (clientCodeChallenge == null && clientCodeVerifier == null
-            && (c.isConfidential() || !expectCodeVerifierForPublicClients)) {
-            return true;
+        if (clientCodeChallenge == null && clientCodeVerifier == null) {
+            if (requireCodeVerifier) {
+                return false;
+            }
+            return c.isConfidential() || !expectCodeVerifierForPublicClients;
         } else if (clientCodeChallenge != null && clientCodeVerifier == null
             || clientCodeChallenge == null && clientCodeVerifier != null) {
             return false;
@@ -191,7 +194,19 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
         this.codeVerifierTransformers = new ArrayList<>(codeVerifierTransformers);
     }
 
+    /**
+     * Require a code verifier for public clients only.
+     * @param expectCodeVerifierForPublicClients require a code verifier for public clients only.
+     */
     public void setExpectCodeVerifierForPublicClients(boolean expectCodeVerifierForPublicClients) {
         this.expectCodeVerifierForPublicClients = expectCodeVerifierForPublicClients;
+    }
+
+    /**
+     * Require a code verifier (PKCE). This will override any value set for expectCodeVerifierForPublicClients
+     * @param requireCodeVerifier require a code verifier
+     */
+    public void setRequireCodeVerifier(boolean requireCodeVerifier) {
+        this.requireCodeVerifier = requireCodeVerifier;
     }
 }

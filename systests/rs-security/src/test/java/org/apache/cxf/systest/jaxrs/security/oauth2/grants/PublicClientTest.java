@@ -85,30 +85,6 @@ public class PublicClientTest extends AbstractClientServerTestBase {
     }
 
     @org.junit.Test
-    public void testAuthorizationCodeGrant() throws Exception {
-        URL busFile = PublicClientTest.class.getResource("publicclient.xml");
-
-        String address = "https://localhost:" + port + "/services/";
-        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
-                                            "alice", "security", busFile.toString());
-        // Save the Cookie for the second request...
-        WebClient.getConfig(client).getRequestContext().put(
-            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
-
-        // Get Authorization Code
-        String code = OAuth2TestUtils.getAuthorizationCode(client);
-        assertNotNull(code);
-
-        // Now get the access token - note services2 doesn't require basic auth
-        String address2 = "https://localhost:" + port + "/services2/";
-        client = WebClient.create(address2, busFile.toString());
-
-        ClientAccessToken accessToken =
-            OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
-        assertNotNull(accessToken.getTokenKey());
-    }
-
-    @org.junit.Test
     public void testAuthorizationCodeGrantNoRedirectURI() throws Exception {
         URL busFile = PublicClientTest.class.getResource("publicclient.xml");
 
@@ -121,7 +97,17 @@ public class PublicClientTest extends AbstractClientServerTestBase {
 
         // Get Authorization Code
         try {
-            OAuth2TestUtils.getAuthorizationCode(client, null, "fredPublic");
+            // Get Authorization Code
+            AuthorizationCodeParameters parameters = new AuthorizationCodeParameters();
+            parameters.setConsumerId("fredPublic");
+            String codeVerifier = Base64UrlUtility.encode(CryptoUtils.generateSecureRandomBytes(32));
+            CodeVerifierTransformer transformer = new PlainCodeVerifier();
+            parameters.setCodeChallenge(transformer.transformCodeVerifier(codeVerifier));
+            parameters.setCodeChallengeMethod(transformer.getChallengeMethod());
+            parameters.setResponseType(OAuthConstants.CODE_RESPONSE_TYPE);
+            parameters.setPath("authorize/");
+
+            OAuth2TestUtils.getLocation(client, parameters);
             fail("Failure expected on a missing (registered) redirectURI");
         } catch (Exception ex) {
             // expected
