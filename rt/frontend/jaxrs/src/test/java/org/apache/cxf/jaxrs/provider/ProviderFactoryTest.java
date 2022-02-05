@@ -37,9 +37,11 @@ import java.util.Map;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.annotation.Priority;
+import javax.ws.rs.ConstrainedTo;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.Produces;
+import javax.ws.rs.RuntimeType;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.MediaType;
@@ -1526,6 +1528,32 @@ public class ProviderFactoryTest {
         Object mapperResponse4 = pf.createExceptionMapper(RuntimeExceptionBB.class, new MessageImpl());
         assertSame(runtimeExceptionBMapper, mapperResponse4);
     }
+
+    @Test
+    public void testProvidersWithConstraints() {
+        ProviderFactory pf = ServerProviderFactory.getInstance();
+        
+        @ConstrainedTo(RuntimeType.SERVER)
+        class ServerWildcardReader extends WildcardReader {
+            
+        }
+        
+        @ConstrainedTo(RuntimeType.CLIENT)
+        class ClientWildcardReader extends WildcardReader {
+            
+        }
+
+        final ServerWildcardReader reader = new ServerWildcardReader();
+        pf.registerUserProvider(reader);
+        
+        List<ProviderInfo<MessageBodyReader<?>>> readers = pf.getMessageReaders();
+        assertEquals(10, readers.size());
+        assertSame(reader, readers.get(7).getProvider());
+
+        pf.registerUserProvider(new ClientWildcardReader());
+        assertEquals(10, pf.getMessageReaders().size());
+    }
+
     private static class RuntimeExceptionA extends RuntimeException {
         private static final long serialVersionUID = 1L;
     }
