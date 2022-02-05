@@ -240,9 +240,14 @@ public final class ServerProviderFactory extends ProviderFactory {
 
         List<ProviderInfo<? extends Object>> theProviders =
             prepareProviders(custom, busGlobal, allProviders.toArray(), application);
-        super.setCommonProviders(theProviders);
+        super.setCommonProviders(theProviders, RuntimeType.SERVER);
         for (ProviderInfo<? extends Object> provider : theProviders) {
             Class<?> providerCls = ClassHelper.getRealClass(getBus(), provider.getProvider());
+
+            // Check if provider is constrained to server
+            if (!constraintedTo(providerCls, RuntimeType.SERVER)) {
+                continue;
+            }
 
             if (filterContractSupported(provider, providerCls, ContainerRequestFilter.class)) {
                 addContainerRequestFilter(postMatchRequestFilters,
