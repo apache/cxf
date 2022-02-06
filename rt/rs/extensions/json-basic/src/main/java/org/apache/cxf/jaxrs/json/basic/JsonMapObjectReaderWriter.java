@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
+import java.nio.ByteBuffer;
 import java.util.*;
 
 import org.apache.cxf.common.util.StringUtils;
@@ -30,7 +31,6 @@ import org.apache.cxf.helpers.IOUtils;
 
 
 public class JsonMapObjectReaderWriter {
-    private static final Set<Character> ESCAPED_CHARS;
     private static final char DQUOTE = '"';
     private static final char COMMA = ',';
     private static final char COLON = ':';
@@ -41,18 +41,35 @@ public class JsonMapObjectReaderWriter {
     private static final char ESCAPE = '\\';
     private static final String NULL_VALUE = "null";
     private boolean format;
+    private final static int[] sOutputEscapes128;
+    private final static char[] HC = "0123456789ABCDEF".toCharArray();
 
+    /**
+     * Value used for lookup tables to indicate that matching characters
+     * are to be escaped using standard escaping; for JSON this means
+     * (for example) using "backslash - u" escape method.
+     */
+
+    public final static int ESCAPE_STANDARD = -1;
     static {
-        Set<Character> chars = new HashSet<>();
-        chars.add('"');
-        chars.add('\\');
-        chars.add('/');
-        chars.add('b');
-        chars.add('f');
-        chars.add('h');
-        chars.add('r');
-        chars.add('t');
-        ESCAPED_CHARS = Collections.unmodifiableSet(chars);
+        int[] table = new int[128];
+        // Control chars need generic escape sequence
+        for (int i = 0; i < 32; ++i) {
+            // 04-Mar-2011, tatu: Used to use "-(i + 1)", replaced with constant
+            table[i] = ESCAPE_STANDARD;
+        }
+        /* Others (and some within that range too) have explicit shorter
+         * sequences
+         */
+        table['"'] = '"';
+        table['\\'] = '\\';
+        // Escaping of slash is optional, so let's not add it
+        table[0x08] = 'b';
+        table[0x09] = 't';
+        table[0x0C] = 'f';
+        table[0x0A] = 'n';
+        table[0x0D] = 'r';
+        sOutputEscapes128 = table;
     }
 
     public JsonMapObjectReaderWriter() {
@@ -384,26 +401,38 @@ public class JsonMapObjectReaderWriter {
 
     }
 
-    private String escapeJson(String value) {
+    private String escapeJson(String content) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < value.length(); i++) {
-            char c = value.charAt(i);
-            // If we have " and the previous char was not \ then escape it
-            if (c == '"' && (i == 0 || value.charAt(i - 1) != '\\')) {
-                sb.append('\\').append(c);
-            // If we have \ and the previous char was not \ and the next char is not an escaped char, then escape it
-            } else if (c == '\\' && (i == 0 || value.charAt(i - 1) != '\\')
-                    && (i == value.length() - 1 || !isEscapedChar(value.charAt(i + 1)))) {
-                sb.append('\\').append(c);
-            } else {
+        final int[] escCodes = sOutputEscapes128;
+        int escLen = escCodes.length;
+        for (int i = 0, len = content.length(); i < len; ++i) {
+            char c = content.charAt(i);
+            if (c >= escLen || escCodes[c] == 0) {
                 sb.append(c);
+                continue;
+            }
+            sb.append('\\');
+            int escCode = escCodes[c];
+            if (escCode < 0) { // generic quoting (hex value)
+                // The only negative value sOutputEscapes128 returns
+                // is CharacterEscapes.ESCAPE_STANDARD, which mean
+                // appendQuotes should encode using the Unicode encoding;
+                // not sure if this is the right way to encode for
+                // CharacterEscapes.ESCAPE_CUSTOM or other (future)
+                // CharacterEscapes.ESCAPE_XXX values.
+
+                // We know that it has to fit in just 2 hex chars
+                sb.append('u');
+                sb.append('0');
+                sb.append('0');
+                int value = c;  // widening
+                sb.append(HC[value >> 4]);
+                sb.append(HC[value & 0xF]);
+            } else { // "named", i.e. prepend with slash
+                sb.append((char) escCode);
             }
         }
         return sb.toString();
-    }
-
-    private boolean isEscapedChar(char c) {
-        return ESCAPED_CHARS.contains(Character.valueOf(c));
     }
 
 }
