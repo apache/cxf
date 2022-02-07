@@ -245,7 +245,7 @@ public final class ServerProviderFactory extends ProviderFactory {
             Class<?> providerCls = ClassHelper.getRealClass(getBus(), provider.getProvider());
 
             // Check if provider is constrained to server
-            if (!constraintedTo(providerCls, RuntimeType.SERVER)) {
+            if (!constrainedTo(providerCls, RuntimeType.SERVER)) {
                 continue;
             }
 

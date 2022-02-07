@@ -80,7 +80,7 @@ public final class ClientProviderFactory extends ProviderFactory {
             }
             
             // Check if provider is constrained to client
-            if (!constraintedTo(providerCls, RuntimeType.CLIENT)) {
+            if (!constrainedTo(providerCls, RuntimeType.CLIENT)) {
                 continue;
             }
             
