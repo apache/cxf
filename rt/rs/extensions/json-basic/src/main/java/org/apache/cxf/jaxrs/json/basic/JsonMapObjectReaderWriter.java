@@ -18,17 +18,14 @@
  */
 package org.apache.cxf.jaxrs.json.basic;
 
+import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.IOUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
-import java.nio.ByteBuffer;
 import java.util.*;
-
-import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.helpers.IOUtils;
-
-
 
 public class JsonMapObjectReaderWriter {
     private static final char DQUOTE = '"';
@@ -55,7 +52,6 @@ public class JsonMapObjectReaderWriter {
         int[] table = new int[128];
         // Control chars need generic escape sequence
         for (int i = 0; i < 32; ++i) {
-            // 04-Mar-2011, tatu: Used to use "-(i + 1)", replaced with constant
             table[i] = ESCAPE_STANDARD;
         }
         /* Others (and some within that range too) have explicit shorter
@@ -415,11 +411,11 @@ public class JsonMapObjectReaderWriter {
             int escCode = escCodes[c];
             if (escCode < 0) { // generic quoting (hex value)
                 // The only negative value sOutputEscapes128 returns
-                // is CharacterEscapes.ESCAPE_STANDARD, which mean
+                // is ESCAPE_STANDARD, which mean
                 // appendQuotes should encode using the Unicode encoding;
                 // not sure if this is the right way to encode for
-                // CharacterEscapes.ESCAPE_CUSTOM or other (future)
-                // CharacterEscapes.ESCAPE_XXX values.
+                // ESCAPE_CUSTOM or other (future)
+                // ESCAPE_XXX values.
 
                 // We know that it has to fit in just 2 hex chars
                 sb.append('u');
