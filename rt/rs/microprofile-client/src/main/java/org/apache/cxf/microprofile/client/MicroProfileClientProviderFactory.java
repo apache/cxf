@@ -102,7 +102,7 @@ public final class MicroProfileClientProviderFactory extends ProviderFactory {
             Class<?> providerCls = ClassHelper.getRealClass(getBus(), provider.getProvider());
 
             // Check if provider is constrained to client
-            if (!constraintedTo(providerCls, RuntimeType.CLIENT)) {
+            if (!constrainedTo(providerCls, RuntimeType.CLIENT)) {
                 continue;
             }
 

@@ -634,7 +634,7 @@ public abstract class ProviderFactory {
             Class<?> providerCls = ClassHelper.getRealClass(bus, provider.getProvider());
 
             // Check if provider is constrained to runtime type
-            if (!constraintedTo(providerCls, type)) {
+            if (!constrainedTo(providerCls, type)) {
                 continue;
             }
 
@@ -1540,7 +1540,7 @@ public abstract class ProviderFactory {
      * @param type runtime type
      * @return "true" if provider could be used with runtime type, "false" otherwise
      */
-    protected static boolean constraintedTo(Class<?> providerCls, RuntimeType type) {
+    protected static boolean constrainedTo(Class<?> providerCls, RuntimeType type) {
         final ConstrainedTo constrained = AnnotationUtils.getClassAnnotation(providerCls, ConstrainedTo.class);
         return constrained == null || constrained.value() == type;
     }
