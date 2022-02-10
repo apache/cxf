@@ -104,10 +104,7 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.ext.ProtocolHeaders;
 import org.apache.cxf.jaxrs.ext.ProtocolHeadersImpl;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.InputStreamDataSource;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
-import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.jaxrs.impl.ContainerRequestContextImpl;
 import org.apache.cxf.jaxrs.impl.ContainerResponseContextImpl;
@@ -175,9 +172,13 @@ public final class JAXRSUtils {
     private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
     private static final Set<Class<?>> STREAMING_OUT_TYPES = new HashSet<>(
         Arrays.asList(InputStream.class, Reader.class, StreamingOutput.class));
-    private static final Set<Class<?>> STREAMING_LIKE_OUT_TYPES = new HashSet<>(
-        Arrays.asList(XMLSource.class, InputStreamDataSource.class, 
-            MultipartBody.class, Attachment.class));
+    private static final Set<String> STREAMING_LIKE_OUT_TYPES = new HashSet<>(
+        Arrays.asList(
+            "org.apache.cxf.jaxrs.ext.xml.XMLSource", 
+            "org.apache.cxf.jaxrs.ext.multipart.InputStreamDataSource", 
+            "org.apache.cxf.jaxrs.ext.multipart.MultipartBody", 
+            "org.apache.cxf.jaxrs.ext.multipart.Attachment"
+        ));
     private static final Set<String> REACTIVE_OUT_TYPES = new HashSet<>(
         Arrays.asList(
             // Reactive Streams
@@ -215,7 +216,7 @@ public final class JAXRSUtils {
      */
     public static boolean isStreamingLikeOutType(Class<?> cls, Type type) {
         if (cls != null && (isStreamingOutType(cls) 
-                || STREAMING_LIKE_OUT_TYPES.contains(cls) 
+                || STREAMING_LIKE_OUT_TYPES.contains(cls.getName()) 
                 || REACTIVE_OUT_TYPES.contains(cls.getName()))) {
             return true;
         }
@@ -231,7 +232,7 @@ public final class JAXRSUtils {
         
         if (type instanceof Class) {
             final Class<?> typeCls = (Class<?>)type;
-            return isStreamingOutType(typeCls) || STREAMING_LIKE_OUT_TYPES.contains(typeCls);
+            return isStreamingOutType(typeCls) || STREAMING_LIKE_OUT_TYPES.contains(typeCls.getName());
         }
         
         return false;
