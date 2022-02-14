@@ -25,17 +25,17 @@ import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
 import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiConfig;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -43,13 +43,13 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-public class SwaggerUiConfigurationTest extends AbstractBusClientServerTestBase {
-    private static final String PORT = allocatePort(SwaggerUiConfigurationTest.class);
+public class SwaggerUiConfigurationQueryConfigTest extends AbstractClientServerTestBase {
+    private static final String PORT = allocatePort(SwaggerUiConfigurationQueryConfigTest.class);
 
-    @Ignore
-    public static class Server extends AbstractBusTestServerBase {
+    public static class Server extends AbstractServerTestServerBase {
+
         @Override
-        protected void run() {
+        protected org.apache.cxf.endpoint.Server createServer(Bus bus) throws Exception {
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookStoreSwagger2.class);
             sf.setResourceProvider(BookStoreSwagger2.class,
@@ -57,22 +57,14 @@ public class SwaggerUiConfigurationTest extends AbstractBusClientServerTestBase 
             sf.setProvider(new JacksonJsonProvider());
             final Swagger2Feature feature = new Swagger2Feature();
             feature.setRunAsFilter(false);
-            feature.setSwaggerUiConfig(new SwaggerUiConfig().url("/swagger.json"));
+            feature.setSwaggerUiConfig(new SwaggerUiConfig().url("/swagger.json").queryConfigEnabled(true));
             sf.setFeatures(Arrays.asList(feature));
             sf.setAddress("http://localhost:" + PORT + "/");
-            sf.create();
+            return sf.create();
         }
 
-        public static void main(String[] args) {
-            try {
-                Server s = new Server();
-                s.start();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.exit(-1);
-            } finally {
-                System.out.println("done!");
-            }
+        public static void main(String[] args) throws Exception {
+            new Server().start();
         }
     }
 
@@ -81,23 +73,6 @@ public class SwaggerUiConfigurationTest extends AbstractBusClientServerTestBase 
         AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
         assertTrue("server did not launch correctly", launchServer(Server.class, false));
-        createStaticBus();
-    }
-
-    @Test
-    public void testUiRootResourceRedirect() {
-        // Test that Swagger UI resources do not interfere with
-        // application-specific ones and are accessible.
-        final String url = "http://localhost:" + getPort() + "/api-docs";
-
-        WebClient uiClient = WebClient
-            .create(url)
-            .accept("*/*");
-
-        try (Response response = uiClient.get()) {
-            assertThat(response.getStatus(), equalTo(Response.Status.TEMPORARY_REDIRECT.getStatusCode()));
-            assertThat(response.getHeaderString("Location"), equalTo(url + "?url=/swagger.json"));
-        }
     }
 
     @Test
@@ -112,24 +87,7 @@ public class SwaggerUiConfigurationTest extends AbstractBusClientServerTestBase 
         try (Response response = uiClient.get()) {
             String html = response.readEntity(String.class);
             assertThat(html, containsString("<!-- HTML"));
-            assertThat(html, containsString("url: \"/swagger.json\","));
-            assertThat(response.getMediaType(), equalTo(MediaType.TEXT_HTML_TYPE));
-        }
-    }
-
-    @Test
-    public void testUiRootResourcePicksUrlFromConfigurationOnly() {
-        // Test that Swagger UI URL is picked from configuration only and 
-        // never from the query string (when query config is disabled).
-        WebClient uiClient = WebClient
-            .create("http://localhost:" + getPort() + "/api-docs")
-            .query("url", "http://malicious.site/swagger.json")
-            .accept("*/*");
-
-        try (Response response = uiClient.get()) {
-            String html = response.readEntity(String.class);
-            assertThat(html, containsString("<!-- HTML"));
-            assertThat(html, containsString("url: \"/swagger.json\","));
+            assertThat(html, containsString("url: \"https://petstore.swagger.io/v2/swagger.json\","));
             assertThat(response.getMediaType(), equalTo(MediaType.TEXT_HTML_TYPE));
         }
     }
