@@ -63,6 +63,8 @@ public class SwaggerUiConfig {
     private String validatorUrl;
     // Controls whether the "Try it out" section should be enabled by default.
     private Boolean tryItOutEnabled;
+    // Enables overriding configuration parameters via URL search params.
+    private Boolean queryConfigEnabled;
     
     public String getConfigUrl() {
         return configUrl;
@@ -242,6 +244,11 @@ public class SwaggerUiConfig {
         return this;
     }
 
+    public SwaggerUiConfig queryConfigEnabled(boolean enabled) {
+        setQueryConfigEnabled(enabled);
+        return this;
+    }
+
     public SwaggerUiConfig filter(final String f) {
         setFilter(f);
         return this;
@@ -250,6 +257,14 @@ public class SwaggerUiConfig {
     public SwaggerUiConfig tryItOutEnabled(boolean tryItOut) {
         setTryItOutEnabled(tryItOut);
         return this;
+    }
+
+    public Boolean isQueryConfigEnabled() {
+        return queryConfigEnabled;
+    }
+
+    public void setQueryConfigEnabled(Boolean queryConfigEnabled) {
+        this.queryConfigEnabled = queryConfigEnabled;
     }
 
     public Map<String, String> getConfigParameters() {
