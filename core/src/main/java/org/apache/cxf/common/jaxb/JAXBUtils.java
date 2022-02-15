@@ -92,7 +92,7 @@ import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.JavaUtils;
 
 public final class JAXBUtils {
-    public static final String JAXB_URI = "http://java.sun.com/xml/ns/jaxb";
+    public static final String JAXB_URI = "https://jakarta.ee/xml/ns/jaxb";
 
     private static final Logger LOG = LogUtils.getL7dLogger(JAXBUtils.class);
 
@@ -587,6 +587,7 @@ public final class JAXBUtils {
     }
 
     private static synchronized ClassLoader getXJCClassLoader() {
+        //TODO: review and remove this after JDK11
         if (jaxbXjcLoader == null) {
             try {
                 Class.forName("com.sun.tools.internal.xjc.api.XJC");
@@ -620,11 +621,8 @@ public final class JAXBUtils {
         ClassLoaderService classLoaderService = bus.getExtension(ClassLoaderService.class);
         Object mapper = classLoaderService.createNamespaceWrapperInstance(marshaller.getClass(), nspref);
         if (mapper != null) {
-            if (marshaller.getClass().getName().contains(".internal.")) {
-                marshaller.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper",
-                                       mapper);
-            } else if (marshaller.getClass().getName().contains("com.sun")) {
-                marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper",
+            if (marshaller.getClass().getName().contains("org.glassfish")) {
+                marshaller.setProperty("org.glassfish.jaxb.namespacePrefixMapper",
                                        mapper);
             } else if (marshaller.getClass().getName().contains("eclipse")) {
                 marshaller.setProperty("eclipselink.namespace-prefix-mapper",
@@ -640,13 +638,12 @@ public final class JAXBUtils {
         try {
             Class<?> cls;
             Class<?> refClass;
-            String pkg = "com.sun.xml.bind.";
+            String pkg = "org.glassfish.jaxb.runtime.api.";
             try {
-                cls = Class.forName("com.sun.xml.bind.api.JAXBRIContext");
+                cls = Class.forName("org.glassfish.jaxb.runtime.api.JAXBRIContext");
                 refClass = Class.forName(pkg + "api.TypeReference");
             } catch (ClassNotFoundException e) {
-                cls = Class.forName("com.sun.xml.internal.bind.api.JAXBRIContext", true, getXJCClassLoader());
-                pkg = "com.sun.xml.internal.bind.";
+                cls = Class.forName("org.glassfish.jaxb.runtime.api.JAXBRIContext", true, getXJCClassLoader());
                 refClass = Class.forName(pkg + "api.TypeReference", true, getXJCClassLoader());
             }
             Object ref = refClass.getConstructor(QName.class,
@@ -705,7 +702,7 @@ public final class JAXBUtils {
                 cls = Class.forName("com.sun.tools.xjc.api.XJC");
                 sc = cls.getMethod("createSchemaCompiler").invoke(null);
             } catch (Throwable e) {
-                cls = Class.forName("com.sun.tools.internal.xjc.api.XJC", true, getXJCClassLoader());
+                cls = Class.forName("com.sun.tools.xjc.api.XJC", true, getXJCClassLoader());
                 sc = cls.getMethod("createSchemaCompiler").invoke(null);
             }
 
@@ -775,6 +772,7 @@ public final class JAXBUtils {
             try {
                 cls = Class.forName("com.sun.codemodel.writer.FileCodeWriter");
             } catch (ClassNotFoundException e) {
+                //TODO: review and remove this check
                 cls = Class.forName("com.sun.codemodel.internal.writer.FileCodeWriter",
                                     true, getXJCClassLoader());
             }
@@ -1084,7 +1082,8 @@ public final class JAXBUtils {
     public static JAXBContextProxy createJAXBContextProxy(final JAXBContext ctx,
                                                           final SchemaCollection collection,
                                                           final String defaultNs) {
-        if (ctx.getClass().getName().contains("com.sun.")
+        if (ctx.getClass().getName().contains("org.glassfish.")
+                || ctx.getClass().getName().contains("com.sun.")
             || collection == null) {
             return ReflectionInvokationHandler.createProxyWrapper(ctx, JAXBContextProxy.class);
         }
@@ -1103,13 +1102,15 @@ public final class JAXBUtils {
 
     private static String getPostfix(Class<?> cls) {
         String className = cls.getName();
-        if (className.contains("com.sun.xml.internal")
-            || className.contains("eclipse")) {
-            //eclipse moxy accepts sun package CharacterEscapeHandler 
-            return ".internal";
-        } else if (className.contains("com.sun.xml.bind")
-            || className.startsWith("com.ibm.xml")) {
+        System.out.println("Marshaller class Name : " + className);
+        //TODO: review and remove "com.sun" package name check
+        if (className.contains("org.glassfish.jaxb") || className.contains("com.sun.xml.bind")
+                || className.startsWith("com.ibm.xml")) {
             return "";
+        } else if (className.contains("com.sun.xml.internal")
+                || className.contains("eclipse")) {
+            //eclipse moxy accepts sun package CharacterEscapeHandler
+            return ".internal";
         }
         return null;
     }
@@ -1132,7 +1133,7 @@ public final class JAXBUtils {
         try {
             String postFix = getPostfix(marshaller.getClass());
             if (postFix != null && escapeHandler != null) {
-                marshaller.setProperty("com.sun.xml" + postFix + ".bind.characterEscapeHandler", escapeHandler);
+                marshaller.setProperty("org.glassfish.jaxb" + postFix + ".characterEscapeHandler", escapeHandler);
             }
         } catch (PropertyException e) {
             LOG.log(Level.INFO, "Failed to set MinumEscapeHandler to jaxb marshaller", e);
@@ -1155,11 +1156,10 @@ public final class JAXBUtils {
                     + cls);
                 return null;
             }
-            Class<?> handlerClass = ClassLoaderUtils.loadClass("com.sun.xml" + postFix
-                                                                   + ".bind.marshaller." + simpleClassName,
-                                                               cls);
+            Class<?> handlerClass = ClassLoaderUtils.loadClass("org.glassfish.jaxb.core.marshaller."
+                            + simpleClassName, cls);
             Class<?> handlerInterface = ClassLoaderUtils
-                .loadClass("com.sun.xml" + postFix + ".bind.marshaller.CharacterEscapeHandler",
+                .loadClass("org.glassfish.jaxb.core.marshaller.CharacterEscapeHandler",
                            cls);
             Object targetHandler = ReflectionUtil.getDeclaredField(handlerClass, "theInstance").get(null);
             return ProxyHelper.getProxy(cls.getClassLoader(),
