@@ -218,7 +218,7 @@ public class MessageContextImpl implements MessageContext {
         Attachment root = (Attachment)handlers.get(0);
 
         String rootContentType = root.getContentType().toString();
-        MultivaluedMap<String, String> rootHeaders = new MetadataMap<>(root.getHeaders());
+        MultivaluedMap<String, String> rootHeaders = new MetadataMap<>(root.getHeaders(), true, false, true);
         if (!AttachmentUtil.isMtomEnabled(outMessage)) {
             rootHeaders.putSingle(Message.CONTENT_TYPE, rootContentType);
         }
