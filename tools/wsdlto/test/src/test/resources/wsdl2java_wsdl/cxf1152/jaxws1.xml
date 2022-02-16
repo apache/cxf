@@ -24,7 +24,7 @@
         </jaxws:package>
     </jaxws:bindings>
     <jaxws:bindings xmlns:xsd="http://www.w3.org/2001/XMLSchema" node="wsdl:definitions/wsdl:types/xsd:schema[@targetNamespace='http://cxf.apache.org/w2j/hello_world_soap_http/types']">
-        <jxb:schemaBindings xmlns:jxb="http://java.sun.com/xml/ns/jaxb">
+        <jxb:schemaBindings xmlns:jxb="https://jakarta.ee/xml/ns/jaxb">
             <jxb:package name="org.mypkg"/>
         </jxb:schemaBindings>
     </jaxws:bindings>

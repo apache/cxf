@@ -171,7 +171,7 @@ public final class ToolConstants {
 
     // Binding namespace
     public static final String NS_JAXWS_BINDINGS = "http://java.sun.com/xml/ns/jaxws";
-    public static final String NS_JAXB_BINDINGS = "http://java.sun.com/xml/ns/jaxb";
+    public static final String NS_JAXB_BINDINGS = "https://jakarta.ee/xml/ns/jaxb";
     public static final QName  JAXWS_BINDINGS = new QName(NS_JAXWS_BINDINGS, "bindings");
     public static final QName  JAXB_BINDINGS = new QName(NS_JAXB_BINDINGS, "bindings");
     public static final QName SCHEMA = new QName(SCHEMA_URI, "schema");
