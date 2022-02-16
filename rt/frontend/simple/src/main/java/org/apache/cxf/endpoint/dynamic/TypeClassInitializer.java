@@ -50,6 +50,15 @@ public class TypeClassInitializer extends ServiceModelVisitor {
     boolean isFault;
     Bus bus;
 
+    @Deprecated // CXF-8658
+    public TypeClassInitializer(ServiceInfo serviceInfo,
+            S2JJAXBModel model,
+            boolean allowWr) {
+        super(serviceInfo);
+        this.model = model;
+        this.allowWrapperOperations = allowWr;
+    }
+
     public TypeClassInitializer(Bus bus, ServiceInfo serviceInfo,
                                 S2JJAXBModel model,
                                 boolean allowWr) {
