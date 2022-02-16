@@ -194,7 +194,7 @@ public final class JAXBContextCache {
             if (HAS_MOXY) {
                 map.put("eclipselink.default-target-namespace", defaultNs);
             }
-            map.put("com.sun.xml.bind.defaultNamespaceRemap", defaultNs);
+            map.put("org.glassfish.jaxb.defaultNamespaceRemap", defaultNs);
         }
         if (props != null) {
             map.putAll(props);
@@ -298,18 +298,12 @@ public final class JAXBContextCache {
         JAXBContext ctx;
         if (typeRefs != null && !typeRefs.isEmpty()) {
             Class<?> fact = null;
-            String pfx = "com.sun.xml.bind.";
+            String pfx = "org.glassfish.jaxb.";
             try {
-                fact = ClassLoaderUtils.loadClass("com.sun.xml.bind.v2.ContextFactory",
+                fact = ClassLoaderUtils.loadClass("org.glassfish.jaxb.runtime.v2.ContextFactory",
                                                   JAXBContextCache.class);
             } catch (Throwable t) {
-                try {
-                    fact = ClassLoaderUtils.loadClass("com.sun.xml.internal.bind.v2.ContextFactory",
-                                                      JAXBContextCache.class);
-                    pfx = "com.sun.xml.internal.bind.";
-                } catch (Throwable t2) {
-                    //ignore
-                }
+               //ignore
             }
             if (fact != null) {
                 for (Method m : fact.getMethods()) {
@@ -348,22 +342,14 @@ public final class JAXBContextCache {
         } catch (PrivilegedActionException e2) {
             if (e2.getException() instanceof JAXBException) {
                 JAXBException ex = (JAXBException)e2.getException();
-                if (map.containsKey("com.sun.xml.bind.defaultNamespaceRemap")
-                    && ex.getMessage() != null
-                    && ex.getMessage().contains("com.sun.xml.bind.defaultNamespaceRemap")) {
-                    map.put("com.sun.xml.internal.bind.defaultNamespaceRemap",
-                            map.remove("com.sun.xml.bind.defaultNamespaceRemap"));
-                    ctx = JAXBContext.newInstance(classes.toArray(new Class<?>[0]), map);
-                } else {
-                    throw ex;
-                }
+                throw ex;
             } else {
                 throw new RuntimeException(e2.getException());
             }
         }
         return ctx;
     }
-    // Now we can not add all the classes that Jaxb needed into JaxbContext,
+    // Now we can not add all the classes that Jaxb needed into JaxbContext
     // especially when
     // an ObjectFactory is pointed to by an jaxb @XmlElementDecl annotation
     // added this workaround method to load the jaxb needed ObjectFactory class

@@ -1102,7 +1102,6 @@ public final class JAXBUtils {
 
     private static String getPostfix(Class<?> cls) {
         String className = cls.getName();
-        System.out.println("Marshaller class Name : " + className);
         //TODO: review and remove "com.sun" package name check
         if (className.contains("org.glassfish.jaxb") || className.contains("com.sun.xml.bind")
                 || className.startsWith("com.ibm.xml")) {
