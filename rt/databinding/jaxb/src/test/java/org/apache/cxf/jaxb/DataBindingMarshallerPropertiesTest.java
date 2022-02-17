@@ -33,9 +33,7 @@ public class DataBindingMarshallerPropertiesTest extends TestBase {
         Map<String, Object> unmarshallerProperties = new HashMap<>();
         unmarshallerProperties.put("someproperty", "somevalue");
         db.setUnmarshallerProperties(unmarshallerProperties);
-
         db.initialize(service);
-
         assertEquals("somevalue", db.getUnmarshallerProperties().get("someproperty"));
     }
 }
