@@ -232,6 +232,7 @@ public class JAXBDataBindingTest {
     }
 
     void doNamespaceMappingTest(boolean internal, boolean asm) throws Exception {
+        //TODO: review this to see if we can remove the below check
         /*if (internal) {
             try {
                 Class.forName("com.sun.xml.internal.bind.v2.ContextFactory");
