@@ -25,11 +25,22 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.Temporal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -111,6 +122,7 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
         return setter;
     }
 
+    @SuppressWarnings("unchecked")
     protected Object parseType(String originalPropName,
                              Object ownerBean,
                              Object lastCastedValue,
@@ -126,6 +138,8 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
             Object castedValue = value;
             if (Date.class.isAssignableFrom(valueType)) {
                 castedValue = convertToDate(valueType, value);
+            } else if (Temporal.class.isAssignableFrom(valueType)) {
+                castedValue = convertToTemporal((Class<? extends Temporal>)valueType, value);
             } else {
                 boolean isPrimitive = InjectionUtils.isPrimitive(valueType);
                 boolean isPrimitiveOrEnum = isPrimitive || valueType.isEnum();
@@ -309,6 +323,47 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
             }
         }
     }
+    
+    private Temporal convertToTemporal(Class<? extends Temporal> valueType, String value) throws SearchParseException {
+
+        Message m = JAXRSUtils.getCurrentMessage();
+        Temporal obj = InjectionUtils.createFromParameterHandler(value, valueType, valueType,
+                                                               new Annotation[]{}, m);
+        if (obj != null) {
+            return obj;
+        }
+
+        try {
+            if (LocalTime.class.isAssignableFrom(valueType)) {
+                return LocalTime.parse(value);
+            } else if (LocalDate.class.isAssignableFrom(valueType)) {
+                return LocalDate.from(convertToDefaultDate(value).toInstant().atZone(ZoneId.systemDefault()));
+            } else if (LocalDateTime.class.isAssignableFrom(valueType)) {
+                return convertTo(value, SearchUtils.DEFAULT_DATETIME_FORMAT, Boolean.FALSE, LocalDateTime::parse);
+            } else if (OffsetTime.class.isAssignableFrom(valueType)) {
+                return OffsetTime.parse(value);
+            } else if (OffsetDateTime.class.isAssignableFrom(valueType)) {
+                return convertTo(value, SearchUtils.DEFAULT_OFFSET_DATETIME_FORMAT,
+                    Boolean.TRUE, OffsetDateTime::parse);
+            } else if (ZonedDateTime.class.isAssignableFrom(valueType)) {
+                return convertTo(value, SearchUtils.DEFAULT_ZONE_DATETIME_FORMAT,
+                    Boolean.TRUE, ZonedDateTime::parse);
+            } else {
+                return convertToDefaultDate(value).toInstant();
+            }
+        } catch (ParseException | DateTimeParseException e) {
+            // is that duration?
+            try {
+                Date now = new Date();
+                DatatypeFactory.newInstance().newDuration(value).addTo(now);
+                return LocalDateTime.from(now.toInstant().atZone(ZoneId.systemDefault()));
+            } catch (DatatypeConfigurationException e1) {
+                throw new SearchParseException(e1);
+            } catch (IllegalArgumentException e1) {
+                throw new SearchParseException("Can parse " + value + " neither as date nor duration", e);
+            }
+        }
+    }
 
     private Timestamp convertToTimestamp(String value) throws ParseException {
         Date date = convertToDefaultDate(value);
@@ -322,15 +377,33 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
 
     private Date convertToDefaultDate(String value) throws ParseException {
         DateFormat df = SearchUtils.getDateFormat(contextProperties);
+        String dateValue = normalizeTimeZone(value);
+        return df.parse(dateValue);
+    }
+
+    private <S extends Temporal> S convertTo(String value, String pattern, Boolean timezoneSupported,
+            BiFunction<String, DateTimeFormatter, S> parser) throws ParseException {
+        final DateTimeFormatter df = DateTimeFormatter.ofPattern(SearchUtils
+            .getDateFormatOrDefault(contextProperties, pattern)
+            .toPattern());
+        final String dateValue = normalizeTimeZone(value, timezoneSupported);
+        return parser.apply(dateValue, df);
+    }
+
+    private String normalizeTimeZone(String value) {
+        return normalizeTimeZone(value, Boolean.FALSE);
+    }
+
+    private String normalizeTimeZone(String value, Boolean timezoneSupported) {
         String dateValue = value;
-        if (SearchUtils.isTimeZoneSupported(contextProperties, Boolean.FALSE)) {
+        if (SearchUtils.isTimeZoneSupported(contextProperties, timezoneSupported)) {
             // zone in XML is "+01:00" in Java is "+0100"; stripping semicolon
             int idx = value.lastIndexOf(':');
             if (idx != -1) {
                 dateValue = value.substring(0, idx) + value.substring(idx + 1);
             }
         }
-        return df.parse(dateValue);
+        return dateValue;
     }
 
     private static String getMethodNameSuffix(String name) {

@@ -36,6 +36,9 @@ public final class SearchUtils {
     public static final String TIMESTAMP_NO_TIMEZONE = "yyyy-MM-dd'T'HH:mm:ss";
     public static final String TIMESTAMP_WITH_TIMEZONE_Z = "yyyy-MM-dd'T'HH:mm:ssZ";
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
+    public static final String DEFAULT_DATETIME_FORMAT = TIMESTAMP_NO_TIMEZONE;
+    public static final String DEFAULT_OFFSET_DATETIME_FORMAT = TIMESTAMP_WITH_TIMEZONE_Z;
+    public static final String DEFAULT_ZONE_DATETIME_FORMAT = TIMESTAMP_WITH_TIMEZONE_Z + "'['z']'";
     public static final String DATE_FORMAT_PROPERTY = "search.date-format";
     public static final String TIMEZONE_SUPPORT_PROPERTY = "search.timezone.support";
     public static final String LAX_PROPERTY_MATCH = "search.lax.property.match";
@@ -85,11 +88,20 @@ public final class SearchUtils {
         return dateFromStringWithDefaultFormats(value);
     }
 
+    public static SimpleDateFormat getDateFormatOrDefault(Map<String, String> properties, String pattern) {
+        return getDateFormatOrDefault(properties.get(DATE_FORMAT_PROPERTY), pattern);
+    }
+
     public static SimpleDateFormat getDateFormat(Map<String, String> properties) {
         return getDateFormat(properties.get(DATE_FORMAT_PROPERTY));
     }
+
+    public static SimpleDateFormat getDateFormatOrDefault(String dfProperty, String pattern) {
+        return new SimpleDateFormat(dfProperty == null ? pattern : dfProperty);
+    }
+
     public static SimpleDateFormat getDateFormat(String dfProperty) {
-        return new SimpleDateFormat(dfProperty == null ? DEFAULT_DATE_FORMAT : dfProperty);
+        return getDateFormatOrDefault(dfProperty, DEFAULT_DATE_FORMAT);
     }
 
     public static boolean isTimeZoneSupported(Map<String, String> properties, Boolean defaultValue) {
