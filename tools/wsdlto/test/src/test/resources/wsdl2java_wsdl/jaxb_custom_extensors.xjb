@@ -23,11 +23,11 @@
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
     jaxb:extensionBindingPrefixes="xjc"
-    xmlns:xjc="https://jakarta.ee/xml/ns/jaxb/xjc">
+
+    xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc">
     <jaxws:bindings node="wsdl:definitions/wsdl:types/xsd:schema">
             
-        <jaxb:globalBindings 
-           	jaxb:version="3.0">
+        <jaxb:globalBindings>
             <xjc:simple />
         </jaxb:globalBindings>
     </jaxws:bindings>
