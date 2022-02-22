@@ -34,8 +34,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import com.migesok.jaxb.adapter.javatime.LocalDateXmlAdapter;
-
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.QueryParam;

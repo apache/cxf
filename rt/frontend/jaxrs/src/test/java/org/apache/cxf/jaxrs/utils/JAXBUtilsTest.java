@@ -24,8 +24,6 @@ import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import com.migesok.jaxb.adapter.javatime.LocalDateXmlAdapter;
-
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.QueryParam;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;

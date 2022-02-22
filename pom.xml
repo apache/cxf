@@ -42,7 +42,7 @@
         <cxf.compiler.fork>false</cxf.compiler.fork>
         <cxf.build-utils.version>3.4.5-SNAPSHOT</cxf.build-utils.version>
         <cxf.xjc-utils.version>4.0.0-SNAPSHOT</cxf.xjc-utils.version>
-        <cxf.jdk.version>11</cxf.jdk.version>
+        <cxf.jdk.version>17</cxf.jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <site.deploy.url>scp://people.apache.org/www/cxf.apache.org/maven-site</site.deploy.url>
         <maven-owasp-plugin-version>6.1.6</maven-owasp-plugin-version>

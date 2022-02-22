@@ -1033,7 +1033,7 @@ public class WSDLToCorbaBindingTest {
         assertTrue(p12qitem.getMember().get(0).isQualified());
     }
 
-    private List<ExtensibilityElement> getExtensibilityElements(jakarta.wsdl.extensions.ElementExtensible e) {
+    private List<ExtensibilityElement> getExtensibilityElements(javax.wsdl.extensions.ElementExtensible e) {
         return CastUtils.cast(e.getExtensibilityElements());
     }
 }
