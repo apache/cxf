@@ -24,7 +24,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import io.micrometer.core.annotation.Timed;
+import io.micrometer.api.annotation.Timed;
 
 @Target({ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

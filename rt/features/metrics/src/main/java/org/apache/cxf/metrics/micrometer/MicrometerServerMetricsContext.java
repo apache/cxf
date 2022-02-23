@@ -26,8 +26,8 @@ import org.apache.cxf.metrics.micrometer.provider.TagsCustomizer;
 import org.apache.cxf.metrics.micrometer.provider.TagsProvider;
 import org.apache.cxf.metrics.micrometer.provider.TimedAnnotationProvider;
 
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tag;
+import io.micrometer.api.instrument.MeterRegistry;
+import io.micrometer.api.instrument.Tag;
 
 public class MicrometerServerMetricsContext extends MicrometerMetricsContext {
     public MicrometerServerMetricsContext(MeterRegistry registry, TagsProvider tagsProvider,

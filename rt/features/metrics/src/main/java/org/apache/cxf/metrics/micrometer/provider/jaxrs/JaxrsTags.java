@@ -24,7 +24,7 @@ import java.lang.reflect.Method;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 
-import io.micrometer.core.instrument.Tag;
+import io.micrometer.api.instrument.Tag;
 
 import static java.util.Optional.ofNullable;
 

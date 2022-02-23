@@ -23,7 +23,7 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
-import io.micrometer.core.instrument.Tag;
+import io.micrometer.api.instrument.Tag;
 
 import org.junit.Before;
 import org.junit.Test;

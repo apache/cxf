@@ -30,13 +30,13 @@ import org.apache.cxf.metrics.micrometer.provider.TagsCustomizer;
 import org.apache.cxf.metrics.micrometer.provider.TagsProvider;
 import org.apache.cxf.metrics.micrometer.provider.TimedAnnotationProvider;
 
-import io.micrometer.core.annotation.Timed;
-import io.micrometer.core.instrument.Meter;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Tags;
-import io.micrometer.core.instrument.Timer;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import io.micrometer.api.annotation.Timed;
+import io.micrometer.api.instrument.Meter;
+import io.micrometer.api.instrument.MeterRegistry;
+import io.micrometer.api.instrument.Tag;
+import io.micrometer.api.instrument.Tags;
+import io.micrometer.api.instrument.Timer;
+import io.micrometer.api.instrument.simple.SimpleMeterRegistry;
 
 import org.junit.Before;
 import org.junit.Test;

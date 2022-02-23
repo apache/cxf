@@ -22,8 +22,8 @@ package org.apache.cxf.metrics.micrometer.provider;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 
-import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Tags;
+import io.micrometer.api.instrument.Tag;
+import io.micrometer.api.instrument.Tags;
 
 import static java.util.Optional.ofNullable;
 
