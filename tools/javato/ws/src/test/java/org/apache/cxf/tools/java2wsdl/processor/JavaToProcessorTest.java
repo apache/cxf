@@ -985,7 +985,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
     private Definition getDefinition(String wsdl) throws WSDLException {
         WSDLFactory wsdlFactory = WSDLFactory.newInstance();
         WSDLReader wsdlReader = wsdlFactory.newWSDLReader();
-        wsdlReader.setFeature("jakarta.wsdl.verbose", false);
+        wsdlReader.setFeature("javax.wsdl.verbose", false);
         return wsdlReader.readWSDL(wsdl);
 
     }

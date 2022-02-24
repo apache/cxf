@@ -25,8 +25,8 @@
   <jaxws:bindings  node="wsdl:definitions/wsdl:types/xs:schema[@targetNamespace='http://date.fortest.tools.cxf.apache.org/']">
       <jxb:globalBindings xmlns:jxb="https://jakarta.ee/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema">
         <jxb:javaType name="java.util.Calendar" xmlType="xs:dateTime"
-                      parseMethod="javax.xml.bind.DatatypeConverter.parseDateTime"
-                      printMethod="javax.xml.bind.DatatypeConverter.printDateTime"/>
+                      parseMethod="jakarta.xml.bind.DatatypeConverter.parseDateTime"
+                      printMethod="jakarta.xml.bind.DatatypeConverter.printDateTime"/>
       </jxb:globalBindings>
   </jaxws:bindings>
 </jaxws:bindings>

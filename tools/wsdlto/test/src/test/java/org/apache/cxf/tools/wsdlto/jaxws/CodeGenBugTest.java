@@ -256,7 +256,11 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
                                       getLocation("/wsdl2java_wsdl/hello_world_exclude.wsdl")};
         CommandInterfaceUtils.commandCommonMain();
         WSDLToJava w2j = new WSDLToJava(args);
-        w2j.run(new ToolContext());
+        try {
+            w2j.run(new ToolContext());
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
 
         assertNotNull(output);
         File com = new File(output, "com");

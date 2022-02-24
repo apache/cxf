@@ -27,12 +27,12 @@
     * To customize the generated date types
 -->
 
-<jxb:bindings version="1.0"
-              xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+<jxb:bindings version="3.0"
+              xmlns:jxb="https://jakarta.ee/xml/ns/jaxb"
               xmlns:xs="http://www.w3.org/2001/XMLSchema">
 #foreach ($schemaFile in $schemaFiles)
   <jxb:bindings schemaLocation="$schemaFile" node="/xs:schema">
-    <jxb:globalBindings xmlns:jxb="http://java.sun.com/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <jxb:globalBindings xmlns:jxb="https://jakarta.ee/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema">
       <jxb:javaType name="$datetype" xmlType="xs:dateTime" parseMethod="$parseMethod" printMethod="$printMethod"/>
     </jxb:globalBindings>
   </jxb:bindings>
