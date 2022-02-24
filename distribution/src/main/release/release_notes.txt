@@ -1,4 +1,4 @@
-Apache CXF 3.5.0 Release Notes
+Apache CXF 3.5.1 Release Notes
 
 1. Overview
 
@@ -29,6 +29,9 @@ Users are encouraged to review the migration guide at:
 http://cxf.apache.org/docs/34-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
+
+
+3.5.1 fixes over 25 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -67,3 +70,36 @@ http://issues.apache.org/jira/browse/CXF
 See the migration guide at:
 http://cxf.apache.org/docs/35-migration-guide.html
 for caveats when upgrading.
+
+7. Specific issues, features, and improvements fixed in this version
+
+** Sub-task
+    * [CXF-8477] - jaxrs.ee.rs.constrainedto clientSideReaderIsNotUsedOnServerTest
+    * [CXF-8479] - jaxrs.ee.rs.container.responsecontext getEntityAnnotationsTest
+    * [CXF-8480] - jaxrs.ee.rs.core.responsebuilder entityObjectTest
+    * [CXF-8481] - jaxrs.ee.rs.core.uriinfo getMatchedURIsTest
+    * [CXF-8482] - jaxrs.ee.rs.core.uriinfo getMatchedURIsTest1
+    * [CXF-8483] - jaxrs.ee.rs.core.uriinfo getMatchedURIsTest2
+    * [CXF-8484] - jaxrs.ee.rs.ext.interceptor.containerwriter.interceptorcontext getAnnotationsTest
+    * [CXF-8635] - Fix org.apache.cxf.jaxrs.client.logging.RESTLoggingTest.testSlf4
+    * [CXF-8650] - Fix org.apache.cxf.systest.jaxrs.JAXRSContinuationsServlet3Test.testSuspendSetTimeout
+
+** Bug
+    * [CXF-8632] - StaxTransformFeature deep-dropping doesn't work with any element
+    * [CXF-8633] - "http.responseMessage" gets lost in AbstractClient#setResponseBuilder
+    * [CXF-8636] - Swagger2Feature: Can't set url in UI through SwaggerUiConfig
+    * [CXF-8641] - NPE on NamePasswordCallbackHandler
+    * [CXF-8642] - ResponseImpl#hasEntity changed behaviour starting with cxf 3.4.1
+    * [CXF-8649] - Deprecated method in jackson-databind still being used even after updating version
+    * [CXF-8652] - Implement @ConstrainedTo annotation support
+    * [CXF-8654] - Ensure InputStreamDataSource is optional in JAXRSUtils to be able to run without activation dependency
+    * [CXF-8657] - Headers are copied as case sensitive in MessageContextImpl
+
+** Improvement
+    * [CXF-8630] - Remove mockwebserver dependency, use wiremock instead
+    * [CXF-8644] - introduce a cache for AbstractJAXBProvider to avoid unnecessary  ObjectFactory.class|jaxb.index availability check
+    * [CXF-8646] - Don't return exception class name when parsing XML
+    * [CXF-8647] - add DisallowedMethodsHandler for cxf http-undertow transport
+    * [CXF-8648] - Make ClaimsAuthorizingInterceptor configurable in ClaimsAuthorizingFilter
+    * [CXF-8653] - Provide an easy way to require PKCE for the AuthorizationCodeGrantHandler
+    * [CXF-8659] - Can't filter when attribute type is LocalDate or LocalDateTime
