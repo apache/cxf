@@ -1,4 +1,4 @@
-Apache CXF 3.3.12 Release Notes
+Apache CXF 3.3.13 Release Notes
 
 1. Overview
 
@@ -16,7 +16,7 @@ New features include:
 
 
 Important notes:
-3.3.12 is the last planned release for the 3.3.x line of CXF.   Users
+3.3.13 is the last planned release for the 3.3.x line of CXF.   Users
 are encouraged to migrate to the latest 3.4 or newer release.
 
 CXF 3.3.x no longer supports Java 7.   You must upgrade to Java 8 or later.
@@ -26,7 +26,7 @@ http://cxf.apache.org/docs/33-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
-3.3.12 fixes over 25 JIRA issues reported by users and the community.
+3.3.13 fixes over 9 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -69,74 +69,16 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Sub-task
-    * [CXF-8514] - jaxrs.spec.context.client clientReaderTest
-    * [CXF-8515] - jaxrs.spec.context.client clientWriterTest
-    * [CXF-8534] - Fix org.apache.cxf.jaxrs.client.logging.RESTLoggingTest.testBinary
-    * [CXF-8573] - Fix org.apache.cxf.systest.jaxrs.spring.boot.SpringJaxrsTest.testJaxrsSuccessMetric
+    * [CXF-8483] - jaxrs.ee.rs.core.uriinfo getMatchedURIsTest2
 
 ** Bug
-    * [CXF-7543] - JAX-RS Features not used in proxies or WebClients
-    * [CXF-8544] - SseEventSink cannot be used in a @POST resource method
-    * [CXF-8555] - JsonMapObjectReaderWriter escapes now any back slash
-    * [CXF-8556] - Null AbstractEndpointFactory Properties Interferes with Class-Level PathParam When Creating Proxies with Defined ClientState
-    * [CXF-8557] - Incorrect Proxy Path Segmenting when @Path Annotation Regex Expression Contains "/"
-    * [CXF-8559] - SseInterceptor uses PROTOCOL_HEADERS from request (in) message, not from response (out) one
-    * [CXF-8561] - SseEventSource sometimes sends partial events when being closed
-    * [CXF-8569] - http-undertow: ensure clear registered paths until destory an undertow server(Port)
-    * [CXF-8572] - Incorrectly parsed ETag when contains 'W/' as part of the content
-    * [CXF-8574] - Rest call on jax-rs interface with long @Path and 3 pathparams causes error since cxf-rt-rs-mp-client 3.3.3
-    * [CXF-8578] - Bridge methods for covariant return types cannot be invoked on client proxies
-    * [CXF-8585] - cxf-specs feature should use stax2-api 4.2 and flag bundle with dependency=true
-    * [CXF-8588] - Micrometer operation UNKNOWN for clients
-    * [CXF-8591] - Temporary queues are never deleted when the are used
-    * [CXF-8594] - Regular expression parameter with non-capturing group doesn't work
-    * [CXF-8596] - WebFaultOutInterceptor goes into infinite loop when it tries to write SoapFaultException with detail
+    * [CXF-8565] - Unable to use transport-http-petty-client with JAX-RS due to NPE
+    * [CXF-8616] - Calling oneway methods using async client hangs response indefinitely
+    * [CXF-8620] - AbstractHTTPServlet should support HTTP TRACE method dispatching if it is allowed by underlying container
+    * [CXF-8626] - async http client may handle response by multiple threads on work queue
+    * [CXF-8641] - NPE on NamePasswordCallbackHandler
 
 ** Improvement
-    * [CXF-8117] - Make dependencies optional
-    * [CXF-8539] - Allow client-only Spring Boot autoconfiguration
-    * [CXF-8587] - Don't check the validation flag and get the schema on every iteration for SoapHeader
-    * [CXF-8600] - Swagger2Feature : Upgrade SwaggerUiConfig to add more configs
-
-** Test
-    * [CXF-8570] - a test to demonstrate how to configure JAXRSClientFactoryBean with org.apache.cxf.feature.Feature to enable Client Cache
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    * [CXF-8610] - Some public methds in org.apache.cxf.helpers.IOUtils lacks parameter verification, which may cause Null pointer exceptions
+    * [CXF-8627] - AttachmentDataSource should always returns a valid contentType
+    * [CXF-8646] - Don't return exception class name when parsing XML
