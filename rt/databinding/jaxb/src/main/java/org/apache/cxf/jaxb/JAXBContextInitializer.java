@@ -531,15 +531,10 @@ class JAXBContextInitializer extends ServiceModelVisitor {
     private static Object createTypeReference(QName n, Class<?> cls) {
         Class<?> refClass = null;
         try {
-            refClass = ClassLoaderUtils.loadClass("com.sun.xml.bind.api.TypeReference",
+            refClass = ClassLoaderUtils.loadClass("org.glassfish.jaxb.runtime.api.TypeReference",
                                                   JAXBContextInitializer.class);
         } catch (Throwable ex) {
-            try {
-                refClass = ClassLoaderUtils.loadClass("com.sun.xml.internal.bind.api.TypeReference",
-                                                      JAXBContextInitializer.class);
-            } catch (Throwable ex2) {
-                //ignore
-            }
+            //ignore
         }
         if (refClass != null) {
             try {
