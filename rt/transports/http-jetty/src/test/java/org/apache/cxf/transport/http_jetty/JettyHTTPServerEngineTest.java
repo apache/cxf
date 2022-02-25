@@ -308,8 +308,6 @@ public class JettyHTTPServerEngineTest {
 
         engine.removeServant(new URL(urlStr));
         engine2.removeServant(new URL(urlStr2));
-
-
         engine.shutdown();
 
         s = CastUtils.cast(ManagementFactory.getPlatformMBeanServer().
