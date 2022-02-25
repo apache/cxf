@@ -154,7 +154,7 @@ public class WSDLGenerationTester {
         WSDLFactory factory
             = WSDLFactory.newInstance("org.apache.cxf.tools.corba.utils.TestWSDLCorbaFactoryImpl");
         WSDLReader reader = factory.newWSDLReader();
-        reader.setFeature("jakarta.wsdl.importDocuments", false);
+        reader.setFeature("javax.wsdl.importDocuments", false);
         reader.setExtensionRegistry(wm.getExtensionRegistry());
         final String url = defnFile.toString();
         CatalogWSDLLocator locator = new CatalogWSDLLocator(url, (Bus)null);
