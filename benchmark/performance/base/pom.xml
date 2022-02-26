@@ -27,7 +27,7 @@
     <description>Apache CXF Benchmark Base</description>
     <url>https://cxf.apache.org</url>
     <properties>
-        <cxf.version>3.4.6-SNAPSHOT</cxf.version>
+        <cxf.version>3.4.7-SNAPSHOT</cxf.version>
     </properties>
     <build>
         <defaultGoal>install</defaultGoal>
