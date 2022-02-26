@@ -364,26 +364,6 @@
 
     <profiles>
         <profile>
-            <id>jdk8</id>
-            <activation>
-                <jdk>1.8</jdk>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-alpn-openjdk8-server</artifactId>
-                    <version>${cxf.jetty9.version}</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-alpn-openjdk8-client</artifactId>
-                    <version>${cxf.jetty9.version}</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
             <id>jdk9+</id>
             <activation>
                 <jdk>[9,)</jdk>
