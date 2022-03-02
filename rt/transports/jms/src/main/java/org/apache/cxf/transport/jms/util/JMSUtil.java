@@ -28,7 +28,6 @@ import jakarta.jms.ObjectMessage;
 import jakarta.jms.Queue;
 import jakarta.jms.Session;
 import jakarta.jms.XAConnection;
-
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.transport.jms.JMSConstants;
