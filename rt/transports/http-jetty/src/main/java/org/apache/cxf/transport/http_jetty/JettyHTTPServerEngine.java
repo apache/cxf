@@ -68,6 +68,7 @@ import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Response;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
@@ -679,7 +680,7 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
             result = new org.eclipse.jetty.server.ServerConnector(server);
 
             if (tlsServerParameters != null) {
-                httpConfig.addCustomizer(new org.eclipse.jetty.server.SecureRequestCustomizer());
+                httpConfig.addCustomizer(new SecureRequestCustomizer(tlsServerParameters.isSniHostCheck()));
 
                 if (!isHttp2Enabled(bus)) {
                     final SslConnectionFactory scf = new SslConnectionFactory(sslcf, httpFactory.getProtocol());

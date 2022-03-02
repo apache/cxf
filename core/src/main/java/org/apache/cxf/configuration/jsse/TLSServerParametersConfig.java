@@ -92,6 +92,9 @@ public class TLSServerParametersConfig
         if (params.isSetCertAlias()) {
             this.setCertAlias(params.getCertAlias());
         }
+        if (params.isSetSniHostCheck()) {
+            this.setSniHostCheck(params.isSniHostCheck());
+        }
         if (iparams != null && iparams.isSetKeyManagersRef()) {
             this.setKeyManagers(iparams.getKeyManagersRef());
         }
