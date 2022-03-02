@@ -657,5 +657,12 @@
                 </xs:documentation>
              </xs:annotation>
            </xs:attribute>
+           <xs:attribute name="sniHostCheck" type="pt:ParameterizedBoolean" default="true">
+             <xs:annotation>
+                <xs:documentation>
+                    If the SNI host name must match.
+                </xs:documentation>
+             </xs:annotation>
+           </xs:attribute>
     </xs:complexType>
 </xs:schema>
