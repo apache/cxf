@@ -470,6 +470,7 @@
                         <detectOfflineLinks>false</detectOfflineLinks>
                         <notimestamp>true</notimestamp>
                         <doclint>none</doclint>
+                        <javadocVersion>1.8.0</javadocVersion>
                         <!--subpackages>org.apache.cxf</subpackages-->
                     </configuration>
                 </plugin>
