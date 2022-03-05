@@ -19,6 +19,7 @@
 package org.apache.cxf.wsn;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
@@ -35,7 +36,12 @@ import java.util.concurrent.TimeUnit;
 import javax.xml.namespace.QName;
 
 import jakarta.xml.bind.JAXBElement;
-import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.artemis.api.core.SimpleString;
+import org.apache.activemq.artemis.core.config.Configuration;
+import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
+import org.apache.activemq.artemis.core.server.ActiveMQServer;
+import org.apache.activemq.artemis.core.server.impl.ActiveMQServerImpl;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.apache.cxf.wsn.client.Consumer;
 import org.apache.cxf.wsn.client.CreatePullPoint;
 import org.apache.cxf.wsn.client.NotificationBroker;
@@ -49,7 +55,7 @@ import org.apache.cxf.wsn.types.CustomType;
 import org.apache.cxf.wsn.util.WSNHelper;
 import org.oasis_open.docs.wsn.b_2.NotificationMessageHolderType;
 import org.oasis_open.docs.wsn.b_2.TopicExpressionType;
-
+import org.oasis_open.docs.wsn.brw_2.PublisherRegistrationFailedFault;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -71,6 +77,7 @@ public abstract class WsnBrokerTest {
 
     private int port1 = 8182;
     private int port2;
+    private ActiveMQServer broker;
 
     protected abstract String getProviderImpl();
 
@@ -90,6 +97,8 @@ public abstract class WsnBrokerTest {
         if (!useExternal) {
             port1 = getFreePort();
             int brokerPort = getFreePort();
+            broker = new ActiveMQServerImpl(getConfiguration(brokerPort));
+            broker.start();
             activemq = new ActiveMQConnectionFactory("vm:(broker:(tcp://localhost:" + brokerPort
                                                      + ")?persistent=false)");
 
@@ -120,6 +129,7 @@ public abstract class WsnBrokerTest {
             notificationBrokerServer.destroy();
             createPullPointServer.destroy();
         }
+        broker.stop();
         System.clearProperty("jakarta.xml.ws.spi.Provider");
         Thread.currentThread()
             .setContextClassLoader(loader);
@@ -284,7 +294,7 @@ public abstract class WsnBrokerTest {
         publisher.stop();
         consumer.stop();
     }
-    @Test
+    @Test(expected = PublisherRegistrationFailedFault.class)
     public void testPublisherOnDemand() throws Exception {
         TestConsumer consumerCallback = new TestConsumer();
         Consumer consumer = new Consumer(consumerCallback, "http://localhost:" + port2 + "/test/consumer");
@@ -406,4 +416,19 @@ public abstract class WsnBrokerTest {
         }
     }
 
+    private static Configuration getConfiguration(int port) {
+        try {
+            final Configuration config = new ConfigurationImpl()
+                .setManagementNotificationAddress(SimpleString.toSimpleString("notifications-topic"))
+                .setSecurityEnabled(false)
+                .setPersistenceEnabled(false)
+                .addAcceptorConfiguration("vm", "vm://0")
+                .addAcceptorConfiguration("tcp", "tcp://localhost:" + port);
+            
+            config.setBrokerInstance(new File("./target/activemq-data"));
+            return config;
+        } catch (final Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 }

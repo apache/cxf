@@ -18,7 +18,10 @@
  */
 package org.apache.cxf.systest.jaxrs.jms;
 
-import org.apache.activemq.broker.BrokerService;
+import org.apache.activemq.artemis.core.config.Configuration;
+import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
+import org.apache.activemq.artemis.core.server.ActiveMQServer;
+import org.apache.activemq.artemis.core.server.impl.ActiveMQServerImpl;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -39,9 +42,14 @@ public class JMSServer extends AbstractBusTestServerBase {
 
     public static void main(String[] args) {
         try {
-            BrokerService broker = new BrokerService();
-            broker.addConnector("tcp://localhost:61500");
+            final Configuration config = new ConfigurationImpl();
+            config.setPersistenceEnabled(false);
+            config.setSecurityEnabled(false);
+            config.addAcceptorConfiguration("tcp", "tcp://localhost:61500");
+           
+            final ActiveMQServer broker = new ActiveMQServerImpl(config);
             broker.start();
+
             System.setProperty("testutil.ports.EmbeddedJMSBrokerLauncher", "61500");
             JMSServer s = new JMSServer();
             s.start();

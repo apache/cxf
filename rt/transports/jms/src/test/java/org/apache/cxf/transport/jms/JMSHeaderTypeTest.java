@@ -24,24 +24,27 @@ import jakarta.jms.Connection;
 import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 import jakarta.jms.Session;
-import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
+import org.apache.activemq.artemis.junit.EmbeddedActiveMQResource;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class JMSHeaderTypeTest {
-
     private static final String TEST_VALUE = "test";
     private static final String CONVERTED_RESPONSE_KEY = "org__apache__cxf__message__Message__RESPONSE_CODE";
-    
+
+    @Rule public EmbeddedActiveMQResource server = new EmbeddedActiveMQResource(0);
+
     @Test
     public void testConversionIn() throws JMSException {
         Message message = createMessage();
         message.setStringProperty(CONVERTED_RESPONSE_KEY, TEST_VALUE);
         JMSMessageHeadersType messageHeaders = JMSMessageHeadersType.from(message);
         Set<String> keys = messageHeaders.getPropertyKeys();
-        assertEquals(1, keys.size());
+        assertEquals(2, keys.size());
         assertEquals(TEST_VALUE, messageHeaders.getProperty(org.apache.cxf.message.Message.RESPONSE_CODE));
     }
     
@@ -57,12 +60,13 @@ public class JMSHeaderTypeTest {
     }
 
     private Message createMessage() throws JMSException {
-        ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory("vm://test?broker.persistent=false");
-        Connection connection = cf.createConnection();
-        connection.start();
-        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        Message message = session.createMessage();
-        connection.stop();
-        return message;
+        try (ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory("vm://test?broker.persistent=false")) {
+            Connection connection = cf.createConnection();
+            connection.start();
+            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            Message message = session.createMessage();
+            connection.stop();
+            return message;
+        }
     }
 }

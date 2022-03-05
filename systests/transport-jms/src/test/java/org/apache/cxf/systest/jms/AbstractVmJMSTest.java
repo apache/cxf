@@ -26,11 +26,12 @@ import java.util.List;
 
 import jakarta.jms.ConnectionFactory;
 import jakarta.xml.ws.Endpoint;
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.RedeliveryPolicy;
-import org.apache.activemq.broker.BrokerService;
-import org.apache.activemq.pool.PooledConnectionFactory;
-import org.apache.activemq.store.memory.MemoryPersistenceAdapter;
+import org.apache.activemq.artemis.core.config.Configuration;
+import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
+import org.apache.activemq.artemis.core.server.ActiveMQServer;
+import org.apache.activemq.artemis.core.server.impl.ActiveMQServerImpl;
+import org.apache.activemq.artemis.core.settings.impl.AddressSettings;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws.EndpointImpl;
@@ -51,7 +52,7 @@ public abstract class AbstractVmJMSTest {
     protected static Bus bus;
     protected static ConnectionFactoryFeature cff;
     protected static ConnectionFactory cf;
-    protected static BrokerService broker;
+    protected static ActiveMQServer broker;
     private List<Object> closeableResources = new ArrayList<>();
 
     public static void startBusAndJMS(Class<?> testClass) {
@@ -62,33 +63,27 @@ public abstract class AbstractVmJMSTest {
 
     public static void startBusAndJMS(String brokerURI) {
         bus = BusFactory.getDefaultBus();
-        ActiveMQConnectionFactory cf1 = new ActiveMQConnectionFactory(brokerURI);
-        RedeliveryPolicy redeliveryPolicy = new RedeliveryPolicy();
-        redeliveryPolicy.setMaximumRedeliveries(1);
-        redeliveryPolicy.setInitialRedeliveryDelay(1000);
-        cf1.setRedeliveryPolicy(redeliveryPolicy());
-        cf = new PooledConnectionFactory(cf1);
+        cf = new ActiveMQConnectionFactory(brokerURI);
         cff = new ConnectionFactoryFeature(cf);
     }
 
-    protected static RedeliveryPolicy redeliveryPolicy() {
-        RedeliveryPolicy redeliveryPolicy = new RedeliveryPolicy();
-        redeliveryPolicy.setMaximumRedeliveries(1);
-        redeliveryPolicy.setInitialRedeliveryDelay(1000);
-        return redeliveryPolicy;
-    }
-
     public static void startBroker(String brokerURI) {
-        broker = new BrokerService();
-        broker.setPersistent(false);
         try {
-            broker.setPersistenceAdapter(new MemoryPersistenceAdapter());
-            broker.setTmpDataDirectory(new File("./target"));
-            broker.setUseJmx(false);
-            broker.addConnector(brokerURI);
+            final Configuration config = new ConfigurationImpl()
+                .setSecurityEnabled(false)
+                .setPersistenceEnabled(false)
+                .setJMXManagementEnabled(false)
+                .addAcceptorConfiguration("#", brokerURI)
+                .addAddressesSetting("#",
+                    new AddressSettings()
+                        .setMaxDeliveryAttempts(1)
+                        .setRedeliveryDelay(1000L));
+            config.setBrokerInstance(new File("./target"));
+            
+            broker = new ActiveMQServerImpl(config);
             broker.start();
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
+        } catch (final Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
 

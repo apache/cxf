@@ -19,11 +19,11 @@
 
 package org.apache.cxf.rs.security.saml.sso;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import org.joda.time.DateTime;
 import org.opensaml.core.xml.XMLObjectBuilderFactory;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.saml.common.SAMLObjectBuilder;
@@ -84,7 +84,7 @@ public final class SamlpRequestComponentBuilder {
         authnRequest.setForceAuthn(forceAuthn);
         authnRequest.setID("_" + UUID.randomUUID());
         authnRequest.setIsPassive(isPassive);
-        authnRequest.setIssueInstant(new DateTime());
+        authnRequest.setIssueInstant(Instant.now());
         authnRequest.setProtocolBinding(protocolBinding);
         authnRequest.setVersion(version);
 
@@ -112,12 +112,12 @@ public final class SamlpRequestComponentBuilder {
         LogoutRequest logoutRequest = logoutRequestBuilder.buildObject();
         logoutRequest.setID("_" + UUID.randomUUID());
         logoutRequest.setVersion(version);
-        logoutRequest.setIssueInstant(new DateTime());
+        logoutRequest.setIssueInstant(Instant.now());
         logoutRequest.setDestination(destination);
         logoutRequest.setConsent(consent);
         logoutRequest.setIssuer(issuer);
         if (notOnOrAfter != null) {
-            logoutRequest.setNotOnOrAfter(new DateTime(notOnOrAfter.getTime()));
+            logoutRequest.setNotOnOrAfter(new Date(notOnOrAfter.getTime()).toInstant());
         }
         logoutRequest.setReason(reason);
         logoutRequest.setNameID(nameID);

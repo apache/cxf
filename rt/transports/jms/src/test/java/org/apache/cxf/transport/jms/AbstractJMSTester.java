@@ -31,9 +31,10 @@ import javax.xml.namespace.QName;
 
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.DeliveryMode;
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.broker.BrokerService;
-import org.apache.activemq.store.memory.MemoryPersistenceAdapter;
+import org.apache.activemq.artemis.core.config.Configuration;
+import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
+import org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.helpers.IOUtils;
@@ -62,7 +63,7 @@ public abstract class AbstractJMSTester {
     protected static Bus bus;
     protected static ActiveMQConnectionFactory cf1;
     protected static ConnectionFactory cf;
-    protected static BrokerService broker;
+    protected static EmbeddedActiveMQ broker;
     private static final String MESSAGE_CONTENT = "HelloWorld";
 
     protected enum ExchangePattern { oneway, requestReply };
@@ -72,14 +73,14 @@ public abstract class AbstractJMSTester {
 
     @BeforeClass
     public static void startSerices() throws Exception {
-        broker = new BrokerService();
-        broker.setPersistent(false);
-        broker.setPopulateJMSXUserID(true);
-        broker.setUseAuthenticatedPrincipalForJMSXUserID(true);
-        broker.setUseJmx(false);
-        broker.setPersistenceAdapter(new MemoryPersistenceAdapter());
-        String brokerUri = "tcp://localhost:" + TestUtil.getNewPortNumber(AbstractJMSTester.class);
-        broker.addConnector(brokerUri);
+        final String brokerUri = "tcp://localhost:" + TestUtil.getNewPortNumber(AbstractJMSTester.class);
+        final Configuration config = new ConfigurationImpl();
+        config.setPersistenceEnabled(false);
+        config.setJMXManagementEnabled(false);
+        config.setSecurityEnabled(false);
+        config.addAcceptorConfiguration("tcp", brokerUri);
+        broker = new EmbeddedActiveMQ();
+        broker.setConfiguration(config);
         broker.start();
         bus = BusFactory.getDefaultBus();
         cf1 = new ActiveMQConnectionFactory(brokerUri);

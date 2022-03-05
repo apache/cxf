@@ -45,7 +45,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
     public static final String ADDRESS
         = "jms:jndi:dynamicQueues/test.cxf.jmstransport.swa.queue"
             + "?jndiInitialContextFactory"
-            + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+            + "=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
             + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=";
 
     static EmbeddedJMSBrokerLauncher broker;
