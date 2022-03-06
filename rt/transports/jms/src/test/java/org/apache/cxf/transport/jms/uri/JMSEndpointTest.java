@@ -85,14 +85,14 @@ public class JMSEndpointTest {
     @Test
     public void testJNDIParameters() throws Exception {
         JMSEndpoint endpoint = new JMSEndpoint("jms:jndi:Foo.Bar?" + "jndiInitialContextFactory"
-            + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+            + "=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
             + "&jndiConnectionFactoryName=ConnectionFactory"
             + "&jndiURL=tcp://localhost:61616");
         assertEquals(JMSEndpoint.JNDI, endpoint.getJmsVariant());
         assertEquals(endpoint.getParameters().size(), 0);
         assertEquals(endpoint.getDestinationName(), "Foo.Bar");
         assertEquals(endpoint.getJndiInitialContextFactory(),
-                     "org.apache.activemq.jndi.ActiveMQInitialContextFactory");
+                     "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory");
         assertEquals(endpoint.getJndiConnectionFactoryName(),
                      "ConnectionFactory");
         assertEquals(endpoint.getJndiURL(), "tcp://localhost:61616");
@@ -121,14 +121,14 @@ public class JMSEndpointTest {
     @Test
     public void testJNDIWithAdditionalParameters() throws Exception {
         JMSEndpoint endpoint = new JMSEndpoint("jms:jndi:Foo.Bar?" + "jndiInitialContextFactory"
-            + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+            + "=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
             + "&jndiConnectionFactoryName=ConnectionFactory"
             + "&jndiURL=tcp://localhost:61616"
             + "&jndi-com.sun.jndi.someParameter=someValue"
             + "&durableSubscriptionName=dur");
         assertEquals(JMSEndpoint.JNDI, endpoint.getJmsVariant());
         assertEquals(endpoint.getParameters().size(), 0);
-        assertEquals("org.apache.activemq.jndi.ActiveMQInitialContextFactory",
+        assertEquals("org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory",
                      endpoint.getJndiInitialContextFactory());
         assertEquals("ConnectionFactory", endpoint.getJndiConnectionFactoryName());
         assertEquals("tcp://localhost:61616", endpoint.getJndiURL());
@@ -153,7 +153,7 @@ public class JMSEndpointTest {
     @Test
     public void testRequestUri() throws Exception {
         JMSEndpoint endpoint = new JMSEndpoint("jms:jndi:Foo.Bar"
-            + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+            + "?jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
             + "&targetService=greetMe"
             + "&replyToName=replyQueue"
             + "&timeToLive=1000"

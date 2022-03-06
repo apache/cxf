@@ -19,12 +19,11 @@
 package org.apache.cxf.wsn.jms;
 
 import java.util.Iterator;
-import java.util.List;
 
 import javax.xml.namespace.QName;
 
 import jakarta.jms.Topic;
-import org.apache.activemq.command.ActiveMQTopic;
+import org.apache.activemq.artemis.jms.client.ActiveMQTopic;
 import org.oasis_open.docs.wsn.b_2.TopicExpressionType;
 
 public class JmsTopicExpressionConverter {
@@ -36,7 +35,7 @@ public class JmsTopicExpressionConverter {
     }
 
     public TopicExpressionType toTopicExpression(ActiveMQTopic topic) {
-        return toTopicExpression(topic.getPhysicalName());
+        return toTopicExpression(topic.getTopicName());
     }
 
     public TopicExpressionType toTopicExpression(String name) {
@@ -44,21 +43,6 @@ public class JmsTopicExpressionConverter {
         answer.getContent().add(name);
         answer.setDialect(SIMPLE_DIALECT);
         return answer;
-    }
-
-    public ActiveMQTopic toActiveMQTopic(List<TopicExpressionType> topics) throws InvalidTopicException {
-        if (topics == null || topics.isEmpty()) {
-            return null;
-        }
-        int size = topics.size();
-        ActiveMQTopic[] childrenDestinations = new ActiveMQTopic[size];
-        for (int i = 0; i < size; i++) {
-            childrenDestinations[i] = toActiveMQTopic(topics.get(i));
-        }
-
-        ActiveMQTopic topic = new ActiveMQTopic();
-        topic.setCompositeDestinations(childrenDestinations);
-        return topic;
     }
 
     public ActiveMQTopic toActiveMQTopic(TopicExpressionType topic) throws InvalidTopicException {

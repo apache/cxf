@@ -50,7 +50,7 @@ public final class JMSTestUtil {
     public static String getFullAddress(String partAddress, String jndiUrl) {
         String separator = partAddress.contains("?") ? "&" : "?";
         return partAddress + separator
-            + "&jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+            + "&jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
             + "&jndiConnectionFactoryName=ConnectionFactory"
             + "&jndiURL=" + jndiUrl;
     }

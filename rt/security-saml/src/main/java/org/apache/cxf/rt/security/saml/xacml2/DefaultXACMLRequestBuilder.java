@@ -20,6 +20,7 @@
 package org.apache.cxf.rt.security.saml.xacml2;
 
 import java.security.Principal;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,7 +30,6 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rt.security.saml.xacml.CXFMessageParser;
 import org.apache.cxf.rt.security.saml.xacml.XACMLConstants;
-import org.joda.time.DateTime;
 import org.opensaml.xacml.ctx.ActionType;
 import org.opensaml.xacml.ctx.AttributeType;
 import org.opensaml.xacml.ctx.AttributeValueType;
@@ -137,7 +137,7 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
             List<AttributeType> attributes = new ArrayList<>();
             AttributeType environmentAttribute = createAttribute(XACMLConstants.CURRENT_DATETIME,
                                                                  XACMLConstants.XS_DATETIME, null,
-                                                                 new DateTime().toString());
+                                                                 Instant.now().toString());
             attributes.add(environmentAttribute);
             return RequestComponentBuilder.createEnvironmentType(attributes);
         }

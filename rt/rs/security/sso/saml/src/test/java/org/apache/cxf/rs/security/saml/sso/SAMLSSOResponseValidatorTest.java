@@ -23,6 +23,8 @@ import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -44,7 +46,6 @@ import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.Loader;
-import org.joda.time.DateTime;
 import org.opensaml.saml.common.SignableSAMLObject;
 import org.opensaml.saml.saml2.core.AuthnStatement;
 import org.opensaml.saml.saml2.core.Response;
@@ -73,7 +74,7 @@ public class SAMLSSOResponseValidatorTest {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
         subjectConfirmationData.setAddress("http://apache.org");
         subjectConfirmationData.setInResponseTo("12345");
-        subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
+        subjectConfirmationData.setNotAfter(Instant.now().plus(5, ChronoUnit.MINUTES));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
 
         Response response = createResponse(subjectConfirmationData);
@@ -99,7 +100,7 @@ public class SAMLSSOResponseValidatorTest {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
         subjectConfirmationData.setAddress("http://bad.apache.org");
         subjectConfirmationData.setInResponseTo("12345");
-        subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
+        subjectConfirmationData.setNotAfter(Instant.now().plus(5, ChronoUnit.MINUTES));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
 
         Response response = createResponse(subjectConfirmationData);
@@ -125,7 +126,7 @@ public class SAMLSSOResponseValidatorTest {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
         subjectConfirmationData.setAddress("http://apache.org");
         subjectConfirmationData.setInResponseTo("12345-bad");
-        subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
+        subjectConfirmationData.setNotAfter(Instant.now().plus(5, ChronoUnit.MINUTES));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
 
         Response response = createResponse(subjectConfirmationData);
@@ -151,7 +152,7 @@ public class SAMLSSOResponseValidatorTest {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
         subjectConfirmationData.setAddress("http://apache.org");
         subjectConfirmationData.setInResponseTo("12345");
-        subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
+        subjectConfirmationData.setNotAfter(Instant.now().plus(5, ChronoUnit.MINUTES));
         subjectConfirmationData.setRecipient("http://bad.recipient.apache.org");
 
         Response response = createResponse(subjectConfirmationData);
@@ -177,7 +178,7 @@ public class SAMLSSOResponseValidatorTest {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
         subjectConfirmationData.setAddress("http://apache.org");
         subjectConfirmationData.setInResponseTo("12345");
-        subjectConfirmationData.setNotAfter(new DateTime().minusSeconds(1));
+        subjectConfirmationData.setNotAfter(Instant.now().minusSeconds(1));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
 
         Response response = createResponse(subjectConfirmationData);
@@ -203,8 +204,8 @@ public class SAMLSSOResponseValidatorTest {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
         subjectConfirmationData.setAddress("http://apache.org");
         subjectConfirmationData.setInResponseTo("12345");
-        subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
-        subjectConfirmationData.setNotBefore(new DateTime());
+        subjectConfirmationData.setNotAfter(Instant.now().plus(5, ChronoUnit.MINUTES));
+        subjectConfirmationData.setNotBefore(Instant.now());
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
 
         Response response = createResponse(subjectConfirmationData);
@@ -245,8 +246,8 @@ public class SAMLSSOResponseValidatorTest {
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
 
         ConditionsBean conditions = new ConditionsBean();
-        conditions.setNotBefore(new DateTime());
-        conditions.setNotAfter(new DateTime().plusMinutes(5));
+        conditions.setNotBefore(Instant.now());
+        conditions.setNotAfter(Instant.now().plus(5, ChronoUnit.MINUTES));
         AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
         audienceRestriction.setAudienceURIs(Collections.singletonList("http://service.apache.org"));
         conditions.setAudienceRestrictions(Collections.singletonList(audienceRestriction));
@@ -255,7 +256,7 @@ public class SAMLSSOResponseValidatorTest {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
         subjectConfirmationData.setAddress("http://apache.org");
         subjectConfirmationData.setInResponseTo("12345");
-        subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
+        subjectConfirmationData.setNotAfter(Instant.now().plus(5, ChronoUnit.MINUTES));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
         callbackHandler.setSubjectConfirmationData(subjectConfirmationData);
 
@@ -301,7 +302,7 @@ public class SAMLSSOResponseValidatorTest {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
         subjectConfirmationData.setAddress("http://apache.org");
         subjectConfirmationData.setInResponseTo("12345");
-        subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
+        subjectConfirmationData.setNotAfter(Instant.now().plus(5, ChronoUnit.MINUTES));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
 
         Response response = createResponse(subjectConfirmationData);
@@ -328,7 +329,7 @@ public class SAMLSSOResponseValidatorTest {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
         subjectConfirmationData.setAddress("http://apache.org");
         subjectConfirmationData.setInResponseTo("12345");
-        subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
+        subjectConfirmationData.setNotAfter(Instant.now().plus(5, ChronoUnit.MINUTES));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
 
         Response response = createResponse(subjectConfirmationData);
@@ -375,7 +376,7 @@ public class SAMLSSOResponseValidatorTest {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
         subjectConfirmationData.setAddress("http://apache.org");
         subjectConfirmationData.setInResponseTo("12345");
-        subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
+        subjectConfirmationData.setNotAfter(Instant.now().plus(5, ChronoUnit.MINUTES));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
 
         AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
@@ -405,7 +406,7 @@ public class SAMLSSOResponseValidatorTest {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
         subjectConfirmationData.setAddress("http://apache.org");
         subjectConfirmationData.setInResponseTo("12345");
-        subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
+        subjectConfirmationData.setNotAfter(Instant.now().plus(5, ChronoUnit.MINUTES));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
 
         AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
@@ -437,7 +438,7 @@ public class SAMLSSOResponseValidatorTest {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
         subjectConfirmationData.setAddress("http://apache.org");
         subjectConfirmationData.setInResponseTo("12345");
-        subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
+        subjectConfirmationData.setNotAfter(Instant.now().plus(5, ChronoUnit.MINUTES));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
 
         List<String> values = new ArrayList<>();
@@ -468,7 +469,7 @@ public class SAMLSSOResponseValidatorTest {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
         subjectConfirmationData.setAddress("http://apache.org");
         subjectConfirmationData.setInResponseTo("12345");
-        subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
+        subjectConfirmationData.setNotAfter(Instant.now().plus(5, ChronoUnit.MINUTES));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
 
         List<AudienceRestrictionBean> audienceRestrictions =
@@ -509,7 +510,7 @@ public class SAMLSSOResponseValidatorTest {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
         subjectConfirmationData.setAddress("http://apache.org");
         subjectConfirmationData.setInResponseTo("12345");
-        subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
+        subjectConfirmationData.setNotAfter(Instant.now().plus(5, ChronoUnit.MINUTES));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
 
         // Create a AuthenticationAssertion
@@ -521,8 +522,8 @@ public class SAMLSSOResponseValidatorTest {
         callbackHandler.setSubjectConfirmationData(subjectConfirmationData);
 
         ConditionsBean conditions = new ConditionsBean();
-        conditions.setNotBefore(new DateTime());
-        conditions.setNotAfter(new DateTime().plusMinutes(5));
+        conditions.setNotBefore(Instant.now());
+        conditions.setNotAfter(Instant.now().plus(5, ChronoUnit.MINUTES));
 
         AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
         audienceRestriction.setAudienceURIs(Collections.singletonList("http://service.apache.org"));
@@ -554,7 +555,7 @@ public class SAMLSSOResponseValidatorTest {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
         subjectConfirmationData.setAddress("http://apache.org");
         subjectConfirmationData.setInResponseTo("12345");
-        subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
+        subjectConfirmationData.setNotAfter(Instant.now().plus(5, ChronoUnit.MINUTES));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
 
         Response response = createResponse(subjectConfirmationData);
@@ -614,8 +615,8 @@ public class SAMLSSOResponseValidatorTest {
         callbackHandler.setSubjectConfirmationData(subjectConfirmationData);
 
         ConditionsBean conditions = new ConditionsBean();
-        conditions.setNotBefore(new DateTime());
-        conditions.setNotAfter(new DateTime().plusMinutes(5));
+        conditions.setNotBefore(Instant.now());
+        conditions.setNotAfter(Instant.now().plus(5, ChronoUnit.MINUTES));
 
         if (audienceRestrictions == null) {
             AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();

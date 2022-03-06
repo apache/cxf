@@ -19,6 +19,7 @@
 
 package org.apache.cxf.transport.jms;
 
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,9 +40,8 @@ import jakarta.jms.Queue;
 import jakarta.jms.ServerSessionPool;
 import jakarta.jms.Session;
 import jakarta.jms.Topic;
-import org.apache.activemq.EnhancedConnection;
-import org.apache.activemq.advisory.DestinationSource;
-import org.apache.activemq.util.ServiceStopper;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnection;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -443,7 +443,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         assertNull(conduit.getJmsConfig().getReplyDestination());
 
         // Store the connection so we could check temporary queues
-        final AtomicReference<DestinationSource> destinationSource = new AtomicReference<>();
+        final AtomicReference<ActiveMQConnection> connectionHolder = new AtomicReference<>();
         final Message outMessage = createMessage();
         
         // Capture the DestinationSource instance associated with the connection
@@ -451,14 +451,14 @@ public class JMSDestinationTest extends AbstractJMSTester {
             @Override
             public Connection createConnection() throws JMSException {
                 final Connection connection = c.createConnection();
-                destinationSource.set(((EnhancedConnection)connection).getDestinationSource());
+                connectionHolder.set((ActiveMQConnection)connection);
                 return connection;
             }
 
             @Override
             public Connection createConnection(String userName, String password) throws JMSException {
                 final Connection connection = c.createConnection(userName, password);
-                destinationSource.set(((EnhancedConnection)connection).getDestinationSource());
+                connectionHolder.set((ActiveMQConnection)connection);
                 return connection;
             }
 
@@ -507,15 +507,17 @@ public class JMSDestinationTest extends AbstractJMSTester {
         Message inMessage = waitForReceiveInMessage();
         verifyReceivedMessage(inMessage);
 
-        final DestinationSource ds = destinationSource.get();
-        assertThat(ds.getTemporaryQueues().size(), equalTo(1));
+        final ActiveMQConnection connection = connectionHolder.get();
+        assertThat(ReflectionUtil.accessDeclaredField("tempQueues", ActiveMQConnection.class,
+            connection, Set.class).size(), equalTo(1));
         
         // Force manual temporary queue deletion by resetting the reply destination
         conduit.getJmsConfig().resetCachedReplyDestination();
         // The queue deletion events (as well as others) are propagated asynchronously
         await()
             .atMost(1, TimeUnit.SECONDS)
-            .untilAsserted(() -> assertThat(ds.getTemporaryQueues().size(), equalTo(0)));
+            .untilAsserted(() -> assertThat(ReflectionUtil.accessDeclaredField("tempQueues", ActiveMQConnection.class, 
+                connection, Set.class).size(), equalTo(0)));
         
         conduit.close();
         destination.shutdown();
@@ -693,9 +695,9 @@ public class JMSDestinationTest extends AbstractJMSTester {
         destination.setMessageObserver(createMessageObserver());
 
         Thread.sleep(500L);
-        broker.stopAllConnectors(new ServiceStopper());
+        broker.stop();
 
-        broker.startAllConnectors();
+        broker.start();
         Thread.sleep(2000L);
 
         final Message outMessage = createMessage();

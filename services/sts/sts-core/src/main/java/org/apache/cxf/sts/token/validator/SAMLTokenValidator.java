@@ -20,6 +20,7 @@ package org.apache.cxf.sts.token.validator;
 
 import java.security.Principal;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +57,6 @@ import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.SignatureTrustValidator;
 import org.apache.wss4j.dom.validate.Validator;
-import org.joda.time.DateTime;
 import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.xmlsec.signature.KeyInfo;
 import org.opensaml.xmlsec.signature.Signature;
@@ -289,9 +289,9 @@ public class SAMLTokenValidator implements TokenValidator {
     protected boolean validateConditions(
         SamlAssertionWrapper assertion, ReceivedToken validateTarget
     ) {
-        final DateTime validFrom;
-        final DateTime validTill;
-        final DateTime issueInstant;
+        final Instant validFrom;
+        final Instant validTill;
+        final Instant issueInstant;
         if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
             validFrom = assertion.getSaml2().getConditions().getNotBefore();
             validTill = assertion.getSaml2().getConditions().getNotOnOrAfter();
@@ -302,16 +302,16 @@ public class SAMLTokenValidator implements TokenValidator {
             issueInstant = assertion.getSaml1().getIssueInstant();
         }
 
-        if (validFrom != null && validFrom.isAfterNow()) {
+        if (validFrom != null && validFrom.isAfter(Instant.now())) {
             LOG.log(Level.WARNING, "SAML Token condition not met");
             return false;
-        } else if (validTill != null && validTill.isBeforeNow()) {
+        } else if (validTill != null && validTill.isBefore(Instant.now())) {
             LOG.log(Level.WARNING, "SAML Token condition not met");
             validateTarget.setState(STATE.EXPIRED);
             return false;
         }
 
-        if (issueInstant != null && issueInstant.isAfterNow()) {
+        if (issueInstant != null && issueInstant.isAfter(Instant.now())) {
             LOG.log(Level.WARNING, "SAML Token IssueInstant not met");
             return false;
         }

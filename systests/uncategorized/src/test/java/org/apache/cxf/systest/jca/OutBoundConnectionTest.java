@@ -21,11 +21,11 @@ package org.apache.cxf.systest.jca;
 
 import java.net.URL;
 
-import javax.resource.spi.ManagedConnection;
-import javax.resource.spi.ManagedConnectionFactory;
 import javax.security.auth.Subject;
 import javax.xml.namespace.QName;
 
+import jakarta.resource.spi.ManagedConnection;
+import jakarta.resource.spi.ManagedConnectionFactory;
 import jakarta.xml.ws.Endpoint;
 import jakarta.xml.ws.WebServiceException;
 import org.apache.cxf.BusFactory;

@@ -23,7 +23,7 @@ import java.lang.management.ManagementFactory;
 
 import javax.management.MBeanServer;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.apache.cxf.wsn.AbstractCreatePullPoint;
 import org.apache.cxf.wsn.AbstractNotificationBroker;
 

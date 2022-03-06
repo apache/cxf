@@ -34,13 +34,15 @@ import jakarta.jms.QueueBrowser;
 import jakarta.jms.Session;
 import jakarta.jms.TextMessage;
 import jakarta.transaction.TransactionManager;
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.ActiveMQXAConnectionFactory;
-import org.apache.activemq.RedeliveryPolicy;
-import org.apache.activemq.pool.XaPooledConnectionFactory;
-import org.apache.geronimo.transaction.manager.GeronimoTransactionManager;
+import org.apache.activemq.artemis.core.config.Configuration;
+import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
+import org.apache.activemq.artemis.core.settings.impl.AddressSettings;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
+import org.apache.activemq.artemis.jms.client.ActiveMQXAConnectionFactory;
+import org.apache.activemq.artemis.junit.EmbeddedActiveMQResource;
 import org.awaitility.Awaitility;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -48,6 +50,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class MessageListenerTest {
+    @Rule public EmbeddedActiveMQResource server = new EmbeddedActiveMQResource(getConfiguration());
 
     enum TestMessage {
         OK, FAILFIRST, FAIL;
@@ -68,12 +71,12 @@ public class MessageListenerTest {
         Awaitility.await().until(() -> exListener.exception != null);
         JMSException ex = exListener.exception;
         assertNotNull(ex);
-        assertEquals("The connection is already closed", ex.getMessage());
+        assertEquals("Connection is closed", ex.getMessage());
     }
     
     @Test
     public void testConnectionProblemXA() throws JMSException, XAException, InterruptedException {
-        TransactionManager transactionManager = new GeronimoTransactionManager();
+        TransactionManager transactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
         Connection connection = createXAConnection("brokerJTA", transactionManager);
         Queue dest = JMSUtil.createQueue(connection, "test");
 
@@ -98,7 +101,7 @@ public class MessageListenerTest {
 
     @Test
     public void testWithJTA() throws JMSException, XAException, InterruptedException {
-        TransactionManager transactionManager = new GeronimoTransactionManager();
+        TransactionManager transactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
         Connection connection = createXAConnection("brokerJTA", transactionManager);
         Queue dest = JMSUtil.createQueue(connection, "test");
 
@@ -174,31 +177,17 @@ public class MessageListenerTest {
     }
 
     private static Connection createConnection(String name) throws JMSException {
-        ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory("vm://" + name
-                                                                     + "?broker.persistent=false");
-        cf.setRedeliveryPolicy(redeliveryPolicy());
+        ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory("vm://" + name);
         Connection connection = cf.createConnection();
         connection.start();
         return connection;
     }
 
     private static Connection createXAConnection(String name, TransactionManager tm) throws JMSException {
-        ActiveMQXAConnectionFactory cf = new ActiveMQXAConnectionFactory("vm://" + name
-                                                                         + "?broker.persistent=false&jms.xaAckMode=1");
-        cf.setRedeliveryPolicy(redeliveryPolicy());
-        XaPooledConnectionFactory cfp = new XaPooledConnectionFactory(cf);
-        cfp.setTransactionManager(tm);
-        cfp.setConnectionFactory(cf);
-        Connection connection = cfp.createConnection();
+        ActiveMQXAConnectionFactory cf = new ActiveMQXAConnectionFactory("vm://" + name);
+        Connection connection = cf.createXAConnection();
         connection.start();
         return connection;
-    }
-
-    private static RedeliveryPolicy redeliveryPolicy() {
-        RedeliveryPolicy redeliveryPolicy = new RedeliveryPolicy();
-        redeliveryPolicy.setRedeliveryDelay(500L);
-        redeliveryPolicy.setMaximumRedeliveries(1);
-        return redeliveryPolicy;
     }
 
     private static void assertNumMessagesInQueue(String message, Connection connection, Queue queue,
@@ -266,4 +255,19 @@ public class MessageListenerTest {
             exception = ex;
         }
     };
+    
+    private static Configuration getConfiguration() {
+        try {
+            return new ConfigurationImpl()
+                .setSecurityEnabled(false)
+                .setPersistenceEnabled(false)
+                .addAcceptorConfiguration("#", "vm://0")
+                .addAddressesSetting("#",
+                    new AddressSettings()
+                        .setMaxDeliveryAttempts(1)
+                        .setRedeliveryDelay(500L));
+        } catch (final Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 }

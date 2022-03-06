@@ -23,6 +23,8 @@ import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 
@@ -44,7 +46,6 @@ import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.dom.engine.WSSConfig;
-import org.joda.time.DateTime;
 import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.common.SignableSAMLObject;
 import org.opensaml.saml.common.xml.SAMLConstants;
@@ -472,7 +473,7 @@ public class SAMLResponseValidatorTest {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
         subjectConfirmationData.setAddress("http://apache.org");
         subjectConfirmationData.setInResponseTo("12345");
-        subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
+        subjectConfirmationData.setNotAfter(Instant.now().plus(5, ChronoUnit.MINUTES));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
 
         // Create a AuthenticationAssertion
@@ -484,8 +485,8 @@ public class SAMLResponseValidatorTest {
         callbackHandler.setSubjectConfirmationData(subjectConfirmationData);
 
         ConditionsBean conditions = new ConditionsBean();
-        conditions.setNotBefore(new DateTime());
-        conditions.setNotAfter(new DateTime().plusMinutes(5));
+        conditions.setNotBefore(Instant.now());
+        conditions.setNotAfter(Instant.now().plus(5, ChronoUnit.MINUTES));
 
         AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
         audienceRestriction.setAudienceURIs(Collections.singletonList("http://service.apache.org"));
@@ -511,7 +512,7 @@ public class SAMLResponseValidatorTest {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
         subjectConfirmationData.setAddress("http://apache.org");
         subjectConfirmationData.setInResponseTo("12345");
-        subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
+        subjectConfirmationData.setNotAfter(Instant.now().plus(5, ChronoUnit.MINUTES));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
 
         // Create a AuthenticationAssertion
@@ -523,8 +524,8 @@ public class SAMLResponseValidatorTest {
         callbackHandler.setSubjectConfirmationData(subjectConfirmationData);
 
         ConditionsBean conditions = new ConditionsBean();
-        conditions.setNotBefore(new DateTime());
-        conditions.setNotAfter(new DateTime().plusMinutes(5));
+        conditions.setNotBefore(Instant.now());
+        conditions.setNotAfter(Instant.now().plus(5, ChronoUnit.MINUTES));
 
         AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
         audienceRestriction.setAudienceURIs(Collections.singletonList("http://service.apache.org"));
@@ -557,7 +558,7 @@ public class SAMLResponseValidatorTest {
                 "http://cxf.apache.org/saml", "http://cxf.apache.org/issuer", status
             );
 
-        response.setIssueInstant(new DateTime().plusMinutes(5));
+        response.setIssueInstant(Instant.now().plus(5, ChronoUnit.MINUTES));
 
         // Create an AuthenticationAssertion
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
@@ -610,7 +611,7 @@ public class SAMLResponseValidatorTest {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
 
-        assertion.getSaml2().setIssueInstant(new DateTime().plusMinutes(5));
+        assertion.getSaml2().setIssueInstant(Instant.now().plus(5, ChronoUnit.MINUTES));
 
         response.getAssertions().add(assertion.getSaml2());
 
@@ -648,7 +649,7 @@ public class SAMLResponseValidatorTest {
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("http://cxf.apache.org/issuer");
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
-        callbackHandler.setAuthnInstant(new DateTime().plusDays(1));
+        callbackHandler.setAuthnInstant(Instant.now().plus(1, ChronoUnit.DAYS));
 
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
@@ -690,7 +691,7 @@ public class SAMLResponseValidatorTest {
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("http://cxf.apache.org/issuer");
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
-        callbackHandler.setSessionNotOnOrAfter(new DateTime().minusDays(1));
+        callbackHandler.setSessionNotOnOrAfter(Instant.now().minus(1, ChronoUnit.DAYS));
 
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);

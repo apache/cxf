@@ -19,15 +19,10 @@
 package org.apache.cxf.wsn.jms;
 
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jakarta.jms.Connection;
-import jakarta.jms.Destination;
 import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 import jakarta.jms.MessageProducer;
@@ -35,26 +30,21 @@ import jakarta.jms.Session;
 import jakarta.jms.Topic;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
-import org.apache.activemq.advisory.ConsumerEvent;
-import org.apache.activemq.advisory.ConsumerEventSource;
-import org.apache.activemq.advisory.ConsumerListener;
+import org.apache.activemq.artemis.jms.client.ActiveMQTopic;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.wsn.AbstractPublisher;
 import org.oasis_open.docs.wsn.b_2.InvalidTopicExpressionFaultType;
 import org.oasis_open.docs.wsn.b_2.NotificationMessageHolderType;
 import org.oasis_open.docs.wsn.b_2.Notify;
 import org.oasis_open.docs.wsn.b_2.TopicExpressionType;
-import org.oasis_open.docs.wsn.br_2.PublisherRegistrationFailedFaultType;
 import org.oasis_open.docs.wsn.br_2.RegisterPublisher;
-import org.oasis_open.docs.wsn.br_2.ResourceNotDestroyedFaultType;
 import org.oasis_open.docs.wsn.brw_2.PublisherRegistrationFailedFault;
 import org.oasis_open.docs.wsn.brw_2.PublisherRegistrationRejectedFault;
-import org.oasis_open.docs.wsn.brw_2.ResourceNotDestroyedFault;
 import org.oasis_open.docs.wsn.bw_2.InvalidTopicExpressionFault;
 import org.oasis_open.docs.wsn.bw_2.TopicNotSupportedFault;
 import org.oasis_open.docs.wsrf.rw_2.ResourceUnknownFault;
 
-public abstract class JmsPublisher extends AbstractPublisher implements ConsumerListener {
+public abstract class JmsPublisher extends AbstractPublisher {
 
     private static final Logger LOGGER = LogUtils.getL7dLogger(JmsPublisher.class);
 
@@ -63,10 +53,6 @@ public abstract class JmsPublisher extends AbstractPublisher implements Consumer
     private JmsTopicExpressionConverter topicConverter;
 
     private JAXBContext jaxbContext;
-
-    private List<ConsumerEventSource> advisories;
-
-    private Map<Destination, Object> producers;
 
     public JmsPublisher(String name) {
         super(name);
@@ -119,7 +105,13 @@ public abstract class JmsPublisher extends AbstractPublisher implements Consumer
             TopicNotSupportedFault {
         super.validatePublisher(registerPublisherRequest);
         try {
-            topicConverter.toActiveMQTopic(topic);
+            if (topic != null && !topic.isEmpty()) {
+                int size = topic.size();
+                ActiveMQTopic[] childrenDestinations = new ActiveMQTopic[size];
+                for (int i = 0; i < size; i++) {
+                    childrenDestinations[i] = topicConverter.toActiveMQTopic(topic.get(i));
+                }
+            }
         } catch (InvalidTopicException e) {
             InvalidTopicExpressionFaultType fault = new InvalidTopicExpressionFaultType();
             throw new InvalidTopicExpressionFault(e.getMessage(), fault);
@@ -128,54 +120,6 @@ public abstract class JmsPublisher extends AbstractPublisher implements Consumer
 
     @Override
     protected void start() throws PublisherRegistrationFailedFault {
-        if (demand) {
-            try {
-                producers = new HashMap<>();
-                advisories = new ArrayList<>();
-                for (TopicExpressionType topic : this.topic) {
-                    ConsumerEventSource advisory
-                        = new ConsumerEventSource(connection, topicConverter.toActiveMQTopic(topic));
-                    advisory.setConsumerListener(this);
-                    advisory.start();
-                    advisories.add(advisory);
-                }
-            } catch (Exception e) {
-                PublisherRegistrationFailedFaultType fault = new PublisherRegistrationFailedFaultType();
-                throw new PublisherRegistrationFailedFault("Error starting demand-based publisher", fault, e);
-            }
-        }
-    }
-
-    protected void destroy() throws ResourceNotDestroyedFault {
-        try {
-            if (advisories != null) {
-                for (ConsumerEventSource advisory : advisories) {
-                    advisory.stop();
-                }
-            }
-        } catch (Exception e) {
-            ResourceNotDestroyedFaultType fault = new ResourceNotDestroyedFaultType();
-            throw new ResourceNotDestroyedFault("Error destroying publisher", fault, e);
-        } finally {
-            super.destroy();
-        }
-    }
-
-    public synchronized void onConsumerEvent(ConsumerEvent event) {
-        Object producer = producers.get(event.getDestination());
-        if (event.getConsumerCount() > 0) {
-            if (producer == null) {
-                // start subscription
-                producer = startSubscription(topicConverter.toTopicExpression((Topic)event.getDestination()));
-                producers.put(event.getDestination(), producer);
-            }
-        } else {
-            if (producer != null) {
-                Object sub = producers.remove(event.getDestination());
-                // destroy subscription
-                stopSubscription(sub);
-            }
-        }
     }
 
     protected abstract Object startSubscription(TopicExpressionType topic);

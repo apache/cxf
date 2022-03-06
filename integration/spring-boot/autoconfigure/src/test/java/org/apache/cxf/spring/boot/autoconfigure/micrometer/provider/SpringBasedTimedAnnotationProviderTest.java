@@ -28,8 +28,8 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
 
-import io.micrometer.core.annotation.Timed;
-import io.micrometer.core.annotation.TimedSet;
+import io.micrometer.api.annotation.Timed;
+import io.micrometer.api.annotation.TimedSet;
 
 import org.junit.Before;
 import org.junit.Test;

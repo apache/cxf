@@ -21,6 +21,7 @@ package org.apache.cxf.sts.token.renewer;
 
 import java.security.Principal;
 import java.security.cert.Certificate;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -70,7 +71,6 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.saml.DOMSAMLUtil;
 import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
-import org.joda.time.DateTime;
 import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.saml1.core.Audience;
 import org.opensaml.saml.saml1.core.AudienceRestrictionCondition;
@@ -218,8 +218,8 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
             response.setToken(token);
             response.setTokenId(renewedAssertion.getId());
 
-            final DateTime validFrom;
-            final DateTime validTill;
+            final Instant validFrom;
+            final Instant validTill;
             if (renewedAssertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
                 validFrom = renewedAssertion.getSaml2().getConditions().getNotBefore();
                 validTill = renewedAssertion.getSaml2().getConditions().getNotOnOrAfter();
@@ -227,8 +227,8 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
                 validFrom = renewedAssertion.getSaml1().getConditions().getNotBefore();
                 validTill = renewedAssertion.getSaml1().getConditions().getNotOnOrAfter();
             }
-            response.setCreated(validFrom.toDate().toInstant());
-            response.setExpires(validTill.toDate().toInstant());
+            response.setCreated(validFrom);
+            response.setExpires(validTill);
 
             LOG.fine("SAML Token successfully renewed");
             return response;
@@ -315,9 +315,9 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
                     "Renewal after expiry is not allowed", STSException.REQUEST_FAILED
                 );
             }
-            DateTime expiryDate = getExpiryDate(assertion);
-            DateTime currentDate = new DateTime();
-            if ((currentDate.getMillis() - expiryDate.getMillis()) > (maxExpiry * 1000L)) {
+            Instant expiryDate = getExpiryDate(assertion);
+            Instant currentDate = Instant.now();
+            if ((currentDate.toEpochMilli() - expiryDate.toEpochMilli()) > (maxExpiry * 1000L)) {
                 LOG.log(Level.WARNING, "The token expired too long ago to be renewed");
                 throw new STSException(
                     "The token expired too long ago to be renewed", STSException.REQUEST_FAILED
@@ -452,7 +452,7 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
 
         if (assertion.getSaml1() != null) {
             org.opensaml.saml.saml1.core.Assertion saml1Assertion = assertion.getSaml1();
-            saml1Assertion.setIssueInstant(new DateTime());
+            saml1Assertion.setIssueInstant(Instant.now());
 
             org.opensaml.saml.saml1.core.Conditions saml1Conditions =
                 SAML1ComponentBuilder.createSamlv1Conditions(conditions);
@@ -460,7 +460,7 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
             saml1Assertion.setConditions(saml1Conditions);
         } else {
             org.opensaml.saml.saml2.core.Assertion saml2Assertion = assertion.getSaml2();
-            saml2Assertion.setIssueInstant(new DateTime());
+            saml2Assertion.setIssueInstant(Instant.now());
 
             org.opensaml.saml.saml2.core.Conditions saml2Conditions =
                 SAML2ComponentBuilder.createConditions(conditions);
@@ -530,7 +530,7 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
     }
 
 
-    private DateTime getExpiryDate(SamlAssertionWrapper assertion) {
+    private Instant getExpiryDate(SamlAssertionWrapper assertion) {
         if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
             return assertion.getSaml2().getConditions().getNotOnOrAfter();
         }
