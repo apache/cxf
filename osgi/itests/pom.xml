@@ -58,7 +58,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
-            <artifactId>artemis-jakarta-client</artifactId>
+            <artifactId>activemq-client</artifactId>
         </dependency>
 
         <dependency>
@@ -91,10 +91,10 @@
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
-            <artifactId>artemis-features</artifactId>
+            <artifactId>activemq-karaf</artifactId>
             <type>xml</type>
-            <version>${cxf.activemq.artemis.version}</version>
-            <classifier>features</classifier>
+            <version>${cxf.activemq.version}</version>
+            <classifier>features-core</classifier>
             <exclusions>
                 <exclusion>
                     <groupId>*</groupId>

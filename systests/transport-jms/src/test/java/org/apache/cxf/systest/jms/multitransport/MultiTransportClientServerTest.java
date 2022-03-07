@@ -24,8 +24,8 @@ import java.net.URL;
 import javax.xml.namespace.QName;
 
 import jakarta.xml.ws.Endpoint;
-import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
-import org.apache.activemq.artemis.junit.EmbeddedActiveMQResource;
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws.EndpointImpl;
@@ -40,15 +40,12 @@ import org.apache.hello_world_doc_lit.PingMeFault;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
 import org.junit.Test;
 
 /**
  * Show that one service can have two ports with different transports
  */
 public class MultiTransportClientServerTest {
-    @ClassRule public static EmbeddedActiveMQResource server = new EmbeddedActiveMQResource(0);
-
     private static final String PORT = TestUtil.getNewPortNumber(MultiTransportClientServerTest.class);
     private static QName serviceName = new QName("http://apache.org/hello_world_doc_lit",
                                                 "MultiTransportService");
@@ -60,7 +57,8 @@ public class MultiTransportClientServerTest {
     public static void startServers() throws Exception {
         bus = BusFactory.getDefaultBus();
         ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false");
-        cff = new ConnectionFactoryFeature(cf);
+        PooledConnectionFactory cfp = new PooledConnectionFactory(cf);
+        cff = new ConnectionFactoryFeature(cfp);
         String address = "http://localhost:" + PORT + "/SOAPDocLitService/SoapPort";
         Endpoint.publish(address, new HTTPGreeterImpl());
         EndpointImpl ep1 = (EndpointImpl)Endpoint.create(new JMSGreeterImpl());

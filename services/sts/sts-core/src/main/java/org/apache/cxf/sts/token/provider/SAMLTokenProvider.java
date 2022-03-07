@@ -19,7 +19,6 @@
 
 package org.apache.cxf.sts.token.provider;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -53,6 +52,7 @@ import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean;
 import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.joda.time.DateTime;
 import org.opensaml.saml.common.SAMLVersion;
 
 /**
@@ -153,8 +153,8 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
             }
             response.setToken(token);
 
-            final Instant validFrom;
-            final Instant validTill;
+            final DateTime validFrom;
+            final DateTime validTill;
             if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
                 validFrom = assertion.getSaml2().getConditions().getNotBefore();
                 validTill = assertion.getSaml2().getConditions().getNotOnOrAfter();
@@ -162,8 +162,8 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
                 validFrom = assertion.getSaml1().getConditions().getNotBefore();
                 validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
             }
-            response.setCreated(validFrom);
-            response.setExpires(validTill);
+            response.setCreated(validFrom.toDate().toInstant());
+            response.setExpires(validTill.toDate().toInstant());
 
             response.setEntropy(entropyBytes);
             if (keySize > 0) {

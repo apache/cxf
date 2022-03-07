@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
 
 import org.springframework.core.annotation.AliasFor;
 
-import io.micrometer.api.annotation.Timed;
+import io.micrometer.core.annotation.Timed;
 
 @Target({ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

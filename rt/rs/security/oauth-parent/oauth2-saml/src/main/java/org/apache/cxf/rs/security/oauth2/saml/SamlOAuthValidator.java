@@ -19,7 +19,6 @@
 
 package org.apache.cxf.rs.security.oauth2.saml;
 
-import java.time.Instant;
 import java.util.List;
 
 import jakarta.ws.rs.core.UriBuilder;
@@ -145,7 +144,7 @@ public class SamlOAuthValidator {
                                              SubjectConfirmationData subjectConfData) {
         if (subjectConfData == null) {
             if (!subjectConfirmationDataRequired
-                && cs.getNotOnOrAfter() != null && !cs.getNotOnOrAfter().isBefore(Instant.now())) {
+                && cs.getNotOnOrAfter() != null && !cs.getNotOnOrAfter().isBeforeNow()) {
                 return;
             }
             throw ExceptionUtils.toNotAuthorizedException(null, null);
@@ -159,7 +158,7 @@ public class SamlOAuthValidator {
 
         // We must have a NotOnOrAfter timestamp
         if (subjectConfData.getNotOnOrAfter() == null
-            || subjectConfData.getNotOnOrAfter().isBefore(Instant.now())) {
+            || subjectConfData.getNotOnOrAfter().isBeforeNow()) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
 

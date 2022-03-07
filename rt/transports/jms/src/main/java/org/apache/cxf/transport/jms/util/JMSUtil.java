@@ -27,7 +27,6 @@ import jakarta.jms.MessageConsumer;
 import jakarta.jms.ObjectMessage;
 import jakarta.jms.Queue;
 import jakarta.jms.Session;
-import jakarta.jms.XAConnection;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.transport.jms.JMSConstants;
@@ -122,14 +121,8 @@ public final class JMSUtil {
     }
 
     public static Queue createQueue(Connection connection, String name) throws JMSException {
-        if (connection instanceof XAConnection) { 
-            try (Session session = ((XAConnection)connection).createXASession()) {
-                return session.createQueue(name);
-            }
-        } else {
-            try (Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)) {
-                return session.createQueue(name);
-            }
+        try (Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)) {
+            return session.createQueue(name);
         }
     }
 

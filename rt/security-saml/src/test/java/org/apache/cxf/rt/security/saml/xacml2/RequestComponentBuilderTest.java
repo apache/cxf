@@ -19,7 +19,6 @@
 
 package org.apache.cxf.rt.security.saml.xacml2;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -33,6 +32,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.rt.security.saml.xacml.XACMLConstants;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
+import org.joda.time.DateTime;
 import org.opensaml.xacml.ctx.ActionType;
 import org.opensaml.xacml.ctx.AttributeType;
 import org.opensaml.xacml.ctx.AttributeValueType;
@@ -193,7 +193,7 @@ public class RequestComponentBuilderTest {
         ActionType action = RequestComponentBuilder.createActionType(attributes);
 
         // Environment
-        Instant dateTime = Instant.now();
+        DateTime dateTime = new DateTime();
         AttributeValueType environmentAttributeValue =
             RequestComponentBuilder.createAttributeValueType(dateTime.toString());
         AttributeType environmentAttribute =

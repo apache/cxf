@@ -59,7 +59,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
-            <artifactId>artemis-jakarta-server</artifactId>
+            <artifactId>activemq-broker</artifactId>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>

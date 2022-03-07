@@ -29,8 +29,8 @@ import jakarta.xml.ws.BindingProvider;
 import jakarta.xml.ws.Endpoint;
 import jakarta.xml.ws.Holder;
 import jakarta.xml.ws.soap.SOAPBinding;
-
-import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws.EndpointImpl;
@@ -56,7 +56,8 @@ public class ClientMtomXopWithJMSTest {
         bus = BusFactory.getDefaultBus();
 
         ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false");
-        cff = new ConnectionFactoryFeature(cf);
+        PooledConnectionFactory cfp = new PooledConnectionFactory(cf);
+        cff = new ConnectionFactoryFeature(cfp);
 
         EndpointImpl ep = (EndpointImpl)Endpoint.create(implementor);
         ep.getFeatures().add(cff);

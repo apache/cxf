@@ -56,7 +56,7 @@
                 <configuration>
                     <instructions>
                         <Require-Bundle>
-                            org.apache.activemq.artemis-core-client
+                            org.apache.activemq.activemq-core
                         </Require-Bundle>
                         <Import-Package>
                             org.apache.cxf.*;resolution:=optional,

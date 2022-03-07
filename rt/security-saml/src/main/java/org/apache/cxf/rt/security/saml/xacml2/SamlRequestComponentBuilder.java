@@ -19,9 +19,9 @@
 
 package org.apache.cxf.rt.security.saml.xacml2;
 
-import java.time.Instant;
 import java.util.UUID;
 
+import org.joda.time.DateTime;
 import org.opensaml.core.xml.XMLObjectBuilderFactory;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.saml.common.SAMLObjectBuilder;
@@ -79,7 +79,7 @@ public final class SamlRequestComponentBuilder {
             );
         authzQuery.setID("_" + UUID.randomUUID().toString());
         authzQuery.setVersion(SAMLVersion.VERSION_20);
-        authzQuery.setIssueInstant(Instant.now());
+        authzQuery.setIssueInstant(new DateTime());
         authzQuery.setInputContextOnly(Boolean.valueOf(inputContextOnly));
         authzQuery.setReturnContext(Boolean.valueOf(returnContext));
 

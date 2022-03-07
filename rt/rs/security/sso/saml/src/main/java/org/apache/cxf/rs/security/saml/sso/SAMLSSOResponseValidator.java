@@ -128,12 +128,15 @@ public class SAMLSSOResponseValidator {
                     // Store Session NotOnOrAfter
                     for (AuthnStatement authnStatment : assertion.getAuthnStatements()) {
                         if (authnStatment.getSessionNotOnOrAfter() != null) {
-                            sessionNotOnOrAfter = authnStatment.getSessionNotOnOrAfter();
+                            sessionNotOnOrAfter =
+                                Instant.ofEpochMilli(authnStatment.getSessionNotOnOrAfter().toDate().getTime());
                         }
                     }
                     // Fall back to the SubjectConfirmationData NotOnOrAfter if we have no session NotOnOrAfter
                     if (sessionNotOnOrAfter == null) {
-                        sessionNotOnOrAfter = subjectConf.getSubjectConfirmationData().getNotOnOrAfter();
+                        sessionNotOnOrAfter =
+                            Instant.ofEpochMilli(subjectConf.getSubjectConfirmationData()
+                                                 .getNotOnOrAfter().toDate().getTime());
                     }
                 }
             }
@@ -149,7 +152,7 @@ public class SAMLSSOResponseValidator {
         validatorResponse.setResponseId(samlResponse.getID());
         validatorResponse.setSessionNotOnOrAfter(sessionNotOnOrAfter);
         if (samlResponse.getIssueInstant() != null) {
-            validatorResponse.setCreated(samlResponse.getIssueInstant());
+            validatorResponse.setCreated(Instant.ofEpochMilli(samlResponse.getIssueInstant().toDate().getTime()));
         }
 
         Element assertionElement = validAssertion.getDOM();
@@ -229,7 +232,7 @@ public class SAMLSSOResponseValidator {
 
         // We must have a NotOnOrAfter timestamp
         if (subjectConfData.getNotOnOrAfter() == null
-            || subjectConfData.getNotOnOrAfter().isBefore(Instant.now())) {
+            || subjectConfData.getNotOnOrAfter().isBeforeNow()) {
             LOG.warning("Subject Conf Data does not contain NotOnOrAfter or it has expired");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
@@ -237,7 +240,7 @@ public class SAMLSSOResponseValidator {
         // Need to keep bearer assertion IDs based on NotOnOrAfter to detect replay attacks
         if (postBinding && replayCache != null) {
             if (!replayCache.contains(id)) {
-                Instant expires = subjectConfData.getNotOnOrAfter();
+                Instant expires = Instant.ofEpochMilli(subjectConfData.getNotOnOrAfter().toDate().getTime());
                 replayCache.putId(id, expires);
             } else {
                 LOG.warning("Replay attack with token id: " + id);
