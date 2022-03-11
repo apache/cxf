@@ -638,7 +638,7 @@ public final class JAXBUtils {
         try {
             Class<?> cls;
             Class<?> refClass;
-            String pkg = "org.glassfish.jaxb.runtime.api.";
+            String pkg = "org.glassfish.jaxb.runtime.";
             try {
                 cls = Class.forName("org.glassfish.jaxb.runtime.api.JAXBRIContext");
                 refClass = Class.forName(pkg + "api.TypeReference");
