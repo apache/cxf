@@ -301,7 +301,7 @@ public final class JAXBContextCache {
             String pfx = "org.glassfish.jaxb.";
             try {
                 fact = ClassLoaderUtils.loadClass("org.glassfish.jaxb.runtime.v2.ContextFactory",
-                                                  JAXBContextCache.class);
+                        JAXBContextCache.class);
             } catch (Throwable t) {
                //ignore
             }
@@ -336,7 +336,13 @@ public final class JAXBContextCache {
         try {
             ctx = AccessController.doPrivileged(new PrivilegedExceptionAction<JAXBContext>() {
                 public JAXBContext run() throws Exception {
-                    return JAXBContext.newInstance(classes.toArray(new Class<?>[0]), map);
+                    //This is a workaround for CXF-8675
+                    Class factoryClass = ClassLoaderUtils.loadClass("org.glassfish.jaxb.runtime.v2.ContextFactory",
+                            JAXBContextCache.class);
+                    Object obj = factoryClass.newInstance();
+                    Method m = factoryClass.getMethod("createContext", Class[].class, Map.class);
+                    Object context = m.invoke(obj, classes.toArray(new Class<?>[0]), null);
+                    return (JAXBContext)context;
                 }
             });
         } catch (PrivilegedActionException e2) {
@@ -413,5 +419,4 @@ public final class JAXBContextCache {
             //ignore
         }
     }
-
 }
