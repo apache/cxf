@@ -17,7 +17,7 @@ KIND, either express or implied. See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<bindings xmlns="https://jakarta.ee/xml/ns/jaxb" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xjc="https://jakarta.ee/xml/ns/jaxb/xjc" version="3.0">
+<bindings xmlns="https://jakarta.ee/xml/ns/jaxb" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" version="3.0">
     <bindings scd="x-schema::wsa" if-exists="true">
         <schemaBindings map="false"/>
         <bindings scd="wsa:EndpointReference">
