@@ -164,11 +164,11 @@ public interface Message extends StringMap {
     String MAINTAIN_SESSION = Message.class.getName() + ".MAINTAIN_SESSION";
     String ATTACHMENTS = Message.class.getName() + ".ATTACHMENTS";
 
-    String WSDL_DESCRIPTION = "javax.xml.ws.wsdl.description";
-    String WSDL_SERVICE = "javax.xml.ws.wsdl.service";
-    String WSDL_PORT = "javax.xml.ws.wsdl.port";
-    String WSDL_INTERFACE = "javax.xml.ws.wsdl.interface";
-    String WSDL_OPERATION = "javax.xml.ws.wsdl.operation";
+    String WSDL_DESCRIPTION = "jakarta.xml.ws.wsdl.description";
+    String WSDL_SERVICE = "jakarta.xml.ws.wsdl.service";
+    String WSDL_PORT = "jakarta.xml.ws.wsdl.port";
+    String WSDL_INTERFACE = "jakarta.xml.ws.wsdl.interface";
+    String WSDL_OPERATION = "jakarta.xml.ws.wsdl.operation";
 
     /**
      * Some properties to allow adding interceptors to the chain
