@@ -215,7 +215,7 @@
         <cxf.swagger2.version>1.6.5</cxf.swagger2.version>
         <cxf.swagger2.guava.version>31.0.1-jre</cxf.swagger2.guava.version>
         <cxf.swagger2.guava.failureaccess.version>1.0.1</cxf.swagger2.guava.failureaccess.version>
-        <cxf.tika.version>1.28</cxf.tika.version>
+        <cxf.tika.version>1.28.1</cxf.tika.version>
         <cxf.tomcat.version>9.0.60</cxf.tomcat.version>
         <cxf.tomitribe.http.signature.version>1.7</cxf.tomitribe.http.signature.version>
         <cxf.undertow.osgi.version>[1.4,3.0)</cxf.undertow.osgi.version>
