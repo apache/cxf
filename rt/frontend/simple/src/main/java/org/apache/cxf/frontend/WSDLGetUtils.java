@@ -552,7 +552,9 @@ public class WSDLGetUtils {
                                 start), e);
             }
 
-            if (!doneSchemas.containsKey(decodedStart)) {
+            final SchemaReference doneSchema = doneSchemas.get(decodedStart);
+            if (doneSchema == null || !doneSchema.getSchemaLocationURI().equals(
+                    schemaReference.getSchemaLocationURI())) {
                 String resolvedSchemaLocation = resolveWithCatalogs(catalogs, start, base);
                 if (resolvedSchemaLocation == null) {
                     resolvedSchemaLocation =
