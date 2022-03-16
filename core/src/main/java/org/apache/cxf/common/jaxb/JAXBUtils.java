@@ -40,6 +40,8 @@ import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -123,7 +125,7 @@ public final class JAXBUtils {
     private static ClassLoader jaxbXjcLoader;
     private static volatile Optional<Object> jaxbMinimumEscapeHandler;
     private static volatile Optional<Object> jaxbNoEscapeHandler;
-    
+
     static {
         BUILTIN_DATATYPES_MAP = new HashMap<>();
         BUILTIN_DATATYPES_MAP.put("string", "java.lang.String");
@@ -942,8 +944,8 @@ public final class JAXBUtils {
         }
         return clazz.getClassLoader();
     }
-       
-    private static void addToObjectFactoryCache(Package objectFactoryPkg, 
+
+    private static void addToObjectFactoryCache(Package objectFactoryPkg,
                                          Class<?> ofactory,
                                          Map<Package, CachedClass> objectFactoryCache) {
         if (objectFactoryPkg == null || objectFactoryCache == null) {
@@ -1127,7 +1129,7 @@ public final class JAXBUtils {
         }
         jaxbNoEscapeHandler.ifPresent(p -> setEscapeHandler(marshaller, p));
     }
-    
+
     public static void setEscapeHandler(Marshaller marshaller, Object escapeHandler) {
         try {
             String postFix = getPostfix(marshaller.getClass());
@@ -1138,15 +1140,15 @@ public final class JAXBUtils {
             LOG.log(Level.INFO, "Failed to set MinumEscapeHandler to jaxb marshaller", e);
         }
     }
-    
+
     public static Object createMininumEscapeHandler(Class<?> cls) {
         return createEscapeHandler(cls, "MinimumEscapeHandler");
     }
-    
+
     public static Object createNoEscapeHandler(Class<?> cls) {
         return createEscapeHandler(cls, "NoEscapeHandler");
     }
-    
+
     private static Object createEscapeHandler(Class<?> cls, String simpleClassName) {
         try {
             String postFix = getPostfix(cls);
@@ -1174,6 +1176,54 @@ public final class JAXBUtils {
         }
         return null;
     }
-    
-
+    public static JAXBContext createJAXBContext(Set<Class<?>> classes,
+                                                Map<String, Object> contextProperties) throws JAXBException {
+        JAXBContext ctx;
+        try {
+            ctx = AccessController.doPrivileged(new PrivilegedExceptionAction<JAXBContext>() {
+                public JAXBContext run() throws Exception {
+                    //This is a workaround for CXF-8675
+                    Class factoryClass = ClassLoaderUtils.loadClass("org.glassfish.jaxb.runtime.v2.ContextFactory",
+                            JAXBContextCache.class);
+                    Object obj = factoryClass.newInstance();
+                    Method m = factoryClass.getMethod("createContext", Class[].class, Map.class);
+                    Object context = m.invoke(obj, classes.toArray(new Class<?>[0]), null);
+                    return (JAXBContext)context;
+                }
+            });
+        } catch (PrivilegedActionException e2) {
+            if (e2.getException() instanceof JAXBException) {
+                JAXBException ex = (JAXBException)e2.getException();
+                throw ex;
+            } else {
+                throw new RuntimeException(e2.getException());
+            }
+        }
+        return ctx;
+    }
+    public static JAXBContext createContext(final Set<Class<?>> classes,
+                                            final Map<String, Object> map) throws JAXBException {
+        JAXBContext ctx = null;
+        try {
+            ctx = AccessController.doPrivileged(new PrivilegedExceptionAction<JAXBContext>() {
+                public JAXBContext run() throws Exception {
+                    //This is a workaround for CXF-8675
+                    Class factoryClass = ClassLoaderUtils.loadClass("org.glassfish.jaxb.runtime.v2.ContextFactory",
+                            JAXBContextCache.class);
+                    Object obj = factoryClass.newInstance();
+                    Method m = factoryClass.getMethod("createContext", Class[].class, Map.class);
+                    Object context = m.invoke(obj, classes.toArray(new Class<?>[0]), null);
+                    return (JAXBContext) context;
+                }
+            });
+        } catch (PrivilegedActionException e2) {
+            if (e2.getException() instanceof JAXBException) {
+                JAXBException ex = (JAXBException) e2.getException();
+                throw ex;
+            } else {
+                throw new RuntimeException(e2.getException());
+            }
+        }
+        return ctx;
+    }
 }

@@ -50,7 +50,7 @@ public final class JAXBUtils {
 
         JAXBContext ctx;
         try {
-            ctx = JAXBContext.newInstance(classes.toArray(new Class[0]), contextProperties);
+            ctx = org.apache.cxf.common.jaxb.JAXBUtils.createContext(classes, contextProperties);
             return ctx;
         } catch (JAXBException ex) {
             LOG.log(Level.SEVERE, "No JAXB context can be created", ex);

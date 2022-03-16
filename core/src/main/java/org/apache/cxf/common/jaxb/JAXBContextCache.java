@@ -25,9 +25,6 @@ import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -247,15 +244,7 @@ public final class JAXBContextCache {
             // load jaxb needed class and try to create jaxb context
             boolean added = addJaxbObjectFactory(ex, classes);
             if (added) {
-                try {
-                    context = AccessController.doPrivileged(new PrivilegedExceptionAction<JAXBContext>() {
-                        public JAXBContext run() throws Exception {
-                            return JAXBContext.newInstance(classes.toArray(new Class<?>[0]), null);
-                        }
-                    });
-                } catch (PrivilegedActionException e) {
-                    throw ex;
-                }
+                context = JAXBUtils.createContext(classes, null);
             }
             if (context == null) {
                 throw ex;
@@ -333,26 +322,7 @@ public final class JAXBContextCache {
                 }
             }
         }
-        try {
-            ctx = AccessController.doPrivileged(new PrivilegedExceptionAction<JAXBContext>() {
-                public JAXBContext run() throws Exception {
-                    //This is a workaround for CXF-8675
-                    Class factoryClass = ClassLoaderUtils.loadClass("org.glassfish.jaxb.runtime.v2.ContextFactory",
-                            JAXBContextCache.class);
-                    Object obj = factoryClass.newInstance();
-                    Method m = factoryClass.getMethod("createContext", Class[].class, Map.class);
-                    Object context = m.invoke(obj, classes.toArray(new Class<?>[0]), null);
-                    return (JAXBContext)context;
-                }
-            });
-        } catch (PrivilegedActionException e2) {
-            if (e2.getException() instanceof JAXBException) {
-                JAXBException ex = (JAXBException)e2.getException();
-                throw ex;
-            } else {
-                throw new RuntimeException(e2.getException());
-            }
-        }
+        ctx = JAXBUtils.createContext(classes, null);
         return ctx;
     }
     // Now we can not add all the classes that Jaxb needed into JaxbContext
