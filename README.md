@@ -1,4 +1,4 @@
-[![Build Status](https://ci-builds.apache.org/job/CXF/job/CXF-JDK8/badge/icon?subject=Build)](https://ci-builds.apache.org/job/CXF/job/CXF-JDK8/)
+[![Build Status](https://ci-builds.apache.org/job/CXF/job/CXF-JDK11/badge/icon?subject=Build)](https://ci-builds.apache.org/job/CXF/job/CXF-JDK11/)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.cxf/cxf/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.apache.cxf/cxf)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/apache/cxf)](https://lgtm.com/projects/g/apache/cxf/alerts/)
 

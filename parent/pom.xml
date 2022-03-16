@@ -102,7 +102,7 @@
         <cxf.derby.version>10.14.2.0</cxf.derby.version>
         <cxf.dom4j.version>2.1.3</cxf.dom4j.version>
         <cxf.dropwizard3.version>3.2.6</cxf.dropwizard3.version>
-        <cxf.dropwizard4.version>4.2.8</cxf.dropwizard4.version>
+        <cxf.dropwizard4.version>4.2.9</cxf.dropwizard4.version>
         <cxf.ehcache3.version>3.10.0-alpha0</cxf.ehcache3.version>
         <cxf.el-api.version>3.0.3</cxf.el-api.version>
         <cxf.findbugs.version>3.0.2</cxf.findbugs.version>
@@ -117,14 +117,14 @@
         <cxf.hibernate.validator.version>7.0.1.Final</cxf.hibernate.validator.version>
         <cxf.hsqldb.version>2.5.0</cxf.hsqldb.version>
         <cxf.httpcomponents.asyncclient.version.range>[4.0,4.2)</cxf.httpcomponents.asyncclient.version.range>
-        <cxf.httpcomponents.asyncclient.version>4.1.4</cxf.httpcomponents.asyncclient.version>
+        <cxf.httpcomponents.asyncclient.version>4.1.5</cxf.httpcomponents.asyncclient.version>
         <cxf.httpcomponents.client.version>4.5.13</cxf.httpcomponents.client.version>
         <cxf.httpcomponents.core.version.range>[4.3,4.5.0)</cxf.httpcomponents.core.version.range>
         <cxf.httpcomponents.core.version>4.4.15</cxf.httpcomponents.core.version>
         <cxf.httpcomponents.client5.version>5.1.2</cxf.httpcomponents.client5.version>
         <cxf.httpcomponents.core5.version>5.1.3</cxf.httpcomponents.core5.version>
-        <cxf.jackson.version>2.13.1</cxf.jackson.version>
-        <cxf.jackson.databind.version>2.13.1</cxf.jackson.databind.version>
+        <cxf.jackson.version>2.13.2</cxf.jackson.version>
+        <cxf.jackson.databind.version>2.13.2</cxf.jackson.databind.version>
         <cxf.jacorb.version>3.9</cxf.jacorb.version>
         <cxf.jaeger.version>1.8.0</cxf.jaeger.version>
         <cxf.jaeger.version>1.6.0</cxf.jaeger.version>
@@ -172,11 +172,11 @@
         <cxf.microprofile.rest.client.version>3.0</cxf.microprofile.rest.client.version>
         <cxf.microprofile.openapi.version>3.0</cxf.microprofile.openapi.version>
         <cxf.mina.version>2.1.5</cxf.mina.version>
-        <cxf.mockito.version>4.3.1</cxf.mockito.version>
+        <cxf.mockito.version>4.4.0</cxf.mockito.version>
         <cxf.msv.version>2013.6.1</cxf.msv.version>
         <cxf.neethi.version>3.2.0</cxf.neethi.version>
         <cxf.netty.version.range>[4,5)</cxf.netty.version.range>
-        <cxf.netty.version>4.1.74.Final</cxf.netty.version>
+        <cxf.netty.version>4.1.75.Final</cxf.netty.version>
         <cxf.netty.tcnative.version>2.0.46.Final</cxf.netty.tcnative.version>
         <cxf.olingo.version>2.0.11</cxf.olingo.version>
         <cxf.openjpa.version>3.1.2</cxf.openjpa.version>
@@ -188,7 +188,7 @@
         <cxf.plexus-archiver.version>4.2.0</cxf.plexus-archiver.version>
         <cxf.plexus-utils.version>3.3.0</cxf.plexus-utils.version>
         <cxf.reactivestreams.version>1.0.3</cxf.reactivestreams.version>
-        <cxf.reactor.version>3.4.15</cxf.reactor.version>
+        <cxf.reactor.version>3.4.16</cxf.reactor.version>
         <cxf.rhino.version>1.7.13</cxf.rhino.version>
         <cxf.rxjava.version>1.3.8</cxf.rxjava.version>
         <cxf.rxjava2.version>2.2.21</cxf.rxjava2.version>
@@ -213,7 +213,7 @@
         <cxf.swagger2.guava.version>31.0.1-jre</cxf.swagger2.guava.version>
         <cxf.swagger2.guava.failureaccess.version>1.0.1</cxf.swagger2.guava.failureaccess.version>
         <cxf.tika.version>2.3.0</cxf.tika.version>
-        <cxf.tomcat.version>10.1.0-M11</cxf.tomcat.version>
+        <cxf.tomcat.version>10.1.0-M12</cxf.tomcat.version>
         <cxf.tomitribe.http.signature.version>1.7</cxf.tomitribe.http.signature.version>
         <cxf.undertow.osgi.version>[1.4,3.0)</cxf.undertow.osgi.version>
         <cxf.undertow.xnio.osgi.version>[3.3,4.0)</cxf.undertow.xnio.osgi.version>
