@@ -32,6 +32,11 @@
             <xsd:import namespace="http://apache.org/hello_world/schemas-in-separate-dir"
                         schemaLocation="http://apache.org/hello_world/schemas-in-separate-dir-non-cp/another-schema.xsd"/>
         </schema>
+        <schema targetNamespace="http://apache.org/hello_world/types2"
+                xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+            <xsd:import namespace="http://apache.org/hello_world/d/shared"
+                        schemaLocation="d/shared.xsd"/>
+        </schema>
     </wsdl:types>
     <wsdl:message name="sayHiRequest">
         <wsdl:part name="in" element="x1:sayHi"/>
