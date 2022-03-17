@@ -18,7 +18,7 @@
   under the License.
 -->
 <jaxws:bindings wsdlLocation="jaxb_custom_extensors.wsdl"
-    xmlns:jaxws="http://java.sun.com/xml/ns/jaxws" 
+    xmlns:jaxws="https://jakarta.ee/xml/ns/jaxws"
     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"

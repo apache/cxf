@@ -181,7 +181,7 @@ public final class ToolConstants {
 
     public static final String ASYNC_METHOD_SUFFIX = "Async";
 
-    public static final String HANDLER_CHAINS_URI = "https://jakarta.ee/xml/ns/javaee";
+    public static final String HANDLER_CHAINS_URI = "https://jakarta.ee/xml/ns/jakartaee";
     public static final String HANDLER_CHAIN = "handler-chain";
     public static final String HANDLER_CHAINS = "handler-chains";
 

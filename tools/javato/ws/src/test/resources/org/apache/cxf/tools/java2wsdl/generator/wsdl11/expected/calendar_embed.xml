@@ -17,7 +17,7 @@
         under the License.
 -->
 <jaxws:bindings wsdlLocation="calendar_embed.wsdl"
-          xmlns:jaxws="http://java.sun.com/xml/ns/jaxws"
+          xmlns:jaxws="https://jakarta.ee/xml/ns/jaxws"
           xmlns:xs="http://www.w3.org/2001/XMLSchema"
           xmlns:jxb="https://jakarta.ee/xml/ns/jaxb"
           xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">

@@ -17,7 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http-conf="http://schemas.iona.com/transports/http/configuration" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/binary_attachment" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://xmlbus.com/AttachmentAppService/xsd" xmlns:jaxws="http://java.sun.com/xml/ns/jaxws" name="binary_attachment" targetNamespace="http://apache.org/binary_attachment">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http-conf="http://schemas.iona.com/transports/http/configuration" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/binary_attachment" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://xmlbus.com/AttachmentAppService/xsd" xmlns:jaxws="https://jakarta.ee/xml/ns/jaxws" name="binary_attachment" targetNamespace="http://apache.org/binary_attachment">
     <wsdl:message name="echoImageRequest">
         <wsdl:part name="para0" type="xsd:base64Binary"/>
     </wsdl:message>

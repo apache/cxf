@@ -28,7 +28,7 @@
 -->
 
 <jaxws:bindings wsdlLocation="echo_date.wsdl"
-          xmlns:jaxws="http://java.sun.com/xml/ns/jaxws"
+          xmlns:jaxws="https://jakarta.ee/xml/ns/jaxws"
           xmlns:xs="http://www.w3.org/2001/XMLSchema"
           xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
   <jaxws:bindings node="wsdl:definitions/wsdl:types/xs:schema[@targetNamespace='http://date.fortest.tools.cxf.apache.org/']">
