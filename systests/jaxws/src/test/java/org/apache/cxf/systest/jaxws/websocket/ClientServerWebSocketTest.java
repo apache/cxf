@@ -54,7 +54,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
+//TODO: Enable this test after jakarta websocket is ready
+@org.junit.Ignore("It requires jakarta version:The CXF websocket transport needs either the "
+        + "Jetty WebSocket or Atmosphere dependencies to be available")
 public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
 

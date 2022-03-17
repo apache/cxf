@@ -1212,7 +1212,7 @@ public final class JAXBUtils {
                             JAXBContextCache.class);
                     Object obj = factoryClass.newInstance();
                     Method m = factoryClass.getMethod("createContext", Class[].class, Map.class);
-                    Object context = m.invoke(obj, classes.toArray(new Class<?>[0]), null);
+                    Object context = m.invoke(obj, classes.toArray(new Class<?>[0]), map);
                     return (JAXBContext) context;
                 }
             });

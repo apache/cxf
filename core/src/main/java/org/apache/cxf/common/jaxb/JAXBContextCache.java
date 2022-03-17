@@ -322,7 +322,7 @@ public final class JAXBContextCache {
                 }
             }
         }
-        ctx = JAXBUtils.createContext(classes, null);
+        ctx = JAXBUtils.createContext(classes, map);
         return ctx;
     }
     // Now we can not add all the classes that Jaxb needed into JaxbContext
