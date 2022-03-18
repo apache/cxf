@@ -1176,31 +1176,6 @@ public final class JAXBUtils {
         }
         return null;
     }
-    public static JAXBContext createJAXBContext(Set<Class<?>> classes,
-                                                Map<String, Object> contextProperties) throws JAXBException {
-        JAXBContext ctx;
-        try {
-            ctx = AccessController.doPrivileged(new PrivilegedExceptionAction<JAXBContext>() {
-                public JAXBContext run() throws Exception {
-                    //This is a workaround for CXF-8675
-                    Class factoryClass = ClassLoaderUtils.loadClass("org.glassfish.jaxb.runtime.v2.ContextFactory",
-                            JAXBContextCache.class);
-                    Object obj = factoryClass.newInstance();
-                    Method m = factoryClass.getMethod("createContext", Class[].class, Map.class);
-                    Object context = m.invoke(obj, classes.toArray(new Class<?>[0]), null);
-                    return (JAXBContext)context;
-                }
-            });
-        } catch (PrivilegedActionException e2) {
-            if (e2.getException() instanceof JAXBException) {
-                JAXBException ex = (JAXBException)e2.getException();
-                throw ex;
-            } else {
-                throw new RuntimeException(e2.getException());
-            }
-        }
-        return ctx;
-    }
     public static JAXBContext createContext(final Set<Class<?>> classes,
                                             final Map<String, Object> map) throws JAXBException {
         JAXBContext ctx = null;
