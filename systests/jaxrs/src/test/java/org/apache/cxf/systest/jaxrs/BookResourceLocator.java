@@ -19,28 +19,22 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
-@Path("/bookstore")
-public class BookStoreSubObject {
-    @Path("/booksubresourceobject")
-    public Object getBookSubResourceObject() throws BookNotFoundFault {
+public class BookResourceLocator {
+    @GET
+    public Book get() {
         return new Book();
     }
-    
-    @Path("consumeslocator")
-    public BookResourceLocator consumeslocator() {
-        return new BookResourceLocator();
-    }
-    
-    @GET
-    @Path("{id}")
-    public Book book(@PathParam("id") Long id) {
-        return new Book("Book", id);
+
+    @POST
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.TEXT_PLAIN)
+    public Book post() {
+        return get();
     }
 }
-
-
