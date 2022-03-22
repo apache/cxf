@@ -586,7 +586,7 @@ public class ClientProxyImpl extends AbstractClient implements
             } else if (requestBody != null) {
                 getBeanGetter(requestBody.getClass(), varName, new Class<?>[] {}).ifPresent(getter -> {
                     try {
-                        getter.invoke(requestBody, new Object[] {});
+                        list.add(getter.invoke(requestBody, new Object[] {}));
                     } catch (Exception ex) {
                         // continue
                     }
