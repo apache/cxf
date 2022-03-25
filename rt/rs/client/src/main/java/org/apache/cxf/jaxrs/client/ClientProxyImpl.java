@@ -42,8 +42,11 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Predicate;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -406,6 +409,23 @@ public class ClientProxyImpl extends AbstractClient implements
         return index;
     }
 
+    protected static Optional<Method> getBeanGetter(
+            final Class<?> clazz, final String property, final Class<?>... parameterTypes) {
+
+        try {
+            return Optional.of(clazz.getMethod("get" + StringUtils.capitalize(property), parameterTypes));
+        } catch (Throwable t1) {
+            try {
+                return Optional.of(clazz.getMethod("is" + StringUtils.capitalize(property), parameterTypes));
+            } catch (Throwable t2) {
+                LOG.log(Level.SEVERE,
+                        "While attempting to find getter method from {0}#{1}",
+                        new Object[] {clazz.getName(), property});
+                return Optional.empty();
+            }
+        }
+    }
+
     protected void checkResponse(Method m, Response r, Message inMessage) throws Throwable {
         Throwable t = null;
         int status = r.getStatus();
@@ -563,13 +583,13 @@ public class ClientProxyImpl extends AbstractClient implements
                 BeanPair pair = beanParamValues.get(varName);
                 list.add(convertParamValue(pair.getValue(), pair.getAnns()));
             } else if (requestBody != null) {
-                try {
-                    Method getter = requestBody.getClass().
-                            getMethod("get" + StringUtils.capitalize(varName), new Class<?>[]{});
-                    list.add(getter.invoke(requestBody, new Object[]{}));
-                } catch (Exception ex) {
-                    // continue
-                }
+                getBeanGetter(requestBody.getClass(), varName, new Class<?>[] {}).ifPresent(getter -> {
+                    try {
+                        list.add(getter.invoke(requestBody, new Object[] {}));
+                    } catch (Exception ex) {
+                        // continue
+                    }
+                });
             }
         });
 
@@ -639,16 +659,24 @@ public class ClientProxyImpl extends AbstractClient implements
                     Annotation methodAnnotation = m.getAnnotation(annClass);
                     boolean beanParam = m.getAnnotation(BeanParam.class) != null;
                     if (methodAnnotation != null || beanParam) {
-                        Method getter = bean.getClass().getMethod("get" + propertyName, new Class<?>[]{});
-                        Object value = getter.invoke(bean, new Object[]{});
-                        if (value != null) {
-                            if (methodAnnotation != null) {
-                                String annotationValue = AnnotationUtils.getAnnotationValue(methodAnnotation);
-                                values.put(annotationValue, new BeanPair(value, m.getParameterAnnotations()[0]));
-                            } else {
-                                getValuesFromBeanParam(value, annClass, values);
-                            }
-                        }
+                        getBeanGetter(bean.getClass(), propertyName, new Class<?>[] {}).
+                                map(getter -> {
+                                    try {
+                                        return getter.invoke(bean, new Object[] {});
+                                    } catch (Exception ex) {
+                                        // ignore
+                                        return null;
+                                    }
+                                }).
+                                filter(Objects::nonNull).
+                                ifPresent(value -> {
+                                    if (methodAnnotation != null) {
+                                        String annValue = AnnotationUtils.getAnnotationValue(methodAnnotation);
+                                        values.put(annValue, new BeanPair(value, m.getParameterAnnotations()[0]));
+                                    } else {
+                                        getValuesFromBeanParam(value, annClass, values);
+                                    }
+                                });
                     } else {
                         String fieldName = StringUtils.uncapitalize(propertyName);
                         Field f = InjectionUtils.getDeclaredField(bean.getClass(), fieldName);
@@ -1031,6 +1059,7 @@ public class ClientProxyImpl extends AbstractClient implements
         return method.getReturnType();
     }
 
+    @Override
     public Object getInvocationHandler() {
         return this;
     }
