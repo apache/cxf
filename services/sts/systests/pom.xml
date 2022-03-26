@@ -33,6 +33,16 @@
         <module>basic</module>
         <module>advanced</module>
         <module>sts-osgi</module>
-        <module>sts-itests</module>
     </modules>
+    
+    <profiles>
+        <!-- TODO: This profile includes modules which are still on 'javax.*' namespace and
+        are not migrated to Jakarta -->
+        <profile>
+            <id>javax</id>
+            <modules>
+                <module>sts-itests</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>
