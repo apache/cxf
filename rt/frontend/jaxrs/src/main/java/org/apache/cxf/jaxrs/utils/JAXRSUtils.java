@@ -510,7 +510,7 @@ public final class JAXRSUtils {
         int pathMatched = 0;
         int methodMatched = 0;
         int consumeMatched = 0;
-
+        
         List<OperationResourceInfo> finalPathSubresources = null;
         for (Map.Entry<ClassResourceInfo, MultivaluedMap<String, String>> rEntry : matchedResources.entrySet()) {
             ClassResourceInfo resource = rEntry.getKey();
@@ -561,7 +561,12 @@ public final class JAXRSUtils {
                 LOG.fine(matchMessageLogSupplier(ori, path, httpMethod, requestType, acceptContentTypes, added));
             }
         }
-        if (finalPathSubresources != null && pathMatched > 0
+        
+        // We may get several matching candidates with different HTTP methods which match subresources
+        // and resources. Before excluding subresources, let us make sure we have at least one matching
+        // HTTP method candidate.
+        boolean isOptions = HttpMethod.OPTIONS.equalsIgnoreCase(httpMethod);
+        if (finalPathSubresources != null && (methodMatched > 0 || isOptions)
             && !MessageUtils.getContextualBoolean(message, KEEP_SUBRESOURCE_CANDIDATES, false)) {
             for (OperationResourceInfo key : finalPathSubresources) {
                 candidateList.remove(key);
