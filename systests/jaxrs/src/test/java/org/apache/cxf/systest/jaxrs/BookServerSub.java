@@ -19,6 +19,12 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
+
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -27,10 +33,33 @@ public class BookServerSub extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(BookServerSub.class);
 
     org.apache.cxf.endpoint.Server server;
-    
+
+    @Provider
+    public static class ExceptionMatcher implements ExceptionMapper<WebApplicationException> {
+        @Override
+        public Response toResponse(WebApplicationException exception) {
+            Response response = exception.getResponse();
+            int status = response == null ? Status.INTERNAL_SERVER_ERROR.getStatusCode() : response.getStatus();
+            if (response != null && response.getEntity() != null) {
+                return response;
+            }
+        
+            switch (status) {
+            case 404:
+            case 405:
+            case 406:
+            case 415:
+                return Response.status(status).entity(String.valueOf(status)).build();
+            default:
+                return response;
+            }
+        }
+    }
+
     protected void run() {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setStaticSubresourceResolution(true);
+        sf.setProvider(new ExceptionMatcher());
         sf.setResourceClasses(BookStoreSubObject.class);
         sf.setResourceProvider(BookStoreSubObject.class,
                                new SingletonResourceProvider(new BookStoreSubObject(), true));
