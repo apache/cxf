@@ -35,8 +35,7 @@ import static org.junit.Assert.assertTrue;
  * Tests the addition of WS-Addressing Message Addressing Properties
  * in the non-decoupled case.
  */
-//TODO:Enable this test after JMS jakarta is ready
-@org.junit.Ignore("Enable this after migrate to Artemis or jakarta version ActiveMQ")
+//TODO: This test needs jms jakarta implementation is ready
 public class DecoupledJMSTest extends MAPTestBase {
     static final String PORT = allocatePort(DecoupledJMSTest.class);
     private static final String ADDRESS = "jms:jndi:dynamicQueues/testqueue0001?"
