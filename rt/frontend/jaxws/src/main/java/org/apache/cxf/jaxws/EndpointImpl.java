@@ -295,8 +295,8 @@ public class EndpointImpl extends jakarta.xml.ws.Endpoint
 
     protected void checkProperties() {
         if (properties != null) {
-            if (properties.containsKey("jakarta.xml.ws.wsdl.description")) {
-                wsdlLocation = properties.get("jakarta.xml.ws.wsdl.description").toString();
+            if (properties.containsKey(Message.WSDL_DESCRIPTION)) {
+                wsdlLocation = properties.get(Message.WSDL_DESCRIPTION).toString();
             }
             if (properties.containsKey(jakarta.xml.ws.Endpoint.WSDL_PORT)) {
                 endpointName = (QName)properties.get(jakarta.xml.ws.Endpoint.WSDL_PORT);
