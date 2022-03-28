@@ -121,6 +121,12 @@ pipeline {
                     sh "cp -r jakartaee-tck/release/JAXRS_BUILD/latest/restful-ws-tck ${WORKSPACE}"
                     sh "yes | cp -vr ts.jte.template ${TS_HOME}/bin/ts.jte"
 
+                    // It seems to be impossible to exclude Jersey from the Glassfish deployment but it 
+                    // interferes with Apache CXF, as such some tests cases are failing. Modifying the Jersey 
+                    // manifest to exclude 'javax.ws.rs.ext.RuntimeDelegate' from Jersey so the Apache CXF
+                    // implementation will be used reliably all the time.
+                    sh 'zip -d ${WORKSPACE}/glassfish5/glassfish/modules/jersey-server.jar META-INF/services/javax.ws.rs.ext.RuntimeDelegate'
+
                     dir("${TS_HOME}/bin") {
                         sh "ant config.vi"
                         sh "ant deploy.all"
