@@ -148,7 +148,7 @@ public class ExtensionClassGenerator extends ClassGeneratorClassLoader implement
         mv.visitEnd();
 
         mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "getElementType", "()Ljavax/xml/namespace/QName;", null, null);
-        av0 = mv.visitAnnotation("Ljavax/xml/bind/annotation/XmlTransient;", true);
+        av0 = mv.visitAnnotation("Ljakarta/xml/bind/annotation/XmlTransient;", true);
         av0.visitEnd();
         mv.visitCode();
         l0 = helper.createLabel();
