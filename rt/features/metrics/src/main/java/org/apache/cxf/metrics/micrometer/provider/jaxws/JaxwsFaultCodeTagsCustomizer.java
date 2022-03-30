@@ -22,8 +22,8 @@ package org.apache.cxf.metrics.micrometer.provider.jaxws;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.metrics.micrometer.provider.TagsCustomizer;
 
-import io.micrometer.api.instrument.Tag;
-import io.micrometer.api.instrument.Tags;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Tags;
 
 public class JaxwsFaultCodeTagsCustomizer implements TagsCustomizer {
 

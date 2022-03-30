@@ -25,7 +25,7 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.BindingOperationInfo;
 
-import io.micrometer.api.instrument.Tag;
+import io.micrometer.core.instrument.Tag;
 
 import org.junit.Before;
 import org.junit.Test;

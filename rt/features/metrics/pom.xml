@@ -36,7 +36,7 @@
 
         <dependency>
             <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-api</artifactId>
+            <artifactId>micrometer-core</artifactId>
             <optional>true</optional>
         </dependency>
 

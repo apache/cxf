@@ -1815,11 +1815,6 @@
                 <version>${cxf.micrometer.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.micrometer</groupId>
-                <artifactId>micrometer-api</artifactId>
-                <version>${cxf.micrometer.version}</version>
-            </dependency>
-            <dependency>
                  <groupId>io.zipkin.brave</groupId>
                  <artifactId>brave</artifactId>
                  <version>${cxf.brave.version}</version>

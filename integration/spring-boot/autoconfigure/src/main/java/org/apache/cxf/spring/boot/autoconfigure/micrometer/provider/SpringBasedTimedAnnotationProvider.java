@@ -34,7 +34,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.springframework.core.annotation.MergedAnnotationCollectors;
 import org.springframework.core.annotation.MergedAnnotations;
 
-import io.micrometer.api.annotation.Timed;
+import io.micrometer.core.annotation.Timed;
 
 import static java.util.Collections.emptySet;
 

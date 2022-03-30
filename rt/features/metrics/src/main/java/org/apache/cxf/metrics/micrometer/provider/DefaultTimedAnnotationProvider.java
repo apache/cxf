@@ -33,8 +33,8 @@ import java.util.stream.Stream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.MessageUtils;
 
-import io.micrometer.api.annotation.Timed;
-import io.micrometer.api.annotation.TimedSet;
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.annotation.TimedSet;
 
 import static java.util.Collections.emptySet;
 

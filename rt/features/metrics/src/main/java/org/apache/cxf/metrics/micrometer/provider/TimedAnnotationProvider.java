@@ -23,7 +23,7 @@ import java.util.Set;
 
 import org.apache.cxf.message.Exchange;
 
-import io.micrometer.api.annotation.Timed;
+import io.micrometer.core.annotation.Timed;
 
 public interface TimedAnnotationProvider {
 

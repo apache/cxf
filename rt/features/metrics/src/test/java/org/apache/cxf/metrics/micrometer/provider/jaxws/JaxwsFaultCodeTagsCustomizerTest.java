@@ -21,9 +21,9 @@ package org.apache.cxf.metrics.micrometer.provider.jaxws;
 
 import org.apache.cxf.message.Exchange;
 
-import io.micrometer.api.instrument.ImmutableTag;
-import io.micrometer.api.instrument.Tag;
-import io.micrometer.api.instrument.Tags;
+import io.micrometer.core.instrument.ImmutableTag;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Tags;
 
 import org.junit.Before;
 import org.junit.Test;

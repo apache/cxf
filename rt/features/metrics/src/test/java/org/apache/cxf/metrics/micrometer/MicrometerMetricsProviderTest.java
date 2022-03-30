@@ -29,7 +29,7 @@ import org.apache.cxf.metrics.micrometer.provider.TagsProvider;
 import org.apache.cxf.metrics.micrometer.provider.TimedAnnotationProvider;
 import org.apache.cxf.service.model.BindingOperationInfo;
 
-import io.micrometer.api.instrument.MeterRegistry;
+import io.micrometer.core.instrument.MeterRegistry;
 
 import org.junit.Before;
 import org.junit.Test;
