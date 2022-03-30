@@ -281,4 +281,30 @@
             </plugins>
         </pluginManagement>
     </build>
+    
+    <!-- TODO: Remove once OSGi is supported or / and extracted -->
+    <profiles>
+        <profile>
+            <id>jakarta</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/org/apache/cxf/transport/http/osgi/**.java</exclude>
+                            </excludes>
+                            <testExcludes>
+                                <testExclude>**/org/apache/cxf/transport/http/osgi/**.java</testExclude>
+                            </testExcludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
