@@ -19,6 +19,12 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -26,7 +32,9 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class JAXRSClientServerSubBookTest extends AbstractBusClientServerTestBase {
@@ -44,9 +52,23 @@ public class JAXRSClientServerSubBookTest extends AbstractBusClientServerTestBas
     public void testGetChapterFromBookSubObject() throws Exception {
         WebClient wc =
             WebClient.create("http://localhost:" + PORT + "/bookstore/booksubresourceobject/chaptersobject/sub/1");
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(100000000L);
         Chapter c = wc.accept("application/xml").get(Chapter.class);
         assertNotNull(c);
     }
 
+    @Test
+    public void testSubresourceLocatorFromBookSubObject() throws Exception {
+        final Client c = ClientBuilder.newClient();
+
+        // There are two matching endpoints with different HTTP methods:
+        //  - POST for BookSubObject /consumeslocator"
+        //  - GET for BookStore /{id}
+        // The test verifies that in this case for the POST method the correct subresource
+        // locator is picked.
+        final WebTarget wc = c.target("http://localhost:" + PORT + "/bookstore/consumeslocator");
+        try (Response r = wc.request().header("Content-Type", MediaType.APPLICATION_ATOM_XML).post(null)) {
+            assertThat(r.getStatus(), equalTo(Response.Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode()));
+            assertThat(Integer.toString(r.getStatus()), equalTo(r.readEntity(String.class)));
+        }
+    }
 }

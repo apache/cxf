@@ -124,7 +124,7 @@
         <cxf.httpcomponents.client5.version>5.1.2</cxf.httpcomponents.client5.version>
         <cxf.httpcomponents.core5.version>5.1.3</cxf.httpcomponents.core5.version>
         <cxf.jackson.version>2.13.2</cxf.jackson.version>
-        <cxf.jackson.databind.version>2.13.2.1</cxf.jackson.databind.version>
+        <cxf.jackson.databind.version>2.13.2.2</cxf.jackson.databind.version>
         <cxf.jacorb.version>3.9</cxf.jacorb.version>
         <cxf.jaeger.version>1.8.0</cxf.jaeger.version>
         <cxf.jaeger.version>1.6.0</cxf.jaeger.version>
@@ -207,7 +207,7 @@
         <cxf.spring.security.version>6.0.0-M3</cxf.spring.security.version>
         <cxf.spring.version>6.0.0-M3</cxf.spring.version>
         <cxf.stax-ex.version>1.8.3</cxf.stax-ex.version>
-        <cxf.swagger.ui.version>4.5.2</cxf.swagger.ui.version>
+        <cxf.swagger.ui.version>4.8.1</cxf.swagger.ui.version>
         <cxf.swagger.v3.version>2.1.13</cxf.swagger.v3.version>
         <cxf.swagger2.version>1.6.5</cxf.swagger2.version>
         <cxf.swagger2.guava.version>31.0.1-jre</cxf.swagger2.guava.version>
