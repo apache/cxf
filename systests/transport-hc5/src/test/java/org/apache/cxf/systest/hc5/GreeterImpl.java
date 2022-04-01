@@ -21,8 +21,7 @@ package org.apache.cxf.systest.hc5;
 
 import java.util.logging.Logger;
 
-import javax.jws.WebService;
-
+import jakarta.jws.WebService;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.hello_world.Greeter;
 

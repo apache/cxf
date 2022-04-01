@@ -138,11 +138,11 @@ public class Http2TestClient implements AutoCloseable {
             new ServerSessionListener.Adapter(), sessionPromise);
         final Session session = sessionPromise.get();
 
-        final HttpFields requestFields = new HttpFields();
+        final HttpFields.Mutable requestFields = HttpFields.build();
         requestFields.add(HttpHeader.ACCEPT, accept);
         requestFields.add(HttpHeader.HOST, "localhost");
 
-        final MetaData.Request request = new MetaData.Request(method, new HttpURI(address + path), 
+        final MetaData.Request request = new MetaData.Request(method, HttpURI.build(address + path), 
             version, requestFields);
 
         final CompletableFuture<ClientResponse> future = new CompletableFuture<>();
@@ -191,21 +191,15 @@ public class Http2TestClient implements AutoCloseable {
         }
         
         @Override
-        public void onTimeout(Stream stream, Throwable x) {
+        public boolean onIdleTimeout(Stream stream, Throwable x) {
             future.completeExceptionally(x);
-            super.onTimeout(stream, x);
+            return super.onIdleTimeout(stream, x);
         }
         
         @Override
         public void onFailure(Stream stream, int error, String reason, Throwable failure, Callback callback) {
-            future.completeExceptionally(failure);
-            super.onFailure(stream, error, reason, failure, callback);
-        }
-        
-        @Override
-        public void onFailure(Stream stream, int error, String reason, Callback callback) {
             future.completeExceptionally(new ClientErrorException(reason, error));
-            super.onFailure(stream, error, reason, callback);
+            super.onFailure(stream, error, reason, failure, callback);
         }
     }
 }

@@ -33,6 +33,16 @@
     <url>https://cxf.apache.org</url>
     <modules>
         <module>webapp</module>
-        <module>grizzly</module>
     </modules>
+    
+    <profiles>
+        <!-- TODO: This profile includes modules which are still on 'javax.*' namespace and
+        are not migrated to Jakarta -->
+        <profile>
+            <id>javax</id>
+            <modules>
+                <module>grizzly</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>

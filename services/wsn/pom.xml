@@ -32,7 +32,17 @@
     </parent>
     <modules>
         <module>wsn-api</module>
-        <module>wsn-core</module>
         <module>wsn-osgi</module>
     </modules>
+    
+    <profiles>
+        <!-- TODO: This profile includes modules which are still on 'javax.*' namespace and
+        are not migrated to Jakarta -->
+        <profile>
+            <id>javax</id>
+            <modules>
+                <module>wsn-core</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>

@@ -22,7 +22,7 @@ package org.apache.cxf.systest.jaxrs.sse.tomcat;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;

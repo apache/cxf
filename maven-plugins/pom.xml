@@ -34,10 +34,20 @@
         <module>codegen-plugin</module>
         <module>java2ws-plugin</module>
         <module>java2wadl-plugin</module>
-        <module>java2swagger-plugin</module>
         <module>wsdl-validator-plugin</module>
-        <module>wadl2java-plugin</module>
         <module>corba</module>
         <module>archetypes</module>
     </modules>
+    
+    <profiles>
+        <!-- TODO: This profile includes modules which are still on 'javax.*' namespace and
+        are not migrated to Jakarta -->
+        <profile>
+            <id>javax</id>
+            <modules>
+                <module>wadl2java-plugin</module>
+                <module>java2swagger-plugin</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>
