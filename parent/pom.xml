@@ -229,7 +229,7 @@
         <cxf.woodstox.core.version>6.2.7</cxf.woodstox.core.version>
         <cxf.woodstox.stax2-api.version>4.2.1</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
-        <cxf.jakarta.wss4j.version>3.0.0-SNAPSHOT</cxf.jakarta.wss4j.version>
+        <cxf.jakarta.wss4j.version>2.4.1</cxf.jakarta.wss4j.version>
         <cxf.xalan.version>2.7.2</cxf.xalan.version>
         <cxf.xerces.version>2.12.2</cxf.xerces.version>
         <cxf.xmlschema.version>2.3.0</cxf.xmlschema.version>
@@ -273,7 +273,6 @@
         <cxf.xalan.bundle.version>2.7.2_3</cxf.xalan.bundle.version>
         <cxf.xerces.bundle.version>2.12.0_1</cxf.xerces.bundle.version>
         <cxf.xmlresolver.bundle.version>1.2_5</cxf.xmlresolver.bundle.version>
-        <cxf.xmlsec.bundle.version>3.0.0-SNAPSHOT</cxf.xmlsec.bundle.version>
         <cxf.xpp3.bundle.version>1.1.4c_6</cxf.xpp3.bundle.version>
         <cxf.awaitility.version>4.1.1</cxf.awaitility.version>
     </properties>

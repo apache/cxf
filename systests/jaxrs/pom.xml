@@ -92,6 +92,12 @@
         <dependency>
             <groupId>org.apache.olingo</groupId>
             <artifactId>olingo-odata2-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.ws.rs</groupId>
+                    <artifactId>javax.ws.rs-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>xalan</groupId>
@@ -108,6 +114,12 @@
             <artifactId>cxf-rt-rs-service-description-swagger</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>

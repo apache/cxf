@@ -44,6 +44,7 @@ import org.apache.cxf.metrics.MetricsProvider;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.systest.jaxws.resources.HelloService;
 import org.apache.cxf.systest.jaxws.resources.HelloServiceImpl;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -54,7 +55,6 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.util.SocketUtils;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -353,7 +353,7 @@ public class SpringJaxwsTest {
 
     @Test
     public void testJaxwsProxyClientExceptionMetric() throws MalformedURLException {
-        final int fakePort = SocketUtils.findAvailableTcpPort();
+        final int fakePort = Integer.parseInt(TestUtil.getPortNumber("proxy-client-exception"));
         final HelloService api = createApi(fakePort, HELLO_SERVICE_NAME_V1); 
         
         assertThatThrownBy(() -> api.sayHello("Elan"))

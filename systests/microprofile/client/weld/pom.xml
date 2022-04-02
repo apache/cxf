@@ -87,6 +87,12 @@
             <groupId>org.eclipse.microprofile.rest.client</groupId>
             <artifactId>microprofile-rest-client-tck</artifactId>
             <version>${cxf.microprofile.rest.client.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.github.tomakehurst</groupId>
+                    <artifactId>wiremock</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
     <build>

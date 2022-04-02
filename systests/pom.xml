@@ -35,11 +35,9 @@
         <module>uncategorized</module>
         <module>transports</module>
         <module>forked</module>
-        <module>transport-jms</module>
         <module>transport-undertow</module>
         <module>jaxws</module>
         <module>databinding</module>
-        <module>jaxrs</module>
         <module>ws-specs</module>
         <module>ws-rm</module>
         <module>ws-security</module>
@@ -58,4 +56,16 @@
         <module>transport-netty</module>
         <module>transport-hc5</module>
     </modules>
+    
+    <profiles>
+        <!-- TODO: This profile includes modules which are still on 'javax.*' namespace and
+        are not migrated to Jakarta -->
+        <profile>
+            <id>javax</id>
+            <modules>
+                <module>transport-jms</module>
+                <module>jaxrs</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>

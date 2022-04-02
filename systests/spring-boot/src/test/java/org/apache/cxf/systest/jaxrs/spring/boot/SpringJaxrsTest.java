@@ -40,6 +40,7 @@ import org.apache.cxf.metrics.MetricsProvider;
 import org.apache.cxf.systest.jaxrs.resources.Book;
 import org.apache.cxf.systest.jaxrs.resources.Library;
 import org.apache.cxf.systest.jaxrs.resources.LibraryApi;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -51,7 +52,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.util.SocketUtils;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -241,7 +241,7 @@ public class SpringJaxrsTest {
     
     @Test
     public void testJaxrsClientExceptionMetric() {
-        final int fakePort = SocketUtils.findAvailableTcpPort();
+        final int fakePort = Integer.parseInt(TestUtil.getPortNumber("client-exception"));
         
         final WebTarget target = ClientBuilder
             .newClient()
@@ -396,7 +396,7 @@ public class SpringJaxrsTest {
     
     @Test
     public void testJaxrsProxyClientExceptionMetric() {
-        final int fakePort = SocketUtils.findAvailableTcpPort();
+        final int fakePort = Integer.parseInt(TestUtil.getPortNumber("proxy-client-exception"));
         final LibraryApi api = createApi(fakePort);
 
         assertThatThrownBy(() -> api.deleteBooks())

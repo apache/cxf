@@ -38,8 +38,18 @@
         <module>http-hc5</module>
         <module>http-netty/netty-server</module>
         <module>http-netty/netty-client</module>
-        <module>jms</module>
         <module>udp</module>
-        <module>websocket</module>
     </modules>
+    
+    <profiles>
+        <!-- TODO: This profile includes modules which are still on 'javax.*' namespace and
+        are not migrated to Jakarta -->
+        <profile>
+            <id>javax</id>
+            <modules>
+                <module>jms</module>
+                <module>websocket</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>
