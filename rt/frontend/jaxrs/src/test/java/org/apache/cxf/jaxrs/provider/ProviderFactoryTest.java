@@ -531,14 +531,16 @@ public class ProviderFactoryTest {
 
     @Test
     public void testExceptionMappersHierarchy2() throws Exception {
+        Message m = new MessageImpl();
+        m.put("default.wae.mapper.least.specific", false);
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
 
         TestRuntimeExceptionMapper rm = new TestRuntimeExceptionMapper();
         pf.registerUserProvider(rm);
         ExceptionMapper<WebApplicationException> em =
-            pf.createExceptionMapper(WebApplicationException.class, new MessageImpl());
+            pf.createExceptionMapper(WebApplicationException.class, m);
         assertTrue(em instanceof WebApplicationExceptionMapper);
-        assertSame(rm, pf.createExceptionMapper(RuntimeException.class, new MessageImpl()));
+        assertSame(rm, pf.createExceptionMapper(RuntimeException.class, m));
 
         WebApplicationExceptionMapper wm = new WebApplicationExceptionMapper();
         pf.registerUserProvider(wm);
@@ -549,7 +551,6 @@ public class ProviderFactoryTest {
     @Test
     public void testExceptionMappersHierarchy3() throws Exception {
         Message m = new MessageImpl();
-        m.put("default.wae.mapper.least.specific", true);
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
 
         TestRuntimeExceptionMapper rm = new TestRuntimeExceptionMapper();
