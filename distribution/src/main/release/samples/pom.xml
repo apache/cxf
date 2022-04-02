@@ -32,7 +32,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.boot.version>2.3.9.RELEASE</spring.boot.version>
         <spring.cloud.eureka.version>2.2.3.RELEASE</spring.cloud.eureka.version>
-        <cxf.jetty9.version>9.4.45.v20220203</cxf.jetty9.version>
+        <cxf.jetty9.version>9.4.46.v20220331</cxf.jetty9.version>
         <cxf.netty.version>4.1.75.Final</cxf.netty.version>
         <cxf.httpcomponents.client.version>4.5.13</cxf.httpcomponents.client.version>
         <cxf.swagger.ui.version>4.8.1</cxf.swagger.ui.version>
