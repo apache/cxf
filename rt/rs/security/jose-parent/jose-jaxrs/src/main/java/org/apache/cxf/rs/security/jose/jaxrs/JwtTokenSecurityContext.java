@@ -44,10 +44,21 @@ public class JwtTokenSecurityContext implements ClaimsSecurityContext {
         principal = new SimplePrincipal(jwt.getClaims().getSubject());
         this.token = jwt;
         if (roleClaim != null && jwt.getClaims().containsProperty(roleClaim)) {
-            roles = new HashSet<>();
-            String role = jwt.getClaims().getStringProperty(roleClaim).trim();
-            for (String r : role.split(",")) {
-                roles.add(new SimpleGroup(r));
+            Object roleClaimValue = jwt.getClaims().getClaim(roleClaim);
+            if (!(roleClaimValue instanceof List)) {
+                roles = new HashSet<>();
+                String role = jwt.getClaims().getStringProperty(roleClaim).trim();
+                for (String r : role.split(",")) {
+                    roles.add(new SimpleGroup(r));
+                }
+            } else if (roleClaimValue instanceof List && ((List) roleClaimValue).stream()
+                        .noneMatch(o -> !(o instanceof String))) {
+                roles = new HashSet<>();
+                ((List)roleClaimValue).stream().forEach(val -> {
+                    roles.add(new SimpleGroup(val.toString()));
+                });
+            } else {
+                roles = Collections.emptySet();
             }
         } else {
             roles = Collections.emptySet();
