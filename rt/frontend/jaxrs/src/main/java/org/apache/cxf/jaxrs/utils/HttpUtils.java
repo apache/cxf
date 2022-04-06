@@ -471,7 +471,9 @@ public final class HttpUtils {
             URI uri = new URI(endpointAddress);
             String path = uri.getRawPath();
             String scheme = uri.getScheme();
-            if (scheme != null && !scheme.startsWith(HttpUtils.HTTP_SCHEME)
+            // RFC-3986: the scheme and host are case-insensitive and therefore should 
+            // be normalized to lowercase. 
+            if (scheme != null && !scheme.toLowerCase().startsWith(HttpUtils.HTTP_SCHEME)
                 && HttpUtils.isHttpRequest(m)) {
                 path = HttpUtils.toAbsoluteUri(path, m).getRawPath();
             }

@@ -222,6 +222,33 @@ public class HttpUtilsTest {
     }
 
     @Test
+    public void testGetBaseAddressHttpUriMixedCase() {
+        final String baseURI = "HTTP://LoCALHoST:8080/STORE";
+        
+        Message m = new MessageImpl();
+        HttpServletRequest req = EasyMock.createMock(HttpServletRequest.class);
+        m.put(AbstractHTTPDestination.HTTP_REQUEST, req);
+        Exchange exchange = new ExchangeImpl();
+        
+        req.getRequestURL();
+        EasyMock.expectLastCall().andReturn(new StringBuffer(baseURI));
+        req.getPathInfo();
+        EasyMock.expectLastCall().andReturn("/STORE");
+        req.getContextPath();
+        EasyMock.expectLastCall().andReturn("/");
+        req.getServletPath();
+        EasyMock.expectLastCall().andReturn("/");
+        EasyMock.replay(req);
+
+        m.setExchange(exchange);
+        Destination dest = EasyMock.createMock(Destination.class);
+        exchange.setDestination(dest);
+        m.put(Message.BASE_PATH, baseURI);
+        String address = HttpUtils.getBaseAddress(m);
+        assertEquals("/STORE", address);
+    }
+
+    @Test
     public void testReplaceAnyIPAddress() {
         Message m = new MessageImpl();
         HttpServletRequest req = EasyMock.createMock(HttpServletRequest.class);
