@@ -33,6 +33,7 @@ public class TLSServerParameters extends TLSParameterBase {
     ClientAuthentication clientAuthentication;
     List<String> excludeProtocols = new ArrayList<>();
     List<String> includeProtocols = new ArrayList<>();
+    boolean sniHostCheck;
 
     /**
      * This parameter configures the server side to request and/or
@@ -83,4 +84,17 @@ public class TLSServerParameters extends TLSParameterBase {
         return includeProtocols;
     }
 
+    /**
+     * Returns if the SNI host name must match
+     */
+    public boolean isSniHostCheck() {
+        return sniHostCheck;
+    }
+
+    /**
+     * @param sniHostCheck if the SNI host name must match
+     */
+    public void setSniHostCheck(boolean sniHostCheck) {
+        this.sniHostCheck = sniHostCheck;
+    }
 }

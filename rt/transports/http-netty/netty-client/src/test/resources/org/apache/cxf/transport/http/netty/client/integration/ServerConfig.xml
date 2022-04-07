@@ -31,7 +31,7 @@
     <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <httpj:engine-factory>
         <httpj:engine port="${SSLNettyClientTest.port}">
-            <httpj:tlsServerParameters>
+            <httpj:tlsServerParameters sniHostCheck="false">
                 <sec:keyManagers keyPassword="skpass">
                     <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>
                 </sec:keyManagers>
