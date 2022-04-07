@@ -50,7 +50,7 @@ public class AsyncTest {
     @SuppressWarnings("unchecked")
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(wireMockConfig()
-        .extensions(SimpleTransformer.class));
+        .extensions(SimpleTransformer.class).dynamicPort());
     
     public static class SimpleTransformer extends ResponseTransformer {
         private final Queue<String> queue = new ArrayBlockingQueue<>(2);
