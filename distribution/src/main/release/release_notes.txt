@@ -1,4 +1,4 @@
-Apache CXF 3.5.1 Release Notes
+Apache CXF 3.5.2 Release Notes
 
 1. Overview
 
@@ -31,7 +31,7 @@ for further information and requirements for upgrading from earlier
 versions of CXF.
 
 
-3.5.1 fixes over 25 JIRA issues reported by users and the community.
+3.5.2 fixes over 30 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -74,32 +74,39 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Sub-task
-    * [CXF-8477] - jaxrs.ee.rs.constrainedto clientSideReaderIsNotUsedOnServerTest
-    * [CXF-8479] - jaxrs.ee.rs.container.responsecontext getEntityAnnotationsTest
-    * [CXF-8480] - jaxrs.ee.rs.core.responsebuilder entityObjectTest
-    * [CXF-8481] - jaxrs.ee.rs.core.uriinfo getMatchedURIsTest
-    * [CXF-8482] - jaxrs.ee.rs.core.uriinfo getMatchedURIsTest1
-    * [CXF-8483] - jaxrs.ee.rs.core.uriinfo getMatchedURIsTest2
-    * [CXF-8484] - jaxrs.ee.rs.ext.interceptor.containerwriter.interceptorcontext getAnnotationsTest
-    * [CXF-8635] - Fix org.apache.cxf.jaxrs.client.logging.RESTLoggingTest.testSlf4
-    * [CXF-8650] - Fix org.apache.cxf.systest.jaxrs.JAXRSContinuationsServlet3Test.testSuspendSetTimeout
+    * [CXF-8485] - jaxrs.ee.rs.ext.paramconverter atomicIntegerIsLazyDeployableAndThrowsErrorTest
+    * [CXF-8486] - jaxrs.ee.rs.pathparam.locator pathParamEntityWithConstructorTest
+    * [CXF-8487] - jaxrs.ee.rs.pathparam.locator pathParamEntityWithFromStringTest
+    * [CXF-8488] - jaxrs.ee.rs.pathparam.locator pathParamEntityWithValueOfTest
+    * [CXF-8489] - jaxrs.ee.rs.pathparam.locator pathParamListEntityWithFromStringTest
+    * [CXF-8490] - jaxrs.ee.rs.pathparam.locator pathParamSetEntityWithFromStringTest
+    * [CXF-8491] - jaxrs.ee.rs.pathparam.locator pathParamThrowingIllegalArgumentExceptionTest
+    * [CXF-8492] - jaxrs.ee.rs.pathparam.locator pathParamThrowingWebApplicationExceptionTest
+    * [CXF-8493] - jaxrs.ee.rs.pathparam.locator test1
+    * [CXF-8494] - jaxrs.ee.rs.pathparam.locator test2
+    * [CXF-8495] - jaxrs.ee.rs.pathparam.locator test3
+    * [CXF-8496] - jaxrs.ee.rs.pathparam.locator test4
+    * [CXF-8497] - jaxrs.ee.rs.pathparam.locator test5
+    * [CXF-8520] - jaxrs.spec.resource.requestmatching consumesCorrectContentTypeOnResourceLocatorTest
+    * [CXF-8521] - jaxrs.spec.resource.requestmatching consumesCorrectContentTypeOnSubResourceLocatorTest
+    * [CXF-8522] - jaxrs.spec.resource.requestmatching consumesOnResourceLocatorTest
+    * [CXF-8523] - jaxrs.spec.resource.requestmatching consumesOnSubResourceLocatorTest
+    * [CXF-8524] - jaxrs.spec.resource.requestmatching producesCorrectContentTypeOnResourceLocatorTest
+    * [CXF-8525] - jaxrs.spec.resource.requestmatching producesCorrectContentTypeOnSubResourceLocatorTest
+    * [CXF-8526] - jaxrs.spec.resource.requestmatching producesOnResourceLocatorTest
+    * [CXF-8527] - jaxrs.spec.resource.requestmatching producesOnSubResourceLocatorTest
 
 ** Bug
-    * [CXF-8632] - StaxTransformFeature deep-dropping doesn't work with any element
-    * [CXF-8633] - "http.responseMessage" gets lost in AbstractClient#setResponseBuilder
-    * [CXF-8636] - Swagger2Feature: Can't set url in UI through SwaggerUiConfig
-    * [CXF-8641] - NPE on NamePasswordCallbackHandler
-    * [CXF-8642] - ResponseImpl#hasEntity changed behaviour starting with cxf 3.4.1
-    * [CXF-8649] - Deprecated method in jackson-databind still being used even after updating version
-    * [CXF-8652] - Implement @ConstrainedTo annotation support
-    * [CXF-8654] - Ensure InputStreamDataSource is optional in JAXRSUtils to be able to run without activation dependency
-    * [CXF-8657] - Headers are copied as case sensitive in MessageContextImpl
+    * [CXF-8655] - Incorrect XSD resolution when the file name is the same in different folders
+    * [CXF-8667] - Custom certificate alias not being used when using HC5 AsyncHTTPConduit
+    * [CXF-8674] - Custom SSLContext using async http-client5 does not work
+    * [CXF-8680] - ClientProxyImpl fails to find boolean param values via BeanParam
+    * [CXF-8682] - x-forwarded-proto header causes cxf to not match request to java method
+    * [CXF-8686] - JWT role claim incorrectly parsed if not tokenized as string
 
 ** Improvement
-    * [CXF-8630] - Remove mockwebserver dependency, use wiremock instead
-    * [CXF-8644] - introduce a cache for AbstractJAXBProvider to avoid unnecessary  ObjectFactory.class|jaxb.index availability check
-    * [CXF-8646] - Don't return exception class name when parsing XML
-    * [CXF-8647] - add DisallowedMethodsHandler for cxf http-undertow transport
-    * [CXF-8648] - Make ClaimsAuthorizingInterceptor configurable in ClaimsAuthorizingFilter
-    * [CXF-8653] - Provide an easy way to require PKCE for the AuthorizationCodeGrantHandler
-    * [CXF-8659] - Can't filter when attribute type is LocalDate or LocalDateTime
+    * [CXF-8673] - Bump httpasyncclient version to 4.1.5
+    * [CXF-8684] - Default WebApplicationExceptionMapper should be less specific by default
+
+** Task
+    * [CXF-8668] - Set SniHostCheck to false for SSLNettyClientTest
