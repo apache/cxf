@@ -1,4 +1,4 @@
-Apache CXF 3.4.6 Release Notes
+Apache CXF 3.4.7 Release Notes
 
 1. Overview
 
@@ -23,7 +23,7 @@ http://cxf.apache.org/docs/34-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
-3.4.6 fixes over 59 JIRA issues reported by users and the community.
+3.4.7 fixes over 37 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -66,68 +66,47 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Sub-task
-    * [CXF-8463] - jaxrs.ee.rs.client.asyncinvoker traceWithCallbackThrowsNoWebApplicationExceptionForResponseTest
-    * [CXF-8464] - jaxrs.ee.rs.client.asyncinvoker traceWithCallbackThrowsWebApplicationExceptionTest
-    * [CXF-8465] - jaxrs.ee.rs.client.asyncinvoker traceWithClassThrowsNoWebApplicationExceptionForResponseTest
-    * [CXF-8466] - jaxrs.ee.rs.client.asyncinvoker traceWithClassThrowsWebApplicationExceptionTest
-    * [CXF-8467] - jaxrs.ee.rs.client.asyncinvoker traceWithGenericTypeStringWhileServerWaitTest
-    * [CXF-8468] - jaxrs.ee.rs.client.asyncinvoker traceWithGenericTypeThrowsNoWebApplicationExceptionForResponseTest
-    * [CXF-8469] - jaxrs.ee.rs.client.asyncinvoker traceWithGenericTypeThrowsWebApplicationExceptionTest
-    * [CXF-8470] - jaxrs.ee.rs.client.asyncinvoker traceWithStringClassWhileServerWaitTest
-    * [CXF-8471] - jaxrs.ee.rs.client.syncinvoker traceWithGenericTypeResponseThrowsNoWebApplicationExceptionTest
-    * [CXF-8472] - jaxrs.ee.rs.client.syncinvoker traceWithGenericTypeStringTest
-    * [CXF-8473] - jaxrs.ee.rs.client.syncinvoker traceWithGenericTypeStringThrowsWebApplicationExceptionTest
-    * [CXF-8474] - jaxrs.ee.rs.client.syncinvoker traceWithResponseClassThrowsNoWebApplicationExceptionTest
-    * [CXF-8475] - jaxrs.ee.rs.client.syncinvoker traceWithStringClassTest
-    * [CXF-8476] - jaxrs.ee.rs.client.syncinvoker traceWithStringClassThrowsWebApplicationExceptionTest
-    * [CXF-8477] - jaxrs.ee.rs.constrainedto clientSideReaderIsNotUsedOnServerTest
     * [CXF-8479] - jaxrs.ee.rs.container.responsecontext getEntityAnnotationsTest
     * [CXF-8480] - jaxrs.ee.rs.core.responsebuilder entityObjectTest
     * [CXF-8481] - jaxrs.ee.rs.core.uriinfo getMatchedURIsTest
     * [CXF-8482] - jaxrs.ee.rs.core.uriinfo getMatchedURIsTest1
     * [CXF-8483] - jaxrs.ee.rs.core.uriinfo getMatchedURIsTest2
     * [CXF-8484] - jaxrs.ee.rs.ext.interceptor.containerwriter.interceptorcontext getAnnotationsTest
-    * [CXF-8498] - jaxrs.jaxrs21.ee.client.rxinvoker traceWithClassThrowsNoWebApplicationExceptionForResponseTest
-    * [CXF-8499] - jaxrs.jaxrs21.ee.client.rxinvoker traceWithClassThrowsWebApplicationExceptionTest
-    * [CXF-8500] - jaxrs.jaxrs21.ee.client.rxinvoker traceWithGenericTypeStringTest
-    * [CXF-8501] - jaxrs.jaxrs21.ee.client.rxinvoker traceWithGenericTypeThrowsNoWebApplicationExceptionForResponseTest
-    * [CXF-8502] - jaxrs.jaxrs21.ee.client.rxinvoker traceWithGenericTypeThrowsWebApplicationExceptionTest
-    * [CXF-8503] - jaxrs.jaxrs21.ee.client.rxinvoker traceWithStringClassTest
-    * [CXF-8517] - jaxrs.spec.provider.standardnotnull clientDataSourceProviderTest
-    * [CXF-8601] - [Regression] jaxrs.ee.rs.core.response
-    * [CXF-8605] - Introduce HTTP/2 Transport: server-side support
-    * [CXF-8635] - Fix org.apache.cxf.jaxrs.client.logging.RESTLoggingTest.testSlf4
-    * [CXF-8650] - Fix org.apache.cxf.systest.jaxrs.JAXRSContinuationsServlet3Test.testSuspendSetTimeout
+    * [CXF-8485] - jaxrs.ee.rs.ext.paramconverter atomicIntegerIsLazyDeployableAndThrowsErrorTest
+    * [CXF-8486] - jaxrs.ee.rs.pathparam.locator pathParamEntityWithConstructorTest
+    * [CXF-8487] - jaxrs.ee.rs.pathparam.locator pathParamEntityWithFromStringTest
+    * [CXF-8488] - jaxrs.ee.rs.pathparam.locator pathParamEntityWithValueOfTest
+    * [CXF-8489] - jaxrs.ee.rs.pathparam.locator pathParamListEntityWithFromStringTest
+    * [CXF-8490] - jaxrs.ee.rs.pathparam.locator pathParamSetEntityWithFromStringTest
+    * [CXF-8491] - jaxrs.ee.rs.pathparam.locator pathParamThrowingIllegalArgumentExceptionTest
+    * [CXF-8492] - jaxrs.ee.rs.pathparam.locator pathParamThrowingWebApplicationExceptionTest
+    * [CXF-8493] - jaxrs.ee.rs.pathparam.locator test1
+    * [CXF-8494] - jaxrs.ee.rs.pathparam.locator test2
+    * [CXF-8495] - jaxrs.ee.rs.pathparam.locator test3
+    * [CXF-8496] - jaxrs.ee.rs.pathparam.locator test4
+    * [CXF-8497] - jaxrs.ee.rs.pathparam.locator test5
+    * [CXF-8520] - jaxrs.spec.resource.requestmatching consumesCorrectContentTypeOnResourceLocatorTest
+    * [CXF-8521] - jaxrs.spec.resource.requestmatching consumesCorrectContentTypeOnSubResourceLocatorTest
+    * [CXF-8522] - jaxrs.spec.resource.requestmatching consumesOnResourceLocatorTest
+    * [CXF-8523] - jaxrs.spec.resource.requestmatching consumesOnSubResourceLocatorTest
+    * [CXF-8524] - jaxrs.spec.resource.requestmatching producesCorrectContentTypeOnResourceLocatorTest
+    * [CXF-8525] - jaxrs.spec.resource.requestmatching producesCorrectContentTypeOnSubResourceLocatorTest
+    * [CXF-8526] - jaxrs.spec.resource.requestmatching producesOnResourceLocatorTest
+    * [CXF-8527] - jaxrs.spec.resource.requestmatching producesOnSubResourceLocatorTest
 
 ** Bug
-    * [CXF-8603] - ClassLoaderUtils.setThreadContextClassloader attempts to set null class loader
-    * [CXF-8607] - OpenApiFeature: OpenApiCustomizer doesn´t work with runAsFilter
-    * [CXF-8614] - ensure OSGi header of cxf-core to import com.sun.codemodel.writer package
-    * [CXF-8616] - Calling oneway methods using async client hangs response indefinitely
-    * [CXF-8617] - The org.apache.cxf.transport.http.asyncclient.hc5.AsyncHTTPConduitTest hangs intermittently
-    * [CXF-8619] - Potential double-urldecode of @Form parameters
-    * [CXF-8620] - AbstractHTTPServlet should support HTTP TRACE method dispatching if it is allowed by underlying container
-    * [CXF-8626] - async http client may handle response by multiple threads on work queue
-    * [CXF-8632] - StaxTransformFeature deep-dropping doesn't work with any element
-    * [CXF-8633] - "http.responseMessage" gets lost in AbstractClient#setResponseBuilder
-    * [CXF-8636] - Swagger2Feature: Can't set url in UI through SwaggerUiConfig
-    * [CXF-8641] - NPE on NamePasswordCallbackHandler
-    * [CXF-8642] - ResponseImpl#hasEntity changed behaviour starting with cxf 3.4.1
-    * [CXF-8649] - Deprecated method in jackson-databind still being used even after updating version
-    * [CXF-8652] - Implement @ConstrainedTo annotation support
-    * [CXF-8654] - Ensure InputStreamDataSource is optional in JAXRSUtils to be able to run without activation dependency
-    * [CXF-8657] - Headers are copied as case sensitive in MessageContextImpl
+    * [CXF-8655] - Incorrect XSD resolution when the file name is the same in different folders
+    * [CXF-8667] - Custom certificate alias not being used when using HC5 AsyncHTTPConduit
+    * [CXF-8674] - Custom SSLContext using async http-client5 does not work
+    * [CXF-8680] - ClientProxyImpl fails to find boolean param values via BeanParam
+    * [CXF-8682] - x-forwarded-proto header causes cxf to not match request to java method
 
 ** Improvement
-    * [CXF-8221] - Upgrade Http Components Core and Client to 5.0
-    * [CXF-8610] - Some public methds in org.apache.cxf.helpers.IOUtils lacks parameter verification, which may cause Null pointer exceptions
-    * [CXF-8627] - AttachmentDataSource should always returns a valid contentType
-    * [CXF-8630] - Remove mockwebserver dependency, use wiremock instead
-    * [CXF-8644] - introduce a cache for AbstractJAXBProvider to avoid unnecessary  ObjectFactory.class|jaxb.index availability check
-    * [CXF-8646] - Don't return exception class name when parsing XML
-    * [CXF-8647] - add DisallowedMethodsHandler for cxf http-undertow transport
-    * [CXF-8653] - Provide an easy way to require PKCE for the AuthorizationCodeGrantHandler
-    * [CXF-8659] - Can't filter when attribute type is LocalDate or LocalDateTime
+    * [CXF-8673] - Bump httpasyncclient version to 4.1.5
+    * [CXF-8684] - Default WebApplicationExceptionMapper should be less specific by default
 
 ** Task
-    * [CXF-8608] - WSSCTest always failed with JDK8
+    * [CXF-8668] - Set SniHostCheck to false for SSLNettyClientTest
+
+
+
