@@ -293,9 +293,11 @@ public class Java2WSMojo extends AbstractMojo {
         List<String> args = new ArrayList<>();
 
         if (fork) {
-            String[] split = additionalJvmArgs.split("\\s+");
-            for (String each : split) {
-                args.add(each);
+            if (!StringUtils.isEmpty(additionalJvmArgs)) {
+                String[] split = additionalJvmArgs.split("\\s+");
+                for (String each : split) {
+                    args.add(each);
+                }
             }
             // @see JavaToWS#isExitOnFinish()
             args.add("-DexitOnFinish=true");
