@@ -145,7 +145,7 @@ public class FormEncodingProvider<T> extends AbstractConfigurableProvider
         if (clazz == MultivaluedMap.class || clazz == Form.class) {
             return new MetadataMap<String, String>();
         }
-        return (MultivaluedMap<String, String>)clazz.newInstance();
+        return (MultivaluedMap<String, String>)clazz.getDeclaredConstructor().newInstance();
     }
 
     private T getFormObject(Class<T> clazz, MultivaluedMap<String, String> params) {

@@ -154,7 +154,7 @@ public class CXFCacheControlFeature extends AbstractFeature {
     @SuppressWarnings("unchecked")
     private static <T> T newInstance(final ClassLoader contextClassLoader, final String clazz, final Class<T> cast) {
         try {
-            return (T) contextClassLoader.loadClass(clazz).newInstance();
+            return (T) contextClassLoader.loadClass(clazz).getDeclaredConstructor().newInstance();
         } catch (final Exception e) {
             throw new IllegalArgumentException(e);
         }

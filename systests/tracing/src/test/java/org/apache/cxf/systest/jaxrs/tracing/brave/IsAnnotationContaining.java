@@ -20,10 +20,10 @@ package org.apache.cxf.systest.jaxrs.tracing.brave;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
-import org.hamcrest.core.IsCollectionContaining;
+import org.hamcrest.core.IsIterableContaining;
 import zipkin2.Annotation;
 
-public class IsAnnotationContaining extends IsCollectionContaining<Annotation> {
+public class IsAnnotationContaining extends IsIterableContaining<Annotation> {
     public IsAnnotationContaining(final String value) {
         super(new TypeSafeMatcher<Annotation>() {
             @Override

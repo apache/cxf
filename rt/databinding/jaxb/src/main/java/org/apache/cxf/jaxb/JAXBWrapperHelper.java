@@ -43,7 +43,7 @@ public class JAXBWrapperHelper extends AbstractWrapperHelper {
 
     @Override
     protected Object createWrapperObject(Class<?> typeClass) throws Exception {
-        return typeClass.newInstance();
+        return typeClass.getDeclaredConstructor().newInstance();
     }
 
     @Override

@@ -124,9 +124,9 @@ public class BeanType extends AegisType {
                 } else {
                     try {
                         clazz = ClassLoaderUtils.loadClass(impl, getClass());
-                        object = clazz.newInstance();
+                        object = clazz.getDeclaredConstructor().newInstance();
                         target = object;
-                    } catch (ClassNotFoundException e) {
+                    } catch (ClassNotFoundException | NoSuchMethodException e) {
                         throw new DatabindingException("Could not find implementation class " + impl
                                                        + " for class " + clazz.getName());
                     }
@@ -135,8 +135,12 @@ public class BeanType extends AegisType {
                 object = createFromFault(context);
                 target = object;
             } else {
-                object = clazz.newInstance();
-                target = object;
+                try {
+                    object = clazz.getDeclaredConstructor().newInstance();
+                    target = object;
+                } catch (NoSuchMethodException e) {
+                    throw new DatabindingException("Could not create object of class " + clazz.getName());
+                }
             }
 
             // Read attributes

@@ -385,7 +385,7 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
                     beanspector.instantiate().setValue(setter, tvalue.getObject());
                     return beanspector.getBean();
                 }
-                SearchBean bean = (SearchBean)conditionClass.newInstance();
+                SearchBean bean = (SearchBean)conditionClass.getDeclaredConstructor().newInstance();
                 bean.set(setter, tvalue.getObject().toString());
                 return (T)bean;
             } catch (Throwable e) {

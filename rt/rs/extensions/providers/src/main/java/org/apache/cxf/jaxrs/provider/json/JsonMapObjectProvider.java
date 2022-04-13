@@ -70,7 +70,9 @@ public class JsonMapObjectProvider implements MessageBodyReader<JsonMapObject>, 
         WebApplicationException {
         String s = IOUtils.readStringFromStream(is);
         try {
-            JsonMapObject obj = cls == JsonMapObject.class ? new JsonMapObject() : cls.newInstance();
+            JsonMapObject obj = cls == JsonMapObject.class 
+                ? new JsonMapObject() 
+                    : cls.getDeclaredConstructor().newInstance();
             handler.fromJson(obj, s);
             return obj;
         } catch (Exception ex) {

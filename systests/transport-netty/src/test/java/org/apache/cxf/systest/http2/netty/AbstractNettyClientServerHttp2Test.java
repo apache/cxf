@@ -31,8 +31,8 @@ import org.apache.cxf.transport.https.InsecureTrustManager;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 abstract class AbstractNettyClientServerHttp2Test extends AbstractBusClientServerTestBase {
     @Test

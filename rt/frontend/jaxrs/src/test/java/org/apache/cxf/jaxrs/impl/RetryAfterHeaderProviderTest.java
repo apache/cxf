@@ -28,12 +28,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.TimeZone;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 @RunWith(Parameterized.class)
 public class RetryAfterHeaderProviderTest {
@@ -70,6 +70,6 @@ public class RetryAfterHeaderProviderTest {
     
     @Test
     public void test() {
-        Assert.assertThat(RetryAfterHeaderProvider.valueOf(clock, date), is(delay));
+        assertThat(RetryAfterHeaderProvider.valueOf(clock, date), is(delay));
     }
 }

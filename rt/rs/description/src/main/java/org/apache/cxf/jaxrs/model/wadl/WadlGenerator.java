@@ -1607,7 +1607,7 @@ public class WadlGenerator implements ContainerRequestFilter {
             if (jaxbInfo == null) {
                 return null;
             }
-            Object instance = type.newInstance();
+            Object instance = type.getDeclaredConstructor().newInstance();
             return getQNameFromParts(jaxbInfo.getElementLocalName(instance),
                                      jaxbInfo.getElementNamespaceURI(instance), type, clsMap);
         } catch (Exception ex) {

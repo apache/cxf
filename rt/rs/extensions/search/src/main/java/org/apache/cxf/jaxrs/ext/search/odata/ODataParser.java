@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs.ext.search.odata;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -280,12 +281,13 @@ public class ODataParser<T> extends AbstractSearchConditionParser<T> {
     @SuppressWarnings("unchecked")
     public SearchCondition<T> parse(String searchExpression) throws SearchParseException {
         try {
-            final T condition = conditionClass.newInstance();
+            final T condition = conditionClass.getDeclaredConstructor().newInstance();
             final FilterExpression expression = parser.parseFilterString(searchExpression);
             final FilterExpressionVisitor visitor = new FilterExpressionVisitor(condition);
             return (SearchCondition< T >)expression.accept(visitor);
         } catch (ODataMessageException | ODataApplicationException
-            | InstantiationException | IllegalAccessException ex) {
+            | InstantiationException | IllegalAccessException | IllegalArgumentException 
+            | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
             throw new SearchParseException(ex);
         }
     }

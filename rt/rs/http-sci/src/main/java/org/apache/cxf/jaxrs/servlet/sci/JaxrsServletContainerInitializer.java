@@ -68,7 +68,7 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
                 return;
             }
             try {
-                app = (Application)appClass.newInstance();
+                app = (Application)appClass.getDeclaredConstructor().newInstance();
             } catch (Throwable t) {
                 throw new ServletException(t);
             }

@@ -989,7 +989,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         if (o instanceof String) {
             try {
                 Class<?> cls = ClassLoaderUtils.loadClass((String)o, this.getClass());
-                o = cls.newInstance();
+                o = cls.getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                 throw new Fault(e);
             }

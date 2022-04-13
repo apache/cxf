@@ -80,7 +80,7 @@ public abstract class WSDLCorbaFactory {
                 ClassLoader loader = Thread.currentThread().getContextClassLoader();
                 Class<?> cl = loader.loadClass(factoryImplName);
 
-                return (WSDLCorbaFactory)cl.newInstance();
+                return (WSDLCorbaFactory)cl.getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                 /*
                  Catches:

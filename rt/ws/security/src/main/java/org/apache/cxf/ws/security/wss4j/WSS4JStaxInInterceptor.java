@@ -376,7 +376,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             if (o instanceof Validator) {
                 return (Validator)o;
             } else if (o instanceof Class) {
-                return (Validator)((Class<?>)o).newInstance();
+                return (Validator)((Class<?>)o).getDeclaredConstructor().newInstance();
             } else if (o instanceof String) {
                 return (Validator)ClassLoaderUtils.loadClass(o.toString(),
                                                              WSS4JStaxInInterceptor.class)

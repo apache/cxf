@@ -154,7 +154,7 @@ public class ToolSpec {
             String handlerClz = doc.getDocumentElement().getAttribute("handler");
 
             try {
-                handler = (Tool)Class.forName(handlerClz, true, loader).newInstance();
+                handler = (Tool)Class.forName(handlerClz, true, loader).getDeclaredConstructor().newInstance();
             } catch (Exception ex) {
                 Message message = new Message("FAIL_TO_INSTANTIATE_HANDLER", LOG, handlerClz);
                 throw new ToolException(message, ex);

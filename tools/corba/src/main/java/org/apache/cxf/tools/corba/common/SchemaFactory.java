@@ -78,7 +78,7 @@ public abstract class SchemaFactory {
                 ClassLoader loader = Thread.currentThread().getContextClassLoader();
                 Class<?> cl = loader.loadClass(factoryImplName);
 
-                return (SchemaFactory)cl.newInstance();
+                return (SchemaFactory)cl.getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                 /*
                  Catches:

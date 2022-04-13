@@ -33,8 +33,8 @@ import io.undertow.util.Protocols;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 abstract class AbstractUndertowClientServerHttp2Test extends AbstractBusClientServerTestBase {
     @Test

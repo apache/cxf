@@ -193,7 +193,7 @@ public class XMLStreamDataReaderTest {
         assertNotNull(val);
         assertTrue(val instanceof TradePriceData);
         assertEquals("CXF", ((TradePriceData)val).getTickerSymbol());
-        assertEquals(Float.valueOf(1.0f), new Float(((TradePriceData)val).getTickerPrice()));
+        assertEquals(Float.valueOf(1.0f), Float.valueOf(((TradePriceData)val).getTickerPrice()));
     }
 
     private JAXBDataBinding getDataBinding(Class<?>... clz) throws Exception {

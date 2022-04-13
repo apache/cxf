@@ -359,7 +359,7 @@ public final class TLSParameterJaxBUtils {
         }
         try {
             final CallbackHandler ch = (CallbackHandler) ClassLoaderUtils
-                .loadClass(callbackHandlerClass, TLSParameterJaxBUtils.class).newInstance();
+                .loadClass(callbackHandlerClass, TLSParameterJaxBUtils.class).getDeclaredConstructor().newInstance();
             String prompt = kmc.getKeyStore().getFile();
             if (prompt == null) {
                 prompt = kmc.getKeyStore().getResource();

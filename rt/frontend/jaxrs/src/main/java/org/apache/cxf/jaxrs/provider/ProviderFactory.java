@@ -135,7 +135,7 @@ public abstract class ProviderFactory {
                             return c.newInstance(bus);
                         }
                     }
-                    return cls.newInstance();
+                    return cls.getDeclaredConstructor().newInstance();
                 } catch (Throwable ex) {
                     String message = "Problem with creating the provider " + className;
                     if (ex.getMessage() != null) {
@@ -232,7 +232,7 @@ public abstract class ProviderFactory {
                     return c.newInstance(bus);
                 }
             }
-            return cls.newInstance();
+            return cls.getDeclaredConstructor().newInstance();
         } catch (Throwable ex) {
             String message = "Problem with creating the default provider " + className;
             if (ex.getMessage() != null) {

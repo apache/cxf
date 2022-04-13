@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxws.spring;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
@@ -192,8 +193,9 @@ public class JaxWsWebServicePublisherBeanPostProcessor
 
     public void setServletConfig(ServletConfig servletConfig) {
         try {
-            shadowCxfServlet = (Servlet)servletClass.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
+            shadowCxfServlet = (Servlet)servletClass.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException 
+            | InvocationTargetException | NoSuchMethodException | SecurityException e) {
             throw new RuntimeException(e);
         }
         try {

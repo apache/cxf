@@ -34,7 +34,7 @@ public class BookLoginModule implements LoginModule {
 
     public BookLoginModule() {
         try {
-            module = LOGIN_MODULE_C.newInstance();
+            module = LOGIN_MODULE_C.getDeclaredConstructor().newInstance();
         } catch (Throwable ex) {
             throw new RuntimeException(ex);
         }

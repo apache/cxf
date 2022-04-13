@@ -41,7 +41,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class SpringServletContextTest extends AbstractServletTest {
     @Configuration
