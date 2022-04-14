@@ -446,7 +446,7 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
                     if (h instanceof DefaultHandler) {
                         defaultHandler = (DefaultHandler) h;
                     } else {
-                        if ((h instanceof SecurityHandler)
+                        if (h instanceof SecurityHandler
                             && ((SecurityHandler)h).getHandler() == null) {
                             //if h is SecurityHandler(such as ConstraintSecurityHandler)
                             //then it need be on top of JettyHTTPHandler

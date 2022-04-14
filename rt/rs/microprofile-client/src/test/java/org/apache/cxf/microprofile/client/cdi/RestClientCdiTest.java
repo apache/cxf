@@ -90,7 +90,7 @@ public class RestClientCdiTest {
     }
 
     @Test
-    @SuppressWarnings({"unchecked", "rawTypes"})
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public void testCreationalContextsReleasedOnClientClose() throws Exception {
         IMocksControl control = EasyMock.createStrictControl();
         BeanManager mockedBeanMgr = control.createMock(BeanManager.class);
@@ -123,7 +123,7 @@ public class RestClientCdiTest {
     }
 
     @Test
-    @SuppressWarnings({"unchecked", "rawTypes"})
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public void testCreationalContextsNotReleasedOnClientCloseUsingNormalScope() throws Exception {
         IMocksControl control = EasyMock.createStrictControl();
         BeanManager mockedBeanMgr = control.createMock(BeanManager.class);

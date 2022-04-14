@@ -391,7 +391,7 @@ public class PortTypeVisitor extends VisitorBase {
             interfaceNameNode = interfaceNameNode.getNextSibling();
         }
 
-        if ((!inheritedScopes.isEmpty())
+        if (!inheritedScopes.isEmpty()
             && (wsdlVisitor.getInheritedScopeMap() != null)) {
             wsdlVisitor.getInheritedScopeMap().put(childScope, inheritedScopes);
         }

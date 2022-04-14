@@ -1071,7 +1071,7 @@ public final class InjectionUtils {
         } else {
             String result = null;
             if (!paramValues.isEmpty()) {
-                boolean isLast = pathParam == ParameterType.PATH ? true : false;
+                boolean isLast = pathParam == ParameterType.PATH;
                 result = isLast ? paramValues.get(paramValues.size() - 1)
                                 : paramValues.get(0);
             }

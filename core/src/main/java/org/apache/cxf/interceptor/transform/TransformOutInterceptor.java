@@ -165,7 +165,7 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     protected boolean isHttpVerbSupported(Message message) {
-        return isRequestor(message) && isGET(message) ? false : true;
+        return !(isRequestor(message) && isGET(message));
     }
 
     public void setContextPropertyName(String propertyName) {

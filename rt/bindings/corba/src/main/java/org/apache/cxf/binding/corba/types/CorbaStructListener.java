@@ -53,7 +53,7 @@ public class CorbaStructListener extends AbstractCorbaTypeListener {
     }
 
     public void processStartElement(QName name) {
-        if (depth == 0 && (currentElement != null) && (!currentElement.equals(name))) {
+        if (depth == 0 && (currentElement != null) && !currentElement.equals(name)) {
             currentTypeListener = null;
         }
         depth++;

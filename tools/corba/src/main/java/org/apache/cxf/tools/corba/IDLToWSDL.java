@@ -205,8 +205,8 @@ public class IDLToWSDL extends AbstractCXFToolContainer {
         if (doc.hasParameter(ToolCorbaConstants.CFG_SEQUENCE_OCTET_TYPE)) {
             String sequenceOctetType = doc.getParameter(ToolCorbaConstants.CFG_SEQUENCE_OCTET_TYPE);
             if (sequenceOctetType != null
-                && (!(sequenceOctetType.equals(ToolCorbaConstants.CFG_SEQUENCE_OCTET_TYPE_BASE64BINARY)
-                    || sequenceOctetType.equals(ToolCorbaConstants.CFG_SEQUENCE_OCTET_TYPE_HEXBINARY)))) {
+                && !(sequenceOctetType.equals(ToolCorbaConstants.CFG_SEQUENCE_OCTET_TYPE_BASE64BINARY)
+                    || sequenceOctetType.equals(ToolCorbaConstants.CFG_SEQUENCE_OCTET_TYPE_HEXBINARY))) {
                 errors.add(new ErrorVisitor.UserError("Invalid value specified for -s option"));
             }
         }

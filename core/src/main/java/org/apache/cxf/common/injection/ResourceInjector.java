@@ -315,8 +315,6 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
         return res.name();
     }
 
-
-
     private void injectField(Field field, Object resource) {
         assert field != null;
         assert resource != null;
@@ -335,9 +333,7 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
         }
     }
 
-
     public void invokePostConstruct() {
-
         boolean accessible = false;
         for (Method method : getPostConstructMethods()) {
             PostConstruct pc = method.getAnnotation(PostConstruct.class);
@@ -357,7 +353,6 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
     }
 
     public void invokePreDestroy() {
-
         boolean accessible = false;
         for (Method method : getPreDestroyMethods()) {
             PreDestroy pd = method.getAnnotation(PreDestroy.class);

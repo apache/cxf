@@ -176,7 +176,7 @@ public class SchemaCollectionContextProxy implements JAXBContextProxy {
 
         return new JAXBBeanInfo() {
             public boolean isElement() {
-                return el == null ? false : true;
+                return el != null;
             }
             public Collection<QName> getTypeNames() {
                 return Collections.singletonList(typeName);

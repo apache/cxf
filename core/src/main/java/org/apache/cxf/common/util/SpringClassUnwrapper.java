@@ -65,7 +65,7 @@ class SpringClassUnwrapper implements ClassUnwrapper {
 
     @Override
     public Class<?> getRealClass(Object o) {
-        if (AopUtils.isAopProxy(o) && (o instanceof Advised)) {
+        if (AopUtils.isAopProxy(o) && o instanceof Advised) {
             Advised advised = (Advised)o;
             try {
                 TargetSource targetSource = advised.getTargetSource();

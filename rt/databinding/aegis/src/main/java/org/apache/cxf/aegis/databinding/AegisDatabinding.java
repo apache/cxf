@@ -602,7 +602,7 @@ public class AegisDatabinding extends AbstractDataBinding {
                     param.setProperty("maxOccurs", Long.toString(info.getMaxOccurs()));
                 }
 
-                if ((type instanceof ArrayType) && !type.isWriteOuter()) {
+                if (type instanceof ArrayType && !type.isWriteOuter()) {
                     param.setProperty("org.apache.cxf.aegis.outerType", type);
                     ArrayType aType = (ArrayType) type;
                     type = aType.getComponentType();

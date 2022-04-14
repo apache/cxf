@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
@@ -212,27 +213,27 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
         contexts.push(curContext);
         curContext = new NSContext(curContext);
         lastStart = new QName(name);
-        addEvent(factory.createStartElement(lastStart,
-                                            Collections.EMPTY_SET.iterator(),
-                                            Collections.EMPTY_SET.iterator()));
+        Set<javax.xml.stream.events.Attribute> atSet = Collections.emptySet();
+        Set<javax.xml.stream.events.Namespace> nsSet = Collections.emptySet();
+        addEvent(factory.createStartElement(lastStart, atSet.iterator(), nsSet.iterator()));
     }
     public void writeStartElement(String name, String ns) throws XMLStreamException {
         elNames.push(lastStart);
         contexts.push(curContext);
         curContext = new NSContext(curContext);
         lastStart = new QName(ns, name);
-        addEvent(factory.createStartElement(lastStart,
-                                            Collections.EMPTY_SET.iterator(),
-                                            Collections.EMPTY_SET.iterator()));
+        Set<javax.xml.stream.events.Attribute> atSet = Collections.emptySet();
+        Set<javax.xml.stream.events.Namespace> nsSet = Collections.emptySet();
+        addEvent(factory.createStartElement(lastStart, atSet.iterator(), nsSet.iterator()));
     }
     public void writeStartElement(String pfx, String name, String ns) throws XMLStreamException {
         elNames.push(lastStart);
         contexts.push(curContext);
         curContext = new NSContext(curContext);
         lastStart = new QName(ns, name, pfx);
-        addEvent(factory.createStartElement(lastStart,
-                                            Collections.EMPTY_SET.iterator(),
-                                            Collections.EMPTY_SET.iterator()));
+        Set<javax.xml.stream.events.Attribute> atSet = Collections.emptySet();
+        Set<javax.xml.stream.events.Namespace> nsSet = Collections.emptySet();
+        addEvent(factory.createStartElement(lastStart, atSet.iterator(), nsSet.iterator()));
     }
 
     public static class NSContext implements NamespaceContext {

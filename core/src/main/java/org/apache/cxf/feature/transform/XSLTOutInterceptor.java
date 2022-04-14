@@ -120,20 +120,17 @@ public class XSLTOutInterceptor extends AbstractXSLTInterceptor {
 
         @Override
         public void close() {
-            Reader transformedReader = null;
             try {
                 super.flush();
-                transformedReader = XSLTUtils.transform(xsltTemplate, cachedWriter.getReader());
-                StaxUtils.copy(new StreamSource(transformedReader), origXWriter);
+                try (Reader transformedReader = XSLTUtils.transform(xsltTemplate, cachedWriter.getReader())) {
+                    StaxUtils.copy(new StreamSource(transformedReader), origXWriter);                    
+                }
             } catch (XMLStreamException e) {
                 throw new Fault("STAX_COPY", LOG, e, e.getMessage());
             } catch (IOException e) {
                 throw new Fault("GET_CACHED_INPUT_STREAM", LOG, e, e.getMessage());
             } finally {
                 try {
-                    if (transformedReader != null) {
-                        transformedReader.close();
-                    }
                     cachedWriter.close();
                     StaxUtils.close(origXWriter);
                     super.close();

@@ -292,7 +292,9 @@ public class AttachmentDeserializer {
             value = pushbackInStream.read();
             if ((byte) value == boundary[0]) {
                 int boundaryIndex = 0;
-                while (value != -1 && (boundaryIndex < boundary.length) && ((byte) value == boundary[boundaryIndex])) {
+                while (value != -1 
+                    && boundaryIndex < boundary.length 
+                    && (byte)value == boundary[boundaryIndex]) {
 
                     value = pushbackInStream.read();
                     if (value == -1) {

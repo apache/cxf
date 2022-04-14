@@ -79,7 +79,7 @@ public class WSDLToServiceProcessor extends AbstractWSDLToProcessor {
                 break;
             }
         }
-        return (service == null) ? false : true;
+        return service != null;
     }
 
     private boolean isPortExisted() {
@@ -93,7 +93,7 @@ public class WSDLToServiceProcessor extends AbstractWSDLToProcessor {
                 break;
             }
         }
-        return (port == null) ? false : true;
+        return port != null;
     }
 
     private boolean isBindingExisted() {
@@ -108,7 +108,7 @@ public class WSDLToServiceProcessor extends AbstractWSDLToProcessor {
                 binding = entry.getValue();
             }
         }
-        return (binding == null) ? false : true;
+        return binding != null;
     }
 
     protected void init() throws ToolException {

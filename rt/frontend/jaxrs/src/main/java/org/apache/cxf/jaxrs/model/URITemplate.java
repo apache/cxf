@@ -179,7 +179,7 @@ public final class URITemplate {
     public boolean match(String uri, MultivaluedMap<String, String> templateVariableToValue) {
 
         if (uri == null) {
-            return (templateRegexPattern == null) ? true : false;
+            return templateRegexPattern == null;
         }
 
         if (templateRegexPattern == null) {

@@ -357,7 +357,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
             return userCID;
         } else if (!jmsConfig.isSetConduitSelectorPrefix() && !jmsConfig.isReplyPubSubDomain()
                    && exchange.isSynchronous()
-                   && (!jmsConfig.isUseConduitIdSelector())) {
+                   && !jmsConfig.isUseConduitIdSelector()) {
             // in this case the correlation id will be set to
             // the message id later
             return null;

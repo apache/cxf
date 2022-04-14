@@ -84,7 +84,7 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
             }
             res = CastUtils.cast((List<?>)super.invoke(exchange, serviceObject, m, params));
 
-            if ((serviceObject instanceof Provider)
+            if (serviceObject instanceof Provider
                 && MessageUtils.getContextualBoolean(exchange.getInMessage(),
                                                      "jaxws.provider.interpretNullAsOneway",
                                                      true)

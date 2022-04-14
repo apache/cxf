@@ -874,12 +874,12 @@ public class WSDLToCorbaHelper {
     public boolean isLiteralArray(XmlSchemaComplexType type) {
         boolean array = false;
 
-        if ((type.getAttributes().isEmpty())
-            && (type.getParticle() instanceof XmlSchemaSequence)) {
+        if (type.getAttributes().isEmpty()
+            && type.getParticle() instanceof XmlSchemaSequence) {
             XmlSchemaSequence stype = (XmlSchemaSequence)type.getParticle();
 
             if ((stype.getItems().size() == 1)
-                && (stype.getItems().get(0) instanceof XmlSchemaElement)) {
+                && stype.getItems().get(0) instanceof XmlSchemaElement) {
                 XmlSchemaElement el = (XmlSchemaElement)stype.getItems().get(0);
                 if (el.getMaxOccurs() != 1) {
                     // it's a literal array
@@ -1578,8 +1578,8 @@ public class WSDLToCorbaHelper {
 
     private boolean isAddressingNamespace(QName typeName) {
         return (typeName != null)
-                && (!isIDLObjectType(typeName))
-                && (typeName.getNamespaceURI().equals(ReferenceConstants.WSADDRESSING_NAMESPACE));
+                && !isIDLObjectType(typeName)
+                && typeName.getNamespaceURI().equals(ReferenceConstants.WSADDRESSING_NAMESPACE);
     }
 
     protected static boolean queryBinding(Definition definition, QName bqname) {

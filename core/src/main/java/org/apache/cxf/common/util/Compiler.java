@@ -327,7 +327,7 @@ public class Compiler {
                 infoStreamPrinter.start();
             }
 
-            return p.waitFor() == 0 ? true : false;
+            return p.waitFor() == 0;
         } catch (SecurityException e) {
             System.err.println("[ERROR] SecurityException during exec() of compiler \"" + args[0] + "\".");
         } catch (InterruptedException e) {

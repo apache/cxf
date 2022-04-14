@@ -82,7 +82,7 @@ public class ToolErrorListener {
     public void throwToolException() {
         StringBuilder b = new StringBuilder();
         for (ErrorInfo e : errors) {
-            createMessage(b, e).append("\n");
+            createMessage(b, e).append('\n');
         }
         throw new ToolException(b.toString(), errors);
     }

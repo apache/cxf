@@ -103,7 +103,7 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
         Exchange exchange = inMessage.getExchange();
         exchange.setOutMessage(message);
 
-        boolean isTextMessage = (jmsMessage instanceof TextMessage) && !JMSMessageUtils.isMtomEnabled(message);
+        boolean isTextMessage = jmsMessage instanceof TextMessage && !JMSMessageUtils.isMtomEnabled(message);
         MessageStreamUtil.prepareStream(message, isTextMessage, this);
     }
 

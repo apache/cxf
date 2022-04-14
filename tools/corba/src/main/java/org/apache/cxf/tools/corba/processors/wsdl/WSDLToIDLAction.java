@@ -376,7 +376,7 @@ public class WSDLToIDLAction {
         IdlDefn result = root.lookup(name);
 
         if (result != null
-            &&  (!(result instanceof IdlType))) {
+            &&  !(result instanceof IdlType)) {
             String msgStr = idlType.getLocalPart() + " is an incorrect idltype.";
             org.apache.cxf.common.i18n.Message msg =
                 new org.apache.cxf.common.i18n.Message(msgStr, LOG);
@@ -546,7 +546,7 @@ public class WSDLToIDLAction {
 
         Object obj = scope.lookup(local);
 
-        if (obj != null && (obj instanceof IdlException)) {
+        if (obj instanceof IdlException) {
             result = (IdlType)obj;
         } else {
             IdlException exc = IdlException.create(scope, local);

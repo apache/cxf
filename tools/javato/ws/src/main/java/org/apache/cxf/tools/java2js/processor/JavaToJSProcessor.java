@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
@@ -124,9 +125,7 @@ public class JavaToJSProcessor implements Processor {
                 beanDefinitions.addAll((List<String>)beanFilesParameter);
             } else {
                 String[] list = (String[])beanFilesParameter;
-                for (String b : list) {
-                    beanDefinitions.add(b);
-                }
+                beanDefinitions.addAll(Arrays.asList(list));
             }
         }
 

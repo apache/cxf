@@ -38,11 +38,11 @@ public interface ASMHelper {
     String getNonPrimitive(Class<?> tp);
     String getPrimitive(Class<?> tp);
 
-    public interface ASMType {
+    interface ASMType {
         int getOpcode(int ireturn);
     }
 
-    public interface ClassWriter {
+    interface ClassWriter {
         @WrapReturn(AnnotationVisitor.class)
         AnnotationVisitor visitAnnotation(String cls, boolean t);
 
@@ -61,15 +61,15 @@ public interface ASMHelper {
         void visitSource(String arg0, String arg1);
     }
 
-    public interface Label {
+    interface Label {
     }
 
-    public interface FieldVisitor {
+    interface FieldVisitor {
         @WrapReturn(AnnotationVisitor.class)
         AnnotationVisitor visitAnnotation(String cls, boolean b);
         void visitEnd();
     }
-    public interface MethodVisitor {
+    interface MethodVisitor {
         void visitEnd();
         void visitLabel(@UnwrapParam(typeMethodName = "realType") Label l1);
         void visitMaxs(int i, int j);
@@ -97,7 +97,7 @@ public interface ASMHelper {
         @WrapReturn(AnnotationVisitor.class)
         AnnotationVisitor visitAnnotation(String cls, boolean b);
     }
-    public interface AnnotationVisitor {
+    interface AnnotationVisitor {
         void visit(String arg0, @UnwrapParam(typeMethodName = "realType") ASMType arg1);
         void visit(String arg0, Object arg1);
         @WrapReturn(AnnotationVisitor.class)

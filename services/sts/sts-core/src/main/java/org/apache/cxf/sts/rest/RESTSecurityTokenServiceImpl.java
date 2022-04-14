@@ -386,7 +386,7 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
             PhaseInterceptorChain.getCurrentMessage().get(TLSSessionInfo.class);
         if (tlsInfo != null && tlsInfo.getPeerCertificates() != null
                 && tlsInfo.getPeerCertificates().length > 0
-                && (tlsInfo.getPeerCertificates()[0] instanceof X509Certificate)
+                && tlsInfo.getPeerCertificates()[0] instanceof X509Certificate
         ) {
             return (X509Certificate)tlsInfo.getPeerCertificates()[0];
         }

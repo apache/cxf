@@ -85,7 +85,7 @@ public class AttachmentStreamSourceXMLProvider implements Provider<StreamSource>
                     InputStream is = entry.getValue().getInputStream();
                     IOUtils.copy(is, bous);
 
-                    buf.append("<att contentId=\"" + entry.getKey() + "\">");
+                    buf.append("<att contentId=\"").append(entry.getKey()).append("\">");
                     buf.append(Base64Utility.encode(bous.toByteArray()));
                     buf.append("</att>");
 

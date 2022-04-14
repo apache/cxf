@@ -97,7 +97,7 @@ public class CorbaStreamFaultOutInterceptor extends AbstractPhaseInterceptor<Mes
         // JCGS. If the cause is not available I can only continue if the exception
         //       is a Fault instance and contains a detail object.
         if (ex.getCause() == null) {
-            if ((ex instanceof Fault) && (((Fault)ex).getDetail() != null)) {
+            if (ex instanceof Fault && (((Fault)ex).getDetail() != null)) {
                 faultEx = (Fault) ex;
             } else {
                 throw new CorbaBindingException(ex);

@@ -732,6 +732,6 @@ public class JMSDestinationTest extends AbstractJMSTester {
                    type.isAssignableFrom(jmsMsg.getJMSReplyTo().getClass()));
         String receivedName = getDestinationName(jmsMsg.getJMSReplyTo());
         assertTrue("JMS Messsage's replyTo must be named " + expectedName + " but was " + receivedName,
-                   expectedName == receivedName || receivedName.equals(expectedName));
+                   receivedName.equals(expectedName));
     }
 }

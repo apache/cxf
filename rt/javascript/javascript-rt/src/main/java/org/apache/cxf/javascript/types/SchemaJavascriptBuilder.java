@@ -78,7 +78,7 @@ public class SchemaJavascriptBuilder {
     }
 
     public String generateCodeForSchemaCollection(XmlSchemaCollection collection) {
-        StringBuilder accumulatedCode = new StringBuilder();
+        StringBuilder accumulatedCode = new StringBuilder(128);
         for (XmlSchema schema : collection.getXmlSchemas()) {
             if (!Constants.URI_2001_SCHEMA_XSD.equals(schema.getTargetNamespace())) {
                 accumulatedCode.append(generateCodeForSchema(schema));
@@ -89,7 +89,7 @@ public class SchemaJavascriptBuilder {
 
     public String generateCodeForSchema(XmlSchema schema) {
         xmlSchema = schema;
-        code = new StringBuilder();
+        code = new StringBuilder(512);
         code.append("//\n");
         code.append("// Definitions for schema: ").append(schema.getTargetNamespace());
         if (schema.getSourceURI() != null) {
@@ -173,7 +173,7 @@ public class SchemaJavascriptBuilder {
     // of parameters, it's the least of the evils.
 
     public void complexTypeConstructorAndAccessors(QName name, XmlSchemaComplexType type) {
-        accessors = new StringBuilder();
+        accessors = new StringBuilder(512);
         utils = new JavascriptUtils(code);
         List<XmlSchemaObject> items = JavascriptUtils.getContentElements(type, xmlSchemaCollection);
         List<XmlSchemaAnnotated> attrs = XmlSchemaUtils.getContentAttributes(type, xmlSchemaCollection);
@@ -291,7 +291,7 @@ public class SchemaJavascriptBuilder {
      */
     public void complexTypeSerializerFunction(QName name, XmlSchemaComplexType type) {
 
-        StringBuilder bodyCode = new StringBuilder();
+        StringBuilder bodyCode = new StringBuilder(128);
         JavascriptUtils bodyUtils = new JavascriptUtils(bodyCode);
         bodyUtils.setXmlStringAccumulator("xml");
 

@@ -50,9 +50,9 @@ public class CorbaStructEventProducer extends AbstractStartEndEventProducer {
             CorbaObjectHandler obj = iterator.next();
             //Special case for wrapped/unwrapped arrays or sequences
             boolean primitiveSequence = obj instanceof CorbaSequenceHandler
-                        && (!CorbaHandlerUtils.isOctets(obj.getType()));
+                        && !CorbaHandlerUtils.isOctets(obj.getType());
             boolean primitivearray = obj instanceof CorbaArrayHandler
-                        && (!CorbaHandlerUtils.isOctets(obj.getType()));
+                        && !CorbaHandlerUtils.isOctets(obj.getType());
             if (primitiveSequence || primitivearray) {
                 boolean wrapped = true;
                 if (obj.getType() instanceof Abstractanonsequence) {

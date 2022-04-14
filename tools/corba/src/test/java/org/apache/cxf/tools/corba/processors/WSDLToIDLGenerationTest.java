@@ -74,7 +74,7 @@ public class WSDLToIDLGenerationTest {
             if (sgen.trim().startsWith(START_COMMENT)) {
                 genComment = true;
             }
-            if ((!origComment) && (!genComment)) {
+            if (!origComment && !genComment) {
                 assertEquals(sorig, sgen);
                 sgen = genReader.readLine();
                 sorig = origReader.readLine();

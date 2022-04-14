@@ -139,7 +139,7 @@ public class ImportRepairTest {
 
     Method findMethod(Object o, String name) {
         for (Method m: o.getClass().getMethods()) {
-            if (m.getName() == name) {
+            if (m.getName().equals(name)) {
                 return m;
             }
         }

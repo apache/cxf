@@ -22,6 +22,7 @@ package org.apache.cxf.maven_plugin;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -295,9 +296,7 @@ public class Java2WSMojo extends AbstractMojo {
         if (fork) {
             if (!StringUtils.isEmpty(additionalJvmArgs)) {
                 String[] split = additionalJvmArgs.split("\\s+");
-                for (String each : split) {
-                    args.add(each);
-                }
+                args.addAll(Arrays.asList(split));
             }
             // @see JavaToWS#isExitOnFinish()
             args.add("-DexitOnFinish=true");

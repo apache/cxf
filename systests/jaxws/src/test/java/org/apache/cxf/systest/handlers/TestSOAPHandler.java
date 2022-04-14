@@ -310,6 +310,6 @@ public class  TestSOAPHandler extends TestHandlerBase
 
     private boolean isValidWsdlDescription(Object wsdlDescription) {
         return (wsdlDescription != null)
-               && ((wsdlDescription instanceof java.net.URI) || (wsdlDescription instanceof java.net.URL));
+               && (wsdlDescription instanceof java.net.URI || wsdlDescription instanceof java.net.URL);
     }
 }

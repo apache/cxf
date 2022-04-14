@@ -72,7 +72,7 @@ public class MAPVerifier extends AbstractPhaseInterceptor<Message> {
                 String expected = exposeAs != null
                                   ? exposeAs
                                   : Names.WSA_NAMESPACE_NAME;
-                if (maps.getNamespaceURI() != expected) {
+                if (!maps.getNamespaceURI().equals(expected)) {
                     verificationCache.put("Incoming version mismatch"
                                           + " expected: " + expected
                                           + " got: " + maps.getNamespaceURI());
