@@ -44,7 +44,7 @@ import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 
-public class CXFCacheControlFeature extends AbstractFeature {
+public class CXFCacheControlFeature extends AbstractFeature implements AutoCloseable {
     
     private static final String BUS_PROVIDERS = "org.apache.cxf.jaxrs.bus.providers";
     private CachingProvider provider;

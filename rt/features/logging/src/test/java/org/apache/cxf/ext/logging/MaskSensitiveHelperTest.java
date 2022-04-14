@@ -67,7 +67,7 @@ public class MaskSensitiveHelperTest {
         "<item><user>testUser1</user><password myAttribute=\"test\">XXX</password></item>"
             + "<item><user>testUser2</user><password>XXX</password></item>";
 
-    private static final Set<String> SENSITIVE_ELEMENTS = new HashSet(Arrays.asList("password"));
+    private static final Set<String> SENSITIVE_ELEMENTS = new HashSet<>(Arrays.asList("password"));
     private static final String APPLICATION_XML = "application/xml";
     private static final String APPLICATION_JSON = "application/json";
 

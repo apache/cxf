@@ -33,6 +33,11 @@
     </properties>
     <dependencies>
         <dependency>
+            <groupId>jakarta.xml.ws</groupId>
+            <artifactId>jakarta.xml.ws-api</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>jakarta.transaction</groupId>
             <artifactId>jakarta.transaction-api</artifactId>
         </dependency>

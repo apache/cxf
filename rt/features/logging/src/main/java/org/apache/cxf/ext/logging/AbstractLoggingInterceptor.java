@@ -54,7 +54,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
 
     protected final MaskSensitiveHelper maskSensitiveHelper = new MaskSensitiveHelper();
 
-    protected Set<String> sensitiveProtocolHeaderNames = new HashSet();
+    protected Set<String> sensitiveProtocolHeaderNames = new HashSet<>();
 
     public AbstractLoggingInterceptor(String phase, LogEventSender sender) {
         super(phase);

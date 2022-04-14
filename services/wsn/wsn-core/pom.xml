@@ -38,6 +38,14 @@
     </properties>
     <dependencies>
         <dependency>
+            <groupId>jakarta.xml.ws</groupId>
+            <artifactId>jakarta.xml.ws-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.jws</groupId>
+            <artifactId>jakarta.jws-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jms_1.1_spec</artifactId>
         </dependency>
@@ -64,6 +72,10 @@
             <groupId>org.apache.cxf.services.wsn</groupId>
             <artifactId>cxf-services-wsn-api</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.messaging.saaj</groupId>
+            <artifactId>saaj-impl</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -148,32 +160,4 @@
             </plugin>
         </plugins>
     </build>
-    <profiles>
-        <profile>
-            <id>java9plus</id>
-            <activation>
-                <jdk>[9,)</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <includes>
-                                <include>**/*Test.java</include>
-                                <include>**/*TestCase.java</include>
-                                <include>**/*TestCases.java</include>
-                            </includes>
-                            <excludes>
-                                <exclude>**/*$*</exclude>
-                                <!--ignore the test caused by CXF-7270-->
-                                <exclude>/org/apache/cxf/wsn/RiTest.java</exclude>
-                            </excludes>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>

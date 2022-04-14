@@ -581,6 +581,11 @@
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.jboss.spec.javax.rmi</groupId>
+            <artifactId>jboss-rmi-api_1.0_spec</artifactId>
+            <version>1.0.6.Final</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -734,19 +739,4 @@
             </plugins>
         </pluginManagement>
     </build>
-    <profiles>
-        <profile>
-            <id>java9-plus</id>
-            <activation>
-                <jdk>[9,)</jdk>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.jboss.spec.javax.rmi</groupId>
-                    <artifactId>jboss-rmi-api_1.0_spec</artifactId>
-                    <version>1.0.6.Final</version>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 </project>

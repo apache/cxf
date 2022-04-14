@@ -535,6 +535,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     protected void finalize() throws Throwable {
         close();
         super.finalize();

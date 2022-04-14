@@ -230,7 +230,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
             } catch (NoSuchMethodException nsme) {
                 //ignore, use the no-arg constructor
             }
-            return cls.newInstance();
+            return cls.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             throw new ServiceConstructionException(e);
         }

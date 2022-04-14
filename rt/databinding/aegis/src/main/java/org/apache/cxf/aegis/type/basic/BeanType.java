@@ -202,7 +202,7 @@ public class BeanType extends AegisType {
             throw new DatabindingException("Illegal access. " + e.getMessage(), e);
         } catch (IllegalArgumentException e) {
             throw new DatabindingException("Illegal argument. " + e.getMessage(), e);
-        } catch (InvocationTargetException e) {
+        } catch (InvocationTargetException | NoSuchMethodException e) {
             throw new DatabindingException("Could not create class: " + e.getMessage(), e);
         }
     }
@@ -226,7 +226,7 @@ public class BeanType extends AegisType {
      * it exists).
      */
     protected Object createFromFault(Context context) throws SecurityException, InstantiationException,
-        IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         Class<?> clazz = getTypeClass();
         Constructor<?> ctr;
         Object o;
@@ -257,7 +257,7 @@ public class BeanType extends AegisType {
                         fault.getMessage()
                     });
                 } catch (NoSuchMethodException e2) {
-                    return clazz.newInstance();
+                    return clazz.getDeclaredConstructor().newInstance();
                 }
             }
         }

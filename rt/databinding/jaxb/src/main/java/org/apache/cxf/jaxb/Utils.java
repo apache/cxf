@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxb;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -256,8 +257,9 @@ final class Utils {
 
     @SuppressWarnings("rawtypes")
     static XmlAdapter getXmlAdapter(XmlJavaTypeAdapter adapterAnnotation)
-        throws InstantiationException, IllegalAccessException {
-        return adapterAnnotation != null ? adapterAnnotation.value().newInstance() : null;
+        throws InstantiationException, IllegalAccessException, InvocationTargetException,
+               NoSuchMethodException, SecurityException {
+        return adapterAnnotation != null ? adapterAnnotation.value().getDeclaredConstructor().newInstance() : null;
     }
 
     static XmlJavaTypeAdapter getFieldXJTA(final Field f) {

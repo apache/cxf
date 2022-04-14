@@ -183,7 +183,7 @@ public class ServerLauncher {
                     Class<? extends AbstractTestServerBase> svcls =
                         cls.asSubclass(AbstractTestServerBase.class);
                     if (null == serverArgs) {
-                        inProcessServer = svcls.newInstance();
+                        inProcessServer = svcls.getDeclaredConstructor().newInstance();
                     } else {
                         Constructor<? extends AbstractTestServerBase> ctor
                             = svcls.getConstructor(serverArgs.getClass());

@@ -235,7 +235,7 @@ public class ConfigurationImpl implements Configuration {
 
     public static Object createProvider(Class<?> cls) {
         try {
-            return cls.newInstance();
+            return cls.getDeclaredConstructor().newInstance();
         } catch (Throwable ex) {
             throw new RuntimeException(ex);
         }

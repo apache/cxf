@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs.client.spec;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.ws.rs.client.Client;
@@ -40,8 +41,9 @@ public class ClientBuilderImplTest {
             public <T> Object create(final Class<T> cls) {
                 try {
                     create.incrementAndGet();
-                    return cls.newInstance();
-                } catch (final InstantiationException | IllegalAccessException e) {
+                    return cls.getDeclaredConstructor().newInstance();
+                } catch (final InstantiationException | IllegalAccessException | IllegalArgumentException 
+                    | InvocationTargetException | NoSuchMethodException | SecurityException e) {
                     fail(e.getMessage());
                 }
                 return null;

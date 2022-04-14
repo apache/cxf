@@ -25,6 +25,10 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+        <groupId>com.sun.xml.messaging.saaj</groupId>
+        <artifactId>saaj-impl</artifactId>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>

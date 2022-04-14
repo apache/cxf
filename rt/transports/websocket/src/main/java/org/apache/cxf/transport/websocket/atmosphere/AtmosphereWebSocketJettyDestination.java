@@ -20,6 +20,7 @@
 package org.apache.cxf.transport.websocket.atmosphere;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -90,8 +91,10 @@ public class AtmosphereWebSocketJettyDestination extends JettyHTTPDestination im
                 Class<?> dcc = ClassUtils.forName("org.eclipse.jetty.util.DecoratedObjectFactory", 
                                                   getClass().getClassLoader());
                 handler.getServletContext().setAttribute("org.eclipse.jetty.util.DecoratedObjectFactory",
-                                                         dcc.newInstance());
-            } catch (ClassNotFoundException | LinkageError | InstantiationException | IllegalAccessException e) {
+                                                         dcc.getDeclaredConstructor().newInstance());
+            } catch (ClassNotFoundException | LinkageError | InstantiationException | IllegalAccessException 
+                | IllegalArgumentException | InvocationTargetException | NoSuchMethodException 
+                | SecurityException e) {
                 //ignore, old version of Jetty
             }            
         }

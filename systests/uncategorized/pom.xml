@@ -132,6 +132,10 @@
     </build>
     <dependencies>
         <dependency>
+            <groupId>com.sun.xml.messaging.saaj</groupId>
+            <artifactId>saaj-impl</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-tools-common</artifactId>
             <version>${project.version}</version>
@@ -380,6 +384,13 @@
             <artifactId>httpclient</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.jboss.spec.javax.rmi</groupId>
+            <artifactId>jboss-rmi-api_1.0_spec</artifactId>
+            <version>1.0.6.Final</version>
+            <scope>test</scope>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
     <profiles>
         <profile>
@@ -389,21 +400,6 @@
                     <groupId>org.apache.cxf</groupId>
                     <artifactId>cxf-rt-transports-http-hc</artifactId>
                     <version>${project.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>java9-plus</id>
-            <activation>
-                <jdk>[9,)</jdk>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.jboss.spec.javax.rmi</groupId>
-                    <artifactId>jboss-rmi-api_1.0_spec</artifactId>
-                    <version>1.0.6.Final</version>
-                    <scope>test</scope>
-                    <optional>true</optional>
                 </dependency>
             </dependencies>
         </profile>
