@@ -99,6 +99,8 @@ public final class HttpUtils {
         new HashSet<>(Arrays.asList(new String[]{"GET", "HEAD", "OPTIONS", "TRACE"}));
     private static final Set<String> KNOWN_HTTP_VERBS_WITH_NO_RESPONSE_CONTENT =
         new HashSet<>(Arrays.asList(new String[]{"HEAD", "OPTIONS"}));
+    
+    private static final Pattern HTTP_SCHEME_PATTERN = Pattern.compile("^(?i)(http|https)$");
 
     private HttpUtils() {
     }
@@ -702,5 +704,9 @@ public final class HttpUtils {
     
     public static boolean isMethodWithNoResponseContent(String method) {
         return KNOWN_HTTP_VERBS_WITH_NO_RESPONSE_CONTENT.contains(method);
+    }
+    
+    public static boolean isHttpScheme(final String scheme) {
+        return scheme != null && HTTP_SCHEME_PATTERN.matcher(scheme).matches();
     }
 }
