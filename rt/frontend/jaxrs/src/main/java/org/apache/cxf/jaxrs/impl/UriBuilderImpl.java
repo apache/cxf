@@ -124,7 +124,13 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
 
         UriParts parts = doBuildUriParts(fromEncoded, encodePathSlash, false, values);
         try {
-            return buildURI(fromEncoded, parts.path, parts.query, parts.fragment);
+            final URI uri = buildURI(fromEncoded, parts.path, parts.query, parts.fragment);
+            
+            if (!Rfc3986UriValidator.validate(uri)) {
+                throw new UriBuilderException("[" + uri + "] is not a valid HTTP URL");
+            }
+            
+            return uri;
         } catch (URISyntaxException ex) {
             throw new UriBuilderException("URI can not be built", ex);
         }

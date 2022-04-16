@@ -33,6 +33,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -138,6 +139,12 @@ public class LinkBuilderImplTest {
         } catch (java.lang.IllegalArgumentException e) {
             // expected
         }
+    }
+
+    @Test
+    public void invalidUrlsNoHost() {
+        assertThrows(UriBuilderException.class, () -> Link.fromUri("http://@").build());
+        assertThrows(UriBuilderException.class, () -> Link.fromUri("http://:@").build());
     }
 
     @Path("resource")

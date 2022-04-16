@@ -32,6 +32,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriBuilderException;
 
 import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.BookStore;
@@ -43,6 +44,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
 
 public class UriBuilderImplTest {
@@ -1974,5 +1976,11 @@ public class UriBuilderImplTest {
             .path("{")
             .build();
         assertEquals("/%7B", uri.toString());
+    }
+    
+    @Test
+    public void invalidUrlsNoHost() {
+        assertThrows(UriBuilderException.class, () -> UriBuilder.fromUri("http://@").build());
+        assertThrows(UriBuilderException.class, () -> UriBuilder.fromUri("http://:@").build());
     }
 }
