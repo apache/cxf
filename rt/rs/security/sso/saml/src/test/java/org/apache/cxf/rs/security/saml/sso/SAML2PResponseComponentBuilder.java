@@ -19,9 +19,9 @@
 
 package org.apache.cxf.rs.security.saml.sso;
 
+import java.time.Instant;
 import java.util.UUID;
 
-import org.joda.time.DateTime;
 import org.opensaml.core.xml.XMLObjectBuilderFactory;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.saml.common.SAMLObjectBuilder;
@@ -70,7 +70,7 @@ public final class SAML2PResponseComponentBuilder {
         Response response = responseBuilder.buildObject();
 
         response.setID(UUID.randomUUID().toString());
-        response.setIssueInstant(new DateTime());
+        response.setIssueInstant(Instant.now());
         response.setInResponseTo(inResponseTo);
         response.setIssuer(createIssuer(issuer));
         response.setStatus(status);
