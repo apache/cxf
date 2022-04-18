@@ -32,6 +32,5 @@
     </parent>
     <modules>
         <module>compatible</module>
-        <module>servlet-compatible</module>
     </modules>
 </project>
