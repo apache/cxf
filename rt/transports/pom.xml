@@ -39,6 +39,7 @@
         <module>http-netty/netty-server</module>
         <module>http-netty/netty-client</module>
         <module>udp</module>
+        <module>jms</module>
     </modules>
     
     <profiles>
@@ -47,7 +48,6 @@
         <profile>
             <id>javax</id>
             <modules>
-                <module>jms</module>
                 <module>websocket</module>
             </modules>
         </profile>

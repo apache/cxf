@@ -55,6 +55,7 @@
         <module>spring-boot</module>
         <module>transport-netty</module>
         <module>transport-hc5</module>
+        <module>transport-jms</module>
     </modules>
     
     <profiles>
@@ -63,7 +64,6 @@
         <profile>
             <id>javax</id>
             <modules>
-                <module>transport-jms</module>
                 <module>jaxrs</module>
             </modules>
         </profile>

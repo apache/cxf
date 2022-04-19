@@ -72,7 +72,7 @@
     <wsdl:binding name="JMSMTOMPortBinding" type="tns:JMSMTOMPortType">
         <soap:binding style="document" transport="http://www.w3.org/2010/soapjms/"/>
         <jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
-  		<jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
+  		<jms:jndiInitialContextFactory>org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
         
         <wsdl:operation name="testDataHandler">
             <soap:operation soapAction=""/>

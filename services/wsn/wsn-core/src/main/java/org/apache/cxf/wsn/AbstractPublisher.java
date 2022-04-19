@@ -109,6 +109,12 @@ public abstract class AbstractPublisher extends AbstractEndpoint implements Publ
         // Check demand based
         demand = registerPublisherRequest.isDemand() != null
             && registerPublisherRequest.isDemand().booleanValue();
+        
+        if (demand) {
+            PublisherRegistrationFailedFaultType fault = new PublisherRegistrationFailedFaultType();
+            throw new PublisherRegistrationFailedFault("On-demand publishing is not supported", fault);
+        }
+        
         // Check all parameters
         if (publisherReference == null && demand) {
             PublisherRegistrationFailedFaultType fault = new PublisherRegistrationFailedFaultType();

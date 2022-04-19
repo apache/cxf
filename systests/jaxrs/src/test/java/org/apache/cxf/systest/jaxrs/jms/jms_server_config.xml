@@ -25,7 +25,7 @@
     xsi:schemaLocation="http://cxf.apache.org/transports/jms http://cxf.apache.org/schemas/configuration/jms.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
     <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
-    <bean id="ConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" 
+    <bean id="ConnectionFactory" class="org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory" 
     	p:brokerURL="tcp://localhost:${testutil.ports.EmbeddedJMSBrokerLauncher}"/>
     <jaxrs:server xmlns:s="http://books.com" 
     	serviceName="s:BookService" 

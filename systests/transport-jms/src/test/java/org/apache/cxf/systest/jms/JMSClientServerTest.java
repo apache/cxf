@@ -35,7 +35,7 @@ import jakarta.xml.ws.Endpoint;
 import jakarta.xml.ws.Response;
 import jakarta.xml.ws.soap.AddressingFeature;
 import jakarta.xml.ws.soap.SOAPFaultException;
-import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.interceptor.TibcoSoapActionInterceptor;

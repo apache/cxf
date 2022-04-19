@@ -156,7 +156,7 @@
         </port>
         <port binding="tns:headerTesterXMLBinding" name="XMLPortJms">
             <jms:address destinationStyle="queue" jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.xml.jmstransport.queue">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"/>
                 <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61616"/>
             </jms:address>
         </port>
@@ -167,7 +167,7 @@
         </port>
         <port binding="tns:headerTesterSOAPBinding" name="SoapPortJms">
             <jms:address destinationStyle="queue" jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.celtix.jmstransport.queue">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"/>
                 <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61616"/>
             </jms:address>
         </port>
