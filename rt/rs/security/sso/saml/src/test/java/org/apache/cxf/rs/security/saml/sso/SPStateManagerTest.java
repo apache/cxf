@@ -20,6 +20,7 @@
 package org.apache.cxf.rs.security.saml.sso;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
@@ -58,8 +59,9 @@ public class SPStateManagerTest {
     }
 
     @Before
-    public void setUp() throws IllegalAccessException, InstantiationException {
-        stateManager = stateManagerClass.newInstance();
+    public void setUp() throws IllegalAccessException, InstantiationException,
+            NoSuchMethodException, InvocationTargetException {
+        stateManager = stateManagerClass.getDeclaredConstructor().newInstance();
     }
 
     @After

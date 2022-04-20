@@ -119,7 +119,7 @@ public final class SAML2PResponseComponentBuilder {
 
         if (statusMessage != null) {
             StatusMessage statusMessageObject = statusMessageBuilder.buildObject();
-            statusMessageObject.setMessage(statusMessage);
+            statusMessageObject.setValue(statusMessage);
             status.setStatusMessage(statusMessageObject);
         }
 
@@ -134,7 +134,7 @@ public final class SAML2PResponseComponentBuilder {
         }
 
         AuthnContextClassRef authnContextClassRef = authnContextClassRefBuilder.buildObject();
-        authnContextClassRef.setAuthnContextClassRef(newAuthnContextClassRef);
+        authnContextClassRef.setURI(newAuthnContextClassRef);
 
         return authnContextClassRef;
     }
