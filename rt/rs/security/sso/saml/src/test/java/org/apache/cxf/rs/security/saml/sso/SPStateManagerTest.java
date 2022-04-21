@@ -59,8 +59,8 @@ public class SPStateManagerTest {
     }
 
     @Before
-    public void setUp() throws IllegalAccessException, InstantiationException, 
-        InvocationTargetException, NoSuchMethodException, SecurityException {
+    public void setUp() throws IllegalAccessException, InstantiationException,
+            NoSuchMethodException, InvocationTargetException {
         stateManager = stateManagerClass.getDeclaredConstructor().newInstance();
     }
 
