@@ -766,7 +766,7 @@ public class WebClient extends AbstractClient {
         if (path == null) {
             return back(true);
         }
-        back(path.startsWith("/") ? true : false);
+        back(path.startsWith("/"));
         return path(path);
     }
 

@@ -124,7 +124,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
                                     NameManager nameManager) {
         super(serviceInfo);
         this.endpointAddress = endpointAddress;
-        code = new StringBuilder();
+        code = new StringBuilder(512);
         utils = new JavascriptUtils(code);
         this.nameManager = nameManager;
         xmlSchemaCollection = serviceInfo.getXmlSchemaCollection();

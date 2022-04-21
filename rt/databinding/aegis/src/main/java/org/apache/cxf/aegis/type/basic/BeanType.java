@@ -124,9 +124,9 @@ public class BeanType extends AegisType {
                 } else {
                     try {
                         clazz = ClassLoaderUtils.loadClass(impl, getClass());
-                        object = clazz.newInstance();
+                        object = clazz.getDeclaredConstructor().newInstance();
                         target = object;
-                    } catch (ClassNotFoundException e) {
+                    } catch (ClassNotFoundException | NoSuchMethodException e) {
                         throw new DatabindingException("Could not find implementation class " + impl
                                                        + " for class " + clazz.getName());
                     }
@@ -135,8 +135,12 @@ public class BeanType extends AegisType {
                 object = createFromFault(context);
                 target = object;
             } else {
-                object = clazz.newInstance();
-                target = object;
+                try {
+                    object = clazz.getDeclaredConstructor().newInstance();
+                    target = object;
+                } catch (NoSuchMethodException e) {
+                    throw new DatabindingException("Could not create object of class " + clazz.getName());
+                }
             }
 
             // Read attributes
@@ -198,7 +202,7 @@ public class BeanType extends AegisType {
             throw new DatabindingException("Illegal access. " + e.getMessage(), e);
         } catch (IllegalArgumentException e) {
             throw new DatabindingException("Illegal argument. " + e.getMessage(), e);
-        } catch (InvocationTargetException e) {
+        } catch (InvocationTargetException | NoSuchMethodException e) {
             throw new DatabindingException("Could not create class: " + e.getMessage(), e);
         }
     }
@@ -222,7 +226,7 @@ public class BeanType extends AegisType {
      * it exists).
      */
     protected Object createFromFault(Context context) throws SecurityException, InstantiationException,
-        IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         Class<?> clazz = getTypeClass();
         Constructor<?> ctr;
         Object o;
@@ -253,7 +257,7 @@ public class BeanType extends AegisType {
                         fault.getMessage()
                     });
                 } catch (NoSuchMethodException e2) {
-                    return clazz.newInstance();
+                    return clazz.getDeclaredConstructor().newInstance();
                 }
             }
         }

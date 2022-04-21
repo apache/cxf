@@ -53,7 +53,7 @@ public final class WrapperHelperClassGenerator extends ClassGeneratorClassLoader
         Class<?> cls = findClass(StringUtils.slashesToPeriod(newClassName), wrapperType);
         while (cls != null) {
             try {
-                WrapperHelper helper = WrapperHelper.class.cast(cls.newInstance());
+                WrapperHelper helper = WrapperHelper.class.cast(cls.getDeclaredConstructor().newInstance());
                 if (!helper.getSignature().equals(computeSignature(setMethods, getMethods))) {
                     count++;
                     newClassName = wrapperType.getName() + "_WrapperTypeHelper" + count;
@@ -93,7 +93,7 @@ public final class WrapperHelperClassGenerator extends ClassGeneratorClassLoader
                 cw.visitEnd();
                 byte[] bt = cw.toByteArray();
                 Class<?> cl = loadClass(StringUtils.slashesToPeriod(newClassName), wrapperType, bt);
-                Object o = cl.newInstance();
+                Object o = cl.getDeclaredConstructor().newInstance();
                 return WrapperHelper.class.cast(o);
             }
         } catch (Throwable e) {

@@ -1269,7 +1269,7 @@ public final class JAXRSUtils {
         }
         Object instance;
         try {
-            instance = clazz.newInstance();
+            instance = clazz.getDeclaredConstructor().newInstance();
         } catch (Throwable t) {
             throw ExceptionUtils.toInternalServerErrorException(t, null);
         }

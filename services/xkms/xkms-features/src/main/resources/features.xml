@@ -20,6 +20,7 @@
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
     <repository>mvn:org.apache.cxf.karaf/apache-cxf/${project.version}/xml/features</repository>
     <feature name="cxf-xkms-client" version="${project.version}">
+        <feature>scr</feature>
         <feature>aries-blueprint</feature>
         <feature>cxf-jaxws</feature>
         <feature>cxf-http</feature>

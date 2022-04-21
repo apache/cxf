@@ -53,7 +53,7 @@ public class Server extends AbstractBusTestServerBase implements VerificationCac
         addVerifiers();
 
         try {
-            AbstractGreeterImpl implementor = (AbstractGreeterImpl)cls.newInstance();
+            AbstractGreeterImpl implementor = (AbstractGreeterImpl)cls.getDeclaredConstructor().newInstance();
             implementor.verificationCache = this;
             ep = Endpoint.publish(address, implementor);
         } catch (Exception ex) {

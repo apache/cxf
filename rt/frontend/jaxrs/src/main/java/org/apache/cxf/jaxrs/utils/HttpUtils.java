@@ -98,6 +98,8 @@ public final class HttpUtils {
         new HashSet<>(Arrays.asList(new String[]{"GET", "HEAD", "OPTIONS", "TRACE"}));
     private static final Set<String> KNOWN_HTTP_VERBS_WITH_NO_RESPONSE_CONTENT =
         new HashSet<>(Arrays.asList(new String[]{"HEAD", "OPTIONS"}));
+    
+    private static final Pattern HTTP_SCHEME_PATTERN = Pattern.compile("^(?i)(http|https)$");
 
     private HttpUtils() {
     }
@@ -470,7 +472,9 @@ public final class HttpUtils {
             URI uri = new URI(endpointAddress);
             String path = uri.getRawPath();
             String scheme = uri.getScheme();
-            if (scheme != null && !scheme.startsWith(HttpUtils.HTTP_SCHEME)
+            // RFC-3986: the scheme and host are case-insensitive and therefore should 
+            // be normalized to lowercase. 
+            if (scheme != null && !scheme.toLowerCase().startsWith(HttpUtils.HTTP_SCHEME)
                 && HttpUtils.isHttpRequest(m)) {
                 path = HttpUtils.toAbsoluteUri(path, m).getRawPath();
             }
@@ -699,5 +703,9 @@ public final class HttpUtils {
     
     public static boolean isMethodWithNoResponseContent(String method) {
         return KNOWN_HTTP_VERBS_WITH_NO_RESPONSE_CONTENT.contains(method);
+    }
+    
+    public static boolean isHttpScheme(final String scheme) {
+        return scheme != null && HTTP_SCHEME_PATTERN.matcher(scheme).matches();
     }
 }

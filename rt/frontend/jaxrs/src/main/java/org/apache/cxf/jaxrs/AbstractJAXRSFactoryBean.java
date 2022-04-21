@@ -351,7 +351,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
                 cris.get(0).getServiceClass().getAnnotation(org.apache.cxf.annotations.DataBinding.class);
             if (ann != null) {
                 try {
-                    setDataBinding(ann.value().newInstance());
+                    setDataBinding(ann.value().getDeclaredConstructor().newInstance());
                 } catch (Exception ex) {
                     LOG.warning("DataBinding " + ann.value() + " can not be loaded");
                 }

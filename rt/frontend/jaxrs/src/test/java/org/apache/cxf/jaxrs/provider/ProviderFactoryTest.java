@@ -87,13 +87,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class ProviderFactoryTest {
@@ -531,14 +531,16 @@ public class ProviderFactoryTest {
 
     @Test
     public void testExceptionMappersHierarchy2() throws Exception {
+        Message m = new MessageImpl();
+        m.put("default.wae.mapper.least.specific", false);
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
 
         TestRuntimeExceptionMapper rm = new TestRuntimeExceptionMapper();
         pf.registerUserProvider(rm);
         ExceptionMapper<WebApplicationException> em =
-            pf.createExceptionMapper(WebApplicationException.class, new MessageImpl());
+            pf.createExceptionMapper(WebApplicationException.class, m);
         assertTrue(em instanceof WebApplicationExceptionMapper);
-        assertSame(rm, pf.createExceptionMapper(RuntimeException.class, new MessageImpl()));
+        assertSame(rm, pf.createExceptionMapper(RuntimeException.class, m));
 
         WebApplicationExceptionMapper wm = new WebApplicationExceptionMapper();
         pf.registerUserProvider(wm);
@@ -549,7 +551,6 @@ public class ProviderFactoryTest {
     @Test
     public void testExceptionMappersHierarchy3() throws Exception {
         Message m = new MessageImpl();
-        m.put("default.wae.mapper.least.specific", true);
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
 
         TestRuntimeExceptionMapper rm = new TestRuntimeExceptionMapper();

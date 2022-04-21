@@ -21,11 +21,11 @@ package org.apache.cxf.systest.jaxrs.tracing.brave;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
-import org.hamcrest.core.IsCollectionContaining;
+import org.hamcrest.core.IsIterableContaining;
 import zipkin2.Annotation;
 import zipkin2.Span;
 
-public class HasSpan extends IsCollectionContaining<Span> {
+public class HasSpan extends IsIterableContaining<Span> {
     public HasSpan(final String name) {
         this(name, null);
     }

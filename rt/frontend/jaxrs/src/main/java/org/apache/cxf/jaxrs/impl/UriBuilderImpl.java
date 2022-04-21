@@ -123,7 +123,13 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
 
         UriParts parts = doBuildUriParts(fromEncoded, encodePathSlash, false, values);
         try {
-            return buildURI(fromEncoded, parts.path, parts.query, parts.fragment);
+            final URI uri = buildURI(fromEncoded, parts.path, parts.query, parts.fragment);
+            
+            if (!Rfc3986UriValidator.validate(uri)) {
+                throw new UriBuilderException("[" + uri + "] is not a valid HTTP URL");
+            }
+            
+            return uri;
         } catch (URISyntaxException ex) {
             throw new UriBuilderException("URI can not be built", ex);
         }
@@ -378,7 +384,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         for (String var : uniqueVars) {
             boolean isPathEncVar = !isQuery && alreadyResolvedTsPathEnc.containsKey(var);
 
-            boolean isVarEncoded = isPathEncVar || alreadyResolvedTs.containsKey(var) ? false : true;
+            boolean isVarEncoded = !(isPathEncVar || alreadyResolvedTs.containsKey(var));
             Map<String, Object> resolved = isVarEncoded ? alreadyResolvedTsEnc
                 : isPathEncVar ? alreadyResolvedTsPathEnc : alreadyResolvedTs;
             Object oval = resolved.isEmpty() ? null : resolved.remove(var);

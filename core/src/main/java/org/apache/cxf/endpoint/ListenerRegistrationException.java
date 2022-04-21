@@ -20,6 +20,8 @@
 package org.apache.cxf.endpoint;
 
 public class ListenerRegistrationException extends RuntimeException {
+    private static final long serialVersionUID = 1L;
+
     public ListenerRegistrationException(String message) {
         super(message);
     }

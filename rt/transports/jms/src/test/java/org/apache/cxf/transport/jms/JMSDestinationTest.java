@@ -58,10 +58,10 @@ import org.junit.Test;
 
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class JMSDestinationTest extends AbstractJMSTester {
@@ -796,6 +796,6 @@ public class JMSDestinationTest extends AbstractJMSTester {
                    type.isAssignableFrom(jmsMsg.getJMSReplyTo().getClass()));
         String receivedName = getDestinationName(jmsMsg.getJMSReplyTo());
         assertTrue("JMS Messsage's replyTo must be named " + expectedName + " but was " + receivedName,
-                   expectedName == receivedName || receivedName.equals(expectedName));
+                   receivedName.equals(expectedName));
     }
 }

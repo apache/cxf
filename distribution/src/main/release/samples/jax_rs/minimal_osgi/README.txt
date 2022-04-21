@@ -141,6 +141,5 @@ Bundles
    55|Active     |    1|geronimo-stax-api_1.0_spec (1.0.1)|1.0.1
    56|Active     |    1|Apache ServiceMix :: Specs :: JAXB API 2.2 (2.9.0)|2.9.0
    57|Active     |    1|slf4j-api (1.7.25)|1.7.25
-   58|Active     |    1|geronimo-jta_1.1_spec (1.1.1)|1.1.1
    59|Active     |    1|SAAJ 1.3 (1.1.0)|1.1.0
    60|Active     |    1|minimalosgi (0.0.0)|0.0.0

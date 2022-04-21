@@ -47,14 +47,14 @@ public final class SecurityUtils {
         // complete
     }
 
-    public static CallbackHandler getCallbackHandler(Object o) throws InstantiationException,
-        IllegalAccessException, ClassNotFoundException {
+    public static CallbackHandler getCallbackHandler(Object o) throws Exception {
         CallbackHandler handler = null;
         if (o instanceof CallbackHandler) {
             handler = (CallbackHandler)o;
         } else if (o instanceof String) {
             handler = (CallbackHandler)ClassLoaderUtils.loadClass((String)o,
-                                                                  SecurityUtils.class).newInstance();
+                                                                  SecurityUtils.class)
+                .getDeclaredConstructor().newInstance();
         }
         return handler;
     }

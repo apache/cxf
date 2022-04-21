@@ -117,24 +117,4 @@
             </plugin>
         </plugins>
     </build>
-    
-    <profiles>
-        <profile>
-            <id>xerces</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <jdk>[9,)</jdk>
-                <property>
-                    <name>xerces</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 </project>

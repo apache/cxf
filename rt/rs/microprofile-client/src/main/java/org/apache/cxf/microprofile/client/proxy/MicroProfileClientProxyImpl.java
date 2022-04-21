@@ -464,7 +464,7 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
             if (m != null) {
                 factory = CDIFacade.getInstanceFromCDI(factoryCls, m.getExchange().getBus())
                                    .map(this::mapInstance)
-                                   .orElse(factoryCls.newInstance());
+                                   .orElse(factoryCls.getDeclaredConstructor().newInstance());
                 ProviderInfo<ClientHeadersFactory> pi = clientHeaderFactories.computeIfAbsent(factoryCls, k -> {
                     return new ProviderInfo<ClientHeadersFactory>(factory, m.getExchange().getBus(), true);
                 });
@@ -472,7 +472,7 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
             } else {
                 factory = CDIFacade.getInstanceFromCDI(factoryCls)
                                    .map(this::mapInstance)
-                                   .orElse(factoryCls.newInstance());
+                                   .orElse(factoryCls.getDeclaredConstructor().newInstance());
             }
 
             MultivaluedMap<String, String> updatedHeaders = factory.update(getJaxrsHeaders(m), existingHeaders);

@@ -97,7 +97,7 @@ public class X509TokenValidator implements TokenValidator {
      */
     public boolean canHandleToken(ReceivedToken validateTarget, String realm) {
         Object token = validateTarget.getToken();
-        if ((token instanceof BinarySecurityTokenType)
+        if (token instanceof BinarySecurityTokenType
             && X509_V3_TYPE.equals(((BinarySecurityTokenType)token).getValueType())) {
             return true;
         } else if (token instanceof Element

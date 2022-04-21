@@ -437,7 +437,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
         AbstractToken sigToken = wrapper.getToken();
         configureSignature(sigToken, false);
 
-        if (abinding.isProtectTokens() && (sigToken instanceof X509Token)
+        if (abinding.isProtectTokens() && sigToken instanceof X509Token
             && sigToken.getIncludeTokenType() != IncludeTokenType.INCLUDE_TOKEN_NEVER) {
             SecurePart securePart =
                 new SecurePart(new QName(WSSConstants.NS_WSSE10, "BinarySecurityToken"), Modifier.Element);

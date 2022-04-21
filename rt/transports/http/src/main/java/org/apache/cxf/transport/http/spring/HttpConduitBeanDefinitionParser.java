@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.transport.http.spring;
 
+import java.lang.reflect.InvocationTargetException;
+
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Attr;
@@ -204,14 +206,16 @@ public class HttpConduitBeanDefinitionParser
             try {
                 Object obj =
                     ClassLoaderUtils.loadClass(
-                            classProperty, getClass()).newInstance();
+                            classProperty, getClass()).getDeclaredConstructor().newInstance();
                 if (!elementClass.isInstance(obj)) {
                     throw new IllegalArgumentException(
                         "Element '" + elementName + "' must be of type "
                         + elementClass.getName() + ".");
                 }
                 bean.addPropertyValue(elementName, obj);
-            } catch (IllegalAccessException | ClassNotFoundException | InstantiationException ex) {
+            } catch (IllegalAccessException | ClassNotFoundException | InstantiationException 
+                | IllegalArgumentException | InvocationTargetException | NoSuchMethodException 
+                | SecurityException ex) {
                 throw new IllegalArgumentException(
                     "Element '" + elementName + "' could not load "
                     + classProperty

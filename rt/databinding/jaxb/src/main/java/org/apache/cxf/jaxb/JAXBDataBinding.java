@@ -664,7 +664,8 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
 
         Object objectFactory = null;
         try {
-            objectFactory = wrapperType.getClassLoader().loadClass(objectFactoryClassName).newInstance();
+            objectFactory = wrapperType.getClassLoader().loadClass(objectFactoryClassName)
+                .getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             //ignore, probably won't need it
         }

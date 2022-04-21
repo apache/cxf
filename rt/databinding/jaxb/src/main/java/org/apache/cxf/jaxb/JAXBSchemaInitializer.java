@@ -541,7 +541,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             //we want to return the right type for collections so if we get null
             //from the return type we check if it's ParameterizedType and get the
             //generic return type.
-            if ((type == null) && (f.getGenericType() instanceof ParameterizedType)) {
+            if ((type == null) && f.getGenericType() instanceof ParameterizedType) {
                 type = f.getGenericType();
             }
             if (generateGenericType(type)) {
@@ -560,7 +560,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             // we want to return the right type for collections so if we get null
             // from the return type we check if it's ParameterizedType and get the
             // generic return type.
-            if ((type == null) && (m.getGenericReturnType() instanceof ParameterizedType)) {
+            if ((type == null) && m.getGenericReturnType() instanceof ParameterizedType) {
                 type = m.getGenericReturnType();
             }
 

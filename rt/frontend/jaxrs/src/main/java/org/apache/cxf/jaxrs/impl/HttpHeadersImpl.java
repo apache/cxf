@@ -260,7 +260,7 @@ public class HttpHeadersImpl implements HttpHeaders {
         if (!originalValue.contains(QUOTE)
             || HEADERS_WITH_POSSIBLE_QUOTES.contains(headerName)) {
             final String[] ls; 
-            if (COOKIE_SEPARATOR_CRLF_EXPRESSION != sep) {
+            if (!COOKIE_SEPARATOR_CRLF_EXPRESSION.equals(sep)) {
                 ls = originalValue.split(sep);
             } else {
                 ls = COOKIE_SEPARATOR_CRLF_PATTERN.split(originalValue);

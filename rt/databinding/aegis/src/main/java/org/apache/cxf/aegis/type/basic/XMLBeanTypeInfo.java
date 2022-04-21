@@ -19,6 +19,7 @@
 package org.apache.cxf.aegis.type.basic;
 
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -126,7 +127,7 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
                 try {
                     Class<?> typeClass =
                         ClassLoaderUtils.loadClass(explicitTypeName, XMLBeanTypeInfo.class);
-                    AegisType customTypeObject = (AegisType) typeClass.newInstance();
+                    AegisType customTypeObject = (AegisType) typeClass.getDeclaredConstructor().newInstance();
                     mapType(mappedName, customTypeObject);
                     QName schemaType = mappedType;
                     if (schemaType == null) {
@@ -134,7 +135,9 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
                     }
                     customTypeObject.setTypeClass(typeClass);
                     customTypeObject.setSchemaType(schemaType);
-                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e1) {
+                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException 
+                    | IllegalArgumentException | InvocationTargetException 
+                    | NoSuchMethodException | SecurityException e1) {
                     //
                 }
             }

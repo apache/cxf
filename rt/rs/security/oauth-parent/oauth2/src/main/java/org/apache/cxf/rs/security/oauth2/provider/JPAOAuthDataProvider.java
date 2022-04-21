@@ -293,7 +293,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
 
     private static <T> TypedQuery<T> getQuery(String table, Client c, UserSubject resourceOwnerSubject,
             EntityManager entityManager, Class<T> resultClass) {
-        StringBuilder query = new StringBuilder("SELECT t FROM ").append(table).append(" t");
+        StringBuilder query = new StringBuilder(64).append("SELECT t FROM ").append(table).append(" t");
         Map<String, Object> parameterMap = new HashMap<>();
         if (c != null || resourceOwnerSubject != null) {
             query.append(" WHERE");

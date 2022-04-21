@@ -200,6 +200,7 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
                 }
                 return exception;
             } catch (SOAPException e) {
+                e.printStackTrace();
                 return new WebServiceException(ex);
             }
         }

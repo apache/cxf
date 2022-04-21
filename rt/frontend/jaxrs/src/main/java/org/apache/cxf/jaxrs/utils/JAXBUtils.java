@@ -149,7 +149,7 @@ public final class JAXBUtils {
         if (typeAdapter != null) {
             try {
                 @SuppressWarnings("rawtypes")
-                XmlAdapter xmlAdapter = typeAdapter.value().newInstance();
+                XmlAdapter xmlAdapter = typeAdapter.value().getDeclaredConstructor().newInstance();
                 if (marshal) {
                     return xmlAdapter.marshal(obj);
                 }

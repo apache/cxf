@@ -95,7 +95,7 @@ public class CorbaObjectWriterTest {
         OutputStream oStream = orb.create_output_stream();
 
         CorbaObjectWriter writer = new CorbaObjectWriter(oStream);
-        Character charValue = new Character('c');
+        Character charValue = Character.valueOf('c');
         writer.writeChar(charValue);
 
         InputStream iStream = oStream.create_input_stream();
@@ -108,7 +108,7 @@ public class CorbaObjectWriterTest {
         OutputStream oStream = orb.create_output_stream();
 
         CorbaObjectWriter writer = new CorbaObjectWriter(oStream);
-        Character wcharValue = new Character('w');
+        Character wcharValue = Character.valueOf('w');
         writer.writeChar(wcharValue);
 
         InputStream iStream = oStream.create_input_stream();

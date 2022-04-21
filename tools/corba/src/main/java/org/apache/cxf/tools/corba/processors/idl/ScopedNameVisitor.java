@@ -523,11 +523,11 @@ public class ScopedNameVisitor extends VisitorBase {
                                                            Scope scopedName) {
         CorbaType result = null;
         for (CorbaType type : typeMap.getStructOrExceptionOrUnion()) {
-            if ((type instanceof Sequence)
-                || (type instanceof Array)
+            if (type instanceof Sequence
+                || type instanceof Array
                 || (type.getType() == null)
-                || (type instanceof Anonsequence)
-                || (type instanceof Anonarray)) {
+                || type instanceof Anonsequence
+                || type instanceof Anonarray) {
                 //REVISIT, cannot compare the type because they are incorrect
                 if (type.getQName().getLocalPart().equals(schemaTypeName.getLocalPart())) {
                     result = type;
@@ -600,7 +600,7 @@ public class ScopedNameVisitor extends VisitorBase {
                 if (holder != null) {
                     populateAliasSchemaType(corbaType, wsdlVisitor, holder);
                 }
-            } else if (((corbaType instanceof Sequence) || (corbaType instanceof Anonsequence))
+            } else if ((corbaType instanceof Sequence || corbaType instanceof Anonsequence)
                        && ((corbaType.getType().equals(Constants.XSD_BASE64)))) {
                 //special case of sequence of octets
                 result = true;
@@ -622,7 +622,7 @@ public class ScopedNameVisitor extends VisitorBase {
         Alias alias = (Alias) corbaType;
         //loop through alias base types, till you get a non-alias corba type
         CorbaType type = findCorbaType(typeMap, alias.getBasetype());
-        while ((type != null) && (type instanceof Alias)) {
+        while ((type != null) && type instanceof Alias) {
             alias = (Alias) type;
             type = findCorbaType(typeMap, alias.getBasetype());
         }

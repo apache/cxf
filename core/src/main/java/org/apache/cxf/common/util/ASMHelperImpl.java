@@ -257,7 +257,7 @@ public class ASMHelperImpl implements ASMHelper {
                     cwClass);
             @SuppressWarnings("unused")
             Label l = new Label() {
-                Object l = cls.newInstance();
+                Object l = cls.getDeclaredConstructor().newInstance();
                 public Object getValue() {
                     return l;
                 }

@@ -747,7 +747,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                                                                              true,
                                                                              Thread.currentThread()
                                                                                  .getContextClassLoader())
-                    .newInstance();
+                    .getDeclaredConstructor().newInstance();
                 validators.add(validator);
             } catch (Exception ex) {
                 LOG.log(Level.WARNING, "EXTENSION_ADD_FAILED_MSG", ex);

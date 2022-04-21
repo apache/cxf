@@ -246,7 +246,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             if (!theValue.isEmpty()) {
                 try {
                     Class<?> intClass = loadClass(theValue, "Interceptor");
-                    Object object = intClass.newInstance();
+                    Object object = intClass.getDeclaredConstructor().newInstance();
                     injectProperties(object, props);
                     list.add((Interceptor<? extends Message>)object);
                 } catch (ServletException ex) {
@@ -279,7 +279,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         if (!theValue.isEmpty()) {
             try {
                 Class<?> intClass = loadClass(theValue, "Invoker");
-                Object object = intClass.newInstance();
+                Object object = intClass.getDeclaredConstructor().newInstance();
                 injectProperties(object, props);
                 bean.setInvoker((Invoker)object);
             } catch (ServletException ex) {

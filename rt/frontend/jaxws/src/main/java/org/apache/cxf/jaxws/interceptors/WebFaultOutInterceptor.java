@@ -134,6 +134,7 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                 }
             }
         }
+
         if (cause instanceof Exception && fault != null) {
             Exception ex = (Exception)cause;
             Object faultInfo;
@@ -142,7 +143,6 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                 faultInfo = method.invoke(cause, new Object[0]);
             } catch (NoSuchMethodException e) {
                 faultInfo = createFaultInfoBean(fault, cause);
-
             } catch (InvocationTargetException e) {
                 throw new Fault(new org.apache.cxf.common.i18n.Message("INVOCATION_TARGET_EXC", BUNDLE), e);
             } catch (IllegalAccessException | IllegalArgumentException e) {
@@ -207,7 +207,7 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                 Class<?> cls = ClassLoaderUtils.loadClass(fault.faultBean(),
                                                           cause.getClass());
                 if (cls != null) {
-                    Object ret = cls.newInstance();
+                    Object ret = cls.getDeclaredConstructor().newInstance();
                     //copy props
                     Method[] meth = cause.getClass().getMethods();
                     for (Method m : meth) {
@@ -230,7 +230,9 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                     }
                     return ret;
                 }
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e1) {
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException 
+                | IllegalArgumentException | InvocationTargetException | NoSuchMethodException 
+                | SecurityException e1) {
                 //ignore
             }
         }

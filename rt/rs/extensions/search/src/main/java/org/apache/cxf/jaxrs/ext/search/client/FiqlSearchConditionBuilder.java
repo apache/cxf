@@ -323,8 +323,8 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
         }
 
         public PartialCondition and() {
-            if (currentCompositeOp == FiqlParser.OR
-                || parent != null && parent.currentCompositeOp == FiqlParser.OR) {
+            if (FiqlParser.OR.equals(currentCompositeOp) 
+                || parent != null && FiqlParser.OR.equals(parent.currentCompositeOp)) {
                 if (parent != null) {
                     parent.result = "(" + parent.result;
                     result += ")";
@@ -342,8 +342,8 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
         }
 
         public PartialCondition or() {
-            if (currentCompositeOp == FiqlParser.AND
-                || parent != null && parent.currentCompositeOp == FiqlParser.AND) {
+            if (FiqlParser.AND.equals(currentCompositeOp) 
+                || parent != null && FiqlParser.AND.equals(parent.currentCompositeOp)) {
                 if (parent != null) {
                     parent.result = "(" + parent.result;
                     result += ")";

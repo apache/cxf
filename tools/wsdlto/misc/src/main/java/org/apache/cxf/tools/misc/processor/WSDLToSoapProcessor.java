@@ -124,7 +124,7 @@ public class WSDLToSoapProcessor extends AbstractWSDLToProcessor {
                 break;
             }
         }
-        return (portType == null) ? false : true;
+        return portType != null;
     }
 
     private boolean isBindingExisted() {
@@ -139,7 +139,7 @@ public class WSDLToSoapProcessor extends AbstractWSDLToProcessor {
                 binding = entry.getValue();
             }
         }
-        return (binding == null) ? false : true;
+        return binding != null;
     }
 
     private boolean nameSpaceCheck() {

@@ -251,7 +251,7 @@ public class CommandLineParserTest {
     private boolean isQuolifiedVersion() {
         try {
             Class<?> c = Class.forName("org.apache.xerces.impl.Version");
-            Object o = c.newInstance();
+            Object o = c.getDeclaredConstructor().newInstance();
             String v = (String) c.getMethod("getVersion").invoke(o);
             v = StringUtils.getFirstFound(v, "(\\d+.\\d+)").trim();
             if (v.charAt(0) >= '3') {

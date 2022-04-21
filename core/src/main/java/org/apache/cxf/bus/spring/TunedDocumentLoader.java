@@ -76,8 +76,8 @@ class TunedDocumentLoader extends DefaultDocumentLoader {
         try {
             Class<?> cls = ClassLoaderUtils.loadClass("com.ctc.wstx.sax.WstxSAXParserFactory",
                                                       TunedDocumentLoader.class);
-            saxParserFactory = (SAXParserFactory)cls.newInstance();
-            nsasaxParserFactory = (SAXParserFactory)cls.newInstance();
+            saxParserFactory = (SAXParserFactory)cls.getDeclaredConstructor().newInstance();
+            nsasaxParserFactory = (SAXParserFactory)cls.getDeclaredConstructor().newInstance();
         } catch (Throwable e) {
             //woodstox not found, use any other Stax parser
             saxParserFactory = SAXParserFactory.newInstance();

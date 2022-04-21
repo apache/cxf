@@ -26,7 +26,6 @@ import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -40,7 +39,6 @@ public class JCacheCodeDataProviderTest {
         provider = new JCacheCodeDataProvider();
     }
 
-    @Ignore
     @Test
     public void testAddGetDeleteCodeGrants() {
         Client c = addClient("111", "bob");
@@ -70,7 +68,6 @@ public class JCacheCodeDataProviderTest {
         assertEquals(0, grants.size());
     }
 
-    @Ignore
     @Test
     public void testAddGetDeleteCodeGrants2() {
         Client c = addClient("111", "bob");
@@ -99,6 +96,7 @@ public class JCacheCodeDataProviderTest {
         provider.setClient(c);
         return c;
     }
+
     @After
     public void tearDown() throws Exception {
         if (provider != null) {

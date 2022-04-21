@@ -86,7 +86,7 @@ public class ClientConfiguration implements InterceptorProvider, ConduitSelector
      * @return true if the response can be expected
      */
     public boolean isResponseExpectedForOneway() {
-        return getConduit() instanceof HTTPConduit ? true : false;
+        return getConduit() instanceof HTTPConduit;
     }
 
     /**

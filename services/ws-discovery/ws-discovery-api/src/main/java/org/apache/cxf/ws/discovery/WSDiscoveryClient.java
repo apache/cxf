@@ -275,6 +275,7 @@ public class WSDiscoveryClient implements Closeable {
         }
         service = null;
     }
+    @SuppressWarnings("deprecation")
     protected void finalize() throws Throwable {
         close();
         super.finalize();

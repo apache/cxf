@@ -100,7 +100,7 @@ For JAX-RS support:
 
 For JMS transport
 - geronimo-jms.jar (Or the Sun equivalent)
-- geronimo-jta.jar (Or the Sun equivalent)
+- jakarta.transaction-api
 - cxf-rt-transports-jms.jar
 
 For the UDP transport

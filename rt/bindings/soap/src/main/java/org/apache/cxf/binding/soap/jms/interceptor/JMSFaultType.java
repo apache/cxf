@@ -84,7 +84,7 @@ public class JMSFaultType {
     }
 
     public boolean isSetAny() {
-        return (this.any != null) && (!this.any.isEmpty());
+        return (this.any != null) && !this.any.isEmpty();
     }
 
     public void unsetAny() {

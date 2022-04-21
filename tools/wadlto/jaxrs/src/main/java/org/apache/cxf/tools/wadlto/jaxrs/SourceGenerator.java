@@ -455,7 +455,7 @@ public class SourceGenerator {
             resourceId += DEFAULT_RESOURCE_NAME;
         }
 
-        boolean expandedQName = resourceId.startsWith("{") ? true : false;
+        boolean expandedQName = resourceId.startsWith("{");
         QName qname = convertToQName(resourceId, expandedQName);
         String namespaceURI = possiblyConvertNamespaceURI(qname.getNamespaceURI(), expandedQName);
 
@@ -939,7 +939,7 @@ public class SourceGenerator {
             return false;
         }
         return methodNames.contains(methodNameLowerCase)
-            || methodNameLowerCase != id && methodNames.contains(id.toLowerCase())
+            || !methodNameLowerCase.equals(id) && methodNames.contains(id.toLowerCase())
             || methodNames.size() == 1 && "*".equals(methodNames.iterator().next());
     }
 

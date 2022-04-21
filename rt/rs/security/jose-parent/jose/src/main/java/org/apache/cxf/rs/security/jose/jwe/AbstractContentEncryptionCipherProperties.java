@@ -30,7 +30,6 @@ public abstract class AbstractContentEncryptionCipherProperties implements Conte
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractContentEncryptionCipherProperties.class);
 
     private static final int DEFAULT_AUTH_TAG_LENGTH = 128;
-    private final int authTagLen = DEFAULT_AUTH_TAG_LENGTH;
     private final ContentAlgorithm algo;
 
     public AbstractContentEncryptionCipherProperties(ContentAlgorithm algo) {
@@ -43,7 +42,7 @@ public abstract class AbstractContentEncryptionCipherProperties implements Conte
         return JweUtils.getAdditionalAuthenticationData(headersJson, aad);
     }
     protected int getAuthTagLen() {
-        return authTagLen;
+        return DEFAULT_AUTH_TAG_LENGTH;
     }
     @Override
     public ContentAlgorithm getAlgorithm() {

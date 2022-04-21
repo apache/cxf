@@ -26,11 +26,17 @@
         <cxf.spi-dir>spi-2.1</cxf.spi-dir>
         <cxf.osgi.import>
             jakarta.jms;version="[3,4)",
+            javax.transaction;version="[2,3)",
             jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}"
         </cxf.osgi.import>
         <cxf.module.name>org.apache.cxf.transport.jms</cxf.module.name>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>jakarta.xml.ws</groupId>
+            <artifactId>jakarta.xml.ws-api</artifactId>
+            <optional>true</optional>
+        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-core</artifactId>
@@ -108,7 +114,7 @@
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
+                    <artifactId>geronimo-jta_1.1_spec</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

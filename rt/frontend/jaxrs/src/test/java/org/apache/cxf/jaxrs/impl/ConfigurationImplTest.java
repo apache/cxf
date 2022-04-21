@@ -84,7 +84,7 @@ public class ConfigurationImplTest {
         assertTrue(c.register(provider,
                               Collections.<Class<?>, Integer>singletonMap(ContainerResponseFilter.class, 1000)));
         assertTrue(c.isRegistered(provider));
-        assertFalse(c.isRegistered(providerClass.newInstance()));
+        assertFalse(c.isRegistered(providerClass.getDeclaredConstructor().newInstance()));
         assertTrue(c.isRegistered(providerClass));
         assertFalse(c.isRegistered(ContainerResponseFilter.class));
         assertFalse(c.register(provider,

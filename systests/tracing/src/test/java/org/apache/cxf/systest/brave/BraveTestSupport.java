@@ -19,11 +19,14 @@
 
 package org.apache.cxf.systest.brave;
 
-public abstract class BraveTestSupport {
+public final class BraveTestSupport {
     public static final String TRACE_ID_NAME = "X-B3-TraceId";
     public static final String SPAN_ID_NAME = "X-B3-SpanId";
     public static final String PARENT_SPAN_ID_NAME = "X-B3-ParentSpanId";
     public static final String SAMPLED_NAME = "X-B3-Sampled";
+    
+    private BraveTestSupport() {
+    }
     
     public static class SpanId {
         private long traceId;

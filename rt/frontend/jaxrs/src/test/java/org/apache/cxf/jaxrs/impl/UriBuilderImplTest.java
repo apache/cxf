@@ -32,6 +32,8 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.UriBuilderException;
+
 import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.BookStore;
 import org.apache.cxf.jaxrs.resources.UriBuilderWrongAnnotations;
@@ -42,6 +44,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
 
 public class UriBuilderImplTest {
@@ -1973,5 +1976,11 @@ public class UriBuilderImplTest {
             .path("{")
             .build();
         assertEquals("/%7B", uri.toString());
+    }
+    
+    @Test
+    public void invalidUrlsNoHost() {
+        assertThrows(UriBuilderException.class, () -> UriBuilder.fromUri("http://@").build());
+        assertThrows(UriBuilderException.class, () -> UriBuilder.fromUri("http://:@").build());
     }
 }

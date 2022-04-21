@@ -50,7 +50,7 @@ public class ContentDisposition {
         String tempValue = value;
 
         int index = tempValue.indexOf(';');
-        if (index > 0 && (tempValue.indexOf('=') >= index)) {
+        if (index > 0 && tempValue.indexOf('=') >= index) {
             type = tempValue.substring(0, index).trim();
             tempValue = tempValue.substring(index + 1);
         }

@@ -404,7 +404,7 @@ public class OperationProcessor  extends AbstractProcessor {
                 counter++;
             }
         }
-        return counter > 1 ? true : false;
+        return counter > 1;
     }
 
 }

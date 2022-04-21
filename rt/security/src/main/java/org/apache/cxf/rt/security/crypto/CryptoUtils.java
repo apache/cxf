@@ -77,7 +77,8 @@ public final class CryptoUtils {
     public static void installBouncyCastleProvider() throws Exception {
         final String bcClassName = "org.bouncycastle.jce.provider.BouncyCastleProvider";
         if (Security.getProvider(bcClassName) == null) {
-            Security.addProvider((Provider)ClassLoaderUtils.loadClass(bcClassName, CryptoUtils.class).newInstance());
+            Security.addProvider((Provider)ClassLoaderUtils.loadClass(bcClassName, CryptoUtils.class)
+                                 .getDeclaredConstructor().newInstance());
         }
     }
     public static void removeBouncyCastleProvider() {

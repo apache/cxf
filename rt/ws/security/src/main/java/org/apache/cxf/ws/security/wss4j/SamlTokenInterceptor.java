@@ -243,7 +243,7 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
         } else if (o instanceof String) {
             try {
                 handler = (CallbackHandler)ClassLoaderUtils
-                    .loadClass((String)o, this.getClass()).newInstance();
+                    .loadClass((String)o, this.getClass()).getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                 handler = null;
             }

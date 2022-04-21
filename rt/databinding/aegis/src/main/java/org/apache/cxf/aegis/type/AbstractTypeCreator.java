@@ -20,6 +20,7 @@ package org.apache.cxf.aegis.type;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -179,7 +180,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
 
     protected AegisType createUserType(TypeClassInfo info) {
         try {
-            AegisType type = info.getAegisTypeClass().newInstance();
+            AegisType type = info.getAegisTypeClass().getDeclaredConstructor().newInstance();
 
             QName name = info.getTypeName();
             if (name == null) {
@@ -203,10 +204,11 @@ public abstract class AbstractTypeCreator implements TypeCreator {
             type.setTypeMapping(getTypeMapping());
 
             return type;
-        } catch (InstantiationException e) {
+        } catch (InstantiationException | IllegalArgumentException | InvocationTargetException 
+                | NoSuchMethodException e) {
             throw new DatabindingException("Couldn't instantiate type classs "
                                            + info.getAegisTypeClass().getName(), e);
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException | SecurityException e) {
             throw new DatabindingException("Couldn't access type classs "
                                            + info.getAegisTypeClass().getName(), e);
         }

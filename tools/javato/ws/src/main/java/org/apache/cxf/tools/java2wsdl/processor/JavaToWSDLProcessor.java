@@ -21,6 +21,7 @@ package org.apache.cxf.tools.java2wsdl.processor;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -169,9 +170,7 @@ public class JavaToWSDLProcessor implements Processor {
                 beanDefinitions.addAll((List<String>)beanFilesParameter);
             } else {
                 String[] list = (String[]) beanFilesParameter;
-                for (String b : list) {
-                    beanDefinitions.add(b);
-                }
+                beanDefinitions.addAll(Arrays.asList(list));
             }
         }
 

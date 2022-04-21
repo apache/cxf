@@ -108,7 +108,7 @@ public abstract class AbstractBPBeanDefinitionParser {
         }
 
         String id;
-        if (first.getNamespaceURI().equals(XMLNS_BLUEPRINT)) {
+        if (XMLNS_BLUEPRINT.equals(first.getNamespaceURI())) {
             String name = first.getLocalName();
             if ("ref".equals(name)) {
                 id = first.getAttribute(COMPONENT_ID);

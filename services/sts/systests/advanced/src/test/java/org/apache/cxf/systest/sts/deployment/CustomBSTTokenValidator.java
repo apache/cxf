@@ -40,7 +40,7 @@ public class CustomBSTTokenValidator implements TokenValidator {
 
     public boolean canHandleToken(ReceivedToken validateTarget) {
         Object token = validateTarget.getToken();
-        return (token instanceof BinarySecurityTokenType)
+        return token instanceof BinarySecurityTokenType
             && TOKEN_TYPE.equals(((BinarySecurityTokenType)token).getValueType());
     }
 

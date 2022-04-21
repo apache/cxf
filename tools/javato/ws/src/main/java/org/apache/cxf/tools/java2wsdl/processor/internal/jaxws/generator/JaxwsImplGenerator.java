@@ -39,7 +39,7 @@ public class JaxwsImplGenerator extends AbstractJaxwsGenerator {
     public boolean passthrough() {
         Boolean genFromSei = (Boolean)env.get(ToolConstants.GEN_FROM_SEI);
         return !(genFromSei && env.optionSet(ToolConstants.CFG_SERVER)
-            && (!env.optionSet(ToolConstants.IMPL_CLASS)));
+            && !env.optionSet(ToolConstants.IMPL_CLASS));
     }
 
     public void generate(ToolContext penv) throws ToolException {

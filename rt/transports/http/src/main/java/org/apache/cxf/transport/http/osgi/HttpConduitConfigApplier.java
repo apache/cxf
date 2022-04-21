@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.transport.http.osgi;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.List;
@@ -370,8 +371,10 @@ class HttpConduitConfigApplier {
                 String v = d.get(k);
                 Object obj;
                 try {
-                    obj = Class.forName(v).newInstance();
-                } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+                    obj = Class.forName(v).getDeclaredConstructor().newInstance();
+                } catch (InstantiationException | IllegalAccessException | ClassNotFoundException 
+                    | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+                    | SecurityException e) {
                     throw new RuntimeException(e);
                 }
                 if (obj instanceof HttpAuthSupplier) {

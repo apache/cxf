@@ -76,6 +76,7 @@
         <bundle start-level="30" dependency="true">mvn:org.apache.ws.xmlschema/xmlschema-core/${cxf.xmlschema.version}</bundle>
         <bundle start-level="25" dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlresolver/${cxf.xmlresolver.bundle.version}</bundle>
         <bundle start-level="30" dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.fastinfoset/${cxf.fastinfoset.bundle.version}</bundle>
+        <bundle start-level="30" dependency="true">mvn:${cxf.asm.groupId}/${cxf.asm.artifactId}/${cxf.asm.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-core/${project.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-management/${project.version}</bundle>
         <conditional>
@@ -205,7 +206,7 @@
     </feature>
     <feature name="cxf-http-undertow" version="${project.version}">
         <feature version="${project.version}">cxf-http</feature>
-        <feature>pax-http-undertow</feature>
+        <feature>pax-web-http-undertow</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-transports-http-undertow/${project.version}</bundle>
         <capability>
             cxf.http.provider;name=undertow
@@ -520,6 +521,7 @@
         <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.aopalliance/1.0_6</bundle>
         <bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/${cxf.geronimo.jms.version}</bundle>
         <bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-j2ee-management_1.1_spec/${cxf.geronimo.j2ee.management.version}</bundle>
+        <bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/${cxf.geronimo.jta.version}</bundle>
         <bundle dependency="true">mvn:org.apache.activemq/activemq-osgi/${cxf.activemq.version}</bundle>
         <bundle>mvn:org.apache.cxf.services.wsn/cxf-services-wsn-core/${project.version}</bundle>
     </feature>
@@ -558,8 +560,8 @@
 
     <feature name="cxf-bean-validation" version="${project.version}">
         <feature version="${project.version}">cxf-bean-validation-core</feature>
-        <bundle start-level="30" dependency="true">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.javax-el-api-3.0.0/${cxf.servicemix.javax.el.version}</bundle> 
-        <bundle start-level="30" dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.javax-el-impl/${cxf.servicemix.javax.el.version}</bundle>
+        <bundle start-level="30">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.javax-el-api-3.0.0/${cxf.servicemix.javax.el.version}</bundle> 
+        <bundle start-level="30">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.javax-el-impl/${cxf.servicemix.javax.el.version}</bundle>
     </feature>
 
     <feature name="cxf-jaxrs-cdi" version="${project.version}">

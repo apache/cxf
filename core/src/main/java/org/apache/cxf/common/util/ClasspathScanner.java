@@ -179,7 +179,7 @@ public class ClasspathScanner {
         final Set<String> basePackages = new HashSet<>(values.length);
         for (final String value : values) {
             final String trimmed = value.trim();
-            if (trimmed.equals(WILDCARD)) {
+            if (WILDCARD.equals(trimmed)) {
                 basePackages.clear();
                 basePackages.add(trimmed);
                 break;

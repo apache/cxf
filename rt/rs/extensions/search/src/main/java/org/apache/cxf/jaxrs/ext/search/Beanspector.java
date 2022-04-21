@@ -138,7 +138,7 @@ public class Beanspector<T> {
     }
 
     public Beanspector<T> instantiate() throws Exception {
-        tobj = tclass.newInstance();
+        tobj = tclass.getDeclaredConstructor().newInstance();
         return this;
     }
 

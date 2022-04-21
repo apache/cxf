@@ -763,7 +763,7 @@ public final class JAXBEncoderDecoder {
         }
         Collection<Object> c;
         try {
-            c = CastUtils.cast((Collection<?>)tp2.newInstance());
+            c = CastUtils.cast((Collection<?>)tp2.getDeclaredConstructor().newInstance());
         } catch (Exception e) {
             c = new HashSet<>();
         }
@@ -800,7 +800,7 @@ public final class JAXBEncoderDecoder {
                 Class<?> cls = (Class<?>)tp2;
                 if (!cls.isInterface() && List.class.isAssignableFrom(cls)) {
                     try {
-                        return CastUtils.cast((List<?>)cls.newInstance());
+                        return CastUtils.cast((List<?>)cls.getDeclaredConstructor().newInstance());
                     } catch (Exception e) {
                         // ignore, just return an ArrayList
                     }

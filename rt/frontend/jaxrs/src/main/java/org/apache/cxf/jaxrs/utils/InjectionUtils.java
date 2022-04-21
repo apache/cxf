@@ -654,7 +654,7 @@ public final class InjectionUtils {
                                                                                          paramType,
                                                                                          paramAnns);
             }
-            bean = paramType.newInstance();
+            bean = paramType.getDeclaredConstructor().newInstance();
         } catch (IllegalAccessException ex) {
             reportServerError("CLASS_ACCESS_FAILURE", paramType.getName());
         } catch (Exception ex) {
@@ -977,7 +977,7 @@ public final class InjectionUtils {
         Object theValues = null;
         if (type != null) {
             try {
-                theValues = type.newInstance();
+                theValues = type.getDeclaredConstructor().newInstance();
             } catch (IllegalAccessException ex) {
                 reportServerError("CLASS_ACCESS_FAILURE", type.getName());
             } catch (Exception ex) {
@@ -1070,7 +1070,7 @@ public final class InjectionUtils {
         } else {
             String result = null;
             if (!paramValues.isEmpty()) {
-                boolean isLast = pathParam == ParameterType.PATH ? true : false;
+                boolean isLast = pathParam == ParameterType.PATH;
                 result = isLast ? paramValues.get(paramValues.size() - 1)
                                 : paramValues.get(0);
             }
@@ -1164,7 +1164,7 @@ public final class InjectionUtils {
         if (proxyClassName != null) {
             try {
                 return (ThreadLocalProxy<?>)ClassLoaderUtils.loadClass(proxyClassName, InjectionUtils.class)
-                    .newInstance();
+                    .getDeclaredConstructor().newInstance();
             } catch (Throwable t) {
                 throw new RuntimeException(t);
             }

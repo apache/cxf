@@ -168,7 +168,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
                 LdapName ln = new LdapName(principal.getName());
 
                 for (Rdn rdn : ln.getRdns()) {
-                    if ("CN".equalsIgnoreCase(rdn.getType()) && (rdn.getValue() instanceof String)) {
+                    if ("CN".equalsIgnoreCase(rdn.getType()) && rdn.getValue() instanceof String) {
                         subjectName = (String)rdn.getValue();
                         break;
                     }

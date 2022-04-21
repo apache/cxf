@@ -127,7 +127,7 @@ public class HandlerChainBuilder {
                                                                       .getValue()), true, classLoader)
                 .asSubclass(Handler.class);
 
-            Handler<?> handler = handlerClass.newInstance();
+            Handler<?> handler = handlerClass.getDeclaredConstructor().newInstance();
             if (fineLog) {
                 LOG.fine("adding handler to chain: " + handler);
             }

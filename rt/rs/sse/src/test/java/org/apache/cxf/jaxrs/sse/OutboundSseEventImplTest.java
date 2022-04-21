@@ -224,7 +224,7 @@ public class OutboundSseEventImplTest {
         public boolean equals(Object o) {
             if (o instanceof TestDataImpl && ((TestDataImpl)o).data.size() == data.size()) {
                 for (int i = 0; i < data.size(); i++) {
-                    if (((TestDataImpl)o).data.get(i) != data.get(i)) {
+                    if (!((TestDataImpl)o).data.get(i).equals(data.get(i))) {
                         return false;
                     }
                 }

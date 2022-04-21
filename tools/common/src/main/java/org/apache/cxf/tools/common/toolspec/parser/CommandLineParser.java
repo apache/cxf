@@ -310,7 +310,7 @@ public class CommandLineParser {
                                                                      "annotation");
 
 
-        if ((annotations != null) && (!annotations.isEmpty())) {
+        if ((annotations != null) && !annotations.isEmpty()) {
             result = annotations.get(0).getFirstChild().getNodeValue();
         }
         return result;

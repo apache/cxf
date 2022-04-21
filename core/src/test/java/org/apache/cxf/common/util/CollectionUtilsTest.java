@@ -53,8 +53,10 @@ public class CollectionUtilsTest {
 
     @Test
     public void testIsEmpty() throws Exception {
-        assertTrue(CollectionUtils.isEmpty((Collection) null));
-        assertTrue(CollectionUtils.isEmpty((Map) null));
+        Collection<String> c = null;
+        Map<String, String> m = null;
+        assertTrue(CollectionUtils.isEmpty(c));
+        assertTrue(CollectionUtils.isEmpty(m));
 
         Collection<String> l = Arrays.asList(null, null);
         assertTrue(CollectionUtils.isEmpty(l));

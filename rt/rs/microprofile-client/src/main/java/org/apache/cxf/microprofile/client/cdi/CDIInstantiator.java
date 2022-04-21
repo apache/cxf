@@ -45,7 +45,7 @@ public final class CDIInstantiator implements Instantiator {
                                 }
                                 return instance;
                             })
-                            .orElse(cls.newInstance());
+                            .orElse(cls.getDeclaredConstructor().newInstance());
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }

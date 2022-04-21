@@ -299,7 +299,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                 if (method.getParameterTypes().length == 1
                     && method.getParameterTypes()[0].equals(typeClass)) {
 
-                    mObj = method.invoke(objectFactory.newInstance(), new Object[] {obj});
+                    mObj = method.invoke(objectFactory.getDeclaredConstructor().newInstance(), new Object[] {obj});
                 }
             }
 

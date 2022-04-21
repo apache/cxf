@@ -99,7 +99,7 @@ public class JavascriptUtils {
     private String xmlStringAccumulatorVariable;
 
     public JavascriptUtils(StringBuilder code) {
-        this.code = code;
+        this.code = code == null ? new StringBuilder(128) : code;
 
         prefixStack.push("    ");
     }

@@ -211,7 +211,7 @@ public class OperationResourceInfo {
     }
 
     public boolean isSubResourceLocator() {
-        return httpMethod == null ? true : false;
+        return httpMethod == null;
     }
 
 

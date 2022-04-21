@@ -83,7 +83,7 @@ public class CollectionType extends ArrayType {
             values = new ArrayList<>();
         } else {
             try {
-                values = (Collection<Object>)userTypeClass.newInstance();
+                values = (Collection<Object>)userTypeClass.getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                 throw new DatabindingException("Could not create map implementation: "
                                                + userTypeClass.getName(), e);

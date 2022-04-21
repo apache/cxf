@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxb;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -162,8 +163,11 @@ public abstract class JAXBDataBase {
 
     protected ValidationEventHandler getValidationEventHandler(String cn) {
         try {
-            return (ValidationEventHandler)ClassLoaderUtils.loadClass(cn, getClass()).newInstance();
-        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+            return (ValidationEventHandler)ClassLoaderUtils.loadClass(cn, getClass())
+                .getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException 
+            | IllegalArgumentException | InvocationTargetException | NoSuchMethodException 
+            | SecurityException e) {
             LOG.log(Level.INFO, "Could not create validation event handler", e);
         }
         return null;

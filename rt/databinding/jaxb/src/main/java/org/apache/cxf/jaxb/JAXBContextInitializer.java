@@ -553,7 +553,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
 
         Class<?> factoryClass = creator.createFactory(cls);
         try {
-            return factoryClass.newInstance();
+            return factoryClass.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
            //ignore
         }

@@ -127,7 +127,7 @@ public class JwsMultipartSignatureInFilter implements MultipartInputFilter {
             } catch (IOException ex) {
                 throw ExceptionUtils.toBadRequestException(ex, null);
             }
-            boolean verifyOnLastRead = i == attSize - 1 ? true : false;
+            boolean verifyOnLastRead = i == attSize - 1;
             JwsInputStream jwsStream = new JwsInputStream(dataPartStream, sig, signatureBytes, verifyOnLastRead);
             
             final InputStream newStream;

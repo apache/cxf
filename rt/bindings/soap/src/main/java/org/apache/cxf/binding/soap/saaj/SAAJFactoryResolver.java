@@ -19,10 +19,13 @@
 
 package org.apache.cxf.binding.soap.saaj;
 
+import java.lang.reflect.InvocationTargetException;
+
 import jakarta.xml.soap.MessageFactory;
 import jakarta.xml.soap.SOAPConstants;
 import jakarta.xml.soap.SOAPException;
 import jakarta.xml.soap.SOAPFactory;
+
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapVersion;
@@ -94,16 +97,10 @@ public final class SAAJFactoryResolver {
         throws SOAPException {
         try {
             Class<?> klass = Class.forName(factoryName);
-            return cls.cast(klass.newInstance());
-        } catch (ClassNotFoundException cnfe) {
-            throw new SOAPException("Provider " + factoryName + " could not be instantiated: "
-                                    + cnfe, cnfe);
-        } catch (InstantiationException ie) {
-            throw new SOAPException("Provider " + factoryName + " could not be instantiated: "
-                                    + ie, ie);
-        } catch (IllegalAccessException iae) {
-            throw new SOAPException("Provider " + factoryName + " could not be instantiated: "
-                                    + iae, iae);
+            return cls.cast(klass.getDeclaredConstructor().newInstance());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
+                 | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
+            throw new SOAPException("Provider " + factoryName + " could not be instantiated: " + ex, ex);
         }
     }
 

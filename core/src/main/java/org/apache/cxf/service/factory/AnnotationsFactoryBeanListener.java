@@ -393,6 +393,7 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
                 break;
             default:
                 later.add(doc);
+                break;
             }
         }
         if (!later.isEmpty()) {
@@ -427,6 +428,7 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
                 break;
             default:
                 later.add(doc);
+                break;
             }
         }
         if (!later.isEmpty()) {
