@@ -55,8 +55,24 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
+import jakarta.resource.ResourceException;
+import jakarta.resource.spi.ResourceAdapterInternalException;
+import jakarta.resource.spi.UnavailableException;
+import jakarta.resource.spi.XATerminator;
+import jakarta.resource.spi.work.ExecutionContext;
+import jakarta.resource.spi.work.Work;
+import jakarta.resource.spi.work.WorkContext;
+import jakarta.resource.spi.work.WorkException;
+import jakarta.resource.spi.work.WorkListener;
+import jakarta.resource.spi.work.WorkManager;
+import jakarta.transaction.TransactionSynchronizationRegistry;
+import java.util.Timer;
+import org.apache.activemq.artemis.ra.ActiveMQResourceAdapter;
+
 public class MessageListenerTest {
-    @Rule public EmbeddedActiveMQResource server = new EmbeddedActiveMQResource(getConfiguration());
+
+    @Rule
+    public EmbeddedActiveMQResource server = new EmbeddedActiveMQResource(getConfiguration());
 
     enum TestMessage {
         OK, FAILFIRST, FAIL;
@@ -70,8 +86,9 @@ public class MessageListenerTest {
         MessageListener listenerHandler = new TestMessageListener();
         TestExceptionListener exListener = new TestExceptionListener();
 
-        PollingMessageListenerContainer container = //
-            new PollingMessageListenerContainer(connection, dest, listenerHandler, exListener);
+        PollingMessageListenerContainer container
+                = //
+                new PollingMessageListenerContainer(connection, dest, listenerHandler, exListener);
         connection.close(); // Simulate connection problem
         container.start();
         Awaitility.await().until(() -> exListener.exception != null);
@@ -79,9 +96,9 @@ public class MessageListenerTest {
         assertNotNull(ex);
         assertEquals("Connection is closed", ex.getMessage());
     }
-    
+
     @Test
-    public void testConnectionProblemXA() throws JMSException, XAException, InterruptedException {
+    public void testConnectionProblemXA() throws JMSException, XAException, InterruptedException, ResourceAdapterInternalException, ResourceException {
         TransactionManager transactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
         Connection connection = createXAConnection("brokerJTA", transactionManager);
         Queue dest = JMSUtil.createQueue(connection, "test");
@@ -89,8 +106,9 @@ public class MessageListenerTest {
         MessageListener listenerHandler = new TestMessageListener();
         TestExceptionListener exListener = new TestExceptionListener();
 
-        PollingMessageListenerContainer container = //
-            new PollingMessageListenerContainer(connection, dest, listenerHandler, exListener);
+        PollingMessageListenerContainer container
+                = //
+                new PollingMessageListenerContainer(connection, dest, listenerHandler, exListener);
         container.setTransacted(false);
         container.setAcknowledgeMode(Session.SESSION_TRANSACTED);
         container.setTransactionManager(transactionManager);
@@ -100,13 +118,12 @@ public class MessageListenerTest {
         Awaitility.await().until(() -> exListener.exception != null);
         JMSException ex = exListener.exception;
         assertNotNull(ex);
-        // Closing the pooled connection will result in a NPE when using it
-        assertThat(ex.getMessage(), containsString("Wrapped exception.")); 
-        assertThat(ex.getMessage(), containsString("null"));
+        // Closing the pooled connection will result in a Connection is closed exception when using it
+        assertThat(ex.getMessage(), containsString("Connection is closed"));
     }
 
     @Test
-    public void testWithJTA() throws JMSException, XAException, InterruptedException {
+    public void testWithJTA() throws JMSException, XAException, InterruptedException, ResourceAdapterInternalException, ResourceException {
         TransactionManager transactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
         Connection connection = createXAConnection("brokerJTA", transactionManager);
         Queue dest = JMSUtil.createQueue(connection, "test");
@@ -114,7 +131,7 @@ public class MessageListenerTest {
         MessageListener listenerHandler = new TestMessageListener();
         ExceptionListener exListener = new TestExceptionListener();
         PollingMessageListenerContainer container = new PollingMessageListenerContainer(connection, dest,
-                                                                                        listenerHandler, exListener);
+                listenerHandler, exListener);
         container.setTransacted(false);
         container.setAcknowledgeMode(Session.SESSION_TRANSACTED);
         container.setTransactionManager(transactionManager);
@@ -133,7 +150,7 @@ public class MessageListenerTest {
 
         MessageListener listenerHandler = new TestMessageListener();
         AbstractMessageListenerContainer container = new MessageListenerContainer(connection, dest,
-                                                                                        listenerHandler);
+                listenerHandler);
         container.setTransacted(false);
         container.setAcknowledgeMode(Session.AUTO_ACKNOWLEDGE);
         container.start();
@@ -145,7 +162,7 @@ public class MessageListenerTest {
 
         sendMessage(connection, dest, TestMessage.FAIL);
         assertNumMessagesInQueue("Even when an exception occurs the message should be committed", connection,
-                                 dest, 0, 3500L);
+                dest, 0, 3500L);
 
         container.stop();
         connection.close();
@@ -167,7 +184,7 @@ public class MessageListenerTest {
     }
 
     private void testTransactionalBehaviour(Connection connection, Queue dest) throws JMSException,
-        InterruptedException {
+            InterruptedException {
         Queue dlq = JMSUtil.createQueue(connection, "ActiveMQ.DLQ");
         assertNumMessagesInQueue("At the start the queue should be empty", connection, dest, 0, 0L);
         assertNumMessagesInQueue("At the start the DLQ should be empty", connection, dlq, 0, 0L);
@@ -189,22 +206,25 @@ public class MessageListenerTest {
         return connection;
     }
 
-    private static Connection createXAConnection(String name, TransactionManager tm) throws JMSException {
-        ActiveMQXAConnectionFactory cf = new ActiveMQXAConnectionFactory("vm://" + name);
+    private static Connection createXAConnection(String name, TransactionManager tm) throws JMSException, ResourceAdapterInternalException, ResourceException{
+        ActiveMQResourceAdapter ra = new ActiveMQResourceAdapter();
+        ra.setConnectorClassName("org.apache.activemq.artemis.core.remoting.impl.invm.InVMConnectorFactory");
+        ra.start(new BootstrapContext());
+        ActiveMQConnectionFactory cf = ra.getDefaultActiveMQConnectionFactory();
         ConnectionFactory cf1 = new ConnectionFactoryProxy(cf, new TransactionHelperImpl(tm));
         Connection connection = cf1.createConnection();
         connection.start();
-        
+
         return connection;
     }
 
     private static void assertNumMessagesInQueue(String message, Connection connection, Queue queue,
-                                          int expectedNum, long timeout) throws JMSException, InterruptedException {
+            int expectedNum, long timeout) throws JMSException, InterruptedException {
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         QueueBrowser browser = session.createBrowser(queue);
         int actualNum = 0;
         for (long startTime = System.currentTimeMillis(); System.currentTimeMillis() - startTime < timeout;
-            Thread.sleep(100L)) {
+                Thread.sleep(100L)) {
             actualNum = 0;
             for (Enumeration<?> messages = browser.getEnumeration(); messages.hasMoreElements(); actualNum++) {
                 messages.nextElement();
@@ -231,24 +251,25 @@ public class MessageListenerTest {
     }
 
     private static final class TestMessageListener implements MessageListener {
+
         @Override
         public void onMessage(Message message) {
-            TextMessage textMessage = (TextMessage)message;
+            TextMessage textMessage = (TextMessage) message;
             try {
                 switch (TestMessage.valueOf(textMessage.getText())) {
-                case OK:
-                    //System.out.println("Simulating Processing successful");
-                    break;
-                case FAILFIRST:
-                    if (message.getJMSRedelivered()) {
-                        //System.out.println("Simulating processing worked on second try");
+                    case OK:
+                        //System.out.println("Simulating Processing successful");
                         break;
-                    }
-                    throw new RuntimeException("Simulating something went wrong. Expecting rollback");
-                case FAIL:
-                    throw new RuntimeException("Simulating something went wrong. Expecting rollback");
-                default:
-                    throw new IllegalArgumentException("Invalid message type");
+                    case FAILFIRST:
+                        if (message.getJMSRedelivered()) {
+                            //System.out.println("Simulating processing worked on second try");
+                            break;
+                        }
+                        throw new RuntimeException("Simulating something went wrong. Expecting rollback");
+                    case FAIL:
+                        throw new RuntimeException("Simulating something went wrong. Expecting rollback");
+                    default:
+                        throw new IllegalArgumentException("Invalid message type");
                 }
             } catch (JMSException e) {
                 // Ignore
@@ -257,27 +278,93 @@ public class MessageListenerTest {
     }
 
     private static final class TestExceptionListener implements ExceptionListener {
+
         JMSException exception;
+
         @Override
         public void onException(JMSException ex) {
             exception = ex;
         }
     };
-    
+
     private static Configuration getConfiguration() {
         try {
             return new ConfigurationImpl()
-                .setSecurityEnabled(false)
-                .setPersistenceEnabled(false)
-                .setAddressQueueScanPeriod(1)
-                .addAcceptorConfiguration("#", "vm://0")
-                .addAddressesSetting("#",
-                    new AddressSettings()
-                        .setMaxDeliveryAttempts(1)
-                        .setRedeliveryDelay(500L)
-                        .setDeadLetterAddress(SimpleString.toSimpleString("ActiveMQ.DLQ")));
+                    .setSecurityEnabled(false)
+                    .setPersistenceEnabled(false)
+                    .setAddressQueueScanPeriod(1)
+                    .addAcceptorConfiguration("#", "vm://0")
+                    .addAddressesSetting("#",
+                            new AddressSettings()
+                                    .setMaxDeliveryAttempts(1)
+                                    .setRedeliveryDelay(500L)
+                                    .setDeadLetterAddress(SimpleString.toSimpleString("ActiveMQ.DLQ")));
         } catch (final Exception ex) {
             throw new RuntimeException(ex);
+        }
+    }
+
+    public static class BootstrapContext implements jakarta.resource.spi.BootstrapContext {
+
+        @Override
+        public Timer createTimer() throws UnavailableException {
+            return null;
+        }
+
+        @Override
+        public boolean isContextSupported(Class<? extends WorkContext> aClass) {
+            return false;
+        }
+
+        @Override
+        public TransactionSynchronizationRegistry getTransactionSynchronizationRegistry() {
+            return null;
+        }
+
+        @Override
+        public WorkManager getWorkManager() {
+            return new WorkManager() {
+                @Override
+                public void doWork(final Work work) throws WorkException {
+                }
+
+                @Override
+                public void doWork(final Work work,
+                        final long l,
+                        final ExecutionContext executionContext,
+                        final WorkListener workListener) throws WorkException {
+                }
+
+                @Override
+                public long startWork(final Work work) throws WorkException {
+                    return 0;
+                }
+
+                @Override
+                public long startWork(final Work work,
+                        final long l,
+                        final ExecutionContext executionContext,
+                        final WorkListener workListener) throws WorkException {
+                    return 0;
+                }
+
+                @Override
+                public void scheduleWork(final Work work) throws WorkException {
+                    work.run();
+                }
+
+                @Override
+                public void scheduleWork(final Work work,
+                        final long l,
+                        final ExecutionContext executionContext,
+                        final WorkListener workListener) throws WorkException {
+                }
+            };
+        }
+
+        @Override
+        public XATerminator getXATerminator() {
+            return null;
         }
     }
 }
