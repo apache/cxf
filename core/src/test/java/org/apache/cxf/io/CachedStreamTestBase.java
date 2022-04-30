@@ -69,16 +69,27 @@ public abstract class CachedStreamTestBase {
 
     @Test
     public void testDeleteTmpFile() throws IOException {
-        Object cache = createCache();
-        //ensure output data size larger then 64k which will generate tmp file
-        String result = initTestData(65);
-        File tempFile = getTmpFile(result, cache);
-        assertNotNull(tempFile);
-        //assert tmp file is generated
-        assertTrue(tempFile.exists());
-        close(cache);
-        //assert tmp file is deleted after close the CachedOutputStream
-        assertFalse(tempFile.exists());
+        String old = System.getProperty(CachedConstants.THRESHOLD_SYS_PROP);
+        try {
+            System.setProperty(CachedConstants.THRESHOLD_SYS_PROP, "4");
+            reloadDefaultProperties();
+            Object cache = createCache();
+            //ensure output data size larger then 64k which will generate tmp file
+            String result = initTestData(65);
+            File tempFile = getTmpFile(result, cache);
+            assertNotNull(tempFile);
+            //assert tmp file is generated
+            assertTrue(tempFile.exists());
+            close(cache);
+            //assert tmp file is deleted after close the CachedOutputStream
+            assertFalse(tempFile.exists());
+        } finally {
+            System.clearProperty(CachedConstants.THRESHOLD_SYS_PROP);
+            if (old != null) {
+                System.setProperty(CachedConstants.THRESHOLD_SYS_PROP, old);
+            }
+            reloadDefaultProperties();
+        }
     }
 
     @Test
