@@ -19,6 +19,7 @@
 package org.apache.cxf.transport.jms.util;
 
 import java.util.Enumeration;
+import java.util.Timer;
 
 import javax.transaction.xa.XAException;
 
@@ -34,15 +35,24 @@ import jakarta.jms.Queue;
 import jakarta.jms.QueueBrowser;
 import jakarta.jms.Session;
 import jakarta.jms.TextMessage;
+import jakarta.resource.ResourceException;
+import jakarta.resource.spi.UnavailableException;
+import jakarta.resource.spi.XATerminator;
+import jakarta.resource.spi.work.ExecutionContext;
+import jakarta.resource.spi.work.Work;
+import jakarta.resource.spi.work.WorkContext;
+import jakarta.resource.spi.work.WorkException;
+import jakarta.resource.spi.work.WorkListener;
+import jakarta.resource.spi.work.WorkManager;
 import jakarta.transaction.TransactionManager;
-
+import jakarta.transaction.TransactionSynchronizationRegistry;
 import org.apache.activemq.artemis.api.core.SimpleString;
 import org.apache.activemq.artemis.core.config.Configuration;
 import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
 import org.apache.activemq.artemis.core.settings.impl.AddressSettings;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
-import org.apache.activemq.artemis.jms.client.ActiveMQXAConnectionFactory;
 import org.apache.activemq.artemis.junit.EmbeddedActiveMQResource;
+import org.apache.activemq.artemis.ra.ActiveMQResourceAdapter;
 import org.awaitility.Awaitility;
 import org.jboss.narayana.jta.jms.ConnectionFactoryProxy;
 import org.jboss.narayana.jta.jms.TransactionHelperImpl;
@@ -55,19 +65,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
-import jakarta.resource.ResourceException;
-import jakarta.resource.spi.ResourceAdapterInternalException;
-import jakarta.resource.spi.UnavailableException;
-import jakarta.resource.spi.XATerminator;
-import jakarta.resource.spi.work.ExecutionContext;
-import jakarta.resource.spi.work.Work;
-import jakarta.resource.spi.work.WorkContext;
-import jakarta.resource.spi.work.WorkException;
-import jakarta.resource.spi.work.WorkListener;
-import jakarta.resource.spi.work.WorkManager;
-import jakarta.transaction.TransactionSynchronizationRegistry;
-import java.util.Timer;
-import org.apache.activemq.artemis.ra.ActiveMQResourceAdapter;
 
 public class MessageListenerTest {
 
@@ -98,7 +95,7 @@ public class MessageListenerTest {
     }
 
     @Test
-    public void testConnectionProblemXA() throws JMSException, XAException, InterruptedException, ResourceAdapterInternalException, ResourceException {
+    public void testConnectionProblemXA() throws JMSException, XAException, ResourceException {
         TransactionManager transactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
         Connection connection = createXAConnection("brokerJTA", transactionManager);
         Queue dest = JMSUtil.createQueue(connection, "test");
@@ -123,7 +120,7 @@ public class MessageListenerTest {
     }
 
     @Test
-    public void testWithJTA() throws JMSException, XAException, InterruptedException, ResourceAdapterInternalException, ResourceException {
+    public void testWithJTA() throws JMSException, XAException, ResourceException, InterruptedException {
         TransactionManager transactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
         Connection connection = createXAConnection("brokerJTA", transactionManager);
         Queue dest = JMSUtil.createQueue(connection, "test");
@@ -206,7 +203,9 @@ public class MessageListenerTest {
         return connection;
     }
 
-    private static Connection createXAConnection(String name, TransactionManager tm) throws JMSException, ResourceAdapterInternalException, ResourceException{
+    private static Connection createXAConnection(String name, TransactionManager tm) 
+            throws JMSException, ResourceException {
+
         ActiveMQResourceAdapter ra = new ActiveMQResourceAdapter();
         ra.setConnectorClassName("org.apache.activemq.artemis.core.remoting.impl.invm.InVMConnectorFactory");
         ra.start(new BootstrapContext());
@@ -257,19 +256,19 @@ public class MessageListenerTest {
             TextMessage textMessage = (TextMessage) message;
             try {
                 switch (TestMessage.valueOf(textMessage.getText())) {
-                    case OK:
-                        //System.out.println("Simulating Processing successful");
+                case OK:
+                    //System.out.println("Simulating Processing successful");
+                    break;
+                case FAILFIRST:
+                    if (message.getJMSRedelivered()) {
+                        //System.out.println("Simulating processing worked on second try");
                         break;
-                    case FAILFIRST:
-                        if (message.getJMSRedelivered()) {
-                            //System.out.println("Simulating processing worked on second try");
-                            break;
-                        }
-                        throw new RuntimeException("Simulating something went wrong. Expecting rollback");
-                    case FAIL:
-                        throw new RuntimeException("Simulating something went wrong. Expecting rollback");
-                    default:
-                        throw new IllegalArgumentException("Invalid message type");
+                    }
+                    throw new RuntimeException("Simulating something went wrong. Expecting rollback");
+                case FAIL:
+                    throw new RuntimeException("Simulating something went wrong. Expecting rollback");
+                default:
+                    throw new IllegalArgumentException("Invalid message type");
                 }
             } catch (JMSException e) {
                 // Ignore

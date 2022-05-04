@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
@@ -33,8 +34,13 @@ import jakarta.jms.ConnectionFactory;
 import jakarta.jms.DeliveryMode;
 import org.apache.activemq.artemis.core.config.Configuration;
 import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
+import org.apache.activemq.artemis.core.config.impl.SecurityConfiguration;
+import org.apache.activemq.artemis.core.security.Role;
 import org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ;
+import org.apache.activemq.artemis.core.settings.impl.AddressSettings;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
+import org.apache.activemq.artemis.spi.core.security.ActiveMQJAASSecurityManager;
+import org.apache.activemq.artemis.spi.core.security.jaas.InVMLoginModule;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.helpers.IOUtils;
@@ -55,13 +61,6 @@ import org.junit.BeforeClass;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-
-import java.util.Collections;
-import org.apache.activemq.artemis.core.config.impl.SecurityConfiguration;
-import org.apache.activemq.artemis.core.security.Role;
-import org.apache.activemq.artemis.core.settings.impl.AddressSettings;
-import org.apache.activemq.artemis.spi.core.security.ActiveMQJAASSecurityManager;
-import org.apache.activemq.artemis.spi.core.security.jaas.InVMLoginModule;
 
 public abstract class AbstractJMSTester {
     protected static final String WSDL = "/jms_test.wsdl";
@@ -196,14 +195,23 @@ public abstract class AbstractJMSTester {
     }
 
     protected static JMSConduit setupJMSConduit(EndpointInfo ei) throws IOException {
+        return setupJMSConduit(ei, Function.identity());
+    }
+
+    protected static JMSConduit setupJMSConduit(EndpointInfo ei, 
+            Function<ConnectionFactory, ConnectionFactory> wrapper) throws IOException {
         JMSConfiguration jmsConfig = JMSConfigFactory.createFromEndpointInfo(bus, ei, null);
-        jmsConfig.setConnectionFactory(cf);
+        jmsConfig.setConnectionFactory(wrapper.apply(cf));
         return new JMSConduit(null, jmsConfig, bus);
     }
 
-
     protected JMSConduit setupJMSConduitWithObserver(EndpointInfo ei) throws IOException {
-        JMSConduit jmsConduit = setupJMSConduit(ei);
+        return setupJMSConduit(ei, Function.identity());
+    }
+
+    protected JMSConduit setupJMSConduitWithObserver(EndpointInfo ei, 
+            Function<ConnectionFactory, ConnectionFactory> wrapper) throws IOException {
+        JMSConduit jmsConduit = setupJMSConduit(ei, wrapper);
         MessageObserver observer = new MessageObserver() {
             public void onMessage(Message m) {
                 inMessage.set(m);

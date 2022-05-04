@@ -291,7 +291,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         header.setTimeToLive(1000L);
         header.setJMSReplyTo(replyTo);
         outMessage.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, header);
-        outMessage.put(Message.ENCODING, "UTF-8");
+        outMessage.put(Message.ENCODING, "US-ASCII");
     }
 
     private void verifyRequestResponseHeaders(Message msgIn, Message msgOut) {
@@ -437,28 +437,22 @@ public class JMSDestinationTest extends AbstractJMSTester {
     @Test
     public void testTemporaryQueueDeletionUponReset() throws Exception {
         EndpointInfo ei = setupServiceInfo("HelloWorldService", "HelloWorldPort");
+        // Store the connection so we could check temporary queues
+        final AtomicReference<ActiveMQConnection> connectionHolder = new AtomicReference<>();
 
         // set up the conduit send to be true
-        JMSConduit conduit = setupJMSConduitWithObserver(ei);
-        assertNull(conduit.getJmsConfig().getReplyDestination());
-
-        // Store the connection so we could check temporary queues
-//        final AtomicReference<ActiveMQConnection> connectionHolder = new AtomicReference<>();
-        final Message outMessage = createMessage();
-        
-        // Capture the DestinationSource instance associated with the connection
-        final JMSDestination destination = setupJMSDestination(ei, c -> new ConnectionFactory() {
+        JMSConduit conduit = setupJMSConduitWithObserver(ei, c -> new ConnectionFactory() {
             @Override
             public Connection createConnection() throws JMSException {
                 final Connection connection = c.createConnection();
-//                connectionHolder.set((ActiveMQConnection)connection);
+                connectionHolder.set((ActiveMQConnection)connection);
                 return connection;
             }
 
             @Override
             public Connection createConnection(String userName, String password) throws JMSException {
                 final Connection connection = c.createConnection(userName, password);
-//                connectionHolder.set((ActiveMQConnection)connection);
+                connectionHolder.set((ActiveMQConnection)connection);
                 return connection;
             }
 
@@ -482,6 +476,12 @@ public class JMSDestinationTest extends AbstractJMSTester {
                 return c.createContext(sessionMode);
             }
         });
+        assertNull(conduit.getJmsConfig().getReplyDestination());
+
+        final Message outMessage = createMessage();
+        
+        // Capture the DestinationSource instance associated with the connection
+        final JMSDestination destination = setupJMSDestination(ei);
 
         // set up MessageObserver for handling the conduit message
         final MessageObserver observer = new MessageObserver() {
@@ -501,23 +501,23 @@ public class JMSDestinationTest extends AbstractJMSTester {
         
         destination.setMessageObserver(observer);
         sendMessageSync(conduit, outMessage);
-        String[] addresses = broker.getActiveMQServer().getActiveMQServerControl().listAddresses(",").split(",");
         // wait for the message to be got from the destination,
         // create the thread to handler the Destination incoming message
 
         Message inMessage = waitForReceiveInMessage();
         verifyReceivedMessage(inMessage);
 
-//        final ActiveMQConnection connection = connectionHolder.get();
-        assertThat(addresses.length, equalTo(3));
+        final ActiveMQConnection connection = connectionHolder.get();
+        assertThat(ReflectionUtil.accessDeclaredField("tempQueues", ActiveMQConnection.class,
+            connection, Set.class).size(), equalTo(1));
         
         // Force manual temporary queue deletion by resetting the reply destination
         conduit.getJmsConfig().resetCachedReplyDestination();
         // The queue deletion events (as well as others) are propagated asynchronously
         await()
             .atMost(1, TimeUnit.SECONDS)
-            .untilAsserted(() -> assertThat(
-                    broker.getActiveMQServer().getActiveMQServerControl().listAddresses(",").split(",").length, equalTo(2)));
+            .untilAsserted(() -> assertThat(ReflectionUtil.accessDeclaredField("tempQueues", ActiveMQConnection.class, 
+                connection, Set.class).size(), equalTo(0)));
         
         conduit.close();
         destination.shutdown();
