@@ -18,8 +18,11 @@
  */
 package org.apache.cxf.ext.logging.osgi;
 
+import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Set;
 
 import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.feature.AbstractFeature;
@@ -71,6 +74,14 @@ public class Activator implements BundleActivator {
             Long inMemThreshold = Long.valueOf(getValue(config, "inMemThresHold", "-1"));
             Boolean logMultipart = Boolean.valueOf(getValue(config, "logMultipart", "true"));
             Boolean logBinary = Boolean.valueOf(getValue(config, "logBinary", "false"));
+            Set<String> sensitiveElementNames = new HashSet<>(
+                    Arrays.asList(
+                            String.valueOf(getValue(config, "sensitiveElementNames", ""))
+                                .split(",")));
+            Set<String> sensitiveProtocolHeaderNames = new HashSet<>(
+                    Arrays.asList(
+                            String.valueOf(getValue(config, "sensitiveProtocolHeaderNames", ""))
+                                .split(",")));
             
             if (limit != null) {
                 logging.setLimit(limit);
@@ -90,6 +101,14 @@ public class Activator implements BundleActivator {
             }
             if (logBinary != null) {
                 logging.setLogBinary(logBinary);
+            }
+            
+            if (!sensitiveElementNames.isEmpty()) {
+                logging.setSensitiveElementNames(sensitiveElementNames);
+            }
+            
+            if (!sensitiveProtocolHeaderNames.isEmpty()) {
+                logging.setSensitiveProtocolHeaderNames(sensitiveProtocolHeaderNames);
             }
 
             if (intentReg == null) {
