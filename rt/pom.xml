@@ -36,6 +36,7 @@
         <module>bindings</module>
         <module>features</module>
         <module>frontend</module>
+        <module>attachment-image</module>
         <module>ws</module>
         <module>rs</module>
         <module>management</module>

@@ -155,8 +155,18 @@ public final class AttachmentUtil {
     }
 
     static {
-        COMMAND_MAP.addMailcap("image/*;;x-java-content-handler="
-                               + ImageDataContentHandler.class.getName());
+        String imageDataContentHandlerClassName = "org.apache.cxf.management.attachment.image.ImageDataContentHandler";
+
+        try {
+            Class<?> imageDataContentHandlerClass = Class.forName(
+                imageDataContentHandlerClassName);
+
+            COMMAND_MAP.addMailcap("image/*;;x-java-content-handler="
+                                   + imageDataContentHandlerClass.getName());
+        } catch (ReflectiveOperationException e) {
+            LOG.warning(() -> imageDataContentHandlerClassName.concat(
+                              " cannot be found. Is cxf-rt-attachment-image present?"));
+        }
     }
 
     public static CommandMap getCommandMap() {
