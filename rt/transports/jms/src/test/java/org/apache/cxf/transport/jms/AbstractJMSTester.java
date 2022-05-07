@@ -206,7 +206,7 @@ public abstract class AbstractJMSTester {
     }
 
     protected JMSConduit setupJMSConduitWithObserver(EndpointInfo ei) throws IOException {
-        return setupJMSConduit(ei, Function.identity());
+        return setupJMSConduitWithObserver(ei, Function.identity());
     }
 
     protected JMSConduit setupJMSConduitWithObserver(EndpointInfo ei, 
