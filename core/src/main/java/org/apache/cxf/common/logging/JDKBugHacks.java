@@ -29,7 +29,6 @@ import java.net.URLConnection;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-import javax.imageio.ImageIO;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
@@ -101,7 +100,9 @@ final class JDKBugHacks {
                 try {
                     //Trigger a call to sun.awt.AppContext.getAppContext()
                     if (!skipHack("org.apache.cxf.JDKBugHacks.imageIO", "true")) {
-                        ImageIO.getCacheDirectory();
+                        Class<?> imageIOClass = Class.forName("javax.imageio.ImageIO");
+                        Method getCacheDirectoryMethod = imageIOClass.getDeclaredMethod("getCacheDirectory");
+                        getCacheDirectoryMethod.invoke(null);
                     }
                 } catch (Throwable t) {
                     //ignore
