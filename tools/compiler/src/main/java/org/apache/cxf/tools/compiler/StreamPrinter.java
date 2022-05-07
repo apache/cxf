@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.common.util;
+package org.apache.cxf.tools.compiler;
 
 import java.io.BufferedReader;
 import java.io.IOException;

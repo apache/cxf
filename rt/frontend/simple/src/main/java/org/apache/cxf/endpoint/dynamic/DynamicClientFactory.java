@@ -626,8 +626,8 @@ public class DynamicClientFactory {
     }
 
     protected boolean compileJavaSrc(String classPath, List<File> srcList, String dest) {
-        org.apache.cxf.common.util.Compiler javaCompiler
-            = new org.apache.cxf.common.util.Compiler();
+        org.apache.cxf.tools.compiler.Compiler javaCompiler
+            = new org.apache.cxf.tools.compiler.Compiler();
 
         javaCompiler.setClassPath(classPath);
         javaCompiler.setOutputDir(dest);
@@ -735,7 +735,7 @@ public class DynamicClientFactory {
         } catch (IOException e) {
             throw new ServiceConstructionException(new Message("COULD_NOT_RESOLVE_URL", LOG, s), e);
         }
-        
+
         throw new ServiceConstructionException(new Message("COULD_NOT_RESOLVE_URL", LOG, s));
     }
 
