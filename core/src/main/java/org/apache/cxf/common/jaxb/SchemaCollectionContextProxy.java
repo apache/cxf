@@ -43,6 +43,7 @@ import javax.xml.transform.Source;
 
 import org.w3c.dom.Document;
 
+import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.ws.commons.schema.XmlSchemaElement;
@@ -135,7 +136,7 @@ public class SchemaCollectionContextProxy implements JAXBContextProxy {
         String name = xre == null ? "##default" : xre.name();
         String namespace = xre == null ? "##default" : xre.namespace();
         if ("##default".equals(name)) {
-            name = java.beans.Introspector.decapitalize(cls.getSimpleName());
+            name = ClassHelper.decapitalizedSimpleName(cls);
         }
         if ("##default".equals(namespace) && cls.getPackage() != null) {
             XmlSchema sc = cls.getPackage().getAnnotation(XmlSchema.class);
@@ -199,7 +200,7 @@ public class SchemaCollectionContextProxy implements JAXBContextProxy {
         String tn = xtype == null ? "##default" : xtype.name();
         String tns = xtype == null ? "##default" : xtype.namespace();
         if ("##default".equals(tn)) {
-            tn = java.beans.Introspector.decapitalize(cls.getSimpleName());
+            tn = ClassHelper.decapitalizedSimpleName(cls);
         }
         if ("##default".equals(tns) || StringUtils.isEmpty(tns)) {
             tns = JAXBUtils.getPackageNamespace(cls);
