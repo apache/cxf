@@ -389,7 +389,7 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(transportClaimsPort, test.getPort());
 
-        SecurityTestUtil.updateSTSPort((BindingProvider)transportClaimsPort, test.getStsPort());
+        TokenTestUtils.updateSTSPort((BindingProvider)transportClaimsPort, test.getStsPort());
 
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(transportClaimsPort);
