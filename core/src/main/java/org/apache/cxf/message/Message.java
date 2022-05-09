@@ -19,6 +19,7 @@
 
 package org.apache.cxf.message;
 
+import jakarta.xml.ws.handler.MessageContext;
 import java.util.Collection;
 import java.util.Set;
 
@@ -164,11 +165,11 @@ public interface Message extends StringMap {
     String MAINTAIN_SESSION = Message.class.getName() + ".MAINTAIN_SESSION";
     String ATTACHMENTS = Message.class.getName() + ".ATTACHMENTS";
 
-    String WSDL_DESCRIPTION = "javax.xml.ws.wsdl.description";
-    String WSDL_SERVICE = "javax.xml.ws.wsdl.service";
-    String WSDL_PORT = "javax.xml.ws.wsdl.port";
-    String WSDL_INTERFACE = "javax.xml.ws.wsdl.interface";
-    String WSDL_OPERATION = "javax.xml.ws.wsdl.operation";
+    String WSDL_DESCRIPTION = MessageContext.WSDL_DESCRIPTION;
+    String WSDL_SERVICE = MessageContext.WSDL_SERVICE;
+    String WSDL_PORT = MessageContext.WSDL_PORT;
+    String WSDL_INTERFACE = MessageContext.WSDL_INTERFACE;
+    String WSDL_OPERATION = MessageContext.WSDL_OPERATION;
 
     /**
      * Some properties to allow adding interceptors to the chain
