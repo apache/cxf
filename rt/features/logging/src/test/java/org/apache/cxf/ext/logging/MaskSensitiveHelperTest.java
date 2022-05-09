@@ -92,7 +92,7 @@ public class MaskSensitiveHelperTest {
     }
 
     @Test
-    public void shouldReplaceSensitiveDataIn() {
+    public void shouldReplaceSensitiveDataInWithAdd() {
         // Arrange
         final LoggingInInterceptor inInterceptor = new LoggingInInterceptor(logEventSender);
         inInterceptor.addSensitiveElementNames(SENSITIVE_ELEMENTS);
@@ -113,10 +113,52 @@ public class MaskSensitiveHelperTest {
     }
 
     @Test
-    public void shouldReplaceSensitiveDataOut() throws IOException {
+    public void shouldReplaceSensitiveDataInWithSet() {
+        // Arrange
+        final LoggingInInterceptor inInterceptor = new LoggingInInterceptor(logEventSender);
+        inInterceptor.setSensitiveElementNames(SENSITIVE_ELEMENTS);
+
+        final Message message = prepareInMessage();
+
+        // Act
+        Collection<PhaseInterceptor<? extends Message>> interceptors = inInterceptor.getAdditionalInterceptors();
+        for (PhaseInterceptor intercept : interceptors) {
+            intercept.handleMessage(message);
+        }
+        inInterceptor.handleMessage(message);
+
+        // Verify
+        LogEvent event = logEventSender.getLogEvent();
+        assertNotNull(event);
+        assertEquals(maskedContent, event.getPayload());
+    }
+
+    @Test
+    public void shouldReplaceSensitiveDataOutWithAdd() throws IOException {
         // Arrange
         final LoggingOutInterceptor outInterceptor = new LoggingOutInterceptor(logEventSender);
         outInterceptor.addSensitiveElementNames(SENSITIVE_ELEMENTS);
+
+        final Message message = prepareOutMessage();
+
+        // Act
+        outInterceptor.handleMessage(message);
+        byte[] payload = loggingContent.getBytes(StandardCharsets.UTF_8);
+        OutputStream out = message.getContent(OutputStream.class);
+        out.write(payload);
+        out.close();
+
+        // Verify
+        LogEvent event = logEventSender.getLogEvent();
+        assertNotNull(event);
+        assertEquals(maskedContent, event.getPayload());
+    }
+
+    @Test
+    public void shouldReplaceSensitiveDataOutWithSet() throws IOException {
+        // Arrange
+        final LoggingOutInterceptor outInterceptor = new LoggingOutInterceptor(logEventSender);
+        outInterceptor.setSensitiveElementNames(SENSITIVE_ELEMENTS);
 
         final Message message = prepareOutMessage();
 
