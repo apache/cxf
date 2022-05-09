@@ -147,12 +147,44 @@ public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
      * </pre>
      * @param sensitiveElementNames set of sensitive element names to be replaced
      */
+    public void setSensitiveElementNames(final Set<String> sensitiveElementNames) {
+        delegate.setSensitiveElementNames(sensitiveElementNames);
+    }
+    
+    /**
+     * Adds list of XML or JSON elements containing sensitive information to be masked.
+     * Corresponded data will be replaced with configured mask
+     * For example:
+     * <pre>
+     * sensitiveElementNames: {password}
+     *
+     * Initial logging statement: <user>my user</user><password>my secret password</password>
+     * Result logging statement: <user>my user</user><password>XXXX</password>
+     * </pre>
+     * @param sensitiveElementNames set of sensitive element names to be replaced
+     */
     public void addSensitiveElementNames(final Set<String> sensitiveElementNames) {
         delegate.addSensitiveElementNames(sensitiveElementNames);
     }
 
     /**
      * Sets list of protocol headers containing sensitive information to be masked.
+     * Corresponded data will be replaced with configured mask
+     * For example:
+     * <pre>
+     * sensitiveHeaders: {Authorization}
+     *
+     * Initial logging statement: {Authorization=Basic QWxhZGRpbjpPcGVuU2VzYW1l}
+     * Result logging statement: {Authorization=XXX}
+     * </pre>
+     * @param sensitiveProtocolHeaderNames set of sensitive element names to be replaced
+     */
+    public void setSensitiveProtocolHeaderNames(final Set<String> sensitiveProtocolHeaderNames) {
+        delegate.setSensitiveProtocolHeaderNames(sensitiveProtocolHeaderNames);
+    }
+    
+    /**
+     * Adds list of protocol headers containing sensitive information to be masked.
      * Corresponded data will be replaced with configured mask
      * For example:
      * <pre>
@@ -252,11 +284,21 @@ public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
             addOutBinaryContentMediaTypes(mediaTypes);
         }
 
+        public void setSensitiveElementNames(final Set<String> sensitiveElementNames) {
+            in.setSensitiveElementNames(sensitiveElementNames);
+            out.setSensitiveElementNames(sensitiveElementNames);
+        }
+        
         public void addSensitiveElementNames(final Set<String> sensitiveElementNames) {
             in.addSensitiveElementNames(sensitiveElementNames);
             out.addSensitiveElementNames(sensitiveElementNames);
         }
 
+        public void setSensitiveProtocolHeaderNames(final Set<String> sensitiveProtocolHeaderNames) {
+            in.setSensitiveProtocolHeaderNames(sensitiveProtocolHeaderNames);
+            out.setSensitiveProtocolHeaderNames(sensitiveProtocolHeaderNames);
+        }
+        
         public void addSensitiveProtocolHeaderNames(final Set<String> sensitiveProtocolHeaderNames) {
             in.addSensitiveProtocolHeaderNames(sensitiveProtocolHeaderNames);
             out.addSensitiveProtocolHeaderNames(sensitiveProtocolHeaderNames);

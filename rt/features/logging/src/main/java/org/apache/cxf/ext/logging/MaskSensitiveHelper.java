@@ -50,6 +50,12 @@ public class MaskSensitiveHelper {
     private final Set<ReplacementPair> replacementsXML = new HashSet<>();
     private final Set<ReplacementPair> replacementsJSON = new HashSet<>();
 
+    public void setSensitiveElementNames(final Set<String> inSensitiveElementNames) {
+        replacementsXML.clear();
+        replacementsJSON.clear();
+        addSensitiveElementNames(inSensitiveElementNames);
+    }
+    
     public void addSensitiveElementNames(final Set<String> inSensitiveElementNames) {
         for (final String sensitiveName : inSensitiveElementNames) {
             addReplacementPair(MATCH_PATTERN_XML_TEMPLATE, REPLACEMENT_XML_TEMPLATE, sensitiveName, replacementsXML);
