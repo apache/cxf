@@ -23,6 +23,7 @@ import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.feature.AbstractFeature;
@@ -35,6 +36,8 @@ import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static java.util.function.Predicate.not;
 
 public class Activator implements BundleActivator {
     private static final Logger LOG = LoggerFactory.getLogger(Activator.class);
@@ -74,14 +77,8 @@ public class Activator implements BundleActivator {
             Long inMemThreshold = Long.valueOf(getValue(config, "inMemThresHold", "-1"));
             Boolean logMultipart = Boolean.valueOf(getValue(config, "logMultipart", "true"));
             Boolean logBinary = Boolean.valueOf(getValue(config, "logBinary", "false"));
-            Set<String> sensitiveElementNames = new HashSet<>(
-                    Arrays.asList(
-                            String.valueOf(getValue(config, "sensitiveElementNames", ""))
-                                .split(",")));
-            Set<String> sensitiveProtocolHeaderNames = new HashSet<>(
-                    Arrays.asList(
-                            String.valueOf(getValue(config, "sensitiveProtocolHeaderNames", ""))
-                                .split(",")));
+            Set<String> sensitiveElementNames = getTrimmedSet(config, "sensitiveElementNames");
+            Set<String> sensitiveProtocolHeaderNames = getTrimmedSet(config, "sensitiveProtocolHeaderNames");
             
             if (limit != null) {
                 logging.setLimit(limit);
@@ -129,6 +126,15 @@ public class Activator implements BundleActivator {
                     serviceReg = null;
                 }
             }
+        }
+
+        @SuppressWarnings("rawtypes")
+        private Set<String> getTrimmedSet(Dictionary config, String propertyKey) {
+            return new HashSet<>(
+                    Arrays.stream(String.valueOf(getValue(config, propertyKey, "")).split(","))
+                            .map(String::trim)
+                            .filter(not(String::isEmpty))
+                            .collect(Collectors.toSet()));
         }
 
         @SuppressWarnings("rawtypes")
