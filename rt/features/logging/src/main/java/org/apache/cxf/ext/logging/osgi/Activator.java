@@ -37,8 +37,6 @@ import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static java.util.function.Predicate.not;
-
 public class Activator implements BundleActivator {
     private static final Logger LOG = LoggerFactory.getLogger(Activator.class);
     private static final String CONFIG_PID = "org.apache.cxf.features.logging";
@@ -133,7 +131,7 @@ public class Activator implements BundleActivator {
             return new HashSet<>(
                     Arrays.stream(String.valueOf(getValue(config, propertyKey, "")).split(","))
                             .map(String::trim)
-                            .filter(not(String::isEmpty))
+                            .filter(s -> !s.isEmpty())
                             .collect(Collectors.toSet()));
         }
 
