@@ -1453,7 +1453,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         if (claimsToSerialize instanceof Element) {
             StaxUtils.copy((Element)claimsToSerialize, writer);
         } else if (claimsToSerialize instanceof ClaimCollection) {
-            ClaimCollection claimCollection = (ClaimCollection)claims;
+            ClaimCollection claimCollection = (ClaimCollection)claimsToSerialize;
             claimCollection.serialize(writer, "wst", namespace);
         }
     }
