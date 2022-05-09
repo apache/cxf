@@ -29,6 +29,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.rt.security.claims.Claim;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.ws.security.trust.claims.ClaimsCallback;
 
 /**
@@ -37,13 +39,18 @@ import org.apache.cxf.ws.security.trust.claims.ClaimsCallback;
  */
 public class ClaimsCallbackHandler implements CallbackHandler {
 
+    private boolean createClaimCollection;
+
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof ClaimsCallback) {
                 ClaimsCallback callback = (ClaimsCallback) callbacks[i];
-                callback.setClaims(createClaims());
-
+                if (isCreateClaimCollection()) {
+                    callback.setClaims(createClaimCollection());
+                } else {
+                    callback.setClaims(createClaims());
+                }
             } else {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
             }
@@ -65,4 +72,23 @@ public class ClaimsCallbackHandler implements CallbackHandler {
         return claimsElement;
     }
 
+    /**
+     * Create a Claims Element for a "role"
+     */
+    private ClaimCollection createClaimCollection() {
+        ClaimCollection claimCollection = new ClaimCollection();
+        Claim claim = new Claim();
+        claim.setClaimType("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");
+        claimCollection.add(claim);
+
+        return claimCollection;
+    }
+
+    public boolean isCreateClaimCollection() {
+        return createClaimCollection;
+    }
+
+    public void setCreateClaimCollection(boolean createClaimCollection) {
+        this.createClaimCollection = createClaimCollection;
+    }
 }
