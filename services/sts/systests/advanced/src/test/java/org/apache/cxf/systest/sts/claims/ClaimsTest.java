@@ -288,6 +288,32 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)transportClaimsPort).close();
     }
 
+    // In this test, the WSDL the client is using has no Claims Element (however the service
+    // is using a WSDL that requires Claims). A CallbackHandler is used to send the Claims
+    // Element to the STS.
+    @org.junit.Test
+    public void testSaml2ClaimsCallbackHandler2() throws Exception {
+        createBus(getClass().getResource("cxf-client-cbhandler2.xml").toString());
+
+        URL wsdl = ClaimsTest.class.getResource("DoubleItNoClaims.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2ClaimsPort");
+        DoubleItPortType transportClaimsPort =
+                service.getPort(portQName, DoubleItPortType.class);
+
+        updateAddressPort(transportClaimsPort, test.getPort());
+
+        SecurityTestUtil.updateSTSPort((BindingProvider)transportClaimsPort, test.getStsPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(transportClaimsPort);
+        }
+
+        doubleIt(transportClaimsPort, 25);
+
+        ((java.io.Closeable)transportClaimsPort).close();
+    }
+
     @org.junit.Test
     public void testSaml2ChildClaims() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());

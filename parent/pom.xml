@@ -87,7 +87,7 @@
         <cxf.atmosphere.version>2.7.3</cxf.atmosphere.version>
         <cxf.bcprov.version>1.70</cxf.bcprov.version>
         <cxf.brave.reporter.version>2.16.2</cxf.brave.reporter.version>
-        <cxf.brave.version>5.13.7</cxf.brave.version>
+        <cxf.brave.version>5.13.9</cxf.brave.version>
         <cxf.brave.zipkin.version>2.23.15</cxf.brave.zipkin.version>
         <cxf.cda.api.osgi.range>[1.1,2)</cxf.cda.api.osgi.range>
         <cxf.cdi.api.version>3.0.0</cxf.cdi.api.version>
@@ -113,7 +113,7 @@
         <cxf.guava.version>30.1-jre</cxf.guava.version>
         <cxf.hamcrest.version>2.2</cxf.hamcrest.version>
         <cxf.hazelcast.version>4.2.4</cxf.hazelcast.version>
-        <cxf.hibernate.em.version>6.0.0.Final</cxf.hibernate.em.version>
+        <cxf.hibernate.em.version>6.0.1.Final</cxf.hibernate.em.version>
         <cxf.hibernate.validator.version>7.0.1.Final</cxf.hibernate.validator.version>
         <cxf.hsqldb.version>2.5.0</cxf.hsqldb.version>
         <cxf.httpcomponents.asyncclient.version.range>[4.0,4.2)</cxf.httpcomponents.asyncclient.version.range>
@@ -162,7 +162,7 @@
         <cxf.jsr250.api.version>1.0</cxf.jsr250.api.version>
         <cxf.junit.version>4.13.2</cxf.junit.version>
         <cxf.junit5.version>5.8.2</cxf.junit5.version>
-        <cxf.kerby.version>2.0.1</cxf.kerby.version>
+        <cxf.kerby.version>2.0.2</cxf.kerby.version>
         <cxf.littleproxy.version>1.1.2</cxf.littleproxy.version>
         <cxf.logback.classic.version>1.2.10</cxf.logback.classic.version>
         <cxf.lucene.version>8.11.1</cxf.lucene.version>
@@ -176,7 +176,7 @@
         <cxf.msv.version>2013.6.1</cxf.msv.version>
         <cxf.neethi.version>3.2.0</cxf.neethi.version>
         <cxf.netty.version.range>[4,5)</cxf.netty.version.range>
-        <cxf.netty.version>4.1.75.Final</cxf.netty.version>
+        <cxf.netty.version>4.1.77.Final</cxf.netty.version>
         <cxf.netty.tcnative.version>2.0.46.Final</cxf.netty.tcnative.version>
         <cxf.olingo.version>2.0.11</cxf.olingo.version>
         <cxf.openjpa.version>3.1.2</cxf.openjpa.version>
@@ -212,7 +212,7 @@
         <cxf.swagger2.version>1.6.6</cxf.swagger2.version>
         <cxf.swagger2.guava.version>31.0.1-jre</cxf.swagger2.guava.version>
         <cxf.swagger2.guava.failureaccess.version>1.0.1</cxf.swagger2.guava.failureaccess.version>
-        <cxf.tika.version>2.3.0</cxf.tika.version>
+        <cxf.tika.version>2.4.0</cxf.tika.version>
         <cxf.tomcat.version>10.0.20</cxf.tomcat.version>
         <cxf.tomitribe.http.signature.version>1.7</cxf.tomitribe.http.signature.version>
         <cxf.undertow.osgi.version>[1.4,3.0)</cxf.undertow.osgi.version>
@@ -253,7 +253,7 @@
         <cxf.jaxb.bundle.version>2.3.2_1</cxf.jaxb.bundle.version>
         <cxf.jaxb.context.class.property>none</cxf.jaxb.context.class.property>
         <cxf.jdom.bundle.version>1.1_4</cxf.jdom.bundle.version>
-        <cxf.karaf.version>4.4.0-SNAPSHOT</cxf.karaf.version>
+        <cxf.karaf.version>4.4.0</cxf.karaf.version>
         <cxf.oauth.bundle.version>20100527_1</cxf.oauth.bundle.version>
         <cxf.oro.bundle.version>2.0.8_6</cxf.oro.bundle.version>
         <cxf.osgi.saaj.version>[1.4,2)</cxf.osgi.saaj.version>

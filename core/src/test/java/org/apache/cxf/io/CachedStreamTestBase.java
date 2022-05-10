@@ -69,7 +69,7 @@ public abstract class CachedStreamTestBase {
 
     @Test
     public void testDeleteTmpFile() throws IOException {
-        Object cache = createCache();
+        Object cache = createCache(64 * 1024);
         //ensure output data size larger then 64k which will generate tmp file
         String result = initTestData(65);
         File tempFile = getTmpFile(result, cache);
