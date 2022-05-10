@@ -128,7 +128,8 @@
         <cxf.jacorb.version>3.9</cxf.jacorb.version>
         <cxf.jaeger.version>1.8.0</cxf.jaeger.version>
         <cxf.jaeger.version>1.6.0</cxf.jaeger.version>
-        <cxf.jakarta.activation.version>2.0.1</cxf.jakarta.activation.version>
+        <cxf.jakarta.activation.version>2.1.0</cxf.jakarta.activation.version>
+        <cxf.jakarta.mail.version>2.1.0</cxf.jakarta.mail.version>
         <cxf.jakarta.injectapi.version>2.0.1</cxf.jakarta.injectapi.version>
         <cxf.jakarta.jwsapi.version>3.0.0</cxf.jakarta.jwsapi.version>
         <cxf.jakarta.soapapi.version>2.0.1</cxf.jakarta.soapapi.version>
@@ -1623,6 +1624,12 @@
                 <groupId>org.glassfish.jaxb</groupId>
                 <artifactId>jaxb-runtime</artifactId>
                 <version>${cxf.jaxb.runtime.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.sun.activation</groupId>
+                        <artifactId>jakarta.activation</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>jakarta.annotation</groupId>
@@ -1661,9 +1668,19 @@
                 </exclusions>
             </dependency>
             <dependency>
+                <groupId>jakarta.activation</groupId>
+                <artifactId>jakarta.activation-api</artifactId>
+                <version>${cxf.jakarta.activation.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.eclipse.angus</groupId>
                 <artifactId>angus-activation</artifactId>
                 <version>${cxf.jakarta.angus.activation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.mail</groupId>
+                <artifactId>jakarta.mail-api</artifactId>
+                <version>${cxf.jakarta.mail.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.angus</groupId>
