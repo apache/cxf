@@ -40,8 +40,17 @@ public class SpringBus extends ExtensionManagerBus
 
     AbstractApplicationContext ctx;
     boolean closeContext;
+    boolean contextLifecycleManaged;
 
     public SpringBus() {
+    }
+    
+    public SpringBus(boolean ctxManaged) {
+        // if this Bus is created via the cxf.xml, then the spring context has the "shutdown" method
+        // already configured as a destroy method.  Thus, we should NOT call destroy
+        // when the context is closed as Spring will do so the rest of the dependencies
+        // and such are ready to be destroyed.
+        contextLifecycleManaged = ctxManaged;
     }
 
     public void setBusConfig(BusDefinitionParser.BusConfig bc) {
@@ -102,7 +111,9 @@ public class SpringBus extends ExtensionManagerBus
                 if (getState() != BusState.RUNNING) {
                     initialize();
                 }
-            } else if (event instanceof ContextClosedEvent && getState() == BusState.RUNNING) {
+            } else if (event instanceof ContextClosedEvent
+                && getState() == BusState.RUNNING
+                && (!contextLifecycleManaged || ctx instanceof BusApplicationContext)) {
                 // The bus could be create by using SpringBusFactory.createBus("/cxf.xml");
                 // Just to make sure the shutdown is called rightly
                 shutdown();
