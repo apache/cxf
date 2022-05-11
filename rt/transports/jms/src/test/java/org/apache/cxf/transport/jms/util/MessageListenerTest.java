@@ -261,7 +261,7 @@ public class MessageListenerTest {
                     break;
                 case FAILFIRST:
                     if (message.getJMSRedelivered()) {
-                        //System.out.println("Simulating processing worked on second try");
+//                        System.out.println("Simulating processing worked on second try");
                         break;
                     }
                     throw new RuntimeException("Simulating something went wrong. Expecting rollback");
@@ -295,7 +295,7 @@ public class MessageListenerTest {
                     .addAcceptorConfiguration("#", "vm://0")
                     .addAddressesSetting("#",
                             new AddressSettings()
-                                    .setMaxDeliveryAttempts(1)
+                                    .setMaxDeliveryAttempts(2)
                                     .setRedeliveryDelay(500L)
                                     .setDeadLetterAddress(SimpleString.toSimpleString("ActiveMQ.DLQ")));
         } catch (final Exception ex) {
