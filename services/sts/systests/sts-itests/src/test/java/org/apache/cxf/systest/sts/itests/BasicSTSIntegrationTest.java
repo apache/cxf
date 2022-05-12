@@ -59,8 +59,8 @@ public class BasicSTSIntegrationTest {
             systemProperty("BasicSTSIntegrationTest.PORT").value(port),
             editConfigurationFilePut("etc/org.ops4j.pax.web.cfg",
                                     "org.osgi.service.http.port", port),
-            when(!localRepository.isEmpty())
-                .useOptions(systemProperty("org.ops4j.pax.url.mvn.localRepository").value(localRepository)),
+            when(!localRepository.isEmpty()).useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
+                    "org.ops4j.pax.url.mvn.localRepository", localRepository)),
             //DO NOT COMMIT WITH THIS LINE ENABLED!!!
             //KarafDistributionOption.keepRuntimeFolder(),
             //KarafDistributionOption.debugConfiguration(), // nor this
