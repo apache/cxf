@@ -98,13 +98,8 @@ public class Activator implements BundleActivator {
                 logging.setLogBinary(logBinary);
             }
             
-            if (!sensitiveElementNames.isEmpty()) {
-                logging.setSensitiveElementNames(sensitiveElementNames);
-            }
-            
-            if (!sensitiveProtocolHeaderNames.isEmpty()) {
-                logging.setSensitiveProtocolHeaderNames(sensitiveProtocolHeaderNames);
-            }
+            logging.setSensitiveElementNames(sensitiveElementNames);
+            logging.setSensitiveProtocolHeaderNames(sensitiveProtocolHeaderNames);
 
             if (intentReg == null) {
                 Dictionary<String, Object> properties = new Hashtable<>();
