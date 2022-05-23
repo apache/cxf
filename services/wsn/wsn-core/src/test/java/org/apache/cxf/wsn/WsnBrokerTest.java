@@ -55,7 +55,6 @@ import org.apache.cxf.wsn.types.CustomType;
 import org.apache.cxf.wsn.util.WSNHelper;
 import org.oasis_open.docs.wsn.b_2.NotificationMessageHolderType;
 import org.oasis_open.docs.wsn.b_2.TopicExpressionType;
-import org.oasis_open.docs.wsn.brw_2.PublisherRegistrationFailedFault;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -268,6 +267,7 @@ public abstract class WsnBrokerTest {
         publisher.stop();
         consumer.stop();
     }
+
     @Test
     public void testNullPublisherReference() throws Exception {
         TestConsumer consumerCallback = new TestConsumer();
@@ -294,7 +294,8 @@ public abstract class WsnBrokerTest {
         publisher.stop();
         consumer.stop();
     }
-    @Test(expected = PublisherRegistrationFailedFault.class)
+
+    @Test
     public void testPublisherOnDemand() throws Exception {
         TestConsumer consumerCallback = new TestConsumer();
         Consumer consumer = new Consumer(consumerCallback, "http://localhost:" + port2 + "/test/consumer");
@@ -419,7 +420,7 @@ public abstract class WsnBrokerTest {
     private static Configuration getConfiguration(int port) {
         try {
             final Configuration config = new ConfigurationImpl()
-                .setManagementNotificationAddress(SimpleString.toSimpleString("notifications-topic"))
+                .setManagementNotificationAddress(SimpleString.toSimpleString("activemq.notifications"))
                 .setSecurityEnabled(false)
                 .setPersistenceEnabled(false)
                 .addAcceptorConfiguration("vm", "vm://0")
