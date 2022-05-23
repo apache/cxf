@@ -27,41 +27,45 @@ import jakarta.jms.MessageProducer;
 import jakarta.jms.Session;
 import jakarta.jms.TemporaryQueue;
 import jakarta.jms.TextMessage;
-import org.apache.activemq.pool.PooledConnectionFactory;
+import org.apache.activemq.artemis.core.config.Configuration;
+import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
+import org.apache.activemq.artemis.junit.EmbeddedActiveMQResource;
 
+import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
 
-public class PooledConnectionTempQueueTest {
-
+public class ConnectionTempQueueTest {
     protected static final String SERVICE_QUEUE = "queue1";
+
+    @Rule public EmbeddedActiveMQResource server = new EmbeddedActiveMQResource(getConfiguration());
 
     @Test
     public void testTempQueueIssue() throws JMSException, InterruptedException {
-        final ConnectionFactory cf = new PooledConnectionFactory("vm://localhost?broker.persistent=false");
+        final ConnectionFactory cf = new ActiveMQConnectionFactory("vm://0");
 
-        Connection con1 = cf.createConnection();
-        con1.start();
-
-        // This order seems to matter to reproduce the issue
-        con1.close();
-
-        new Thread(() -> {
-            try {
-                receiveAndRespondWithMessageIdAsCorrelationId(cf, SERVICE_QUEUE);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
-
-        sendWithReplyToTemp(cf, SERVICE_QUEUE);
+        try (Connection con = cf.createConnection()) {
+            con.start();
+    
+            new Thread(() -> {
+                try {
+                    receiveAndRespondWithMessageIdAsCorrelationId(con, SERVICE_QUEUE);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }).start();
+    
+            sendWithReplyToTemp(con, SERVICE_QUEUE);
+        }
     }
 
-    private static void sendWithReplyToTemp(ConnectionFactory cf, String serviceQueue) throws JMSException,
+    private static void sendWithReplyToTemp(Connection con, String serviceQueue) throws JMSException,
         InterruptedException {
-        Connection con = cf.createConnection();
-        con.start();
         Session session = con.createSession(false, Session.AUTO_ACKNOWLEDGE);
         TemporaryQueue tempQueue = session.createTemporaryQueue();
         TextMessage msg = session.createTextMessage("Request");
@@ -73,36 +77,40 @@ public class PooledConnectionTempQueueTest {
         Thread.sleep(500L);
 
         MessageConsumer consumer = session.createConsumer(tempQueue);
-        Message replyMsg = consumer.receive();
-        assertNotNull(replyMsg);
-        //System.out.println(replyMsg.getJMSCorrelationID());
+        Message replyMsg = consumer.receive(5000);
+        assertThat(replyMsg, is(not(nullValue())));
 
         consumer.close();
 
         producer.close();
         session.close();
-        con.close();
     }
 
-    public static void receiveAndRespondWithMessageIdAsCorrelationId(ConnectionFactory connectionFactory,
+    public static void receiveAndRespondWithMessageIdAsCorrelationId(Connection con,
                                                               String queueName) throws JMSException {
-        Connection con = connectionFactory.createConnection();
         Session session = con.createSession(false, Session.AUTO_ACKNOWLEDGE);
         MessageConsumer consumer = session.createConsumer(session.createQueue(queueName));
-        final jakarta.jms.Message inMessage = consumer.receive();
+        final jakarta.jms.Message inMessage = consumer.receive(5000);
+        assertThat(inMessage, is(not(nullValue())));
 
-        //String requestMessageId = inMessage.getJMSMessageID();
-        //System.out.println("Received message " + requestMessageId);
         final TextMessage replyMessage = session.createTextMessage("Result");
         replyMessage.setJMSCorrelationID(inMessage.getJMSMessageID());
         final MessageProducer producer = session.createProducer(inMessage.getJMSReplyTo());
-        //System.out.println("Sending reply to " + inMessage.getJMSReplyTo());
         producer.send(replyMessage);
 
         producer.close();
         consumer.close();
         session.close();
-        con.close();
     }
 
+    private static Configuration getConfiguration() {
+        try {
+            return new ConfigurationImpl()
+                .setSecurityEnabled(false)
+                .setPersistenceEnabled(false)
+                .addAcceptorConfiguration("vm", "vm://0");
+        } catch (final Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 }

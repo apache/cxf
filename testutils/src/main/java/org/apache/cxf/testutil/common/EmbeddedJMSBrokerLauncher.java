@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.testutil.common;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.List;
@@ -29,8 +28,9 @@ import javax.wsdl.Port;
 import javax.wsdl.Service;
 import javax.wsdl.extensions.soap.SOAPAddress;
 
-import org.apache.activemq.broker.BrokerService;
-import org.apache.activemq.store.memory.MemoryPersistenceAdapter;
+import org.apache.activemq.artemis.core.config.Configuration;
+import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
+import org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.ReflectionUtil;
@@ -39,7 +39,7 @@ import org.apache.cxf.wsdl.WSDLManager;
 public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(EmbeddedJMSBrokerLauncher.class);
 
-    BrokerService broker;
+    EmbeddedActiveMQ broker;
     String brokerName;
     private final String brokerUrl1;
 
@@ -157,15 +157,16 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
 
     //START SNIPPET: broker
     public final void run() throws Exception {
-        broker = new BrokerService();
-        broker.setPersistent(false);
-        broker.setPersistenceAdapter(new MemoryPersistenceAdapter());
-        broker.setTmpDataDirectory(new File("./target"));
-        broker.setUseJmx(false);
+        final Configuration config = new ConfigurationImpl()
+            .setSecurityEnabled(false)
+            .setPersistenceEnabled(false)
+            .setJMXManagementEnabled(false)
+            .addAcceptorConfiguration("def", brokerUrl1);
         if (brokerName != null) {
-            broker.setBrokerName(brokerName);
+            config.setName(brokerName);
         }
-        broker.addConnector(brokerUrl1);
+        broker = new EmbeddedActiveMQ();
+        broker.setConfiguration(config);
         broker.start();
     }
     //END SNIPPET: broker

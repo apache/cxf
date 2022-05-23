@@ -21,7 +21,7 @@ package org.apache.cxf.osgi.itests.soap;
 import java.util.Collections;
 
 import jakarta.jms.ConnectionFactory;
-import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
@@ -49,7 +49,7 @@ public class JmsTestActivator implements BundleActivator {
     private ActiveMQConnectionFactory createConnectionFactory() {
         ActiveMQConnectionFactory connectionFactory
             = new ActiveMQConnectionFactory("vm://JmsServiceTest");
-        connectionFactory.setUserName("karaf");
+        connectionFactory.setUser("karaf");
         connectionFactory.setPassword("karaf");
         return connectionFactory;
     }

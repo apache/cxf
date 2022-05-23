@@ -76,7 +76,7 @@
         <cxf.osgi.jakarta.xml.ws.version>[3,4)</cxf.osgi.jakarta.xml.ws.version>
 
         <!-- please maintain alphabetical order here -->
-        <cxf.activemq.version>5.16.3</cxf.activemq.version>
+        <cxf.activemq.artemis.version>2.21.0</cxf.activemq.artemis.version>
         <cxf.ahc.version>2.12.3</cxf.ahc.version>
         <cxf.apacheds.version>2.0.0.AM26</cxf.apacheds.version>
         <cxf.arquillian.version>1.1.14.Final</cxf.arquillian.version>
@@ -149,6 +149,7 @@
         <cxf.jaxen.version>1.1.4</cxf.jaxen.version>
         <cxf.jboss.logging.version>3.4.3.Final</cxf.jboss.logging.version>
         <cxf.jboss.weld.version>4.0.2.Final</cxf.jboss.weld.version>
+        <cxf.jboss.narayana.version>5.12.5.Final</cxf.jboss.narayana.version>
         <cxf.jcache.version>1.1.1</cxf.jcache.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
         <cxf.jettison.version>1.4.1</cxf.jettison.version>
@@ -1709,29 +1710,30 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.activemq</groupId>
-                <artifactId>activemq-broker</artifactId>
-                <version>${cxf.activemq.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.google.guava</groupId>
-                        <artifactId>guava</artifactId>
-                    </exclusion>
-                </exclusions>
+                <artifactId>artemis-jakarta-server</artifactId>
+                <version>${cxf.activemq.artemis.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.activemq</groupId>
-                <artifactId>activemq-client</artifactId>
-                <version>${cxf.activemq.version}</version>
+                <artifactId>artemis-jakarta-client</artifactId>
+                <version>${cxf.activemq.artemis.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.activemq</groupId>
-                <artifactId>activemq-pool</artifactId>
-                <version>${cxf.activemq.version}</version>
+                <artifactId>artemis-jakarta-ra</artifactId>
+                <version>${cxf.activemq.artemis.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.activemq</groupId>
-                <artifactId>activemq-kahadb-store</artifactId>
-                <version>${cxf.activemq.version}</version>
+                <artifactId>artemis-junit</artifactId>
+                <version>${cxf.activemq.artemis.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.narayana.jta</groupId>
+                <artifactId>narayana-jta-jakarta</artifactId>
+                <version>${cxf.jboss.narayana.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.mozilla</groupId>

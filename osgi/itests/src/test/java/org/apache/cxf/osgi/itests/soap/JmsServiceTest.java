@@ -22,7 +22,7 @@ import java.io.InputStream;
 import java.util.Collections;
 
 import jakarta.jms.ConnectionFactory;
-import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.osgi.itests.CXFOSGiTestSupport;
@@ -67,7 +67,7 @@ public class JmsServiceTest extends CXFOSGiTestSupport {
     private static ActiveMQConnectionFactory createConnectionFactory() {
         ActiveMQConnectionFactory connectionFactory
             = new ActiveMQConnectionFactory("vm://JmsServiceTest");
-        connectionFactory.setUserName("karaf");
+        connectionFactory.setUser("karaf");
         connectionFactory.setPassword("karaf");
         return connectionFactory;
     }

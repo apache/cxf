@@ -19,12 +19,15 @@
 
 package demo.server;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.io.File;
 import java.util.Collections;
 
 import jakarta.xml.ws.Endpoint;
 
+import org.apache.activemq.artemis.core.config.Configuration;
+import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
+import org.apache.activemq.artemis.core.server.ActiveMQServer;
+import org.apache.activemq.artemis.core.server.impl.ActiveMQServerImpl;
 import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
@@ -37,7 +40,7 @@ public final class ServerJMS {
     private static final String JMS_ENDPOINT_URI = "jms:queue:test.cxf.jmstransport.queue?timeToLive=1000"
                                   + "&jndiConnectionFactoryName=ConnectionFactory"
                                   + "&jndiInitialContextFactory"
-                                  + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+                                  + "=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
                                   + "&jndiURL=tcp://localhost:61616";
 
     private ServerJMS() {
@@ -74,25 +77,15 @@ public final class ServerJMS {
         System.exit(0);
     }
 
-    private static void launchAMQBroker() throws ClassNotFoundException, InstantiationException,
-        IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        /*
-         * The following make it easier to run this against something other than ActiveMQ. You will have
-         * to get a JMS broker onto the right port of localhost.
-         */
-        Class<?> brokerClass = ServerJMS.class.getClassLoader()
-            .loadClass("org.apache.activemq.broker.BrokerService");
-        if (brokerClass == null) {
-            System.err.println("ActiveMQ is not in the classpath, cannot launch broker.");
-            return;
-        }
-        Object broker = brokerClass.newInstance();
-        Method addConnectorMethod = brokerClass.getMethod("addConnector", String.class);
-        addConnectorMethod.invoke(broker, "tcp://localhost:61616");
-        Method setDataDirectory = brokerClass.getMethod("setDataDirectory", String.class);
-        setDataDirectory.invoke(broker, "target/activemq-data");
-        Method startMethod = brokerClass.getMethod("start");
-        startMethod.invoke(broker);
+    private static void launchAMQBroker() throws Exception {
+        final Configuration config = new ConfigurationImpl();
+        config.setPersistenceEnabled(false);
+        config.setSecurityEnabled(false);
+        config.addAcceptorConfiguration("tcp", "tcp://localhost:61616");
+        config.setBrokerInstance(new File("target/activemq-data"));
+       
+        final ActiveMQServer broker = new ActiveMQServerImpl(config);
+        broker.start();
     }
 
     private static void launchCxfApi() {

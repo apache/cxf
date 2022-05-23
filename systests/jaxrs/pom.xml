@@ -248,12 +248,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-broker</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-kahadb-store</artifactId>
+            <artifactId>artemis-jakarta-server</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -27,7 +27,6 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
 
-import javax.xml.bind.Validator;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
@@ -52,6 +51,7 @@ import jakarta.xml.bind.PropertyException;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.UnmarshallerHandler;
 import jakarta.xml.bind.ValidationEventHandler;
+import jakarta.xml.bind.Validator;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.attachment.AttachmentMarshaller;
 import jakarta.xml.bind.attachment.AttachmentUnmarshaller;

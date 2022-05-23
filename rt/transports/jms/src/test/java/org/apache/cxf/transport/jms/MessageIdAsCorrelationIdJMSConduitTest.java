@@ -19,7 +19,8 @@
 package org.apache.cxf.transport.jms;
 
 import jakarta.jms.ConnectionFactory;
-import org.apache.activemq.pool.PooledConnectionFactory;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
+import org.apache.activemq.artemis.junit.EmbeddedActiveMQResource;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -28,6 +29,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.jms.util.TestReceiver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -39,9 +41,10 @@ import static org.junit.Assert.assertNotNull;
  */
 public class MessageIdAsCorrelationIdJMSConduitTest {
     private static final String SERVICE_QUEUE = "test";
-    private static final String BROKER_URI = "vm://localhost?broker.persistent=false";
-
-    private ConnectionFactory connectionFactory = new PooledConnectionFactory(BROKER_URI);
+    private static final String BROKER_URI = "vm://0?broker.persistent=false";
+    
+    @Rule public EmbeddedActiveMQResource server = new EmbeddedActiveMQResource(0);
+    private ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(BROKER_URI);
 
     @Test
     public void testSendReceiveWithTempReplyQueue() throws Exception {

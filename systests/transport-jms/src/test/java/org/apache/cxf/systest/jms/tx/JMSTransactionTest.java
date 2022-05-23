@@ -21,16 +21,13 @@ package org.apache.cxf.systest.jms.tx;
 import java.util.Collections;
 import java.util.Enumeration;
 
-import javax.transaction.xa.XAException;
-
 import jakarta.jms.Connection;
 import jakarta.jms.JMSException;
 import jakarta.jms.Queue;
 import jakarta.jms.QueueBrowser;
 import jakarta.jms.Session;
 import jakarta.transaction.TransactionManager;
-import org.apache.activemq.ActiveMQXAConnectionFactory;
-import org.apache.activemq.jms.pool.JcaPooledConnectionFactory;
+import org.apache.activemq.artemis.jms.client.ActiveMQXAConnectionFactory;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.jaxws.EndpointImpl;
@@ -39,7 +36,6 @@ import org.apache.cxf.systest.jms.AbstractVmJMSTest;
 import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.cxf.transport.jms.util.JMSUtil;
-import org.apache.geronimo.transaction.manager.GeronimoTransactionManager;
 import org.apache.hello_world_doc_lit.Greeter;
 
 import org.junit.AfterClass;
@@ -61,20 +57,11 @@ public class JMSTransactionTest extends AbstractVmJMSTest {
     }
 
     public static void startBusAndJMS(String brokerURI) {
-        try {
-            transactionManager = new GeronimoTransactionManager();
-        } catch (XAException e) {
-            throw new IllegalStateException(e.getMessage(), e);
-        }
+        transactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
         bus = BusFactory.getDefaultBus();
         registerTransactionManager();
-        ActiveMQXAConnectionFactory cf1 = new ActiveMQXAConnectionFactory(brokerURI);
-        cf1.setRedeliveryPolicy(redeliveryPolicy());
-        JcaPooledConnectionFactory pcf = new JcaPooledConnectionFactory();
-        pcf.setTransactionManager(transactionManager);
-        pcf.setConnectionFactory(cf1);
-        cf = pcf;
-        cff = new ConnectionFactoryFeature(pcf);
+        cf = new ActiveMQXAConnectionFactory(brokerURI);
+        cff = new ConnectionFactoryFeature(cf);
     }
 
     /**

@@ -125,7 +125,7 @@
         </wsdl:port>
         <wsdl:port name="NumberPortJMS" binding="tns:NumberServiceSoapJmsBinding">
         	<jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
-    	    <jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
+    	    <jms:jndiInitialContextFactory>org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
             <soap:address location="jms:jndi:dynamicQueues/test.cxf.factory_pattern.queue" />
             <wswa:UsingAddressing xmlns:wswa="http://www.w3.org/2005/02/addressing/wsdl"/>
         </wsdl:port>
