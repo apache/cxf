@@ -22,10 +22,12 @@ import java.util.Collections;
 import java.util.Enumeration;
 
 import jakarta.jms.Connection;
+import jakarta.jms.ConnectionFactory;
 import jakarta.jms.JMSException;
 import jakarta.jms.Queue;
 import jakarta.jms.QueueBrowser;
 import jakarta.jms.Session;
+import jakarta.jms.XAConnectionFactory;
 import jakarta.transaction.TransactionManager;
 import org.apache.activemq.artemis.jms.client.ActiveMQXAConnectionFactory;
 import org.apache.cxf.BusFactory;
@@ -37,6 +39,8 @@ import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.cxf.transport.jms.util.JMSUtil;
 import org.apache.hello_world_doc_lit.Greeter;
+import org.jboss.narayana.jta.jms.ConnectionFactoryProxy;
+import org.jboss.narayana.jta.jms.TransactionHelperImpl;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -45,7 +49,7 @@ import org.junit.Test;
 
 public class JMSTransactionTest extends AbstractVmJMSTest {
     private static final String SERVICE_ADDRESS =
-        "jms:queue:greeter.queue.tx?receivetTimeOut=5000&sessionTransacted=true";
+        "jms:queue:greeter.queue.tx?receiveTimeOut=5000&sessionTransacted=true";
     private static EndpointImpl endpoint;
     private static TransactionManager transactionManager;
 
@@ -61,7 +65,11 @@ public class JMSTransactionTest extends AbstractVmJMSTest {
         bus = BusFactory.getDefaultBus();
         registerTransactionManager();
         cf = new ActiveMQXAConnectionFactory(brokerURI);
-        cff = new ConnectionFactoryFeature(cf);
+        
+        ConnectionFactory cf1 = new ConnectionFactoryProxy((XAConnectionFactory)cf, 
+              new TransactionHelperImpl(transactionManager));
+
+        cff = new ConnectionFactoryFeature(cf1);
     }
 
     /**

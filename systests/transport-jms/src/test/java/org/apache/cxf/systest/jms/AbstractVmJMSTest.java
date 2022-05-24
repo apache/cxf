@@ -26,6 +26,8 @@ import java.util.List;
 
 import jakarta.jms.ConnectionFactory;
 import jakarta.xml.ws.Endpoint;
+
+import org.apache.activemq.artemis.api.core.SimpleString;
 import org.apache.activemq.artemis.core.config.Configuration;
 import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
 import org.apache.activemq.artemis.core.server.ActiveMQServer;
@@ -77,7 +79,8 @@ public abstract class AbstractVmJMSTest {
                 .addAddressesSetting("#",
                     new AddressSettings()
                         .setMaxDeliveryAttempts(1)
-                        .setRedeliveryDelay(1000L));
+                        .setRedeliveryDelay(1000L)
+                        .setDeadLetterAddress(SimpleString.toSimpleString("ActiveMQ.DLQ")));
             config.setBrokerInstance(new File("./target"));
             
             broker = new ActiveMQServerImpl(config);
