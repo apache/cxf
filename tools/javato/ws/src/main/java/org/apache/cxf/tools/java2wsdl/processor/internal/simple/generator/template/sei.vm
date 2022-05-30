@@ -17,11 +17,11 @@
 
 package $intf.PackageName;
 
-import javax.jws.WebParam.Mode;
-import javax.jws.WebParam;
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding.Style;
-import javax.jws.soap.SOAPBinding;
+import jakarta.jws.WebParam.Mode;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding.Style;
+import jakarta.jws.soap.SOAPBinding;
 #foreach ($import in $intf.Imports)
 import ${import};
 #end
