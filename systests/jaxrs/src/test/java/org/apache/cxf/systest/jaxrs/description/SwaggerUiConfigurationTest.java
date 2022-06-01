@@ -112,7 +112,6 @@ public class SwaggerUiConfigurationTest extends AbstractBusClientServerTestBase 
         try (Response response = uiClient.get()) {
             String html = response.readEntity(String.class);
             assertThat(html, containsString("<!-- HTML"));
-            assertThat(html, containsString("url: \"/swagger.json\","));
             assertThat(response.getMediaType(), equalTo(MediaType.TEXT_HTML_TYPE));
         }
     }
@@ -129,7 +128,6 @@ public class SwaggerUiConfigurationTest extends AbstractBusClientServerTestBase 
         try (Response response = uiClient.get()) {
             String html = response.readEntity(String.class);
             assertThat(html, containsString("<!-- HTML"));
-            assertThat(html, containsString("url: \"/swagger.json\","));
             assertThat(response.getMediaType(), equalTo(MediaType.TEXT_HTML_TYPE));
         }
     }
