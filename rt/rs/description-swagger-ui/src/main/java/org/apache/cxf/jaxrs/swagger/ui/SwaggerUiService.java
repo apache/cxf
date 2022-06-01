@@ -108,8 +108,8 @@ public class SwaggerUiService {
             //    http://localhost:8080/services/helloservice/api-docs?url=/services/helloservice/openapi.json
             //
             // in case the "url" configuration parameter is provided for Swagger UI.
-            if (config != null && path.endsWith("/index.html")) {
-                if (uriInfo.getQueryParameters().isEmpty()) {
+            if (config != null) {
+                if (path.endsWith("/index.html") && uriInfo.getQueryParameters().isEmpty()) {
                     final Map<String, String> params = config.getConfigParameters();
                     
                     if (params != null && !params.isEmpty()) {
@@ -127,7 +127,9 @@ public class SwaggerUiService {
 
                 // Since Swagger UI 4.1.3, passing the default URL as query parameter, 
                 // e.g. `?url=swagger.json` is disabled by default due to security concerns.
-                if (config.isQueryConfigEnabled() == null || !config.isQueryConfigEnabled()) {
+                final boolean hasUrlPlaceholder = path.endsWith("/index.html")
+                    || path.endsWith("/swagger-initializer.js");
+                if (hasUrlPlaceholder && config.isQueryConfigEnabled() == null || !config.isQueryConfigEnabled()) {
                     final String url = config.getUrl();
                     if (!StringUtils.isEmpty(url)) {
                         try (InputStream in = resourceURL.openStream()) {
