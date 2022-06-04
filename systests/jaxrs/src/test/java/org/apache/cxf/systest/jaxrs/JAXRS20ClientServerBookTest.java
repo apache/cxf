@@ -355,12 +355,6 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         String address = "http://localhost:" + PORT + "/wrongpath";
         doTestGetBookAsync(address, false);
     }
-    
-    @Test
-    public void testGetBookAbsolutePathAsync() throws Exception {
-        String address = "http://localhost:" + PORT + "/absolutepath";
-        doTestGetBookAsync(address, false);
-    }
 
     @Test
     public void testPostCollectionGenericEntity() throws Exception {
