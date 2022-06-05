@@ -174,7 +174,7 @@
         <cxf.microprofile.rest.client.version>3.0</cxf.microprofile.rest.client.version>
         <cxf.microprofile.openapi.version>3.0</cxf.microprofile.openapi.version>
         <cxf.mina.version>2.1.5</cxf.mina.version>
-        <cxf.mockito.version>4.5.1</cxf.mockito.version>
+        <cxf.mockito.version>4.6.1</cxf.mockito.version>
         <cxf.msv.version>2013.6.1</cxf.msv.version>
         <cxf.neethi.version>3.2.0</cxf.neethi.version>
         <cxf.netty.version.range>[4,5)</cxf.netty.version.range>
@@ -194,7 +194,7 @@
         <cxf.rhino.version>1.7.13</cxf.rhino.version>
         <cxf.rxjava.version>1.3.8</cxf.rxjava.version>
         <cxf.rxjava2.version>2.2.21</cxf.rxjava2.version>
-        <cxf.rxjava3.version>3.1.4</cxf.rxjava3.version>
+        <cxf.rxjava3.version>3.1.5</cxf.rxjava3.version>
         <cxf.saaj-impl.version>2.0.1</cxf.saaj-impl.version>
         <cxf.servlet-api.artifact>jakarta.servlet-api</cxf.servlet-api.artifact>
         <cxf.servlet-api.group>jakarta.servlet</cxf.servlet-api.group>
@@ -209,7 +209,7 @@
         <cxf.spring.security.version>6.0.0-M5</cxf.spring.security.version>
         <cxf.spring.version>6.0.0-M4</cxf.spring.version>
         <cxf.stax-ex.version>1.8.3</cxf.stax-ex.version>
-        <cxf.swagger.ui.version>4.8.1</cxf.swagger.ui.version>
+        <cxf.swagger.ui.version>4.11.1</cxf.swagger.ui.version>
         <cxf.swagger.v3.version>2.1.13</cxf.swagger.v3.version>
         <cxf.swagger2.version>1.6.6</cxf.swagger2.version>
         <cxf.swagger2.guava.version>31.0.1-jre</cxf.swagger2.guava.version>
