@@ -485,6 +485,20 @@ public final class HttpUtils {
         }
     }
 
+    public static String getEndpointUri(Message m) {
+        final Object servletRequest = m.get(AbstractHTTPDestination.HTTP_REQUEST);
+        
+        if (servletRequest != null) {
+            final Object property = ((javax.servlet.http.HttpServletRequest)servletRequest)
+                .getAttribute("org.apache.cxf.transport.endpoint.uri");
+            if (property != null) {
+                return property.toString();
+            }
+        }
+        
+        return getEndpointAddress(m);
+    }
+
     public static String getEndpointAddress(Message m) {
         String address = null;
         Destination d = m.getExchange().getDestination();

@@ -167,6 +167,8 @@ public class BookServer20 extends AbstractBusTestServerBase {
 
             if ("wrongpath".equals(path)) {
                 context.setRequestUri(URI.create("/bookstore/bookheaders/simple"));
+            } else if ("absolutepath".equals(path)) {
+                context.setRequestUri(URI.create("http://xx.yy:888/bookstore/bookheaders/simple?q=1"));
             } else if ("throwException".equals(path)) {
                 context.setProperty("filterexception", "prematch");
                 throw new InternalServerErrorException(
