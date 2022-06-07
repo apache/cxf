@@ -68,8 +68,19 @@ pipeline {
                sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-rt-transports-http:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
 
                echo "Including additional dependencies (woodstox, stax2, ...)"
-               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=com.fasterxml.woodstox:woodstox-core:5.2.1:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
-               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.codehaus.woodstox:stax2-api:4.2:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
+               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-parent:${params.Version}:pom -Dtransitive=false -Ddest=."
+
+               script {
+                   echo "Detect additional dependencies (woodstox, stax2, ...) versions"
+
+                   woodstox_version = sh(returnStdout: true, script: "grep '<cxf.woodstox.core.version>' cxf-parent-${params.Version}.pom").replaceAll("[\n\r]", "").replaceAll(".+[>](.+)[<].+", '$1')
+                   staxapi_version = sh(returnStdout: true, script: "grep '<cxf.woodstox.stax2-api.version>' cxf-parent-${params.Version}.pom").replaceAll("[\n\r]", "").replaceAll(".+[>](.+)[<].+", '$1')
+
+                   sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=com.fasterxml.woodstox:woodstox-core:${woodstox_version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
+                   sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.codehaus.woodstox:stax2-api:${staxapi_version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
+               }
+
+               sh "rm cxf-parent-${params.Version}.pom"
            }
        }
        
@@ -78,6 +89,8 @@ pipeline {
               withEnv(["WORKSPACE = ${PWD}"]) {
                 sh "wget https://raw.githubusercontent.com/apache/cxf/3.5.x-fixes/tck/ts.jte.template"
                 sh "sed -i '" + 's/${version}/' + params.Version + "/g' ts.jte.template"
+                sh "sed -i '" + 's/${woodstox_version}/' + woodstox_version + "/g' ts.jte.template"
+                sh "sed -i '" + 's/${staxapi_version}/' + staxapi_version + "/g' ts.jte.template"
                 sh "sed -i '" + 's#${GF_HOME}#' + "${WORKSPACE}/glassfish5/glassfish" + "#g' ts.jte.template"
                 sh "cp jakartaee-tck/bin/xml/impl/glassfish/jersey.xml jakartaee-tck/bin/xml/impl/glassfish/cxf.xml"
               }
