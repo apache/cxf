@@ -219,7 +219,7 @@ public class UriInfoImpl implements UriInfo {
     }
 
     private String getAbsolutePathAsString() {
-        String address = getBaseUri().toString();
+        String address = URI.create(HttpUtils.getEndpointUri(message)).toString();
         if (MessageUtils.isRequestor(message)) {
             return address;
         }
