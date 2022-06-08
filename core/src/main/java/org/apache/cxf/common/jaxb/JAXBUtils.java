@@ -1183,11 +1183,10 @@ public final class JAXBUtils {
             ctx = AccessController.doPrivileged(new PrivilegedExceptionAction<JAXBContext>() {
                 public JAXBContext run() throws Exception {
                     //This is a workaround for CXF-8675
-                    Class factoryClass = ClassLoaderUtils.loadClass("org.glassfish.jaxb.runtime.v2.ContextFactory",
+                    Class<?> factoryClass = ClassLoaderUtils.loadClass("org.glassfish.jaxb.runtime.v2.ContextFactory",
                             JAXBContextCache.class);
-                    Object obj = factoryClass.newInstance();
                     Method m = factoryClass.getMethod("createContext", Class[].class, Map.class);
-                    Object context = m.invoke(obj, classes.toArray(new Class<?>[0]), map);
+                    Object context = m.invoke(null, classes.toArray(new Class<?>[0]), map);
                     return (JAXBContext) context;
                 }
             });
