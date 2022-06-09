@@ -37,6 +37,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.sse.OutboundSseEvent.Builder;
+import javax.ws.rs.sse.OutboundSseEvent;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseBroadcaster;
 import javax.ws.rs.sse.SseEventSink;
@@ -76,7 +77,7 @@ public class BookStore2 extends BookStoreClientCloseable {
             public void run() {
                 try {
                     final Integer id = Integer.valueOf(lastEventId);
-                    final Builder builder = sse.newEventBuilder();
+                    final OutboundSseEvent.Builder builder = sse.newEventBuilder();
 
                     sink.send(createEvent(builder.name("book"), id + 1));
                     Thread.sleep(200);
@@ -104,7 +105,7 @@ public class BookStore2 extends BookStoreClientCloseable {
             public void run() {
                 try {
                     final Integer id = Integer.valueOf(lastEventId);
-                    final Builder builder = sse.newEventBuilder();
+                    final OutboundSseEvent.Builder builder = sse.newEventBuilder();
 
                     sink.send(createEvent(builder.name("book"), id + 1));
                     Thread.sleep(200);
