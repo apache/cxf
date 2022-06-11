@@ -152,7 +152,7 @@
         <cxf.jboss.narayana.version>5.12.5.Final</cxf.jboss.narayana.version>
         <cxf.jcache.version>1.1.1</cxf.jcache.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
-        <cxf.jettison.version>1.4.1</cxf.jettison.version>
+        <cxf.jettison.version>1.5.0</cxf.jettison.version>
         <cxf.jetty.osgi.version>[11,12)</cxf.jetty.osgi.version>
         <cxf.jetty11.version>11.0.9</cxf.jetty11.version>
         <cxf.jetty.version>${cxf.jetty11.version}</cxf.jetty.version>
@@ -274,7 +274,7 @@
         <cxf.servicemix.specs.version>2.9.0</cxf.servicemix.specs.version>
         <cxf.wsdl4j.bundle.version>1.6.3_1</cxf.wsdl4j.bundle.version>
         <cxf.xalan.bundle.version>2.7.2_3</cxf.xalan.bundle.version>
-        <cxf.xerces.bundle.version>2.12.0_1</cxf.xerces.bundle.version>
+        <cxf.xerces.bundle.version>2.12.2_1</cxf.xerces.bundle.version>
         <cxf.xmlresolver.bundle.version>1.2_5</cxf.xmlresolver.bundle.version>
         <cxf.xpp3.bundle.version>1.1.4c_6</cxf.xpp3.bundle.version>
         <cxf.awaitility.version>4.1.1</cxf.awaitility.version>

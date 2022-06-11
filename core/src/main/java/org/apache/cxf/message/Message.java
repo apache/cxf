@@ -19,10 +19,10 @@
 
 package org.apache.cxf.message;
 
-import jakarta.xml.ws.handler.MessageContext;
 import java.util.Collection;
 import java.util.Set;
 
+import jakarta.xml.ws.handler.MessageContext;
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.transport.Destination;
 
