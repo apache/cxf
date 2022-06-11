@@ -558,9 +558,12 @@ public final class CryptoUtils {
                 if (blockSize == -1) {
                     if (JavaUtils.isJava8Before161()) {
                         blockSize = secretKey instanceof PublicKey ? 117 : 128;
-                    } else {
+                    } else if (JavaUtils.getJavaMajorVersion() < 19) {
                         //the default block size is 256 when use private key under java9
                         blockSize = secretKey instanceof PublicKey ? 117 : 256;
+                    } else {
+                        //the default block size is 384 when use private key after java19
+                        blockSize = secretKey instanceof PublicKey ? 117 : 384;
                     }
                 }
                 boolean updateRequired = keyProps != null && keyProps.getAdditionalData() != null;
