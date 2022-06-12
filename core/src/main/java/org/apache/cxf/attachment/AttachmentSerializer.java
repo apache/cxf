@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Iterator;
@@ -215,7 +216,35 @@ public class AttachmentSerializer {
         if (attachmentId != null) {
             attachmentId = checkAngleBrackets(attachmentId);
             writer.write("Content-ID: <");
-            writer.write(URLDecoder.decode(attachmentId, StandardCharsets.UTF_8.name()));
+            
+            // 
+            // RFC-2392 (https://datatracker.ietf.org/doc/html/rfc2392) says:
+            // A "cid" URL is converted to the corresponding Content-ID message
+            // header [MIME] by removing the "cid:" prefix, converting the % encoded
+            // character to their equivalent US-ASCII characters, and enclosing the
+            // remaining parts with an angle bracket pair, "<" and ">".  
+            //
+            if (attachmentId.startsWith("cid:")) {
+                writer.write(URLDecoder.decode(attachmentId.substring(4),
+                    StandardCharsets.UTF_8.name()));
+            } else { 
+                //
+                // RFC-2392 (https://datatracker.ietf.org/doc/html/rfc2392) says:
+                // 
+                //   content-id = url-addr-spec
+                //   url-addr-spec = addr-spec ; URL encoding of RFC 822 addr-spec
+                // 
+                // RFC-822 addr-spec (https://datatracker.ietf.org/doc/html/rfc822#appendix-D) says:
+                //  
+                //   addr-spec = local-part "@" domain ; global address
+                //
+                String[] address = attachmentId.split("@", 2);
+                if (address.length == 2) {
+                    writer.write(attachmentId);
+                } else {
+                    writer.write(URLEncoder.encode(attachmentId, StandardCharsets.UTF_8.name()));
+                }
+            }
             writer.write(">\r\n");
         }
         // headers like Content-Disposition need to be serialized
