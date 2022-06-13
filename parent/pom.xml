@@ -225,7 +225,7 @@
         <cxf.velocity.version>2.3</cxf.velocity.version>
         <cxf.wildfly.common.version>1.5.4.Final</cxf.wildfly.common.version>
         <cxf.wiremock.version>2.27.2</cxf.wiremock.version>
-        <cxf.woodstox.core.version>6.2.7</cxf.woodstox.core.version>
+        <cxf.woodstox.core.version>6.2.8</cxf.woodstox.core.version>
         <cxf.woodstox.stax2-api.version>4.2.1</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
         <cxf.wss4j.version>2.4.1</cxf.wss4j.version>
