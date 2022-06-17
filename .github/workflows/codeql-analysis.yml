@@ -7,15 +7,22 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [master]
+    branches: ['master', '3.6.x-fixes']
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [master]
+    branches: ['master', '3.6.x-fixes']
   #schedule:
     #- cron: '0 18 * * 5'
 
+permissions:
+  contents: read
+
 jobs:
   analyze:
+    permissions:
+      actions: read  # for github/codeql-action/init to get workflow details
+      contents: read  # for actions/checkout to fetch code
+      security-events: write  # for github/codeql-action/analyze to upload SARIF results
     name: Analyze
     runs-on: ubuntu-latest
 
