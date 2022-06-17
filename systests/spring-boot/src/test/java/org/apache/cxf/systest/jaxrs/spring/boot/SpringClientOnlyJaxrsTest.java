@@ -21,7 +21,7 @@ package org.apache.cxf.systest.jaxrs.spring.boot;
 
 import java.util.Map;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.client.ClientBuilder;
