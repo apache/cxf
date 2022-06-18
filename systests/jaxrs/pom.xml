@@ -558,6 +558,7 @@
         <dependency>
             <groupId>org.apache.johnzon</groupId>
             <artifactId>johnzon-jsonb</artifactId>
+            <classifier>jakarta</classifier>
             <scope>test</scope>
         </dependency>
     </dependencies>

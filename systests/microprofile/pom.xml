@@ -82,6 +82,7 @@
                 <groupId>org.apache.johnzon</groupId>
                 <artifactId>johnzon-core</artifactId>
                 <version>${cxf.johnzon.version}</version>
+                <classifier>jakarta</classifier>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -118,6 +119,7 @@
                 <groupId>org.apache.johnzon</groupId>
                 <artifactId>johnzon-jsonb</artifactId>
                 <version>${cxf.johnzon.version}</version>
+                <classifier>jakarta</classifier>
                 <scope>test</scope>
             </dependency>
             <dependency>

@@ -56,10 +56,6 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-annotations</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
             <artifactId>apache-jsp</artifactId>
             <version>${cxf.jetty.version}</version>
         </dependency>
