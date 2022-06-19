@@ -546,24 +546,40 @@ public final class AttachmentUtil {
     }
 
     public static DataSource getAttachmentDataSource(String contentId, Collection<Attachment> atts) {
-        // Is this right? - DD
+        //
+        // RFC-2392 (https://datatracker.ietf.org/doc/html/rfc2392) says:
+        //
+        // A "cid" URL is converted to the corresponding Content-ID message
+        // header [MIME] by removing the "cid:" prefix, converting the % encoded
+        // character to their equivalent US-ASCII characters, and enclosing the
+        // remaining parts with an angle bracket pair, "<" and ">".  
+        //
         if (contentId.startsWith("cid:")) {
             try {
                 contentId = URLDecoder.decode(contentId.substring(4), StandardCharsets.UTF_8.name());
             } catch (UnsupportedEncodingException ue) {
                 contentId = contentId.substring(4);
             }
-            return loadDataSource(contentId, atts);
-        } else if (contentId.indexOf("://") == -1) {
-            return loadDataSource(contentId, atts);
-        } else {
-            try {
-                return new URLDataSource(new URL(contentId));
-            } catch (MalformedURLException e) {
-                throw new Fault(e);
+            
+            // href attribute information item: MUST be a valid URI per the cid: URI scheme (RFC 2392), 
+            // for example:
+            //
+            //   <xop:Include xmlns:xop='http://www.w3.org/2004/08/xop/include' href='cid:http://example.org/me.png'/>
+            // 
+            // See please https://www.w3.org/TR/xop10/
+            //
+            if (contentId.indexOf("://") == -1) {
+                return loadDataSource(contentId, atts);
+            } else {
+                try {
+                    return new URLDataSource(new URL(contentId));
+                } catch (MalformedURLException e) {
+                    throw new Fault(e);
+                }
             }
+        } else {
+            return loadDataSource(contentId, atts);
         }
-
     }
 
     private static DataSource loadDataSource(String contentId, Collection<Attachment> atts) {
