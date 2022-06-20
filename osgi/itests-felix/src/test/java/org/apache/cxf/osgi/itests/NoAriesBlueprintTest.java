@@ -58,6 +58,7 @@ public class NoAriesBlueprintTest extends OSGiTestSupport {
         assertBundleStarted("org.apache.cxf.cxf-core");
         assertBundleStarted("org.apache.cxf.cxf-rt-frontend-simple");
         assertBundleStarted("org.apache.cxf.cxf-rt-frontend-jaxws");
+        assertBundleStarted("org.apache.cxf.cxf-tools-compiler");
     }
 
     @Configuration
@@ -84,6 +85,7 @@ public class NoAriesBlueprintTest extends OSGiTestSupport {
             mavenBundle("jakarta.servlet", "jakarta.servlet-api").versionAsInProject(),
             mavenBundle("org.apache.cxf", "cxf-rt-transports-http").versionAsInProject(),
             mavenBundle("org.apache.cxf", "cxf-rt-frontend-jaxws").versionAsInProject(),
+            mavenBundle("org.apache.cxf", "cxf-tools-compiler").versionAsInProject(),
             junitBundles(),
             systemPackages(
                 "javax.annotation;version=\"1.3\"",

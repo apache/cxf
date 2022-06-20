@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.attachment;
+package org.apache.cxf.management.attachment.image;
 
 import java.awt.Component;
 import java.awt.Graphics;

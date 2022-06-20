@@ -24,11 +24,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.cxf.common.util.Compiler;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.VelocityGenerator;
 import org.apache.cxf.tools.common.model.JavaClass;
+import org.apache.cxf.tools.compiler.Compiler;
 import org.apache.cxf.tools.java2wsdl.generator.AbstractGenerator;
 import org.apache.cxf.tools.util.FileWriterUtil;
 

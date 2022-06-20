@@ -223,6 +223,7 @@
         <feature version="${project.version}">cxf-databinding-jaxb</feature>
         <feature version="${project.version}">cxf-bindings-soap</feature>
         <feature version="${project.version}">cxf-http</feature>
+        <bundle start-level="40">mvn:org.apache.cxf/cxf-tools-compiler/${project.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-frontend-simple/${project.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-frontend-jaxws/${project.version}</bundle>
     </feature>

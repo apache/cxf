@@ -22,6 +22,8 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -38,9 +40,12 @@ import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.TypeCreator;
 import org.apache.cxf.aegis.type.TypeMapping;
-import org.apache.cxf.common.util.ReflectionUtil;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 
 public class BeanTypeInfo {
+    private static Method springBeanUtilsDescriptorFetcher;
+    private static boolean springChecked;
+
     private Map<QName, QName> mappedName2typeName = new HashMap<>();
     private Map<QName, String> mappedName2pdName = new HashMap<>();
     private Map<QName, AegisType> mappedName2type = new HashMap<>();
@@ -104,6 +109,61 @@ public class BeanTypeInfo {
         } catch (Exception e) {
             throw new DatabindingException("Couldn't create TypeInfo.", e);
         }
+    }
+
+    /**
+     *  create own array of property descriptors to:
+     *  <pre>
+     *  - prevent memory leaks by Introspector's cache
+     *  - get correct type for generic properties from superclass
+     *     that are limited to a specific type in beanClass
+     *    see http://bugs.sun.com/view_bug.do?bug_id=6528714
+     *   we cannot use BeanUtils.getPropertyDescriptors because of issue SPR-6063
+     *   </pre>
+     * @param refClass calling class for class loading.
+     * @param beanInfo Bean in question
+     * @param beanClass class for bean in question
+     * @param propertyDescriptors raw descriptors
+     */
+    public static PropertyDescriptor[] getPropertyDescriptorsAvoidSunBug(Class<?> refClass,
+                                                                  BeanInfo beanInfo,
+                                                                  Class<?> beanClass,
+                                                                  PropertyDescriptor[] propertyDescriptors) {
+        if (!springChecked) {
+            try {
+                springChecked = true;
+                Class<?> cls = ClassLoaderUtils
+                    .loadClass("org.springframework.beans.BeanUtils", refClass);
+                springBeanUtilsDescriptorFetcher
+                    = cls.getMethod("getPropertyDescriptor", Class.class, String.class);
+            } catch (Exception e) {
+                //ignore - just assume it's an unsupported/unknown annotation
+            }
+        }
+
+        if (springBeanUtilsDescriptorFetcher != null) {
+            if (propertyDescriptors != null) {
+                List<PropertyDescriptor> descriptors = new ArrayList<>(propertyDescriptors.length);
+                for (int i = 0; i < propertyDescriptors.length; i++) {
+                    PropertyDescriptor propertyDescriptor = propertyDescriptors[i];
+                    try {
+                        propertyDescriptor = (PropertyDescriptor)springBeanUtilsDescriptorFetcher.invoke(null,
+                                                                                     beanClass,
+                                                                                     propertyDescriptor.getName());
+                        if (propertyDescriptor != null) {
+                            descriptors.add(propertyDescriptor);
+                        }
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    } catch (InvocationTargetException e) {
+                        throw new RuntimeException(e.getCause());
+                    }
+                }
+                return descriptors.toArray(new PropertyDescriptor[0]);
+            }
+            return null;
+        }
+        return beanInfo.getPropertyDescriptors();
     }
 
     private synchronized void initializeSync() {
@@ -285,10 +345,10 @@ public class BeanTypeInfo {
             PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
             if (propertyDescriptors != null) {
                 // see comments on this function.
-                descriptors = ReflectionUtil.getPropertyDescriptorsAvoidSunBug(getClass(),
-                                                                               beanInfo,
-                                                                               beanClass,
-                                                                               propertyDescriptors);
+                descriptors = getPropertyDescriptorsAvoidSunBug(getClass(),
+                                                                beanInfo,
+                                                                beanClass,
+                                                                propertyDescriptors);
             }
         }
 

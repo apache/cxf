@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.common.util;
+package org.apache.cxf.tools.compiler;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -38,6 +38,8 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
+import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.helpers.FileUtils;
 
 public class Compiler {
@@ -93,9 +95,9 @@ public class Compiler {
             List<String> correctedEntries = new ArrayList<>();
 
             String[] toks = javaClasspath.split(File.pathSeparator);
-            
+
             for (String tok: toks) {
-                // if any classpath entry contains a whitespace char, 
+                // if any classpath entry contains a whitespace char,
                 // enclose the entry in double quotes
                 if (tok.matches(".*\\s+.*")) {
                     correctedEntries.add("\"" + tok + "\"");

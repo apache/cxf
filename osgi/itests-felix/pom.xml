@@ -86,7 +86,12 @@
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
             <version>${project.version}</version>
         </dependency>
-        
+         <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-tools-compiler</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam-container-native</artifactId>

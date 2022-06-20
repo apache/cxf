@@ -19,8 +19,6 @@
 
 package org.apache.cxf.workqueue;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -78,7 +76,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
     boolean shared;
     int sharedCount;
 
-    private List<PropertyChangeListener> changeListenerList;
+    private List<WorkqueueEventListener> workqueueEventListeners;
 
     public AutomaticWorkQueueImpl() {
         this(DEFAULT_MAX_QUEUE_SIZE);
@@ -116,20 +114,20 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         this.lowWaterMark = -1 == lowWaterMark ? Integer.MAX_VALUE : lowWaterMark;
         this.dequeueTimeout = dequeueTimeout;
         this.name = name;
-        this.changeListenerList = new ArrayList<>();
+        this.workqueueEventListeners = new ArrayList<>();
     }
 
-    public void addChangeListener(PropertyChangeListener listener) {
-        this.changeListenerList.add(listener);
+    public void addChangeListener(WorkqueueEventListener listener) {
+        this.workqueueEventListeners.add(listener);
     }
 
-    public void removeChangeListener(PropertyChangeListener listener) {
-        this.changeListenerList.remove(listener);
+    public void removeChangeListener(WorkqueueEventListener listener) {
+        this.workqueueEventListeners.remove(listener);
     }
 
-    public void notifyChangeListeners(PropertyChangeEvent event) {
-        for (PropertyChangeListener listener : changeListenerList) {
-            listener.propertyChange(event);
+    public void notifyChangeListeners(WorkqueueEvent workqueueEvent) {
+        for (WorkqueueEventListener listener : workqueueEventListeners) {
+            listener.processEvent(workqueueEvent);
         }
     }
 
@@ -530,7 +528,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
     public void setHighWaterMark(int hwm) {
         highWaterMark = hwm < 0 ? Integer.MAX_VALUE : hwm;
         if (executor != null) {
-            notifyChangeListeners(new PropertyChangeEvent(this, "highWaterMark",
+            notifyChangeListeners(new WorkqueueEvent(this, "highWaterMark",
                                                           this.executor.getMaximumPoolSize(), hwm));
             executor.setMaximumPoolSize(highWaterMark);
         }
@@ -539,24 +537,24 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
     public void setLowWaterMark(int lwm) {
         lowWaterMark = lwm < 0 ? 0 : lwm;
         if (executor != null) {
-            notifyChangeListeners(new PropertyChangeEvent(this, "lowWaterMark",
+            notifyChangeListeners(new WorkqueueEvent(this, "lowWaterMark",
                                                           this.executor.getCorePoolSize(), lwm));
             executor.setCorePoolSize(lowWaterMark);
         }
     }
 
     public void setInitialSize(int initialSize) {
-        notifyChangeListeners(new PropertyChangeEvent(this, "initialSize", this.initialThreads, initialSize));
+        notifyChangeListeners(new WorkqueueEvent(this, "initialSize", this.initialThreads, initialSize));
         this.initialThreads = initialSize;
     }
 
     public void setQueueSize(int size) {
-        notifyChangeListeners(new PropertyChangeEvent(this, "queueSize", this.maxQueueSize, size));
+        notifyChangeListeners(new WorkqueueEvent(this, "queueSize", this.maxQueueSize, size));
         this.maxQueueSize = size;
     }
 
     public void setDequeueTimeout(long l) {
-        notifyChangeListeners(new PropertyChangeEvent(this, "dequeueTimeout", this.dequeueTimeout, l));
+        notifyChangeListeners(new WorkqueueEvent(this, "dequeueTimeout", this.dequeueTimeout, l));
         this.dequeueTimeout = l;
     }
 

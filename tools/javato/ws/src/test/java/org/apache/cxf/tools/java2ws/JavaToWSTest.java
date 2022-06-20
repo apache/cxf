@@ -28,7 +28,6 @@ import java.util.Map;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import org.apache.cxf.common.util.Compiler;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -36,6 +35,7 @@ import org.apache.cxf.tools.common.CommandInterfaceUtils;
 import org.apache.cxf.tools.common.TestFileUtils;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolTestBase;
+import org.apache.cxf.tools.compiler.Compiler;
 
 import org.junit.After;
 import org.junit.Before;

@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.bus.osgi;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.Dictionary;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,6 +28,8 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.workqueue.AutomaticWorkQueueImpl;
 import org.apache.cxf.workqueue.WorkQueueManager;
+import org.apache.cxf.workqueue.WorkqueueEvent;
+import org.apache.cxf.workqueue.WorkqueueEventListener;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
@@ -39,7 +39,7 @@ import org.osgi.util.tracker.ServiceTracker;
 /**
  * List of work queues that can be managed using the OSGi configuration admin service
  */
-public class ManagedWorkQueueList implements ManagedServiceFactory, PropertyChangeListener {
+public class ManagedWorkQueueList implements ManagedServiceFactory, WorkqueueEventListener {
     public static final String FACTORY_PID = "org.apache.cxf.workqueues";
     private static final Logger LOG = LogUtils.getL7dLogger(ManagedWorkQueueList.class);
 
@@ -76,9 +76,9 @@ public class ManagedWorkQueueList implements ManagedServiceFactory, PropertyChan
     /*
      * On property changes of queue settings we update the config admin service pid of the queue
      */
-    public void propertyChange(PropertyChangeEvent evt) {
+    public void processEvent(WorkqueueEvent workqueueEvent) {
         try {
-            AutomaticWorkQueueImpl queue = (AutomaticWorkQueueImpl)evt.getSource();
+            AutomaticWorkQueueImpl queue = (AutomaticWorkQueueImpl)workqueueEvent.getSource();
             ConfigurationAdmin configurationAdmin = configAdminTracker.getService();
             if (configurationAdmin != null) {
                 Configuration selectedConfig = findConfigForQueueName(queue, configurationAdmin);
