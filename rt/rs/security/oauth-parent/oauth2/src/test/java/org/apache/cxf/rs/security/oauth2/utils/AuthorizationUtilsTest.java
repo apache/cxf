@@ -24,10 +24,9 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.message.Message;

@@ -22,11 +22,11 @@ package org.apache.cxf.ws.policy.attachment.external;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import javax.annotation.Resource;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
+import jakarta.annotation.Resource;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;

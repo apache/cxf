@@ -21,8 +21,8 @@ package org.apache.cxf.systest.sts.usernametoken;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
 
+import jakarta.xml.ws.Service;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
 import org.apache.cxf.systest.sts.deployment.DoubleItServer;
@@ -121,7 +121,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         try {
             doubleIt(transportUTPort, 30);
             fail("Expected failure on a bad password");
-        } catch (javax.xml.ws.soap.SOAPFaultException fault) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException fault) {
             // expected
         }
 
@@ -176,7 +176,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         try {
             doubleIt(transportUTPort, 30);
             fail("Expected failure on a bad password");
-        } catch (javax.xml.ws.soap.SOAPFaultException fault) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException fault) {
             // expected
         }
 

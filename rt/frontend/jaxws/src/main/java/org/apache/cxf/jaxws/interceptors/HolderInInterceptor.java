@@ -21,8 +21,7 @@ package org.apache.cxf.jaxws.interceptors;
 
 import java.util.List;
 
-import javax.xml.ws.Holder;
-
+import jakarta.xml.ws.Holder;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;

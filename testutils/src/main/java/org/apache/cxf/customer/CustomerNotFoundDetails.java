@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.customer;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "CustomerNotFoundDetails")
 public class CustomerNotFoundDetails {

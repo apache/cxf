@@ -21,13 +21,12 @@ package org.apache.cxf.systest.jaxws.attachment;
 
 import java.io.InputStream;
 
-import javax.activation.DataHandler;
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebService;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.ws.soap.MTOM;
-
+import jakarta.activation.DataHandler;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.ws.soap.MTOM;
 import org.apache.cxf.annotations.SchemaValidation;
 import org.apache.cxf.helpers.IOUtils;
 

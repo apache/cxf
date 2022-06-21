@@ -103,7 +103,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         try {
             echo.echo("test");
             fail("Failure expected on the wrong password type");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
             String error = "The security token could not be authenticated or authorized";
             assertTrue(ex.getMessage().contains(error));
@@ -153,7 +153,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         try {
             echo.echo("test");
             fail("Failure expected on the wrong password type");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
             String error = "The security token could not be authenticated or authorized";
             assertTrue(ex.getMessage().contains(error));
@@ -193,7 +193,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         try {
             echo.echo("test");
             fail("Failure expected on an unknown user");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
             String error = "The security token could not be authenticated or authorized";
             assertTrue(ex.getMessage().contains(error));
@@ -233,7 +233,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         try {
             echo.echo("test");
             fail("Failure expected on an unknown password");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
             String error = "The security token could not be authenticated or authorized";
             assertTrue(ex.getMessage().contains(error));
@@ -284,7 +284,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         try {
             echo.echo("test");
             fail("Failure expected on the wrong password type");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
             String error = "The security token could not be authenticated or authorized";
             assertTrue(ex.getMessage().contains(error));
@@ -334,7 +334,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         try {
             echo.echo("test");
             fail("Failure expected on the wrong password type");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
             String error = "The security token could not be authenticated or authorized";
             assertTrue(ex.getMessage().contains(error));
@@ -374,7 +374,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         try {
             echo.echo("test");
             fail("Failure expected on an unknown user");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
             String error = "The security token could not be authenticated or authorized";
             assertTrue(ex.getMessage().contains(error));
@@ -414,7 +414,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         try {
             echo.echo("test");
             fail("Failure expected on an unknown password");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
             String error = "The security token could not be authenticated or authorized";
             assertTrue(ex.getMessage().contains(error));

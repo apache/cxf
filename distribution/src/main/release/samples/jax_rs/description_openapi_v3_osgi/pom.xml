@@ -40,9 +40,9 @@ under the License.
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.${project.artifactId};blueprint.aries.xml-validation:=false</Bundle-SymbolicName>
                         <Import-Package>
-                            javax.ws.rs,
-                            javax.ws.rs.core,
-                            javax.ws.rs.container,
+                            jakarta.ws.rs,
+                            jakarta.ws.rs.core,
+                            jakarta.ws.rs.container,
                             org.apache.cxf.jaxrs.provider,
                             org.apache.cxf.jaxrs.openapi,
                             org.osgi.service.blueprint,
@@ -51,7 +51,7 @@ under the License.
                             io.swagger.v3.jaxrs2,
                             com.fasterxml.jackson.jaxrs.base,
                             com.fasterxml.jackson.jaxrs.json,
-                            javax.annotation;version="[1.2,2)",
+                            jakarta.annotation;version="[1.2,2)",
                             *
                         </Import-Package>
                         <Export-Package>

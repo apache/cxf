@@ -29,14 +29,14 @@ import java.util.Map;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPEnvelope;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.soap.SOAPEnvelope;
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPMessage;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;

@@ -21,9 +21,8 @@ package org.apache.cxf.systest.ws.rm;
 
 import java.util.logging.Logger;
 
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Response;
-
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Response;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;

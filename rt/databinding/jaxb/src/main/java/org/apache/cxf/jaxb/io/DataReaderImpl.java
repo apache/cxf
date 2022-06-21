@@ -24,15 +24,15 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.PropertyException;
-import javax.xml.bind.UnmarshalException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.ValidationEvent;
-import javax.xml.bind.ValidationEventHandler;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.namespace.QName;
 
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.PropertyException;
+import jakarta.xml.bind.UnmarshalException;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.ValidationEvent;
+import jakarta.xml.bind.ValidationEventHandler;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -132,7 +132,7 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
                 um.setAdapter(adapter);
             }
             return um;
-        } catch (javax.xml.bind.UnmarshalException ex) {
+        } catch (jakarta.xml.bind.UnmarshalException ex) {
             throw new Fault(new Message("UNMARSHAL_ERROR", LOG, ex.getLinkedException()
                 .getMessage()), ex);
         } catch (JAXBException ex) {

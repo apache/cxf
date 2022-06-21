@@ -20,10 +20,9 @@ package org.apache.cxf.jaxws.binding.soap;
 
 import java.lang.reflect.Method;
 
-import javax.jws.soap.SOAPBinding;
-import javax.jws.soap.SOAPBinding.Style;
-import javax.jws.soap.SOAPBinding.Use;
-
+import jakarta.jws.soap.SOAPBinding;
+import jakarta.jws.soap.SOAPBinding.Style;
+import jakarta.jws.soap.SOAPBinding.Use;
 import org.apache.cxf.binding.soap.SoapBindingConfiguration;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
 import org.apache.cxf.service.model.OperationInfo;

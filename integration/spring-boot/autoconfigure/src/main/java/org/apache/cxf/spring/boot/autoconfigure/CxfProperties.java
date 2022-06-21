@@ -21,9 +21,8 @@ package org.apache.cxf.spring.boot.autoconfigure;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 

@@ -20,9 +20,8 @@ package org.apache.cxf.xkms.x509.validator;
 
 import java.io.InputStream;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 import org.apache.cxf.xkms.model.xkms.KeyBindingEnum;
 import org.apache.cxf.xkms.model.xkms.ReasonEnum;
 import org.apache.cxf.xkms.model.xkms.StatusType;

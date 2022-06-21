@@ -18,12 +18,11 @@
  */
 package org.apache.cxf.systest.jaxrs.cdi;
 
-import javax.enterprise.inject.Produces;
-import javax.inject.Inject;
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Feature;
-
+import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.Feature;
 import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationFeature;
 import org.apache.cxf.jaxrs.validation.ValidationExceptionMapper;
 import org.apache.cxf.systests.cdi.base.BookStoreService;

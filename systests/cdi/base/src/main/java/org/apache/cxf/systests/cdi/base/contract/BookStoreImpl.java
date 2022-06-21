@@ -18,10 +18,9 @@
  */
 package org.apache.cxf.systests.cdi.base.contract;
 
-import javax.inject.Inject;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-
+import jakarta.inject.Inject;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
 import org.apache.cxf.systests.cdi.base.BookStoreService;
 import org.apache.cxf.systests.cdi.base.bindings.Logged;
 

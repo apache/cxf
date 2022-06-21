@@ -22,13 +22,13 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.persistence.Cacheable;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.OrderColumn;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.persistence.Cacheable;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OrderColumn;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 
 /**

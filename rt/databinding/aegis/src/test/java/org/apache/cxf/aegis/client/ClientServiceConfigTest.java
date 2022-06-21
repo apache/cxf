@@ -19,9 +19,8 @@
 
 package org.apache.cxf.aegis.client;
 
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Holder;
-
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Holder;
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;

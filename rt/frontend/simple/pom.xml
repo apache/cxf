@@ -36,7 +36,7 @@
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
             com.sun.tools*;resolution:=optional,
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
-            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}"
+            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}"
         </cxf.osgi.import>
         <!-- keep in sync with services exported in activator -->
         <cxf.export.service>
@@ -145,6 +145,10 @@
             <artifactId>jaxb-xjc</artifactId>
             <optional>true</optional>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.angus</groupId>
+            <artifactId>angus-mail</artifactId>
         </dependency>
     </dependencies>
 </project>

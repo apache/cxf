@@ -20,8 +20,7 @@ package org.apache.cxf.transport.servlet;
 
 import java.net.URI;
 
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.cxf.transport.AbstractDestination;
 import org.apache.cxf.wsdl.http.AddressType;
 

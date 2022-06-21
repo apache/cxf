@@ -36,17 +36,17 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapters;
 import javax.xml.namespace.QName;
 
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapters;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.jaxb.JAXBUtils;
@@ -316,7 +316,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
             }
             addClass(String.class);
         } else if (claz.getName().startsWith("java.")
-            || claz.getName().startsWith("javax.")) {
+            || claz.getName().startsWith("jakarta.") || claz.getName().startsWith("javax.")) {
             return;
         } else {
             Class<?> cls = JAXBUtils.getValidClass(claz);
@@ -375,7 +375,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
             return;
         }
         if (cls.getName().startsWith("java.")
-            || cls.getName().startsWith("javax.")) {
+            || cls.getName().startsWith("jakarta.") || cls.getName().startsWith("javax.")) {
             return;
         }
         //walk the public fields/methods to try and find all the classes. JAXB will only load the
@@ -531,15 +531,10 @@ class JAXBContextInitializer extends ServiceModelVisitor {
     private static Object createTypeReference(QName n, Class<?> cls) {
         Class<?> refClass = null;
         try {
-            refClass = ClassLoaderUtils.loadClass("com.sun.xml.bind.api.TypeReference",
+            refClass = ClassLoaderUtils.loadClass("org.glassfish.jaxb.runtime.api.TypeReference",
                                                   JAXBContextInitializer.class);
         } catch (Throwable ex) {
-            try {
-                refClass = ClassLoaderUtils.loadClass("com.sun.xml.internal.bind.api.TypeReference",
-                                                      JAXBContextInitializer.class);
-            } catch (Throwable ex2) {
-                //ignore
-            }
+            //ignore
         }
         if (refClass != null) {
             try {

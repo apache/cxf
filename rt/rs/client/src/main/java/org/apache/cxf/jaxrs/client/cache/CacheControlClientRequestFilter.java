@@ -23,15 +23,15 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Priority;
 import javax.cache.Cache;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
 
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.client.ClientRequestContext;
+import jakarta.ws.rs.client.ClientRequestFilter;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.common.util.StringUtils;
 
 @Priority(Priorities.USER - 1)

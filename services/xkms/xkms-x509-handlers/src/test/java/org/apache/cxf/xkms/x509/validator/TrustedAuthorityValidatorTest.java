@@ -26,9 +26,8 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.xkms.handlers.Applications;
 import org.apache.cxf.xkms.model.xkms.KeyBindingEnum;

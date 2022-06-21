@@ -23,7 +23,8 @@ package demo.jaxws.tracing.client;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
+
+import jakarta.xml.ws.Service;
 
 import demo.jaxws.tracing.server.Book;
 import demo.jaxws.tracing.server.CatalogService;

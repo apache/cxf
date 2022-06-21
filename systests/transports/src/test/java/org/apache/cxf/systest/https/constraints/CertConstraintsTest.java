@@ -21,8 +21,7 @@ package org.apache.cxf.systest.https.constraints;
 
 import java.net.URL;
 
-import javax.xml.ws.BindingProvider;
-
+import jakarta.xml.ws.BindingProvider;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.systest.https.BusServer;
@@ -118,7 +117,7 @@ public class CertConstraintsTest extends AbstractBusClientServerTestBase {
         try {
             assertEquals(port.greetMe("Kitty"), "Hello Kitty");
             fail("Failure expected");
-        } catch (javax.xml.ws.WebServiceException ex) {
+        } catch (jakarta.xml.ws.WebServiceException ex) {
             // expected
         }
     }

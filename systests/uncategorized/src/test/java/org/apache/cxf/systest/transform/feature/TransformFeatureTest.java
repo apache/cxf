@@ -24,9 +24,9 @@ import java.io.IOException;
 import java.net.ServerSocket;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
-import javax.xml.ws.soap.SOAPBinding;
 
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.soap.SOAPBinding;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.feature.transform.XSLTInInterceptor;
 import org.apache.cxf.feature.transform.XSLTOutInterceptor;

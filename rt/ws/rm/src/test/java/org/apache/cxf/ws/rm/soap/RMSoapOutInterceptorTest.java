@@ -26,12 +26,12 @@ import java.util.List;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPConstants;
-import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPConstants;
+import jakarta.xml.soap.SOAPMessage;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.headers.Header;

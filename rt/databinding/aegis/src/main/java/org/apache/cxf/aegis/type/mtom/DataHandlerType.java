@@ -22,15 +22,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import javax.activation.DataHandler;
-
+import jakarta.activation.DataHandler;
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.message.Attachment;
 
 /**
- * Binding for {@link javax.activation.DataHandler}. This assumes that the DataHandler will always
- * contain a {@link javax.activation.DataSource}, not data in the Object.
+ * Binding for {@link jakarta.activation.DataHandler}. This assumes that the DataHandler will always
+ * contain a {@link jakarta.activation.DataSource}, not data in the Object.
  */
 public class DataHandlerType extends AbstractXOPType {
 

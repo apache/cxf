@@ -25,12 +25,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;

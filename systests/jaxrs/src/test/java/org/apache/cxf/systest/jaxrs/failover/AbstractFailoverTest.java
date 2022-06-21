@@ -24,10 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.clustering.FailoverFeature;
 import org.apache.cxf.clustering.FailoverTargetSelector;
 import org.apache.cxf.clustering.RandomStrategy;

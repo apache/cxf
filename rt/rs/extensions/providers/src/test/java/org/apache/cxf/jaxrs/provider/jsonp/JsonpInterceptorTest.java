@@ -22,8 +22,7 @@ package org.apache.cxf.jaxrs.provider.jsonp;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
-import javax.ws.rs.core.MediaType;
-
+import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;

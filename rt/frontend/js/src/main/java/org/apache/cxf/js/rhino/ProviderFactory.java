@@ -27,8 +27,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.ws.Service;
-
+import jakarta.xml.ws.Service;
 import org.apache.cxf.common.logging.LogUtils;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;

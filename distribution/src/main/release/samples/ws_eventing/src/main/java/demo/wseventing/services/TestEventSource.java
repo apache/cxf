@@ -20,9 +20,9 @@
 package demo.wseventing.services;
 
 
-import javax.annotation.Resource;
-import javax.jws.WebService;
-import javax.xml.ws.WebServiceContext;
+import jakarta.annotation.Resource;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.WebServiceContext;
 
 import org.apache.cxf.ws.eventing.backend.manager.SubscriptionManagerInterfaceForEventSources;
 import org.apache.cxf.ws.eventing.eventsource.AbstractEventSource;

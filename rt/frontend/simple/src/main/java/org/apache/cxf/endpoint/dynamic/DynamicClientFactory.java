@@ -45,8 +45,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -70,9 +68,9 @@ import org.xml.sax.helpers.XMLFilterImpl;
 import com.sun.tools.xjc.reader.internalizer.AbstractReferenceFinderImpl;
 import com.sun.tools.xjc.reader.internalizer.DOMForest;
 import com.sun.tools.xjc.reader.internalizer.InternalizationLogic;
-//import com.sun.tools.xjc.reader.xmlschema.parser.XMLSchemaInternalizationLogic;
 
-
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.CXFBusFactory;

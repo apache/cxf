@@ -8,7 +8,7 @@
 		<load-on-startup>1</load-on-startup>
 		<async-supported>true</async-supported>
 		<init-param>
-			<param-name>javax.ws.rs.Application</param-name>
+			<param-name>jakarta.ws.rs.Application</param-name>
 			<param-value>org.apache.cxf.systest.jaxrs.sse.SseApplication</param-value>
 		</init-param>
 		<init-param>

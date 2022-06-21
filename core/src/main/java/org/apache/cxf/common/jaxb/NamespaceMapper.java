@@ -21,7 +21,7 @@ package org.apache.cxf.common.jaxb;
 
 import java.util.Map;
 
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+import org.glassfish.jaxb.runtime.marshaller.NamespacePrefixMapper;
 
 
 public final class NamespaceMapper extends NamespacePrefixMapper {

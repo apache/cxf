@@ -25,8 +25,8 @@
         </dependency>
 
         <dependency>
-            <groupId>com.fasterxml.jackson.jaxrs</groupId>
-            <artifactId>jackson-jaxrs-json-provider</artifactId>
+            <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+            <artifactId>jackson-jakarta-rs-json-provider</artifactId>
         </dependency>
 
         <dependency>
@@ -47,7 +47,7 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>apache-jsp</artifactId>
-            <version>${cxf.jetty9.version}</version>
+            <version>${cxf.jetty11.version}</version>
         </dependency>
 
         <dependency>
@@ -57,8 +57,8 @@
 
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
-            <artifactId>websocket-server</artifactId>
-            <version>${cxf.jetty9.version}</version>
+            <artifactId>websocket-jakarta-server</artifactId>
+            <version>${cxf.jetty11.version}</version>
         </dependency>
         
         <dependency>

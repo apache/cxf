@@ -21,7 +21,7 @@
 
 package demo.soap_header.server;
 
-import javax.xml.ws.Holder;
+import jakarta.xml.ws.Holder;
 import org.apache.headers.HeaderTester;
 import org.apache.headers.InHeader;
 import org.apache.headers.InHeaderResponse;
@@ -32,7 +32,7 @@ import org.apache.headers.OutHeaderResponse;
 import org.apache.headers.SOAPHeaderData;
 
 
-@javax.jws.WebService(serviceName = "HeaderService",
+@jakarta.jws.WebService(serviceName = "HeaderService",
             portName = "SoapPort",
             endpointInterface = "org.apache.headers.HeaderTester",
             targetNamespace = "http://apache.org/headers")

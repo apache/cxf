@@ -28,9 +28,9 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import javax.wsdl.OperationType;
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import javax.xml.namespace.QName;
 
+import jakarta.xml.bind.annotation.adapters.HexBinaryAdapter;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -299,7 +299,7 @@ public class ParameterProcessor extends AbstractProcessor {
                         if (p.getQName().equals(ProcessorUtil.getElementName(outpart))
                             && p.getPartName().equals(outpart.getName().getLocalPart())) {
                             p.setHolder(true);
-                            p.setHolderName(javax.xml.ws.Holder.class.getName());
+                            p.setHolderName(jakarta.xml.ws.Holder.class.getName());
                             String holderClass = p.getClassName();
                             if (JAXBUtils.holderClass(holderClass) != null) {
                                 holderClass = JAXBUtils.holderClass(holderClass).getName();
@@ -541,7 +541,7 @@ public class ParameterProcessor extends AbstractProcessor {
 
         if (style == JavaType.Style.OUT || style == JavaType.Style.INOUT) {
             parameter.setHolder(true);
-            parameter.setHolderName(javax.xml.ws.Holder.class.getName());
+            parameter.setHolderName(jakarta.xml.ws.Holder.class.getName());
             String holderClass = fullJavaName;
             if (JAXBUtils.holderClass(fullJavaName) != null) {
                 holderClass = JAXBUtils.holderClass(fullJavaName).getName();

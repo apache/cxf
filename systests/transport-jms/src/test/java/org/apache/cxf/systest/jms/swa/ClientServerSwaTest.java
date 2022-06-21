@@ -21,11 +21,11 @@ package org.apache.cxf.systest.jms.swa;
 import java.io.Closeable;
 import java.io.InputStream;
 
-import javax.activation.DataHandler;
-import javax.mail.util.ByteArrayDataSource;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Holder;
 
+import jakarta.activation.DataHandler;
+import jakarta.mail.util.ByteArrayDataSource;
+import jakarta.xml.ws.Holder;
 import org.apache.cxf.binding.soap.jms.interceptor.SoapJMSConstants;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.helpers.IOUtils;
@@ -45,7 +45,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
     public static final String ADDRESS
         = "jms:jndi:dynamicQueues/test.cxf.jmstransport.swa.queue"
             + "?jndiInitialContextFactory"
-            + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+            + "=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
             + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=";
 
     static EmbeddedJMSBrokerLauncher broker;

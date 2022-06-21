@@ -22,8 +22,8 @@ package org.apache.cxf.ws.eventing.integration;
 import java.io.IOException;
 
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.ws.soap.SOAPFaultException;
 
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.ws.eventing.DeliveryType;
 import org.apache.cxf.ws.eventing.ExpirationType;
 import org.apache.cxf.ws.eventing.FilterType;

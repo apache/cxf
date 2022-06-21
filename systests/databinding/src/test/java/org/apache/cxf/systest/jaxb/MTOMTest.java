@@ -22,14 +22,14 @@ package org.apache.cxf.systest.jaxb;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.jws.WebService;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Service;
-import javax.xml.ws.soap.MTOM;
-import javax.xml.ws.soap.SOAPBinding;
 
+import jakarta.jws.WebService;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.soap.MTOM;
+import jakarta.xml.ws.soap.SOAPBinding;
 import org.apache.cxf.ext.logging.Logging;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;

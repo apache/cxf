@@ -22,15 +22,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.jws.Oneway;
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-import javax.jws.WebService;
 import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;
 
+import jakarta.jws.Oneway;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
+import jakarta.jws.WebService;
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.helpers.XPathUtils;

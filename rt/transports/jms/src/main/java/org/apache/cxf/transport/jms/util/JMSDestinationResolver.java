@@ -18,10 +18,11 @@
  */
 package org.apache.cxf.transport.jms.util;
 
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Session;
 import javax.naming.NamingException;
+
+import jakarta.jms.Destination;
+import jakarta.jms.JMSException;
+import jakarta.jms.Session;
 
 public class JMSDestinationResolver implements DestinationResolver {
     JndiHelper jndiTemplate;

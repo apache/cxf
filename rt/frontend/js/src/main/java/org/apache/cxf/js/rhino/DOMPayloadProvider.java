@@ -20,8 +20,8 @@
 package org.apache.cxf.js.rhino;
 
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.ws.Provider;
 
+import jakarta.xml.ws.Provider;
 import org.mozilla.javascript.Scriptable;
 
 

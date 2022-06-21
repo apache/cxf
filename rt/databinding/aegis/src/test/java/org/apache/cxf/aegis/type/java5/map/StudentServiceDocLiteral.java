@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(targetNamespace = "uri:org.apache.cxf.aegis.test.map",
     name = "StudentService")

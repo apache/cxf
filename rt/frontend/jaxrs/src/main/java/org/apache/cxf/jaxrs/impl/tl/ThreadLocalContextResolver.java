@@ -19,7 +19,7 @@
 
 package org.apache.cxf.jaxrs.impl.tl;
 
-import javax.ws.rs.ext.ContextResolver;
+import jakarta.ws.rs.ext.ContextResolver;
 
 public class ThreadLocalContextResolver<T>
     extends AbstractThreadLocalProxy<ContextResolver<T>>

@@ -24,9 +24,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;

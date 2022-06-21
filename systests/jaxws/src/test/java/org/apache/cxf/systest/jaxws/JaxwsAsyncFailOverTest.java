@@ -22,9 +22,8 @@ package org.apache.cxf.systest.jaxws;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.jws.WebService;
-import javax.xml.ws.Response;
-
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Response;
 import org.apache.cxf.clustering.FailoverFeature;
 import org.apache.cxf.clustering.RandomStrategy;
 import org.apache.cxf.greeter_control.AbstractGreeterImpl;
@@ -49,7 +48,7 @@ public class JaxwsAsyncFailOverTest  extends AbstractBusClientServerTestBase {
         protected void run()  {
             GreeterImpl implementor = new GreeterImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
-            javax.xml.ws.Endpoint.publish(address, implementor);
+            jakarta.xml.ws.Endpoint.publish(address, implementor);
         }
 
 

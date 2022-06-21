@@ -29,13 +29,13 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Service;
-import javax.xml.ws.Service.Mode;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.soap.SOAPFaultException;
 
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.Service.Mode;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -44,17 +44,17 @@ import org.apache.cxf.metrics.MetricsProvider;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.systest.jaxws.resources.HelloService;
 import org.apache.cxf.systest.jaxws.resources.HelloServiceImpl;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.util.SocketUtils;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -353,7 +353,7 @@ public class SpringJaxwsTest {
 
     @Test
     public void testJaxwsProxyClientExceptionMetric() throws MalformedURLException {
-        final int fakePort = SocketUtils.findAvailableTcpPort();
+        final int fakePort = Integer.parseInt(TestUtil.getPortNumber("proxy-client-exception"));
         final HelloService api = createApi(fakePort, HELLO_SERVICE_NAME_V1); 
         
         assertThatThrownBy(() -> api.sayHello("Elan"))

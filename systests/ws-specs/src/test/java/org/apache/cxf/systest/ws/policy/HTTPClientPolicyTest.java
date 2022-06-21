@@ -25,9 +25,9 @@ import java.net.URL;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.WebServiceException;
 
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.WebServiceException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;

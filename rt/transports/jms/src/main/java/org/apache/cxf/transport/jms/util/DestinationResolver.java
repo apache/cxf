@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.transport.jms.util;
 
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Session;
+import jakarta.jms.Destination;
+import jakarta.jms.JMSException;
+import jakarta.jms.Session;
 
 public interface DestinationResolver {
     Destination resolveDestinationName(Session session, String destinationName, boolean pubSubDomain)

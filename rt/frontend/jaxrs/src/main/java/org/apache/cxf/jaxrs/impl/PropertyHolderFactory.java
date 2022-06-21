@@ -26,8 +26,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 

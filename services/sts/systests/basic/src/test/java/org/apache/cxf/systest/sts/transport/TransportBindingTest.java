@@ -27,13 +27,13 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Service;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
@@ -238,7 +238,7 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         try {
             doubleIt(transportSaml1Port, 35);
             fail("Expected failure on an unknown client");
-        } catch (javax.xml.ws.soap.SOAPFaultException fault) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException fault) {
             // expected
         }
 
@@ -292,7 +292,7 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         try {
             doubleIt(transportSaml1Port, 35);
             //fail("Expected failure on an unknown address");
-        } catch (javax.xml.ws.soap.SOAPFaultException fault) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException fault) {
             // expected
         }
 

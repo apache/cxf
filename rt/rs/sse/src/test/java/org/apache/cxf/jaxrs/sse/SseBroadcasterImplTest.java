@@ -24,11 +24,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.atomic.LongAdder;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.sse.OutboundSseEvent;
-import javax.ws.rs.sse.SseBroadcaster;
-
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.ext.MessageBodyWriter;
+import jakarta.ws.rs.sse.OutboundSseEvent;
+import jakarta.ws.rs.sse.SseBroadcaster;
 import org.springframework.mock.web.MockAsyncContext;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;

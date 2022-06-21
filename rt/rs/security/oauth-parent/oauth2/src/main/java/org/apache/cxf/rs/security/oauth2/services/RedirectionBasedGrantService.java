@@ -26,15 +26,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
@@ -537,7 +536,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
      * Get the {@link Client} reference
      * @param params request parameters
      * @return Client the client reference
-     * @throws {@link javax.ws.rs.WebApplicationException} if no matching Client is found,
+     * @throws {@link jakarta.ws.rs.WebApplicationException} if no matching Client is found,
      *         the error is returned directly to the end user without
      *         following the redirect URI if any
      */

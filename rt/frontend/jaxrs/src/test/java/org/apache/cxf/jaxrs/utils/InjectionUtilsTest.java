@@ -34,16 +34,13 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import com.migesok.jaxb.adapter.javatime.LocalDateXmlAdapter;
-
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;

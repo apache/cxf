@@ -19,7 +19,7 @@
 
 package org.apache.cxf.jaxrs.impl;
 
-import javax.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.Cookie;
 
 import org.junit.Test;
 

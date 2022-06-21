@@ -23,8 +23,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URL;
 
-import javax.resource.ResourceException;
-
+import jakarta.resource.ResourceException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.jca.core.resourceadapter.ResourceAdapterInternalException;
 import org.apache.cxf.test.AbstractCXFTest;

@@ -28,21 +28,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
-import javax.ws.rs.BeanParam;
-import javax.ws.rs.MatrixParam;
 
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
+
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import jakarta.ws.rs.BeanParam;
+import jakarta.ws.rs.MatrixParam;
 
 import io.swagger.converter.ModelConverters;
 import io.swagger.jaxrs.ext.AbstractSwaggerExtension;
@@ -56,6 +57,7 @@ import io.swagger.models.properties.RefProperty;
 import io.swagger.models.properties.StringProperty;
 import io.swagger.util.Json;
 import io.swagger.util.ParameterProcessor;
+
 
 public class JaxRs2Extension extends AbstractSwaggerExtension {
 

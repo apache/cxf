@@ -25,8 +25,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.WebFault;
 
+import jakarta.xml.ws.WebFault;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.tools.common.ToolConstants;

@@ -22,12 +22,11 @@ package org.apache.cxf.jaxrs.impl;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;

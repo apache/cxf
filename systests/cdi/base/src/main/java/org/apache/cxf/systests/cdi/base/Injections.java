@@ -21,22 +21,21 @@ package org.apache.cxf.systests.cdi.base;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.container.ResourceContext;
-import javax.ws.rs.container.ResourceInfo;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Configuration;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.Providers;
-
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.container.ResourceContext;
+import jakarta.ws.rs.container.ResourceInfo;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.Configuration;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Request;
+import jakarta.ws.rs.core.SecurityContext;
+import jakarta.ws.rs.core.UriInfo;
+import jakarta.ws.rs.ext.ContextResolver;
+import jakarta.ws.rs.ext.Providers;
 import org.apache.cxf.cdi.ContextResolved;
 
 @ApplicationScoped

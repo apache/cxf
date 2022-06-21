@@ -26,14 +26,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.Tuple;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.metamodel.SingularAttribute;
-
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
+import jakarta.persistence.Tuple;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.metamodel.SingularAttribute;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchConditionParser;
 import org.apache.cxf.jaxrs.ext.search.SearchConditionVisitor;

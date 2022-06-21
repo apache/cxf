@@ -27,9 +27,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
-
+import jakarta.ws.rs.core.CacheControl;
+import jakarta.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;

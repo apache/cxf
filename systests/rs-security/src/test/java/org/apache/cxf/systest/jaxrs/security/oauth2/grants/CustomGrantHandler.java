@@ -21,8 +21,7 @@ package org.apache.cxf.systest.jaxrs.security.oauth2.grants;
 import java.util.Collections;
 import java.util.List;
 
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;

@@ -27,7 +27,7 @@ import java.time.OffsetTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
-import javax.ws.rs.ext.ParamConverter;
+import jakarta.ws.rs.ext.ParamConverter;
 
 import org.junit.Assert;
 import org.junit.Test;

@@ -28,15 +28,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.annotation.XmlRootElement;
-
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.UriInfo;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.Customer;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;

@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.transport.jms;
 
-import javax.jms.Connection;
-
+import jakarta.jms.Connection;
 import org.apache.cxf.transport.jms.util.JMSListenerContainer;
 
 import org.junit.Test;

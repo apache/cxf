@@ -19,8 +19,9 @@
 package org.apache.cxf.jaxws.provider;
 
 import javax.xml.transform.Source;
-import javax.xml.ws.Provider;
-import javax.xml.ws.WebServiceProvider;
+
+import jakarta.xml.ws.Provider;
+import jakarta.xml.ws.WebServiceProvider;
 
 @WebServiceProvider
 public class PayloadProvider implements Provider<Source> {

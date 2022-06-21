@@ -27,7 +27,7 @@ import uri.cxf_apache_org.jstest.PingMeFault;
 import uri.cxf_apache_org.jstest.types.FaultDetail;
 
 
-@javax.jws.WebService(portName = "SoapPort", serviceName = "SOAPService",
+@jakarta.jws.WebService(portName = "SoapPort", serviceName = "SOAPService",
                       targetNamespace = "http://apache.org/hello_world_soap_http",
                       endpointInterface = "uri.cxf_apache_org.jstest.Greeter")
 @org.apache.cxf.feature.Features(features = "org.apache.cxf.feature.LoggingFeature")

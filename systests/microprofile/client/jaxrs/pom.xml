@@ -54,12 +54,6 @@
             </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-rs-service-description-swagger</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-service-description-openapi-v3</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>

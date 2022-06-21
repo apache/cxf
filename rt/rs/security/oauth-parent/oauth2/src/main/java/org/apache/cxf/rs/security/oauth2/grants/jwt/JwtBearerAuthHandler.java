@@ -19,11 +19,10 @@
 
 package org.apache.cxf.rs.security.oauth2.grants.jwt;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.FormUtils;

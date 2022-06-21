@@ -22,8 +22,7 @@ package org.apache.cxf.systest.soapfault.details;
 
 import java.net.MalformedURLException;
 
-import javax.xml.ws.soap.SOAPFaultException;
-
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
 import org.apache.cxf.greeter_control.PingMeFault;

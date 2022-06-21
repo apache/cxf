@@ -21,9 +21,8 @@ package org.apache.cxf.jaxws.context;
 
 import java.io.InputStream;
 
-import javax.annotation.Resource;
-import javax.xml.ws.WebServiceContext;
-
+import jakarta.annotation.Resource;
+import jakarta.xml.ws.WebServiceContext;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.resource.ResourceManager;

@@ -21,15 +21,14 @@ package org.apache.cxf.systest.jaxrs.spring.boot;
 
 import java.util.Map;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Invocation.Builder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Invocation.Builder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.Bus;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.metrics.MetricsFeature;
@@ -38,7 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;

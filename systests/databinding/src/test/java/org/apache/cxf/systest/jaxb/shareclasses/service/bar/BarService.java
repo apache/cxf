@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.systest.jaxb.shareclasses.service.bar;
 
-import javax.jws.WebService;
-
+import jakarta.jws.WebService;
 import org.apache.cxf.systest.jaxb.shareclasses.service.Getter;
 
 @WebService

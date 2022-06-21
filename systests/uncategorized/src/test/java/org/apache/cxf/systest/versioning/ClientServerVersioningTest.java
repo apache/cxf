@@ -23,7 +23,6 @@ import java.lang.reflect.UndeclaredThrowableException;
 
 import javax.xml.namespace.QName;
 
-
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.hello_world_mixedstyle.Greeter;
 import org.apache.hello_world_mixedstyle.SOAPService;

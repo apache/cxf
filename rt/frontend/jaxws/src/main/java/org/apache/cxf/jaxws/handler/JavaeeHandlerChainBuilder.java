@@ -23,13 +23,13 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
-import javax.xml.ws.handler.Handler;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.ws.handler.Handler;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.jaxws.handler.types.PortComponentHandlerType;
 

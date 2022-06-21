@@ -20,12 +20,11 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.io.IOException;
 
-import javax.annotation.Priority;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.core.HttpHeaders;
-
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.client.ClientRequestContext;
+import jakarta.ws.rs.client.ClientRequestFilter;
+import jakarta.ws.rs.core.HttpHeaders;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;

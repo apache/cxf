@@ -23,8 +23,8 @@ import java.io.FileInputStream;
 import java.security.KeyStore;
 
 import javax.net.ssl.SSLContext;
-import javax.ws.rs.core.Response;
 
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpEntity;

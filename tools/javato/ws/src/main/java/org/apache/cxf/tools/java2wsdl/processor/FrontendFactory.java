@@ -25,12 +25,11 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.jws.WebMethod;
-import javax.jws.WebResult;
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
-import javax.xml.ws.WebServiceProvider;
-
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebResult;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
+import jakarta.xml.ws.WebServiceProvider;
 import org.apache.cxf.tools.java2wsdl.processor.internal.jaxws.WrapperUtil;
 import org.apache.cxf.tools.util.AnnotationUtil;
 

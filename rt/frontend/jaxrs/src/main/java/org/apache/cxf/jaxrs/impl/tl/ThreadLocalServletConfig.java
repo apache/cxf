@@ -22,8 +22,8 @@ package org.apache.cxf.jaxrs.impl.tl;
 
 import java.util.Enumeration;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
 
 public class ThreadLocalServletConfig extends AbstractThreadLocalProxy<ServletConfig>
     implements ServletConfig {

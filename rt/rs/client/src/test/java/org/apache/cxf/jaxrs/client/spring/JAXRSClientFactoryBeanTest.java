@@ -20,10 +20,10 @@ package org.apache.cxf.jaxrs.client.spring;
 
 import java.util.List;
 
-import javax.ws.rs.core.Feature;
-import javax.ws.rs.core.FeatureContext;
 import javax.xml.namespace.QName;
 
+import jakarta.ws.rs.core.Feature;
+import jakarta.ws.rs.core.FeatureContext;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.client.Client;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;

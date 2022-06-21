@@ -22,15 +22,14 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 
-import javax.resource.ResourceException;
-import javax.resource.spi.ConnectionEvent;
-import javax.resource.spi.ManagedConnectionMetaData;
-import javax.resource.spi.ResourceAdapterInternalException;
-import javax.resource.spi.security.PasswordCredential;
 import javax.security.auth.Subject;
 import javax.xml.namespace.QName;
 
-
+import jakarta.resource.ResourceException;
+import jakarta.resource.spi.ConnectionEvent;
+import jakarta.resource.spi.ManagedConnectionMetaData;
+import jakarta.resource.spi.ResourceAdapterInternalException;
+import jakarta.resource.spi.security.PasswordCredential;
 import org.apache.cxf.connector.Connection;
 import org.apache.cxf.jca.cxf.handlers.ProxyInvocationHandler;
 import org.apache.hello_world_soap_http.Greeter;

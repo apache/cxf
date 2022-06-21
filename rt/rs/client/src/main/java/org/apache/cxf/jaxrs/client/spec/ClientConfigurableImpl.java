@@ -19,10 +19,9 @@
 
 package org.apache.cxf.jaxrs.client.spec;
 
-import javax.ws.rs.RuntimeType;
-import javax.ws.rs.core.Configurable;
-import javax.ws.rs.core.Configuration;
-
+import jakarta.ws.rs.RuntimeType;
+import jakarta.ws.rs.core.Configurable;
+import jakarta.ws.rs.core.Configuration;
 import org.apache.cxf.jaxrs.impl.ConfigurableImpl;
 import org.apache.cxf.jaxrs.impl.ConfigurationImpl;
 

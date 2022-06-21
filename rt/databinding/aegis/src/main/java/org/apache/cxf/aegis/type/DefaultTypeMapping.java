@@ -31,14 +31,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 
 import org.w3c.dom.Document;
 
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
 import org.apache.cxf.aegis.type.basic.Base64Type;
 import org.apache.cxf.aegis.type.basic.BigDecimalType;
 import org.apache.cxf.aegis.type.basic.BigIntegerType;

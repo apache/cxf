@@ -28,10 +28,11 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Service;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.http.HTTPBinding;
+
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.http.HTTPBinding;
 
 import org.w3c.dom.Document;
 

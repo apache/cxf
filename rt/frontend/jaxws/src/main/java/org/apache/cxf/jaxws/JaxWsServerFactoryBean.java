@@ -24,10 +24,9 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.handler.Handler;
-import javax.xml.ws.soap.SOAPBinding;
-
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.handler.Handler;
+import jakarta.xml.ws.soap.SOAPBinding;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;

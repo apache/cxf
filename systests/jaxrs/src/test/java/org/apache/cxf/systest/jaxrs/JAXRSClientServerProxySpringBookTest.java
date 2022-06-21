@@ -28,11 +28,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 
-import javax.ws.rs.core.Response;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.client.WebClient;

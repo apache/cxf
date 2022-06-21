@@ -18,9 +18,8 @@
  */
 package org.apache.cxf.systest.http.auth;
 
-import javax.ws.rs.NotAuthorizedException;
-import javax.ws.rs.core.MediaType;
-
+import jakarta.ws.rs.NotAuthorizedException;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.auth.DigestAuthSupplier;
@@ -28,7 +27,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

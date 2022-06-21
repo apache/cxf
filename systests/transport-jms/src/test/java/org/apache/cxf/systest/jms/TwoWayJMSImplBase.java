@@ -20,12 +20,11 @@ package org.apache.cxf.systest.jms;
 
 import java.util.concurrent.Future;
 
-import javax.annotation.Resource;
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.Response;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.handler.MessageContext;
-
+import jakarta.annotation.Resource;
+import jakarta.xml.ws.AsyncHandler;
+import jakarta.xml.ws.Response;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.handler.MessageContext;
 import org.apache.cxf.hello_world_jms.BadRecordLitFault;
 import org.apache.cxf.hello_world_jms.HelloWorldPortType;
 import org.apache.cxf.hello_world_jms.NoSuchCodeLitFault;

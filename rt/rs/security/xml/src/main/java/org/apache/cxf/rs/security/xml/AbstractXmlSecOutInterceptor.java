@@ -24,13 +24,13 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
 
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;

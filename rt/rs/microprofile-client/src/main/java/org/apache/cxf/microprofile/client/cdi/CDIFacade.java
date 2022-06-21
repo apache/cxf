@@ -36,7 +36,7 @@ public final class CDIFacade {
     static {
         boolean b;
         try {
-            Class.forName("javax.enterprise.inject.spi.BeanManager");
+            Class.forName("jakarta.enterprise.inject.spi.BeanManager");
             b = true;
         } catch (Throwable t) {
             b = false;

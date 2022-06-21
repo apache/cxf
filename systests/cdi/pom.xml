@@ -45,7 +45,7 @@
             </dependency>
             <dependency>
                 <groupId>org.glassfish</groupId>
-                <artifactId>javax.el</artifactId>
+                <artifactId>jakarta.el</artifactId>
                 <version>${cxf.glassfish.el.version}</version>
             </dependency>
             <dependency>

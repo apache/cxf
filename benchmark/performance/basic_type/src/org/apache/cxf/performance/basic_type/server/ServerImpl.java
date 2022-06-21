@@ -21,7 +21,7 @@ package org.apache.cxf.performance.basic_type.server;
 import java.util.logging.Logger;
 
 import org.apache.cxf.performance.basic_type.BasicPortType;
-@javax.jws.WebService(portName = "SoapHttpPort", serviceName = "BasicService",
+@jakarta.jws.WebService(portName = "SoapHttpPort", serviceName = "BasicService",
                       targetNamespace = "http://cxf.apache.org/performance/basic_type",
                       endpointInterface = "org.apache.cxf.performance.basic_type.BasicPortType",
                       wsdlLocation = "wsdl/basic_type.wsdl"

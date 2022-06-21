@@ -25,14 +25,14 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.ValidationEventHandler;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.ValidationEventHandler;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxb.JAXBDataBinding;

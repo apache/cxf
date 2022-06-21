@@ -18,8 +18,7 @@
  */
 package org.apache.hello_world_mixedstyle;
 
-import javax.jws.WebService;
-
+import jakarta.jws.WebService;
 import org.apache.hello_world_mixedstyle.types.FaultDetail;
 import org.apache.hello_world_mixedstyle.types.GreetMe1;
 import org.apache.hello_world_mixedstyle.types.GreetMeResponse;

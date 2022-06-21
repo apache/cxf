@@ -21,8 +21,10 @@ package demo.hw.client;
 
 import java.io.File;
 import java.net.URL;
+
 import javax.xml.namespace.QName;
-import javax.xml.ws.WebServiceException;
+
+import jakarta.xml.ws.WebServiceException;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.PingMeFault;
 import org.apache.hello_world_soap_http.SOAPService;

@@ -21,13 +21,14 @@ package org.apache.cxf.jaxws.handler;
 
 import java.util.List;
 
-import javax.jws.HandlerChain;
-import javax.jws.WebService;
 import javax.xml.namespace.QName;
-import javax.xml.ws.handler.Handler;
-import javax.xml.ws.handler.LogicalHandler;
-import javax.xml.ws.handler.LogicalMessageContext;
-import javax.xml.ws.handler.MessageContext;
+
+import jakarta.jws.HandlerChain;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.handler.Handler;
+import jakarta.xml.ws.handler.LogicalHandler;
+import jakarta.xml.ws.handler.LogicalMessageContext;
+import jakarta.xml.ws.handler.MessageContext;
 
 import org.junit.Before;
 import org.junit.Test;

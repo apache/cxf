@@ -21,10 +21,9 @@ package org.apache.hello_world_soap_http.any_types;
 
 import java.util.List;
 
-import javax.jws.WebService;
-
 import org.w3c.dom.Element;
 
+import jakarta.jws.WebService;
 import org.apache.hello_world_soap_http.any.Greeter;
 import org.apache.hello_world_soap_http.any_types.SayHi.Port;
 

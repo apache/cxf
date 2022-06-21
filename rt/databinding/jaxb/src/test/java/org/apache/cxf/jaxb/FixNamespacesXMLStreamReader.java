@@ -19,9 +19,10 @@
 
 package org.apache.cxf.jaxb;
 
-import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.util.StreamReaderDelegate;
+
+import jakarta.xml.bind.Unmarshaller;
 
 public class FixNamespacesXMLStreamReader extends StreamReaderDelegate implements UnmarshallerAwareXMLReader {
     private Unmarshaller unmarshaller;

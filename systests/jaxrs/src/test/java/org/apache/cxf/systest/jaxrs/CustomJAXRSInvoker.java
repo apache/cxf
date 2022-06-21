@@ -21,8 +21,7 @@ package org.apache.cxf.systest.jaxrs;
 import java.lang.reflect.Method;
 import java.security.Principal;
 
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.jaxrs.JAXRSInvoker;
 import org.apache.cxf.jaxrs.impl.SecurityContextImpl;

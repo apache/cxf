@@ -60,16 +60,16 @@ public final class JAXWSAConstants {
      * Context.
      */
     public static final String CLIENT_ADDRESSING_PROPERTIES =
-        "javax.xml.ws.addressing.context";
+        "jakarta.xml.ws.addressing.context";
 
     /**
      * Well-known Property names for AddressingProperties in Handler
      * Context.
      */
     public static final String ADDRESSING_PROPERTIES_INBOUND =
-        "javax.xml.ws.addressing.context.inbound";
+        "jakarta.xml.ws.addressing.context.inbound";
     public static final String ADDRESSING_PROPERTIES_OUTBOUND =
-        "javax.xml.ws.addressing.context.outbound";
+        "jakarta.xml.ws.addressing.context.outbound";
 
 
     @Deprecated

@@ -20,9 +20,9 @@
 package demo.wseventing;
 
 import java.util.logging.Logger;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
+import jakarta.servlet.annotation.WebListener;
 
 import org.apache.cxf.ws.eventing.backend.manager.SubscriptionManagerInterfaceForNotificators;
 import org.apache.cxf.ws.eventing.backend.notification.EventSinkInterfaceNotificatorService;

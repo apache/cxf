@@ -19,10 +19,10 @@
 
 package org.apache.cxf.systest.source;
 
-import javax.jws.WebService;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.ws.Holder;
 
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Holder;
 import org.apache.cxf.source.doc_lit_bare.PutLastTradedPricePortType;
 
 /**

@@ -23,14 +23,14 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.resource.ResourceException;
-import javax.resource.spi.ConnectionEvent;
-import javax.resource.spi.ConnectionEventListener;
-import javax.resource.spi.ConnectionRequestInfo;
-import javax.resource.spi.ManagedConnection;
-import javax.resource.spi.ManagedConnectionMetaData;
 import javax.security.auth.Subject;
 
+import jakarta.resource.ResourceException;
+import jakarta.resource.spi.ConnectionEvent;
+import jakarta.resource.spi.ConnectionEventListener;
+import jakarta.resource.spi.ConnectionRequestInfo;
+import jakarta.resource.spi.ManagedConnection;
+import jakarta.resource.spi.ManagedConnectionMetaData;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jca.core.logging.LoggerHelper;
 import org.apache.cxf.jca.cxf.CXFManagedConnectionMetaData;
@@ -64,10 +64,6 @@ public abstract class AbstractManagedConnectionImpl implements ManagedConnection
     }
 
     public abstract void associateConnection(Object arg0) throws ResourceException;
-
-    //public abstract LocalTransaction getLocalTransaction() throws ResourceException;
-
-    //public abstract javax.transaction.xa.XAResource getXAResource() throws ResourceException;
 
     public abstract Object getConnection(Subject aSubject, ConnectionRequestInfo aCrInfo)
         throws ResourceException;

@@ -25,9 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.rs.security.jose.common.JoseHeaders;
 

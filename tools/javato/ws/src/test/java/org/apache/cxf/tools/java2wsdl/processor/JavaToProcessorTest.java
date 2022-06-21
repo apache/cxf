@@ -33,8 +33,6 @@ import javax.wsdl.Service;
 import javax.wsdl.WSDLException;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -42,6 +40,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;

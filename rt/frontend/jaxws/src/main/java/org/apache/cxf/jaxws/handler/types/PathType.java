@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.jaxws.handler.types;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlType;
 
 /**
  * The elements that use this type designate either a relative path or an absolute path starting with a "/".

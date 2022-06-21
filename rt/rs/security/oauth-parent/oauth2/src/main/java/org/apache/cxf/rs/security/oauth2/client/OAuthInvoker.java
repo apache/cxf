@@ -21,8 +21,7 @@ package org.apache.cxf.rs.security.oauth2.client;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import javax.ws.rs.NotAuthorizedException;
-
+import jakarta.ws.rs.NotAuthorizedException;
 import org.apache.cxf.jaxrs.JAXRSInvoker;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.MessageContext;

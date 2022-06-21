@@ -33,7 +33,7 @@
     <properties>
         <cxf.module.name>org.apache.cxf.binding.xml</cxf.module.name>
         <cxf.osgi.import>
-            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}"
+            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}"
         </cxf.osgi.import>
     </properties>
     <dependencies>

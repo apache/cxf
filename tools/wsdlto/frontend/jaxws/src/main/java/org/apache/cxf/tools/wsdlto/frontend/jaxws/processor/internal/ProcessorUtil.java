@@ -155,7 +155,7 @@ public final class ProcessorUtil {
                     || "From".equals(pn)
                     || "FaultTo".equals(pn)) {
 
-                    name = "javax.xml.ws.wsaddressing.W3CEndpointReference";
+                    name = "jakarta.xml.ws.wsaddressing.W3CEndpointReference";
                 }
             }
 

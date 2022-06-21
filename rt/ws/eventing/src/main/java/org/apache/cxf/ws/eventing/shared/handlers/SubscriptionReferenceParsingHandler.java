@@ -24,13 +24,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.soap.SOAPHandler;
-import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.handler.soap.SOAPHandler;
+import jakarta.xml.ws.handler.soap.SOAPMessageContext;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.eventing.shared.EventingConstants;

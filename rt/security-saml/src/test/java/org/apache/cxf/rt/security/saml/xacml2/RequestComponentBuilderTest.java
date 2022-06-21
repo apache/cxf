@@ -19,6 +19,7 @@
 
 package org.apache.cxf.rt.security.saml.xacml2;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,9 +31,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import net.shibboleth.utilities.java.support.xml.DOMTypeSupport;
 import org.apache.cxf.rt.security.saml.xacml.XACMLConstants;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
-import org.joda.time.DateTime;
 import org.opensaml.xacml.ctx.ActionType;
 import org.opensaml.xacml.ctx.AttributeType;
 import org.opensaml.xacml.ctx.AttributeValueType;
@@ -193,9 +194,9 @@ public class RequestComponentBuilderTest {
         ActionType action = RequestComponentBuilder.createActionType(attributes);
 
         // Environment
-        DateTime dateTime = new DateTime();
+        Instant dateTime = Instant.now();
         AttributeValueType environmentAttributeValue =
-            RequestComponentBuilder.createAttributeValueType(dateTime.toString());
+            RequestComponentBuilder.createAttributeValueType(DOMTypeSupport.instantToString(dateTime));
         AttributeType environmentAttribute =
             RequestComponentBuilder.createAttributeType(
                     XACMLConstants.CURRENT_DATETIME,

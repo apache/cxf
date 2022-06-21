@@ -21,13 +21,12 @@ package org.apache.cxf.systest.jaxrs.reactive;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.rx3.client.FlowableRxInvoker;
 import org.apache.cxf.jaxrs.rx3.client.FlowableRxInvokerProvider;

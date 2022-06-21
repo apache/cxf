@@ -24,10 +24,10 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 
 import javax.xml.transform.Source;
-import javax.xml.ws.Binding;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.WebServiceContext;
 
+import jakarta.xml.ws.Binding;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.WebServiceContext;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;

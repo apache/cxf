@@ -23,9 +23,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response.ResponseBuilder;
-
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;

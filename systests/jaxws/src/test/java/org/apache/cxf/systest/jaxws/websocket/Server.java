@@ -22,9 +22,8 @@ package org.apache.cxf.systest.jaxws.websocket;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.jws.WebService;
-import javax.xml.ws.Endpoint;
-
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Endpoint;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.hello_world_soap_http.BaseGreeterImpl;
@@ -47,7 +46,7 @@ public class Server extends AbstractBusTestServerBase {
 
         //publish port with soap12 binding
         address = "ws://localhost:" + PORT + "/SoapContext/SoapPort";
-        EndpointImpl e = (EndpointImpl) Endpoint.create(javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING,
+        EndpointImpl e = (EndpointImpl) Endpoint.create(jakarta.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING,
                                                         new Greeter12Impl());
         e.publish(address);
         eps.add(e);

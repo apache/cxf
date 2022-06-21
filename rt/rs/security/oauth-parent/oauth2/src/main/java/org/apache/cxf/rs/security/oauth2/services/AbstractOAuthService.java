@@ -20,11 +20,10 @@ package org.apache.cxf.rs.security.oauth2.services;
 
 import java.util.logging.Logger;
 
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response.ResponseBuilder;
-
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;

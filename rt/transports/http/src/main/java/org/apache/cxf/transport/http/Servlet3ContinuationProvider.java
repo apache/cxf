@@ -21,14 +21,13 @@ package org.apache.cxf.transport.http;
 
 import java.io.IOException;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.AsyncEvent;
-import javax.servlet.AsyncListener;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.AsyncEvent;
+import jakarta.servlet.AsyncListener;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.continuations.Continuation;
@@ -45,7 +44,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
     static {
         boolean is31;
         try {
-            ClassLoaderUtils.loadClass("javax.servlet.WriteListener", HttpServletRequest.class);
+            ClassLoaderUtils.loadClass("jakarta.servlet.WriteListener", HttpServletRequest.class);
             is31 = true;
         } catch (Throwable t) {
             is31 = false;

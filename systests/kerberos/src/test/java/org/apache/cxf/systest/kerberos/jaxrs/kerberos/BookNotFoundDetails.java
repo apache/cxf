@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.kerberos.jaxrs.kerberos;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class BookNotFoundDetails {

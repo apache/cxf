@@ -20,10 +20,10 @@
 package org.apache.cxf.js.rhino;
 
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.ws.Provider;
-import javax.xml.ws.Service;
-import javax.xml.ws.ServiceMode;
 
+import jakarta.xml.ws.Provider;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.ServiceMode;
 import org.mozilla.javascript.Scriptable;
 
 

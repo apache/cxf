@@ -138,8 +138,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-j2ee-management_1.1_spec</artifactId>
+            <groupId>jakarta.management.j2ee</groupId>
+            <artifactId>jakarta.management.j2ee-api</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -167,8 +167,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
+            <groupId>jakarta.resource</groupId>
+            <artifactId>jakarta.resource-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
@@ -181,8 +181,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.jaxrs</groupId>
-            <artifactId>jackson-jaxrs-json-provider</artifactId>
+            <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+            <artifactId>jackson-jakarta-rs-json-provider</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.cache</groupId>
@@ -194,6 +194,7 @@
             <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
             <version>${cxf.ehcache3.version}</version>
+            <classifier>jakarta</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -210,21 +211,21 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
+            <artifactId>hibernate-core</artifactId>
             <version>${cxf.hibernate.em.version}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>javax.xml.bind</groupId>
-                    <artifactId>jaxb-api</artifactId>
+                    <groupId>jakarta.xml.bind</groupId>
+                    <artifactId>bind-api</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>javax.activation</groupId>
-                    <artifactId>javax.activation-api</artifactId>
+                    <groupId>jakarta.activation</groupId>
+                    <artifactId>jakarta.activation-api</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>javax.persistence</groupId>
-                    <artifactId>javax.persistence-api</artifactId>
+                    <groupId>jakarta.persistence</groupId>
+                    <artifactId>jakarta.persistence-api</artifactId>
                 </exclusion>
             </exclusions> 
         </dependency>

@@ -20,10 +20,9 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.io.IOException;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
-
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponseWrapper;
 import org.apache.cxf.message.Message;
 
 public class HttpServletResponseFilter extends HttpServletResponseWrapper {

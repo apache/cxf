@@ -22,10 +22,10 @@ package org.apache.cxf.systest.coloc;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Holder;
-import javax.xml.ws.WebServiceException;
 
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Holder;
+import jakarta.xml.ws.WebServiceException;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Message;
 import org.apache.headers.coloc.types.FaultDetailT;

@@ -290,29 +290,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-j2ee-management_1.1_spec</artifactId>
+            <groupId>jakarta.management.j2ee</groupId>
+            <artifactId>jakarta.management.j2ee-api</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-broker</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-pool</artifactId>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>geronimo-jta_1.1_spec</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-kahadb-store</artifactId>
+            <artifactId>artemis-jakarta-server</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -342,8 +326,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>jakarta.mail</artifactId>
+            <groupId>org.eclipse.angus</groupId>
+            <artifactId>angus-activation</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.angus</groupId>
+            <artifactId>angus-mail</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -352,8 +341,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
+            <groupId>jakarta.resource</groupId>
+            <artifactId>jakarta.resource-api</artifactId>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.fastinfoset</groupId>

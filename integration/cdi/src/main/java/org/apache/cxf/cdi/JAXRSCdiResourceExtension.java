@@ -31,33 +31,32 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import javax.enterprise.context.Dependent;
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.event.Observes;
-import javax.enterprise.inject.spi.AfterBeanDiscovery;
-import javax.enterprise.inject.spi.AfterDeploymentValidation;
-import javax.enterprise.inject.spi.Annotated;
-import javax.enterprise.inject.spi.AnnotatedType;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.BeforeBeanDiscovery;
-import javax.enterprise.inject.spi.BeforeShutdown;
-import javax.enterprise.inject.spi.Extension;
-import javax.enterprise.inject.spi.InjectionTarget;
-import javax.enterprise.inject.spi.ProcessAnnotatedType;
-import javax.enterprise.inject.spi.ProcessBean;
-import javax.enterprise.inject.spi.ProcessProducerField;
-import javax.enterprise.inject.spi.ProcessProducerMethod;
-import javax.enterprise.inject.spi.WithAnnotations;
-import javax.inject.Singleton;
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.Provider;
-
+import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.context.spi.CreationalContext;
+import jakarta.enterprise.event.Observes;
+import jakarta.enterprise.inject.spi.AfterBeanDiscovery;
+import jakarta.enterprise.inject.spi.AfterDeploymentValidation;
+import jakarta.enterprise.inject.spi.Annotated;
+import jakarta.enterprise.inject.spi.AnnotatedType;
+import jakarta.enterprise.inject.spi.Bean;
+import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.inject.spi.BeforeBeanDiscovery;
+import jakarta.enterprise.inject.spi.BeforeShutdown;
+import jakarta.enterprise.inject.spi.Extension;
+import jakarta.enterprise.inject.spi.InjectionTarget;
+import jakarta.enterprise.inject.spi.ProcessAnnotatedType;
+import jakarta.enterprise.inject.spi.ProcessBean;
+import jakarta.enterprise.inject.spi.ProcessProducerField;
+import jakarta.enterprise.inject.spi.ProcessProducerMethod;
+import jakarta.enterprise.inject.spi.WithAnnotations;
+import jakarta.inject.Singleton;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.ext.MessageBodyWriter;
+import jakarta.ws.rs.ext.Provider;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.cdi.event.DisposableCreationalContext;
@@ -162,8 +161,8 @@ public class JAXRSCdiResourceExtension implements Extension {
         }
         if (webHandled) {
             existingStandardClasses.addAll(asList(
-                "javax.servlet.http.HttpServletRequest",
-                "javax.servlet.ServletContext"));
+                "jakarta.servlet.http.HttpServletRequest",
+                "jakarta.servlet.ServletContext"));
         }
         beanManager.fireEvent(this);
     }
@@ -199,7 +198,7 @@ public class JAXRSCdiResourceExtension implements Extension {
             serviceBeans.add(event.getBean());
         } else if (isAnnotationPresent(beanManager, annotated, Provider.class)) {
             providerBeans.add(event.getBean());
-        } else if (event.getBean().getTypes().contains(javax.ws.rs.core.Feature.class)) {
+        } else if (event.getBean().getTypes().contains(jakarta.ws.rs.core.Feature.class)) {
             providerBeans.add(event.getBean());
         } else if (event.getBean().getTypes().contains(Feature.class)) {
             featureBeans.add((Bean< ? extends Feature >)event.getBean());

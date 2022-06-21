@@ -20,7 +20,7 @@ package org.apache.cxf.systest.jaxws;
 
 import java.util.Arrays;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(targetNamespace = "org.apache.cxf.systest.jaxws",
             endpointInterface = "org.apache.cxf.systest.jaxws.ArrayService")

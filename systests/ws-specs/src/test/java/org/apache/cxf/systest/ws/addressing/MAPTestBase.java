@@ -27,11 +27,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.ProtocolException;
 
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.ProtocolException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;

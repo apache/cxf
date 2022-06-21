@@ -28,10 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ws.rs.core.Link;
-import javax.ws.rs.core.Link.Builder;
-import javax.ws.rs.core.UriBuilder;
-
+import jakarta.ws.rs.core.Link;
+import jakarta.ws.rs.core.Link.Builder;
+import jakarta.ws.rs.core.UriBuilder;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 
 public class LinkBuilderImpl implements Builder {

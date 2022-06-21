@@ -28,10 +28,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
-import javax.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.transport.websocket.InvalidPathException;

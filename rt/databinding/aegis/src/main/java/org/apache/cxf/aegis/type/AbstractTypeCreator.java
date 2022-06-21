@@ -159,7 +159,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
 
 
     protected boolean isHolder(Class<?> javaType) {
-        return "javax.xml.ws.Holder".equals(javaType.getName());
+        return "jakarta.xml.ws.Holder".equals(javaType.getName());
     }
 
     protected AegisType createHolderType(TypeClassInfo info) {

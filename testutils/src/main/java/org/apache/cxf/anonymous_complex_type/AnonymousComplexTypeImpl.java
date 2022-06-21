@@ -19,7 +19,7 @@
 
 package org.apache.cxf.anonymous_complex_type;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 
 

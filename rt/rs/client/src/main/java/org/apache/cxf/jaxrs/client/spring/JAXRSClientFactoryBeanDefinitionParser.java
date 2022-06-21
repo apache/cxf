@@ -26,13 +26,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Configurable;
-import javax.ws.rs.ext.Provider;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Configurable;
+import jakarta.ws.rs.ext.Provider;
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.common.util.ClasspathScanner;
 import org.apache.cxf.configuration.spring.AbstractFactoryBeanDefinitionParser;

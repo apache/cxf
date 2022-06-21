@@ -22,14 +22,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 

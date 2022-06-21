@@ -23,10 +23,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;

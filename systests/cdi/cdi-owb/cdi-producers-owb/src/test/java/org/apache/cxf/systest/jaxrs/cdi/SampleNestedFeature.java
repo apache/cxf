@@ -19,9 +19,8 @@
 
 package org.apache.cxf.systest.jaxrs.cdi;
 
-import javax.ws.rs.core.Feature;
-import javax.ws.rs.core.FeatureContext;
-
+import jakarta.ws.rs.core.Feature;
+import jakarta.ws.rs.core.FeatureContext;
 import org.apache.cxf.systests.cdi.base.BookStorePreMatchingRequestFilter;
 
 public class SampleNestedFeature implements Feature {

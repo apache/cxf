@@ -21,8 +21,7 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.util.Date;
 
-import javax.ws.rs.core.NewCookie;
-
+import jakarta.ws.rs.core.NewCookie;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 
 import org.junit.Test;

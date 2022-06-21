@@ -20,12 +20,12 @@
 package demo.hwDispatch.server;
 import java.io.InputStream;
 
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.ws.Provider;
-import javax.xml.ws.Service;
-import javax.xml.ws.ServiceMode;
-import javax.xml.ws.WebServiceProvider;
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.ws.Provider;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.ServiceMode;
+import jakarta.xml.ws.WebServiceProvider;
 
 @WebServiceProvider(portName = "SoapPort1", serviceName = "SOAPService1",
                       targetNamespace = "http://apache.org/hello_world_soap_http",

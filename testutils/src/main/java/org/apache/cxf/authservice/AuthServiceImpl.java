@@ -22,7 +22,7 @@ package org.apache.cxf.authservice;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(targetNamespace = "http://cxf.apache.org/AuthService", name = "AuthService",
             endpointInterface = "org.apache.cxf.authservice.AuthService")

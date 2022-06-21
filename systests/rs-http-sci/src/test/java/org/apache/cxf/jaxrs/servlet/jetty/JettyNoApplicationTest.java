@@ -19,7 +19,7 @@
 
 package org.apache.cxf.jaxrs.servlet.jetty;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.servlet.AbstractSciTest;

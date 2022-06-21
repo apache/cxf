@@ -29,12 +29,12 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPMessage;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;

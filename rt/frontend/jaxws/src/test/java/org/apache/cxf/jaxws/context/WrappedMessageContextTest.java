@@ -24,11 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.activation.DataHandler;
-import javax.mail.util.ByteArrayDataSource;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.MessageContext.Scope;
-
+import jakarta.activation.DataHandler;
+import jakarta.mail.util.ByteArrayDataSource;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.handler.MessageContext.Scope;
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Attachment;

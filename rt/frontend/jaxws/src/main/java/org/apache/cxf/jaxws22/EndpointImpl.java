@@ -19,8 +19,7 @@
 
 package org.apache.cxf.jaxws22;
 
-import javax.xml.ws.WebServiceFeature;
-
+import jakarta.xml.ws.WebServiceFeature;
 import org.apache.cxf.Bus;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 

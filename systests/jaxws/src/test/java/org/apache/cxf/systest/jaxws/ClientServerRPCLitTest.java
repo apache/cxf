@@ -26,25 +26,9 @@ import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
-import javax.jws.soap.SOAPBinding.Style;
-import javax.jws.soap.SOAPBinding.Use;
-import javax.xml.bind.UnmarshalException;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.soap.SOAPFaultException;
 import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;
@@ -52,6 +36,22 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
+import jakarta.jws.soap.SOAPBinding.Style;
+import jakarta.jws.soap.SOAPBinding.Use;
+import jakarta.xml.bind.UnmarshalException;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
@@ -158,7 +158,7 @@ public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
     public void testDispatchClient() throws Exception {
         SOAPServiceRPCLit service = new SOAPServiceRPCLit();
         Dispatch<Source> disp = service.createDispatch(portName, Source.class,
-                                                       javax.xml.ws.Service.Mode.PAYLOAD);
+                                                       jakarta.xml.ws.Service.Mode.PAYLOAD);
         updateAddressPort(disp, PORT);
 
         String req = "<ns1:sendReceiveData xmlns:ns1=\"http://apache.org/hello_world_rpclit\">"

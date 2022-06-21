@@ -20,11 +20,10 @@ package org.apache.cxf.rs.security.oauth2.services;
 
 import java.util.Properties;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;

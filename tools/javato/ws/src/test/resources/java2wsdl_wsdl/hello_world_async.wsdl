@@ -17,7 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http-conf="http://schemas.iona.com/transports/http/configuration" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/hello_world_async_soap_http" xmlns:x1="http://apache.org/hello_world_async_soap_http/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jaxws="http://java.sun.com/xml/ns/jaxws" targetNamespace="http://apache.org/hello_world_async_soap_http" name="HelloWorld">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http-conf="http://schemas.iona.com/transports/http/configuration" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/hello_world_async_soap_http" xmlns:x1="http://apache.org/hello_world_async_soap_http/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jaxws="https://jakarta.ee/xml/ns/jaxws" targetNamespace="http://apache.org/hello_world_async_soap_http" name="HelloWorld">
     <jaxws:bindings>
         <jaxws:enableAsyncMapping>true</jaxws:enableAsyncMapping>
     </jaxws:bindings>

@@ -27,8 +27,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import javax.ws.rs.client.InvocationCallback;
-
+import jakarta.ws.rs.client.InvocationCallback;
 import org.apache.cxf.endpoint.ClientCallback;
 
 public class JaxrsClientCallback<T> extends ClientCallback {

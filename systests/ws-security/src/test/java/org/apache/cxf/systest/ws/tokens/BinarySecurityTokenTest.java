@@ -23,11 +23,11 @@ import java.net.URL;
 import java.util.UUID;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Service;
 
 import org.w3c.dom.Document;
 
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;

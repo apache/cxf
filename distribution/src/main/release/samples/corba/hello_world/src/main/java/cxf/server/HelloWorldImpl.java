@@ -21,7 +21,7 @@ package cxf.server;
 import cxf.common.HelloWorld;
 
 
-@javax.jws.WebService(portName = "HelloWorldCORBAPort", serviceName = "HelloWorldCORBAService",
+@jakarta.jws.WebService(portName = "HelloWorldCORBAPort", serviceName = "HelloWorldCORBAService",
                       targetNamespace = "http://cxf.apache.org/schemas/cxf/idl/HelloWorld",
                       wsdlLocation = "classpath:/wsdl/HelloWorld-corba.wsdl",
                       endpointInterface = "cxf.common.HelloWorld")

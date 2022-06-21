@@ -19,8 +19,7 @@
 
 package org.apache.cxf.systest.mtom_feature;
 
-import javax.xml.ws.Endpoint;
-
+import jakarta.xml.ws.Endpoint;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {

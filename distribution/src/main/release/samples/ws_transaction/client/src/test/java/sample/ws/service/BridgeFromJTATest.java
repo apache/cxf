@@ -29,7 +29,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.transaction.UserTransaction;
+import jakarta.transaction.UserTransaction;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SampleWsApplication.class, webEnvironment = WebEnvironment.DEFINED_PORT)

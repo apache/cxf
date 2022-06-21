@@ -18,15 +18,14 @@
  */
 package org.apache.cxf.jaxrs.model.wadl.jaxb;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
-
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
 import org.apache.cxf.jaxrs.ext.xml.XMLName;
 import org.apache.cxf.jaxrs.model.wadl.Description;
 import org.apache.cxf.jaxrs.model.wadl.FormInterface;

@@ -20,10 +20,10 @@ package org.apache.cxf.jaxrs.sse.client;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.sse.SseEvent;
-import javax.ws.rs.sse.SseEventSource;
-import javax.ws.rs.sse.SseEventSource.Builder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.sse.SseEvent;
+import jakarta.ws.rs.sse.SseEventSource;
+import jakarta.ws.rs.sse.SseEventSource.Builder;
 
 public class SseEventSourceBuilderImpl extends SseEventSource.Builder {
     private long delay = SseEvent.RECONNECT_NOT_SET;

@@ -18,11 +18,11 @@
  */
 package org.apache.cxf.tools.fortest.cxf188;
 
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
 
-@SOAPBinding(style = javax.jws.soap.SOAPBinding.Style.RPC,
-             use = javax.jws.soap.SOAPBinding.Use.LITERAL)
+@SOAPBinding(style = jakarta.jws.soap.SOAPBinding.Style.RPC,
+             use = jakarta.jws.soap.SOAPBinding.Use.LITERAL)
 @WebService(portName = "DemoPort", targetNamespace = "http://apache.org/cxf",
             serviceName = "DemoService", name = "Demo")
 interface Demo {

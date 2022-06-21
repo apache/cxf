@@ -24,15 +24,14 @@ import java.lang.reflect.Type;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.WriterInterceptor;
-import javax.ws.rs.ext.WriterInterceptorContext;
-
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.ext.MessageBodyWriter;
+import jakarta.ws.rs.ext.WriterInterceptor;
+import jakarta.ws.rs.ext.WriterInterceptorContext;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;

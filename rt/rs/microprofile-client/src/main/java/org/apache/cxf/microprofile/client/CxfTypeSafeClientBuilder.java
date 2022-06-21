@@ -37,10 +37,10 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.core.Configurable;
-import javax.ws.rs.core.Configuration;
 
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.core.Configurable;
+import jakarta.ws.rs.core.Configuration;
 import org.apache.cxf.jaxrs.client.ClientProperties;
 import org.apache.cxf.jaxrs.client.spec.TLSConfiguration;
 import org.apache.cxf.microprofile.client.sse.SseMessageBodyReader;

@@ -24,9 +24,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBElement;
 import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
@@ -34,6 +31,9 @@ import org.w3c.dom.Element;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.xml.bind.JAXBElement;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.CompressionUtils;
 import org.apache.cxf.jaxrs.client.WebClient;

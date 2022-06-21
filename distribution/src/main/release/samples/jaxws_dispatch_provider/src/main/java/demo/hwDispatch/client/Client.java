@@ -24,11 +24,12 @@ import java.io.InputStream;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPMessage;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Service.Mode;
+
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.Service.Mode;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

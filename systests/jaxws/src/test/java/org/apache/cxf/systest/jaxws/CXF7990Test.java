@@ -21,11 +21,11 @@ package org.apache.cxf.systest.jaxws;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Service;
-import javax.xml.ws.soap.SOAPBinding;
-import javax.xml.ws.soap.SOAPFaultException;
 
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.soap.SOAPBinding;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 

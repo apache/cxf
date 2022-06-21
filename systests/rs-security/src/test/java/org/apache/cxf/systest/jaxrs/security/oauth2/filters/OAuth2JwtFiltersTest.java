@@ -22,9 +22,8 @@ package org.apache.cxf.systest.jaxrs.security.oauth2.filters;
 import java.net.URI;
 import java.util.Collections;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;

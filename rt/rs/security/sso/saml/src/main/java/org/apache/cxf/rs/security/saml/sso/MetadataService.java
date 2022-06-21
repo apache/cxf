@@ -26,12 +26,12 @@ import java.util.logging.Logger;
 
 import javax.security.auth.DestroyFailedException;
 import javax.security.auth.callback.CallbackHandler;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 
 import org.w3c.dom.Document;
 
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;

@@ -20,9 +20,8 @@ package org.apache.cxf.jaxrs.reactivestreams.server;
 
 import java.util.concurrent.CancellationException;
 
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.core.MediaType;
-
+import jakarta.ws.rs.container.AsyncResponse;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.jaxrs.JAXRSInvoker;
 import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.message.Message;

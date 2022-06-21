@@ -22,9 +22,9 @@ import java.net.URL;
 import java.security.cert.X509Certificate;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Service;
 
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Service;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;

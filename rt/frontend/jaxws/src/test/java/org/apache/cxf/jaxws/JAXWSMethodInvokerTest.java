@@ -31,12 +31,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.Provider;
 
 import org.w3c.dom.Document;
 
 import org.xml.sax.SAXException;
 
+import jakarta.xml.ws.Provider;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.headers.Header;

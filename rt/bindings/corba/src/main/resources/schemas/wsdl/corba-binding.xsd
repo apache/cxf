@@ -22,8 +22,8 @@
 <xs:schema targetNamespace="http://cxf.apache.org/bindings/corba" 
     xmlns:corba="http://cxf.apache.org/bindings/corba" 
     xmlns:xs="http://www.w3.org/2001/XMLSchema" 
-    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-    jaxb:version="2.0"
+    xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
+    jaxb:version="3.0"
     elementFormDefault="qualified" 
     attributeFormDefault="unqualified"> 
       

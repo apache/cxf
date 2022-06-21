@@ -25,8 +25,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ws.rs.ext.ParamConverterProvider;
-
+import jakarta.ws.rs.ext.ParamConverterProvider;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.search.DefaultParamConverterProvider;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;

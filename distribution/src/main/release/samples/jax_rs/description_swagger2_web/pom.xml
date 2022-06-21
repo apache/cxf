@@ -39,7 +39,7 @@ under the License.
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>${cxf.jetty9.version}</version>
+                <version>${cxf.jetty11.version}</version>
                 <configuration>
                     <webApp>
                         <contextPath>/</contextPath>
@@ -75,8 +75,8 @@ under the License.
             <artifactId>jakarta.ws.rs-api</artifactId>
         </dependency>
         <dependency>
-          <groupId>com.fasterxml.jackson.jaxrs</groupId>
-          <artifactId>jackson-jaxrs-json-provider</artifactId>
+            <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+            <artifactId>jackson-jakarta-rs-json-provider</artifactId>
         </dependency>
         <!-- spring -->
         <dependency>

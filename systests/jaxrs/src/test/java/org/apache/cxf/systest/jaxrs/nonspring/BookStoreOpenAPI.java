@@ -19,9 +19,8 @@
 
 package org.apache.cxf.systest.jaxrs.nonspring;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
 import org.apache.cxf.feature.Features;
 import org.apache.cxf.systest.jaxrs.Book;
 

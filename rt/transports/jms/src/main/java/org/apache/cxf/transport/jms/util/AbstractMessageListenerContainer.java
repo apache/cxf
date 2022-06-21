@@ -26,14 +26,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jms.Connection;
-import javax.jms.Destination;
-import javax.jms.MessageListener;
-import javax.jms.Session;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.transaction.TransactionManager;
 
+import jakarta.jms.Connection;
+import jakarta.jms.Destination;
+import jakarta.jms.MessageListener;
+import jakarta.jms.Session;
+import jakarta.transaction.TransactionManager;
 import org.apache.cxf.common.logging.LogUtils;
 
 public abstract class AbstractMessageListenerContainer implements JMSListenerContainer {

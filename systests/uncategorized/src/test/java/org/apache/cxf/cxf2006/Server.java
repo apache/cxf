@@ -21,8 +21,7 @@ package org.apache.cxf.cxf2006;
 
 import java.net.URL;
 
-import javax.xml.ws.Endpoint;
-
+import jakarta.xml.ws.Endpoint;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;

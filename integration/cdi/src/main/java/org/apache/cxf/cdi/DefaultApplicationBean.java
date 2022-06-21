@@ -21,9 +21,9 @@ package org.apache.cxf.cdi;
 import java.lang.reflect.Type;
 import java.util.Set;
 
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.Vetoed;
-import javax.ws.rs.core.Application;
+import jakarta.enterprise.context.spi.CreationalContext;
+import jakarta.enterprise.inject.Vetoed;
+import jakarta.ws.rs.core.Application;
 
 @Vetoed
 class DefaultApplicationBean extends AbstractCXFBean<DefaultApplication> {

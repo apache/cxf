@@ -21,10 +21,9 @@ package org.apache.cxf.jaxws;
 
 import java.util.logging.Logger;
 
-import javax.jws.WebService;
-import javax.xml.ws.Provider;
-import javax.xml.ws.WebServiceProvider;
-
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Provider;
+import jakarta.xml.ws.WebServiceProvider;
 import org.apache.cxf.common.logging.LogUtils;
 
 public final class EndpointUtils {

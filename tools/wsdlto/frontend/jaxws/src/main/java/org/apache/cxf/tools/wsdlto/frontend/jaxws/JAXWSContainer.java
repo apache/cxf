@@ -25,8 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import javax.xml.ws.Service;
-
+import jakarta.xml.ws.Service;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.tools.common.ToolConstants;

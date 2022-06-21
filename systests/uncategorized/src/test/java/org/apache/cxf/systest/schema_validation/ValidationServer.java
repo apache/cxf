@@ -24,19 +24,19 @@ import java.io.StringReader;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.jws.WebService;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Provider;
-import javax.xml.ws.Service;
-import javax.xml.ws.ServiceMode;
-import javax.xml.ws.WebServiceProvider;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Provider;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.ServiceMode;
+import jakarta.xml.ws.WebServiceProvider;
 import org.apache.cxf.annotations.SchemaValidation;
 import org.apache.cxf.ext.logging.Logging;
 import org.apache.cxf.helpers.DOMUtils;

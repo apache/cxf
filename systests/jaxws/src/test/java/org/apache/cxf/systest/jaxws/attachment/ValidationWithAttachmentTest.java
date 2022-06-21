@@ -19,10 +19,9 @@
 
 package org.apache.cxf.systest.jaxws.attachment;
 
-import javax.activation.DataHandler;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.soap.SOAPBinding;
-
+import jakarta.activation.DataHandler;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.soap.SOAPBinding;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;

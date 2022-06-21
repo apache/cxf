@@ -29,11 +29,11 @@ import java.util.Properties;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Service;
 
 import org.w3c.dom.Document;
 
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -154,7 +154,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         try {
             port.doubleIt(25);
             fail("Failure expected on not sending a UsernameToken element");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             assertEquals(ex.getMessage(), WSSecurityException.UNIFIED_SECURITY_ERR);
         }
 
@@ -196,7 +196,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         try {
             port.doubleIt(25);
             fail("Failure expected on a replayed UsernameToken");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             assertEquals(ex.getMessage(), WSSecurityException.UNIFIED_SECURITY_ERR);
         }
 
@@ -281,7 +281,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         try {
             port.doubleIt(25);
             fail("Failure expected on a replayed Timestamp");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             assertEquals(ex.getMessage(), WSSecurityException.UNIFIED_SECURITY_ERR);
         }
 
@@ -429,7 +429,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         try {
             port.doubleIt(25);
             fail("Failure expected as the client doesn't trust the cert of the service");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
 
@@ -457,7 +457,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         try {
             port.doubleIt(25);
             fail("Failure expected as the client doesn't trust the cert of the service");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
 
@@ -485,7 +485,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         try {
             port.doubleIt(25);
             fail("Failure expected as the service doesn't trust the client cert");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
 
@@ -513,7 +513,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         try {
             port.doubleIt(25);
             fail("Failure expected as the service doesn't trust the client cert");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
 

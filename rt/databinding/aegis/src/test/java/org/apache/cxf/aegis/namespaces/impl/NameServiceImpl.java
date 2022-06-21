@@ -22,8 +22,7 @@ package org.apache.cxf.aegis.namespaces.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.jws.WebService;
-
+import jakarta.jws.WebService;
 import org.apache.cxf.aegis.namespaces.data.Name;
 import org.apache.cxf.aegis.namespaces.intf.NameService;
 

@@ -19,11 +19,11 @@
 package org.apache.attachment;
 
 
-@javax.jws.WebService(targetNamespace = "http://apache.org/attachment",
+@jakarta.jws.WebService(targetNamespace = "http://apache.org/attachment",
                       endpointInterface = "org.apache.attachment.AddNumbers")
 public class AddNumbersImpl implements AddNumbers {
 
-    public int addNumbers(javax.activation.DataHandler body) {
+    public int addNumbers(jakarta.activation.DataHandler body) {
         return 1;
     }
 

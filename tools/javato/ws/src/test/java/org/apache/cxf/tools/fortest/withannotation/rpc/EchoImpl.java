@@ -18,14 +18,14 @@
  */
 package org.apache.cxf.tools.fortest.withannotation.rpc;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
 
 @WebService(name = "Echo",
             serviceName = "EchoService",
             targetNamespace = "http://cxf.apache.org/echotest")
-@SOAPBinding(style = javax.jws.soap.SOAPBinding.Style.RPC)
+@SOAPBinding(style = jakarta.jws.soap.SOAPBinding.Style.RPC)
 public class EchoImpl {
 
     @WebMethod

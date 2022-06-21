@@ -20,13 +20,13 @@ package org.apache.cxf.systest.beanincreationexception;
 
 import java.util.List;
 
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-import javax.jws.WebService;
-import javax.xml.bind.annotation.XmlList;
-import javax.xml.ws.RequestWrapper;
-import javax.xml.ws.ResponseWrapper;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
+import jakarta.jws.WebService;
+import jakarta.xml.bind.annotation.XmlList;
+import jakarta.xml.ws.RequestWrapper;
+import jakarta.xml.ws.ResponseWrapper;
 
 @WebService(name = "AddNumbersPortType", targetNamespace = "http://apache.org/xmllist")
 public interface AddNumbersPortType {

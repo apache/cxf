@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.jaxrs.resources;
 
-import javax.ws.rs.Path;
+import jakarta.ws.rs.Path;
 
 public class UriBuilderWrongAnnotations {
 

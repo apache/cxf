@@ -20,11 +20,10 @@ package org.apache.cxf.systest.jaxrs.security.jose.jwejws;
 
 import java.io.IOException;
 
-import javax.annotation.Priority;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.PreMatching;
-
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.container.PreMatching;
 import org.apache.cxf.rs.security.jose.jaxrs.Priorities;
 
 @PreMatching

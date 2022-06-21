@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs.sse.undertow;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.apache.cxf.systest.jaxrs.sse.BookStore;

@@ -33,15 +33,19 @@
     <properties>
         <cxf.module.name>org.apache.cxf.xkms.common</cxf.module.name>
         <cxf.osgi.import>
-            javax.jws*;version="${cxf.osgi.jws.version}",
-            javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
-            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}"
+            jakarta.jws*;version="${cxf.osgi.jws.version}",
+            jakarta.xml.ws*;version="${cxf.osgi.jakarta.xml.ws.version}",
+            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}"
         </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>
             <groupId>jakarta.jws</groupId>
             <artifactId>jakarta.jws-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.xml.ws</groupId>
+            <artifactId>jakarta.xml.ws-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>

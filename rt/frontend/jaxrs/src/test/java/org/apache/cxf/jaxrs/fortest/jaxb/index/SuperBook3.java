@@ -19,8 +19,7 @@
 
 package org.apache.cxf.jaxrs.fortest.jaxb.index;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
+import jakarta.xml.bind.annotation.XmlRootElement;
 import org.apache.cxf.jaxrs.fortest.jaxb.Book;
 
 @XmlRootElement

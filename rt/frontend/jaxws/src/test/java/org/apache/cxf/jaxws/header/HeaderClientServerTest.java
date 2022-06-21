@@ -25,9 +25,9 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Holder;
 
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Holder;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws.AbstractJaxWsTest;
 import org.apache.cxf.jaxws.EndpointImpl;

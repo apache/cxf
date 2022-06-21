@@ -21,10 +21,10 @@ package org.apache.cxf.systest.sts.intermediary_transformation;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Service;
-import javax.xml.ws.soap.SOAPFaultException;
 
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
 import org.apache.cxf.systest.sts.deployment.DoubleItServer;
 import org.apache.cxf.systest.sts.deployment.STSServer;

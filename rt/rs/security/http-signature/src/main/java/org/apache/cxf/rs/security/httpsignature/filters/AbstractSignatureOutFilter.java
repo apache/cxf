@@ -28,8 +28,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;

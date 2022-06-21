@@ -244,7 +244,7 @@ public final class CustomizationParser {
         if (jaxbPrefix == null) {
             schemaElement.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI,
                                        "xmlns:jaxb", ToolConstants.NS_JAXB_BINDINGS);
-            schemaElement.setAttributeNS(ToolConstants.NS_JAXB_BINDINGS, "jaxb:version", "2.0");
+            schemaElement.setAttributeNS(ToolConstants.NS_JAXB_BINDINGS, "jaxb:version", "3.0");
         }
     }
 

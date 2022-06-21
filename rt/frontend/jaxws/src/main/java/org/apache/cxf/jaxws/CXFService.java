@@ -23,11 +23,11 @@ import java.lang.reflect.Field;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.WebServiceFeature;
-import javax.xml.ws.spi.ServiceDelegate;
 
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.WebServiceFeature;
+import jakarta.xml.ws.spi.ServiceDelegate;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.ReflectionUtil;
 

@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.systest.wssec.examples.common;
 
-import javax.xml.ws.BindingProvider;
-
+import jakarta.xml.ws.BindingProvider;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.example.contract.doubleit.DoubleItPortType;
 

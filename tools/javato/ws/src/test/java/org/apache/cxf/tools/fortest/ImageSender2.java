@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.tools.fortest;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService
 public class ImageSender2 {

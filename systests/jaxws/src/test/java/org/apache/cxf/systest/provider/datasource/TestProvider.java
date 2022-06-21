@@ -25,16 +25,15 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.logging.Logger;
 
-import javax.activation.DataSource;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.util.ByteArrayDataSource;
-import javax.xml.ws.BindingType;
-import javax.xml.ws.Provider;
-import javax.xml.ws.Service;
-import javax.xml.ws.ServiceMode;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.WebServiceProvider;
-
+import jakarta.activation.DataSource;
+import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.util.ByteArrayDataSource;
+import jakarta.xml.ws.BindingType;
+import jakarta.xml.ws.Provider;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.ServiceMode;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.WebServiceProvider;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.IOUtils;
 
@@ -48,7 +47,7 @@ public class TestProvider extends AbstractProvider<DataSource> implements Provid
 
     static final Logger LOG = LogUtils.getLogger(TestProvider.class);
 
-    @javax.annotation.Resource
+    @jakarta.annotation.Resource
     public void setWebServiceContext(WebServiceContext wsc) {
         super.setWebServiceContext(wsc);
     }

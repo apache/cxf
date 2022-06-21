@@ -29,8 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;

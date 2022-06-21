@@ -22,12 +22,12 @@ package org.apache.cxf.ws.rm;
 import java.util.Collection;
 import java.util.List;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.jaxb.JAXBDataBinding;

@@ -24,11 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
-
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.UriInfo;
 import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 
 @ApplicationPath("/")

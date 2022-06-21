@@ -30,7 +30,17 @@
         <version>4.0.0-SNAPSHOT</version>
     </parent>
     <modules>
-        <module>codegen</module>
         <module>java2ws</module>
     </modules>
+    
+    <profiles>
+        <!-- TODO: This profile includes modules which are still on 'javax.*' namespace and
+        are not migrated to Jakarta -->
+        <profile>
+            <id>javax</id>
+            <modules>
+                <module>codegen</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>

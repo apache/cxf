@@ -23,16 +23,15 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
 
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Response;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.Bus;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
@@ -41,15 +40,15 @@ import org.apache.cxf.metrics.MetricsProvider;
 import org.apache.cxf.systest.jaxrs.applications.LibraryApplication;
 import org.apache.cxf.systest.jaxrs.resources.Book;
 import org.apache.cxf.systest.jaxrs.resources.LibraryApi;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.util.SocketUtils;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -272,7 +271,7 @@ public class SpringJaxrsApplicationTest {
     
     @Test
     public void testJaxrsClientExceptionMetric() {
-        final int fakePort = SocketUtils.findAvailableTcpPort();
+        final int fakePort = Integer.parseInt(TestUtil.getPortNumber("client-exception"));
         
         final WebTarget target = ClientBuilder
             .newClient()
@@ -427,7 +426,7 @@ public class SpringJaxrsApplicationTest {
     
     @Test
     public void testJaxrsProxyClientExceptionMetric() {
-        final int fakePort = SocketUtils.findAvailableTcpPort();
+        final int fakePort = Integer.parseInt(TestUtil.getPortNumber("proxy-client-exception"));
         final LibraryApi api = createApi(fakePort);
 
         assertThatThrownBy(() -> api.deleteBooks())

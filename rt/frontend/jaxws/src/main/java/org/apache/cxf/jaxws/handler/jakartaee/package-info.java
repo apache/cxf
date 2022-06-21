@@ -17,8 +17,8 @@
  * under the License.
  */
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "https://jakarta.ee/xml/ns/jakartaee",
-    elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "https://jakarta.ee/xml/ns/jakartaee",
+    elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED
 )
 package org.apache.cxf.jaxws.handler.jakartaee;
 

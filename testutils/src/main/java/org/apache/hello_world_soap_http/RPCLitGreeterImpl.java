@@ -19,8 +19,7 @@
 
 package org.apache.hello_world_soap_http;
 
-import javax.jws.WebService;
-
+import jakarta.jws.WebService;
 import org.apache.hello_world_rpclit.GreeterRPCLit;
 import org.apache.hello_world_rpclit.types.MyComplexStruct;
 

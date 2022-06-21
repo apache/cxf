@@ -20,7 +20,7 @@ package org.apache.cxf.customer;
 
 import java.util.Collection;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 
 // START SNIPPET: bean

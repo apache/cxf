@@ -26,13 +26,13 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.Name;
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPFactory;
-import javax.xml.ws.Holder;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.soap.Name;
+import jakarta.xml.soap.SOAPElement;
+import jakarta.xml.soap.SOAPFactory;
+import jakarta.xml.ws.Holder;
 import org.apache.type_test.types1.DerivedChoiceBaseArray;
 import org.apache.type_test.types1.DerivedChoiceBaseChoice;
 import org.apache.type_test.types1.DerivedChoiceBaseStruct;

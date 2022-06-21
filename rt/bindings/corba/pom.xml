@@ -35,9 +35,9 @@
         <cxf.checkstyle.extension>-corba</cxf.checkstyle.extension>
         <cxf.osgi.import>
             org.objectweb.asm*;version="${cxf.osgi.asm.version}",
-            javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
-            javax.annotation*;version="${cxf.osgi.javax.annotation.version}",
-            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
+            jakarta.xml.ws*;version="${cxf.osgi.jakarta.xml.ws.version}",
+            jakarta.annotation*;version="${cxf.osgi.jakarta.annotation.version}",
+            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}",
             org.apache.yoko.orb.*;resolution:=optional
         </cxf.osgi.import>
     </properties>

@@ -38,11 +38,6 @@ import javax.wsdl.Definition;
 import javax.wsdl.Service;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLInputFactory;
@@ -52,6 +47,10 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Node;
 
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
@@ -198,7 +197,7 @@ public class JAXBDataBindingTest {
         nsMap.put("uri:ultima:thule", "");
         db.setNamespaceMap(nsMap);
         Map<String, Object> contextProperties = new HashMap<>();
-        contextProperties.put("com.sun.xml.bind.defaultNamespaceRemap", "uri:ultima:thule");
+        contextProperties.put("org.glassfish.jaxb.defaultNamespaceRemap", "uri:ultima:thule");
         db.setContextProperties(contextProperties);
         Set<Class<?>> classes = new HashSet<>();
         classes.add(UnqualifiedBean.class);
@@ -226,29 +225,22 @@ public class JAXBDataBindingTest {
         classes.add(QualifiedBean.class);
 
         //have to fastboot to avoid conflicts of generated accessors
-        System.setProperty("com.sun.xml.bind.v2.runtime.JAXBContextImpl.fastBoot", "true");
-        System.setProperty("com.sun.xml.internal.bind.v2.runtime.JAXBContextImpl.fastBoot", "true");
-        if (internal) {
-            System.setProperty(JAXBContext.JAXB_CONTEXT_FACTORY, "com.sun.xml.internal.bind.v2.ContextFactory");
-            db.setContext(db.createJAXBContext(classes));
-            System.clearProperty(JAXBContext.JAXB_CONTEXT_FACTORY);
-        } else {
-            db.setContext(db.createJAXBContext(classes));
-        }
-        System.clearProperty("com.sun.xml.bind.v2.runtime.JAXBContextImpl.fastBoot");
-        System.clearProperty("com.sun.xml.internal.bind.v2.runtime.JAXBContextImpl.fastBoot");
+        System.setProperty("org.glassfish.jaxb.v2.runtime.JAXBContextImpl.fastBoot", "true");
+        db.setContext(db.createJAXBContext(classes));
+        System.clearProperty("org.glassfish.jaxb.v2.runtime.JAXBContextImpl.fastBoot");
         return db;
     }
 
     void doNamespaceMappingTest(boolean internal, boolean asm) throws Exception {
-        if (internal) {
+        //TODO: review this to see if we can remove the below check
+        /*if (internal) {
             try {
                 Class.forName("com.sun.xml.internal.bind.v2.ContextFactory");
             } catch (Throwable t) {
                 //on a JVM (likely IBM's) that doesn't rename the ContextFactory package to include "internal"
                 return;
             }
-        }
+        }*/
         Bus b = new ExtensionManagerBus();
         ASMHelper helper = new ASMHelperImpl();
         b.setExtension(helper, ASMHelper.class);

@@ -25,12 +25,12 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
+import jakarta.xml.bind.JAXBElement;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.ws.addressing.AttributedURIType;

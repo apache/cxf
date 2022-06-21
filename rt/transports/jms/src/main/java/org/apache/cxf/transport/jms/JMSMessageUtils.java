@@ -32,12 +32,11 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jms.BytesMessage;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-
+import jakarta.jms.BytesMessage;
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.Session;
+import jakarta.jms.TextMessage;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.helpers.CastUtils;
@@ -319,7 +318,7 @@ final class JMSMessageUtils {
         }
     }
 
-    public static String getMessageType(final javax.jms.Message request) {
+    public static String getMessageType(final jakarta.jms.Message request) {
         final String msgType;
         if (request instanceof TextMessage) {
             msgType = JMSConstants.TEXT_MESSAGE_TYPE;

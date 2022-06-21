@@ -23,9 +23,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;

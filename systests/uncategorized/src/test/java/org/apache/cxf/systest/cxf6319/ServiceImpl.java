@@ -19,10 +19,10 @@
 
 package org.apache.cxf.systest.cxf6319;
 
-import javax.jws.HandlerChain;
-import javax.jws.WebParam;
+import jakarta.jws.HandlerChain;
+import jakarta.jws.WebParam;
 
-@javax.jws.WebService(serviceName = "SOAPService",
+@jakarta.jws.WebService(serviceName = "SOAPService",
                       targetNamespace = "http://example.com")
 @HandlerChain(file = "handler.xml")
 public class ServiceImpl {

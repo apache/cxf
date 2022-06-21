@@ -22,9 +22,8 @@ package org.apache.cxf.jaxrs.impl;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.core.CacheControl;
-
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.core.CacheControl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 

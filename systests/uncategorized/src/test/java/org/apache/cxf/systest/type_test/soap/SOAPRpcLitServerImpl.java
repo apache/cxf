@@ -18,9 +18,8 @@
  */
 package org.apache.cxf.systest.type_test.soap;
 
-import javax.jws.WebService;
-import javax.xml.ws.Endpoint;
-
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Endpoint;
 import org.apache.cxf.systest.type_test.TypeTestImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.type_test.rpc.TypeTestPortType;

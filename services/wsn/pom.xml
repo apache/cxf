@@ -32,7 +32,7 @@
     </parent>
     <modules>
         <module>wsn-api</module>
-        <module>wsn-core</module>
         <module>wsn-osgi</module>
+        <module>wsn-core</module>
     </modules>
 </project>

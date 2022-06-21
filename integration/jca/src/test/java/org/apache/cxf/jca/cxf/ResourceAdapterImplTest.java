@@ -26,11 +26,9 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Properties;
 
-import javax.resource.ResourceException;
-import javax.resource.spi.BootstrapContext;
-import javax.resource.spi.ResourceAdapter;
-
-
+import jakarta.resource.ResourceException;
+import jakarta.resource.spi.BootstrapContext;
+import jakarta.resource.spi.ResourceAdapter;
 import org.apache.cxf.Bus;
 import org.apache.cxf.jca.core.resourceadapter.ResourceBean;
 

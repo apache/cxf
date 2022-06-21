@@ -21,9 +21,8 @@ package org.apache.cxf.jca.inbound;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.resource.spi.endpoint.MessageEndpoint;
-import javax.resource.spi.endpoint.MessageEndpointFactory;
-
+import jakarta.resource.spi.endpoint.MessageEndpoint;
+import jakarta.resource.spi.endpoint.MessageEndpointFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Exchange;
 

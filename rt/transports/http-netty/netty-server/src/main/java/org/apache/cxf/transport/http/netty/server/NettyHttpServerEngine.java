@@ -27,8 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
-import javax.annotation.PostConstruct;
-
+import jakarta.annotation.PostConstruct;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;

@@ -27,9 +27,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingType;
-import javax.xml.ws.soap.SOAPBinding;
 
+import jakarta.xml.ws.BindingType;
+import jakarta.xml.ws.soap.SOAPBinding;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.i18n.Message;

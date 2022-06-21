@@ -25,12 +25,12 @@ import java.net.URL;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Service;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.Service;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world_xml_http.wrapped.XMLService;

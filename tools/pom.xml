@@ -34,7 +34,8 @@
         <module>validator</module>
         <module>wsdlto</module>
         <module>javato</module>
-        <module>wadlto</module>
+        <!--TODO: enable wadlto module after jakarta jaxb2-basics is ready-->
+        <!--module>wadlto</module-->
         <module>corba</module>
     </modules>
 </project>

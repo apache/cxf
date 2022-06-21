@@ -17,7 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<bindings xmlns="http://java.sun.com/xml/ns/jaxws" wsdlLocation="../InvoiceServer.wsdl">
+<bindings xmlns="https://jakarta.ee/xml/ns/jaxws" wsdlLocation="../InvoiceServer.wsdl">
     <bindings xmlns:ns1="http://schemas.xmlsoap.org/wsdl/" node="ns1:definitions">
         <package name="org.mytest"/>
     </bindings>

@@ -22,8 +22,8 @@ package org.apache.cxf.systest.ws.addr_responses;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.soap.SOAPFaultException;
 
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.systest.ws.AbstractWSATestBase;
 
 import org.junit.Before;

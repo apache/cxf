@@ -16,16 +16,16 @@
         specific language governing permissions and limitations
         under the License.
 -->
-<jxb:bindings version="1.0"
-              xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+<jxb:bindings version="3.0"
+              xmlns:jxb="https://jakarta.ee/xml/ns/jaxb"
               xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <jxb:bindings schemaLocation="hello_schema1.xsd" node="/xs:schema">
-    <jxb:globalBindings xmlns:jxb="http://java.sun.com/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <jxb:globalBindings xmlns:jxb="https://jakarta.ee/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema">
       <jxb:javaType name="java.util.Date" xmlType="xs:dateTime" parseMethod="org.apache.cxf.xjc.runtime.DataTypeAdapter.parseDateTime" printMethod="org.apache.cxf.xjc.runtime.DataTypeAdapter.printDateTime"/>
     </jxb:globalBindings>
   </jxb:bindings>
   <jxb:bindings schemaLocation="hello_schema2.xsd" node="/xs:schema">
-    <jxb:globalBindings xmlns:jxb="http://java.sun.com/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <jxb:globalBindings xmlns:jxb="https://jakarta.ee/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema">
       <jxb:javaType name="java.util.Date" xmlType="xs:dateTime" parseMethod="org.apache.cxf.xjc.runtime.DataTypeAdapter.parseDateTime" printMethod="org.apache.cxf.xjc.runtime.DataTypeAdapter.printDateTime"/>
     </jxb:globalBindings>
   </jxb:bindings>

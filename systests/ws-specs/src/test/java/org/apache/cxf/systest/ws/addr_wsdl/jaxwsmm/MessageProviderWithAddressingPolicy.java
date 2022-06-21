@@ -28,11 +28,11 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.ws.Provider;
-import javax.xml.ws.Service;
-import javax.xml.ws.ServiceMode;
-import javax.xml.ws.WebServiceProvider;
 
+import jakarta.xml.ws.Provider;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.ServiceMode;
+import jakarta.xml.ws.WebServiceProvider;
 import org.apache.cxf.common.logging.LogUtils;
 
 @WebServiceProvider(

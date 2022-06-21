@@ -21,10 +21,9 @@ package org.apache.cxf.systest.type_test;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPFactory;
-import javax.xml.ws.Holder;
-
+import jakarta.xml.soap.SOAPElement;
+import jakarta.xml.soap.SOAPFactory;
+import jakarta.xml.ws.Holder;
 import org.apache.type_test.types1.ComplexRestriction;
 import org.apache.type_test.types1.ComplexRestriction2;
 import org.apache.type_test.types1.ComplexRestriction3;

@@ -24,8 +24,7 @@ import java.security.Security;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.ws.rs.BadRequestException;
-
+import jakarta.ws.rs.BadRequestException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;

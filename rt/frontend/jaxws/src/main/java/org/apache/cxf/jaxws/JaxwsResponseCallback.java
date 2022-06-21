@@ -24,8 +24,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import javax.xml.ws.Response;
-
+import jakarta.xml.ws.Response;
 import org.apache.cxf.endpoint.ClientCallback;
 
 class JaxwsResponseCallback<T> implements Response<T> {

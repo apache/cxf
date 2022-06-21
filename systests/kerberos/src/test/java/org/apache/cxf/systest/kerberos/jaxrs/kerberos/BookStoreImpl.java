@@ -23,8 +23,8 @@ package org.apache.cxf.systest.kerberos.jaxrs.kerberos;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.QueryParam;
 
 public class BookStoreImpl implements BookStore {
     private Map<Long, Book> books = new HashMap<>();

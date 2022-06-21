@@ -24,13 +24,13 @@ import java.time.ZonedDateTime;
 import java.util.Iterator;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPFault;
-import javax.xml.ws.Service;
-import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import jakarta.xml.soap.SOAPFault;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;

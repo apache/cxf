@@ -22,13 +22,12 @@ package org.apache.cxf.ws.mex;
 import java.util.List;
 import java.util.Map;
 
-import javax.jws.soap.SOAPBinding;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.ws.BindingType;
-import javax.xml.ws.soap.Addressing;
-
 import org.w3c.dom.Element;
 
+import jakarta.jws.soap.SOAPBinding;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.ws.BindingType;
+import jakarta.xml.ws.soap.Addressing;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.EndpointImpl;
@@ -37,7 +36,7 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 
 
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
-@BindingType(javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING)
+@BindingType(jakarta.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING)
 @Addressing(required = true, enabled = true)
 @XmlSeeAlso({
     org.apache.cxf.ws.mex.model._2004_09.ObjectFactory.class })

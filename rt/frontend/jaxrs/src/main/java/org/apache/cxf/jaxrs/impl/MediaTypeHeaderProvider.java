@@ -29,9 +29,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
-
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;

@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.jaxws;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(wsdlLocation = "partialwsdl/AddNumbersImplPartial1Service.wsdl")
 public class AddNumbersImplPartial1 {

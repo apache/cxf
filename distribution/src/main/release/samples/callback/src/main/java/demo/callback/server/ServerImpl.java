@@ -20,14 +20,14 @@
 package demo.callback.server;
 
 
-import javax.xml.ws.WebServiceFeature;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
+import jakarta.xml.ws.WebServiceFeature;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 
 import org.apache.callback.CallbackPortType;
 import org.apache.callback.ServerPortType;
 
 
-@javax.jws.WebService(serviceName = "SOAPService",
+@jakarta.jws.WebService(serviceName = "SOAPService",
                       portName = "SOAPPort",
                       targetNamespace = "http://apache.org/callback",
                       endpointInterface = "org.apache.callback.ServerPortType")

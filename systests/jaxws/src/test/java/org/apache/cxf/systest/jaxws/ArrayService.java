@@ -19,9 +19,9 @@
 package org.apache.cxf.systest.jaxws;
 
 
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebService;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
 
 @WebService(targetNamespace = "org.apache.cxf.systest.jaxws")
 public interface ArrayService {

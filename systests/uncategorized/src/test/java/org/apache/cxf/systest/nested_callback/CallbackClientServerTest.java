@@ -23,9 +23,9 @@ import java.net.URL;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;

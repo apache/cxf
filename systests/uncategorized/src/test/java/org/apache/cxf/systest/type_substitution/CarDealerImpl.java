@@ -22,10 +22,9 @@ package org.apache.cxf.systest.type_substitution;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
-import javax.xml.ws.WebServiceException;
-
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
+import jakarta.xml.ws.WebServiceException;
 import org.apache.type_substitution.Car;
 import org.apache.type_substitution.CarDealer;
 import org.apache.type_substitution.Porsche;

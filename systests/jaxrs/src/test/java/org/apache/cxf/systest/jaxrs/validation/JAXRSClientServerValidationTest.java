@@ -21,12 +21,11 @@ package org.apache.cxf.systest.jaxrs.validation;
 import java.util.Arrays;
 import java.util.Collections;
 
-import javax.validation.ValidationException;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
+import jakarta.validation.ValidationException;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 import org.apache.cxf.Bus;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;

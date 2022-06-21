@@ -16,9 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://superbooks",
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://superbooks",
  xmlns = { @XmlNs(prefix = "os", namespaceURI = "http://superbooks") })
 package org.apache.cxf.jaxrs.model.wadl.jaxb.packageinfo;
 
-import javax.xml.bind.annotation.XmlNs;
+import jakarta.xml.bind.annotation.XmlNs;
 

@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.jca.cxf;
 
-import javax.resource.spi.LocalTransaction;
+import jakarta.resource.spi.LocalTransaction;
 
 
 

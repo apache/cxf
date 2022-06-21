@@ -23,11 +23,10 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.core.Application;
 import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationFeature;
 import org.apache.cxf.jaxrs.validation.ValidationExceptionMapper;
 import org.apache.cxf.systests.cdi.base.BookStore;

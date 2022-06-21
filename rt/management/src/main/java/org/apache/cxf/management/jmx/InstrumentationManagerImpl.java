@@ -28,7 +28,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.PostConstruct;
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.JMException;
 import javax.management.MBeanServer;
@@ -42,6 +41,7 @@ import javax.management.modelmbean.InvalidTargetObjectTypeException;
 import javax.management.modelmbean.ModelMBeanInfo;
 import javax.management.modelmbean.RequiredModelMBean;
 
+import jakarta.annotation.PostConstruct;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.ManagedBus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;

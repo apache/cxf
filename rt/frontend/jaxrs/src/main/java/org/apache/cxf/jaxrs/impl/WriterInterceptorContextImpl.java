@@ -24,12 +24,11 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.WriterInterceptor;
-import javax.ws.rs.ext.WriterInterceptorContext;
-
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.ext.WriterInterceptor;
+import jakarta.ws.rs.ext.WriterInterceptorContext;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;

@@ -37,8 +37,8 @@
             org.apache.cxf.tools.validator.*,
         </cxf.osgi.export>
         <cxf.osgi.import>
-            javax.jws*;version="${cxf.osgi.jws.version}",
-            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}"
+            jakarta.jws*;version="${cxf.osgi.jws.version}",
+            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}"
         </cxf.osgi.import>
     </properties>
     <dependencies>

@@ -19,10 +19,10 @@
 
 package org.apache.cxf.tools.fortest;
 
-import javax.jws.WebService;
-import javax.xml.ws.Action;
-import javax.xml.ws.FaultAction;
-import javax.xml.ws.soap.Addressing;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Action;
+import jakarta.xml.ws.FaultAction;
+import jakarta.xml.ws.soap.Addressing;
 
 // Jax-WS 2.1 WS-Addressing FromJava
 

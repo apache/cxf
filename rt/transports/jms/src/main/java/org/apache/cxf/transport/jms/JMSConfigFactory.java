@@ -25,13 +25,13 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jms.ConnectionFactory;
-import javax.jms.DeliveryMode;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.transaction.TransactionManager;
 
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.DeliveryMode;
+import jakarta.transaction.TransactionManager;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;

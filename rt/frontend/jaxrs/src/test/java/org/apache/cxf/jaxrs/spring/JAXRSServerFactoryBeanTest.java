@@ -20,9 +20,9 @@ package org.apache.cxf.jaxrs.spring;
 
 import java.util.List;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
 
+import jakarta.xml.bind.JAXBContext;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;

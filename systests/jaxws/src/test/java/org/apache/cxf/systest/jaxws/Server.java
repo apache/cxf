@@ -24,16 +24,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Future;
 
-import javax.jws.WebService;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Provider;
-import javax.xml.ws.Service;
-import javax.xml.ws.ServiceMode;
-import javax.xml.ws.WebServiceProvider;
 
+import jakarta.jws.WebService;
+import jakarta.xml.ws.AsyncHandler;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Provider;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.ServiceMode;
+import jakarta.xml.ws.WebServiceProvider;
 import org.apache.cxf.annotations.UseAsyncMethod;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.ServerAsyncResponse;
@@ -96,7 +96,7 @@ public class Server extends AbstractBusTestServerBase {
         address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
 
 
-        EndpointImpl e = (EndpointImpl) Endpoint.create(javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING,
+        EndpointImpl e = (EndpointImpl) Endpoint.create(jakarta.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING,
                                                         new Greeter12Impl());
         e.publish(address);
         eps.add(e);

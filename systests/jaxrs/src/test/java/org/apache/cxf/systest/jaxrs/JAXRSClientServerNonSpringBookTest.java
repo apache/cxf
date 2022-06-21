@@ -25,10 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;

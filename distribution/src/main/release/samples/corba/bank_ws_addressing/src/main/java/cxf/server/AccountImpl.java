@@ -21,7 +21,7 @@ package cxf.server;
 
 import cxf.common.Account;
 
-@javax.jws.WebService(portName = "AccountCORBAPort",
+@jakarta.jws.WebService(portName = "AccountCORBAPort",
                       serviceName = "AccountCORBAService",
                       targetNamespace = "http://cxf.apache.org/schemas/cxf/idl/Bank",
                       wsdlLocation = "classpath:/wsdl/BankWS-corba.wsdl",

@@ -19,9 +19,8 @@
 
 package org.apache.cxf.microprofile.client.mock;
 
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.eclipse.microprofile.rest.client.ext.ClientHeadersFactory;
 
 public class MyClientHeadersFactory implements ClientHeadersFactory {

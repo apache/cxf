@@ -19,11 +19,11 @@
 
 package org.apache.cxf.systest.jaxws.cxf5064;
 
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebParam.Mode;
-import javax.jws.WebService;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebParam.Mode;
+import jakarta.jws.WebService;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @WebService(targetNamespace = "http://cxf.apache.org/cxf5064")
 public interface SOAPHeaderSEI {

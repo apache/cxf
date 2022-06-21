@@ -140,6 +140,7 @@
             <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
             <version>${cxf.ehcache3.version}</version>
+            <classifier>jakarta</classifier>
         </dependency>
         <dependency>
             <groupId>com.hazelcast</groupId>
@@ -152,8 +153,8 @@
             <version>${cxf.hazelcast.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.jaxrs</groupId>
-            <artifactId>jackson-jaxrs-json-provider</artifactId>
+            <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+            <artifactId>jackson-jakarta-rs-json-provider</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

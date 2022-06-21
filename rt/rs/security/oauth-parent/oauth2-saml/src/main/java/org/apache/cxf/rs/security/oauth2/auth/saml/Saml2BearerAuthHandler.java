@@ -22,12 +22,11 @@ package org.apache.cxf.rs.security.oauth2.auth.saml;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MultivaluedMap;
-
 import org.w3c.dom.Element;
 
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.jaxrs.provider.FormEncodingProvider;

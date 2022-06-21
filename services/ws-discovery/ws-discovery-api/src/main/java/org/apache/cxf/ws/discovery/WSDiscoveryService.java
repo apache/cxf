@@ -19,8 +19,7 @@
 
 package org.apache.cxf.ws.discovery;
 
-import javax.xml.ws.EndpointReference;
-
+import jakarta.xml.ws.EndpointReference;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ws.discovery.wsdl.HelloType;
 

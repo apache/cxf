@@ -62,7 +62,7 @@ public class ResourceAdapterInternalExceptionTest {
     public void testMessageWithNullTx() {
         final String msg = "msg1".intern();
 
-        javax.resource.spi.ResourceAdapterInternalException e = new ResourceAdapterInternalException(msg,
+        jakarta.resource.spi.ResourceAdapterInternalException e = new ResourceAdapterInternalException(msg,
                                                                                                      null);
         assertTrue(e.toString().indexOf(msg) != -1);
         assertTrue(e.toString().indexOf("reason") == -1);
@@ -76,7 +76,7 @@ public class ResourceAdapterInternalExceptionTest {
         final String causeMsg = "cause";
 
         Exception cause = new RuntimeException(causeMsg);
-        javax.resource.spi.ResourceAdapterInternalException e = new ResourceAdapterInternalException(msg,
+        jakarta.resource.spi.ResourceAdapterInternalException e = new ResourceAdapterInternalException(msg,
                                                                                                      cause);
         assertTrue(e.toString().indexOf(msg) != -1);
         assertTrue(e.toString().indexOf("reason") != -1);
@@ -91,7 +91,7 @@ public class ResourceAdapterInternalExceptionTest {
         final String causeMsg = "cause";
 
         Throwable cause = new Throwable(causeMsg);
-        javax.resource.spi.ResourceAdapterInternalException e = new ResourceAdapterInternalException(msg,
+        jakarta.resource.spi.ResourceAdapterInternalException e = new ResourceAdapterInternalException(msg,
                                                                                                      cause);
         assertTrue(e.toString().indexOf(msg) != -1);
         assertTrue(e.toString().indexOf("reason") != -1);
@@ -106,7 +106,7 @@ public class ResourceAdapterInternalExceptionTest {
         final String causeMsg = "cause";
 
         Exception cause = new RuntimeException(causeMsg);
-        javax.resource.spi.ResourceAdapterInternalException re =
+        jakarta.resource.spi.ResourceAdapterInternalException re =
             new ResourceAdapterInternalException(
                 msg,
                 new java.lang.reflect.InvocationTargetException(cause));

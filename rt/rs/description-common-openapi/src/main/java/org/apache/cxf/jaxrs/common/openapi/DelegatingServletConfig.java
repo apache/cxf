@@ -20,8 +20,8 @@ package org.apache.cxf.jaxrs.common.openapi;
 
 import java.util.Enumeration;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
 
 public class DelegatingServletConfig implements ServletConfig {
     private final ServletConfig delegate;

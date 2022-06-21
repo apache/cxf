@@ -26,12 +26,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
-
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.ext.ContextResolver;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.ext.MessageBodyWriter;
 import org.apache.cxf.aegis.AegisContext;
 
 public abstract class AbstractAegisProvider<T>

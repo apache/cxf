@@ -21,8 +21,7 @@ package org.apache.cxf.jms.testsuite.services;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.ws.Endpoint;
-
+import jakarta.xml.ws.Endpoint;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jms.testsuite.util.JMSTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;

@@ -23,13 +23,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.MessageContext.Scope;
-
-
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.handler.MessageContext.Scope;
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.attachment.ByteDataSource;
 import org.apache.cxf.helpers.CastUtils;

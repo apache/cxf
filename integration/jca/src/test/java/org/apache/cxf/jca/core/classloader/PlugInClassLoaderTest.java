@@ -104,7 +104,7 @@ public class PlugInClassLoaderTest {
     @Test
     public void testLoadNonFilteredButAvailableClassWithPlugInClassLoader()
         throws Exception {
-        String className = "javax.resource.ResourceException";
+        String className = "jakarta.resource.ResourceException";
         // ensure it is available
         getClass().getClassLoader().loadClass(className);
         try {

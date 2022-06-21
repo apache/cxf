@@ -21,8 +21,7 @@ package org.apache.cxf.systest.jaxrs.security.oidc;
 import java.util.Collections;
 import java.util.List;
 
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.provider.SubjectCreator;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;

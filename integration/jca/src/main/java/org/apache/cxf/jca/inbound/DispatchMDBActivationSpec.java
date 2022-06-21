@@ -20,7 +20,7 @@ package org.apache.cxf.jca.inbound;
 
 /**
  *
- * DispatchMDBActivationSpec is an {@link javax.resource.spi.ActivationSpec}
+ * DispatchMDBActivationSpec is an {@link jakarta.resource.spi.ActivationSpec}
  * that activates a CXF service endpoint facade to dispatch call to the target
  * Stateless Session Bean.
  *

@@ -26,15 +26,15 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.ws.WebFault;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.ws.WebFault;
 import org.apache.cxf.binding.corba.CorbaBindingException;
 import org.apache.cxf.binding.corba.CorbaDestination;
 import org.apache.cxf.binding.corba.CorbaMessage;

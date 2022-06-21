@@ -21,7 +21,7 @@ package org.apache.cxf.jaxws.service;
 
 import java.io.Serializable;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 /**
  *

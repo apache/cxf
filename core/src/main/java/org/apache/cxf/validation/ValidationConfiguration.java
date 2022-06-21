@@ -21,10 +21,10 @@ package org.apache.cxf.validation;
 import java.util.Collections;
 import java.util.Map;
 
-import javax.validation.ConstraintValidatorFactory;
-import javax.validation.MessageInterpolator;
-import javax.validation.ParameterNameProvider;
-import javax.validation.TraversableResolver;
+import jakarta.validation.ConstraintValidatorFactory;
+import jakarta.validation.MessageInterpolator;
+import jakarta.validation.ParameterNameProvider;
+import jakarta.validation.TraversableResolver;
 
 public class ValidationConfiguration {
     private ParameterNameProvider parameterNameProvider;

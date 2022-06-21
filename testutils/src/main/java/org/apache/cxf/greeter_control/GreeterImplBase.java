@@ -21,10 +21,9 @@ package org.apache.cxf.greeter_control;
 
 import java.util.concurrent.Future;
 
-import javax.jws.WebService;
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.Response;
-
+import jakarta.jws.WebService;
+import jakarta.xml.ws.AsyncHandler;
+import jakarta.xml.ws.Response;
 import org.apache.cxf.greeter_control.types.GreetMeResponse;
 import org.apache.cxf.greeter_control.types.PingMeResponse;
 import org.apache.cxf.greeter_control.types.SayHiResponse;

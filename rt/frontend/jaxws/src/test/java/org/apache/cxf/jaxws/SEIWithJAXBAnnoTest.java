@@ -23,8 +23,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.ws.Endpoint;
-
+import jakarta.xml.ws.Endpoint;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;

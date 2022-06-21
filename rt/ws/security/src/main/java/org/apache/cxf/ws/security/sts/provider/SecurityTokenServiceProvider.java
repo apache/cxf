@@ -29,24 +29,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Resource;
-import javax.xml.bind.Binder;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlAnyElement;
-import javax.xml.bind.util.JAXBSource;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
-import javax.xml.ws.Provider;
-import javax.xml.ws.Service;
-import javax.xml.ws.ServiceMode;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import jakarta.annotation.Resource;
+import jakarta.xml.bind.Binder;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.annotation.XmlAnyElement;
+import jakarta.xml.bind.util.JAXBSource;
+import jakarta.xml.ws.Provider;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.ServiceMode;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.handler.MessageContext;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.common.jaxb.JAXBContextCache;

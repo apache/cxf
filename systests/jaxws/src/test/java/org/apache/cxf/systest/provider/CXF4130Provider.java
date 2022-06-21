@@ -20,18 +20,18 @@ package org.apache.cxf.systest.provider;
 
 import java.io.StringReader;
 
-import javax.annotation.Resource;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPMessage;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.Provider;
-import javax.xml.ws.ServiceMode;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.WebServiceProvider;
 
 import org.w3c.dom.Node;
 
+import jakarta.annotation.Resource;
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.ws.Provider;
+import jakarta.xml.ws.ServiceMode;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.WebServiceProvider;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.helpers.DOMUtils;
 
@@ -39,7 +39,7 @@ import org.apache.cxf.helpers.DOMUtils;
     targetNamespace = "http://cxf.apache.org/soapheader/inband",
     portName = "InBandSoapHeaderSoapHttpPort",
     wsdlLocation = "/wsdl_systest_jaxws/cxf4130.wsdl")
-@ServiceMode(value = javax.xml.ws.Service.Mode.MESSAGE)
+@ServiceMode(value = jakarta.xml.ws.Service.Mode.MESSAGE)
 public class CXF4130Provider implements Provider<SOAPMessage> {
 
     @Resource

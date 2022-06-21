@@ -28,11 +28,11 @@ import java.util.Locale;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Service.Mode;
-import javax.xml.ws.WebServiceException;
 
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.Service.Mode;
+import jakarta.xml.ws.WebServiceException;
 import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.ext.logging.LoggingFeature;

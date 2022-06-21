@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.jaxws.service;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(endpointInterface = "org.apache.cxf.jaxws.service.FooService")
 public class FooServiceImpl implements FooService {

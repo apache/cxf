@@ -24,8 +24,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.servlet.Servlet;
-
+import jakarta.servlet.Servlet;
 import org.apache.cxf.common.logging.LogUtils;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;

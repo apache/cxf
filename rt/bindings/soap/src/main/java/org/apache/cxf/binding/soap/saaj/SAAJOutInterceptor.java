@@ -27,18 +27,17 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ResourceBundle;
 
-import javax.xml.soap.AttachmentPart;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.MimeHeader;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.soap.SOAPPart;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Node;
 
-
+import jakarta.xml.soap.AttachmentPart;
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.MimeHeader;
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.soap.SOAPPart;
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.binding.soap.Soap11;

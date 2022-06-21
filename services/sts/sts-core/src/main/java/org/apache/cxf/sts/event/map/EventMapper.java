@@ -26,8 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.sts.event.AbstractSTSEvent;

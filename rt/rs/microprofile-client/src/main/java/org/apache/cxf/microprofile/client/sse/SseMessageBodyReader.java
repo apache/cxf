@@ -25,16 +25,15 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.concurrent.ExecutorService;
 
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.Providers;
-import javax.ws.rs.sse.InboundSseEvent;
-
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.ext.Providers;
+import jakarta.ws.rs.sse.InboundSseEvent;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.impl.ProvidersImpl;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProviders;

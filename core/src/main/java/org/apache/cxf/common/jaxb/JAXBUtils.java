@@ -40,6 +40,8 @@ import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,16 +54,6 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.PropertyException;
-import javax.xml.bind.SchemaOutputResolver;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.attachment.AttachmentMarshaller;
-import javax.xml.bind.attachment.AttachmentUnmarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -76,6 +68,16 @@ import org.w3c.dom.Node;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.PropertyException;
+import jakarta.xml.bind.SchemaOutputResolver;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.attachment.AttachmentMarshaller;
+import jakarta.xml.bind.attachment.AttachmentUnmarshaller;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -92,7 +94,7 @@ import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.JavaUtils;
 
 public final class JAXBUtils {
-    public static final String JAXB_URI = "http://java.sun.com/xml/ns/jaxb";
+    public static final String JAXB_URI = "https://jakarta.ee/xml/ns/jaxb";
 
     private static final Logger LOG = LogUtils.getL7dLogger(JAXBUtils.class);
 
@@ -123,7 +125,7 @@ public final class JAXBUtils {
     private static ClassLoader jaxbXjcLoader;
     private static volatile Optional<Object> jaxbMinimumEscapeHandler;
     private static volatile Optional<Object> jaxbNoEscapeHandler;
-    
+
     static {
         BUILTIN_DATATYPES_MAP = new HashMap<>();
         BUILTIN_DATATYPES_MAP.put("string", "java.lang.String");
@@ -569,10 +571,10 @@ public final class JAXBUtils {
         }
 
         if (cls == Object.class || cls == String.class || cls.isPrimitive() || cls.isAnnotation()
-            || "javax.xml.ws.Holder".equals(cls.getName())) {
+            || "jakarta.xml.ws.Holder".equals(cls.getName())) {
             return null;
         } else if (cls.isInterface()
-            || "javax.xml.ws.wsaddressing.W3CEndpointReference".equals(cls.getName())) {
+            || "jakarta.xml.ws.wsaddressing.W3CEndpointReference".equals(cls.getName())) {
             return cls;
         }
 
@@ -587,6 +589,7 @@ public final class JAXBUtils {
     }
 
     private static synchronized ClassLoader getXJCClassLoader() {
+        //TODO: review and remove this after JDK11
         if (jaxbXjcLoader == null) {
             try {
                 Class.forName("com.sun.tools.internal.xjc.api.XJC");
@@ -620,11 +623,8 @@ public final class JAXBUtils {
         ClassLoaderService classLoaderService = bus.getExtension(ClassLoaderService.class);
         Object mapper = classLoaderService.createNamespaceWrapperInstance(marshaller.getClass(), nspref);
         if (mapper != null) {
-            if (marshaller.getClass().getName().contains(".internal.")) {
-                marshaller.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper",
-                                       mapper);
-            } else if (marshaller.getClass().getName().contains("com.sun")) {
-                marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper",
+            if (marshaller.getClass().getName().contains("org.glassfish")) {
+                marshaller.setProperty("org.glassfish.jaxb.namespacePrefixMapper",
                                        mapper);
             } else if (marshaller.getClass().getName().contains("eclipse")) {
                 marshaller.setProperty("eclipselink.namespace-prefix-mapper",
@@ -640,13 +640,12 @@ public final class JAXBUtils {
         try {
             Class<?> cls;
             Class<?> refClass;
-            String pkg = "com.sun.xml.bind.";
+            String pkg = "org.glassfish.jaxb.runtime.";
             try {
-                cls = Class.forName("com.sun.xml.bind.api.JAXBRIContext");
+                cls = Class.forName("org.glassfish.jaxb.runtime.api.JAXBRIContext");
                 refClass = Class.forName(pkg + "api.TypeReference");
             } catch (ClassNotFoundException e) {
-                cls = Class.forName("com.sun.xml.internal.bind.api.JAXBRIContext", true, getXJCClassLoader());
-                pkg = "com.sun.xml.internal.bind.";
+                cls = Class.forName("org.glassfish.jaxb.runtime.api.JAXBRIContext", true, getXJCClassLoader());
                 refClass = Class.forName(pkg + "api.TypeReference", true, getXJCClassLoader());
             }
             Object ref = refClass.getConstructor(QName.class,
@@ -705,7 +704,7 @@ public final class JAXBUtils {
                 cls = Class.forName("com.sun.tools.xjc.api.XJC");
                 sc = cls.getMethod("createSchemaCompiler").invoke(null);
             } catch (Throwable e) {
-                cls = Class.forName("com.sun.tools.internal.xjc.api.XJC", true, getXJCClassLoader());
+                cls = Class.forName("com.sun.tools.xjc.api.XJC", true, getXJCClassLoader());
                 sc = cls.getMethod("createSchemaCompiler").invoke(null);
             }
 
@@ -775,6 +774,7 @@ public final class JAXBUtils {
             try {
                 cls = Class.forName("com.sun.codemodel.writer.FileCodeWriter");
             } catch (ClassNotFoundException e) {
+                //TODO: review and remove this check
                 cls = Class.forName("com.sun.codemodel.internal.writer.FileCodeWriter",
                                     true, getXJCClassLoader());
             }
@@ -829,8 +829,8 @@ public final class JAXBUtils {
     public static String getPackageNamespace(Class<?> cls) {
         Package p = cls.getPackage();
         if (p != null) {
-            javax.xml.bind.annotation.XmlSchema schemaAnn =
-                p.getAnnotation(javax.xml.bind.annotation.XmlSchema.class);
+            jakarta.xml.bind.annotation.XmlSchema schemaAnn =
+                p.getAnnotation(jakarta.xml.bind.annotation.XmlSchema.class);
             if (schemaAnn != null) {
                 return schemaAnn.namespace();
             }
@@ -944,8 +944,8 @@ public final class JAXBUtils {
         }
         return clazz.getClassLoader();
     }
-       
-    private static void addToObjectFactoryCache(Package objectFactoryPkg, 
+
+    private static void addToObjectFactoryCache(Package objectFactoryPkg,
                                          Class<?> ofactory,
                                          Map<Package, CachedClass> objectFactoryCache) {
         if (objectFactoryPkg == null || objectFactoryCache == null) {
@@ -1084,7 +1084,8 @@ public final class JAXBUtils {
     public static JAXBContextProxy createJAXBContextProxy(final JAXBContext ctx,
                                                           final SchemaCollection collection,
                                                           final String defaultNs) {
-        if (ctx.getClass().getName().contains("com.sun.")
+        if (ctx.getClass().getName().contains("org.glassfish.")
+                || ctx.getClass().getName().contains("com.sun.")
             || collection == null) {
             return ReflectionInvokationHandler.createProxyWrapper(ctx, JAXBContextProxy.class);
         }
@@ -1103,13 +1104,14 @@ public final class JAXBUtils {
 
     private static String getPostfix(Class<?> cls) {
         String className = cls.getName();
-        if (className.contains("com.sun.xml.internal")
-            || className.contains("eclipse")) {
-            //eclipse moxy accepts sun package CharacterEscapeHandler 
-            return ".internal";
-        } else if (className.contains("com.sun.xml.bind")
-            || className.startsWith("com.ibm.xml")) {
+        //TODO: review and remove "com.sun" package name check
+        if (className.contains("org.glassfish.jaxb") || className.contains("com.sun.xml.bind")
+                || className.startsWith("com.ibm.xml")) {
             return "";
+        } else if (className.contains("com.sun.xml.internal")
+                || className.contains("eclipse")) {
+            //eclipse moxy accepts sun package CharacterEscapeHandler
+            return ".internal";
         }
         return null;
     }
@@ -1127,26 +1129,26 @@ public final class JAXBUtils {
         }
         jaxbNoEscapeHandler.ifPresent(p -> setEscapeHandler(marshaller, p));
     }
-    
+
     public static void setEscapeHandler(Marshaller marshaller, Object escapeHandler) {
         try {
             String postFix = getPostfix(marshaller.getClass());
             if (postFix != null && escapeHandler != null) {
-                marshaller.setProperty("com.sun.xml" + postFix + ".bind.characterEscapeHandler", escapeHandler);
+                marshaller.setProperty("org.glassfish.jaxb" + postFix + ".characterEscapeHandler", escapeHandler);
             }
         } catch (PropertyException e) {
             LOG.log(Level.INFO, "Failed to set MinumEscapeHandler to jaxb marshaller", e);
         }
     }
-    
+
     public static Object createMininumEscapeHandler(Class<?> cls) {
         return createEscapeHandler(cls, "MinimumEscapeHandler");
     }
-    
+
     public static Object createNoEscapeHandler(Class<?> cls) {
         return createEscapeHandler(cls, "NoEscapeHandler");
     }
-    
+
     private static Object createEscapeHandler(Class<?> cls, String simpleClassName) {
         try {
             String postFix = getPostfix(cls);
@@ -1155,11 +1157,10 @@ public final class JAXBUtils {
                     + cls);
                 return null;
             }
-            Class<?> handlerClass = ClassLoaderUtils.loadClass("com.sun.xml" + postFix
-                                                                   + ".bind.marshaller." + simpleClassName,
-                                                               cls);
+            Class<?> handlerClass = ClassLoaderUtils.loadClass("org.glassfish.jaxb.core.marshaller."
+                            + simpleClassName, cls);
             Class<?> handlerInterface = ClassLoaderUtils
-                .loadClass("com.sun.xml" + postFix + ".bind.marshaller.CharacterEscapeHandler",
+                .loadClass("org.glassfish.jaxb.core.marshaller.CharacterEscapeHandler",
                            cls);
             Object targetHandler = ReflectionUtil.getDeclaredField(handlerClass, "theInstance").get(null);
             return ProxyHelper.getProxy(cls.getClassLoader(),
@@ -1175,6 +1176,28 @@ public final class JAXBUtils {
         }
         return null;
     }
-    
-
+    public static JAXBContext createContext(final Set<Class<?>> classes,
+                                            final Map<String, Object> map) throws JAXBException {
+        JAXBContext ctx = null;
+        try {
+            ctx = AccessController.doPrivileged(new PrivilegedExceptionAction<JAXBContext>() {
+                public JAXBContext run() throws Exception {
+                    //This is a workaround for CXF-8675
+                    Class<?> factoryClass = ClassLoaderUtils.loadClass("org.glassfish.jaxb.runtime.v2.ContextFactory",
+                            JAXBContextCache.class);
+                    Method m = factoryClass.getMethod("createContext", Class[].class, Map.class);
+                    Object context = m.invoke(null, classes.toArray(new Class<?>[0]), map);
+                    return (JAXBContext) context;
+                }
+            });
+        } catch (PrivilegedActionException e2) {
+            if (e2.getException() instanceof JAXBException) {
+                JAXBException ex = (JAXBException) e2.getException();
+                throw ex;
+            } else {
+                throw new RuntimeException(e2.getException());
+            }
+        }
+        return ctx;
+    }
 }

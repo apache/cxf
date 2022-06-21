@@ -21,8 +21,7 @@ package org.apache.cxf.jaxrs.client;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.ws.rs.ext.ParamConverter;
-
+import jakarta.ws.rs.ext.ParamConverter;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 
 public class UrlEncodingParamConverter implements ParamConverter<String> {

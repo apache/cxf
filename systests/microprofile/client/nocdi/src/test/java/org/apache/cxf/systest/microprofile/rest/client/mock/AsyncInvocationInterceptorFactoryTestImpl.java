@@ -22,8 +22,7 @@ package org.apache.cxf.systest.microprofile.rest.client.mock;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Priority;
-
+import jakarta.annotation.Priority;
 import org.eclipse.microprofile.rest.client.ext.AsyncInvocationInterceptor;
 import org.eclipse.microprofile.rest.client.ext.AsyncInvocationInterceptorFactory;
 

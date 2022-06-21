@@ -22,10 +22,9 @@ package org.apache.cxf.no_body_parts;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import javax.jws.WebService;
-import javax.xml.ws.Holder;
-import javax.xml.ws.WebServiceException;
-
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Holder;
+import jakarta.xml.ws.WebServiceException;
 import org.apache.cxf.no_body_parts.types.Operation1;
 import org.apache.cxf.no_body_parts.types.Operation1Response;
 import org.apache.cxf.no_body_parts.wsdl.NoBodyPartsSEI;

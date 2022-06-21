@@ -21,10 +21,10 @@ package org.apache.cxf.systest.ws.security;
 
 import java.security.Principal;
 
-import javax.xml.ws.WebServiceContext;
+import jakarta.xml.ws.WebServiceContext;
 
 
-@javax.jws.WebService(
+@jakarta.jws.WebService(
     serviceName = "SOAPServiceWSSecurity",
     portName = "TimestampSignEncrypt",
     endpointInterface = "org.apache.hello_world_soap_http.Greeter",

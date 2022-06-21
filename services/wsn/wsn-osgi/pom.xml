@@ -56,15 +56,15 @@
                 <configuration>
                     <instructions>
                         <Require-Bundle>
-                            org.apache.activemq.activemq-core
+                            org.apache.activemq.artemis-core-client
                         </Require-Bundle>
                         <Import-Package>
                             org.apache.cxf.*;resolution:=optional,
                             !org.apache.activemq*,
                             !org.slf4j.*,
-                            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
-                            javax.jws*;version="${cxf.osgi.jws.version}",
-                            javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
+                            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}",
+                            jakarta.jws*;version="${cxf.osgi.jws.version}",
+                            jakarta.xml.ws*;version="${cxf.osgi.jakarta.xml.ws.version}",
                             *
                         </Import-Package>
                         <Export-Package>

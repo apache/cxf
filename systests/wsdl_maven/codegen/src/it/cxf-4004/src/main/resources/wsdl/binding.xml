@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<jaxws:bindings xmlns:jaxws="http://java.sun.com/xml/ns/jaxws" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jxb="http://java.sun.com/xml/ns/jaxb" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" wsdlLocation="CustomerService.wsdl">
+<jaxws:bindings xmlns:jaxws="https://jakarta.ee/xml/ns/jaxws" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jxb="https://jakarta.ee/xml/ns/jaxb" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" wsdlLocation="CustomerService.wsdl">
     <!-- <jaxws:enableAsyncMapping>true</jaxws:enableAsyncMapping> -->
     <jaxws:bindings node="wsdl:definitions/wsdl:types/xs:schema">
         <jxb:globalBindings>

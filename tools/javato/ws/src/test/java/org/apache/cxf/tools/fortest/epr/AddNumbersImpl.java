@@ -19,12 +19,12 @@
 
 package org.apache.cxf.tools.fortest.epr;
 
-import javax.jws.WebService;
-import javax.xml.ws.BindingType;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.soap.Addressing;
-import javax.xml.ws.soap.SOAPBinding;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.BindingType;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.soap.Addressing;
+import jakarta.xml.ws.soap.SOAPBinding;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 
 @WebService(
     name = "AddNumbers",

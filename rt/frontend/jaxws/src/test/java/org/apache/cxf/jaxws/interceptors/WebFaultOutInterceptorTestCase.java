@@ -24,12 +24,6 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.Detail;
-import javax.xml.soap.Name;
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPFault;
-import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
@@ -40,7 +34,12 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.TypeInfo;
 import org.w3c.dom.UserDataHandler;
 
-
+import jakarta.xml.soap.Detail;
+import jakarta.xml.soap.Name;
+import jakarta.xml.soap.SOAPElement;
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPFault;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;

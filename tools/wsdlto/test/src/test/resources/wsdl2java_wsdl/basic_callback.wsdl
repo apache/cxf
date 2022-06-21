@@ -17,9 +17,9 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:references="http://www.w3.org/2005/08/addressing" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/callback" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" name="basic_callback" targetNamespace="http://apache.org/callback" jaxb:version="2.0">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:references="http://www.w3.org/2005/08/addressing" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/callback" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" name="basic_callback" targetNamespace="http://apache.org/callback" jaxb:version="3.0">
     <wsdl:types>
-        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" targetNamespace="http://apache.org/callback" jaxb:version="2.0" elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" targetNamespace="http://apache.org/callback" jaxb:version="3.0" elementFormDefault="qualified">
             <xsd:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="/schemas/wsdl/ws-addr.xsd"/>
             <element name="callback_message" type="xsd:string"/>
             <element name="RegisterCallback" type="references:EndpointReferenceType"/>

@@ -19,8 +19,7 @@
 
 package org.apache.cxf.jaxws.handler.logical;
 
-import javax.xml.ws.Binding;
-
+import jakarta.xml.ws.Binding;
 import org.apache.cxf.jaxws.handler.AbstractJAXWSHandlerInterceptor;
 import org.apache.cxf.jaxws.handler.HandlerChainInvoker;
 import org.apache.cxf.jaxws.handler.soap.SOAPHandlerFaultInInterceptor;

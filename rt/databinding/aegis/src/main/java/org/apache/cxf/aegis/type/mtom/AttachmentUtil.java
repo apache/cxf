@@ -25,9 +25,8 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Iterator;
 
-import javax.activation.DataHandler;
-import javax.activation.URLDataSource;
-
+import jakarta.activation.DataHandler;
+import jakarta.activation.URLDataSource;
 import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.util.UID;
 import org.apache.cxf.attachment.AttachmentImpl;

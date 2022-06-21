@@ -23,8 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.WebFault;
 
+import jakarta.xml.ws.WebFault;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.interceptor.Fault;

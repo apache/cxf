@@ -24,15 +24,15 @@ import java.io.ByteArrayInputStream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.soap.SOAPPart;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.soap.SOAPPart;
 
 import org.junit.Test;
 

@@ -24,14 +24,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.MapKeyColumn;
-import javax.persistence.OrderColumn;
-import javax.xml.bind.annotation.XmlRootElement;
-
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.MapKeyColumn;
+import jakarta.persistence.OrderColumn;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 

@@ -26,11 +26,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.client.ClientResponseFilter;
-import javax.ws.rs.core.Configurable;
-import javax.ws.rs.core.Configuration;
-
+import jakarta.ws.rs.client.ClientRequestFilter;
+import jakarta.ws.rs.client.ClientResponseFilter;
+import jakarta.ws.rs.core.Configurable;
+import jakarta.ws.rs.core.Configuration;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;

@@ -20,10 +20,9 @@ package org.apache.cxf.sts.token.provider;
 
 import java.util.Properties;
 
-import javax.xml.bind.JAXBElement;
-
 import org.w3c.dom.Element;
 
+import jakarta.xml.bind.JAXBElement;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;

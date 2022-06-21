@@ -25,17 +25,17 @@ import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.util.Map;
 
-import javax.jms.Connection;
-import javax.jms.DeliveryMode;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.Session;
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Service;
-import javax.xml.ws.WebServiceException;
 
+import jakarta.jms.Connection;
+import jakarta.jms.DeliveryMode;
+import jakarta.jms.Destination;
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.Session;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.WebServiceException;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jms.testsuite.services.TestSuiteServer;
 import org.apache.cxf.jms.testsuite.util.JMSTestUtil;

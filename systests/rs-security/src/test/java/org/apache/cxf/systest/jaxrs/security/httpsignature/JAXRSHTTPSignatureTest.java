@@ -39,16 +39,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import javax.annotation.Priority;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
-import javax.ws.rs.ext.WriterInterceptorContext;
-
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.client.ClientRequestContext;
+import jakarta.ws.rs.client.ClientRequestFilter;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.Provider;
+import jakarta.ws.rs.ext.WriterInterceptorContext;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.MessageDigestInputStream;
 import org.apache.cxf.helpers.IOUtils;

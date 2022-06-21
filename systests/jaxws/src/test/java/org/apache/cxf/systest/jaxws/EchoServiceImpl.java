@@ -18,14 +18,14 @@
  */
 package org.apache.cxf.systest.jaxws;
 
-import javax.jws.WebService;
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPConstants;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPFactory;
-import javax.xml.soap.SOAPFault;
-import javax.xml.ws.soap.SOAPFaultException;
 
+import jakarta.jws.WebService;
+import jakarta.xml.soap.SOAPConstants;
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPFactory;
+import jakarta.xml.soap.SOAPFault;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.ext.logging.Logging;
 
 @WebService(name = "MyEchoService", targetNamespace = "urn:echo")

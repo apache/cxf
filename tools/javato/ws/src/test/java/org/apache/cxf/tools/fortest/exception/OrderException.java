@@ -18,10 +18,10 @@
  */
 package org.apache.cxf.tools.fortest.exception;
 
-import javax.xml.bind.annotation.XmlAccessOrder;
-import javax.xml.bind.annotation.XmlAccessorOrder;
+import jakarta.xml.bind.annotation.XmlAccessOrder;
+import jakarta.xml.bind.annotation.XmlAccessorOrder;
 
-@javax.xml.ws.WebFault
+@jakarta.xml.ws.WebFault
 @XmlAccessorOrder(XmlAccessOrder.ALPHABETICAL)
 public class OrderException extends SuperException {
     private static final long serialVersionUID = 1L;

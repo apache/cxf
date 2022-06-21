@@ -21,9 +21,8 @@ package org.apache.cxf.systests.java2ws;
 
 import java.util.Date;
 
-import javax.jws.WebParam;
-import javax.jws.WebService;
-
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
 import org.apache.cxf.annotations.WSDLDocumentation;
 
 @WebService

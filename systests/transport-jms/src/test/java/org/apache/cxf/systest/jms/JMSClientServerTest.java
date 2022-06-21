@@ -28,14 +28,14 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Response;
-import javax.xml.ws.soap.AddressingFeature;
-import javax.xml.ws.soap.SOAPFaultException;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
+import jakarta.xml.ws.AsyncHandler;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Response;
+import jakarta.xml.ws.soap.AddressingFeature;
+import jakarta.xml.ws.soap.SOAPFaultException;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.interceptor.TibcoSoapActionInterceptor;

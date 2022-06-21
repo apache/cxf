@@ -23,14 +23,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.container.ContainerRequestContext;
 import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.container.ContainerRequestContext;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;

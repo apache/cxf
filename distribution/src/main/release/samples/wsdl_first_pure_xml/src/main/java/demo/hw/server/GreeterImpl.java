@@ -22,12 +22,12 @@ package demo.hw.server;
 import org.apache.hello_world_xml_http.bare.Greeter;
 import org.apache.hello_world_xml_http.bare.types.MyComplexStructType;
 
-@javax.jws.WebService(serviceName = "XMLService",
+@jakarta.jws.WebService(serviceName = "XMLService",
                 portName = "XMLPort",
                 endpointInterface = "org.apache.hello_world_xml_http.bare.Greeter",
                 targetNamespace = "http://apache.org/hello_world_xml_http/bare")
 
-@javax.xml.ws.BindingType(value = "http://cxf.apache.org/bindings/xformat")
+@jakarta.xml.ws.BindingType(value = "http://cxf.apache.org/bindings/xformat")
 
 public class GreeterImpl implements Greeter {
 

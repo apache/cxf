@@ -20,16 +20,15 @@
 package org.apache.cxf.transport.jms;
 
 import javax.naming.NamingException;
-import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAException;
 
+import jakarta.transaction.TransactionManager;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.jms.uri.JMSEndpoint;
 import org.apache.cxf.transport.jms.uri.MyBeanLocator;
-import org.apache.geronimo.transaction.manager.GeronimoTransactionManager;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -51,7 +50,7 @@ public class JMSConfigFactoryTest extends AbstractJMSTester {
         MyBeanLocator mybl = new MyBeanLocator(cbl);
         bus.setExtension(mybl, ConfiguredBeanLocator.class);
 
-        TransactionManager tmExpected = new GeronimoTransactionManager();
+        TransactionManager tmExpected = com.arjuna.ats.jta.TransactionManager.transactionManager();
         mybl.register("tm", tmExpected);
         tmByName(bus, tmExpected);
         tmByClass(bus, tmExpected);

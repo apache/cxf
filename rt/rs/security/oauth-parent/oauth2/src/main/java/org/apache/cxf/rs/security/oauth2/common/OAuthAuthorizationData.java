@@ -25,8 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
+import jakarta.xml.bind.annotation.XmlRootElement;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 /**

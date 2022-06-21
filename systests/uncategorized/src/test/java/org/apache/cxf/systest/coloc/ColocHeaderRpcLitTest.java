@@ -36,7 +36,7 @@ public class ColocHeaderRpcLitTest extends AbstractHeaderServiceRpcLitTest {
         return TRANSPORT_URI;
     }
 
-    @javax.jws.WebService(portName = "SoapPort", serviceName = "SOAPHeaderService",
+    @jakarta.jws.WebService(portName = "SoapPort", serviceName = "SOAPHeaderService",
             targetNamespace = "http://apache.org/headers/rpc_lit",
             endpointInterface = "org.apache.headers.rpc_lit.HeaderTester")
     class HttpServiceImpl extends BaseHeaderTesterRpcLitImpl { }

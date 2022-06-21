@@ -28,7 +28,7 @@ import org.apache.cxf.service.invoker.Invoker;
 @Deprecated
 public class JAXWS22Invoker extends JAXWSMethodInvoker implements Invoker {
 
-    public JAXWS22Invoker(javax.xml.ws.spi.Invoker inv) {
+    public JAXWS22Invoker(jakarta.xml.ws.spi.Invoker inv) {
         super(inv);
     }
 }

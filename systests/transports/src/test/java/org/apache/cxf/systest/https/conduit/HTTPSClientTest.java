@@ -23,8 +23,8 @@ import java.net.URL;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.TrustManager;
-import javax.xml.ws.BindingProvider;
 
+import jakarta.xml.ws.BindingProvider;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.configuration.jsse.TLSParameterJaxBUtils;

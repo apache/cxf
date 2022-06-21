@@ -23,15 +23,14 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.concurrent.Future;
 
-import javax.jws.WebService;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Response;
-import javax.xml.ws.soap.Addressing;
-
+import jakarta.jws.WebService;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.xml.ws.AsyncHandler;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Response;
+import jakarta.xml.ws.soap.Addressing;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;

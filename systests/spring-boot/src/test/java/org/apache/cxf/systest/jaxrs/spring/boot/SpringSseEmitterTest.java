@@ -24,17 +24,16 @@ import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.sse.SseEventSource;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.sse.SseEventSource;
 import org.apache.cxf.systest.jaxrs.resources.Book;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -89,7 +88,7 @@ public class SpringSseEmitterTest {
 
         try (SseEventSource eventSource = SseEventSource.target(target).build()) {
             eventSource.register(event -> {
-                books.add(event.readData(Book.class, javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE));
+                books.add(event.readData(Book.class, jakarta.ws.rs.core.MediaType.APPLICATION_JSON_TYPE));
                 if (books.size() == CNT) {
                     synchronized (books) {
                         books.notify();

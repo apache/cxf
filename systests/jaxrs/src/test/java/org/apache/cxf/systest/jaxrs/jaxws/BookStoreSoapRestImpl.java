@@ -23,16 +23,15 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import javax.jws.WebMethod;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
+import jakarta.jws.WebMethod;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
 import org.apache.cxf.annotations.SchemaValidation;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.MessageContext;

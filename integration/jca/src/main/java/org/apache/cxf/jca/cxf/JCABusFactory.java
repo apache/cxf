@@ -29,11 +29,10 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import javax.resource.ResourceException;
-import javax.resource.spi.BootstrapContext;
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkManager;
-
+import jakarta.resource.ResourceException;
+import jakarta.resource.spi.BootstrapContext;
+import jakarta.resource.spi.work.Work;
+import jakarta.resource.spi.work.WorkManager;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.i18n.BundleUtils;

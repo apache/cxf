@@ -24,15 +24,15 @@ import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.callback.CallbackHandler;
-import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Service;
 
 import org.w3c.dom.Element;
 
+import jakarta.ws.rs.core.Response;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Service;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;

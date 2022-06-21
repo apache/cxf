@@ -21,8 +21,7 @@ package org.apache.cxf.jca.servant;
 
 import java.lang.reflect.Method;
 
-import javax.ejb.EJBHome;
-
+import jakarta.ejb.EJBHome;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.service.invoker.AbstractInvoker;
 

@@ -24,9 +24,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.Resource;
 import javax.xml.namespace.QName;
 
+import jakarta.annotation.Resource;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;

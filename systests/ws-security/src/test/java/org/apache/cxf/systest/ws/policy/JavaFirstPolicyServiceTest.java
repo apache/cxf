@@ -26,11 +26,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.DOMUtils;

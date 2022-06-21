@@ -22,8 +22,7 @@ package org.apache.cxf.microprofile.client;
 import java.lang.reflect.Type;
 import java.util.concurrent.Future;
 
-import javax.ws.rs.client.InvocationCallback;
-
+import jakarta.ws.rs.client.InvocationCallback;
 import org.apache.cxf.jaxrs.client.JaxrsClientCallback;
 import org.apache.cxf.message.Message;
 

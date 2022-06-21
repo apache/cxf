@@ -24,22 +24,24 @@ import java.nio.charset.Charset;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.jms.BytesMessage;
-import javax.jms.Connection;
-import javax.jms.JMSException;
-import javax.jms.Session;
-
-import org.apache.activemq.ActiveMQConnectionFactory;
+import jakarta.jms.BytesMessage;
+import jakarta.jms.Connection;
+import jakarta.jms.JMSException;
+import jakarta.jms.Session;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
+import org.apache.activemq.artemis.junit.EmbeddedActiveMQResource;
 import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSFactory;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class JMSUtilTest {
+    @Rule public EmbeddedActiveMQResource server = new EmbeddedActiveMQResource(0);
 
     @Test
     public void testCorrelationIDGeneration() {
@@ -74,12 +76,12 @@ public class JMSUtilTest {
         String testMsg = "Test Message";
         final byte[] testBytes = testMsg.getBytes(Charset.defaultCharset().name()); // TODO encoding
         JMSConfiguration jmsConfig = new JMSConfiguration();
-        jmsConfig.setConnectionFactory(new ActiveMQConnectionFactory("vm://tesstMarshal?broker.persistent=false"));
+        jmsConfig.setConnectionFactory(new ActiveMQConnectionFactory("vm://0?broker.persistent=false"));
 
         try (ResourceCloser closer = new ResourceCloser()) {
             Connection connection = JMSFactory.createConnection(jmsConfig);
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            javax.jms.Message jmsMessage =
+            jakarta.jms.Message jmsMessage =
                 JMSUtil.createAndSetPayload(testBytes, session, JMSConstants.BYTE_MESSAGE_TYPE);
             assertTrue("Message should have been of type BytesMessage ", jmsMessage instanceof BytesMessage);
         }

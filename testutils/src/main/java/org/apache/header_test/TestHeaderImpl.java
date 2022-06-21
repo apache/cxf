@@ -20,9 +20,8 @@
 package org.apache.header_test;
 
 
-import javax.jws.WebService;
-import javax.xml.ws.Holder;
-
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Holder;
 import org.apache.header_test.types.TestHeader1;
 import org.apache.header_test.types.TestHeader1Response;
 import org.apache.header_test.types.TestHeader2;

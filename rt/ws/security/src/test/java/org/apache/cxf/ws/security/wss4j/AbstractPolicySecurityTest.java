@@ -30,7 +30,6 @@ import java.util.concurrent.Executor;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPMessage;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -40,6 +39,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import jakarta.xml.soap.SOAPMessage;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.Binding;

@@ -25,11 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.TypedQuery;
-
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.TypedQuery;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;

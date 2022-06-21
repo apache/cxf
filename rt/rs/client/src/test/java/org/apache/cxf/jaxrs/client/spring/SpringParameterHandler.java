@@ -23,9 +23,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Objects;
 
-import javax.ws.rs.ext.ParamConverter;
-import javax.ws.rs.ext.ParamConverterProvider;
-
+import jakarta.ws.rs.ext.ParamConverter;
+import jakarta.ws.rs.ext.ParamConverterProvider;
 import org.apache.cxf.jaxrs.client.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;

@@ -25,10 +25,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.refresh.RefreshTokenGrant;

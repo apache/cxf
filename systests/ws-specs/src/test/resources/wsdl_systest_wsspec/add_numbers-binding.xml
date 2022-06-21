@@ -17,7 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<bindings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns="http://java.sun.com/xml/ns/jaxws" wsdlLocation="add_numbers.wsdl">
+<bindings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns="https://jakarta.ee/xml/ns/jaxws" wsdlLocation="add_numbers.wsdl">
     <bindings node="wsdl:definitions">
         <enableAsyncMapping>true</enableAsyncMapping>
     </bindings>

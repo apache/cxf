@@ -24,9 +24,8 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 import java.util.stream.IntStream;
 
-import javax.ws.rs.sse.OutboundSseEvent;
-import javax.ws.rs.sse.SseEventSink;
-
+import jakarta.ws.rs.sse.OutboundSseEvent;
+import jakarta.ws.rs.sse.SseEventSink;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;

@@ -20,13 +20,12 @@ package org.apache.cxf.cdi;
 
 import java.util.Set;
 
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.ws.rs.RuntimeType;
-import javax.ws.rs.core.Configurable;
-import javax.ws.rs.core.FeatureContext;
-
+import jakarta.enterprise.context.spi.CreationalContext;
+import jakarta.enterprise.inject.spi.Bean;
+import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.ws.rs.RuntimeType;
+import jakarta.ws.rs.core.Configurable;
+import jakarta.ws.rs.core.FeatureContext;
 import org.apache.cxf.cdi.event.DisposableCreationalContext;
 import org.apache.cxf.jaxrs.impl.ConfigurableImpl;
 import org.apache.cxf.jaxrs.impl.ConfigurableImpl.Instantiator;

@@ -35,12 +35,12 @@
         <cxf.bundle.activator>org.apache.cxf.transport.http.osgi.HTTPTransportActivator</cxf.bundle.activator>
         <cxf.osgi.import>
             javax.net,
-            javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
+            jakarta.servlet*;version="${cxf.osgi.jakarta.servlet.version}",
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
             org.osgi.service.http,
-            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
-            javax.activation;version="${cxf.osgi.javax.activation.version}",
+            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}",
+            jakarta.activation;version="${cxf.osgi.jakarta.activation.version}",
             com.sun.activation.registries;resolution:=optional
         </cxf.osgi.import>
         <cxf.osgi.export>
@@ -286,4 +286,30 @@
             </plugins>
         </pluginManagement>
     </build>
+    
+    <!-- TODO: Remove once OSGi is supported or / and extracted -->
+    <profiles>
+        <profile>
+            <id>jakarta</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/org/apache/cxf/transport/http/osgi/**.java</exclude>
+                            </excludes>
+                            <testExcludes>
+                                <testExclude>**/org/apache/cxf/transport/http/osgi/**.java</testExclude>
+                            </testExcludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

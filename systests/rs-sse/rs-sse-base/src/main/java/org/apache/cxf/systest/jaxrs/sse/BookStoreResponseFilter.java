@@ -25,13 +25,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.Provider;
-
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.UriInfo;
+import jakarta.ws.rs.ext.Provider;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.Headers;

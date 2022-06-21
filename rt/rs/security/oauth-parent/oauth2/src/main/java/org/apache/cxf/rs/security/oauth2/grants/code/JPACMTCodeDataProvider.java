@@ -21,10 +21,9 @@ package org.apache.cxf.rs.security.oauth2.grants.code;
 import java.util.Collections;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.LockModeType;
-
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.LockModeType;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 
@@ -135,7 +134,7 @@ public class JPACMTCodeDataProvider extends JPACodeDataProvider {
             execute(em -> {
                 final Map<String, Object> options;
                 if (pessimisticLockTimeout > 0) {
-                    options = Collections.singletonMap("javax.persistence.lock.timeout", pessimisticLockTimeout);
+                    options = Collections.singletonMap("jakarta.persistence.lock.timeout", pessimisticLockTimeout);
                 } else {
                     options = Collections.emptyMap();
                 }

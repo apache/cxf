@@ -28,22 +28,21 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.ws.rs.BeanParam;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.CookieParam;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.MatrixParam;
-import javax.ws.rs.NameBinding;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-
+import jakarta.ws.rs.BeanParam;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.CookieParam;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.FormParam;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.MatrixParam;
+import jakarta.ws.rs.NameBinding;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
@@ -51,7 +50,7 @@ import org.apache.cxf.common.util.ClassHelper;
 public final class AnnotationUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(AnnotationUtils.class);
     private static final Class<? extends Annotation> PRIORITY_API =
-            (Class<? extends Annotation>) loadClassOrNull("javax.annotation.Priority");
+            (Class<? extends Annotation>) loadClassOrNull("jakarta.annotation.Priority");
     private static final Method PRIORITY_VALUE = getMethodOrNull(PRIORITY_API, "value");
 
     private static final Set<Class<?>> PARAM_ANNOTATION_CLASSES;

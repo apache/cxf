@@ -21,9 +21,8 @@ package org.apache.cxf.jaxrs.client.spec;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.ws.rs.client.ClientResponseContext;
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.client.ClientResponseContext;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.impl.AbstractResponseContextImpl;
 import org.apache.cxf.jaxrs.impl.ResponseImpl;

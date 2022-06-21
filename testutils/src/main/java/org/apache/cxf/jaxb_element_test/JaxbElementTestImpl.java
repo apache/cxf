@@ -19,7 +19,7 @@
 
 package org.apache.cxf.jaxb_element_test;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(serviceName = "jaxb_element_test",
         portName = "jaxb_element_testSOAP",

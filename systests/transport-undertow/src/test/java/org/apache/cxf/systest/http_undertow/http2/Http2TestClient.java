@@ -25,8 +25,8 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
-import javax.ws.rs.core.MediaType;
 
+import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.transport.https.InsecureTrustManager;
 import org.xnio.IoUtils;
 import org.xnio.OptionMap;

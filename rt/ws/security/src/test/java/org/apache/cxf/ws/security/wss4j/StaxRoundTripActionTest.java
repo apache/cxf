@@ -98,7 +98,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
         try {
             echo.echo("test");
             fail("Failure expected on the wrong action");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
             assertTrue(ex.getMessage().contains(WSSecurityException.UNIFIED_SECURITY_ERR));
         }
@@ -150,7 +150,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
         try {
             echo.echo("test");
             fail("Failure expected on the wrong action");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
             assertTrue(ex.getMessage().contains(WSSecurityException.UNIFIED_SECURITY_ERR));
         }
@@ -204,7 +204,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
         try {
             echo.echo("test");
             fail("Failure expected on the wrong action");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
             assertTrue(ex.getMessage().contains(WSSecurityException.UNIFIED_SECURITY_ERR));
         }
@@ -252,7 +252,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
         try {
             echo.echo("test");
             fail("Failure expected on the wrong action");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
             assertTrue(ex.getMessage().contains(WSSecurityException.UNIFIED_SECURITY_ERR));
         }
@@ -398,7 +398,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
         try {
             echo.echo("test");
             fail("Failure expected on the wrong action");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
             assertTrue(ex.getMessage().contains(WSSecurityException.UNIFIED_SECURITY_ERR));
         }
@@ -448,7 +448,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
         try {
             echo.echo("test");
             fail("Failure expected on the wrong action");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
             assertTrue(ex.getMessage().contains(WSSecurityException.UNIFIED_SECURITY_ERR));
         }

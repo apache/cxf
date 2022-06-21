@@ -29,8 +29,6 @@ import java.util.Map;
 import java.util.Vector;
 
 import javax.xml.namespace.NamespaceContext;
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPEnvelope;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -45,6 +43,8 @@ import org.w3c.dom.Node;
 
 import org.xml.sax.InputSource;
 
+import jakarta.xml.soap.SOAPElement;
+import jakarta.xml.soap.SOAPEnvelope;
 import org.apache.cxf.binding.soap.saaj.SAAJStreamWriter;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;

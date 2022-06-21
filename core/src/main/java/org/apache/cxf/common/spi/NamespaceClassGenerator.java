@@ -47,7 +47,7 @@ public class NamespaceClassGenerator extends ClassGeneratorClassLoader implement
             return createEclipseNamespaceMapper();
         } else if (mcls.getName().contains(".internal")) {
             postFix = "Internal";
-        } else if (mcls.getName().contains("com.sun")) {
+        } else if (mcls.getName().contains("org.glassfish")) {
             postFix = "RI";
         }
 
@@ -294,9 +294,7 @@ public class NamespaceClassGenerator extends ClassGeneratorClassLoader implement
 
     private byte[] createNamespaceWrapperInternal(String postFix) {
 
-        String superName = "com/sun/xml/"
-                + ("RI".equals(postFix) ? "" : "internal/")
-                + "bind/marshaller/NamespacePrefixMapper";
+        String superName = "org/glassfish/jaxb/runtime/marshaller/NamespacePrefixMapper";
         String postFixedName = "org/apache/cxf/jaxb/NamespaceMapper" + postFix;
         ASMHelper.ClassWriter cw = helper.createClassWriter();
         if (cw == null) {

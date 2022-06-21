@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.osgi.itests.soap;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService
 public interface Greeter {

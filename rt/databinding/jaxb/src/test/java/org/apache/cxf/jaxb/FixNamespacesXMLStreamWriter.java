@@ -19,9 +19,9 @@
 
 package org.apache.cxf.jaxb;
 
-import javax.xml.bind.Marshaller;
 import javax.xml.stream.XMLStreamWriter;
 
+import jakarta.xml.bind.Marshaller;
 import org.codehaus.stax2.util.StreamWriterDelegate;
 
 public class FixNamespacesXMLStreamWriter extends StreamWriterDelegate implements MarshallerAwareXMLWriter {

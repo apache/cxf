@@ -22,9 +22,10 @@ package org.apache.cxf.systest.ws.security;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.soap.SOAPHandler;
-import javax.xml.ws.handler.soap.SOAPMessageContext;
+
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.handler.soap.SOAPHandler;
+import jakarta.xml.ws.handler.soap.SOAPMessageContext;
 
 public class TestOutHandler implements SOAPHandler<SOAPMessageContext> {
     boolean handleFaultCalledOutbound;

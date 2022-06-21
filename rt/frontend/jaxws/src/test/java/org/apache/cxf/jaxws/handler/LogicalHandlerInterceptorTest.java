@@ -23,13 +23,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 
-import javax.xml.ws.Binding;
-import javax.xml.ws.LogicalMessage;
-import javax.xml.ws.handler.Handler;
-import javax.xml.ws.handler.LogicalHandler;
-import javax.xml.ws.handler.LogicalMessageContext;
-import javax.xml.ws.handler.MessageContext;
-
+import jakarta.xml.ws.Binding;
+import jakarta.xml.ws.LogicalMessage;
+import jakarta.xml.ws.handler.Handler;
+import jakarta.xml.ws.handler.LogicalHandler;
+import jakarta.xml.ws.handler.LogicalMessageContext;
+import jakarta.xml.ws.handler.MessageContext;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.jaxws.handler.logical.LogicalHandlerInInterceptor;

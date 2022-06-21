@@ -22,8 +22,7 @@ package org.apache.cxf.transport.udp;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
 
-import javax.xml.ws.soap.SOAPFaultException;
-
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;

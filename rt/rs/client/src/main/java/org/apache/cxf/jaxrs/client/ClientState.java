@@ -21,9 +21,9 @@ package org.apache.cxf.jaxrs.client;
 import java.net.URI;
 import java.util.Map;
 
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
 
 
 /**

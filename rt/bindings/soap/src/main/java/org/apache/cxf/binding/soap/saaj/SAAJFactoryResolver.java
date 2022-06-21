@@ -21,10 +21,10 @@ package org.apache.cxf.binding.soap.saaj;
 
 import java.lang.reflect.InvocationTargetException;
 
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPConstants;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPFactory;
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPConstants;
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPFactory;
 
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.Soap12;

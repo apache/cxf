@@ -27,19 +27,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
 
 import org.apache.cxf.transport.websocket.WebSocketConstants;
 
@@ -146,7 +146,7 @@ public class CustomerService {
     @Path("/monitor2")
     @Produces("text/*")
     public void monitorCustomers2(
-            @javax.ws.rs.core.Context final HttpServletResponse httpResponse,
+            @jakarta.ws.rs.core.Context final HttpServletResponse httpResponse,
             @HeaderParam(WebSocketConstants.DEFAULT_REQUEST_ID_KEY) String reqid) {
         final String key = reqid == null ? "*" : reqid;
         monitors2.put(key, new WriterHolder(httpResponse, MAX_ERROR_COUNT));

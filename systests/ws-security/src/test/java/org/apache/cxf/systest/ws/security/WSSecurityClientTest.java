@@ -33,17 +33,17 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.Binding;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Service;
-import javax.xml.ws.handler.Handler;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.http.HTTPBinding;
-import javax.xml.ws.soap.AddressingFeature;
-import javax.xml.ws.soap.SOAPBinding;
-import javax.xml.ws.soap.SOAPFaultException;
 
+import jakarta.xml.ws.Binding;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.handler.Handler;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.http.HTTPBinding;
+import jakarta.xml.ws.soap.AddressingFeature;
+import jakarta.xml.ws.soap.SOAPBinding;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -146,8 +146,8 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testUsernameToken() throws Exception {
-        final javax.xml.ws.Service svc
-            = javax.xml.ws.Service.create(WSDL_LOC, GREETER_SERVICE_QNAME);
+        final jakarta.xml.ws.Service svc
+            = jakarta.xml.ws.Service.create(WSDL_LOC, GREETER_SERVICE_QNAME);
         final Greeter greeter = svc.getPort(USERNAME_TOKEN_PORT_QNAME, Greeter.class);
         updateAddressPort(greeter, test.getPort());
 
@@ -194,8 +194,8 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testUsernameTokenStreaming() throws Exception {
-        final javax.xml.ws.Service svc
-            = javax.xml.ws.Service.create(WSDL_LOC, GREETER_SERVICE_QNAME);
+        final jakarta.xml.ws.Service svc
+            = jakarta.xml.ws.Service.create(WSDL_LOC, GREETER_SERVICE_QNAME);
         final Greeter greeter = svc.getPort(USERNAME_TOKEN_PORT_QNAME, Greeter.class);
         updateAddressPort(greeter, test.getPort());
 
@@ -255,7 +255,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         Bus b = new SpringBusFactory()
             .createBus("org/apache/cxf/systest/ws/security/client.xml");
         BusFactory.setDefaultBus(b);
-        final javax.xml.ws.Service svc = javax.xml.ws.Service.create(
+        final jakarta.xml.ws.Service svc = jakarta.xml.ws.Service.create(
             WSDL_LOC,
             GREETER_SERVICE_QNAME
         );

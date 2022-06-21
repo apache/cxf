@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.aegis.exception;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
 
 @WebService(name = "ExceptionService", serviceName = "ExceptionService")
 public interface ExceptionService {

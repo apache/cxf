@@ -25,8 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.jaxrs.ext.MessageContext;

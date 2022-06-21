@@ -21,9 +21,9 @@ package org.apache.xmladapter;
 
 import java.util.Currency;
 
-import javax.jws.WebParam;
-import javax.jws.WebService;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @WebService
 public interface Greeter {

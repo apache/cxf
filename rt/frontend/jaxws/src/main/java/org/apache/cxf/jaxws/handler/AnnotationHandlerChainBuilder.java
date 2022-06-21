@@ -28,15 +28,15 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jws.HandlerChain;
-import javax.jws.WebService;
 import javax.xml.namespace.QName;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.handler.Handler;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import jakarta.jws.HandlerChain;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.handler.Handler;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;

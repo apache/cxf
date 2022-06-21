@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.schemaimport;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 @WebService(targetNamespace = "http://cxf.apache.org/xsd/test/", name = "service_v1_port",
             wsdlLocation = "classpath:/wsdl_systest/service.wsdl",
             serviceName = "service_v1",

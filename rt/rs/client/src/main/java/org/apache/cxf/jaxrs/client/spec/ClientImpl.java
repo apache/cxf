@@ -28,17 +28,17 @@ import java.util.WeakHashMap;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.Invocation.Builder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Configurable;
-import javax.ws.rs.core.Configuration;
-import javax.ws.rs.core.Feature;
-import javax.ws.rs.core.Link;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriBuilder;
 
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.Invocation.Builder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Configurable;
+import jakarta.ws.rs.core.Configuration;
+import jakarta.ws.rs.core.Feature;
+import jakarta.ws.rs.core.Link;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.UriBuilder;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.jaxrs.client.AbstractClient;

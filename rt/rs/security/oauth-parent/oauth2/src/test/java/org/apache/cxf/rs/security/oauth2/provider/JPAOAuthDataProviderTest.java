@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.rs.security.oauth2.provider;
 
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 
 import org.junit.After;
 import org.junit.Before;

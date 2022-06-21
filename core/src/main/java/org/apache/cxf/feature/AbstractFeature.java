@@ -20,8 +20,7 @@ package org.apache.cxf.feature;
 
 import java.util.List;
 
-import javax.xml.ws.WebServiceFeature;
-
+import jakarta.xml.ws.WebServiceFeature;
 import org.apache.cxf.Bus;
 import org.apache.cxf.interceptor.InterceptorProvider;
 

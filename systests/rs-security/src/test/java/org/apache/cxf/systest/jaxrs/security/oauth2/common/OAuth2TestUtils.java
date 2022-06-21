@@ -31,9 +31,9 @@ import java.util.Properties;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManagerFactory;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.Response;
 
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.provider.json.JSONProvider;

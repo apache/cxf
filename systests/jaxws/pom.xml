@@ -54,7 +54,7 @@
                                 <validate>basic</validate>
                                 <seiSuper>
                                   <super>java.lang.AutoCloseable</super>
-                                  <super>javax.xml.ws.BindingProvider</super>
+                                  <super>jakarta.xml.ws.BindingProvider</super>
                                   <super>org.apache.cxf.endpoint.Client</super>
                                 </seiSuper>
                             </defaultOptions>
@@ -87,8 +87,12 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>jakarta.mail</artifactId>
+            <groupId>org.eclipse.angus</groupId>
+            <artifactId>angus-activation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.angus</groupId>
+            <artifactId>angus-mail</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -168,13 +172,13 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
-            <artifactId>websocket-server</artifactId>
-            <version>${cxf.jetty9.version}</version>
+            <artifactId>websocket-jakarta-server</artifactId>
+            <version>${cxf.jetty11.version}</version>
             <optional>true</optional>
             <exclusions>
                 <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>javax.servlet-api</artifactId>
+                    <groupId>jakarta.servlet</groupId>
+                    <artifactId>jakarta.servlet-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -249,8 +253,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
+            <groupId>jakarta.resource</groupId>
+            <artifactId>jakarta.resource-api</artifactId>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.fastinfoset</groupId>

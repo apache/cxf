@@ -24,10 +24,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.ws.rs.core.Response;
-
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;

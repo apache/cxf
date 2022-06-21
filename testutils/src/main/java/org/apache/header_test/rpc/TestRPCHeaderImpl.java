@@ -18,9 +18,8 @@
  */
 package org.apache.header_test.rpc;
 
-import javax.jws.WebService;
-import javax.xml.ws.Holder;
-
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Holder;
 import org.apache.header_test.rpc.types.HeaderMessage;
 
 

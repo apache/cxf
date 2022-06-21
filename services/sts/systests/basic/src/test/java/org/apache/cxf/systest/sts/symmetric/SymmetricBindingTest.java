@@ -27,14 +27,14 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Service;
-import javax.xml.ws.soap.AddressingFeature;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.soap.AddressingFeature;
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.jaxws.DispatchImpl;

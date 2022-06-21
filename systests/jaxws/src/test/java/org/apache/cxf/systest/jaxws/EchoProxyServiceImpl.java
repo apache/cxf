@@ -21,11 +21,11 @@ package org.apache.cxf.systest.jaxws;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import javax.jws.WebService;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
-import javax.xml.ws.soap.SOAPFaultException;
 
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.ext.logging.Logging;
 
 @WebService(name = "MyEchoProxyService", targetNamespace = "urn:echo")

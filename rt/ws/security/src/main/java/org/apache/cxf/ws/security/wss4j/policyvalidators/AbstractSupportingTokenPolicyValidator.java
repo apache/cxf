@@ -31,8 +31,6 @@ import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -41,6 +39,8 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPMessage;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;

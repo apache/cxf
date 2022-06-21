@@ -26,8 +26,6 @@ import java.io.StringReader;
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.MessageBodyReader;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLStreamReader;
@@ -40,6 +38,8 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.ext.MessageBodyReader;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;

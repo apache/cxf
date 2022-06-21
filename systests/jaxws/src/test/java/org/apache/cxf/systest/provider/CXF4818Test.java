@@ -23,22 +23,22 @@ package org.apache.cxf.systest.provider;
 import java.io.InputStream;
 import java.io.StringReader;
 
-import javax.annotation.Resource;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPMessage;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Provider;
-import javax.xml.ws.ServiceMode;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.WebServiceProvider;
-import javax.xml.ws.soap.Addressing;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import jakarta.annotation.Resource;
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Provider;
+import jakarta.xml.ws.ServiceMode;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.WebServiceProvider;
+import jakarta.xml.ws.soap.Addressing;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -121,7 +121,7 @@ public class CXF4818Test extends AbstractBusClientServerTestBase {
     @WebServiceProvider(serviceName = "GenericService",
         targetNamespace = "http://cxf.apache.org/basictest",
         portName = "GenericServicePosrt")
-    @ServiceMode(value = javax.xml.ws.Service.Mode.MESSAGE)
+    @ServiceMode(value = jakarta.xml.ws.Service.Mode.MESSAGE)
     @Addressing
     public static class CXF4818Provider implements Provider<SOAPMessage> {
 

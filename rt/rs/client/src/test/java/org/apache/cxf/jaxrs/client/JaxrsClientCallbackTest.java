@@ -30,8 +30,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.ws.rs.client.InvocationCallback;
-
+import jakarta.ws.rs.client.InvocationCallback;
 import org.apache.cxf.jaxrs.client.JaxrsClientCallback.JaxrsResponseFuture;
 import org.apache.cxf.message.MessageImpl;
 

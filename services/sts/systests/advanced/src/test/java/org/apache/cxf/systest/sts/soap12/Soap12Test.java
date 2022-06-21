@@ -23,11 +23,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Service;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;

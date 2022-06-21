@@ -21,10 +21,9 @@ package org.apache.cxf.transport.http.netty.client.integration;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
 
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Response;
-
+import jakarta.xml.ws.AsyncHandler;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Response;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;

@@ -21,7 +21,8 @@ package org.apache.cxf.transport.http.netty.server.servlet;
 
 import java.io.IOException;
 
-import javax.servlet.ServletOutputStream;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
 
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.handler.codec.http.HttpContent;
@@ -69,5 +70,14 @@ public class NettyServletOutputStream extends ServletOutputStream {
         return this.out.buffer().capacity();
     }
 
+    @Override
+    public boolean isReady() {
+        throw new IllegalStateException("Method 'isReady' not yet implemented!");
 
+    }
+
+    @Override
+    public void setWriteListener(WriteListener writeListener) {
+        throw new IllegalStateException("Method 'setWriteListener' not yet implemented!");
+    }
 }

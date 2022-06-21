@@ -238,10 +238,8 @@ public class Java2WSMojo extends AbstractMojo {
         if (requiresModules) {
             // Since JEP 261 ("Jigsaw"), access to some packages must be granted
             fork = true;
-            boolean skipXmlWsModule = JavaUtils.isJava11Compatible(); //
             additionalJvmArgs = "--add-exports=jdk.xml.dom/org.w3c.dom.html=ALL-UNNAMED "
                     + "--add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs=ALL-UNNAMED "
-                    + (skipXmlWsModule ? "" : "--add-opens java.xml.ws/javax.xml.ws.wsaddressing=ALL-UNNAMED ")
                     + "--add-opens java.base/java.security=ALL-UNNAMED "
                     + "--add-opens java.base/java.net=ALL-UNNAMED "
                     + "--add-opens java.base/java.lang=ALL-UNNAMED "

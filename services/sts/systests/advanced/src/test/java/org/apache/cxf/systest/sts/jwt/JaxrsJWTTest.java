@@ -24,10 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.core.HttpHeaders;
-
+import jakarta.ws.rs.client.ClientRequestContext;
+import jakarta.ws.rs.client.ClientRequestFilter;
+import jakarta.ws.rs.core.HttpHeaders;
 import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.message.Message;

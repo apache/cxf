@@ -17,9 +17,9 @@
         specific language governing permissions and limitations
         under the License.
 -->
-<bindings xmlns="http://java.sun.com/xml/ns/jaxws" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" wsdlLocation="hello-mime.wsdl">
+<bindings xmlns="https://jakarta.ee/xml/ns/jaxws" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" wsdlLocation="hello-mime.wsdl">
     <bindings node="wsdl:definitions/wsdl:types/xs:schema[@targetNamespace='http://cxf.apache.org/w2j/hello_world_mime/types']">
-        <ns:schemaBindings xmlns:ns="http://java.sun.com/xml/ns/jaxb">
+        <ns:schemaBindings xmlns:ns="https://jakarta.ee/xml/ns/jaxb">
             <ns:package name="org.apache.cxf.mime"/>
         </ns:schemaBindings>
     </bindings>

@@ -22,18 +22,18 @@ package org.apache.cxf.systest.provider;
 import java.lang.reflect.UndeclaredThrowableException;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPEnvelope;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Service;
-import javax.xml.ws.soap.SOAPBinding;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPEnvelope;
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.soap.SOAPBinding;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;

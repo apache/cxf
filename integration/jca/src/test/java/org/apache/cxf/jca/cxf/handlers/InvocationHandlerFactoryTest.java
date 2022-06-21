@@ -22,10 +22,9 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.resource.spi.ResourceAdapterInternalException;
 import javax.security.auth.Subject;
 
-
+import jakarta.resource.spi.ResourceAdapterInternalException;
 import org.apache.cxf.jca.cxf.CXFInvocationHandler;
 import org.apache.cxf.jca.cxf.CXFInvocationHandlerData;
 

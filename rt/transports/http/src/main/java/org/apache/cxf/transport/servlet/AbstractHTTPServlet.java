@@ -35,19 +35,18 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterConfig;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
@@ -255,7 +254,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
     /**
      * {@inheritDoc}
      *
-     * javax.http.servlet.HttpServlet does not let to override the code which deals with
+     * jakarta.http.servlet.HttpServlet does not let to override the code which deals with
      * unrecognized HTTP verbs such as PATCH (being standardized), WebDav ones, etc.
      * Thus we let CXF servlets process unrecognized HTTP verbs directly, otherwise we delegate
      * to HttpService

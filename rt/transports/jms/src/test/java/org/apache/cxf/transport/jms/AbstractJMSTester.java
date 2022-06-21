@@ -24,16 +24,23 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
-import javax.jms.ConnectionFactory;
-import javax.jms.DeliveryMode;
 import javax.xml.namespace.QName;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.broker.BrokerService;
-import org.apache.activemq.store.memory.MemoryPersistenceAdapter;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.DeliveryMode;
+import org.apache.activemq.artemis.core.config.Configuration;
+import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
+import org.apache.activemq.artemis.core.config.impl.SecurityConfiguration;
+import org.apache.activemq.artemis.core.security.Role;
+import org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ;
+import org.apache.activemq.artemis.core.settings.impl.AddressSettings;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
+import org.apache.activemq.artemis.spi.core.security.ActiveMQJAASSecurityManager;
+import org.apache.activemq.artemis.spi.core.security.jaas.InVMLoginModule;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.helpers.IOUtils;
@@ -62,7 +69,7 @@ public abstract class AbstractJMSTester {
     protected static Bus bus;
     protected static ActiveMQConnectionFactory cf1;
     protected static ConnectionFactory cf;
-    protected static BrokerService broker;
+    protected static EmbeddedActiveMQ broker;
     private static final String MESSAGE_CONTENT = "HelloWorld";
 
     protected enum ExchangePattern { oneway, requestReply };
@@ -71,18 +78,40 @@ public abstract class AbstractJMSTester {
     private final AtomicReference<Message> destMessage = new AtomicReference<>();
 
     @BeforeClass
-    public static void startSerices() throws Exception {
-        broker = new BrokerService();
-        broker.setPersistent(false);
-        broker.setPopulateJMSXUserID(true);
-        broker.setUseAuthenticatedPrincipalForJMSXUserID(true);
-        broker.setUseJmx(false);
-        broker.setPersistenceAdapter(new MemoryPersistenceAdapter());
-        String brokerUri = "tcp://localhost:" + TestUtil.getNewPortNumber(AbstractJMSTester.class);
-        broker.addConnector(brokerUri);
+    public static void startServices() throws Exception {
+        final String brokerUri = "tcp://localhost:" + TestUtil.getNewPortNumber(AbstractJMSTester.class);
+        final Configuration config = new ConfigurationImpl();
+        config.setPersistenceEnabled(false);
+        config.setJMXManagementEnabled(false);
+        config.setSecurityEnabled(true);
+        config.addAcceptorConfiguration("tcp", brokerUri);
+        config.setPopulateValidatedUser(true);
+        config.putSecurityRoles("#", Collections.singleton(
+                new Role("guest", true, true, true, true, true, true, true, true, true, true)));
+        config.setAddressQueueScanPeriod(10);
+        AddressSettings addressSettings = new AddressSettings();
+        addressSettings.setAutoCreateAddresses(true);
+        addressSettings.setAutoCreateQueues(true);
+        addressSettings.setAutoDeleteQueues(false);
+        addressSettings.setAutoDeleteAddresses(false);
+        config.setAddressesSettings(Collections.singletonMap("#", new AddressSettings()));
+        broker = new EmbeddedActiveMQ();
+        broker.setConfiguration(config);
+        SecurityConfiguration securityConfig = new SecurityConfiguration();
+        securityConfig.addUser("guest", "guest");
+        securityConfig.addUser("testUser", "testPassword");
+        securityConfig.addRole("testUser", "guest");
+        securityConfig.addRole("guest", "guest");
+        securityConfig.setDefaultUser("guest");
+        ActiveMQJAASSecurityManager securityManager = 
+                new ActiveMQJAASSecurityManager(InVMLoginModule.class.getName(), securityConfig);
+        broker.setSecurityManager(securityManager);
         broker.start();
         bus = BusFactory.getDefaultBus();
         cf1 = new ActiveMQConnectionFactory(brokerUri);
+        cf1.setUser("guest");
+        cf1.setPassword("guest");
+        cf1.setDeserializationWhiteList("org.apache.cxf.security");
         cf = cf1;
     }
 
@@ -166,14 +195,23 @@ public abstract class AbstractJMSTester {
     }
 
     protected static JMSConduit setupJMSConduit(EndpointInfo ei) throws IOException {
+        return setupJMSConduit(ei, Function.identity());
+    }
+
+    protected static JMSConduit setupJMSConduit(EndpointInfo ei, 
+            Function<ConnectionFactory, ConnectionFactory> wrapper) throws IOException {
         JMSConfiguration jmsConfig = JMSConfigFactory.createFromEndpointInfo(bus, ei, null);
-        jmsConfig.setConnectionFactory(cf);
+        jmsConfig.setConnectionFactory(wrapper.apply(cf));
         return new JMSConduit(null, jmsConfig, bus);
     }
 
-
     protected JMSConduit setupJMSConduitWithObserver(EndpointInfo ei) throws IOException {
-        JMSConduit jmsConduit = setupJMSConduit(ei);
+        return setupJMSConduitWithObserver(ei, Function.identity());
+    }
+
+    protected JMSConduit setupJMSConduitWithObserver(EndpointInfo ei, 
+            Function<ConnectionFactory, ConnectionFactory> wrapper) throws IOException {
+        JMSConduit jmsConduit = setupJMSConduit(ei, wrapper);
         MessageObserver observer = new MessageObserver() {
             public void onMessage(Message m) {
                 inMessage.set(m);

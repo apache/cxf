@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.jaxrs.fortest;
 
-import javax.ws.rs.Path;
-
+import jakarta.ws.rs.Path;
 import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.Chapter;
 

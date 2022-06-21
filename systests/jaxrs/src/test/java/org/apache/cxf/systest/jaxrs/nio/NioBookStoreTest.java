@@ -23,11 +23,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;

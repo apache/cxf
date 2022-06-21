@@ -24,15 +24,14 @@ import java.net.URISyntaxException;
 import java.security.Principal;
 import java.util.logging.Logger;
 
-import javax.xml.ws.EndpointReference;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
-import javax.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
-
 import org.w3c.dom.Element;
 
+import jakarta.xml.ws.EndpointReference;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.i18n.Message;
@@ -56,7 +55,7 @@ public class WebServiceContextImpl implements WebServiceContext {
         localCtx = c;
     }
 
-    // Implementation of javax.xml.ws.WebServiceContext
+    // Implementation of jakarta.xml.ws.WebServiceContext
     public final MessageContext getMessageContext() {
         return localCtx == null ? context.get() : localCtx;
     }

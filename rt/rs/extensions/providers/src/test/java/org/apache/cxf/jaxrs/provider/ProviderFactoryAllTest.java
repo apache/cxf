@@ -19,10 +19,9 @@
 
 package org.apache.cxf.jaxrs.provider;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
-
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.ext.MessageBodyWriter;
 import org.apache.cxf.jaxrs.provider.json.JSONProvider;
 import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.message.MessageImpl;

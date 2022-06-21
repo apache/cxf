@@ -25,13 +25,13 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import javax.enterprise.inject.spi.AnnotatedConstructor;
-import javax.enterprise.inject.spi.AnnotatedField;
-import javax.enterprise.inject.spi.AnnotatedMethod;
-import javax.enterprise.inject.spi.AnnotatedType;
-import javax.enterprise.util.AnnotationLiteral;
-import javax.inject.Inject;
-import javax.ws.rs.core.Context;
+import jakarta.enterprise.inject.spi.AnnotatedConstructor;
+import jakarta.enterprise.inject.spi.AnnotatedField;
+import jakarta.enterprise.inject.spi.AnnotatedMethod;
+import jakarta.enterprise.inject.spi.AnnotatedType;
+import jakarta.enterprise.util.AnnotationLiteral;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.core.Context;
 
 import static java.util.stream.Collectors.toSet;
 

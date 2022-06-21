@@ -70,7 +70,7 @@
             <scope>test</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>javax.xml.ws</groupId>
+                    <groupId>jakarta.xml.ws</groupId>
                     <artifactId>jaxws-api</artifactId>
                 </exclusion>
             </exclusions>
@@ -81,8 +81,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>jakarta.mail</artifactId>
+            <groupId>org.eclipse.angus</groupId>
+            <artifactId>angus-activation</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.angus</groupId>
+            <artifactId>angus-mail</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

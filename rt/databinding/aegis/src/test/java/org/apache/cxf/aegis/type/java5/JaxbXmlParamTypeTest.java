@@ -19,9 +19,8 @@
 package org.apache.cxf.aegis.type.java5;
 
 
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.type.DefaultTypeCreator;
 import org.apache.cxf.aegis.type.DefaultTypeMapping;

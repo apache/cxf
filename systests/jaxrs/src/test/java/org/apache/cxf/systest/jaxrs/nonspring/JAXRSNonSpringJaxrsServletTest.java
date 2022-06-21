@@ -21,12 +21,11 @@ package org.apache.cxf.systest.jaxrs.nonspring;
 
 import java.io.IOException;
 
-import javax.ws.rs.core.Response;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systest.jaxrs.Book;

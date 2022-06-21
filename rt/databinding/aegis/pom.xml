@@ -34,10 +34,10 @@
     <properties>
         <cxf.module.name>org.apache.cxf.databinding.aegis</cxf.module.name>
         <cxf.osgi.import>
-            javax.jws*;version="${cxf.osgi.jws.version}",
-            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
-            javax.activation;version="${cxf.osgi.javax.activation.version}",
-            javax.xml.stream*;version="${cxf.osgi.javax.stream.version}"
+            jakarta.jws*;version="${cxf.osgi.jws.version}",
+            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}",
+            jakarta.activation;version="${cxf.osgi.jakarta.activation.version}",
+            jakarta.xml.stream*;version="${cxf.osgi.jakarta.stream.version}"
         </cxf.osgi.import>
     </properties>
     <dependencies>

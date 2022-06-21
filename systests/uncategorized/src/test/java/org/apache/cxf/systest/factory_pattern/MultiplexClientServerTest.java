@@ -25,9 +25,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
-
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.factory_pattern.Number;
 import org.apache.cxf.factory_pattern.NumberFactory;

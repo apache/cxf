@@ -17,5 +17,5 @@
  * under the License.
  */
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "uri:org.apache.cxf.javascript.testns")
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "uri:org.apache.cxf.javascript.testns")
 package org.apache.cxf.javascript.fortest;

@@ -28,11 +28,11 @@ import java.util.Collections;
 
 import javax.net.ssl.TrustManagerFactory;
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Service;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -550,7 +550,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         try {
             utPort.doubleIt(25);
             fail("Failure expected on no UsernameToken");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error = "The received token does not match the token inclusion requirement";
             assertTrue(ex.getMessage().contains(error)
                    || ex.getMessage().contains("UsernameToken not satisfied"));
@@ -589,7 +589,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
             try {
                 utPort.doubleIt(25);
                 fail("Failure expected on a replayed UsernameToken");
-            } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
                 assertTrue(ex.getMessage().contains(WSSecurityException.UNIFIED_SECURITY_ERR));
             }
         }
@@ -629,7 +629,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
             try {
                 utPort.doubleIt(25);
                 fail("Failure expected on a replayed UsernameToken");
-            } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
                 assertEquals(ex.getMessage(), WSSecurityException.UNIFIED_SECURITY_ERR);
             }
         }
@@ -666,7 +666,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
             ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "Frank");
             utPort.doubleIt(30);
             fail("Failure expected on a user with the wrong role");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error = "Unauthorized";
             assertTrue(ex.getMessage().contains(error));
         }
@@ -707,7 +707,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
             ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "Frank");
             utPort.doubleIt(30);
             fail("Failure expected on a user with the wrong role");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error = "Unauthorized";
             assertTrue(ex.getMessage().contains(error));
         }

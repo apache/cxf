@@ -28,8 +28,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
 
+import jakarta.xml.ws.BindingProvider;
 import org.apache.cxf.hello_world_jms.HelloWorldPortType;
 import org.apache.cxf.hello_world_jms.HelloWorldServiceAppCorrelationID;
 import org.apache.cxf.hello_world_jms.HelloWorldServiceAppCorrelationIDNoPrefix;

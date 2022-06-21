@@ -17,6 +17,6 @@
  * under the License.
  */
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://nstest.helloworld",
-                                     elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://nstest.helloworld",
+                                     elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package org.apache.cxf.cxf1226;

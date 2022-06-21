@@ -24,8 +24,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.ws.Holder;
-
+import jakarta.xml.ws.Holder;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;

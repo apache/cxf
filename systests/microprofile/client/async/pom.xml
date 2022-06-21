@@ -50,7 +50,7 @@
             <dependency>
                 <groupId>jakarta.ws.rs</groupId>
                 <artifactId>jakarta.ws.rs-api</artifactId>
-                <version>${cxf.javax.ws.rs.version}</version>
+                <version>${cxf.jakarta.ws.rs.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.weld.se</groupId>
@@ -74,6 +74,7 @@
                 <groupId>org.apache.johnzon</groupId>
                 <artifactId>johnzon-core</artifactId>
                 <version>${cxf.johnzon.version}</version>
+                <classifier>jakarta</classifier>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -110,6 +111,7 @@
                 <groupId>org.apache.johnzon</groupId>
                 <artifactId>johnzon-jsonb</artifactId>
                 <version>${cxf.johnzon.version}</version>
+                <classifier>jakarta</classifier>
                 <scope>test</scope>
             </dependency>
             <dependency>

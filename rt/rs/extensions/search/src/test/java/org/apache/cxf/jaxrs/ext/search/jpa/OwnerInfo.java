@@ -20,8 +20,8 @@ package org.apache.cxf.jaxrs.ext.search.jpa;
 
 import java.util.Date;
 
-import javax.persistence.Embeddable;
-import javax.persistence.Embedded;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 
 @Embeddable
 public class OwnerInfo {

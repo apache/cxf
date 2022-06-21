@@ -19,8 +19,7 @@
 
 package org.apache.cxf.spring.boot.autoconfigure;
 
-import javax.validation.ConstraintViolationException;
-
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

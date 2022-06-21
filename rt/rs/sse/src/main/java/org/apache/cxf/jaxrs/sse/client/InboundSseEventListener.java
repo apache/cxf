@@ -19,7 +19,7 @@
 
 package org.apache.cxf.jaxrs.sse.client;
 
-import javax.ws.rs.sse.InboundSseEvent;
+import jakarta.ws.rs.sse.InboundSseEvent;
 
 /**
  * Flow/RxJava like listener for processing SSE events 

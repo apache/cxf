@@ -22,9 +22,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.xml.bind.JAXBElement;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.xml.bind.JAXBElement;
 
 public class CollectionsResource {
 

@@ -22,10 +22,10 @@ import java.net.URL;
 import java.time.Instant;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Service;
-import javax.xml.ws.soap.SOAPFaultException;
 
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;

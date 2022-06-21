@@ -24,13 +24,13 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 
-import javax.ws.rs.core.Response;
 import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;

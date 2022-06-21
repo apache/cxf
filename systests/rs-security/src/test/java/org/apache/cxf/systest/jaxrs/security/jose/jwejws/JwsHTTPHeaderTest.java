@@ -28,11 +28,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.message.Message;

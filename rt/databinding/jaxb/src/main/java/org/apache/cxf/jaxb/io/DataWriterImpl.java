@@ -29,15 +29,14 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.MarshalException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.PropertyException;
-import javax.xml.bind.ValidationEvent;
-import javax.xml.bind.ValidationEventHandler;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.attachment.AttachmentMarshaller;
-
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.MarshalException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.PropertyException;
+import jakarta.xml.bind.ValidationEvent;
+import jakarta.xml.bind.ValidationEventHandler;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.attachment.AttachmentMarshaller;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.jaxb.JAXBUtils;
@@ -182,7 +181,7 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
                 marshaller.setEventHandler(new MtomValidationHandler(marshaller.getEventHandler(),
                                                             (JAXBAttachmentMarshaller)atmarsh));
             }
-        } catch (javax.xml.bind.MarshalException ex) {
+        } catch (jakarta.xml.bind.MarshalException ex) {
             Message faultMessage = new Message("MARSHAL_ERROR", LOG, ex.getLinkedException()
                 .getMessage());
             throw new Fault(faultMessage, ex);

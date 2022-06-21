@@ -19,29 +19,29 @@
 
 package org.apache.cxf.transport.jms;
 
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionConsumer;
-import javax.jms.ConnectionFactory;
-import javax.jms.ConnectionMetaData;
-import javax.jms.DeliveryMode;
-import javax.jms.Destination;
-import javax.jms.ExceptionListener;
-import javax.jms.InvalidClientIDException;
-import javax.jms.JMSException;
-import javax.jms.Queue;
-import javax.jms.ServerSessionPool;
-import javax.jms.Session;
-import javax.jms.Topic;
-
-import org.apache.activemq.EnhancedConnection;
-import org.apache.activemq.advisory.DestinationSource;
-import org.apache.activemq.util.ServiceStopper;
+import jakarta.jms.Connection;
+import jakarta.jms.ConnectionConsumer;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.ConnectionMetaData;
+import jakarta.jms.DeliveryMode;
+import jakarta.jms.Destination;
+import jakarta.jms.ExceptionListener;
+import jakarta.jms.InvalidClientIDException;
+import jakarta.jms.JMSContext;
+import jakarta.jms.JMSException;
+import jakarta.jms.Queue;
+import jakarta.jms.ServerSessionPool;
+import jakarta.jms.Session;
+import jakarta.jms.Topic;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnection;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -129,6 +129,30 @@ public class JMSDestinationTest extends AbstractJMSTester {
             return delegate.createDurableConnectionConsumer(topic, subscriptionName, messageSelector,
                 sessionPool, maxMessages);
         }
+
+        @Override
+        public Session createSession(int sessionMode) throws JMSException {
+            return delegate.createSession(sessionMode);
+        }
+
+        @Override
+        public Session createSession() throws JMSException {
+            return delegate.createSession();
+        }
+
+        @Override
+        public ConnectionConsumer createSharedConnectionConsumer(Topic topic, String subscriptionName,
+                String messageSelector, ServerSessionPool sessionPool, int maxMessages) throws JMSException {
+            return delegate.createSharedConnectionConsumer(topic, subscriptionName, 
+                messageSelector, sessionPool, maxMessages);
+        }
+
+        @Override
+        public ConnectionConsumer createSharedDurableConnectionConsumer(Topic topic, String subscriptionName,
+                String messageSelector, ServerSessionPool sessionPool, int maxMessages) throws JMSException {
+            return delegate.createSharedDurableConnectionConsumer(topic, subscriptionName, messageSelector, 
+                sessionPool, maxMessages);
+        }
     }
 
     private static final class FaultyConnectionFactory implements ConnectionFactory {
@@ -165,6 +189,26 @@ public class JMSDestinationTest extends AbstractJMSTester {
             } else {
                 throw new JMSException("createConnection(userName, password) failed (simulated)");
             }
+        }
+
+        @Override
+        public JMSContext createContext() {
+            return delegate.createContext();
+        }
+
+        @Override
+        public JMSContext createContext(String userName, String password) {
+            return delegate.createContext(userName, password);
+        }
+
+        @Override
+        public JMSContext createContext(String userName, String password, int sessionMode) {
+            return delegate.createContext(userName, password, sessionMode);
+        }
+
+        @Override
+        public JMSContext createContext(int sessionMode) {
+            return delegate.createContext(sessionMode);
         }
     }
 
@@ -393,31 +437,51 @@ public class JMSDestinationTest extends AbstractJMSTester {
     @Test
     public void testTemporaryQueueDeletionUponReset() throws Exception {
         EndpointInfo ei = setupServiceInfo("HelloWorldService", "HelloWorldPort");
+        // Store the connection so we could check temporary queues
+        final AtomicReference<ActiveMQConnection> connectionHolder = new AtomicReference<>();
 
         // set up the conduit send to be true
-        JMSConduit conduit = setupJMSConduitWithObserver(ei);
-        assertNull(conduit.getJmsConfig().getReplyDestination());
-
-        // Store the connection so we could check temporary queues
-        final AtomicReference<DestinationSource> destinationSource = new AtomicReference<>();
-        final Message outMessage = createMessage();
-        
-        // Capture the DestinationSource instance associated with the connection
-        final JMSDestination destination = setupJMSDestination(ei, c -> new ConnectionFactory() {
+        JMSConduit conduit = setupJMSConduitWithObserver(ei, c -> new ConnectionFactory() {
             @Override
             public Connection createConnection() throws JMSException {
                 final Connection connection = c.createConnection();
-                destinationSource.set(((EnhancedConnection)connection).getDestinationSource());
+                connectionHolder.set((ActiveMQConnection)connection);
                 return connection;
             }
 
             @Override
             public Connection createConnection(String userName, String password) throws JMSException {
                 final Connection connection = c.createConnection(userName, password);
-                destinationSource.set(((EnhancedConnection)connection).getDestinationSource());
+                connectionHolder.set((ActiveMQConnection)connection);
                 return connection;
             }
+
+            @Override
+            public JMSContext createContext() {
+                return c.createContext();
+            }
+
+            @Override
+            public JMSContext createContext(String userName, String password) {
+                return c.createContext(userName, password);
+            }
+
+            @Override
+            public JMSContext createContext(String userName, String password, int sessionMode) {
+                return c.createContext(userName, password, sessionMode);
+            }
+
+            @Override
+            public JMSContext createContext(int sessionMode) {
+                return c.createContext(sessionMode);
+            }
         });
+        assertNull(conduit.getJmsConfig().getReplyDestination());
+
+        final Message outMessage = createMessage();
+        
+        // Capture the DestinationSource instance associated with the connection
+        final JMSDestination destination = setupJMSDestination(ei);
 
         // set up MessageObserver for handling the conduit message
         final MessageObserver observer = new MessageObserver() {
@@ -443,15 +507,17 @@ public class JMSDestinationTest extends AbstractJMSTester {
         Message inMessage = waitForReceiveInMessage();
         verifyReceivedMessage(inMessage);
 
-        final DestinationSource ds = destinationSource.get();
-        assertThat(ds.getTemporaryQueues().size(), equalTo(1));
+        final ActiveMQConnection connection = connectionHolder.get();
+        assertThat(ReflectionUtil.accessDeclaredField("tempQueues", ActiveMQConnection.class,
+            connection, Set.class).size(), equalTo(1));
         
         // Force manual temporary queue deletion by resetting the reply destination
         conduit.getJmsConfig().resetCachedReplyDestination();
         // The queue deletion events (as well as others) are propagated asynchronously
         await()
             .atMost(1, TimeUnit.SECONDS)
-            .untilAsserted(() -> assertThat(ds.getTemporaryQueues().size(), equalTo(0)));
+            .untilAsserted(() -> assertThat(ReflectionUtil.accessDeclaredField("tempQueues", ActiveMQConnection.class, 
+                connection, Set.class).size(), equalTo(0)));
         
         conduit.close();
         destination.shutdown();
@@ -629,9 +695,9 @@ public class JMSDestinationTest extends AbstractJMSTester {
         destination.setMessageObserver(createMessageObserver());
 
         Thread.sleep(500L);
-        broker.stopAllConnectors(new ServiceStopper());
+        broker.stop();
 
-        broker.startAllConnectors();
+        broker.start();
         Thread.sleep(2000L);
 
         final Message outMessage = createMessage();
@@ -709,8 +775,8 @@ public class JMSDestinationTest extends AbstractJMSTester {
 
 
     protected void verifyReplyToNotSet(Message cxfMsg) {
-        javax.jms.Message jmsMsg =
-            javax.jms.Message.class.cast(cxfMsg.get(JMSConstants.JMS_REQUEST_MESSAGE));
+        jakarta.jms.Message jmsMsg =
+            jakarta.jms.Message.class.cast(cxfMsg.get(JMSConstants.JMS_REQUEST_MESSAGE));
         assertNotNull("JMS Messsage must be null", jmsMsg);
     }
 
@@ -724,8 +790,8 @@ public class JMSDestinationTest extends AbstractJMSTester {
     protected void verifyReplyToSet(Message cxfMsg,
                                     Class<? extends Destination> type,
                                     String expectedName) throws Exception {
-        javax.jms.Message jmsMsg =
-            javax.jms.Message.class.cast(cxfMsg.get(JMSConstants.JMS_REQUEST_MESSAGE));
+        jakarta.jms.Message jmsMsg =
+            jakarta.jms.Message.class.cast(cxfMsg.get(JMSConstants.JMS_REQUEST_MESSAGE));
         assertNotNull("JMS Messsage must not be null", jmsMsg);
         assertNotNull("JMS Messsage's replyTo must not be null", jmsMsg.getJMSReplyTo());
         assertTrue("JMS Messsage's replyTo type must be of type " + type.getName(),

@@ -20,12 +20,12 @@
 
 package org.apache.cxf.systest.callback;
 
-import javax.annotation.Resource;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
-import javax.xml.ws.soap.SOAPBinding;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
+import jakarta.annotation.Resource;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.soap.SOAPBinding;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 import org.apache.callback.CallbackPortType;
 import org.apache.callback.ServerPortType;
 import org.apache.cxf.Bus;
@@ -36,7 +36,7 @@ import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLManagerImpl;
 
-@javax.jws.WebService(serviceName = "SOAPService",
+@jakarta.jws.WebService(serviceName = "SOAPService",
                       portName = "SOAPPort",
                       targetNamespace = "http://apache.org/callback",
                       endpointInterface = "org.apache.callback.ServerPortType",

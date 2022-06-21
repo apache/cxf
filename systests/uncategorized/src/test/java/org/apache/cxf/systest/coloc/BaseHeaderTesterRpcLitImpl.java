@@ -22,8 +22,7 @@ package org.apache.cxf.systest.coloc;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import javax.xml.ws.Holder;
-
+import jakarta.xml.ws.Holder;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;

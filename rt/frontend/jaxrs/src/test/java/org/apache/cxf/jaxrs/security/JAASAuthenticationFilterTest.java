@@ -19,9 +19,8 @@
 
 package org.apache.cxf.jaxrs.security;
 
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 

@@ -18,10 +18,9 @@
  */
 package org.apache.cxf.microprofile.client.mock;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.Path;
-
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.Path;
 import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
 import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 

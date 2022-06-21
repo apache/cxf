@@ -25,9 +25,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import javax.annotation.PreDestroy;
-import javax.annotation.Resource;
-
+import jakarta.annotation.PreDestroy;
+import jakarta.annotation.Resource;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.common.i18n.BundleUtils;

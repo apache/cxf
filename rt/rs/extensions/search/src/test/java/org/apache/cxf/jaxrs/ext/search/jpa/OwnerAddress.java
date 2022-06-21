@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.jaxrs.ext.search.jpa;
 
-import javax.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
 
 @Embeddable
 public class OwnerAddress {

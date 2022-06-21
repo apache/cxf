@@ -20,8 +20,7 @@ package org.apache.cxf.microprofile.client;
 
 import java.util.Collections;
 
-import javax.ws.rs.core.MediaType;
-
+import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;

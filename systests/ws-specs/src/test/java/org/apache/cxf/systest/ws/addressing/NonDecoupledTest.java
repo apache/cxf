@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.ws.addressing;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 import org.junit.BeforeClass;
 import org.junit.Test;

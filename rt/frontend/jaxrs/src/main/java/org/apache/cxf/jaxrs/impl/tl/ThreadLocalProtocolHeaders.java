@@ -22,8 +22,7 @@ package org.apache.cxf.jaxrs.impl.tl;
 
 import java.util.List;
 
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.ext.ProtocolHeaders;
 
 public class ThreadLocalProtocolHeaders extends AbstractThreadLocalProxy<ProtocolHeaders>

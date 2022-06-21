@@ -22,8 +22,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweCompactConsumer;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;

@@ -18,8 +18,8 @@
  */
 package demo.jaxrs.sse;
 
-import javax.inject.Inject;
-import javax.ws.rs.ext.RuntimeDelegate;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.ext.RuntimeDelegate;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 

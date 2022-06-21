@@ -26,22 +26,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.jms.BytesMessage;
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 
+import jakarta.jms.BytesMessage;
+import jakarta.jms.Connection;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.Destination;
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.MessageConsumer;
+import jakarta.jms.MessageProducer;
+import jakarta.jms.Session;
+import jakarta.ws.rs.core.Response;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -83,7 +83,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
              + "?replyToName=dynamicQueues/test.jmstransport.response"
-             + "&jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "&jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
              + "&jndiURL=tcp://localhost:" + JMS_PORT;
 
         WebClient client = WebClient.create(endpointAddressUrlEncoded);
@@ -101,7 +101,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
              + "?replyToName=dynamicQueues/test.jmstransport.response"
-             + "&jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "&jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
              + "&jndiURL=tcp://localhost:" + JMS_PORT
              + "&messageType=text";
 
@@ -120,7 +120,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
              + "?replyToName=dynamicQueues/test.jmstransport.response"
-             + "&jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "&jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
              + "&jndiURL=tcp://localhost:" + JMS_PORT;
 
         WebClient client = WebClient.create(endpointAddressUrlEncoded);
@@ -153,7 +153,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     public void testGetBookFromWebClientWithPath() throws Exception {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
-             + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "?jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
              + "&replyToName=dynamicQueues/test.jmstransport.response"
              + "&jndiURL=tcp://localhost:" + JMS_PORT
              + "&jndiConnectionFactoryName=ConnectionFactory";
@@ -170,7 +170,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     public void testGetBookFromWebClientWithPathWithTextJMSMessage() throws Exception {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
-             + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "?jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
              + "&replyToName=dynamicQueues/test.jmstransport.response"
              + "&jndiURL=tcp://localhost:" + JMS_PORT
              + "&jndiConnectionFactoryName=ConnectionFactory"
@@ -189,7 +189,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     public void testGetBookFromProxyClient() throws Exception {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
-             + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "?jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
              + "&replyToName=dynamicQueues/test.jmstransport.response"
              + "&jndiURL=tcp://localhost:" + JMS_PORT
              + "&jndiConnectionFactoryName=ConnectionFactory";
@@ -204,7 +204,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     public void testGetBookFromProxyClientWithTextJMSMessage() throws Exception {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
-             + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "?jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
              + "&replyToName=dynamicQueues/test.jmstransport.response"
              + "&jndiURL=tcp://localhost:" + JMS_PORT
              + "&jndiConnectionFactoryName=ConnectionFactory"
@@ -220,7 +220,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     public void testGetBookFromSubresourceProxyClient() throws Exception {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
-             + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "?jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
              + "&replyToName=dynamicQueues/test.jmstransport.response"
              + "&jndiURL=tcp://localhost:" + JMS_PORT
              + "&jndiConnectionFactoryName=ConnectionFactory";
@@ -236,7 +236,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     public void testGetBookFromSubresourceProxyClientWithTextJMSMessage() throws Exception {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
-             + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "?jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
              + "&replyToName=dynamicQueues/test.jmstransport.response"
              + "&jndiURL=tcp://localhost:" + JMS_PORT
              + "&jndiConnectionFactoryName=ConnectionFactory"
@@ -253,7 +253,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     public void testGetBookFromProxyClientWithQuery() throws Exception {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
-             + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "?jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
              + "&replyToName=dynamicQueues/test.jmstransport.response"
              + "&jndiURL=tcp://localhost:" + JMS_PORT
              + "&jndiConnectionFactoryName=ConnectionFactory";
@@ -269,7 +269,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     public void testGetBookFromProxyClientWithQueryWithTextJMSMessage() throws Exception {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
-             + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "?jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
              + "&replyToName=dynamicQueues/test.jmstransport.response"
              + "&jndiURL=tcp://localhost:" + JMS_PORT
              + "&jndiConnectionFactoryName=ConnectionFactory"
@@ -368,7 +368,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     private Context getContext() throws Exception {
         Properties props = new Properties();
         props.setProperty(Context.INITIAL_CONTEXT_FACTORY,
-                          "org.apache.activemq.jndi.ActiveMQInitialContextFactory");
+                          "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory");
         props.setProperty(Context.PROVIDER_URL, "tcp://localhost:" + JMS_PORT);
         return new InitialContext(props);
 

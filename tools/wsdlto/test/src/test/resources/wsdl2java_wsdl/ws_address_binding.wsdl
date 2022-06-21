@@ -17,8 +17,8 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<bindings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns="http://java.sun.com/xml/ns/jaxws" wsdlLocation="hello_world_addr.wsdl">
-    <bindings xmlns:jws="http://java.sun.com/xml/ns/javaee" node="wsdl:definitions">
+<bindings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns="https://jakarta.ee/xml/ns/jaxws" wsdlLocation="hello_world_addr.wsdl">
+    <bindings xmlns:jws="https://jakarta.ee/xml/ns/jakartaee" node="wsdl:definitions">
         <jws:handler-chains>
             <jws:handler-chain>
                 <jws:handler>

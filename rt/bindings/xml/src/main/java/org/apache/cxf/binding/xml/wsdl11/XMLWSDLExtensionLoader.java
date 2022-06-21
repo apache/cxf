@@ -19,8 +19,7 @@
 
 package org.apache.cxf.binding.xml.wsdl11;
 
-import javax.xml.bind.JAXBException;
-
+import jakarta.xml.bind.JAXBException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.wsdl.JAXBExtensionHelper;

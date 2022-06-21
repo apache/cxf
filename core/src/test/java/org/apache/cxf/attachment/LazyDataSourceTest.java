@@ -20,8 +20,8 @@ package org.apache.cxf.attachment;
 
 import java.util.Collections;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
 
 import org.junit.Test;
 

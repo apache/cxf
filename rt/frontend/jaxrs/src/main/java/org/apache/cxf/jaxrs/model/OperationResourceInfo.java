@@ -26,13 +26,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.Encoded;
-import javax.ws.rs.Produces;
-import javax.ws.rs.container.Suspended;
-import javax.ws.rs.core.MediaType;
-
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.Encoded;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.container.Suspended;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.jaxrs.ext.Oneway;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;

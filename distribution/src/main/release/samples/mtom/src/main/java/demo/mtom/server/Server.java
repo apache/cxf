@@ -19,9 +19,9 @@
 
 package demo.mtom.server;
 
-import javax.xml.ws.Binding;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.soap.SOAPBinding;
+import jakarta.xml.ws.Binding;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.soap.SOAPBinding;
 
 public class Server {
 

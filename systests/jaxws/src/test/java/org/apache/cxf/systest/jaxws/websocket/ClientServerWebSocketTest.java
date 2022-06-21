@@ -29,10 +29,10 @@ import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Response;
 
+import jakarta.xml.ws.AsyncHandler;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Response;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.Client;
@@ -54,7 +54,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
+//TODO: The CXF websocket transport needs either the
+//"Jetty WebSocket or Atmosphere dependencies to be available")
 public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
 
@@ -136,7 +137,7 @@ public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
         Greeter greeter = service.getPort(portName, Greeter.class);
         updateGreeterAddress(greeter, PORT);
 
-        ((javax.xml.ws.BindingProvider)greeter).getRequestContext().put("javax.xml.ws.client.receiveTimeout",
+        ((jakarta.xml.ws.BindingProvider)greeter).getRequestContext().put("jakarta.xml.ws.client.receiveTimeout",
                                                                         "1");
         try {
             greeter.greetMe("test");

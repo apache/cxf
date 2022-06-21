@@ -22,10 +22,10 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.activation.DataHandler;
 import javax.imageio.ImageIO;
 import javax.xml.transform.stream.StreamSource;
 
+import jakarta.activation.DataHandler;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.binding.soap.model.SoapBodyInfo;

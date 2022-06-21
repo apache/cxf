@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
@@ -45,6 +44,7 @@ import javax.xml.crypto.dsig.keyinfo.X509Data;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import jakarta.xml.bind.JAXBElement;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.helpers.CastUtils;

@@ -21,8 +21,7 @@ package org.apache.cxf.aegis.type.map.fortest;
 
 import java.util.Map;
 
-import javax.jws.WebService;
-
+import jakarta.jws.WebService;
 import org.apache.cxf.aegis.type.map.ns2.ObjectWithAMapNs2;
 
 /**

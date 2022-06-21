@@ -26,8 +26,8 @@ import java.lang.reflect.Proxy;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
 
+import jakarta.xml.ws.BindingProvider;
 import org.apache.cxf.jms_greeter.JMSGreeterPortType;
 import org.apache.cxf.jms_greeter.JMSGreeterService;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;

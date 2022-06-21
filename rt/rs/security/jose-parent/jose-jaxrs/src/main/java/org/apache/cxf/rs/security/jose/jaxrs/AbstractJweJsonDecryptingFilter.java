@@ -23,8 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;

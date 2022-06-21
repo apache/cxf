@@ -22,8 +22,7 @@ package org.apache.cxf.systest.jaxrs.security;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.Path;
-
+import jakarta.ws.rs.Path;
 import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.systest.jaxrs.BookInterface;
 import org.apache.cxf.systest.jaxrs.BookNotFoundFault;

@@ -19,26 +19,23 @@
 package org.apache.cxf.wsn.jms;
 
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jms.Connection;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-import javax.jms.Topic;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
+import jakarta.jms.Connection;
+import jakarta.jms.Destination;
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.MessageConsumer;
+import jakarta.jms.MessageProducer;
+import jakarta.jms.Session;
+import jakarta.jms.Topic;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 
-import org.apache.activemq.advisory.ConsumerEvent;
-import org.apache.activemq.advisory.ConsumerEventSource;
-import org.apache.activemq.advisory.ConsumerListener;
+import org.apache.activemq.artemis.jms.client.ActiveMQTopic;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.wsn.AbstractPublisher;
 import org.oasis_open.docs.wsn.b_2.InvalidTopicExpressionFaultType;
@@ -55,7 +52,7 @@ import org.oasis_open.docs.wsn.bw_2.InvalidTopicExpressionFault;
 import org.oasis_open.docs.wsn.bw_2.TopicNotSupportedFault;
 import org.oasis_open.docs.wsrf.rw_2.ResourceUnknownFault;
 
-public abstract class JmsPublisher extends AbstractPublisher implements ConsumerListener {
+public abstract class JmsPublisher extends AbstractPublisher {
 
     private static final Logger LOGGER = LogUtils.getL7dLogger(JmsPublisher.class);
 
@@ -64,14 +61,23 @@ public abstract class JmsPublisher extends AbstractPublisher implements Consumer
     private JmsTopicExpressionConverter topicConverter;
 
     private JAXBContext jaxbContext;
-
-    private List<ConsumerEventSource> advisories;
-
+    
+    private Session advisory;
+    
+    private MessageConsumer notificationConsumer;
+    
     private Map<Destination, Object> producers;
+    
+    private final String notificationTopicName;
 
     public JmsPublisher(String name) {
+        this(name, "activemq.notifications");
+    }
+    
+    public JmsPublisher(String name, String notificationTopicName) {
         super(name);
         topicConverter = new JmsTopicExpressionConverter();
+        this.notificationTopicName = notificationTopicName;
         try {
             jaxbContext = JAXBContext.newInstance(Notify.class);
         } catch (JAXBException e) {
@@ -120,7 +126,13 @@ public abstract class JmsPublisher extends AbstractPublisher implements Consumer
             TopicNotSupportedFault {
         super.validatePublisher(registerPublisherRequest);
         try {
-            topicConverter.toActiveMQTopic(topic);
+            if (topic != null && !topic.isEmpty()) {
+                int size = topic.size();
+                ActiveMQTopic[] childrenDestinations = new ActiveMQTopic[size];
+                for (int i = 0; i < size; i++) {
+                    childrenDestinations[i] = topicConverter.toActiveMQTopic(topic.get(i));
+                }
+            }
         } catch (InvalidTopicException e) {
             InvalidTopicExpressionFaultType fault = new InvalidTopicExpressionFaultType();
             throw new InvalidTopicExpressionFault(e.getMessage(), fault);
@@ -132,14 +144,10 @@ public abstract class JmsPublisher extends AbstractPublisher implements Consumer
         if (demand) {
             try {
                 producers = new HashMap<>();
-                advisories = new ArrayList<>();
-                for (TopicExpressionType topic : this.topic) {
-                    ConsumerEventSource advisory
-                        = new ConsumerEventSource(connection, topicConverter.toActiveMQTopic(topic));
-                    advisory.setConsumerListener(this);
-                    advisory.start();
-                    advisories.add(advisory);
-                }
+                advisory = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                final Topic notificationsTopic = advisory.createTopic(notificationTopicName);
+                notificationConsumer = advisory.createConsumer(notificationsTopic);
+                notificationConsumer.setMessageListener(this::onMessage);
             } catch (Exception e) {
                 PublisherRegistrationFailedFaultType fault = new PublisherRegistrationFailedFaultType();
                 throw new PublisherRegistrationFailedFault("Error starting demand-based publisher", fault, e);
@@ -149,10 +157,12 @@ public abstract class JmsPublisher extends AbstractPublisher implements Consumer
 
     protected void destroy() throws ResourceNotDestroyedFault {
         try {
-            if (advisories != null) {
-                for (ConsumerEventSource advisory : advisories) {
-                    advisory.stop();
-                }
+            if (notificationConsumer != null) {
+                notificationConsumer.close();
+            }
+            
+            if (advisory != null) {
+                advisory.close();
             }
         } catch (Exception e) {
             ResourceNotDestroyedFaultType fault = new ResourceNotDestroyedFaultType();
@@ -162,20 +172,35 @@ public abstract class JmsPublisher extends AbstractPublisher implements Consumer
         }
     }
 
-    public synchronized void onConsumerEvent(ConsumerEvent event) {
-        Object producer = producers.get(event.getDestination());
-        if (event.getConsumerCount() > 0) {
-            if (producer == null) {
-                // start subscription
-                producer = startSubscription(topicConverter.toTopicExpression((Topic)event.getDestination()));
-                producers.put(event.getDestination(), producer);
+    public synchronized void onMessage(Message event) {
+        try {
+            // See please https://activemq.apache.org/components/artemis/documentation/latest/management.html
+            final String type = event.getStringProperty("_AMQ_NotifType");
+            final String routing = event.getStringProperty("_AMQ_RoutingName");
+            if (routing != null) {
+                final TopicExpressionType topic = topicConverter.toTopicExpression(routing);
+                final Destination destination = topicConverter.toActiveMQTopic(topic);
+                Object producer = producers.get(destination);
+                if ("CONSUMER_CREATED".equalsIgnoreCase(type)) {
+                    final int consumerCount = event.getIntProperty("_AMQ_ConsumerCount");
+                    if (consumerCount > 0) {
+                        if (producer == null) {
+                            // start subscription
+                            producer = startSubscription(topic);
+                            producers.put(destination, producer);
+                        }
+                    }
+                } else if ("CONSUMER_CLOSED".equalsIgnoreCase(type)) {
+                    final int consumerCount = event.getIntProperty("_AMQ_ConsumerCount");
+                    if (consumerCount == 0 && producer != null) {
+                        Object sub = producers.remove(destination);
+                        // destroy subscription
+                        stopSubscription(sub);
+                    }
+                }
             }
-        } else {
-            if (producer != null) {
-                Object sub = producers.remove(event.getDestination());
-                // destroy subscription
-                stopSubscription(sub);
-            }
+        } catch (JMSException | InvalidTopicException ex) {
+            LOGGER.log(Level.WARNING, "Error consuming message", ex);
         }
     }
 

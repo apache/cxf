@@ -32,13 +32,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
@@ -169,7 +168,7 @@ public final class FormUtils {
                                              String postBody,
                                              String enc,
                                              boolean decode,
-                                             javax.servlet.http.HttpServletRequest request) {
+                                             jakarta.servlet.http.HttpServletRequest request) {
         if (!StringUtils.isEmpty(postBody)) {
             populateMapFromString(params, m, postBody, enc, decode);
         } else if (request != null

@@ -31,28 +31,28 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jws.WebMethod;
 import javax.wsdl.Operation;
-import javax.xml.bind.annotation.XmlNsForm;
-import javax.xml.bind.annotation.XmlSchema;
-import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Action;
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.BindingType;
-import javax.xml.ws.FaultAction;
-import javax.xml.ws.Provider;
-import javax.xml.ws.RespectBinding;
-import javax.xml.ws.RespectBindingFeature;
-import javax.xml.ws.Service;
-import javax.xml.ws.WebFault;
-import javax.xml.ws.WebServiceFeature;
-import javax.xml.ws.soap.Addressing;
-import javax.xml.ws.soap.AddressingFeature;
-import javax.xml.ws.soap.MTOM;
-import javax.xml.ws.soap.MTOMFeature;
-import javax.xml.ws.soap.SOAPBinding;
 
+import jakarta.jws.WebMethod;
+import jakarta.xml.bind.annotation.XmlNsForm;
+import jakarta.xml.bind.annotation.XmlSchema;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.ws.Action;
+import jakarta.xml.ws.AsyncHandler;
+import jakarta.xml.ws.BindingType;
+import jakarta.xml.ws.FaultAction;
+import jakarta.xml.ws.Provider;
+import jakarta.xml.ws.RespectBinding;
+import jakarta.xml.ws.RespectBindingFeature;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.WebFault;
+import jakarta.xml.ws.WebServiceFeature;
+import jakarta.xml.ws.soap.Addressing;
+import jakarta.xml.ws.soap.AddressingFeature;
+import jakarta.xml.ws.soap.MTOM;
+import jakarta.xml.ws.soap.MTOMFeature;
+import jakarta.xml.ws.soap.SOAPBinding;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
@@ -447,7 +447,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         try {
             if (java.rmi.ServerException.class.isAssignableFrom(exClass)
                 || java.rmi.RemoteException.class.isAssignableFrom(exClass)
-                || "javax.xml.ws".equals(PackageUtils.getPackageName(exClass))) {
+                || "jakarta.xml.ws".equals(PackageUtils.getPackageName(exClass))) {
                 return null;
             }
 

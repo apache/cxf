@@ -27,9 +27,8 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;

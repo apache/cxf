@@ -28,11 +28,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.activation.DataHandler;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
+import jakarta.activation.DataHandler;
 import org.apache.cxf.attachment.AttachmentDataSource;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;

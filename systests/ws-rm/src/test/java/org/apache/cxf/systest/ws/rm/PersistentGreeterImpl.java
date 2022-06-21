@@ -19,8 +19,7 @@
 
 package org.apache.cxf.systest.ws.rm;
 
-import javax.jws.WebService;
-
+import jakarta.jws.WebService;
 import org.apache.cxf.greeter_control.AbstractGreeterImpl;
 
 /**

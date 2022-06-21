@@ -31,16 +31,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.ws.rs.CookieParam;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.RuntimeType;
-import javax.ws.rs.core.Configurable;
-import javax.ws.rs.core.Configuration;
-import javax.ws.rs.core.Feature;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.ParamConverter;
-import javax.ws.rs.ext.ParamConverterProvider;
-
+import jakarta.ws.rs.CookieParam;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.RuntimeType;
+import jakarta.ws.rs.core.Configurable;
+import jakarta.ws.rs.core.Configuration;
+import jakarta.ws.rs.core.Feature;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.ext.ParamConverter;
+import jakarta.ws.rs.ext.ParamConverterProvider;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.ProxyHelper;

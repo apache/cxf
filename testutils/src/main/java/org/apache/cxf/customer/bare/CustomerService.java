@@ -21,14 +21,13 @@ package org.apache.cxf.customer.bare;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Resource;
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-import javax.jws.WebService;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.WebServiceException;
-
+import jakarta.annotation.Resource;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.WebServiceException;
 import org.apache.cxf.customer.Customer;
 import org.apache.cxf.customer.CustomerNotFoundDetails;
 import org.apache.cxf.customer.CustomerNotFoundFault;

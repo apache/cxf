@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.jaxws.cxf5064;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 public class HeaderObjTypeAdapter extends XmlAdapter<String, HeaderObj> {
     @Override

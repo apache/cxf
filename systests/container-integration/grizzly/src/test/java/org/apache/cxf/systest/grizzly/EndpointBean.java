@@ -20,12 +20,12 @@ package org.apache.cxf.systest.grizzly;
 
 import java.io.IOException;
 
-import javax.activation.DataHandler;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.jws.WebService;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.soap.MTOM;
+import jakarta.activation.DataHandler;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.soap.MTOM;
 
 @WebService(serviceName = "EndpointService",
             endpointInterface = "org.apache.cxf.systest.grizzly.EndpointInterface",

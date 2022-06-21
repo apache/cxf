@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://java.sun.com/xml/ns/javaee",
-        elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://java.sun.com/xml/ns/javaee",
+        elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package org.apache.cxf.jaxws.handler.types;
 

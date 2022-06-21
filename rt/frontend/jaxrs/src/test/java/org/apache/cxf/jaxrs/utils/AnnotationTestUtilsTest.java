@@ -25,9 +25,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.UriInfo;
-
+import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.core.UriInfo;
 import org.apache.cxf.jaxrs.Customer;
 
 import org.junit.Test;

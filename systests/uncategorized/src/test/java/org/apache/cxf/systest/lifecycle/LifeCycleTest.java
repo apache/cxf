@@ -24,10 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.jws.WebService;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Endpoint;
-
+import jakarta.jws.WebService;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Endpoint;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;

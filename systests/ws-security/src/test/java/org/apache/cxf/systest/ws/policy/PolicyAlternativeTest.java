@@ -24,8 +24,8 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
 
+import jakarta.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -141,7 +141,7 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         try {
             port.doubleIt(25);
             fail("Failure expected on no Security");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
 
@@ -208,7 +208,7 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         try {
             port.doubleIt(25);
             fail("Failure expected because no client certificate");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             if (!test.isStreaming()) {
                 assertTrue(ex.getMessage().contains("HttpsToken"));
             }
@@ -246,7 +246,7 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         try {
             transportPort.doubleIt(25);
             fail("Failure expected on not signing a wsa header");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
 
@@ -283,7 +283,7 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         try {
             transportPort.doubleIt(25);
             fail("Failure expected on not signing a wsa header");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
 

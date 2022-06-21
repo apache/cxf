@@ -22,10 +22,9 @@ import java.net.URL;
 import java.time.Instant;
 import java.util.Collections;
 
-import javax.ws.rs.client.ResponseProcessingException;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.client.ResponseProcessingException;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;

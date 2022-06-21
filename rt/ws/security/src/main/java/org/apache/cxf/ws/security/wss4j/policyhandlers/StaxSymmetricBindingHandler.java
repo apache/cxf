@@ -28,8 +28,8 @@ import java.util.logging.Logger;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
 
+import jakarta.xml.soap.SOAPException;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;

@@ -19,11 +19,11 @@
 
 package org.apache.cxf.systest.sts.custom;
 
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPMessage;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;

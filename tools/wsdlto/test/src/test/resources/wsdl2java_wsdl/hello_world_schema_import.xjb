@@ -17,7 +17,7 @@
   under the License.
 -->
 <jxb:bindings jxb:version="1.0"
-	      xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+	      xmlns:jxb="https://jakarta.ee/xml/ns/jaxb"
 	      xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <jxb:bindings schemaLocation="./schema1.xsd" node="/xsd:schema">
 	<jxb:schemaBindings>

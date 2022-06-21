@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.xml.ws.Endpoint;
+import jakarta.xml.ws.Endpoint;
 
 @Configuration
 public class WebServiceConfig {

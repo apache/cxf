@@ -28,7 +28,7 @@ import bank.common.AccountNotFoundException;
 import bank.common.AccountNotFoundExceptionType;
 import bank.common.Bank;
 
-@javax.jws.WebService(portName = "BankCORBAPort", serviceName = "BankCORBAService",
+@jakarta.jws.WebService(portName = "BankCORBAPort", serviceName = "BankCORBAService",
                       targetNamespace = "http://cxf.apache.org/schemas/cxf/idl/bank",
                       wsdlLocation = "classpath:/wsdl/bank.wsdl",
                       endpointInterface = "bank.common.Bank")
@@ -37,7 +37,7 @@ public class BankImpl implements Bank {
 
     Map<String, Account> accounts = new HashMap<>();
 
-    public boolean createAccount(String name, javax.xml.ws.Holder<Account> account)
+    public boolean createAccount(String name, jakarta.xml.ws.Holder<Account> account)
         throws AccountAlreadyExistsException {
 
         System.out.println("Creating account: " + name);

@@ -21,8 +21,7 @@ package org.apache.cxf.rs.security.oauth2.client;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;

@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>codegen-it-parent</artifactId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
         <relativePath>../it-parent/pom.xml</relativePath>
     </parent>
     <artifactId>cxf-4004-it</artifactId>
@@ -38,11 +38,11 @@
                         <version>${cxf.xjc-utils.version}</version>
                     </dependency>
                     <dependency>
+                        <!--we need the plugin which supports jaxb3-->
                         <groupId>net.java.dev.jaxb2-commons</groupId>
                         <artifactId>jaxb-fluent-api</artifactId>
                         <version>2.1.8</version>
                     </dependency>
-                     
                 </dependencies>
                 <configuration>
                     <defaultOptions>

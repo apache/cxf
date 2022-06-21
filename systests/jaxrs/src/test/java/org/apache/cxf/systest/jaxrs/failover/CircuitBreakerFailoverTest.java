@@ -23,8 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.ProcessingException;
-
+import jakarta.ws.rs.ProcessingException;
 import org.apache.cxf.clustering.FailoverFailedException;
 import org.apache.cxf.clustering.FailoverFeature;
 import org.apache.cxf.clustering.RandomStrategy;
