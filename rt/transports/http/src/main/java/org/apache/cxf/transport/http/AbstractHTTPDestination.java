@@ -337,6 +337,11 @@ public abstract class AbstractHTTPDestination
         inMessage.put(Message.HTTP_REQUEST_METHOD, req.getMethod());
         String requestURI = req.getRequestURI();
         inMessage.put(Message.REQUEST_URI, requestURI);
+        try {
+            req.setAttribute("org.springframework.web.servlet.HandlerMapping.bestMatchingPattern", requestURI);
+        } catch (RuntimeException rex) {
+            //ignore, not using Spring so the property is irrelevant
+        }
         String requestURL = req.getRequestURL().toString();
         inMessage.put(Message.REQUEST_URL, requestURL);
         String contextPath = req.getContextPath();
