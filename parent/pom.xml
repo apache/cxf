@@ -107,7 +107,7 @@
         <cxf.el-api.version>3.0.3</cxf.el-api.version>
         <cxf.findbugs.version>3.0.2</cxf.findbugs.version>
         <cxf.geronimo.jta.version>1.1.1</cxf.geronimo.jta.version>
-        <cxf.geronimo.openapi.version>1.0.14</cxf.geronimo.openapi.version>
+        <cxf.geronimo.openapi.version>1.0.15</cxf.geronimo.openapi.version>
         <cxf.glassfish.el.version>4.0.0</cxf.glassfish.el.version>
         <cxf.glassfish.json.version>2.0.1</cxf.glassfish.json.version>
         <cxf.guava.version>30.1-jre</cxf.guava.version>
@@ -1142,6 +1142,7 @@
                 <groupId>org.apache.geronimo</groupId>
                 <artifactId>geronimo-openapi-impl</artifactId>
                 <version>${cxf.geronimo.openapi.version}</version>
+                <classifier>jakarta</classifier>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
