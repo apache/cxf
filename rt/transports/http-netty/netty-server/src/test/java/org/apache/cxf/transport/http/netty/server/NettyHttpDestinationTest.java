@@ -663,6 +663,8 @@ public class NettyHttpDestinationTest {
                 EasyMock.expect(request.getRequestURI()).andReturn("/foo");
                 EasyMock.expect(request.getRequestURL())
                     .andReturn(new StringBuffer("http://localhost/foo")).anyTimes();
+                request.setAttribute("org.springframework.web.servlet.HandlerMapping.bestMatchingPattern", "/foo");
+                EasyMock.expectLastCall();
                 EasyMock.expect(request.getCharacterEncoding()).andReturn(StandardCharsets.UTF_8.name());
                 EasyMock.expect(request.getQueryString()).andReturn(query).times(2);
                 EasyMock.expect(request.getHeader("Accept")).andReturn("*/*");
