@@ -372,6 +372,13 @@ public final class HttpUtils {
             (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST));
         return URI.create(base + relativePath);
     }
+    
+    public static void setHttpRequestURI(Message message, String uriTemplate) {
+        HttpServletRequest request =
+            (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
+        request.setAttribute("org.springframework.web.servlet.HandlerMapping.bestMatchingPattern", uriTemplate);
+    }
+
 
     public static URI toAbsoluteUri(URI u, Message message) {
         HttpServletRequest request =

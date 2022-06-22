@@ -238,7 +238,13 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         exchange.put(JAXRSUtils.ROOT_RESOURCE_CLASS, cri);
         message.put(RESOURCE_METHOD, ori.getMethodToInvoke());
         message.put(URITemplate.TEMPLATE_PARAMETERS, values);
-        message.put(URITemplate.URI_TEMPLATE, JAXRSUtils.getUriTemplate(message, cri, ori));
+        
+        
+        String uriTemplate = JAXRSUtils.getUriTemplate(message, cri, ori);
+        message.put(URITemplate.URI_TEMPLATE, uriTemplate);
+        if (HttpUtils.isHttpRequest(message)) {
+            HttpUtils.setHttpRequestURI(message, uriTemplate);
+        }
 
         String plainOperationName = ori.getMethodToInvoke().getName();
         if (numberOfResources > 1) {
