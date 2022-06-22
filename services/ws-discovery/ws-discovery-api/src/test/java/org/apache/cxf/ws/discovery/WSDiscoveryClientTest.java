@@ -84,7 +84,6 @@ public final class WSDiscoveryClientTest {
             System.out.println("Skipping MultiResponse test for REL");
             return;
         }
-
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         int count = 0;
         if (interfaces != null) {
@@ -108,8 +107,10 @@ public final class WSDiscoveryClientTest {
                     //fake a discovery server to send back some canned messages.
                     InetAddress address = InetAddress.getByName("239.255.255.250");
                     MulticastSocket s = new MulticastSocket(Integer.parseInt(PORT));
+                    if (!"Mac OS X".equals(System.getProperties().getProperty("os.name"))) {
+                        s.setNetworkInterface(findIpv4Interface());
+                    }
                     s.setBroadcast(true);
-                    s.setNetworkInterface(findIpv4Interface());
                     s.setLoopbackMode(false);
                     s.setReuseAddress(true);
                     s.joinGroup(address);
@@ -120,8 +121,7 @@ public final class WSDiscoveryClientTest {
                     s.receive(p);
                     SocketAddress sa = p.getSocketAddress();
                     String incoming = new String(p.getData(), 0, p.getLength(), StandardCharsets.UTF_8);
-                    int idx = incoming.indexOf("MessageID");
-                    idx = incoming.indexOf('>', idx);
+                    int idx = incoming.indexOf('>', incoming.indexOf("MessageID"));
                     incoming = incoming.substring(idx + 1);
                     idx = incoming.indexOf("</");
                     incoming = incoming.substring(0, idx);
