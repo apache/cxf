@@ -340,6 +340,11 @@
                         <enabled>false</enabled>
                     </releases>
                 </pluginRepository>
+                <pluginRepository>
+                    <id>spring.milestone</id>
+                    <url>https://repo.spring.io/milestone/</url>
+                    <name>Spring Milestone Repo</name>
+                </pluginRepository>
             </pluginRepositories>
         </profile>
     </profiles>
