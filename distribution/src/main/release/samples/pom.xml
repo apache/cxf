@@ -36,7 +36,7 @@
         <cxf.netty.version>4.1.77.Final</cxf.netty.version>
         <cxf.httpcomponents.client.version>4.5.13</cxf.httpcomponents.client.version>
         <cxf.swagger.ui.version>4.11.1</cxf.swagger.ui.version>
-        <cxf.tika.version>2.4.0</cxf.tika.version>
+        <cxf.tika.version>2.4.1</cxf.tika.version>
         <cxf.tomcat.version>9.0.63</cxf.tomcat.version>
         <graalvm.version>21.1.0</graalvm.version>
     </properties>
