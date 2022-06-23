@@ -181,6 +181,7 @@
         <bundle dependency="true" start-level="40">mvn:${cxf.servlet-api.group}/${cxf.servlet-api.artifact}/${cxf.servlet-api.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-tcnative-classes/${cxf.netty.tcnative.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-common/${cxf.netty.version}</bundle>
+        <bundle start-level="40">mvn:io.netty/netty-transport-native-unix-common/${cxf.netty.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-handler/${cxf.netty.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-buffer/${cxf.netty.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-transport/${cxf.netty.version}</bundle>
@@ -193,6 +194,7 @@
         <feature version="${project.version}">cxf-http</feature>
         <bundle start-level="40">mvn:io.netty/netty-tcnative-classes/${cxf.netty.tcnative.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-common/${cxf.netty.version}</bundle>
+        <bundle start-level="40">mvn:io.netty/netty-transport-native-unix-common/${cxf.netty.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-handler/${cxf.netty.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-buffer/${cxf.netty.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-transport/${cxf.netty.version}</bundle>
