@@ -376,6 +376,16 @@
             <version>${cxf.lucene.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.olingo</groupId>
+            <artifactId>olingo-odata2-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.ws.rs</groupId>
+                    <artifactId>javax.ws.rs-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
         </dependency>
