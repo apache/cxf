@@ -102,11 +102,6 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-rs-service-description-swagger</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-service-description-openapi-v3</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -155,8 +150,6 @@
             <artifactId>cxf-rt-ws-transfer</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-        
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
@@ -381,10 +374,6 @@
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
             <version>${cxf.lucene.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.olingo</groupId>
-            <artifactId>olingo-odata2-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
