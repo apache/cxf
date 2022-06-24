@@ -1,4 +1,4 @@
-Apache CXF 3.4.7 Release Notes
+Apache CXF 3.4.8 Release Notes
 
 1. Overview
 
@@ -23,7 +23,7 @@ http://cxf.apache.org/docs/34-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
-3.4.7 fixes over 37 JIRA issues reported by users and the community.
+3.4.8 fixes over 13 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -65,48 +65,24 @@ for caveats when upgrading.
 
 7. Specific issues, features, and improvements fixed in this version
 
+Release Notes - CXF - Version 3.4.8
 ** Sub-task
-    * [CXF-8479] - jaxrs.ee.rs.container.responsecontext getEntityAnnotationsTest
-    * [CXF-8480] - jaxrs.ee.rs.core.responsebuilder entityObjectTest
-    * [CXF-8481] - jaxrs.ee.rs.core.uriinfo getMatchedURIsTest
-    * [CXF-8482] - jaxrs.ee.rs.core.uriinfo getMatchedURIsTest1
-    * [CXF-8483] - jaxrs.ee.rs.core.uriinfo getMatchedURIsTest2
-    * [CXF-8484] - jaxrs.ee.rs.ext.interceptor.containerwriter.interceptorcontext getAnnotationsTest
-    * [CXF-8485] - jaxrs.ee.rs.ext.paramconverter atomicIntegerIsLazyDeployableAndThrowsErrorTest
-    * [CXF-8486] - jaxrs.ee.rs.pathparam.locator pathParamEntityWithConstructorTest
-    * [CXF-8487] - jaxrs.ee.rs.pathparam.locator pathParamEntityWithFromStringTest
-    * [CXF-8488] - jaxrs.ee.rs.pathparam.locator pathParamEntityWithValueOfTest
-    * [CXF-8489] - jaxrs.ee.rs.pathparam.locator pathParamListEntityWithFromStringTest
-    * [CXF-8490] - jaxrs.ee.rs.pathparam.locator pathParamSetEntityWithFromStringTest
-    * [CXF-8491] - jaxrs.ee.rs.pathparam.locator pathParamThrowingIllegalArgumentExceptionTest
-    * [CXF-8492] - jaxrs.ee.rs.pathparam.locator pathParamThrowingWebApplicationExceptionTest
-    * [CXF-8493] - jaxrs.ee.rs.pathparam.locator test1
-    * [CXF-8494] - jaxrs.ee.rs.pathparam.locator test2
-    * [CXF-8495] - jaxrs.ee.rs.pathparam.locator test3
-    * [CXF-8496] - jaxrs.ee.rs.pathparam.locator test4
-    * [CXF-8497] - jaxrs.ee.rs.pathparam.locator test5
-    * [CXF-8520] - jaxrs.spec.resource.requestmatching consumesCorrectContentTypeOnResourceLocatorTest
-    * [CXF-8521] - jaxrs.spec.resource.requestmatching consumesCorrectContentTypeOnSubResourceLocatorTest
-    * [CXF-8522] - jaxrs.spec.resource.requestmatching consumesOnResourceLocatorTest
-    * [CXF-8523] - jaxrs.spec.resource.requestmatching consumesOnSubResourceLocatorTest
-    * [CXF-8524] - jaxrs.spec.resource.requestmatching producesCorrectContentTypeOnResourceLocatorTest
-    * [CXF-8525] - jaxrs.spec.resource.requestmatching producesCorrectContentTypeOnSubResourceLocatorTest
-    * [CXF-8526] - jaxrs.spec.resource.requestmatching producesOnResourceLocatorTest
-    * [CXF-8527] - jaxrs.spec.resource.requestmatching producesOnSubResourceLocatorTest
+    * [CXF-8458] - jaxrs.api.rs.core.linkbuilder buildNoArgsThrowsUriBuilderExceptionTest
+    * [CXF-8459] - jaxrs.api.rs.core.linkbuilder buildObjectsThrowsUriBuilderExceptionTest
+    * [CXF-8460] - jaxrs.api.rs.core.linkbuilder buildRelativizedThrowsUriBuilderExceptionTest
+    * [CXF-8478] - jaxrs.ee.rs.container.requestcontext setRequestUriTwoUrisTest
 
 ** Bug
-    * [CXF-8655] - Incorrect XSD resolution when the file name is the same in different folders
-    * [CXF-8667] - Custom certificate alias not being used when using HC5 AsyncHTTPConduit
-    * [CXF-8674] - Custom SSLContext using async http-client5 does not work
-    * [CXF-8680] - ClientProxyImpl fails to find boolean param values via BeanParam
-    * [CXF-8682] - x-forwarded-proto header causes cxf to not match request to java method
+    * [CXF-8689] - cxf-java2ws-plugin plugin running on non-modular JDK fails with NullPointerException
+    * [CXF-8694] - CXF 3.5.0 Generated WSDL root element
+    * [CXF-8698] - Content-ID of attachments for outgoing requests are URL-decoded instead of URL-encoded
+    * [CXF-8703] - PAX Maven URL does not take local Maven repository into account
 
 ** Improvement
-    * [CXF-8673] - Bump httpasyncclient version to 4.1.5
-    * [CXF-8684] - Default WebApplicationExceptionMapper should be less specific by default
+    * [CXF-8683] - Support SwaggerUI 4.10.3+
+    * [CXF-8688] - Accomodate some RFC 3986 checks to filter out invalid URIs
+    * [CXF-8699] - Abillity to set sensitive filters on LoggingFeature
 
 ** Task
-    * [CXF-8668] - Set SniHostCheck to false for SSLNettyClientTest
-
-
-
+    * [CXF-7996] - Jakarta EE TCKs and compatibility
+    * [CXF-8695] - Remove duplicate copied class from cxf-core in cxf-rt-management when build with JDK11
