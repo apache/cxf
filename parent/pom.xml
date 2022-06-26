@@ -111,7 +111,7 @@
         <cxf.geronimo.json.version>1.4</cxf.geronimo.json.version>
         <cxf.geronimo.jta.version>1.1.1</cxf.geronimo.jta.version>
         <cxf.geronimo.transaction.version>3.1.4</cxf.geronimo.transaction.version>
-        <cxf.geronimo.openapi.version>1.0.14</cxf.geronimo.openapi.version>
+        <cxf.geronimo.openapi.version>1.0.15</cxf.geronimo.openapi.version>
         <cxf.glassfish.el.version>3.0.1-b11</cxf.glassfish.el.version>
         <cxf.glassfish.json.version>1.1.4</cxf.glassfish.json.version>
         <cxf.guava.version>30.1-jre</cxf.guava.version>
