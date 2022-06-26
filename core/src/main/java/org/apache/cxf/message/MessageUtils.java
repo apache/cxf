@@ -30,6 +30,7 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
 
@@ -162,7 +163,9 @@ public final class MessageUtils {
                 Collection<Integer> intValues = new ArrayList<>();
                 for (String value : ((String) o).split(",")) {
                     try {
-                        intValues.add(Integer.parseInt(value));
+                        if (!StringUtils.isEmpty(value)) {
+                            intValues.add(Integer.parseInt(value.trim()));
+                        }
                     } catch (NumberFormatException ex) {
                         LOG.warning("Incorrect integer value of " + value + " specified for: " + key);
                     }
