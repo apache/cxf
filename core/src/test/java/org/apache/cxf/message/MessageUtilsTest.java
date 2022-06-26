@@ -19,7 +19,7 @@
 package org.apache.cxf.message;
 
 import java.lang.reflect.Method;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Optional;
 
 import javax.xml.namespace.QName;
@@ -30,12 +30,13 @@ import org.apache.cxf.service.factory.SimpleMethodDispatcher;
 import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
+
 import org.junit.Test;
 
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class MessageUtilsTest {
@@ -86,8 +87,10 @@ public class MessageUtilsTest {
     @Test
     public void getContextualIntegers() {
         Message message = new MessageImpl();
-        message.put("key1", "1,2,invalid,3");
-        MatcherAssert.assertThat(MessageUtils.getContextualIntegers(message, "key1", List.of(0)), Matchers.contains(1,2,3));
-        MatcherAssert.assertThat(MessageUtils.getContextualIntegers(message, "invalid-key", List.of(0, 1)), Matchers.contains(0,1));
+        message.put("key1", "1, 2,invalid,3");
+        assertThat(MessageUtils.getContextualIntegers(message, "key1", Arrays.asList(0)),
+            contains(1, 2, 3));
+        assertThat(MessageUtils.getContextualIntegers(message, "invalid-key", Arrays.asList(0, 1)), 
+            contains(0, 1));
     }
 }
