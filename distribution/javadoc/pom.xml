@@ -57,11 +57,6 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-websocket</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-security</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -693,7 +688,6 @@
                     <minmemory>256M</minmemory>
                     <maxmemory>1G</maxmemory>
                     <header>Apache CXF API</header>
-                    <footer>Apache CXF API</footer>
                     <doctitle>Apache CXF ${project.version} API</doctitle>
                     <notimestamp>true</notimestamp>
                 </configuration>
@@ -735,4 +729,23 @@
             </plugins>
         </pluginManagement>
     </build>
+    <profiles>
+        <!-- TODO: This profile includes modules which are still on 'javax.*' namespace and
+        are not migrated to Jakarta -->
+        <profile>
+            <id>javax</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.cxf</groupId>
+                    <artifactId>cxf-rt-rs-service-description-swagger</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.cxf</groupId>
+                    <artifactId>cxf-rt-transports-websocket</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>
