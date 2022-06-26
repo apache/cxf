@@ -21,6 +21,8 @@ package org.apache.cxf.message;
 
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -148,6 +150,24 @@ public final class MessageUtils {
             Object o = m.getContextualProperty(key);
             if (o != null) {
                 return PropertyUtils.isTrue(o);
+            }
+        }
+        return defaultValue;
+    }
+
+    public static Collection<Integer> getContextualIntegers(Message m, String key, Collection<Integer> defaultValue) {
+        if (m != null) {
+            Object o = m.getContextualProperty(key);
+            if (o instanceof String) {
+                Collection<Integer> intValues = new ArrayList<>();
+                for (String value : ((String) o).split(",")) {
+                    try {
+                        intValues.add(Integer.parseInt(value));
+                    } catch (NumberFormatException ex) {
+                        LOG.warning("Incorrect integer value of " + value + " specified for: " + key);
+                    }
+                }
+                return intValues;
             }
         }
         return defaultValue;
