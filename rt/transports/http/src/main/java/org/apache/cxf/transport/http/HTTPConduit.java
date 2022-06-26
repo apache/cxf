@@ -32,6 +32,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -164,6 +165,15 @@ public abstract class HTTPConduit
 
     public static final String PROCESS_FAULT_ON_HTTP_400 = "org.apache.cxf.transport.process_fault_on_http_400";
     public static final String NO_IO_EXCEPTIONS = "org.apache.cxf.transport.no_io_exceptions";
+
+    /** 
+     * The HTTP status codes as contextual property (comma-separated integers as String) on the outgoing {@link Message} which lead to 
+     * setting {@code org.apache.cxf.transport.service_not_available} for all responses with those status codes.
+     * This is used e.g. by the {@code org.apache.cxf.clustering.FailoverTargetSelector} to determine if it should do the fail-over.
+     * Default: {@code 404,429,503} 
+     */
+    public static final String SERVICE_NOT_AVAILABLE_ON_HTTP_STATUS_CODES = "org.apache.cxf.transport.service_not_available_on_http_status_codes";
+
     /**
      * The Logger for this class.
      */
@@ -1601,7 +1611,8 @@ public abstract class HTTPConduit
             }
             if (exchange != null) {
                 exchange.put(Message.RESPONSE_CODE, rc);
-                if (rc == 404 || rc == 503 || rc == 429) {
+                Collection<Integer> serviceNotAvailableOnHttpStatusCodes = MessageUtils.getContextualIntegers(outMessage, SERVICE_NOT_AVAILABLE_ON_HTTP_STATUS_CODES, List.of(404, 429, 503));
+                if (serviceNotAvailableOnHttpStatusCodes.contains(rc)) {
                     exchange.put("org.apache.cxf.transport.service_not_available", true);
                 }
             }
