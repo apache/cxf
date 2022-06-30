@@ -54,6 +54,7 @@ public class BundlesAndNamespacesTest extends CXFOSGiTestSupport {
     public Option[] config() {
         return OptionUtils.combine(
             cxfBaseConfig(),
+            testUtils(),
             features(cxfUrl, "aries-blueprint", "cxf-core", "cxf-jaxws"),
             logLevel(LogLevel.INFO)
         );
