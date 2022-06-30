@@ -23,6 +23,8 @@ package org.apache.cxf.osgi.itests;
 import java.io.File;
 
 import jakarta.inject.Inject;
+
+import org.apache.cxf.testutil.common.TestUtil;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -47,11 +49,13 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDist
 /**
  *
  */
-public class CXFOSGiTestSupport {
+public abstract class CXFOSGiTestSupport {
 
     // Adding apache snapshots as cxf trunk may contain snapshot dependencies
 //    private static final String REPOS = "https://repo1.maven.org/maven2@id=central,"
 //        + "https://repository.apache.org/content/groups/snapshots-group@id=apache@snapshots@noreleases";
+
+    protected static final String PORT = TestUtil.getPortNumber("osgi-itests");
 
     @Inject
     protected BundleContext bundleContext;
@@ -68,7 +72,6 @@ public class CXFOSGiTestSupport {
             .type("xml").classifier("features");
 
         String localRepo = System.getProperty("localRepository");
-        Object urp = System.getProperty("cxf.useRandomFirstPort");
 
         final Option[] basicOptions = new Option[] {
             karafDistributionConfiguration()
@@ -89,7 +92,8 @@ public class CXFOSGiTestSupport {
                 .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
                                                      "org.ops4j.pax.url.mvn.localRepository",
                                                      localRepo)),
-            when(urp != null).useOptions(systemProperty("cxf.useRandomFirstPort").value("true"))
+            systemProperty("testutil.ports.osgi-itests").value(PORT),
+            editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", PORT)
         };
         if (JavaVersionUtil.getMajorVersion() >= 9) {
             final String karafVersion = MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf-minimal");
