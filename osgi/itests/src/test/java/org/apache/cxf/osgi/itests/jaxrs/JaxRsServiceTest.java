@@ -53,7 +53,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 @ExamReactorStrategy(PerClass.class)
 public class JaxRsServiceTest extends CXFOSGiTestSupport {
 
-    private static final String BASE_URL = "http://localhost:8181/cxf/jaxrs/bookstore";
+    private static final String BASE_URL = "http://localhost:" + PORT + "/cxf/jaxrs/bookstore";
 
     private final WebTarget wt = ClientBuilder.newClient().target(BASE_URL);
 
@@ -109,6 +109,7 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
             cxfBaseConfig(),
             features(cxfUrl, "cxf-core", "cxf-wsdl", "cxf-jaxrs", "cxf-bean-validation-core", "cxf-bean-validation"),
             logLevel(LogLevel.INFO),
+            testUtils(),
             provision(serviceBundle())
         );
     }
@@ -133,5 +134,4 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
                 .build(TinyBundles.withBnd());
         }
     }
-
 }
