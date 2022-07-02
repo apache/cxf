@@ -188,7 +188,7 @@
         <cxf.openwebbeans.version>2.0.26</cxf.openwebbeans.version>
         <cxf.persistence-api.version>3.0.0</cxf.persistence-api.version>
         <cxf.plexus-archiver.version>4.2.0</cxf.plexus-archiver.version>
-        <cxf.plexus-utils.version>3.3.0</cxf.plexus-utils.version>
+        <cxf.plexus-utils.version>3.4.2</cxf.plexus-utils.version>
         <cxf.reactivestreams.version>1.0.3</cxf.reactivestreams.version>
         <cxf.reactor.version>3.4.19</cxf.reactor.version>
         <cxf.rhino.version>1.7.13</cxf.rhino.version>
