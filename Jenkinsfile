@@ -63,7 +63,7 @@ pipeline {
               }
               /* stage('Build Source & JavaDoc') {
               when {
-                branch 'master'
+                branch 'main'
               }
               steps {
                 dir("local-snapshots-dir/") {
@@ -74,7 +74,7 @@ pipeline {
             }
             stage('Deploy Snapshot') {
               when {
-                branch 'master'
+                branch 'main'
               }
               steps {
                 withCredentials([file(credentialsId: 'lukaszlenart-repository-access-token', variable: 'CUSTOM_SETTINGS')]) {
@@ -84,7 +84,7 @@ pipeline {
             }
             stage('Code Quality') {
               when {
-                branch 'master'
+                branch 'main'
               }
               steps {
                 withCredentials([string(credentialsId: 'asf-cxf-sonarcloud', variable: 'SONARCLOUD_TOKEN')]) {

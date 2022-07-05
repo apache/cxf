@@ -87,7 +87,7 @@ pipeline {
        stage('Prepare JAX-RS TCK build configuration') {
            steps {
               withEnv(["WORKSPACE = ${PWD}"]) {
-                sh "wget https://raw.githubusercontent.com/apache/cxf/master/tck/ts.jte.template"
+                sh "wget https://raw.githubusercontent.com/apache/cxf/main/tck/ts.jte.template"
                 sh "sed -i '" + 's/${version}/' + params.Version + "/g' ts.jte.template"
                 sh "sed -i '" + 's/${woodstox_version}/' + woodstox_version + "/g' ts.jte.template"
                 sh "sed -i '" + 's/${staxapi_version}/' + staxapi_version + "/g' ts.jte.template"
