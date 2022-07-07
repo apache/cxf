@@ -138,7 +138,7 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
         // If there are no services associated with this endpoint (often in case of JAX-RS), 
         // returning the endpoint itself if allowed.
         if (services.isEmpty() && acceptCandidatesWithSameAddress) {
-            return Collections.singletonList(endpoint);
+            return new ArrayList<>(Collections.singleton(endpoint));
         }
         
         QName currentBinding = endpoint.getBinding().getBindingInfo().getName();

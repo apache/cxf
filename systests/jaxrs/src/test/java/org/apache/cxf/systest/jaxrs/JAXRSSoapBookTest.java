@@ -43,6 +43,8 @@ import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.ws.Service;
 import jakarta.xml.ws.soap.SOAPBinding;
 import org.apache.cxf.Bus;
+import org.apache.cxf.clustering.FailoverFeature;
+import org.apache.cxf.clustering.RetryStrategy;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
@@ -915,6 +917,25 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
             assertTrue("Client In Fault In Interceptor was invoked",
                     testFeature.faultInInterceptorCalled());
         }
+    }
+
+    @Test
+    public void testCheckBookClientErrorResponseWithFailover() {
+        final RetryStrategy retry = new RetryStrategy();
+        retry.setMaxNumberOfRetries(1);
+
+        final FailoverFeature failoverFeature = new FailoverFeature();
+        failoverFeature.setStrategy(retry);
+        
+        String baseAddress = "http://localhost:" + PORT + "/test/services/rest";
+        BookStoreJaxrsJaxws proxy = JAXRSClientFactory.create(baseAddress,
+                                          BookStoreJaxrsJaxws.class,
+                                          Collections.singletonList(new DummyResponseExceptionMapper()),
+                                          Collections.singletonList(failoverFeature),
+                                          null);
+        
+        Response response = proxy.checkBook(100L);
+        assertEquals(HttpStatus.SC_NOT_FOUND, response.getStatus());
     }
 
     private void serverFaultInInterceptorTest(String param) {
