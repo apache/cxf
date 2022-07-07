@@ -21,6 +21,7 @@ package org.apache.cxf.sts.token.provider;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Properties;
+import java.util.Random;
 
 import org.w3c.dom.Element;
 
@@ -48,7 +49,6 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -200,7 +200,10 @@ public class SAMLProviderKeyTypeTest {
 
         Entropy entropy = new Entropy();
         BinarySecret binarySecret = new BinarySecret();
-        binarySecret.setBinarySecretValue(WSSecurityUtil.generateNonce(256 / 8));
+        Random random = new Random();
+        byte[] secret = new byte[256 / 8];
+        random.nextBytes(secret);
+        binarySecret.setBinarySecretValue(secret);
         entropy.setBinarySecret(binarySecret);
         providerParameters.getKeyRequirements().setEntropy(entropy);
 
@@ -265,7 +268,10 @@ public class SAMLProviderKeyTypeTest {
 
         Entropy entropy = new Entropy();
         BinarySecret binarySecret = new BinarySecret();
-        binarySecret.setBinarySecretValue(WSSecurityUtil.generateNonce(256 / 8));
+        Random random = new Random();
+        byte[] secret = new byte[256 / 8];
+        random.nextBytes(secret);
+        binarySecret.setBinarySecretValue(secret);
         entropy.setBinarySecret(binarySecret);
         providerParameters.getKeyRequirements().setEntropy(entropy);
 
@@ -299,7 +305,10 @@ public class SAMLProviderKeyTypeTest {
 
         Entropy entropy = new Entropy();
         BinarySecret binarySecret = new BinarySecret();
-        binarySecret.setBinarySecretValue(WSSecurityUtil.generateNonce(256 / 8));
+        Random random = new Random();
+        byte[] secret = new byte[256 / 8];
+        random.nextBytes(secret);
+        binarySecret.setBinarySecretValue(secret);
         entropy.setBinarySecret(binarySecret);
         providerParameters.getKeyRequirements().setEntropy(entropy);
 

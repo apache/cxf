@@ -27,6 +27,8 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -206,17 +208,23 @@ abstract class STSInvoker implements Invoker {
     ) throws NoSuchAlgorithmException, WSSecurityException, XMLStreamException {
         final byte[] secret;
         writer.writeStartElement(prefix, "RequestedProofToken", namespace);
+        byte[] randomBytes = null;
+        try {
+            randomBytes = XMLSecurityConstants.generateBytes(keySize / 8);
+        } catch (XMLSecurityException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        }
+
         if (clientEntropy == null) {
-            secret = WSSecurityUtil.generateNonce(keySize / 8);
+            secret = randomBytes;
 
             writer.writeStartElement(prefix, "BinarySecret", namespace);
             writer.writeAttribute("Type", namespace + "/Nonce");
             writer.writeCharacters(XMLUtils.encodeToString(secret));
             writer.writeEndElement();
         } else {
-            byte[] entropy = WSSecurityUtil.generateNonce(keySize / 8);
             P_SHA1 psha1 = new P_SHA1();
-            secret = psha1.createKey(clientEntropy, entropy, 0, keySize / 8);
+            secret = psha1.createKey(clientEntropy, randomBytes, 0, keySize / 8);
 
             writer.writeStartElement(prefix, "ComputedKey", namespace);
             writer.writeCharacters(namespace + "/CK/PSHA1");
@@ -226,7 +234,7 @@ abstract class STSInvoker implements Invoker {
             writer.writeStartElement(prefix, "Entropy", namespace);
             writer.writeStartElement(prefix, "BinarySecret", namespace);
             writer.writeAttribute("Type", namespace + "/Nonce");
-            writer.writeCharacters(XMLUtils.encodeToString(entropy));
+            writer.writeCharacters(XMLUtils.encodeToString(randomBytes));
             writer.writeEndElement();
 
         }

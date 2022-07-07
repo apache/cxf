@@ -50,6 +50,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
 
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -131,7 +133,6 @@ import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.processor.EncryptedKeyProcessor;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.X509Util;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.SPConstants.SPVersion;
@@ -944,13 +945,18 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
             writer.writeStartElement("wst", "Entropy", namespace);
             writer.writeStartElement("wst", "BinarySecret", namespace);
             writer.writeAttribute("Type", namespace + "/Nonce");
-            if (algorithmSuite == null) {
-                requestorEntropy = WSSecurityUtil.generateNonce(keySize / 8);
-            } else {
-                AlgorithmSuiteType algType = algorithmSuite.getAlgorithmSuiteType();
-                requestorEntropy = WSSecurityUtil
-                    .generateNonce(algType.getMaximumSymmetricKeyLength() / 8);
+
+            try {
+                if (algorithmSuite == null) {
+                    requestorEntropy = XMLSecurityConstants.generateBytes(keySize / 8);
+                } else {
+                    AlgorithmSuiteType algType = algorithmSuite.getAlgorithmSuiteType();
+                    requestorEntropy = XMLSecurityConstants.generateBytes(algType.getMaximumSymmetricKeyLength() / 8);
+                }
+            } catch (XMLSecurityException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
             }
+
             writer.writeCharacters(org.apache.xml.security.utils.XMLUtils.encodeToString(requestorEntropy));
 
             writer.writeEndElement();
