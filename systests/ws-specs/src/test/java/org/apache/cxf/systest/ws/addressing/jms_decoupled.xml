@@ -25,7 +25,7 @@
     <import resource="wsa_interceptors.xml"/>
     <jaxws:client name="{http://apache.org/hello_world_soap_http}GreeterPort" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="org.apache.cxf.ws.addressing.replyto" value="jms:jndi:dynamicQueues/testreplyto?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:${testutil.ports.EmbeddedJMSBrokerLauncher}"/>
+            <entry key="org.apache.cxf.ws.addressing.replyto" value="jms:jndi:dynamicQueues/testreplyto?jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:${testutil.ports.EmbeddedJMSBrokerLauncher}"/>
         </jaxws:properties>
     </jaxws:client>
 </beans>

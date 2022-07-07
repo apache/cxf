@@ -39,7 +39,7 @@ import static org.junit.Assert.assertTrue;
 public class NonDecoupledJMSTest extends MAPTestBase {
     static final String PORT = allocatePort(NonDecoupledJMSTest.class);
     private static final String ADDRESS = "jms:jndi:dynamicQueues/testqueue0002?"
-        + "jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+        + "jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
         + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:"
         + EmbeddedJMSBrokerLauncher.PORT;
 
