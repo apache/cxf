@@ -107,7 +107,7 @@ public class JPACodeDataProvider extends JPAOAuthDataProvider implements Authori
     @Override
     public List<ServerAuthorizationCodeGrant> getCodeGrants(final Client c, final UserSubject subject)
             throws OAuthServiceException {
-        return execute(em -> {
+        return executeInTransaction(em -> {
             return getCodeGrants(c, subject, em);
         });
     }

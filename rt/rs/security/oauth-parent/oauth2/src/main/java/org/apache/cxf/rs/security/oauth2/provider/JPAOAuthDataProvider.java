@@ -133,28 +133,28 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
 
     @Override
     public List<Client> getClients(final UserSubject resourceOwner) {
-        return execute(em -> {
+        return executeInTransaction(em -> {
             return getClientsQuery(resourceOwner, em).getResultList();
         });
     }
 
     @Override
     public List<ServerAccessToken> getAccessTokens(final Client c, final UserSubject sub) {
-        return execute(em -> {
+        return executeInTransaction(em -> {
             return CastUtils.cast(getTokensQuery(c, sub, em).getResultList());
         });
     }
 
     @Override
     public List<RefreshToken> getRefreshTokens(final Client c, final UserSubject sub) {
-        return execute(em ->  {
+        return executeInTransaction(em ->  {
             return getRefreshTokensQuery(c, sub, em).getResultList();
         });
     }
 
     @Override
     public ServerAccessToken getAccessToken(final String accessToken) throws OAuthServiceException {
-        return execute(em -> {
+        return executeInTransaction(em -> {
             TypedQuery<BearerAccessToken> query = em.createQuery("SELECT t FROM BearerAccessToken t"
                                   + " WHERE t.tokenKey = :tokenKey", BearerAccessToken.class)
                                   .setParameter("tokenKey", accessToken);
@@ -185,7 +185,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
 
     @Override
     protected RefreshToken getRefreshToken(final String refreshTokenKey) {
-        return execute(em -> {
+        return executeInTransaction(em -> {
             return em.find(RefreshToken.class, refreshTokenKey);
         });
     }

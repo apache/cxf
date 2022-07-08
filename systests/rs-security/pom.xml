@@ -210,7 +210,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
             <version>${cxf.hibernate.em.version}</version>
             <scope>test</scope>
@@ -230,7 +230,7 @@
             </exclusions> 
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-jcache</artifactId>
             <version>${cxf.hibernate.em.version}</version>
             <scope>test</scope>

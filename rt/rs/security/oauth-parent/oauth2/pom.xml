@@ -114,6 +114,7 @@
       <groupId>org.apache.openjpa</groupId>
       <artifactId>openjpa</artifactId>
       <version>${cxf.openjpa.version}</version>
+      <classifier>jakarta</classifier>
       <scope>test</scope>
       <optional>true</optional>
     </dependency>
@@ -261,7 +262,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <argLine>-javaagent:${org.apache.openjpa:openjpa:jar} ${cxf.surefire.fork.vmargs}</argLine>
+          <argLine>-javaagent:${org.apache.openjpa:openjpa:jar:jakarta} ${cxf.surefire.fork.vmargs}</argLine>
           <workingDirectory>${project.build.directory}</workingDirectory>
         </configuration>
       </plugin>
