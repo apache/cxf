@@ -689,6 +689,7 @@
                                     <exclude>javax.xml.soap:javax.xml.soap-api</exclude>
                                     <exclude>javax.activation:javax.activation-api</exclude>
                                     <exclude>com.sun.activation:javax.activation</exclude>
+                                    <exclude>com.sun.activation:jakarta.activation</exclude>
                                     <exclude>javax.annotation:javax.annotation-api</exclude>
                                     <exclude>javax.validation:validation-api</exclude>
                                     <exclude>javax.servlet:servlet-api</exclude>
