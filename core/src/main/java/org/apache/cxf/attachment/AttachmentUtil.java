@@ -354,21 +354,14 @@ public final class AttachmentUtil {
             }
             // strip cid:
             if (id.startsWith("cid:")) {
-                //
-                // RFC-2392 (https://datatracker.ietf.org/doc/html/rfc2392) says:
-                //
-                // A "cid" URL is converted to the corresponding Content-ID message
-                // header [MIME] by removing the "cid:" prefix, converting the % encoded
-                // character to their equivalent US-ASCII characters, and enclosing the
-                // remaining parts with an angle bracket pair, "<" and ">".  
-                //
-                try {
-                    id = id.substring(4);
-                    // urldecode
-                    id = URLDecoder.decode(id, StandardCharsets.UTF_8.name());
-                } catch (UnsupportedEncodingException e) {
-                    //ignore, keep id as is
-                }
+                id = id.substring(4);
+            }
+
+            try {
+                // urldecode
+                id = URLDecoder.decode(id, StandardCharsets.UTF_8.name());
+            } catch (UnsupportedEncodingException e) {
+                //ignore, keep id as is
             }
         }
         if (id == null) {
