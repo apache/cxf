@@ -1005,7 +1005,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         if (isTokenRequired(sigToken.getIncludeTokenType())) {
             boolean useMac = hasSignedPartsOrElements();
             byte[] salt = UsernameTokenUtil.generateSalt(useMac);
-            WSSecUsernameToken usernameToken = addDKUsernameToken(sigToken, salt, useMac);
+            WSSecUsernameToken usernameToken = addDKUsernameToken(sigToken, salt);
             String id = usernameToken.getId();
             byte[] secret = usernameToken.getDerivedKey(salt);
             Arrays.fill(salt, (byte)0);

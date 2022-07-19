@@ -337,7 +337,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         } else if (token instanceof UsernameToken) {
             // Create a UsernameToken object for derived keys and store the security token
             byte[] salt = UsernameTokenUtil.generateSalt(true);
-            WSSecUsernameToken usernameToken = addDKUsernameToken((UsernameToken)token, salt, true);
+            WSSecUsernameToken usernameToken = addDKUsernameToken((UsernameToken)token, salt);
             String id = usernameToken.getId();
             byte[] secret = usernameToken.getDerivedKey(salt);
             Arrays.fill(salt, (byte)0);
