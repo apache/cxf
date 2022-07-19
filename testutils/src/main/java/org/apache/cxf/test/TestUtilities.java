@@ -196,7 +196,20 @@ public class TestUtilities {
         XPathAssert.assertNoFault(node);
     }
 
+    public byte[] invokeBytes(String address, String transport, byte[] message) throws Exception {
+        return invokeBytes(address, transport, new ByteArrayInputStream(message));
+    }
+
     public byte[] invokeBytes(String address, String transport, String message) throws Exception {
+        try (InputStream is = getResourceAsStream(message)) {
+            if (is == null) {
+                throw new RuntimeException("Could not find resource " + message);
+            }
+            return invokeBytes(address, transport, is);
+        }
+    }
+
+    public byte[] invokeBytes(String address, String transport, InputStream message) throws Exception {
         EndpointInfo ei = new EndpointInfo(null, "http://schemas.xmlsoap.org/soap/http");
         ei.setAddress(address);
 
@@ -211,17 +224,12 @@ public class TestUtilities {
         conduit.prepare(m);
 
         OutputStream os = m.getContent(OutputStream.class);
-        InputStream is = getResourceAsStream(message);
-        if (is == null) {
-            throw new RuntimeException("Could not find resource " + message);
-        }
 
-        IOUtils.copy(is, os);
+        IOUtils.copy(message, os);
 
         // TODO: shouldn't have to do this. IO caching needs cleaning
         // up or possibly removal...
         os.flush();
-        is.close();
         os.close();
 
         return obs.getResponseStream().toByteArray();
