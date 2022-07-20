@@ -341,7 +341,7 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
             // Parse the HOK subject if it exists
 
             assertion.parseSubject(
-                new WSSSAMLKeyInfoProcessor(requestData), sigCrypto, callbackHandler
+                new WSSSAMLKeyInfoProcessor(requestData), sigCrypto
             );
 
             SAMLKeyInfo keyInfo = assertion.getSubjectKeyInfo();

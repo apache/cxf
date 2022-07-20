@@ -206,8 +206,7 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
                     );
                 assertion.verifySignature(samlKeyInfo);
                 assertion.parseSubject(
-                    new WSSSAMLKeyInfoProcessor(data), data.getSigVerCrypto(),
-                    data.getCallbackHandler()
+                    new WSSSAMLKeyInfoProcessor(data), data.getSigVerCrypto()
                 );
             } else if (getTLSCertificates(message) == null) {
                 throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);

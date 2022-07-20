@@ -413,9 +413,7 @@ public class SAMLProtocolResponseValidator {
                 assertion.verifySignature(samlKeyInfo);
 
                 assertion.parseSubject(
-                    new WSSSAMLKeyInfoProcessor(requestData),
-                    requestData.getSigVerCrypto(),
-                    requestData.getCallbackHandler()
+                    new WSSSAMLKeyInfoProcessor(requestData), requestData.getSigVerCrypto()
                 );
             } catch (WSSecurityException e) {
                 LOG.log(Level.FINE, "Assertion failed signature validation", e);
