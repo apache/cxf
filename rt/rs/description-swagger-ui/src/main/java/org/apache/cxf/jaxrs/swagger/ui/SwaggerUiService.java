@@ -129,7 +129,7 @@ public class SwaggerUiService {
                 // e.g. `?url=swagger.json` is disabled by default due to security concerns.
                 final boolean hasUrlPlaceholder = path.endsWith("/index.html")
                     || path.endsWith("/swagger-initializer.js");
-                if (hasUrlPlaceholder && config.isQueryConfigEnabled() == null || !config.isQueryConfigEnabled()) {
+                if (hasUrlPlaceholder && !Boolean.TRUE.equals(config.isQueryConfigEnabled())) {
                     final String url = config.getUrl();
                     if (!StringUtils.isEmpty(url)) {
                         try (InputStream in = resourceURL.openStream()) {
