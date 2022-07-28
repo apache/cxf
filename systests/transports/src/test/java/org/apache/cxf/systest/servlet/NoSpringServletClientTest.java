@@ -20,23 +20,25 @@ package org.apache.cxf.systest.servlet;
 
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import com.meterware.httpunit.WebConversation;
-import com.meterware.httpunit.WebLink;
-import com.meterware.httpunit.WebResponse;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerRegistry;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
+import org.apache.html.dom.HTMLAnchorElementImpl;
+import org.apache.html.dom.HTMLDocumentImpl;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -47,12 +49,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class NoSpringServletClientTest extends AbstractBusClientServerTestBase {
+public class NoSpringServletClientTest extends AbstractServletTest {
     private static final String PORT = NoSpringServletServer.PORT;
     private static Bus serverBus;
     private static NoSpringServletServer server;
     private final QName portName = new QName("http://apache.org/hello_world_soap_http", "SoapPort");
     private final String serviceURL = "http://localhost:" + PORT + "/soap/";
+    
     @BeforeClass
     public static void startServers() throws Exception {
         server = new NoSpringServletServer();
@@ -129,17 +132,28 @@ public class NoSpringServletClientTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testGetServiceList() throws Exception {
-        WebConversation client = new WebConversation();
-        WebResponse res = client.getResponse(serviceURL + "/services");
-        WebLink[] links = res.getLinks();
-        Set<String> s = new HashSet<>();
-        for (WebLink l : links) {
-            s.add(l.getURLString());
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
+            final HttpGet method = new HttpGet(serviceURL + "/services");
+
+            try (CloseableHttpResponse res = client.execute(method)) {
+                HTMLDocumentImpl doc = parse(res.getEntity().getContent());
+                Collection<HTMLAnchorElementImpl> links = getLinks(doc);
+
+                Set<String> s = new HashSet<>();
+                for (HTMLAnchorElementImpl l : links) {
+                    s.add(l.getHref());
+                }
+                assertEquals("There should be 3 links for the service", 3, links.size());
+                assertTrue(s.contains(serviceURL + "Greeter?wsdl"));
+                assertTrue(s.contains(serviceURL + "Hello?wsdl"));
+                assertTrue(s.contains(serviceURL + "?wsdl"));
+                assertEquals("text/html", getContentType(res));
+            }
         }
-        assertEquals("There should be 3 links for the service", 3, links.length);
-        assertTrue(s.contains(serviceURL + "Greeter?wsdl"));
-        assertTrue(s.contains(serviceURL + "Hello?wsdl"));
-        assertTrue(s.contains(serviceURL + "?wsdl"));
-        assertEquals("text/html", res.getContentType());
+    }
+    
+    @Override
+    protected int getPort() {
+        return Integer.parseInt(NoSpringServletServer.PORT);
     }
 }
