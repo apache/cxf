@@ -21,59 +21,104 @@ package org.apache.cxf.systest.servlet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.util.Collection;
+import java.util.HashSet;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import com.meterware.httpunit.HttpException;
-import com.meterware.httpunit.HttpNotFoundException;
-import com.meterware.httpunit.HttpUnitOptions;
-import com.meterware.httpunit.WebRequest;
-import com.meterware.servletunit.ServletRunner;
-import com.meterware.servletunit.ServletUnitClient;
-
-import org.apache.cxf.test.AbstractCXFTest;
-
-import org.junit.After;
-import org.junit.Before;
+import org.apache.cxf.test.TestUtilities;
+import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.html.dom.HTMLAnchorElementImpl;
+import org.apache.html.dom.HTMLDocumentImpl;
+import org.apache.http.HttpHeaders;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.ContentType;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.cyberneko.html.parsers.DOMParser;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
-public abstract class AbstractServletTest extends AbstractCXFTest {
+public abstract class AbstractServletTest extends AbstractBusClientServerTestBase {
     public static final String CONTEXT = "/mycontext";
-    public static final String CONTEXT_URL = "http://localhost/mycontext";
-    protected ServletRunner sr;
-
-    @Before
-    public void setUp() throws Exception {
-        InputStream configurationStream = getResourceAsStream(getConfiguration());
-        sr = new ServletRunner(configurationStream, CONTEXT);
-        try {
-            sr.newClient().getResponse(CONTEXT_URL + "/services");
-        } catch (HttpNotFoundException e) {
-            // ignore, we just want to boot up the servlet
-        }
-
-        HttpUnitOptions.setExceptionsThrownOnErrorStatus(true);
-        configurationStream.close();
-    }
-    @After
-    public void tearDown() throws Exception {
-        if (sr != null) {
-            sr.shutDown();
-        }
+    protected TestUtilities testUtilities;
+    
+    protected AbstractServletTest() {
+        testUtilities = new TestUtilities(getClass());
+        testUtilities.addDefaultNamespaces();
     }
 
     /**
-     * @return The web.xml to use for testing.
+     * Add a namespace that will be used for XPath expressions.
+     *
+     * @param ns Namespace name.
+     * @param uri The namespace uri.
      */
-    protected String getConfiguration() {
-        return "/org/apache/cxf/systest/servlet/web.xml";
+    public void addNamespace(String ns, String uri) {
+        testUtilities.addNamespace(ns, uri);
     }
 
-    protected ServletUnitClient newClient() {
-        return sr.newClient();
+    /**
+     * Assert that the following XPath query selects one or more nodes.
+     *
+     * @param xpath
+     * @throws Exception
+     */
+    public NodeList assertValid(String xpath, Node node) throws Exception {
+        return testUtilities.assertValid(xpath, node);
     }
+
+    /**
+     * Assert that the text of the xpath node retrieved is equal to the value
+     * specified.
+     *
+     * @param xpath
+     * @param value
+     * @param node
+     */
+    public void assertXPathEquals(String xpath, String value, Node node) throws Exception {
+        testUtilities.assertXPathEquals(xpath, value, node);
+    }
+
+    protected CloseableHttpClient newClient() {
+        return HttpClients.createDefault();
+    }
+
+    protected String uri(String path) {
+        return "http://localhost:" + getPort() + CONTEXT + path;
+    }
+    
+    protected Collection<HTMLAnchorElementImpl> getLinks(HTMLDocumentImpl document) {
+        final Collection<HTMLAnchorElementImpl> links = new HashSet<>();
+
+        for (int i = 0; i < document.getLinks().getLength(); ++i) {
+            final HTMLAnchorElementImpl link = (HTMLAnchorElementImpl)document.getLinks().item(i); 
+            links.add(link);
+        }
+
+        return links;
+    }
+
+    protected HTMLDocumentImpl parse(InputStream in) throws SAXException, IOException {
+        final DOMParser parser = new DOMParser();
+        parser.parse(new InputSource(in));
+        return (HTMLDocumentImpl)parser.getDocument();
+    }
+
+    protected String getContentType(CloseableHttpResponse response) {
+        return ContentType.parse(response.getFirstHeader(HttpHeaders.CONTENT_TYPE).getValue()).getMimeType();
+    }
+    
+    protected String getCharset(CloseableHttpResponse response) {
+        return ContentType.parse(response.getFirstHeader(HttpHeaders.CONTENT_TYPE).getValue()).getCharset().name();
+    }
+
+    protected abstract int getPort();
 
     /**
      * Here we expect an errorCode other than 200, and look for it checking for
@@ -88,20 +133,12 @@ public abstract class AbstractServletTest extends AbstractCXFTest {
      * @throws IOException
      * @throws SAXException
      */
-    protected void expectErrorCode(WebRequest request, int errorCode, String errorText)
+    protected void expectErrorCode(HttpUriRequest request, int errorCode, String errorText)
         throws MalformedURLException, IOException, SAXException {
-        String failureText = "Expected error " + errorCode + " from " + request.getURL();
+        String failureText = "Expected error " + errorCode + " from " + request.getRequestLine().getUri();
 
-        try {
-            newClient().getResponse(request);
-            fail(errorText + " -got success instead");
-        } catch (HttpException e) {
-            assertEquals(failureText, errorCode, e.getResponseCode());
-            /*
-             * checking for text omitted as it doesn't work. if(errorText!=null) {
-             * assertTrue( "Failed to find "+errorText+" in "+
-             * e.getResponseMessage(), e.getMessage().indexOf(errorText)>=0); }
-             */
+        try (CloseableHttpResponse response = newClient().execute(request)) {
+            assertEquals(failureText, errorCode, response.getStatusLine().getStatusCode());
         }
     }
 }
