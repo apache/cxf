@@ -18,16 +18,10 @@
  */
 package org.apache.cxf.systest.servlet;
 
-import java.nio.charset.StandardCharsets;
-
-import org.w3c.dom.Document;
 
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
-import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import org.junit.AfterClass;
@@ -36,16 +30,15 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class JsFrontEndServletTest extends AbstractServletTest {
+public class ErrorContextServletTest extends AbstractServletTest {
     @Ignore
     public static class EmbeddedJettyServer extends AbstractJettyServer {
         public static final int PORT = allocatePortAsInt(EmbeddedJettyServer.class);
 
         public EmbeddedJettyServer() {
-            super("/org/apache/cxf/systest/servlet/web-js.xml", "/", CONTEXT, PORT);
+            super("/org/apache/cxf/systest/servlet/web-spring-error.xml", "/", CONTEXT, PORT);
         }
     }
 
@@ -62,28 +55,14 @@ public class JsFrontEndServletTest extends AbstractServletTest {
     }
 
     @Test
-    public void testPostInvokeServices() throws Exception {
+    public void testInvoke() throws Exception {
         try (CloseableHttpClient client = newClient()) {
-            final HttpPost method = new HttpPost(uri("/services/Greeter"));
-
-            method.setEntity(new InputStreamEntity(getClass().getResourceAsStream("GreeterMessage.xml"),
-                ContentType.create("text/xml", StandardCharsets.UTF_8)));
-
-            try (CloseableHttpResponse response = client.execute(method)) {
-        
-                assertEquals("text/xml", getContentType(response));
-                assertEquals(StandardCharsets.UTF_8.name(), getCharset(response));
-        
-                Document doc = StaxUtils.read(response.getEntity().getContent());
-                assertNotNull(doc);
-        
-                addNamespace("h", "http://apache.org/hello_world_soap_http/types");
-        
-                assertValid("/s:Envelope/s:Body", doc);
-                assertValid("//h:sayHiResponse", doc);
-                assertValid("//h:responseType", doc);
+            final HttpGet method = new HttpGet(uri("/services/greeter?wsdl"));
+            // The Spring context contains errors, the service should not be available
+            try (CloseableHttpResponse res = client.execute(method)) {
+                assertEquals(503, res.getStatusLine().getStatusCode());
             }
-        }
+        } 
     }
 
     @Override

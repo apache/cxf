@@ -20,70 +20,102 @@ package org.apache.cxf.systest.servlet;
 
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.w3c.dom.Document;
 
-import com.meterware.httpunit.PostMethodWebRequest;
-import com.meterware.httpunit.WebLink;
-import com.meterware.httpunit.WebRequest;
-import com.meterware.httpunit.WebResponse;
-import com.meterware.servletunit.ServletUnitClient;
-
+import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.html.dom.HTMLAnchorElementImpl;
+import org.apache.html.dom.HTMLDocumentImpl;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class CXFFilterTest extends AbstractServletTest {
 
+    @Ignore
+    public static class EmbeddedJettyServer extends AbstractJettyServer {
+        public static final int PORT = allocatePortAsInt(EmbeddedJettyServer.class);
 
-    @Override
-    protected String getConfiguration() {
-        return "/org/apache/cxf/systest/servlet/web-filter.xml";
+        public EmbeddedJettyServer() {
+            super("/org/apache/cxf/systest/servlet/web-filter.xml", "/", CONTEXT, PORT);
+        }
+    }
+
+    @BeforeClass
+    public static void startServers() throws Exception {
+        AbstractResourceInfo.clearAllMaps();
+        assertTrue("server did not launch correctly", launchServer(EmbeddedJettyServer.class, true));
+        createStaticBus();
+    }
+
+    @AfterClass
+    public static void tearDown() throws Exception {
+        stopAllServers();
     }
 
     @Test
     public void testGetServiceList() throws Exception {
-
-        ServletUnitClient client = newClient();
-        client.setExceptionsThrownOnErrorStatus(false);
-
-        //test the '/' context get service list
-        WebResponse res = client.getResponse(CONTEXT_URL + "/");
-        WebLink[] links = res.getLinks();
-        assertEquals("Wrong number of service links", 3, links.length);
-
-        Set<String> links2 = new HashSet<>();
-        for (WebLink l : links) {
-            links2.add(l.getURLString());
+        try (CloseableHttpClient client = newClient()) {
+            final HttpGet method = new HttpGet(uri("/"));
+            
+            //test the '/' context get service list
+            try (CloseableHttpResponse res = client.execute(method)) {
+                HTMLDocumentImpl doc = parse(res.getEntity().getContent());
+                Collection<HTMLAnchorElementImpl> links = getLinks(doc);
+                assertEquals("Wrong number of service links", 3, links.size());
+    
+                Set<String> links2 = new HashSet<>();
+                for (HTMLAnchorElementImpl link: links) {
+                    links2.add(link.getHref());
+                }
+    
+                assertEquals("text/html", getContentType(res));
+                assertEquals(StandardCharsets.UTF_8.name(), getCharset(res));
+            }
         }
-
-        assertEquals("text/html", res.getContentType());
     }
 
     @Test
     public void testPostInvokeServices() throws Exception {
-        newClient();
+        try (CloseableHttpClient client = newClient()) {
+            final HttpPost method = new HttpPost(uri("/services/Greeter"));
 
-        WebRequest req = new PostMethodWebRequest(CONTEXT_URL + "/services/Greeter",
-                getClass().getResourceAsStream("GreeterMessage.xml"),
-                "text/xml; charset=UTF-8");
+            method.setEntity(new InputStreamEntity(getClass().getResourceAsStream("GreeterMessage.xml"),
+                ContentType.create("text/xml", StandardCharsets.UTF_8)));
+            
+            try (CloseableHttpResponse response = client.execute(method)) {
+                assertEquals("text/xml", getContentType(response));
+                assertEquals(StandardCharsets.UTF_8.name(), getCharset(response));
+                
+                Document doc = StaxUtils.read(response.getEntity().getContent());
+                assertNotNull(doc);
+        
+                addNamespace("h", "http://apache.org/hello_world_soap_http/types");
+        
+                assertValid("/s:Envelope/s:Body", doc);
+                assertValid("//h:sayHiResponse", doc);
+            }
+        }
+    }
 
-        WebResponse response = newClient().getResponse(req);
-
-        assertEquals("text/xml", response.getContentType());
-        assertEquals(StandardCharsets.UTF_8.name(), response.getCharacterSet());
-
-        Document doc = StaxUtils.read(response.getInputStream());
-        assertNotNull(doc);
-
-        addNamespace("h", "http://apache.org/hello_world_soap_http/types");
-
-        assertValid("/s:Envelope/s:Body", doc);
-        assertValid("//h:sayHiResponse", doc);
+    @Override
+    protected int getPort() {
+        return EmbeddedJettyServer.PORT;
     }
 }
