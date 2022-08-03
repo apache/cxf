@@ -676,6 +676,7 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
             HttpConnectionFactory httpFactory = new HttpConnectionFactory(httpConfig);
 
             Collection<ConnectionFactory> connectionFactories = new ArrayList<>();
+            connectionFactories.add(httpFactory);
 
             result = new org.eclipse.jetty.server.ServerConnector(server);
 
@@ -702,7 +703,7 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
             } else if (isHttp2Enabled(bus)) {
                 connectionFactories.add(new HTTP2CServerConnectionFactory(httpConfig));
             }
-            connectionFactories.add(httpFactory);
+            
             result.setConnectionFactories(connectionFactories);
 
             if (getMaxIdleTime() > 0) {
