@@ -38,7 +38,7 @@ public class MockHTTPConduit extends HTTPConduit {
     }
 
     @Override
-    protected void setupConnection(Message message, Address address, HTTPClientPolicy csPolicy)
+    protected void setupConnection(Message message, Address address, HTTPClientPolicy csPolicy, boolean forceGET)
         throws IOException {
         // TODO Auto-generated method stub
 
@@ -136,7 +136,7 @@ public class MockHTTPConduit extends HTTPConduit {
         }
 
         @Override
-        protected void setupNewConnection(String newURL) throws IOException {
+        protected void setupNewConnection(String newURL, boolean forceGet) throws IOException {
             // TODO Auto-generated method stub
             
         }

@@ -121,7 +121,8 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
         return connectionFactory.createConnection(clientParameters,
                                                   proxy != null ? proxy : address.getDefaultProxy(), url);
     }
-    protected void setupConnection(Message message, Address address, HTTPClientPolicy csPolicy) throws IOException {
+    protected void setupConnection(Message message, Address address, HTTPClientPolicy csPolicy,
+                                    boolean forceGET) throws IOException {
         HttpURLConnection connection = createConnection(message, address, csPolicy);
         connection.setDoOutput(true);
 
@@ -140,10 +141,15 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
         // If the HTTP_REQUEST_METHOD is not set, the default is "POST".
         String httpRequestMethod =
             (String)message.get(Message.HTTP_REQUEST_METHOD);
-        if (httpRequestMethod == null) {
+
+        if (forceGET) {
+            httpRequestMethod = "GET";
+            message.put(Message.HTTP_REQUEST_METHOD, "GET");
+        } else if (httpRequestMethod == null) {
             httpRequestMethod = "POST";
             message.put(Message.HTTP_REQUEST_METHOD, "POST");
         }
+
         try {
             connection.setRequestMethod(httpRequestMethod);
         } catch (java.net.ProtocolException ex) {
@@ -411,7 +417,7 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
                 connection.getOutputStream().close();
             }
         }
-        protected void setupNewConnection(String newURL) throws IOException {
+        protected void setupNewConnection(String newURL, boolean forceGET) throws IOException {
             HTTPClientPolicy cp = getClient(outMessage);
             Address address;
             try {
@@ -423,9 +429,13 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
             } catch (URISyntaxException e) {
                 throw new IOException(e);
             }
-            setupConnection(outMessage, address, cp);
+            setupConnection(outMessage, address, cp, false);
             this.url = address.getURI();
             connection = (HttpURLConnection)outMessage.get(KEY_HTTP_CONNECTION);
+
+            if (forceGET) {
+                connection.setRequestMethod("GET");
+            }
         }
 
         @Override
