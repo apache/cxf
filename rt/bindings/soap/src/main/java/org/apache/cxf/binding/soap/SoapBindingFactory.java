@@ -131,6 +131,9 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
     public static final String HEADER = "messagepart.isheader";
     public static final String OUT_OF_BAND_HEADER = "messagepart.is_out_of_band_header";
 
+    private static final boolean IGNORE_SOAP_VERSION = !Boolean
+        .valueOf(System.getProperty("org.apache.cxf.endpoint.registration.is.soap.version.specific", "true"));
+
     public SoapBindingFactory() {
     }
 
@@ -911,8 +914,8 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
                 }
                 if (b instanceof org.apache.cxf.binding.soap.SoapBinding
                     && b2 instanceof org.apache.cxf.binding.soap.SoapBinding
-                    && ((org.apache.cxf.binding.soap.SoapBinding)b).getSoapVersion()
-                        .equals(((org.apache.cxf.binding.soap.SoapBinding)b2).getSoapVersion())
+                    && (IGNORE_SOAP_VERSION || ((org.apache.cxf.binding.soap.SoapBinding)b).getSoapVersion()
+                        .equals(((org.apache.cxf.binding.soap.SoapBinding)b2).getSoapVersion()))
                     && Boolean.FALSE.equals(o)) {
 
                     throw new RuntimeException("Soap "
