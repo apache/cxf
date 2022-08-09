@@ -18,6 +18,11 @@
  */
 package org.apache.cxf.attachment;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 import jakarta.activation.DataHandler;
@@ -25,13 +30,57 @@ import jakarta.activation.DataSource;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class LazyDataSourceTest {
 
     private static final String ID_1 = "id1";
     private static final String ID_2 = "id2";
+
+    private static final String CONTENT_TYPE = "contentType";
+
+    private static final DataHandler DATA_HANDLER = new DataHandler((DataSource) null) {
+        @Override
+        public DataSource getDataSource() {
+            return new DataSource() {
+                @Override
+                public InputStream getInputStream() throws IOException {
+                    return null;
+                }
+
+                @Override
+                public OutputStream getOutputStream() throws IOException {
+                    return null;
+                }
+
+                @Override
+                public String getContentType() {
+                    return CONTENT_TYPE;
+                }
+
+                @Override
+                public String getName() {
+                    return null;
+                }
+            };
+        }
+    };
+
+    @Test
+    public void testInternalLoadOK() throws Exception {
+        DataSource ds = new LazyDataSource(ID_1,
+                Collections.singleton(new AttachmentImpl(ID_1, DATA_HANDLER)));
+
+        assertEquals(CONTENT_TYPE, ds.getContentType());
+    }
+
+    @Test
+    public void testUrlEncodedId() throws Exception {
+        String id = "tes123_123@org:apache:cxf";
+        String urlEncodedId = URLEncoder.encode(id, StandardCharsets.UTF_8);
+        DataSource ds = new LazyDataSource(id, Collections.singleton(new AttachmentImpl(urlEncodedId, DATA_HANDLER)));
+        ds.getContentType(); // No exception thrown
+    }
 
     @Test
     public void testNoDataSource() throws Exception {

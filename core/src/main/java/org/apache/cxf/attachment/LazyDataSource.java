@@ -22,6 +22,9 @@ package org.apache.cxf.attachment;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -47,7 +50,13 @@ public class LazyDataSource implements DataSource {
     private synchronized void load() {
         if (dataSource == null) {
             for (Attachment a : attachments) {
-                if (a.getId().equals(id)) {
+                String attachmentId = a.getId();
+                try {
+                    attachmentId = URLDecoder.decode(attachmentId, StandardCharsets.UTF_8.name());
+                } catch (UnsupportedEncodingException e) {
+                    //ignore, keep id as is
+                }
+                if (attachmentId.equals(id)) {
                     this.dataSource = a.getDataHandler().getDataSource();
                     if (dataSource == null) {
                         throw new IllegalStateException("Could not get DataSource for "
