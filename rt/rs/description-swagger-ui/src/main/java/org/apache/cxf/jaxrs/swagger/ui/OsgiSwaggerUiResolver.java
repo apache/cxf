@@ -22,7 +22,6 @@ import java.lang.annotation.Annotation;
 import java.net.URL;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
 
 public class OsgiSwaggerUiResolver extends SwaggerUiResolver {
     private static final String DEFAULT_COORDINATES = "org.webjars/swagger-ui";
@@ -32,18 +31,24 @@ public class OsgiSwaggerUiResolver extends SwaggerUiResolver {
     };
     
     private final Class<? extends Annotation> annotationBundle;
+    private FrameworkUtilWrapper frameworkUtilWrapper;
 
     public OsgiSwaggerUiResolver(Class<? extends Annotation> annotationBundle) throws Exception {
         super(annotationBundle.getClassLoader());
         Class.forName("org.osgi.framework.FrameworkUtil");
         this.annotationBundle = annotationBundle;
+        setFrameworkUtilWrapper(new FrameworkUtilWrapper());
+    }
+
+    public void setFrameworkUtilWrapper(FrameworkUtilWrapper frameworkUtilWrapper) {
+        this.frameworkUtilWrapper = frameworkUtilWrapper;
     }
 
     @Override
     public String findSwaggerUiRootInternal(String swaggerUiMavenGroupAndArtifact,
                                                String swaggerUiVersion) {
         try {
-            Bundle bundle = FrameworkUtil.getBundle(annotationBundle);
+            Bundle bundle = frameworkUtilWrapper.getBundle(annotationBundle);
             if (bundle == null) {
                 return null;
             }
@@ -88,7 +93,9 @@ public class OsgiSwaggerUiResolver extends SwaggerUiResolver {
         }
         URL entry = b.getEntry(SwaggerUiResolver.UI_RESOURCES_ROOT_START + swaggerUiVersion);
         if (entry != null) {
-            return entry.toString() + "/";
+            String entryAsString = entry.toString();
+            // add the trailing slash if it is missing, it depends on OSGi version/implementation 
+            return entryAsString.endsWith("/") ? entryAsString : entryAsString + "/";
         }
         return null;
     }
