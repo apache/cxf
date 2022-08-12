@@ -88,7 +88,9 @@ public class OsgiSwaggerUiResolver extends SwaggerUiResolver {
         }
         URL entry = b.getEntry(SwaggerUiResolver.UI_RESOURCES_ROOT_START + swaggerUiVersion);
         if (entry != null) {
-            return entry.toString() + "/";
+            String entryAsString = entry.toString();
+            // add the trailing slash if it is missing, it depends on OSGi version/implementation
+            return entryAsString.endsWith("/") ? entryAsString : entryAsString + "/";
         }
         return null;
     }
