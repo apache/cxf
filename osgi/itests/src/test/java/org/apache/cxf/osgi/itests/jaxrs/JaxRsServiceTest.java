@@ -26,6 +26,9 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.osgi.itests.AbstractServerActivator;
 import org.apache.cxf.osgi.itests.CXFOSGiTestSupport;
@@ -44,6 +47,9 @@ import org.ops4j.pax.tinybundles.core.TinyBundles;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.provision;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
@@ -53,9 +59,12 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 @ExamReactorStrategy(PerClass.class)
 public class JaxRsServiceTest extends CXFOSGiTestSupport {
 
-    private static final String BASE_URL = "http://localhost:" + PORT + "/cxf/jaxrs/bookstore";
+    private static final String BASE_URL = "http://localhost:" + PORT + "/cxf/jaxrs/";
+    private static final String BOOKSTORE_URL = BASE_URL + "bookstore";
+    private static final String SWAGGER_URL = BASE_URL + "api-docs";
+    private static final String OPEN_API_FILE_URL = BASE_URL + "openapi.json";
 
-    private final WebTarget wt = ClientBuilder.newClient().target(BASE_URL);
+    private final WebTarget wt = ClientBuilder.newClient().target(BOOKSTORE_URL);
 
     @Test
     public void testJaxRsGet() throws Exception {
@@ -99,6 +108,35 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
         assertStatus(Status.OK, response);
     }
 
+    @Test
+    public void testGetSwaggerUi() {
+        WebTarget swaggerWt = ClientBuilder.newClient().target(SWAGGER_URL)
+                .queryParam("url", "/cxf/jaxrs/openapi.json");
+        Response response = swaggerWt.request().get();
+        String swaggerFileHtml = response.readEntity(String.class);
+
+        assertStatus(Status.OK, response);
+        assertTrue(swaggerFileHtml.contains("<html"));
+        assertTrue(swaggerFileHtml.contains("<head>"));
+        assertTrue(swaggerFileHtml.contains("<title>Swagger UI</title>"));
+        assertTrue(swaggerFileHtml.contains("</html>"));
+    }
+
+    @Test
+    public void testGetOpenApiJsonFile() {
+        WebTarget openApiWt = ClientBuilder.newClient().target(OPEN_API_FILE_URL);
+        Response response = openApiWt.request().get();
+        String openApiJson = response.readEntity(String.class);
+
+        assertStatus(Status.OK, response);
+        try {
+            new ObjectMapper().readValue(openApiJson, Object.class);
+            assertTrue(openApiJson.contains("/bookstore/"));
+        } catch (JsonProcessingException e) {
+            fail();
+        }
+    }
+
     private static void assertStatus(Status expectedStatus, Response response) {
         assertEquals(expectedStatus.getStatusCode(), response.getStatus());
     }
@@ -107,7 +145,9 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
     public Option[] config() {
         return OptionUtils.combine(
             cxfBaseConfig(),
-            features(cxfUrl, "cxf-core", "cxf-wsdl", "cxf-jaxrs", "cxf-bean-validation-core", "cxf-bean-validation"),
+            features(cxfUrl, "cxf-core", "cxf-wsdl", "cxf-jaxrs", "cxf-bean-validation-core", "cxf-bean-validation",
+                    "cxf-rs-description-openapi-v3"),
+            mavenBundle("org.webjars", "swagger-ui").versionAsInProject(),
             logLevel(LogLevel.INFO),
             testUtils(),
             provision(serviceBundle())
