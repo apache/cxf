@@ -18,11 +18,7 @@
  */
 package org.apache.cxf.osgi.itests.jaxrs;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.stream.Collectors;
 
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -117,7 +113,7 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
         WebTarget swaggerWt = ClientBuilder.newClient().target(SWAGGER_URL)
                 .queryParam("url", "/cxf/jaxrs/openapi.json");
         Response response = swaggerWt.request().get();
-        String swaggerFileHtml = readResponseAsString(response);
+        String swaggerFileHtml = response.readEntity(String.class);
 
         assertStatus(Status.OK, response);
         assertTrue(swaggerFileHtml.contains("<html"));
@@ -130,21 +126,15 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
     public void testGetOpenApiJsonFile() {
         WebTarget openApiWt = ClientBuilder.newClient().target(OPEN_API_FILE_URL);
         Response response = openApiWt.request().get();
-        String openApiJson = readResponseAsString(response);
+        String openApiJson = response.readEntity(String.class);
 
+        assertStatus(Status.OK, response);
         try {
             new ObjectMapper().readValue(openApiJson, Object.class);
             assertTrue(openApiJson.contains("/bookstore/"));
         } catch (JsonProcessingException e) {
             fail();
         }
-    }
-
-    private String readResponseAsString(Response response) {
-        return new BufferedReader(
-                new InputStreamReader((InputStream) response.getEntity(), StandardCharsets.UTF_8))
-                .lines()
-                .collect(Collectors.joining("\n"));
     }
 
     private static void assertStatus(Status expectedStatus, Response response) {
