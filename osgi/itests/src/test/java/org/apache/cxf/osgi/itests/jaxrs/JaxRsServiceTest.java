@@ -60,22 +60,28 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 public class JaxRsServiceTest extends CXFOSGiTestSupport {
 
     private static final String BASE_URL = "http://localhost:" + PORT + "/cxf/jaxrs/";
-    private static final String BOOKSTORE_URL = BASE_URL + "bookstore";
-    private static final String SWAGGER_URL = BASE_URL + "api-docs";
-    private static final String OPEN_API_FILE_URL = BASE_URL + "openapi.json";
+    private static final String BOOKSTORE_PATH = "bookstore";
+    private static final String SWAGGER_PATH = "api-docs";
+    private static final String OPEN_API_FILE_PATH = "openapi.json";
 
-    private final WebTarget wt = ClientBuilder.newClient().target(BOOKSTORE_URL);
+    private final WebTarget wt = ClientBuilder.newClient().target(BASE_URL);
 
     @Test
     public void testJaxRsGet() throws Exception {
-        Book book = wt.path("/books/123").request("application/xml").get(Book.class);
+        Book book = wt.path(BOOKSTORE_PATH)
+            .path("/books/123")
+            .request("application/xml")
+            .get(Book.class);
         assertNotNull(book);
     }
 
     @Test
     public void testJaxRsPost() throws Exception {
         Book book = new Book("New Book", 321);
-        Response response = wt.path("/books/").request("application/xml").post(Entity.xml(book));
+        Response response = wt.path(BOOKSTORE_PATH)
+            .path("/books/")
+            .request("application/xml")
+            .post(Entity.xml(book));
         assertStatus(Status.CREATED, response);
         assertNotNull(response.getLocation());
     }
@@ -83,35 +89,46 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
     @Test
     public void postWithValidationError() throws Exception {
         Book book = new Book(null, -1);
-        Response response = wt.path("/books-validate/").request("application/xml").post(Entity.xml(book));
+        final Response response = wt.path(BOOKSTORE_PATH)
+            .path("/books-validate/")
+            .request("application/xml")
+            .post(Entity.xml(book));
         assertStatus(Status.BAD_REQUEST, response);
     }
 
     @Test
     public void postWithValidation() throws Exception {
         Book book = new Book("A Book", 3212);
-        Response response = wt.path("/books-validate/").request("application/xml").post(Entity.xml(book));
+        Response response = wt.path(BOOKSTORE_PATH)
+            .path("/books-validate/")
+            .request("application/xml")
+            .post(Entity.xml(book));
         assertStatus(Status.CREATED, response);
         assertNotNull(response.getLocation());
     }
 
     @Test
     public void testJaxRsDelete() throws Exception {
-        Response response = wt.path("/books/123").request("application/xml").delete();
+        Response response = wt.path(BOOKSTORE_PATH)
+            .path("/books/123")
+            .request("application/xml")
+            .delete();
         assertStatus(Status.OK, response);
     }
 
     @Test
     public void testJaxRsPut() throws Exception {
         Book book = new Book("Updated Book", 123);
-        Response response = wt.path("/books/123").request("application/xml").put(Entity.xml(book));
+        Response response = wt.path(BOOKSTORE_PATH)
+            .path("/books/123")
+            .request("application/xml")
+            .put(Entity.xml(book));
         assertStatus(Status.OK, response);
     }
 
     @Test
     public void testGetSwaggerUi() {
-        WebTarget swaggerWt = ClientBuilder.newClient().target(SWAGGER_URL)
-                .queryParam("url", "/cxf/jaxrs/openapi.json");
+        WebTarget swaggerWt = wt.path(SWAGGER_PATH).queryParam("url", "/cxf/jaxrs/openapi.json");
         Response response = swaggerWt.request().get();
         String swaggerFileHtml = response.readEntity(String.class);
 
@@ -124,7 +141,7 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
 
     @Test
     public void testGetOpenApiJsonFile() {
-        WebTarget openApiWt = ClientBuilder.newClient().target(OPEN_API_FILE_URL);
+        WebTarget openApiWt = wt.path(OPEN_API_FILE_PATH);
         Response response = openApiWt.request().get();
         String openApiJson = response.readEntity(String.class);
 
