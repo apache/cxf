@@ -39,6 +39,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedMap;
@@ -51,7 +52,6 @@ import java.util.stream.Collectors;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 
-import jakarta.activation.DataSource;
 import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.HttpMethod;
@@ -85,6 +85,7 @@ import jakarta.ws.rs.ext.ReaderInterceptor;
 import jakarta.ws.rs.ext.ReaderInterceptorContext;
 import jakarta.ws.rs.ext.WriterInterceptor;
 import jakarta.ws.rs.ext.WriterInterceptorContext;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
@@ -202,6 +203,40 @@ public final class JAXRSUtils {
             "java.util.concurrent.CompletableFuture",
             "java.util.concurrent.CompletionStage"
         ));
+    private static final LazyLoadedClass DATA_SOURCE_CLASS = new LazyLoadedClass("javax.activation.DataSource");
+
+    // Class to lazily call the ClassLoaderUtil.loadClass, but do it once
+    // and cache the result.  Then use the class to create instances as needed.
+    // This avoids calling loadClass every time as calling loadClass is super expensive, 
+    // particularly if the class cannot be found and particularly in OSGi where the 
+    // search is very complex. This would record that the class is not found and prevent 
+    // future searches.
+    private static class LazyLoadedClass {
+        private final String className;
+        private volatile boolean initialized;
+        private Class<?> cls;
+
+        LazyLoadedClass(String cn) {
+            className = cn;
+        }
+
+        synchronized Optional<Class<?>> load() {
+            if (!initialized) {
+                try {
+                    cls = ClassLoaderUtils.loadClass(className, ProviderFactory.class);
+                } catch (final Throwable ex) {
+                    LOG.fine(className + " not available, skipping");
+                }
+                initialized = true;
+            }
+
+            return Optional.ofNullable(cls);
+        }
+
+        boolean isAssignableFrom(Class<?> cls) {
+            return load().map(c -> c.isAssignableFrom(cls)).orElse(false);
+        }
+    }
 
     private JAXRSUtils() {
     }
@@ -242,7 +277,7 @@ public final class JAXRSUtils {
         return STREAMING_OUT_TYPES.contains(type) 
             || Closeable.class.isAssignableFrom(type)
             || Source.class.isAssignableFrom(type)
-            || DataSource.class.isAssignableFrom(type);
+            || DATA_SOURCE_CLASS.isAssignableFrom(type);
     }
 
     public static List<PathSegment> getPathSegments(String thePath, boolean decode) {
