@@ -22,6 +22,8 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
+import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiConfig;
 import org.apache.cxf.osgi.itests.AbstractServerActivator;
 
 public class JaxRsTestActivator extends AbstractServerActivator {
@@ -33,8 +35,15 @@ public class JaxRsTestActivator extends AbstractServerActivator {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setBus(bus);
         sf.setResourceClasses(BookStore.class);
+        OpenApiFeature openApiFeature = new OpenApiFeature();
+        openApiFeature.setScan(false);
+        openApiFeature.setUseContextBasedConfig(true);
+        SwaggerUiConfig swaggerUiConfig = new SwaggerUiConfig();
+        swaggerUiConfig.setUrl("/cxf/jaxrs/openapi.json");
+        openApiFeature.setSwaggerUiConfig(swaggerUiConfig);
+
+        sf.getFeatures().add(openApiFeature);
         sf.setAddress("/jaxrs");
         return sf.create();
     }
-
 }
