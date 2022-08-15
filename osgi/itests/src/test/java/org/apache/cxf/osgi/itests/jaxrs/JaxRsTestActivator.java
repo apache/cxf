@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.osgi.itests.jaxrs;
 
+import com.fasterxml.jackson.jaxrs.xml.JacksonXMLProvider;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Server;
@@ -35,6 +37,7 @@ public class JaxRsTestActivator extends AbstractServerActivator {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setBus(bus);
         sf.setResourceClasses(BookStore.class);
+        sf.setProvider(new JacksonXMLProvider());
         OpenApiFeature openApiFeature = new OpenApiFeature();
         openApiFeature.setScan(false);
         openApiFeature.setUseContextBasedConfig(true);
