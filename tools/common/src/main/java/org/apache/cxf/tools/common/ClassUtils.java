@@ -21,6 +21,7 @@ package org.apache.cxf.tools.common;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,6 +30,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.i18n.Message;
@@ -94,11 +96,12 @@ public class ClassUtils {
                                 && str.regionMatches(true, str.length() - suffix.length(), suffix, 0, suffix.length())
                                 && context.get(ToolConstants.CFG_CLASSDIR) != null) {
                                 String targetDir = (String)context.get(ToolConstants.CFG_CLASSDIR);
-
                                 try {
                                     Files.copy(otherFile,
-                                        Files.createDirectories(Paths.get(targetDir, dirName)).resolve(str));
-
+                                            Files.createDirectories(Paths.get(targetDir, dirName)).resolve(str));
+                                } catch (FileAlreadyExistsException existsException) {
+                                    LOG.log(Level.WARNING, "EXIST_RESOURCE_FILE",
+                                            Paths.get(targetDir, dirName).resolve(str));
                                 } catch (IOException e) {
                                     Message msg = new Message("FAIL_TO_COPY_GENERATED_RESOURCE_FILE", LOG);
                                     throw new ToolException(msg, e);
