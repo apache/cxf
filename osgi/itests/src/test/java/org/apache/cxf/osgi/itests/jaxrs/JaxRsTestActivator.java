@@ -35,9 +35,9 @@ public class JaxRsTestActivator extends AbstractServerActivator {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setBus(bus);
         sf.setResourceClasses(BookStore.class);
+
         OpenApiFeature openApiFeature = new OpenApiFeature();
         openApiFeature.setScan(false);
-        openApiFeature.setUseContextBasedConfig(true);
         SwaggerUiConfig swaggerUiConfig = new SwaggerUiConfig();
         swaggerUiConfig.setUrl("/cxf/jaxrs/openapi.json");
         openApiFeature.setSwaggerUiConfig(swaggerUiConfig);
