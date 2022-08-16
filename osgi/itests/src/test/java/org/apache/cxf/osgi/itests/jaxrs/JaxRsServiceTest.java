@@ -28,6 +28,7 @@ import javax.ws.rs.core.Response.Status;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.osgi.itests.AbstractServerActivator;
@@ -64,7 +65,10 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
     private static final String SWAGGER_PATH = "api-docs";
     private static final String OPEN_API_FILE_PATH = "openapi.json";
 
-    private final WebTarget wt = ClientBuilder.newClient().target(BASE_URL);
+    private final WebTarget wt = ClientBuilder
+        .newClient()
+        .register(JacksonJsonProvider.class)
+        .target(BASE_URL);
 
     @Test
     public void testJaxRsGet() throws Exception {
