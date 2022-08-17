@@ -49,14 +49,7 @@ import org.apache.cxf.validation.BeanValidationProvider;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 @Path("/bookstore")
-@Tag(name = "BookStore")
 @Produces("application/xml")
 public class BookStore {
     private Map<Long, Book> books = new HashMap<>();
@@ -79,15 +72,6 @@ public class BookStore {
 
     @GET
     @Path("/books/{id}")
-    @Operation(
-            summary = "Get book by ID",
-            description = "Get operation with path parameter",
-            responses = {
-                @ApiResponse(content = @Content(schema = @Schema(implementation = Book.class)),
-                    description = "Book found", responseCode = "200"),
-                @ApiResponse(description = "Book not found", responseCode = "404")
-            }
-    )
     public Response getBookRoot(@PathParam("id") Long id) {
         assertInjections();
         Book b = books.get(id);
@@ -97,14 +81,6 @@ public class BookStore {
         return Response.ok(b).build();
     }
 
-    @Operation(
-            summary = "Update book by ID",
-            description = "Put operation with path parameter",
-            responses = {
-                @ApiResponse(description = "Book found and updated", responseCode = "200"),
-                @ApiResponse(description = "Book not found", responseCode = "404")
-            }
-    )
     @PUT
     @Path("/books/{id}")
     public Response updateBook(@PathParam("id") Long id, Book book) {
@@ -117,14 +93,6 @@ public class BookStore {
         return Response.ok().build();
     }
 
-    @Operation(
-            summary = "Create a book with validation",
-            description = "Post operation with entity in body and validation",
-            responses = {
-                @ApiResponse(description = "Book created", responseCode = "201"),
-                @ApiResponse(description = "Validation failed", responseCode = "400")
-            }
-    )
     @POST
     @Path("/books-validate")
     public Response createBookValidate(Book book) {
@@ -154,15 +122,6 @@ public class BookStore {
         return createBook(book);
     }
 
-
-    @Operation(
-            summary = "Create new book",
-            description = "Post operation with entity in body",
-            responses = {
-                @ApiResponse(description = "Book created", responseCode = "201"),
-                @ApiResponse(description = "Book with given ID already exists", responseCode = "409")
-            }
-    )
     @POST
     @Path("/books")
     public Response createBook(Book book) {
@@ -177,14 +136,6 @@ public class BookStore {
         return Response.created(createdURI).build();
     }
 
-    @Operation(
-            summary = "Delete a book",
-            description = "Delete operation with path param",
-            responses = {
-                @ApiResponse(description = "Book deleted", responseCode = "200"),
-                @ApiResponse(description = "Book not found", responseCode = "404")
-            }
-    )
     @DELETE
     @Path("/books/{id}")
     public Response removeBook(@PathParam("id") Long id) {

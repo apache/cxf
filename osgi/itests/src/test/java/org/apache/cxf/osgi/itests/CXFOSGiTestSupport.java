@@ -23,7 +23,6 @@ package org.apache.cxf.osgi.itests;
 import java.io.File;
 
 import jakarta.inject.Inject;
-
 import org.apache.cxf.testutil.common.TestUtil;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
