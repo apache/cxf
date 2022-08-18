@@ -37,11 +37,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.namespace.QName;
 
@@ -201,6 +203,9 @@ public abstract class HTTPConduit
     private static final String HTTP_GET_METHOD = "GET";
     private static final Set<String> KNOWN_HTTP_VERBS_WITH_NO_CONTENT =
         new HashSet<>(Arrays.asList(new String[]{"GET", "HEAD", "OPTIONS", "TRACE"}));
+
+    private static final String AUTHORIZED_REDIRECTED_HTTP_VERBS = "http.redirect.allowed.verbs";
+
     /**
      * This constant is the Message(Map) key for a list of visited URLs that
      * is used in redirect loop protection.
@@ -1427,9 +1432,22 @@ public abstract class HTTPConduit
          * @throws IOException
          */
         protected void handleRetransmits() throws IOException {
+
+            String defaultVerbs = KNOWN_HTTP_VERBS_WITH_NO_CONTENT.stream().collect(Collectors.joining(","));
+
+
+            /*MessageImpl m = new MessageImpl();
+            updateResponseHeaders(m);*/
+
+            String contextualProperty = (String) MessageUtils.getContextualProperty(outMessage,
+                    AUTHORIZED_REDIRECTED_HTTP_VERBS, null);
+
+            String allowedVerbs = Optional.ofNullable(contextualProperty).orElse(defaultVerbs);
+            Set<String> allowedVerbsSet = new HashSet<>(Arrays.asList(allowedVerbs.split(",")));
+
             // If we have a cachedStream, we are caching the request.
             if (cachedStream != null
-                || getClient().isAutoRedirect() && KNOWN_HTTP_VERBS_WITH_NO_CONTENT.contains(getMethod())
+                || getClient().isAutoRedirect() && allowedVerbsSet.contains(getMethod())
                 || authSupplier != null && authSupplier.requiresRequestCaching()) {
 
                 if (LOG.isLoggable(Level.FINE) && cachedStream != null) {
