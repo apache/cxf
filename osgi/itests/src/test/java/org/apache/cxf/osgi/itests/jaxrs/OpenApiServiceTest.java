@@ -109,6 +109,7 @@ public class OpenApiServiceTest extends CXFOSGiTestSupport {
     public Option[] config() {
         return OptionUtils.combine(
             cxfBaseConfig(),
+            mavenBundle("org.apache.cxf", "cxf-servlet-compatible").versionAsInProject(),
             features(cxfUrl, "cxf-core", "cxf-wsdl", "cxf-jaxrs", "cxf-bean-validation-core", "cxf-bean-validation",
                     "cxf-rs-description-openapi-v3"),
             mavenBundle("org.webjars", "swagger-ui").versionAsInProject(),

@@ -31,6 +31,11 @@
         <dependencies>
             <dependency>
                 <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-servlet-compatible</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-bundle-compatible</artifactId>
                 <version>${project.version}</version>
             </dependency>
