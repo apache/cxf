@@ -187,8 +187,8 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
 
     protected ServerAccessToken createNewAccessToken(Client client, UserSubject userSub) {
         BearerAccessToken token = new BearerAccessToken(client, accessTokenLifetime);
-        if (issuer != null) {
-            token.setIssuer(issuer);
+        if (getIssuer() != null) {
+            token.setIssuer(getIssuer());
         }
         return token;
     }
