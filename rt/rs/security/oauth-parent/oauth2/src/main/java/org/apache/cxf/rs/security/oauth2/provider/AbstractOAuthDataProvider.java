@@ -27,6 +27,7 @@ import java.util.Map;
 import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
+import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
@@ -646,7 +647,12 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         // It will JWS-sign (default) and/or JWE-encrypt
         OAuthJoseJwtProducer processor =
             getJwtAccessTokenProducer() == null ? new OAuthJoseJwtProducer() : getJwtAccessTokenProducer();
-        return processor.processJwt(new JwtToken(jwtCliams));
+
+        JwsHeaders jwsHeaders = new JwsHeaders();
+
+        jwsHeaders.setHeader("typ", "at+jwt");
+
+        return processor.processJwt(new JwtToken(jwsHeaders, jwtCliams));
     }
 
     public Map<String, String> getJwtAccessTokenClaimMap() {
