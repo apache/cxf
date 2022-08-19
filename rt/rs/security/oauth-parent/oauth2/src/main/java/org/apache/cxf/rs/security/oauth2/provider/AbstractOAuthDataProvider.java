@@ -93,13 +93,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         }
 
         if (isUseJwtFormatForAccessTokens()) {
-            JwtClaims claims = createJwtAccessToken(at);
-            String jose = processJwtAccessToken(claims);
-            if (isPersistJwtEncoding()) {
-                at.setTokenKey(jose);
-            } else {
-                at.setEncodedToken(jose);
-            }
+            convertToJWTAccessToken(at);
         }
 
         return at;
@@ -204,6 +198,16 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
             claims.setClaim(OAuthConstants.NONCE, at.getNonce());
         }
         return claims;
+    }
+
+    protected void convertToJWTAccessToken(ServerAccessToken at) {
+        JwtClaims claims = createJwtAccessToken(at);
+        String jose = processJwtAccessToken(claims);
+        if (isPersistJwtEncoding()) {
+            at.setTokenKey(jose);
+        } else {
+            at.setEncodedToken(jose);
+        }
     }
 
     protected ServerAccessToken createNewAccessToken(Client client, UserSubject userSub) {
@@ -439,13 +443,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
                     oldRefreshToken.getSubject());
 
         if (isUseJwtFormatForAccessTokens()) {
-            JwtClaims claims = createJwtAccessToken(at);
-            String jose = processJwtAccessToken(claims);
-            if (isPersistJwtEncoding()) {
-                at.setTokenKey(jose);
-            } else {
-                at.setEncodedToken(jose);
-            }
+            convertToJWTAccessToken(at);
         }
 
         return at;
