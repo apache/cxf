@@ -41,6 +41,7 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class SwaggerUiConfigurationQueryConfigTest extends AbstractClientServerTestBase {
@@ -57,7 +58,7 @@ public class SwaggerUiConfigurationQueryConfigTest extends AbstractClientServerT
             sf.setProvider(new JacksonJsonProvider());
             final Swagger2Feature feature = new Swagger2Feature();
             feature.setRunAsFilter(false);
-            feature.setSwaggerUiConfig(new SwaggerUiConfig().url("/swagger.json").queryConfigEnabled(true));
+            feature.setSwaggerUiConfig(new SwaggerUiConfig().url("/swagger.json"));
             sf.setFeatures(Arrays.asList(feature));
             sf.setAddress("http://localhost:" + PORT + "/");
             return sf.create();
@@ -88,6 +89,25 @@ public class SwaggerUiConfigurationQueryConfigTest extends AbstractClientServerT
             String html = response.readEntity(String.class);
             assertThat(html, containsString("<!-- HTML"));
             assertThat(response.getMediaType(), equalTo(MediaType.TEXT_HTML_TYPE));
+        }
+    }
+
+    @Test
+    public void testUiRootResourceDoesNotReplaceUrl() {
+        // With query config enabled, we do not replace any values in the Swagger resource, just let
+        // Swagger UI handle the query parameters.
+        WebClient uiClient = WebClient
+                .create("http://localhost:" + getPort() + "/api-docs")
+                .path("/swagger-initializer.js")
+                .query("url", "/another-swagger.json")
+                .accept("*/*");
+
+        try (Response response = uiClient.get()) {
+            String jsCode = response.readEntity(String.class);
+            // We can only verify that the url was not replaced with the one configured, but not that
+            // the one in query is used (that would be testing the Swagger itself). The query parameter was included
+            // to demonstrate how the address might look, though.
+            assertFalse(jsCode.contains("url: \"/swagger.json\""));
         }
     }
 
