@@ -698,13 +698,15 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
                     connectionFactories.add(new HTTP2ServerConnectionFactory(httpConfig));
                 }
 
+                // Has to be set before the default protocol change
+                result.setConnectionFactories(connectionFactories);
+
                 String proto = (major > 9 || (major == 9 && minor >= 3)) ? "SSL" : "SSL-HTTP/1.1";
                 result.setDefaultProtocol(proto);
             } else if (isHttp2Enabled(bus)) {
                 connectionFactories.add(new HTTP2CServerConnectionFactory(httpConfig));
+                result.setConnectionFactories(connectionFactories);
             }
-            
-            result.setConnectionFactories(connectionFactories);
 
             if (getMaxIdleTime() > 0) {
                 result.setIdleTimeout(Long.valueOf(getMaxIdleTime()));
