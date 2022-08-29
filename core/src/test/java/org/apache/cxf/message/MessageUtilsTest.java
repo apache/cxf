@@ -20,7 +20,10 @@ package org.apache.cxf.message;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.xml.namespace.QName;
 
@@ -92,5 +95,26 @@ public class MessageUtilsTest {
             contains(1, 2, 3));
         assertThat(MessageUtils.getContextualIntegers(message, "invalid-key", Arrays.asList(0, 1)), 
             contains(0, 1));
+    }
+
+    @Test
+    public void getContextualStrings(){
+        Message message = new MessageImpl();
+        String key = "key1";
+        message.put(key, "aaaa, bbb  ,  cc, d");
+        Set contextualStrings = MessageUtils.getContextualStrings(message, key, Collections.EMPTY_SET);
+        assertEquals(4, contextualStrings.size());
+        assertTrue(contextualStrings.remove("aaaa"));
+        assertTrue(contextualStrings.remove("bbb"));
+        assertTrue(contextualStrings.remove("cc"));
+        assertTrue(contextualStrings.remove("d"));
+        assertTrue(contextualStrings.isEmpty());
+
+        Set<String> defaults = new TreeSet<>();
+        defaults.add("aaa");
+        defaults.add("zzz");
+        defaults.add("eee");
+        Set contextualStringsDefault = MessageUtils.getContextualStrings(message, "unknownKey", defaults);
+        assertEquals(defaults, contextualStringsDefault);
     }
 }
