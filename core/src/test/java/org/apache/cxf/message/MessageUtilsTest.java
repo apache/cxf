@@ -98,7 +98,7 @@ public class MessageUtilsTest {
     }
 
     @Test
-    public void getContextualStrings(){
+    public void getContextualStrings() {
         Message message = new MessageImpl();
         String key = "key1";
         message.put(key, "aaaa, bbb  ,  cc, d");

@@ -37,13 +37,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import javax.xml.namespace.QName;
 
@@ -1433,17 +1431,8 @@ public abstract class HTTPConduit
          */
         protected void handleRetransmits() throws IOException {
 
-            String defaultVerbs = KNOWN_HTTP_VERBS_WITH_NO_CONTENT.stream().collect(Collectors.joining(","));
-
-
-            /*MessageImpl m = new MessageImpl();
-            updateResponseHeaders(m);*/
-
-            String contextualProperty = (String) MessageUtils.getContextualProperty(outMessage,
-                    AUTHORIZED_REDIRECTED_HTTP_VERBS, null);
-
-            String allowedVerbs = Optional.ofNullable(contextualProperty).orElse(defaultVerbs);
-            Set<String> allowedVerbsSet = new HashSet<>(Arrays.asList(allowedVerbs.split(",")));
+            Set<String> allowedVerbsSet = MessageUtils.getContextualStrings(outMessage,
+                    AUTHORIZED_REDIRECTED_HTTP_VERBS, KNOWN_HTTP_VERBS_WITH_NO_CONTENT);
 
             // If we have a cachedStream, we are caching the request.
             if (cachedStream != null
