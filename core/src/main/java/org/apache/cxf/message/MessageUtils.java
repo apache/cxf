@@ -24,6 +24,8 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Node;
@@ -187,6 +189,22 @@ public final class MessageUtils {
                 } catch (NumberFormatException ex) {
                     LOG.warning("Incorrect integer value of " + o + " specified for: " + key);
                 }
+            }
+        }
+        return defaultValue;
+    }
+
+    public static Set<String> getContextualStrings(Message m, String key, Set<String> defaultValue) {
+        if (m != null) {
+            Object o = m.getContextualProperty(key);
+            if (o instanceof String) {
+                Set<String> values = new TreeSet<>();
+                for (String value : ((String) o).split(",")) {
+                    if (!StringUtils.isEmpty(value)) {
+                        values.add(value.trim());
+                    }
+                }
+                return values;
             }
         }
         return defaultValue;
