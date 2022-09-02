@@ -291,6 +291,20 @@ public class HTTPConduitURLEasyMockTest {
         finalVerify();
     }
 
+    @Test
+    public void testSendHttpConnectionAllowedRedirectVerbs() throws Exception {
+        control = EasyMock.createNiceControl();
+        HTTPConduit conduit = setUpConduit(true, false, "POST");
+        Message message = createMessage();
+        message.put("http.redirect.allowed.verbs", "POST");
+        message.put(HTTPConduit.SET_HTTP_RESPONSE_MESSAGE, Boolean.TRUE);
+        conduit.prepare(message);
+        conduit.getClient().setAutoRedirect(true);
+        verifySentMessage(conduit, message, "POST");
+        assertEquals(HTTP_RESPONSE_MESSAGE, inMessage.get(HTTPConduit.HTTP_RESPONSE_MESSAGE));
+        finalVerify();
+    }
+
     private void setUpHeaders(Message message) {
         Map<String, List<String>> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         List<String> contentTypes = new ArrayList<>();
