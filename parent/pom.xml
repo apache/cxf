@@ -422,7 +422,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <version>3.18.0</version>
+                    <version>3.17.0</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.apache.cxf.build-utils</groupId>
@@ -432,12 +432,12 @@
                         <dependency>
                             <groupId>net.sourceforge.pmd</groupId>
                             <artifactId>pmd-core</artifactId>
-                            <version>6.44.0</version>
+                            <version>6.49.0</version>
                         </dependency>
                         <dependency>
                             <groupId>net.sourceforge.pmd</groupId>
                             <artifactId>pmd-java</artifactId>
-                            <version>6.44.0</version>
+                            <version>6.49.0</version>
                         </dependency>
                     </dependencies>
                     <configuration>
