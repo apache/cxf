@@ -91,4 +91,23 @@ public class DigestAuthSupplierTest {
         expectedParams.put("algorithm", "MD5");
         assertEquals(expectedParams, params);
     }
+
+    @Test
+    public void testUrlEncodedUri() throws Exception {
+        AuthorizationPolicy authPolicy = new AuthorizationPolicy();
+        authPolicy.setUserName("testUser");
+        authPolicy.setPassword("testPassword");
+
+        // uri with utf-8 url encoded path and query
+        URI uri = new URI("http://localhost.com/sch%C3%B6ne?gr%C3%BC%C3%9Fe");
+        assertEquals("/schöne", uri.getPath());
+        assertEquals("grüße", uri.getQuery());
+
+        DigestAuthSupplier authSupplier = new DigestAuthSupplier();
+        String authToken = authSupplier.getAuthorization(authPolicy, uri, new MessageImpl(), "Digest");
+        HttpAuthHeader authHeader = new HttpAuthHeader(authToken);
+        assertTrue(authHeader.authTypeIsDigest());
+        // uri parts must stay encoded
+        assertEquals("/sch%C3%B6ne?gr%C3%BC%C3%9Fe", authHeader.getParams().get("uri"));
+    }
 }
