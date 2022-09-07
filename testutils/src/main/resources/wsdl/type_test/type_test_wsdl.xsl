@@ -19,13 +19,12 @@
 -->
 <xsl:stylesheet
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-    xmlns:xalan="http://xml.apache.org/xslt"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
     xmlns:wsse="http://schemas.xmlsoap.org/ws/2003/06/secext"
     xmlns:itst="http://tests.iona.com/ittests">
 
-  <xsl:output method="xml" indent="yes" xalan:indent-amount="4"/>
+  <xsl:output method="xml" indent="yes" />
   <xsl:strip-space elements="*"/>
 
   <!-- Parameter: Path to the generated XSDs to include -->
