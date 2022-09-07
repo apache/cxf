@@ -22,7 +22,6 @@
 <xsl:stylesheet
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:xalan="http://xml.apache.org/xslt"
     xmlns:itst="http://tests.iona.com/ittests">
 
     <xsl:output method="text"/>

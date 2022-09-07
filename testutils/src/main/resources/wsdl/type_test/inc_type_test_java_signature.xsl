@@ -22,7 +22,6 @@
 <xsl:stylesheet
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:xalan="http://xml.apache.org/xslt"
     xmlns:itst="http://tests.iona.com/ittests">
 
     <xsl:import href="inc_type_test_java_types.xsl"/>
