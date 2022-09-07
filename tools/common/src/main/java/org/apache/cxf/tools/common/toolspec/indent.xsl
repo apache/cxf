@@ -18,9 +18,9 @@
   under the License.
 -->
 
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xslt" version="1.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-<xsl:output method="xml" omit-xml-declaration="no" indent="yes" xalan:indent-amount="2"/>
+<xsl:output method="xml" omit-xml-declaration="no" indent="yes" />
 <xsl:strip-space elements="@*|node()"/>
 
 <xsl:template match="@*|node()">
