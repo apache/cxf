@@ -146,6 +146,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-websocket</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
         </dependency>
@@ -712,18 +717,4 @@
             </plugins>
         </pluginManagement>
     </build>
-    <profiles>
-        <!-- TODO: This profile includes modules which are still on 'javax.*' namespace and
-        are not migrated to Jakarta -->
-        <profile>
-            <id>javax</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.apache.cxf</groupId>
-                    <artifactId>cxf-rt-transports-websocket</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 </project>

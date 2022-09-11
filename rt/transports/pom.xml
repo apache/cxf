@@ -40,16 +40,6 @@
         <module>http-netty/netty-client</module>
         <module>udp</module>
         <module>jms</module>
+        <module>websocket</module>
     </modules>
-    
-    <profiles>
-        <!-- TODO: This profile includes modules which are still on 'javax.*' namespace and
-        are not migrated to Jakarta -->
-        <profile>
-            <id>javax</id>
-            <modules>
-                <module>websocket</module>
-            </modules>
-        </profile>
-    </profiles>
 </project>
