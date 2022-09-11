@@ -439,8 +439,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
                 client, oldRefreshToken.getClientCodeVerifier(),
                 oldRefreshToken.getExtraProperties(), oldRefreshToken.getGrantCode(),
                 oldRefreshToken.getGrantType(), oldRefreshToken.getNonce(),
-                oldRefreshToken.getResponseType(), theNewScopes,
-                    oldRefreshToken.getSubject());
+                null, theNewScopes, oldRefreshToken.getSubject());
 
         if (isUseJwtFormatForAccessTokens()) {
             convertToJWTAccessToken(at);
