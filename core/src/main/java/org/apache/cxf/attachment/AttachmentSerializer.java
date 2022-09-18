@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -374,7 +375,7 @@ public class AttachmentSerializer {
 
     // URL decoder would also decode '+' but according to  RFC-2392 we need to convert
     // only the % encoded character to their equivalent US-ASCII characters. 
-    private static String decode(String s, Charset charset) {
-        return URLDecoder.decode(s.replaceAll("([^%])[+]", "$1%2B"), charset);
+    private static String decode(String s, Charset charset) throws UnsupportedEncodingException {
+        return URLDecoder.decode(s.replaceAll("([^%])[+]", "$1%2B"), charset.name());
     }
 }
