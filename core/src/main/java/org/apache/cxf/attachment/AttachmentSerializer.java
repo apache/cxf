@@ -26,6 +26,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Iterator;
@@ -225,8 +226,8 @@ public class AttachmentSerializer {
             // remaining parts with an angle bracket pair, "<" and ">".  
             //
             if (attachmentId.startsWith("cid:")) {
-                writer.write(URLDecoder.decode(attachmentId.substring(4),
-                    StandardCharsets.UTF_8.name()));
+                writer.write(decode(attachmentId.substring(4),
+                    StandardCharsets.UTF_8));
             } else { 
                 //
                 // RFC-2392 (https://datatracker.ietf.org/doc/html/rfc2392) says:
@@ -371,4 +372,9 @@ public class AttachmentSerializer {
         this.xop = xop;
     }
 
+    // URL decoder would also decode '+' but according to  RFC-2392 we need to convert
+    // only the % encoded character to their equivalent US-ASCII characters. 
+    private static String decode(String s, Charset charset) {
+        return URLDecoder.decode(s.replaceAll("([^%])[+]", "$1%2B"), charset);
+    }
 }

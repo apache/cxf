@@ -187,6 +187,11 @@ public class AttachmentSerializerTest {
     public void testMessageMTOMUrlDecoded() throws Exception {
         doTestMessageMTOM("test+me.xml", "<test%2Bme.xml>");
     }
+    
+    @Test
+    public void testMessageMTOMUrlDecodedCid() throws Exception {
+        doTestMessageMTOM("cid:test+me.xml", "<test+me.xml>");
+    }
 
     private void doTestMessageMTOM(String contentId, String expectedContentId) throws Exception {
         MessageImpl msg = new MessageImpl();
