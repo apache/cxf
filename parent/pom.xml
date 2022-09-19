@@ -106,6 +106,7 @@
         <cxf.ehcache3.version>3.9.3</cxf.ehcache3.version>
         <cxf.el-api.version>3.0.3</cxf.el-api.version>
         <cxf.findbugs.version>3.0.2</cxf.findbugs.version>
+        <cxf.hoverfly.version>0.14.0</cxf.hoverfly.version>
         <cxf.geronimo.j2ee.management.version>1.0.1</cxf.geronimo.j2ee.management.version>
         <cxf.geronimo.jms.version>1.1.1</cxf.geronimo.jms.version>
         <cxf.geronimo.json.version>1.4</cxf.geronimo.json.version>
@@ -151,8 +152,8 @@
         <cxf.jdom.version>1.0</cxf.jdom.version>
         <cxf.jettison.version>1.5.2</cxf.jettison.version>
         <cxf.jetty.osgi.version>[9.2,10)</cxf.jetty.osgi.version>
-        <cxf.jetty9.version>9.4.49.v20220914</cxf.jetty9.version>
-        <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
+        <cxf.jetty10.version>10.0.12</cxf.jetty10.version>
+        <cxf.jetty.version>${cxf.jetty10.version}</cxf.jetty.version>
         <cxf.jexl.version>3.2.1</cxf.jexl.version>
         <cxf.joda.time.version>2.10.10</cxf.joda.time.version>
         <cxf.johnzon.version>1.2.18</cxf.johnzon.version>
@@ -1171,11 +1172,6 @@
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-security</artifactId>
-                <version>${cxf.jetty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-continuation</artifactId>
                 <version>${cxf.jetty.version}</version>
             </dependency>
             <dependency>

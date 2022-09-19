@@ -460,10 +460,6 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-continuation</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-jmx</artifactId>
         </dependency>
         <dependency>
@@ -490,7 +486,7 @@
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
             <artifactId>websocket-server</artifactId>
-            <version>${cxf.jetty9.version}</version>
+            <version>${cxf.jetty10.version}</version>
         </dependency>
         <dependency>
           <groupId>io.reactivex.rxjava3</groupId>

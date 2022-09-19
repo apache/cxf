@@ -43,8 +43,8 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
         probeClass("org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory");
     private static final boolean UNDERTOW_AVAILABLE = 
         probeClass("org.apache.cxf.transport.http_undertow.UndertowHTTPServerEngineFactory");
-    private static final Constructor<?> JETTY9_WEBSOCKET_DESTINATION_CTR =
-        probeConstructor("org.apache.cxf.transport.websocket.jetty9.Jetty9WebSocketDestination");
+    private static final Constructor<?> JETTY10_WEBSOCKET_DESTINATION_CTR =
+        probeConstructor("org.apache.cxf.transport.websocket.jetty10.Jetty10WebSocketDestination");
     private static final Constructor<?> UNDERTOW_WEBSOCKET_DESTINATION_CTR =
         probeUndertowConstructor("org.apache.cxf.transport.websocket.undertow.UndertowWebSocketDestination");
     private static final Constructor<?> ATMOSPHERE_WEBSOCKET_JETTY_DESTINATION_CTR =
@@ -110,7 +110,7 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
             // for the embedded mode, we stick to jetty if jetty is available
                 JettyHTTPServerEngineFactory serverEngineFactory = bus
                     .getExtension(JettyHTTPServerEngineFactory.class);
-                return createJettyHTTPDestination(JETTY9_WEBSOCKET_DESTINATION_CTR, bus, registry,
+                return createJettyHTTPDestination(JETTY10_WEBSOCKET_DESTINATION_CTR, bus, registry,
                                               endpointInfo, serverEngineFactory);
             } else if (UNDERTOW_AVAILABLE) {
                 // use UndertowWebSocketDestination
@@ -132,7 +132,7 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
                                                              endpointInfo.getAddress());
         }
         // use jetty-websocket
-        return createJettyHTTPDestination(JETTY9_WEBSOCKET_DESTINATION_CTR, bus, registry,
+        return createJettyHTTPDestination(JETTY10_WEBSOCKET_DESTINATION_CTR, bus, registry,
                                           endpointInfo, null);
     }
 

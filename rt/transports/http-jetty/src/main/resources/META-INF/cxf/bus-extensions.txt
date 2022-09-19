@@ -1,3 +1,2 @@
 org.apache.cxf.transport.http_jetty.JettyDestinationFactory::true
 org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory::true
-org.apache.cxf.transport.http_jetty.continuations.JettyContinuationProviderFactory:org.apache.cxf.transport.http.ContinuationProviderFactory:true

@@ -31,7 +31,7 @@
     <description>Apache CXF Servlet Container Initializer Integration System Tests</description>
     <url>https://cxf.apache.org</url>
     <properties>
-        <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
+        <cxf.jetty.version>${cxf.jetty10.version}</cxf.jetty.version>
         <cxf.module.name>org.apache.cxf.systests.rs.sci</cxf.module.name>
     </properties>
     <dependencies>

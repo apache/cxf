@@ -32,8 +32,9 @@
     
     <properties>
         <cxf.module.name>org.apache.cxf.systests.microprofile.weld</cxf.module.name>
+        <cxf.jetty.version>9.4.49.v20220914</cxf.jetty.version>
     </properties>
-    
+
     <dependencies>
         <dependency>
             <groupId>org.jboss.arquillian.testng</groupId>
@@ -68,6 +69,10 @@
             <artifactId>jakarta.json-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>jakarta.json.bind</groupId>
+            <artifactId>jakarta.json.bind-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
         </dependency>
@@ -87,6 +92,36 @@
             <groupId>org.eclipse.microprofile.rest.client</groupId>
             <artifactId>microprofile-rest-client-tck</artifactId>
             <version>${cxf.microprofile.rest.client.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>${cxf.jetty.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-servlet</artifactId>
+            <version>${cxf.jetty.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-servlets</artifactId>
+            <version>${cxf.jetty.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-webapp</artifactId>
+            <version>${cxf.jetty.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-proxy</artifactId>
+            <version>${cxf.jetty.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
@@ -135,13 +170,17 @@
                     <dependenciesToScan>
                         <dependency>org.eclipse.microprofile.rest.client:microprofile-rest-client-tck</dependency>
                     </dependenciesToScan>
-                    <suiteXmlFiles>
-                        <suiteXmlFile>testng.xml</suiteXmlFile>
-                    </suiteXmlFiles>
                     <systemPropertyVariables>
                         <wiremock.server.port>${wiremock.server.port}</wiremock.server.port>
                         <sse.server.port>${sse.server.port}</sse.server.port>
                     </systemPropertyVariables>
+                    <properties>
+                        <property>
+                            <name>listener</name>
+                            <value>org.apache.cxf.microprofile.AnnotationTransformer</value>
+                        </property>
+                    </properties>
+                    <reuseForks>false</reuseForks>
                 </configuration>
 	            <dependencies>
                     <dependency>
