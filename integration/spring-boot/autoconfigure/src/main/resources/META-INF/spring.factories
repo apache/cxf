@@ -1,5 +1,0 @@
-# Auto Configure
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-org.apache.cxf.spring.boot.autoconfigure.CxfAutoConfiguration,\
-org.apache.cxf.spring.boot.autoconfigure.openapi.OpenApiAutoConfiguration,\
-org.apache.cxf.spring.boot.autoconfigure.micrometer.MicrometerMetricsAutoConfiguration
