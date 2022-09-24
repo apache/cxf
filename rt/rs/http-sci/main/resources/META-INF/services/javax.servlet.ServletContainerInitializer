@@ -1,1 +1,1 @@
-org.apache.cxf.jaxrs.servlet.JaxrsServletContainerInitializer
+org.apache.cxf.jaxrs.servlet.sci.JaxrsServletContainerInitializer
