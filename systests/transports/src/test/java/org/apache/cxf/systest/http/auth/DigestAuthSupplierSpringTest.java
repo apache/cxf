@@ -81,7 +81,7 @@ public class DigestAuthSupplierSpringTest {
 
         static final String RESPONSE = "Hi!";
 
-        @GetMapping(produces = MediaType.TEXT_PLAIN)
+        @GetMapping(produces = MediaType.TEXT_PLAIN, value = "/")
         public String get() {
             return "Hi!";
         }
