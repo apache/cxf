@@ -33,6 +33,7 @@
     <properties>
         <cxf.module.name>org.apache.cxf.rs.openapi.microprofile</cxf.module.name>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>jakarta.xml.ws</groupId>
@@ -88,12 +89,6 @@
             <groupId>jakarta.json.bind</groupId>
             <artifactId>jakarta.json.bind-api</artifactId>
             <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
     </dependencies>
 </project>

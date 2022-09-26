@@ -33,15 +33,6 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.ws.discovery</cxf.module.name>
-        <cxf.osgi.export>
-            =org.apache.cxf.ws.discovery.internal,
-            org.apache.cxf.ws.discovery.*,
-        </cxf.osgi.export>
-        <cxf.osgi.import>
-            jakarta.jws*;version="${cxf.osgi.jws.version}",
-            jakarta.xml.ws*;version="${cxf.osgi.jakarta.xml.ws.version}",
-            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}"
-        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>
@@ -129,16 +120,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Export-Package>${cxf.osgi.export}</Export-Package>
-                    </instructions>
-                </configuration>
             </plugin>
         </plugins>
     </build>

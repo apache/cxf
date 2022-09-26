@@ -32,30 +32,11 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.binding.coloc</cxf.module.name>
-        <cxf.osgi.import>
-            org.springframework*;resolution:=optional;version="${cxf.osgi.spring.version}",
-            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
-            jakarta.xml.ws*;version="${cxf.osgi.jakarta.xml.ws.version}"
-        </cxf.osgi.import>
-        <cxf.bundle.activator>org.apache.cxf.binding.coloc.blueprint.Activator</cxf.bundle.activator>
-        <!-- keep in sync with services exported in activator -->
-        <cxf.export.service>
-            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/binding/coloc"
-        </cxf.export.service>
     </properties>
     <dependencies>
         <dependency>
             <groupId>jakarta.xml.ws</groupId>
             <artifactId>jakarta.xml.ws-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.aries.blueprint</groupId>
-            <artifactId>org.apache.aries.blueprint.core</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>

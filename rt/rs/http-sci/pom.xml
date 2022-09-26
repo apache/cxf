@@ -32,9 +32,6 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.rs.sci</cxf.module.name>
-        <cxf.osgi.import>
-            jakarta.servlet*;version="${cxf.osgi.jakarta.servlet.version}",
-        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>

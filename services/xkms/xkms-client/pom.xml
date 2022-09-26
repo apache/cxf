@@ -49,30 +49,6 @@
                 </includes>
             </testResource>
         </testResources>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Import-Package>
-                            jakarta.xml.ws*;version="${cxf.osgi.jakarta.xml.ws.version}", <!-- To workaround issue with BindingProvider interface not visible -->
-                            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}",
-                            *
-                        </Import-Package>
-                        <Export-Package>
-                                org.apache.cxf.xkms.crypto.provider,
-                                org.apache.cxf.xkms.cache,
-                                org.apache.cxf.xkms.client
-                                <!-- To avoid problems with existing users.
-                                         We should try to remove the exports again in the future.
-                                 -->
-                        </Export-Package>
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins>
     </build>
     <dependencies>
         <dependency>

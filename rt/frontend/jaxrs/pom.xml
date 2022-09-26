@@ -32,25 +32,6 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.frontend.jaxrs</cxf.module.name>
-        <cxf.osgi.import>
-            jakarta.servlet*;version="${cxf.osgi.jakarta.servlet.version}",
-            jakarta.activation;version="${cxf.osgi.jakarta.activation.version}",
-            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
-            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
-            jakarta.validation*;resolution:=optional;version="${cxf.validation.api.package.version}",
-            jakarta.ws.rs.client;version="[3,4)",
-            jakarta.ws.rs*;version="[3,4)",
-            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}",
-            jakarta.annotation*;version="${cxf.osgi.jakarta.annotation.version}"
-        </cxf.osgi.import>
-        <cxf.osgi.export>
-            org.apache.cxf.jaxrs*
-        </cxf.osgi.export>
-        <cxf.bundle.activator>org.apache.cxf.jaxrs.blueprint.Activator</cxf.bundle.activator>
-        <!-- keep in sync with services exported in activator -->
-        <cxf.export.service>
-            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/blueprint/jaxrs"
-        </cxf.export.service>
     </properties>
     <dependencies>
         <dependency>
@@ -62,21 +43,6 @@
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
             <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.aries.blueprint</groupId>
-            <artifactId>org.apache.aries.blueprint.core</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.aries.blueprint</groupId>
-            <artifactId>blueprint-parser</artifactId>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -203,39 +169,4 @@
             </exclusions>
         </dependency>
     </dependencies>
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>maven-bundle-plugin</artifactId>
-                    <extensions>true</extensions>
-                    <configuration>
-                        <instructions>
-                            <Bundle-SymbolicName>${cxf.osgi.symbolic.name}</Bundle-SymbolicName>
-                            <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
-                            <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>
-                            <Implementation-Version>${cxf.osgi.version.clean}</Implementation-Version>
-                            <Specification-Vendor>The Apache Software Foundation</Specification-Vendor>
-                            <Specification-Version>${cxf.osgi.version.clean}</Specification-Version>
-                            <Bundle-DocURL>http://cxf.apache.org</Bundle-DocURL>
-                            <Fragment-Host>${cxf.fragment.host}</Fragment-Host>
-                            <_failok>true</_failok>
-                            <_nouses>true</_nouses>
-                            <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
-                            <Export-Package>${cxf.osgi.export}</Export-Package>
-                            <Import-Package>
-                                ${cxf.osgi.import},
-                                *
-                            </Import-Package>
-                            <DynamicImport-Package>
-                                ${cxf.osgi.dynamic.import}
-                            </DynamicImport-Package>
-                            <Bundle-Activator>${cxf.bundle.activator}</Bundle-Activator>
-                        </instructions>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
 </project>

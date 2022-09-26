@@ -55,25 +55,7 @@
         <cxf.asm.groupId>org.ow2.asm</cxf.asm.groupId>
         <cxf.asm.artifactId>asm</cxf.asm.artifactId>
         <cxf.asm.version>9.3</cxf.asm.version>
-        <cxf.osgi.asm.version>[3.0,10)</cxf.osgi.asm.version>
         <cxf.easymock.version>4.3</cxf.easymock.version>
-        <!-- OSGi related properties -->
-        <cxf.fragment.host />
-        <cxf.bundle.activation.policy>lazy</cxf.bundle.activation.policy>
-        <cxf.bundle.activator />
-        <cxf.osgi.import />
-        <cxf.osgi.symbolic.name>${project.groupId}.${project.artifactId}</cxf.osgi.symbolic.name>
-        <cxf.osgi.dynamic.import />
-        <cxf.osgi.spring.version>[3.1,6)</cxf.osgi.spring.version>
-        <cxf.osgi.spring.osgi.version>[1.2.0,2)</cxf.osgi.spring.osgi.version>
-        <cxf.osgi.slf4j.version>[1.5,2)</cxf.osgi.slf4j.version>
-        <cxf.osgi.jakarta.annotation.version>[2,3)</cxf.osgi.jakarta.annotation.version>
-        <cxf.osgi.jakarta.bind.version>[3,4)</cxf.osgi.jakarta.bind.version>
-        <cxf.osgi.javax.stream.version>[0,2)</cxf.osgi.javax.stream.version>
-        <cxf.osgi.jakarta.activation.version>[2,3)</cxf.osgi.jakarta.activation.version>
-        <cxf.osgi.jakarta.mail.version>[2,3)</cxf.osgi.jakarta.mail.version>
-        <cxf.osgi.jakarta.servlet.version>[5,6)</cxf.osgi.jakarta.servlet.version>
-        <cxf.osgi.jakarta.xml.ws.version>[3,4)</cxf.osgi.jakarta.xml.ws.version>
 
         <!-- please maintain alphabetical order here -->
         <cxf.activemq.artemis.version>2.21.0</cxf.activemq.artemis.version>
@@ -89,7 +71,6 @@
         <cxf.brave.reporter.version>2.16.2</cxf.brave.reporter.version>
         <cxf.brave.version>5.13.11</cxf.brave.version>
         <cxf.brave.zipkin.version>2.23.15</cxf.brave.zipkin.version>
-        <cxf.cda.api.osgi.range>[1.1,2)</cxf.cda.api.osgi.range>
         <cxf.cdi.api.version>3.0.0</cxf.cdi.api.version>
         <cxf.classgraph.version>4.8.25</cxf.classgraph.version>
         <cxf.classmate.version>1.5.1</cxf.classmate.version>
@@ -153,7 +134,6 @@
         <cxf.jcache.version>1.1.1</cxf.jcache.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
         <cxf.jettison.version>1.5.1</cxf.jettison.version>
-        <cxf.jetty.osgi.version>[11,12)</cxf.jetty.osgi.version>
         <cxf.jetty11.version>11.0.12</cxf.jetty11.version>
         <cxf.jetty.version>${cxf.jetty11.version}</cxf.jetty.version>
         <cxf.jexl.version>3.2.1</cxf.jexl.version>
@@ -182,8 +162,6 @@
         <cxf.netty.tcnative.version>2.0.46.Final</cxf.netty.tcnative.version>
         <cxf.olingo.version>2.0.11</cxf.olingo.version>
         <cxf.openjpa.version>3.1.2</cxf.openjpa.version>
-        <cxf.opensaml.osgi.version.range>[3.1,4)</cxf.opensaml.osgi.version.range>
-        <cxf.opensaml.osgi.version>3.4.5_2</cxf.opensaml.osgi.version>
         <cxf.opentracing.version>0.33.0</cxf.opentracing.version>
         <cxf.openwebbeans.version>2.0.26</cxf.openwebbeans.version>
         <cxf.persistence-api.version>3.0.0</cxf.persistence-api.version>
@@ -205,7 +183,6 @@
         <cxf.spring.boot.version>3.0.0-M5</cxf.spring.boot.version>
         <cxf.spring.ldap.version>3.0.0-M2</cxf.spring.ldap.version>
         <cxf.spring.mock>spring-test</cxf.spring.mock>
-        <cxf.spring.osgi.version>1.2.1</cxf.spring.osgi.version>
         <cxf.spring.security.version>6.0.0-M7</cxf.spring.security.version>
         <cxf.spring.version>6.0.0-M6</cxf.spring.version>
         <cxf.stax-ex.version>1.8.3</cxf.stax-ex.version>
@@ -217,8 +194,6 @@
         <cxf.tika.version>2.4.1</cxf.tika.version>
         <cxf.tomcat.version>10.0.22</cxf.tomcat.version>
         <cxf.tomitribe.http.signature.version>1.8</cxf.tomitribe.http.signature.version>
-        <cxf.undertow.osgi.version>[1.4,3.0)</cxf.undertow.osgi.version>
-        <cxf.undertow.xnio.osgi.version>[3.3,4.0)</cxf.undertow.xnio.osgi.version>
         <cxf.undertow.version>2.2.19.Final</cxf.undertow.version>
         <!-- the Export-Package is the same as the Maven artifact
              version (with the Final), but we don't want an import package with a version
@@ -243,7 +218,6 @@
         <cxf.aries.parser.version>1.6.1</cxf.aries.parser.version>
         <cxf.aries.version.range>[1.0,2)</cxf.aries.version.range>
         <cxf.bcel.bundle.version>5.2_4</cxf.bcel.bundle.version>
-        <cxf.cglib.osgi.version>[2.2.2,3.4)</cxf.cglib.osgi.version>
         <cxf.dom4j.bundle.version>2.1.3_1</cxf.dom4j.bundle.version>
         <cxf.fastinfoset.bundle.version>1.2.18_1</cxf.fastinfoset.bundle.version>
         <cxf.felix.configadmin.version>1.2.4</cxf.felix.configadmin.version>
@@ -257,9 +231,6 @@
         <cxf.karaf.version>4.4.0</cxf.karaf.version>
         <cxf.oauth.bundle.version>20100527_1</cxf.oauth.bundle.version>
         <cxf.oro.bundle.version>2.0.8_6</cxf.oro.bundle.version>
-        <cxf.osgi.saaj.version>[1.4,2)</cxf.osgi.saaj.version>
-        <cxf.osgi.jws.version>[0,3)</cxf.osgi.jws.version>
-        <cxf.osgi.version>6.0.0</cxf.osgi.version>
         <cxf.pax.exam.version>4.13.5</cxf.pax.exam.version>
         <cxf.reflections.bundle.version>0.9.11_2</cxf.reflections.bundle.version>
         <cxf.rhino.bundle.version>1.7.13_1</cxf.rhino.bundle.version>
@@ -332,18 +303,6 @@
                     <groupId>org.apache.servicemix.tooling</groupId>
                     <artifactId>depends-maven-plugin</artifactId>
                     <version>1.4.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <configuration>
-                        <archive>
-                            <manifestEntries>
-                                <Bundle-SymbolicName>${cxf.osgi.symbolic.name}.source</Bundle-SymbolicName>
-                                <Eclipse-SourceBundle>${cxf.osgi.symbolic.name};version="${cxf.osgi.version.clean}"</Eclipse-SourceBundle>
-                            </manifestEntries>
-                        </archive>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -710,16 +669,6 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.cxf.osgi.itests</groupId>
-                <artifactId>org.apache.cxf.osgi.itests</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf.osgi.itests</groupId>
-                <artifactId>org.apache.cxf.osgi.itests-felix</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.cxf.services.sts.systests</groupId>
                 <artifactId>cxf-services-sts-systests-advanced</artifactId>
                 <version>${project.version}</version>
@@ -771,39 +720,6 @@
                         <artifactId>jakarta.activation</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.aries.blueprint</groupId>
-                <artifactId>org.apache.aries.blueprint.api</artifactId>
-                <version>${cxf.aries.api.version}</version>
-                <scope>provided</scope>
-                <optional>true</optional>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.aries.blueprint</groupId>
-                <artifactId>org.apache.aries.blueprint.core</artifactId>
-                <version>${cxf.aries.core.version}</version>
-                <scope>provided</scope>
-                <optional>true</optional>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.aries.blueprint</groupId>
-                <artifactId>blueprint-parser</artifactId>
-                <version>${cxf.aries.parser.version}</version>
-                <scope>provided</scope>
-                <optional>true</optional>
-            </dependency>
-            <dependency>
-                <groupId>org.osgi</groupId>
-                <artifactId>org.osgi.core</artifactId>
-                <version>${cxf.osgi.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.osgi</groupId>
-                <artifactId>osgi.cmpn</artifactId>
-                <version>${cxf.osgi.version}</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>cglib</groupId>
@@ -1493,38 +1409,6 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>${cxf.spring.mock}</artifactId>
                 <version>${cxf.spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.osgi</groupId>
-                <artifactId>spring-osgi-io</artifactId>
-                <version>${cxf.spring.osgi.version}</version>
-            </dependency>
-            <dependency>
-                 <groupId>org.springframework.osgi</groupId>
-                 <artifactId>spring-osgi-core</artifactId>
-                 <version>${cxf.spring.osgi.version}</version>
-                 <exclusions>
-                     <exclusion>
-                         <groupId>org.springframework</groupId>
-                         <artifactId>org.springframework.aop</artifactId>
-                     </exclusion>
-                     <exclusion>
-                         <groupId>org.springframework</groupId>
-                         <artifactId>com.springsource.org.aopalliance</artifactId>
-                     </exclusion>
-                     <exclusion>
-                         <groupId>org.springframework</groupId>
-                         <artifactId>org.springframework.core</artifactId>
-                     </exclusion>
-                     <exclusion>
-                         <groupId>org.springframework</groupId>
-                         <artifactId>org.springframework.context</artifactId>
-                     </exclusion>
-                     <exclusion>
-                         <groupId>org.springframework</groupId>
-                         <artifactId>org.springframework.beans</artifactId>
-                     </exclusion>
-                 </exclusions>
             </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>

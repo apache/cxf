@@ -132,7 +132,9 @@ public class SpringBus extends ExtensionManagerBus
     @Override
     public String getId() {
         if (id == null) {
-            try {
+            id = super.getId();
+            //TODO:[OSGi+Jakarta] uncomment this when osgi comes back
+            /*try {
                 Class<?> clsbc = Class.forName("org.osgi.framework.BundleContext");
                 Class<?> clsb = Class.forName("org.osgi.framework.Bundle");
                 Object o = getExtension(clsbc);
@@ -141,7 +143,7 @@ public class SpringBus extends ExtensionManagerBus
                 id = s + '-' + DEFAULT_BUS_ID + Integer.toString(this.hashCode());
             } catch (Throwable t) {
                 id = super.getId();
-            }
+            }*/
         }
         return id;
     }

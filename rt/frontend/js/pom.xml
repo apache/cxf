@@ -32,9 +32,6 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.frontend.js</cxf.module.name>
-        <cxf.osgi.import>
-            jakarta.xml.ws*;version="${cxf.osgi.jakarta.xml.ws.version}",
-        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>

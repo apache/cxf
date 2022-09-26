@@ -32,23 +32,6 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.transport.http.netty.server</cxf.module.name>
-        <cxf.bundle.activator>org.apache.cxf.transport.http.netty.server.blueprint.Activator</cxf.bundle.activator>
-        <cxf.osgi.import>
-            jakarta.servlet*;version="[5,6)",
-            io.netty.*;version="${cxf.netty.version.range}",
-            jakarta.annotation;version="${cxf.osgi.jakarta.annotation.version}",
-            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
-            org.osgi.service.blueprint*;resolution:=optional,
-            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
-            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}"
-        </cxf.osgi.import>
-        <cxf.osgi.export>
-            org.apache.cxf.*,
-        </cxf.osgi.export>
-        <!-- keep in sync with services exported in activator -->
-        <cxf.export.service>
-            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/transports/http-netty-server/configuration"
-        </cxf.export.service>
     </properties>
     <dependencies>
         <dependency>
@@ -71,28 +54,6 @@
             <!-- we don't implement the servlet 5.0 specification here -->
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.aries.blueprint</groupId>
-            <artifactId>org.apache.aries.blueprint.core</artifactId>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.aries.blueprint</groupId>
-            <artifactId>blueprint-parser</artifactId>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>osgi.cmpn</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>

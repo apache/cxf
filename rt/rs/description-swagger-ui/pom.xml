@@ -32,10 +32,6 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.rs.swagger.ui</cxf.module.name>
-        <cxf.osgi.import>
-            jakarta.annotation*;version="${cxf.osgi.jakarta.annotation.version}",
-            *
-        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>
@@ -48,12 +44,6 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

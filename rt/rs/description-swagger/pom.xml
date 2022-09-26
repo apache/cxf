@@ -32,11 +32,6 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.rs.swagger</cxf.module.name>
-        <cxf.osgi.import>
-            jakarta.servlet*;version="${cxf.osgi.jakarta.servlet.version}",
-            jakarta.annotation;version="${cxf.osgi.jakarta.annotation.version}",
-            jakarta.validation*;resolution:=optional;version="${cxf.validation.api.package.version}",
-        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>
@@ -82,12 +77,6 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-json-basic</artifactId>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>

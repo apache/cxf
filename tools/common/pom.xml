@@ -32,10 +32,6 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.tools.common</cxf.module.name>
-        <cxf.osgi.import>
-            jakarta.jws*;version="${cxf.osgi.jws.version}",
-            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}"
-        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>

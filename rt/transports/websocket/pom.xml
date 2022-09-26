@@ -31,43 +31,9 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
-<!--
-        <cxf.bundle.activator>org.apache.cxf.transport.websocket.osgi.WebSocketTransportActivator</cxf.bundle.activator>
-                    org.eclipse.jetty.websocket;version="${cxf.jetty.osgi.version}";resolution:=optional,
-        
--->
         <cxf.module.name>org.apache.cxf.transport.websocket</cxf.module.name>
-        <cxf.osgi.import>
-            jakarta.servlet*;version="${cxf.osgi.jakarta.servlet.version}",
-            org.eclipse.jetty*;version="${cxf.jetty.osgi.version}";resolution:=optional,
-            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
-            org.atmosphere*;version="${cxf.atmosphere.version.range}";resolution:=optional,
-            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
-        </cxf.osgi.import>
-        <cxf.osgi.dynamic.import>
-            org.eclipse.jetty.jmx
-        </cxf.osgi.dynamic.import>
-        <!-- keep in sync with services exported in activator -->
-        <cxf.export.service>
-        </cxf.export.service>
     </properties>
     <dependencies>
-        <dependency>
-            <groupId>org.apache.aries.blueprint</groupId>
-            <artifactId>org.apache.aries.blueprint.core</artifactId>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>osgi.cmpn</artifactId>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-core</artifactId>
