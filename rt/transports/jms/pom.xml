@@ -24,11 +24,6 @@
     </parent>
     <properties>
         <cxf.spi-dir>spi-2.1</cxf.spi-dir>
-        <cxf.osgi.import>
-            jakarta.jms;version="[3,4)",
-            javax.transaction;version="[2,3)",
-            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}"
-        </cxf.osgi.import>
         <cxf.module.name>org.apache.cxf.transport.jms</cxf.module.name>
     </properties>
     <dependencies>

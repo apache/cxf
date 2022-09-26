@@ -32,10 +32,6 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.rs.openapi.v3</cxf.module.name>
-        <cxf.osgi.import>
-            jakarta.servlet*;version="${cxf.osgi.jakarta.servlet.version}",
-            jakarta.annotation;version="${cxf.osgi.jakarta.annotation.version}",
-        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>
@@ -83,12 +79,6 @@
                     <artifactId>bind-api</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
     </dependencies>
 </project>

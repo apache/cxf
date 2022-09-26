@@ -32,29 +32,12 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.transport.http.hc</cxf.module.name>
-        <cxf.bundle.activator>org.apache.cxf.transport.http.asyncclient.Activator</cxf.bundle.activator>
-        <cxf.osgi.import>
-            jakarta.annotation;version="${cxf.osgi.jakarta.annotation.version}",
-            *
-        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <scope>provided</scope>
-            <optional />
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>osgi.cmpn</artifactId>
-            <scope>provided</scope>
-            <optional />
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>

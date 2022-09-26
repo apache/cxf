@@ -32,45 +32,8 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.frontend.jaxws</cxf.module.name>
-        <cxf.osgi.import>
-            jakarta.xml.soap;version="${cxf.osgi.saaj.version}",
-            jakarta.jws*;version="${cxf.osgi.jws.version}",
-            jakarta.activation;version="${cxf.osgi.jakarta.activation.version}",
-            jakarta.servlet*;version="${cxf.osgi.jakarta.servlet.version}",
-            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
-            jakarta.xml.ws.spi.http;version="${cxf.osgi.jakarta.xml.ws.version}";resolution:="optional",
-            jakarta.xml.ws*;version="${cxf.osgi.jakarta.xml.ws.version}",
-            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
-            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}",
-            jakarta.annotation*;version="${cxf.osgi.jakarta.annotation.version}"
-        </cxf.osgi.import>
-        <!-- keep in sync with services exported in activator -->
-        <cxf.export.service>
-            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/blueprint/jaxws"
-        </cxf.export.service>
-        <cxf.bundle.activator>org.apache.cxf.jaxws.blueprint.Activator</cxf.bundle.activator>
     </properties>
     <dependencies>
-        <dependency>
-            <groupId>org.apache.aries.blueprint</groupId>
-            <artifactId>org.apache.aries.blueprint.api</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.aries.blueprint</groupId>
-            <artifactId>org.apache.aries.blueprint.core</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.aries.blueprint</groupId>
-            <artifactId>blueprint-parser</artifactId>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

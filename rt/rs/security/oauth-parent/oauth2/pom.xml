@@ -32,12 +32,6 @@
   </parent>
   <properties>
     <cxf.module.name>org.apache.cxf.rs.security.oauth2</cxf.module.name>
-    <cxf.osgi.import>
-      jakarta.servlet*;version="${cxf.osgi.jakarta.servlet.version}",
-      jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}",
-      jakarta.annotation*;version="${cxf.osgi.jakarta.annotation.version}",
-      jakarta.persistence*;resolution:=optional
-    </cxf.osgi.import>
     <compilerArguments>-Aopenjpa.source=8 -Aopenjpa.metamodel=true</compilerArguments>
   </properties>
   <dependencies>

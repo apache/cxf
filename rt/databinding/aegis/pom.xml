@@ -30,15 +30,9 @@
         <version>4.0.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-    
+
     <properties>
         <cxf.module.name>org.apache.cxf.databinding.aegis</cxf.module.name>
-        <cxf.osgi.import>
-            jakarta.jws*;version="${cxf.osgi.jws.version}",
-            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}",
-            jakarta.activation;version="${cxf.osgi.jakarta.activation.version}",
-            jakarta.xml.stream*;version="${cxf.osgi.jakarta.stream.version}"
-        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>

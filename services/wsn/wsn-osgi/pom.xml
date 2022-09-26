@@ -47,39 +47,4 @@
             </exclusions>
         </dependency>
     </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Require-Bundle>
-                            org.apache.activemq.artemis-core-client
-                        </Require-Bundle>
-                        <Import-Package>
-                            org.apache.cxf.*;resolution:=optional,
-                            !org.apache.activemq*,
-                            !org.slf4j.*,
-                            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}",
-                            jakarta.jws*;version="${cxf.osgi.jws.version}",
-                            jakarta.xml.ws*;version="${cxf.osgi.jakarta.xml.ws.version}",
-                            *
-                        </Import-Package>
-                        <Export-Package>
-                            org.oasis_open.docs.wsn.*;version=1.3;-noimport:=true,
-                            org.oasis_open.docs.wsrf.*;version=1.2;-noimport:=true,
-                            org.apache.cxf.wsn.client;version=${cxf.osgi.version.clean}
-                        </Export-Package>
-                        <Private-Package>
-                            org.apache.cxf.wsn.*,
-                            org.apache.cxf.common.logging
-                        </Private-Package>
-                        <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>

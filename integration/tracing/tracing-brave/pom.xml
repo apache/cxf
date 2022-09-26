@@ -33,11 +33,6 @@
     
     <properties>
         <cxf.module.name>org.apache.cxf.tracing.brave</cxf.module.name>
-        <cxf.osgi.export>
-            org.apache.cxf.tracing,
-            org.apache.cxf.tracing.brave,
-            org.apache.cxf.tracing.brave.jaxrs
-        </cxf.osgi.export>
     </properties>
     
     <dependencies>

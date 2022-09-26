@@ -50,16 +50,6 @@
             <artifactId>jakarta.xml.ws-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.aries.blueprint</groupId>
-            <artifactId>org.apache.aries.blueprint.core</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>artemis-jakarta-server</artifactId>
         </dependency>
@@ -140,33 +130,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Require-Bundle>
-                            org.apache.cxf.services.wsn.cxf-services-wsn-api
-                        </Require-Bundle>
-                        <Import-Package>
-                            org.apache.cxf.wsn.util.*;version=${cxf.osgi.version.clean},
-                            !org.apache.cxf.wsn*,
-                            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}",
-                            jakarta.jws*;version="${cxf.osgi.jws.version}",
-                            jakarta.xml.ws*;version="${cxf.osgi.jakarta.xml.ws.version}",
-                            *
-                        </Import-Package>
-                        <Export-Package>
-                            org.apache.cxf.wsn.services;version=${cxf.osgi.version.clean}
-                        </Export-Package>
-                        <_nouses>true</_nouses>
-                        <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>

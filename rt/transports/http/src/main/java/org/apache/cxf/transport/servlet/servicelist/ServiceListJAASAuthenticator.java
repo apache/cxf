@@ -39,13 +39,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
-import org.apache.cxf.transport.http.blueprint.HttpDestinationBPBeanDefinitionParser;
+
 
 
 
 public class ServiceListJAASAuthenticator {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(HttpDestinationBPBeanDefinitionParser.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(ServiceListJAASAuthenticator.class);
 
     private static final String HEADER_WWW_AUTHENTICATE = "WWW-Authenticate";
 

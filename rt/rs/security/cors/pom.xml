@@ -32,10 +32,6 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.rs.security.cors</cxf.module.name>
-        <cxf.osgi.import>
-            jakarta.annotation*;version="${cxf.osgi.jakarta.annotation.version}",
-            *
-        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>

@@ -36,20 +36,7 @@
         <module>xkms-x509-handlers</module>
         <module>xkms-service</module>
         <module>xkms-client</module>
-        <module>xkms-features</module>
-        <module>xkms-osgi</module>
         <module>xkms-war</module>
         <module>xkms-x509-repo-ldap</module>
     </modules>
-    
-    <profiles>
-        <!-- TODO: This profile includes modules which are still on 'javax.*' namespace and
-        are not migrated to Jakarta -->
-        <profile>
-            <id>javax</id>
-            <modules>
-                <module>xkms-itests</module>
-            </modules>
-        </profile>
-    </profiles>
 </project>
