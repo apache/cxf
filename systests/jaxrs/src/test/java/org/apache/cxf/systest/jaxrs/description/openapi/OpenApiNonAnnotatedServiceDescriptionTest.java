@@ -21,7 +21,7 @@ package org.apache.cxf.systest.jaxrs.description.openapi;
 import java.util.Arrays;
 import java.util.Collections;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
