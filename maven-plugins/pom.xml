@@ -46,7 +46,6 @@
             <id>javax</id>
             <modules>
                 <module>wadl2java-plugin</module>
-                <module>java2swagger-plugin</module>
             </modules>
         </profile>
     </profiles>

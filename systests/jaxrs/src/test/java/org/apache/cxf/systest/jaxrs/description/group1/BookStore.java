@@ -32,10 +32,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.cxf.systest.jaxrs.Book;
 
-import io.swagger.annotations.Api;
-
 @Path("/bookstore")
-@Api("/bookstore")
 public class BookStore {
     @Produces({ MediaType.APPLICATION_JSON })
     @GET
