@@ -79,7 +79,9 @@ public final class WSDiscoveryClientTest {
     @Test
     public void testMultiResponses() throws Exception {
         // Disable the test on Redhat Enterprise Linux which doesn't enable the UDP broadcast by default
-        if ("Linux".equals(System.getProperties().getProperty("os.name"))
+        final String osName = System.getProperties().getProperty("os.name");
+        final String osArch = System.getProperties().getProperty("os.arch");
+        if ("Linux".equals(osName)
             && System.getProperties().getProperty("os.version").indexOf("el") > 0) {
             System.out.println("Skipping MultiResponse test for REL");
             return;
@@ -107,7 +109,7 @@ public final class WSDiscoveryClientTest {
                     //fake a discovery server to send back some canned messages.
                     InetAddress address = InetAddress.getByName("239.255.255.250");
                     MulticastSocket s = new MulticastSocket(Integer.parseInt(PORT));
-                    if (!"Mac OS X".equals(System.getProperties().getProperty("os.name"))) {
+                    if (!("Mac OS X".equals(osName) && !"x86_64".equals(osArch))) {
                         s.setNetworkInterface(findIpv4Interface());
                     }
                     s.setBroadcast(true);
