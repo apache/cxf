@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonXmlBindJsonProvider;
 
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -68,7 +68,7 @@ public class JAXRSMultipartLocalTransportTest {
     @Test
     public void testBookAsMultipleInputStreams() throws Exception {
         final MultipartStore store = JAXRSClientFactory.create(ENDPOINT_ADDRESS, MultipartStore.class, 
-            Collections.singletonList(new JacksonJaxbJsonProvider()));
+            Collections.singletonList(new JacksonXmlBindJsonProvider()));
         
         final byte[] books1 = generateBooks(40000).getBytes(StandardCharsets.UTF_8); 
         final byte[] books2 = generateBooks(2000).getBytes(StandardCharsets.UTF_8);

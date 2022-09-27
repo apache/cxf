@@ -22,7 +22,7 @@ package org.apache.cxf.systest.jaxrs.logging;
 import java.util.Collections;
 import java.util.List;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;

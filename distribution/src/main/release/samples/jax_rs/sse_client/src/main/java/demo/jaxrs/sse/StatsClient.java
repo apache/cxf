@@ -24,7 +24,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.sse.InboundSseEvent;
 import jakarta.ws.rs.sse.SseEventSource;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 public final class StatsClient {
     private StatsClient() {

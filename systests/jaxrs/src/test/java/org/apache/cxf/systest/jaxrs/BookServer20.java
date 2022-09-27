@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonXmlBindJsonProvider;
 
 import jakarta.annotation.Priority;
 import jakarta.servlet.http.HttpServletRequest;
@@ -107,7 +107,7 @@ public class BookServer20 extends AbstractServerTestServerBase {
         providers.add(new FaultyContainerRequestFilter());
         providers.add(new PreMatchReplaceStreamOrAddress());
         providers.add(new ServerTestFeature());
-        providers.add(new JacksonJaxbJsonProvider());
+        providers.add(new JacksonXmlBindJsonProvider());
         providers.add(new IOExceptionMapper());
         providers.add(new GregorianCalendarMessageBodyWriter());
         sf.setApplication(new Application());

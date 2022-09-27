@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs.reactor;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.client.ClientBuilder;

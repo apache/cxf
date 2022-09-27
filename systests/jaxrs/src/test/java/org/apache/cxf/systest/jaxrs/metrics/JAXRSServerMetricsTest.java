@@ -21,7 +21,7 @@ package org.apache.cxf.systest.jaxrs.metrics;
 
 import java.util.Arrays;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.ProcessingException;

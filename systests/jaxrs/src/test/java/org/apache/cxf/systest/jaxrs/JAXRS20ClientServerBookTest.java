@@ -34,7 +34,7 @@ import java.util.concurrent.Future;
 
 import javax.xml.namespace.QName;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonXmlBindJsonProvider;
 
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.WebApplicationException;
@@ -478,7 +478,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         String endpointAddress =
             "http://localhost:" + PORT + "/bookstore/collections";
         WebClient wc = WebClient.create(endpointAddress,
-                                        Collections.singletonList(new JacksonJaxbJsonProvider()));
+                                        Collections.singletonList(new JacksonXmlBindJsonProvider()));
         doTestPostGetCollectionGenericEntityAndType(wc, MediaType.APPLICATION_JSON_TYPE);
     }
 

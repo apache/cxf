@@ -37,7 +37,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import jakarta.activation.DataHandler;
 import jakarta.mail.util.ByteArrayDataSource;
