@@ -32,7 +32,7 @@ public class SequentialStrategy extends AbstractStaticFailoverStrategy {
      * Get next alternate endpoint.
      *
      * @param alternates non-empty List of alternate endpoints
-     * @return
+     * @return the next endpoint or {@code null} in case there are no more alternates
      */
     protected <T> T getNextAlternate(List<T> alternates) {
         return alternates.remove(0);

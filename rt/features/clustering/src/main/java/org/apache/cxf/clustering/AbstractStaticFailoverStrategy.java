@@ -73,12 +73,14 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
      * Select one of the alternate addresses for a retried invocation.
      *
      * @param alternates a List of alternate addresses if available
-     * @return the selected address
+     * @return the selected address or {@code null} if no alternate address is available
      */
     public String selectAlternateAddress(List<String> alternates) {
         String selected = null;
         if (alternates != null && !alternates.isEmpty()) {
             selected = getNextAlternate(alternates);
+        }
+        if (selected != null) {
             Level level = getLogLevel();
             if (LOG.isLoggable(level)) {
                 LOG.log(level,
@@ -105,18 +107,20 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
      * Select one of the alternate endpoints for a retried invocation.
      *
      * @param alternates a List of alternate endpoints if available
-     * @return the selected endpoint
+     * @return the selected endpoint or {@code null} if no alternate endpoint is available
      */
     public Endpoint selectAlternateEndpoint(List<Endpoint> alternates) {
         Endpoint selected = null;
         if (alternates != null && !alternates.isEmpty()) {
             selected = getNextAlternate(alternates);
+        } 
+        if (selected != null) {
             Level level = getLogLevel();
             if (LOG.isLoggable(level)) {
                 LOG.log(level,
                         "FAILING_OVER_TO_ALTERNATE_ENDPOINT",
-                         new Object[] {selected.getEndpointInfo().getName(),
-                                       selected.getEndpointInfo().getAddress()});
+                        new Object[] {selected.getEndpointInfo().getName(),
+                                selected.getEndpointInfo().getAddress()});
             }
         } else {
             LOG.warning("NO_ALTERNATE_TARGETS_REMAIN");
