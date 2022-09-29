@@ -99,7 +99,8 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         return at;
     }
 
-    protected ServerAccessToken doCreateAccessToken(List<String> audiences,
+    //CHECKSTYLE:OFF
+    protected ServerAccessToken doCreateAccessToken(List<String> audiences, //NOPMD
                                                     Client client,
                                                     String clientCodeVerifier,
                                                     Map<String, String> extraProperties,
@@ -109,6 +110,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
                                                     String responseType,
                                                     List<OAuthPermission> scopes,
                                                     UserSubject userSubject) {
+    //CHECKSTYLE:ON
 
         ServerAccessToken at =
             createNewAccessToken(client, userSubject);
@@ -423,8 +425,8 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         List<OAuthPermission> theNewScopes = null;
 
         if (restrictedScopes.isEmpty()) {
-            theNewScopes = oldRefreshToken.getScopes() != null ?
-                    new ArrayList<OAuthPermission>(oldRefreshToken.getScopes()) : null;
+            theNewScopes = oldRefreshToken.getScopes() != null
+                    ? new ArrayList<OAuthPermission>(oldRefreshToken.getScopes()) : null;
         } else {
             theNewScopes = convertScopeToPermissions(client, restrictedScopes);
             if (!oldRefreshToken.getScopes().containsAll(theNewScopes)) {
@@ -434,8 +436,8 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
 
         ServerAccessToken at =
             doCreateAccessToken(
-                oldRefreshToken.getAudiences() != null ?
-                    new ArrayList<String>(oldRefreshToken.getAudiences()) : null,
+                oldRefreshToken.getAudiences() != null
+                    ? new ArrayList<String>(oldRefreshToken.getAudiences()) : null,
                 client, oldRefreshToken.getClientCodeVerifier(),
                 oldRefreshToken.getExtraProperties(), oldRefreshToken.getGrantCode(),
                 oldRefreshToken.getGrantType(), oldRefreshToken.getNonce(),
