@@ -373,13 +373,15 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
         protected <T> T getNextAlternate(List<T> alternates) {
             totalCount++;
             T next = super.getNextAlternate(alternates);
-            String address = (String)next;
-            Integer count = map.get(address);
-            if (count == null) {
-                count = 0;
+            if (next != null) {
+                String address = (String)next;
+                Integer count = map.get(address);
+                if (count == null) {
+                    count = 0;
+                }
+                count++;
+                map.put(address, count);
             }
-            count++;
-            map.put(address, count);
             return next;
         }
 
@@ -388,7 +390,7 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
         }
 
         public int getAddressCount(String address) {
-            return map.get(address) - 1;
+            return map.get(address);
         }
     }
 }
