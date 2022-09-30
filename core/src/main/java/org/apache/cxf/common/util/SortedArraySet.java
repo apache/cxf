@@ -39,7 +39,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * If no data is stored in the Set, it uses very little memory.  The backing
  * array is created on demand.
  *
- * This class is primarly useful for stuff that will be setup at startup, but
+ * This class is primarily useful for stuff that will be setup at startup, but
  * then iterated over MANY times during runtime.
  *
  * @param <T>
@@ -71,25 +71,29 @@ public final class SortedArraySet<T> implements SortedSet<T> {
     }
 
     public boolean add(T o) {
-        if (!contains(o)) {
-            T[] tmp = data.get();
-            T[] tmp2;
-            if (tmp == null) {
-                tmp2 = newArray(1);
-                tmp2[0] = o;
-            } else {
-                tmp2 = newArray(tmp.length + 1);
-                System.arraycopy(tmp, 0, tmp2, 0, tmp.length);
-                tmp2[tmp2.length - 1] = o;
-                Arrays.sort(tmp2);
-            }
 
-            if (!data.compareAndSet(tmp, tmp2)) {
-                return add(o);
+        T[] tmp2;
+        T[] tmp = data.get();
+
+        if (tmp == null) {
+            tmp2 = newArray(1);
+            tmp2[0] = o;
+        } else {
+            int idx = Arrays.binarySearch(tmp, o);
+            if (idx >= 0) {
+                return false;
             }
-            return true;
+            // insertion point
+            idx = -idx - 1;
+            tmp2 = newArray(tmp.length + 1);
+            System.arraycopy(tmp, 0, tmp2, 0, idx);
+            tmp2[idx] = o;
+            System.arraycopy(tmp, idx, tmp2, idx + 1, tmp.length - idx);
         }
-        return false;
+        if (!data.compareAndSet(tmp, tmp2)) {
+            return add(o);
+        }
+        return true;
     }
     public boolean addAll(Collection<? extends T> c) {
         boolean val = false;
@@ -99,9 +103,9 @@ public final class SortedArraySet<T> implements SortedSet<T> {
         return val;
     }
     public boolean containsAll(Collection<?> c) {
-        boolean val = false;
+        boolean val = true;
         for (Object t : c) {
-            val |= contains(t);
+            val &= contains(t);
         }
         return val;
     }
@@ -138,20 +142,21 @@ public final class SortedArraySet<T> implements SortedSet<T> {
             return false;
         }
         int idx = Arrays.binarySearch(tmp, o);
-        if (idx != -1) {
-            if (tmp.length == 1
-                && !data.compareAndSet(tmp, null)) {
-                return remove(o);
-            }
-            T[] tmp2 = newArray(tmp.length - 1);
-            System.arraycopy(tmp, 0, tmp2, 0, idx);
-            System.arraycopy(tmp, idx + 1, tmp2, idx, tmp.length - 1 - idx);
-            if (!data.compareAndSet(tmp, tmp2)) {
-                return remove(o);
-            }
-            return true;
+        if (idx < 0) {
+            return false;
         }
-        return false;
+        T[] tmp2;
+        if (tmp.length == 1) { // last one
+            tmp2 = null;
+        } else {
+            tmp2 = newArray(tmp.length - 1);
+            System.arraycopy(tmp, 0, tmp2, 0, idx);
+            System.arraycopy(tmp, idx + 1, tmp2, idx, tmp2.length - idx);
+        }
+        if (!data.compareAndSet(tmp, tmp2)) {
+            return remove(o);
+        }
+        return true;
     }
 
 
@@ -225,7 +230,7 @@ public final class SortedArraySet<T> implements SortedSet<T> {
         @Override
         public void remove() {
             if (idx > 0) {
-                SortedArraySet.this.remove((Object)data[idx - 1]);
+                SortedArraySet.this.remove(data[idx - 1]);
             }
         }
     }
