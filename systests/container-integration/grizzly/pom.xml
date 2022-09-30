@@ -58,22 +58,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.sun.grizzly</groupId>
-            <artifactId>grizzly-http</artifactId>
-            <version>1.9.65</version>
+            <groupId>org.glassfish.grizzly</groupId>
+            <artifactId>grizzly-http-server</artifactId>
+            <version>3.0.1</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jvnet.jax-ws-commons</groupId>
-            <artifactId>jaxws-grizzly-httpspi</artifactId>
-            <version>1.1</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>jakarta.xml.ws</groupId>
-                    <artifactId>jaxws-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>${cxf.servlet-api.group}</groupId>
