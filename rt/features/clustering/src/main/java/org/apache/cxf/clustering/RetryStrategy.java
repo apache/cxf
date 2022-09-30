@@ -44,7 +44,7 @@ public class RetryStrategy extends SequentialStrategy {
     @Override
     protected <T> T getNextAlternate(List<T> alternates) {
         // is the amount of retries for the first alternate already exceeded?
-        if (!stillTheSameAddress()) {
+        if (!stillTheSameAddress() && !alternates.isEmpty()) {
             alternates.remove(0);
         }
         return alternates.isEmpty() ? null : alternates.get(0);
