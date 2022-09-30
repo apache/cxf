@@ -376,7 +376,7 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
                 String address = (String)next;
                 Integer count = map.get(address);
                 if (count == null) {
-                    count = 0;
+                    count = map.isEmpty() ? 1 /* count first call */ : 0;
                 }
                 count++;
                 map.put(address, count);
@@ -389,7 +389,7 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
         }
 
         public int getAddressCount(String address) {
-            return map.get(address);
+            return map.get(address) - 1;
         }
     }
 }
