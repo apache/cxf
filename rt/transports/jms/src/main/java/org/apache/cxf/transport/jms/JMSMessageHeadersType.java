@@ -379,7 +379,7 @@ public class JMSMessageHeadersType {
     }
 
     public void writeProp(Message jmsMessage, String origName, Object value) throws JMSException {
-        String name = origName.replace(".", "__");
+        String name = origName.replace(".", "__").replace("-", "___");
         if (value == null) {
             jmsMessage.setStringProperty(name, null);
             return;

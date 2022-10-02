@@ -58,7 +58,7 @@
         <cxf.easymock.version>4.3</cxf.easymock.version>
 
         <!-- please maintain alphabetical order here -->
-        <cxf.activemq.artemis.version>2.21.0</cxf.activemq.artemis.version>
+        <cxf.activemq.artemis.version>2.26.0</cxf.activemq.artemis.version>
         <cxf.ahc.version>2.12.3</cxf.ahc.version>
         <cxf.apacheds.version>2.0.0.AM26</cxf.apacheds.version>
         <cxf.arquillian.version>1.1.14.Final</cxf.arquillian.version>
