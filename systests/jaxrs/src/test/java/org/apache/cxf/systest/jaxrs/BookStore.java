@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -659,6 +660,13 @@ public class BookStore {
     @Produces("text/plain,text/boolean")
     public boolean checkBook(@PathParam("id") Long id) {
         return books.containsKey(id);
+    }
+    
+    @GET
+    @Path("books/check/uuid/{uuid}")
+    @Produces("text/plain,text/boolean")
+    public boolean checkBookUuid(@PathParam("uuid") BookId id) {
+        return books.containsKey(id.getId());
     }
 
     @GET
@@ -2309,6 +2317,27 @@ public class BookStore {
         }
     }
 
+    public abstract static class AbstractBookId {
+        public static BookId fromString(String id) {
+            return BookId.of(UUID.fromString(id));
+        }
+    }
+
+    public static final class BookId extends AbstractBookId {
+        private final UUID uuid;
+
+        private BookId(UUID uuid) {
+            this.uuid = uuid;
+        }
+
+        public long getId() {
+            return uuid.getMostSignificantBits();
+        }
+
+        public static BookId of(UUID uuid) {
+            return new BookId(uuid);
+        }
+    }
 }
 
 

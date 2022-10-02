@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.InternalServerErrorException;
@@ -159,6 +160,14 @@ public class InjectionUtilsTest {
                                                          CarType.class, null,
                                                          ParameterType.QUERY, null);
         assertEquals("Type is wrong", CarType.AUDI, carType);
+    }
+
+    @Test
+    public void testInstantiateClass() {
+        HelmId helmId = InjectionUtils.handleParameter("a6f7357f-6e7e-40e5-9b4a-c455c23b10a2", false, HelmId.class,
+                                                         HelmId.class, null,
+                                                         ParameterType.QUERY, null);
+        assertEquals("Type is wrong", "a6f7357f-6e7e-40e5-9b4a-c455c23b10a2", helmId.getId());
     }
 
     @Test
@@ -380,6 +389,28 @@ public class InjectionUtilsTest {
 
         public void setBirthDate(LocalDate birthDate) {
             this.birthDate = birthDate;
+        }
+    }
+
+    private abstract static class AbstractHelmId {
+        public static HelmId fromString(String id) {
+            return HelmId.of(UUID.fromString(id));
+        }
+    }
+
+    private static final class HelmId extends AbstractHelmId {
+        private final UUID uuid;
+
+        private HelmId(UUID uuid) {
+            this.uuid = uuid;
+        }
+
+        public String getId() {
+            return uuid.toString();
+        }
+
+        public static HelmId of(UUID uuid) {
+            return new HelmId(uuid);
         }
     }
 }
