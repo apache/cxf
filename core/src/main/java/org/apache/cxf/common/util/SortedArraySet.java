@@ -103,11 +103,12 @@ public final class SortedArraySet<T> implements SortedSet<T> {
         return val;
     }
     public boolean containsAll(Collection<?> c) {
-        boolean val = true;
         for (Object t : c) {
-            val &= contains(t);
+            if (!contains(t)) {
+                return false;
+            }
         }
-        return val;
+        return true;
     }
 
     public boolean contains(Object o) {
