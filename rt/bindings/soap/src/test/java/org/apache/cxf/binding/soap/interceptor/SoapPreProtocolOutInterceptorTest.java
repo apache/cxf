@@ -20,11 +20,14 @@
 package org.apache.cxf.binding.soap.interceptor;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.helpers.CastUtils;
@@ -72,6 +75,23 @@ public class SoapPreProtocolOutInterceptorTest {
         List<String> soapaction = reqHeaders.get("soapaction");
         assertTrue(null != soapaction && soapaction.size() == 1);
         assertEquals("\"http://foo/bar/SEI/opReq\"", soapaction.get(0));
+    }
+
+    @Test
+    public void testSoapActionFromHeaders() throws Exception {
+        SoapMessage message = setUpMessage();
+        Map<String, List<String>> transportHeaders = new TreeMap<>();
+        // Set the header value as a simple string (not quoted) just as DefaultCxfBinding#propagateHeadersFromCamelToCxf
+        // does
+        transportHeaders.put(SoapBindingConstants.SOAP_ACTION, Collections.singletonList("http://foo/bar/SEI/opReq"));
+        message.put(Message.PROTOCOL_HEADERS, transportHeaders);
+        interceptor.handleMessage(message);
+        control.verify();
+
+        Map<String, List<String>> reqHeaders = CastUtils.cast((Map<?, ?>) message.get(Message.PROTOCOL_HEADERS));
+        List<String> soapAction = reqHeaders.get(SoapBindingConstants.SOAP_ACTION);
+        // test the SOAPAction value is quoted just as required by a specification
+        assertEquals(Collections.singletonList("\"http://foo/bar/SEI/opReq\""), soapAction);
     }
 
     private SoapMessage setUpMessage() throws Exception {
