@@ -1,4 +1,4 @@
-Apache CXF 3.5.3 Release Notes
+Apache CXF 3.5.4 Release Notes
 
 1. Overview
 
@@ -31,7 +31,7 @@ for further information and requirements for upgrading from earlier
 versions of CXF.
 
 
-3.5.3 fixes over 14 JIRA issues reported by users and the community.
+3.5.4 fixes over 14 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -74,23 +74,25 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Sub-task
-    * [CXF-8458] - jaxrs.api.rs.core.linkbuilder buildNoArgsThrowsUriBuilderExceptionTest
-    * [CXF-8459] - jaxrs.api.rs.core.linkbuilder buildObjectsThrowsUriBuilderExceptionTest
-    * [CXF-8460] - jaxrs.api.rs.core.linkbuilder buildRelativizedThrowsUriBuilderExceptionTest
-    * [CXF-8478] - jaxrs.ee.rs.container.requestcontext setRequestUriTwoUrisTest
+    * [CXF-8730] - Fix org.apache.cxf.osgi.itests.jaxrs.JaxRsServiceTest
 
 ** Bug
-    * [CXF-8689] - cxf-java2ws-plugin plugin running on non-modular JDK fails with NullPointerException
-    * [CXF-8694] - CXF 3.5.0 Generated WSDL root element
     * [CXF-8698] - Content-ID of attachments for outgoing requests are URL-decoded instead of URL-encoded
-    * [CXF-8702] - Graceful shutdown : Error 404 with "Can't find the request for XXXXX's Observer" on - Springboot + CXF Server
-    * [CXF-8703] - PAX Maven URL does not take local Maven repository into account
+    * [CXF-8712] - RetryStrategy tries one time too often
+    * [CXF-8732] - [regression] activation DataSource requires to run JAXRS
+    * [CXF-8733] - [regression] Content-ID of attachments for outgoing requests is not URL-decoded
+    * [CXF-8735] - AbstractStaticFailoverStrategy: UnsupportedOperationException when there are no services associated with the endpoint
+    * [CXF-8738] - NullPointerException when SwaggerUiConfig.queryConfigEnabled not set
+    * [CXF-8749] - Existing handler file fails the compile generated java source files
+    * [CXF-8750] - Swagger UI not working in Karaf 4.4.0 due to a double slash
+
+** New Feature
+    * [CXF-8752] - Configurable list of redirectable verbs
 
 ** Improvement
-    * [CXF-8683] - Support SwaggerUI 4.10.3+
-    * [CXF-8688] - Accomodate some RFC 3986 checks to filter out invalid URIs
-    * [CXF-8699] - Abillity to set sensitive filters on LoggingFeature
-
-** Task
-    * [CXF-8695] - Remove duplicate copied class from cxf-core in cxf-rt-management when build with JDK11
-    * [CXF-8711] - Jakarta EE TCKs and compatibility
+    * [CXF-8710] - Set `queryConfigEnabled` to `true` if any query parameters are configured in SwaggerUiConfig
+    * [CXF-8725] - Allow RetryStrategy to optionally not retry for HTTP 404 responses
+    * [CXF-8734] - upgrade to undertow 2.2.15 or later
+    * [CXF-8744] - Get rid of httpunit
+    * [CXF-8756] - Update to Swagger UI 4.14.0
+    * [CXF-8757] - Swagger UI: update queryConfigEnabled documented behavior
