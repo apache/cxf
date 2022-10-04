@@ -37,7 +37,7 @@
         <cxf.httpcomponents.client.version>4.5.13</cxf.httpcomponents.client.version>
         <cxf.swagger.ui.version>4.14.0</cxf.swagger.ui.version>
         <cxf.tika.version>2.4.1</cxf.tika.version>
-        <cxf.tomcat.version>10.0.22</cxf.tomcat.version>
+        <cxf.tomcat.version>10.0.26</cxf.tomcat.version>
         <graalvm.version>21.1.0</graalvm.version>
     </properties>
     <dependencies>
