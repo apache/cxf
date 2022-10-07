@@ -21,11 +21,9 @@ import jakarta.ws.rs.Path;
 
 import org.springframework.stereotype.Service;
 
-import io.swagger.annotations.Api;
 import sample.rs.service.HelloService;
 
 @Path("/sayHello2")
-@Api("/sayHello2")
 @Service
 public class HelloServiceImpl2 implements HelloService {
 

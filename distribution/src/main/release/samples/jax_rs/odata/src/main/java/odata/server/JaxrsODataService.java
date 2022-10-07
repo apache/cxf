@@ -26,10 +26,10 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
+import odata.jakarta.ODataHttpHandlerImpl;
 
 import org.apache.olingo.commons.api.edmx.EdmxReference;
 import org.apache.olingo.server.api.OData;
-import org.apache.olingo.server.api.ODataHttpHandler;
 import org.apache.olingo.server.api.ServiceMetadata;
 
 @Path("/DemoService.svc")
@@ -45,7 +45,7 @@ public class JaxrsODataService {
         OData odata = OData.newInstance();
         ServiceMetadata edm = odata.createServiceMetadata(new DemoEdmProvider(),
                                                           new ArrayList<EdmxReference>());
-        ODataHttpHandler handler = odata.createHandler(edm);
+        ODataHttpHandlerImpl handler = new ODataHttpHandlerImpl(odata, edm);
         handler.register(new DemoEntityCollectionProcessor());
 
         // let the handler do the work
