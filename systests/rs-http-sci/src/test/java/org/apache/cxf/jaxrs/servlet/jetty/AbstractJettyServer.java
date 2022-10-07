@@ -24,6 +24,7 @@ import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.webapp.Configuration;
+import org.eclipse.jetty.webapp.WebAppConfiguration;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.webapp.WebXmlConfiguration;
 
@@ -50,6 +51,7 @@ public abstract class AbstractJettyServer extends AbstractBusTestServerBase {
             context.setClassLoader(Thread.currentThread().getContextClassLoader());
             context.setConfigurations(new Configuration[] {
                 new WebXmlConfiguration(),
+                new WebAppConfiguration(),
                 new AnnotationConfiguration()
             });
 

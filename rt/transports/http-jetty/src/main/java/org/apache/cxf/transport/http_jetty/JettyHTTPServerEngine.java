@@ -490,7 +490,7 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
         }
 
         String contextName = HttpUriMapper.getContextName(url.getPath());
-        ContextHandler context = new ContextHandler();
+        ContextHandler context = handler.createContextHandler();
         context.setContextPath(contextName);
         // bind the jetty http handler with the context handler
         if (isSessionSupport) {
