@@ -37,16 +37,6 @@
         <module>wsdl-validator-plugin</module>
         <module>corba</module>
         <module>archetypes</module>
+        <module>wadl2java-plugin</module>
     </modules>
-    
-    <profiles>
-        <!-- TODO: This profile includes modules which are still on 'javax.*' namespace and
-        are not migrated to Jakarta -->
-        <profile>
-            <id>javax</id>
-            <modules>
-                <module>wadl2java-plugin</module>
-            </modules>
-        </profile>
-    </profiles>
 </project>

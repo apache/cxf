@@ -47,7 +47,7 @@
                     <response status="404">
                         <representation mediaType="text/plain">
                             <param name="error" style="plain"
-                                type="javax.ws.rs.NotFoundException" />
+                                type="jakarta.ws.rs.NotFoundException" />
                         </representation>
                     </response>
                     <response status="500">
