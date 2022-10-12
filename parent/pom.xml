@@ -203,7 +203,7 @@
         <cxf.woodstox.core.version>6.2.8</cxf.woodstox.core.version>
         <cxf.woodstox.stax2-api.version>4.2.1</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
-        <cxf.jakarta.wss4j.version>3.0.0</cxf.jakarta.wss4j.version>
+        <cxf.jakarta.wss4j.version>3.0.0-SNAPSHOT</cxf.jakarta.wss4j.version>
         <cxf.xerces.version>2.12.2</cxf.xerces.version>
         <cxf.xmlschema.version>2.3.0</cxf.xmlschema.version>
         <cxf.zest.version>2.1</cxf.zest.version>
