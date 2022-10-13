@@ -56,16 +56,6 @@
         <module>transport-netty</module>
         <module>transport-hc5</module>
         <module>transport-jms</module>
+        <module>jaxrs</module>
     </modules>
-    
-    <profiles>
-        <!-- TODO: This profile includes modules which are still on 'javax.*' namespace and
-        are not migrated to Jakarta -->
-        <profile>
-            <id>javax</id>
-            <modules>
-                <module>jaxrs</module>
-            </modules>
-        </profile>
-    </profiles>
 </project>

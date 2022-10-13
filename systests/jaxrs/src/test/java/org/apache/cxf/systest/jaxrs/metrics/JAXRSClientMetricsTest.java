@@ -37,7 +37,7 @@ import org.apache.cxf.metrics.MetricsContext;
 import org.apache.cxf.metrics.MetricsFeature;
 import org.apache.cxf.metrics.MetricsProvider;
 import org.apache.cxf.service.model.BindingOperationInfo;
-import org.springframework.util.SocketUtils;
+import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -143,7 +143,7 @@ public class JAXRSClientMetricsTest {
 
     @Test
     public void usingClientStopIsCalledWhenConnectionIsRefused() throws Exception {
-        final int port = SocketUtils.findAvailableTcpPort();
+        final int port = Integer.parseInt(TestUtil.getNewPortNumber(getClass()));
         
         final Client client = ClientBuilder
             .newClient()
