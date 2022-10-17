@@ -189,7 +189,7 @@
         <cxf.swagger.ui.version>4.14.2</cxf.swagger.ui.version>
         <cxf.swagger.v3.version>2.2.3</cxf.swagger.v3.version>
         <cxf.tika.version>2.5.0</cxf.tika.version>
-        <cxf.tomcat.version>10.0.26</cxf.tomcat.version>
+        <cxf.tomcat.version>10.1.1</cxf.tomcat.version>
         <cxf.tomitribe.http.signature.version>1.8</cxf.tomitribe.http.signature.version>
         <cxf.undertow.version>2.2.19.Final</cxf.undertow.version>
         <!-- the Export-Package is the same as the Maven artifact
