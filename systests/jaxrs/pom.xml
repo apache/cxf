@@ -103,6 +103,11 @@
             <artifactId>swagger-ui</artifactId>
             <version>${cxf.swagger.ui.version}</version>
         </dependency>
+         <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-client</artifactId>
+            <version>${cxf.jetty.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
