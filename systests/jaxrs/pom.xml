@@ -217,6 +217,12 @@
             <groupId>org.apache.activemq</groupId>
             <artifactId>artemis-jakarta-server</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -437,6 +443,12 @@
             <groupId>org.asynchttpclient</groupId>
             <artifactId>async-http-client</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
          <dependency>
             <groupId>org.apache.lucene</groupId>
