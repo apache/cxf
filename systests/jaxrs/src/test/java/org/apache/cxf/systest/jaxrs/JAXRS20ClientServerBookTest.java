@@ -976,8 +976,8 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
             .get()
             .readEntity(String.class);
             
-        assertThat(response, equalTo("2020-01-01{javax.ws.rs.GET,javax.ws.rs.Path,javax.ws.rs.Produces,"
-            + "javax.ws.rs.ext.Provider,javax.ws.rs.Consumes}"));
+        assertThat(response, equalTo("2020-01-01{jakarta.ws.rs.GET,jakarta.ws.rs.Path,jakarta.ws.rs.Produces,"
+            + "jakarta.ws.rs.ext.Provider,jakarta.ws.rs.Consumes}"));
     }
     
     private static class ReplaceBodyFilter implements ClientRequestFilter {
