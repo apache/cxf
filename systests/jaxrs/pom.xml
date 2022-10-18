@@ -546,6 +546,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.johnzon</groupId>
+            <artifactId>johnzon-mapper</artifactId>
+            <version>${cxf.johnzon.version}</version>
+            <classifier>jakarta</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-codec-socks</artifactId>
             <version>${cxf.netty.version}</version>
