@@ -30,7 +30,6 @@ import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -80,7 +79,6 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
     }
 
     @Test
-    @Ignore("JSP pages need to be precompiled by Maven build")
     public void testGetBookJSPRequestScope() throws Exception {
         String endpointAddress =
             "http://localhost:" + PORT + "/the/bookstore2/books/html/123";
@@ -94,7 +92,6 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
     }
 
     @Test
-    @Ignore("JSP pages need to be precompiled by Maven build")
     public void testGetBookJSPSessionScope() throws Exception {
         String endpointAddress =
             "http://localhost:" + PORT + "/the/bookstore3/books/html/456";
