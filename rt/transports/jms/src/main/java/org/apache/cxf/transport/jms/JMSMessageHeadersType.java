@@ -373,13 +373,13 @@ public class JMSMessageHeadersType {
         while (enm.hasMoreElements()) {
             String name = enm.nextElement();
             String val = message.getStringProperty(name);
-            String unescapedName = name.replace("__", ".");
+            String unescapedName = name.replace("_$_", "-").replace("__", ".");
             putProperty(unescapedName, val);
         }
     }
 
     public void writeProp(Message jmsMessage, String origName, Object value) throws JMSException {
-        String name = origName.replace(".", "__").replace("-", "___");
+        String name = origName.replace(".", "__").replace("-", "_$_");
         if (value == null) {
             jmsMessage.setStringProperty(name, null);
             return;

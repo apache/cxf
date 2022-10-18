@@ -152,7 +152,7 @@ public class JMSBookStore {
     private Context getContext() throws Exception {
         Properties props = new Properties();
         props.setProperty(Context.INITIAL_CONTEXT_FACTORY,
-                          "org.apache.activemq.jndi.ActiveMQInitialContextFactory");
+                          "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory");
         props.setProperty(Context.PROVIDER_URL, "tcp://localhost:" + EmbeddedJMSBrokerLauncher.PORT);
         return new InitialContext(props);
 
