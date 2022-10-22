@@ -23,24 +23,26 @@ import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.auth.DigestAuthSupplier;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.DigestAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.DigestAuthenticationFilter;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -88,17 +90,18 @@ public class DigestAuthSupplierSpringTest {
 
     }
 
-    static class SecurityConfig extends WebSecurityConfigurerAdapter {
+    static class SecurityConfig {
 
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
+        @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
             DigestAuthenticationEntryPoint authenticationEntryPoint = digestAuthenticationEntryPoint();
-            http
+            return http
                 .authorizeRequests().anyRequest().authenticated()
                     .and()
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
                     .and()
-                .addFilter(digestAuthenticationFilter(authenticationEntryPoint));
+                .addFilter(digestAuthenticationFilter(authenticationEntryPoint))
+                .build();
         }
 
         private DigestAuthenticationFilter digestAuthenticationFilter(
@@ -116,10 +119,15 @@ public class DigestAuthSupplierSpringTest {
             return digestAuthenticationEntryPoint;
         }
 
-        @Override
-        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-            auth.inMemoryAuthentication()
-                .withUser(USER).password(PWD).roles("");
+        @Bean
+        public InMemoryUserDetailsManager userDetailsService() {
+            final UserDetails user = User
+                .builder()
+                .username(USER)
+                .password(PWD)
+                .roles("")
+                .build();
+            return new InMemoryUserDetailsManager(user);
         }
 
         @Bean
