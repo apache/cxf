@@ -20,6 +20,10 @@
 package org.apache.cxf.systest.jaxrs.security;
 
 import org.apache.cxf.systest.jaxrs.AbstractSpringServer;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.webapp.WebAppContext;
 
 
 
@@ -28,6 +32,17 @@ public class BookServerSecuritySpringClass extends AbstractSpringServer {
 
     public BookServerSecuritySpringClass() {
         super("/jaxrs_security_cglib", PORT);
+    }
+    
+    @Override
+    protected void configureServer(Server server) throws Exception {
+        final HandlerCollection collection = (HandlerCollection) server.getHandler();
+        for (Handler handler: collection.getHandlers()) {
+            if (handler instanceof WebAppContext) {
+                final WebAppContext webappcontext = (WebAppContext) handler; 
+                webappcontext.setClassLoader(getClass().getClassLoader());
+            }
+        }
     }
 
     public static void main(String[] args) {
