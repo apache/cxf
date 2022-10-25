@@ -83,8 +83,8 @@ import org.apache.cxf.staxutils.transform.TransformUtils;
 @Provider
 public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
     private static final String XML_PI_START = "<?xml version=\"1.0\" encoding=\"";
-    private static final String XML_PI_PROPERTY_RI = "com.sun.xml.bind.xmlHeaders";
-    private static final String XML_PI_PROPERTY_RI_INT = "com.sun.xml.internal.bind.xmlHeaders";
+    private static final String XML_PI_PROPERTY_RI = "org.glassfish.jaxb.xmlHeaders";
+    private static final String XML_PI_PROPERTY_RI_INT = "org.glassfish.jaxb.internal.bind.xmlHeaders";
 
     private static final String[] MARSHALLER_PROPERTIES = {
         Marshaller.JAXB_ENCODING,

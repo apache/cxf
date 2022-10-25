@@ -158,7 +158,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
         return lst;
     }
     private <T> void tryOSGI(Collection<T> lst, Class<T> type) {
-        if (!osgi) {
+        if (!osgi || bundleContext == null) {
             return;
         }
         try {

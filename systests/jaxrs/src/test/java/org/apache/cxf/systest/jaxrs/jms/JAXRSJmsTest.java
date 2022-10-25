@@ -379,9 +379,9 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         MessageProducer producer = session.createProducer(destination);
         Message message = session.createBytesMessage();
         message.setJMSReplyTo(replyTo);
-        message.setStringProperty("Accept", "application/xml");
-        message.setStringProperty(org.apache.cxf.message.Message.REQUEST_URI, "/bookstore/books/123");
-        message.setStringProperty(org.apache.cxf.message.Message.HTTP_REQUEST_METHOD, "GET");
+        setStringProperty(message, "Accept", "application/xml");
+        setStringProperty(message, org.apache.cxf.message.Message.REQUEST_URI, "/bookstore/books/123");
+        setStringProperty(message, org.apache.cxf.message.Message.HTTP_REQUEST_METHOD, "GET");
         producer.send(message);
         producer.close();
     }
@@ -393,9 +393,9 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         byte[] payload = writeBook(new Book("JMS OneWay", 125L));
         BytesMessage message = session.createBytesMessage();
         message.writeBytes(payload);
-        message.setStringProperty("Content-Type", "application/xml");
-        message.setStringProperty(org.apache.cxf.message.Message.REQUEST_URI, "/bookstore/oneway");
-        message.setStringProperty(org.apache.cxf.message.Message.HTTP_REQUEST_METHOD, "PUT");
+        setStringProperty(message, "Content-Type", "application/xml");
+        setStringProperty(message, org.apache.cxf.message.Message.REQUEST_URI, "/bookstore/oneway");
+        setStringProperty(message, org.apache.cxf.message.Message.HTTP_REQUEST_METHOD, "PUT");
 
         producer.send(message);
         producer.close();
@@ -422,11 +422,11 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         // POST
         // Message.REQUEST_URI : "/"
 
-        message.setStringProperty("Content-Type", "application/xml");
-        message.setStringProperty("Accept", "text/xml");
-        message.setStringProperty(org.apache.cxf.message.Message.REQUEST_URI, "/bookstore/books");
-        message.setStringProperty(org.apache.cxf.message.Message.HTTP_REQUEST_METHOD, "POST");
-        message.setStringProperty("custom.protocol.header", "custom.value");
+        setStringProperty(message, "Content-Type", "application/xml");
+        setStringProperty(message, "Accept", "text/xml");
+        setStringProperty(message, org.apache.cxf.message.Message.REQUEST_URI, "/bookstore/books");
+        setStringProperty(message, org.apache.cxf.message.Message.HTTP_REQUEST_METHOD, "POST");
+        setStringProperty(message, "custom.protocol.header", "custom.value");
 
         producer.send(message);
         producer.close();
@@ -457,4 +457,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         }
     }
 
+    private static void setStringProperty(Message message, String name, String value) throws JMSException {
+        message.setStringProperty(name.replace(".", "__").replace("-", "_$_"), value);
+    }
 }

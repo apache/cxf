@@ -18,78 +18,75 @@
  */
 package org.apache.cxf.microprofile.client;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 
-import com.github.tomakehurst.wiremock.common.FileSource;
-import com.github.tomakehurst.wiremock.extension.Parameters;
-import com.github.tomakehurst.wiremock.extension.ResponseTransformer;
-import com.github.tomakehurst.wiremock.http.Request;
-import com.github.tomakehurst.wiremock.http.Response;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 
 import org.apache.cxf.microprofile.client.mock.AsyncClient;
 import org.apache.cxf.microprofile.client.mock.NotFoundExceptionMapper;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
-import org.junit.Rule;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.notFound;
-import static com.github.tomakehurst.wiremock.client.WireMock.ok;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class AsyncTest {
-    @SuppressWarnings("unchecked")
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule(wireMockConfig()
-        .extensions(SimpleTransformer.class).dynamicPort());
-    
-    public static class SimpleTransformer extends ResponseTransformer {
-        private final Queue<String> queue = new ArrayBlockingQueue<>(2);
-        
-        public SimpleTransformer() {
-            queue.add("Hello");
-            queue.add("World");
-        }
-        
-        @Override
-        public Response transform(Request request, Response response, FileSource fileSource, Parameters parameters) {
-            return Response.Builder
-                .like(response)
-                .but().body(queue.poll())
-                .build();
-        }
+    private HttpServer server;
+    private final Queue<String> queue = new ArrayBlockingQueue<>(2);
 
+    public class SimpleHandler implements HttpHandler {
         @Override
-        public boolean applyGlobally() {
-            return false;
-        }
-
-        @Override
-        public String getName() {
-            return "enqueue-transformer";
+        public void handle(HttpExchange exchange) throws IOException {
+            final String body = queue.poll();
+            if (body == null) {
+                exchange.sendResponseHeaders(404, 0);
+            } else {
+                exchange.sendResponseHeaders(200, body.length());
+                try (OutputStream os = exchange.getResponseBody()) {
+                    os.write(body.getBytes());
+                }
+            }
         }
     }
-    
+
+    @Before
+    public void setUp() throws IOException {
+        server = HttpServer.create(new InetSocketAddress(0), 2);
+        server.createContext("/", new SimpleHandler());
+        server.start();
+    }
+
+    @After
+    public void tearDown() throws IOException {
+        server.stop(0);
+        queue.clear();
+    }
+
     @Test
     public void testAsyncClient() throws Exception {
-        URI uri = URI.create(wireMockRule.baseUrl());
+        queue.add("Hello");
+        queue.add("World");
+
+        URI uri = URI.create("http://localhost:" + server.getAddress().getPort());
         AsyncClient client = RestClientBuilder.newBuilder()
                                               .baseUri(uri)
                                               .connectTimeout(5, TimeUnit.SECONDS)
                                               .readTimeout(5, TimeUnit.SECONDS)
                                               .build(AsyncClient.class);
         assertNotNull(client);
-
-        wireMockRule.stubFor(get("/").willReturn(ok().withTransformers("enqueue-transformer")));
 
         String combined = client.get().thenCombine(client.get(), (a, b) -> {
             return a + " " + b;
@@ -100,14 +97,13 @@ public class AsyncTest {
 
     @Test
     public void testAsyncClientCanMapExceptionResponses() throws Exception {
-        URI uri = URI.create(wireMockRule.baseUrl());
+        URI uri = URI.create("http://localhost:" + server.getAddress().getPort());
         AsyncClient client = RestClientBuilder.newBuilder()
                                               .baseUri(uri)
                                               .connectTimeout(5, TimeUnit.SECONDS)
                                               .readTimeout(5, TimeUnit.SECONDS)
                                               .register(NotFoundExceptionMapper.class)
                                               .build(AsyncClient.class);
-        wireMockRule.stubFor(get("/").willReturn(notFound()));
 
         CompletionStage<?> cs = client.get().exceptionally(t -> {
             Throwable t2 = t.getCause();
