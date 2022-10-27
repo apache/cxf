@@ -31,7 +31,7 @@
         <maven.deploy.skip>true</maven.deploy.skip>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.boot.version>3.0.0-RC1</spring.boot.version>
-        <spring.cloud.eureka.version>3.1.0</spring.cloud.eureka.version>
+        <spring.cloud.eureka.version>4.0.0-M1</spring.cloud.eureka.version>
         <cxf.jetty11.version>11.0.12</cxf.jetty11.version>
         <cxf.netty.version>4.1.84.Final</cxf.netty.version>
         <cxf.httpcomponents.client.version>4.5.13</cxf.httpcomponents.client.version>
@@ -314,6 +314,13 @@
                     <id>spring.milestone</id>
                     <url>https://repo.spring.io/milestone/</url>
                     <name>Spring Milestone Repo</name>
+                </repository>
+                <repository>
+                    <id>netflix.candidates</id>
+                    <url>https://artifactory-oss.prod.netflix.net/artifactory/maven-oss-candidates</url>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
                 </repository>
             </repositories>
             <pluginRepositories>
