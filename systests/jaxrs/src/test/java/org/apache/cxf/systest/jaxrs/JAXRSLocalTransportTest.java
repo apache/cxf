@@ -45,8 +45,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
@@ -204,6 +206,28 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
         localClient.path("bookstore/books/123");
         Book book = localClient.get(Book.class);
         assertEquals(123L, book.getId());
+    }
+
+    
+    @Test
+    public void testWebClientDirectDispatchBookId() throws Exception {
+        WebClient localClient = WebClient.create("local://books");
+        localClient.accept("text/plain");
+
+        WebClient.getConfig(localClient).getRequestContext().put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
+        localClient.path("bookstore/books/check/uuid/a6f7357f-6e7e-40e5-9b4a-c455c23b10a2");
+        boolean hasBook = localClient.get(boolean.class);
+        assertThat(hasBook, equalTo(false));
+    }
+    
+    @Test
+    public void testWebClientPipedDispatchBookId() throws Exception {
+        WebClient localClient = WebClient.create("local://books");
+        localClient.accept("text/plain");
+
+        localClient.path("bookstore/books/check/uuid/a6f7357f-6e7e-40e5-9b4a-c455c23b10a2");
+        boolean hasBook = localClient.get(boolean.class);
+        assertThat(hasBook, equalTo(false));
     }
 
     @Test
