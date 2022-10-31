@@ -101,6 +101,19 @@
             <version>${cxf.johnzon.version}</version>
             <classifier>jakarta</classifier>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.johnzon</groupId>
+            <artifactId>johnzon-mapper</artifactId>
+            <version>${cxf.johnzon.version}</version>
+            <classifier>jakarta</classifier>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.microprofile.rest.client</groupId>
@@ -126,9 +139,10 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!--TODO: after wiremock jakarta version is ready change back to com.github.tomakehurst:wiremock -->
         <dependency>
             <groupId>com.github.tomakehurst</groupId>
-            <artifactId>wiremock</artifactId>
+            <artifactId>wiremock-standalone</artifactId>
             <version>${cxf.wiremock.version}</version>
             <scope>test</scope>
             <exclusions>
