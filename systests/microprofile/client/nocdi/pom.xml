@@ -33,6 +33,7 @@
     <properties>
         <cxf.module.name>org.apache.cxf.systests.microprofile.nocdi</cxf.module.name>
         <cxf.wiremock.params>--port=8765</cxf.wiremock.params>
+        <cxf.jetty.version>9.4.49.v20220914</cxf.jetty.version>
     </properties>
     <dependencies>
         <dependency>
@@ -141,6 +142,12 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

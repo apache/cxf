@@ -32,6 +32,7 @@
     
     <properties>
         <cxf.module.name>org.apache.cxf.systests.microprofile.weld</cxf.module.name>
+        <cxf.jetty.version>9.4.49.v20220914</cxf.jetty.version>
     </properties>
     
     <dependencies>
@@ -93,6 +94,23 @@
                 <exclusion>
                     <groupId>com.github.tomakehurst</groupId>
                     <artifactId>wiremock</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.ejb</groupId>
+            <artifactId>jakarta.ejb-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.tomakehurst</groupId>
+            <artifactId>wiremock</artifactId>
+            <version>${cxf.wiremock.version}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.xmlunit</groupId>
+                    <artifactId>xmlunit-core</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

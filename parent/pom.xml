@@ -61,8 +61,8 @@
         <cxf.activemq.artemis.version>2.26.0</cxf.activemq.artemis.version>
         <cxf.ahc.version>2.12.3</cxf.ahc.version>
         <cxf.apacheds.version>2.0.0.AM26</cxf.apacheds.version>
-        <cxf.arquillian.version>1.1.14.Final</cxf.arquillian.version>
-        <cxf.arquillian.weld.container.version>2.0.1.Final</cxf.arquillian.weld.container.version>
+        <cxf.arquillian.version>1.7.0.Alpha10</cxf.arquillian.version>
+        <cxf.arquillian.weld.container.version>3.0.0.Final</cxf.arquillian.weld.container.version>
         <cxf.aspectj.version>1.9.1</cxf.aspectj.version>
         <cxf.assertj.version>3.22.0</cxf.assertj.version>
         <cxf.atmosphere.version.range>[3.0, 4.0)</cxf.atmosphere.version.range>
@@ -152,7 +152,7 @@
         <cxf.maven.core.version>3.6.3</cxf.maven.core.version>
         <cxf.micrometer.version>1.10.0-RC1</cxf.micrometer.version>
         <cxf.microprofile.config.version>3.0.1</cxf.microprofile.config.version>
-        <cxf.microprofile.rest.client.version>3.0</cxf.microprofile.rest.client.version>
+        <cxf.microprofile.rest.client.version>3.0.1</cxf.microprofile.rest.client.version>
         <cxf.microprofile.openapi.version>3.0</cxf.microprofile.openapi.version>
         <cxf.mina.version>2.1.5</cxf.mina.version>
         <cxf.mockito.version>4.8.1</cxf.mockito.version>
