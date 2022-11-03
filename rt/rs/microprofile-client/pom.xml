@@ -96,6 +96,10 @@
             <artifactId>jakarta.json-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>jakarta.json.bind</groupId>
+            <artifactId>jakarta.json.bind-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.eclipse.microprofile.rest.client</groupId>
             <artifactId>microprofile-rest-client-tck</artifactId>
             <version>${cxf.microprofile.rest.client.version}</version>

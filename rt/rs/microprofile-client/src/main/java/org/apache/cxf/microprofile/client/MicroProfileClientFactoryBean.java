@@ -43,6 +43,7 @@ import org.apache.cxf.jaxrs.client.spec.TLSConfiguration;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.FilterProviderInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
+import org.apache.cxf.jaxrs.provider.jsrjsonb.JsrJsonbProvider;
 import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
 import org.apache.cxf.microprofile.client.cdi.CDIInterceptorWrapper;
 import org.apache.cxf.microprofile.client.proxy.MicroProfileClientProxyImpl;
@@ -77,6 +78,7 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
             registeredProviders.add(new ProviderInfo<>(new DefaultResponseExceptionMapper(), getBus(), false));
         }
         registeredProviders.add(new ProviderInfo<>(new JsrJsonpProvider(), getBus(), false));
+        registeredProviders.add(new ProviderInfo<>(new JsrJsonbProvider(), getBus(), false));
         super.setProviders(registeredProviders);
     }
 
