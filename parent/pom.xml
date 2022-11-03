@@ -152,7 +152,7 @@
         <cxf.maven.core.version>3.6.3</cxf.maven.core.version>
         <cxf.micrometer.version>1.10.0-RC1</cxf.micrometer.version>
         <cxf.microprofile.config.version>3.0.1</cxf.microprofile.config.version>
-        <cxf.microprofile.rest.client.version>3.0</cxf.microprofile.rest.client.version>
+        <cxf.microprofile.rest.client.version>3.0.1</cxf.microprofile.rest.client.version>
         <cxf.microprofile.openapi.version>3.0</cxf.microprofile.openapi.version>
         <cxf.mina.version>2.1.5</cxf.mina.version>
         <cxf.mockito.version>4.8.1</cxf.mockito.version>
