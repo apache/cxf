@@ -31,11 +31,14 @@ import javax.json.bind.JsonbBuilder;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
+import javax.ws.rs.ext.Providers;
 
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 
@@ -54,9 +57,17 @@ import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 @Provider
 public class JsrJsonbProvider implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
     private final Jsonb jsonb;
+    @Context private Providers providers;
+
+    /**
+     * Create and capture only singleton instance of the Jsonb, if needed.
+     */
+    private static class DefaultJsonbSupplier {
+        private static final Jsonb INSTANCE = JsonbBuilder.create();
+    }
      
     public JsrJsonbProvider() {
-        this(JsonbBuilder.create()); 
+        this(null); 
     }
     
     public JsrJsonbProvider(Jsonb jsonb) {
@@ -72,7 +83,7 @@ public class JsrJsonbProvider implements MessageBodyReader<Object>, MessageBodyW
     public void writeTo(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
             MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) 
                 throws IOException, WebApplicationException {
-        jsonb.toJson(t, type, entityStream);
+        jsonbFor(type).toJson(t, type, entityStream);
     }
 
     @Override
@@ -86,9 +97,9 @@ public class JsrJsonbProvider implements MessageBodyReader<Object>, MessageBodyW
                 throws IOException, WebApplicationException {
         try {
             if (genericType == null) {
-                return jsonb.fromJson(entityStream, type);
+                return jsonbFor(type).fromJson(entityStream, type);
             } else {
-                return jsonb.fromJson(entityStream, genericType);
+                return jsonbFor(type).fromJson(entityStream, genericType);
             }
         } catch (JsonException ex) {
             throw ExceptionUtils.toBadRequestException(ex, null);
@@ -105,4 +116,19 @@ public class JsrJsonbProvider implements MessageBodyReader<Object>, MessageBodyW
         }
     }
 
+    private Jsonb jsonbFor(Class<?> type) {
+        if (providers != null) {
+            final ContextResolver<Jsonb> contextResolver = providers
+                .getContextResolver(Jsonb.class, MediaType.APPLICATION_JSON_TYPE);
+            if (contextResolver != null) {
+                return contextResolver.getContext(type);
+            }
+        }
+
+        if (jsonb != null) {
+            return jsonb;
+        } else {
+            return DefaultJsonbSupplier.INSTANCE;
+        }
+    }
 }
