@@ -40,6 +40,7 @@
         <cxf.tomcat.version>10.1.1</cxf.tomcat.version>
         <graalvm.version>21.1.0</graalvm.version>
         <cxf.jboss.weld.version>4.0.2.Final</cxf.jboss.weld.version>
+        <cxf.gson.version>2.8.5</cxf.gson.version>
     </properties>
     <dependencies>
         <dependency>
@@ -162,6 +163,11 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>org.glassfish.corba</groupId>
+                <artifactId>glassfish-corba-orb</artifactId>
+                <version>4.2.2</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <build>
@@ -240,56 +246,7 @@
                 </pluginRepository>
             </pluginRepositories>
         </profile>
-        <profile>
-            <id>java9-plus</id>
-            <activation>
-                <jdk>[9,)</jdk>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>jakarta.xml.bind</groupId>
-                    <artifactId>jakarta.xml.bind-api</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>jakarta.annotation</groupId>
-                    <artifactId>jakarta.annotation-api</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>jakarta.xml.ws</groupId>
-                    <artifactId>jakarta.xml.ws-api</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>jakarta.activation</groupId>
-                    <artifactId>jakarta.activation-api</artifactId>
-                    <version>2.1.0</version>
-                </dependency>
-                <dependency>
-                    <groupId>jakarta.jws</groupId>
-                    <artifactId>jakarta.jws-api</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>com.sun.xml.messaging.saaj</groupId>
-                    <artifactId>saaj-impl</artifactId>
-                    <version>2.0.1</version>
-                    <scope>runtime</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.glassfish.jaxb</groupId>
-                    <artifactId>jaxb-runtime</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>org.glassfish.jaxb</groupId>
-                    <artifactId>jaxb-xjc</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>org.glassfish.corba</groupId>
-                    <artifactId>glassfish-corba-orb</artifactId>
-                    <version>4.2.2</version>
-                </dependency>
-            </dependencies>
-        </profile>
-        
-        <!-- 
+        <!--
             TODO: Please remove, temporary repository settings in order to enable snapshots for
             Spring Boot 3.0.0
         -->
@@ -299,17 +256,6 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <repositories>
-                <repository>
-                    <id>spring.snapshots</id>
-                    <url>https://repo.spring.io/snapshot/</url>
-                    <name>Spring Snapshot Repo</name>
-                    <snapshots>
-                        <enabled>true</enabled>
-                    </snapshots>
-                    <releases>
-                        <enabled>false</enabled>
-                    </releases>
-                </repository>
                 <repository>
                     <id>spring.milestone</id>
                     <url>https://repo.spring.io/milestone/</url>
@@ -325,23 +271,13 @@
             </repositories>
             <pluginRepositories>
                 <pluginRepository>
-                    <id>spring.snapshots</id>
-                    <url>https://repo.spring.io/snapshot/</url>
-                    <name>Spring Snapshot Repo</name>
-                    <snapshots>
-                        <enabled>true</enabled>
-                    </snapshots>
-                    <releases>
-                        <enabled>false</enabled>
-                    </releases>
-                </pluginRepository>
-                <pluginRepository>
                     <id>spring.milestone</id>
                     <url>https://repo.spring.io/milestone/</url>
                     <name>Spring Milestone Repo</name>
                 </pluginRepository>
             </pluginRepositories>
         </profile>
+
     </profiles>
     <!--
      we turn off the deploy in the properties above, but deploy plugin will
