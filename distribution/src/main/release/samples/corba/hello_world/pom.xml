@@ -289,5 +289,9 @@
             <artifactId>junit</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.glassfish.corba</groupId>
+            <artifactId>glassfish-corba-orb</artifactId>
+        </dependency>
     </dependencies>
 </project>
