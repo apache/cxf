@@ -161,11 +161,6 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-javascript-tests</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-management</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -286,16 +281,6 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-rs-service-description-openapi-v3</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-                        <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-rs-service-description-common-openapi</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-rs-service-description-swagger</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -317,11 +302,6 @@
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-rs-mp-client</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-security</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -431,7 +411,7 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-servlet-compatible</artifactId>
+                <artifactId>cxf-rt-security</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -502,46 +482,6 @@
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-tools-wsdlto-frontend-jaxws</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-tools-wsdlto-test</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-wsdl-validator-plugin</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-codegen-plugin</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-java2wadl-plugin</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-java2ws-plugin</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-wadl2java-plugin</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-java2swagger-plugin</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-corbatools-maven-plugin</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -624,11 +564,6 @@
             <dependency>
                 <groupId>org.apache.cxf.services.xkms</groupId>
                 <artifactId>cxf-services-xkms-features</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf.services.xkms</groupId>
-                <artifactId>cxf-services-xkms-itests</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
