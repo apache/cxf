@@ -21,6 +21,8 @@ package org.apache.cxf.systest.jaxrs.extraction;
 
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -54,15 +56,25 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.RAMDirectory;
+import org.apache.lucene.store.MMapDirectory;
 import org.apache.tika.parser.pdf.PDFParser;
 
 @Path("/catalog")
 public class BookCatalog {
     private final TikaLuceneContentExtractor extractor = new TikaLuceneContentExtractor(new PDFParser());
-    private final Directory directory = new RAMDirectory();
+    private final Directory directory;
     private final Analyzer analyzer = new StandardAnalyzer();
     private final LuceneQueryVisitor<SearchBean> visitor = createVisitor();
+    
+    public BookCatalog() {
+        try {
+            final java.nio.file.Path path = Files.createTempDirectory("catalog");
+            directory = new MMapDirectory(path);
+            path.toFile().deleteOnExit();
+        } catch (final IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
+    }
 
     @POST
     @Consumes("multipart/form-data")

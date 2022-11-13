@@ -463,7 +463,7 @@
         </dependency>
          <dependency>
             <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-common</artifactId>
+            <artifactId>lucene-analysis-common</artifactId>
             <version>${cxf.lucene.version}</version>
             <scope>test</scope>
         </dependency>
