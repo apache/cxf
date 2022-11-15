@@ -40,6 +40,10 @@ import static org.junit.Assert.assertNotEquals;
 
 public class AttachmentUtilTest {
 
+    // Yet RFC822 allows more characters in domain-literal,
+    // this regex is enough to check that the fallback domain is compliant
+    public static final String CONTENT_ID_WITH_ALPHA_NUMERIC_DOMAIN_PATTERN = ".+@\\w+(\\.\\w+)*";
+
     @Test
     public void testContendDispositionFileNameNoQuotes() {
         assertEquals("a.txt",
@@ -141,9 +145,7 @@ public class AttachmentUtilTest {
     public void testCreateContentIDWithNullDomainNamePassed() {
         String actual = AttachmentUtil.createContentID(null);
 
-        // Yet RFC822 allows more characters in domain-literal,
-        // this regex is enough to check that the fallback domain is compliant
-        assertThat(actual, matchesPattern(".+@\\w+(\\.\\w+)*"));
+        assertThat(actual, matchesPattern(CONTENT_ID_WITH_ALPHA_NUMERIC_DOMAIN_PATTERN));
     }
 
     @Test
@@ -176,14 +178,13 @@ public class AttachmentUtilTest {
     }
 
     @Test
-    @Ignore //TODO:8698 Content-Id should contain valid domain, but IPv6 input results in URL-encoded string
     public void testCreateContentIDWithIPv6BasedUrlPassed() {
         String domain = "[2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d]";
         String url = "http://" + domain + "/a/b/c";
 
         String actual = AttachmentUtil.createContentID(url);
 
-        assertThat(actual, endsWith("@" + domain));
+        assertThat(actual, matchesPattern(CONTENT_ID_WITH_ALPHA_NUMERIC_DOMAIN_PATTERN));
     }
 
     private CachedOutputStream testSetStreamedAttachmentProperties(final String property, final Object value)
