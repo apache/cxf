@@ -291,9 +291,9 @@ public class MessageListenerTest {
             return new ConfigurationImpl()
                     .setSecurityEnabled(false)
                     .setPersistenceEnabled(false)
-                    .setAddressQueueScanPeriod(1)
+                    .setAddressQueueScanPeriod(0)
                     .addAcceptorConfiguration("#", "vm://0")
-                    .addAddressesSetting("#",
+                    .addAddressSetting("#",
                             new AddressSettings()
                                     .setMaxDeliveryAttempts(2)
                                     .setRedeliveryDelay(500L)
