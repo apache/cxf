@@ -138,7 +138,7 @@ public class AttachmentUtilTest {
     }
 
     @Test
-    public void testCreateContentIDWithNullDomainNamePassed() throws Exception {
+    public void testCreateContentIDWithNullDomainNamePassed() {
         String actual = AttachmentUtil.createContentID(null);
 
         // Yet RFC822 allows more characters in domain-literal,
@@ -147,7 +147,7 @@ public class AttachmentUtilTest {
     }
 
     @Test
-    public void testCreateContentIDWithDomainNamePassed() throws Exception {
+    public void testCreateContentIDWithDomainNamePassed() {
         String domain = "subdomain.example.com";
 
         String actual = AttachmentUtil.createContentID(domain);
@@ -156,7 +156,7 @@ public class AttachmentUtilTest {
     }
 
     @Test
-    public void testCreateContentIDWithUrlPassed() throws Exception {
+    public void testCreateContentIDWithUrlPassed() {
         String domain = "subdomain.example.com";
         String url = "https://" + domain + "/a/b/c";
 
@@ -166,7 +166,7 @@ public class AttachmentUtilTest {
     }
 
     @Test
-    public void testCreateContentIDWithIPv4BasedUrlPassed() throws Exception {
+    public void testCreateContentIDWithIPv4BasedUrlPassed() {
         String domain = "127.0.0.1";
         String url = "https://" + domain + "/a/b/c";
 
@@ -177,7 +177,7 @@ public class AttachmentUtilTest {
 
     @Test
     @Ignore //TODO:8698 Content-Id should contain valid domain, but IPv6 input results in URL-encoded string
-    public void testCreateContentIDWithIPv6BasedUrlPassed() throws Exception {
+    public void testCreateContentIDWithIPv6BasedUrlPassed() {
         String domain = "[2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d]";
         String url = "http://" + domain + "/a/b/c";
 
