@@ -247,7 +247,7 @@ public final class AttachmentUtil {
      * @param ns namespace. If null, falls back to "cxf.apache.org"
      * @return Content ID
      */
-    public static String createContentID(String ns) throws UnsupportedEncodingException {
+    public static String createContentID(String ns) {
         // tend to change
         String cid = "cxf.apache.org";
         if (ns != null && !ns.isEmpty()) {
@@ -264,7 +264,7 @@ public final class AttachmentUtil {
             }
         }
         return ATT_UUID + '-' + Integer.toString(COUNTER.incrementAndGet()) + '@'
-            + URLEncoder.encode(cid, StandardCharsets.UTF_8.name());
+            + URLEncoder.encode(cid, StandardCharsets.UTF_8);
     }
 
     public static String getUniqueBoundaryValue() {
@@ -504,12 +504,7 @@ public final class AttachmentUtil {
         source.setContentType(mimeType);
         DataHandler handler = new DataHandler(source);
 
-        String id;
-        try {
-            id = AttachmentUtil.createContentID(elementNS);
-        } catch (UnsupportedEncodingException e) {
-            throw new Fault(e);
-        }
+        String id = AttachmentUtil.createContentID(elementNS);
         AttachmentImpl att = new AttachmentImpl(id, handler);
         att.setXOP(isXop);
         return att;
@@ -544,12 +539,7 @@ public final class AttachmentUtil {
         //      ignore, just do the normal attachment thing
         }
 
-        String id;
-        try {
-            id = AttachmentUtil.createContentID(elementNS);
-        } catch (UnsupportedEncodingException e) {
-            throw new Fault(e);
-        }
+        String id = AttachmentUtil.createContentID(elementNS);
         AttachmentImpl att = new AttachmentImpl(id, handler);
         if (!StringUtils.isEmpty(handler.getName())) {
             //set Content-Disposition attachment header if filename isn't null
