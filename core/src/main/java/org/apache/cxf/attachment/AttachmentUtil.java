@@ -45,6 +45,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.activation.CommandInfo;
 import javax.activation.CommandMap;
@@ -80,6 +81,13 @@ public final class AttachmentUtil {
     private static final CommandMap DEFAULT_COMMAND_MAP = CommandMap.getDefaultCommandMap();
     private static final MailcapCommandMap COMMAND_MAP = new EnhancedMailcapCommandMap();
 
+    /**
+     * Yet <a href="https://datatracker.ietf.org/doc/html/rfc822#appendix-D">RFC-822 Appendix D (ALPHABETICAL LISTING OF SYNTAX RULES)</a>
+     * allows more characters in domain-literal,
+     * this regex is valid to check that the parsed domain is compliant,
+     * although it is stricter
+     */
+    private static final Pattern ALPHA_NUMERIC_DOMAIN_PATTERN = Pattern.compile("^\\w+(\\.\\w+)*$");
     static final class EnhancedMailcapCommandMap extends MailcapCommandMap {
         @Override
         public synchronized DataContentHandler createDataContentHandler(
@@ -253,20 +261,25 @@ public final class AttachmentUtil {
         // tend to change
         String cid = "cxf.apache.org";
         if (ns != null && !ns.isEmpty()) {
+            if (isAlphaNumericDomain(ns)) {
+                cid = ns;
+            }
             try {
                 URI uri = new URI(ns);
                 String host = uri.getHost();
-                if (host != null) {
+                if (host != null && isAlphaNumericDomain(host)) {
                     cid = host;
-                } else {
-                    cid = ns;
                 }
             } catch (Exception e) {
-                cid = ns;
+                // Could not parse domain => use fallback value
             }
         }
         return ATT_UUID + '-' + Integer.toString(COUNTER.incrementAndGet()) + '@'
             + URLEncoder.encode(cid, StandardCharsets.UTF_8);
+    }
+
+    private static boolean isAlphaNumericDomain(String string) {
+        return ALPHA_NUMERIC_DOMAIN_PATTERN.matcher(string).matches();
     }
 
     public static String getUniqueBoundaryValue() {
