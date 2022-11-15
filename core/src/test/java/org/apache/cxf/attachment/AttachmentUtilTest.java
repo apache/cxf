@@ -26,11 +26,15 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
@@ -131,6 +135,55 @@ public class AttachmentUtilTest {
     @Test
     public void testCreateContentID() throws Exception {
         assertNotEquals(AttachmentUtil.createContentID(null), AttachmentUtil.createContentID(null));
+    }
+
+    @Test
+    public void testCreateContentIDWithNullDomainNamePassed() throws Exception {
+        String actual = AttachmentUtil.createContentID(null);
+
+        // Yet RFC822 allows more characters in domain-literal,
+        // this regex is enough to check that the fallback domain is compliant
+        assertThat(actual, matchesPattern(".+@\\w+(\\.\\w+)*"));
+    }
+
+    @Test
+    public void testCreateContentIDWithDomainNamePassed() throws Exception {
+        String domain = "subdomain.example.com";
+
+        String actual = AttachmentUtil.createContentID(domain);
+
+        assertThat(actual, endsWith("@" + domain));
+    }
+
+    @Test
+    public void testCreateContentIDWithUrlPassed() throws Exception {
+        String domain = "subdomain.example.com";
+        String url = "https://" + domain + "/a/b/c";
+
+        String actual = AttachmentUtil.createContentID(url);
+
+        assertThat(actual, endsWith("@" + domain));
+    }
+
+    @Test
+    public void testCreateContentIDWithIPv4BasedUrlPassed() throws Exception {
+        String domain = "127.0.0.1";
+        String url = "https://" + domain + "/a/b/c";
+
+        String actual = AttachmentUtil.createContentID(url);
+
+        assertThat(actual, endsWith("@" + domain));
+    }
+
+    @Test
+    @Ignore //TODO:8698 Content-Id should contain valid domain, but IPv6 input results in URL-encoded string
+    public void testCreateContentIDWithIPv6BasedUrlPassed() throws Exception {
+        String domain = "[2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d]";
+        String url = "http://" + domain + "/a/b/c";
+
+        String actual = AttachmentUtil.createContentID(url);
+
+        assertThat(actual, endsWith("@" + domain));
     }
 
     private CachedOutputStream testSetStreamedAttachmentProperties(final String property, final Object value)

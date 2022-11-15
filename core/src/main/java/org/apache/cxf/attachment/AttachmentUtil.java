@@ -232,6 +232,26 @@ public final class AttachmentUtil {
         }
     }
 
+    /**
+     * Creates Content ID from {@link #ATT_UUID} and given namespace
+     * <p>
+     * Example:
+     * <pre>6976d00d-740c-48ed-b63d-8c56707544f7-1@example.com</pre>
+     * <p>
+     * <a href="https://datatracker.ietf.org/doc/html/rfc2392#section-2">RFC-2392 Section 2 (The MID and CID URL Schemes)</a>
+     * specifies Content ID as:
+     * <pre>
+     *   content-id = url-addr-spec
+     *   url-addr-spec = addr-spec ; URL encoding of RFC 822 addr-spec
+     * </pre>
+     * <a href="https://datatracker.ietf.org/doc/html/rfc822#appendix-D">RFC-822 Appendix D (ALPHABETICAL LISTING OF SYNTAX RULES)</a>:
+     * <pre>
+     *   addr-spec = local-part "@" domain ; global address
+     * </pre>
+     *
+     * @param ns namespace. If null, falls back to "cxf.apache.org"
+     * @return Content ID
+     */
     public static String createContentID(String ns) throws UnsupportedEncodingException {
         // tend to change
         String cid = "cxf.apache.org";
