@@ -31,7 +31,6 @@
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <cxf.tomcat.version>7.0.96</cxf.tomcat.version>
     </properties>
     <build>
         <plugins>
@@ -107,6 +106,17 @@
                         <version>${cxf.tomcat.version}</version>
                     </dependency>
                 </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <configuration>
+                    <rules>
+                        <requireJavaVersion>
+                            <version>17</version>
+                        </requireJavaVersion>
+                    </rules>
+                </configuration>
             </plugin>
         </plugins>
     </build>

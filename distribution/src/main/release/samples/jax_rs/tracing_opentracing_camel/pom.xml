@@ -31,7 +31,6 @@
     
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <cxf.camel.version>2.24.0</cxf.camel.version>
     </properties>
     
     <profiles>
@@ -214,4 +213,20 @@
             <artifactId>jackson-jakarta-rs-json-provider</artifactId>
         </dependency>
     </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <configuration>
+                    <rules>
+                        <requireJavaVersion>
+                            <version>17</version>
+                        </requireJavaVersion>
+                    </rules>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

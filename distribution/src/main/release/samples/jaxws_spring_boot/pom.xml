@@ -10,6 +10,7 @@
     <artifactId>spring-boot-sample-ws-cxf</artifactId>
     <name>Spring Boot CXF Web Services Sample</name>
     <description>Spring Boot CXF Web Services Sample</description>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -101,6 +102,18 @@
                             <include>${project.build.finalName}.jar</include>
                         </resource>
                     </resources>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <configuration>
+                    <rules>
+                        <requireJavaVersion>
+                            <version>17</version>
+                        </requireJavaVersion>
+                    </rules>
                 </configuration>
             </plugin>
         </plugins>

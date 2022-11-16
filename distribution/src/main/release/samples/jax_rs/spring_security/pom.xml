@@ -31,11 +31,22 @@
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <aspectj.version>1.9.1</aspectj.version>
-        <spring.security.version>5.3.4.RELEASE</spring.security.version>
     </properties>
     <build>
         <finalName>JAXRSSpringSecurity</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <configuration>
+                    <rules>
+                        <requireJavaVersion>
+                            <version>17</version>
+                        </requireJavaVersion>
+                    </rules>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
     <profiles>
         <profile>
@@ -125,22 +136,20 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-config</artifactId>
-            <version>${spring.security.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
-            <version>${spring.security.version}</version>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
-            <version>${aspectj.version}</version>
+            <version>${cxf.aspectj.version}</version>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
-            <version>${aspectj.version}</version>
+            <version>${cxf.aspectj.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>

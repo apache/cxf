@@ -11,9 +11,6 @@
     <name>Spring Boot CXF REST Scan Application Client</name>
     <description>Spring Boot CXF REST Scan Application Client</description>
 
-    <properties>
-        <cxf.zest.version>2.1</cxf.zest.version>
-    </properties>
     <dependencies>
         <!-- CXF JAX-RS Client -->
         <dependency>
@@ -66,4 +63,19 @@
             </build>
         </profile>
     </profiles>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <configuration>
+                    <rules>
+                        <requireJavaVersion>
+                            <version>17</version>
+                        </requireJavaVersion>
+                    </rules>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
