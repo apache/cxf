@@ -165,7 +165,7 @@
         <cxf.kerby.version>2.0.2</cxf.kerby.version>
         <cxf.littleproxy.version>1.1.2</cxf.littleproxy.version>
         <cxf.logback.classic.version>1.2.10</cxf.logback.classic.version>
-        <cxf.lucene.version>8.11.1</cxf.lucene.version>
+        <cxf.lucene.version>8.11.2</cxf.lucene.version>
         <cxf.maven.core.version>3.6.3</cxf.maven.core.version>
         <cxf.micrometer.version>1.8.12</cxf.micrometer.version>
         <cxf.microprofile.config.version>2.0</cxf.microprofile.config.version>

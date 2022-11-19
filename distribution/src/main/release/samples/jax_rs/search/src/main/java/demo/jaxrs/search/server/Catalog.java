@@ -80,8 +80,8 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.store.ByteBuffersDirectory;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.RAMDirectory;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.parser.odf.OpenDocumentParser;
 import org.apache.tika.parser.pdf.PDFParser;
@@ -91,7 +91,7 @@ public class Catalog {
     private final TikaLuceneContentExtractor extractor = new TikaLuceneContentExtractor(
         Arrays.< Parser >asList(new PDFParser(), new OpenDocumentParser()),
         new LuceneDocumentMetadata());
-    private final Directory directory = new RAMDirectory();
+    private final Directory directory = new ByteBuffersDirectory();
     private final Analyzer analyzer = new StandardAnalyzer();
     private final Storage storage;
     private final LuceneQueryVisitor<SearchBean> visitor;

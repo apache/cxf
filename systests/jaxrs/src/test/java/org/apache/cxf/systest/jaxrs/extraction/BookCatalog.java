@@ -54,14 +54,14 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.store.ByteBuffersDirectory;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.RAMDirectory;
 import org.apache.tika.parser.pdf.PDFParser;
 
 @Path("/catalog")
 public class BookCatalog {
     private final TikaLuceneContentExtractor extractor = new TikaLuceneContentExtractor(new PDFParser());
-    private final Directory directory = new RAMDirectory();
+    private final Directory directory = new ByteBuffersDirectory();
     private final Analyzer analyzer = new StandardAnalyzer();
     private final LuceneQueryVisitor<SearchBean> visitor = createVisitor();
 
