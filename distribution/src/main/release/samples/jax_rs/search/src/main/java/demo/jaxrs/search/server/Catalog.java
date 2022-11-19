@@ -26,8 +26,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -82,8 +80,8 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.store.ByteBuffersDirectory;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.MMapDirectory;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.parser.odf.OpenDocumentParser;
 import org.apache.tika.parser.pdf.PDFParser;
@@ -93,7 +91,7 @@ public class Catalog {
     private final TikaLuceneContentExtractor extractor = new TikaLuceneContentExtractor(
         Arrays.< Parser >asList(new PDFParser(), new OpenDocumentParser()),
         new LuceneDocumentMetadata());
-    private final Directory directory;
+    private final Directory directory = new ByteBuffersDirectory();
     private final Analyzer analyzer = new StandardAnalyzer();
     private final Storage storage;
     private final LuceneQueryVisitor<SearchBean> visitor;
@@ -107,15 +105,6 @@ public class Catalog {
     public Catalog(final Storage storage) throws IOException {
         this.storage = storage;
         this.visitor = createVisitor();
-
-        try {
-            final java.nio.file.Path path = Files.createTempDirectory("search-demo");
-            directory = new MMapDirectory(path);
-            path.toFile().deleteOnExit();
-        } catch (final IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
-
         initIndex();
     }
 
