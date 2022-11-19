@@ -30,7 +30,6 @@
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <cxf.lucene.version>8.2.0</cxf.lucene.version>
     </properties>
     <profiles>
         <profile>
@@ -119,7 +118,7 @@
         </dependency>
          <dependency>
             <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-common</artifactId>
+            <artifactId>lucene-analysis-common</artifactId>
             <version>${cxf.lucene.version}</version>
         </dependency>
         <dependency>
