@@ -32,11 +32,6 @@
         <!-- don't deploy the samples, kind of pointless -->
         <maven.deploy.skip>true</maven.deploy.skip>
         <maven.test.skip>true</maven.test.skip>
-        <narayana.spring.boot.version>2.1.0</narayana.spring.boot.version>
-        <narayana.version>5.9.0.Final</narayana.version>
-        <version.org.jboss.ws>1.0.2.Final</version.org.jboss.ws>
-        <jbossws-cxf.version>5.2.4.Final</jbossws-cxf.version>
-        <h2.version>2.1.214</h2.version>
     </properties>
     <dependencies>
         <dependency>
@@ -66,35 +61,35 @@
         <dependency>
             <groupId>me.snowdrop</groupId>
             <artifactId>narayana-spring-boot-starter</artifactId>
-            <version>${narayana.spring.boot.version}</version>
+            <version>${cxf.narayana.spring.boot.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.narayana</groupId>
+                    <artifactId>jbosstxbridge</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.narayana</groupId>
+                    <artifactId>jbosstxts</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.narayana.jta</groupId>
+                    <artifactId>narayana-jta</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.narayana.jta</groupId>
+            <artifactId>narayana-jta-jakarta</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jboss.narayana.xts</groupId>
-            <artifactId>jbossxts</artifactId>
-            <version>${narayana.version}</version>
+            <artifactId>jbossxts-jakarta</artifactId>
+            <version>${cxf.jboss.narayana.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.narayana</groupId>
-            <artifactId>jbosstxbridge</artifactId>
-            <version>${narayana.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.ws</groupId>
-            <artifactId>jbossws-api</artifactId>
-            <version>${version.org.jboss.ws}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.ws.cxf</groupId>
-            <artifactId>jbossws-cxf-client</artifactId>
-            <version>${jbossws-cxf.version}</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
+            <artifactId>jbosstxbridge-jakarta</artifactId>
+            <version>${cxf.jboss.narayana.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -104,7 +99,7 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>${h2.version}</version>
+            <version>${cxf.h2.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -132,4 +127,19 @@
             </properties>
         </profile>
     </profiles>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <configuration>
+                    <rules>
+                        <requireJavaVersion>
+                            <version>17</version>
+                        </requireJavaVersion>
+                    </rules>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

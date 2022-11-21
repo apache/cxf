@@ -28,6 +28,7 @@
         <artifactId>cxf-samples</artifactId>
         <version>4.0.0-SNAPSHOT</version>
     </parent>
+
     <build>
         <plugins>
             <plugin>
@@ -79,6 +80,17 @@
                             </properties>
                         </deployable>
                     </deployables>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <configuration>
+                    <rules>
+                        <requireJavaVersion>
+                            <version>17</version>
+                        </requireJavaVersion>
+                    </rules>
                 </configuration>
             </plugin>
         </plugins>
