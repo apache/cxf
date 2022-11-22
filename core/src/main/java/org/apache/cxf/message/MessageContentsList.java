@@ -27,6 +27,15 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.MessagePartInfo;
 
 public class MessageContentsList extends ArrayList<Object> {
+
+    /**
+     * Indicates that the element of the underlying list is absent.
+     * This is necessary for the elements to keep their original
+     * indexes within this list when some preceding elements
+     * are not populated or deleted.
+     * 
+     * @see {@link #get(MessagePartInfo)}, {@link #remove(MessagePartInfo)}
+     */
     public static final Object REMOVED_MARKER = new Object();
     private static final long serialVersionUID = -5780720048950696258L;
 
@@ -53,6 +62,7 @@ public class MessageContentsList extends ArrayList<Object> {
         return (MessageContentsList)o;
     }
 
+    @Override
     public Object set(int idx, Object value) {
         ensureSize(idx);
         return super.set(idx, value);
@@ -76,11 +86,46 @@ public class MessageContentsList extends ArrayList<Object> {
         return super.get(key.getIndex()) != REMOVED_MARKER;
     }
 
+    /**
+     * @param key the key whose associated element is to be returned.
+     * @return the element to which the index property of the specified key
+     * is mapped, or {@code null} if mapped element is marked as removed.
+     */
     public Object get(MessagePartInfo key) {
         Object o = super.get(key.getIndex());
         return o == REMOVED_MARKER ? null : o;
     }
+
+    /**
+     * Marks corresponding element as removed, indicating absent value,
+     * so subsequent {@code get(MessagePartInfo)} for the same key return null.
+     * @param key the key whose associated element is to be marked as removed.
+     */
     public void remove(MessagePartInfo key) {
         put(key, REMOVED_MARKER);
     }
+
+    /**
+     * Allocates a new array containing the elements of the underlying list.
+     *
+     * @return an array containing all the elements of this list which are not
+     * marked as removed and {@code null} instead of those elements which are
+     * marked as removed, producing the same sequence of the elements as when
+     * sequentially iterating through underlying list using {@code get(int)}.
+     *                                                                              
+     * @see {@link #get(MessagePartInfo)}
+     */
+    @Override
+    public Object[] toArray() {
+        final int size = size();
+        Object[] array = new Object[size];
+        for (int idx = 0; idx < size; ++idx) {
+            Object o = super.get(idx);
+            if (o != REMOVED_MARKER) {
+                array[idx] = o;
+            }
+        }
+        return array;
+    }
+
 }
