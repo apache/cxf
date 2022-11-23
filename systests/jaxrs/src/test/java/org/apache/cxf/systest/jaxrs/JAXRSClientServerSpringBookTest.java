@@ -150,6 +150,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         assertFalse(s.contains(";a=b"));
         assertTrue(s.contains("<a href=\"http://localhost:" + PORT + "/the/"));
     }
+
     @Test
     public void testGetServicesPageWithServletPatternMatchOnly2() throws Exception {
         final String address = "http://localhost:" + PORT + "/services;a=b;/list;a=b/;a=b";
@@ -159,6 +160,15 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         assertTrue(s.contains("<title>CXF - Service list</title>"));
         assertFalse(s.contains(";a=b"));
         assertTrue(s.contains("<a href=\"http://localhost:" + PORT + "/services/list/"));
+    }
+
+    @Test
+    public void testStaticResourcesWithRedirectQueryCheck() throws Exception {
+        final String address = "http://localhost:" + PORT + "/services/?.html";
+        WebClient wc = WebClient.create(address).accept("text/*");
+        String s = wc.get(String.class);
+        // Check we don't have a directory listing
+        assertFalse(s.contains("META-INF"));
     }
 
     @Test
