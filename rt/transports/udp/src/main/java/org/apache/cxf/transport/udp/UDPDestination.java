@@ -202,7 +202,9 @@ public class UDPDestination extends AbstractDestination {
                     NetworkInterface ni = ifcs.nextElement();
                     if (ni.supportsMulticast() && ni.isUp()) {
                         for (InterfaceAddress ia : ni.getInterfaceAddresses()) {
-                            if (ia.getAddress() instanceof java.net.Inet4Address && !ia.getAddress().isLoopbackAddress()
+                            // Ignore any virtual interfaces created by/for a VPN connection.
+                            if (ia != null && ia.getAddress() instanceof java.net.Inet4Address
+                                    && !ia.getAddress().isLoopbackAddress()
                                     && !ni.getDisplayName().startsWith("vnic")) {
                                 possibles.add(ni);
                             }
