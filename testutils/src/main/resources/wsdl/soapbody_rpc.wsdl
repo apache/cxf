@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+  
+  http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xformat="http://cxf.apache.org/bindings/xformat" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:x1="http://apache.org/body_test/rpc/types" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:tns="http://apache.org/body_test/rpc" targetNamespace="http://apache.org/body_test/rpc" name="HelloWorld">
+    <wsdl:types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/body_test/rpc/types" targetNamespace="http://apache.org/body_test/rpc/types" elementFormDefault="qualified">
+            <simpleType name="array">
+                <list itemType="string"/>
+            </simpleType>
+        </schema>
+    </wsdl:types>
+    <wsdl:message name="sayHelloRequest">
+        <wsdl:part name="in1" type="xsd:string"/>
+        <wsdl:part name="in2" type="xsd:string"/>
+        <wsdl:part name="in3" type="x1:array"/>
+    </wsdl:message>
+    <wsdl:message name="sayHelloResponse">
+        <wsdl:part name="out" type="xsd:string"/>
+    </wsdl:message>
+    <wsdl:message name="sayHelloRequest1">
+        <wsdl:part name="in1" type="xsd:string"/>
+        <wsdl:part name="in2" type="xsd:int"/>
+        <wsdl:part name="in3" type="x1:array"/>
+    </wsdl:message>
+    <wsdl:message name="sayHelloResponse1">
+        <wsdl:part name="out" type="xsd:string"/>
+    </wsdl:message>
+    <wsdl:portType name="RPCGreeter">
+        <wsdl:operation name="sayHello">
+            <wsdl:input name="sayHelloRequest" message="tns:sayHelloRequest"/>
+            <wsdl:output name="sayHelloResponse" message="tns:sayHelloResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="sayHello1">
+            <wsdl:input name="sayHelloRequest1" message="tns:sayHelloRequest1"/>
+            <wsdl:output name="sayHelloResponse1" message="tns:sayHelloResponse1"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="Greeter_SOAPBinding" type="tns:RPCGreeter">
+        <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="sayHello">
+            <soap:operation style="rpc" soapAction="sayHello"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="sayHello1">
+            <soap:operation style="rpc" soapAction="sayHello"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="SOAPRPCBodyService">
+        <wsdl:port name="SoapRPCBodyPort" binding="tns:Greeter_SOAPBinding">
+            <soap:address location="http://localhost:9105/SoapBodyRPCContext/SoapBodyRPCPort"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

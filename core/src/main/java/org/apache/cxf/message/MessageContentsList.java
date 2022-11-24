@@ -21,7 +21,9 @@ package org.apache.cxf.message;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.MessagePartInfo;
@@ -38,6 +40,7 @@ public class MessageContentsList extends ArrayList<Object> {
      */
     public static final Object REMOVED_MARKER = new Object();
     private static final long serialVersionUID = -5780720048950696258L;
+    private final Set<Integer> removed = new HashSet<>();
 
     public MessageContentsList() {
         super(6);
@@ -65,25 +68,32 @@ public class MessageContentsList extends ArrayList<Object> {
     @Override
     public Object set(int idx, Object value) {
         ensureSize(idx);
-        return super.set(idx, value);
+
+        if (value != REMOVED_MARKER) {
+            removed.remove(idx);
+            return super.set(idx, value);
+        } else {
+            removed.add(idx);
+            return super.set(idx, null);
+        }
     }
 
     private void ensureSize(int idx) {
         while (idx >= size()) {
-            add(REMOVED_MARKER);
+            removed.add(size());
+            add(null);
         }
     }
 
     public Object put(MessagePartInfo key, Object value) {
-        ensureSize(key.getIndex());
-        return super.set(key.getIndex(), value);
+        return set(key.getIndex(), value);
     }
 
     public boolean hasValue(MessagePartInfo key) {
         if (key.getIndex() >= size()) {
             return false;
         }
-        return super.get(key.getIndex()) != REMOVED_MARKER;
+        return !removed.contains(key.getIndex());
     }
 
     /**
@@ -92,8 +102,7 @@ public class MessageContentsList extends ArrayList<Object> {
      * is mapped, or {@code null} if mapped element is marked as removed.
      */
     public Object get(MessagePartInfo key) {
-        Object o = super.get(key.getIndex());
-        return o == REMOVED_MARKER ? null : o;
+        return super.get(key.getIndex());
     }
 
     /**
@@ -104,28 +113,4 @@ public class MessageContentsList extends ArrayList<Object> {
     public void remove(MessagePartInfo key) {
         put(key, REMOVED_MARKER);
     }
-
-    /**
-     * Allocates a new array containing the elements of the underlying list.
-     *
-     * @return an array containing all the elements of this list which are not
-     * marked as removed and {@code null} instead of those elements which are
-     * marked as removed, producing the same sequence of the elements as when
-     * sequentially iterating through underlying list using {@code get(int)}.
-     *                                                                              
-     * @see {@link #get(MessagePartInfo)}
-     */
-    @Override
-    public Object[] toArray() {
-        final int size = size();
-        Object[] array = new Object[size];
-        for (int idx = 0; idx < size; ++idx) {
-            Object o = super.get(idx);
-            if (o != REMOVED_MARKER) {
-                array[idx] = o;
-            }
-        }
-        return array;
-    }
-
 }
