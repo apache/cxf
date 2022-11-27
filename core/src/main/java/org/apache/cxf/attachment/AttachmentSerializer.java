@@ -242,7 +242,14 @@ public class AttachmentSerializer {
                 //
                 String[] address = attachmentId.split("@", 2);
                 if (address.length == 2) {
-                    writer.write(attachmentId);
+                    // See please AttachmentUtil::createContentID, the domain part is URL encoded
+                    final String decoded = tryDecode(address[1], StandardCharsets.UTF_8);
+                    // If the domain part is encoded, decode it 
+                    if (!decoded.equalsIgnoreCase(address[1])) {
+                        writer.write(address[0] + "@" + decoded);
+                    } else {
+                        writer.write(attachmentId);
+                    }
                 } else {
                     writer.write(URLEncoder.encode(attachmentId, StandardCharsets.UTF_8.name()));
                 }
@@ -377,5 +384,15 @@ public class AttachmentSerializer {
     // only the % encoded character to their equivalent US-ASCII characters. 
     private static String decode(String s, Charset charset) throws UnsupportedEncodingException {
         return URLDecoder.decode(s.replaceAll("([^%])[+]", "$1%2B"), charset.name());
+    }
+
+    // Try to decode the string assuming the decoding may fail, the original string is going to
+    // be returned in this case.
+    private static String tryDecode(String s, Charset charset) {
+        try { 
+            return decode(s, charset);
+        } catch (IllegalArgumentException ex) {
+            return s;
+        }
     }
 }
