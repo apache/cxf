@@ -184,6 +184,12 @@ public class AttachmentSerializerTest {
     }
 
     @Test
+    public void testMessageMTOMCidEncoded() throws Exception {
+        doTestMessageMTOM("cid:cxf@[2001%3A0db8%3A11a3%3A09d7%3A1f34%3A8a2e%3A07a0%3A765d]",
+            "<cxf@[2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d]>");
+    }
+
+    @Test
     public void testMessageMTOMUrlDecoded() throws Exception {
         doTestMessageMTOM("test+me.xml", "<test%2Bme.xml>");
     }
